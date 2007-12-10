@@ -39,13 +39,10 @@
  */
 package org.dspace.authenticate;
 
-import java.sql.SQLException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -89,7 +86,6 @@ public class PasswordAuthentication
     public boolean canSelfRegister(Context context,
                                    HttpServletRequest request,
                                    String email)
-                                                 throws SQLException
     {
         // Is there anything set in authentication.password.domain.valid?
         String domains = ConfigurationManager.getProperty("authentication.password.domain.valid");
@@ -124,7 +120,6 @@ public class PasswordAuthentication
      */
     public void initEPerson(Context context, HttpServletRequest request,
             EPerson eperson)
-        throws SQLException
     {
     }
 
@@ -134,7 +129,6 @@ public class PasswordAuthentication
     public boolean allowSetPassword(Context context,
                                     HttpServletRequest request,
                                     String username)
-        throws SQLException
     {
         return true;
     }
@@ -195,20 +189,12 @@ public class PasswordAuthentication
                             String password,
                             String realm,
                             HttpServletRequest request)
-        throws SQLException
     {
         if (username != null && password != null)
         {
             EPerson eperson = null;
             log.info(LogManager.getHeader(context, "authenticate", "attempting password auth of user="+username));
-            try
-            {
-                eperson = EPerson.findByEmail(context, username.toLowerCase());
-            }
-            catch (AuthorizeException e)
-            {
-                // ignore exception, treat it as lookup failure.
-            }
+            eperson = EPerson.findByEmail(context, username.toLowerCase());
 
             // lookup failed.
             if (eperson == null)

@@ -466,7 +466,7 @@ function startEditItem()
 	doEditItem(itemID);
 	
 	var item = Item.find(getDSContext(),itemID);
-	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+item.getHandle(),true);
+	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+item.getExternalIdentifier().getCanonicalForm(),true);
 	getDSContext().complete();
 	item = null;
 	cocoon.exit();
@@ -485,7 +485,7 @@ function startMapItems()
 	doMapItems(collectionID);
 	
 	var collection = Collection.find(getDSContext(),collectionID);
-	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+collection.getHandle(),true);
+	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+collection.getExternalIdentifier().getCanonicalForm(),true);
     getDSContext().complete();
 	collection = null;
 	cocoon.exit();  
@@ -522,7 +522,7 @@ function startEditCollection()
 	
 	// Go back to the collection
 	var collection = Collection.find(getDSContext(),collectionID);
-	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+collection.getHandle(),true);
+	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+collection.getExternalIdentifier().getCanonicalForm(),true);
 	getDSContext().complete();
 	collection = null;
 	cocoon.exit(); 
@@ -558,7 +558,7 @@ function startEditCommunity()
 	
 	// Go back to the collection
 	var community = community.find(getDSContext(),communityID);
-	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+community.getHandle(),true);
+	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+community.getExternalIdentifier().getCanonicalForm(),true);
 	getDSContext().complete();
 	community = null;
 	cocoon.exit(); 

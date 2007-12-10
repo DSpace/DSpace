@@ -52,6 +52,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.dao.EPersonDAO;
+import org.dspace.eperson.dao.EPersonDAOFactory;
 import org.dspace.eperson.Group;
 
 /**
@@ -77,6 +79,7 @@ public class CreateAdministrator
 {
 	/** DSpace Context object */
 	private Context context;
+    private EPersonDAO dao;
 	
     /**
      * For invoking via the command line.  If called with no command line arguments,
@@ -123,6 +126,7 @@ public class CreateAdministrator
     	throws Exception
     {
     	context = new Context();
+        dao = EPersonDAOFactory.getInstance(context);
     }
     
     /**
@@ -216,7 +220,7 @@ public class CreateAdministrator
      * @param email	the email for the user
      * @param first	user's first name
      * @param last	user's last name
-     * @param ps	desired password
+     * @param pw	desired password
      * 
      * @throws Exception
      */
@@ -243,7 +247,7 @@ public class CreateAdministrator
         // if not create a new user with this email
         if (eperson == null)
         {
-            eperson = EPerson.create(context);
+            eperson = dao.create();
             eperson.setEmail(email);
             eperson.setCanLogIn(true);
             eperson.setRequireCertificate(false);
@@ -254,7 +258,7 @@ public class CreateAdministrator
     	eperson.setFirstName(first);
     	eperson.setLanguage(language);
     	eperson.setPassword(pw);
-    	eperson.update();
+    	dao.update(eperson);
     	
     	admins.addMember(eperson);
     	admins.update();

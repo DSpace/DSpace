@@ -48,6 +48,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.dspace.app.webui.servlet.DSpaceServlet;
@@ -59,6 +60,10 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.dao.EPersonDAO;
+import org.dspace.eperson.dao.EPersonDAOFactory;
+import org.dspace.eperson.dao.GroupDAO;
+import org.dspace.eperson.dao.GroupDAOFactory;
 
 /**
  * Servlet for editing groups
@@ -79,13 +84,16 @@ public class GroupEditServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
+        GroupDAO groupDAO = GroupDAOFactory.getInstance(c);
+        EPersonDAO epersonDAO = EPersonDAOFactory.getInstance(c);
+
         // Find out if there's a group parameter
         int groupID = UIUtil.getIntParameter(request, "group_id");
         Group group = null;
 
         if (groupID >= 0)
         {
-            group = Group.find(c, groupID);
+            group = groupDAO.retrieve(groupID);
         }
 
         // group is set
@@ -160,8 +168,7 @@ public class GroupEditServlet extends DSpaceServlet
 
                         if (!memberSet.contains(currentID))
                         {
-                            group.addMember(EPerson.find(c, currentID
-                                    .intValue()));
+                            group.addMember(epersonDAO.retrieve(currentID));
                         }
                     }
 
@@ -216,9 +223,7 @@ public class GroupEditServlet extends DSpaceServlet
 
                         if (!memberSet.contains(currentID))
                         {
-                            group
-                                    .addMember(Group.find(c, currentID
-                                            .intValue()));
+                            group.addMember(groupDAO.retrieve(currentID));
                         }
                     }
 
@@ -258,7 +263,7 @@ public class GroupEditServlet extends DSpaceServlet
                 AuthorizeManager.authorizeAction(c, group, Constants.WRITE);
 
                 // delete group, return to group-list.jsp
-                group.delete();
+                groupDAO.delete(group.getID());
 
                 showMainPage(c, request, response);
             }
@@ -281,10 +286,10 @@ public class GroupEditServlet extends DSpaceServlet
 
             if (button.equals("submit_add"))
             {
-                group = Group.create(c);
+                group = groupDAO.create();
 
                 group.setName("new group" + group.getID());
-                group.update();
+                groupDAO.update(group);
 
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
@@ -305,11 +310,10 @@ public class GroupEditServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        Group[] groups = Group.findAll(c, Group.NAME);
+        GroupDAO dao = GroupDAOFactory.getInstance(c);
+        List<Group> groups = dao.getGroups(Group.NAME);
 
-        // if( groups == null ) { System.out.println("groups are null"); }
-        // else System.out.println("# of groups: " + groups.length);
-        request.setAttribute("groups", groups);
+        request.setAttribute("groups", (Group[]) groups.toArray(new Group[0]));
 
         JSPManager.showJSP(request, response, "/tools/group-list.jsp");
         c.complete();

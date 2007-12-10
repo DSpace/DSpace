@@ -193,9 +193,9 @@ public class TableRowIterator
      * @exception SQLException -
      *                If a database error occurs while fetching values
      */
-    public List toList() throws SQLException
+    public List<TableRow> toList() throws SQLException
     {
-        List resultsList = new ArrayList();
+        List<TableRow> resultsList = new ArrayList<TableRow>();
 
         while (hasNext())
         {

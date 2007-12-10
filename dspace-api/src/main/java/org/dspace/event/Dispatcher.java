@@ -42,7 +42,6 @@ package org.dspace.event;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.dspace.core.Context;

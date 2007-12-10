@@ -42,19 +42,23 @@ package org.dspace.core;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.dao.GroupDAO;
+import org.dspace.eperson.dao.GroupDAOFactory;
+import org.dspace.event.Dispatcher;
 import org.dspace.event.Event;
 import org.dspace.event.EventManager;
-import org.dspace.event.Dispatcher;
-import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.dao.GlobalDAO;
+import org.dspace.storage.dao.GlobalDAOFactory;
 
 /**
  * Class representing the context of a particular DSpace operation. This stores
@@ -71,14 +75,17 @@ import org.dspace.storage.rdbms.DatabaseManager;
  * The context object is also used as a cache for CM API objects.
  * 
  * 
+ * @author James Rutherford
  * @version $Revision$
  */
 public class Context
 {
     private static final Logger log = Logger.getLogger(Context.class);
 
-    /** Database connection */
-    private Connection connection;
+    /** Global DAO object */
+    private GlobalDAO dao;
+
+    private GroupDAO groupDAO;
 
     /** Current user - null means anonymous access */
     private EPerson currentUser;
@@ -93,10 +100,10 @@ public class Context
     private boolean ignoreAuth;
 
     /** Object cache for this context */
-    private Map objectCache;
+    private Map<String, Object> objectCache;
 
     /** Group IDs of special groups user is a member of */
-    private List specialGroups;
+    private List<Integer> specialGroups;
     
     /** Content events */
     private List<Event> events = null;
@@ -113,17 +120,26 @@ public class Context
      */
     public Context() throws SQLException
     {
-        // Obtain a non-auto-committing connection
-        connection = DatabaseManager.getConnection();
-        connection.setAutoCommit(false);
+        dao = GlobalDAOFactory.getInstance();
+        groupDAO = GroupDAOFactory.getInstance(this);
 
         currentUser = null;
         currentLocale = I18nUtil.DEFAULTLOCALE;
         extraLogInfo = "";
         ignoreAuth = false;
 
-        objectCache = new HashMap();
-        specialGroups = new ArrayList();
+        objectCache = new HashMap<String, Object>();
+        specialGroups = new ArrayList<Integer>();
+    }
+
+    /**
+     * Get the top-level DAO associated with the context
+     * 
+     * @return the dao
+     */
+    public GlobalDAO getGlobalDAO()
+    {
+        return dao;
     }
 
     /**
@@ -131,9 +147,10 @@ public class Context
      * 
      * @return the database connection
      */
+    @Deprecated
     public Connection getDBConnection()
     {
-        return connection;
+        return dao.getConnection();
     }
 
     /**
@@ -174,7 +191,7 @@ public class Context
     /**
      *  set the current Locale
      *  
-     *  @param Locale
+     *  @param locale
      *          the current Locale
      */
     public void setCurrentLocale(Locale locale)
@@ -244,19 +261,11 @@ public class Context
      */
     public void complete() throws SQLException
     {
-        // FIXME: Might be good not to do a commit() if nothing has actually
-        // been written using this connection
-        try
-        {
-            // Commit any changes made as part of the transaction
-            commit();
-        }
-        finally
-        {
-            // Free the connection
-            DatabaseManager.freeConnection(connection);
-            connection = null;
-        }
+        // We need to commit first to complete the event processing
+        // TODO this may be temporary - MRD
+        commit();
+        
+        dao.endTransaction();
     }
 
     /**
@@ -267,35 +276,50 @@ public class Context
      *                if there was an error completing the database transaction
      *                or closing the connection
      */
-    public void commit() throws SQLException {
-        // Commit any changes made as part of the transaction
+    public void commit() throws SQLException
+    {
+        
+
         Dispatcher dispatcher = null;
 
         try
         {
             if (events != null)
-            {
-
+            {    
                 if (dispName == null)
                 {
                     dispName = EventManager.DEFAULT_DISPATCHER;
                 }
-
+                
                 dispatcher = EventManager.getDispatcher(dispName);
-                connection.commit();
+                
+                // Commit any changes made as part of the transaction
+                dao.saveTransaction();
+                
                 dispatcher.dispatch(this);
             }
             else
             {
-                connection.commit();
+                // Commit any changes made as part of the transaction
+                dao.saveTransaction();
             }
-
         }
         finally
         {
-            events = null;
-            if(dispatcher != null) 
+            if (events != null)
             {
+                // FIXME: Is this pointless / harmful?
+                synchronized (events)
+                {
+                    events = null;
+                }
+            }
+            if(dispatcher != null)
+            {
+            	/* 
+            	 * TODO return dispatcher via internal method dispatcher.close();
+            	 * and remove the returnDispatcher method from EventManager.
+            	 */
                 EventManager.returnDispatcher(dispName, dispatcher);
             }
         }
@@ -304,7 +328,8 @@ public class Context
 
     /**
      * Select an event dispatcher, <code>null</code> selects the default
-     * 
+     *
+     * @param dispatcher
      */
     public void setDispatcher(String dispatcher)
     {
@@ -320,11 +345,11 @@ public class Context
      * 
      * @param event
      */
-    public void addEvent(Event event)
+    public synchronized void addEvent(Event event)
     {
         if (events == null)
         {
-            events = new ArrayList<Event>();
+            events = Collections.synchronizedList(new ArrayList<Event>());
         }
         
         events.add(event);
@@ -336,9 +361,11 @@ public class Context
      * 
      * @return List of all available events.
      */
-    public List<Event> getEvents()
+    public synchronized List<Event> getEvents()
     {
-        return events;
+        List<Event> tmp = events;
+        events = null;
+        return tmp;
     }
 
     
@@ -351,21 +378,8 @@ public class Context
      */
     public void abort()
     {
-        try
-        {
-            connection.rollback();
-        }
-        catch (SQLException se)
-        {
-            log.error(se.getMessage());
-            se.printStackTrace();
-        }
-        finally
-        {
-            DatabaseManager.freeConnection(connection);
-            connection = null;
-            events = null;
-        }
+        dao.abortTransaction();
+        events = null;
     }
 
     /**
@@ -379,7 +393,7 @@ public class Context
     public boolean isValid()
     {
         // Only return true if our DB connection is live
-        return (connection != null);
+        return dao.transactionOpen();
     }
 
     /**
@@ -433,7 +447,7 @@ public class Context
      */
     public void clearCache()
     {
-    	objectCache.clear();
+        objectCache.clear();
     }
     
     /**
@@ -444,9 +458,7 @@ public class Context
      */
     public void setSpecialGroup(int groupID)
     {
-        specialGroups.add(new Integer(groupID));
-
-        // System.out.println("Added " + groupID);
+        specialGroups.add(groupID);
     }
 
     /**
@@ -458,13 +470,7 @@ public class Context
      */
     public boolean inSpecialGroup(int groupID)
     {
-        if (specialGroups.contains(new Integer(groupID)))
-        {
-            // System.out.println("Contains " + groupID);
-            return true;
-        }
-
-        return false;
+        return specialGroups.contains(groupID);
     }
 
     /**
@@ -472,29 +478,28 @@ public class Context
      * of
      * 
      * @return
-     * @throws SQLException
      */
-    public Group[] getSpecialGroups() throws SQLException
+    public Group[] getSpecialGroups()
     {
-        List myGroups = new ArrayList();
+        List<Group> groups = new ArrayList<Group>();
 
-        Iterator i = specialGroups.iterator();
-
-        while (i.hasNext())
+        for (Integer i : specialGroups)
         {
-            myGroups.add(Group.find(this, ((Integer) i.next()).intValue()));
+            groups.add(groupDAO.retrieve(i));
         }
 
-        return (Group[]) myGroups.toArray(new Group[0]);
+        return groups.toArray(new Group[0]);
     }
 
-    protected void finalize()
+    protected void finalize() throws Throwable
     {
+        super.finalize();
+
         /*
          * If a context is garbage-collected, we roll back and free up the
          * database connection if there is one.
          */
-        if (connection != null)
+        if (dao.transactionOpen())
         {
             abort();
         }

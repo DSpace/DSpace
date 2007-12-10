@@ -42,7 +42,6 @@
 
 package org.dspace.search;
 
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -50,6 +49,7 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.uri.ObjectIdentifier;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
@@ -68,8 +68,8 @@ public class SearchConsumer implements Consumer
     // collect Items, Collections, Communities that need indexing
     private Set<DSpaceObject> objectsToUpdate = null;
 
-    // handles to delete since IDs are not useful by now.
-    private Set<String> handlesToDelete = null;
+    // oid to delete since IDs are not useful by now.
+    private Set<ObjectIdentifier> objectsToDelete = null;
 
     public void initialize() throws Exception
     {
@@ -92,28 +92,19 @@ public class SearchConsumer implements Consumer
         if (objectsToUpdate == null)
         {
             objectsToUpdate = new HashSet<DSpaceObject>();
-            handlesToDelete = new HashSet<String>();
+            objectsToDelete = new HashSet<ObjectIdentifier>();
         }
 
         int st = event.getSubjectType();
         if (!(st == Constants.ITEM || st == Constants.BUNDLE
                 || st == Constants.COLLECTION || st == Constants.COMMUNITY))
         {
-            log
-                    .warn("SearchConsumer should not have been given this kind of Subject in an event, skipping: "
-                            + event.toString());
+            log.warn("SearchConsumer should not have been given this "
+                    + "kind of Subject in an event, skipping: "
+                    + event.toString());
             return;
         }
-        DSpaceObject dso = null;
-        // EVENT FIXME This call to getSubjectOfEvent is catching a SQLException
-        // but other Consumers don't
-        try
-        {
-            dso = event.getSubject(ctx);
-        }
-        catch (SQLException se)
-        {
-        }
+        DSpaceObject dso = event.getSubject(ctx);
 
         // If event subject is a Bundle and event was Add or Remove,
         // transform the event to be a Modify on the owning Item.
@@ -130,7 +121,8 @@ public class SearchConsumer implements Consumer
                 dso = ((Bundle) dso).getItems()[0];
                 if (log.isDebugEnabled())
                     log.debug("Transforming Bundle event into MODIFY of Item "
-                            + dso.getHandle());
+                    // + dso.getHandle());
+                            + dso.getID());
             }
             else
                 return;
@@ -142,7 +134,8 @@ public class SearchConsumer implements Consumer
         case Event.MODIFY:
         case Event.MODIFY_METADATA:
             if (dso == null)
-                log.warn(event.getEventTypeAsString() + " event, could not get object for "
+                log.warn(event.getEventTypeAsString()
+                        + " event, could not get object for "
                         + event.getSubjectTypeAsString() + " id="
                         + String.valueOf(event.getSubjectID())
                         + ", perhaps it has been deleted.");
@@ -154,14 +147,12 @@ public class SearchConsumer implements Consumer
             if (detail == null)
                 log.warn("got null detail on DELETE event, skipping it.");
             else
-                handlesToDelete.add(detail);
+                objectsToDelete.add(ObjectIdentifier.fromString(detail));
             break;
         default:
-            log
-                    .warn("SearchConsumer should not have been given a event of type="
-                            + event.getEventTypeAsString()
-                            + " on subject="
-                            + event.getSubjectTypeAsString());
+            log.warn("SearchConsumer should not have been "
+                    + "given a event of type=" + event.getEventTypeAsString()
+                    + " on subject=" + event.getSubjectTypeAsString());
             break;
         }
     }
@@ -173,62 +164,84 @@ public class SearchConsumer implements Consumer
      */
     public void end(Context ctx) throws Exception
     {
-        
-        if(objectsToUpdate != null && handlesToDelete != null)
+
+        if (objectsToUpdate != null && objectsToDelete != null)
         {
-         
-            // update the changed Items not deleted because they were on create list
+
+            // update the changed Items not deleted because they were on create
+            // list
             for (DSpaceObject iu : objectsToUpdate)
             {
                 if (iu.getType() != Constants.ITEM || ((Item) iu).isArchived())
                 {
                     // if handle is NOT in list of deleted objects, index it:
-                    String hdl = iu.getHandle();
-                    if (hdl != null && !handlesToDelete.contains(hdl))
+                    ObjectIdentifier oid = iu.getIdentifier();
+                    if (oid != null && !objectsToDelete.contains(oid))
                     {
                         try
                         {
-                            DSIndexer.indexContent(ctx, iu);
+                            DSIndexer.reIndexContent(ctx, iu);
                             if (log.isDebugEnabled())
-                                log.debug("Indexed "
+                                log.debug("re-indexed "
                                         + Constants.typeText[iu.getType()]
                                         + ", id=" + String.valueOf(iu.getID())
-                                        + ", handle=" + hdl);
+                                        + ", oid=" + oid.getCanonicalForm());
                         }
                         catch (Exception e)
                         {
-                            log.error("Failed while indexing object: ", e);
+                            log.error("Failed while re-indexing object: ", e);
+                            objectsToUpdate = null;
+                            objectsToDelete = null;
+                        }
+                    }
+                    else if (iu.getType() == Constants.ITEM && (
+                        !((Item) iu).isArchived() || ((Item) iu).isWithdrawn()))
+                    {
+                        try
+                        {
+                            // If an update to an Item removes it from the
+                            // archive we must remove it from the search indices
+                            DSIndexer.unIndexContent(ctx, oid.getObject(ctx));
+                        }
+                        catch (Exception e)
+                        {
+                            log.error("Failed while un-indexing object: "
+                                    + oid.getCanonicalForm(), e);
+                            objectsToUpdate = new HashSet<DSpaceObject>();
+                            objectsToDelete = new HashSet<ObjectIdentifier>();
                         }
                     }
                 }
             }
 
-            for (String hdl : handlesToDelete)
+            for (ObjectIdentifier oid : objectsToDelete)
             {
                 try
                 {
-                    DSIndexer.unIndexContent(ctx, hdl);
+                    DSIndexer.unIndexContent(ctx, oid.getObject(ctx));
                     if (log.isDebugEnabled())
-                        log.debug("UN-Indexed Item, handle=" + hdl);
+                        log.debug("un-indexed Item, oid="
+                                + oid.getCanonicalForm());
                 }
                 catch (Exception e)
                 {
-                    log.error("Failed while UN-indexing object: " + hdl, e);
+                    log.error("Failed while un-indexing object: "
+                            + oid.getCanonicalForm(), e);
+                    objectsToUpdate = new HashSet<DSpaceObject>();
+                    objectsToDelete = new HashSet<ObjectIdentifier>();
                 }
 
             }
 
         }
-        
+
         // "free" the resources
         objectsToUpdate = null;
-        handlesToDelete = null;
+        objectsToDelete = null;
     }
 
     public void finish(Context ctx) throws Exception
     {
         // No-op
-
     }
-
 }

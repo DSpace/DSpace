@@ -139,7 +139,7 @@ public class EditFileStep extends AbstractStep
             UIException, SQLException, IOException, AuthorizeException
     {
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit";
+		String actionURL = contextPath + "/handle/"+collection.getExternalIdentifier().getCanonicalForm() + "/submit";
 		
     	// Get the bitstream and all the various formats
 		BitstreamFormat currentFormat = bitstream.getFormat();

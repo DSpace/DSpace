@@ -71,7 +71,7 @@ public class FlowGroupUtils {
 	 * @param groupID The group id.
 	 * @return The group's name.
 	 */
-	public static String getName(Context context, int groupID) throws SQLException
+	public static String getName(Context context, int groupID)
 	{
 		if (groupID < 0)
 			return "New Group";	
@@ -91,7 +91,7 @@ public class FlowGroupUtils {
 	 * @param groupID The group's id.
 	 * @return An array of ids.
 	 */
-	public static String[] getEPeopleMembers(Context context, int groupID) throws SQLException
+	public static String[] getEPeopleMembers(Context context, int groupID)
 	{
 		// New group, just return an empty list
 		if (groupID < 0)
@@ -118,7 +118,7 @@ public class FlowGroupUtils {
 	 * @param groupID The group's id.
 	 * @return An array of ids.
 	 */
-	public static String[] getGroupMembers(Context context, int groupID) throws SQLException
+	public static String[] getGroupMembers(Context context, int groupID)
 	{
 		if (groupID < 0)
 			return new String[0];
@@ -181,7 +181,7 @@ public class FlowGroupUtils {
 	 * @param newGroupIDsArray All group members.
 	 * @return A result
 	 */
-	public static FlowResult processSaveGroup(Context context, int groupID, String newName, String[] newEPeopleIDsArray, String[] newGroupIDsArray) throws SQLException, AuthorizeException
+	public static FlowResult processSaveGroup(Context context, int groupID, String newName, String[] newEPeopleIDsArray, String[] newGroupIDsArray) throws AuthorizeException, SQLException
 	{
 		FlowResult result = new FlowResult();
 		
@@ -328,7 +328,8 @@ public class FlowGroupUtils {
 	 * @param groupIDs A list of groups to be removed.
 	 * @return A results object.
 	 */
-	public static FlowResult processDeleteGroups(Context context, String[] groupIDs) throws SQLException
+    public static FlowResult processDeleteGroups(Context context, String[] groupIDs)
+        throws AuthorizeException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(true);

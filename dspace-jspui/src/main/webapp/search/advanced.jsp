@@ -85,7 +85,7 @@
         for (int i = 0; i < communityArray.length; i++)
         {
 %>
-			<option value="<%= communityArray[i].getHandle() %>"><%= communityArray[i].getMetadata("name") %></option>
+			<option value="<%= communityArray[i].getIdentifier().getCanonicalForm() %>"><%= communityArray[i].getMetadata("name") %></option>
 <%
         }
 %>

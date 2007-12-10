@@ -194,8 +194,8 @@ public class SubmissionConfigReader
      * Returns the Item Submission process config used for a particular
      * collection, or the default if none is defined for the collection
      * 
-     * @param collectionHandle
-     *            collection's unique Handle
+     * @param collectionURI
+     *            collection's unique URI (canonical form)
      * @param isWorkflow
      *            whether or not we are loading the submission process for a
      *            workflow
@@ -204,12 +204,12 @@ public class SubmissionConfigReader
      * @throws ServletException
      *             if no default submission process configuration defined
      */
-    public SubmissionConfig getSubmissionConfig(String collectionHandle,
+    public SubmissionConfig getSubmissionConfig(String collectionURI,
             boolean isWorkflow) throws ServletException
     {
         // get the name of the submission process config for this collection
         String submitName = (String) collectionToSubmissionConfig
-                .get(collectionHandle);
+                .get(collectionURI);
         if (submitName == null)
         {
             submitName = (String) collectionToSubmissionConfig
@@ -347,9 +347,10 @@ public class SubmissionConfigReader
 
     /**
      * Process the submission-map section of the XML file. Each element looks
-     * like: <name-map collection-handle="hdl" submission-name="name" /> Extract
-     * the collection handle and item submission name, put name in hashmap keyed
-     * by the collection handle.
+     * like: <name-map collection-uri="canonical_form_uri"
+     * submission-name="name" /> Extract the collection URI (canonical form)
+     * and item submission name, put name in hashmap keyed by the collection
+     * URI.
      */
     private void processMap(Node e) throws SAXException
     {
@@ -360,13 +361,13 @@ public class SubmissionConfigReader
             Node nd = nl.item(i);
             if (nd.getNodeName().equals("name-map"))
             {
-                String id = getAttribute(nd, "collection-handle");
+                String id = getAttribute(nd, "collection-uri");
                 String value = getAttribute(nd, "submission-name");
                 String content = getValue(nd);
                 if (id == null)
                 {
                     throw new SAXException(
-                            "name-map element is missing collection-handle attribute in 'item-submission-" + getUIName() + ".xml'");
+                            "name-map element is missing collection-uri attribute in 'item-submission-" + getUIName() + ".xml'");
                 }
                 if (value == null)
                 {

@@ -40,7 +40,6 @@
 package org.dspace.app.webui.util;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Iterator;
 
 import javax.servlet.ServletException;
@@ -256,19 +255,8 @@ public class Authenticate
         
         boolean isAdmin = false;
         
-        try
-        {
-            isAdmin = AuthorizeManager.isAdmin(context);
-        }
-        catch (SQLException se)
-        {
-            log.warn("Unable to use AuthorizeManager " + se);
-        }
-        finally 
-        {
-            request.setAttribute("is.admin", new Boolean(isAdmin));
-        }
-    
+        isAdmin = AuthorizeManager.isAdmin(context);
+        request.setAttribute("is.admin", new Boolean(isAdmin));
 
         // We store the current user in the request as an EPerson object...
         request.setAttribute("dspace.current.user", eperson);

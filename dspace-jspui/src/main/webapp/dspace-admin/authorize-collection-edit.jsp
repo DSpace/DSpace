@@ -95,7 +95,7 @@
       <td align="left">
             <h1><fmt:message key="jsp.dspace-admin.authorize-collection-edit.policies">
             <fmt:param><%= collection.getMetadata("name") %></fmt:param>
-            <fmt:param>hdl:<%= collection.getHandle() %></fmt:param>
+            <fmt:param>hdl:<%= collection.getIdentifier().getCanonicalForm() %></fmt:param>
             <fmt:param><%= collection.getID() %></fmt:param>
         </fmt:message></h1>
       </td>

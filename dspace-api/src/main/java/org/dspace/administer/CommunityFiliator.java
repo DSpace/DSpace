@@ -47,16 +47,23 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
+import org.dspace.content.dao.CommunityDAO;
+import org.dspace.content.dao.CommunityDAOFactory;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.core.ArchiveManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
-import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
  * A command-line tool for setting/removing community/sub-community
- * relationships. Takes community DB Id or handle arguments as inputs.
+ * relationships. Takes community DB Id or URI canonical form arguments as
+ * inputs.
  * 
  * @author rrodgers
  * @version $Revision$
@@ -64,6 +71,8 @@ import org.dspace.storage.rdbms.DatabaseManager;
 
 public class CommunityFiliator
 {
+    private static CommunityDAO communityDAO = null;
+
     public static void main(String[] argv) throws Exception
     {
         // create an options object and populate it
@@ -75,9 +84,9 @@ public class CommunityFiliator
         options.addOption("r", "remove", false,
                 "remove a parent/child relationship");
         options.addOption("p", "parent", true,
-                "parent community (handle or database ID)");
+                "parent community (canonical form of URI or database ID)");
         options.addOption("c", "child", true,
-                "child community (handle or databaseID)");
+                "child community (canonical form of URI or databaseID)");
         options.addOption("h", "help", false, "help");
 
         CommandLine line = parser.parse(options, argv);
@@ -147,6 +156,8 @@ public class CommunityFiliator
         CommunityFiliator filiator = new CommunityFiliator();
         Context c = new Context();
 
+        communityDAO = CommunityDAOFactory.getInstance(c);
+
         // ve are superuser!
         c.setIgnoreAuthorization(true);
 
@@ -197,37 +208,10 @@ public class CommunityFiliator
     public void filiate(Context c, Community parent, Community child)
             throws SQLException, AuthorizeException, IOException
     {
-        // check that a valid filiation would be established
-        // first test - proposed child must currently be an orphan (i.e.
-        // top-level)
-        Community childDad = child.getParentCommunity();
+        ArchiveManager.move(c, child, null, parent);
 
-        if (childDad != null)
-        {
-            System.out.println("Error, child community: " + child.getID()
-                    + " already a child of: " + childDad.getID());
-            System.exit(1);
-        }
-
-        // second test - circularity: parent's parents can't include proposed
-        // child
-        Community[] parentDads = parent.getAllParents();
-
-        for (int i = 0; i < parentDads.length; i++)
-        {
-            if (parentDads[i].getID() == child.getID())
-            {
-                System.out
-                        .println("Error, circular parentage - child is parent of parent");
-                System.exit(1);
-            }
-        }
-
-        // everthing's OK
-        parent.addSubcommunity(child);
-
-        // complete the pending transaction
         c.complete();
+
         System.out.println("Filiation complete. Community: '" + parent.getID()
                 + "' is parent of community: '" + child.getID() + "'");
     }
@@ -235,50 +219,35 @@ public class CommunityFiliator
     public void defiliate(Context c, Community parent, Community child)
             throws SQLException, AuthorizeException, IOException
     {
-        // verify that child is indeed a child of parent
-        Community[] parentKids = parent.getSubcommunities();
-        boolean isChild = false;
+        ArchiveManager.move(c, child, parent, null);
 
-        for (int i = 0; i < parentKids.length; i++)
-        {
-            if (parentKids[i].getID() == child.getID())
-            {
-                isChild = true;
-
-                break;
-            }
-        }
-
-        if (!isChild)
-        {
-            System.out
-                    .println("Error, child community not a child of parent community");
-            System.exit(1);
-        }
-
-        // OK remove the mappings - but leave the community, which will become
-        // top-level
-        DatabaseManager.updateQuery(c,
-                "DELETE FROM community2community WHERE parent_comm_id= ? "+
-                "AND child_comm_id= ? ", parent.getID(), child.getID());
-
-        // complete the pending transaction
         c.complete();
+
         System.out.println("Defiliation complete. Community: '" + child.getID()
                 + "' is no longer a child of community: '" + parent.getID()
                 + "'");
     }
 
     private Community resolveCommunity(Context c, String communityID)
-            throws SQLException
     {
+        ExternalIdentifierDAO identifierDAO =
+            ExternalIdentifierDAOFactory.getInstance(c);
         Community community = null;
 
         if (communityID.indexOf('/') != -1)
         {
-            // has a / must be a handle
-            community = (Community) HandleManager.resolveToObject(c,
-                    communityID);
+            if (communityID.indexOf(':') == -1)
+            {
+                // has no : must be a handle
+                communityID = "hdl:" + communityID;
+                System.out.println("no namespace provided. assuming handles.");
+            }
+
+            ExternalIdentifier identifier =
+                identifierDAO.retrieve(communityID);
+
+            ObjectIdentifier oi = identifier.getObjectIdentifier();
+            community = (Community) oi.getObject(c);
 
             // ensure it's a community
             if ((community == null)
@@ -289,7 +258,7 @@ public class CommunityFiliator
         }
         else
         {
-            community = Community.find(c, Integer.parseInt(communityID));
+            community = communityDAO.retrieve(Integer.parseInt(communityID));
         }
 
         return community;

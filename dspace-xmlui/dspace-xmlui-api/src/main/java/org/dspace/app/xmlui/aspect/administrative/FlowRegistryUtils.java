@@ -51,6 +51,10 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
+import org.dspace.content.dao.MetadataFieldDAO;
+import org.dspace.content.dao.MetadataFieldDAOFactory;
+import org.dspace.content.dao.MetadataSchemaDAO;
+import org.dspace.content.dao.MetadataSchemaDAOFactory;
 import org.dspace.core.Context;
 
 /**
@@ -109,17 +113,19 @@ public class FlowRegistryUtils
 		
 		if (result.getErrors() == null)
 		{
-			MetadataSchema schema = new MetadataSchema();
+            MetadataSchemaDAO schemaDAO =
+                MetadataSchemaDAOFactory.getInstance(context);
+			MetadataSchema schema = schemaDAO.create();
 		    schema.setNamespace(namespace);
 		    schema.setName(name);
-		    schema.create(context);
+		    schemaDAO.update(schema);
 
 		    context.commit();
 		    
 		    result.setContinue(true);
 		    result.setOutcome(true);
 		    result.setMessage(T_add_metadata_schema_success_notice);   
-		    result.setParameter("schemaID", schema.getSchemaID());
+		    result.setParameter("schemaID", schema.getID());
 		}
 		
 		return result;
@@ -142,7 +148,7 @@ public class FlowRegistryUtils
 			MetadataSchema schema = MetadataSchema.find(context, Integer.valueOf(id));
 			
 			// First remove and fields in the schema
-			MetadataField[] fields = MetadataField.findAllInSchema(context, schema.getSchemaID());
+			MetadataField[] fields = MetadataField.findAllInSchema(context, schema.getID());
 			for (MetadataField field : fields)
 				field.delete(context);
 			
@@ -188,27 +194,21 @@ public class FlowRegistryUtils
 		
 		if (result.getErrors() == null)
 		{
-			try
-			{
-				
-				MetadataField field = new MetadataField();
-				field.setSchemaID(schemaID);
-				field.setElement(element);
-				field.setQualifier(qualifier);
-				field.setScopeNote(note);
-				field.create(context);
-				
-				context.commit();
-				
-				result.setContinue(true);
-				result.setOutcome(true);
-				result.setMessage(T_add_metadata_field_success_notice);
-				result.setParameter("fieldID", field.getFieldID());
-			} 
-			catch (NonUniqueMetadataException nume)
-			{
-				result.addError("duplicate_field");
-			}
+            MetadataFieldDAO fieldDAO =
+                MetadataFieldDAOFactory.getInstance(context);
+            MetadataField field = fieldDAO.create();
+            field.setSchemaID(schemaID);
+            field.setElement(element);
+            field.setQualifier(qualifier);
+            field.setScopeNote(note);
+            fieldDAO.update(field);
+            
+            context.commit();
+            
+            result.setContinue(true);
+            result.setOutcome(true);
+            result.setMessage(T_add_metadata_field_success_notice);
+            result.setParameter("fieldID", field.getID());
 			
 		}
 		
@@ -240,31 +240,25 @@ public class FlowRegistryUtils
 		
 		// Check to make sure the field is unique, sometimes the NonUniqueMetadataException is not thrown.
 		MetadataField possibleDuplicate = MetadataField.findByElement(context, schemaID, element, qualifier);
-		if (possibleDuplicate != null && possibleDuplicate.getFieldID() != fieldID)
+		if (possibleDuplicate != null && possibleDuplicate.getID() != fieldID)
 			result.addError("duplicate_field");
 		
 		if (result.getErrors() == null)
 		{	
-			try
-			{
-				// Update the metadata for a DC type
-				MetadataField field = MetadataField.find(context, fieldID);
-				field.setElement(element);
-				field.setQualifier(qualifier);
-				field.setScopeNote(note);
-				field.update(context);
-				
-				context.commit();
-				
-				result.setContinue(true);
-				result.setOutcome(true);
-				result.setMessage(T_edit_metadata_field_success_notice);
-			} 
-			catch (NonUniqueMetadataException nume)
-			{
-				// This shouldn't ever occure.
-				result.addError("duplicate_field");
-			}	
+            // Update the metadata for a DC type
+            MetadataFieldDAO fieldDAO =
+                MetadataFieldDAOFactory.getInstance(context);
+            MetadataField field = fieldDAO.retrieve(fieldID);
+            field.setElement(element);
+            field.setQualifier(qualifier);
+            field.setScopeNote(note);
+            fieldDAO.update(field);
+            
+            context.commit();
+            
+            result.setContinue(true);
+            result.setOutcome(true);
+            result.setMessage(T_edit_metadata_field_success_notice);
 		}
 		
 		return result;
@@ -334,9 +328,11 @@ public class FlowRegistryUtils
 		int count = 0;
 		for (String id : fieldIDs) 
 		{
-			MetadataField field = MetadataField.find(context, Integer.valueOf(id));
+            MetadataFieldDAO fieldDAO =
+                MetadataFieldDAOFactory.getInstance(context);
+			MetadataField field = fieldDAO.retrieve(Integer.valueOf(id));
 			field.setSchemaID(schemaID);
-			field.update(context);
+			fieldDAO.update(field);
 			count++;
 		}
 

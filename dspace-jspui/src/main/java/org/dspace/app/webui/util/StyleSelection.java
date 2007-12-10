@@ -57,7 +57,7 @@ public interface StyleSelection
      * @return the style name to use for display simple metadata of the item 
      * @throws SQLException
      */
-    public String getStyleForItem(Item item) throws SQLException;
+    public String getStyleForItem(Item item);
 
     /**
      * Get the configuration of the style passed as argument.

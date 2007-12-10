@@ -208,12 +208,14 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             String comHandle = "n/a";
             if (community != null)
             {
-                comHandle = community.getHandle();
+//                comHandle = community.getHandle();
+                comHandle = community.getIdentifier().getCanonicalForm();
             }
             String colHandle = "n/a";
             if (collection != null)
             {
-                colHandle = collection.getHandle();
+//                colHandle = collection.getHandle();
+                colHandle = collection.getIdentifier().getCanonicalForm();
             }
             
             String arguments = "type=" + type + ",order=" + order + ",value=" + value + 

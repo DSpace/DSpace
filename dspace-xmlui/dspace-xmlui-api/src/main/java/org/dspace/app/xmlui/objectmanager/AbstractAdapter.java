@@ -399,8 +399,8 @@ public abstract class AbstractAdapter
         // item its internal id. In the last case where the bitstream is not associated
         // with an item (such as a community logo) then refrence the bitstreamID directly.
         String identifier = null;
-        if (item != null && item.getHandle() != null)
-        	identifier = "handle/"+item.getHandle();
+        if (item != null && item.getExternalIdentifier().getCanonicalForm() != null)
+        	identifier = "handle/"+item.getExternalIdentifier().getCanonicalForm();
         else if (item != null)
         	identifier = "item/"+item.getID();
         else

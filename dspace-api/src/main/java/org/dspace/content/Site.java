@@ -39,18 +39,11 @@
  */
 package org.dspace.content;
 
-import java.sql.SQLException;
-import java.net.URI;
 import java.io.IOException;
-
 
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
-import org.dspace.event.Event;
 import org.dspace.authorize.AuthorizeException;
 
 /**
@@ -88,17 +81,6 @@ public class Site extends DSpaceObject
     }
 
     /**
-     * Get the Handle of the object. This may return <code>null</code>
-     *
-     * @return Handle of the object, or <code>null</code> if it doesn't have
-     *         one
-     */
-    public String getHandle()
-    {
-        return getSiteHandle();
-    }
-
-    /**
      * Static method to return site Handle without creating a Site.
      * @returns handle of the Site.
      */
@@ -115,22 +97,20 @@ public class Site extends DSpaceObject
      * @param context the context.
      * @param id integer database id, ignored.
      * @returns Site object.
+     * @deprecated
      */
     public static DSpaceObject find(Context context, int id)
-        throws SQLException
     {
         if (theSite == null)
             theSite = new Site();
         return theSite;
     }
 
-    void delete()
-        throws SQLException, AuthorizeException, IOException
+    void delete() throws AuthorizeException, IOException
     {
     }
 
-    public void update()
-        throws SQLException, AuthorizeException, IOException
+    public void update() throws AuthorizeException, IOException
     {
     }
 

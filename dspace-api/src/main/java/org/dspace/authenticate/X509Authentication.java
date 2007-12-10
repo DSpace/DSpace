@@ -51,7 +51,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 
@@ -185,7 +184,6 @@ public class X509Authentication
      *         address cannot be found in the certificate.
      */
     private static String getEmail(X509Certificate certificate)
-            throws SQLException
     {
         Principal principal = certificate.getSubjectDN();
 
@@ -305,7 +303,6 @@ public class X509Authentication
     public boolean canSelfRegister(Context context,
                                    HttpServletRequest request,
                                    String username)
-        throws SQLException
     {
         return ConfigurationManager
             .getBooleanProperty("authentication.x509.autoregister");
@@ -316,7 +313,6 @@ public class X509Authentication
      */
     public void initEPerson(Context context, HttpServletRequest request,
             EPerson eperson)
-        throws SQLException
     {
     }
 
@@ -326,7 +322,6 @@ public class X509Authentication
     public boolean allowSetPassword(Context context,
                                     HttpServletRequest request,
                                     String username)
-        throws SQLException
     {
         return false;
     }
@@ -372,7 +367,6 @@ public class X509Authentication
                             String password,
                             String realm,
                             HttpServletRequest request)
-        throws SQLException
     {
         // Obtain the certificate from the request, if any
         X509Certificate[] certs = null;
@@ -416,7 +410,14 @@ public class X509Authentication
                         AuthenticationManager.initEPerson(context,
                                 request, eperson);
                         eperson.update();
-                        context.commit();
+                        try
+                        {
+                            context.commit();
+                        }
+                        catch (java.sql.SQLException sqle)
+                        {
+                            throw new RuntimeException(sqle);
+                        }
                         context.setIgnoreAuthorization(false);
                         context.setCurrentUser(eperson);
                         return SUCCESS;

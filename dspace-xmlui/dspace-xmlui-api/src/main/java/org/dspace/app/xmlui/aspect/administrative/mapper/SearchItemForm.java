@@ -57,7 +57,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.handle.HandleManager;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
@@ -138,7 +140,7 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 			if (dcTitles != null && dcTitles.length >= 1)
 				title = dcTitles[0].value;
 
-			String url = contextPath+"/handle/"+item.getHandle();
+			String url = contextPath+"/handle/"+item.getExternalIdentifier().getCanonicalForm();
 			
 			Row row = table.addRow();
 			
@@ -177,14 +179,21 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
         queryArgs.setPageSize(Integer.MAX_VALUE);
         QueryResults results = DSQuery.doQuery(context, queryArgs);
         
+        ExternalIdentifierDAO identifierDAO =
+            ExternalIdentifierDAOFactory.getInstance(context);
 
         // Get a list of found items
         ArrayList<Item> items = new ArrayList<Item>();
         @SuppressWarnings("unchecked")
-        java.util.List<String> handles = results.getHitHandles();
-        for (String handle : handles)
+        java.util.List<String> uris = results.getHitURIs();
+//        java.util.List<String> handles = results.getHithandles();
+//        for (String handle : handles)
+        for (String uri : uris)
         {
-            DSpaceObject resultDSO = HandleManager.resolveToObject(context, handle);
+//            DSpaceObject resultDSO = HandleManager.resolveToObject(context, handle);
+            ExternalIdentifier identifier = identifierDAO.retrieve(uri);
+            DSpaceObject resultDSO =
+                identifier.getObjectIdentifier().getObject(context);
 
             if (resultDSO instanceof Item)
             {

@@ -107,28 +107,28 @@
 	<schema>dc</schema>
     <element>contributor</element>
     <qualifier>author</qualifier>
-    <scope_note></scope_note>
+    <scope_note/>
   </dc-type>
 
   <dc-type>
 	<schema>dc</schema>
     <element>contributor</element>
     <qualifier>editor</qualifier>
-    <scope_note></scope_note>
+    <scope_note/>
   </dc-type>
 
   <dc-type>
 	<schema>dc</schema>
     <element>contributor</element>
     <qualifier>illustrator</qualifier>
-    <scope_note></scope_note>
+    <scope_note/>
   </dc-type>
 
   <dc-type>
 	<schema>dc</schema>
     <element>contributor</element>
     <qualifier>other</qualifier>
-    <scope_note></scope_note>
+    <scope_note/>
   </dc-type>
 
   <dc-type>
@@ -196,6 +196,13 @@
     <qualifier>issued</qualifier>
     <scope_note>Date of publication or distribution.</scope_note>
   </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>date</element>
+        <qualifier>modified</qualifier>
+        <scope_note>Date on which the resource was changed.</scope_note>
+    </dc-type>
 
   <dc-type>
 	<schema>dc</schema>

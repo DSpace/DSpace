@@ -68,7 +68,6 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.handle.HandleManager;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
@@ -371,11 +370,12 @@ public class FlowUtils {
         // See if that gave the item a Handle. If it did,
         // the item made it into the archive, so we
         // should display a suitable page.
-        String handle = HandleManager.findHandle(context, item);
+//        String handle = HandleManager.findHandle(context, item);
 
         context.commit();
         
-        if (handle != null)
+//        if (handle != null)
+        if (item.isArchived())
         {
             return true;
         }
@@ -457,7 +457,7 @@ public class FlowUtils {
 			//Load the Submission Process for the collection this WSI is associated with
             Collection c = wsi.getCollection();
             SubmissionConfigReader subConfigReader = new SubmissionConfigReader(UI_NAME);
-            SubmissionConfig subConfig = subConfigReader.getSubmissionConfig(c.getHandle(), false);
+            SubmissionConfig subConfig = subConfigReader.getSubmissionConfig(c.getExternalIdentifier().getCanonicalForm(), false);
             
             // Set the "stage_reached" column on the workspace item
             // to the LAST page of the LAST step in the submission process 

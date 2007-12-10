@@ -110,7 +110,7 @@
 <%
 		for (int dc = 0; dc < dcTypes.length; dc++)
 		{ %>
-					<option value="<%= dcTypes[dc].getFieldID() %>"><%= dcTypes[dc].getQualifier() == null ?
+					<option value="<%= dcTypes[dc].getID() %>"><%= dcTypes[dc].getQualifier() == null ?
 					    MetadataSchema.find(UIUtil.obtainContext(request), dcTypes[dc].getSchemaID()).getName() + "." + dcTypes[dc].getElement() : MetadataSchema.find(UIUtil.obtainContext(request), dcTypes[dc].getSchemaID()).getName() + "." + dcTypes[dc].getElement() + "." + dcTypes[dc].getQualifier() %></option>
 <%      } %>
 				</select></td>

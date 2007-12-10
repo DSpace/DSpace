@@ -116,11 +116,13 @@
 	String linkBase = request.getContextPath() + "/";
 	if (collection != null)
 	{
-		linkBase = linkBase + "handle/" + collection.getHandle() + "/";
+//		linkBase = linkBase + "handle/" + collection.getHandle() + "/";
+		linkBase = collection.getIdentifier().getURL().toString() + "/";
 	}
 	if (community != null)
 	{
-		linkBase = linkBase + "handle/" + community.getHandle() + "/";
+//		linkBase = linkBase + "handle/" + community.getHandle() + "/";
+		linkBase = community.getIdentifier().getURL().toString() + "/";
 	}
 	
 	String direction = (bi.isAscending() ? "ASC" : "DESC");
@@ -174,11 +176,13 @@
 	String formaction = request.getContextPath() + "/";
 	if (collection != null)
 	{
-		formaction = formaction + "handle/" + collection.getHandle() + "/";
+//		formaction = formaction + "handle/" + collection.getHandle() + "/";
+		formaction = collection.getIdentifier().getURL().toString() + "/";
 	}
 	if (community != null)
 	{
-		formaction = formaction + "handle/" + community.getHandle() + "/";
+//		formaction = formaction + "handle/" + community.getHandle() + "/";
+		formaction = community.getIdentifier().getURL().toString() + "/";
 	}
 	formaction = formaction + urlFragment;
 	

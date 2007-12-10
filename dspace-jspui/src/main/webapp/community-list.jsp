@@ -93,7 +93,7 @@
     {
     	ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
         out.println( "<li class=\"communityLink\">" );
-        out.println( "<strong><a href=\"" + request.getContextPath() + "/handle/" + c.getHandle() + "\">" + c.getMetadata("name") + "</a></strong>");
+        out.println( "<strong><a href=\"" + c.getIdentifier().getURL().toString() + "\">" + c.getMetadata("name") + "</a></strong>");
         if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
         {
             out.println(" <span class=\"communityStrength\">[" + ic.getCount(c) + "]</span>");
@@ -107,7 +107,7 @@
             for (int j = 0; j < cols.length; j++)
             {
                 out.println("<li class=\"collectionListItem\">");
-                out.println("<a href=\"" + request.getContextPath() + "/handle/" + cols[j].getHandle() + "\">" + cols[j].getMetadata("name") +"</a>");
+                out.println("<a href=\"" + cols[j].getIdentifier().getURL().toString() + "\">" + cols[j].getMetadata("name") +"</a>");
 				if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
                 {
                     out.println(" [" + ic.getCount(cols[j]) + "]");
@@ -209,7 +209,7 @@
 %>		
             <li class="communityLink">
             <%-- HACK: <strong> tags here for broken Netscape 4.x CSS support --%>
-            <strong><a href="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></a></strong>
+            <strong><a href="<%= communities[i].getIdentifier().getURL().toString() %>"><%= communities[i].getMetadata("name") %></a></strong>
 	    <ul>
 <%
             // Get the collections in this community from the map
@@ -220,7 +220,7 @@
             {
 %>
                 <li class="collectionListItem">
-                <a href="<%= request.getContextPath() %>/handle/<%= cols[j].getHandle() %>"><%= cols[j].getMetadata("name") %></a>
+                <a href="<%= cols[j].getIdentifier().getURL().toString() %>"><%= cols[j].getMetadata("name") %></a>
 <%
                 if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
                 {
@@ -245,7 +245,7 @@
             {
 %>
                 <li class="communityLink">
-                <a href="<%= request.getContextPath() %>/handle/<%= comms[k].getHandle() %>"><%= comms[k].getMetadata("name") %></a>
+                <a href="<%= comms[k].getIdentifier().getURL().toString() %>"><%= comms[k].getMetadata("name") %></a>
 <%
                 if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
                 {

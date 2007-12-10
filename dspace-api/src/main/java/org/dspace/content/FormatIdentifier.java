@@ -39,11 +39,11 @@
  */
 package org.dspace.content;
 
-import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.core.Context;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.content.dao.BitstreamFormatDAO;
+import org.dspace.content.dao.BitstreamFormatDAOFactory;
 
 /**
  * This class handles the recognition of bitstream formats, using the format
@@ -66,7 +66,7 @@ public class FormatIdentifier
      * @return a format from the bitstream format registry, or null
      */
     public static BitstreamFormat guessFormat(Context context,
-            Bitstream bitstream) throws SQLException
+            Bitstream bitstream)
     {
         // FIXME: Just setting format to first guess
         // For now just get the file name
@@ -96,26 +96,19 @@ public class FormatIdentifier
             return null;
         }
 
-        // See if the extension is in the fileextension table
-        TableRowIterator tri = DatabaseManager.query(context,
-                "SELECT bitstreamformatregistry.* FROM bitstreamformatregistry, " + 
-                "fileextension WHERE fileextension.extension LIKE ? " + 
-                "AND bitstreamformatregistry.bitstream_format_id=" + 
-                "fileextension.bitstream_format_id",
-                extension);
+        // See if the extension is associated with any formats
+        BitstreamFormatDAO dao = BitstreamFormatDAOFactory.getInstance(context);
+        List<BitstreamFormat> formats = dao.getBitstreamFormats(extension);
 
         BitstreamFormat retFormat = null;
-        if (tri.hasNext())
+
+        if (!formats.isEmpty())
         {
-            // Return first match
-            retFormat = new BitstreamFormat(context, tri.next());
+            // We can do no better than guess the first if there are multiple
+            // results. 
+            retFormat = formats.get(0);
         }
-        else
-        {
-            retFormat = null;
-        }
-        // close the TableRowIterator to free up resources
-        tri.close();
+
         return retFormat;
     }
 }

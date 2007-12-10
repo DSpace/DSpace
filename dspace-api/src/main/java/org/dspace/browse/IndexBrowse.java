@@ -51,8 +51,11 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
+
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.dao.ItemDAO;
+import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.Context;
 
 /**
@@ -134,7 +137,7 @@ public class IndexBrowse
      * @throws BrowseException
      */
     public IndexBrowse(Context context)
-    	throws SQLException, BrowseException
+    	throws BrowseException
     {
     	this.context = context;
     	this.context.setIgnoreAuthorization(true);
@@ -525,7 +528,7 @@ public class IndexBrowse
 	    return true;
 	}
 
-	/**
+    /**
 	 * remove all the indices for the given item
 	 * 
 	 * @param item		the item to be removed
@@ -534,17 +537,23 @@ public class IndexBrowse
 	 */
 	public boolean itemRemoved(Item item)
 		throws BrowseException
-	{
+    {
+        return itemRemoved(item.getID());
+    }
+
+    public boolean itemRemoved(int itemID)
+            throws BrowseException
+    {
 		// go over the indices and index the item
 		for (int i = 0; i < bis.length; i++)
 		{
-			log.debug("Removing indexing for removed item " + item.getID() + ", for index: " + bis[i].getTableName());
-			removeIndex(item, bis[i]);
+			log.debug("Removing indexing for removed item " + itemID + ", for index: " + bis[i].getTableName());
+			removeIndex(itemID, bis[i]);
 	    }
 
         // Remove from the item indexes (archive and withdrawn)
-        removeIndex(item.getID(), BrowseIndex.getItemBrowseIndex().getTableName());
-        removeIndex(item.getID(), BrowseIndex.getWithdrawnBrowseIndex().getTableName());
+        removeIndex(itemID, BrowseIndex.getItemBrowseIndex().getTableName());
+        removeIndex(itemID, BrowseIndex.getWithdrawnBrowseIndex().getTableName());
 
         // Ensure that we remove any invalid entries
         pruneIndexes();
@@ -1067,15 +1076,19 @@ public class IndexBrowse
     		}
     		
     		// now get the ids of ALL the items in the database
-            BrowseItemDAO biDao = BrowseDAOFactory.getItemInstance(context);
-            BrowseItem[] items = biDao.findAll();
+//            BrowseItemDAO biDao = BrowseDAOFactory.getItemInstance(context);
+//            BrowseItem[] items = biDao.findAll();
+            ItemDAO itemDAO = ItemDAOFactory.getInstance(context);
+            List<Item> items = itemDAO.getItems();
 
     		// go through every item id, grab the relevant metadata
     		// and write it into the database
     		
-    		for (int j = 0; j < items.length; j++)
+//    		for (int j = 0; j < items.length; j++)
+    		for (Item item : items)
     		{
-                indexItem(new ItemMetadataProxy(items[j].getID(), items[j]));
+//                indexItem(new ItemMetadataProxy(items[j].getID(), items[j]));
+                indexItem(new ItemMetadataProxy(item));
     			
     			// after each item we commit the context and clear the cache
     			context.commit();
@@ -1089,7 +1102,8 @@ public class IndexBrowse
             // Make sure the deletes are written back
             context.commit();
     		
-    		return items.length;
+//    		return items.length;
+    		return items.size();
     	}
     	catch (SQLException e)
     	{
@@ -1142,25 +1156,26 @@ public class IndexBrowse
 	// private inner class
 	//	 Hides the Item / BrowseItem in such a way that we can remove
 	//	 the duplication in indexing an item.
+    // FIXME: I (JR) think this is pointless now that BrowseItem doesn't exist.
 	private class ItemMetadataProxy
 	{
 	    private Item item;
-	    private BrowseItem browseItem;
+//	    private BrowseItem browseItem;
 	    private int id;
 	    
 	    ItemMetadataProxy(Item item)
 	    {
 	        this.item       = item;
-	        this.browseItem = null;
+//	        this.browseItem = null;
 	        this.id         = 0;
 	    }
 
-	    ItemMetadataProxy(int id, BrowseItem browseItem)
-	    {
-	        this.item       = null;
-	        this.browseItem = browseItem;
-	        this.id         = id;
-	    }
+//	    ItemMetadataProxy(int id, BrowseItem browseItem)
+//	    {
+//	        this.item       = null;
+//	        this.browseItem = browseItem;
+//	        this.id         = id;
+//	    }
 
 	    public DCValue[] getMetadata(String schema, String element, String qualifier, String lang)
 	        throws SQLException
@@ -1170,17 +1185,18 @@ public class IndexBrowse
 	            return item.getMetadata(schema, element, qualifier, lang);
 	        }
 	        
-	        return browseItem.getMetadata(schema, element, qualifier, lang);
+            throw new IllegalStateException("this shouldn't have happened");
+//	        return browseItem.getMetadata(schema, element, qualifier, lang);
 	    }
 	    
 	    public int getID()
 	    {
-	        if (item != null)
-	        {
+//	        if (item != null)
+//	        {
 	            return item.getID();
-	        }
-	        
-	        return id;
+//	        }
+//	        
+//	        return id;
 	    }
 	    
 	    /**
@@ -1189,12 +1205,12 @@ public class IndexBrowse
 	     */
 	    public boolean isArchived()
 	    {
-	    	if (item != null)
-	    	{
+//	    	if (item != null)
+//	    	{
 	    		return item.isArchived();
-	    	}
-	    	
-	    	return browseItem.isArchived();
+//	    	}
+//	    	
+//	    	return browseItem.isArchived();
 	    }
 	    
         /**
@@ -1203,12 +1219,12 @@ public class IndexBrowse
          */
         public boolean isWithdrawn()
         {
-            if (item != null)
-            {
+//            if (item != null)
+//            {
             	return item.isWithdrawn();
-            }
-            
-            return browseItem.isWithdrawn();
+//            }
+//            
+//            return browseItem.isWithdrawn();
         }
 	}
 }

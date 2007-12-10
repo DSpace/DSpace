@@ -82,7 +82,7 @@
     <p><fmt:message key="jsp.dspace-admin.confirm-delete-mdfield.warning"/></p>
 
     <form method="post" action="">
-        <input type="hidden" name="dc_type_id" value="<%= type.getFieldID() %>">
+        <input type="hidden" name="dc_type_id" value="<%= type.getID() %>">
         <center>
             <table width="70%">
                 <tr>

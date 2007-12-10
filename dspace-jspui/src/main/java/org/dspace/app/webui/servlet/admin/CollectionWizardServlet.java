@@ -66,6 +66,8 @@ import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.dao.CollectionDAOFactory;
+import org.dspace.content.dao.CommunityDAOFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -160,7 +162,8 @@ public class CollectionWizardServlet extends DSpaceServlet
         if (communityID > -1)
         {
             // We have a community ID, "create new collection" button pressed
-            Community c = Community.find(context, communityID);
+            Community c =
+                CommunityDAOFactory.getInstance(context).retrieve(communityID);
 
             if (c == null)
             {
@@ -190,7 +193,8 @@ public class CollectionWizardServlet extends DSpaceServlet
             int stage = UIUtil.getIntParameter(request, "stage");
 
             // Get the collection
-            Collection collection = Collection.find(context, collectionID);
+            Collection collection =
+                CollectionDAOFactory.getInstance(context).retrieve(collectionID);
 
             // Put it in request attributes, as most JSPs will need it
             request.setAttribute("collection", collection);
@@ -453,8 +457,9 @@ public class CollectionWizardServlet extends DSpaceServlet
         // Wrap multipart request to get the submission info
         FileUploadRequest wrapper = new FileUploadRequest(request);
 
-        Collection collection = Collection.find(context, UIUtil
-                .getIntParameter(wrapper, "collection_id"));
+        Collection collection =
+            CollectionDAOFactory.getInstance(context).retrieve(
+                    UIUtil.getIntParameter(wrapper, "collection_id"));
 
         if (collection == null)
         {

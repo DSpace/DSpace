@@ -40,7 +40,6 @@
 package org.dspace.app.oai;
 
 import java.util.Properties;
-import java.sql.SQLException;
 
 import org.dspace.app.util.Util;
 import org.dspace.content.DCValue;
@@ -120,7 +119,7 @@ public class RDFCrosswalk extends Crosswalk
         metadata.append("<ow:Publication rdf:about=\"oai:")
                 .append(hostName)
                 .append(":")
-                .append(item.getHandle())
+                .append(item.getIdentifier().getCanonicalForm())
                 .append("\">");
 
         for (int i = 0; i < allDC.length; i++)
@@ -173,17 +172,11 @@ public class RDFCrosswalk extends Crosswalk
         Community[] comms = null;
         Bundle[] origBundles = null;
         Bundle[] thumbBundles = null;
-        try
-        {
-        	colls = item.getCollections();
-        	comms = item.getCommunities();
-        	origBundles = item.getBundles("ORIGINAL");
-        	thumbBundles = item.getBundles("THUMBNAIL");
-        }
-        catch(SQLException sqlE)
-        {
-        	;
-        }
+
+        colls = item.getCollections();
+        comms = item.getCommunities();
+        origBundles = item.getBundles("ORIGINAL");
+        thumbBundles = item.getBundles("THUMBNAIL");
         
         // all parent communities map to DC source
         for (int i = 0; i < comms.length; i++)
@@ -207,15 +200,15 @@ public class RDFCrosswalk extends Crosswalk
         	for (int j = 0; j < bitstreams.length; j++)
         	{
         		String tName = bitstreams[j].getName() + ".jpg";
-				Bitstream tb = null;
+                Bitstream tb = null;
 
                 if (thumbBundles.length > 0)
                 {
                     tb = thumbBundles[0].getBitstreamByName(tName);
                 }
 
-				if (tb != null)
-				{
+                if (tb != null)
+                {
 					String thumbUrl = null;
 					try
 					{

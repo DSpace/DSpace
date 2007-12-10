@@ -40,7 +40,6 @@
 package org.dspace.search;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -63,6 +62,9 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.core.PluginManager;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ExternalIdentifierType;
 
 // issues
 // need to filter query string for security
@@ -122,11 +124,11 @@ public class DSQuery
     {
         String querystring = args.getQuery();
         QueryResults qr = new QueryResults();
-        List hitHandles = new ArrayList();
-        List hitTypes = new ArrayList();
+        List<String> hitURIs = new ArrayList<String>();
+        List<Integer> hitTypes = new ArrayList<Integer>();
 
         // set up the QueryResults object
-        qr.setHitHandles(hitHandles);
+        qr.setHitURIs(hitURIs);
         qr.setHitTypes(hitTypes);
         qr.setStart(args.getStart());
         qr.setPageSize(args.getPageSize());
@@ -136,7 +138,7 @@ public class DSQuery
         // string
         querystring = workAroundLuceneBug(querystring); // logicals changed to
         // && ||, etc.
-        querystring = stripHandles(querystring); // remove handles from query
+        querystring = stripURIs(querystring); // remove URIs from query
         // string
         querystring = stripAsterisk(querystring); // remove asterisk from
         // beginning of string
@@ -165,7 +167,7 @@ public class DSQuery
             qr.setHitCount(hits.length());
 
             // We now have a bunch of hits - snip out a 'window'
-            // defined in start, count and return the handles
+            // defined in start, count and return the URIs
             // from that window
             // first, are there enough hits?
             if (args.getStart() < hits.length())
@@ -181,22 +183,22 @@ public class DSQuery
                 {
                     Document d = hits.doc(i);
 
-                    String handleText = d.get("handle");
-                    String handletype = d.get("type");
+                    String uriText = d.get("uri");
+                    String uriType = d.get("type");
 
-                    hitHandles.add(handleText);
+                    hitURIs.add(uriText);
 
-                    if (handletype.equals("" + Constants.ITEM))
+                    if (uriType.equals("" + Constants.ITEM))
                     {
-                        hitTypes.add(new Integer(Constants.ITEM));
+                        hitTypes.add(Constants.ITEM);
                     }
-                    else if (handletype.equals("" + Constants.COLLECTION))
+                    else if (uriType.equals("" + Constants.COLLECTION))
                     {
-                        hitTypes.add(new Integer(Constants.COLLECTION));
+                        hitTypes.add(Constants.COLLECTION);
                     }
-                    else if (handletype.equals("" + Constants.COMMUNITY))
+                    else if (uriType.equals("" + Constants.COMMUNITY))
                     {
-                        hitTypes.add(new Integer(Constants.COMMUNITY));
+                        hitTypes.add(Constants.COMMUNITY);
                     }
                     else
                     {
@@ -266,14 +268,28 @@ public class DSQuery
         return myquery;
     }
 
-    static String stripHandles(String myquery)
+    static String stripURIs(String myquery)
     {
-        // Drop beginning pieces of full handle strings
-        Perl5Util util = new Perl5Util();
+        // FIXME: Do we need to strip "local" identifier prefixes as well?
 
-        myquery = util.substitute("s|^(\\s+)?http://hdl\\.handle\\.net/||",
-                myquery);
-        myquery = util.substitute("s|^(\\s+)?hdl:||", myquery);
+        Object[] types =
+                PluginManager.getPluginSequence(ExternalIdentifierType.class);
+        if (types != null)
+        {
+            for (ExternalIdentifierType t : (ExternalIdentifierType[]) types)
+            {
+                if (myquery.startsWith(t.getBaseURI() + "/"))
+                {
+                    int urlPos = myquery.indexOf(t.getBaseURI() + "/");
+                    return myquery.substring(urlPos + 1);
+                }
+                if (myquery.startsWith(t.getNamespace() + ":"))
+                {
+                    int namespacePos = myquery.indexOf(t.getNamespace() + ":");
+                    return myquery.substring(namespacePos + 1);
+                }
+            }
+        }
 
         return myquery;
     }
@@ -312,10 +328,7 @@ public class DSQuery
 
         String location = "l" + (coll.getID());
 
-        String newquery = new String("+(" + querystring + ") +location:\""
-                + location + "\"");
-
-        args.setQuery(newquery);
+        args.setQuery("+(" + querystring + ") +location:\"" + location + "\"");
 
         return doQuery(c, args);
     }
@@ -341,10 +354,7 @@ public class DSQuery
 
         String location = "m" + (comm.getID());
 
-        String newquery = new String("+(" + querystring + ") +location:\""
-                + location + "\"");
-
-        args.setQuery(newquery);
+        args.setQuery("+(" + querystring + ") +location:\"" + location + "\"");
 
         return doQuery(c, args);
     }
@@ -368,17 +378,17 @@ public class DSQuery
 
             QueryResults results = doQuery(c, args);
 
-            Iterator i = results.getHitHandles().iterator();
+            Iterator i = results.getHitURIs().iterator();
             Iterator j = results.getHitTypes().iterator();
 
             while (i.hasNext())
             {
-                String thisHandle = (String) i.next();
+                String thisURI = (String) i.next();
                 Integer thisType = (Integer) j.next();
                 String type = Constants.typeText[thisType.intValue()];
 
                 // also look up type
-                System.out.println(type + "\t" + thisHandle);
+                System.out.println(type + "\t" + thisURI);
             }
         }
         catch (Exception e)

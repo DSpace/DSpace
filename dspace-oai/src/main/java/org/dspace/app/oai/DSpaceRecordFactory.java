@@ -46,7 +46,9 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+
 import org.dspace.content.DCDate;
+import org.dspace.uri.ObjectIdentifier;
 import org.dspace.search.HarvestedItemInfo;
 
 import ORG.oclc.oai.server.catalog.RecordFactory;
@@ -71,7 +73,7 @@ public class DSpaceRecordFactory extends RecordFactory
 
     public String fromOAIIdentifier(String identifier)
     {
-        // Our local identifier is actually the same as the OAI one (the Handle)
+        // Our local identifier is actually the same as the OAI one (the URI)
         return identifier;
     }
 
@@ -86,7 +88,7 @@ public class DSpaceRecordFactory extends RecordFactory
     public String getOAIIdentifier(Object nativeItem)
     {
         String h = DSpaceOAICatalog.OAI_ID_PREFIX
-                + ((HarvestedItemInfo) nativeItem).handle;
+                + ((HarvestedItemInfo) nativeItem).identifier.getCanonicalForm();
 
         return h;
     }
@@ -102,15 +104,14 @@ public class DSpaceRecordFactory extends RecordFactory
     public Iterator getSetSpecs(Object nativeItem)
     {
         HarvestedItemInfo hii = (HarvestedItemInfo) nativeItem;
-        Iterator i = hii.collectionHandles.iterator();
-        List setSpecs = new LinkedList();
+        List<String> setSpecs = new LinkedList<String>();
 
-        // Convert the DB Handle string 123.456/789 to the OAI-friendly
-        // hdl_123.456/789
-        while (i.hasNext())
+        // Convert the canonical form xyz:123.456/789 to the OAI-friendly
+        // xyz_123.456/789
+        for (ObjectIdentifier identifier : hii.collectionIdentifiers)
         {
-            String handle = "hdl_" + (String) i.next();
-            setSpecs.add(handle.replace('/', '_'));
+            String uri = identifier.getCanonicalForm();
+            setSpecs.add(uri.replaceFirst(":", "_").replace('/', '_'));
         }
 
         return setSpecs.iterator();

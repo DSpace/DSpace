@@ -104,7 +104,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             if (dso == null)
                 return "0"; // no item, something is wrong.
             
-            return HashUtil.hash(dso.getHandle() + "full:" + showFullItem(objectModel));
+            return HashUtil.hash(dso.getExternalIdentifier().getCanonicalForm() + "full:" + showFullItem(objectModel));
         } 
         catch (SQLException sqle)
         {
@@ -158,7 +158,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         if (title != null)
             pageMeta.addMetadata("title").addContent(title);
         else
-            pageMeta.addMetadata("title").addContent(item.getHandle());
+            pageMeta.addMetadata("title").addContent(item.getExternalIdentifier().getCanonicalForm());
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         HandleUtil.buildHandleTrail(item,pageMeta,contextPath);
@@ -183,18 +183,18 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         if (title != null)
             division.setHead(title);
         else
-            division.setHead(item.getHandle());
+            division.setHead(item.getExternalIdentifier().getCanonicalForm());
 
         Para showfullPara = division.addPara(null, "item-view-toggle item-view-toggle-top");
 
         if (showFullItem(objectModel))
         {
-            String link = contextPath + "/handle/" + item.getHandle();
+            String link = contextPath + "/handle/" + item.getExternalIdentifier().getCanonicalForm();
             showfullPara.addXref(link).addContent(T_show_simple);
         }
         else
         {
-            String link = contextPath + "/handle/" + item.getHandle()
+            String link = contextPath + "/handle/" + item.getExternalIdentifier().getCanonicalForm()
                     + "?show=full";
             showfullPara.addXref(link).addContent(T_show_full);
         }
@@ -225,12 +225,12 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
         if (showFullItem(objectModel))
         {
-            String link = contextPath + "/handle/" + item.getHandle();
+            String link = contextPath + "/handle/" + item.getExternalIdentifier().getCanonicalForm();
             showfullPara.addXref(link).addContent(T_show_simple);
         }
         else
         {
-            String link = contextPath + "/handle/" + item.getHandle()
+            String link = contextPath + "/handle/" + item.getExternalIdentifier().getCanonicalForm()
                     + "?show=full";
             showfullPara.addXref(link).addContent(T_show_full);
         }

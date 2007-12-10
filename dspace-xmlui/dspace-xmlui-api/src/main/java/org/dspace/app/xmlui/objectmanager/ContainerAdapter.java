@@ -123,8 +123,8 @@ public class ContainerAdapter extends AbstractAdapter
      */
     protected String getMETSOBJID()
     {
-    	if (dso.getHandle() != null)
-    		return contextPath+"/handle/" + dso.getHandle();
+    	if (dso.getExternalIdentifier() != null)
+    		return contextPath+"/handle/" + dso.getExternalIdentifier().getCanonicalForm();
     	return null;
     }
 
@@ -141,7 +141,7 @@ public class ContainerAdapter extends AbstractAdapter
      */
     protected String getMETSID()
     {
-    	if (dso.getHandle() == null)
+    	if (dso.getExternalIdentifier().getCanonicalForm() == null)
     	{
         	if (dso instanceof Collection)
         		return "collection:"+dso.getID();
@@ -149,7 +149,7 @@ public class ContainerAdapter extends AbstractAdapter
         		return "community:"+dso.getID();
     	}
         else
-        	return "hdl:"+dso.getHandle();
+        	return dso.getExternalIdentifier().getCanonicalForm();
     }
 
     /**
@@ -269,7 +269,8 @@ public class ContainerAdapter extends AbstractAdapter
                 String description = collection.getMetadata("introductory_text");
                 String description_abstract = collection.getMetadata("short_description");
                 String description_table = collection.getMetadata("side_bar_text");
-                String identifier_uri = "http://hdl.handle.net/" + collection.getHandle();
+                // FIXME: Oh, so broken.
+                String identifier_uri = "http://hdl.handle.net/" + collection.getExternalIdentifier().getValue();
                 String provenance = collection.getMetadata("provenance_description");
                 String rights = collection.getMetadata("copyright_text");
                 String rights_license = collection.getMetadata("license");
@@ -291,7 +292,8 @@ public class ContainerAdapter extends AbstractAdapter
                 String description = community.getMetadata("introductory_text");
                 String description_abstract = community.getMetadata("short_description");
                 String description_table = community.getMetadata("side_bar_text");
-                String identifier_uri = "http://hdl.handle.net/" + community.getHandle();
+                // FIXME: Oh, so broken.
+                String identifier_uri = "http://hdl.handle.net/" + community.getExternalIdentifier().getValue();
                 String rights = community.getMetadata("copyright_text");
                 String title = community.getMetadata("name");
                 

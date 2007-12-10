@@ -47,6 +47,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.dspace.content.dao.ItemDAO;
+import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
@@ -230,6 +233,7 @@ public class BrowseEngine
 		throws BrowseException
 	{
 		log.info(LogManager.getHeader(context, "browse_by_item", ""));
+        ItemDAO itemDAO = ItemDAOFactory.getInstance(context);
 		try
 		{
 			// get the table name that we are going to be getting our data from
@@ -343,11 +347,13 @@ public class BrowseEngine
 			// previous queries
 			
 			// NEXT PAGE
-			BrowseItem next = null;
+//			BrowseItem next = null;
+			Item next = null;
 			int lastIndex = results.size() - 1;
 			if (lastIndex >= scope.getResultsPerPage())
 			{
-				next = (BrowseItem) results.get(lastIndex);
+//				next = (BrowseItem) results.get(lastIndex);
+				next = (Item) results.get(lastIndex);
 				results.remove(lastIndex);
 			}
 			
@@ -355,7 +361,8 @@ public class BrowseEngine
 			// this involves some slightly complex messing around, so delegated to
 			// its own method.  remember to only do this when there is a focus
 			// value, otherwise we are just on the first page
-			BrowseItem prev = null;
+//			BrowseItem prev = null;
+			Item prev = null;
 			if (scope.hasJumpToItem() || scope.hasJumpToValue() || scope.hasStartsWith())
 			{
 				int prevID = -1;
@@ -369,12 +376,13 @@ public class BrowseEngine
 				}
 				if (prevID != -1)
 				{
+                    prev = itemDAO.retrieve(prevID);
                     // If we are browsing the withdrawn index, create a 'withdrawn' browse item
                     // Otherwise, assume that the item is in the archive and not withdrawn
-                    if (bs.getBrowseIndex() == BrowseIndex.getWithdrawnBrowseIndex())
-                        prev = new BrowseItem(context, prevID, false, true);
-                    else
-                        prev = new BrowseItem(context, prevID, true, false);
+//                    if (bs.getBrowseIndex() == BrowseIndex.getWithdrawnBrowseIndex())
+//                        prev = new BrowseItem(context, prevID, false, true);
+//                    else
+//                        prev = new BrowseItem(context, prevID, true, false);
                 }
 			}
 			
@@ -948,10 +956,12 @@ public class BrowseEngine
 		// work our way through the list, capturing if necessary, and finally
 		// having the last result, which will be the top of the previous page
 		int i = 0;
-		BrowseItem prev = null;
+//		BrowseItem prev = null;
+		Item prev = null;
 		while (itr.hasNext())
 		{
-			BrowseItem browseItem = (BrowseItem) itr.next();
+//			BrowseItem browseItem = (BrowseItem) itr.next();
+			Item browseItem = (Item) itr.next();
 			
 			// we need to copy this, because of the scoping vs by-reference issue
 			prev = browseItem;

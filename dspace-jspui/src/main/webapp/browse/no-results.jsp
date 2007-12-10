@@ -87,17 +87,17 @@
     // FIXME: this is not using the i18n
     // Description of what the user is actually browsing, and where link back
     String linkText = LocaleSupport.getLocalizedMessage(pageContext, "jsp.general.home");
-    String linkBack = "/";
+    String linkBack = request.getContextPath();
 
     if (collection != null)
     {
         linkText = collection.getMetadata("name");
-        linkBack = "/handle/" + collection.getHandle();
+        linkBack = collection.getIdentifier().getURL().toString();
     }
     else if (community != null)
     {
         linkText = community.getMetadata("name");
-        linkBack = "/handle/" + community.getHandle();
+        linkBack = community.getIdentifier().getURL().toString();
     }
 %>
 
@@ -132,7 +132,7 @@
    %>
  </p>
    
-    <p><a href="<%= request.getContextPath() %><%= linkBack %>"><%= linkText %></a></p>
+    <p><a href="<%= linkBack %>"><%= linkText %></a></p>
 
     <%-- dump the results for debug (uncomment to enable) --%>
     <%--

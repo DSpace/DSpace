@@ -14,7 +14,7 @@
  <!-- the mapping for handle "default".                                    -->
 
  <form-map>
-   <name-map collection-handle="default" form-name="traditional" />
+   <name-map collection-uri="default" form-name="traditional" />
  </form-map>
 
 

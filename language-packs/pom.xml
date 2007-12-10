@@ -18,7 +18,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>SNAPSHOT</version>
+      <version>1.6-SNAPSHOT</version>
    </parent>
 
    <repositories>

@@ -43,13 +43,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
@@ -58,6 +58,12 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
+import org.dspace.content.dao.BitstreamDAO;
+import org.dspace.content.dao.BitstreamDAOFactory;
+import org.dspace.content.dao.BundleDAO;
+import org.dspace.content.dao.BundleDAOFactory;
+import org.dspace.content.dao.ItemDAO;
+import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
 
@@ -68,7 +74,8 @@ import org.dspace.submit.AbstractProcessingStep;
  * This class performs all the behind-the-scenes processing that
  * this particular step requires.  This class's methods are utilized 
  * by both the JSP-UI and the Manakin XML-UI
- * 
+ *
+ * FIXME: DAO operations need to be made consistent & checked.
  * @see org.dspace.app.util.SubmissionConfig
  * @see org.dspace.app.util.SubmissionStepConfig
  * @see org.dspace.submit.AbstractProcessingStep
@@ -144,6 +151,9 @@ public class UploadStep extends AbstractProcessingStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
+        BitstreamDAO bsDAO = BitstreamDAOFactory.getInstance(context);
+        BundleDAO bundleDAO= BundleDAOFactory.getInstance(context);
+
         // get button user pressed
         String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
 
@@ -176,7 +186,7 @@ public class UploadStep extends AbstractProcessingStep
             else
             {
                 // load info for bitstream we are editing
-                Bitstream b = Bitstream.find(context, Integer.parseInt(request
+                Bitstream b = bsDAO.retrieve(Integer.parseInt(request
                         .getParameter("bitstream_id")));
 
                 // save bitstream to submission info
@@ -189,8 +199,7 @@ public class UploadStep extends AbstractProcessingStep
             String bitstreamID = buttonPressed.substring("submit_edit_"
                     .length());
 
-            Bitstream b = Bitstream
-                    .find(context, Integer.parseInt(bitstreamID));
+            Bitstream b = bsDAO.retrieve(Integer.parseInt(bitstreamID));
 
             // save bitstream to submission info
             subInfo.setBitstream(b);
@@ -309,8 +318,8 @@ public class UploadStep extends AbstractProcessingStep
         {
             Bundle[] bundles = item.getBundles("ORIGINAL");
             bundles[0].setPrimaryBitstreamID(new Integer(request
-                    .getParameter("primary_bitstream_id")).intValue());
-            bundles[0].update();
+                    .getParameter("primary_bitstream_id")));
+            bundleDAO.update(bundles[0]);
         }
 
         // ---------------------------------------------------
@@ -393,16 +402,21 @@ public class UploadStep extends AbstractProcessingStep
      * @return Status or error flag which will be processed by
      *         UI-related code! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
+     *
+     * FIXME: How does this deal with multiple bundle -> bitstream ownership?
      */
     protected int processRemoveFile(Context context, Item item, int bitstreamID)
             throws IOException, SQLException, AuthorizeException
     {
+        BitstreamDAO bsDAO = BitstreamDAOFactory.getInstance(context);
+        BundleDAO bundleDAO = BundleDAOFactory.getInstance(context);
+        ItemDAO itemDAO = ItemDAOFactory.getInstance(context);
         Bitstream bitstream;
 
         // Try to find bitstream
         try
         {
-            bitstream = Bitstream.find(context, bitstreamID);
+            bitstream = bsDAO.retrieve(bitstreamID);
         }
         catch (NumberFormatException nfe)
         {
@@ -418,17 +432,28 @@ public class UploadStep extends AbstractProcessingStep
 
         // remove bitstream from bundle..
         // delete bundle if it's now empty
-        Bundle[] bundles = bitstream.getBundles();
+        List<Bundle> bundles = bundleDAO.getBundles(bitstream);
+        Bundle bundle = null;
 
-        bundles[0].removeBitstream(bitstream);
+        if (bundles.size() > 0)
+        {
+            bundle = bundles.get(0);
+        }
+        else
+        {
+            throw new IllegalStateException(
+                    "no bundle associated with bitstream" +
+                    bitstream.getIdentifier().getCanonicalForm());
+        }
 
-        Bitstream[] bitstreams = bundles[0].getBitstreams();
+        bundle.removeBitstream(bitstream);
+        Bitstream[] bitstreams = bundle.getBitstreams();
 
         // remove bundle if it's now empty
         if (bitstreams.length < 1)
         {
-            item.removeBundle(bundles[0]);
-            item.update();
+            item.removeBundle(bundle);
+            itemDAO.update(item);
         }
 
         // no errors occurred
@@ -456,6 +481,9 @@ public class UploadStep extends AbstractProcessingStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
+        BitstreamDAO bsDAO = BitstreamDAOFactory.getInstance(context);
+        ItemDAO itemDAO = ItemDAOFactory.getInstance(context);
+
         boolean formatKnown = true;
         boolean fileOK = false;
         BitstreamFormat bf = null;
@@ -507,10 +535,12 @@ public class UploadStep extends AbstractProcessingStep
                     if (bundles.length < 1)
                     {
                         // set bundle's name to ORIGINAL
+                        log.info("creating new bundle and adding bitstream to it");
                         b = item.createSingleBitstream(fileInputStream, "ORIGINAL");
                     }
                     else
                     {
+                        log.info("adding bitstream to existing bundle");
                         // we have a bundle already, just add bitstream
                         b = bundles[0].createBitstream(fileInputStream);
                     }
@@ -538,9 +568,9 @@ public class UploadStep extends AbstractProcessingStep
                     b.setFormat(bf);
         
                     // Update to DB
-                    b.update();
-                    item.update();
-        
+                    bsDAO.update(b);
+                    itemDAO.update(item);
+
                     if (bf == null || !bf.isInternal())
                     {
                         fileOK = true;

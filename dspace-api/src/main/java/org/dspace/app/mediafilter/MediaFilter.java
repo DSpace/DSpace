@@ -41,6 +41,10 @@ package org.dspace.app.mediafilter;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
+import org.dspace.content.dao.BitstreamDAO;
+import org.dspace.content.dao.BitstreamDAOFactory;
+import org.dspace.content.dao.BitstreamFormatDAO;
+import org.dspace.content.dao.BitstreamFormatDAOFactory;
 import org.dspace.core.Context;
 
 

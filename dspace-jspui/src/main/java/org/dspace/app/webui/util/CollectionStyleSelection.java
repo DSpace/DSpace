@@ -39,13 +39,14 @@
  */
 package org.dspace.app.webui.util;
 
-import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
+
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.uri.ObjectIdentifier;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -58,8 +59,8 @@ import org.dspace.core.ConfigurationManager;
  */
 public class CollectionStyleSelection extends AKeyBasedStyleSelection
 {
-    /** Hashmap of collection Handles to styles to use, from dspace.cfg */
-    private static java.util.Map<String, String> styles;
+    /** Hashmap of collection identifiers to styles to use, from dspace.cfg */
+    private static java.util.Map<ObjectIdentifier, String> styles;
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(CollectionStyleSelection.class);
@@ -67,17 +68,21 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
     /**
      * Get the style using the owning collection handle
      */
-    public String getStyleForItem(Item item) throws SQLException
+    public String getStyleForItem(Item item)
     {
         Collection c = item.getOwningCollection();
- 
-        if(c!=null)
-        {    
+
+        if (c != null)
+        {
             // Style specified & exists
-            return getFromMap(c.getHandle());
+            return getFromMap(c.getIdentifier());
         }
         else
-            return "default";  //no specific style - item is an in progress Submission
+        {
+            // If the Item hasn't hit a Collection yet (most likely an
+            // InProgressSubmission), we don't give it a specific style.
+            return "default";
+        }
     }
     
     /**
@@ -85,7 +90,7 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
      */
     private void readKeyStyleConfig()
     {
-        styles = new HashMap();
+        styles = new HashMap<ObjectIdentifier, String>();
 
         Enumeration e = ConfigurationManager.propertyNames();
 
@@ -104,7 +109,9 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
 
                 for (int i = 0; i < collections.length; i++)
                 {
-                    styles.put(collections[i].trim(), styleName.toLowerCase());
+                    styles.put(
+                            ObjectIdentifier.fromString(collections[i].trim()),
+                            styleName.toLowerCase());
                 }
             }
         }
@@ -115,17 +122,17 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
      * initialized read it from dspace.cfg
      * Check for the style configuration: return the default style if no configuration has found.
      * 
-     * @param handle
+     * @param oid
      * @return the specific style or the default if not properly defined
      */
-    public String getFromMap(String handle)
+    public String getFromMap(ObjectIdentifier oid)
     {
         if (styles == null)
         {
             readKeyStyleConfig();
         }
 
-        String styleName = (String) styles.get(handle);
+        String styleName = (String) styles.get(oid);
 
         if (styleName == null)
         {
@@ -137,7 +144,8 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
         if (isConfigurationDefinedForStyle(styleName))
         {
             log.warn("dspace.cfg specifies undefined item display style '"
-                    + styleName + "' for collection handle " + handle + ".  Using default");
+                    + styleName + "' for collection handle "
+                    + oid.getCanonicalForm() + ".  Using default");
             return "default";
         }
 

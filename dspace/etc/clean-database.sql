@@ -60,6 +60,7 @@ DROP VIEW CommunityItemsByAuthor;
 DROP VIEW CollectionItemsByAuthor;
 DROP VIEW Community2Item;
 DROP VIEW DCValue;
+DROP VIEW externalidentifier;
 
 -- Then the tables
 DROP TABLE checksum_history;

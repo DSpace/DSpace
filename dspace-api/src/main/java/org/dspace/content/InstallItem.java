@@ -40,12 +40,14 @@
 package org.dspace.content;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.dao.ItemDAO;
+import org.dspace.content.dao.ItemDAOFactory;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 
 /**
  * Support to install item in the archive
@@ -67,28 +69,35 @@ public class InstallItem
      * @return the fully archived Item
      */
     public static Item installItem(Context c, InProgressSubmission is)
-            throws SQLException, IOException, AuthorizeException
+            throws IOException, AuthorizeException
     {
         return installItem(c, is, null);
     }
 
     /**
      * Take an InProgressSubmission and turn it into a fully-archived Item.
-     * 
+     *
+     * FIXME: This needs to be more flexible about what kind of existing
+     * identifiers may be passed in.
+     *
      * @param c  current context
      * @param is
      *            submission to install
-     * @param suppliedHandle
-     *            the existing Handle to give the installed item
+     * @param value
+     *            the existing identifier to give the installed item in
+     *            canonical form
      * 
      * @return the fully archived Item
      */
     public static Item installItem(Context c, InProgressSubmission is,
-            String suppliedHandle) throws SQLException,
-            IOException, AuthorizeException
+            String value) throws IOException, AuthorizeException
     {
+        ItemDAO itemDAO = ItemDAOFactory.getInstance(c);
+        ExternalIdentifierDAO identifierDAO =
+            ExternalIdentifierDAOFactory.getInstance(c);
+
         Item item = is.getItem();
-        String handle;
+        ExternalIdentifier identifier;
 
         // create accession date
         DCDate now = DCDate.getCurrent();
@@ -103,21 +112,23 @@ public class InstallItem
             item.addDC("date", "issued", null, now.toString());
         }
 
-        // if no previous handle supplied, create one
-        if (suppliedHandle == null)
+        // if no previous identifier supplied, create one
+        if (value == null)
         {
-            // create handle
-            handle = HandleManager.createHandle(c, item);
+            // Create persistent identifier. Note that this will create an
+            // identifier of the default type (as specified in the
+            // configuration).
+            identifier = identifierDAO.create(item);
         }
         else
         {
-            handle = HandleManager.createHandle(c, item, suppliedHandle);
+            identifier = identifierDAO.create(item, value);
         }
 
-        String handleref = HandleManager.getCanonicalForm(handle);
+        String uri = identifier.getURI().toString();
 
-        // Add handle as identifier.uri DC value
-        item.addDC("identifier", "uri", null, handleref);
+        // Add uri as identifier.uri DC value
+        item.addDC("identifier", "uri", null, uri);
 
         String provDescription = "Made available in DSpace on " + now
                 + " (GMT). " + getBitstreamProvenanceMessage(item);
@@ -142,7 +153,7 @@ public class InstallItem
         item.setArchived(true);
 
         // save changes ;-)
-        item.update();
+        itemDAO.update(item);
 
         // remove in-progress submission
         is.deleteWrapper();
@@ -164,7 +175,6 @@ public class InstallItem
      * @return provenance description
      */
     public static String getBitstreamProvenanceMessage(Item myitem)
-    						throws SQLException
     {
         // Get non-internal format bitstreams
         Bitstream[] bitstreams = myitem.getNonInternalBitstreams();

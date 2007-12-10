@@ -40,23 +40,17 @@
 
 package org.dspace.content;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Item;
-import org.dspace.content.Collection;
-import org.dspace.content.WorkspaceItem;
+import org.dspace.content.dao.SupervisedItemDAO;
+import org.dspace.content.dao.SupervisedItemDAOFactory;
+import org.dspace.content.dao.WorkspaceItemDAO;
+import org.dspace.content.dao.WorkspaceItemDAOFactory;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.storage.rdbms.TableRow;
+import org.dspace.eperson.dao.GroupDAO;
+import org.dspace.eperson.dao.GroupDAOFactory;
 
 /**
  * Class to handle WorkspaceItems which are being supervised.  It extends the
@@ -67,198 +61,48 @@ import org.dspace.storage.rdbms.TableRow;
  */
 public class SupervisedItem extends WorkspaceItem
 {
+    private GroupDAO groupDAO;
+    private WorkspaceItemDAO wsiDAO;
     
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(SupervisedItem.class);
-    
-    /** The item this workspace object pertains to */
-    private Item item;
-    
-    /** Our context */
-    private Context ourContext;
-
-    /** The table row corresponding to this workspace item */
-    private TableRow siRow;
-
-    /** The collection the item is being submitted to */
-    private Collection collection;
-    
-    /**
-     * Construct a supervised item out of the given row
-     *
-     * @param context  the context this object exists in
-     * @param row      the database row
-     */
-    SupervisedItem(Context context, TableRow row)
-        throws SQLException
+    public SupervisedItem(Context context, int id)
     {
         // construct a new workspace item
-        super(context, row);
+        super(context, id);
+
+        wsiDAO = WorkspaceItemDAOFactory.getInstance(context);
+        groupDAO = GroupDAOFactory.getInstance(context);
     }
 
-    /**
-     * Get all workspace items which are being supervised
-     *
-     * @param context the context this object exists in
-     *
-     * @return array of SupervisedItems
-     */
+    @Deprecated
     public static SupervisedItem[] getAll(Context context)
-        throws SQLException
     {
-        List sItems = new ArrayList();
-        
-        // The following query pulls out distinct workspace items which have 
-        // entries in the supervisory linking database.  We use DISTINCT to
-        // prevent multiple instances of the item in the case that it is 
-        // supervised by more than one group
-        String query = "SELECT DISTINCT workspaceitem.* " +
-                       "FROM workspaceitem, epersongroup2workspaceitem " +
-                       "WHERE workspaceitem.workspace_item_id = " +
-                       "epersongroup2workspaceitem.workspace_item_id " +
-                       "ORDER BY workspaceitem.workspace_item_id";
-        
-        TableRowIterator tri = DatabaseManager.queryTable(context,
-                                    "workspaceitem",
-                                    query);
-        
-        while (tri.hasNext())
-        {
-            TableRow row = tri.next();
-            SupervisedItem si = new SupervisedItem(context, row);
-            
-            sItems.add(si);
-        }
-        
-        tri.close();
-        
-        SupervisedItem[] siArray = new SupervisedItem[sItems.size()];
-        siArray = (SupervisedItem[]) sItems.toArray(siArray);
+        SupervisedItemDAO dao = SupervisedItemDAOFactory.getInstance(context);
+        List<SupervisedItem> items = dao.getSupervisedItems();
 
-        return siArray;
+        return items.toArray(new SupervisedItem[0]);
     }
     
-    /**
-     * Gets all the groups that are supervising a particular workspace item
-     * 
-     * @param c the context this object exists in
-     * @param wi the ID of the workspace item
-     *
-     * @return the supervising groups in an array
-     */
-    public Group[] getSupervisorGroups(Context c, int wi)
-        throws SQLException
-    {
-        List groupList = new ArrayList();
-        String query = "SELECT epersongroup.* " +
-                       "FROM epersongroup, epersongroup2workspaceitem " +
-                       "WHERE epersongroup2workspaceitem.workspace_item_id" +
-                       " = ? " +
-                       " AND epersongroup2workspaceitem.eperson_group_id =" +
-                       " epersongroup.eperson_group_id " +
-                       "ORDER BY epersongroup.name";
-        
-        TableRowIterator tri = DatabaseManager.queryTable(c,"epersongroup",query, wi);
-        
-        while (tri.hasNext())
-        {
-            TableRow row = tri.next();
-            Group group = Group.find(c,row.getIntColumn("eperson_group_id"));
-            
-            groupList.add(group);
-        }
-        
-        tri.close();
-        
-        Group[] groupArray = new Group[groupList.size()];
-        groupArray = (Group[]) groupList.toArray(groupArray);
-
-        return groupArray;
-    }
-    
-    /**
-     * Gets all the groups that are supervising a this workspace item
-     * 
-     *
-     * @return the supervising groups in an array
-     */
-    // FIXME: We should arrange this code to use the above getSupervisorGroups 
-    // method by building the relevant info before passing the request.
-    public Group[] getSupervisorGroups()
-        throws SQLException
-    {
-        Context ourContext = new Context();
-        
-        List groupList = new ArrayList();
-        String query = "SELECT epersongroup.* " +
-                       "FROM epersongroup, epersongroup2workspaceitem " +
-                       "WHERE epersongroup2workspaceitem.workspace_item_id" +
-                       " = ? " + 
-                       " AND epersongroup2workspaceitem.eperson_group_id =" +
-                       " epersongroup.eperson_group_id " +
-                       "ORDER BY epersongroup.name";
-        
-        TableRowIterator tri = DatabaseManager.queryTable(ourContext,
-                                    "epersongroup",
-                                    query, this.getID());
-        
-        while (tri.hasNext())
-        {
-            TableRow row = tri.next();
-            Group group = Group.find(ourContext,
-                                row.getIntColumn("eperson_group_id"));
-            
-            groupList.add(group);
-        }
-        
-        tri.close();
-        
-        Group[] groupArray = new Group[groupList.size()];
-        groupArray = (Group[]) groupList.toArray(groupArray);
-
-        return groupArray;
-    }
-    
-    /**
-     * Get items being supervised by given EPerson
-     *
-     * @param   ep          the eperson who's items to supervise we want
-     * @param   context     the dspace context
-     *
-     * @return the items eperson is supervising in an array
-     */
+    @Deprecated
     public static SupervisedItem[] findbyEPerson(Context context, EPerson ep)
-        throws SQLException
     {
-        List sItems = new ArrayList();
-        String query = "SELECT DISTINCT workspaceitem.* " +
-                        "FROM workspaceitem, epersongroup2workspaceitem, " +
-                        "epersongroup2eperson " +
-                        "WHERE workspaceitem.workspace_item_id = " +
-                        "epersongroup2workspaceitem.workspace_item_id " +
-                        "AND epersongroup2workspaceitem.eperson_group_id =" +
-                        " epersongroup2eperson.eperson_group_id " +
-                        "AND epersongroup2eperson.eperson_id= ? " + 
-                        " ORDER BY workspaceitem.workspace_item_id";
+        SupervisedItemDAO dao = SupervisedItemDAOFactory.getInstance(context);
+        List<SupervisedItem> items = dao.getSupervisedItems(ep);
 
-        TableRowIterator tri = DatabaseManager.queryTable(context,
-                                    "workspaceitem",
-                                    query,ep.getID());
-        
-        while (tri.hasNext())
-        {
-            TableRow row = tri.next();
-            SupervisedItem si = new SupervisedItem(context, row);
-            sItems.add(si);
-        }
-        
-        tri.close();
-        
-        SupervisedItem[] siArray = new SupervisedItem[sItems.size()];
-        siArray = (SupervisedItem[]) sItems.toArray(siArray);
-
-        return siArray;
-        
+        return items.toArray(new SupervisedItem[0]);
     }
     
+    @Deprecated
+    public Group[] getSupervisorGroups(Context context, int id)
+    {
+        WorkspaceItem wsi = wsiDAO.retrieve(id);
+        List<Group> groups = groupDAO.getSupervisorGroups(wsi);
+
+        return groups.toArray(new Group[0]);
+    }
+    
+    @Deprecated
+    public Group[] getSupervisorGroups()
+    {
+        return getSupervisorGroups(context, getID());
+    }
 }

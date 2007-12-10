@@ -65,7 +65,6 @@ import org.dspace.content.packager.PackageIngester;
 import org.dspace.content.packager.PackageParameters;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
-import org.dspace.handle.HandleManager;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 import org.jdom.Element;
@@ -195,13 +194,13 @@ class DAVCollection extends DAVDSpaceObject
             value = getObjectMetadata("name");
             if (value == null)
             {
-                value = this.collection.getHandle();
+                value = this.collection.getIdentifier().getCanonicalForm();
             }
         }
 
         else if (elementsEqualIsh(property, handleProperty))
         {
-            value = canonicalizeHandle(this.collection.getHandle());
+            value = canonicalizeHandle(this.collection.getIdentifier().getCanonicalForm());
         }
         else if (elementsEqualIsh(property, logoProperty))
         {
@@ -507,7 +506,11 @@ class DAVCollection extends DAVDSpaceObject
             if (state == WorkflowManager.WFSTATE_ARCHIVE)
             {
                 Item ni = wfi.getItem();
-                String handle = HandleManager.findHandle(this.context, ni);
+
+                // FIXME: I'm not sure this is what we want
+                String handle = ni.getExternalIdentifier().getCanonicalForm();
+//                String handle = HandleManager.findHandle(this.context, ni);
+
                 String end = (handle != null) ? DAVDSpaceObject
                         .getPathElt(handle) : DAVItem.getPathElt(ni);
                 DAVItem newItem = new DAVItem(this.context, this.request, this.response,

@@ -133,7 +133,7 @@ public class DeleteMetadataFieldsConfirm extends AbstractDSpaceTransformer
     		if (field == null)
     			continue;
     		
-    		String fieldID = String.valueOf(field.getFieldID());
+    		String fieldID = String.valueOf(field.getID());
 			String fieldEelement = field.getElement();
 			String fieldQualifier = field.getQualifier();
 			

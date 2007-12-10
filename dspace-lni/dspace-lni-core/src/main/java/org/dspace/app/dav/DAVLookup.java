@@ -52,9 +52,9 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.uri.ExternalIdentifier;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 import org.jdom.Element;
 
 
@@ -210,7 +210,10 @@ class DAVLookup extends DAVResource
         }
 
         // did handle lookup fail?
-        dso = HandleManager.resolveToObject(this.context, handle);
+//        dso = HandleManager.resolveToObject(this.context, handle);
+        // FIXME: I don't think this will work. It will need an hdl: prefix.
+        ExternalIdentifier identifier = externalIdentifierDAO.retrieve(handle);
+        dso = identifier.getObjectIdentifier().getObject(context);
         if (dso == null)
         {
             throw new DAVStatusException(HttpServletResponse.SC_NOT_FOUND,
@@ -255,7 +258,10 @@ class DAVLookup extends DAVResource
     protected String makeURI(String handle, String bsPid) throws IOException,
             SQLException
     {
-        DSpaceObject dso = HandleManager.resolveToObject(this.context, handle);
+//        DSpaceObject dso = HandleManager.resolveToObject(this.context, handle);
+        // FIXME: I don't think this will work. It will need an hdl: prefix.
+        ExternalIdentifier identifier = externalIdentifierDAO.retrieve(handle);
+        DSpaceObject dso = identifier.getObjectIdentifier().getObject(context);
         if (dso == null)
         {
             return null;

@@ -133,8 +133,8 @@ public class ViewWorkspaceItemServlet
             displayAll = true;
         }
         
-        // FIXME: we need to synchronise with the handle servlet to use the
-        // display item JSP for both handled and un-handled items
+        // FIXME: we need to synchronise with the URI servlet to use the
+        // display item JSP for items with and without persistent identifiers
         // Set attributes and display
         // request.setAttribute("wsItem", wsItem);
         request.setAttribute("display.all", new Boolean(displayAll));

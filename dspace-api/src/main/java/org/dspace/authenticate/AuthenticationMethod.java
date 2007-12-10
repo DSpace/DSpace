@@ -39,13 +39,9 @@
  */
 package org.dspace.authenticate;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.PageContext;
-import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
@@ -110,8 +106,7 @@ public interface AuthenticationMethod {
      */
     public boolean canSelfRegister(Context context,
                                    HttpServletRequest request,
-                                   String username)
-        throws SQLException;
+                                   String username);
 
     /**
      * Initialize a new EPerson record for a self-registered new user.
@@ -128,8 +123,7 @@ public interface AuthenticationMethod {
      */
     public void initEPerson(Context context,
                             HttpServletRequest request,
-                            EPerson eperson)
-        throws SQLException;
+                            EPerson eperson);
 
     /**
      * Should (or can) we allow the user to change their password.
@@ -147,8 +141,7 @@ public interface AuthenticationMethod {
      */
     public boolean allowSetPassword(Context context,
                                     HttpServletRequest request,
-                                    String username)
-        throws SQLException;
+                                    String username);
 
     /**
      * Predicate, is this an implicit authentication method.
@@ -183,8 +176,7 @@ public interface AuthenticationMethod {
      * @return array of EPerson-group IDs, possibly 0-length, but
      * never <code>null</code>.
      */
-    public int[] getSpecialGroups(Context context, HttpServletRequest request)
-        throws SQLException;
+    public int[] getSpecialGroups(Context context, HttpServletRequest request);
 
     /**
      * Authenticate the given or implicit credentials.
@@ -224,8 +216,7 @@ public interface AuthenticationMethod {
                             String username,
                             String password,
                             String realm,
-                            HttpServletRequest request)
-        throws SQLException;
+                            HttpServletRequest request);
 
     /**
      * Get login page to which to redirect.

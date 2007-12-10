@@ -123,7 +123,7 @@ public class HandleMatcher extends AbstractLogEnabled implements Matcher
         {
 
             // Check if the current object has the handle we are looking for.
-            if (current.getHandle().equals(handle))
+            if (current.getExternalIdentifier().getCanonicalForm().equals(handle))
                 return current;
 
             if (dso.getType() == Constants.ITEM)

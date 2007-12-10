@@ -142,7 +142,7 @@ for (int i = supportedLocales.length-1; i >= 0; i--)
     {
 %>                  <tr>
                         <td class="standard">
-                            <a href="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></a>
+                            <a href="<%= communities[i].getIdentifier().getURL().toString() %>"><%= communities[i].getMetadata("name") %></a>
 <%
         if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
         {

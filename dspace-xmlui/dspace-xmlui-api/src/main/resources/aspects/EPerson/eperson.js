@@ -46,7 +46,7 @@ importClass(Packages.org.dspace.core.Context);
 importClass(Packages.org.dspace.content.Collection);
 importClass(Packages.org.dspace.eperson.EPerson);
 importClass(Packages.org.dspace.eperson.AccountManager);
-importClass(Packages.org.dspace.eperson.Subscribe);
+importClass(Packages.org.dspace.eperson.SubscriptionManager);
 
 importClass(Packages.org.dspace.app.xmlui.utils.AuthenticationUtil);
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
@@ -331,7 +331,7 @@ function doUpdateProfile()
             var collection = Collection.find(getDSContext(),cocoon.request.get("subscriptions"));
             if (collection != null)
             {
-                Subscribe.subscribe(getDSContext(),getEPerson(),collection);
+                SubscriptionManager.subscribe(getDSContext(),getEPerson(),collection);
                 getDSContext().commit();
             }
         }
@@ -346,7 +346,7 @@ function doUpdateProfile()
 	            	var collectionID = cocoon.request.get(names[i]);
 	                var collection = Collection.find(getDSContext(),collectionID);
 	                if (collection != null)
-	                    Subscribe.unsubscribe(getDSContext(),getEPerson(),collection);
+	                    SubscriptionManager.unsubscribe(getDSContext(),getEPerson(),collection);
 	            }
             }
             getDSContext().commit();

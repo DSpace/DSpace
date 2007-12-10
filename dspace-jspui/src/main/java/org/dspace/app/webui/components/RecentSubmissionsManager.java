@@ -114,7 +114,7 @@ public class RecentSubmissionsManager
 			
 			BrowseInfo results = be.browseMini(bs);
 			
-			Item[] items = results.getItemResults(context);
+			Item[] items = results.getBrowseItemResults(context);
 			
 			RecentSubmissions rs = new RecentSubmissions(items);
 			

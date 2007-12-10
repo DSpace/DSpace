@@ -52,11 +52,15 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="org.apache.log4j.Logger" %>
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
+<%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.content.WorkspaceItem" %>
 
 <%
+    Logger log = Logger.getLogger("remove-item.jsp");
     WorkspaceItem wi = (WorkspaceItem) request.getAttribute("workspace.item");
+    Item item = wi.getItem();
 %>
 
 <dspace:layout locbar="link"
@@ -66,11 +70,12 @@
                nocache="true">
 
 <h1><fmt:message key="jsp.mydspace.remove-item.title"/></h1>
-    
+
     <%-- <p>Are you sure you want to remove the following incomplete item?</p> --%>
     <p><fmt:message key="jsp.mydspace.remove-item.confirmation"/></p>
 
-    <dspace:item item="<%= wi.getItem() %>"/>
+    <%= item.toString() %>
+    <dspace:item item="<%= item %>"/>
 
     <form action="<%= request.getContextPath() %>/mydspace" method="post">
         <input type="hidden" name="workspace_id" value="<%= wi.getID() %>"/>

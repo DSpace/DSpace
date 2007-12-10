@@ -39,19 +39,20 @@
  */
 package org.dspace.authorize;
 
-import java.sql.SQLException;
-
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.dao.ResourcePolicyDAO;
+import org.dspace.authorize.dao.ResourcePolicyDAOFactory;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
+import org.dspace.content.dao.CollectionDAOFactory;
+import org.dspace.content.dao.ItemDAO;
+import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.dao.GroupDAO;
+import org.dspace.eperson.dao.GroupDAOFactory;
 
 /**
  * Was Hack/Tool to set policies for items, bundles, and bitstreams. Now has
@@ -132,15 +133,13 @@ public class PolicySet
      * @param clearOnly
      *            if <code>true</code>, just delete policies for matching
      *            objects
-     * @throws SQLException
      *             if database problem
      * @throws AuthorizeException
      *             if current user is not authorized to change these policies
      */
     public static void setPolicies(Context c, int containerType,
             int containerID, int contentType, int actionID, int groupID,
-            boolean isReplace, boolean clearOnly) throws SQLException,
-            AuthorizeException
+            boolean isReplace, boolean clearOnly) throws AuthorizeException
     {
         setPoliciesFilter(c, containerType, containerID, contentType,
                            actionID, groupID, isReplace, clearOnly, null);                         
@@ -170,58 +169,52 @@ public class PolicySet
      *            objects
      * @param filter
      *            if non-null, only process bitstreams whose names contain filter
-     * @throws SQLException
-     *             if database problem
      * @throws AuthorizeException
      *             if current user is not authorized to change these policies
      */
     public static void setPoliciesFilter(Context c, int containerType,
             int containerID, int contentType, int actionID, int groupID,
-            boolean isReplace, boolean clearOnly, String filter) throws SQLException,
-            AuthorizeException
+            boolean isReplace, boolean clearOnly, String filter)
+        throws AuthorizeException
     {
         if (containerType == Constants.COLLECTION)
         {
-            Collection collection = Collection.find(c, containerID);
-            Group group = Group.find(c, groupID);
+            GroupDAO groupDAO = GroupDAOFactory.getInstance(c);
+            ItemDAO itemDAO = ItemDAOFactory.getInstance(c);
+            ResourcePolicyDAO rpDAO = ResourcePolicyDAOFactory.getInstance(c);
 
-            ItemIterator i = collection.getItems();
+            Collection collection =
+                CollectionDAOFactory.getInstance(c).retrieve(containerID);
+            Group group = groupDAO.retrieve(groupID);
 
-            if (contentType == Constants.ITEM)
+            for (Item item : itemDAO.getItemsByCollection(collection))
             {
                 // build list of all items in a collection
-                while (i.hasNext())
+                if (contentType == Constants.ITEM)
                 {
-                    Item myitem = i.next();
-
                     // is this a replace? delete policies first
                     if (isReplace || clearOnly)
                     {
-                        AuthorizeManager.removeAllPolicies(c, myitem);
+                        AuthorizeManager.removeAllPolicies(c, item);
                     }
 
                     if (!clearOnly)
                     {
                         // now add the policy
-                        ResourcePolicy rp = ResourcePolicy.create(c);
+                        ResourcePolicy rp = rpDAO.create();
 
-                        rp.setResource(myitem);
+                        rp.setResource(item);
                         rp.setAction(actionID);
                         rp.setGroup(group);
 
-                        rp.update();
+                        rpDAO.update(rp);
                     }
                 }
-            }
-            else if (contentType == Constants.BUNDLE)
-            {
-                // build list of all items in a collection
-                // build list of all bundles in those items
-                while (i.hasNext())
+                else if (contentType == Constants.BUNDLE)
                 {
-                    Item myitem = i.next();
-
-                    Bundle[] bundles = myitem.getBundles();
+                    // build list of all items in a collection
+                    // build list of all bundles in those items
+                    Bundle[] bundles = item.getBundles();
 
                     for (int j = 0; j < bundles.length; j++)
                     {
@@ -236,27 +229,23 @@ public class PolicySet
                         if (!clearOnly)
                         {
                             // now add the policy
-                            ResourcePolicy rp = ResourcePolicy.create(c);
+                            ResourcePolicy rp = rpDAO.create();
 
                             rp.setResource(t);
                             rp.setAction(actionID);
                             rp.setGroup(group);
 
-                            rp.update();
+                            rpDAO.update(rp);
                         }
                     }
                 }
-            }
-            else if (contentType == Constants.BITSTREAM)
-            {
-                // build list of all bitstreams in a collection
-                // iterate over items, bundles, get bitstreams
-                while (i.hasNext())
+                else if (contentType == Constants.BITSTREAM)
                 {
-                    Item myitem = i.next();
-                    System.out.println("Item " + myitem.getID());
+                    // build list of all bitstreams in a collection
+                    // iterate over items, bundles, get bitstreams
+                    System.out.println("Item " + item.getID());
 
-                    Bundle[] bundles = myitem.getBundles();
+                    Bundle[] bundles = item.getBundles();
 
                     for (int j = 0; j < bundles.length; j++)
                     {
@@ -280,13 +269,13 @@ public class PolicySet
                                 if (!clearOnly)
                                 {
                                         // now add the policy
-                                        ResourcePolicy rp = ResourcePolicy.create(c);
+                                        ResourcePolicy rp = rpDAO.create();
 
                                         rp.setResource(t);
                                         rp.setAction(actionID);
                                         rp.setGroup(group);
 
-                                        rp.update();
+                                        rpDAO.update(rp);
                                 }
                             }
                         }

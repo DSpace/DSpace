@@ -45,7 +45,6 @@ import java.sql.SQLException;
 
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
-import org.dspace.browse.BrowseItem;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -263,7 +262,7 @@ public class DSpaceValidity implements SourceValidity
             Community community = (Community) dso;
 
             validityKey.append("Community:");
-            validityKey.append(community.getHandle());
+            validityKey.append(community.getExternalIdentifier().getCanonicalForm());
             validityKey.append(community.getMetadata("introductory_text"));
             validityKey.append(community.getMetadata("short_description"));
             validityKey.append(community.getMetadata("side_bar_text"));
@@ -279,7 +278,7 @@ public class DSpaceValidity implements SourceValidity
             Collection collection = (Collection) dso;
             
             validityKey.append("Collection:");
-            validityKey.append(collection.getHandle());
+            validityKey.append(collection.getExternalIdentifier().getCanonicalForm());
             validityKey.append(collection.getMetadata("introductory_text"));
             validityKey.append(collection.getMetadata("short_description"));
             validityKey.append(collection.getMetadata("side_bar_text"));
@@ -297,7 +296,7 @@ public class DSpaceValidity implements SourceValidity
             Item item = (Item) dso;
             
             validityKey.append("Item:");
-            validityKey.append(item.getHandle());            
+            validityKey.append(item.getExternalIdentifier().getCanonicalForm());
             // Include all metadata values in the validity key.
             DCValue[] dcvs = item.getDC(Item.ANY,Item.ANY,Item.ANY);
             for (DCValue dcv : dcvs)
@@ -315,22 +314,22 @@ public class DSpaceValidity implements SourceValidity
                 this.add(bundle);
             }
         }
-        else if (dso instanceof BrowseItem)
-        {
-        	BrowseItem browseItem = (BrowseItem) dso;
-        	
-        	validityKey.append("BrowseItem:");
-        	validityKey.append(browseItem.getHandle());
-        	DCValue[] dcvs = browseItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-            for (DCValue dcv : dcvs)
-            {
-                validityKey.append(dcv.schema + ".");
-                validityKey.append(dcv.element + ".");
-                validityKey.append(dcv.qualifier + ".");
-                validityKey.append(dcv.language + "=");
-                validityKey.append(dcv.value);
-            }
-        }
+//        else if (dso instanceof BrowseItem)
+//        {
+//        	BrowseItem browseItem = (BrowseItem) dso;
+//        	
+//        	validityKey.append("BrowseItem:");
+//        	validityKey.append(browseItem.getExternalIdentifier().getCanonicalForm());
+//        	DCValue[] dcvs = browseItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+//            for (DCValue dcv : dcvs)
+//            {
+//                validityKey.append(dcv.schema + ".");
+//                validityKey.append(dcv.element + ".");
+//                validityKey.append(dcv.qualifier + ".");
+//                validityKey.append(dcv.language + "=");
+//                validityKey.append(dcv.value);
+//            }
+//        }
         else if (dso instanceof Bundle)
         {
             Bundle bundle = (Bundle) dso;

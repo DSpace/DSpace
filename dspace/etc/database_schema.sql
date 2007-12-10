@@ -279,7 +279,8 @@ CREATE TABLE MetadataSchemaRegistry
 CREATE TABLE MetadataFieldRegistry
 (
   metadata_field_id   INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatafieldregistry_seq'),
-  metadata_schema_id  INTEGER NOT NULL REFERENCES MetadataSchemaRegistry(metadata_schema_id),
+--  metadata_schema_id  INTEGER NOT NULL REFERENCES MetadataSchemaRegistry(metadata_schema_id),
+  metadata_schema_id  INTEGER REFERENCES MetadataSchemaRegistry(metadata_schema_id),
   element             VARCHAR(64),
   qualifier           VARCHAR(64),
   scope_note          TEXT

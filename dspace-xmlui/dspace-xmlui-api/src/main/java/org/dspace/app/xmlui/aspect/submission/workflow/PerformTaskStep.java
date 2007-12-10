@@ -133,7 +133,7 @@ public class PerformTaskStep extends AbstractStep
     	// Get any metadata that may be removed by unselecting one of these options.
     	Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/workflow";
+		String actionURL = contextPath + "/handle/"+collection.getExternalIdentifier().getCanonicalForm() + "/workflow";
 		int state = ((WorkflowItem) submission).getState();
     	
     	Request request = ObjectModelHelper.getRequest(objectModel);

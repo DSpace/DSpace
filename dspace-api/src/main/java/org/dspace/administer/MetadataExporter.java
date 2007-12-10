@@ -114,7 +114,7 @@ public class MetadataExporter
             }
             
             // Get the metadata fields only for the specified schema
-            mdFields = MetadataField.findAllInSchema(context, mdSchema.getSchemaID());
+            mdFields = MetadataField.findAllInSchema(context, mdSchema.getID());
         }
         else
         {
@@ -300,7 +300,7 @@ public class MetadataExporter
             if (mdSchema != null)
             {
                 name = mdSchema.getName();
-                schemaMap.put(new Integer(mdSchema.getSchemaID()), name);
+                schemaMap.put(new Integer(mdSchema.getID()), name);
             }
             else
             {

@@ -62,6 +62,9 @@ import org.dspace.content.DCSeriesNumber;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.content.dao.WorkspaceItemDAO;
+import org.dspace.content.dao.WorkspaceItemDAOFactory;
 import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
 
@@ -144,6 +147,8 @@ public class DescribeStep extends AbstractProcessingStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
+        WorkspaceItemDAO wsiDAO = WorkspaceItemDAOFactory.getInstance(context);
+
         // check what submit button was pressed in User Interface
         String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
 
@@ -153,7 +158,8 @@ public class DescribeStep extends AbstractProcessingStep
 
         // lookup applicable inputs
         Collection c = subInfo.getSubmissionItem().getCollection();
-        DCInput[] inputs = inputsReader.getInputs(c.getHandle()).getPageRows(
+        DCInput[] inputs = inputsReader.getInputs(
+                c.getIdentifier().getCanonicalForm()).getPageRows(
                 currentPage - 1,
                 subInfo.getSubmissionItem().hasMultipleTitles(),
                 subInfo.getSubmissionItem().isPublishedBefore());
@@ -283,7 +289,7 @@ public class DescribeStep extends AbstractProcessingStep
 
         // Step 4:
         // Save changes to database
-        subInfo.getSubmissionItem().update();
+        wsiDAO.update((WorkspaceItem) subInfo.getSubmissionItem());
 
         // commit changes
         context.commit();
@@ -342,7 +348,7 @@ public class DescribeStep extends AbstractProcessingStep
         if (subInfo.getSubmissionItem() != null)
         {
             collectionHandle = subInfo.getSubmissionItem().getCollection()
-                    .getHandle();
+                    .getIdentifier().getCanonicalForm();
         }
 
         // get number of input pages (i.e. "Describe" pages)
@@ -824,3 +830,4 @@ public class DescribeStep extends AbstractProcessingStep
     }
 
 }
+

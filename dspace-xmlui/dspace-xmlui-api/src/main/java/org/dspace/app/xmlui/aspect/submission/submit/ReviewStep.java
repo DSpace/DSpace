@@ -137,7 +137,7 @@ public class ReviewStep extends AbstractSubmissionStep
 	{
 		// Get actionable URL
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit";
+		String actionURL = contextPath + "/handle/"+collection.getExternalIdentifier().getCanonicalForm() + "/submit";
 		
         SubmissionConfig subConfig = submissionInfo.getSubmissionConfig();
         

@@ -51,7 +51,7 @@ import org.apache.log4j.Logger;
 import org.dspace.checker.BitstreamDispatcher;
 import org.dspace.checker.BitstreamInfoDAO;
 import org.dspace.checker.CheckerCommand;
-import org.dspace.checker.HandleDispatcher;
+import org.dspace.checker.URIDispatcher;
 import org.dspace.checker.LimitedCountDispatcher;
 import org.dspace.checker.LimitedDurationDispatcher;
 import org.dspace.checker.ListDispatcher;
@@ -97,8 +97,8 @@ public class ChecksumChecker
      *            <dd>specify duration of process run</dd>
      *            <dt>-b</dt>
      *            <dd>specify bitstream IDs</dd>
-     *            <dt>-a [handle_id]</dt>
-     *            <dd>check anything by handle</dd>
+     *            <dt>-a [uri]</dt>
+     *            <dd>check anything by URI</dd>
      *            <dt>-e</dt>
      *            <dd>Report only errors in the logs</dd>
      *            <dt>-p</dt>
@@ -120,7 +120,7 @@ public class ChecksumChecker
         options.addOption("h", "help", false, "Help");
         options.addOption("d", "duration", true, "Checking duration");
         options.addOption("c", "count", true, "Check count");
-        options.addOption("a", "handle", true, "Specify a handle to check");
+        options.addOption("a", "uri", true, "Specify a URI to check (canonical form)");
         options.addOption("v", "verbose", false, "Report all processing");
 
         OptionBuilder.withArgName("bitstream-ids").hasArgs().withDescription(
@@ -212,7 +212,7 @@ public class ChecksumChecker
 
         else if (line.hasOption('a'))
         {
-            dispatcher = new HandleDispatcher(new BitstreamInfoDAO(), line.getOptionValue('a'));
+            dispatcher = new URIDispatcher(new BitstreamInfoDAO(), line.getOptionValue('a'));
         }
         else if (line.hasOption('d'))
         {

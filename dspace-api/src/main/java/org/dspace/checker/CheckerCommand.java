@@ -33,7 +33,6 @@
  */
 package org.dspace.checker;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.DigestInputStream;
@@ -43,8 +42,6 @@ import java.sql.SQLException;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Utils;
 
 /**

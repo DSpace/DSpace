@@ -41,7 +41,6 @@ package org.dspace.administer;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -55,6 +54,10 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
+import org.dspace.content.dao.MetadataFieldDAO;
+import org.dspace.content.dao.MetadataFieldDAOFactory;
+import org.dspace.content.dao.MetadataSchemaDAO;
+import org.dspace.content.dao.MetadataSchemaDAOFactory;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.w3c.dom.Document;
@@ -153,7 +156,7 @@ public class RegistryLoader
      *            the filename of the XML file to load
      */
     public static void loadBitstreamFormats(Context context, String filename)
-            throws SQLException, IOException, ParserConfigurationException,
+            throws IOException, ParserConfigurationException,
             SAXException, TransformerException, AuthorizeException
     {
         Document document = loadXML(filename);
@@ -183,7 +186,7 @@ public class RegistryLoader
      *            the node in the DOM tree
      */
     private static void loadFormat(Context context, Node node)
-            throws SQLException, IOException, TransformerException,
+            throws IOException, TransformerException,
             AuthorizeException
     {
         // Get the values
@@ -224,7 +227,7 @@ public class RegistryLoader
      * @throws NonUniqueMetadataException
      */
     public static void loadDublinCoreTypes(Context context, String filename)
-            throws SQLException, IOException, ParserConfigurationException,
+            throws IOException, ParserConfigurationException,
             SAXException, TransformerException, AuthorizeException,
             NonUniqueMetadataException
     {
@@ -256,9 +259,14 @@ public class RegistryLoader
      * @throws NonUniqueMetadataException
      */
     private static void loadDCType(Context context, Node node)
-            throws SQLException, IOException, TransformerException,
-            AuthorizeException, NonUniqueMetadataException
+        throws TransformerException, AuthorizeException,
+                          NonUniqueMetadataException
     {
+        MetadataSchemaDAO schemaDAO =
+            MetadataSchemaDAOFactory.getInstance(context);
+        MetadataFieldDAO fieldDAO =
+            MetadataFieldDAOFactory.getInstance(context);
+
         // Get the values
         String schema = getElementData(node, "schema");
         String element = getElementData(node, "element");
@@ -272,14 +280,14 @@ public class RegistryLoader
         }
 
         // Find the matching schema object
-        MetadataSchema schemaObj = MetadataSchema.find(context, schema);
+        MetadataSchema schemaObj = schemaDAO.retrieveByName(schema);
         
-        MetadataField field = new MetadataField();
-        field.setSchemaID(schemaObj.getSchemaID());
+        MetadataField field = fieldDAO.create();
+        field.setSchemaID(schemaObj.getID());
         field.setElement(element);
         field.setQualifier(qualifier);
         field.setScopeNote(scopeNote);
-        field.create(context);
+        fieldDAO.update(field);
     }
 
     // ===================== XML Utility Methods =========================

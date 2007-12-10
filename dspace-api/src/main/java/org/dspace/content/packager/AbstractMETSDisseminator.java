@@ -321,7 +321,7 @@ public abstract class AbstractMETSDisseminator
          
             // Top-level stuff
             mets.setID(gensym("mets"));
-            mets.setOBJID("hdl:" + item.getHandle());
+            mets.setOBJID(item.getIdentifier().getCanonicalForm());
             mets.setLABEL("DSpace Item");
             mets.setPROFILE(getProfile());
          

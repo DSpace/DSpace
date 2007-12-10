@@ -132,6 +132,11 @@ public class BrowseConsumer implements Consumer
             // Update/Add items
             for (Item i : toUpdate)
             {
+                if (i == null)
+                {
+                    continue;
+                }
+                
                 // FIXME: there is an exception handling problem here
                 try
                 {
@@ -146,16 +151,16 @@ public class BrowseConsumer implements Consumer
                 }
 
                 if (log.isDebugEnabled())
-                    log.debug("Updated browse indices for Item id="
-                            + String.valueOf(i.getID()) + ", hdl="
-                            + i.getHandle());
+                {
+                    log.debug("Updated browse indices for Item id=" + i.getID()
+                            + ", oid=" + i.getIdentifier().getCanonicalForm());
+                }
             }
 
             // NOTE: Removed items are necessarily handled inline (ugh).
 
             // browse updates wrote to the DB, so we have to commit.
-            ctx.getDBConnection().commit();
-
+            ctx.commit();
         }
         
         // clean out toUpdate
@@ -164,5 +169,7 @@ public class BrowseConsumer implements Consumer
     
     public void finish(Context ctx) {
     	
+    	toUpdate = null;
+    	return;
     }
 }

@@ -47,7 +47,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+
+import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DSpaceObject;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
@@ -56,57 +63,110 @@ import org.dspace.core.LogManager;
  * open URL and redirects to search.
  * 
  * @author Robert Tansley
+ * @author James Rutherford
  * @version $Revision$
  */
-public class OpenURLServlet extends DSpaceServlet
+public class OpenURLServlet extends URIServlet
 {
     /** Logger */
     private static Logger log = Logger.getLogger(OpenURLServlet.class);
 
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
-            SQLException, AuthorizeException
+            HttpServletResponse response)
+        throws ServletException, IOException, SQLException, AuthorizeException
     {
-        String query = "";
+        String id = request.getParameter("id");
 
-        // Extract open URL terms. Note: assume no repetition
-        String title = request.getParameter("title");
-        String authorFirst = request.getParameter("aufirst");
-        String authorLast = request.getParameter("aulast");
-
-        String logInfo = "";
-
-        if (title != null)
+        if (id != null)
         {
-            query = query + " " + title;
-            logInfo = logInfo + "title=\"" + title + "\",";
+            processURI(context, request, response);
         }
-
-        if (authorFirst != null)
+        else
         {
-            query = query + " " + authorFirst;
-            logInfo = logInfo + "aufirst=\"" + authorFirst + "\",";
+            // Previous behaviour
+            String query = "";
+
+            // Extract open URL terms. Note: assume no repetition
+            String title = request.getParameter("title");
+            String authorFirst = request.getParameter("aufirst");
+            String authorLast = request.getParameter("aulast");
+
+            String logInfo = "";
+
+            if (title != null)
+            {
+                query = query + " " + title;
+                logInfo = logInfo + "title=\"" + title + "\",";
+            }
+
+            if (authorFirst != null)
+            {
+                query = query + " " + authorFirst;
+                logInfo = logInfo + "aufirst=\"" + authorFirst + "\",";
+            }
+
+            if (authorLast != null)
+            {
+                query = query + " " + authorLast;
+                logInfo = logInfo + "aulast=\"" + authorLast + "\",";
+            }
+
+            log.info(LogManager.getHeader(context, "openURL", logInfo
+                    + "dspacequery=" + query));
+
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/simple-search?query=" + query));
         }
-
-        if (authorLast != null)
-        {
-            query = query + " " + authorLast;
-            logInfo = logInfo + "aulast=\"" + authorLast + "\",";
-        }
-
-        log.info(LogManager.getHeader(context, "openURL", logInfo
-                + "dspacequery=" + query));
-
-        response.sendRedirect(response.encodeRedirectURL(request
-                .getContextPath()
-                + "/simple-search?query=" + query));
     }
 
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
         // Same as a GET
         doDSGet(context, request, response);
+    }
+
+    private void processURI(Context context, HttpServletRequest request,
+            HttpServletResponse response)
+        throws ServletException, IOException, SQLException, AuthorizeException
+    {
+        String id = request.getParameter("id");
+
+        if (id.startsWith("info:dspace/"))
+        {
+            id = id.substring(new String("info:dspace/").length());
+            id = id.replaceFirst("/", ":");
+        }
+
+        ExternalIdentifier identifier = null;
+        ObjectIdentifier oi = null;
+        DSpaceObject dso = null;
+
+        // The value of URI will be the persistent identifier in canonical
+        // form, eg: xyz:1234/56
+        ExternalIdentifierDAO identifierDAO =
+            ExternalIdentifierDAOFactory.getInstance(context);
+        identifier = identifierDAO.retrieve(id);
+
+        oi = identifier.getObjectIdentifier();
+
+        dso = oi.getObject(context);
+
+        if (dso == null)
+        {
+            log.info(LogManager.getHeader(
+                        context, "invalid_id", "id=" + id));
+            JSPManager.showInvalidIDError(request, response, id, -1);
+
+            return;
+        }
+        else
+        {
+            processDSpaceObject(context, request, response, dso, null);
+        }
     }
 }

@@ -49,9 +49,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.webui.util.JSPManager;
-import org.dspace.app.util.SubmissionConfigReader;
+
 import org.dspace.app.util.SubmissionConfig;
+import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -59,15 +60,18 @@ import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.SupervisedItem;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.dao.WorkspaceItemDAO;
+import org.dspace.content.dao.WorkspaceItemDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.handle.HandleManager;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
+import org.dspace.workflow.dao.WorkflowItemDAO;
+import org.dspace.workflow.dao.WorkflowItemDAOFactory;
 
 /**
  * Servlet for constructing the components of the "My DSpace" page
@@ -153,6 +157,9 @@ public class MyDSpaceServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
+        WorkflowItemDAO wfDAO = WorkflowItemDAOFactory.getInstance(context);
+        WorkspaceItemDAO wsDAO = WorkspaceItemDAOFactory.getInstance(context);
+
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_own");
 
         // Get workspace item, if any
@@ -161,7 +168,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         try
         {
             int wsID = Integer.parseInt(request.getParameter("workspace_id"));
-            workspaceItem = WorkspaceItem.find(context, wsID);
+            workspaceItem = wsDAO.retrieve(wsID);
         }
         catch (NumberFormatException nfe)
         {
@@ -174,7 +181,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         try
         {
             int wfID = Integer.parseInt(request.getParameter("workflow_id"));
-            workflowItem = WorkflowItem.find(context, wfID);
+            workflowItem = wfDAO.retrieve(wfID);
         }
         catch (NumberFormatException nfe)
         {
@@ -442,17 +449,11 @@ public class MyDSpaceServlet extends DSpaceServlet
             WorkflowManager.advance(context, workflowItem, context
                     .getCurrentUser());
 
-            // FIXME: This should be a return value from advance()
-            // See if that gave the item a Handle. If it did,
-            // the item made it into the archive, so we
-            // should display a suitable page.
-            String handle = HandleManager.findHandle(context, item);
-
-            if (handle != null)
+            if (item.isArchived())
             {
-                String displayHandle = HandleManager.getCanonicalForm(handle);
+                String uri = item.getIdentifier().getURL().toString();
 
-                request.setAttribute("handle", displayHandle);
+                request.setAttribute("identifier", uri);
                 JSPManager.showJSP(request, response,
                         "/mydspace/in-archive.jsp");
             }
@@ -555,7 +556,7 @@ public class MyDSpaceServlet extends DSpaceServlet
             Collection c = wsi.getCollection();
             SubmissionConfigReader subConfigReader = new SubmissionConfigReader(SubmissionController.UI_NAME);
             SubmissionConfig subConfig = subConfigReader.getSubmissionConfig(c
-                    .getHandle(), false);
+                    .getIdentifier().getCanonicalForm(), false);
 
             // Set the "stage_reached" column on the workspace item
             // to the LAST page of the LAST step in the submission process

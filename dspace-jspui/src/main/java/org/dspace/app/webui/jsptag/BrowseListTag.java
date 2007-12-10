@@ -77,7 +77,8 @@ public class BrowseListTag extends TagSupport
     private static Logger log = Logger.getLogger(BrowseListTag.class);
     
     /** Items to display */
-    private BrowseItem[] items;
+//    private BrowseItem[] items;
+    private Item[] items;
 
     /** Row to highlight, -1 for no row */
     private int highlightRow = -1;
@@ -351,8 +352,12 @@ public class BrowseListTag extends TagSupport
                         // format the title field correctly (as long as the item isn't withdrawn, link to it)
                         else if (field.equals(titleField))
                         {
-                            metadata = "<a href=\"" + hrq.getContextPath() + "/handle/"
-                            + items[i].getHandle() + "\">"
+//                            metadata = "<a href=\"" + hrq.getContextPath() + "/handle/" 
+//                            + items[i].getHandle() + "\">" 
+//                            + Utils.addEntities(metadataArray[0].value)
+//                            + "</a>";
+                            metadata = "<a href=\""
+                            + items[i].getIdentifier().getURL().toString() + "\">" 
                             + Utils.addEntities(metadataArray[0].value)
                             + "</a>";
                         }
@@ -476,7 +481,8 @@ public class BrowseListTag extends TagSupport
                     frags[idx] = "<td headers=\"" + id + "\" class=\""
                     	+ rOddOrEven + "Row" + cOddOrEven + "Col\" nowrap>"
                     	+ "<form method=get action=\"" + hrq.getContextPath() + "/tools/edit-item\">"
-                        + "<input type=\"hidden\" name=\"handle\" value=\"" + items[i].getHandle() + "\" />"
+//                        + "<input type=\"hidden\" name=\"handle\" value=\"" + items[i].getHandle() + "\" />"
+                        + "<input type=\"hidden\" name=\"item_id\" value=\"" + items[i].getID() + "\" />"
                         + "<input type=\"submit\" value=\"Edit Item\" /></form>"
                     	+ "</td>";
                 }
@@ -504,10 +510,6 @@ public class BrowseListTag extends TagSupport
         catch (IOException ie)
         {
             throw new JspException(ie);
-        }
-        catch (SQLException e)
-        {
-        	throw new JspException(e);
         }
         catch (BrowseException e)
         {
@@ -554,7 +556,8 @@ public class BrowseListTag extends TagSupport
      * 
      * @return the items
      */
-    public BrowseItem[] getItems()
+//    public BrowseItem[] getItems()
+    public Item[] getItems()
     {
         return items;
     }
@@ -565,7 +568,8 @@ public class BrowseListTag extends TagSupport
      * @param itemsIn
      *            the items
      */
-    public void setItems(BrowseItem[] itemsIn)
+//    public void setItems(BrowseItem[] itemsIn)
+    public void setItems(Item[] itemsIn)
     {
         items = itemsIn;
     }
@@ -738,7 +742,8 @@ public class BrowseListTag extends TagSupport
     }
 
     /* generate the (X)HTML required to show the thumbnail */
-    private String getThumbMarkup(HttpServletRequest hrq, BrowseItem item)
+//    private String getThumbMarkup(HttpServletRequest hrq, BrowseItem item)
+    private String getThumbMarkup(HttpServletRequest hrq, Item item)
             throws JspException
     {
     	try
@@ -754,13 +759,14 @@ public class BrowseListTag extends TagSupport
         	if (linkToBitstream)
         	{
         		Bitstream original = thumbnail.getOriginal();
-        		String link = hrq.getContextPath() + "/bitstream/" + item.getHandle() + "/" + original.getSequenceID() + "/" +
-        						UIUtil.encodeBitstreamName(original.getName(), Constants.DEFAULT_ENCODING);
+//        		String link = hrq.getContextPath() + "/bitstream/" + item.getHandle() + "/" + original.getSequenceID() + "/" +
+        		String link = original.getIdentifier().getURL().toString();
         		thumbFrag.append("<a target=\"_blank\" href=\"" + link + "\" />");
         	}
         	else
         	{
-        		String link = hrq.getContextPath() + "/handle/" + item.getHandle();
+//        		String link = hrq.getContextPath() + "/handle/" + item.getHandle();
+        		String link = item.getIdentifier().getURL().toString();
         		thumbFrag.append("<a href=\"" + link + "\" />");
         	}
         	
@@ -771,10 +777,6 @@ public class BrowseListTag extends TagSupport
         	thumbFrag.append("<img src=\"" + img + "\" alt=\"" + alt + "\" /></a>");
         	
         	return thumbFrag.toString();
-        }
-        catch (SQLException sqle)
-        {
-        	throw new JspException(sqle.getMessage());
         }
         catch (UnsupportedEncodingException e)
         {

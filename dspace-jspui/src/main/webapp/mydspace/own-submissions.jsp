@@ -44,7 +44,7 @@
   - Attributes to pass in:
   -    user     - the e-person who's submissions these are (EPerson)
   -    items    - the submissions themselves (Item[])
-  -    handles  - Corresponding Handles (String[])
+  -    URIs     - Corresponding persistent identifiers (canonical form -- String[])
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -74,28 +74,23 @@
     if (items.length == 0)
     {
 %>
-    <%-- <p>There are no items in the main archive that have been submitted by you.</p> --%>
 	<p><fmt:message key="jsp.mydspace.own-submissions.text1"/></p>
 <%
     }
     else
     {
 %>
-    <%-- <p>Below are listed your previous submissions that have been accepted into
-    the archive.</p> --%>
 	<p><fmt:message key="jsp.mydspace.own-submissions.text2"/></p>
 <%
         if (items.length == 1)
         {
 %>
-    <%-- <p>There is <strong>1</strong> item in the main archive that was submitted by you.</p> --%>
 	<p><fmt:message key="jsp.mydspace.own-submissions.text3"/></p>
 <%
         }
         else
         {
 %>
-    <%-- <p>There are <strong><%= items.length %></strong> items in the main archive that were submitted by you.</p> --%>
 	<p><fmt:message key="jsp.mydspace.own-submissions.text4">
         <fmt:param><%= items.length %></fmt:param>
     </fmt:message></p>
@@ -107,6 +102,5 @@
     }
 %>
 
-    <%-- <p align="center"><a href="<%= request.getContextPath() %>/mydspace">Back to My DSpace</a></p> --%>
 	<p align="center"><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.mydspace.general.backto-mydspace"/></a></p>
 </dspace:layout>

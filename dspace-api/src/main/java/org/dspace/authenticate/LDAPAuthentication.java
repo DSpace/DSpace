@@ -39,7 +39,6 @@
  */
 package org.dspace.authenticate;
 
-import java.sql.SQLException;
 import java.util.Hashtable;
 
 import javax.naming.NamingEnumeration;
@@ -84,7 +83,6 @@ public class LDAPAuthentication
     public boolean canSelfRegister(Context context,
                                    HttpServletRequest request,
                                    String username)
-        throws SQLException
     {
         // XXX might also want to check that username exists in LDAP.
 
@@ -96,7 +94,6 @@ public class LDAPAuthentication
      */
     public void initEPerson(Context context, HttpServletRequest request,
             EPerson eperson)
-        throws SQLException
     {
         // XXX should we try to initialize netid based on email addr,
         // XXX  for eperson created by some other method??
@@ -108,7 +105,6 @@ public class LDAPAuthentication
     public boolean allowSetPassword(Context context,
                                     HttpServletRequest request,
                                     String username)
-        throws SQLException
     {
         // XXX is this right?
         return false;
@@ -141,19 +137,12 @@ public class LDAPAuthentication
                             String password,
                             String realm,
                             HttpServletRequest request)
-        throws SQLException
     {
         log.info(LogManager.getHeader(context, "auth", "attempting trivial auth of user="+netid));
 
         // Locate the eperson
-        EPerson eperson = null;
-        try
-        {
-            eperson = EPerson.findByNetid(context, netid.toLowerCase());
-        }
-        catch (SQLException e)
-        {
-        }
+        EPerson eperson = EPerson.findByNetid(context, netid.toLowerCase());
+
         boolean loggedIn = false;
         SpeakerToLDAP ldap = new SpeakerToLDAP(log);
 
@@ -199,7 +188,14 @@ public class LDAPAuthentication
 	                        context.setIgnoreAuthorization(true);
 	                        eperson.setNetid(netid);
 	                        eperson.update();
-	                        context.commit();
+                            try
+                            {
+	                            context.commit();
+                            }
+                            catch (java.sql.SQLException sqle)
+                            {
+                                throw new RuntimeException(sqle);
+                            }
 	                        context.setIgnoreAuthorization(false);
 	                        context.setCurrentUser(eperson);
 	                        return SUCCESS;
@@ -228,6 +224,10 @@ public class LDAPAuthentication
 	                            {
 	                                return NO_SUCH_USER;
 	                            }
+                                catch (java.sql.SQLException sqle)
+                                {
+                                    throw new RuntimeException(sqle);
+                                }
 	                            finally
 	                            {
 	                                context.setIgnoreAuthorization(false);

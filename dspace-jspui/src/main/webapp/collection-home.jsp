@@ -64,6 +64,7 @@
 <%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.browse.ItemCounter"%>
 <%@ page import="org.dspace.content.*"%>
+<%@ page import="org.dspace.core.Utils" %>
 <%@ page import="org.dspace.core.ConfigurationManager"%>
 <%@ page import="org.dspace.eperson.Group"     %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
@@ -76,7 +77,7 @@
     Group      submitters = (Group) request.getAttribute("submitters");
 
     RecentSubmissions rs = (RecentSubmissions) request.getAttribute("recently.submitted");
-    
+
     boolean loggedIn =
         ((Boolean) request.getAttribute("logged.in")).booleanValue();
     boolean subscribed =
@@ -112,17 +113,17 @@
     }
 
     String communityName = community.getMetadata("name");
-    String communityLink = "/handle/" + community.getHandle();
+    String communityLink = community.getIdentifier().getURL().toString();
 
     Bitstream logo = collection.getLogo();
-    
+
     boolean feedEnabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");
     String feedData = "NONE";
     if (feedEnabled)
     {
         feedData = "coll:" + ConfigurationManager.getProperty("webui.feed.formats");
     }
-    
+
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
 %>
 
@@ -161,8 +162,8 @@
 	        <label for="tlocation"><small><strong><fmt:message key="jsp.general.location"/></strong></small></label>&nbsp;
                   <select name="location" id="tlocation">
 		    <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
-                    <option selected="selected" value="<%= community.getHandle() %>"><%= communityName %></option>
-                    <option selected="selected" value="<%= collection.getHandle() %>"><%= name %></option>
+                    <option selected="selected" value="<%= community.getIdentifier().getCanonicalForm() %>"><%= communityName %></option>
+                    <option selected="selected" value="<%= collection.getIdentifier().getCanonicalForm() %>"><%= name %></option>
                   </select>
               </td>
             </tr>
@@ -186,7 +187,7 @@
 		String key = "browse.menu." + bis[i].getName();
 %>
 	<div class="browse_buttons">
-	<form method="get" action="<%= request.getContextPath() %>/handle/<%= collection.getHandle() %>/browse">
+	<form method="get" action="<%= collection.getIdentifier().getURL().toString() %>/browse">
 		<input type="hidden" name="type" value="<%= bis[i].getName() %>"/>
 		<%-- <input type="hidden" name="collection" value="<%= collection.getHandle() %>" /> --%>
 		<input type="submit" name="submit_browse" value="<fmt:message key="<%= key %>"/>"/>
@@ -319,7 +320,7 @@
 					displayTitle = dcv[0].value;
 				}
 			}
-			%><p class="recentItem"><a href="<%= request.getContextPath() %>/handle/<%= items[i].getHandle() %>"><%= displayTitle %></a></p><%
+			%><p class="recentItem"><a href="<%= items[i].getIdentifier().getURL().toString() %>"><%= displayTitle %></a></p><%
 		}
 	}
 %>
@@ -352,7 +353,7 @@
     	       width = 36;
     	    }
 %>
-    <a href="<%= request.getContextPath() %>/feed/<%= fmts[j] %>/<%= collection.getHandle() %>"><img src="<%= request.getContextPath() %>/image/<%= icon %>" alt="RSS Feed" width="<%= width %>" height="15" vspace="3" border="0" /></a>
+    <a href="<%= request.getContextPath() %>/feed/<%= fmts[j] %>/<%= collection.getIdentifier().getCanonicalForm() %>"><img src="<%= request.getContextPath() %>/image/<%= icon %>" alt="RSS Feed" width="<%= width %>" height="15" vspace="3" border="0" /></a>
 <%
     	}
 %>

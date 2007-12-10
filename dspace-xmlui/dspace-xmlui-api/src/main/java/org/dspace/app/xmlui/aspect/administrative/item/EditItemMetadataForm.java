@@ -158,7 +158,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
 		MetadataField[] fields = MetadataField.findAll(context);
 		for (MetadataField field : fields)
 		{
-			int fieldID = field.getFieldID();
+			int fieldID = field.getID();
 			MetadataSchema schema = MetadataSchema.find(context, field.getSchemaID());
 			String name = schema.getName() +"."+field.getElement();
 			if (field.getQualifier() != null)

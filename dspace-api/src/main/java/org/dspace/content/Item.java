@@ -42,290 +42,102 @@ package org.dspace.content;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.browse.BrowseException;
-import org.dspace.browse.IndexBrowse;
+import org.dspace.browse.Thumbnail;
+import org.dspace.content.dao.BitstreamDAO;
+import org.dspace.content.dao.BitstreamDAOFactory;
+import org.dspace.content.dao.BitstreamFormatDAO;
+import org.dspace.content.dao.BitstreamFormatDAOFactory;
+import org.dspace.content.dao.BundleDAO;
+import org.dspace.content.dao.BundleDAOFactory;
+import org.dspace.content.dao.CollectionDAO;
+import org.dspace.content.dao.CollectionDAOFactory;
+import org.dspace.content.dao.CommunityDAO;
+import org.dspace.content.dao.CommunityDAOFactory;
+import org.dspace.content.dao.ItemDAO;
+import org.dspace.content.dao.ItemDAOFactory;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.core.ArchiveManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.event.Event;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.handle.HandleManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.eperson.dao.EPersonDAO;
+import org.dspace.eperson.dao.EPersonDAOFactory;
+import org.dspace.event.Event;
 
 /**
- * Class representing an item in DSpace.
- * <P>
- * This class holds in memory the item Dublin Core metadata, the bundles in the
- * item, and the bitstreams in those bundles. When modifying the item, if you
- * modify the Dublin Core or the "in archive" flag, you must call
- * <code>update</code> for the changes to be written to the database.
- * Creating, adding or removing bundles or bitstreams has immediate effect in
- * the database.
+ * Class representing an item in DSpace. Note that everything is held in memory
+ * until update() is called on the ItemDAO.
  * 
- * @author Robert Tansley
- * @author Martin Hald
+ * @author James Rutherford
  * @version $Revision$
  */
 public class Item extends DSpaceObject
 {
-    /**
-     * Wild card for Dublin Core metadata qualifiers/languages
-     */
-    public final static String ANY = "*";
-
-    /** log4j category */
     private static Logger log = Logger.getLogger(Item.class);
 
-    /** Our context */
-    private Context ourContext;
+    public static final String ANY = "*";
 
-    /** The table row corresponding to this item */
-    private TableRow itemRow;
+    protected ItemDAO dao;
+    protected BitstreamDAO bitstreamDAO;
+    protected BitstreamFormatDAO bitstreamFormatDAO;
+    protected BundleDAO bundleDAO;
+    protected CollectionDAO collectionDAO;
+    protected CommunityDAO communityDAO;
+    protected EPersonDAO epersonDAO;
 
-    /** The e-person who submitted this item */
-    private EPerson submitter;
+    protected String identifier;
+    protected boolean inArchive;
+    protected boolean withdrawn;
+    protected Date lastModified;
 
-    /** The bundles in this item - kept in sync with DB */
-    private List<Bundle> bundles;
+    protected int owningCollectionId;
+    protected Collection owningCollection;
+    protected int submitterId;
+    protected EPerson submitter;
 
-    /** The Dublin Core metadata - a list of DCValue objects. */
-    private List<DCValue> dublinCore;
+    protected List<Bundle> bundles;
+    protected List<DCValue> metadata;
 
-    /** Handle, if any */
-    private String handle;
-
-    /**
-     * True if the Dublin Core has changed since reading from the DB or the last
-     * update()
-     */
-    private boolean dublinCoreChanged;
+    protected boolean metadataChanged;
 
     /**
      * True if anything else was changed since last update()
      * (to drive event mechanism)
      */
     private boolean modified;
-
-    /**
-     * Construct an item with the given table row
-     * 
-     * @param context
-     *            the context this object exists in
-     * @param row
-     *            the corresponding row in the table
-     * @throws SQLException
-     */
-    Item(Context context, TableRow row) throws SQLException
+    
+    public Item(Context context, int id)
     {
-        ourContext = context;
-        itemRow = row;
-        dublinCoreChanged = false;
+        this.id = id;
+        this.context = context;
+
         modified = false;
-        dublinCore = new ArrayList<DCValue>();
         clearDetails();
- 
-        // Get Dublin Core metadata
-        TableRowIterator tri = DatabaseManager.queryTable(ourContext, "MetadataValue",
-                "SELECT * FROM MetadataValue WHERE item_id= ? " +
-                " ORDER BY metadata_field_id, place",
-                itemRow.getIntColumn("item_id"));
+        
+        dao = ItemDAOFactory.getInstance(context);
+        bitstreamDAO = BitstreamDAOFactory.getInstance(context);
+        bitstreamFormatDAO = BitstreamFormatDAOFactory.getInstance(context);
+        bundleDAO = BundleDAOFactory.getInstance(context);
+        collectionDAO = CollectionDAOFactory.getInstance(context);
+        communityDAO = CommunityDAOFactory.getInstance(context);
+        epersonDAO = EPersonDAOFactory.getInstance(context);
 
-        while (tri.hasNext())
-        {
-            TableRow resultRow = tri.next();
-
-            // Get the associated metadata field and schema information
-            int fieldID = resultRow.getIntColumn("metadata_field_id");
-            MetadataField field = MetadataField.find(context, fieldID);
-
-            if (field == null)
-            {
-                log.error("Loading item - cannot found metadata field "
-                        + fieldID);
-            }
-            else
-            {
-                MetadataSchema schema = MetadataSchema.find(
-                        context, field.getSchemaID());
-
-            // Make a DCValue object
-            DCValue dcv = new DCValue();
-                dcv.element = field.getElement();
-                dcv.qualifier = field.getQualifier();
-            dcv.value = resultRow.getStringColumn("text_value");
-            dcv.language = resultRow.getStringColumn("text_lang");
-                //dcv.namespace = schema.getNamespace();
-                dcv.schema = schema.getName();
-
-            // Add it to the list
-            dublinCore.add(dcv);
-        }
-        }
-        // close the TableRowIterator to free up resources
-        tri.close();
-
-        // Get our Handle if any
-        handle = HandleManager.findHandle(context, this);
-
-        // Cache ourselves
-        context.cache(this, row.getIntColumn("item_id"));
-    }
-
-    /**
-     * Get an item from the database. The item, its Dublin Core metadata, and
-     * the bundle and bitstream metadata are all loaded into memory.
-     * 
-     * @param context
-     *            DSpace context object
-     * @param id
-     *            Internal ID of the item
-     * @return the item, or null if the internal ID is invalid.
-     * @throws SQLException
-     */
-    public static Item find(Context context, int id) throws SQLException
-    {
-        // First check the cache
-        Item fromCache = (Item) context.fromCache(Item.class, id);
-
-        if (fromCache != null)
-        {
-            return fromCache;
-        }
-
-        TableRow row = DatabaseManager.find(context, "item", id);
-
-        if (row == null)
-        {
-            if (log.isDebugEnabled())
-            {
-                log.debug(LogManager.getHeader(context, "find_item",
-                        "not_found,item_id=" + id));
-            }
-
-            return null;
-        }
-
-        // not null, return item
-        if (log.isDebugEnabled())
-        {
-            log.debug(LogManager.getHeader(context, "find_item", "item_id="
-                    + id));
-        }
-
-        return new Item(context, row);
-    }
-
-    /**
-     * Create a new item, with a new internal ID. This method is not public,
-     * since items need to be created as workspace items. Authorisation is the
-     * responsibility of the caller.
-     * 
-     * @param context
-     *            DSpace context object
-     * @return the newly created item
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-    static Item create(Context context) throws SQLException, AuthorizeException
-    {
-        TableRow row = DatabaseManager.create(context, "item");
-        Item i = new Item(context, row);
-
-        // Call update to give the item a last modified date. OK this isn't
-        // amazingly efficient but creates don't happen that often.
-        context.setIgnoreAuthorization(true);
-        i.update();
-        context.setIgnoreAuthorization(false);
-
-        context.addEvent(new Event(Event.CREATE, Constants.ITEM, i.getID(), null));
-
-        log.info(LogManager.getHeader(context, "create_item", "item_id="
-                + row.getIntColumn("item_id")));
-
-        return i;
-    }
-
-    /**
-     * Get all the items in the archive. Only items with the "in archive" flag
-     * set are included. The order of the list is indeterminate.
-     * 
-     * @param context
-     *            DSpace context object
-     * @return an iterator over the items in the archive.
-     * @throws SQLException
-     */
-    public static ItemIterator findAll(Context context) throws SQLException
-    {
-        String myQuery = "SELECT * FROM item WHERE in_archive='1'";
-
-        TableRowIterator rows = DatabaseManager.queryTable(context, "item", myQuery);
-
-        return new ItemIterator(context, rows);
-    }
-
-    /**
-     * Find all the items in the archive by a given submitter. The order is
-     * indeterminate. Only items with the "in archive" flag set are included.
-     * 
-     * @param context
-     *            DSpace context object
-     * @param eperson
-     *            the submitter
-     * @return an iterator over the items submitted by eperson
-     * @throws SQLException
-     */
-    public static ItemIterator findBySubmitter(Context context, EPerson eperson)
-            throws SQLException
-    {
-        String myQuery = "SELECT * FROM item WHERE in_archive='1' AND submitter_id="
-                + eperson.getID();
-
-        TableRowIterator rows = DatabaseManager.queryTable(context, "item", myQuery);
-
-        return new ItemIterator(context, rows);
-    }
-
-    /**
-     * Get the internal ID of this item. In general, this shouldn't be exposed
-     * to users
-     * 
-     * @return the internal identifier
-     */
-    public int getID()
-    {
-        return itemRow.getIntColumn("item_id");
-    }
-
-    /**
-     * @see org.dspace.content.DSpaceObject#getHandle()
-     */
-    public String getHandle()
-    {
-        if(handle == null) {
-        	try {
-				handle = HandleManager.findHandle(this.ourContext, this);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
-			}
-        }
-    	return handle;
+        identifiers = new ArrayList<ExternalIdentifier>();
+        bundles = new ArrayList<Bundle>();
+        metadata = new ArrayList<DCValue>();
+        metadataChanged = false;
     }
 
     /**
@@ -335,7 +147,17 @@ public class Item extends DSpaceObject
      */
     public boolean isArchived()
     {
-        return itemRow.getBooleanColumn("in_archive");
+        return inArchive;
+    }
+
+    /**
+     * Only <code>WorkflowItem.archive()</code> should really set this.
+     * 
+     * @param inArchive new value for the flag
+     */
+    public void setArchived(boolean inArchive)
+    {
+        this.inArchive = inArchive;
     }
 
     /**
@@ -345,7 +167,12 @@ public class Item extends DSpaceObject
      */
     public boolean isWithdrawn()
     {
-        return itemRow.getBooleanColumn("withdrawn");
+        return withdrawn;
+    }
+
+    public void setWithdrawn(boolean withdrawn)
+    {
+        this.withdrawn = withdrawn;
     }
 
     /**
@@ -357,105 +184,50 @@ public class Item extends DSpaceObject
      */
     public Date getLastModified()
     {
-        Date myDate = itemRow.getDateColumn("last_modified");
-
-        if (myDate == null)
-        {
-            myDate = new Date();
-        }
-
-        return myDate;
+        return lastModified;
     }
 
-    /**
-     * Set the "is_archived" flag. This is public and only
-     * <code>WorkflowItem.archive()</code> should set this.
-     * 
-     * @param isArchived
-     *            new value for the flag
-     */
-    public void setArchived(boolean isArchived)
+    public void setLastModified(Date date)
     {
-        itemRow.setColumn("in_archive", isArchived);
-        modified = true;
-    }
-
-    /**
-     * Set the owning Collection for the item
-     * 
-     * @param c
-     *            Collection
-     */
-    public void setOwningCollection(Collection c)
-    {
-        itemRow.setColumn("owning_collection", c.getID());
-        modified = true;
+        // FIXME: Sanity checks!
+        lastModified = date;
     }
 
     /**
      * Get the owning Collection for the item
      * 
      * @return Collection that is the owner of the item
-     * @throws SQLException
      */
-    public Collection getOwningCollection() throws java.sql.SQLException
+    public Collection getOwningCollection()
     {
-        Collection myCollection = null;
-
-        // get the collection ID
-        int cid = itemRow.getIntColumn("owning_collection");
-
-        myCollection = Collection.find(ourContext, cid);
-
-        return myCollection;
+        modified = true;
+        return owningCollection;
     }
 
     /**
-     * Get Dublin Core metadata for the item.
-     * Passing in a <code>null</code> value for <code>qualifier</code>
-     * or <code>lang</code> only matches Dublin Core fields where that
-     * qualifier or languages is actually <code>null</code>.
-     * Passing in <code>Item.ANY</code>
-     * retrieves all metadata fields with any value for the qualifier or
-     * language, including <code>null</code>
-     * <P>
-     * Examples:
-     * <P>
-     * Return values of the unqualified "title" field, in any language.
-     * Qualified title fields (e.g. "title.uniform") are NOT returned:
-     * <P>
-     * <code>item.getDC( "title", null, Item.ANY );</code>
-     * <P>
-     * Return all US English values of the "title" element, with any qualifier
-     * (including unqualified):
-     * <P>
-     * <code>item.getDC( "title", Item.ANY, "en_US" );</code>
-     * <P>
-     * The ordering of values of a particular element/qualifier/language
-     * combination is significant. When retrieving with wildcards, values of a
-     * particular element/qualifier/language combinations will be adjacent, but
-     * the overall ordering of the combinations is indeterminate.
+     * List the owning Collection for the item
      * 
-     * @param element
-     *            the Dublin Core element. <code>Item.ANY</code> matches any
-     *            element. <code>null</code> doesn't really make sense as all
-     *            DC must have an element.
-     * @param qualifier
-     *            the qualifier. <code>null</code> means unqualified, and
-     *            <code>Item.ANY</code> means any qualifier (including
-     *            unqualified.)
-     * @param lang
-     *            the ISO639 language code, optionally followed by an underscore
-     *            and the ISO3166 country code. <code>null</code> means only
-     *            values with no language are returned, and
-     *            <code>Item.ANY</code> means values with any country code or
-     *            no country code are returned.
-     * @return Dublin Core fields that match the parameters
+     * @param owningCollection Collection
      */
-    @Deprecated
-    public DCValue[] getDC(String element, String qualifier, String lang)
+    public void setOwningCollection(Collection owningCollection)
     {
-        return getMetadata(MetadataSchema.DC_SCHEMA, element, qualifier, lang);
+        this.owningCollection = owningCollection;
+        modified = true;
+    }
+
+    public void setOwningCollectionId(int owningCollectionId)
+    {
+        this.owningCollectionId = owningCollectionId;
+    }
+
+    public List<DCValue> getMetadata()
+    {
+        return metadata;
+    }
+
+    public void setMetadata(List<DCValue> metadata)
+    {
+        this.metadata = metadata;
     }
 
     /**
@@ -509,7 +281,8 @@ public class Item extends DSpaceObject
     {
         // Build up list of matching values
         List<DCValue> values = new ArrayList<DCValue>();
-        for (DCValue dcv : dublinCore)
+
+        for (DCValue dcv : metadata)
         {
             if (match(schema, element, qualifier, lang, dcv))
             {
@@ -525,11 +298,7 @@ public class Item extends DSpaceObject
             }
         }
 
-        // Create an array of matching values
-        DCValue[] valueArray = new DCValue[values.size()];
-        valueArray = (DCValue[]) values.toArray(valueArray);
-
-        return valueArray;
+        return values.toArray(new DCValue[0]);
     }
     
     /**
@@ -542,13 +311,13 @@ public class Item extends DSpaceObject
      */
     public DCValue[] getMetadata(String mdString)
     {
-        StringTokenizer dcf = new StringTokenizer(mdString, ".");
+        StringTokenizer st = new StringTokenizer(mdString, ".");
         
         String[] tokens = { "", "", "" };
         int i = 0;
-        while(dcf.hasMoreTokens())
+        while(st.hasMoreTokens())
         {
-            tokens[i] = dcf.nextToken().toLowerCase().trim();
+            tokens[i] = st.nextToken().toLowerCase().trim();
             i++;
         }
         String schema = tokens[0];
@@ -571,53 +340,6 @@ public class Item extends DSpaceObject
         
         return values;
     }
-
-    /**
-     * Add Dublin Core metadata fields. These are appended to existing values.
-     * Use <code>clearDC</code> to remove values. The ordering of values
-     * passed in is maintained.
-     * 
-     * @param element
-     *            the Dublin Core element
-     * @param qualifier
-     *            the Dublin Core qualifer, or <code>null</code> for
-     *            unqualified
-     * @param lang
-     *            the ISO639 language code, optionally followed by an underscore
-     *            and the ISO3166 country code. <code>null</code> means the
-     *            value has no language (for example, a date).
-     * @param values
-     *            the values to add.
-     */
-    @Deprecated
-    public void addDC(String element, String qualifier, String lang,
-            String[] values)
-    {
-        addMetadata(MetadataSchema.DC_SCHEMA, element, qualifier, lang, values);
-    }
-
-    /**
-     * Add a single Dublin Core metadata field. This is appended to existing
-     * values. Use <code>clearDC</code> to remove values.
-     *
-     * @param element
-     *            the Dublin Core element
-     * @param qualifier
-     *            the Dublin Core qualifer, or <code>null</code> for
-     *            unqualified
-     * @param lang
-     *            the ISO639 language code, optionally followed by an underscore
-     *            and the ISO3166 country code. <code>null</code> means the
-     *            value has no language (for example, a date).
-     * @param value
-     *            the value to add.
-     */
-    @Deprecated
-    public void addDC(String element, String qualifier, String lang,
-            String value)
-    {
-        addMetadata(MetadataSchema.DC_SCHEMA, element, qualifier, lang, value);
-    }
     
     /**
      * Add metadata fields. These are appended to existing values.
@@ -638,22 +360,23 @@ public class Item extends DSpaceObject
      * @param values
      *            the values to add.
      */
-    public void addMetadata(String schema, String element, String qualifier, String lang,
-            String[] values)
+    public void addMetadata(String schema, String element, String qualifier,
+            String lang, String... values)
     {
         // We will not verify that they are valid entries in the registry
         // until update() is called.
-        for (int i = 0; i < values.length; i++)
+        for (String value : values)
         {
             DCValue dcv = new DCValue();
             dcv.schema = schema;
             dcv.element = element;
             dcv.qualifier = qualifier;
             dcv.language = lang;
-            if (values[i] != null)
+
+            if (value != null && !value.trim().equals(""))
             {
                 // remove control unicode char
-                String temp = values[i].trim();
+                String temp = value.trim();
                 char[] dcvalue = temp.toCharArray();
                 for (int charPos = 0; charPos < dcvalue.length; charPos++)
                 {
@@ -669,72 +392,18 @@ public class Item extends DSpaceObject
             }
             else
             {
-                dcv.value = null;
+                continue;
+//                dcv.value = null;
             }
-            dublinCore.add(dcv);
+            
+            if (!metadata.contains(dcv))
+            {
+                metadata.add(dcv);
+                metadataChanged = true;
+            }
+
             addDetails(schema+"."+element+((qualifier==null)? "": "."+qualifier));
-
         }
-
-        if (values.length > 0)
-        {
-            dublinCoreChanged = true;
-        }
-    }
-
-    /**
-     * Add a single metadata field. This is appended to existing
-     * values. Use <code>clearDC</code> to remove values.
-     * 
-     * @param schema
-     *            the schema for the metadata field. <em>Must</em> match
-     *            the <code>name</code> of an existing metadata schema.
-     * @param element
-     *            the metadata element name
-     * @param qualifier
-     *            the metadata qualifer, or <code>null</code> for
-     *            unqualified
-     * @param lang
-     *            the ISO639 language code, optionally followed by an underscore
-     *            and the ISO3166 country code. <code>null</code> means the
-     *            value has no language (for example, a date).
-     * @param value
-     *            the value to add.
-     */
-    public void addMetadata(String schema, String element, String qualifier,
-            String lang, String value)
-    {
-        String[] valArray = new String[1];
-        valArray[0] = value;
-
-        addMetadata(schema, element, qualifier, lang, valArray);
-    }
-
-    /**
-     * Clear Dublin Core metadata values. As with <code>getDC</code> above,
-     * passing in <code>null</code> only matches fields where the qualifier or
-     * language is actually <code>null</code>.<code>Item.ANY</code> will
-     * match any element, qualifier or language, including <code>null</code>.
-     * Thus, <code>item.clearDC(Item.ANY, Item.ANY, Item.ANY)</code> will
-     * remove all Dublin Core metadata associated with an item.
-     * 
-     * @param element
-     *            the Dublin Core element to remove, or <code>Item.ANY</code>
-     * @param qualifier
-     *            the qualifier. <code>null</code> means unqualified, and
-     *            <code>Item.ANY</code> means any qualifier (including
-     *            unqualified.)
-     * @param lang
-     *            the ISO639 language code, optionally followed by an underscore
-     *            and the ISO3166 country code. <code>null</code> means only
-     *            values with no language are removed, and <code>Item.ANY</code>
-     *            means values with any country code or no country code are
-     *            removed.
-     */
-    @Deprecated
-    public void clearDC(String element, String qualifier, String lang)
-    {
-        clearMetadata(MetadataSchema.DC_SCHEMA, element, qualifier, lang);
     }
 
     /**
@@ -764,19 +433,617 @@ public class Item extends DSpaceObject
     public void clearMetadata(String schema, String element, String qualifier,
             String lang)
     {
-        // We will build a list of values NOT matching the values to clear
-        List<DCValue> values = new ArrayList<DCValue>();
-        for (DCValue dcv : dublinCore)
+        if (metadata.size() == 0)
         {
-            if (!match(schema, element, qualifier, lang, dcv))
+            return;
+        }
+
+        Iterator<DCValue> i = metadata.iterator();
+        while (i.hasNext())
+        {
+            if (match(schema, element, qualifier, lang, i.next()))
             {
-                values.add(dcv);
+                i.remove();
+                metadataChanged = true;
+            }
+        }
+    }
+
+    /**
+     * Get the e-person that originally submitted this item
+     * 
+     * @return the submitter
+     */
+    public EPerson getSubmitter()
+    {
+        return submitter;
+    }
+
+    /**
+     * List the e-person that originally submitted this item. This is a public
+     * method since it is handled by the WorkspaceItem class in the ingest
+     * package. <code>update</code> must be called to write the change to the
+     * database.
+     * 
+     * @param submitter
+     *            the submitter
+     */
+    public void setSubmitter(EPerson submitter)
+    {
+        this.submitter = submitter;
+        submitterId = submitter.getID();
+        modified = true;
+    }
+
+    public void setSubmitter(int submitterId)
+    {
+        setSubmitter(epersonDAO.retrieve(submitterId));
+    }
+
+    /**
+     * Get the bundles in this item.
+     * 
+     * @return the bundles in an unordered array
+     */
+    public Bundle[] getBundles()
+    {
+        return bundles.toArray(new Bundle[0]);
+    }
+
+    public void setBundles(List<Bundle> bundles)
+    {
+        this.bundles = bundles;
+    }
+
+    /**
+     * Get the bundles matching a bundle name (name corresponds roughly to type)
+     * 
+     * @param name
+     *            name of bundle (ORIGINAL/TEXT/THUMBNAIL)
+     * 
+     * @return the bundles in an unordered array
+     */
+    public Bundle[] getBundles(String name)
+    {
+        List<Bundle> tmp = new ArrayList<Bundle>();
+        for (Bundle bundle : getBundles())
+        {
+            if (name.equals(bundle.getName()))
+            {
+                tmp.add(bundle);
+            }
+        }
+        return tmp.toArray(new Bundle[0]);
+    }
+
+    /**
+     * Create a bundle in this item, with immediate effect
+     * 
+     * @param name
+     *            bundle name (ORIGINAL/TEXT/THUMBNAIL)
+     * @return the newly created bundle
+     * @throws AuthorizeException
+     */
+    public Bundle createBundle(String name) throws AuthorizeException
+    {
+        if ((name == null) || "".equals(name))
+        {
+            throw new RuntimeException("Bundle must be created with non-empty name");
+        }
+
+        AuthorizeManager.authorizeAction(context, this, Constants.ADD);
+
+        // FIXME: Ideally, we wouldn't reach into the DAO layer here, we'd just
+        // let everything fall into place when item.update() is called, but I
+        // haven't quite worked out the logistics of that yet. Basically, we
+        // need the behaviour to propogate downwards (ie: through bundles into
+        // bitstreams) because bitstreams don't yet use DAOs, they do the
+        // creation immediately. Once Bitstreams use DAOs, we *should* be able
+        // to replace this code with the following:
+        // Addendum: That didn't seem to do it. Need to figure out why.
+        /*
+        Bundle b = new Bundle();
+        b.setName(name);
+        addBundle(b);
+        return b;
+        */
+        Bundle b = bundleDAO.create();
+        b.setName(name);
+        bundleDAO.update(b);
+
+        addBundle(b);
+
+        return b;
+    }
+
+    /**
+     * Add an existing bundle to this item. This has immediate effect.
+     * 
+     * @param b
+     *            the bundle to add
+     */
+    public void addBundle(Bundle b) throws AuthorizeException
+    {
+        // Check it's not already there
+        for (Bundle bundle : getBundles())
+        {
+            if ((b.getName().equals(bundle.getName())) ||
+                (b.getID() == bundle.getID()))
+            {
+                // Bundle is a duplicate, do nothing
+                return;
             }
         }
 
-        // Now swap the old list of values for the new, unremoved values
-        dublinCore = values;
-        dublinCoreChanged = true;
+        AuthorizeManager.inheritPolicies(context, this, b);
+
+        bundles.add(b);
+
+        context.addEvent(new Event(Event.ADD, Constants.ITEM, getID(), Constants.BUNDLE, b.getID(), b.getName()));
+    }
+
+    /**
+     * Remove a bundle. This may result in the bundle being deleted, if the
+     * bundle is orphaned.
+     *
+     * FIXME: Will this ever not be the case? Can multiple Items own the same
+     * Bundle? (I think the answer is no).
+     * 
+     * @param b
+     *            the bundle to remove
+     */
+    public void removeBundle(Bundle b) throws AuthorizeException
+    {
+        AuthorizeManager.authorizeAction(context, this, Constants.REMOVE);
+
+        log.info(LogManager.getHeader(context, "remove_bundle", "item_id="
+                + getID() + ",bundle_id=" + b.getID()));
+
+        Iterator<Bundle> i = bundles.iterator();
+        while (i.hasNext())
+        {
+            if (i.next().getID() == b.getID())
+            {
+                i.remove();
+            }
+        }
+
+        context.addEvent(new Event(Event.REMOVE, Constants.ITEM, getID(), Constants.BUNDLE, b.getID(), b.getName()));
+    }
+
+    /**
+     * Create a single bitstream in a new bundle. Provided as a convenience
+     * method for the most common use.
+     * 
+     * @param is
+     *            the stream to create the new bitstream from
+     * @param name
+     *            is the name of the bundle (ORIGINAL, TEXT, THUMBNAIL)
+     * @return Bitstream that is created
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    public Bitstream createSingleBitstream(InputStream is, String name)
+            throws AuthorizeException, IOException
+    {
+        // Authorisation is checked by methods below
+        // Create a bundle
+        log.info("creating bundle " + name);
+        Bundle bnd = createBundle(name);
+        log.info("creating bitstream");
+        Bitstream bitstream = bnd.createBitstream(is);
+        log.info("adding bundle to item");
+        addBundle(bnd);
+
+        // FIXME: Create permissions for new bundle + bitstream
+        return bitstream;
+    }
+
+    /**
+     * Convenience method, calls createSingleBitstream() with name "ORIGINAL"
+     * 
+     * @param is
+     *            InputStream
+     * @return created bitstream
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    public Bitstream createSingleBitstream(InputStream is)
+            throws AuthorizeException, IOException
+    {
+        return createSingleBitstream(is, "ORIGINAL");
+    }
+
+    /**
+     * Get all non-internal bitstreams in the item. This is mainly used for
+     * auditing for provenance messages and adding format.* DC values. The order
+     * is indeterminate.
+     * 
+     * @return non-internal bitstreams.
+     */
+    public Bitstream[] getNonInternalBitstreams()
+    {
+        List<Bitstream> bitstreamList = new ArrayList<Bitstream>();
+
+        // Go through the bundles and bitstreams picking out ones which aren't
+        // of internal formats
+        for (Bundle b : getBundles())
+        {
+            Bitstream[] bitstreams = b.getBitstreams();
+
+            for (int j = 0; j < bitstreams.length; j++)
+            {
+                if (!bitstreams[j].getFormat().isInternal())
+                {
+                    // Bitstream is not of an internal format
+                    bitstreamList.add(bitstreams[j]);
+                }
+            }
+        }
+
+        Bitstream[] bsArray = new Bitstream[bitstreamList.size()];
+        bsArray = (Bitstream[]) bitstreamList.toArray(bsArray);
+
+        return bsArray;
+    }
+
+    /**
+     * Store a copy of the license a user granted in this item.
+     * 
+     * @param license
+     *            the license the user granted
+     * @param eperson
+     *            the eperson who granted the license
+     * @throws IOException
+     * @throws AuthorizeException
+     */
+    public void licenseGranted(String license, EPerson eperson)
+            throws IOException, AuthorizeException
+    {
+        // Put together text to store
+        String licenseText = "License granted by " + eperson.getFullName()
+                + " (" + eperson.getEmail() + ") on "
+                + DCDate.getCurrent().toString() + " (GMT):\n\n" + license;
+
+        // Store text as a bitstream
+        byte[] licenseBytes = licenseText.getBytes();
+        ByteArrayInputStream bais = new ByteArrayInputStream(licenseBytes);
+        Bitstream b = createSingleBitstream(bais, "LICENSE");
+
+        // Now set the format and name of the bitstream
+        b.setName("license.txt");
+        b.setSource("Written by org.dspace.content.Item");
+
+        // Find the License format
+        BitstreamFormat bf =
+                bitstreamFormatDAO.retrieveByShortDescription("License");
+        b.setFormat(bf);
+
+        bitstreamDAO.update(b);
+    }
+
+    /**
+     * Remove just the DSpace license from an item This is useful to update the
+     * current DSpace license, in case the user must accept the DSpace license
+     * again (either the item was rejected, or resumed after saving)
+     * <p>
+     * This method is used by the org.dspace.submit.step.LicenseStep class
+     * 
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    public void removeDSpaceLicense() throws AuthorizeException,
+            IOException
+    {
+        // get all bundles with name "LICENSE" (these are the DSpace license
+        // bundles)
+        Bundle[] bunds = getBundles("LICENSE");
+
+        for (int i = 0; i < bunds.length; i++)
+        {
+            // FIXME: probably serious troubles with Authorizations
+            // fix by telling system not to check authorization?
+            removeBundle(bunds[i]);
+        }
+    }
+
+    /**
+     * Remove all licenses from an item - it was rejected
+     * 
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    public void removeLicenses() throws AuthorizeException,
+            IOException
+    {
+        // Find the License format
+        BitstreamFormat bf =
+                bitstreamFormatDAO.retrieveByShortDescription("License");
+        int licensetype = bf.getID();
+
+        // search through bundles, looking for bitstream type license
+        for (Bundle bundle : getBundles())
+        {
+            boolean removethisbundle = false;
+
+            for (Bitstream bitstream : bundle.getBitstreams())
+            {
+                BitstreamFormat format = bitstream.getFormat();
+
+                if (format.getID() == licensetype)
+                {
+                    removethisbundle = true;
+                }
+            }
+
+            // probably serious troubles with Authorizations
+            // fix by telling system not to check authorization?
+            if (removethisbundle)
+            {
+                removeBundle(bundle);
+            }
+        }
+    }
+
+    /**
+     * Withdraw the item from the archive. It is kept in place, and the content
+     * and metadata are not deleted, but it is not publicly accessible.
+     * 
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    @Deprecated
+    public void withdraw() throws AuthorizeException, IOException
+    {
+        ArchiveManager.withdrawItem(context, this);
+
+		context.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), "WITHDRAW"));
+    }
+
+    /**
+     * Reinstate a withdrawn item
+     * 
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    @Deprecated
+    public void reinstate() throws AuthorizeException, IOException
+    {
+        ArchiveManager.reinstateItem(context, this);
+        context.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), "REINSTATE"));
+    }
+
+    /**
+     * Return true if the given Collection 'owns' this item.
+     * 
+     * @param c Collection
+     * @return true if this Collection owns this item
+     */
+    public boolean isOwningCollection(Collection c)
+    {
+        if (owningCollectionId > 0)
+        {
+            if (c.getID() == owningCollectionId)
+            {
+                return true;
+            }
+        }
+        else if (owningCollection != null)
+        {
+            if (c.getID() == owningCollection.getID())
+            {
+                return true;
+            }
+        }
+
+        // not the owner
+        return false;
+    }
+
+    /**
+     * Return type found in Constants
+     * 
+     * @return int Constants.ITEM
+     */
+    public int getType()
+    {
+        return Constants.ITEM;
+    }
+
+    /**
+     * remove all of the policies for item and replace them with a new list of
+     * policies
+     * 
+     * @param newpolicies -
+     *            this will be all of the new policies for the item and its
+     *            contents
+     * @throws AuthorizeException
+     *
+     * FIXME: Move this somewhere more appropriate. It isn't the responsibility
+     * of the Item to do this kind of thing.
+     */
+    public void replaceAllItemPolicies(List newpolicies)
+        throws AuthorizeException
+    {
+        // remove all our policies, add new ones
+        AuthorizeManager.removeAllPolicies(context, this);
+        AuthorizeManager.addPolicies(context, newpolicies, this);
+    }
+
+    /**
+     * remove all of the policies for item's bitstreams and bundles and replace
+     * them with a new list of policies
+     * 
+     * @param newpolicies -
+     *            this will be all of the new policies for the bundle and
+     *            bitstream contents
+     * @throws AuthorizeException
+     *
+     * FIXME: Move this somewhere more appropriate. It isn't the responsibility
+     * of the Item to do this kind of thing.
+     */
+    public void replaceAllBitstreamPolicies(List newpolicies)
+            throws AuthorizeException
+    {
+        // remove all policies from bundles, add new ones
+        // Remove bundles
+        Bundle[] bunds = getBundles();
+
+        for (int i = 0; i < bunds.length; i++)
+        {
+            Bundle mybundle = bunds[i];
+
+            Bitstream[] bs = mybundle.getBitstreams();
+
+            for (int j = 0; j < bs.length; j++)
+            {
+                Bitstream mybitstream = bs[j];
+
+                // change bitstream policies
+                AuthorizeManager.removeAllPolicies(context, bs[j]);
+                AuthorizeManager.addPolicies(context, newpolicies, bs[j]);
+            }
+
+            // change bundle policies
+            AuthorizeManager.removeAllPolicies(context, mybundle);
+            AuthorizeManager.addPolicies(context, newpolicies, mybundle);
+        }
+    }
+
+    /**
+     * remove all of the policies for item's bitstreams and bundles that belong
+     * to a given Group
+     * 
+     * @param g
+     *            Group referenced by policies that needs to be removed
+     *
+     * FIXME: Move this somewhere more appropriate. It isn't the responsibility
+     * of the Item to do this kind of thing.
+     */
+    public void removeGroupPolicies(Group g)
+    {
+        // remove Group's policies from Item
+        AuthorizeManager.removeGroupPolicies(context, this, g);
+
+        // remove all policies from bundles
+        Bundle[] bunds = getBundles();
+
+        for (int i = 0; i < bunds.length; i++)
+        {
+            Bundle mybundle = bunds[i];
+
+            Bitstream[] bs = mybundle.getBitstreams();
+
+            for (int j = 0; j < bs.length; j++)
+            {
+                Bitstream mybitstream = bs[j];
+
+                // remove bitstream policies
+                AuthorizeManager.removeGroupPolicies(context, bs[j], g);
+            }
+
+            // change bundle policies
+            AuthorizeManager.removeGroupPolicies(context, mybundle, g);
+        }
+    }
+
+    /**
+     * remove all policies on an item and its contents, and replace them with
+     * the DEFAULT_ITEM_READ and DEFAULT_BITSTREAM_READ policies belonging to
+     * the collection.
+     * 
+     * @param c
+     *            Collection
+     * @throws AuthorizeException
+     *
+     * FIXME: Move this somewhere more appropriate. It isn't the responsibility
+     * of the Item to do this kind of thing.
+     */
+    public void inheritCollectionDefaultPolicies(Collection c)
+            throws AuthorizeException
+    {
+        // remove the submit authorization policies
+        // and replace them with the collection's default READ policies
+        List policies = AuthorizeManager.getPoliciesActionFilter(context, c,
+                Constants.DEFAULT_ITEM_READ);
+
+        // change the action to just READ
+        // just don't call update on the resourcepolicies!!!
+        Iterator i = policies.iterator();
+
+        // MUST have default policies
+        if (!i.hasNext())
+        {
+            throw new RuntimeException("Collection " + c.getID()
+                    + " has no default item READ policies");
+        }
+
+        while (i.hasNext())
+        {
+            ResourcePolicy rp = (ResourcePolicy) i.next();
+            rp.setAction(Constants.READ);
+        }
+
+        replaceAllItemPolicies(policies);
+
+        policies = AuthorizeManager.getPoliciesActionFilter(context, c,
+                Constants.DEFAULT_BITSTREAM_READ);
+
+        // change the action to just READ
+        // just don't call update on the resourcepolicies!!!
+        i = policies.iterator();
+
+        if (!i.hasNext())
+        {
+            throw new RuntimeException("Collection " + c.getID()
+                    + " has no default bitstream READ policies");
+        }
+
+        while (i.hasNext())
+        {
+            ResourcePolicy rp = (ResourcePolicy) i.next();
+            rp.setAction(Constants.READ);
+        }
+
+        replaceAllBitstreamPolicies(policies);
+    }
+
+    /**
+     * return TRUE if context's user can edit item, false otherwise
+     * 
+     * @return boolean true = current user can edit item
+     */
+    public boolean canEdit()
+    {
+        // can this person write to the item?
+        if (AuthorizeManager.authorizeActionBoolean(context, this,
+                Constants.WRITE))
+        {
+            return true;
+        }
+
+        // is this collection not yet created, and an item template is created
+        if (getOwningCollection() == null)
+        {
+            return true;
+        }
+
+        // is this person an COLLECTION_EDITOR for the owning collection?
+        if (getOwningCollection().canEditBoolean())
+        {
+            return true;
+        }
+
+        // is this person an COLLECTION_EDITOR for the owning collection?
+        return AuthorizeManager.authorizeActionBoolean(context,
+                getOwningCollection(), Constants.COLLECTION_ADMIN);
+
+    }
+
+    public String getName()
+    {
+        DCValue t[] = getMetadata("dc", "title", null, Item.ANY);
+        return (t.length >= 1) ? t[0].value : null;
     }
 
     /**
@@ -786,6 +1053,10 @@ public class Item extends DSpaceObject
      * qualifier and language of the <code>DCValue</code> object passed
      * in.  Any or all of the elemenent, qualifier and language passed
      * in can be the <code>Item.ANY</code> wildcard.
+     *
+     * FIXME: It's a bit filthy and horrid to make this protected, but I need
+     * to access from the ItemProxy subclass. Really, it should exist somewhere
+     * else, possibly in DCValue.
      *
      * @param schema
      *            the schema for the metadata field. <em>Must</em> match
@@ -800,7 +1071,7 @@ public class Item extends DSpaceObject
      *            the Dublin Core value
      * @return <code>true</code> if there is a match
      */
-    private boolean match(String schema, String element, String qualifier,
+    protected boolean match(String schema, String element, String qualifier,
             String language, DCValue dcv)
     {
         // We will attempt to disprove a match - if we can't we have a match
@@ -858,1226 +1129,208 @@ public class Item extends DSpaceObject
         return true;
     }
 
-    /**
-     * Get the e-person that originally submitted this item
-     * 
-     * @return the submitter
-     */
-    public EPerson getSubmitter() throws SQLException
-    {
-        if (submitter == null && !itemRow.isColumnNull("submitter_id"))
-        {
-            submitter = EPerson.find(ourContext, itemRow
-                    .getIntColumn("submitter_id"));
-        }
-        return submitter;
-    }
+    ////////////////////////////////////////////////////////////////////
+    // Stuff from BrowseItem
+    ////////////////////////////////////////////////////////////////////
 
     /**
-     * Set the e-person that originally submitted this item. This is a public
-     * method since it is handled by the WorkspaceItem class in the ingest
-     * package. <code>update</code> must be called to write the change to the
-     * database.
+     * Get a thumbnail object out of the item.
      * 
-     * @param sub
-     *            the submitter
-     */
-    public void setSubmitter(EPerson sub)
-    {
-        submitter = sub;
-
-        if (submitter != null)
-        {
-            itemRow.setColumn("submitter_id", submitter.getID());
-        }
-        else
-        {
-            itemRow.setColumnNull("submitter_id");
-        }
-        modified = true;
-    }
-
-    /**
-     * Get the collections this item is in. The order is indeterminate.
+     * Warning: using this method actually instantiates an Item, which has a
+     * corresponding performance hit on the database during browse listing
+     * rendering.  That's your own fault for wanting to put images on your
+     * browse page!
      * 
-     * @return the collections this item is in, if any.
-     * @throws SQLException
+     * @return
      */
-    public Collection[] getCollections() throws SQLException
+    public Thumbnail getThumbnail()
     {
-        List<Collection> collections = new ArrayList<Collection>();
-
-        // Get collection table rows
-        TableRowIterator tri = DatabaseManager.queryTable(ourContext,"collection",
-                        "SELECT collection.* FROM collection, collection2item WHERE " +
-                        "collection2item.collection_id=collection.collection_id AND " +
-                        "collection2item.item_id= ? ",
-                        itemRow.getIntColumn("item_id"));
-
-        while (tri.hasNext())
+        // if there's no original, there is no thumbnail
+        Bundle[] original = getBundles("ORIGINAL");
+        if (original.length == 0)
         {
-            TableRow row = tri.next();
+            return null;
+        }
+        
+        // if multiple bitstreams, check if the primary one is HTML
+        boolean html = false;
+        if (original[0].getBitstreams().length > 1)
+        {
+            Bitstream[] bitstreams = original[0].getBitstreams();
 
-            // First check the cache
-            Collection fromCache = (Collection) ourContext.fromCache(
-                    Collection.class, row.getIntColumn("collection_id"));
-
-            if (fromCache != null)
+            for (int i = 0; (i < bitstreams.length) && !html; i++)
             {
-                collections.add(fromCache);
+                if (bitstreams[i].getID() == original[0].getPrimaryBitstreamID())
+                {
+                    html = bitstreams[i].getFormat().getMIMEType().equals("text/html");
+                }
+            }
+        }
+
+        // now actually pull out the thumbnail (ouch!)
+        Bundle[] thumbs = getBundles("THUMBNAIL");
+        
+        // if there are thumbs and we're not dealing with an HTML item
+        // then show the thumbnail
+        if ((thumbs.length > 0) && !html)
+        {
+            Bitstream thumbnailBitstream;
+            Bitstream originalBitstream;
+            
+            if ((original[0].getBitstreams().length > 1) && (original[0].getPrimaryBitstreamID() > -1))
+            {
+                originalBitstream = Bitstream.find(context, original[0].getPrimaryBitstreamID());
+                thumbnailBitstream = thumbs[0].getBitstreamByName(originalBitstream.getName() + ".jpg");
             }
             else
             {
-                collections.add(new Collection(ourContext, row));
+                originalBitstream = original[0].getBitstreams()[0];
+                thumbnailBitstream = thumbs[0].getBitstreams()[0];
+            }
+            
+            if ((thumbnailBitstream != null)
+                    && (AuthorizeManager.authorizeActionBoolean(context, thumbnailBitstream, Constants.READ)))
+            {
+                Thumbnail thumbnail = new Thumbnail(thumbnailBitstream, originalBitstream);
+                return thumbnail;
             }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
 
-        Collection[] collectionArray = new Collection[collections.size()];
-        collectionArray = (Collection[]) collections.toArray(collectionArray);
-
-        return collectionArray;
+        return null;
     }
 
-    /**
-     * Get the communities this item is in. Returns an unordered array of the
-     * communities that house the collections this item is in, including parent
-     * communities of the owning collections.
-     * 
-     * @return the communities this item is in.
-     * @throws SQLException
-     */
-    public Community[] getCommunities() throws SQLException
+    ////////////////////////////////////////////////////////////////////
+    // Deprecated methods
+    ////////////////////////////////////////////////////////////////////
+
+    @Deprecated
+    public static Item find(Context context, int id)
     {
-        List<Community> communities = new ArrayList<Community>();
-
-        // Get community table rows
-        TableRowIterator tri = DatabaseManager.queryTable(ourContext,"community",
-                        "SELECT community.* FROM community, community2item " +
-                        "WHERE community2item.community_id=community.community_id " +
-                        "AND community2item.item_id= ? ",
-                        itemRow.getIntColumn("item_id"));
-
-        while (tri.hasNext())
-        {
-            TableRow row = tri.next();
-
-            // First check the cache
-            Community owner = (Community) ourContext.fromCache(Community.class,
-                    row.getIntColumn("community_id"));
-
-            if (owner == null)
-            {
-                owner = new Community(ourContext, row);
-            }
-
-            communities.add(owner);
-
-            // now add any parent communities
-            Community[] parents = owner.getAllParents();
-
-            for (int i = 0; i < parents.length; i++)
-            {
-                communities.add(parents[i]);
-            }
-        }
-        // close the TableRowIterator to free up resources
-        tri.close();
-
-        Community[] communityArray = new Community[communities.size()];
-        communityArray = (Community[]) communities.toArray(communityArray);
-
-        return communityArray;
+        return ItemDAOFactory.getInstance(context).retrieve(id);
     }
 
-    /**
-     * Get the bundles in this item.
-     * 
-     * @return the bundles in an unordered array
-     */
-    public Bundle[] getBundles() throws SQLException
+    @Deprecated
+    static Item create(Context context) throws AuthorizeException
     {
-    	if (bundles == null)
-    	{
-                bundles = new ArrayList<Bundle>();
-    		// Get bundles
-    		TableRowIterator tri = DatabaseManager.queryTable(ourContext, "bundle",
-    					"SELECT bundle.* FROM bundle, item2bundle WHERE " +
-    					"item2bundle.bundle_id=bundle.bundle_id AND " +
-    					"item2bundle.item_id= ? ",
-                        itemRow.getIntColumn("item_id"));
+        Item item = ItemDAOFactory.getInstance(context).create();
 
-    		while (tri.hasNext())
-    		{
-    			TableRow r = tri.next();
+        context.addEvent(new Event(Event.CREATE, Constants.ITEM, item.getID(), null));
 
-    			// First check the cache
-    			Bundle fromCache = (Bundle) ourContext.fromCache(Bundle.class,
-    										r.getIntColumn("bundle_id"));
+        return item;
+    }
 
-    			if (fromCache != null)
-    			{
-    				bundles.add(fromCache);
-    			}
-    			else
-    			{
-    				bundles.add(new Bundle(ourContext, r));
-    			}
-    		}
-    		// close the TableRowIterator to free up resources
-    		tri.close();
-    	}
+    @Deprecated
+    public static ItemIterator findAll(Context context)
+    {
+        ItemDAO dao = ItemDAOFactory.getInstance(context);
+        List<Item> items = dao.getItems();
+
+        return new ItemIterator(context, items);
+    }
+
+    @Deprecated
+    public static ItemIterator findBySubmitter(Context context,
+            EPerson eperson)
+    {
+        ItemDAO dao = ItemDAOFactory.getInstance(context);
+        List<Item> items = dao.getItemsBySubmitter(eperson);
+
+        ArrayList<Integer> list = new ArrayList<Integer>();
         
-        Bundle[] bundleArray = new Bundle[bundles.size()];
-        bundleArray = (Bundle[]) bundles.toArray(bundleArray);
+        for (Item i : items)
+        {
+            list.add(i.getID());
+        }
 
-        return bundleArray;
+        return new ItemIterator(context, list);
     }
 
-    /**
-     * Get the bundles matching a bundle name (name corresponds roughly to type)
-     * 
-     * @param name
-     *            name of bundle (ORIGINAL/TEXT/THUMBNAIL)
-     * 
-     * @return the bundles in an unordered array
-     */
-    public Bundle[] getBundles(String name) throws SQLException
+    @Deprecated
+    public Collection[] getCollections()
     {
-        List<Bundle> matchingBundles = new ArrayList<Bundle>();
-
-        // now only keep bundles with matching names
-        Bundle[] bunds = getBundles();
-        for (int i = 0; i < bunds.length; i++ )
-        {
-            if (name.equals(bunds[i].getName()))
-            {
-                matchingBundles.add(bunds[i]);
-            }
-        }
-
-        Bundle[] bundleArray = new Bundle[matchingBundles.size()];
-        bundleArray = (Bundle[]) matchingBundles.toArray(bundleArray);
-
-        return bundleArray;
+        List<Collection> parents = collectionDAO.getParentCollections(this);
+        return (Collection[]) parents.toArray(new Collection[0]);
     }
 
-    /**
-     * Create a bundle in this item, with immediate effect
-     * 
-     * @param name
-     *            bundle name (ORIGINAL/TEXT/THUMBNAIL)
-     * @return the newly created bundle
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-    public Bundle createBundle(String name) throws SQLException,
-            AuthorizeException
+    @Deprecated
+    public Community[] getCommunities()
     {
-        if ((name == null) || "".equals(name))
-        {
-            throw new SQLException("Bundle must be created with non-null name");
-        }
-
-        // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
-
-        Bundle b = Bundle.create(ourContext);
-        b.setName(name);
-        b.update();
-
-        addBundle(b);
-
-        return b;
+        List<Community> parents = communityDAO.getParentCommunities(this);
+        return (Community[]) parents.toArray(new Community[0]);
     }
 
-    /**
-     * Add an existing bundle to this item. This has immediate effect.
-     * 
-     * @param b
-     *            the bundle to add
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-    public void addBundle(Bundle b) throws SQLException, AuthorizeException
+    @Deprecated
+    public void decache()
     {
-        // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
-
-        log.info(LogManager.getHeader(ourContext, "add_bundle", "item_id="
-                + getID() + ",bundle_id=" + b.getID()));
-
-        // Check it's not already there
-        Bundle[] bunds = getBundles();
-        for (int i = 0; i < bunds.length; i++)
-        {
-            if (b.getID() == bunds[i].getID())
-            {
-                // Bundle is already there; no change
-                return;
-            }
-        }
-
-        // now add authorization policies from owning item
-        // hmm, not very "multiple-inclusion" friendly
-        AuthorizeManager.inheritPolicies(ourContext, this, b);
-
-        // Add the bundle to in-memory list
-        bundles.add(b);
-
-        // Insert the mapping
-        TableRow mappingRow = DatabaseManager.create(ourContext, "item2bundle");
-        mappingRow.setColumn("item_id", getID());
-        mappingRow.setColumn("bundle_id", b.getID());
-        DatabaseManager.update(ourContext, mappingRow);
-
-        ourContext.addEvent(new Event(Event.ADD, Constants.ITEM, getID(), Constants.BUNDLE, b.getID(), b.getName()));
+        dao.decache(this);
     }
 
-    /**
-     * Remove a bundle. This may result in the bundle being deleted, if the
-     * bundle is orphaned.
-     * 
-     * @param b
-     *            the bundle to remove
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
-     */
-    public void removeBundle(Bundle b) throws SQLException, AuthorizeException,
-            IOException
+    @Deprecated
+    public void update() throws AuthorizeException
     {
-        // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
-
-        log.info(LogManager.getHeader(ourContext, "remove_bundle", "item_id="
-                + getID() + ",bundle_id=" + b.getID()));
-
-        // Remove from internal list of bundles
-        Bundle[] bunds = getBundles();
-        
-        for (int i = 0; i < bunds.length; i++)
-        {
-            if (b.getID() == bunds[i].getID())
-            {
-                // We've found the bundle to remove
-                bundles.remove(bunds[i]);
-                break;
-            }
-        }
-
-        // Remove mapping from DB
-        DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM item2bundle WHERE item_id= ? " +
-                "AND bundle_id= ? ",
-                getID(), b.getID());
-
-        ourContext.addEvent(new Event(Event.REMOVE, Constants.ITEM, getID(), Constants.BUNDLE, b.getID(), b.getName()));
-
-        // If the bundle is orphaned, it's removed
-        TableRowIterator tri = DatabaseManager.query(ourContext,
-                "SELECT * FROM item2bundle WHERE bundle_id= ? ",
-                b.getID());
-
-        if (!tri.hasNext())
-        {
-            //make the right to remove the bundle explicit because the implicit
-            // relation
-            //has been removed. This only has to concern the currentUser
-            // because
-            //he started the removal process and he will end it too.
-            //also add right to remove from the bundle to remove it's
-            // bitstreams.
-            AuthorizeManager.addPolicy(ourContext, b, Constants.DELETE,
-                    ourContext.getCurrentUser());
-            AuthorizeManager.addPolicy(ourContext, b, Constants.REMOVE,
-                    ourContext.getCurrentUser());
-
-            // The bundle is an orphan, delete it
-            b.delete();
-        }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        dao.update(this);
+        context.addEvent(new Event(Event.MODIFY_METADATA, Constants.ITEM, getID(), getDetails()));
+        metadataChanged = false;
+        clearDetails();
     }
 
-    /**
-     * Create a single bitstream in a new bundle. Provided as a convenience
-     * method for the most common use.
-     * 
-     * @param is
-     *            the stream to create the new bitstream from
-     * @param name
-     *            is the name of the bundle (ORIGINAL, TEXT, THUMBNAIL)
-     * @return Bitstream that is created
-     * @throws AuthorizeException
-     * @throws IOException
-     * @throws SQLException
-     */
-    public Bitstream createSingleBitstream(InputStream is, String name)
-            throws AuthorizeException, IOException, SQLException
+    @Deprecated
+    void delete() throws AuthorizeException, IOException
     {
-        // Authorisation is checked by methods below
-        // Create a bundle
-        Bundle bnd = createBundle(name);
-        Bitstream bitstream = bnd.createBitstream(is);
-        addBundle(bnd);
-
-        // FIXME: Create permissions for new bundle + bitstream
-        return bitstream;
+        dao.delete(this.getID());
     }
 
-    /**
-     * Convenience method, calls createSingleBitstream() with name "ORIGINAL"
-     * 
-     * @param is
-     *            InputStream
-     * @return created bitstream
-     * @throws AuthorizeException
-     * @throws IOException
-     * @throws SQLException
-     */
-    public Bitstream createSingleBitstream(InputStream is)
-            throws AuthorizeException, IOException, SQLException
+    /** Deprecated because we shouldn't be referencing DC explicitly any more */
+    @Deprecated
+    public DCValue[] getDC(String element, String qualifier, String lang)
     {
-        return createSingleBitstream(is, "ORIGINAL");
+        return getMetadata(MetadataSchema.DC_SCHEMA, element, qualifier, lang);
     }
 
-    /**
-     * Get all non-internal bitstreams in the item. This is mainly used for
-     * auditing for provenance messages and adding format.* DC values. The order
-     * is indeterminate.
-     * 
-     * @return non-internal bitstreams.
-     */
-    public Bitstream[] getNonInternalBitstreams() throws SQLException
+    @Deprecated
+    public void addDC(String element, String qualifier, String lang,
+            String... values)
     {
-        List<Bitstream> bitstreamList = new ArrayList<Bitstream>();
-
-        // Go through the bundles and bitstreams picking out ones which aren't
-        // of internal formats
-        Bundle[] bunds = getBundles();
-
-        for (int i = 0; i < bunds.length; i++)
-        {
-            Bitstream[] bitstreams = bunds[i].getBitstreams();
-
-            for (int j = 0; j < bitstreams.length; j++)
-            {
-                if (!bitstreams[j].getFormat().isInternal())
-                {
-                    // Bitstream is not of an internal format
-                    bitstreamList.add(bitstreams[j]);
-                }
-            }
-        }
-
-        Bitstream[] bsArray = new Bitstream[bitstreamList.size()];
-        bsArray = (Bitstream[]) bitstreamList.toArray(bsArray);
-
-        return bsArray;
+        addMetadata(MetadataSchema.DC_SCHEMA, element, qualifier, lang, values);
     }
 
-    /**
-     * Store a copy of the license a user granted in this item.
-     * 
-     * @param license
-     *            the license the user granted
-     * @param eperson
-     *            the eperson who granted the license
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
-     */
-    public void licenseGranted(String license, EPerson eperson)
-            throws SQLException, IOException, AuthorizeException
+    @Deprecated
+    public void clearDC(String element, String qualifier, String lang)
     {
-        // Put together text to store
-        String licenseText = "License granted by " + eperson.getFullName()
-                + " (" + eperson.getEmail() + ") on "
-                + DCDate.getCurrent().toString() + " (GMT):\n\n" + license;
-
-        // Store text as a bitstream
-        byte[] licenseBytes = licenseText.getBytes();
-        ByteArrayInputStream bais = new ByteArrayInputStream(licenseBytes);
-        Bitstream b = createSingleBitstream(bais, "LICENSE");
-
-        // Now set the format and name of the bitstream
-        b.setName("license.txt");
-        b.setSource("Written by org.dspace.content.Item");
-
-        // Find the License format
-        BitstreamFormat bf = BitstreamFormat.findByShortDescription(ourContext,
-                "License");
-        b.setFormat(bf);
-
-        b.update();
+        clearMetadata(MetadataSchema.DC_SCHEMA, element, qualifier, lang);
     }
 
-    /**
-     * Remove just the DSpace license from an item This is useful to update the
-     * current DSpace license, in case the user must accept the DSpace license
-     * again (either the item was rejected, or resumed after saving)
-     * <p>
-     * This method is used by the org.dspace.submit.step.LicenseStep class
-     * 
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
-     */
-    public void removeDSpaceLicense() throws SQLException, AuthorizeException,
-            IOException
-    {
-        // get all bundles with name "LICENSE" (these are the DSpace license
-        // bundles)
-        Bundle[] bunds = getBundles("LICENSE");
-
-        for (int i = 0; i < bunds.length; i++)
-        {
-            // FIXME: probably serious troubles with Authorizations
-            // fix by telling system not to check authorization?
-            removeBundle(bunds[i]);
-        }
-    }
-
-    /**
-     * Remove all licenses from an item - it was rejected
-     * 
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
-     */
-    public void removeLicenses() throws SQLException, AuthorizeException,
-            IOException
-    {
-        // Find the License format
-        BitstreamFormat bf = BitstreamFormat.findByShortDescription(ourContext,
-                "License");
-        int licensetype = bf.getID();
-
-        // search through bundles, looking for bitstream type license
-        Bundle[] bunds = getBundles();
-
-        for (int i = 0; i < bunds.length; i++)
-        {
-            boolean removethisbundle = false;
-
-            Bitstream[] bits = bunds[i].getBitstreams();
-
-            for (int j = 0; j < bits.length; j++)
-            {
-                BitstreamFormat bft = bits[j].getFormat();
-
-                if (bft.getID() == licensetype)
-                {
-                    removethisbundle = true;
-                }
-            }
-
-            // probably serious troubles with Authorizations
-            // fix by telling system not to check authorization?
-            if (removethisbundle)
-            {
-                removeBundle(bunds[i]);
-            }
-        }
-    }
-
-    /**
-     * Update the item "in archive" flag and Dublin Core metadata in the
-     * database
-     * 
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-    public void update() throws SQLException, AuthorizeException
-    {
-        // Check authorisation
-        // only do write authorization if user is not an editor
-        if (!canEdit())
-        {
-            AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
-        }
-
-        log.info(LogManager.getHeader(ourContext, "update_item", "item_id="
-                + getID()));
-
-        // Set the last modified date
-        itemRow.setColumn("last_modified", new Date());
-
-        // Set sequence IDs for bitstreams in item
-        int sequence = 0;
-        Bundle[] bunds = getBundles();
-
-        // find the highest current sequence number
-        for (int i = 0; i < bunds.length; i++)
-        {
-            Bitstream[] streams = bunds[i].getBitstreams();
-
-            for (int k = 0; k < streams.length; k++)
-            {
-                if (streams[k].getSequenceID() > sequence)
-                {
-                    sequence = streams[k].getSequenceID();
-                }
-            }
-        }
-
-        // start sequencing bitstreams without sequence IDs
-        sequence++;
-
-        for (int i = 0; i < bunds.length; i++)
-        {
-            Bitstream[] streams = bunds[i].getBitstreams();
-
-            for (int k = 0; k < streams.length; k++)
-            {
-                if (streams[k].getSequenceID() < 0)
-                {
-                    streams[k].setSequenceID(sequence);
-                    sequence++;
-                    streams[k].update();
-                }
-            }
-        }
-
-        // Make sure that withdrawn and in_archive are non-null
-        if (itemRow.isColumnNull("in_archive"))
-        {
-            itemRow.setColumn("in_archive", false);
-        }
-
-        if (itemRow.isColumnNull("withdrawn"))
-        {
-            itemRow.setColumn("withdrawn", false);
-        }
-
-        // Map counting number of values for each element/qualifier.
-        // Keys are Strings: "element" or "element.qualifier"
-        // Values are Integers indicating number of values written for a
-        // element/qualifier
-        Map<String,Integer> elementCount = new HashMap<String,Integer>();
-
-        DatabaseManager.update(ourContext, itemRow);
-
-        // Redo Dublin Core if it's changed
-        if (dublinCoreChanged)
-        {
-            // Remove existing DC
-            removeMetadataFromDatabase();
-
-            // Add in-memory DC
-            for (DCValue dcv : dublinCore)
-            {
-                // Get the DC Type
-                int schemaID;
-                MetadataSchema schema = MetadataSchema.find(ourContext,dcv.schema);
-                if (schema == null) {
-                    schemaID = MetadataSchema.DC_SCHEMA_ID;
-                } else {
-                    schemaID = schema.getSchemaID();
-                }
-
-                MetadataField field = MetadataField.findByElement(ourContext,
-                        schemaID, dcv.element, dcv.qualifier);
-
-                if (field == null)
-                {
-                    // Bad DC field, log and throw exception
-                    log.warn(LogManager
-                            .getHeader(ourContext, "bad_dc",
-                                    "Bad DC field. SchemaID="+String.valueOf(schemaID)
-                                            + ", element: \""
-                                            + ((dcv.element == null) ? "null"
-                                                    : dcv.element)
-                                            + "\" qualifier: \""
-                                            + ((dcv.qualifier == null) ? "null"
-                                                    : dcv.qualifier)
-                                            + "\" value: \""
-                                            + ((dcv.value == null) ? "null"
-                                                    : dcv.value) + "\""));
-
-                    throw new SQLException("bad_dublin_core "
-                            + "SchemaID="+String.valueOf(schemaID)+", "
-                            + dcv.element
-                            + " " + dcv.qualifier);
-                }
-
-                // Work out the place number for ordering
-                int current = 0;
-
-                // Key into map is "element" or "element.qualifier"
-                String key = dcv.element
-                        + ((dcv.qualifier == null) ? "" : ("." + dcv.qualifier));
-
-                Integer currentInteger = (Integer) elementCount.get(key);
-
-                if (currentInteger != null)
-                {
-                    current = currentInteger.intValue();
-                }
-
-                current++;
-                elementCount.put(key, new Integer(current));
-
-                // Write DCValue
-                MetadataValue metadata = new MetadataValue();
-                metadata.setItemId(getID());
-                metadata.setFieldId(field.getFieldID());
-                metadata.setValue(dcv.value);
-                metadata.setLanguage(dcv.language);
-                metadata.setPlace(current);
-                metadata.create(ourContext);
-            }
-
-            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.ITEM, getID(), getDetails()));
-            dublinCoreChanged = false;
-            clearDetails();
-        }
-
-        if (modified)
-        {
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
-            modified = false;
-        }
-    }
-
-    /**
-     * Withdraw the item from the archive. It is kept in place, and the content
-     * and metadata are not deleted, but it is not publicly accessible.
-     * 
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
-     */
-    public void withdraw() throws SQLException, AuthorizeException, IOException
-    {
-        String timestamp = DCDate.getCurrent().toString();
-
-        // Build some provenance data while we're at it.
-        String collectionProv = "";
-        Collection[] colls = getCollections();
-
-        for (int i = 0; i < colls.length; i++)
-        {
-            collectionProv = collectionProv + colls[i].getMetadata("name")
-                    + " (ID: " + colls[i].getID() + ")\n";
-        }
-
-        // Check permission. User either has to have REMOVE on owning collection
-        // or be COLLECTION_EDITOR of owning collection
-        if (AuthorizeManager.authorizeActionBoolean(ourContext,
-                getOwningCollection(), Constants.COLLECTION_ADMIN)
-                || AuthorizeManager.authorizeActionBoolean(ourContext,
-                        getOwningCollection(), Constants.REMOVE))
-        {
-            // authorized
-        }
-        else
-        {
-            throw new AuthorizeException(
-                    "To withdraw item must be COLLECTION_ADMIN or have REMOVE authorization on owning Collection");
-        }
-
-        // Set withdrawn flag. timestamp will be set; last_modified in update()
-        itemRow.setColumn("withdrawn", true);
-
-        // in_archive flag is now false
-        itemRow.setColumn("in_archive", false);
-
-        // Add suitable provenance - includes user, date, collections +
-        // bitstream checksums
-        EPerson e = ourContext.getCurrentUser();
-        String prov = "Item withdrawn by " + e.getFullName() + " ("
-                + e.getEmail() + ") on " + timestamp + "\n"
-                + "Item was in collections:\n" + collectionProv
-                + InstallItem.getBitstreamProvenanceMessage(this);
-
-        addDC("description", "provenance", "en", prov);
-
-        // Update item in DB
-        update();
-
-        ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), "WITHDRAW"));
-
-        // and all of our authorization policies
-        // FIXME: not very "multiple-inclusion" friendly
-        AuthorizeManager.removeAllPolicies(ourContext, this);
-
-        // Write log
-        log.info(LogManager.getHeader(ourContext, "withdraw_item", "user="
-                + e.getEmail() + ",item_id=" + getID()));
-    }
-
-    /**
-     * Reinstate a withdrawn item
-     * 
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
-     */
-    public void reinstate() throws SQLException, AuthorizeException,
-            IOException
-    {
-        String timestamp = DCDate.getCurrent().toString();
-
-        // Check permission. User must have ADD on all collections.
-        // Build some provenance data while we're at it.
-        String collectionProv = "";
-        Collection[] colls = getCollections();
-
-        for (int i = 0; i < colls.length; i++)
-        {
-            collectionProv = collectionProv + colls[i].getMetadata("name")
-                    + " (ID: " + colls[i].getID() + ")\n";
-            AuthorizeManager.authorizeAction(ourContext, colls[i],
-                    Constants.ADD);
-        }
-
-        // Clear withdrawn flag
-        itemRow.setColumn("withdrawn", false);
-
-        // in_archive flag is now true
-        itemRow.setColumn("in_archive", true);
-
-        // Add suitable provenance - includes user, date, collections +
-        // bitstream checksums
-        EPerson e = ourContext.getCurrentUser();
-        String prov = "Item reinstated by " + e.getFullName() + " ("
-                + e.getEmail() + ") on " + timestamp + "\n"
-                + "Item was in collections:\n" + collectionProv
-                + InstallItem.getBitstreamProvenanceMessage(this);
-
-        addDC("description", "provenance", "en", prov);
-
-        // Update item in DB
-        update();
-
-        ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), "REINSTATE"));
-
-        // authorization policies
-        if (colls.length > 0)
-        {
-            // FIXME: not multiple inclusion friendly - just apply access
-            // policies from first collection
-            // remove the item's policies and replace them with
-            // the defaults from the collection
-            inheritCollectionDefaultPolicies(colls[0]);
-        }
-
-        // Write log
-        log.info(LogManager.getHeader(ourContext, "reinstate_item", "user="
-                + e.getEmail() + ",item_id=" + getID()));
-    }
-
-    /**
-     * Delete (expunge) the item. Bundles and bitstreams are also deleted if
-     * they are not also included in another item. The Dublin Core metadata is
-     * deleted.
-     * 
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
-     */
-    void delete() throws SQLException, AuthorizeException, IOException
-    {
-        ourContext.addEvent(new Event(Event.DELETE, Constants.ITEM, getID(), getHandle()));
-
-        log.info(LogManager.getHeader(ourContext, "delete_item", "item_id="
-                + getID()));
-
-        // Remove from cache
-        ourContext.removeCached(this, getID());
-
-        // Remove from browse indices, if appropriate
-        /** XXX FIXME
-         ** Although all other Browse index updates are managed through
-         ** Event consumers, removing an Item *must* be done *here* (inline)
-         ** because otherwise, tables are left in an inconsistent state
-         ** and the DB transaction will fail.
-         ** Any fix would involve too much work on Browse code that
-         ** is likely to be replaced soon anyway.   --lcs, Aug 2006
-         **
-         ** NB Do not check to see if the item is archived - withdrawn /
-         ** non-archived items may still be tracked in some browse tables
-         ** for administrative purposes, and these need to be removed.
-         **/
-//        	 FIXME: there is an exception handling problem here
-        try
-        {
-//            	 Remove from indicies
-            IndexBrowse ib = new IndexBrowse(ourContext);
-            ib.itemRemoved(this);
-        }
-        catch (BrowseException e)
-        {
-            log.error("caught exception: ", e);
-            throw new SQLException(e.getMessage());
-        }
-
-        // Delete the Dublin Core
-        removeMetadataFromDatabase();
-
-        // Remove bundles
-        Bundle[] bunds = getBundles();
-
-        for (int i = 0; i < bunds.length; i++)
-        {
-            removeBundle(bunds[i]);
-        }
-
-        // remove all of our authorization policies
-        AuthorizeManager.removeAllPolicies(ourContext, this);
-
-        // Finally remove item row
-        DatabaseManager.delete(ourContext, itemRow);
-    }
-    
-    /**
-     * Remove item and all its sub-structure from the context cache.
-     * Useful in batch processes where a single context has a long,
-     * multi-item lifespan
-     */
-    public void decache() throws SQLException
-    {
-        // Remove item and it's submitter from cache
-        ourContext.removeCached(this, getID());
-        if (submitter != null)
-        {
-        	ourContext.removeCached(submitter, submitter.getID());
-        }
-        // Remove bundles & bitstreams from cache if they have been loaded
-        if (bundles != null)
-        {
-        	Bundle[] bunds = getBundles();
-        	for (int i = 0; i < bunds.length; i++)
-        	{
-        		ourContext.removeCached(bunds[i], bunds[i].getID());
-        		Bitstream[] bitstreams = bunds[i].getBitstreams();
-        		for (int j = 0; j < bitstreams.length; j++)
-        		{
-        			ourContext.removeCached(bitstreams[j], bitstreams[j].getID());
-        		}
-        	}
-        }
-    }
-
-    /**
-     * Return <code>true</code> if <code>other</code> is the same Item as
-     * this object, <code>false</code> otherwise
-     * 
-     * @param other
-     *            object to compare to
-     * @return <code>true</code> if object passed in represents the same item
-     *         as this object
-     */
-    public boolean equals(DSpaceObject other)
-    {
-        if (this.getType() == other.getType())
-        {
-            if (this.getID() == other.getID())
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Return true if this Collection 'owns' this item
-     * 
-     * @param c
-     *            Collection
-     * @return true if this Collection owns this item
-     */
-    public boolean isOwningCollection(Collection c)
-    {
-        int owner_id = itemRow.getIntColumn("owning_collection");
-
-        if (c.getID() == owner_id)
-        {
-            return true;
-        }
-
-        // not the owner
-        return false;
-    }
-
-    /**
-     * Utility method to remove all descriptive metadata associated with the item from
-     * the database (regardless of in-memory version)
-     * 
-     * @throws SQLException
-     */
-    private void removeMetadataFromDatabase() throws SQLException
-    {
-        DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM MetadataValue WHERE item_id= ? ",
-                getID());
-    }
-
-    /**
-     * return type found in Constants
-     * 
-     * @return int Constants.ITEM
-     */
-    public int getType()
-    {
-        return Constants.ITEM;
-    }
-
-    /**
-     * remove all of the policies for item and replace them with a new list of
-     * policies
-     * 
-     * @param newpolicies -
-     *            this will be all of the new policies for the item and its
-     *            contents
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-    public void replaceAllItemPolicies(List newpolicies) throws SQLException,
-            AuthorizeException
-    {
-        // remove all our policies, add new ones
-        AuthorizeManager.removeAllPolicies(ourContext, this);
-        AuthorizeManager.addPolicies(ourContext, newpolicies, this);
-    }
-
-    /**
-     * remove all of the policies for item's bitstreams and bundles and replace
-     * them with a new list of policies
-     * 
-     * @param newpolicies -
-     *            this will be all of the new policies for the bundle and
-     *            bitstream contents
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-    public void replaceAllBitstreamPolicies(List newpolicies)
-            throws SQLException, AuthorizeException
-    {
-        // remove all policies from bundles, add new ones
-        // Remove bundles
-        Bundle[] bunds = getBundles();
-
-        for (int i = 0; i < bunds.length; i++)
-        {
-            Bundle mybundle = bunds[i];
-
-            Bitstream[] bs = mybundle.getBitstreams();
-
-            for (int j = 0; j < bs.length; j++)
-            {
-                Bitstream mybitstream = bs[j];
-
-                // change bitstream policies
-                AuthorizeManager.removeAllPolicies(ourContext, bs[j]);
-                AuthorizeManager.addPolicies(ourContext, newpolicies, bs[j]);
-            }
-
-            // change bundle policies
-            AuthorizeManager.removeAllPolicies(ourContext, mybundle);
-            AuthorizeManager.addPolicies(ourContext, newpolicies, mybundle);
-        }
-    }
-
-    /**
-     * remove all of the policies for item's bitstreams and bundles that belong
-     * to a given Group
-     * 
-     * @param g
-     *            Group referenced by policies that needs to be removed
-     * @throws SQLException
-     */
-    public void removeGroupPolicies(Group g) throws SQLException
-    {
-        // remove Group's policies from Item
-        AuthorizeManager.removeGroupPolicies(ourContext, this, g);
-
-        // remove all policies from bundles
-        Bundle[] bunds = getBundles();
-
-        for (int i = 0; i < bunds.length; i++)
-        {
-            Bundle mybundle = bunds[i];
-
-            Bitstream[] bs = mybundle.getBitstreams();
-
-            for (int j = 0; j < bs.length; j++)
-            {
-                Bitstream mybitstream = bs[j];
-
-                // remove bitstream policies
-                AuthorizeManager.removeGroupPolicies(ourContext, bs[j], g);
-            }
-
-            // change bundle policies
-            AuthorizeManager.removeGroupPolicies(ourContext, mybundle, g);
-        }
-    }
-
-    /**
-     * remove all policies on an item and its contents, and replace them with
-     * the DEFAULT_ITEM_READ and DEFAULT_BITSTREAM_READ policies belonging to
-     * the collection.
-     * 
-     * @param c
-     *            Collection
-     * @throws java.sql.SQLException
-     *             if an SQL error or if no default policies found. It's a bit
-     *             draconian, but default policies must be enforced.
-     * @throws AuthorizeException
-     */
-    public void inheritCollectionDefaultPolicies(Collection c)
-            throws java.sql.SQLException, AuthorizeException
-    {
-        // remove the submit authorization policies
-        // and replace them with the collection's default READ policies
-        List policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c,
-                Constants.DEFAULT_ITEM_READ);
-
-        // change the action to just READ
-        // just don't call update on the resourcepolicies!!!
-        Iterator i = policies.iterator();
-
-        // MUST have default policies
-        if (!i.hasNext())
-        {
-            throw new java.sql.SQLException("Collection " + c.getID()
-                    + " has no default item READ policies");
-        }
-
-        while (i.hasNext())
-        {
-            ResourcePolicy rp = (ResourcePolicy) i.next();
-            rp.setAction(Constants.READ);
-        }
-
-        replaceAllItemPolicies(policies);
-
-        policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c,
-                Constants.DEFAULT_BITSTREAM_READ);
-
-        // change the action to just READ
-        // just don't call update on the resourcepolicies!!!
-        i = policies.iterator();
-
-        if (!i.hasNext())
-        {
-            throw new java.sql.SQLException("Collection " + c.getID()
-                    + " has no default bitstream READ policies");
-        }
-
-        while (i.hasNext())
-        {
-            ResourcePolicy rp = (ResourcePolicy) i.next();
-            rp.setAction(Constants.READ);
-        }
-
-        replaceAllBitstreamPolicies(policies);
-    }
-    
     /**
      * Moves the item from one collection to another one
-     * 
-     * @throws SQLException
+     *
      * @throws AuthorizeException
      * @throws IOException
      */
-    public void move (Collection from, Collection to) throws SQLException, AuthorizeException, IOException 
+    @Deprecated
+    public void move (Collection from, Collection to) throws AuthorizeException, IOException
     {
-    	if (isOwningCollection(from))
-    	{
-    		setOwningCollection(to);
-    		update();
-    	}
-    	
-    	to.addItem(this);
-    	from.removeItem(this);
+        ArchiveManager.move(context, this, from, to);
+        
+        /*
+        if (isOwningCollection(from))
+        {
+            setOwningCollection(to);
+            update();
+        }
+
+        to.addItem(this);
+        from.removeItem(this);
+        */
     }
-    
+
     /**
      * Get the collections this item is not in.
-     * 
+     *
      * @return the collections this item is not in, if any.
-     * @throws SQLException
      */
-    public Collection[] getCollectionsNotLinked() throws SQLException
+    @Deprecated
+    public Collection[] getCollectionsNotLinked()
     {
-    	Collection[] allCollections = Collection.findAll(ourContext);
-       	Collection[] linkedCollections = getCollections();
-       	Collection[] notLinkedCollections = new Collection[allCollections.length - linkedCollections.length];
-
-       	if ((allCollections.length - linkedCollections.length) == 0)
-       	{
-       		return notLinkedCollections;
-       	}
-       	
-       	int i = 0;
-           	 
-       	for (Collection collection : allCollections)
-        {
-           	 boolean alreadyLinked = false;
-           		 
-           	 for (Collection linkedCommunity : linkedCollections)
-           	 {
-           		 if (collection.getID() == linkedCommunity.getID())
-           		 {
-           			 alreadyLinked = true;
-           			 break;
-           		 }
-           	 }
-           		 
-           	 if (!alreadyLinked)
-           	 {
-           		 notLinkedCollections[i++] = collection;
-          	 }
-        }   	 
-       	
-       	return notLinkedCollections;
-    }
-
-    /**
-     * return TRUE if context's user can edit item, false otherwise
-     * 
-     * @return boolean true = current user can edit item
-     * @throws SQLException
-     */
-    public boolean canEdit() throws java.sql.SQLException
-    {
-        // can this person write to the item?
-        if (AuthorizeManager.authorizeActionBoolean(ourContext, this,
-                Constants.WRITE))
-        {
-            return true;
-        }
-
-        // is this collection not yet created, and an item template is created
-        if (getOwningCollection() == null)
-        {
-            return true;
-        }
-
-        // is this person an COLLECTION_EDITOR for the owning collection?
-        if (getOwningCollection().canEditBoolean())
-        {
-            return true;
-        }
-
-        // is this person an COLLECTION_EDITOR for the owning collection?
-        if (AuthorizeManager.authorizeActionBoolean(ourContext,
-                getOwningCollection(), Constants.COLLECTION_ADMIN))
-        {
-            return true;
-        }
-
-        return false;
-    }
-    public String getName()
-    {
-        DCValue t[] = getMetadata("dc", "title", null, Item.ANY);
-        return (t.length >= 1) ? t[0].value : null;
+        return collectionDAO.getCollectionsNotLinked(this).toArray(new Collection[0]);
     }
 }

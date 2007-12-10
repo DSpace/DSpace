@@ -171,13 +171,13 @@ public class DescribeStep extends AbstractSubmissionStep
 		// Obtain the inputs (i.e. metadata fields we are going to display)
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit";
+		String actionURL = contextPath + "/handle/"+collection.getExternalIdentifier().getCanonicalForm() + "/submit";
 
 		DCInputSet inputSet = null;
 		DCInput[] inputs = {};
 		try 
 		{
-			inputSet = getInputsReader().getInputs(submission.getCollection().getHandle());
+			inputSet = getInputsReader().getInputs(submission.getCollection().getExternalIdentifier().getCanonicalForm());
 			inputs = inputSet.getPageRows(getPage()-1, submission.hasMultipleTitles(), submission.isPublishedBefore());
 		} 
 		catch (ServletException se) 
@@ -317,7 +317,7 @@ public class DescribeStep extends AbstractSubmissionStep
         DCInputSet inputSet = null;
         try 
         {
-            inputSet = getInputsReader().getInputs(submission.getCollection().getHandle());
+            inputSet = getInputsReader().getInputs(submission.getCollection().getExternalIdentifier().getCanonicalForm());
         } 
         catch (ServletException se) 
         {

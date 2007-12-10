@@ -48,4 +48,4 @@
 # Get the DSPACE/bin directory
 BINDIR=`dirname $0`
 
-$BINDIR/dsrun org.dspace.eperson.Subscribe
+$BINDIR/dsrun org.dspace.eperson.SubscriptionManager

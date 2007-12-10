@@ -43,10 +43,9 @@ package org.dspace.app.mediafilter;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -56,7 +55,6 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
-
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -66,13 +64,21 @@ import org.dspace.content.Community;
 import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
+import org.dspace.content.dao.BitstreamDAO;
+import org.dspace.content.dao.BitstreamDAOFactory;
+import org.dspace.content.dao.BitstreamFormatDAO;
+import org.dspace.content.dao.BitstreamFormatDAOFactory;
+import org.dspace.content.dao.ItemDAO;
+import org.dspace.content.dao.ItemDAOFactory;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.core.SelfNamedPlugin;
-import org.dspace.handle.HandleManager;
 import org.dspace.search.DSIndexer;
 
 /**
@@ -80,7 +86,7 @@ import org.dspace.search.DSIndexer;
  * repository's content. a few command line flags affect the operation of the
  * MFM: -v verbose outputs all extracted text to STDOUT; -f force forces all
  * bitstreams to be processed, even if they have been before; -n noindex does not
- * recreate index after processing bitstreams; -i [identifier] limits processing 
+ * recreate index after processing bitstreams; -i [identifier] limits processing
  * scope to a community, collection or item; and -m [max] limits processing to a
  * maximum number of items.
  */
@@ -88,37 +94,39 @@ public class MediaFilterManager
 {
 	//key (in dspace.cfg) which lists all enabled filters by name
     public static String MEDIA_FILTER_PLUGINS_KEY = "filter.plugins";
-	
+
     //prefix (in dspace.cfg) for all filter properties
     public static String FILTER_PREFIX = "filter";
-    
+
     //suffix (in dspace.cfg) for input formats supported by each filter
     public static String INPUT_FORMATS_SUFFIX = "inputFormats";
-    
+
     public static boolean updateIndex = true; // default to updating index
 
     public static boolean isVerbose = false; // default to not verbose
 
     public static boolean isForce = false; // default to not forced
-    
+
     public static String identifier = null; // object scope limiter
-    
+
     public static int max2Process = Integer.MAX_VALUE;  // maximum number items to process
-    
+
     public static int processed = 0;   // number items processed
-    
+
     private static Item currentItem = null;   // current item being processed
-    
+
     private static FormatFilter[] filterClasses = null;
-    
+
     private static Map filterFormats = new HashMap();
-    
+
+    private static ItemDAO itemDAO;
+
     private static List skipList = null; //list of identifiers to skip during processing
     
     //separator in filterFormats Map between a filter class name and a plugin name,
     //for MediaFilters which extend SelfNamedPlugin (\034 is "file separator" char)
     public static String FILTER_PLUGIN_SEPARATOR = "\034";
-    
+
     public static void main(String[] argv) throws Exception
     {
         // set headless for non-gui workstations
@@ -130,7 +138,7 @@ public class MediaFilterManager
         int status = 0;
 
         Options options = new Options();
-        
+
         options.addOption("v", "verbose", false,
                 "print all extracted text and other details to STDOUT");
         options.addOption("f", "force", false,
@@ -148,9 +156,9 @@ public class MediaFilterManager
         OptionBuilder.withValueSeparator(',');
         OptionBuilder.withDescription(
                        "ONLY run the specified Media Filter plugin(s)\n" +
-                       "listed from '" + MEDIA_FILTER_PLUGINS_KEY + "' in dspace.cfg.\n" + 
+                       "listed from '" + MEDIA_FILTER_PLUGINS_KEY + "' in dspace.cfg.\n" +
                        "Separate multiple with a comma (,)\n" +
-                       "(e.g. MediaFilterManager -p \n\"Word Text Extractor\",\"PDF Text Extractor\")");                
+                       "(e.g. MediaFilterManager -p \n\"Word Text Extractor\",\"PDF Text Extractor\")");
         Option pluginOption = OptionBuilder.create('p');
         pluginOption.setArgs(Option.UNLIMITED_VALUES); //unlimited number of args
         options.addOption(pluginOption);	
@@ -177,7 +185,7 @@ public class MediaFilterManager
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("MediaFilterManager\n", options);
             System.exit(1);
-        }          
+        }
 
         if (line.hasOption('h'))
         {
@@ -201,18 +209,23 @@ public class MediaFilterManager
         {
             isForce = true;
         }
-        
+
         if (line.hasOption('i'))
         {
         	identifier = line.getOptionValue('i');
+            if (identifier.indexOf(":") == -1)
+            {
+                identifier = "hdl:" + identifier;
+                System.out.println("no namespace provided. assuming handles.");
+            }
         }
-        
+
         if (line.hasOption('m'))
         {
         	max2Process = Integer.parseInt(line.getOptionValue('m'));
         	if (max2Process <= 1)
         	{
-        		System.out.println("Invalid maximum value '" + 
+        		System.out.println("Invalid maximum value '" +
         				     		line.getOptionValue('m') + "' - ignoring");
         		max2Process = Integer.MAX_VALUE;
         	}
@@ -223,7 +236,7 @@ public class MediaFilterManager
         {
             //specified which media filter plugins we are using
             filterNames = line.getOptionValues('p');
-        
+
             if(filterNames==null || filterNames.length==0)
             {   //display error, since no plugins specified
                 System.err.println("\nERROR: -p (-plugin) option requires at least one plugin to be specified.\n" +
@@ -234,33 +247,33 @@ public class MediaFilterManager
              }
         }
         else
-        { 
+        {
             //retrieve list of all enabled media filter plugins!
             String enabledPlugins = ConfigurationManager.getProperty(MEDIA_FILTER_PLUGINS_KEY);
             filterNames = enabledPlugins.split(",\\s*");
         }
-                
+
         //initialize an array of our enabled filters
         List filterList = new ArrayList();
-                
+
         //set up each filter
         for(int i=0; i< filterNames.length; i++)
         {
             //get filter of this name & add to list of filters
             FormatFilter filter = (FormatFilter) PluginManager.getNamedPlugin(FormatFilter.class, filterNames[i]);
             if(filter==null)
-            {   
+            {
                 System.err.println("\nERROR: Unknown MediaFilter specified (either from command-line or in dspace.cfg): '" + filterNames[i] + "'");
                 System.exit(1);
             }
             else
-            {   
+            {
                 filterList.add(filter);
-                       
+
                 String filterClassName = filter.getClass().getName();
-                           
+
                 String pluginName = null;
-                           
+
                 //If this filter is a SelfNamedPlugin,
                 //then the input formats it accepts may differ for
                 //each "named" plugin that it defines.
@@ -271,35 +284,35 @@ public class MediaFilterManager
                     //Get the plugin instance name for this class
                     pluginName = ((SelfNamedPlugin) filter).getPluginInstanceName();
                 }
-            
-                
+
+
                 //Retrieve our list of supported formats from dspace.cfg
-                //For SelfNamedPlugins, format of key is:  
+                //For SelfNamedPlugins, format of key is:
                 //  filter.<class-name>.<plugin-name>.inputFormats
-                //For other MediaFilters, format of key is: 
+                //For other MediaFilters, format of key is:
                 //  filter.<class-name>.inputFormats
                 String formats = ConfigurationManager.getProperty(
-                    FILTER_PREFIX + "." + filterClassName + 
+                    FILTER_PREFIX + "." + filterClassName +
                     (pluginName!=null ? "." + pluginName : "") +
                     "." + INPUT_FORMATS_SUFFIX);
-            
-                //add to internal map of filters to supported formats	
+
+                //add to internal map of filters to supported formats
                 if (formats != null)
                 {
-                    //For SelfNamedPlugins, map key is:  
+                    //For SelfNamedPlugins, map key is:
                     //  <class-name><separator><plugin-name>
                     //For other MediaFilters, map key is just:
                     //  <class-name>
-                    filterFormats.put(filterClassName + 
+                    filterFormats.put(filterClassName +
         	            (pluginName!=null ? FILTER_PLUGIN_SEPARATOR + pluginName : ""),
         	            Arrays.asList(formats.split(",[\\s]*")));
                 }
             }//end if filter!=null
         }//end for
-        
+
         //If verbose, print out loaded mediafilter info
         if(isVerbose)
-        {   
+        {
             System.out.println("The following MediaFilters are enabled: ");
             java.util.Iterator i = filterFormats.keySet().iterator();
             while(i.hasNext())
@@ -313,12 +326,12 @@ public class MediaFilterManager
                     filterName=fields[0];
                     pluginName=fields[1];
                 }
-                 
+
                 System.out.println(filterName +
                         (pluginName!=null? " (Plugin: " + pluginName + ")": ""));
              }
         }
-              
+
         //store our filter list into an internal array
         filterClasses = (FormatFilter[]) filterList.toArray(new FormatFilter[filterList.size()]);
         
@@ -349,6 +362,8 @@ public class MediaFilterManager
         try
         {
             c = new Context();
+            ExternalIdentifierDAO identifierDAO =
+                ExternalIdentifierDAOFactory.getInstance(c);
 
             // have to be super-user to do the filtering
             c.setIgnoreAuthorization(true);
@@ -360,27 +375,32 @@ public class MediaFilterManager
             }
             else  // restrict application scope to identifier
             {
-            	DSpaceObject dso = HandleManager.resolveToObject(c, identifier);
+                ExternalIdentifier pid =
+                    identifierDAO.retrieve(identifier);
+                ObjectIdentifier oi = pid.getObjectIdentifier();
+
+                DSpaceObject dso = oi.getObject(c);
+
             	if (dso == null)
             	{
             		throw new IllegalArgumentException("Cannot resolve "
                                 + identifier + " to a DSpace object");
             	}
-            	
+
             	switch (dso.getType())
             	{
             		case Constants.COMMUNITY:
             						applyFiltersCommunity(c, (Community)dso);
-            						break;					
+            						break;
             		case Constants.COLLECTION:
             						applyFiltersCollection(c, (Collection)dso);
-            						break;						
+            						break;
             		case Constants.ITEM:
             						applyFiltersItem(c, (Item)dso);
             						break;
             	}
             }
-          
+
             // update search index?
             if (updateIndex)
             {
@@ -426,9 +446,9 @@ public class MediaFilterManager
             }
         }
     }
-    
+
     public static void applyFiltersCommunity(Context c, Community community)
-                                             throws Exception
+        throws Exception
     {   //only apply filters if community not in skip-list
         if(!inSkipList(community.getHandle()))
         {    
@@ -445,9 +465,9 @@ public class MediaFilterManager
            	}
         }
     }
-        
+
     public static void applyFiltersCollection(Context c, Collection collection)
-                                              throws Exception
+          throws Exception
     {
         //only apply filters if collection not in skip-list
         if(!inSkipList(collection.getHandle()))
@@ -459,7 +479,7 @@ public class MediaFilterManager
             }
         }
     }
-       
+
     public static void applyFiltersItem(Context c, Item item) throws Exception
     {
         //only apply filters if item not in skip-list
@@ -485,8 +505,8 @@ public class MediaFilterManager
     /**
      * iterate through the item's bitstreams in the ORIGINAL bundle, applying
      * filters if possible
-     * 
-     * @return true if any bitstreams processed, 
+     *
+     * @return true if any bitstreams processed,
      *         false if none
      */
     public static boolean filterItem(Context c, Item myItem) throws Exception
@@ -498,7 +518,7 @@ public class MediaFilterManager
         {
         	// now look at all of the bitstreams
             Bitstream[] myBitstreams = myBundles[i].getBitstreams();
-            
+
             for (int k = 0; k < myBitstreams.length; k++)
             {
             	done |= filterBitstream(c, myItem, myBitstreams[k]);
@@ -509,26 +529,26 @@ public class MediaFilterManager
 
     /**
      * Attempt to filter a bitstream
-     * 
+     *
      * An exception will be thrown if the media filter class cannot be
      * instantiated, exceptions from filtering will be logged to STDOUT and
      * swallowed.
-     * 
-     * @return true if bitstream processed, 
+     *
+     * @return true if bitstream processed,
      *         false if no applicable filter or already processed
      */
     public static boolean filterBitstream(Context c, Item myItem,
             Bitstream myBitstream) throws Exception
     {
     	boolean filtered = false;
-    	
+
     	// iterate through filter classes. A single format may be actioned
     	// by more than one filter
     	for (int i = 0; i < filterClasses.length; i++)
     	{
     		//List fmts = (List)filterFormats.get(filterClasses[i].getClass().getName());
     	    String pluginName = null;
-    	               
+
     	    //if this filter class is a SelfNamedPlugin,
     	    //its list of supported formats is different for
     	    //differently named "plugin"
@@ -537,15 +557,15 @@ public class MediaFilterManager
     	        //get plugin instance name for this media filter
     	        pluginName = ((SelfNamedPlugin)filterClasses[i]).getPluginInstanceName();
     	    }
-    	               
+
     	    //Get list of supported formats for the filter (and possibly named plugin)
-    	    //For SelfNamedPlugins, map key is:  
+    	    //For SelfNamedPlugins, map key is:
     	    //  <class-name><separator><plugin-name>
     	    //For other MediaFilters, map key is just:
     	    //  <class-name>
-    	    List fmts = (List)filterFormats.get(filterClasses[i].getClass().getName() + 
+    	    List fmts = (List)filterFormats.get(filterClasses[i].getClass().getName() +
     	                       (pluginName!=null ? FILTER_PLUGIN_SEPARATOR + pluginName : ""));
-    	   
+
     	    if (fmts.contains(myBitstream.getFormat().getShortDescription()))
     		{
             	try
@@ -553,8 +573,8 @@ public class MediaFilterManager
 		            // only update item if bitstream not skipped
 		            if (processBitstream(c, myItem, myBitstream, filterClasses[i]))
             	    {
-		           		myItem.update(); // Make sure new bitstream has a sequence
-		                                 	// number
+		           		itemDAO.update(myItem); // Make sure new bitstream has a
+		                                 	    // sequence number
 		           		filtered = true;
 		            }
             	}
@@ -568,14 +588,14 @@ public class MediaFilterManager
     	}
         return filtered;
     }
-    
+
     /**
      * processBitstream is a utility class that calls the virtual methods
      * from the current MediaFilter class.
-     * It scans the bitstreams in an item, and decides if a bitstream has 
-     * already been filtered, and if not or if overWrite is set, invokes the 
+     * It scans the bitstreams in an item, and decides if a bitstream has
+     * already been filtered, and if not or if overWrite is set, invokes the
      * filter.
-     * 
+     *
      * @param c
      *            context
      * @param item
@@ -584,7 +604,7 @@ public class MediaFilterManager
      *            source bitstream to process
      * @param formatFilter
      *            FormatFilter to perform filtering
-     * 
+     *
      * @return true if new rendition is created, false if rendition already
      *         exists and overWrite is not set
      */
@@ -594,9 +614,9 @@ public class MediaFilterManager
         //do pre-processing of this bitstream, and if it fails, skip this bitstream!
     	if(!formatFilter.preProcessBitstream(c, item, source))
         	return false;
-        	
+
     	boolean overWrite = MediaFilterManager.isForce;
-        
+
         // get bitstream filename, calculate destination filename
         String newName = formatFilter.getFilteredName(source.getName());
 
@@ -651,15 +671,18 @@ public class MediaFilterManager
         // Now set the format and name of the bitstream
         b.setName(newName);
         b.setSource("Written by FormatFilter " + formatFilter.getClass().getName() +
-        			" on " + DCDate.getCurrent() + " (GMT)."); 
+        			" on " + DCDate.getCurrent() + " (GMT).");
         b.setDescription(formatFilter.getDescription());
 
         // Find the proper format
-        BitstreamFormat bf = BitstreamFormat.findByShortDescription(c,
-                formatFilter.getFormatString());
+        BitstreamFormatDAO bfDAO = BitstreamFormatDAOFactory.getInstance(c);
+        BitstreamFormat bf =
+                bfDAO.retrieveByShortDescription(formatFilter.getFormatString());
         b.setFormat(bf);
-        b.update();
-        
+
+        BitstreamDAO bsDAO = BitstreamDAOFactory.getInstance(c);
+        bsDAO.update(b);
+
         //Inherit policies from the source bitstream
         //(first remove any existing policies)
         AuthorizeManager.removeAllPolicies(c, b);
@@ -677,10 +700,10 @@ public class MediaFilterManager
 
         //do post-processing of the generated bitstream
         formatFilter.postProcessBitstream(c, item, b);
-        
+
         return true;
     }
-    
+
     /**
      * Return the item that is currently being processed/filtered
      * by the MediaFilterManager
@@ -688,14 +711,13 @@ public class MediaFilterManager
      * This allows FormatFilters to retrieve the Item object
      * in case they need access to item-level information for their format
      * transformations/conversions.
-     * 
+     *
      * @return current Item being processed by MediaFilterManager
      */
     public static Item getCurrentItem()
     {
         return currentItem;
     }
-    
     /**
      * Check whether or not to skip processing the given identifier
      * 

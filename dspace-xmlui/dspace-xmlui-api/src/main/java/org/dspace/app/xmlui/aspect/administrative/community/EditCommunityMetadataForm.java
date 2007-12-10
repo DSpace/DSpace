@@ -106,7 +106,7 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 	    
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("community-metadata-edit",contextPath+"/admin/community",Division.METHOD_MULTIPART,"primary administrative community");
-	    main.setHead(T_main_head.parameterize(thisCommunity.getHandle()));
+	    main.setHead(T_main_head.parameterize(thisCommunity.getExternalIdentifier().getCanonicalForm()));
 	    
 	    if (AuthorizeManager.isAdmin(context))
 	    {

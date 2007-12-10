@@ -79,7 +79,7 @@
     <P><fmt:message key="jsp.dspace-admin.confirm-delete-mdschema.warning"/></P>
 
     <form method=POST>
-        <input type="hidden" name="dc_schema_id" value="<%= schema.getSchemaID() %>">
+        <input type="hidden" name="dc_schema_id" value="<%= schema.getID() %>">
 
         <center>
             <table width="70%">

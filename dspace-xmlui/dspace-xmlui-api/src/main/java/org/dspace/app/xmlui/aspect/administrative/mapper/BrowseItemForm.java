@@ -147,7 +147,7 @@ public class BrowseItemForm extends AbstractDSpaceTransformer {
 			if (dcTitles != null && dcTitles.length >= 1)
 				title = dcTitles[0].value;
 
-			String url = contextPath+"/handle/"+item.getHandle();
+			String url = contextPath+"/handle/"+item.getExternalIdentifier().getCanonicalForm();
 			
 			Row row = table.addRow();
 			

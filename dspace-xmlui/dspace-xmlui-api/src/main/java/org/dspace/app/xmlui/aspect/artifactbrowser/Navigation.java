@@ -115,7 +115,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
             if (dso != null)
-                key += "-" + dso.getHandle();
+                key += "-" + dso.getExternalIdentifier().getCanonicalForm();
 
             return HashUtil.hash(key);
         } 
@@ -192,7 +192,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             }
 
             // Add the configured browse lists for scoped browsing
-            String handle = dso.getHandle();
+            String handle = dso.getExternalIdentifier().getCanonicalForm();
             addBrowseOptions(browseContext, contextPath + "/handle/" + handle + "/browse");
         }
     }
@@ -229,14 +229,14 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         {
             if (dso instanceof Item)
             {
-                pageMeta.addMetadata("focus","object").addContent("hdl:"+dso.getHandle());
+                pageMeta.addMetadata("focus","object").addContent(dso.getExternalIdentifier().getCanonicalForm());
                 this.getObjectManager().manageObject(dso);
                 dso = ((Item) dso).getOwningCollection();
             }
             
             if (dso instanceof Collection || dso instanceof Community)
             {
-                pageMeta.addMetadata("focus","container").addContent("hdl:"+dso.getHandle());
+                pageMeta.addMetadata("focus","container").addContent(dso.getExternalIdentifier().getCanonicalForm());
                 this.getObjectManager().manageObject(dso);
             }
         }

@@ -42,7 +42,6 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.MissingResourceException;
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
@@ -54,16 +53,19 @@ import org.apache.log4j.Logger;
 
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.DCValue;
+import org.dspace.content.Item;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.handle.HandleManager;
-import org.dspace.content.Item;
-import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
 
 
 /**
@@ -81,15 +83,25 @@ public class SuggestServlet extends DSpaceServlet
     					   HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
+        ExternalIdentifierDAO identifierDAO =
+            ExternalIdentifierDAOFactory.getInstance(context);
+
         // Obtain information from request
-        String handle = request.getParameter("handle");
+        String uri = request.getParameter("uri");
+        ExternalIdentifier identifier = identifierDAO.retrieve(uri);
+        ObjectIdentifier oi = identifier.getObjectIdentifier();
         
         // Lookup Item title & collection
+        Item item = null;
+        String link = "";
         String title = null;
         String collName = null;
-        if (handle != null && !handle.equals(""))
+        if (identifier != null)
         {
-            Item item = (Item) HandleManager.resolveToObject(context, handle);
+            item = (Item) oi.getObject(context);
+            link = item.getIdentifier().getURL().toString();
+            request.setAttribute("link", link);
+
             if (item != null)
             {   
                 DCValue[] titleDC = item.getDC("title", null, Item.ANY);
@@ -184,8 +196,7 @@ public class SuggestServlet extends DSpaceServlet
             		senderAddr = authEmail;
             	}
             }
-            String itemUri = HandleManager.getCanonicalForm(handle);
-            String itemUrl = HandleManager.resolveToURL(context,handle);
+            String itemUri = identifier.getURI().toString();
             String message = request.getParameter("message");          
             String siteName = ConfigurationManager.getProperty("dspace.name");
 
@@ -198,8 +209,8 @@ public class SuggestServlet extends DSpaceServlet
                 email.addArgument(senderName);   // 2nd arg - sender name
                 email.addArgument(siteName);     // 3rd arg - repository name
                 email.addArgument(title);        // 4th arg - item title
-                email.addArgument(itemUri);      // 5th arg - item handle URI
-                email.addArgument(itemUrl);      // 6th arg - item local URL
+                email.addArgument(itemUri);      // 5th arg - item identifier URI
+                email.addArgument(link);         // 6th arg - item local URL
                 email.addArgument(collName);     // 7th arg - collection name
                 email.addArgument(message);      // 8th arg - user comments     
                 

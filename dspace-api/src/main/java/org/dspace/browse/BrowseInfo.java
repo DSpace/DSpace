@@ -39,7 +39,6 @@
  */
 package org.dspace.browse;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -526,48 +525,32 @@ public class BrowseInfo
     {
         return (String[]) results.toArray(new String[results.size()]);
     }
-
-    /**
-     * @deprecated
-     * @return
-     */
-    public Item[] getItemResults()
-    {
-    	return new Item[0];
-    }
     
     /**
      * Return the results of the Browse as an Item array.
      * 
      * @return The results of the Browse as an Item array.
      */
-    public Item[] getItemResults(Context context)
+    public Item[] getBrowseItemResults(Context context)
     	throws BrowseException
     {
-    	try
-    	{
-    		BrowseItem[] bis = getBrowseItemResults();
-    		Item[] items = new Item[bis.length];
-    		for (int i = 0; i < bis.length; i++)
-    		{
-    			items[i] = Item.find(context, bis[i].getID());
-    		}
-    		return items;
-    	}
-    	catch (SQLException e)
-    	{
-    		throw new BrowseException(e);
-    	}
+        Item[] bis = getBrowseItemResults();
+        Item[] items = new Item[bis.length];
+        for (int i = 0; i < bis.length; i++)
+        {
+            items[i] = Item.find(context, bis[i].getID());
+        }
+        return items;
     }
 
     /**
-     * Return the results of the Browse as a BrowseItem array
+     * Return the results of the Browse as a Item array
      * 
-     * @return		the results of the browse as a BrowseItem array
+     * @return		the results of the browse as a Item array
      */
-    public BrowseItem[] getBrowseItemResults()
+    public Item[] getBrowseItemResults()
     {
-        return (BrowseItem[]) results.toArray(new BrowseItem[results.size()]);
+        return (Item[]) results.toArray(new Item[results.size()]);
     }
     
     /**
@@ -790,7 +773,8 @@ public class BrowseInfo
     		String containerID = "no id available/necessary";
     		if (theContainer != null)
     		{
-    			containerID = Integer.toString(theContainer.getID()) + " (" + theContainer.getHandle() + ")";
+                containerID = Integer.toString(theContainer.getID()) + " (" +
+                    theContainer.getIdentifier().getCanonicalForm() + ")";
     		}
     		
     		sb.append("Browsing in " + container + ": " + containerID);
@@ -900,10 +884,6 @@ public class BrowseInfo
     		
     		return sb.toString();
     	}
-    	catch (SQLException e)
-    	{
-    		return e.getMessage();
-    	}
     	catch (BrowseException e)
     	{
     		return e.getMessage();
@@ -916,10 +896,8 @@ public class BrowseInfo
      * 
      * @param config
      * @return
-     * @throws SQLException
      */
     private String fullListingString(ItemListConfig config)
-    	throws SQLException
     {
     	// report on all the results contained herein
     	StringBuffer sb = new StringBuffer();
@@ -927,7 +905,7 @@ public class BrowseInfo
 		Iterator itr = results.iterator();
 		while (itr.hasNext())
 		{
-			BrowseItem bi = (BrowseItem) itr.next();
+			Item bi = (Item) itr.next();
 			if (bi == null)
 			{
 				sb.append("{{ NULL ITEM }}");

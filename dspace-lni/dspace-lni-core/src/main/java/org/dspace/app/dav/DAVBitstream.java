@@ -467,7 +467,7 @@ class DAVBitstream extends DAVDSpaceObject
             if (this.item != null)
             {
                 log.info(LogManager.getHeader(this.context, "DAV GET Bitstream",
-                        "item handle=" + this.item.getHandle() + ", bitstream_id="
+                        "item handle=" + this.item.getIdentifier().getCanonicalForm() + ", bitstream_id="
                                 + this.bitstream.getID()));
             }
 

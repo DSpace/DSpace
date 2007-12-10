@@ -76,13 +76,13 @@ import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
-import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
 import org.dspace.browse.SortOption;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.xml.sax.SAXException;
@@ -170,7 +170,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             {
                 DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
                 if (dso != null)
-                    key += "-" + dso.getHandle();
+                    key += "-" + dso.getExternalIdentifier().getCanonicalForm();
 
                 return HashUtil.hash(key);
             }
@@ -201,7 +201,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                 if (isItemBrowse(info))
                 {
                     // Add the browse items to the validity
-                    for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
+                    for (Item item : (java.util.List<Item>) info.getResults())
                     {
                         validity.add(item);
                     }
@@ -293,7 +293,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
         if (isItemBrowse(info))
         {
             // Add the items to the browse results
-            for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
+            for (Item item : (java.util.List<Item>) info.getResults())
             {
                 referenceSet.addReference(item);
             }

@@ -35,7 +35,6 @@
 package org.dspace.app.oai;
 
 import java.io.BufferedInputStream;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.Properties;
 
@@ -93,7 +92,7 @@ public class DIDLCrosswalk extends Crosswalk
         
         StringBuffer metadata = new StringBuffer();
         StringBuffer metadata1 = new StringBuffer();
-        String itemhandle=item.getHandle();
+        String itemURI=item.getIdentifier().getCanonicalForm();
         int maxsize=  Integer.parseInt(ConfigurationManager.getProperty("oai.didl.maxresponse")); 
         String currdate=ServerVerb.createResponseDate(new Date());
         
@@ -110,7 +109,7 @@ public class DIDLCrosswalk extends Crosswalk
         metadata.append("<didl:Descriptor>")
             .append("<didl:Statement mimeType=\"application/xml; charset=utf-8\">")
             .append("<dii:Identifier xmlns:dii=\"urn:mpeg:mpeg21:2002:01-DII-NS\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:mpeg:mpeg21:2002:01-DII-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/dii/dii.xsd\">")
-            .append("urn:hdl:" + itemhandle)
+            .append("urn:" + itemURI)
             .append("</dii:Identifier>")
             .append("</didl:Statement>")
             .append("</didl:Descriptor>");
@@ -176,93 +175,85 @@ public class DIDLCrosswalk extends Crosswalk
         
         //**CYCLE HERE!!!!**//
        
-        try
+        Bundle[] bundles= item.getBundles("ORIGINAL");    
+        
+        if (bundles.length == 0)
         {
-            Bundle[] bundles= item.getBundles("ORIGINAL");    
-            
-            if (bundles.length == 0)
-            {
-                metadata.append("<P>There are no files associated with this item.</P>");
-            }
-            else
-            {  
-            	/**cycle bundles**/
-                for (int i = 0; i < bundles.length; i++)
-                { 
-                    int flag=0;			
-                    Bitstream[] bitstreams = bundles[i].getBitstreams();
-                    
-                    /**cycle bitstreams**/
-                    for (int k = 0; k < bitstreams.length ; k++)
-                    {
-                        // Skip internal types
-                        if (!bitstreams[k].getFormat().isInternal())
-                        {
-                            if (flag==0)	
-                            {
-                                flag=1;
-                            }
-                        	
-                            metadata.append("<didl:Component id=" + "\"uuid-"+ UUIDFactory.generateUUID().toString() + "\">");
-                           
-                           if (bitstreams[k].getSize()> maxsize) 
-                           {
-                               metadata.append("<didl:Resource ref=\""+ConfigurationManager.getProperty("dspace.url")+"/bitstream/"+itemhandle+"/"+bitstreams[k].getSequenceID()+"/"+bitstreams[k].getName() );
-                               metadata.append("\" mimeType=\"");
-                               metadata.append(bitstreams[k].getFormat().getMIMEType());
-                               metadata.append("\">");
-                               metadata.append("</didl:Resource>");
-                           }
-                           else
-                           {    
-                            
-                                try
-                                {
-                                    metadata.append("<didl:Resource mimeType=\"");
-                                    metadata.append(bitstreams[k].getFormat().getMIMEType());
-                                    metadata.append("\" encoding=\"base64\">");
-                                                                       
-                                    /*
-                                     * Assume that size of in-line bitstreams will always be
-                                     * smaller than MAXINT bytes
-                                     */
-                                    int intSize = (int) bitstreams[k].getSize();
-                                    
-                                    byte[] buffer = new byte[intSize];
-                                    
-                                    Context contextl= new Context();
-                                    BufferedInputStream bis=new BufferedInputStream(BitstreamStorageManager.retrieve(contextl,bitstreams[k].getID()));
-                                    int size=bis.read(buffer);
-                                    contextl.complete();
-                                    
-                                    BASE64Encoder encoder=(BASE64Encoder) Class.forName("sun.misc.BASE64Encoder").newInstance();
-                                    String encoding = encoder.encodeBuffer(buffer);
-                                    metadata.append(encoding);
-                                }
-                                catch (Exception ex)
-                                {
-                                    ex.printStackTrace();                       
-                                    
-                                    metadata.append("<didl:Resource ref=\""+ConfigurationManager.getProperty("dspace.url")+"/bitstream/"+itemhandle+"/"+bitstreams[k].getSequenceID()+"/"+bitstreams[k].getName() );
-                                    metadata.append("\" mimeType=\"");
-                                    metadata.append(bitstreams[k].getFormat().getMIMEType());
-                                    metadata.append("\">");
-                                }
-
-                                metadata.append("</didl:Resource>");
-                            }
-                            metadata.append("</didl:Component>");	
-                        }
-                        /*end bitstream cycle*/     
-                    }
-                    /*end bundle cycle*/
-                }
-            }
+            metadata.append("<P>There are no files associated with this item.</P>");
         }
-        catch (SQLException sqle)
-        {
-            System.err.println("Caught exception:"+sqle.getCause());
-            sqle.printStackTrace();
+        else
+        {  
+            /**cycle bundles**/
+            for (int i = 0; i < bundles.length; i++)
+            { 
+                int flag=0;			
+                Bitstream[] bitstreams = bundles[i].getBitstreams();
+                
+                /**cycle bitstreams**/
+                for (int k = 0; k < bitstreams.length ; k++)
+                {
+                    // Skip internal types
+                    if (!bitstreams[k].getFormat().isInternal())
+                    {
+                        if (flag==0)	
+                        {
+                            flag=1;
+                        }
+                        
+                        metadata.append("<didl:Component id=" + "\"uuid-"+ UUIDFactory.generateUUID().toString() + "\">");
+                       
+                       if (bitstreams[k].getSize()> maxsize) 
+                       {
+                           metadata.append("<didl:Resource ref=\""+ConfigurationManager.getProperty("dspace.url")+"/bitstream/"+itemURI+"/"+bitstreams[k].getSequenceID()+"/"+bitstreams[k].getName() );
+                           metadata.append("\" mimeType=\"");
+                           metadata.append(bitstreams[k].getFormat().getMIMEType());
+                           metadata.append("\">");
+                           metadata.append("</didl:Resource>");
+                       }
+                       else
+                       {    
+                        
+                            try
+                            {
+                                metadata.append("<didl:Resource mimeType=\"");
+                                metadata.append(bitstreams[k].getFormat().getMIMEType());
+                                metadata.append("\" encoding=\"base64\">");
+                                                                   
+                                /*
+                                 * Assume that size of in-line bitstreams will always be
+                                 * smaller than MAXINT bytes
+                                 */
+                                int intSize = (int) bitstreams[k].getSize();
+                                
+                                byte[] buffer = new byte[intSize];
+                                
+                                Context contextl= new Context();
+                                BufferedInputStream bis=new BufferedInputStream(BitstreamStorageManager.retrieve(contextl,bitstreams[k].getID()));
+                                int size=bis.read(buffer);
+                                contextl.complete();
+                                
+                                BASE64Encoder encoder=(BASE64Encoder) Class.forName("sun.misc.BASE64Encoder").newInstance();
+                                String encoding = encoder.encodeBuffer(buffer);
+                                metadata.append(encoding);
+                            }
+                            catch (Exception ex)
+                            {
+                                ex.printStackTrace();                       
+                                
+                                metadata.append("<didl:Resource ref=\""+ConfigurationManager.getProperty("dspace.url")+"/bitstream/"+itemURI+"/"+bitstreams[k].getSequenceID()+"/"+bitstreams[k].getName() );
+                                metadata.append("\" mimeType=\"");
+                                metadata.append(bitstreams[k].getFormat().getMIMEType());
+                                metadata.append("\">");
+                            }
+
+                            metadata.append("</didl:Resource>");
+                        }
+                        metadata.append("</didl:Component>");	
+                    }
+                    /*end bitstream cycle*/     
+                }
+                /*end bundle cycle*/
+            }
         }
     		
         //**END CYCLE HERE **//		

@@ -113,7 +113,7 @@
                   --%>
 
                  <td class="<%= row %>RowOddCol">
-                      <a href="<%= request.getContextPath() %>/handle/<%= subscriptions[i].getHandle() %>"><%= subscriptions[i].getMetadata("name") %></a>
+                      <a href="<%= subscriptions[i].getIdentifier().getURL().toString() %>"><%= subscriptions[i].getMetadata("name") %></a>
                  </td>
                  <td class="<%= row %>RowEvenCol">
                     <form method="post" action=""> 

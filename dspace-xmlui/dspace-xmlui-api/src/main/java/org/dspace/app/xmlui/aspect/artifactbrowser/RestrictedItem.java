@@ -125,7 +125,7 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
         } 
         else 
         {
-        	String handle = dso.getHandle();
+        	String handle = dso.getExternalIdentifier().getCanonicalForm();
         	type = "item";
         	if (handle == null || "".equals(handle))
         	{
@@ -133,7 +133,7 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
         	}
         	else
         	{
-        		identifier = "hdl:"+handle;
+        		identifier = handle;
         	}
         	
         	if (request.getParameter("bitstreamId")!=null){

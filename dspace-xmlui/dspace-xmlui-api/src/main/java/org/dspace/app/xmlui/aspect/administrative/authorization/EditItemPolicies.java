@@ -146,7 +146,7 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
 
 		// DIVISION: main
 		Division main = body.addInteractiveDivision("edit-item-policies",contextPath+"/admin/authorize",Division.METHOD_POST,"primary administrative authorization");
-		main.setHead(T_main_head.parameterize(item.getHandle(),item.getID()));
+		main.setHead(T_main_head.parameterize(item.getExternalIdentifier().getCanonicalForm(),item.getID()));
 		main.addPara().addHighlight("italic").addContent(T_main_para1);
 		main.addPara().addHighlight("italic").addContent(T_main_para2);
 		

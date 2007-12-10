@@ -64,6 +64,14 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.MetadataValidationException;
+import org.dspace.content.dao.BitstreamDAO;
+import org.dspace.content.dao.BitstreamDAOFactory;
+import org.dspace.content.dao.BitstreamFormatDAO;
+import org.dspace.content.dao.BitstreamFormatDAOFactory;
+import org.dspace.content.dao.BundleDAO;
+import org.dspace.content.dao.BundleDAOFactory;
+import org.dspace.content.dao.WorkspaceItemDAO;
+import org.dspace.content.dao.WorkspaceItemDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -182,6 +190,11 @@ public abstract class AbstractMETSIngester
         throws PackageValidationException, CrosswalkException,
                AuthorizeException, SQLException, IOException
     {
+        BitstreamDAO bsDAO = BitstreamDAOFactory.getInstance(context);
+        BitstreamFormatDAO bfDAO = BitstreamFormatDAOFactory.getInstance(context);
+        BundleDAO bundleDAO = BundleDAOFactory.getInstance(context);
+        WorkspaceItemDAO wsiDAO = WorkspaceItemDAOFactory.getInstance(context);
+
         ZipInputStream zip = new ZipInputStream(pkg);
         HashMap fileIdToBitstream = new HashMap();
         WorkspaceItem wi = null;
@@ -199,7 +212,7 @@ public abstract class AbstractMETSIngester
              *  match the URL references in <Flocat> and <mdRef> elements.
              */
             METSManifest manifest = null;
-            wi = WorkspaceItem.create(context, collection, false);
+            wi = wsiDAO.create(collection, false);
             Item item = wi.getItem();
             Bundle contentBundle = item.createBundle(Constants.CONTENT_BUNDLE_NAME);
             Bundle mdBundle = null;
@@ -242,7 +255,7 @@ public abstract class AbstractMETSIngester
                 }
                 packageFiles.add(fname);
                 bs.setSource(fname);
-                bs.update();
+                bsDAO.update(bs);
             }
             zip.close();
 
@@ -295,7 +308,7 @@ public abstract class AbstractMETSIngester
                     //  2. if that fails, guess from "name" extension.
                     String mimeType = mfile.getAttributeValue("MIMETYPE");
                     BitstreamFormat bf = (mimeType == null) ? null :
-                            BitstreamFormat.findByMIMEType(context, mimeType);
+                            bfDAO.retrieveByMimeType(mimeType);
                     if (bf == null)
                         bf = FormatIdentifier.guessFormat(context, bs);
                     bs.setFormat(bf);
@@ -410,7 +423,7 @@ public abstract class AbstractMETSIngester
                             String mfileId = mfile.getAttributeValue("ID");
                             Bitstream bs = (Bitstream)fileIdToBitstream.get(mfileId);
                             bs.setName(newName);
-                            bs.update();
+                            bsDAO.update(bs);
                         }
                     }
                 }
@@ -430,9 +443,9 @@ public abstract class AbstractMETSIngester
                              ", but found no corresponding bitstream.");
                 else
                 {
-                    Bundle bn[] = pbs.getBundles();
-                    if (bn.length > 0)
-                        bn[0].setPrimaryBitstreamID(pbs.getID());
+                    List<Bundle> bn = bundleDAO.getBundles(pbs);
+                    if (bn.size() > 0)
+                        bn.get(0).setPrimaryBitstreamID(pbs.getID());
                     else
                         log.error("Sanity check, got primary bitstream without any parent bundle.");
                 }
@@ -448,10 +461,10 @@ public abstract class AbstractMETSIngester
             Bundle allBn[] = item.getBundles();
             for (int i = 0; i < allBn.length; ++i)
             {
-                allBn[i].update();
+                bundleDAO.update(allBn[i]);
             }
 
-            wi.update();
+            wsiDAO.update(wi);
             success = true;
             log.info(LogManager.getHeader(context, "ingest",
                 "Created new Item, db ID="+String.valueOf(item.getID())+
@@ -472,7 +485,7 @@ public abstract class AbstractMETSIngester
         {
             // kill item (which also deletes bundles, bitstreams) if ingest fails
             if (!success && wi != null)
-                wi.deleteAll();
+                wsiDAO.deleteAll(wi.getID());
         }
     }
 

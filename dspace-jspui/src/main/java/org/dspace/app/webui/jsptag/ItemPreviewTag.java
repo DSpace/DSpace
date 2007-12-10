@@ -39,17 +39,6 @@
  */
 package org.dspace.app.webui.jsptag;
 
-import org.dspace.app.webui.util.UIUtil;
-
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
-
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Utils;
-
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -57,6 +46,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
+
+import org.dspace.app.webui.util.UIUtil;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.DCValue;
+import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 
 /**
  * <p>

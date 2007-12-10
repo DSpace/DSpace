@@ -245,7 +245,7 @@ public class Submissions extends AbstractDSpaceTransformer
         	for (WorkflowItem owned : ownedItems)
         	{
         		int workflowItemID = owned.getID();
-        		String url = contextPath+"/handle/"+owned.getCollection().getHandle()+"/workflow?workflowID="+workflowItemID;
+        		String url = contextPath+"/handle/"+owned.getCollection().getExternalIdentifier().getCanonicalForm()+"/workflow?workflowID="+workflowItemID;
         		DCValue[] titles = owned.getItem().getDC("title", null, Item.ANY);
         		String collectionName = owned.getCollection().getMetadata("name");
         		EPerson submitter = owned.getSubmitter();
@@ -308,7 +308,7 @@ public class Submissions extends AbstractDSpaceTransformer
         	for (WorkflowItem pooled : pooledItems)
         	{
         		int workflowItemID = pooled.getID();
-        		String url = contextPath+"/handle/"+pooled.getCollection().getHandle()+"/workflow?workflowID="+workflowItemID;
+        		String url = contextPath+"/handle/"+pooled.getCollection().getExternalIdentifier().getCanonicalForm()+"/workflow?workflowID="+workflowItemID;
         		DCValue[] titles = pooled.getItem().getDC("title", null, Item.ANY);
         		String collectionName = pooled.getCollection().getMetadata("name");
         		EPerson submitter = pooled.getSubmitter();

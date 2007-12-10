@@ -230,9 +230,10 @@ public class JSPDescribeStep extends DescribeStep implements JSPStep
 
         // requires configurable form info per collection
         request.setAttribute("submission.inputs", getInputsReader().getInputs(c
-                .getHandle()));
+                .getIdentifier().getCanonicalForm()));
 
         // forward to edit-metadata JSP
         JSPStepManager.showJSP(request, response, subInfo, DISPLAY_JSP);
     }
 }
+

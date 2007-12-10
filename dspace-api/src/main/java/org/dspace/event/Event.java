@@ -41,7 +41,6 @@
 package org.dspace.event;
 
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,6 +49,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
+import org.dspace.uri.ObjectIdentifier;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
@@ -317,14 +317,19 @@ public class Event implements Serializable
      * 
      * @returns DSpaceObject or null if none can be found or no object was set.
      */
-    public DSpaceObject getObject(Context context) throws SQLException
+    public DSpaceObject getObject(Context context)
     {
         int type = getObjectType();
         int id = getObjectID();
         if (type < 0 || id < 0)
+        {
             return null;
+        }
         else
-            return DSpaceObject.find(context, type, id);
+        {
+            ObjectIdentifier oid = new ObjectIdentifier(id, type);
+            return oid.getObject(context);
+        }
     }
 
     /**
@@ -333,9 +338,10 @@ public class Event implements Serializable
      * 
      * @returns DSpaceObject or null if none can be found.
      */
-    public DSpaceObject getSubject(Context context) throws SQLException
+    public DSpaceObject getSubject(Context context)
     {
-        return DSpaceObject.find(context, getSubjectType(), getSubjectID());
+        ObjectIdentifier oid = new ObjectIdentifier(getSubjectID(), getSubjectType());
+        return oid.getObject(context);
     }
 
     /**

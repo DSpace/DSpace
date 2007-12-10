@@ -56,8 +56,10 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.Constants;
-import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -103,9 +105,18 @@ public class SelectCollectionStep extends AbstractSubmissionStep
             UIException, SQLException, IOException, AuthorizeException
     {     
 		Collection[] collections; // List of possible collections.
-		DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+//		DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+        ExternalIdentifierDAO identifierDAO =
+            ExternalIdentifierDAOFactory.getInstance(context);
+        ExternalIdentifier eid = identifierDAO.retrieve(handle);
 
-		if (dso != null && dso instanceof Community)
+        DSpaceObject dso = null;
+        if (eid != null)
+        {
+            dso = eid.getObjectIdentifier().getObject(context);
+        }
+
+        if (dso != null && dso instanceof Community)
 		{
 			collections = Collection.findAuthorized(context, ((Community) dso), Constants.ADD);   
 		} 
@@ -131,7 +142,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         	String name = collection.getMetadata("name");
    		   	if (name.length() > 50)
    		   		name = name.substring(0, 47) + "...";
-        	select.addOption(collection.getHandle(),name);
+        	select.addOption(collection.getExternalIdentifier().getCanonicalForm(),name);
         }
         
         Button submit = list.addItem().addButton("submit");

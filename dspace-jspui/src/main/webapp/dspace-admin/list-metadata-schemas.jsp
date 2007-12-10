@@ -106,18 +106,18 @@ if (error!=null) {
     {
 %>
         <tr>
-            <td class="<%= row %>RowOddCol"><%= schemas[i].getSchemaID() %></td>
+            <td class="<%= row %>RowOddCol"><%= schemas[i].getID() %></td>
             <td class="<%= row %>RowEvenCol">
-                <a href="<%=request.getContextPath()%>/dspace-admin/metadata-field-registry?dc_schema_id=<%= schemas[i].getSchemaID() %>"><%= schemas[i].getNamespace() %></a>
+                <a href="<%=request.getContextPath()%>/dspace-admin/metadata-field-registry?dc_schema_id=<%= schemas[i].getID() %>"><%= schemas[i].getNamespace() %></a>
             </td>
             <td class="<%= row %>RowOddCol">
                 <%= schemas[i].getName() %>
             </td>
             <td class="<%= row %>RowOddCol">
-		<% if ( schemas[i].getSchemaID() != 1 ) { %>
+		<% if ( schemas[i].getID() != 1 ) { %>
                 <form method="post" action="">
-                    <input type="hidden" name="dc_schema_id" value="<%= schemas[i].getSchemaID() %>"/>
-                    <input type="button" name="submit_update" value="<fmt:message key="jsp.dspace-admin.general.update"/>" onclick="javascript:document.schema.namespace.value='<%= schemas[i].getNamespace() %>';document.schema.short_name.value='<%= schemas[i].getName() %>';document.schema.dc_schema_id.value='<%= schemas[i].getSchemaID() %>';return null;"/>
+                    <input type="hidden" name="dc_schema_id" value="<%= schemas[i].getID() %>"/>
+                    <input type="button" name="submit_update" value="<fmt:message key="jsp.dspace-admin.general.update"/>" onclick="javascript:document.schema.namespace.value='<%= schemas[i].getNamespace() %>';document.schema.short_name.value='<%= schemas[i].getName() %>';document.schema.dc_schema_id.value='<%= schemas[i].getID() %>';return null;"/>
                     <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>"/>
                 </form>
 		    <% } %>

@@ -39,14 +39,16 @@
  */
 package org.dspace.administer;
 
-import java.io.IOException;
-import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.log4j.Logger;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
+import org.dspace.content.dao.MetadataFieldDAO;
+import org.dspace.content.dao.MetadataFieldDAOFactory;
 import org.dspace.core.Context;
 
 /**
@@ -65,6 +67,7 @@ import org.dspace.core.Context;
  * @version $Revision$
  * @deprecated
  */
+@Deprecated
 public class DCType
 {
     /** log4j logger */
@@ -74,7 +77,8 @@ public class DCType
     private Context ourContext;
 
     /** The matching metadata field */
-    private MetadataField field = new MetadataField();
+    private MetadataField field;
+    private MetadataFieldDAO dao;
 
     /**
      * Create a DCType from an existing metadata field.
@@ -87,6 +91,8 @@ public class DCType
     {
         this.ourContext = context;
         this.field = field;
+
+        dao = MetadataFieldDAOFactory.getInstance(context);
     }
 
     /**
@@ -97,7 +103,7 @@ public class DCType
      */
     public DCType(Context context)
     {
-        this.ourContext = context;
+        this(context, null);
     }
 
     /**
@@ -113,16 +119,16 @@ public class DCType
      * @deprecated
      */
     public static String[] quickFind(Context context, int id)
-            throws SQLException
     {
-        MetadataField field = MetadataField.find(context, id);
+        MetadataFieldDAO dao = MetadataFieldDAOFactory.getInstance(context);
+        MetadataField field = dao.retrieve(id);
 
         String[] result = new String[2];
 
         if (field == null)
         {
-        return result;
-    }
+            return result;
+        }
         else
         {
             result[0] = field.getElement();
@@ -142,9 +148,11 @@ public class DCType
      * @return the metadata field, or null if the ID is invalid.
      * @deprecated
      */
-    public static DCType find(Context context, int id) throws SQLException
+    public static DCType find(Context context, int id)
     {
-        MetadataField field = MetadataField.find(context, id);
+        MetadataFieldDAO dao = MetadataFieldDAOFactory.getInstance(context);
+        MetadataField field = dao.retrieve(id);
+
         return new DCType(context, field);
     }
 
@@ -166,10 +174,11 @@ public class DCType
      * @deprecated
      */
     public static DCType findByElement(Context context, String element,
-            String qualifier) throws SQLException, AuthorizeException
+            String qualifier) throws AuthorizeException
     {
-        MetadataField field = MetadataField.findByElement(context,
-                MetadataSchema.DC_SCHEMA_ID, element, qualifier);
+        MetadataFieldDAO dao = MetadataFieldDAOFactory.getInstance(context);
+        MetadataField field = dao.retrieve(MetadataSchema.DC_SCHEMA_ID,
+                element, qualifier);
 
         if (field == null)
         {
@@ -187,15 +196,17 @@ public class DCType
      * @return an array of all the Dublin Core types
      * @deprecated
      */
-    public static DCType[] findAll(Context context) throws SQLException
+    public static DCType[] findAll(Context context)
     {
+        MetadataFieldDAO dao = MetadataFieldDAOFactory.getInstance(context);
 
-        MetadataField field[] = MetadataField.findAll(context);
-        DCType[] typeArray = new DCType[field.length];
+        List<MetadataField> fields = dao.getMetadataFields();
+        DCType[] typeArray = new DCType[fields.size()];
 
-        for (int ii = 0; ii < field.length; ii++)
+        int i = 0;
+        for (MetadataField field : fields)
         {
-            typeArray[ii] = new DCType(context, field[ii]);
+            typeArray[i++] = new DCType(context, field);
         }
 
         // Return the array
@@ -209,15 +220,17 @@ public class DCType
      *            DSpace context object
      * @return the newly created DCType
      * @throws NonUniqueMetadataException
-     * @throws IOException
      * @deprecated
      */
-    public static DCType create(Context context) throws SQLException,
-            AuthorizeException, IOException, NonUniqueMetadataException
-        {
-        MetadataField field = new MetadataField();
+    public static DCType create(Context context)
+        throws AuthorizeException, NonUniqueMetadataException
+    {
+        MetadataFieldDAO dao = MetadataFieldDAOFactory.getInstance(context);
+
+        MetadataField field = dao.create();
         field.setSchemaID(MetadataSchema.DC_SCHEMA_ID);
-        field.create(context);
+        dao.update(field);
+
         return new DCType(context, field);
     }
 
@@ -228,9 +241,9 @@ public class DCType
      * thrown in this case.
      * @deprecated
      */
-    public void delete() throws SQLException, AuthorizeException
+    public void delete() throws AuthorizeException
     {
-        field.delete(ourContext);
+        dao.delete(field.getID());
     }
 
     /**
@@ -240,7 +253,7 @@ public class DCType
      */
     public int getID()
     {
-        return field.getFieldID();
+        return field.getID();
     }
 
     /**
@@ -311,13 +324,11 @@ public class DCType
     /**
      * Update the dublin core registry
      *
-     * @throws IOException
      * @throws NonUniqueMetadataException
      * @deprecated
      */
-    public void update() throws SQLException, AuthorizeException,
-            NonUniqueMetadataException, IOException
-        {
-        field.update(ourContext);
+    public void update() throws AuthorizeException, NonUniqueMetadataException
+    {
+        dao.update(field);
     }
 }

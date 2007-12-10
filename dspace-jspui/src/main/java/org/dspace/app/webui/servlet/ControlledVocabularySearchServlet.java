@@ -34,7 +34,6 @@
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -54,10 +53,13 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.handle.HandleManager;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
@@ -149,6 +151,9 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
     private void doSearch(Context context, HttpServletRequest request,
             String query) throws IOException, SQLException
     {
+        ExternalIdentifierDAO identifierDAO =
+            ExternalIdentifierDAOFactory.getInstance(context);
+
         // Get the query
         // String query = request.getParameter("query");
         int start = UIUtil.getIntParameter(request, "start");
@@ -163,9 +168,9 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
             start = 0;
         }
 
-        List itemHandles = new ArrayList();
-        List collectionHandles = new ArrayList();
-        List communityHandles = new ArrayList();
+        List itemIdentifiers = new ArrayList();
+        List collectionIdentifiers = new ArrayList();
+        List communityIdentifiers = new ArrayList();
 
         Item[] resultsItems;
         Collection[] resultsCollections;
@@ -238,82 +243,88 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         }
 
         // now instantiate the results and put them in their buckets
-        for (int i = 0; i < qResults.getHitHandles().size(); i++)
+        for (int i = 0; i < qResults.getHitURIs().size(); i++)
         {
-            String myHandle = (String) qResults.getHitHandles().get(i);
+            String myURI = (String) qResults.getHitURIs().get(i);
             Integer myType = (Integer) qResults.getHitTypes().get(i);
 
-            // add the handle to the appropriate lists
+            // add the URI to the appropriate lists
             switch (myType.intValue())
             {
             case Constants.ITEM:
-                itemHandles.add(myHandle);
+                itemIdentifiers.add(myURI);
 
                 break;
 
             case Constants.COLLECTION:
-                collectionHandles.add(myHandle);
+                collectionIdentifiers.add(myURI);
 
                 break;
 
             case Constants.COMMUNITY:
-                communityHandles.add(myHandle);
+                communityIdentifiers.add(myURI);
 
                 break;
             }
         }
 
-        int numCommunities = communityHandles.size();
-        int numCollections = collectionHandles.size();
-        int numItems = itemHandles.size();
+        int numCommunities = communityIdentifiers.size();
+        int numCollections = collectionIdentifiers.size();
+        int numItems = itemIdentifiers.size();
 
-        // Make objects from the handles - make arrays, fill them out
+        // Make objects from the URIs - make arrays, fill them out
         resultsCommunities = new Community[numCommunities];
         resultsCollections = new Collection[numCollections];
         resultsItems = new Item[numItems];
 
         for (int i = 0; i < numItems; i++)
         {
-            String myhandle = (String) itemHandles.get(i);
+            String uri = (String) itemIdentifiers.get(i);
 
-            Object o = HandleManager.resolveToObject(context, myhandle);
+            ExternalIdentifier identifier = identifierDAO.retrieve(uri);
+            ObjectIdentifier oi = identifier.getObjectIdentifier();
+            Item item = (Item) oi.getObject(context);
 
-            resultsItems[i] = (Item) o;
+            resultsItems[i] = item;
 
             if (resultsItems[i] == null)
             {
                 throw new SQLException("Query \"" + query
-                        + "\" returned unresolvable handle: " + myhandle);
+                        + "\" returned unresolvable uri: " + uri);
             }
         }
 
-        for (int i = 0; i < collectionHandles.size(); i++)
+        for (int i = 0; i < collectionIdentifiers.size(); i++)
         {
-            String myhandle = (String) collectionHandles.get(i);
+            String uri = (String) collectionIdentifiers.get(i);
 
-            Object o = HandleManager.resolveToObject(context, myhandle);
+            ExternalIdentifier identifier = identifierDAO.retrieve(uri);
+            ObjectIdentifier oi = identifier.getObjectIdentifier();
+            Collection c = (Collection) oi.getObject(context);
 
-            resultsCollections[i] = (Collection) o;
+            resultsCollections[i] = collection;
 
             if (resultsCollections[i] == null)
             {
                 throw new SQLException("Query \"" + query
-                        + "\" returned unresolvable handle: " + myhandle);
+                        + "\" returned unresolvable uri: " + uri);
             }
         }
 
-        for (int i = 0; i < communityHandles.size(); i++)
+        for (int i = 0; i < communityIdentifiers.size(); i++)
         {
-            String myhandle = (String) communityHandles.get(i);
+            String uri = (String) communityIdentifiers.get(i);
 
-            Object o = HandleManager.resolveToObject(context, myhandle);
+            ExternalIdentifier identifier = identifierDAO.retrieve(uri);
+            ObjectIdentifier oi = identifier.getObjectIdentifier();
+            Community c = (Community) oi.getObject(context);
 
-            resultsCommunities[i] = (Community) o;
+            resultsCommunities[i] = c;
 
             if (resultsCommunities[i] == null)
             {
                 throw new SQLException("Query \"" + query
-                        + "\" returned unresolvable handle: " + myhandle);
+                        + "\" returned unresolvable uri: " + uri);
             }
         }
 

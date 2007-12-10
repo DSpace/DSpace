@@ -251,7 +251,7 @@ class DAVItem extends DAVDSpaceObject
      */
     protected static String getPathElt(Item item)
     {
-        String handle = item.getHandle();
+        String handle = item.getIdentifier().getCanonicalForm();
         if (handle == null)
         {
             return getPathElt(item.getID());
@@ -333,11 +333,11 @@ class DAVItem extends DAVDSpaceObject
         {
             // displayname - title or handle.
             DCValue titleDc[] = this.item.getDC("title", Item.ANY, Item.ANY);
-            value = titleDc.length > 0 ? titleDc[0].value : this.item.getHandle();
+            value = titleDc.length > 0 ? titleDc[0].value : this.item.getIdentifier().getCanonicalForm();
         }
         else if (elementsEqualIsh(property, handleProperty))
         {
-            value = canonicalizeHandle(this.item.getHandle());
+            value = canonicalizeHandle(this.item.getIdentifier().getCanonicalForm());
         }
         else if (elementsEqualIsh(property, submitterProperty))
         {
@@ -352,7 +352,7 @@ class DAVItem extends DAVDSpaceObject
             Collection owner = this.item.getOwningCollection();
             if (owner != null)
             {
-                value = canonicalizeHandle(owner.getHandle());
+                value = canonicalizeHandle(owner.getIdentifier().getCanonicalForm());
             }
         }
         else if (elementsEqualIsh(property, getlastmodifiedProperty))
@@ -590,8 +590,8 @@ class DAVItem extends DAVDSpaceObject
         // make sure item doesn't belong to this collection
         Collection destColl = ((DAVCollection) destination).getCollection();
 
-        log.debug("COPY from=" + item.toString() + " (" + item.getHandle()
-                + "), to=" + destColl.toString() + " (" + destColl.getHandle()
+        log.debug("COPY from=" + item.toString() + " (" + item.getIdentifier().getCanonicalForm()
+                + "), to=" + destColl.toString() + " (" + destColl.getIdentifier().getCanonicalForm()
                 + ")");
 
         // check if it's already a member
@@ -600,9 +600,9 @@ class DAVItem extends DAVDSpaceObject
         {
             if (destColl.equals(element))
             {
-                log.debug("COPY - item @ " + item.getHandle()
+                log.debug("COPY - item @ " + item.getIdentifier().getCanonicalForm()
                         + " is already a member of collection @ "
-                        + destColl.getHandle());
+                        + destColl.getIdentifier().getCanonicalForm());
                 if (overwrite)
                 {
                     return DAV.SC_NO_CONTENT;
@@ -611,7 +611,7 @@ class DAVItem extends DAVDSpaceObject
                 {
                     throw new DAVStatusException(DAV.SC_CONFLICT,
                             "This Item is already a member of collection handle="
-                                    + destColl.getHandle());
+                                    + destColl.getIdentifier().getCanonicalForm());
                 }
             }
         }

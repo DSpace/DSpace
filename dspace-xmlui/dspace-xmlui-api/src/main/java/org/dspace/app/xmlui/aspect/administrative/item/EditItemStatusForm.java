@@ -145,8 +145,9 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		itemInfo.addItem(String.valueOf(item.getID()));
 		
 		itemInfo.addLabel(T_label_handle);
-		itemInfo.addItem(item.getHandle()==null?"None":item.getHandle());
-		
+//      itemInfo.addItem(item.getHandle()==null?"None":item.getHandle());
+        itemInfo.addItem(item.getExternalIdentifier()==null?"None":item.getExternalIdentifier().getCanonicalForm());
+
 		itemInfo.addLabel(T_label_modified);
 		itemInfo.addItem(item.getLastModified().toString());
 		
@@ -159,12 +160,14 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		}
 		
 		itemInfo.addLabel(T_label_page);
-		if(item.getHandle()==null){
-			itemInfo.addItem(T_na);		
+//		if(item.getHandle()==null){
+        if(item.getExternalIdentifier()==null){
+			itemInfo.addItem(T_na);
 		}
 		else{
-			itemInfo.addItem().addXref(ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getHandle(),ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getHandle());		
-		}
+//            itemInfo.addItem().addXref(ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getHandle(),ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getHandle());
+            itemInfo.addItem().addXref(ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getExternalIdentifier().getCanonicalForm(),ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getExternalIdentifier().getCanonicalForm());
+        }
 		
 		itemInfo.addLabel(T_label_auth);
 		addAdministratorOnlyButton(itemInfo.addItem(), "submit_authorization", T_submit_authorizations);

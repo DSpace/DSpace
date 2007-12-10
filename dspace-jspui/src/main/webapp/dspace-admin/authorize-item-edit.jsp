@@ -113,7 +113,7 @@
     <tr>
       <td align="left">
 	<h1><fmt:message key="jsp.dspace-admin.authorize-item-edit.policies">
-        <fmt:param><%= item.getHandle() %></fmt:param>
+        <fmt:param><%= item.getIdentifier().getCanonicalForm() %></fmt:param>
         <fmt:param><%= item.getID() %></fmt:param>
     </fmt:message></h1>
       </td>

@@ -39,7 +39,7 @@
   --%>
 
 <%--
-  - Form requesting a Handle or internal item ID for item editing
+  - Form requesting a URI or internal item ID for item editing
   -
   - Attributes:
   -     invalid.id  - if this attribute is present, display error msg
@@ -70,16 +70,11 @@
     
 <%
     if (request.getAttribute("invalid.id") != null) { %>
-    <%-- <p><strong>The ID you entered isn't a valid item ID.</strong>  If you're trying to
-    edit a community or collection, you need to use the
-    <a href="<%= request.getContextPath() %>/dspace-admin/edit-communities">communities/collections admin page.</a></p> --%>
-
     <p><fmt:message key="jsp.dspace-admin.item-select.text">
         <fmt:param><%= request.getContextPath() %>/dspace-admin/edit-communities</fmt:param>
     </fmt:message></p>
 <%  } %>
 
-    <%-- <p>Enter the Handle or internal item ID of the item you wish to select. --%>
     <div><fmt:message key="jsp.dspace-admin.item-select.enter"/>
       <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#itempolicies\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
     
@@ -87,10 +82,9 @@
         <center>
             <table class="miscTable">
                 <tr class="oddRowEvenCol">
-                    <%-- <td class="submitFormLabel">Handle:</td> --%>
-                    <td class="submitFormLabel"><label for="thandle"><fmt:message key="jsp.dspace-admin.item-select.handle"/></label></td>
+                    <td class="submitFormLabel"><label for="turi"><fmt:message key="jsp.dspace-admin.item-select.uri"/></label></td>
                     <td>
-                            <input type="text" name="handle" id="thandle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>/" size=12>
+                            <input type="text" name="uri" id="turi" value="hdl:<%= ConfigurationManager.getProperty("handle.prefix") %>/" size=12>
                             <%-- <input type="submit" name="submit_item_select" value="Find"> --%>
                             <input type="submit" name="submit_item_select" value="<fmt:message key="jsp.dspace-admin.item-select.find"/>" />
                     </td>
@@ -101,7 +95,6 @@
                     <td class="submitFormLabel"><label for="titem_id"><fmt:message key="jsp.dspace-admin.item-select.id"/></label></td>
                     <td>
                             <input type="text" name="item_id" size="12">
-                            <%-- <input type="submit" name="submit_item_select" value="Find"> --%>
                             <input type="submit" name="submit_item_select" value="<fmt:message key="jsp.dspace-admin.item-select.find"/>" />
                     </td>
                 </tr>

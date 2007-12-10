@@ -96,7 +96,7 @@ public class SaveOrRemoveStep extends AbstractStep
 	UIException, SQLException, IOException, AuthorizeException
 	{	
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit";
+		String actionURL = contextPath + "/handle/"+collection.getExternalIdentifier().getCanonicalForm() + "/submit";
 		
 		Division div = body.addInteractiveDivision("submit-save-or-cancel",actionURL, Division.METHOD_POST,"primary submission");
 		div.setHead(T_submission_head);

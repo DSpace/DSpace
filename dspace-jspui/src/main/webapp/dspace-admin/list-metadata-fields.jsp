@@ -127,7 +127,7 @@ if (error!=null) {
              <form method="post" action="">
                  <table>
                      <tr>
-                <td class="<%= row %>RowOddCol"><%= types[i].getFieldID() %></td>
+                <td class="<%= row %>RowOddCol"><%= types[i].getID() %></td>
                          <td class="<%= row %>RowEvenCol">
                              <input type="text" name="element" value="<%= types[i].getElement() %>" size="12"/>
                          </td>
@@ -138,11 +138,11 @@ if (error!=null) {
                              <textarea name="scope_note" rows="3" cols="40"><%= (types[i].getScopeNote() == null ? "" : types[i].getScopeNote()) %></textarea>
                          </td>
                          <td class="<%= row %>RowOddCol">
-                            <input type="hidden" name="dc_type_id" value="<%= types[i].getFieldID() %>"/>
+                            <input type="hidden" name="dc_type_id" value="<%= types[i].getID() %>"/>
                             <input type="submit" name="submit_update" value="<fmt:message key="jsp.dspace-admin.general.update"/>"/>
                          </td>
                          <td class="<%= row %>RowEvenCol">
-                            <input type="hidden" name="dc_type_id" value="<%= types[i].getFieldID() %>"/>
+                            <input type="hidden" name="dc_type_id" value="<%= types[i].getID() %>"/>
                             <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>"/>
                          </td>
                      </tr>
@@ -158,7 +158,7 @@ if (error!=null) {
  </table>
 
       <form method="post" action="">
-        <input type="hidden" name="dc_schema_id" value="<%= schema.getSchemaID() %>"/>
+        <input type="hidden" name="dc_schema_id" value="<%= schema.getID() %>"/>
         <table align="center" width="650">
               <tr><td colspan="2"><h2><fmt:message key="jsp.dspace-admin.list-metadata-fields.addfield"/></h2></td></tr>
               <tr>
@@ -196,7 +196,7 @@ if (error!=null) {
     for (int i = 0; i < types.length; i++)
     {
       String qualifier = (types[i].getQualifier() == null ? "" : "."+types[i].getQualifier());
-%>     <option value="<%= types[i].getFieldID() %>"><%= types[i].getElement()+qualifier %></option>
+%>     <option value="<%= types[i].getID() %>"><%= types[i].getElement()+qualifier %></option>
 <%  }
 %>
       </select></td></tr>
@@ -205,9 +205,9 @@ if (error!=null) {
 <%
     for (int i = 0; i < schemas.length; i++)
     {
-              if (schemas[i].getSchemaID() != schema.getSchemaID())
+              if (schemas[i].getID() != schema.getID())
               {
-%>      <option value="<%= schemas[i].getSchemaID() %>"><%= schemas[i].getNamespace() %></option>
+%>      <option value="<%= schemas[i].getID() %>"><%= schemas[i].getNamespace() %></option>
 <%            }
     }
 %>

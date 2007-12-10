@@ -80,73 +80,17 @@
 
 <dspace:layout titlekey="jsp.tools.itemmap-main.title">
 
-    <%-- <h2>Item Mapper - Map Items from Other Collections</h2> --%>
 	<h2><fmt:message key="jsp.tools.itemmap-main.heading"/></h2>
 
-    <%--  <p>Collection: "<%=collection.getMetadata("name")%>"</p> --%>
     <p><fmt:message key="jsp.tools.itemmap-main.collection">
         <fmt:param><%=collection.getMetadata("name")%></fmt:param>
     </fmt:message></p>
 	 
-    <%-- <p>There are <%=count_native%> items owned by this collection, and
-    <%=count_import%> items mapped in from other collections.</p> --%>
 	<p><fmt:message key="jsp.tools.itemmap-main.info1">
         <fmt:param><%=count_native%></fmt:param>
         <fmt:param><%=count_import%></fmt:param>
     </fmt:message></p>
    
-<%-- 
-    <h3>Quick Add Item:</h3>
-
-    <p>Enter the Handle or internal item ID of the item you want to add:</p>
-    
-    <form method="post" action="">
-        <input type="hidden" name="action" value="add"/>
-        <input type="hidden" name="cid" value="<%=collection.getID()%>"/>
-        <center>
-            <table class="miscTable">
-                <tr class="oddRowEvenCol">
-                    <td class="submitFormLabel"><label for="thandle">Handle:</label></td>
-                    <td>
-                            <input type="text" name="handle" id="thandle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>/" size="12"/>
-                            <input type="submit" name="submit" value="Add"/>
-                    </td>
-                </tr>
-                <tr></tr>
-                <tr class="oddRowEvenCol">
-                    <td class="submitFormLabel"><label for="titem_id">Internal ID:</label></td>
-                    <td>
-                            <input type="text" name="item_id" id="titem_id" size="12"/>
-                            <input type="submit" name="submit" value="Add"/>
-                    </td>
-                </tr>
-            </table>
-        </center>
-    </form>
-
-    <h3>Import an entire collection</h3>
-    <form method="post" action="">
-    <input type="hidden" name="cid" value="<%=collection.getID()%>"/>
-    <select name="collection2import">
-<%  for(int i=0; i<all_collections.length; i++)
-    {
-        int myID = all_collections[i].getID();
-        
-        if( myID != collection.getID() )  // leave out this collection!
-        {   %>
-        <option value="<%= all_collections[i].getID()%>">
-        <%= all_collections[i].getMetadata("name")%>
-        </option>
-    <%  }
-    } %>
-    </select>
-
-    <input type="submit" name="action" value="Add Entire Collection!"/>
-    </form>        
-    --%>
-
-    <%-- <h3>Import By Author Match</h3>
-    Enter part of an author's name for a list of matching items<br> --%>
 	<h3><fmt:message key="jsp.tools.itemmap-main.info4"/></h3>
     <fmt:message key="jsp.tools.itemmap-main.info5"/><br/>
 
@@ -159,10 +103,8 @@
         <br/>
     </form> 
 
-    <%-- <h3>Browse Items Imported From Collections:</h3> --%>
 	<h3><fmt:message key="jsp.tools.itemmap-main.info6"/></h3>
 
-    <%-- <p>Click on collection names to browse for items to remove that were mapped in from that collection.</p> --%>
 	<p><fmt:message key="jsp.tools.itemmap-main.info7"/></p>
 
 <%
@@ -172,7 +114,6 @@
     if(!colKeys.hasNext())
     {
 %>
-    <%-- <p>This collection has no items mapped into it.</p> --%>
 	<p><fmt:message key="jsp.tools.itemmap-main.info8"/></p>
 <%
     }

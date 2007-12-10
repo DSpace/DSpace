@@ -152,7 +152,9 @@ public class ManageGroupsMain extends AbstractDSpaceTransformer
 		String query = parameters.getParameter("query","");
 		int page = parameters.getParameterAsInteger("page",0);
 		int highlightID = parameters.getParameterAsInteger("highlightID",-1);
-        int resultCount = Group.searchResultCount(context, query);
+        // FIXME: Bad!
+//        int resultCount = Group.searchResultCount(context, query);
+        int resultCount = Group.search(context, query).length;
         Group[] groups = Group.search(context, query, page*PAGE_SIZE, PAGE_SIZE);
 		
 		
@@ -263,7 +265,7 @@ public class ManageGroupsMain extends AbstractDSpaceTransformer
 	        		Highlight highlight = cell.addHighlight("fade");
 	        		
 	        		highlight.addContent("[");
-	        		highlight.addXref(contextPath+"/handle/"+collection.getHandle(), T_collection_link);
+	        		highlight.addXref(contextPath+"/handle/"+collection.getExternalIdentifier().getCanonicalForm(), T_collection_link);
 	        		highlight.addContent("]");
         		}
         	}

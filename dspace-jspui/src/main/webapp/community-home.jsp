@@ -73,9 +73,9 @@
         (Collection[]) request.getAttribute("collections");
     Community[] subcommunities =
         (Community[]) request.getAttribute("subcommunities");
-    
+
     RecentSubmissions rs = (RecentSubmissions) request.getAttribute("recently.submitted");
-    
+
     Boolean editor_b = (Boolean)request.getAttribute("editor_button");
     boolean editor_button = (editor_b == null ? false : editor_b.booleanValue());
     Boolean add_b = (Boolean)request.getAttribute("add_button");
@@ -92,14 +92,14 @@
     String copyright = community.getMetadata("copyright_text");
     String sidebar = community.getMetadata("side_bar_text");
     Bitstream logo = community.getLogo();
-    
+
     boolean feedEnabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");
     String feedData = "NONE";
     if (feedEnabled)
     {
         feedData = "comm:" + ConfigurationManager.getProperty("webui.feed.formats");
     }
-    
+
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
 %>
 
@@ -139,12 +139,12 @@
               <td class="standard" align="center">
                 <small><label for="tlocation"><strong><fmt:message key="jsp.general.location"/></strong></label></small>&nbsp;<select name="location" id="tlocation"> 
 				 <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
-                 <option selected="selected" value="<%= community.getHandle() %>"><%= name %></option>
+                 <option selected="selected" value="<%= community.getIdentifier().getCanonicalForm() %>"><%= name %></option>
 <%
     for (int i = 0; i < collections.length; i++)
     {
 %>    
-                  <option value="<%= collections[i].getHandle() %>"><%= collections[i].getMetadata("name") %></option>
+                  <option value="<%= collections[i].getIdentifier().getCanonicalForm() %>"><%= collections[i].getMetadata("name") %></option>
 <%
     }
 %>
@@ -152,7 +152,7 @@
     for (int j = 0; j < subcommunities.length; j++)
     {
 %>    
-                  <option value="<%= subcommunities[j].getHandle() %>"><%= subcommunities[j].getMetadata("name") %></option>
+                  <option value="<%= subcommunities[j].getIdentifier().getCanonicalForm() %>"><%= subcommunities[j].getMetadata("name") %></option>
 <%
     }
 %>
@@ -178,7 +178,7 @@
 		String key = "browse.menu." + bis[i].getName();
 %>
 	<div class="browse_buttons">
-	<form method="get" action="<%= request.getContextPath() %>/handle/<%= community.getHandle() %>/browse">
+	<form method="get" action="<%= community.getIdentifier().getURL().toString() %>/browse">
 		<input type="hidden" name="type" value="<%= bis[i].getName() %>"/>
 		<%-- <input type="hidden" name="community" value="<%= community.getHandle() %>" /> --%>
 		<input type="submit" name="submit_browse" value="<fmt:message key="<%= key %>"/>"/>
@@ -209,7 +209,7 @@
 	    <table>
 	    <tr>
 	    <td>
-	      <a href="<%= request.getContextPath() %>/handle/<%= collections[i].getHandle() %>">
+	      <a href="<%= collections[i].getIdentifier().getURL().toString() %>">
 	      <%= collections[i].getMetadata("name") %></a>
 <%
             if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
@@ -259,7 +259,7 @@
 			    <table>
 			    <tr>
 			    <td>
-	                <a href="<%= request.getContextPath() %>/handle/<%= subcommunities[j].getHandle() %>">
+	                <a href="<%= subcommunities[j].getIdentifier().getURL().toString() %>">
 	                <%= subcommunities[j].getMetadata("name") %></a>
 <%
                 if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
@@ -361,7 +361,7 @@
 					displayTitle = dcv[0].value;
 				}
 			}
-			%><p class="recentItem"><a href="<%= request.getContextPath() %>/handle/<%= items[i].getHandle() %>"><%= displayTitle %></a></p><%
+			%><p class="recentItem"><a href="<%= items[i].getIdentifier().getURL().toString() %>"><%= displayTitle %></a></p><%
 		}
 	}
 %>
@@ -394,7 +394,7 @@
     	       width = 36;
     	    }
 %>
-    <a href="<%= request.getContextPath() %>/feed/<%= fmts[j] %>/<%= community.getHandle() %>"><img src="<%= request.getContextPath() %>/image/<%= icon %>" alt="RSS Feed" width="<%= width %>" height="15" vspace="3" border="0" /></a>
+    <a href="<%= request.getContextPath() %>/feed/<%= fmts[j] %>/<%= community.getIdentifier().getCanonicalForm() %>"><img src="<%= request.getContextPath() %>/image/<%= icon %>" alt="RSS Feed" width="<%= width %>" height="15" vspace="3" border="0" /></a>
 <%
     	}
 %>

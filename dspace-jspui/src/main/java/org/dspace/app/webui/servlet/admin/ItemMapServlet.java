@@ -49,6 +49,10 @@ import org.dspace.browse.*;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.content.dao.CollectionDAO;
+import org.dspace.content.dao.CollectionDAOFactory;
+import org.dspace.content.dao.ItemDAO;
+import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -84,13 +88,17 @@ public class ItemMapServlet extends DSpaceServlet
             javax.servlet.ServletException, java.io.IOException,
             AuthorizeException
     {
+    	ItemDAO itemDAO = ItemDAOFactory.getInstance(context);
+        CollectionDAO collectionDAO =
+            CollectionDAOFactory.getInstance(context);
+    	
     	String jspPage = null;
     	
     	// get with a collection ID means put up browse window
     	int myID = UIUtil.getIntParameter(request, "cid");
     	
     	// get collection
-    	Collection myCollection = Collection.find(context, myID);
+    	Collection myCollection = collectionDAO.retrieve(myID);
     	
     	// authorize check
     	AuthorizeManager.authorizeAction(context, myCollection,
@@ -190,72 +198,6 @@ public class ItemMapServlet extends DSpaceServlet
     		// show the page
     		JSPManager.showJSP(request, response, jspPage);
     	}
-    	/*
-    	 * else if( action.equals("add") ) { int itemID =
-    	 * UIUtil.getIntParameter(request, "item_id"); String handle =
-    	 * (String)request.getParameter("handle"); boolean error = true; Item
-    	 * itemToAdd = null;
-    	 * 
-    	 * if( itemID > 0 ) { itemToAdd = Item.find(context, itemID);
-    	 * 
-    	 * if( itemToAdd != null ) error = false; } else if(handle != null &&
-    	 * !handle.equals("")) { DSpaceObject
-    	 * dso=HandleManager.resolveToObject(context, handle);
-    	 * 
-    	 * if(dso != null && dso.getType() == Constants.ITEM) { itemToAdd =
-    	 * (Item)dso; error = false; } }
-    	 * 
-    	 * //FIXME: error handling! if( !error ) { String myTitle =
-    	 * itemToAdd.getDC("title",null,Item.ANY)[0].value; String ownerName =
-    	 * itemToAdd.getOwningCollection().getMetadata("name");
-    	 *  // hook up item, but first, does it belong already? TableRowIterator
-    	 * tri = DatabaseManager.query(context, "collection2item", "SELECT
-    	 * collection2item.* FROM collection2item WHERE " + "collection_id=" +
-    	 * myCollection.getID() + " AND item_id=" + itemToAdd.getID());
-    	 * 
-    	 * if(tri.hasNext()) { request.setAttribute("message", "Item is already
-    	 * part of that collection!"); } else { // Create mapping
-    	 * myCollection.addItem( itemToAdd );
-    	 *  // set up a nice 'done' message request.setAttribute("message",
-    	 * "Item added successfully: <br> " + myTitle + " <br> From Collection:
-    	 * <br> " + ownerName);
-    	 *  }
-    	 * 
-    	 * request.setAttribute("collection", myCollection);
-    	 *  // show this page when we're done jspPage = "itemmap-info.jsp";
-    	 *  // show the page JSPManager.showJSP(request, response, jspPage); }
-    	 * else { // Display an error } } else if( action.equals("Add Entire
-    	 * Collection") ) { int targetID = UIUtil.getIntParameter(request,
-    	 * "collection2import");
-    	 * 
-    	 * Collection targetCollection = Collection.find(context, targetID);
-    	 *  // get all items from that collection and add them if not // already
-    	 * added
-    	 *  // get all items to be added ItemIterator i =
-    	 * targetCollection.getItems(); Map toAdd = new HashMap(); String
-    	 * message = "";
-    	 * 
-    	 * while( i.hasNext() ) { Item myItem = i.next();
-    	 * 
-    	 * toAdd.put(new Integer(myItem.getID()), myItem); }
-    	 *  // now see what we already have, removing dups from the 'toAdd' list
-    	 * i = myCollection.getItems();
-    	 * 
-    	 * while( i.hasNext() ) { Item myItem = i.next(); Integer myKey = new
-    	 * Integer(myItem.getID());
-    	 *  // remove works even if key isn't present toAdd.remove(myKey); }
-    	 *  // what's left in toAdd should be added Iterator addKeys =
-    	 * toAdd.keySet().iterator();
-    	 * 
-    	 * while( addKeys.hasNext() ) { Item myItem =
-    	 * (Item)toAdd.get(addKeys.next()); myCollection.addItem(myItem);
-    	 * message += " <br> Added item ID: " + myItem.getID(); }
-    	 * 
-    	 * request.setAttribute("message", message);
-    	 * request.setAttribute("collection", myCollection);
-    	 *  // show this page when we're done jspPage = "itemmap-info.jsp";
-    	 *  // show the page JSPManager.showJSP(request, response, jspPage); }
-    	 */
     	else if (action.equals("Remove"))
     	{
     		// get item IDs to remove
@@ -268,7 +210,7 @@ public class ItemMapServlet extends DSpaceServlet
     			int i = Integer.parseInt(itemIDs[j]);
     			removedItems.add(itemIDs[j]);
     			
-    			Item myItem = Item.find(context, i);
+    			Item myItem = itemDAO.retrieve(i);
     			
     			// make sure item doesn't belong to this collection
     			if (!myItem.isOwningCollection(myCollection))
@@ -315,7 +257,7 @@ public class ItemMapServlet extends DSpaceServlet
     			{
     				int i = Integer.parseInt(itemIDs[j]);
     				
-    				Item myItem = Item.find(context, i);
+    				Item myItem = itemDAO.retrieve(i);
     				
     				if (AuthorizeManager.authorizeActionBoolean(context,
     						myItem, Constants.READ))
@@ -376,7 +318,7 @@ public class ItemMapServlet extends DSpaceServlet
     			
     			BrowseEngine be = new BrowseEngine(context);
     			BrowseInfo results = be.browse(bs);
-    			Item[] browseItems = results.getItemResults(context);
+    			Item[] browseItems = results.getBrowseItemResults(context);
     			
     			// FIXME: oh god this is so annoying - what an API /Richard
     			// we need to deduplicate against existing items in this collection
@@ -420,7 +362,7 @@ public class ItemMapServlet extends DSpaceServlet
     		// target collection to browse
     		int t = UIUtil.getIntParameter(request, "t");
     		
-    		Collection targetCollection = Collection.find(context, t);
+    		Collection targetCollection = collectionDAO.retrieve(t);
     		
     		// now find all imported items from that collection
     		// seemingly inefficient, but database should have this query cached

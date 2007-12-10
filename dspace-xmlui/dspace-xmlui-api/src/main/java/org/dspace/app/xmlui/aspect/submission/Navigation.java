@@ -103,7 +103,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 //    		Collection collection = (Collection) dso;  		
 //    		if (AuthorizeManager.authorizeActionBoolean(context, collection, Constants.ADD))
 //    		{
-//    	        String submitURL = contextPath + "/handle/" + collection.getHandle() + "/submit";
+//    	        String submitURL = contextPath + "/handle/" + collection.getExternalIdentifier().getCanonicalForm() + "/submit";
 //		        account.addItemXref(submitURL,"Submit to this collection");
 //    		}
 //    	}

@@ -150,14 +150,9 @@
   </servlet>
 
   <servlet>
-    <servlet-name>bitstream</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.BitstreamServlet</servlet-class>
+    <servlet-name>browse</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.BrowserServlet</servlet-class>
   </servlet>
-
-	<servlet>
-		<servlet-name>browse</servlet-name>
-		<servlet-class>org.dspace.app.webui.servlet.BrowserServlet</servlet-class>
-	</servlet>
 
 	<servlet>
 		<servlet-name>browsewithdrawn</servlet-name>
@@ -193,7 +188,7 @@
     <servlet-name>edit-item</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.EditItemServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>edit-news</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.NewsEditServlet</servlet-class>
@@ -213,7 +208,7 @@
     <servlet-name>group-select-list</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.GroupListServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>feed</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.FeedServlet</servlet-class>
@@ -239,8 +234,8 @@
   </servlet>
 
   <servlet>
-    <servlet-name>handle</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.HandleServlet</servlet-class>
+    <servlet-name>uri</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.URIServlet</servlet-class>
   </servlet>
 
   <servlet>
@@ -315,12 +310,12 @@
     <servlet-name>retrieve</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.RetrieveServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>simple-search</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.SimpleSearchServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>sitemap</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.SitemapServlet</servlet-class>
@@ -330,10 +325,10 @@
     </init-param>
   </servlet>
 
-  <servlet>
-    <servlet-name>statistics</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.StatisticsServlet</servlet-class>
-  </servlet>
+    <servlet>
+        <servlet-name>statistics</servlet-name>
+        <servlet-class>org.dspace.app.webui.servlet.StatisticsServlet</servlet-class>
+    </servlet>
 
   <servlet>
     <servlet-name>submit</servlet-name>
@@ -344,7 +339,7 @@
     <servlet-name>subscribe</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.SubscribeServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>suggest</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.SuggestServlet</servlet-class>
@@ -374,12 +369,12 @@
     <servlet-name>controlledvocabulary</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.ControlledVocabularyServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>subject-search</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.ControlledVocabularySearchServlet</servlet-class>
-  </servlet>  
-  
+  </servlet>
+
 
   <!-- Servlet Mappings -->
 
@@ -394,14 +389,9 @@
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>bitstream</servlet-name>
-    <url-pattern>/bitstream/*</url-pattern>
+    <servlet-name>browse</servlet-name>
+    <url-pattern>/browse</url-pattern>
   </servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>browse</servlet-name>
-		<url-pattern>/browse</url-pattern>
-	</servlet-mapping>
 
 	<servlet-mapping>
 		<servlet-name>browsewithdrawn</servlet-name>
@@ -437,7 +427,7 @@
     <servlet-name>edit-item</servlet-name>
     <url-pattern>/tools/edit-item</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>edit-news</servlet-name>
     <url-pattern>/dspace-admin/news-edit</url-pattern>
@@ -452,17 +442,17 @@
     <servlet-name>eperson-list</servlet-name>
     <url-pattern>/tools/eperson-list</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>group-select-list</servlet-name>
     <url-pattern>/tools/group-select-list</url-pattern>
   </servlet-mapping>
-  
+
  <servlet-mapping>
     <servlet-name>itemmap</servlet-name>
     <url-pattern>/tools/itemmap</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>feed</servlet-name>
     <url-pattern>/feed/*</url-pattern>
@@ -489,8 +479,8 @@
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>handle</servlet-name>
-    <url-pattern>/handle/*</url-pattern>
+    <servlet-name>uri</servlet-name>
+    <url-pattern>/resource/*</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
@@ -529,6 +519,11 @@
   </servlet-mapping>
 
   <servlet-mapping>
+      <servlet-name>openURL</servlet-name>
+      <url-pattern>/openurl</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
     <servlet-name>openURL</servlet-name>
     <url-pattern>/openURL</url-pattern>
   </servlet-mapping>
@@ -562,16 +557,16 @@
     <servlet-name>simple-search</servlet-name>
     <url-pattern>/simple-search</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>sitemap</servlet-name>
     <url-pattern>/sitemap</url-pattern>
   </servlet-mapping>
 
-  <servlet-mapping>
-    <servlet-name>statistics</servlet-name>
-    <url-pattern>/statistics</url-pattern>
-  </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>statistics</servlet-name>
+        <url-pattern>/statistics</url-pattern>
+    </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>submit</servlet-name>

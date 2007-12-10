@@ -100,7 +100,7 @@
     Collection c = subInfo.getSubmissionItem().getCollection();
 
 	//load the input set for the current collection
-    DCInputSet inputSet = inputsReader.getInputs(c.getHandle());
+    DCInputSet inputSet = inputsReader.getInputs(c.getIdentifier().getCanonicalForm());
 %>
 
 <%!void layoutSection(HttpServletRequest request, 

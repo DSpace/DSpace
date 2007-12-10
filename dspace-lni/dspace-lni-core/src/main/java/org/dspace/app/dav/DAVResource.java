@@ -60,6 +60,8 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DSpaceObject;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -111,6 +113,8 @@ abstract class DAVResource
 
     /** The context. */
     protected Context context = null;
+
+    protected ExternalIdentifierDAO externalIdentifierDAO = null;
 
     /** Optional limit of resources traversed in a PROPFIND - initialized from PROPFIND_LIMIT_CONFIG in config properties. Names maximum number of HREF's in PROPFIND result or 0 for unlimited. */
     private static final String PROPFIND_LIMIT_CONFIG = "dav.propfind.limit";
@@ -196,6 +200,9 @@ abstract class DAVResource
         this.request = request;
         this.response = response;
         this.context = context;
+
+        // This is used in a lot of subclasses, so setting it here makes sense
+        externalIdentifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
     }
 
     /*----------------- Abstracts -----------------------*/

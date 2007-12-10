@@ -178,16 +178,13 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
     {
         if (dso.getType() != Constants.ITEM)
         {
-            String h = dso.getHandle();
             throw new CrosswalkObjectNotSupported(
                     "Can only support items; object passed in with DB ID "
                             + dso.getID() + ", type "
-                            + Constants.typeText[dso.getType()] + ", handle "
-                            + (h == null ? "null" : h));
+                            + Constants.typeText[dso.getType()]);
         }
 
         Item item = (Item) dso;
-        String handle = item.getHandle();
         List<Element> metas = new ArrayList<Element>();
         DCValue[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
@@ -229,9 +226,7 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
                 // element is OK, so just report at DEBUG level
                if (log.isDebugEnabled())
                {
-                   log.debug("No <meta> field for item "
-                            + (handle == null ? String.valueOf(dso.getID())
-                                    : handle) + " field " + originalKey);
+                   log.debug("No <meta> field for item " + dso.getID());
                }
             }
             else

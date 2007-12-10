@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.dspace.browse.BrowseException;
@@ -92,7 +93,6 @@ public class InitializeDatabase
                 }
                 
                 DatabaseManager.loadSql(getScript(argv[0]));
-                
             }
             else
             {
@@ -112,12 +112,17 @@ public class InitializeDatabase
                     throw new RuntimeException(e.getMessage(),e);
                 }
             }
-            
+
             System.exit(0);
         }
-        catch (Exception e)
+        catch (IOException ioe)
         {
-            log.fatal("Caught exception:", e);
+            log.fatal("Caught IOException:", ioe);
+            System.exit(1);
+        }
+        catch (SQLException sqle)
+        {
+        log.fatal("Caught SQLException:", sqle);
             System.exit(1);
         }
     }

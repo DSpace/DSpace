@@ -128,7 +128,7 @@ public class DeleteMetadataSchemaConfirm extends AbstractDSpaceTransformer
     	for (MetadataSchema schema : schemas) 
     	{
     		Row row = table.addRow();
-    		row.addCell().addContent(schema.getSchemaID());
+    		row.addCell().addContent(schema.getID());
         	row.addCell().addContent(schema.getNamespace());
         	row.addCell().addContent(schema.getName());
 	    }

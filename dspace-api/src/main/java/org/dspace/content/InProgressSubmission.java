@@ -40,7 +40,6 @@
 package org.dspace.content;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.eperson.EPerson;
@@ -64,12 +63,12 @@ public interface InProgressSubmission
     /**
      * Deletes submission wrapper, doesn't delete item contents
      */
-    void deleteWrapper() throws SQLException, IOException, AuthorizeException;
+    void deleteWrapper() throws IOException, AuthorizeException;
 
     /**
      * Update the submission, including the unarchived item.
      */
-    void update() throws SQLException, IOException, AuthorizeException;
+    void update() throws IOException, AuthorizeException;
 
     /**
      * Get the incomplete item object
@@ -78,6 +77,8 @@ public interface InProgressSubmission
      */
     Item getItem();
 
+    public void setItem(Item item);
+
     /**
      * Get the collection being submitted to
      * 
@@ -85,12 +86,14 @@ public interface InProgressSubmission
      */
     Collection getCollection();
 
+    public void setCollection(Collection collection);
+
     /**
      * Get the submitter
      * 
      * @return the submitting e-person
      */
-    EPerson getSubmitter() throws SQLException;
+    EPerson getSubmitter();
 
     /**
      * Find out if the submission has (or is intended to have) more than one

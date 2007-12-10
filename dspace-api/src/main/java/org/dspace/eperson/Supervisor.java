@@ -37,28 +37,20 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
 package org.dspace.eperson;
-
-import java.lang.StringBuffer;
-
-import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.dao.WorkspaceItemDAO;
+import org.dspace.content.dao.WorkspaceItemDAOFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
-import org.dspace.eperson.Group;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.eperson.dao.GroupDAO;
+import org.dspace.eperson.dao.GroupDAOFactory;
 
 /**
  * Class to represent the supervisor, primarily for use in applying supervisor
@@ -98,20 +90,14 @@ public class Supervisor {
      * @return boolean  true if there is an order that matches, false if not
      */
     public static boolean isOrder(Context context, int wsItemID, int groupID)
-        throws SQLException
     {
-        String query = "SELECT epersongroup2workspaceitem.* " +
-                       "FROM epersongroup2workspaceitem " +
-                       "WHERE epersongroup2workspaceitem.eperson_group_id = ? " +
-                       "AND epersongroup2workspaceitem.workspace_item_id = ? ";
-        
-        TableRowIterator tri = DatabaseManager.queryTable(context, 
-                                    "epersongroup2workspaceitem", 
-                                    query,groupID,wsItemID);
-        
-        boolean result = tri.hasNext();
-        tri.close();
-        return result;
+        GroupDAO groupDAO = GroupDAOFactory.getInstance(context);
+        WorkspaceItemDAO wsiDAO = WorkspaceItemDAOFactory.getInstance(context);
+
+        Group group = groupDAO.retrieve(groupID);
+        WorkspaceItem wsi = wsiDAO.retrieve(wsItemID);
+
+        return groupDAO.linked(group, wsi);
     }
     
     /**
@@ -124,21 +110,19 @@ public class Supervisor {
      * @param groupID   the ID of the group to be removed from the item
      */
     public static void remove(Context context, int wsItemID, int groupID)
-        throws SQLException, AuthorizeException
+        throws AuthorizeException
     {
+        GroupDAO groupDAO = GroupDAOFactory.getInstance(context);
+        WorkspaceItemDAO wsiDAO = WorkspaceItemDAOFactory.getInstance(context);
+
         // get the workspace item and the group from the request values
-        WorkspaceItem wsItem = WorkspaceItem.find(context, wsItemID);
-        Group group = Group.find(context, groupID);
+        WorkspaceItem wsi = wsiDAO.retrieve(wsItemID);
+        Group group = groupDAO.retrieve(groupID);
         
-        // remove the link from the supervisory database
-        String query = "DELETE FROM epersongroup2workspaceitem " +
-                       "WHERE workspace_item_id = ? "+
-                       "AND eperson_group_id = ? ";
-        
-        DatabaseManager.updateQuery(context, query, wsItemID, groupID);
+        groupDAO.unlink(group, wsi);
         
         // get the item and have it remove the policies for the group
-        Item item = wsItem.getItem();
+        Item item = wsi.getItem();
         item.removeGroupPolicies(group);
     }
     
@@ -148,22 +132,9 @@ public class Supervisor {
      * @param context   the context this object exists in
      */
     public static void removeRedundant(Context context)
-        throws SQLException
     {
-        // this horrid looking query tests to see if there are any groups or
-        // workspace items which match up to the ones in the linking database
-        // table.  If there aren't, we know that the link is out of date, and 
-        // it can be deleted.
-        String query = "DELETE FROM epersongroup2workspaceitem " +
-                       "WHERE NOT EXISTS ( " +
-                       "SELECT 1 FROM workspaceitem WHERE workspace_item_id " +
-                       "= epersongroup2workspaceitem.workspace_item_id " +
-                       ") OR NOT EXISTS ( " +
-                       "SELECT 1 FROM epersongroup WHERE eperson_group_id " +
-                       "= epersongroup2workspaceitem.eperson_group_id " +
-                       ")";
-        
-        DatabaseManager.updateQuery(context, query);
+        GroupDAO groupDAO = GroupDAOFactory.getInstance(context);
+        groupDAO.cleanSupervisionOrders();
     }
     
     /**
@@ -175,23 +146,22 @@ public class Supervisor {
      * @param policy    String containing the policy type to be used
      */
     public static void add(Context context, int groupID, int wsItemID, int policy)
-        throws SQLException, AuthorizeException
+        throws AuthorizeException
     {
-        // make a table row in the database table, and update with the relevant
-        // details
-        TableRow row = DatabaseManager.create(context, 
-                            "epersongroup2workspaceitem");
-        row.setColumn("workspace_item_id", wsItemID);
-        row.setColumn("eperson_group_id", groupID);
-        DatabaseManager.update(context,row);
+        GroupDAO groupDAO = GroupDAOFactory.getInstance(context);
+        WorkspaceItemDAO wsiDAO = WorkspaceItemDAOFactory.getInstance(context);
+
+        // get the workspace item and the group from the request values
+        WorkspaceItem wsi = wsiDAO.retrieve(wsItemID);
+        Group group = groupDAO.retrieve(groupID);
+
+        groupDAO.link(group, wsi);
         
         // If a default policy type has been requested, apply the policies using
         // the DSpace API for doing so
         if (policy != POLICY_NONE)
         {
-            WorkspaceItem wsItem = WorkspaceItem.find(context, wsItemID);
-            Item item = wsItem.getItem();
-            Group group = Group.find(context, groupID);
+            Item item = wsi.getItem();
             
             // "Editor" implies READ, WRITE, ADD permissions
             // "Observer" implies READ permissions

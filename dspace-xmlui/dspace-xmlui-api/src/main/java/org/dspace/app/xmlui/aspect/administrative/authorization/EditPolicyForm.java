@@ -281,7 +281,9 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
 	private void addGroupSearch(Division div, Group sourceGroup, DSpaceObject dso, String query, int page) throws WingException, SQLException
 	{
 		Group[] groups = Group.search(context, query, page*RESULTS_PER_PAGE, (page+1)*RESULTS_PER_PAGE);
-		int totalResults = Group.searchResultCount(context, query);
+//		int totalResults = Group.searchResultCount(context, query);
+        // FIXME: super-inefficient
+		int totalResults = Group.search(context, query).length;
 		ArrayList<ResourcePolicy> otherPolicies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, dso);
 		
 		

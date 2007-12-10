@@ -52,9 +52,11 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 import org.jdom.Element;
 
 
@@ -101,7 +103,7 @@ abstract class DAVDSpaceObject extends DAVResource
      */
     protected static String getPathElt(DSpaceObject dso)
     {
-        String handle = dso.getHandle();
+        String handle = dso.getIdentifier().getCanonicalForm();
         if (handle == null)
         {
             return null;
@@ -170,7 +172,11 @@ abstract class DAVDSpaceObject extends DAVResource
                 handle = String.copyValueOf(hc);
             }
 
-            DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+//            DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+            ExternalIdentifierDAO identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
+            ExternalIdentifier identifier = identifierDAO.retrieve(handle);
+            DSpaceObject dso = identifier.getObjectIdentifier().getObject(context);
+
             if (dso == null)
             {
                 throw new DAVStatusException(HttpServletResponse.SC_NOT_FOUND,
@@ -252,7 +258,7 @@ abstract class DAVDSpaceObject extends DAVResource
 
         if (elementsEqualIsh(property, handleProperty))
         {
-            value = canonicalizeHandle(this.dso.getHandle());
+            value = canonicalizeHandle(this.dso.getIdentifier().getCanonicalForm());
         }
         else if (elementsEqualIsh(property, current_user_privilege_setProperty))
         {

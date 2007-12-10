@@ -123,7 +123,7 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
     	// Get any metadata that may be removed by unselecting one of these options.
     	Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit";
+		String actionURL = contextPath + "/handle/"+collection.getExternalIdentifier().getCanonicalForm() + "/submit";
 		
 		DCValue[] titles = item.getDC("title", "alternative", Item.ANY);
 		

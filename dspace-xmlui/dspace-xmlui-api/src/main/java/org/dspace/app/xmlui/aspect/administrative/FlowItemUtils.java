@@ -58,9 +58,11 @@ import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 
 /**
  * Utility methods to processes actions on Groups. These methods are used
@@ -99,11 +101,16 @@ public class FlowItemUtils
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
+
+        ExternalIdentifierDAO identifierDAO =
+            ExternalIdentifierDAOFactory.getInstance(context);
 		
 		//		Check whether it's a handle or internal id (by check ing if it has a slash inthe string)
 		if (identifier.contains("/")) 
 		{
-			DSpaceObject dso = HandleManager.resolveToObject(context, identifier);
+//			DSpaceObject dso = HandleManager.resolveToObject(context, identifier);
+            ExternalIdentifier eid = identifierDAO.retrieve(identifier);
+            DSpaceObject dso = eid.getObjectIdentifier().getObject(context);
 	
 			if (dso != null && dso.getType() == Constants.ITEM) 
 			{ 

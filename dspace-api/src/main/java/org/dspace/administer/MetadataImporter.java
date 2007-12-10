@@ -55,6 +55,10 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
+import org.dspace.content.dao.MetadataFieldDAO;
+import org.dspace.content.dao.MetadataFieldDAOFactory;
+import org.dspace.content.dao.MetadataSchemaDAO;
+import org.dspace.content.dao.MetadataSchemaDAOFactory;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
@@ -195,8 +199,14 @@ public class MetadataImporter
         if (s == null)
         {
             // Schema does not exist - create
-            MetadataSchema schema = new MetadataSchema(namespace, name);
-            schema.create(context);
+//            MetadataSchema schema = new MetadataSchema(namespace, name);
+//            schema.create(context);
+
+            MetadataSchemaDAO dao = MetadataSchemaDAOFactory.getInstance(context);
+            MetadataSchema schema = dao.create();
+            schema.setName(name);
+            schema.setNamespace(namespace);
+            dao.update(schema);
             System.out.println("created");
         }
         else
@@ -242,9 +252,14 @@ public class MetadataImporter
      * @throws NonUniqueMetadataException
      */
     private static void loadType(Context context, Node node)
-            throws SQLException, IOException, TransformerException,
-            AuthorizeException, NonUniqueMetadataException, RegistryImportException
+        throws TransformerException, AuthorizeException,
+                          NonUniqueMetadataException, RegistryImportException
     {
+        MetadataSchemaDAO schemaDAO =
+            MetadataSchemaDAOFactory.getInstance(context);
+        MetadataFieldDAO fieldDAO =
+            MetadataFieldDAOFactory.getInstance(context);
+
         // Get the values
         String schema = RegistryImporter.getElementData(node, "schema");
         String element = RegistryImporter.getElementData(node, "element");
@@ -257,29 +272,33 @@ public class MetadataImporter
             schema = MetadataSchema.DC_SCHEMA;
         }
 
-        System.out.print("Registering Metadata: " + schema + "." + element + "." + qualifier + " ... ");
+        System.out.print("Registering Metadata: " + schema + "." + element +
+                "." + qualifier + " ... ");
         
         // Find the matching schema object
-        MetadataSchema schemaObj = MetadataSchema.find(context, schema);
+        MetadataSchema schemaObj = schemaDAO.retrieveByName(schema);
         
         if (schemaObj == null)
         {
-            throw new RegistryImportException("Schema '" + schema + "' is not registered");
+            throw new RegistryImportException("Schema '" + schema
+                    + "' is not registered");
         }
         
-        MetadataField mf = MetadataField.findByElement(context, schemaObj.getSchemaID(), element, qualifier);
+        MetadataField mf =
+            fieldDAO.retrieve(schemaObj.getID(), element, qualifier);
+
         if (mf != null)
         {
             System.out.println("already exists, skipping");
             return;
         }
         
-        MetadataField field = new MetadataField();
-        field.setSchemaID(schemaObj.getSchemaID());
+        MetadataField field = fieldDAO.create();
+        field.setSchemaID(schemaObj.getID());
         field.setElement(element);
         field.setQualifier(qualifier);
         field.setScopeNote(scopeNote);
-        field.create(context);
+        fieldDAO.update(field);
         System.out.println("created");
     }
     

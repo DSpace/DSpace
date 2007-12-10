@@ -128,7 +128,7 @@ public class MoveMetadataFields extends AbstractDSpaceTransformer
     	
     	for (MetadataField field : fields) 
     	{
-    		String fieldID = String.valueOf(field.getFieldID());
+    		String fieldID = String.valueOf(field.getID());
 			String fieldEelement = field.getElement();
 			String fieldQualifier = field.getQualifier();
 			
@@ -153,7 +153,7 @@ public class MoveMetadataFields extends AbstractDSpaceTransformer
     	Select toSchema = cell.addSelect("to_schema");
     	for (MetadataSchema schema : schemas)
     	{
-    		toSchema.addOption(schema.getSchemaID(), schema.getNamespace());
+    		toSchema.addOption(schema.getID(), schema.getNamespace());
     	}
     	
     	Para buttons = moved.addPara();

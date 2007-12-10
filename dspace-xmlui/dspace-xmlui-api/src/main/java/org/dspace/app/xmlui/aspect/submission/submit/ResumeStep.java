@@ -94,7 +94,7 @@ public class ResumeStep extends AbstractStep
 		// Get any metadata that may be removed by unselecting one of these options.
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit";
+		String actionURL = contextPath + "/handle/"+collection.getExternalIdentifier().getCanonicalForm() + "/submit";
 
 		Request request = ObjectModelHelper.getRequest(objectModel);
 		String showfull = request.getParameter("showfull");

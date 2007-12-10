@@ -66,8 +66,8 @@
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
+<%@ page import="org.dspace.uri.ExternalIdentifier" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
-<%@ page import="org.dspace.handle.HandleManager" %>
 <%@ page import="org.dspace.license.CreativeCommons" %>
 
 <%
@@ -84,8 +84,11 @@
     // get the workspace id if one has been passed
     Integer workspace_id = (Integer) request.getAttribute("workspace_id");
 
-    // get the handle if the item has one yet
-    String handle = item.getHandle();
+    // get the persistent identifier if the item has one yet
+    ExternalIdentifier identifier = item.getExternalIdentifier();
+    String uri = "";
+    String citationLink = "";
+    String link = item.getIdentifier().getURL().toString();
 
     // CC URL & RDF
     String cc_url = CreativeCommons.getLicenseURL(item);
@@ -93,12 +96,15 @@
 
     // Full title needs to be put into a string to use as tag argument
     String title = "";
-    if (handle == null)
+    if (identifier == null)
  	{
 		title = "Workspace Item";
 	}
 	else 
 	{
+        uri = identifier.getCanonicalForm();
+        citationLink = identifier.getURI().toString();
+
 		DCValue[] titleValue = item.getDC("title", null, Item.ANY);
 		if (titleValue.length != 0)
 		{
@@ -106,7 +112,7 @@
 		}
 		else
 		{
-			title = "Item " + handle;
+			title = "Item " + uri;
 		}
 	}
 %>
@@ -114,17 +120,15 @@
 <dspace:layout title="<%= title %>">
 
 <%
-    if (handle != null)
+    if (identifier != null)
     {
 %>
 
     <table align="center" class="miscTable">
         <tr>
             <td class="evenRowEvenCol" align="center">
-                <%-- <strong>Please use this identifier to cite or link to this item:
-                <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>--%>
                 <strong><fmt:message key="jsp.display-item.identifier"/>
-                <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>
+                <code><%= citationLink %></code></strong>
             </td>
 <%
         if (admin_button)  // admin edit button
@@ -149,8 +153,6 @@
     <dspace:item item="<%= item %>" collections="<%= collections %>" style="<%= displayStyle %>" />
 
 <%
-    String locationLink = request.getContextPath() + "/handle/" + handle;
-
     if (displayAll)
     {
 %>
@@ -169,7 +171,7 @@
         else
         {
 %>
-    <form method="get" action="<%=locationLink %>">
+    <form method="get" action="<%= link %>">
         <input type="hidden" name="mode" value="simple"/>
         <input type="submit" name="submit_simple" value="<fmt:message key="jsp.display-item.text1"/>" />
     </form>
@@ -196,7 +198,7 @@
         else
         {
 %>
-    <form method="get" action="<%=locationLink %>">
+    <form method="get" action="<%= link %>">
         <input type="hidden" name="mode" value="full"/>
         <input type="submit" name="submit_simple" value="<fmt:message key="jsp.display-item.text2"/>" />
     </form>
@@ -205,7 +207,8 @@
         if (suggestLink)
         {
 %>
-    <a href="<%= request.getContextPath() %>/suggest?handle=<%= handle %>" target="new_window">
+    <%-- FIXME: This really ought to be escaped --%>
+    <a href="<%= request.getContextPath() %>/suggest?uri=<%= uri %>" target="new_window">
        <fmt:message key="jsp.display-item.suggest"/></a>
 <%
         }
@@ -235,7 +238,7 @@
     {
 %>
     <p align="center">
-        <a href="<dspace:sfxlink item="<%= item %>"/>" /><img src="<%= request.getContextPath() %>/image/sfx-link.gif" border="0" alt="SFX Query" /></a>
+        <a href="<dspace:sfxlink item="<%= item %>"/>"><img src="<%= request.getContextPath() %>/image/sfx-link.gif" border="0" alt="SFX Query" /></a>
     </p>
 <%
     }

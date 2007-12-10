@@ -235,7 +235,7 @@ public class JSPInitialQuestionsStep extends InitialQuestionsStep implements JSP
 
         // load the proper submission inputs to be used by the JSP
         request.setAttribute("submission.inputs", inputsReader.getInputs(c
-                .getHandle()));
+                .getIdentifier().getCanonicalForm()));
 
         // forward to initial questions JSP
         JSPStepManager.showJSP(request, response, subInfo, INITIAL_QUESTIONS_JSP);
@@ -288,3 +288,4 @@ public class JSPInitialQuestionsStep extends InitialQuestionsStep implements JSP
         JSPStepManager.showJSP(request, response, subInfo, VERIFY_PRUNE_JSP);
     }
 }
+

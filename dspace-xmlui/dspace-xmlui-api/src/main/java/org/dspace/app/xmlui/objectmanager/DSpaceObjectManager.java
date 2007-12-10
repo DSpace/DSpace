@@ -46,7 +46,6 @@ import java.util.List;
 
 import org.dspace.app.xmlui.wing.ObjectManager;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.browse.BrowseItem;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -77,12 +76,12 @@ public class DSpaceObjectManager implements ObjectManager
     public boolean manageObject(Object object) throws WingException
     {
     	// First check that the object is of a type we can manage.
-    	if (object instanceof BrowseItem)
-    	{
-    		dsos.add((BrowseItem) object);
-    		return true;
-    	}
-    	else if (object instanceof Item)
+//    	if (object instanceof BrowseItem)
+//    	{
+//    		dsos.add((BrowseItem) object);
+//    		return true;
+//    	}
+    	if (object instanceof Item)
     	{
     		dsos.add((Item) object);
     		return true;
@@ -113,7 +112,7 @@ public class DSpaceObjectManager implements ObjectManager
 		if (object instanceof DSpaceObject)
 		{
 			DSpaceObject dso = (DSpaceObject) object;
-			String handle = dso.getHandle();
+			String handle = dso.getExternalIdentifier().getCanonicalForm();
 			
 			// If the object has a handle then refrence it by it's handle.
 			if (handle != null)

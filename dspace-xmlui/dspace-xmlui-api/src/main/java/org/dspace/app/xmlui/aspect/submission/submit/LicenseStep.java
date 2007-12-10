@@ -146,7 +146,7 @@ public class LicenseStep extends AbstractSubmissionStep
         
         // Get the full text for the actuial licese
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit";
+		String actionURL = contextPath + "/handle/"+collection.getExternalIdentifier().getCanonicalForm() + "/submit";
 		String licenseText = collection.getLicense();
 		
 		Division div = body.addInteractiveDivision("submit-license",actionURL, Division.METHOD_POST,"primary submission");

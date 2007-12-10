@@ -288,7 +288,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	    {
 	    	Para para = main.addPara();
 	    	para.addContent(T_collection_para);
-	    	para.addXref(contextPath+"/handle/"+collection.getHandle(), collection.getMetadata("name"));
+	    	para.addXref(contextPath+"/handle/"+collection.getExternalIdentifier().getCanonicalForm(), collection.getMetadata("name"));
 	    }
 	   
 
@@ -355,7 +355,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	 */
 	private void addEPeopleSearch(Division div, String query, int page, Group group, ArrayList<Integer> memberEPeopleIDs) throws SQLException, WingException
 	{
-		int resultCount = EPerson.searchResultCount(context, query);
+//		int resultCount = EPerson.searchResultCount(context, query);
+        // FIXME: super-inefficient
+		int resultCount = EPerson.search(context, query).length;
         EPerson[] epeople = EPerson.search(context, query, page*RESULTS_PER_PAGE, RESULTS_PER_PAGE);
 		
 		Division results = div.addDivision("results");
@@ -428,7 +430,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	 */
 	private void addGroupSearch(Division div, Group sourceGroup, String query, int page, Group parent, ArrayList<Integer> memberGroupIDs) throws WingException, SQLException
 	{
-		int resultCount = Group.searchResultCount(context, query);
+//		int resultCount = Group.searchResultCount(context, query);
+        // FIXME: super-inefficient
+		int resultCount = Group.search(context, query).length;
         Group[] groups = Group.search(context, query, page*RESULTS_PER_PAGE, RESULTS_PER_PAGE);
 		
 		Division results = div.addDivision("results");
@@ -494,7 +498,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	        		
 	        		Highlight highlight = cell.addHighlight("fade");
 	        		highlight.addContent("[");
-	        		highlight.addXref(contextPath+"/handle/"+collection.getHandle(), T_groups_collection_link);
+	        		highlight.addXref(contextPath+"/handle/"+collection.getExternalIdentifier().getCanonicalForm(), T_groups_collection_link);
 	        		highlight.addContent("]");
         		}
         	}

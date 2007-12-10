@@ -78,10 +78,12 @@ import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -132,7 +134,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 	private String format = null;
 	
 	/** The feed's scope, null if no scope */
-	private String handle = null;
+	private String uri = null;
 	
     /** number of DSpace items per feed */
     private static int itemCount = 0;
@@ -160,7 +162,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      */
     public Serializable getKey()
     {
-    	String key = "key:" + this.handle + ":" + this.format;
+    	String key = "key:" + this.uri + ":" + this.format;
     	return HashUtil.hash(key);
     }
 
@@ -170,6 +172,9 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      * The validity object will include the collection being viewed and 
      * all recently submitted items. This does not include the community / collection
      * hierarch, when this changes they will not be reflected in the cache.
+     *
+     * FIXME: This depends on the "handle" string being of the form "hdl:12/34"
+     * rather than just "12/34".
      */
     public SourceValidity getValidity()
     {
@@ -182,8 +187,14 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     			Context context = ContextUtil.obtainContext(objectModel);
 
     			DSpaceObject dso = null;
-    			if (handle != null)
-    				dso = HandleManager.resolveToObject(context, handle);
+    			if (uri != null)
+                {
+//    				dso = HandleManager.resolveToObject(context, handle);
+                    ExternalIdentifierDAO dao =
+                        ExternalIdentifierDAOFactory.getInstance(context);
+                    ExternalIdentifier identifier = dao.retrieve(uri);
+                    dso = identifier.getObjectIdentifier().getObject(context);
+                }
     			
     			validity.add(dso);
     			
@@ -216,6 +227,9 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     
     /**
      * Setup configuration for this request
+     *
+     * FIXME: This should use a parameter called "uri", not "handle", but I
+     * have no idea how to do this with Manakin, so it will have to wait. --JR
      */
     public void setup(SourceResolver resolver, Map objectModel, String src,
             Parameters par) throws ProcessingException, SAXException,
@@ -225,12 +239,15 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         
         
         this.format = par.getParameter("feedFormat", null);
-        this.handle = par.getParameter("handle",null);
+        this.uri = par.getParameter("handle",null);
     }
     
     
     /**
      * Generate the syndication feed.
+     *
+     * FIXME: This depends on the "handle" string being of the form "hdl:12/34"
+     * rather than just "12/34".
      */
     public void generate() throws IOException, SAXException, ProcessingException
     {
@@ -238,20 +255,24 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 			Context context = ContextUtil.obtainContext(objectModel);
 			DSpaceObject dso = null;
 			
-			if (handle != null)
+			if (uri != null)
 			{
-				dso = HandleManager.resolveToObject(context, handle);
+//                dso = HandleManager.resolveToObject(context, handle);
+                ExternalIdentifierDAO dao =
+                    ExternalIdentifierDAOFactory.getInstance(context);
+                ExternalIdentifier identifier = dao.retrieve(uri);
+                dso = identifier.getObjectIdentifier().getObject(context);
 				
 				if (dso == null)
 				{
-					// If we were unable to find a handle then return page not found.
-					throw new ResourceNotFoundException("Unable to find DSpace object matching the given handle: "+handle);
+					// If we were unable to find a uri then return page not found.
+					throw new ResourceNotFoundException("Unable to find DSpace object matching the given URI: "+uri);
 				}
 				
 				if (!(dso.getType() == Constants.COLLECTION || dso.getType() == Constants.COMMUNITY))
 				{
-					// The handle is valid but the object is not a container.
-					throw new ResourceNotFoundException("Unable to syndicate DSpace object: "+handle);
+					// The uri is valid but the object is not a container.
+					throw new ResourceNotFoundException("Unable to syndicate DSpace object: "+uri);
 				}
 				
 			}
@@ -445,10 +466,10 @@ public class DSpaceFeedGenerator extends AbstractGenerator
             dateField = "dc.date.issued";
         }   
         
-        //Set item handle
-    	String itHandle = resolveURL(dspaceItem);
+        //Set item link
+    	String itemLink = resolveURL(dspaceItem);
 
-        rssItem.setLink(itHandle);
+        rssItem.setLink(itemLink);
         
         //get first title
         String title = null;
@@ -594,20 +615,21 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 			return url;	
     	}
     	
-		if (ConfigurationManager.getBooleanProperty("webui.feed.localresolve"))
+		if (ConfigurationManager.getBooleanProperty("webui.feed.localresolve")
+                || dso.getExternalIdentifier() == null)
 		{
 			Request request = ObjectModelHelper.getRequest(objectModel);
-			
+
 			String url = (request.isSecure()) ? "https://" : "http://";
 			url += ConfigurationManager.getProperty("dspace.hostname");
 			url += ":" + request.getServerPort();
 			url += request.getContextPath();
-			url += "/handle/" + dso.getHandle();
-			return url;	
+			url += "/handle/" + dso.getExternalIdentifier().getCanonicalForm();
+			return url;
 		}
 		else
 		{
-			return HandleManager.getCanonicalForm(dso.getHandle()); 
+            return dso.getExternalIdentifier().getURI().toString();
 		}
     }
     
@@ -619,7 +641,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     public void recycle()
     {
     	this.format = null;
-    	this.handle = null;
+    	this.uri = null;
     	this.validity = null;
         this.recentSubmissionItems = null;
     	super.recycle();

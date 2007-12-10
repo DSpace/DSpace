@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-   <modelVersion>4.0.0</modelVersion>
-   <groupId>org.dspace</groupId>
-   <artifactId>dspace</artifactId>
-   <name>DSpace Assembly and Configuration</name>
-   <packaging>pom</packaging>
-   <description>
-      The DSpace Project provides all the functionality required to
-      build, install and upgrade and dspace instance.
-   </description>
-   <url>http://projects.dspace.org/dspace</url>
-   <!-- 
-      A Parent POM that Maven inherits DSpace Default 
-      POM atrributes from. 
-   -->
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dspace</groupId>
+    <artifactId>dspace</artifactId>
+    <name>DSpace Assembly and Configuration</name>
+    <packaging>pom</packaging>
+    <description>
+        The DSpace Project provides all the functionality required to
+        build, install and upgrade and dspace instance.
+    </description>
+    <url>http://projects.dspace.org/dspace</url>
+    <!-- 
+        A Parent POM that Maven inherits DSpace Default 
+        POM atrributes from. 
+    -->
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>SNAPSHOT</version>
+      <version>1.6-SNAPSHOT</version>
    </parent>
 
    <repositories>

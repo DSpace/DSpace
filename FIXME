@@ -1,0 +1,27 @@
+Stuff that needs fixin':
+ * think about where to cache objects in the Context. currently happens in
+   constructors, but should maybe happen elsewhere (should objects be
+   responsible for cacheing themselves? probably not).
+ * CommunityDAOTest sometimes hangs for no apparent reason during test runs.
+   Could be a db connection thing, but it should be investigated.
+   A few others (MetadataFieldDAOTest, WorkspaceItemDAOTest) could potentially
+   be suffering from the same problem, which suggests it's probably a general
+   issue with connection pooling or some such.
+ * Bar.addFoo() vs. BarDAO.link(bar, foo). We need to *either* use the
+   link/unlink/linked methods of the DAOs (where they exist) *or* use the
+   add/remove methods of the "parent" objects. I'm personally in favour of the
+   former because it means we don't hold more in memory than is absolutely
+   necessary, and the data layer is always up-to-date. It also removes the
+   responsibility for objects to know what is associated with them.
+ * Update the clean-database.sql script to account for all the new tables &
+   sequences
+ * After approving a workflow item, it says "...has been assigned the following
+   identifier" and then gives the URL. Either change the text, or change the
+   link to the actual identifier.
+ * Need to forward requests from <url>/handle/ and <url>/bitstream/ to the new
+   URI servlet, and have it mimic the previous behaviour.
+ * Need a way to import items (and any other 'content') that have existing
+   UUIDs / identifiers. One approach would be to just add the value of the
+   identifier as a dc:identifier.uri, but that's not ideal.
+ * When a Collection is deleted, should any WorkspaceItems that are being
+   submitted to that Collection be deleted?

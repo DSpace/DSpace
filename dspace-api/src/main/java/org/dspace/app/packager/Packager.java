@@ -58,11 +58,14 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.packager.PackageDisseminator;
 import org.dspace.content.packager.PackageParameters;
 import org.dspace.content.packager.PackageIngester;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.handle.HandleManager;
 import org.dspace.workflow.WorkflowManager;
 import org.dspace.workflow.WorkflowItem;
 
@@ -85,7 +88,7 @@ import org.dspace.workflow.WorkflowItem;
  *   java org.dspace.app.packager.Packager
  *       -e {ePerson}
  *       -t {PackagerType}
- *       -c {collection-handle} [ -c {collection} ...]
+ *       -c {collection-uri} [ -c {collection} ...]
  *       -o {name}={value} [ -o {name}={value} ..]
  *       [-w]
  *       {package-filename}
@@ -102,7 +105,7 @@ import org.dspace.workflow.WorkflowItem;
  *       -d
  *       -e {ePerson}
  *       -t {PackagerType}
- *       -i {item-handle}
+ *       -i {item-uri}
  *       -o {name}={value} [ -o {name}={value} ..]
  *       {package-filename}
  * 
@@ -131,7 +134,7 @@ public class Packager
     {
         Options options = new Options();
         options.addOption("c", "collection", true,
-                "destination collection(s) Handle (repeatable)");
+                "destination collection(s) URI (canonical form; repeatable)");
         options.addOption("e", "eperson", true,
                 "email address of eperson doing importing");
         options
@@ -146,7 +149,7 @@ public class Packager
                         "Packager option to pass to plugin, \"name=value\" (repeatable)");
         options.addOption("d", "disseminate", false,
                 "Disseminate package (output); default is to submit.");
-        options.addOption("i", "item", true, "Handle of item to disseminate.");
+        options.addOption("i", "item", true, "URI (canonical form) of item to disseminate.");
         options.addOption("h", "help", false, "help");
 
         CommandLineParser parser = new PosixParser();
@@ -158,7 +161,7 @@ public class Packager
         boolean useWorkflow = true;
         String packageType = null;
         boolean submit = true;
-        String itemHandle = null;
+        String itemUri = null;
         PackageParameters pkgParams = new PackageParameters();
 
         if (line.hasOption('h'))
@@ -187,7 +190,7 @@ public class Packager
         if (line.hasOption('t'))
             packageType = line.getOptionValue('t');
         if (line.hasOption('i'))
-            itemHandle = line.getOptionValue('i');
+            itemUri = line.getOptionValue('i');
         String files[] = line.getArgs();
         if (files.length > 0)
             sourceFile = files[0];
@@ -224,6 +227,10 @@ public class Packager
 
         // find the EPerson, assign to context
         Context context = new Context();
+
+        ExternalIdentifierDAO identifierDAO =
+            ExternalIdentifierDAOFactory.getInstance(context);
+
         EPerson myEPerson = null;
         myEPerson = EPerson.findByEmail(context, eperson);
         if (myEPerson == null)
@@ -250,17 +257,28 @@ public class Packager
             mycollections = new Collection[collections.length];
             for (int i = 0; i < collections.length; i++)
             {
-                // sanity check: did handle resolve, and to a collection?
-                DSpaceObject dso = HandleManager.resolveToObject(context,
-                        collections[i]);
+                if (collections[i].indexOf(':') == -1)
+                {
+                    // has no : must be a handle
+                    collections[i] = "hdl:" + collections[i];
+                    System.out.println("no namespace provided. assuming handles.");
+                }
+
+                ExternalIdentifier identifier =
+                    identifierDAO.retrieve(collections[i]);
+                ObjectIdentifier oi = identifier.getObjectIdentifier();
+
+                // sanity check: did uri resolve, and to a collection?
+                DSpaceObject dso = oi.getObject(context);
+
                 if (dso == null)
                     throw new IllegalArgumentException(
                             "Bad collection list -- "
-                                    + "Cannot resolve collection handle \""
+                                    + "Cannot resolve collection uri \""
                                     + collections[i] + "\"");
                 else if (dso.getType() != Constants.COLLECTION)
                     throw new IllegalArgumentException(
-                            "Bad collection list -- " + "Object at handle \""
+                            "Bad collection list -- " + "Object at uri \""
                                     + collections[i]
                                     + "\" is not a collection!");
                 mycollections[i] = (Collection) dso;
@@ -275,28 +293,33 @@ public class Packager
                         source, pkgParams, null);
                 if (useWorkflow)
                 {
-                    String handle = null;
+                    String uri = null;
 
-                    // Check if workflow completes immediately, and
-                    // return Handle if so.
+                    // Check if workflow completes immediately, and return uri
+                    // if so.
                     WorkflowItem wfi = WorkflowManager.startWithoutNotify(context, wi);
 
                     if (wfi.getState() == WorkflowManager.WFSTATE_ARCHIVE)
                     {
                         Item ni = wfi.getItem();
-                        handle = HandleManager.findHandle(context, ni);
+                        uri = ni.getIdentifier().getCanonicalForm();
                     }
-                    if (handle == null)
-                    System.out.println("Created Workflow item, ID="
+                    if (uri == null)
+                    {
+                        System.out.println("Created Workflow item, ID="
                                 + String.valueOf(wfi.getID()));
+                    }
                     else
-                        System.out.println("Created and installed item, handle="+handle);
+                    {
+                        System.out.println(
+                                "Created and installed item, uri=" + uri);
+                    }
                 }
                 else
                 {
                     InstallItem.installItem(context, wi);
-                    System.out.println("Created and installed item, handle="
-                            + HandleManager.findHandle(context, wi.getItem()));
+                    System.out.println("Created and installed item, uri="
+                            + wi.getItem().getIdentifier().getCanonicalForm());
                 }
                 context.complete();
                 System.exit(0);
@@ -320,11 +343,24 @@ public class Packager
             if (dip == null)
                 usageError("Error, Unknown package type: " + packageType);
 
-            DSpaceObject dso = HandleManager.resolveToObject(context,
-                    itemHandle);
+            if (itemUri.indexOf(':') == -1)
+            {
+                // has no : must be a handle
+                itemUri = "hdl:" + itemUri;
+                System.out.println("no namespace provided. assuming handles.");
+            }
+
+            ExternalIdentifier identifier = identifierDAO.retrieve(itemUri);
+            ObjectIdentifier oi = identifier.getObjectIdentifier();
+
+            // sanity check: did uri resolve, and to a collection?
+            DSpaceObject dso = oi.getObject(context);
+
             if (dso == null)
-                throw new IllegalArgumentException("Bad Item handle -- "
-                        + "Cannot resolve handle \"" + itemHandle);
+            {
+                throw new IllegalArgumentException("Bad Item uri -- "
+                        + "Cannot resolve uri \"" + itemUri);
+            }
             dip.disseminate(context, dso, pkgParams, dest);
         }
     }

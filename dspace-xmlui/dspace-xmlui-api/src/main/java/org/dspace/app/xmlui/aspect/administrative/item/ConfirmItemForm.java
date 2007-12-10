@@ -114,7 +114,7 @@ public class ConfirmItemForm extends AbstractDSpaceTransformer {
 
 		// DIVISION: Main
 		Division main = body.addInteractiveDivision("confirm-item", contextPath+"/admin/item", Division.METHOD_POST,"primary administrative item");
-		main.setHead(T_head1.parameterize(item.getHandle()));
+		main.setHead(T_head1.parameterize(item.getExternalIdentifier().getCanonicalForm()));
 
 		// PARA: descriptive instructions
 		if("delete".equals(confirm))

@@ -47,7 +47,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,9 +64,12 @@ import java.util.regex.Pattern;
 
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 
 /**
  * This class performs the action of coordinating a usage report being
@@ -189,8 +191,7 @@ public class ReportGenerator
      * main method to be run from command line.  See usage information for
      * details as to how to use the command line flags
      */
-    public static void main(String [] argv)
-        throws Exception, SQLException
+    public static void main(String [] argv) throws Exception
     {
         // create context as super user
         Context context = new Context();
@@ -247,7 +248,7 @@ public class ReportGenerator
     public static void processReport(Context context, String myFormat, 
                                      String myInput, String myOutput,
                                      String myMap)
-        throws Exception, SQLException
+        throws Exception
     {
         startTime = new GregorianCalendar();
         
@@ -319,7 +320,7 @@ public class ReportGenerator
         // process the items in preparation to be displayed.  This includes sorting
         // by view number, building the links, and getting further info where
         // necessary
-        Statistics viewedItems = new Statistics("Item/Handle", "Number of views", itemFloor);
+        Statistics viewedItems = new Statistics("Item/URI", "Number of views", itemFloor);
         viewedItems.setSectionHeader("Items Viewed");
         
         Stat[] items = new Stat[itemAggregator.size()];
@@ -329,7 +330,7 @@ public class ReportGenerator
         while (keys.hasNext())
         {
             String key = (String) keys.next();
-            String link = url + "handle/" + key;
+            String link = url + "uri/" + key;
             value = Integer.parseInt((String) itemAggregator.get(key));
             items[i] = new Stat(key, value, link);
             i++;
@@ -803,31 +804,34 @@ public class ReportGenerator
     }
     
     /**
-     * get the information for the item with the given handle
+     * get the information for the item with the given URI
      *
      * @param   context     the DSpace context we are operating under
-     * @param   handle      the handle of the item being looked up, in the form
-     *                      1234/567 and so forth
+     * @param   uri         the uri of the item being looked up, in the form
+     *                      xyz:1234/567 and so forth
      *
      * @return      a string containing a reference (almost citation) to the
      *              article
      */
-    public static String getItemInfo(Context context, String handle)
-        throws SQLException
+    public static String getItemInfo(Context context, String uri)
     {
         Item item = null;
         
-        // ensure that the handle exists
+        // ensure that the URI exists
         try 
         {
-            item = (Item) HandleManager.resolveToObject(context, handle);
+            ExternalIdentifierDAO identifierDAO =
+                ExternalIdentifierDAOFactory.getInstance(context);
+            ExternalIdentifier identifier = identifierDAO.retrieve(uri);
+            ObjectIdentifier oi = identifier.getObjectIdentifier();
+            item = (Item) oi.getObject(context);
         } 
         catch (Exception e)
         {
             return null;
         }
         
-        // if no handle that matches is found then also return null
+        // if no URI that matches is found then also return null
         if (item == null)
         {
             return null;

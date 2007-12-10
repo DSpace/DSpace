@@ -53,9 +53,11 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 
 /**
  * Simple utility class for extracting handles.
@@ -109,7 +111,11 @@ public class HandleUtil
             handle = handle.substring(0, secondSlash);
 
             Context context = ContextUtil.obtainContext(objectModel);
-            dso = HandleManager.resolveToObject(context, handle);
+//            dso = HandleManager.resolveToObject(context, handle);
+            ExternalIdentifierDAO dao =
+                ExternalIdentifierDAOFactory.getInstance(context);
+            ExternalIdentifier identifier = dao.retrieve(handle);
+            dso = identifier.getObjectIdentifier().getObject(context);
 
             request.setAttribute(DSPACE_OBJECT, dso);
         }
@@ -136,7 +142,7 @@ public class HandleUtil
         {
 
             // Check if the current object has the handle we are looking for.
-            if (current.getHandle().equals(parent))
+            if (current.getExternalIdentifier().getCanonicalForm().equals(parent))
                 return true;
 
             if (current.getType() == Constants.ITEM)
@@ -222,11 +228,11 @@ public class HandleUtil
             DSpaceObject pop = stack.pop();
             if (pop instanceof Collection)
                 pageMeta.addTrailLink(contextPath + "/handle/"
-                        + pop.getHandle(), ((Collection) pop)
+                        + pop.getExternalIdentifier().getCanonicalForm(), ((Collection) pop)
                         .getMetadata("name"));
             else if (pop instanceof Community)
                 pageMeta.addTrailLink(contextPath + "/handle/"
-                        + pop.getHandle(), ((Community) pop)
+                        + pop.getExternalIdentifier().getCanonicalForm(), ((Community) pop)
                         .getMetadata("name"));
 
         }

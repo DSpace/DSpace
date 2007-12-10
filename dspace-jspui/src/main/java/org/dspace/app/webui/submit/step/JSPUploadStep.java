@@ -66,7 +66,6 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.FormatIdentifier;
-import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.submit.step.UploadStep;
@@ -159,7 +158,7 @@ public class JSPUploadStep extends UploadStep implements JSPStep
             Collection c = subInfo.getSubmissionItem().getCollection();
             DCInputsReader inputsReader = new DCInputsReader();
             request.setAttribute("submission.inputs", inputsReader.getInputs(c
-                    .getHandle()));
+                    .getIdentifier().getCanonicalForm()));
         }
 
         // show whichever upload page is appropriate
@@ -233,8 +232,11 @@ public class JSPUploadStep extends UploadStep implements JSPStep
 
                         filePath = wrapper.getFilesystemName("file");
                     }
-                    // remove our temp file
-                    temp.delete();
+                    if (temp != null)
+                    {
+                        // remove our temp file
+                        temp.delete();
+                    }
                     
                     //save file info to request (for UploadStep class)
                     request.setAttribute("file-path", filePath);
@@ -326,7 +328,7 @@ public class JSPUploadStep extends UploadStep implements JSPStep
                     Collection c = subInfo.getSubmissionItem().getCollection();
                     DCInputsReader inputsReader = new DCInputsReader();
                     request.setAttribute("submission.inputs", inputsReader
-                            .getInputs(c.getHandle()));
+                            .getInputs(c.getIdentifier().getCanonicalForm()));
                 }
                 JSPStepManager.showJSP(request, response, subInfo, UPLOAD_ERROR_JSP);
 

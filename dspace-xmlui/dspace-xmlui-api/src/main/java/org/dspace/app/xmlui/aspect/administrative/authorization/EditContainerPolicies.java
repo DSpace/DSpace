@@ -125,13 +125,13 @@ public class EditContainerPolicies extends AbstractDSpaceTransformer
 		if (containerType == Constants.COLLECTION)
 	    {
 			Collection col = Collection.find(context, containerID); 
-			main.setHead(T_main_head_collection.parameterize(col.getMetadata("name"),col.getHandle(),col.getID()));
+			main.setHead(T_main_head_collection.parameterize(col.getMetadata("name"),col.getExternalIdentifier().getCanonicalForm(),col.getID()));
 			policies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, col);
 	    }
 		else 
 		{
 			Community com = Community.find(context, containerID);
-			main.setHead(T_main_head_community.parameterize(com.getMetadata("name"),com.getHandle(),com.getID()));
+			main.setHead(T_main_head_community.parameterize(com.getMetadata("name"),com.getExternalIdentifier().getCanonicalForm(),com.getID()));
 			policies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, com);
 		}
 		

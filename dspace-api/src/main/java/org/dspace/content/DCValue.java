@@ -39,6 +39,11 @@
  */
 package org.dspace.content;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
 /**
  * Simple data structure-like class representing a Dublin Core value. It has an
  * element, qualifier, value and language.
@@ -64,4 +69,31 @@ public class DCValue
 
     /** The schema name of the metadata element */
     public String schema;
+
+    public DCValue() { }
+
+    public DCValue(MetadataSchema mds, MetadataField mdf, MetadataValue mdv)
+    {
+        this.element = mdf.getElement();
+        this.qualifier = mdf.getQualifier();
+        this.value = mdv.getValue();
+        this.language = mdv.getLanguage();
+        this.schema = mds.getName();
+    }
+
+    public String toString()
+    {
+        return ToStringBuilder.reflectionToString(this,
+                ToStringStyle.MULTI_LINE_STYLE);
+    }
+
+    public boolean equals(Object o)
+    {
+        return EqualsBuilder.reflectionEquals(this, o);
+    }
+
+    public int hashCode()
+    {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
 }

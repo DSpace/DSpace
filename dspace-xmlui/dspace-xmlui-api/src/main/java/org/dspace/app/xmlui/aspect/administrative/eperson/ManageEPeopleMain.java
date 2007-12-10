@@ -149,7 +149,9 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
         int highlightID   = parameters.getParameterAsInteger("highlightID",-1);
         String query      = parameters.getParameter("query",null);
         String baseURL    = contextPath+"/admin/epeople?administrative-continue="+knot.getId();
-        int resultCount   = EPerson.searchResultCount(context, query);	
+//        int resultCount   = EPerson.searchResultCount(context, query);	
+        // FIXME: This is horribly inefficient
+        int resultCount   = EPerson.search(context, query).length;
         EPerson[] epeople = EPerson.search(context, query, page*PAGE_SIZE, PAGE_SIZE);
         
         

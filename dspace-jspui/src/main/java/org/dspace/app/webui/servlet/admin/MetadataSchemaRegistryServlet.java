@@ -47,7 +47,6 @@ import java.util.ResourceBundle;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.servlet.DSpaceServlet;
@@ -55,7 +54,8 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataSchema;
-import org.dspace.content.NonUniqueMetadataException;
+import org.dspace.content.dao.MetadataSchemaDAO;
+import org.dspace.content.dao.MetadataSchemaDAOFactory;
 import org.dspace.core.Context;
 
 /**
@@ -71,18 +71,19 @@ public class MetadataSchemaRegistryServlet extends DSpaceServlet
     private String clazz = "org.dspace.app.webui.servlet.admin.MetadataSchemaRegistryServlet";
 
     protected void doDSGet(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
-            SQLException, AuthorizeException
+            HttpServletResponse response)
+        throws ServletException, IOException, AuthorizeException
     {
         // GET just displays the list of type
         showSchemas(context, request, response);
     }
 
     protected void doDSPost(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
-            SQLException, AuthorizeException
+            HttpServletResponse response)
+        throws ServletException, SQLException, IOException, AuthorizeException
     {
         String button = UIUtil.getSubmitButton(request, "submit");
+        MetadataSchemaDAO dao = MetadataSchemaDAOFactory.getInstance(context);
 
         if (button.equals("submit_add"))
         {
@@ -98,44 +99,46 @@ public class MetadataSchemaRegistryServlet extends DSpaceServlet
                 return;
             }
 
-            try
+            String name = request.getParameter("short_name");
+            String namespace = request.getParameter("namespace");
+            MetadataSchema schema = null;
+            if (id.equals(""))
             {
-                if (id.equals(""))
+                schema = dao.retrieveByName(name);
+                if (schema == null)
                 {
-                    // Create a new metadata schema
-                    MetadataSchema schema = new MetadataSchema();
-                    schema.setNamespace(request.getParameter("namespace"));
-                    schema.setName(request.getParameter("short_name"));
-                    schema.create(context);
-                    showSchemas(context, request, response);
-                    context.complete();
+                    schema = dao.retrieveByNamespace(namespace);
                 }
-                else
+                if (schema != null)
                 {
-                    // Update an existing schema
-                    MetadataSchema schema = MetadataSchema.find(context,
-                            UIUtil.getIntParameter(request, "dc_schema_id"));
-                    schema.setNamespace(request.getParameter("namespace"));
-                    schema.setName(request.getParameter("short_name"));
-                    schema.update(context);
+                    request.setAttribute("error",
+                            "Please make the namespace and short name unique.");
                     showSchemas(context, request, response);
-                    context.complete();
+                    context.abort();
+                    return;
                 }
-            }
-            catch (NonUniqueMetadataException e)
-            {
-                request.setAttribute("error",
-                        "Please make the namespace and short name unique.");
+                schema = dao.create();
+                schema.setName(name);
+                schema.setNamespace(namespace);
+                dao.update(schema);
                 showSchemas(context, request, response);
-                context.abort();
-                return;
+                context.complete();
+            }
+            else
+            {
+                schema = dao.retrieve(Integer.parseInt(id));
+                schema.setName(name);
+                schema.setNamespace(namespace);
+                dao.update(schema);
+                showSchemas(context, request, response);
+                context.complete();
             }
         }
         else if (button.equals("submit_delete"))
         {
             // Start delete process - go through verification step
-            MetadataSchema schema = MetadataSchema.find(context, UIUtil
-                    .getIntParameter(request, "dc_schema_id"));
+            MetadataSchema schema =
+                dao.retrieve(UIUtil.getIntParameter(request, "dc_schema_id"));
             request.setAttribute("schema", schema);
             JSPManager.showJSP(request, response,
                     "/dspace-admin/confirm-delete-mdschema.jsp");
@@ -143,9 +146,7 @@ public class MetadataSchemaRegistryServlet extends DSpaceServlet
         else if (button.equals("submit_confirm_delete"))
         {
             // User confirms deletion of type
-            MetadataSchema dc = MetadataSchema.find(context, UIUtil
-                    .getIntParameter(request, "dc_schema_id"));
-            dc.delete(context);
+            dao.delete(UIUtil.getIntParameter(request, "dc_schema_id"));
             showSchemas(context, request, response);
             context.complete();
         }
@@ -223,12 +224,10 @@ public class MetadataSchemaRegistryServlet extends DSpaceServlet
      *            Current HTTP response
      * @throws ServletException
      * @throws IOException
-     * @throws SQLException
      * @throws IOException
      */
     private void showSchemas(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException,
-            SQLException, IOException
+            HttpServletResponse response) throws ServletException, IOException
     {
         MetadataSchema[] schemas = MetadataSchema.findAll(context);
         request.setAttribute("schemas", schemas);

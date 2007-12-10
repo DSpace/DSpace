@@ -45,7 +45,9 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.*;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.eperson.AccountManager;
 import org.dspace.eperson.EPerson;
 
@@ -527,7 +529,6 @@ public class RegisterServlet extends DSpaceServlet
             eperson.update();
 
             request.setAttribute("eperson", eperson);
-
             JSPManager.showJSP(request, response, "/register/registered.jsp");
             context.complete();
         }

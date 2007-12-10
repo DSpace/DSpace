@@ -47,12 +47,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 
-<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.app.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
-<%@ page import="org.dspace.app.util.SubmissionInfo" %>
-<%@ page import="org.dspace.content.InProgressSubmission" %>
-<%@ page import="org.dspace.content.Collection"%>
+<%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.core.ConfigurationManager"%>
+<%@ page import="org.dspace.core.Context" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -84,9 +84,9 @@
     or if for some reason there is a problem with your submission. You can also
     check on the status of your submission by going to the My DSpace page.</p> --%>
 	<p><fmt:message key="jsp.submit.complete.info"/></p> 
-    <p><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.submit.complete.link"/></a></p>
+    <p><a href="<%= ConfigurationManager.getProperty("dspace.url") %>/mydspace"><fmt:message key="jsp.submit.complete.link"/></a></p>
      
-    <p><a href="<%= request.getContextPath() %>/community-list"><fmt:message key="jsp.community-list.title"/></a></p>
+    <p><a href="<%= ConfigurationManager.getProperty("dspace.url") %>/community-list"><fmt:message key="jsp.community-list.title"/></a></p>
      
     <form action="<%= request.getContextPath() %>/submit" method="POST" onkeydown="return disableEnterKey(event);">
         <input type="hidden" name="collection" value="<%= collection.getID() %>">

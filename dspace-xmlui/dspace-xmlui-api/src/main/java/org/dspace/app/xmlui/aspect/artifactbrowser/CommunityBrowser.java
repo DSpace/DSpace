@@ -297,7 +297,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         else if (dso instanceof Collection)
         	name = ((Collection) dso).getMetadata("name");
         
-        String url = contextPath + "/handle/"+dso.getHandle();
+        String url = contextPath + "/handle/"+dso.getExternalIdentifier().getCanonicalForm();
         list.addItem().addHighlight("bold").addXref(url, name);
         
         List subList = null;
@@ -311,7 +311,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
             for (TreeNode collectionNode : collectionNodes)
             {
                 String collectionName = ((Collection) collectionNode.getDSO()).getMetadata("name");
-                String collectionUrl = contextPath + "/handle/"+collectionNode.getDSO().getHandle();
+                String collectionUrl = contextPath + "/handle/"+collectionNode.getDSO().getExternalIdentifier().getCanonicalForm();
                 subList.addItemXref(collectionUrl, collectionName);
             }
         }

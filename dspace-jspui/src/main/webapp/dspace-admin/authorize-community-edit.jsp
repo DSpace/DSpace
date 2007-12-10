@@ -90,7 +90,7 @@
       <td align="left">
 	<h1><fmt:message key="jsp.dspace-admin.authorize-community-edit.policies">
         <fmt:param><%= community.getMetadata("name") %></fmt:param>
-        <fmt:param>hdl:<%= community.getHandle() %></fmt:param>
+        <fmt:param>hdl:<%= community.getIdentifier().getCanonicalForm() %></fmt:param>
         <fmt:param><%=community.getID()%></fmt:param>
     </fmt:message></h1>
       </td>

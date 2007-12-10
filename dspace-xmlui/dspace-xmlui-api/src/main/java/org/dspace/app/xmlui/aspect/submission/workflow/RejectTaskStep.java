@@ -96,7 +96,7 @@ public class RejectTaskStep extends AbstractStep
     {
     	Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/workflow";
+		String actionURL = contextPath + "/handle/"+collection.getExternalIdentifier().getCanonicalForm() + "/workflow";
     	
     	Request request = ObjectModelHelper.getRequest(objectModel);
 		String showfull = request.getParameter("showfull");

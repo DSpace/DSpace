@@ -323,7 +323,7 @@ public class RepositoryAdapter extends AbstractAdapter
         attributesXLINK.setNamespace(XLINK);
         
         attributes.put("LOCTYPE", "URL");
-        attributesXLINK.put("href", "/metadata/handle/"+ dso.getHandle() +"/mets.xml");
+        attributesXLINK.put("href", "/metadata/handle/"+ dso.getExternalIdentifier().getCanonicalForm() +"/mets.xml");
         startElement(METS,"mptr",attributes,attributesXLINK);
         endElement(METS,"mptr");
         

@@ -112,7 +112,7 @@ public class CCLicenseStep extends AbstractSubmissionStep
 		// Build the url to and from creative commons
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit";
+		String actionURL = contextPath + "/handle/"+collection.getExternalIdentifier().getCanonicalForm() + "/submit";
 		
 		Request request = ObjectModelHelper.getRequest(objectModel);
 		boolean https = request.isSecure();

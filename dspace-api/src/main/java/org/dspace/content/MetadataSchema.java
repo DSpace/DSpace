@@ -39,23 +39,18 @@
  */
 package org.dspace.content;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.log4j.Logger;
+
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.content.dao.MetadataSchemaDAO;
+import org.dspace.content.dao.MetadataSchemaDAOFactory;
 
 /**
  * Class representing a schema in DSpace.
@@ -71,7 +66,6 @@ import org.dspace.storage.rdbms.TableRowIterator;
  */
 public class MetadataSchema
 {
-    /** log4j logger */
     private static Logger log = Logger.getLogger(MetadataSchema.class);
 
     /** Numeric Identifier of built-in Dublin Core schema. */
@@ -80,442 +74,105 @@ public class MetadataSchema
     /** Short Name of built-in Dublin Core schema. */
     public static final String DC_SCHEMA = "dc";
 
-    /** The row in the table representing this type */
-    private TableRow row;
-
-    private int schemaID;
+    private Context context;
+    private MetadataSchemaDAO dao;
+    private int id;
     private String namespace;
     private String name;
 
-    // cache of schema by ID (Integer)
-    private static HashMap id2schema = null;
-
-    // cache of schema by short name
-    private static HashMap name2schema = null;
-
-
-    /**
-     * Default constructor.
-     */
-    public MetadataSchema()
+    public MetadataSchema(Context context, int id)
     {
+        this.context = context;
+        this.id = id;
+
+        dao = MetadataSchemaDAOFactory.getInstance(context);
     }
 
-    /**
-     * Object constructor.
-     *
-     * @param schemaID  database key ID number
-     * @param namespace  XML namespace URI
-     * @param name  short name of schema
-     */
-    public MetadataSchema(int schemaID, String namespace, String name)
+    public int getID()
     {
-        this.schemaID = schemaID;
-        this.namespace = namespace;
-        this.name = name;
+        return id;
     }
 
-    /**
-     * Immutable object constructor for creating a new schema.
-     *
-     * @param namespace  XML namespace URI
-     * @param name  short name of schema
-     */
-    public MetadataSchema(String namespace, String name)
-    {
-        this.namespace = namespace;
-        this.name = name;
-    }
-
-    /**
-     * Constructor for loading the metadata schema from the database.
-     *
-     * @param row table row object from which to populate this schema.
-     */
-    public MetadataSchema(TableRow row)
-    {
-        if (row != null)
-        {
-            this.schemaID = row.getIntColumn("metadata_schema_id");
-            this.namespace = row.getStringColumn("namespace");
-            this.name = row.getStringColumn("short_id");
-            this.row = row;
-        }
-    }
-
-    /**
-     * Get the schema namespace.
-     *
-     * @return namespace String
-     */
-    public String getNamespace()
-    {
-        return namespace;
-    }
-
-    /**
-     * Set the schema namespace.
-     *
-     * @param namespace  XML namespace URI
-     */
-    public void setNamespace(String namespace)
-    {
-        this.namespace = namespace;
-    }
-
-    /**
-     * Get the schema name.
-     *
-     * @return name String
-     */
     public String getName()
     {
         return name;
     }
 
-    /**
-     * Set the schema name.
-     *
-     * @param name  short name of schema
-     */
     public void setName(String name)
     {
         this.name = name;
     }
 
-    /**
-     * Get the schema record key number.
-     *
-     * @return schema record key
-     */
-    public int getSchemaID()
+    public String getNamespace()
     {
-        return schemaID;
+        return namespace;
     }
 
-    /**
-     * Creates a new metadata schema in the database, out of this object.
-     *
-     * @param context
-     *            DSpace context object
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws NonUniqueMetadataException
-     */
-    public void create(Context context) throws SQLException,
-            AuthorizeException, NonUniqueMetadataException
+    public void setNamespace(String namespace)
     {
-        // Check authorisation: Only admins may create metadata schemas
-        if (!AuthorizeManager.isAdmin(context))
-        {
-            throw new AuthorizeException(
-                    "Only administrators may modify the metadata registry");
-        }
-
-        // Ensure the schema name is unique
-        if (!uniqueShortName(context, name))
-        {
-            throw new NonUniqueMetadataException("Please make the name " + name
-                    + " unique");
-        }
-        
-        // Ensure the schema namespace is unique
-        if (!uniqueNamespace(context, namespace))
-        {
-            throw new NonUniqueMetadataException("Please make the namespace " + namespace
-                    + " unique");
-        }
-
-
-        // Create a table row and update it with the values
-        row = DatabaseManager.create(context, "MetadataSchemaRegistry");
-        row.setColumn("namespace", namespace);
-        row.setColumn("short_id", name);
-        DatabaseManager.update(context, row);
-
-        // invalidate our fast-find cache.
-        decache();
-
-        // Remember the new row number
-        this.schemaID = row.getIntColumn("metadata_schema_id");
-
-        log
-                .info(LogManager.getHeader(context, "create_metadata_schema",
-                        "metadata_schema_id="
-                                + row.getIntColumn("metadata_schema_id")));
+        this.namespace = namespace;
     }
 
-    /**
-     * Get the schema object corresponding to this namespace URI.
-     *
-     * @param context DSpace context
-     * @param namespace namespace URI to match
-     * @return metadata schema object or null if none found.
-     * @throws SQLException
-     */
-    public static MetadataSchema findByNamespace(Context context,
-            String namespace) throws SQLException
+    @Deprecated
+    public void update(Context context) throws AuthorizeException
     {
-        // Grab rows from DB
-        TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataSchemaRegistry",
-                "SELECT * FROM MetadataSchemaRegistry WHERE namespace= ? ", 
-                namespace);
-
-        TableRow row = null;
-        if (tri.hasNext())
-        {
-            row = tri.next();
-        }
-
-        // close the TableRowIterator to free up resources
-        tri.close();
-
-        if (row == null)
-        {
-            return null;
-        }
-        else
-        {
-            return new MetadataSchema(row);
-        }
+        dao.update(this);
     }
 
-    /**
-     * Update the metadata schema in the database.
-     *
-     * @param context DSpace context
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws NonUniqueMetadataException
-     */
-    public void update(Context context) throws SQLException,
-            AuthorizeException, NonUniqueMetadataException
+    @Deprecated
+    public void delete(Context context) throws AuthorizeException
     {
-        // Check authorisation: Only admins may update the metadata registry
-        if (!AuthorizeManager.isAdmin(context))
-        {
-            throw new AuthorizeException(
-                    "Only administrators may modify the metadata registry");
-        }
-
-        // Ensure the schema name is unique
-        if (!uniqueShortName(context, name))
-        {
-            throw new NonUniqueMetadataException("Please make the name " + name
-                    + " unique");
-        }
-
-        // Ensure the schema namespace is unique
-        if (!uniqueNamespace(context, namespace))
-        {
-            throw new NonUniqueMetadataException("Please make the namespace " + namespace
-                    + " unique");
-        }
-        
-        row.setColumn("namespace", getNamespace());
-        row.setColumn("short_id", getName());
-        DatabaseManager.update(context, row);
-
-        decache();
-
-        log.info(LogManager.getHeader(context, "update_metadata_schema",
-                "metadata_schema_id=" + getSchemaID() + "namespace="
-                        + getNamespace() + "name=" + getName()));
+        dao.delete(getID());
     }
 
-    /**
-     * Delete the metadata schema.
-     *
-     * @param context DSpace context
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-    public void delete(Context context) throws SQLException, AuthorizeException
+    @Deprecated
+    public static MetadataSchema[] findAll(Context context)
     {
-        // Check authorisation: Only admins may create DC types
-        if (!AuthorizeManager.isAdmin(context))
-        {
-            throw new AuthorizeException(
-                    "Only administrators may modify the metadata registry");
-        }
+        MetadataSchemaDAO dao = MetadataSchemaDAOFactory.getInstance(context);
+        List<MetadataSchema> schemas = dao.getMetadataSchemas();
 
-        log.info(LogManager.getHeader(context, "delete_metadata_schema",
-                "metadata_schema_id=" + getSchemaID()));
-
-        DatabaseManager.delete(context, row);
+        return (MetadataSchema[]) schemas.toArray(new MetadataSchema[0]);
     }
 
-    /**
-     * Return all metadata schemas.
-     *
-     * @param context DSpace context
-     * @return array of metadata schemas
-     * @throws SQLException
-     */
-    public static MetadataSchema[] findAll(Context context) throws SQLException
-    {
-        List schemas = new ArrayList();
-
-        // Get all the metadataschema rows
-        TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataSchemaRegistry",
-                        "SELECT * FROM MetadataSchemaRegistry ORDER BY metadata_schema_id");
-
-        // Make into DC Type objects
-        while (tri.hasNext())
-        {
-            schemas.add(new MetadataSchema(tri.next()));
-        }
-        // close the TableRowIterator to free up resources
-        tri.close();
-
-        // Convert list into an array
-        MetadataSchema[] typeArray = new MetadataSchema[schemas.size()];
-        return (MetadataSchema[]) schemas.toArray(typeArray);
-    }
-
-    /**
-     * Return true if and only if the passed name appears within the allowed
-     * number of times in the current schema.
-     *
-     * @param context DSpace context
-     * @param namespace namespace URI to match
-     * @return true of false
-     * @throws SQLException
-     */
-    private boolean uniqueNamespace(Context context, String namespace)
-            throws SQLException
-    {
-        Connection con = context.getDBConnection();
-        TableRow reg = DatabaseManager.row("MetadataSchemaRegistry");
-        
-        String query = "SELECT COUNT(*) FROM " + reg.getTable() + " " +
-        		"WHERE metadata_schema_id != ? " + 
-        		"AND namespace= ? ";
-        PreparedStatement statement = con.prepareStatement(query);
-        statement.setInt(1,schemaID);
-        statement.setString(2,namespace);
-        
-        ResultSet rs = statement.executeQuery();
-
-        int count = 0;
-        if (rs.next())
-        {
-            count = rs.getInt(1);
-        }
-
-        return (count == 0);
-    }
-
-    /**
-     * Return true if and only if the passed name is unique.
-     *
-     * @param context DSpace context
-     * @param name  short name of schema
-     * @return true of false
-     * @throws SQLException
-     */
-    private boolean uniqueShortName(Context context, String name)
-            throws SQLException
-    {
-        Connection con = context.getDBConnection();
-        TableRow reg = DatabaseManager.row("MetadataSchemaRegistry");
-        
-        String query = "SELECT COUNT(*) FROM " + reg.getTable() + " " +
-        		"WHERE metadata_schema_id != ? " +
-                "AND short_id = ? ";
-        
-        PreparedStatement statement = con.prepareStatement(query);
-        statement.setInt(1,schemaID);
-        statement.setString(2,name);
-        
-        ResultSet rs = statement.executeQuery();
-
-        int count = 0;
-        if (rs.next())
-        {
-            count = rs.getInt(1);
-        }
-
-        return (count == 0);
-    }
-
-    /**
-     * Get the schema corresponding with this numeric ID.
-     * The ID is a database key internal to DSpace.
-     *
-     * @param context
-     *            context, in case we need to read it in from DB
-     * @param id
-     *            the schema ID
-     * @return the metadata schema object
-     * @throws SQLException
-     */
+    @Deprecated
     public static MetadataSchema find(Context context, int id)
-            throws SQLException
     {
-        initCache(context);
-        Integer iid = new Integer(id);
-
-        // sanity check
-        if (!id2schema.containsKey(iid))
-            return null;
-
-        return (MetadataSchema) id2schema.get(iid);
+        MetadataSchemaDAO dao = MetadataSchemaDAOFactory.getInstance(context);
+        return dao.retrieve(id);
     }
 
-    /**
-     * Get the schema corresponding with this short name.
-     *
-     * @param context
-     *            context, in case we need to read it in from DB
-     * @param shortName
-     *            the short name for the schema
-     * @return the metadata schema object
-     * @throws SQLException
-     */
-    public static MetadataSchema find(Context context, String shortName)
-        throws SQLException
+    @Deprecated
+    public static MetadataSchema find(Context context, String name)
     {
-        // If we are not passed a valid schema name then return
-        if (shortName == null)
-            return null;
-
-        initCache(context);
-
-        if (!name2schema.containsKey(shortName))
-            return null;
-
-        return (MetadataSchema) name2schema.get(shortName);
+        MetadataSchemaDAO dao = MetadataSchemaDAOFactory.getInstance(context);
+        return dao.retrieveByName(name);
     }
 
-    // invalidate the cache e.g. after something modifies DB state.
-    private static void decache()
+    @Deprecated
+    public static MetadataSchema findByNamespace(Context context,
+            String namespace)
     {
-        id2schema = null;
-        name2schema = null;
+        MetadataSchemaDAO dao = MetadataSchemaDAOFactory.getInstance(context);
+        return dao.retrieveByNamespace(namespace);
     }
 
-    // load caches if necessary
-    private static void initCache(Context context) throws SQLException
+    ////////////////////////////////////////////////////////////////////
+    // Utility methods
+    ////////////////////////////////////////////////////////////////////
+
+    public String toString()
     {
-        if (id2schema != null && name2schema != null)
-            return;
+        return ToStringBuilder.reflectionToString(this,
+                ToStringStyle.MULTI_LINE_STYLE);
+    }
 
-        log.info("Loading schema cache for fast finds");
-        id2schema = new HashMap();
-        name2schema = new HashMap();
+    public boolean equals(Object o)
+    {
+        return EqualsBuilder.reflectionEquals(this, o);
+    }
 
-        TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataSchemaRegistry",
-                "SELECT * from MetadataSchemaRegistry");
-        while (tri.hasNext())
-        {
-            TableRow row = tri.next();
-
-            MetadataSchema s = new MetadataSchema(row);
-            id2schema.put(new Integer(s.schemaID), s);
-            name2schema.put(s.name, s);
-        }
-        // close the TableRowIterator to free up resources
-        tri.close();
+    public int hashCode()
+    {
+        return HashCodeBuilder.reflectionHashCode(this);
     }
 }

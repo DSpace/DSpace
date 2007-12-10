@@ -66,8 +66,10 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
@@ -136,7 +138,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             // What scope the search is at
             DSpaceObject scope = getScope();
             if (scope != null)
-                key += "-" + scope.getHandle();
+                key += "-" + scope.getExternalIdentifier().getCanonicalForm();
             
             // The actualy search query.
             key += "-" + getQuery();
@@ -169,13 +171,21 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 	            validity.add(scope);
 	            
 	            performSearch();
+
+                ExternalIdentifierDAO dao =
+                    ExternalIdentifierDAOFactory.getInstance(context);
 	            
 	            @SuppressWarnings("unchecked") // This cast is correct
-	            java.util.List<String> handles = queryResults.getHitHandles();
-	            for (String handle : handles)
+	            java.util.List<String> uris = queryResults.getHitURIs();
+//	            java.util.List<String> handles = queryResults.getHitHandles();
+//	            for (String handle : handles)
+	            for (String uri : uris)
 	            {
-	                DSpaceObject resultDSO = HandleManager.resolveToObject(
-	                        context, handle);
+//	                DSpaceObject resultDSO = HandleManager.resolveToObject(
+//	                        context, handle);
+                    ExternalIdentifier identifier = dao.retrieve(uri);
+                    DSpaceObject resultDSO =
+                        identifier.getObjectIdentifier().getObject(context);
 	                validity.add(resultDSO);
 	            }
 	            
@@ -209,6 +219,8 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     {
         if (getQuery().length() > 0)
         {
+            ExternalIdentifierDAO dao =
+                ExternalIdentifierDAOFactory.getInstance(context);
 
             // Preform the actual search
             performSearch();
@@ -264,11 +276,16 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
                 boolean resultsContainsBothContainersAndItems = false;
                 
                 @SuppressWarnings("unchecked") // This cast is correct
-                java.util.List<String> containerHandles = queryResults.getHitHandles();
-                for (String handle : containerHandles)
+                java.util.List<String> containerURIs = queryResults.getHitURIs();
+//                java.util.List<String> containerHandles = queryResults.getHitHandles();
+//                for (String handle : containerHandles)
+                for (String uri : containerURIs)
                 {
-                    DSpaceObject resultDSO = HandleManager.resolveToObject(
-                            context, handle);
+//                    DSpaceObject resultDSO = HandleManager.resolveToObject(
+//                            context, handle);
+                    ExternalIdentifier identifier = dao.retrieve(uri);
+                    DSpaceObject resultDSO =
+                        identifier.getObjectIdentifier().getObject(context);
 
                     if (resultDSO instanceof Community
                             || resultDSO instanceof Collection)
@@ -289,11 +306,16 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
                 referenceSet = null;
                 
                 @SuppressWarnings("unchecked") // This cast is correct
-                java.util.List<String> itemHandles = queryResults.getHitHandles();
-                for (String handle : itemHandles)
+                java.util.List<String> itemURIs = queryResults.getHitURIs();
+//                java.util.List<String> itemHandles = queryResults.getHitHandles();
+//                for (String handle : itemHandles)
+                for (String uri : itemURIs)
                 {
-                    DSpaceObject resultDSO = HandleManager.resolveToObject(
-                            context, handle);
+//                    DSpaceObject resultDSO = HandleManager.resolveToObject(
+//                            context, handle);
+                    ExternalIdentifier identifier = dao.retrieve(uri);
+                    DSpaceObject resultDSO =
+                        identifier.getObjectIdentifier().getObject(context);
 
                     if (resultDSO instanceof Item)
                     {
@@ -345,7 +367,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             scope.setOptionSelected("/");
             for (Community community : Community.findAll(context))
             {
-                scope.addOption(community.getHandle(),community.getMetadata("name"));
+                scope.addOption(community.getExternalIdentifier().getCanonicalForm(),community.getMetadata("name"));
             }
         }
         else if (scopeDSO instanceof Community)
@@ -354,12 +376,12 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             // within
             Community community = (Community) scopeDSO;
             scope.addOption("/",T_all_of_dspace);
-            scope.addOption(community.getHandle(),community.getMetadata("name"));
-            scope.setOptionSelected(community.getHandle());
+            scope.addOption(community.getExternalIdentifier().getCanonicalForm(),community.getMetadata("name"));
+            scope.setOptionSelected(community.getExternalIdentifier().getCanonicalForm());
 
             for (Collection collection : community.getCollections())
             {
-                scope.addOption(collection.getHandle(),collection.getMetadata("name"));
+                scope.addOption(collection.getExternalIdentifier().getCanonicalForm(),collection.getMetadata("name"));
             }
         }
         else if (scopeDSO instanceof Collection)
@@ -367,14 +389,14 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             // The scope is a collection, display all parent collections.
             Collection collection = (Collection) scopeDSO;
             scope.addOption("/",T_all_of_dspace);
-            scope.addOption(collection.getHandle(),collection.getMetadata("name"));
-            scope.setOptionSelected(collection.getHandle());
+            scope.addOption(collection.getExternalIdentifier().getCanonicalForm(),collection.getMetadata("name"));
+            scope.setOptionSelected(collection.getExternalIdentifier().getCanonicalForm());
             
             Community[] communities = collection.getCommunities()[0]
                     .getAllParents();
             for (Community community : communities)
             {
-                scope.addOption(community.getHandle(),community.getMetadata("name"));
+                scope.addOption(community.getExternalIdentifier().getCanonicalForm(),community.getMetadata("name"));
             }
         }
     }
@@ -435,6 +457,9 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
      * Determine the current scope. This may be derived from the current url
      * handle if present or the scope parameter is given. If no scope is
      * specified then null is returned.
+     *
+     * FIXME: This depends on the "handle" string being of the form "hdl:12/34"
+     * rather than just "12/34".
      * 
      * @return The current scope.
      */
@@ -443,14 +468,23 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         Request request = ObjectModelHelper.getRequest(objectModel);
         String scopeString = request.getParameter("scope");
 
+        ExternalIdentifierDAO dao =
+            ExternalIdentifierDAOFactory.getInstance(context);
+
         // Are we in a community or collection?
         DSpaceObject dso;
-        if (scopeString == null || "".equals(scopeString))
+        if (scopeString == null
+                || "".equals(scopeString)
+                || "/".equals(scopeString))
             // get the search scope from the url handle
             dso = HandleUtil.obtainHandle(objectModel);
         else
+        {
             // Get the search scope from the location parameter
-            dso = HandleManager.resolveToObject(context, scopeString);
+//            dso = HandleManager.resolveToObject(context, scopeString);
+            ExternalIdentifier identifier = dao.retrieve(scopeString);
+            dso = identifier.getObjectIdentifier().getObject(context);
+        }
 
         return dso;
     }

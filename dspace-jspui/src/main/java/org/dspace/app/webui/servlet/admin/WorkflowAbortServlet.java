@@ -63,8 +63,8 @@ import org.dspace.workflow.WorkflowManager;
 public class WorkflowAbortServlet extends DSpaceServlet
 {
     protected void doDSGet(Context c, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
-            SQLException, AuthorizeException
+            HttpServletResponse response)
+        throws AuthorizeException, IOException, ServletException
     {
         // Get displays list of workflows
         showWorkflows(c, request, response);
@@ -108,13 +108,12 @@ public class WorkflowAbortServlet extends DSpaceServlet
     }
 
     private void showWorkflows(Context c, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
-            SQLException, AuthorizeException
+            HttpServletResponse response)
+        throws AuthorizeException, IOException, ServletException
     {
         WorkflowItem[] w = WorkflowItem.findAll(c);
 
         request.setAttribute("workflows", w);
-        JSPManager
-                .showJSP(request, response, "/dspace-admin/workflow-list.jsp");
+        JSPManager.showJSP(request, response, "/dspace-admin/workflow-list.jsp");
     }
 }

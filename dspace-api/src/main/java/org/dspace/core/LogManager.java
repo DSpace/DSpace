@@ -84,9 +84,6 @@ public class LogManager
             contextExtraInfo = "no_context";
         }
 
-        String result = new String(email + ":" + contextExtraInfo + ":"
-                + action + ":" + extrainfo);
-
-        return result;
+        return email + ":" + contextExtraInfo + ":" + action + ":" + extrainfo;
     }
 }

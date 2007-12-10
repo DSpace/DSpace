@@ -45,11 +45,13 @@ importClass(Packages.org.apache.cocoon.components.CocoonComponentManager);
 importClass(Packages.org.apache.cocoon.environment.http.HttpEnvironment);
 importClass(Packages.org.apache.cocoon.servlet.multipart.Part);
 
-importClass(Packages.org.dspace.handle.HandleManager);
 importClass(Packages.org.dspace.core.Constants);
 importClass(Packages.org.dspace.workflow.WorkflowItem);
 importClass(Packages.org.dspace.workflow.WorkflowManager);
 importClass(Packages.org.dspace.content.WorkspaceItem);
+importClass(Packages.org.dspace.content.uri.ExternalIdentifier);
+importClass(Packages.org.dspace.content.uri.dao.ExternalIdentifierDAO);
+importClass(Packages.org.dspace.content.uri.dao.ExternalIdentifierDAOFactory);
 importClass(Packages.org.dspace.authorize.AuthorizeManager);
 importClass(Packages.org.dspace.license.CreativeCommons);
 
@@ -179,8 +181,10 @@ function doSubmission()
        do {
            if (handle != null)
            {
-               var dso = HandleManager.resolveToObject(getDSContext(), handle);
-               
+               var dao = ExternalIdentifierDAOFactory.getInstance(getDSContext());
+               var identifier = dao.retrieve(handle);
+               var dso = identifier.getObjectIdentifier().getObject(getDSContext());
+
                // Check that the dso is a collection
                if (dso != null && dso.getType() == Constants.COLLECTION)
                {
@@ -220,7 +224,7 @@ function doSubmission()
        if (submitterID == currentID)
        {
            // Get the collection handle for this item.
-           var handle = workspace.getCollection().getHandle();
+           var handle = workspace.getCollection().getExternalIdentifier().getCanonicalForm();
            
            // Record that this is a submission id, not a workflow id.
            //(specify "S" for submission item, for FlowUtils.findSubmission())
@@ -713,7 +717,7 @@ function doWorkflow()
     }
     
     // Get the collection handle for this item.
-    var handle = WorkflowItem.find(getDSContext(), workflowID).getCollection().getHandle();
+    var handle = WorkflowItem.find(getDSContext(), workflowID).getCollection().getExternalIdentifier().getCanonicalForm();
     
     // Specify that we are working with workflows.
     //(specify "W" for workflow item, for FlowUtils.findSubmission())

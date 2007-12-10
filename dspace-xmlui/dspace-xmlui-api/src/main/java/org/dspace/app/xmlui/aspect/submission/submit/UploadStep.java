@@ -185,7 +185,7 @@ public class UploadStep extends AbstractSubmissionStep
         // Get a list of all files in the original bundle
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit";
+		String actionURL = contextPath + "/handle/"+collection.getExternalIdentifier().getCanonicalForm() + "/submit";
 		boolean workflow = submission instanceof WorkflowItem;
 		Bundle[] bundles = item.getBundles("ORIGINAL");
 		Bitstream[] bitstreams = new Bitstream[0];
