@@ -204,14 +204,25 @@ $ scp MODS-2-DIM.xslt athena.dialup.mit.edu:~/Private/
 -->
         </xsl:element>
 </xsl:template>
- 
 
-<!-- **** MODS   originInfo/dateIssued ====> DC  date.created **** -->
-        <xsl:template match="*[local-name()='originInfo']/*[local-name()='dateIssued']">
+
+<!-- **** MODS   originInfo/dateCreated ====> DC  date.created **** -->
+        <xsl:template match="*[local-name()='originInfo']/*[local-name()='dateCreated']">
                 <xsl:element name="dim:field">
                         <xsl:attribute name="mdschema">dc</xsl:attribute>
                         <xsl:attribute name="element">date</xsl:attribute>
                         <xsl:attribute name="qualifier">created</xsl:attribute>
+                        <xsl:attribute name="lang">en_US</xsl:attribute>
+                        <xsl:value-of select="."/>
+                </xsl:element>
+        </xsl:template>
+
+<!-- **** MODS   originInfo/dateIssued ====> DC  date.issued **** -->
+        <xsl:template match="*[local-name()='originInfo']/*[local-name()='dateIssued']">
+                <xsl:element name="dim:field">
+                        <xsl:attribute name="mdschema">dc</xsl:attribute>
+                        <xsl:attribute name="element">date</xsl:attribute>
+                        <xsl:attribute name="qualifier">issued</xsl:attribute>
                         <xsl:attribute name="lang">en_US</xsl:attribute>
                         <xsl:value-of select="."/>
                 </xsl:element>
