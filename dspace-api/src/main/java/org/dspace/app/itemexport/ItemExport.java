@@ -39,40 +39,25 @@
  */
 package org.dspace.app.itemexport;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Iterator;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
-
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
-import org.dspace.content.MetadataSchema;
+import org.apache.commons.cli.*;
+import org.dspace.content.*;
 import org.dspace.content.dao.CollectionDAO;
 import org.dspace.content.dao.CollectionDAOFactory;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.Utils;
+import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.IdentifierUtils;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.Utils;
+
+import java.io.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Item exporter to create simple AIPs for DSpace content. Currently exports
@@ -447,7 +432,7 @@ public class ItemExport
         }
     }
 
-    // create the file 'handle' which contains (one of the) the URI(s) assigned
+    // create the file 'uri' which contains (one of the) the URI(s) assigned
     // to the item
     private static void writeURI(Context c, Item i, File destDir)
             throws Exception
@@ -460,7 +445,15 @@ public class ItemExport
         {
             PrintWriter out = new PrintWriter(new FileWriter(outFile));
 
+            // first do the internal UUID
             out.println(i.getIdentifier().getCanonicalForm());
+
+            // next do the external identifiers
+            List<ExternalIdentifier> eids = i.getExternalIdentifiers();
+            for (ExternalIdentifier eid : eids)
+            {
+                out.println(eid.getCanonicalForm());
+            }
 
             // close the contents file
             out.close();
