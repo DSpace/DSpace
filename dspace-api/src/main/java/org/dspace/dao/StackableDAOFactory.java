@@ -2,13 +2,11 @@ package org.dspace.dao;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
-import org.dspace.content.dao.ContentDAO;
 
 public class StackableDAOFactory
 {

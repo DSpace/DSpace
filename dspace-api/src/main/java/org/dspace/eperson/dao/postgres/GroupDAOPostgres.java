@@ -76,25 +76,19 @@ public class GroupDAOPostgres extends GroupDAO
     @Override
     public Group create() throws AuthorizeException
     {
-        // FIXME: This is a bit hackish. The call to the superclass is purely
-        // to check authorization, and we will just get back null rather than
-        // an actual Group. Maybe the authorization check should just go in
-        // GroupDAO.create(Group group) instead.
-        Group group = super.create();
+        UUID uuid = UUID.randomUUID();
 
         try
         {
-            UUID uuid = UUID.randomUUID();
-
             TableRow row = DatabaseManager.create(context, "epersongroup");
             row.setColumn("uuid", uuid.toString());
             DatabaseManager.update(context, row);
 
             int id = row.getIntColumn("eperson_group_id");
-            group = new GroupProxy(context, id);
+            Group group = new GroupProxy(context, id);
             group.setIdentifier(new ObjectIdentifier(uuid));
 
-            return super.create(group);
+            return group;
         }
         catch (SQLException sqle)
         {
@@ -105,13 +99,6 @@ public class GroupDAOPostgres extends GroupDAO
     @Override
     public Group retrieve(int id)
     {
-        Group group = super.retrieve(id);
-
-        if (group != null)
-        {
-            return group;
-        }
-
         try
         {
             TableRow row = DatabaseManager.find(context, "epersongroup", id);
@@ -127,13 +114,6 @@ public class GroupDAOPostgres extends GroupDAO
     @Override
     public Group retrieve(UUID uuid)
     {
-        Group group = super.retrieve(uuid);
-
-        if (group != null)
-        {
-            return group;
-        }
-
         try
         {
             TableRow row = DatabaseManager.findByUnique(context,
@@ -150,13 +130,6 @@ public class GroupDAOPostgres extends GroupDAO
     @Override
     public Group retrieve(String name)
     {
-        Group group = super.retrieve(name);
-
-        if (group != null)
-        {
-            return group;
-        }
-
         try
         {
             TableRow row = DatabaseManager.findByUnique(context,
@@ -173,8 +146,6 @@ public class GroupDAOPostgres extends GroupDAO
     @Override
     public void update(Group group) throws AuthorizeException
     {
-        super.update(group);
-
         try
         {
             TableRow row =
@@ -204,8 +175,6 @@ public class GroupDAOPostgres extends GroupDAO
     @Override
     public void delete(int id) throws AuthorizeException
     {
-        super.delete(id);
-
         try
         {
             // Remove any group memberships first
@@ -467,9 +436,6 @@ public class GroupDAOPostgres extends GroupDAO
     {
         if (!linked(parent, child))
         {
-            // Uncomment once the superclass actually does anything
-            // super.link(parent, child);
-
             try
             {
                 TableRow row = DatabaseManager.create(context,
@@ -492,9 +458,6 @@ public class GroupDAOPostgres extends GroupDAO
     {
         if (linked(parent, child))
         {
-            // Uncomment once the superclass actually does anything
-            // super.unlink(parent, child);
-
             try
             {
                 DatabaseManager.updateQuery(context,
@@ -537,9 +500,6 @@ public class GroupDAOPostgres extends GroupDAO
     {
         if (!linked(group, eperson))
         {
-            // Uncomment once the superclass actually does anything
-            // super.link(group, eperson);
-
             try
             {
                 TableRow row = DatabaseManager.create(context,
@@ -560,9 +520,6 @@ public class GroupDAOPostgres extends GroupDAO
     {
         if (linked(group, eperson))
         {
-            // Uncomment once the superclass actually does anything
-            // super.unlink(group, eperson);
-
             try
             {
                 DatabaseManager.updateQuery(context,
@@ -602,9 +559,6 @@ public class GroupDAOPostgres extends GroupDAO
     {
         if (!linked(group, ips))
         {
-            // Uncomment once the superclass actually does anything
-            // super.link(group, ips);
-
             try
             {
                 TableRow row = DatabaseManager.create(context,
@@ -625,9 +579,6 @@ public class GroupDAOPostgres extends GroupDAO
     {
         if (linked(group, ips))
         {
-            // Uncomment once the superclass actually does anything
-            // super.unlink(group, ips);
-
             try
             {
                 DatabaseManager.updateQuery(context,
@@ -702,14 +653,7 @@ public class GroupDAOPostgres extends GroupDAO
 
         int id = row.getIntColumn("eperson_group_id");
 
-        Group group = super.retrieve(id);
-
-        if (group != null)
-        {
-            return group;
-        }
-
-        group = new GroupProxy(context, id);
+        Group group = new GroupProxy(context, id);
         populateGroupFromTableRow(group, row);
 
         context.cache(group, id);

@@ -46,15 +46,13 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.InProgressSubmission;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.dao.CRUD;
 import org.dspace.dao.Link;
+import org.dspace.dao.StackableDAO;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 /**
  * FIXME: We actually implement the Link interface for two other pairs of
@@ -62,169 +60,109 @@ import org.dspace.dao.Link;
  *
  * @author James Rutherford
  */
-public abstract class GroupDAO implements CRUD<Group>, Link<Group, Group>
+public abstract class GroupDAO extends StackableDAO<GroupDAO>
+        implements CRUD<Group>, Link<Group, Group>
 {
     protected Logger log = Logger.getLogger(GroupDAO.class);
 
     protected Context context;
     protected EPersonDAO epersonDAO;
 
-    public Group create() throws AuthorizeException
-    {
-        if (!AuthorizeManager.isAdmin(context))
-        {
-            throw new AuthorizeException(
-                    "You must be an admin to create an EPerson Group");
-        }
+    protected GroupDAO childDAO;
 
-        return null;
+    public GroupDAO()
+    {
     }
 
-    // FIXME: This should be called something else, but I can't think of
-    // anything suitable. The reason this can't go in create() is because we
-    // need access to the object that was created, but we can't reach into the
-    // subclass to get it (storing it as a protected member variable would be
-    // even more filthy).
-    protected final Group create(Group group) throws AuthorizeException
+    public GroupDAO(Context context)
     {
-        log.info(LogManager.getHeader(context, "create_group", "group_id="
-                + group.getID()));
+        this.context = context;
+    }
 
-        return group;
+    public GroupDAO getChild()
+    {
+        return childDAO;
+    }
+
+    public void setChild(GroupDAO childDAO)
+    {
+        this.childDAO = childDAO;
+    }
+
+    public Group create() throws AuthorizeException
+    {
+        return childDAO.create();
     }
 
     public Group retrieve(int id)
     {
-        return (Group) context.fromCache(Group.class, id);
+        return childDAO.retrieve(id);
     }
 
     public Group retrieve(UUID uuid)
     {
-        return null;
+        return childDAO.retrieve(uuid);
     }
 
     public Group retrieve(String name)
     {
-        return null;
+        return childDAO.retrieve(name);
     }
 
-    /**
-     * FIXME: Look back into ItemDAOPostgres to see how we were cunning there
-     * about updating Bundles + Bitstreams and use that below for EPeople and
-     * Groups.
-     */
     public void update(Group group) throws AuthorizeException
     {
-        // Check authorisation - if you're not the eperson
-        // see if the authorization system says you can
-        if (!context.ignoreAuthorization())
-        {
-            AuthorizeManager.authorizeAction(context, group, Constants.WRITE);
-        }
-
-        log.info(LogManager.getHeader(context, "update_group", "group_id="
-                + group.getID()));
-
-        EPerson[] epeople = group.getMembers();
-
-        for (EPerson storedEPerson : epersonDAO.getEPeople(group))
-        {
-            boolean deleted = true;
-            for (EPerson eperson : epeople)
-            {
-                if (eperson.equals(storedEPerson))
-                {
-                    deleted = false;
-                    break;
-                }
-            }
-
-            if (deleted)
-            {
-                unlink(group, storedEPerson);
-            }
-        }
-
-        for (EPerson eperson : epeople)
-        {
-            link(group, eperson);
-        }
-        
-        Group[] groups = group.getMemberGroups();
-
-        for (Group storedGroup : getMemberGroups(group))
-        {
-            boolean deleted = true;
-            for (EPerson eperson : epeople)
-            {
-                if (group.equals(storedGroup))
-                {
-                    deleted = false;
-                    break;
-                }
-            }
-
-            if (deleted)
-            {
-                unlink(group, storedGroup);
-            }
-        }
-
-        for (EPerson eperson : epeople)
-        {
-            link(group, eperson);
-        }
+        childDAO.update(group);
     }
 
     public void delete(int id) throws AuthorizeException
     {
-        Group group = retrieve(id);
-        update(group); // Sync in-memory object before removal
-
-        if (!AuthorizeManager.isAdmin(context))
-        {
-            throw new AuthorizeException(
-                    "You must be an admin to delete a Group");
-        }
-
-        // Remove any ResourcePolicies that reference this group
-        AuthorizeManager.removeGroupPolicies(context, id);
-
-        log.info(LogManager.getHeader(context, "delete_group", "group_id=" +
-                    id));
-
-        // Remove from cache
-        context.removeCached(group, id);
+        childDAO.delete(id);
     }
 
     public List<Group> getGroups()
     {
-        // default to sorting by id. it's a bit arbitrary, but i don't think
-        // anyone will care.
-        return getGroups(Group.ID);
+        return childDAO.getGroups();
     }
 
-    public abstract List<Group> getGroups(int sortField);
+    public List<Group> getGroups(int sortField)
+    {
+        return childDAO.getGroups(sortField);
+    }
 
     /**
      * Returns a list of all the Groups the given EPerson is a member of.
      */
-    public abstract List<Group> getGroups(EPerson eperson);
+    public List<Group> getGroups(EPerson eperson)
+    {
+        return childDAO.getGroups(eperson);
+    }
 
-    public abstract Set<Integer> getGroupIDs(EPerson eperson);
+    public Set<Integer> getGroupIDs(EPerson eperson)
+    {
+        return childDAO.getGroupIDs(eperson);
+    }
 
-    public abstract List<Group> getSupervisorGroups();
+    public List<Group> getSupervisorGroups()
+    {
+        return childDAO.getSupervisorGroups();
+    }
 
     /**
      * Gets all the groups that are supervising an in-progress submission
      */
-    public abstract List<Group> getSupervisorGroups(InProgressSubmission ips);
+    public List<Group> getSupervisorGroups(InProgressSubmission ips)
+    {
+        return childDAO.getSupervisorGroups(ips);
+    }
 
 
     /**
      * Returns a list of all the immediate subgroups of the given Group.
      */
-    public abstract List<Group> getMemberGroups(Group group);
+    public List<Group> getMemberGroups(Group group)
+    {
+        return childDAO.getMemberGroups(group);
+    }
 
     /**
      * Find the groups that match the search query across eperson_group_id or
@@ -236,7 +174,7 @@ public abstract class GroupDAO implements CRUD<Group>, Link<Group, Group>
      */
     public List<Group> search(String query)
     {
-        return search(query, -1, -1);
+        return childDAO.search(query);
     }
 
     /**
@@ -249,7 +187,10 @@ public abstract class GroupDAO implements CRUD<Group>, Link<Group, Group>
      *
      * @return List of Group objects
      */
-    public abstract List<Group> search(String query, int offset, int limit);
+    public List<Group> search(String query, int offset, int limit)
+    {
+        return childDAO.search(query, offset, limit);
+    }
 
     /**
      * Find out whether or not the logged in EPerson is a member of the given
@@ -259,43 +200,60 @@ public abstract class GroupDAO implements CRUD<Group>, Link<Group, Group>
      */
     public boolean currentUserInGroup(int groupID)
     {
-        // special, everyone is member of group 0 (anonymous)
-        if (groupID == 0)
-        {
-            return true;
-        }
-
-        // first, check for membership if it's a special group
-        // (special groups can be set even if person isn't authenticated)
-        if (context.inSpecialGroup(groupID))
-        {
-            return true;
-        }
-
-        EPerson currentuser = context.getCurrentUser();
-
-        // only test for membership if context contains a user
-        if (currentuser != null)
-        {
-            Set<Integer> groupIDs = getGroupIDs(currentuser);
-
-            return groupIDs.contains(groupID);
-        }
-
-        return false;
+        return childDAO.currentUserInGroup(groupID);
     }
 
     // FIXME: All of these should probably check authorization
-    public abstract void link(Group parent, Group child);
-    public abstract void unlink(Group parent, Group child);
-    public abstract boolean linked(Group parent, Group child);
+    public void link(Group parent, Group child)
+    {
+        childDAO.link(parent, child);
+    }
 
-    public abstract void link(Group group, EPerson eperson);
-    public abstract void unlink(Group group, EPerson eperson);
-    public abstract boolean linked(Group group, EPerson eperson);
+    public void unlink(Group parent, Group child)
+    {
+        childDAO.link(parent, child);
+    }
 
-    public abstract void link(Group group, InProgressSubmission ips);
-    public abstract void unlink(Group group, InProgressSubmission ips);
-    public abstract boolean linked(Group group, InProgressSubmission ips);
-    public abstract void cleanSupervisionOrders();
+    public boolean linked(Group parent, Group child)
+    {
+        return childDAO.linked(parent, child);
+    }
+
+    public void link(Group group, EPerson eperson)
+    {
+        childDAO.link(group, eperson);
+    }
+
+    public void unlink(Group group, EPerson eperson)
+    {
+        childDAO.link(group, eperson);
+    }
+
+    public boolean linked(Group group, EPerson eperson)
+    {
+        return childDAO.linked(group, eperson);
+    }
+
+
+    public void link(Group group, InProgressSubmission ips)
+    {
+        childDAO.link(group, ips);
+    }
+
+    public void unlink(Group group, InProgressSubmission ips)
+    {
+        childDAO.link(group, ips);
+    }
+
+    public boolean linked(Group group, InProgressSubmission ips)
+    {
+        return childDAO.linked(group, ips);
+    }
+
+    public void cleanSupervisionOrders()
+    {
+        childDAO.cleanSupervisionOrders();
+    }
+
 }
+

@@ -72,10 +72,6 @@ public class EPersonDAOPostgres extends EPersonDAO
     @Override
     public EPerson create() throws AuthorizeException
     {
-        // FIXME: This is a bit hackish. The call to the superclass is purely
-        // to check authorization, and we will just get back null rather than
-        // an actual EPerson. Maybe the authorization check should just go in
-        // EPersonDAO.create(EPerson eperson) instead.
         UUID uuid = UUID.randomUUID();
 
         try
