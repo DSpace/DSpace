@@ -10,7 +10,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.storage.dao.CRUD;
+import org.dspace.dao.CRUD;
 import org.dspace.workflow.WorkflowItem;
 
 public abstract class WorkspaceItemDAO extends ContentDAO<WorkspaceItemDAO>

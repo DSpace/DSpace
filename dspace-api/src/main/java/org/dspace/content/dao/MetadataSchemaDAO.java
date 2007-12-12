@@ -47,7 +47,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.Context;
-import org.dspace.storage.dao.CRUD;
+import org.dspace.dao.CRUD;
 
 public abstract class MetadataSchemaDAO extends ContentDAO<MetadataSchemaDAO>
         implements CRUD<MetadataSchema>

@@ -40,7 +40,7 @@
 
 package org.dspace.content.dao;
 
-import org.dspace.storage.dao.GlobalDAOException;
+import org.dspace.dao.GlobalDAOException;
 
 public class ContentDAOException extends GlobalDAOException
 {   

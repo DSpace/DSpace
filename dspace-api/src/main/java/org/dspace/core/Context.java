@@ -57,8 +57,8 @@ import org.dspace.eperson.dao.GroupDAOFactory;
 import org.dspace.event.Dispatcher;
 import org.dspace.event.Event;
 import org.dspace.event.EventManager;
-import org.dspace.storage.dao.GlobalDAO;
-import org.dspace.storage.dao.GlobalDAOFactory;
+import org.dspace.dao.GlobalDAO;
+import org.dspace.dao.GlobalDAOFactory;
 
 /**
  * Class representing the context of a particular DSpace operation. This stores

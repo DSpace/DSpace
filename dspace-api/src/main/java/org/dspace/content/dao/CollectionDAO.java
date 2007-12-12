@@ -53,8 +53,8 @@ import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.Context;
 import org.dspace.eperson.dao.GroupDAO;
 import org.dspace.eperson.dao.GroupDAOFactory;
-import org.dspace.storage.dao.CRUD;
-import org.dspace.storage.dao.Link;
+import org.dspace.dao.CRUD;
+import org.dspace.dao.Link;
 
 /**
  * @author James Rutherford

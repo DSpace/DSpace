@@ -3,8 +3,8 @@ package org.dspace.content.dao;
 import java.util.UUID;
 import java.util.List;
 
-import org.dspace.storage.dao.CRUD;
-import org.dspace.storage.dao.Link;
+import org.dspace.dao.CRUD;
+import org.dspace.dao.Link;
 import org.dspace.content.Bundle;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;

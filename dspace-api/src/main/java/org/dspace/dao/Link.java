@@ -1,5 +1,5 @@
 /*
- * CommunityDAOFactory.java
+ * Link.java
  *
  * Version: $Revision: 1727 $
  *
@@ -37,23 +37,13 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.content.dao;
+package org.dspace.dao;
 
-import org.dspace.content.dao.postgres.CommunityDAOPostgres;
-import org.dspace.core.Context;
-import org.dspace.dao.StackableDAOFactory;
+import org.dspace.authorize.AuthorizeException;
 
-/**
- * @author James Rutherford
- */
-public class CommunityDAOFactory
+public interface Link<S, T>
 {
-    public static CommunityDAO getInstance(Context context)
-    {
-        return StackableDAOFactory.prepareStack(context,
-                CommunityDAO.class,
-                new CommunityDAOCore(context),
-                new CommunityDAOPostgres(context),
-                "dao.stack.community.enabled");
-    }
+    public void link(S s, T t) throws AuthorizeException;
+    public void unlink(S s, T t) throws AuthorizeException;
+    public boolean linked(S s, T t);
 }

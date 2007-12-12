@@ -40,17 +40,11 @@
 package org.dspace.content.dao;
 
 import java.util.List;
-import java.util.UUID;
-
-import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.storage.dao.CRUD;
 
 public class MetadataValueDAOCore extends MetadataValueDAO
 {

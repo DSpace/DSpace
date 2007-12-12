@@ -41,6 +41,7 @@ package org.dspace.content.dao;
 
 import org.dspace.content.dao.postgres.MetadataValueDAOPostgres;
 import org.dspace.core.Context;
+import org.dspace.dao.StackableDAOFactory;
 
 /**
  * @author James Rutherford
@@ -49,7 +50,7 @@ public class MetadataValueDAOFactory
 {
     public static MetadataValueDAO getInstance(Context context)
     {
-        return ContentDAOFactory.prepareStack(context,
+        return StackableDAOFactory.prepareStack(context,
                 MetadataValueDAO.class,
                 new MetadataValueDAOCore(context),
                 new MetadataValueDAOPostgres(context),

@@ -39,114 +39,83 @@
  */
 package org.dspace.eperson.dao;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.dao.CRUD;
+import org.dspace.dao.StackableDAO;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPerson.EPersonMetadataField;
 import org.dspace.eperson.Group;
-import org.dspace.storage.dao.CRUD;
 
 /**
  * @author James Rutherford
  */
-public abstract class EPersonDAO implements CRUD<EPerson>
+public abstract class EPersonDAO extends StackableDAO<EPersonDAO>
+        implements CRUD<EPerson>
 {
     protected Logger log = Logger.getLogger(EPersonDAO.class);
 
+    protected EPersonDAO childDAO;
+
     protected Context context;
+
+    public EPersonDAO()
+    {
+    }
+
+    public EPersonDAO(Context context)
+    {
+        this.context = context;
+    }
+
+    public EPersonDAO getChild()
+    {
+        return childDAO;
+    }
+
+    public void setChild(EPersonDAO childDAO)
+    {
+        this.childDAO = childDAO;
+    }
 
     public EPerson create() throws AuthorizeException
     {
-        // authorized?
-        if (!AuthorizeManager.isAdmin(context))
-        {
-            throw new AuthorizeException(
-                    "You must be an admin to create an EPerson");
-        }
-
-        return null;
-    }
-
-    // FIXME: This should be called something else, but I can't think of
-    // anything suitable. The reason this can't go in create() is because we
-    // need access to the object that was created, but we can't reach into the
-    // subclass to get it (storing it as a protected member variable would be
-    // even more filthy).
-    protected final EPerson create(EPerson eperson) throws AuthorizeException
-    {
-        log.info(LogManager.getHeader(context, "create_eperson", "eperson_id="
-                    + eperson.getID()));
-
-        return eperson;
+        return childDAO.create();
     }
 
     public EPerson retrieve(int id)
     {
-        return (EPerson) context.fromCache(EPerson.class, id);
+        return childDAO.retrieve(id);
     }
 
     public EPerson retrieve(UUID uuid)
     {
-        return null;
+        return childDAO.retrieve(uuid);
     }
 
     public EPerson retrieve(EPersonMetadataField field, String value)
     {
-        if ((field != EPersonMetadataField.EMAIL) &&
-            (field != EPersonMetadataField.NETID))
-        {
-            throw new IllegalArgumentException(field + " isn't allowed here");
-        }
-
-        return null;
+        return childDAO.retrieve(field, value);
     }
 
     public void update(EPerson eperson) throws AuthorizeException
     {
-        // Check authorisation - if you're not the eperson
-        // see if the authorization system says you can
-        if (!context.ignoreAuthorization() && (
-                    (context.getCurrentUser() == null) ||
-                    !eperson.equals(context.getCurrentUser())))
-        {
-            AuthorizeManager.authorizeAction(context, eperson, Constants.WRITE);
-        }
-
-        log.info(LogManager.getHeader(context, "update_eperson",
-                "eperson_id=" + eperson.getID()));
+        childDAO.update(eperson);
     }
 
     public void delete(int id) throws AuthorizeException
     {
-        EPerson eperson = retrieve(id);
-        update(eperson); // Sync in-memory object before removal
-
-        // authorized?
-        if (!AuthorizeManager.isAdmin(context))
-        {
-            throw new AuthorizeException(
-                    "You must be an admin to delete an EPerson");
-        }
-
-        // Remove from cache
-        context.removeCached(eperson, id);
-
-        log.info(LogManager.getHeader(context, "delete_eperson",
-                "eperson_id=" + id));
+        childDAO.delete(id);
     }
 
     public List<EPerson> getEPeople()
     {
-        return getEPeople(EPerson.LASTNAME);
+        return childDAO.getEPeople();
     }
 
     /**
@@ -157,15 +126,21 @@ public abstract class EPersonDAO implements CRUD<EPerson>
      * <li><code>EMAIL</code></li>
      * <li><code>NETID</code></li>
      * </ul>
-     * 
+     *
      * @return array of EPerson objects
      */
-    public abstract List<EPerson> getEPeople(int sortField);
+    public List<EPerson> getEPeople(int sortField)
+    {
+        return childDAO.getEPeople(sortField);
+    }
 
     /**
      * FIXME: For consistency, this should take a sort parameter.
      */
-    public abstract List<EPerson> getEPeople(Group group);
+    public List<EPerson> getEPeople(Group group)
+    {
+        return childDAO.getEPeople(group);
+    }
 
     /**
      * FIXME: For consistency, this should take a sort parameter. The
@@ -175,7 +150,10 @@ public abstract class EPersonDAO implements CRUD<EPerson>
      * incur a performance penalty, at least for the (default) RDBMS
      * implementation.
      */
-    public abstract List<EPerson> getAllEPeople(Group group);
+    public List<EPerson> getAllEPeople(Group group)
+    {
+        return childDAO.getAllEPeople(group);
+    }
 
     // For reference, here's how we'd do it in a storage-layer agnostic way.
 //    public List<EPerson> getAllEPeople(Group group)
@@ -204,7 +182,7 @@ public abstract class EPersonDAO implements CRUD<EPerson>
      */
     public List<EPerson> search(String query)
     {
-        return search(query, -1, -1);
+        return childDAO.search(query);
     }
 
     /**
@@ -225,42 +203,6 @@ public abstract class EPersonDAO implements CRUD<EPerson>
      */
     public List<EPerson> search(String query, int offset, int limit)
     {
-        if (limit == 0)
-        {
-            return new ArrayList<EPerson>();
-        }
-        
-        if (query == null || "".equals(query))
-        {
-            List<EPerson> epeople = getEPeople();
-
-            if ((offset > -1) || (limit > -1))
-            {
-                int toIndex = epeople.size();
-
-                if (offset < 0)
-                {
-                    offset = 0;
-                }
-                if (limit != -1)
-                {
-                    // If the limit is set to -1 that means there is no limit,
-                    // and we use the toIndex from above, otherwise we just add
-                    // the limit to the offset to get the toIndex.
-                    if ((offset + limit) <= epeople.size())
-                    {
-                        toIndex = offset + limit;
-                    }
-                }
-
-                return epeople.subList(offset, toIndex);
-            }
-            else
-            {
-                return epeople;
-            }
-        }
-
-        return null;
+        return childDAO.search(query, offset, limit);
     }
 }

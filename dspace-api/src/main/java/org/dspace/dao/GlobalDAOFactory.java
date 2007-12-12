@@ -1,5 +1,5 @@
 /*
- * CommunityDAOFactory.java
+ * GlobalDAOFactory.java
  *
  * Version: $Revision: 1727 $
  *
@@ -37,23 +37,20 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.content.dao;
+package org.dspace.dao;
 
-import org.dspace.content.dao.postgres.CommunityDAOPostgres;
-import org.dspace.core.Context;
-import org.dspace.dao.StackableDAOFactory;
+import java.sql.SQLException;
+
+import org.dspace.dao.postgres.GlobalDAOPostgres;
 
 /**
  * @author James Rutherford
  */
-public class CommunityDAOFactory
+public class GlobalDAOFactory
 {
-    public static CommunityDAO getInstance(Context context)
+    // FIXME: This should be a GlobalDAOException
+    public static GlobalDAO getInstance() throws SQLException
     {
-        return StackableDAOFactory.prepareStack(context,
-                CommunityDAO.class,
-                new CommunityDAOCore(context),
-                new CommunityDAOPostgres(context),
-                "dao.stack.community.enabled");
+        return new GlobalDAOPostgres();
     }
 }

@@ -41,6 +41,7 @@ package org.dspace.content.dao;
 
 import org.dspace.content.dao.postgres.MetadataSchemaDAOPostgres;
 import org.dspace.core.Context;
+import org.dspace.dao.StackableDAOFactory;
 
 /**
  * @author James Rutherford
@@ -49,7 +50,7 @@ public class MetadataSchemaDAOFactory
 {
     public static MetadataSchemaDAO getInstance(Context context)
     {
-        return ContentDAOFactory.prepareStack(context,
+        return StackableDAOFactory.prepareStack(context,
                 MetadataSchemaDAO.class,
                 new MetadataSchemaDAOCore(context),
                 new MetadataSchemaDAOPostgres(context),

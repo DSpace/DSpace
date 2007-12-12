@@ -44,9 +44,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
-import org.dspace.storage.dao.DAOStack;
+import org.dspace.dao.StackableDAO;
 
-public abstract class ContentDAO<T> implements DAOStack<T>
+public abstract class ContentDAO<T> extends StackableDAO<T>
 {
     public String toString()
     {

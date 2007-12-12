@@ -1,5 +1,5 @@
 /*
- * CommunityDAOFactory.java
+ * GlobalDAO.java
  *
  * Version: $Revision: 1727 $
  *
@@ -37,23 +37,25 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.content.dao;
+package org.dspace.dao;
 
-import org.dspace.content.dao.postgres.CommunityDAOPostgres;
-import org.dspace.core.Context;
-import org.dspace.dao.StackableDAOFactory;
+import org.apache.log4j.Logger;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * @author James Rutherford
  */
-public class CommunityDAOFactory
+public abstract class GlobalDAO
 {
-    public static CommunityDAO getInstance(Context context)
-    {
-        return StackableDAOFactory.prepareStack(context,
-                CommunityDAO.class,
-                new CommunityDAOCore(context),
-                new CommunityDAOPostgres(context),
-                "dao.stack.community.enabled");
-    }
+	protected static final Logger log = Logger.getLogger(GlobalDAO.class);
+	
+    // FIXME: These should all be GlobalDAOExceptions
+    public abstract void startTransaction() throws SQLException;
+    public abstract void endTransaction() throws SQLException;
+    public abstract void saveTransaction() throws SQLException;
+    public abstract void abortTransaction();
+    public abstract boolean transactionOpen();
+    @Deprecated public abstract Connection getConnection();
 }

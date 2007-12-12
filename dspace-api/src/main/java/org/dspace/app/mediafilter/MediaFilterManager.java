@@ -740,6 +740,7 @@ public class MediaFilterManager
     {
         return currentItem;
     }
+
     /**
      * Check whether or not to skip processing the given identifier
      * 
@@ -759,5 +760,4 @@ public class MediaFilterManager
         else
             return false;
     }
-    
 }

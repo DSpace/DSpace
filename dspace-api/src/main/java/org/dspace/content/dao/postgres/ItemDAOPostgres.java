@@ -237,12 +237,6 @@ public class ItemDAOPostgres extends ItemDAO
     }
 
     @Override
-    public List<Item> getItems(MetadataValue value)
-    {
-        return new ArrayList<Item>();
-    }
-
-    @Override
     public List<Item> getItems(DSpaceObject scope,
             String startDate, String endDate, int offset, int limit,
             boolean items, boolean collections, boolean withdrawn)
@@ -595,11 +589,6 @@ public class ItemDAOPostgres extends ItemDAO
         {
             throw new RuntimeException(sqle);
         }
-    }
-
-    @Override
-    public void decache(Item item)
-    {
     }
 
     ////////////////////////////////////////////////////////////////////

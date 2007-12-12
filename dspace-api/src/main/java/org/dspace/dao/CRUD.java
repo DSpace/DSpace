@@ -1,5 +1,5 @@
 /*
- * CommunityDAOFactory.java
+ * CRUD.java
  *
  * Version: $Revision: 1727 $
  *
@@ -37,23 +37,17 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.content.dao;
+package org.dspace.dao;
 
-import org.dspace.content.dao.postgres.CommunityDAOPostgres;
-import org.dspace.core.Context;
-import org.dspace.dao.StackableDAOFactory;
+import java.util.UUID;
 
-/**
- * @author James Rutherford
- */
-public class CommunityDAOFactory
+import org.dspace.authorize.AuthorizeException;
+
+public interface CRUD<T>
 {
-    public static CommunityDAO getInstance(Context context)
-    {
-        return StackableDAOFactory.prepareStack(context,
-                CommunityDAO.class,
-                new CommunityDAOCore(context),
-                new CommunityDAOPostgres(context),
-                "dao.stack.community.enabled");
-    }
+    public T create() throws AuthorizeException;
+    public T retrieve(int id);
+    public T retrieve(UUID uuid);
+    public void update(T t) throws AuthorizeException;
+    public void delete(int id) throws AuthorizeException;
 }

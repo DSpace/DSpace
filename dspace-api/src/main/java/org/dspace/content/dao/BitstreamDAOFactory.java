@@ -41,6 +41,7 @@ package org.dspace.content.dao;
 
 import org.dspace.content.dao.postgres.BitstreamDAOPostgres;
 import org.dspace.core.Context;
+import org.dspace.dao.StackableDAOFactory;
 
 /**
  * @author James Rutherford
@@ -49,7 +50,7 @@ public class BitstreamDAOFactory
 {
     public static BitstreamDAO getInstance(Context context)
     {
-        return ContentDAOFactory.prepareStack(context,
+        return StackableDAOFactory.prepareStack(context,
                 BitstreamDAO.class,
                 new BitstreamDAOCore(context),
                 new BitstreamDAOPostgres(context),

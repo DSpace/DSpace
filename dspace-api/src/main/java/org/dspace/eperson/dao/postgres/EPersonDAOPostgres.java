@@ -76,21 +76,19 @@ public class EPersonDAOPostgres extends EPersonDAO
         // to check authorization, and we will just get back null rather than
         // an actual EPerson. Maybe the authorization check should just go in
         // EPersonDAO.create(EPerson eperson) instead.
-        EPerson eperson = super.create();
+        UUID uuid = UUID.randomUUID();
 
         try
         {
-            UUID uuid = UUID.randomUUID();
-
             TableRow row = DatabaseManager.create(context, "eperson");
             row.setColumn("uuid", uuid.toString());
             DatabaseManager.update(context, row);
 
             int id = row.getIntColumn("eperson_id");
-            eperson = new EPerson(context, id);
+            EPerson eperson = new EPerson(context, id);
             eperson.setIdentifier(new ObjectIdentifier(uuid));
 
-            return super.create(eperson);
+            return eperson;
         }
         catch (SQLException sqle)
         {
@@ -101,13 +99,6 @@ public class EPersonDAOPostgres extends EPersonDAO
     @Override
     public EPerson retrieve(int id)
     {
-        EPerson eperson = super.retrieve(id);
-
-        if (eperson != null)
-        {
-            return eperson;
-        }
-
         try
         {
             TableRow row = DatabaseManager.find(context, "eperson", id);
@@ -123,13 +114,6 @@ public class EPersonDAOPostgres extends EPersonDAO
     @Override
     public EPerson retrieve(UUID uuid)
     {
-        EPerson eperson = super.retrieve(uuid);
-
-        if (eperson != null)
-        {
-            return eperson;
-        }
-
         try
         {
             TableRow row = DatabaseManager.findByUnique(context, "eperson",
@@ -146,18 +130,6 @@ public class EPersonDAOPostgres extends EPersonDAO
     @Override
     public EPerson retrieve(EPersonMetadataField field, String value)
     {
-        EPerson eperson = super.retrieve(field, value);
-
-        if (eperson != null)
-        {
-            return eperson;
-        }
-
-        if (value == null || "".equals(value))
-        {
-            return null;
-        }
-
         try
         {
             TableRow row = DatabaseManager.findByUnique(context, "eperson",
@@ -174,8 +146,6 @@ public class EPersonDAOPostgres extends EPersonDAO
     @Override
     public void update(EPerson eperson) throws AuthorizeException
     {
-        super.update(eperson);
-
         try
         {
             TableRow row =
@@ -204,8 +174,6 @@ public class EPersonDAOPostgres extends EPersonDAO
     @Override
     public void delete(int id) throws AuthorizeException
     {
-        super.delete(id);
-
         // check for presence of eperson in tables that
         // have constraints on eperson_id
         Vector constraintList = getDeleteConstraints(id);
@@ -363,21 +331,8 @@ public class EPersonDAOPostgres extends EPersonDAO
     }
 
     @Override
-    public List<EPerson> search(String query)
-    {
-        return search(query, -1, -1);
-    }
-
-    @Override
     public List<EPerson> search(String query, int offset, int limit)
     {
-        List<EPerson> results = super.search(query, offset, limit);
-
-        if (results != null)
-        {
-            return results;
-        }
-
         String params = "%" + query.toLowerCase() + "%";
         String dbquery =
             "SELECT eperson_id FROM eperson " +
@@ -431,14 +386,7 @@ public class EPersonDAOPostgres extends EPersonDAO
 
         int id = row.getIntColumn("eperson_id");
 
-        EPerson eperson = super.retrieve(id);
-
-        if (eperson != null)
-        {
-            return eperson;
-        }
-
-        eperson = new EPerson(context, id);
+        EPerson eperson = new EPerson(context, id);
         populateEPersonFromTableRow(eperson, row);
 
         context.cache(eperson, id);

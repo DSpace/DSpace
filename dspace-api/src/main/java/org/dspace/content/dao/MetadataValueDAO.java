@@ -49,7 +49,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
-import org.dspace.storage.dao.CRUD;
+import org.dspace.dao.CRUD;
 
 public abstract class MetadataValueDAO extends ContentDAO<MetadataValueDAO>
         implements CRUD<MetadataValue>

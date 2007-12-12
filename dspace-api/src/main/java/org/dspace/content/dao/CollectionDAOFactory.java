@@ -41,6 +41,7 @@ package org.dspace.content.dao;
 
 import org.dspace.content.dao.postgres.CollectionDAOPostgres;
 import org.dspace.core.Context;
+import org.dspace.dao.StackableDAOFactory;
 
 /**
  * @author James Rutherford
@@ -49,7 +50,7 @@ public class CollectionDAOFactory
 {
     public static CollectionDAO getInstance(Context context)
     {
-        return ContentDAOFactory.prepareStack(context,
+        return StackableDAOFactory.prepareStack(context,
                 CollectionDAO.class,
                 new CollectionDAOCore(context),
                 new CollectionDAOPostgres(context),

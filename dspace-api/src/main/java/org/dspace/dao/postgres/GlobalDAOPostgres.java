@@ -1,5 +1,5 @@
 /*
- * CommunityDAOFactory.java
+ * GlobalDAOPostgres.java
  *
  * Version: $Revision: 1727 $
  *
@@ -37,23 +37,83 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.content.dao;
+package org.dspace.dao.postgres;
 
-import org.dspace.content.dao.postgres.CommunityDAOPostgres;
-import org.dspace.core.Context;
-import org.dspace.dao.StackableDAOFactory;
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import org.dspace.dao.GlobalDAO;
+import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
  * @author James Rutherford
  */
-public class CommunityDAOFactory
+public class GlobalDAOPostgres extends GlobalDAO
 {
-    public static CommunityDAO getInstance(Context context)
+    private Connection connection;
+
+    // FIXME: This should be a GlobalDAOException
+    public GlobalDAOPostgres() throws SQLException
     {
-        return StackableDAOFactory.prepareStack(context,
-                CommunityDAO.class,
-                new CommunityDAOCore(context),
-                new CommunityDAOPostgres(context),
-                "dao.stack.community.enabled");
+        startTransaction();
+    }
+
+    public boolean transactionOpen()
+    {
+        return (connection != null);
+    }
+
+    public void startTransaction() throws SQLException
+    {
+        // Obtain a non-auto-committing connection
+        connection = DatabaseManager.getConnection();
+        connection.setAutoCommit(false);
+    }
+
+    public void endTransaction() throws SQLException
+    {
+        try
+        {
+            // Commit any changes made as part of the transaction
+            connection.commit();
+        }
+        finally
+        {
+            // Free the connection
+            DatabaseManager.freeConnection(connection);
+            connection = null;
+        }
+    }
+
+    public void saveTransaction() throws SQLException
+    {
+        connection.commit();
+    }
+
+    public void abortTransaction()
+    {
+        try
+        {
+            connection.rollback();
+        }
+        catch (SQLException sqle)
+        {
+            log.error(sqle.getMessage());
+        }
+        finally
+        {
+            DatabaseManager.freeConnection(connection);
+            connection = null;
+        }
+    }
+
+    /**
+     * This method will only exist until no-one calls the RDBMS-centric
+     * Context.getDBConnection() any more.
+     */
+    @Deprecated
+    public Connection getConnection()
+    {
+        return connection;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * CommunityDAOFactory.java
+ * GlobalDAOException.java
  *
  * Version: $Revision: 1727 $
  *
@@ -37,23 +37,23 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.content.dao;
 
-import org.dspace.content.dao.postgres.CommunityDAOPostgres;
-import org.dspace.core.Context;
-import org.dspace.dao.StackableDAOFactory;
+package org.dspace.dao;
 
-/**
- * @author James Rutherford
- */
-public class CommunityDAOFactory
-{
-    public static CommunityDAO getInstance(Context context)
-    {
-        return StackableDAOFactory.prepareStack(context,
-                CommunityDAO.class,
-                new CommunityDAOCore(context),
-                new CommunityDAOPostgres(context),
-                "dao.stack.community.enabled");
+public class GlobalDAOException extends RuntimeException
+{   
+    public GlobalDAOException(String msg)
+    {   
+        super(msg);
+    }
+
+    public GlobalDAOException(String msg, Throwable cause)
+    {   
+        super(msg, cause);
+    }
+
+    public GlobalDAOException(Throwable cause)
+    {   
+        super(cause);
     }
 }

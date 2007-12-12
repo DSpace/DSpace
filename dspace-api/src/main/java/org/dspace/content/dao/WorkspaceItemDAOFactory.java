@@ -41,12 +41,13 @@ package org.dspace.content.dao;
 
 import org.dspace.content.dao.postgres.WorkspaceItemDAOPostgres;
 import org.dspace.core.Context;
+import org.dspace.dao.StackableDAOFactory;
 
 public class WorkspaceItemDAOFactory
 {
     public static WorkspaceItemDAO getInstance(Context context)
     {
-        return ContentDAOFactory.prepareStack(context,
+        return StackableDAOFactory.prepareStack(context,
                 WorkspaceItemDAO.class,
                 new WorkspaceItemDAOCore(context),
                 new WorkspaceItemDAOPostgres(context),

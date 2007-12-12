@@ -55,8 +55,8 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.storage.dao.CRUD;
-import org.dspace.storage.dao.Link;
+import org.dspace.dao.CRUD;
+import org.dspace.dao.Link;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 

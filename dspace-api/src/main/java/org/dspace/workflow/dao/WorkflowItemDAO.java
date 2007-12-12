@@ -53,7 +53,7 @@ import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.content.dao.WorkspaceItemDAO;
 import org.dspace.eperson.EPerson;
-import org.dspace.storage.dao.CRUD;
+import org.dspace.dao.CRUD;
 import org.dspace.workflow.TaskListItem;
 import org.dspace.workflow.WorkflowItem;
 

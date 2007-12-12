@@ -40,6 +40,7 @@
 package org.dspace.eperson.dao;
 
 import org.dspace.core.Context;
+import org.dspace.dao.StackableDAOFactory;
 import org.dspace.eperson.dao.postgres.EPersonDAOPostgres;
 
 /**
@@ -49,6 +50,10 @@ public class EPersonDAOFactory
 {
     public static EPersonDAO getInstance(Context context)
     {
-        return new EPersonDAOPostgres(context);
+        return StackableDAOFactory.prepareStack(context,
+                EPersonDAO.class,
+                new EPersonDAOCore(context),
+                new EPersonDAOPostgres(context),
+                "dao.stack.eperson.enabled");
     }
 }

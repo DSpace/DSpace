@@ -53,8 +53,8 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.storage.dao.CRUD;
-import org.dspace.storage.dao.Link;
+import org.dspace.dao.CRUD;
+import org.dspace.dao.Link;
 
 /**
  * FIXME: We actually implement the Link interface for two other pairs of

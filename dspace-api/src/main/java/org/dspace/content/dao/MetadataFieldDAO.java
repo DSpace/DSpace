@@ -48,7 +48,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.Context;
-import org.dspace.storage.dao.CRUD;
+import org.dspace.dao.CRUD;
 
 public abstract class MetadataFieldDAO extends ContentDAO<MetadataFieldDAO>
         implements CRUD<MetadataField>
