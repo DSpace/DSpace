@@ -298,6 +298,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>certificate-login</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.X509CertificateServlet</servlet-class>
+  </servlet>
+  
+  <servlet>
     <servlet-name>profile</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.EditProfileServlet</servlet-class>
   </servlet>
@@ -543,6 +548,11 @@
     <url-pattern>/ldap-login</url-pattern>
   </servlet-mapping>
 
+  <servlet-mapping>
+    <servlet-name>certificate-login</servlet-name>
+    <url-pattern>/certificate-login</url-pattern>
+  </servlet-mapping>
+  
   <servlet-mapping>
     <servlet-name>profile</servlet-name>
     <url-pattern>/profile</url-pattern>

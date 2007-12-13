@@ -110,6 +110,10 @@ public class X509Authentication
     /** key store for CA certs if we use that */
     private static KeyStore caCertKeyStore = null;
 
+    private static String loginPageTitle = null;
+    
+    private static String loginPageURL = null;
+    
     /**
      * Initialization:
      *  Set caPublicKey and/or keystore.  This loads the information
@@ -117,6 +121,14 @@ public class X509Authentication
      */
     static
     {
+        /*
+         * allow identification of alternative entry points 
+         * for certificate authentication when
+         * selected by the user rather than implicitly.
+         */
+        loginPageTitle = ConfigurationManager.getProperty("authentication.x509.chooser.title.key");
+        loginPageURL = ConfigurationManager.getProperty("authentication.x509.chooser.uri");
+        
         String keystorePath = ConfigurationManager.getProperty("authentication.x509.keystore.path");
         String keystorePassword = ConfigurationManager.getProperty("authentication.x509.keystore.password");
         String caCertPath = ConfigurationManager.getProperty("authentication.x509.ca.cert");
@@ -457,10 +469,10 @@ public class X509Authentication
     }
 
     /**
-     * Return null, since this is an implicit method with no login page.
+     * Returns URL of password-login servlet.
      *
      * @param context
-     *  DSpace context, will be modified (ePerson set) upon success.
+     *  DSpace context, will be modified (EPerson set) upon success.
      *
      * @param request
      *  The HTTP request that started this operation, or null if not applicable.
@@ -474,19 +486,20 @@ public class X509Authentication
                             HttpServletRequest request,
                             HttpServletResponse response)
     {
-        return null;
+        return loginPageURL;
     }
 
     /**
-     * Return null, since this is an implicit method with no login page.
+     * Returns message key for title of the "login" page, to use
+     * in a menu showing the choice of multiple login methods.
      *
      * @param context
-     *  DSpace context, will be modified (ePerson set) upon success.
+     *  DSpace context, will be modified (EPerson set) upon success.
      *
      * @return Message key to look up in i18n message catalog.
      */
     public String loginPageTitle(Context context)
     {
-        return null;
+        return loginPageTitle;
     }
 }
