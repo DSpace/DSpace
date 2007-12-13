@@ -60,11 +60,6 @@ import org.dspace.eperson.Group;
  */
 public class GroupDAOCore extends GroupDAO
 {
-    protected Logger log = Logger.getLogger(GroupDAO.class);
-
-    protected Context context;
-    protected EPersonDAO epersonDAO;
-
     public GroupDAOCore(Context context)
     {
         super(context);

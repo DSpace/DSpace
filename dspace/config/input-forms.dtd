@@ -6,7 +6,7 @@
  <!ELEMENT form-map (name-map)* >
  <!ELEMENT name-map EMPTY >
  <!ATTLIST name-map 
-           collection-handle CDATA #REQUIRED
+           collection-uri CDATA #REQUIRED
            form-name NMTOKEN #REQUIRED>
 
  <!ELEMENT form-definitions (form)+ >

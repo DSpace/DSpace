@@ -77,6 +77,8 @@ public abstract class GroupDAO extends StackableDAO<GroupDAO>
     public GroupDAO(Context context)
     {
         this.context = context;
+
+        epersonDAO = EPersonDAOFactory.getInstance(context);
     }
 
     public GroupDAO getChild()
