@@ -597,9 +597,9 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
     {
         try
         {
-            String query = "DELETE FROM " + table + 
-                            " WHERE id NOT IN " +
-                            "(SELECT distinct_id FROM " + map + ")";
+            String query = "DELETE FROM " + table +
+                            " WHERE id IN (SELECT id FROM " + table +
+                            " MINUS SELECT distinct_id AS id FROM " + map + ")";
             
             DatabaseManager.updateQuery(context, query);
         }
@@ -615,26 +615,20 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
      */
     public void pruneExcess(String table, String map, boolean withdrawn) throws BrowseException
     {
-        TableRowIterator tri = null;
-        
         try
         {
-            String query = "SELECT item_id FROM " + table + " WHERE item_id NOT IN ( SELECT item_id FROM item WHERE ";
-
+            String itemQuery = "SELECT item_id FROM item WHERE ";
             if (withdrawn)
-                query += "withdrawn = 1";
+                itemQuery += "withdrawn = 1";
             else
-                query += "in_archive = 1 AND withdrawn = 0";
+                itemQuery += "in_archive = 1 AND withdrawn = 0";
 
-            query += ")";
+            String delete         = "DELETE FROM " + table + " WHERE item_id IN ( SELECT item_id FROM " + table + " MINUS " + itemQuery + ")";
+            DatabaseManager.updateQuery(context, delete);
 
-            tri = DatabaseManager.query(context, query);
-            while (tri.hasNext())
+            if (map != null)
             {
-                TableRow row = tri.next();
-                String delete = "DELETE FROM " + table + " WHERE item_id = " + Integer.toString(row.getIntColumn("item_id"));
-                String deleteDistinct = "DELETE FROM " + map + " WHERE item_id = " + Integer.toString(row.getIntColumn("item_id"));
-                DatabaseManager.updateQuery(context, delete);
+                String deleteDistinct = "DELETE FROM " + map   + " WHERE item_id IN ( SELECT item_id FROM " + map   + " MINUS " + itemQuery + ")";
                 DatabaseManager.updateQuery(context, deleteDistinct);
             }
         }
@@ -642,13 +636,6 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         {
             log.error("caught exception: ", e);
             throw new BrowseException(e);
-        }
-        finally
-        {
-            if (tri != null)
-            {
-                tri.close();
-            }
         }
     }
 
