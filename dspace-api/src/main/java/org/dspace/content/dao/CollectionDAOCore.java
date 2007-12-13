@@ -105,7 +105,7 @@ public class CollectionDAOCore extends CollectionDAO
                 "collection_id=" + collection.getID())
                 + ",uri=" +
                 collection.getIdentifier().getCanonicalForm());
-        
+
         return collection;
     }
 

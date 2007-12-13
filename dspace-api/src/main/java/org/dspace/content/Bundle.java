@@ -51,13 +51,12 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
-import org.dspace.content.dao.BitstreamDAO;         // Naughty!
-import org.dspace.content.dao.BitstreamDAOFactory;  // Naughty!
-import org.dspace.content.dao.BundleDAO;            // Naughty!
-import org.dspace.content.dao.BundleDAOFactory;     // Naughty!
-import org.dspace.content.dao.ItemDAO;              // Naughty!
-import org.dspace.content.dao.ItemDAOFactory;       // Naughty!
+import org.dspace.content.dao.BitstreamDAO;
+import org.dspace.content.dao.BitstreamDAOFactory;
+import org.dspace.content.dao.BundleDAO;
+import org.dspace.content.dao.BundleDAOFactory;
+import org.dspace.content.dao.ItemDAO;
+import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.event.Event;
 
 /**
@@ -271,7 +270,7 @@ public class Bundle extends DSpaceObject
     {
         dao.delete(this.getID());
         context.addEvent(new Event(Event.DELETE, Constants.BUNDLE, getID(), getIdentifier().getCanonicalForm()));
-        
+
     }
 
     @Deprecated

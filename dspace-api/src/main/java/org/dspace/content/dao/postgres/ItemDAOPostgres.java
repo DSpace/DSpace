@@ -530,43 +530,47 @@ public class ItemDAOPostgres extends ItemDAO
     @Override
     public void link(Item item, Bundle bundle) throws AuthorizeException
     {
-        if (!linked(item, bundle))
+        if (linked(item, bundle))
         {
-            try
-            {
-                TableRow row = DatabaseManager.create(context, "item2bundle");
-                row.setColumn("item_id", item.getID());
-                row.setColumn("bundle_id", bundle.getID());
-                DatabaseManager.update(context, row);
+            return;
+        }
 
-                // If we're adding the Bundle to the Item, we bequeath our
-                // policies unto it.
-                AuthorizeManager.inheritPolicies(context, item, bundle);
-            }
-            catch (SQLException sqle)
-            {
-                throw new RuntimeException(sqle);
-            }
+        try
+        {
+            TableRow row = DatabaseManager.create(context, "item2bundle");
+            row.setColumn("item_id", item.getID());
+            row.setColumn("bundle_id", bundle.getID());
+            DatabaseManager.update(context, row);
+
+            // If we're adding the Bundle to the Item, we bequeath our
+            // policies unto it.
+            AuthorizeManager.inheritPolicies(context, item, bundle);
+        }
+        catch (SQLException sqle)
+        {
+            throw new RuntimeException(sqle);
         }
     }
 
     @Override
     public void unlink(Item item, Bundle bundle) throws AuthorizeException
     {
-        if (linked(item, bundle))
+        if (!linked(item, bundle))
         {
-            try
-            {
-                // Remove bundle mappings from DB
-                DatabaseManager.updateQuery(context,
-                        "DELETE FROM item2bundle WHERE item_id= ? " +
-                        "AND bundle_id= ? ",
-                        item.getID(), bundle.getID());
-            }
-            catch (SQLException sqle)
-            {
-                throw new RuntimeException(sqle);
-            }
+            return;
+        }
+
+        try
+        {
+            // Remove bundle mappings from DB
+            DatabaseManager.updateQuery(context,
+                    "DELETE FROM item2bundle WHERE item_id= ? " +
+                    "AND bundle_id= ? ",
+                    item.getID(), bundle.getID());
+        }
+        catch (SQLException sqle)
+        {
+            throw new RuntimeException(sqle);
         }
     }
 

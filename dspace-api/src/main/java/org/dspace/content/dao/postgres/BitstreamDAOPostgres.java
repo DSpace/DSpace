@@ -70,7 +70,7 @@ public class BitstreamDAOPostgres extends BitstreamDAO
     }
 
     @Override
-    public Bitstream create()throws AuthorizeException
+    public Bitstream create() throws AuthorizeException
     {
         UUID uuid = UUID.randomUUID();
 

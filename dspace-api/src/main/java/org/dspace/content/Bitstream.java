@@ -46,10 +46,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.dao.BitstreamDAO;         // Naughty!
-import org.dspace.content.dao.BitstreamDAOFactory;  // Naughty!
-import org.dspace.content.dao.BundleDAO;            // Naughty!
-import org.dspace.content.dao.BundleDAOFactory;     // Naughty!
+import org.dspace.content.dao.BitstreamDAO;
+import org.dspace.content.dao.BitstreamDAOFactory;
+import org.dspace.content.dao.BundleDAO;
+import org.dspace.content.dao.BundleDAOFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Event;

@@ -41,13 +41,10 @@ package org.dspace.content.dao;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
-import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -83,9 +80,10 @@ public class BitstreamDAOCore extends BitstreamDAO
         return bs;
     }
 
-    protected final Bitstream create(Bitstream bitstream)
-        throws AuthorizeException
+    public Bitstream create() throws AuthorizeException
     {
+        Bitstream bitstream = childDAO.create();
+
         // FIXME: Think about this
         AuthorizeManager.addPolicy(
                 context, bitstream, Constants.WRITE, context.getCurrentUser());

@@ -58,18 +58,18 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
-import org.dspace.content.dao.BitstreamDAO;         // Naughty!
-import org.dspace.content.dao.BitstreamDAOFactory;  // Naughty!
-import org.dspace.content.dao.CollectionDAO;        // Naughty!
-import org.dspace.content.dao.CollectionDAOFactory; // Naughty!
-import org.dspace.content.dao.CommunityDAO;         // Naughty!
-import org.dspace.content.dao.CommunityDAOFactory;  // Naughty!
-import org.dspace.content.dao.ItemDAO;              // Naughty!
-import org.dspace.content.dao.ItemDAOFactory;       // Naughty!
+import org.dspace.content.dao.BitstreamDAO;
+import org.dspace.content.dao.BitstreamDAOFactory;
+import org.dspace.content.dao.CollectionDAO;
+import org.dspace.content.dao.CollectionDAOFactory;
+import org.dspace.content.dao.CommunityDAO;
+import org.dspace.content.dao.CommunityDAOFactory;
+import org.dspace.content.dao.ItemDAO;
+import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.dao.GroupDAO;             // Naughty!
-import org.dspace.eperson.dao.GroupDAOFactory;      // Naughty!
+import org.dspace.eperson.dao.GroupDAO;
+import org.dspace.eperson.dao.GroupDAOFactory;
 import org.dspace.event.Event;
 
 /**
@@ -246,8 +246,6 @@ public class Collection extends DSpaceObject
             }
         }
         metadata.put(field, value);
-        modifiedMetadata = true;
-        addDetails(field);
         modifiedMetadata = true;
         addDetails(field);
     }
@@ -599,9 +597,6 @@ public class Collection extends DSpaceObject
 
     ////////////////////////////////////////////////////////////////////
     // Deprecated methods
-    //
-    // FIXME: All the addEvent() code in the deprecated methods below
-    // should be moved to the appropriate replacement methods.
     ////////////////////////////////////////////////////////////////////
 
     @Deprecated
@@ -632,7 +627,7 @@ public class Collection extends DSpaceObject
     {
         dao.update(this);
         
-	if (modified)
+        if (modified)
         {
             context.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), null));
             modified = false;

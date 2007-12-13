@@ -86,20 +86,20 @@ public abstract class DSpaceObject
      * the cache if it needs to.
      * @param detail detail string to add.
      */
-    protected void addDetails(String d)
+    protected void addDetails(String detail)
     {
         if (eventDetails == null)
         {
-            eventDetails = new StringBuffer(d);
+            eventDetails = new StringBuffer(detail);
         }
         else
         {
-            eventDetails.append(", ").append(d);
+            eventDetails.append(", ").append(detail);
         }
     }
 
     /**
-     * @returns summary of event details, or null if there are none.
+     * @return summary of event details, or null if there are none.
      */
     protected String getDetails()
     {

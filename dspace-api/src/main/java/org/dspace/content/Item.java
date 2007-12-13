@@ -125,7 +125,7 @@ public class Item extends DSpaceObject
 
         modified = false;
         clearDetails();
-        
+
         dao = ItemDAOFactory.getInstance(context);
         bitstreamDAO = BitstreamDAOFactory.getInstance(context);
         bitstreamFormatDAO = BitstreamFormatDAOFactory.getInstance(context);

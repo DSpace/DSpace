@@ -41,8 +41,8 @@ package org.dspace.authorize;
 
 import java.util.Date;
 
-import org.dspace.authorize.dao.ResourcePolicyDAO;          // Naughty!
-import org.dspace.authorize.dao.ResourcePolicyDAOFactory;   // Naughty!
+import org.dspace.authorize.dao.ResourcePolicyDAO;
+import org.dspace.authorize.dao.ResourcePolicyDAOFactory;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;

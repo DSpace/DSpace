@@ -39,15 +39,12 @@
  */
 package org.dspace.content.dao;
 
-import java.util.List;
-import java.util.UUID;
-
 import org.apache.log4j.Logger;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
