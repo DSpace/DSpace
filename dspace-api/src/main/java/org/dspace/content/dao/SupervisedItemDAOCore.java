@@ -41,8 +41,6 @@ package org.dspace.content.dao;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import org.dspace.content.SupervisedItem;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;

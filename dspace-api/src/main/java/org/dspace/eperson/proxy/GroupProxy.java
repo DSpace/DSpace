@@ -39,7 +39,6 @@
  */
 package org.dspace.eperson.proxy;
 
-import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -53,8 +52,6 @@ import org.dspace.eperson.Group;
  */
 public class GroupProxy extends Group
 {
-    private static Logger log = Logger.getLogger(GroupProxy.class);
-
     private boolean epeopleChanged = false;
     private boolean groupsChanged = false;
 
@@ -180,7 +177,7 @@ public class GroupProxy extends Group
             loadGroups();
         }
 
-        return (Group[]) groups.toArray(new Group[0]);
+        return groups.toArray(new Group[0]);
     }
 
     @Override
@@ -191,7 +188,7 @@ public class GroupProxy extends Group
             loadEPeople();
         }
 
-        return (EPerson[]) epeople.toArray(new EPerson[0]);
+        return epeople.toArray(new EPerson[0]);
     }
 
     ////////////////////////////////////////////////////////////////////

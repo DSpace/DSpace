@@ -141,7 +141,6 @@ public class CommunityDAOCore extends CommunityDAO
         try
         {
             Community community = retrieve(id);
-            update(community); // Sync in-memory object before removal
 
             context.removeCached(community, id);
 

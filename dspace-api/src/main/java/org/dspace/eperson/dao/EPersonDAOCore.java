@@ -123,9 +123,6 @@ public class EPersonDAOCore extends EPersonDAO
 
     public void delete(int id) throws AuthorizeException
     {
-        EPerson eperson = retrieve(id);
-        update(eperson); // Sync in-memory object before removal
-
         // authorized?
         if (!AuthorizeManager.isAdmin(context))
         {
@@ -133,7 +130,8 @@ public class EPersonDAOCore extends EPersonDAO
                     "You must be an admin to delete an EPerson");
         }
 
-        // Remove from cache
+        EPerson eperson = retrieve(id);
+
         context.removeCached(eperson, id);
 
         log.info(LogManager.getHeader(context, "delete_eperson",

@@ -39,14 +39,12 @@
  */
 package org.dspace.content.dao;
 
-import java.util.List;
-import java.util.UUID;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.content.BitstreamFormat;
 
 /**
  * @author James Rutherford
@@ -116,17 +114,14 @@ public class BitstreamFormatDAOCore extends BitstreamFormatDAO
                     "Only administrators can delete bitstream formats");
         }
 
-        // Find "unknown" type
-        BitstreamFormat unknown = BitstreamFormat.findUnknown(context);
+        BitstreamFormat bitstreamFormat = retrieve(id);
 
-        if (unknown.getID() == id)
+        if (bitstreamFormat.getShortDescription().equals(
+                BitstreamFormat.UNKNOWN_SHORT_DESCRIPTION))
         {
             throw new IllegalArgumentException(
                     "The Unknown bitstream format may not be deleted.");
         }
-
-        BitstreamFormat bitstreamFormat = retrieve(id);
-        update(bitstreamFormat); // Sync in-memory object before removal
 
         context.removeCached(bitstreamFormat, id);
 

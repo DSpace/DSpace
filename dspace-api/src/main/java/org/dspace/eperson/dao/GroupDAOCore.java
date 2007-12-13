@@ -41,13 +41,11 @@ package org.dspace.eperson.dao;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -90,17 +88,14 @@ public class GroupDAOCore extends GroupDAO
 
     public Group retrieve(int id)
     {
-        return (Group) context.fromCache(Group.class, id);
-    }
+        Group group = (Group) context.fromCache(Group.class, id);
 
-    public Group retrieve(UUID uuid)
-    {
-        return null;
-    }
+        if (group == null)
+        {
+            group = childDAO.retrieve(id);
+        }
 
-    public Group retrieve(String name)
-    {
-        return null;
+        return group;
     }
 
     /**
@@ -169,18 +164,21 @@ public class GroupDAOCore extends GroupDAO
         {
             link(group, eperson);
         }
+
+        childDAO.update(group);
     }
 
     public void delete(int id) throws AuthorizeException
     {
-        Group group = retrieve(id);
-        update(group); // Sync in-memory object before removal
-
         if (!AuthorizeManager.isAdmin(context))
         {
             throw new AuthorizeException(
                     "You must be an admin to delete a Group");
         }
+
+        Group group = retrieve(id);
+
+        context.removeCached(group, id);
 
         // Remove any ResourcePolicies that reference this group
         AuthorizeManager.removeGroupPolicies(context, id);
@@ -188,8 +186,7 @@ public class GroupDAOCore extends GroupDAO
         log.info(LogManager.getHeader(context, "delete_group", "group_id=" +
                     id));
 
-        // Remove from cache
-        context.removeCached(group, id);
+        childDAO.delete(id);
     }
 
     public List<Group> getGroups()

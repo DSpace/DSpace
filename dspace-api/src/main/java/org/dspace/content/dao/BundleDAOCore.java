@@ -71,11 +71,7 @@ public class BundleDAOCore extends BundleDAO
     @Override
     public Bundle create() throws AuthorizeException
     {
-        Bundle bundle = null;
-
-        // pre-processing goes here
-
-        bundle =  childDAO.create();
+        Bundle bundle =  childDAO.create();
 
         log.info(LogManager.getHeader(context, "create_bundle", "bundle_id="
                 + bundle.getID()));
@@ -138,7 +134,6 @@ public class BundleDAOCore extends BundleDAO
     public void delete(int id) throws AuthorizeException
     {
         Bundle bundle = retrieve(id);
-        update(bundle); // Sync in-memory object before removal
 
         context.removeCached(bundle, id);
 

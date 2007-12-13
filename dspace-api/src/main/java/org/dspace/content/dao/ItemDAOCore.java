@@ -291,7 +291,6 @@ public class ItemDAOCore extends ItemDAO
     public void delete(int id) throws AuthorizeException
     {
         Item item = retrieve(id);
-        update(item); // Sync in-memory object before removal
 
         context.removeCached(item, id);
 

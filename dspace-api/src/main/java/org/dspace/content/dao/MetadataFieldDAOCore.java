@@ -149,15 +149,14 @@ public class MetadataFieldDAOCore extends MetadataFieldDAO
     @Override
     public void delete(int id) throws AuthorizeException
     {
-        MetadataField field = retrieve(id);
-        update(field); // Sync in-memory object before removal
-
         // Check authorisation: Only admins may delete metadata fields
         if (!AuthorizeManager.isAdmin(context))
         {
             throw new AuthorizeException(
                     "Only administrators may modify the metadata registry");
         }
+
+        MetadataField field = retrieve(id);
 
         log.info(LogManager.getHeader(context, "delete_metadata_field",
                 "metadata_field_id=" + id));

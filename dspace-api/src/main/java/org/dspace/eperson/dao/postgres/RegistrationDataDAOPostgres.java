@@ -116,8 +116,6 @@ public class RegistrationDataDAOPostgres extends RegistrationDataDAO
     @Override
     public void delete(int id)
     {
-        super.delete(id);
-
         try
         {
             DatabaseManager.delete(context, "registrationdata", id);
@@ -131,8 +129,6 @@ public class RegistrationDataDAOPostgres extends RegistrationDataDAO
     @Override
     public void delete(String token)
     {
-        super.delete(token);
-
         try
         {
             DatabaseManager.deleteByValue(context, "registrationdata", "token",

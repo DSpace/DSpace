@@ -121,7 +121,6 @@ public abstract class WorkflowItemDAO implements CRUD<WorkflowItem>
     public void delete(int id) throws AuthorizeException
     {
         WorkflowItem wfi = retrieve(id);
-        update(wfi); // Sync in-memory object before removal
 
         context.removeCached(wfi, id);
 

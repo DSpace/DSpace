@@ -264,12 +264,6 @@ public class BitstreamFormat
 
     /** Deprecated by the introduction of DAOs */
     @Deprecated
-    BitstreamFormat(Context context, org.dspace.storage.rdbms.TableRow row)
-    {
-        this(context, row.getIntColumn("bitstream_format_id"));
-    }
-
-    @Deprecated
     public static BitstreamFormat create(Context context)
         throws AuthorizeException
     {
@@ -333,7 +327,7 @@ public class BitstreamFormat
         BitstreamFormatDAO dao = BitstreamFormatDAOFactory.getInstance(context);
         List<BitstreamFormat> formats = dao.getBitstreamFormats();
 
-        return (BitstreamFormat[]) formats.toArray(new BitstreamFormat[0]);
+        return formats.toArray(new BitstreamFormat[0]);
     }
 
     @Deprecated
@@ -342,6 +336,6 @@ public class BitstreamFormat
         BitstreamFormatDAO dao = BitstreamFormatDAOFactory.getInstance(context);
         List<BitstreamFormat> formats = dao.getBitstreamFormats(false);
 
-        return (BitstreamFormat[]) formats.toArray(new BitstreamFormat[0]);
+        return formats.toArray(new BitstreamFormat[0]);
     }
 }

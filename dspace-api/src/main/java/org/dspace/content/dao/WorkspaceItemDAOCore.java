@@ -208,7 +208,6 @@ public class WorkspaceItemDAOCore extends WorkspaceItemDAO
     public void delete(int id) throws AuthorizeException
     {
         WorkspaceItem wsi = retrieve(id);
-        update(wsi); // Sync in-memory object before removal
 
         context.removeCached(wsi, id);
 
@@ -236,7 +235,6 @@ public class WorkspaceItemDAOCore extends WorkspaceItemDAO
     public void deleteAll(int id) throws AuthorizeException
     {
         WorkspaceItem wsi = retrieve(id);
-        update(wsi); // Sync in-memory object before removal
         Item item = wsi.getItem();
         Collection collection = wsi.getCollection();
 

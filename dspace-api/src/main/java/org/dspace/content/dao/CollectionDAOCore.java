@@ -159,7 +159,6 @@ public class CollectionDAOCore extends CollectionDAO
         try
         {
             Collection collection = retrieve(id);
-            update(collection); // Sync in-memory object before removal
 
             log.info(LogManager.getHeader(context, "delete_collection",
                     "collection_id=" + id));

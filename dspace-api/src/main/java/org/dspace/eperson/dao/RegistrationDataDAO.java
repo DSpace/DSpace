@@ -58,16 +58,6 @@ public abstract class RegistrationDataDAO
     public abstract RegistrationData retrieveByEmail(String email);
     public abstract RegistrationData retrieveByToken(String token);
     public abstract void update(RegistrationData registrationData);
-
-    public void delete(int id)
-    {
-        RegistrationData rd = retrieve(id);
-        update(rd);
-    }
-
-    public void delete(String token)
-    {
-        RegistrationData rd = retrieveByToken(token);
-        update(rd);
-    }
+    public abstract void delete(int id);
+    public abstract void delete(String token);
 }

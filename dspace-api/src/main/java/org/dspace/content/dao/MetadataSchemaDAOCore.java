@@ -130,27 +130,24 @@ public class MetadataSchemaDAOCore extends MetadataSchemaDAO
     @Override
     public void delete(int id) throws AuthorizeException
     {
-        MetadataSchema schema = retrieve(id);
-        update(schema); // Sync in-memory object before removal
-
         if (!AuthorizeManager.isAdmin(context))
         {
             throw new AuthorizeException(
                     "Only administrators may modify the metadata registry");
         }
 
-        // Ideally, we'd log the action after the operation had taken place,
-        // but it's not desperately important.
+        MetadataSchema schema = retrieve(id);
+
         log.info(LogManager.getHeader(context, "delete_metadata_schema",
                 "metadata_schema_id=" + id));
 
+        context.removeCached(schema, id);
+
         MetadataFieldDAO dao = MetadataFieldDAOFactory.getInstance(context);
-        for (MetadataField field : dao.getMetadataFields(id))
+        for (MetadataField field : dao.getMetadataFields(schema))
         {
             dao.delete(field.getID());
         }
-
-        context.removeCached(schema, id);
 
         childDAO.delete(id);
     }
