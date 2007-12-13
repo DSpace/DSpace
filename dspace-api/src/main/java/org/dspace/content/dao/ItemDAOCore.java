@@ -97,11 +97,6 @@ public class ItemDAOCore extends ItemDAO
         return item;
     }
 
-    public Item retrieve(UUID uuid)
-    {
-        return childDAO.retrieve(uuid);
-    }
-
     public void update(Item item) throws AuthorizeException
     {
         // Check authorisation. We only do write authorization if user is
@@ -334,84 +329,34 @@ public class ItemDAOCore extends ItemDAO
         childDAO.decache(item);
     }
 
-    public List<Item> getItems()
-    {
-        return childDAO.getItems();
-    }
-
     public List<Item> getItems(MetadataValue value)
     {
         return getItems(value, null, null);
     }
 
-    public List<Item> getItems(DSpaceObject scope,
-                                        String startDate, String endDate,
-                                        int offset, int limit,
-                                        boolean items, boolean collections,
-                                        boolean withdrawn)
-            throws ParseException
-    {
-        return childDAO.getItems(scope, startDate, endDate, offset, limit,
-                items, collections, withdrawn);
-    }
-
-    public List<Item> getItems(MetadataValue value,
-                                        Date startDate, Date endDate)
-    {
-        return childDAO.getItems(value, startDate, endDate);
-    }
-
-    public List<Item> getItemsByCollection(Collection collection)
-    {
-        return childDAO.getItemsByCollection(collection);
-    }
-
-    public List<Item> getItemsBySubmitter(EPerson eperson)
-    {
-        return childDAO.getItemsBySubmitter(eperson);
-    }
-
-    public List<Item> getParentItems(Bundle bundle)
-    {
-        return childDAO.getParentItems(bundle);
-    }
-
-    public boolean linked(Item item, Bundle bundle)
-    {
-        return childDAO.linked(item, bundle);
-    }
-
-    public void loadMetadata(Item item)
-    {
-        childDAO.loadMetadata(item);
-    }
-
-    public List<DCValue> getMetadata(Item item, String schema, String element,
-                                     String qualifier, String lang)
-    {
-        return childDAO.getMetadata(item, schema, element, qualifier, lang);
-    }
-
     public void link(Item item, Bundle bundle) throws AuthorizeException
     {
-        if (!linked(item, bundle))
+        if (linked(item, bundle))
         {
-            AuthorizeManager.authorizeAction(context, item, Constants.ADD);
-
-            log.info(LogManager.getHeader(context, "add_bundle", "item_id="
-                    + item.getID() + ",bundle_id=" + bundle.getID()));
-
-            item.addBundle(bundle);
+            return;
         }
+
+        AuthorizeManager.authorizeAction(context, item, Constants.ADD);
+
+        log.info(LogManager.getHeader(context, "add_bundle", "item_id="
+                + item.getID() + ",bundle_id=" + bundle.getID()));
 
         childDAO.link(item, bundle);
     }
 
     public void unlink(Item item, Bundle bundle) throws AuthorizeException
     {
-        AuthorizeManager.authorizeAction(context, item, Constants.REMOVE);
+        if (!linked(item, bundle))
+        {
+            return;
+        }
 
-        item.removeBundle(bundle);
+        AuthorizeManager.authorizeAction(context, item, Constants.REMOVE);
 
         childDAO.unlink(item, bundle);
 
