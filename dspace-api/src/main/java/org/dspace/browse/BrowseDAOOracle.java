@@ -937,11 +937,11 @@ public class BrowseDAOOracle implements BrowseDAO
         {
             buildWhereClauseOpInsert(queryBuf);
             
-            queryBuf.append(" id IN (SELECT distinct_id FROM ");
+            queryBuf.append(" EXISTS (SELECT 1 FROM ");
             queryBuf.append(containerTable);
             queryBuf.append(" WHERE ");
             queryBuf.append(containerIDField);
-            queryBuf.append("=?) ");
+            queryBuf.append("=? AND distinct_id=" + table + ".id) ");
             
             params.add(new Integer(containerID));
         }
