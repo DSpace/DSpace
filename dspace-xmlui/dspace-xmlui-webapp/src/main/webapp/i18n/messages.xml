@@ -391,7 +391,8 @@
 	<message key="xmlui.EPerson.LoginChooser.para1">Log in via:</message>
 	<message key="au.edu.mq.melcoe.mams.dspace.eperson.ShibAuthentication.title">Shibboleth Authentication</message>
 	<message key="org.dspace.eperson.PasswordAuthentication.title">Password Authentication</message>
-	
+	<message key="org.dspace.eperson.X509Authentication.title">Web Certificate Authentication</message>
+
 	<!-- org.dspace.app.xmlui.eperson.FailedAuthentication -->
 	<message key="xmlui.EPerson.FailedAuthentication.BadCreds">The credentials provided are invalid.</message>
 	<message key="xmlui.EPerson.FailedAuthentication.BadArgs">Unable to authenticate due to invalid arguments received.</message>
