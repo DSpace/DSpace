@@ -359,10 +359,22 @@ public class IndexBrowse
     public void indexItem(Item item)
     	throws BrowseException
     {
-        indexItem(new ItemMetadataProxy(item));
+        // If the item is not archived AND has not been withdrawn
+        // we can assume that it has *never* been archived - in that case,
+        // there won't be anything in the browse index, so we can just skip processing.
+        // If it is either archived or withdrawn, then there may be something in the browse
+        // tables, so we *must* process it.
+        // Caveat: an Item.update() that changes isArchived() from TRUE to FALSE, whilst leaving
+        // isWithdrawn() as FALSE, may result in stale data in the browse tables.
+        // Such an update should never occur though, and if it does, probably indicates a major
+        // problem with the code updating the Item.
+        if (item.isArchived() || item.isWithdrawn())
+        {
+            indexItem(new ItemMetadataProxy(item));
 
-        // Ensure that we remove any invalid entries
-        pruneIndexes();
+            // Ensure that we remove any invalid entries
+            pruneIndexes();
+        }
     }
     
        /**
