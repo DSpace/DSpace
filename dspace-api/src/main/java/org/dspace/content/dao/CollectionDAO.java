@@ -39,22 +39,23 @@
  */
 package org.dspace.content.dao;
 
-import java.util.List;
-import java.util.UUID;
-
 import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.Context;
-import org.dspace.eperson.dao.GroupDAO;
-import org.dspace.eperson.dao.GroupDAOFactory;
 import org.dspace.dao.CRUD;
 import org.dspace.dao.Link;
+import org.dspace.eperson.dao.GroupDAO;
+import org.dspace.eperson.dao.GroupDAOFactory;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.dao.UUIDDAO;
+import org.dspace.uri.dao.UUIDDAOFactory;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author James Rutherford
@@ -69,6 +70,7 @@ public abstract class CollectionDAO extends ContentDAO<CollectionDAO>
     protected ItemDAO itemDAO;
     protected GroupDAO groupDAO;
     protected ExternalIdentifierDAO identifierDAO;
+    protected UUIDDAO uuidDAO;
 
     protected CollectionDAO childDAO;
 
@@ -107,6 +109,7 @@ public abstract class CollectionDAO extends ContentDAO<CollectionDAO>
         itemDAO = ItemDAOFactory.getInstance(context);
         groupDAO = GroupDAOFactory.getInstance(context);
         identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
+        uuidDAO = UUIDDAOFactory.getInstance(context);
     }
 
     public CollectionDAO getChild()

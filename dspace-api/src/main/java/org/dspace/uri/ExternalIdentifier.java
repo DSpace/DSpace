@@ -52,6 +52,7 @@ import org.apache.log4j.Logger;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.core.PluginManager;
 
 /**
  * @author James Rutherford
@@ -84,6 +85,12 @@ public class ExternalIdentifier
         oid = dso.getIdentifier();
     }
 
+    public ExternalIdentifier(ExternalIdentifierType type, String value)
+    {
+        this(type);
+        this.value = value;
+    }
+
     public ObjectIdentifier getObjectIdentifier()
     {
         return oid;
@@ -112,6 +119,43 @@ public class ExternalIdentifier
     {
         // eg: hdl:1234/56
         return type.getNamespace() + ":" + value;
+    }
+
+    public static ExternalIdentifier parseCanonicalForm(String canonical)
+    {
+        // first find out if it's the right form
+        int colon = canonical.indexOf(":");
+        if (colon == -1)
+        {
+            return null;
+        }
+
+        // obtain the two components of the canonical form
+        String ns = canonical.substring(0, colon);
+        String value = canonical.substring(colon + 1);
+
+        // see if we can tie a type to the namespace
+        ExternalIdentifierType type = null;
+        ExternalIdentifierType[] types = (ExternalIdentifierType[]) PluginManager.getPluginSequence(ExternalIdentifierType.class);
+        if (types != null)
+        {
+            for (ExternalIdentifierType t : (ExternalIdentifierType[]) types)
+            {
+                if (t.getNamespace().equals(ns))
+                {
+                    type = t;
+                    break;
+                }
+            }
+        }
+        if (type == null)
+        {
+            return null;
+        }
+
+        // assemble and return
+        ExternalIdentifier eid = new ExternalIdentifier(type, value);
+        return eid;
     }
 
     @Deprecated

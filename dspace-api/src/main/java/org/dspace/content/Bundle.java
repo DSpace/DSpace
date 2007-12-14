@@ -58,6 +58,7 @@ import org.dspace.content.dao.BundleDAOFactory;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.event.Event;
+import org.dspace.uri.ObjectIdentifier;
 
 /**
  * Class representing bundles of bitstreams stored in the DSpace system
@@ -162,6 +163,13 @@ public class Bundle extends DSpaceObject
     public void setBitstreams(List<Bitstream> bitstreams)
     {
         this.bitstreams = bitstreams;
+    }
+
+    public void setIdentifier(ObjectIdentifier oid)
+    {
+        oid.setResourceID(this.getID());
+        oid.setResourceTypeID(this.getType());
+        super.setIdentifier(oid);
     }
 
     public Bitstream createBitstream(InputStream is) throws AuthorizeException,

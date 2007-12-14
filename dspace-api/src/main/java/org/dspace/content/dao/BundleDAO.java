@@ -1,15 +1,17 @@
 package org.dspace.content.dao;
 
-import java.util.UUID;
-import java.util.List;
-
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.dspace.dao.CRUD;
 import org.dspace.dao.Link;
-import org.dspace.content.Bundle;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Item;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.Context;
+import org.dspace.uri.dao.UUIDDAO;
+import org.dspace.uri.dao.UUIDDAOFactory;
+
+import java.util.List;
+import java.util.UUID;
 
 public abstract class BundleDAO extends ContentDAO<BundleDAO>
         implements CRUD<Bundle>, Link<Bundle, Bitstream>
@@ -17,10 +19,13 @@ public abstract class BundleDAO extends ContentDAO<BundleDAO>
     protected Context context;
 
     protected BundleDAO childDAO;
+    protected UUIDDAO uuidDAO;
 
     public BundleDAO(Context context)
     {
         this.context = context;
+
+        uuidDAO = UUIDDAOFactory.getInstance(context);
     }
 
     public BundleDAO getChild()

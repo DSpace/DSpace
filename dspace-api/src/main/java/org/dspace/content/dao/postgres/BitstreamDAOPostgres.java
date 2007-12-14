@@ -72,17 +72,17 @@ public class BitstreamDAOPostgres extends BitstreamDAO
     @Override
     public Bitstream create() throws AuthorizeException
     {
-        UUID uuid = UUID.randomUUID();
+        // UUID uuid = UUID.randomUUID();
 
         try
         {
             TableRow row = DatabaseManager.create(context, "bitstream");
-            row.setColumn("uuid", uuid.toString());
+            // row.setColumn("uuid", uuid.toString());
             DatabaseManager.update(context, row);
 
             int id = row.getIntColumn("bitstream_id");
             Bitstream bitstream = new Bitstream(context, id);
-            bitstream.setIdentifier(new ObjectIdentifier(uuid));
+            // bitstream.setIdentifier(new ObjectIdentifier(uuid));
 
             return bitstream;
         }
@@ -358,6 +358,8 @@ public class BitstreamDAOPostgres extends BitstreamDAO
                 throw new IllegalStateException("No Unknown bitsream format");
             }
         }
+
+        row.setColumn("uuid", bitstream.getIdentifier().getUUID().toString());
 
         row.setColumn("sequence_id", sequenceID);
         row.setColumn("store_number", storeNumber);

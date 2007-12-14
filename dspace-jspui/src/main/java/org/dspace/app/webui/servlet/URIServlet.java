@@ -96,6 +96,7 @@ public class URIServlet extends DSpaceServlet
         // or "/xyz/1234/56/extra/stuff"
         String path = request.getPathInfo();
 
+        /*
         try
         {
             path = URLDecoder.decode(path, "UTF-8");
@@ -103,8 +104,11 @@ public class URIServlet extends DSpaceServlet
         catch (UnsupportedEncodingException uee)
         {
             throw new RuntimeException(uee);
-        }
+        }*/
 
+        oi = ObjectIdentifier.extractURLIdentifier(path);
+
+        /*
         // Here, we iterate through the path, one slash at a time, to see if we
         // can match any portion of it (left to right) to an object URI.
         if (path != null)
@@ -138,7 +142,7 @@ public class URIServlet extends DSpaceServlet
                 oi = IdentifierUtils.fromString(context, path);
             }
         }
-
+*/
         if (oi == null)
         {
             log.info(LogManager
@@ -147,6 +151,15 @@ public class URIServlet extends DSpaceServlet
         }
         else
         {
+            // get the index of the identifier in the url
+            String urlForm = oi.getURLForm();
+            int index = path.indexOf(urlForm);
+            int startFrom = index + urlForm.length();
+            if (startFrom < path.length())
+            {
+                extraPathInfo = path.substring(startFrom);
+            }
+
             dso = oi.getObject(context);
             processDSpaceObject(context, request, response, dso, extraPathInfo);
         }

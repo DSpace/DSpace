@@ -48,6 +48,7 @@ import org.dspace.content.Bundle;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.uri.ObjectIdentifier;
 
 /**
  * @author James Rutherford
@@ -69,6 +70,10 @@ public class BundleDAOCore extends BundleDAO
     public Bundle create() throws AuthorizeException
     {
         Bundle bundle =  childDAO.create();
+
+        // now assign an object identifier
+        ObjectIdentifier oid = new ObjectIdentifier(true);
+        bundle.setIdentifier(oid);
 
         log.info(LogManager.getHeader(context, "create_bundle", "bundle_id="
                 + bundle.getID()));
@@ -124,6 +129,15 @@ public class BundleDAOCore extends BundleDAO
             link(bundle, bitstream);
         }
 
+        // finally, deal with the item identifier/uuid
+        ObjectIdentifier oid = bundle.getIdentifier();
+        if (oid == null)
+        {
+            oid = new ObjectIdentifier(true);
+            bundle.setIdentifier(oid);
+        }
+        uuidDAO.update(bundle.getIdentifier());
+
         childDAO.update(bundle);
     }
 
@@ -144,6 +158,9 @@ public class BundleDAOCore extends BundleDAO
 
         // remove our authorization policies
         AuthorizeManager.removeAllPolicies(context, bundle);
+
+        // remove the object identifier
+        uuidDAO.delete(bundle);
 
         childDAO.delete(id);
     }

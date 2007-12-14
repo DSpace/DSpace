@@ -39,13 +39,6 @@
  */
 package org.dspace.content.dao;
 
-import java.text.ParseException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
@@ -61,6 +54,14 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.uri.ObjectIdentifier;
+
+import java.text.ParseException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author James Rutherford
@@ -74,10 +75,15 @@ public class ItemDAOCore extends ItemDAO
 
     public Item create() throws AuthorizeException
     {
+        // first create the item record
         Item item = childDAO.create();
 
+        // now assign an object identifier
+        ObjectIdentifier oid = new ObjectIdentifier(true);
+        item.setIdentifier(oid);
+
         log.info(LogManager.getHeader(context, "create_item",
-                "item_id=" + item.getID()));
+                "item_id=" + item.getID() + ",uuid=" + oid.getCanonicalForm()));
 
         item.setLastModified(new Date());
         update(item);
@@ -280,6 +286,15 @@ public class ItemDAOCore extends ItemDAO
             }
         }
 
+        // finally, deal with the item identifier/uuid
+        ObjectIdentifier oid = item.getIdentifier();
+        if (oid == null)
+        {
+            oid = new ObjectIdentifier(true);
+            item.setIdentifier(oid);
+        }
+        uuidDAO.update(item.getIdentifier());
+
         childDAO.update(item);
     }
 
@@ -300,6 +315,9 @@ public class ItemDAOCore extends ItemDAO
 
         // remove all of our authorization policies
         AuthorizeManager.removeAllPolicies(context, item);
+
+        // remove the object identifier
+        uuidDAO.delete(item);
 
         childDAO.delete(id);
     }

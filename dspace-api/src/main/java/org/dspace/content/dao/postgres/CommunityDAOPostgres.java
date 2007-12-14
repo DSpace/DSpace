@@ -70,15 +70,15 @@ public class CommunityDAOPostgres extends CommunityDAO
     {
         try
         {
-            UUID uuid = UUID.randomUUID();
+            //UUID uuid = UUID.randomUUID();
 
             TableRow row = DatabaseManager.create(context, "community");
-            row.setColumn("uuid", uuid.toString());
+            //row.setColumn("uuid", uuid.toString());
             DatabaseManager.update(context, row);
 
             int id = row.getIntColumn("community_id");
             Community community = new Community(context, id);
-            community.setIdentifier(new ObjectIdentifier(uuid));
+            //community.setIdentifier(new ObjectIdentifier(uuid));
             
             return community;
         }
@@ -450,6 +450,8 @@ public class CommunityDAOPostgres extends CommunityDAO
                 row.setColumn(field.toString(), value);
             }
         }
+
+        row.setColumn("uuid", community.getIdentifier().getUUID().toString());
     }
 
     private void populateCommunityFromTableRow(Community c, TableRow row)

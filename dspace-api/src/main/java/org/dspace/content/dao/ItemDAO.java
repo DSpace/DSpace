@@ -39,13 +39,7 @@
  */
 package org.dspace.content.dao;
 
-import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
 import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -54,11 +48,18 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.dao.CRUD;
 import org.dspace.dao.Link;
+import org.dspace.eperson.EPerson;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.dao.UUIDDAO;
+import org.dspace.uri.dao.UUIDDAOFactory;
+
+import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 public abstract class ItemDAO extends ContentDAO<ItemDAO>
         implements CRUD<Item>, Link<Item, Bundle>
@@ -69,6 +70,7 @@ public abstract class ItemDAO extends ContentDAO<ItemDAO>
     protected BundleDAO bundleDAO;
     protected BitstreamDAO bitstreamDAO;
     protected ExternalIdentifierDAO identifierDAO;
+    protected UUIDDAO uuidDAO;
 
     protected ItemDAO childDAO;
 
@@ -83,6 +85,7 @@ public abstract class ItemDAO extends ContentDAO<ItemDAO>
         bundleDAO = BundleDAOFactory.getInstance(context);
         bitstreamDAO = BitstreamDAOFactory.getInstance(context);
         identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
+        uuidDAO = UUIDDAOFactory.getInstance(context);
     }
 
     public ItemDAO getChild()

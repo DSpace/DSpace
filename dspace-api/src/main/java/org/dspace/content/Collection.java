@@ -67,6 +67,7 @@ import org.dspace.content.dao.CommunityDAOFactory;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ObjectIdentifier;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.dao.GroupDAO;
 import org.dspace.eperson.dao.GroupDAOFactory;
@@ -136,6 +137,13 @@ public class Collection extends DSpaceObject
 
         modified = modifiedMetadata = false;
         clearDetails();
+    }
+
+    public void setIdentifier(ObjectIdentifier oid)
+    {
+        oid.setResourceID(this.getID());
+        oid.setResourceTypeID(this.getType());
+        super.setIdentifier(oid);
     }
 
     public Group getSubmitters()

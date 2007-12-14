@@ -128,17 +128,18 @@ public class ItemDAOPostgres extends ItemDAO
     @Override
     public Item create() throws AuthorizeException
     {
-        UUID uuid = UUID.randomUUID();
+        // UUID is not longer created here
+        //UUID uuid = UUID.randomUUID();
 
         try
         {
             TableRow row = DatabaseManager.create(context, "item");
-            row.setColumn("uuid", uuid.toString());
+            // row.setColumn("uuid", uuid.toString());
             DatabaseManager.update(context, row);
 
             int id = row.getIntColumn("item_id");
             Item item = new ItemProxy(context, id);
-            item.setIdentifier(new ObjectIdentifier(uuid));
+            // item.setIdentifier(new ObjectIdentifier(uuid));
 
             return item;
         }
@@ -191,6 +192,7 @@ public class ItemDAOPostgres extends ItemDAO
                 // Fill out the TableRow and save it
                 populateTableRowFromItem(item, row);
                 row.setColumn("last_modified", new Date());
+                row.setColumn("uuid", item.getIdentifier().getUUID().toString());
                 DatabaseManager.update(context, row);
             }
             else

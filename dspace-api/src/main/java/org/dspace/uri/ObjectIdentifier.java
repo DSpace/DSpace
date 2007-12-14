@@ -39,16 +39,11 @@
  */
 package org.dspace.uri;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.UUID;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.log4j.Logger;
-
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.dao.BitstreamDAO;
 import org.dspace.content.dao.BitstreamDAOFactory;
@@ -63,6 +58,14 @@ import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.uri.dao.UUIDDAO;
+import org.dspace.uri.dao.UUIDDAOFactory;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author James Rutherford
@@ -71,29 +74,42 @@ public class ObjectIdentifier
 {
     private static Logger log = Logger.getLogger(ObjectIdentifier.class);
 
-    private int resourceID;
-    private int resourceTypeID;
-    private UUID uuid;
+    private int resourceID = -1;
+    private int resourceTypeID = -1;
+    private UUID uuid = null;
 
-    private Type type;
+    // FIXME: is this necessary any more?  the dsi is the resource id
+    // private Type type;
 
     public ObjectIdentifier()
     {
+        // a blank identifier
+    }
+
+    public ObjectIdentifier(boolean generate)
+    {
+        // generate a new unique UUID
+        this.uuid = UUID.randomUUID();
     }
 
     public ObjectIdentifier(int resourceID, int resourceTypeID)
     {
-        this.type = Type.INTS;
+        // this.type = Type.INTS;
         this.resourceID = resourceID;
         this.resourceTypeID = resourceTypeID;
+
+        // we are now ready to have a UUID assigned
     }
 
     public ObjectIdentifier(UUID uuid)
     {
-        this.type = Type.UUID;
+        // this.type = Type.UUID;
         this.uuid = uuid;
+
+        // we are now ready to be told who we belong to
     }
 
+    /*
     public ObjectIdentifier(Type type, String value)
     {
         this.type = type;
@@ -115,9 +131,32 @@ public class ObjectIdentifier
                 throw new RuntimeException(":(");
         }
     }
+    */
+
+    public ObjectIdentifier(String uuid)
+    {
+        this.uuid = UUID.fromString(uuid);
+
+        // we are now ready to be told who we belong to
+    }
+
+    public ObjectIdentifier(String uuid, int resourceType, int resourceID)
+    {
+        this.uuid = UUID.fromString(uuid);
+        this.resourceTypeID = resourceType;
+        this.resourceID = resourceID;
+    }
+
+    public ObjectIdentifier(UUID uuid, int resourceType, int resourceID)
+    {
+        this.uuid = uuid;
+        this.resourceTypeID = resourceType;
+        this.resourceID = resourceID;
+    }
 
     public static ObjectIdentifier fromString(String canonicalForm)
     {
+        /*
         for (Type t : Type.values())
         {
             String ns = t.getNamespace();
@@ -139,13 +178,96 @@ public class ObjectIdentifier
         }
 
         return null;
+        */
+        if (!canonicalForm.startsWith("uuid:"))
+        {
+            return null;
+        }
+
+        String value = canonicalForm.substring(5);
+
+        return new ObjectIdentifier(value);
+    }
+
+    public int getResourceID()
+    {
+        return resourceID;
+    }
+
+    public int getResourceTypeID()
+    {
+        return resourceTypeID;
+    }
+
+    public UUID getUUID()
+    {
+        return uuid;
+    }
+
+    public void setResourceID(int resourceID)
+    {
+        this.resourceID = resourceID;
+    }
+
+    public void setResourceTypeID(int resourceTypeID)
+    {
+        this.resourceTypeID = resourceTypeID;
     }
 
     public DSpaceObject getObject(Context context)
     {
+        // do we know what the resource type and id is?
+        if (this.resourceTypeID == -1 || this.resourceID == -1)
+        {
+            // we don't have resource type or resource id for this item
+            // check the UUID cache and see if we can find them
+            UUIDDAO dao = UUIDDAOFactory.getInstance(context);
+            ObjectIdentifier noid = dao.retrieve(uuid);
+
+            // if there is no object identifier, just return null
+            if (noid == null)
+            {
+                return null;
+            }
+
+            // move the values up to this object for convenience
+            this.resourceTypeID = noid.getResourceTypeID();
+            this.resourceID = noid.getResourceID();
+        }
+
+        // now we can select the object based on its resource type and id
+        return this.getObjectByResourceID(context);
+    }
+
+    private DSpaceObject getObjectByResourceID(Context context)
+    {
+        switch(resourceTypeID)
+        {
+            case (Constants.BITSTREAM):
+                BitstreamDAO bitstreamDAO = BitstreamDAOFactory.getInstance(context);
+                return bitstreamDAO.retrieve(resourceID);
+            case (Constants.BUNDLE):
+                BundleDAO bundleDAO = BundleDAOFactory.getInstance(context);
+                return bundleDAO.retrieve(resourceID);
+            case (Constants.ITEM):
+                ItemDAO itemDAO = ItemDAOFactory.getInstance(context);
+                return itemDAO.retrieve(resourceID);
+            case (Constants.COLLECTION):
+                CollectionDAO collectionDAO = CollectionDAOFactory.getInstance(context);
+                return collectionDAO.retrieve(resourceID);
+            case (Constants.COMMUNITY):
+                CommunityDAO communityDAO = CommunityDAOFactory.getInstance(context);
+                return communityDAO.retrieve(resourceID);
+            default:
+                throw new RuntimeException("Not a valid DSpaceObject type");
+        }
+    }
+
+    /*
+    public DSpaceObject getObject(Context context)
+    {
         CommunityDAO communityDAO = CommunityDAOFactory.getInstance(context);
-        CollectionDAO collectionDAO =
-            CollectionDAOFactory.getInstance(context);
+        CollectionDAO collectionDAO = CollectionDAOFactory.getInstance(context);
         ItemDAO itemDAO = ItemDAOFactory.getInstance(context);
         BundleDAO bundleDAO = BundleDAOFactory.getInstance(context);
         BitstreamDAO bitstreamDAO = BitstreamDAOFactory.getInstance(context);
@@ -204,11 +326,22 @@ public class ObjectIdentifier
                 throw new RuntimeException("Whoops!");
         }
     }
+    */
+
+    public String getURLForm()
+    {
+        if (uuid == null)
+        {
+            return null;
+        }
+        return "uuid/" + uuid.toString();
+    }
 
     public URL getURL()
     {
         // This is a bit of a hack to get an almost-URLEncoded form of the URL.
         // (See the FIXME below).
+        /*
         String url = ConfigurationManager.getProperty("dspace.url") +
             "/resource/" + getCanonicalForm().replaceAll(":", "%3A");
 
@@ -228,11 +361,37 @@ public class ObjectIdentifier
         catch (MalformedURLException murle)
         {
             throw new RuntimeException(murle);
+        }*/
+        try
+        {
+            String base = ConfigurationManager.getProperty("dspace.url");
+            String urlForm = this.getURLForm();
+
+            if (base == null || "".equals(base))
+            {
+                throw new RuntimeException("No configuration, or configuration invalid for dspace.url");
+            }
+
+            if (urlForm == null)
+            {
+                throw new RuntimeException("Unable to assign URL: no UUID available");
+            }
+
+            String url = base + "/resource/" + urlForm;
+
+
+            return new URL(url);
+        }
+        catch (MalformedURLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
         }
     }
 
     public String getCanonicalForm()
     {
+        /*
         String s = type.getNamespace() + ":";
 
         switch (type)
@@ -247,9 +406,30 @@ public class ObjectIdentifier
                 throw new RuntimeException("Whoops!");
         }
 
-        return s;
+        return s;*/
+
+        if (uuid == null)
+        {
+            return null;
+        }
+        return "uuid:" + uuid.toString();
     }
 
+    public static ObjectIdentifier extractURLIdentifier(String str)
+    {
+        String oidRX = ".*/uuid/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}).*";
+        Pattern p = Pattern.compile(oidRX);
+        Matcher m = p.matcher(str);
+        if (!m.matches())
+        {
+            return null;
+        }
+        String value = m.group(1);
+        ObjectIdentifier oid = new ObjectIdentifier(value);
+        return oid;
+    }
+
+    /*
     public enum Type
     {
         INTS ("dsi"), // signifies a pair of integers (resource type + id)
@@ -267,7 +447,7 @@ public class ObjectIdentifier
             return namespace;
         }
     }
-
+*/
     ////////////////////////////////////////////////////////////////////
     // Utility methods
     ////////////////////////////////////////////////////////////////////

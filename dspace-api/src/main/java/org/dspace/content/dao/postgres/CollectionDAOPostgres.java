@@ -70,17 +70,17 @@ public class CollectionDAOPostgres extends CollectionDAO
     @Override
     public Collection create() throws AuthorizeException
     {
-        UUID uuid = UUID.randomUUID();
+        // UUID uuid = UUID.randomUUID();
 
         try
         {
             TableRow row = DatabaseManager.create(context, "collection");
-            row.setColumn("uuid", uuid.toString());
+            //row.setColumn("uuid", uuid.toString());
             DatabaseManager.update(context, row);
 
             int id = row.getIntColumn("collection_id");
             Collection collection = new Collection(context, id);
-            collection.setIdentifier(new ObjectIdentifier(uuid));
+            // collection.setIdentifier(new ObjectIdentifier(uuid));
             
             return collection;
         }
@@ -418,6 +418,8 @@ public class CollectionDAOPostgres extends CollectionDAO
                 row.setColumn(field.toString(), value);
             }
         }
+
+        row.setColumn("uuid", collection.getIdentifier().getUUID().toString());
     }
 
     private void populateCollectionFromTableRow(Collection c, TableRow row)

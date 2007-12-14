@@ -74,17 +74,17 @@ public class BundleDAOPostgres extends BundleDAO
     @Override
     public Bundle create() throws AuthorizeException
     {
-        UUID uuid = UUID.randomUUID();
+        // UUID uuid = UUID.randomUUID();
 
         try
         {
             TableRow row = DatabaseManager.create(context, "bundle");
-            row.setColumn("uuid", uuid.toString());
+            // row.setColumn("uuid", uuid.toString());
             DatabaseManager.update(context, row);
 
             int id = row.getIntColumn("bundle_id");
             Bundle bundle = new Bundle(context, id);
-            bundle.setIdentifier(new ObjectIdentifier(uuid));
+            // bundle.setIdentifier(new ObjectIdentifier(uuid));
 
             return bundle;
         }
@@ -146,6 +146,8 @@ public class BundleDAOPostgres extends BundleDAO
                 {
                     row.setColumnNull("primary_bitstream_id");
                 }
+
+                row.setColumn("uuid", bundle.getIdentifier().getUUID().toString());
 
                 DatabaseManager.update(context, row);
             }

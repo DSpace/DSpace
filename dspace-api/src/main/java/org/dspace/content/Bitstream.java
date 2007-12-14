@@ -54,6 +54,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Event;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
+import org.dspace.uri.ObjectIdentifier;
 
 
 /**
@@ -115,6 +116,13 @@ public class Bitstream extends DSpaceObject
         this.sequenceID = sequenceID;
         modifiedMetadata = true;
         addDetails("SequenceID");
+    }
+
+    public void setIdentifier(ObjectIdentifier oid)
+    {
+        oid.setResourceID(this.getID());
+        oid.setResourceTypeID(this.getType());
+        super.setIdentifier(oid);
     }
 
     // FIXME: Do we even want this exposed?

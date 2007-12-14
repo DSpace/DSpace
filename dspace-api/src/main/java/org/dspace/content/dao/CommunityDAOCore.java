@@ -53,6 +53,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ObjectIdentifier;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -71,14 +72,18 @@ public class CommunityDAOCore extends CommunityDAO
     @Override
     public Community create() throws AuthorizeException
     {
-        Community community = childDAO.create();
-
         // Only administrators and adders can create communities
         if (!(AuthorizeManager.isAdmin(context)))
         {
             throw new AuthorizeException(
                     "Only administrators can create communities");
         }
+
+        Community community = childDAO.create();
+
+        // now assign an object identifier
+        ObjectIdentifier oid = new ObjectIdentifier(true);
+        community.setIdentifier(oid);
 
         // Create a default persistent identifier for this Community, and
         // add it to the in-memory Community object.
@@ -131,6 +136,15 @@ public class CommunityDAOCore extends CommunityDAO
 
         // FIXME: Do we need to iterate through child Communities /
         // Collecitons to update / re-index? Probably not.
+
+        // finally, deal with the item identifier/uuid
+        ObjectIdentifier oid = community.getIdentifier();
+        if (oid == null)
+        {
+            oid = new ObjectIdentifier(true);
+            community.setIdentifier(oid);
+        }
+        uuidDAO.update(community.getIdentifier());
 
         childDAO.update(community);
     }
@@ -192,6 +206,9 @@ public class CommunityDAOCore extends CommunityDAO
 
             // Remove all authorization policies
             AuthorizeManager.removeAllPolicies(context, community);
+
+            // remove the object identifier
+            uuidDAO.delete(community);
         }
         catch (IOException ioe)
         {

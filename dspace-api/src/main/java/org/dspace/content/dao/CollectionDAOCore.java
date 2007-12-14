@@ -58,6 +58,7 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
 import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ObjectIdentifier;
 import org.dspace.workflow.WorkflowItem;
 
 /**
@@ -74,6 +75,10 @@ public class CollectionDAOCore extends CollectionDAO
     public Collection create() throws AuthorizeException
     {
         Collection collection = childDAO.create();
+
+        // now assign an object identifier
+        ObjectIdentifier oid = new ObjectIdentifier(true);
+        collection.setIdentifier(oid);
 
         // Create a default persistent identifier for this Collection, and
         // add it to the in-memory Colleciton object.
@@ -146,6 +151,15 @@ public class CollectionDAOCore extends CollectionDAO
         {
             throw new RuntimeException(sqle);
         }
+
+        // finally, deal with the item identifier/uuid
+        ObjectIdentifier oid = collection.getIdentifier();
+        if (oid == null)
+        {
+            oid = new ObjectIdentifier(true);
+            collection.setIdentifier(oid);
+        }
+        uuidDAO.update(collection.getIdentifier());
 
         childDAO.update(collection);
     }
@@ -227,6 +241,9 @@ public class CollectionDAOCore extends CollectionDAO
                     g.delete();
                 }
             }
+
+            // remove the object identifier
+            uuidDAO.delete(collection);
         }
         catch (IOException ioe)
         {

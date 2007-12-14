@@ -63,6 +63,7 @@ import org.dspace.content.dao.CollectionDAOFactory;
 import org.dspace.content.dao.CommunityDAO;
 import org.dspace.content.dao.CommunityDAOFactory;
 import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ObjectIdentifier;
 import org.dspace.event.Event;
 
 /**
@@ -108,6 +109,13 @@ public class Community extends DSpaceObject
 
         modified = modifiedMetadata = false;
         clearDetails();
+    }
+
+    public void setIdentifier(ObjectIdentifier oid)
+    {
+        oid.setResourceID(this.getID());
+        oid.setResourceTypeID(this.getType());
+        super.setIdentifier(oid);
     }
 
     public String getMetadata(String field)

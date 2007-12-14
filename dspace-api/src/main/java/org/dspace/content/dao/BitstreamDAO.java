@@ -39,13 +39,7 @@
  */
 package org.dspace.content.dao;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.UUID;
-
 import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -53,6 +47,13 @@ import org.dspace.core.Context;
 import org.dspace.dao.CRUD;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.dao.UUIDDAO;
+import org.dspace.uri.dao.UUIDDAOFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author James Rutherford
@@ -64,6 +65,7 @@ public abstract class BitstreamDAO extends ContentDAO<BitstreamDAO>
 
     protected Context context;
     protected ExternalIdentifierDAO identifierDAO;
+    protected UUIDDAO uuidDAO;
 
     protected BitstreamDAO childDAO;
 
@@ -72,6 +74,7 @@ public abstract class BitstreamDAO extends ContentDAO<BitstreamDAO>
         this.context = context;
 
         identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
+        uuidDAO = UUIDDAOFactory.getInstance(context);
     }
 
     public BitstreamDAO getChild()
@@ -95,7 +98,6 @@ public abstract class BitstreamDAO extends ContentDAO<BitstreamDAO>
      * as Bundle.createBitstream() will check authorisation. The newly created
      * bitstream has the "unknown" format.
      *
-     * @param context DSpace context object
      * @param is the bits to put in the bitstream
      *
      * @return the newly created bitstream
@@ -113,8 +115,6 @@ public abstract class BitstreamDAO extends ContentDAO<BitstreamDAO>
      * as Bundle.createBitstream() will check authorisation. The newly
      * registered bitstream has the "unknown" format.
      *
-     * @param context DSpace context object
-     * @param is the bits to put in the bitstream
      *
      * @return the newly created bitstream
      * @throws AuthorizeException

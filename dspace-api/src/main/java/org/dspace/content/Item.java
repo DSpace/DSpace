@@ -66,6 +66,7 @@ import org.dspace.content.dao.CommunityDAOFactory;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ObjectIdentifier;
 import org.dspace.core.ArchiveManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -223,6 +224,13 @@ public class Item extends DSpaceObject
     public List<DCValue> getMetadata()
     {
         return metadata;
+    }
+
+    public void setIdentifier(ObjectIdentifier oid)
+    {
+        oid.setResourceTypeID(this.getType());
+        oid.setResourceID(this.getID());
+        super.setIdentifier(oid);
     }
 
     public void setMetadata(List<DCValue> metadata)

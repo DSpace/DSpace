@@ -67,7 +67,7 @@ public abstract class DSpaceObject
 
     protected Context context;
     protected int id;
-    protected UUID uuid;
+    // protected UUID uuid;
     protected ObjectIdentifier oid;
     protected List<ExternalIdentifier> identifiers;
     
@@ -84,7 +84,7 @@ public abstract class DSpaceObject
      * separates entries with a comma.
      * Subclass can just start calling addDetails, since it creates
      * the cache if it needs to.
-     * @param detail detail string to add.
+     * @param d detail string to add.
      */
     protected void addDetails(String detail)
     {
@@ -117,7 +117,7 @@ public abstract class DSpaceObject
      * Get the internal ID (database primary key) of this object
      * 
      * @return internal ID of object
-     */
+     */ 
     public int getID()
     {
         return id;
@@ -130,6 +130,7 @@ public abstract class DSpaceObject
 
     public void setIdentifier(ObjectIdentifier oid)
     {
+        // ensure that the identifier is configured for the item
         this.oid = oid;
     }
 

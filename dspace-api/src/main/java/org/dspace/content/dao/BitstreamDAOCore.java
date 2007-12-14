@@ -49,6 +49,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
+import org.dspace.uri.ObjectIdentifier;
 
 /**
  * @author James Rutherford
@@ -84,6 +85,10 @@ public class BitstreamDAOCore extends BitstreamDAO
     {
         Bitstream bitstream = childDAO.create();
 
+        // now assign an object identifier
+        ObjectIdentifier oid = new ObjectIdentifier(true);
+        bitstream.setIdentifier(oid);
+
         // FIXME: Think about this
         AuthorizeManager.addPolicy(
                 context, bitstream, Constants.WRITE, context.getCurrentUser());
@@ -116,6 +121,15 @@ public class BitstreamDAOCore extends BitstreamDAO
         log.info(LogManager.getHeader(context, "update_bitstream",
                 "bitstream_id=" + bitstream.getID()));
 
+        // finally, deal with the bitstream identifier/uuid
+        ObjectIdentifier oid = bitstream.getIdentifier();
+        if (oid == null)
+        {
+            oid = new ObjectIdentifier(true);
+            bitstream.setIdentifier(oid);
+        }
+        uuidDAO.update(bitstream.getIdentifier());
+
         childDAO.update(bitstream);
     }
 
@@ -132,6 +146,9 @@ public class BitstreamDAOCore extends BitstreamDAO
 
         AuthorizeManager.removeAllPolicies(context, bitstream);
 
+        // remove the object identifier
+        uuidDAO.delete(bitstream);
+
         childDAO.delete(id);
     }
     
@@ -141,6 +158,8 @@ public class BitstreamDAOCore extends BitstreamDAO
         Bitstream bitstream = retrieve(id);
 
         AuthorizeManager.authorizeAction(context, bitstream, Constants.REMOVE);
+        // remove the object identifier
+        uuidDAO.delete(bitstream);
 
         childDAO.remove(id);
     }
