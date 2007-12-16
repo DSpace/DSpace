@@ -395,12 +395,14 @@ public class IndexBrowse
             // Remove from the item indexes (archive and withdrawn)
             removeIndex(item.getID(), BrowseIndex.getItemBrowseIndex().getTableName());
             removeIndex(item.getID(), BrowseIndex.getWithdrawnBrowseIndex().getTableName());
+            dao.deleteCommunityMappings(item.getID());
 
             // Index any archived item that isn't withdrawn
             if (item.isArchived() && !item.isWithdrawn())
             {
                 Map<Integer, String> sortMap = getSortValues(item, itemMDMap);
                 dao.insertIndex(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID(), sortMap);
+                dao.insertCommunityMappings(item.getID());
             }
             else if (item.isWithdrawn())
             {
@@ -566,6 +568,7 @@ public class IndexBrowse
         // Remove from the item indexes (archive and withdrawn)
         removeIndex(itemID, BrowseIndex.getItemBrowseIndex().getTableName());
         removeIndex(itemID, BrowseIndex.getWithdrawnBrowseIndex().getTableName());
+        dao.deleteCommunityMappings(itemID);
 
         // Ensure that we remove any invalid entries
         pruneIndexes();

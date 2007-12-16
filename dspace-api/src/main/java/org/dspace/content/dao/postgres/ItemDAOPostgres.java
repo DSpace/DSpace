@@ -268,7 +268,7 @@ public class ItemDAOPostgres extends ItemDAO
                 }
                 else if (scope.getType() == Constants.COMMUNITY)
                 {
-                    query += ", community2item cm2i";
+                    query += ", communities2item cm2i";
                 }
             }
 

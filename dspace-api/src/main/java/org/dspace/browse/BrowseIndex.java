@@ -641,15 +641,11 @@ public class BrowseIndex
             throws BrowseException
     {
         BrowseIndex[] bis = getBrowseIndices();
-        String[] returnTables = new String[bis.length + 1];
+        String[] returnTables = new String[bis.length];
         for (int i = 0; i < bis.length; i++)
         {
             returnTables[i] = bis[i].getTableName();
         }
-
-        // FIXME: this complies with the old BrowseTables method, but I'm
-        // not really sure why it's here
-        returnTables[bis.length] = "Communities2Item";
 
         return returnTables;
     }
