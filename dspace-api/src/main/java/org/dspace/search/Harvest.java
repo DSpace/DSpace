@@ -142,7 +142,7 @@ public class Harvest
         	}
         	else if (scope.getType() == Constants.COMMUNITY)
         	{
-        		query += ", community2item";
+        		query += ", communities2item";
         	}
         }       
 
@@ -158,8 +158,8 @@ public class Harvest
         	}
         	else if (scope.getType() == Constants.COMMUNITY)
         	{
-        		query += " AND community2item.community_id= ? " +
-						 " AND community2item.item_id=handle.resource_id";
+        		query += " AND communities2item.community_id= ? " +
+						 " AND communities2item.item_id=handle.resource_id";
         		parameters.add(new Integer(scope.getID()));
         	}
         }      

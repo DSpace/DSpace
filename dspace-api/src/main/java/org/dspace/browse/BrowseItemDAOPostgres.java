@@ -44,6 +44,7 @@ import org.dspace.content.Item;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class BrowseItemDAOPostgres implements BrowseItemDAO
 {
@@ -87,61 +88,78 @@ public class BrowseItemDAOPostgres implements BrowseItemDAO
 
     public BrowseItem[] findAll() throws SQLException
     {
-        TableRowIterator tri = DatabaseManager.query(context, findAll);
-        ArrayList items = new ArrayList();
+        TableRowIterator tri = null;
+        List<BrowseItem> items = new ArrayList<BrowseItem>();
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-            items.add(new BrowseItem(context, row.getIntColumn("item_id"),
-                                              row.getBooleanColumn("in_archive"),
-                                              row.getBooleanColumn("withdrawn")));
+            tri = DatabaseManager.query(context, findAll);
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+                items.add(new BrowseItem(context, row.getIntColumn("item_id"),
+                                                  row.getBooleanColumn("in_archive"),
+                                                  row.getBooleanColumn("withdrawn")));
+            }
         }
-
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
+        
         BrowseItem[] bis = new BrowseItem[items.size()];
-        return (BrowseItem[]) items.toArray((BrowseItem[]) bis);
+        return items.toArray(bis);
     }
 
     public DCValue[] queryMetadata(int itemId, String schema, String element, String qualifier, String lang)
     	throws SQLException
     {
-    	ArrayList values = new ArrayList();
-    	TableRowIterator tri;
+    	List<DCValue> values = new ArrayList<DCValue>();
+    	TableRowIterator tri = null;
 
-    	if (qualifier == null)
-    	{
-    		Object[] params = { new Integer(itemId), element, schema };
-    		tri = DatabaseManager.query(context, getByMetadataElement, params);
-    	}
-    	else if (Item.ANY.equals(qualifier))
-    	{
-    		Object[] params = { new Integer(itemId), element, schema };
-    		tri = DatabaseManager.query(context, getByMetadataAnyQualifier, params);
-    	}
-    	else
-    	{
-    		Object[] params = { new Integer(itemId), element, qualifier, schema };
-    		tri = DatabaseManager.query(context, getByMetadata, params);
-    	}
+        try
+        {
+            if (qualifier == null)
+            {
+                Object[] params = { new Integer(itemId), element, schema };
+                tri = DatabaseManager.query(context, getByMetadataElement, params);
+            }
+            else if (Item.ANY.equals(qualifier))
+            {
+                Object[] params = { new Integer(itemId), element, schema };
+                tri = DatabaseManager.query(context, getByMetadataAnyQualifier, params);
+            }
+            else
+            {
+                Object[] params = { new Integer(itemId), element, qualifier, schema };
+                tri = DatabaseManager.query(context, getByMetadata, params);
+            }
 
-    	if (!tri.hasNext())
-    	{
-    		return null;
-    	}
+            if (!tri.hasNext())
+            {
+                return null;
+            }
 
-    	while (tri.hasNext())
-    	{
-    		TableRow tr = tri.next();
-    		DCValue dcv = new DCValue();
-    		dcv.schema = schema;
-    		dcv.element = tr.getStringColumn("element");
-    		dcv.qualifier = tr.getStringColumn("qualifier");
-    		dcv.language = tr.getStringColumn("text_lang");
-    		dcv.value = tr.getStringColumn("text_value");
-            values.add(dcv);
-    	}
-
+            while (tri.hasNext())
+            {
+                TableRow tr = tri.next();
+                DCValue dcv = new DCValue();
+                dcv.schema = schema;
+                dcv.element = tr.getStringColumn("element");
+                dcv.qualifier = tr.getStringColumn("qualifier");
+                dcv.language = tr.getStringColumn("text_lang");
+                dcv.value = tr.getStringColumn("text_value");
+                values.add(dcv);
+            }
+        }
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
+        
         DCValue[] dcvs = new DCValue[values.size()];
-        return (DCValue[]) values.toArray(dcvs);
+        return values.toArray(dcvs);
     }
 }

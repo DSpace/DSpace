@@ -132,9 +132,9 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         try
         {
             String createComView = "CREATE VIEW " + view + " AS " +
-                                   "SELECT Community2Item.community_id, " + table + ".* " +
-                                   "FROM  " + table + ", Community2Item " +
-                                   "WHERE " + table + ".item_id = Community2Item.item_id";
+                                   "SELECT Communities2Item.community_id, " + table + ".* " +
+                                   "FROM  " + table + ", Communities2Item " +
+                                   "WHERE " + table + ".item_id = Communities2Item.item_id";
             
             if (execute)
             {
@@ -372,6 +372,25 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
     }
 
     /* (non-Javadoc)
+     * @see org.dspace.browse.BrowseCreateDAO#deleteCommunityMappings(java.lang.String, int)
+     */
+    public void deleteCommunityMappings(int itemID)
+        throws BrowseException
+    {
+        try
+        {
+            Object[] params = { new Integer(itemID) };
+            String dquery = "DELETE FROM Communities2Item WHERE item_id = ?";
+            DatabaseManager.updateQuery(context, dquery, params);
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new BrowseException(e);
+        }
+    }
+
+    /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#dropIndexAndRelated(java.lang.String, boolean)
      */
     public String dropIndexAndRelated(String table, boolean execute) throws BrowseException
@@ -492,6 +511,30 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         finally
         {
             tri.close();
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.browse.BrowseCreateDAO#insertCommunityMappings(java.lang.String, java.lang.String, java.lang.String)
+     */
+    public void insertCommunityMappings(int itemID) throws BrowseException
+    {
+        try
+        {
+            int[] commID = getAllCommunityIDs(itemID);
+
+            for (int i = 0; i < commID.length; i++)
+            {
+                TableRow row = DatabaseManager.create(context, "Communities2Item");
+                row.setColumn("item_id", itemID);
+                row.setColumn("community_id", commID[i]);
+                DatabaseManager.update(context, row);
+            }
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new BrowseException(e);
         }
     }
 
@@ -750,5 +793,90 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         }
         
         return false;
+    }
+
+    /**
+     * perform a database query to get all the communities that this item belongs to,
+     * including all mapped communities, and ancestors
+     *
+     * this is done here instead of using the Item api, because for reindexing we may
+     * not have Item objects, and in any case this is *much* faster
+     *
+     * @param itemId
+     * @return
+     * @throws SQLException
+     */
+    private int[] getAllCommunityIDs(int itemId) throws SQLException
+    {
+        List<Integer> commIdList = new ArrayList<Integer>();
+
+        TableRowIterator tri = null;
+
+        try
+        {
+            tri = DatabaseManager.queryTable(context, "Community2Item",
+                        "SELECT * FROM Community2Item WHERE item_id=?", itemId);
+
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+                int commId = row.getIntColumn("community_id");
+                commIdList.add(commId);
+
+                // Get the parent community, and continue to get all ancestors
+                Integer parentId = getParentCommunityID(commId);
+                while (parentId != null)
+                {
+                    commIdList.add(parentId);
+                    parentId = getParentCommunityID(parentId);
+                }
+            }
+        }
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
+
+        // Need to iterate the array as toArray will produce an array Integers,
+        // not ints as we need.
+        int[] cIds = new int[commIdList.size()];
+        for (int i = 0; i < commIdList.size(); i++)
+        {
+            cIds[i] = commIdList.get(i);
+        }
+
+        return cIds;
+    }
+
+    /**
+     * Get the id of the parent community. Returns Integer, as null is used to
+     * signify that there are no parents (ie. top-level).
+     *
+     * @param commId
+     * @return
+     * @throws SQLException
+     */
+    private Integer getParentCommunityID(int commId) throws SQLException
+    {
+        TableRowIterator tri = null;
+
+        try
+        {
+            tri = DatabaseManager.queryTable(context, "Community2Community",
+                        "SELECT * FROM Community2Community WHERE child_comm_id=?", commId);
+
+            if (tri.hasNext())
+            {
+                return tri.next().getIntColumn("parent_comm_id");
+            }
+        }
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
+
+        return null;
     }
 }
