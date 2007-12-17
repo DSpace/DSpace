@@ -1,8 +1,6 @@
 package org.dspace.administer;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -14,18 +12,14 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.apache.xml.serialize.EncodingInfo;
-import org.apache.xml.serialize.Encodings;
 import org.apache.xml.serialize.Method;
 import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.Serializer;
 import org.apache.xml.serialize.XMLSerializer;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.Context;
 import org.xml.sax.SAXException;
 
-import edu.sdsc.grid.io.MetaDataField;
 
 /**
  * @author Graham Triggs
