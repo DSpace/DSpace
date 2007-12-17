@@ -128,7 +128,7 @@ public class BitstreamDAOCore extends BitstreamDAO
             oid = new ObjectIdentifier(true);
             bitstream.setIdentifier(oid);
         }
-        uuidDAO.update(bitstream.getIdentifier());
+        oidDAO.update(bitstream.getIdentifier());
 
         childDAO.update(bitstream);
     }
@@ -147,7 +147,7 @@ public class BitstreamDAOCore extends BitstreamDAO
         AuthorizeManager.removeAllPolicies(context, bitstream);
 
         // remove the object identifier
-        uuidDAO.delete(bitstream);
+        oidDAO.delete(bitstream);
 
         childDAO.delete(id);
     }
@@ -159,7 +159,7 @@ public class BitstreamDAOCore extends BitstreamDAO
 
         AuthorizeManager.authorizeAction(context, bitstream, Constants.REMOVE);
         // remove the object identifier
-        uuidDAO.delete(bitstream);
+        oidDAO.delete(bitstream);
 
         childDAO.remove(id);
     }

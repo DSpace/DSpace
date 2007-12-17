@@ -53,8 +53,8 @@ import org.dspace.dao.Link;
 import org.dspace.eperson.EPerson;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
-import org.dspace.uri.dao.UUIDDAO;
-import org.dspace.uri.dao.UUIDDAOFactory;
+import org.dspace.uri.dao.ObjectIdentifierDAO;
+import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -70,7 +70,7 @@ public abstract class ItemDAO extends ContentDAO<ItemDAO>
     protected BundleDAO bundleDAO;
     protected BitstreamDAO bitstreamDAO;
     protected ExternalIdentifierDAO identifierDAO;
-    protected UUIDDAO uuidDAO;
+    protected ObjectIdentifierDAO oidDAO;
 
     protected ItemDAO childDAO;
 
@@ -85,7 +85,7 @@ public abstract class ItemDAO extends ContentDAO<ItemDAO>
         bundleDAO = BundleDAOFactory.getInstance(context);
         bitstreamDAO = BitstreamDAOFactory.getInstance(context);
         identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
-        uuidDAO = UUIDDAOFactory.getInstance(context);
+        oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
     }
 
     public ItemDAO getChild()

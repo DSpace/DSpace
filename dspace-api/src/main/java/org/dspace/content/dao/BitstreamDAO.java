@@ -47,8 +47,8 @@ import org.dspace.core.Context;
 import org.dspace.dao.CRUD;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
-import org.dspace.uri.dao.UUIDDAO;
-import org.dspace.uri.dao.UUIDDAOFactory;
+import org.dspace.uri.dao.ObjectIdentifierDAO;
+import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,7 +65,7 @@ public abstract class BitstreamDAO extends ContentDAO<BitstreamDAO>
 
     protected Context context;
     protected ExternalIdentifierDAO identifierDAO;
-    protected UUIDDAO uuidDAO;
+    protected ObjectIdentifierDAO oidDAO;
 
     protected BitstreamDAO childDAO;
 
@@ -74,7 +74,7 @@ public abstract class BitstreamDAO extends ContentDAO<BitstreamDAO>
         this.context = context;
 
         identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
-        uuidDAO = UUIDDAOFactory.getInstance(context);
+        oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
     }
 
     public BitstreamDAO getChild()

@@ -293,7 +293,7 @@ public class ItemDAOCore extends ItemDAO
             oid = new ObjectIdentifier(true);
             item.setIdentifier(oid);
         }
-        uuidDAO.update(item.getIdentifier());
+        oidDAO.update(item.getIdentifier());
 
         childDAO.update(item);
     }
@@ -317,7 +317,7 @@ public class ItemDAOCore extends ItemDAO
         AuthorizeManager.removeAllPolicies(context, item);
 
         // remove the object identifier
-        uuidDAO.delete(item);
+        oidDAO.delete(item);
 
         childDAO.delete(id);
     }

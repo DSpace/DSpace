@@ -144,7 +144,7 @@ public class CommunityDAOCore extends CommunityDAO
             oid = new ObjectIdentifier(true);
             community.setIdentifier(oid);
         }
-        uuidDAO.update(community.getIdentifier());
+        oidDAO.update(community.getIdentifier());
 
         childDAO.update(community);
     }
@@ -208,7 +208,7 @@ public class CommunityDAOCore extends CommunityDAO
             AuthorizeManager.removeAllPolicies(context, community);
 
             // remove the object identifier
-            uuidDAO.delete(community);
+            oidDAO.delete(community);
         }
         catch (IOException ioe)
         {

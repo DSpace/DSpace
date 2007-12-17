@@ -39,28 +39,6 @@
  */
 package org.dspace.app.itemimport;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.Vector;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -72,10 +50,12 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.dao.ResourcePolicyDAO;
 import org.dspace.authorize.dao.ResourcePolicyDAOFactory;
+import org.dspace.content.Collection;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
@@ -93,6 +73,7 @@ import org.dspace.content.dao.WorkspaceItemDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.PluginManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.dao.GroupDAO;
@@ -107,6 +88,28 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 /**
  * Import items into DSpace. The conventional use is upload files by copying
@@ -393,45 +396,14 @@ public class ItemImport
             // validate each collection arg to see if it's a real collection
             for (int i = 0; i < collections.length; i++)
             {
-                // is the ID a uri?
-                if (collections[i].indexOf('/') != -1)
+                ObjectIdentifier oid = ObjectIdentifier.fromString(collections[i]);
+                DSpaceObject dso = oid.getObject(c);
+                if (!(dso instanceof Collection))
                 {
-                    if (collections[i].indexOf(':') == -1)
-                    {
-                        // has no : must be a handle
-                        collections[i] = "hdl:" + collections[i];
-                        System.out.println("no namespace provided. assuming handles.");
-                    }
-
-                    // string has a / so it must be a persistent identifier in
-                    // canonical form - try to resolve it
-                    ExternalIdentifier identifier =
-                        identifierDAO.retrieve(collections[i]);
-                    ObjectIdentifier oi = identifier.getObjectIdentifier();
-                    mycollections[i] = (Collection) oi.getObject(c);
-
-                    // resolved, now make sure it's a collection
-                    if ((mycollections[i] == null)
-                            || (mycollections[i].getType() != Constants.COLLECTION))
-                    {
-                        mycollections[i] = null;
-                    }
+                    throw new IllegalArgumentException(collections[i] + " does not resolve to a Collection");
                 }
-                // not a uri, try and treat it as an integer collection
-                // database ID
-                else if (collections[i] != null)
-                {
-                    mycollections[i] =
-                        collectionDAO.retrieve(Integer.parseInt(collections[i]));
-                }
-
-                // was the collection valid?
-                if (mycollections[i] == null)
-                {
-                    throw new IllegalArgumentException("Cannot resolve "
-                            + collections[i] + " to collection");
-                }
-
+                mycollections[i] = (Collection) dso;
+                
                 // print progress info
                 String owningPrefix = "";
 
@@ -440,10 +412,9 @@ public class ItemImport
                     owningPrefix = "Owning ";
                 }
 
-                System.out.println(owningPrefix + " Collection: "
-                        + mycollections[i].getMetadata("name"));
+                System.out.println(owningPrefix + " Collection: " + mycollections[i].getMetadata("name"));
             }
-        } // end of validating collections
+        }
 
         try
         {
@@ -704,6 +675,20 @@ public class ItemImport
         // non-standard permissions
         Vector options = processContentsFile(c, myitem, path
                 + File.separatorChar + itemname, "contents");
+
+        // get the suggested or desired identifiers for the item
+        ObjectIdentifier oid = getObjectIdentifier(path + File.separatorChar + itemname + File.separatorChar);
+        List<ExternalIdentifier> eids = getExternalIdentifiers(path + File.separatorChar + itemname + File.separatorChar);
+
+        if (oid != null)
+        {
+            myitem.setIdentifier(oid);
+        }
+        
+        if (eids.size() > 0)
+        {
+            myitem.setExternalIdentifiers(eids);
+        }
 
         if (useWorkflow)
         {
@@ -1616,5 +1601,55 @@ public class ItemImport
                 .newDocumentBuilder();
 
         return builder.parse(new File(filename));
+    }
+
+    /**
+     * Returns the first internal identifier encoungered in the uri file
+     * 
+     * @param directory
+     * @return
+     * @throws IOException
+     */
+    private ObjectIdentifier getObjectIdentifier(String directory)
+        throws IOException
+    {
+        File uriFile = new File(directory + "uri");
+        FileReader reader = new FileReader(uriFile);
+        BufferedReader br = new BufferedReader(reader);
+        String line = null;
+        while ((line = br.readLine()) != null)
+        {
+            ObjectIdentifier oid = ObjectIdentifier.fromString(line);
+            if (oid != null)
+            {
+                return oid;
+            }
+        }
+
+        return null;   
+    }
+
+    private List<ExternalIdentifier> getExternalIdentifiers(String directory)
+            throws IOException
+    {
+        File uriFile = new File(directory + "uri");
+        FileReader reader = new FileReader(uriFile);
+        BufferedReader br = new BufferedReader(reader);
+        String line = null;
+        ArrayList<ExternalIdentifier> eids = new ArrayList<ExternalIdentifier>();
+        ExternalIdentifier[] eidPlugins = (ExternalIdentifier[]) PluginManager.getPluginSequence(ExternalIdentifier.class);
+        while ((line = br.readLine()) != null)
+        {
+            for (int i = 0; i < eidPlugins.length; i++)
+            {
+                ExternalIdentifier eid = eidPlugins[i].parseCanonicalForm(line);
+                if (eid != null)
+                {
+                    eids.add(eid);
+                }
+            }
+        }
+        
+        return eids;
     }
 }

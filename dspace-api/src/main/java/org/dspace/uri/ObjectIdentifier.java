@@ -58,8 +58,8 @@ import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.uri.dao.UUIDDAO;
-import org.dspace.uri.dao.UUIDDAOFactory;
+import org.dspace.uri.dao.ObjectIdentifierDAO;
+import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -221,7 +221,7 @@ public class ObjectIdentifier
         {
             // we don't have resource type or resource id for this item
             // check the UUID cache and see if we can find them
-            UUIDDAO dao = UUIDDAOFactory.getInstance(context);
+            ObjectIdentifierDAO dao = ObjectIdentifierDAOFactory.getInstance(context);
             ObjectIdentifier noid = dao.retrieve(uuid);
 
             // if there is no object identifier, just return null

@@ -51,8 +51,8 @@ import org.dspace.eperson.dao.GroupDAO;
 import org.dspace.eperson.dao.GroupDAOFactory;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
-import org.dspace.uri.dao.UUIDDAO;
-import org.dspace.uri.dao.UUIDDAOFactory;
+import org.dspace.uri.dao.ObjectIdentifierDAO;
+import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
 
 import java.util.List;
 import java.util.UUID;
@@ -70,7 +70,7 @@ public abstract class CollectionDAO extends ContentDAO<CollectionDAO>
     protected ItemDAO itemDAO;
     protected GroupDAO groupDAO;
     protected ExternalIdentifierDAO identifierDAO;
-    protected UUIDDAO uuidDAO;
+    protected ObjectIdentifierDAO oidDAO;
 
     protected CollectionDAO childDAO;
 
@@ -109,7 +109,7 @@ public abstract class CollectionDAO extends ContentDAO<CollectionDAO>
         itemDAO = ItemDAOFactory.getInstance(context);
         groupDAO = GroupDAOFactory.getInstance(context);
         identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
-        uuidDAO = UUIDDAOFactory.getInstance(context);
+        oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
     }
 
     public CollectionDAO getChild()

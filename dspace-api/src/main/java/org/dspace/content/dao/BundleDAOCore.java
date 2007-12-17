@@ -136,7 +136,7 @@ public class BundleDAOCore extends BundleDAO
             oid = new ObjectIdentifier(true);
             bundle.setIdentifier(oid);
         }
-        uuidDAO.update(bundle.getIdentifier());
+        oidDAO.update(bundle.getIdentifier());
 
         childDAO.update(bundle);
     }
@@ -160,7 +160,7 @@ public class BundleDAOCore extends BundleDAO
         AuthorizeManager.removeAllPolicies(context, bundle);
 
         // remove the object identifier
-        uuidDAO.delete(bundle);
+        oidDAO.delete(bundle);
 
         childDAO.delete(id);
     }

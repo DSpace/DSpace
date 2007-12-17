@@ -7,8 +7,8 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.dao.CRUD;
 import org.dspace.dao.Link;
-import org.dspace.uri.dao.UUIDDAO;
-import org.dspace.uri.dao.UUIDDAOFactory;
+import org.dspace.uri.dao.ObjectIdentifierDAO;
+import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,13 +19,13 @@ public abstract class BundleDAO extends ContentDAO<BundleDAO>
     protected Context context;
 
     protected BundleDAO childDAO;
-    protected UUIDDAO uuidDAO;
+    protected ObjectIdentifierDAO oidDAO;
 
     public BundleDAO(Context context)
     {
         this.context = context;
 
-        uuidDAO = UUIDDAOFactory.getInstance(context);
+        oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
     }
 
     public BundleDAO getChild()

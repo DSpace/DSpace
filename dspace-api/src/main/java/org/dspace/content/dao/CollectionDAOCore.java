@@ -159,7 +159,7 @@ public class CollectionDAOCore extends CollectionDAO
             oid = new ObjectIdentifier(true);
             collection.setIdentifier(oid);
         }
-        uuidDAO.update(collection.getIdentifier());
+        oidDAO.update(collection.getIdentifier());
 
         childDAO.update(collection);
     }
@@ -243,7 +243,7 @@ public class CollectionDAOCore extends CollectionDAO
             }
 
             // remove the object identifier
-            uuidDAO.delete(collection);
+            oidDAO.delete(collection);
         }
         catch (IOException ioe)
         {
