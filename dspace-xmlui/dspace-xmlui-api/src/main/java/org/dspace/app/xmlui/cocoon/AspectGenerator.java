@@ -100,12 +100,8 @@ public class AspectGenerator extends FileGenerator implements
         aspectID++;
         request.setAttribute(ASPECT_ID, aspectID);
 
-        // Get the original path, and remove the prefix if it is prepended.
-        String path = request.getServletPath();
-        if (path.startsWith(PREFIX))
-        {
-            path = path.substring(PREFIX.length());
-        }
+        // Get the original path
+        String path = request.getSitemapURI();
 
         // Build the final path to the next Aspect.
         String aspectPath = PROTOCOL + ":/" + PREFIX + aspectID + "/" + path;
