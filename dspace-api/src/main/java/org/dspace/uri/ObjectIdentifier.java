@@ -88,8 +88,11 @@ public class ObjectIdentifier
 
     public ObjectIdentifier(boolean generate)
     {
-        // generate a new unique UUID
-        this.uuid = UUID.randomUUID();
+        if (generate)
+        {
+            // generate a new unique UUID
+            this.uuid = UUID.randomUUID();
+        }
     }
 
     public ObjectIdentifier(int resourceID, int resourceTypeID)
