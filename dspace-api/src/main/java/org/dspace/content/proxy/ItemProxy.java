@@ -39,22 +39,15 @@
  */
 package org.dspace.content.proxy;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -65,8 +58,6 @@ import org.dspace.eperson.EPerson;
  */
 public class ItemProxy extends Item
 {
-    private static Logger log = Logger.getLogger(ItemProxy.class);
-
     private boolean bundlesLoaded = false;
     private boolean metadataLoaded = false;
 
@@ -78,11 +69,7 @@ public class ItemProxy extends Item
     @Override
     public Collection getOwningCollection()
     {
-        if (owningCollection != null)
-        {
-            return owningCollection;
-        }
-        else if (owningCollectionId != -1)
+        if ((owningCollectionId != -1) && (owningCollection == null))
         {
             owningCollection = collectionDAO.retrieve(owningCollectionId);
         }
@@ -93,10 +80,7 @@ public class ItemProxy extends Item
     @Override
     public Bundle[] getBundles()
     {
-        if (!bundlesLoaded)
-        {
-            setBundles(bundleDAO.getBundles(this));
-        }
+        loadBundles();
 
         return super.getBundles();
     }
@@ -104,7 +88,7 @@ public class ItemProxy extends Item
     @Override
     public void setBundles(List<Bundle> bundles)
     {
-        this.bundlesLoaded = true;
+        bundlesLoaded = true;
 
         super.setBundles(bundles);
     }
@@ -112,10 +96,7 @@ public class ItemProxy extends Item
     @Override
     public Bundle[] getBundles(String name)
     {
-        if (!bundlesLoaded)
-        {
-            setBundles(bundleDAO.getBundles(this));
-        }
+        loadBundles();
 
         return super.getBundles(name);
     }
@@ -123,10 +104,7 @@ public class ItemProxy extends Item
     @Override
     public void addBundle(Bundle b) throws AuthorizeException
     {
-        if (!bundlesLoaded)
-        {
-            setBundles(bundleDAO.getBundles(this));
-        }
+        loadBundles();
 
         super.addBundle(b);
     }
@@ -134,10 +112,7 @@ public class ItemProxy extends Item
     @Override
     public void removeBundle(Bundle b) throws AuthorizeException
     {
-        if (!bundlesLoaded)
-        {
-            setBundles(bundleDAO.getBundles(this));
-        }
+        loadBundles();
 
         super.removeBundle(b);
     }
@@ -145,11 +120,7 @@ public class ItemProxy extends Item
     @Override
     public List<DCValue> getMetadata()
     {
-        if (!metadataLoaded)
-        {
-            dao.loadMetadata(this);
-            this.metadataLoaded = true;
-        }
+        loadMetadata();
 
         return super.getMetadata();
     }
@@ -157,11 +128,7 @@ public class ItemProxy extends Item
     @Override
     public DCValue[] getMetadata(String mdString)
     {
-        if (!metadataLoaded)
-        {
-            dao.loadMetadata(this);
-            this.metadataLoaded = true;
-        }
+        loadMetadata();
 
         return super.getMetadata(mdString);
     }
@@ -170,15 +137,7 @@ public class ItemProxy extends Item
     public DCValue[] getMetadata(String schema, String element,
             String qualifier, String language)
     {
-        // Really, we should query the DAO for specific metadata only under
-        // certain conditions, but if the value doesn't exist in memory, we
-        // can't ever guarantee that it's not in the database unless we
-        // actually check.
-        if (!metadataLoaded)
-        {
-            dao.loadMetadata(this);
-            this.metadataLoaded = true;
-        }
+        loadMetadata();
 
         return super.getMetadata(schema, element, qualifier, language);
     }
@@ -186,18 +145,16 @@ public class ItemProxy extends Item
     @Override
     public void setMetadata(List<DCValue> metadata)
     {
-        this.metadata = metadata;
+        metadataLoaded = true;
+
+        super.setMetadata(metadata);
     }
 
     @Override
     public void addMetadata(String schema, String element, String qualifier,
             String lang, String... values)
     {
-        if (!metadataLoaded)
-        {
-            dao.loadMetadata(this);
-            this.metadataLoaded = true;
-        }
+        loadMetadata();
 
         super.addMetadata(schema, element, qualifier, lang, values);
     }
@@ -206,11 +163,7 @@ public class ItemProxy extends Item
     public void clearMetadata(String schema, String element, String qualifier,
             String lang)
     {
-        if (!metadataLoaded)
-        {
-            dao.loadMetadata(this);
-            this.metadataLoaded = true;
-        }
+        loadMetadata();
 
         super.clearMetadata(schema, element, qualifier, lang);
     }
@@ -256,5 +209,29 @@ public class ItemProxy extends Item
     public void clearDC(String element, String qualifier, String lang)
     {
         clearMetadata(MetadataSchema.DC_SCHEMA, element, qualifier, lang);
+    }
+
+    /**
+     * Load the bundles into memory from the data store.
+     */
+    private void loadBundles()
+    {
+        if (!bundlesLoaded)
+        {
+            setBundles(bundleDAO.getBundles(this));
+            bundlesLoaded = true;
+        }
+    }
+
+    /**
+     * Load the metadata into memory from the data store.
+     */
+    private void loadMetadata()
+    {
+        if (!metadataLoaded)
+        {
+            dao.loadMetadata(this);
+            metadataLoaded = true;
+        }
     }
 }
