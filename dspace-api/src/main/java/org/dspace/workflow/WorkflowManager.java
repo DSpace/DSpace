@@ -629,8 +629,7 @@ public class WorkflowManager
             // Get submitter
             EPerson ep = i.getSubmitter();
             // Get the Locale
-            Locale epLocale = new Locale(ep.getLanguage());
-            Locale supportedLocale = I18nUtil.getSupportedLocale(epLocale);
+            Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
             Email email = ConfigurationManager.getEmail(
                     I18nUtil.getEmailFilename(supportedLocale,
                         "submit_archive"));
@@ -812,8 +811,7 @@ public class WorkflowManager
 
                 for (int i = 0; i < epa.length; i++)
                 {
-                    Locale epersonLocale = new Locale(epa[i].getLanguage());
-                    Locale supportedLocale = I18nUtil.getSupportedLocale(epersonLocale);
+                    Locale supportedLocale = I18nUtil.getEPersonLocale(epa[i]);
                     Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_task"));
                     email.addArgument(title);
                     email.addArgument(coll.getMetadata("name"));
@@ -893,8 +891,7 @@ public class WorkflowManager
 
             // Get rejector's name
             String rejector = getEPersonName(e);
-            Locale eLocale = new Locale(e.getLanguage());
-            Locale supportedLocale = I18nUtil.getSupportedLocale(eLocale);
+            Locale supportedLocale = I18nUtil.getEPersonLocale(e);
             Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale,"submit_reject"));
 
             email.addRecipient(getSubmitterEPerson(wi).getEmail());

@@ -37,6 +37,10 @@
 
 package org.dspace.core;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.dspace.eperson.EPerson;
+
 import java.io.File;
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -62,6 +66,8 @@ import java.util.StringTokenizer;
 
 public class I18nUtil
 {
+    private static final Logger log = Logger.getLogger(I18nUtil.class);
+    
     // the default Locale of this DSpace Instance
     public static final Locale DEFAULTLOCALE = getDefaultLocale();
 
@@ -108,6 +114,32 @@ public class I18nUtil
         }
 
         return defaultLocale;
+    }
+
+    /**
+     * Get the Locale for a specified EPerson. If the language is missing,
+     * return the default Locale for the repository.
+     * 
+     * @param ep
+     * @return
+     */
+    public static Locale getEPersonLocale(EPerson ep)
+    {
+        if (ep == null)
+        {
+            log.error("No EPerson specified, returning default locale");
+            return I18nUtil.getDefaultLocale();
+        }
+
+        String lang = ep.getLanguage();
+        
+        if (StringUtils.isBlank(lang))
+        {
+            log.error("No language specified for EPerson " + ep.getID());
+            return I18nUtil.getDefaultLocale();
+        }
+
+        return I18nUtil.getSupportedLocale(new Locale(lang));
     }
 
     /**

@@ -314,8 +314,7 @@ public class SubscriptionManager
         ObjectIdentifier identifier = null;
 
         // Get a resource bundle according to the eperson language preferences
-        Locale epersonLocale = new Locale(eperson.getLanguage());
-        Locale supportedLocale = I18nUtil.getSupportedLocale(epersonLocale);
+        Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
         ResourceBundle labels = ResourceBundle.getBundle("Messages", supportedLocale);
         
         // Get the start and end dates for yesterday

@@ -102,8 +102,7 @@ public class PasswordServlet extends DSpaceServlet
             Authenticate.loggedIn(context, request, context.getCurrentUser());
 
             // Set the Locale according to user preferences
-            String preferredLanguage = context.getCurrentUser().getLanguage();
-            Locale epersonLocale = I18nUtil.getSupportedLocale(new Locale(preferredLanguage));
+            Locale epersonLocale = I18nUtil.getEPersonLocale(context.getCurrentUser());
             context.setCurrentLocale(epersonLocale);
             Config.set(request.getSession(), Config.FMT_LOCALE, epersonLocale);
 
