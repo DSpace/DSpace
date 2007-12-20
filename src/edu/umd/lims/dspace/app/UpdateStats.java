@@ -144,7 +144,7 @@ public class UpdateStats {
 	      int nItemCount = item.getIntMetadata("views");
 	      nItemCount += nCount;
 	      item.setMetadata("views", nItemCount);
-	      item.update();
+	      item.update(false);
 
 	      lItems++;
 

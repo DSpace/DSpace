@@ -1164,6 +1164,21 @@ public class Item extends DSpaceObject
      */
     public void update() throws SQLException, AuthorizeException
     {
+	update(true);
+    }
+
+
+    /**
+     * Update the item "in archive" flag and Dublin Core metadata in the
+     * database
+     * 
+     * @param bLastModified update last_modified column?
+     *
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    public void update(boolean bLastModified) throws SQLException, AuthorizeException
+    {
         // Check authorisation
         // only do write authorization if user is not an editor
         if (!canEdit())
@@ -1178,7 +1193,9 @@ public class Item extends DSpaceObject
                 + getID()));
 
         // Set the last modified date
-        itemRow.setColumn("last_modified", new Date());
+	if (bLastModified) {
+	    itemRow.setColumn("last_modified", new Date());
+	}
 
         // Set sequence IDs for bitstreams in item
         int sequence = 0;
