@@ -1,5 +1,5 @@
 /*
- * Upgrade15To16.java
+ * MigrateHandle.java
  *
  * Version: $Revision: 1727 $
  *
@@ -39,20 +39,42 @@
  */
 package org.dspace.administer.update1516;
 
-import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Context;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.handle.Handle;
+
+import java.sql.SQLException;
 
 /**
  * @author Richard Jones
  */
-public class Upgrade15To16
+public class MigrateHandle
 {
-    public static void main(String[] args)
-                throws Exception, AuthorizeException
+    public void migrate()
+            throws SQLException
     {
-        MigrateUUID uuid = new MigrateUUID();
-        uuid.migrate();
+        Context context = new Context();
+        context.setIgnoreAuthorization(true);
 
-        MigrateHandle hdl = new MigrateHandle();
-        hdl.migrate();
+        ExternalIdentifierDAO dao = ExternalIdentifierDAOFactory.getInstance(context);
+
+        String query = "SELECT * FROM handle";
+        TableRowIterator tri = DatabaseManager.query(context, query);
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+            ObjectIdentifier oid = new ObjectIdentifier(row.getIntColumn("resource_id"), row.getIntColumn("resource_type_id"));
+            ExternalIdentifier eid = new Handle(row.getStringColumn("handle"), oid);
+            dao.update(eid);
+        }
+        tri.close();
+
+        context.complete();
     }
 }
