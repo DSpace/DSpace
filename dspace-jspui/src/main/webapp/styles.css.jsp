@@ -669,3 +669,31 @@ img.controlledvocabulary {
 	margin-top: 5px;
 	margin-bottom: 5px;
 }
+
+.page_identifier
+{
+    font-size: 60%;
+}
+
+.external_identifiers_table
+{
+    border: 1px solid #000044;
+    background: #eeeeee;
+    font-size: 80%;
+    margin-bottom: 10px;
+    margin-left: 40px;
+}
+
+.external_identifiers_table th
+{
+    text-align: left;
+    font-weight: bold;
+    padding-bottom: 5px;
+    padding-right: 10px;
+}
+
+.external_identifiers_table td
+{
+    text-align: left;
+    padding-left: 20px;
+}

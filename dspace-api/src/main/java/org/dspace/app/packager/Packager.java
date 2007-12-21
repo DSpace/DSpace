@@ -40,11 +40,6 @@
 
 package org.dspace.app.packager;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -52,22 +47,28 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.content.InstallItem;
+import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.packager.PackageDisseminator;
-import org.dspace.content.packager.PackageParameters;
 import org.dspace.content.packager.PackageIngester;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.content.packager.PackageParameters;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.workflow.WorkflowManager;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowManager;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Command-line interface to the Packager plugin.
@@ -264,8 +265,8 @@ public class Packager
                     System.out.println("no namespace provided. assuming handles.");
                 }
 
-                ExternalIdentifier identifier =
-                    identifierDAO.retrieve(collections[i]);
+                ExternalIdentifier identifier = ExternalIdentifierMint.parseCanonicalForm(context, collections[i]);
+                // ExternalIdentifier identifier = identifierDAO.retrieve(collections[i]);
                 ObjectIdentifier oi = identifier.getObjectIdentifier();
 
                 // sanity check: did uri resolve, and to a collection?
@@ -350,7 +351,8 @@ public class Packager
                 System.out.println("no namespace provided. assuming handles.");
             }
 
-            ExternalIdentifier identifier = identifierDAO.retrieve(itemUri);
+            ExternalIdentifier identifier = ExternalIdentifierMint.parseCanonicalForm(context, itemUri);
+            // ExternalIdentifier identifier = identifierDAO.retrieve(itemUri);
             ObjectIdentifier oi = identifier.getObjectIdentifier();
 
             // sanity check: did uri resolve, and to a collection?

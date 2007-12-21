@@ -46,19 +46,24 @@ import org.apache.commons.lang.builder.ToStringStyle;
 
 /**
  * @author James Rutherford
+ * @author Richard Jones
  */
 public abstract class ExternalIdentifierType
 {
     private String namespace;
     private String protocol;
     private String baseURI;
+    private String protocolActivator = "://";
+    private String baseSeparator = "/";
 
     public ExternalIdentifierType(
-            String namespace, String protocol, String baseURI)
+            String namespace, String protocol, String baseURI, String protocolActivator, String baseSeparator)
     {
         this.protocol = protocol;
         this.namespace = namespace;
         this.baseURI = baseURI;
+        this.protocolActivator = protocolActivator;
+        this.baseSeparator = baseSeparator;
     }
 
     public String getNamespace()
@@ -76,7 +81,21 @@ public abstract class ExternalIdentifierType
         return baseURI;
     }
 
+    public String getProtocolActivator()
+    {
+        return protocolActivator;
+    }
+
+    public String getBaseSeparator()
+    {
+        return baseSeparator;
+    }
+
     public abstract String getPrefix();
+
+    public abstract ExternalIdentifier getInstance(String value, ObjectIdentifier oid);
+
+    public abstract boolean equals(ExternalIdentifierType type);
 
     ////////////////////////////////////////////////////////////////////
     // Utility methods

@@ -40,6 +40,16 @@
 
 package org.dspace.app.statistics;
 
+import org.dspace.content.DCValue;
+import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -61,15 +71,6 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
 
 /**
  * This class performs the action of coordinating a usage report being
@@ -820,9 +821,9 @@ public class ReportGenerator
         // ensure that the URI exists
         try 
         {
-            ExternalIdentifierDAO identifierDAO =
-                ExternalIdentifierDAOFactory.getInstance(context);
-            ExternalIdentifier identifier = identifierDAO.retrieve(uri);
+            ExternalIdentifier identifier = ExternalIdentifierMint.parseCanonicalForm(context, uri);
+            //ExternalIdentifierDAO identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
+            //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
             ObjectIdentifier oi = identifier.getObjectIdentifier();
             item = (Item) oi.getObject(context);
         } 

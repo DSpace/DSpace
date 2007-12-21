@@ -54,6 +54,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ExternalIdentifierMint;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -61,6 +62,7 @@ import org.dspace.eperson.Group;
 
 /**
  * @author James Rutherford
+ * @author Richard Jones
  */
 public class CommunityDAOCore extends CommunityDAO
 {
@@ -87,8 +89,12 @@ public class CommunityDAOCore extends CommunityDAO
 
         // Create a default persistent identifier for this Community, and
         // add it to the in-memory Community object.
-        ExternalIdentifier identifier = identifierDAO.create(community);
-        community.addExternalIdentifier(identifier);
+        //ExternalIdentifier identifier = identifierDAO.create(community);
+        //community.addExternalIdentifier(identifier);
+
+        // now assign any required external identifiers
+        List<ExternalIdentifier> eids = ExternalIdentifierMint.mintAll(context, community);
+        community.setExternalIdentifiers(eids);
 
         // create the default authorization policy for communities
         // of 'anonymous' READ

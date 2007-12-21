@@ -40,24 +40,12 @@
 
 package org.dspace.app.webui.servlet;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.StringTokenizer;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.sun.syndication.feed.rss.Channel;
+import com.sun.syndication.feed.rss.Description;
+import com.sun.syndication.feed.rss.Image;
+import com.sun.syndication.feed.rss.TextInput;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.WireFeedOutput;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
@@ -74,22 +62,34 @@ import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.search.Harvest;
+import org.dspace.uri.DSpaceIdentifier;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
-import com.sun.syndication.feed.rss.Channel;
-import com.sun.syndication.feed.rss.Description;
-import com.sun.syndication.feed.rss.Image;
-import com.sun.syndication.feed.rss.TextInput;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.WireFeedOutput;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.text.MessageFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.StringTokenizer;
 
 /**
  * Servlet for handling requests for a syndication feed. The URI of the collection
@@ -195,10 +195,11 @@ public class FeedServlet extends DSpaceServlet
         if(!uri.equals(SITE_FEED_KEY))
         { 	
         	// Determine if the URI is a valid reference
-            ExternalIdentifierDAO dao = ExternalIdentifierDAOFactory.getInstance(context);
-            ExternalIdentifier identifier = dao.retrieve(uri);
-            ObjectIdentifier oi = identifier.getObjectIdentifier();
-            dso = oi.getObject(context);
+            DSpaceIdentifier di = IdentifierFactory.resolve(context, uri);
+            //ExternalIdentifierDAO dao = ExternalIdentifierDAOFactory.getInstance(context);
+            //ExternalIdentifier identifier = dao.retrieve(uri);
+            //ObjectIdentifier oi = identifier.getObjectIdentifier();
+            dso = di.getObject(context);
         }
         
         if (! enabled || (dso != null && 

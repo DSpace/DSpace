@@ -58,6 +58,10 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
+/**
+ * @author James Rutherford
+ * @author Richard Jones
+ */
 public class CommunityDAOPostgres extends CommunityDAO
 {
     public CommunityDAOPostgres(Context context)
@@ -400,8 +404,8 @@ public class CommunityDAOPostgres extends CommunityDAO
         // FIXME: I'd like to bump the rest of this up into the superclass
         // so we don't have to do it for every implementation, but I can't
         // figure out a clean way of doing this yet.
-        List<ExternalIdentifier> identifiers =
-                identifierDAO.getExternalIdentifiers(community);
+        List<ExternalIdentifier> identifiers = identifierDAO.retrieve(community);
+        // List<ExternalIdentifier> identifiers = identifierDAO.getExternalIdentifiers(community);
         community.setExternalIdentifiers(identifiers);
 
         return community;

@@ -1,9 +1,5 @@
 /*
- * HandleType.java
- *
- * Version: $Revision: 1727 $
- *
- * Date: $Date: 2007-01-19 10:52:10 +0000 (Fri, 19 Jan 2007) $
+ * IdentifierResolver.java
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -37,44 +33,16 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.uri.handle;
+package org.dspace.uri;
 
-import org.dspace.core.ConfigurationManager;
-import org.dspace.uri.ExternalIdentifierType;
-import org.dspace.uri.ObjectIdentifier;
+import org.dspace.content.DSpaceObject;
 
 /**
- * @author James Rutherford
  * @author Richard Jones
  */
-public class HandleType extends ExternalIdentifierType
+public interface IdentifierResolver<T extends ExternalIdentifier>
 {
-    public HandleType()
-    {
-        super("hdl", "http", "hdl.handle.net", "://", "/");
-    }
+    DSpaceObject resolve(String identifier);
 
-    public String getPrefix()
-    {
-        String prefix = ConfigurationManager.getProperty("handle.prefix");
-        if (prefix == null || "".equals(prefix))
-        {
-            throw new RuntimeException("No configuration, or configuration is invalid for handle.prefix");
-        }
-        return prefix + "/";
-    }
-
-    public Handle getInstance(String value, ObjectIdentifier oid)
-    {
-        return new Handle(value, oid);
-    }
-
-    public boolean equals(ExternalIdentifierType type)
-    {
-        if (type instanceof HandleType)
-        {
-            return true;
-        }
-        return false;
-    }
+    T extractURLIdentifier(String path);
 }

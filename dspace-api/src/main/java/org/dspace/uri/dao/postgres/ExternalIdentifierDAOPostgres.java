@@ -39,33 +39,232 @@
  */
 package org.dspace.uri.dao.postgres;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.dspace.content.DSpaceObject;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierType;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ExternalIdentifierType;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ObjectIdentifierDAO;
+import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * @author James Rutherford
+ * @author Richard Jones
  */
 public class ExternalIdentifierDAOPostgres extends ExternalIdentifierDAO
 {
+    private String createSQL = "INSERT INTO externalidentifier (namespace, identifier, resource_type_id, resource_id) " +
+                               "VALUES (? ,?, ?, ?)";
+
+    private String retrieveSQL = "SELECT * FROM externalidentifier WHERE resource_type_id = ? AND resource_id = ?";
+
+    private String existsSQL = "SELECT * FROM externalidentifier WHERE namespace = ? AND identifier = ? " +
+                               "AND resource_type_id = ? AND resource_id = ?";
+
+    private String deleteSQL = "DELETE FROM externalidentifier WHERE namespace = ? AND identifier = ? " +
+                               "AND resource_type_id = ? AND resource_id = ?";
+
+    private String tombSQL = "UPDATE externalidentifier SET namespace = ?, identifier = ?, resource_type = null, " +
+                             "resource_id = null, tombstone = 1";
+
+    private String nsValueSQL = "SELECT * FROM externalidentifier WHERE namespace = ? AND identifier = ?";
+
+    private String substringSQL = "SELECT * FROM externalidentifier WHERE namespace = ? AND identifier LIKE ?";
+
     public ExternalIdentifierDAOPostgres(Context context)
     {
-        this.context = context;
+        super(context);
     }
 
-    public ExternalIdentifier create(DSpaceObject dso, String value,
-            ExternalIdentifierType type)
+    public void create(ExternalIdentifier eid, DSpaceObject dso)
+    {
+        try
+        {
+            String ns = eid.getType().getNamespace();
+            String value = eid.getValue();
+            int rt = dso.getType();
+            int rid = dso.getID();
+            Object[] params = {ns, value, new Integer(rt), new Integer(rid)};
+            DatabaseManager.updateQuery(context, createSQL, params);
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<ExternalIdentifier> retrieve(DSpaceObject dso)
+    {
+        try
+        {
+            List<ExternalIdentifier> eids = new ArrayList<ExternalIdentifier>();
+            Object[] params = {new Integer(dso.getType()), new Integer(dso.getID())};
+            TableRowIterator tri = DatabaseManager.query(context, retrieveSQL, params);
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+                String value = row.getStringColumn("identifier");
+                ExternalIdentifier eid = ExternalIdentifierMint.get(context, row.getStringColumn("namespace"), value);
+                // ExternalIdentifier eid = new ExternalIdentifier(type, value, dso.getIdentifier());
+                // eid.setValue(value);
+                eid.setObjectIdentifier(dso.getIdentifier());
+                eids.add(eid);
+            }
+            tri.close();
+            return eids;
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public ExternalIdentifier retrieve(ExternalIdentifierType type, String value)
+    {
+        try
+        {
+            Object[] params = {type.getNamespace(), value};
+            TableRowIterator tri = DatabaseManager.query(context, nsValueSQL, params);
+            if (!tri.hasNext())
+            {
+                return null;
+            }
+            TableRow row = tri.next();
+
+            ObjectIdentifierDAO oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
+            ObjectIdentifier oid = oidDAO.retrieve(row.getIntColumn("resource_type_id"), row.getIntColumn("resource_id"));
+            ExternalIdentifier eid = ExternalIdentifierMint.get(context, type, value, oid);
+
+            tri.close();
+            return eid;
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void update(ExternalIdentifier eid)
+    {
+        // find out if the ExternalIdentifier exists at all, and if not create it
+        if (!exists(eid))
+        {
+            insertOID(eid);
+        }
+    }
+
+    public void delete(ExternalIdentifier eid)
+    {
+        try
+        {
+            Object[] params = { eid.getType().getNamespace(), eid.getValue(),
+                                eid.getObjectIdentifier().getResourceTypeID(),
+                                eid.getObjectIdentifier().getResourceID() };
+
+            DatabaseManager.updateQuery(context, deleteSQL, params);
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void tombstone(ExternalIdentifier eid)
+    {
+        try
+        {
+            Object[] params = { eid.getType().getNamespace(), eid.getValue() };
+            DatabaseManager.updateQuery(context, tombSQL, params);
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<ExternalIdentifier> startsWith(ExternalIdentifierType type, String startsWith)
+    {
+        try
+        {
+            List<ExternalIdentifier> eids = new ArrayList<ExternalIdentifier>();
+            Object[] params = {type.getNamespace(), startsWith + "%"};
+            TableRowIterator tri = DatabaseManager.query(context, substringSQL, params);
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+                ObjectIdentifierDAO oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
+                ObjectIdentifier oid = oidDAO.retrieve(row.getIntColumn("resource_type_id"), row.getIntColumn("resource_id"));
+                ExternalIdentifier eid = ExternalIdentifierMint.get(context, type, row.getStringColumn("identifier"), oid);
+                eids.add(eid);
+            }
+
+            tri.close();
+            return eids;
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private boolean exists(ExternalIdentifier eid)
+    {
+        try
+        {
+            Object[] params = { eid.getType().getNamespace(), eid.getValue(),
+                                eid.getObjectIdentifier().getResourceTypeID(),
+                                eid.getObjectIdentifier().getResourceID() };
+
+            TableRowIterator tri = DatabaseManager.query(context, existsSQL, params);
+            if (!tri.hasNext())
+            {
+                tri.close();
+                return false;
+            }
+            tri.close();
+            return true;
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void insertOID(ExternalIdentifier eid)
+    {
+        try
+        {
+            Object[] params = { eid.getType().getNamespace(), eid.getValue(),
+                                eid.getObjectIdentifier().getResourceTypeID(),
+                                eid.getObjectIdentifier().getResourceID() };
+
+            DatabaseManager.updateQuery(context, createSQL, params);
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+/*
+    public ExternalIdentifier create(DSpaceObject dso, String value, ExternalIdentifierType type)
     {
         try
         {
@@ -90,6 +289,7 @@ public class ExternalIdentifierDAOPostgres extends ExternalIdentifierDAO
             dso.addExternalIdentifier(identifier);
 
             return identifier;
+            
         }
         catch (SQLException sqle)
         {
@@ -246,4 +446,5 @@ public class ExternalIdentifierDAOPostgres extends ExternalIdentifierDAO
             throw new RuntimeException(sqle);
         }
     }
+    */
 }

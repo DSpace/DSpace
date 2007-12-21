@@ -50,7 +50,6 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.dao.ResourcePolicyDAO;
 import org.dspace.authorize.dao.ResourcePolicyDAOFactory;
-import org.dspace.content.Collection;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -73,12 +72,12 @@ import org.dspace.content.dao.WorkspaceItemDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.dao.GroupDAO;
 import org.dspace.eperson.dao.GroupDAOFactory;
 import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ExternalIdentifierMint;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
@@ -144,6 +143,8 @@ public class ItemImport
     private static ItemDAO itemDAO;
 
     private static ExternalIdentifierDAO identifierDAO;
+
+    private static Context context;
 
     // File listing filter to look for metadata files
     static FilenameFilter metadataFileFilter = new FilenameFilter()
@@ -357,6 +358,7 @@ public class ItemImport
 
         // create a context
         Context c = new Context();
+        context =c ;
 
         collectionDAO = CollectionDAOFactory.getInstance(c);
         itemDAO = ItemDAOFactory.getInstance(c);
@@ -524,6 +526,7 @@ public class ItemImport
     private void replaceItems(Context c, Collection[] mycollections,
             String sourceDir, String mapFile, boolean template) throws Exception
     {
+        /*
         // verify the source directory
         File d = new java.io.File(sourceDir);
 
@@ -563,8 +566,7 @@ public class ItemImport
                 System.out.println("\tReplacing:  " + oldURI);
 
                 // add new item, locate old one
-                ExternalIdentifier identifier =
-                    identifierDAO.retrieve(oldURI);
+                ExternalIdentifier identifier = identifierDAO.retrieve(oldURI);
                 ObjectIdentifier oi = identifier.getObjectIdentifier();
                 oldItem = (Item) oi.getObject(c);
             }
@@ -572,7 +574,7 @@ public class ItemImport
             {
                 oldItem = itemDAO.retrieve(Integer.parseInt(oldURI));
             }
-
+*/
             /*
              * FIXME: This isn't true any more, now that we have persistent
              * identifiers, and items can have as many as they need.
@@ -589,6 +591,7 @@ public class ItemImport
              * safe to do a delete as any error results in an aborted
              * transaction without harming the original item
              */
+        /*
             File uriFile = new File(sourceDir + File.separatorChar + newItemName + File.separatorChar + "uri");
             PrintWriter uriOut = new PrintWriter(new FileWriter(uriFile, true));
 
@@ -603,7 +606,9 @@ public class ItemImport
             deleteItem(c, oldItem);
 
             newItem = addItem(c, mycollections, sourceDir, newItemName, null, template);
+
         }
+    */
     }
 
     private void deleteItems(Context c, String mapFile) throws Exception
@@ -768,6 +773,7 @@ public class ItemImport
     // remove, given a uri
     private void deleteItem(Context c, String uri) throws Exception
     {
+        /* FIXME
         // bit of a hack - to remove an item, you must remove it
         // from all collections it's a part of, then it will be removed
         ExternalIdentifier identifier = identifierDAO.retrieve(uri);
@@ -781,7 +787,7 @@ public class ItemImport
         else
         {
             deleteItem(c, myitem);
-        }
+        }*/
     }
 
     ////////////////////////////////////
@@ -1637,9 +1643,15 @@ public class ItemImport
         BufferedReader br = new BufferedReader(reader);
         String line = null;
         ArrayList<ExternalIdentifier> eids = new ArrayList<ExternalIdentifier>();
-        ExternalIdentifier[] eidPlugins = (ExternalIdentifier[]) PluginManager.getPluginSequence(ExternalIdentifier.class);
+        // ExternalIdentifier[] eidPlugins = (ExternalIdentifier[]) PluginManager.getPluginSequence(ExternalIdentifier.class);
         while ((line = br.readLine()) != null)
         {
+            ExternalIdentifier eid = ExternalIdentifierMint.parseCanonicalForm(context, line);
+            if (eid != null)
+            {
+                eids.add(eid);
+            }
+            /*
             for (int i = 0; i < eidPlugins.length; i++)
             {
                 ExternalIdentifier eid = eidPlugins[i].parseCanonicalForm(line);
@@ -1647,7 +1659,7 @@ public class ItemImport
                 {
                     eids.add(eid);
                 }
-            }
+            }*/
         }
         
         return eids;

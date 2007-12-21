@@ -260,9 +260,8 @@ public class HandlePlugin implements HandleStorage
 
             context = new Context();
 
-            ExternalIdentifierDAO identifierDAO =
-                ExternalIdentifierDAOFactory.getInstance(context);
-            ExternalIdentifier identifier = identifierDAO.retrieve(handle);
+            ExternalIdentifierDAO identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
+            ExternalIdentifier identifier = identifierDAO.retrieve(new HandleType(), handle);
 
             String url = identifier.getURI().toString();
 
@@ -395,15 +394,11 @@ public class HandlePlugin implements HandleStorage
         {
             context = new Context();
 
-            ExternalIdentifierDAO identifierDAO =
-                ExternalIdentifierDAOFactory.getInstance(context);
-
-            ExternalIdentifierType type = new HandleType();
-
+            ExternalIdentifierDAO identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
+            List<ExternalIdentifier> eids = identifierDAO.startsWith(new HandleType(), naHandle);
             List<String> handles = new ArrayList<String>();
 
-            for(ExternalIdentifier identifier :
-                    identifierDAO.getExternalIdentifiers(type, naHandle))
+            for(ExternalIdentifier identifier : eids)
             {
                 handles.add(identifier.getValue());
             }

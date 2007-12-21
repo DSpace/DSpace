@@ -40,13 +40,6 @@
 
 package org.dspace.app.mediafilter;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -55,7 +48,6 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
-
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -69,12 +61,12 @@ import org.dspace.content.dao.BitstreamDAO;
 import org.dspace.content.dao.BitstreamDAOFactory;
 import org.dspace.content.dao.BitstreamFormatDAO;
 import org.dspace.content.dao.BitstreamFormatDAOFactory;
+import org.dspace.content.dao.CollectionDAO;
 import org.dspace.content.dao.CollectionDAOFactory;
 import org.dspace.content.dao.CommunityDAO;
 import org.dspace.content.dao.CommunityDAOFactory;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
-import org.dspace.content.dao.CollectionDAO;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -82,9 +74,17 @@ import org.dspace.core.PluginManager;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.search.DSIndexer;
 import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ExternalIdentifierMint;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * MediaFilterManager is the class that invokes the media/format filters over the
@@ -379,8 +379,8 @@ public class MediaFilterManager
             }
             else  // restrict application scope to identifier
             {
-                ExternalIdentifier pid =
-                    identifierDAO.retrieve(identifier);
+                ExternalIdentifier pid = ExternalIdentifierMint.parseCanonicalForm(c, identifier);
+                // ExternalIdentifier pid = identifierDAO.retrieve(identifier);
                 ObjectIdentifier oi = pid.getObjectIdentifier();
 
                 DSpaceObject dso = oi.getObject(c);

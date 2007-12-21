@@ -44,7 +44,6 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
-
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -60,7 +59,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.IdentifierUtils;
+import org.dspace.uri.ExternalIdentifierMint;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
@@ -210,6 +209,14 @@ public class ItemExport
         itemDAO = ItemDAOFactory.getInstance(c);
         identifierDAO = ExternalIdentifierDAOFactory.getInstance(c);
 
+        ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(myIDString);
+        if (oi == null)
+        {
+            ExternalIdentifier eid = ExternalIdentifierMint.parseCanonicalForm(c, myIDString);
+            oi = eid.getObjectIdentifier();
+        }
+        
+        /*
         // First, add the namespace if necessary
         if (myIDString.indexOf('/') != -1)
         {
@@ -222,6 +229,7 @@ public class ItemExport
         }
 
         ObjectIdentifier oi = IdentifierUtils.fromString(c, myIDString);
+*/
 
         if (oi == null)
         {

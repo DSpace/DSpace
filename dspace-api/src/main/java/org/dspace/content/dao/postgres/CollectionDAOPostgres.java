@@ -60,6 +60,10 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
+/**
+ * @author James Rutherford
+ * @author Richard Jones
+ */
 public class CollectionDAOPostgres extends CollectionDAO
 {
     public CollectionDAOPostgres(Context context)
@@ -334,8 +338,7 @@ public class CollectionDAOPostgres extends CollectionDAO
         // FIXME: I'd like to bump the rest of this up into the superclass
         // so we don't have to do it for every implementation, but I can't
         // figure out a clean way of doing this yet.
-        List<ExternalIdentifier> identifiers =
-                identifierDAO.getExternalIdentifiers(collection);
+        List<ExternalIdentifier> identifiers = identifierDAO.retrieve(collection);
         collection.setExternalIdentifiers(identifiers);
 
         return collection;

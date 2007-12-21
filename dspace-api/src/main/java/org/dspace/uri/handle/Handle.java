@@ -39,24 +39,44 @@
  */
 package org.dspace.uri.handle;
 
-import java.util.List;
-import java.util.Map;
-
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierType;
+import org.dspace.uri.IdentifierAssigner;
+import org.dspace.uri.IdentifierResolver;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.handle.dao.HandleDAO;
+import org.dspace.uri.handle.dao.HandleDAOFactory;
+
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
+ * @author Richard Jones
  * @author James Rutherford
  */
-public class Handle extends ExternalIdentifier
+public class Handle extends ExternalIdentifier implements IdentifierAssigner<Handle>, IdentifierResolver<Handle>
 {
+    // REQUIRED for the plugin manager
     public Handle()
     {
-        super(new HandleType());
+        super();
     }
 
+    public Handle(String value, ObjectIdentifier oid)
+    {
+        super(new HandleType(), value, oid);
+    }
+
+    public Handle(String value)
+    {
+        super(new HandleType(), value);
+    }
+
+    /*
     public Handle(Context context, DSpaceObject dso, String value)
     {
         super(context, dso, new HandleType(), value);
@@ -66,6 +86,29 @@ public class Handle extends ExternalIdentifier
                   ExternalIdentifierType type, String value)
     {
         super(context, dso, type, value);
+    }*/
+
+    public Handle parseCanonicalForm(String canonical)
+    {
+        // canonical form: hdl:xxxxx/yyyy
+        String[] bits = canonical.split(":");
+
+        if (bits.length != 2)
+        {
+            return null;
+        }
+
+        HandleType type = new HandleType();
+
+        if (!type.getNamespace().equals(bits[0]))
+        {
+            return null;
+        }
+
+        // ExternalIdentifierMint.get();
+
+        Handle handle = new Handle(bits[1]);
+        return handle;
     }
 
     @Override
@@ -78,5 +121,48 @@ public class Handle extends ExternalIdentifier
     public List<String> getMetadata(String field)
     {
         return null;
+    }
+
+    // IdentifierAssigner implementation
+    public Handle mint(Context context, DSpaceObject dso)
+    {
+        HandleDAO dao = HandleDAOFactory.getInstance(context);
+        int next = dao.getNextHandle();
+        String prefix = ConfigurationManager.getProperty("handle.prefix");
+        if (prefix == null || "".equals(prefix))
+        {
+            throw new RuntimeException("no configuration or configuration invalid for handle.prefix");
+        }
+        String fullHandle = prefix + "/" + Integer.toString(next);
+
+        Handle handle = new Handle(fullHandle, dso.getIdentifier());
+        return handle;
+    }
+
+    // IdentifierResolver implementation
+    public DSpaceObject resolve(String identifier)
+    {
+        // FIXME: do we even need this any more?
+        return null;
+    }
+
+    public Handle extractURLIdentifier(String path)
+    {
+        String prefix = ConfigurationManager.getProperty("handle.prefix");
+        if (prefix == null || "".equals(prefix))
+        {
+            throw new RuntimeException("no configuration, or configuration invalid for handle.prefix");
+        }
+
+        String hdlRX = ".*hdl/(" + prefix + "/[0-9]+).*";
+        Pattern p = Pattern.compile(hdlRX);
+        Matcher m = p.matcher(path);
+        if (!m.matches())
+        {
+            return null;
+        }
+        String value = m.group(1);
+        Handle handle = new Handle(value);
+        return handle;
     }
 }

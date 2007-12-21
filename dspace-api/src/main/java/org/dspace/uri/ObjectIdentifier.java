@@ -68,18 +68,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * @author Richard Jones
  * @author James Rutherford
  */
-public class ObjectIdentifier
+public class ObjectIdentifier implements DSpaceIdentifier
 {
     private static Logger log = Logger.getLogger(ObjectIdentifier.class);
 
     private int resourceID = -1;
     private int resourceTypeID = -1;
     private UUID uuid = null;
-
-    // FIXME: is this necessary any more?  the dsi is the resource id
-    // private Type type;
 
     public ObjectIdentifier()
     {
@@ -97,7 +95,6 @@ public class ObjectIdentifier
 
     public ObjectIdentifier(int resourceID, int resourceTypeID)
     {
-        // this.type = Type.INTS;
         this.resourceID = resourceID;
         this.resourceTypeID = resourceTypeID;
 
@@ -106,35 +103,10 @@ public class ObjectIdentifier
 
     public ObjectIdentifier(UUID uuid)
     {
-        // this.type = Type.UUID;
         this.uuid = uuid;
 
         // we are now ready to be told who we belong to
     }
-
-    /*
-    public ObjectIdentifier(Type type, String value)
-    {
-        this.type = type;
-        
-        switch (type)
-        {
-            case UUID:
-                // value will be a string representation of a UUID
-                this.uuid = UUID.fromString(value);
-                break;
-            case INTS:
-                // value will be (eg) "3/12"
-                this.resourceID =
-                    Integer.parseInt(value.substring(value.indexOf('/') + 1));
-                this.resourceTypeID =
-                    Integer.parseInt(value.substring(0, value.indexOf('/')));
-                break;
-            default:
-                throw new RuntimeException(":(");
-        }
-    }
-    */
 
     public ObjectIdentifier(String uuid)
     {
@@ -157,31 +129,14 @@ public class ObjectIdentifier
         this.resourceID = resourceID;
     }
 
+    public static ObjectIdentifier parseCanonicalForm(String canonicalForm)
+    {
+        return fromString(canonicalForm);
+    }
+
+    @Deprecated
     public static ObjectIdentifier fromString(String canonicalForm)
     {
-        /*
-        for (Type t : Type.values())
-        {
-            String ns = t.getNamespace();
-            if (canonicalForm.startsWith(ns))
-            {
-                String value = canonicalForm.substring(ns.length() + 1);
-                if ((value == null) || value.equals(""))
-                {
-                    break;
-                }
-                else if (t.equals(Type.INTS) && value.indexOf('/') == -1)
-                {
-                    // String must be of the form x/y with x & y ints
-                    break;
-                }
-
-                return new ObjectIdentifier(t, value);
-            }
-        }
-
-        return null;
-        */
         if (!canonicalForm.startsWith("uuid:"))
         {
             return null;
@@ -266,71 +221,6 @@ public class ObjectIdentifier
         }
     }
 
-    /*
-    public DSpaceObject getObject(Context context)
-    {
-        CommunityDAO communityDAO = CommunityDAOFactory.getInstance(context);
-        CollectionDAO collectionDAO = CollectionDAOFactory.getInstance(context);
-        ItemDAO itemDAO = ItemDAOFactory.getInstance(context);
-        BundleDAO bundleDAO = BundleDAOFactory.getInstance(context);
-        BitstreamDAO bitstreamDAO = BitstreamDAOFactory.getInstance(context);
-
-        switch (type)
-        {
-            case INTS:
-                switch(resourceTypeID)
-                {
-                    case (Constants.BITSTREAM):
-                        return bitstreamDAO.retrieve(resourceID);
-                    case (Constants.BUNDLE):
-                        return bundleDAO.retrieve(resourceID);
-                    case (Constants.ITEM):
-                        return itemDAO.retrieve(resourceID);
-                    case (Constants.COLLECTION):
-                        return collectionDAO.retrieve(resourceID);
-                    case (Constants.COMMUNITY):
-                        return communityDAO.retrieve(resourceID);
-                    default:
-                        throw new RuntimeException("Not a valid DSpaceObject type");
-                }
-            case UUID:
-                // If we have a UUID, there is no indication of what type of
-                // object it is attached to, so we just keep trying in sequence
-                // until we get something. This isn't an ideal approach, and we
-                // should probably re-order them to minimise lookups.
-                DSpaceObject dso = bitstreamDAO.retrieve(uuid);
-
-                if (dso == null)
-                {
-                    dso = bundleDAO.retrieve(uuid);
-                }
-                if (dso == null)
-                {
-                    dso = itemDAO.retrieve(uuid);
-                }
-                if (dso == null)
-                {
-                    dso = collectionDAO.retrieve(uuid);
-                }
-                if (dso == null)
-                {
-                    dso = communityDAO.retrieve(uuid);
-                }
-
-                if (dso == null)
-                {
-                    throw new RuntimeException("Couldn't find " + uuid);
-                }
-                else
-                {
-                    return dso;
-                }
-            default:
-                throw new RuntimeException("Whoops!");
-        }
-    }
-    */
-
     public String getURLForm()
     {
         if (uuid == null)
@@ -342,29 +232,6 @@ public class ObjectIdentifier
 
     public URL getURL()
     {
-        // This is a bit of a hack to get an almost-URLEncoded form of the URL.
-        // (See the FIXME below).
-        /*
-        String url = ConfigurationManager.getProperty("dspace.url") +
-            "/resource/" + getCanonicalForm().replaceAll(":", "%3A");
-
-        try
-        {
-            return new URL(url);
-
-            // FIXME: The only reason I'm not doing this is because of the
-            // issues Tomcat < version 6 has with encoded slashes in URLs (it
-            // just refuses to parse them).
-//          return new URL(base + "resource/" + URLEncoder.encode(value, "UTF-8"));
-//        }
-//        catch (UnsupportedEncodingException uee)
-//        {
-//            throw new RuntimeException(uee);
-        }
-        catch (MalformedURLException murle)
-        {
-            throw new RuntimeException(murle);
-        }*/
         try
         {
             String base = ConfigurationManager.getProperty("dspace.url");
@@ -394,23 +261,6 @@ public class ObjectIdentifier
 
     public String getCanonicalForm()
     {
-        /*
-        String s = type.getNamespace() + ":";
-
-        switch (type)
-        {
-            case INTS:
-                s += resourceTypeID + "/" + resourceID;
-                break;
-            case UUID:
-                s += uuid.toString();
-                break;
-            default:
-                throw new RuntimeException("Whoops!");
-        }
-
-        return s;*/
-
         if (uuid == null)
         {
             return null;
@@ -420,7 +270,7 @@ public class ObjectIdentifier
 
     public static ObjectIdentifier extractURLIdentifier(String str)
     {
-        String oidRX = ".*/uuid/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}).*";
+        String oidRX = ".*uuid/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}).*";
         Pattern p = Pattern.compile(oidRX);
         Matcher m = p.matcher(str);
         if (!m.matches())
@@ -432,25 +282,6 @@ public class ObjectIdentifier
         return oid;
     }
 
-    /*
-    public enum Type
-    {
-        INTS ("dsi"), // signifies a pair of integers (resource type + id)
-        UUID ("uuid");
-
-        private final String namespace;
-
-        private Type(String namespace)
-        {
-            this.namespace = namespace;
-        }
-
-        public String getNamespace()
-        {
-            return namespace;
-        }
-    }
-*/
     ////////////////////////////////////////////////////////////////////
     // Utility methods
     ////////////////////////////////////////////////////////////////////

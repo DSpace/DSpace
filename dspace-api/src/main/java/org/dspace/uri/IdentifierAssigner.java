@@ -1,5 +1,5 @@
 /*
- * HandleType.java
+ * IdentifierAssigner.java
  *
  * Version: $Revision: 1727 $
  *
@@ -37,44 +37,15 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.uri.handle;
+package org.dspace.uri;
 
-import org.dspace.core.ConfigurationManager;
-import org.dspace.uri.ExternalIdentifierType;
-import org.dspace.uri.ObjectIdentifier;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
 
 /**
- * @author James Rutherford
- * @author Richard Jones
+ * @author Richard JOnes
  */
-public class HandleType extends ExternalIdentifierType
+public interface IdentifierAssigner<T extends ExternalIdentifier>
 {
-    public HandleType()
-    {
-        super("hdl", "http", "hdl.handle.net", "://", "/");
-    }
-
-    public String getPrefix()
-    {
-        String prefix = ConfigurationManager.getProperty("handle.prefix");
-        if (prefix == null || "".equals(prefix))
-        {
-            throw new RuntimeException("No configuration, or configuration is invalid for handle.prefix");
-        }
-        return prefix + "/";
-    }
-
-    public Handle getInstance(String value, ObjectIdentifier oid)
-    {
-        return new Handle(value, oid);
-    }
-
-    public boolean equals(ExternalIdentifierType type)
-    {
-        if (type instanceof HandleType)
-        {
-            return true;
-        }
-        return false;
-    }
+    T mint(Context context, DSpaceObject dso);
 }

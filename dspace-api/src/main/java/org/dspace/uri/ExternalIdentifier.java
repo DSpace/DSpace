@@ -39,60 +39,97 @@
  */
 package org.dspace.uri;
 
-import java.net.URISyntaxException;
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.log4j.Logger;
-
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 /**
+ * @author Richard Jones
  * @author James Rutherford
  */
-public class ExternalIdentifier
+public abstract class ExternalIdentifier implements DSpaceIdentifier
 {
     private static final Logger log = Logger.getLogger(ExternalIdentifier.class);
 
-    protected Context context;
     protected String value;
     protected ObjectIdentifier oid;
     protected ExternalIdentifierType type;
 
     public ExternalIdentifier()
     {
+        // create a blank identifier to be populated
     }
 
-    protected ExternalIdentifier(ExternalIdentifierType type)
+    /*
+    public ExternalIdentifier(ExternalIdentifierType type)
+    {
+        this.type = type;
+    }
+*/
+    
+    public ExternalIdentifier(ExternalIdentifierType type, String value)
+    {
+        this.type = type;
+        this.value = value;
+    }
+
+    public ExternalIdentifier(ExternalIdentifierType type, String value, ObjectIdentifier oid)
+    {
+        // create a real, full size identifier
+        this.type = type;
+        this.oid = oid;
+        this.value = value;
+    }
+
+    public void setValue(String value)
+    {
+        this.value = value;
+    }
+
+    public void setObjectIdentifier(ObjectIdentifier oid)
+    {
+        this.oid = oid;
+    }
+
+    public void setType(ExternalIdentifierType type)
     {
         this.type = type;
     }
 
+    /* FIXME: do we need a replacement for this?
     public ExternalIdentifier(Context context, DSpaceObject dso,
             ExternalIdentifierType type, String value)
     {
         this(type);
-        this.context = context;
+        // this.context = context;
         this.value = value;
 
         oid = dso.getIdentifier();
-    }
+    }*/
 
-    public ExternalIdentifier(ExternalIdentifierType type, String value)
+    public DSpaceObject getObject(Context context)
     {
-        this(type);
-        this.value = value;
+        return this.getObjectIdentifier().getObject(context);
     }
 
     public ObjectIdentifier getObjectIdentifier()
     {
+        if (oid == null)
+        {
+            throw new IllegalStateException("An external identifier with no ObjectIdentifier exists");
+        }
         return oid;
     }
 
@@ -101,13 +138,45 @@ public class ExternalIdentifier
         return type;
     }
 
+    public String getURLForm()
+    {
+        return type.getNamespace() + "/" + this.value;        
+    }
+
+    public URL getURL()
+    {
+        try
+        {
+            String base = ConfigurationManager.getProperty("dspace.url");
+            String urlForm = this.getURLForm();
+
+            if (base == null || "".equals(base))
+            {
+                throw new RuntimeException("No configuration, or configuration invalid for dspace.url");
+            }
+
+            if (urlForm == null)
+            {
+                throw new RuntimeException("Unable to assign URL: no ExternalIdentifier available");
+            }
+
+            String url = base + "/resource/" + urlForm;
+
+            return new URL(url);
+        }
+        catch (MalformedURLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
     public URI getURI()
     {
         try
         {
             // eg: http + :// + hdl.handle.net + / + 1234/56
-            return new URI(type.getProtocol() + "://" + type.getBaseURI() +
-                    "/" + value);
+            return new URI(type.getProtocol() + type.getProtocolActivator() + type.getBaseURI() + type.getBaseSeparator() + value);
         }
         catch (URISyntaxException urise)
         {
@@ -121,6 +190,15 @@ public class ExternalIdentifier
         return type.getNamespace() + ":" + value;
     }
 
+    public boolean leaveTombstone()
+    {
+        // default to true unless implementation overrides to the contrary
+        return true;
+    }
+
+    public abstract ExternalIdentifier parseCanonicalForm(String canonical);
+
+    /*
     public static ExternalIdentifier parseCanonicalForm(String canonical)
     {
         // first find out if it's the right form
@@ -156,9 +234,8 @@ public class ExternalIdentifier
         // assemble and return
         ExternalIdentifier eid = new ExternalIdentifier(type, value);
         return eid;
-    }
+    }*/
 
-    @Deprecated
     public String getValue()
     {
         return value;

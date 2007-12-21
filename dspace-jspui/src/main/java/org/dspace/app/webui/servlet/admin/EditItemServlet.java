@@ -39,34 +39,61 @@
  */
 package org.dspace.app.webui.servlet.admin;
 
-import java.io.*;
-import java.sql.SQLException;
-import java.util.*;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.*;
+import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-import org.dspace.content.dao.*;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.FormatIdentifier;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.dao.BitstreamDAO;
+import org.dspace.content.dao.BitstreamDAOFactory;
+import org.dspace.content.dao.BundleDAO;
+import org.dspace.content.dao.BundleDAOFactory;
+import org.dspace.content.dao.CollectionDAO;
+import org.dspace.content.dao.CollectionDAOFactory;
+import org.dspace.content.dao.ItemDAO;
+import org.dspace.content.dao.ItemDAOFactory;
+import org.dspace.content.dao.MetadataFieldDAO;
+import org.dspace.content.dao.MetadataFieldDAOFactory;
+import org.dspace.content.dao.MetadataSchemaDAO;
+import org.dspace.content.dao.MetadataSchemaDAOFactory;
 import org.dspace.core.ArchiveManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.license.CreativeCommons;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Servlet for editing and deleting (expunging) items
@@ -133,7 +160,8 @@ public class EditItemServlet extends DSpaceServlet
         else if ((uri != null) && !uri.equals(""))
         {
             // resolve uri
-            ExternalIdentifier identifier = identifierDAO.retrieve(uri);
+            ExternalIdentifier identifier = ExternalIdentifierMint.parseCanonicalForm(context, uri);
+            // ExternalIdentifier identifier = identifierDAO.retrieve(uri);
             ObjectIdentifier oi = identifier.getObjectIdentifier();
             DSpaceObject dso = oi.getObject(context);
 

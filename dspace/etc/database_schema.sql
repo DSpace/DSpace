@@ -421,21 +421,22 @@ CREATE TABLE EPersonGroup2EPerson
 CREATE INDEX epersongroup2eperson_group_idx on EPersonGroup2EPerson(eperson_group_id);
 
 
+-- NOTE: there is no longer an explicit Handle table (v1.6; Richard Jones)
 -------------------------------------------------------
 -- Handle table
 -------------------------------------------------------
-CREATE TABLE Handle
-(
-  handle_id        INTEGER PRIMARY KEY,
-  handle           VARCHAR(256) UNIQUE,
-  resource_type_id INTEGER,
-  resource_id      INTEGER
-);
+--CREATE TABLE Handle
+--(
+--  handle_id        INTEGER PRIMARY KEY,
+--  handle           VARCHAR(256) UNIQUE,
+--  resource_type_id INTEGER,
+--  resource_id      INTEGER
+--);
 
 -- index by handle, commonly looked up
-CREATE INDEX handle_handle_idx ON Handle(handle);
+--CREATE INDEX handle_handle_idx ON Handle(handle);
 -- index by resource id and resource type id
-CREATE INDEX handle_resource_id_and_type_idx ON handle(resource_id, resource_type_id);
+--CREATE INDEX handle_resource_id_and_type_idx ON handle(resource_id, resource_type_id);
 
 -------------------------------------------------------
 --  WorkspaceItem table
@@ -715,3 +716,13 @@ CREATE TABLE uuid (
 );
 
 CREATE INDEX uuid_idx ON uuid (uuid);
+
+CREATE TABLE externalidentifier (
+    namespace varchar(20),
+    identifier text,
+    resource_type_id integer,
+    resource_id integer,
+    tombstone integer
+);
+
+CREATE INDEX externalidentifier_idx ON externalidentifier(namespace, identifier);

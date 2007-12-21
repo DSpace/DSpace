@@ -39,24 +39,23 @@
  */
 package org.dspace.app.webui.servlet;
 
-import java.io.IOException;
-import java.sql.SQLException;
+import org.apache.log4j.Logger;
+import org.dspace.app.webui.util.JSPManager;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-
-import org.dspace.app.webui.util.JSPManager;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
-import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * Simple servlet for open URL support. Presently, simply extracts terms from
@@ -148,9 +147,9 @@ public class OpenURLServlet extends URIServlet
 
         // The value of URI will be the persistent identifier in canonical
         // form, eg: xyz:1234/56
-        ExternalIdentifierDAO identifierDAO =
-            ExternalIdentifierDAOFactory.getInstance(context);
-        identifier = identifierDAO.retrieve(id);
+        identifier = ExternalIdentifierMint.parseCanonicalForm(context, id);
+        //ExternalIdentifierDAO identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
+        //identifier = identifierDAO.retrieve(id);
 
         oi = identifier.getObjectIdentifier();
 

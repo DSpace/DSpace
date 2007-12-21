@@ -56,7 +56,7 @@ import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 
 /**
- * @author James Rutherford
+ * @author Richard Jones
  */
 public abstract class ExternalIdentifierDAO
 {
@@ -64,12 +64,33 @@ public abstract class ExternalIdentifierDAO
 
     protected Context context;
 
+    /*
     protected final ExternalIdentifier[] pids = (ExternalIdentifier[])
             PluginManager.getPluginSequence(ExternalIdentifier.class);
+*/
+    public ExternalIdentifierDAO(Context context)
+    {
+        this.context = context;
+    }
+
+    public abstract void create(ExternalIdentifier eid, DSpaceObject dso);
+
+    public abstract List<ExternalIdentifier> retrieve(DSpaceObject dso);
+
+    public abstract ExternalIdentifier retrieve(ExternalIdentifierType type, String value);
+
+    public abstract void update(ExternalIdentifier eid);
+
+    public abstract void delete(ExternalIdentifier eid);
+
+    public abstract void tombstone(ExternalIdentifier eid);
+
+    public abstract List<ExternalIdentifier> startsWith(ExternalIdentifierType type, String startsWith);
 
     /**
      * Creates a persistent identifier of the defualt type.
      */
+    /*
     public ExternalIdentifier create(DSpaceObject dso)
     {
         // The default is the first entry in the list.
@@ -102,7 +123,7 @@ public abstract class ExternalIdentifierDAO
 
     public abstract List<ExternalIdentifier>
         getExternalIdentifiers(ExternalIdentifierType type, String prefix);
-
+*/
     ////////////////////////////////////////////////////////////////////
     // Utility methods
     ////////////////////////////////////////////////////////////////////
@@ -111,6 +132,7 @@ public abstract class ExternalIdentifierDAO
      * Returns an instantiated ExternalIdentifier of the desired type that
      * references the desired DSpaceObject.
      */
+    /*
     protected ExternalIdentifier getInstance(DSpaceObject dso,
             ExternalIdentifierType type, String value)
     {
@@ -156,7 +178,8 @@ public abstract class ExternalIdentifierDAO
             throw new RuntimeException(ite);
         }
     }
-
+*/
+    /*
     protected Object[] parseCanonicalForm(String canonicalForm)
     {
         canonicalForm = canonicalForm.trim();
@@ -197,20 +220,22 @@ public abstract class ExternalIdentifierDAO
 
         return array;
     }
-
+*/
+    /*
     public String toString()
     {
         return ToStringBuilder.reflectionToString(this,
                 ToStringStyle.MULTI_LINE_STYLE);
     }
-
+*/
+    /*
     public boolean equals(Object o)
     {
         return EqualsBuilder.reflectionEquals(this, o);
-    }
-
+    }*/
+/*
     public int hashCode()
     {
         return HashCodeBuilder.reflectionHashCode(this);
-    }
+    }*/
 }

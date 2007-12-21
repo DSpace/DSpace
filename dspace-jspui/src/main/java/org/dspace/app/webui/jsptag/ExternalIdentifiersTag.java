@@ -1,5 +1,5 @@
 /*
- * HandleType.java
+ * ExternalIdentifiersTag.java
  *
  * Version: $Revision: 1727 $
  *
@@ -37,44 +37,77 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.uri.handle;
+package org.dspace.app.webui.jsptag;
 
-import org.dspace.core.ConfigurationManager;
-import org.dspace.uri.ExternalIdentifierType;
-import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ExternalIdentifier;
+
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.jstl.fmt.LocaleSupport;
+import javax.servlet.jsp.tagext.TagSupport;
+import java.io.IOException;
+import java.net.URI;
+import java.util.List;
 
 /**
- * @author James Rutherford
  * @author Richard Jones
  */
-public class HandleType extends ExternalIdentifierType
+public class ExternalIdentifiersTag extends TagSupport
 {
-    public HandleType()
+    private List<ExternalIdentifier> ids;
+
+    public List<ExternalIdentifier> getIds()
     {
-        super("hdl", "http", "hdl.handle.net", "://", "/");
+        return ids;
     }
 
-    public String getPrefix()
+    public void setIds(List<ExternalIdentifier> ids)
     {
-        String prefix = ConfigurationManager.getProperty("handle.prefix");
-        if (prefix == null || "".equals(prefix))
+        this.ids = ids;
+    }
+
+    public int doStartTag() throws JspException
+    {
+        try
         {
-            throw new RuntimeException("No configuration, or configuration is invalid for handle.prefix");
+            // if there are no identifiers, then don't render
+            if (ids.size() < 1)
+            {
+                return SKIP_BODY;
+            }
+
+            JspWriter out = pageContext.getOut();
+
+            String header = "";
+            if (ids.size() == 1)
+            {
+                header = LocaleSupport.getLocalizedMessage(pageContext, "jsp.external-identifier.header.single");
+            }
+            else
+            {
+                header = LocaleSupport.getLocalizedMessage(pageContext, "jsp.external-identifier.header.many");
+            }
+            
+            out.println("<table class=\"external_identifiers_table\"><tr>");
+            out.println("<th>" + header + "</th></tr>");
+            for (ExternalIdentifier eid : ids)
+            {
+                writeIdentifier(eid, out);
+            }
+
+            return SKIP_BODY;
         }
-        return prefix + "/";
-    }
-
-    public Handle getInstance(String value, ObjectIdentifier oid)
-    {
-        return new Handle(value, oid);
-    }
-
-    public boolean equals(ExternalIdentifierType type)
-    {
-        if (type instanceof HandleType)
+        catch (IOException e)
         {
-            return true;
+            throw new JspException(e);
         }
-        return false;
+    }
+
+    private void writeIdentifier(ExternalIdentifier eid, JspWriter out)
+            throws IOException
+    {
+        URI link = eid.getURI();
+        String msg = "<a href=\"" + link + "\">" + link  + "</a>";
+        out.println("<tr><td>" + msg + "</td></tr></table>");
     }
 }

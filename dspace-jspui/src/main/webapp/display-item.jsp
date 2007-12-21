@@ -61,14 +61,13 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Collection" %>
-<%@ page import="org.dspace.content.Community" %>
-<%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
-<%@ page import="org.dspace.uri.ExternalIdentifier" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.license.CreativeCommons" %>
+<%@ page import="org.dspace.uri.ExternalIdentifier" %>
+<%@ page import="org.dspace.uri.ObjectIdentifier" %>
+<%@ page import="java.util.List" %>
 
 <%
     // Attributes
@@ -85,7 +84,9 @@
     Integer workspace_id = (Integer) request.getAttribute("workspace_id");
 
     // get the persistent identifier if the item has one yet
-    ExternalIdentifier identifier = item.getExternalIdentifier();
+    // ExternalIdentifier identifier = item.getExternalIdentifier();
+    List<ExternalIdentifier> eids = item.getExternalIdentifiers();
+    ObjectIdentifier oid = item.getIdentifier();
     String uri = "";
     String citationLink = "";
     String link = item.getIdentifier().getURL().toString();
@@ -95,7 +96,9 @@
     String cc_rdf = CreativeCommons.getLicenseRDF(item);
 
     // Full title needs to be put into a string to use as tag argument
-    String title = "";
+
+    String title = "FIXME";
+    /*
     if (identifier == null)
  	{
 		title = "Workspace Item";
@@ -114,39 +117,14 @@
 		{
 			title = "Item " + uri;
 		}
-	}
+	}*/
 %>
 
 <dspace:layout title="<%= title %>">
 
-<%
-    if (identifier != null)
-    {
-%>
+    <dspace:external-identifiers ids="<%= eids %>"/>
 
-    <table align="center" class="miscTable">
-        <tr>
-            <td class="evenRowEvenCol" align="center">
-                <strong><fmt:message key="jsp.display-item.identifier"/>
-                <code><%= citationLink %></code></strong>
-            </td>
 <%
-        if (admin_button)  // admin edit button
-        { %>
-            <td class="evenRowEvenCol" align="center">
-                <form method="get" action="<%= request.getContextPath() %>/tools/edit-item">
-                    <input type="hidden" name="item_id" value="<%= item.getID() %>" />
-                    <%--<input type="submit" name="submit" value="Edit...">--%>
-                    <input type="submit" name="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
-                </form>
-            </td>
-<%      } %>
-        </tr>
-    </table>
-    <br />
-<%
-    }
-
     String displayStyle = (displayAll ? "full" : "");
 %>
     <dspace:item-preview item="<%= item %>" />
@@ -258,4 +236,37 @@
     }
 %>
     <p class="submitFormHelp"><fmt:message key="jsp.display-item.copyright"/></p>
+
+    <%-- the UUID of the item --%>
+    <p class="page_identifier"><%= oid.getCanonicalForm() %></p>
+
+
+    <%
+        if (admin_button)  // admin edit button
+        { %>
+    <dspace:sidebar>
+<table class="miscTable" align="center">
+      <tr>
+	    <td class="evenRowEvenCol" colspan="2">
+	     <table>
+            <tr>
+              <th id="t1" class="standard">
+                 <strong><fmt:message key="jsp.admintools"/></strong>
+              </th>
+            </tr>
+        <tr>
+              <td headers="t1" class="standard" align="center">
+                <form method="get" action="<%= request.getContextPath() %>/tools/edit-item">
+                    <input type="hidden" name="item_id" value="<%= item.getID() %>" />
+                    <input type="submit" name="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
+                </form>
+            </td>
+        </tr>
+        </table>
+        </td></tr></table>
+
+    </dspace:sidebar>
+
+<%      } %>
+
 </dspace:layout>

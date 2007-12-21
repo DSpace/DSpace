@@ -33,18 +33,20 @@
  */
 package org.dspace.checker;
 
+import org.apache.log4j.Logger;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.uri.DSpaceIdentifier;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.dspace.content.DSpaceObject;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
 
 /**
  * A BitstreamDispatcher that checks all the bitstreams contained within an
@@ -115,13 +117,17 @@ public class URIDispatcher implements BitstreamDispatcher
         {
             context = new Context();
 
+            DSpaceIdentifier di = IdentifierFactory.resolveCanonical(context, uri);
+            DSpaceObject dso = di.getObject(context);
+            /*
             ExternalIdentifierDAO identifierDAO =
                 ExternalIdentifierDAOFactory.getInstance(context);
 
             ExternalIdentifier identifier = identifierDAO.retrieve(uri);
             ObjectIdentifier oi = identifier.getObjectIdentifier();
             DSpaceObject dso = oi.getObject(context);
-
+            */
+            
             id = dso.getID();
             dsoType = dso.getType();
             context.abort();

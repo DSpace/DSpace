@@ -249,10 +249,7 @@ public class ItemDAOPostgres extends ItemDAO
             // Put together our query. Note there is no need for an
             // "in_archive=true" condition, we are using the existence of a
             // persistent identifier as our 'existence criterion'.
-            String query =
-                "SELECT p.value, p.type_id, p.resource_id as item_id, " +
-                "i.withdrawn, i.last_modified " +
-                "FROM externalidentifier p, item i";
+            String query = "SELECT item_id FROM item ";
 
             // We are building a complex query that may contain a variable
             // about of input data points. To accomidate this while still
@@ -272,29 +269,36 @@ public class ItemDAOPostgres extends ItemDAO
                 }
             }
 
-            query += " WHERE p.resource_type_id=" + Constants.ITEM +
-                " AND p.resource_id = i.item_id ";
+            boolean whereStart = false;
+            query += " WHERE ";
 
             if (scope != null)
             {
                 if (scope.getType() == Constants.COLLECTION)
                 {
-                    query += " AND cl2i.collection_id= ? " +
+                    query += " cl2i.collection_id= ? " +
                              " AND cl2i.item_id = p.resource_id ";
                     parameters.add(scope.getID());
+                    whereStart = true;
                 }
                 else if (scope.getType() == Constants.COMMUNITY)
                 {
-                    query += " AND cm2i.community_id= ? " +
+                    query += " cm2i.community_id= ? " +
                              " AND cm2i.item_id = p.resource_id";
                     parameters.add(scope.getID());
+                    whereStart = true;
                 }
             }
 
             if (startDate != null)
             {
-                query = query + " AND i.last_modified >= ? ";
+                if (!whereStart)
+                {
+                    query = query + " AND ";
+                }
+                query = query + " i.last_modified >= ? ";
                 parameters.add(toTimestamp(startDate, false));
+                whereStart = true;
             }
 
             if (endDate != null)
@@ -324,12 +328,18 @@ public class ItemDAOPostgres extends ItemDAO
                     selfGenerated = true;
                 }
 
-                query += " AND i.last_modified <= ? ";
+                if (!whereStart)
+                {
+                    query = query + " AND ";
+                }
+
+                query += " i.last_modified <= ? ";
                 parameters.add(toTimestamp(endDate, selfGenerated));
             }
 
             if (!withdrawn)
             {
+                /*
                 // Exclude withdrawn items
                 if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
                 {
@@ -339,13 +349,25 @@ public class ItemDAOPostgres extends ItemDAO
                 {
                     // postgres uses booleans
                     query += " AND withdrawn=false ";
+                }*/
+                if (!whereStart)
+                {
+                    query = query + " AND ";
                 }
+                query = query + " withdrawn = false ";
             }
+
+            // set the in_archive condition
+            if (!whereStart)
+            {
+                query = query + " AND ";
+            }
+            query = query + " in_archive = true ";
 
             // Order by item ID, so that for a given harvest the order will be
             // consistent. This is so that big harvests can be broken up into
             // several smaller operations (e.g. for OAI resumption tokens.)
-            query += " ORDER BY p.resource_id";
+            query += " ORDER BY item_id";
 
             // Execute
             Object[] parametersArray = parameters.toArray();
@@ -618,9 +640,8 @@ public class ItemDAOPostgres extends ItemDAO
         // FIXME: I'd like to bump the rest of this up into the superclass
         // so we don't have to do it for every implementation, but I can't
         // figure out a clean way of doing this yet.
-        List<ExternalIdentifier> identifiers =
-                identifierDAO.getExternalIdentifiers(item);
-        item.setExternalIdentifiers(identifiers);
+        //List<ExternalIdentifier> identifiers = identifierDAO.getExternalIdentifiers(item);
+        //item.setExternalIdentifiers(identifiers);
 
         return item;
     }

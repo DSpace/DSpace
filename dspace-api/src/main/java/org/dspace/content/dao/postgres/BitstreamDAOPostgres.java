@@ -61,6 +61,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
  * @author James Rutherford
+ * @author Richard Jones
  */
 public class BitstreamDAOPostgres extends BitstreamDAO
 {
@@ -257,8 +258,7 @@ public class BitstreamDAOPostgres extends BitstreamDAO
         // FIXME: I'd like to bump the rest of this up into the superclass
         // so we don't have to do it for every implementation, but I can't
         // figure out a clean way of doing this yet.
-        List<ExternalIdentifier> identifiers =
-                identifierDAO.getExternalIdentifiers(bitstream);
+        List<ExternalIdentifier> identifiers = identifierDAO.retrieve(bitstream);
         bitstream.setExternalIdentifiers(identifiers);
 
         return bitstream;

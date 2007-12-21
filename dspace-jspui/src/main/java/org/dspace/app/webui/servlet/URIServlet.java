@@ -39,21 +39,7 @@
  */
 package org.dspace.app.webui.servlet;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -65,8 +51,6 @@ import org.dspace.content.Community;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.uri.IdentifierUtils;
-import org.dspace.uri.ObjectIdentifier;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -78,7 +62,26 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.SubscriptionManager;
 import org.dspace.plugin.CollectionHomeProcessor;
 import org.dspace.plugin.CommunityHomeProcessor;
+import org.dspace.uri.DSpaceIdentifier;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.ObjectIdentifier;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.util.List;
+
+/**
+ * @author James Rutherford
+ * @author Richard Jones
+ */
 public class URIServlet extends DSpaceServlet
 {
     /** log4j category */
@@ -89,61 +92,25 @@ public class URIServlet extends DSpaceServlet
             SQLException, AuthorizeException
     {
         String extraPathInfo = null;
-        ObjectIdentifier oi = null;
+        //ObjectIdentifier oi = null;
         DSpaceObject dso = null;
+        //ExternalIdentifier ei = null;
 
         // Original path info, of the form "/xyz/1234/56"
         // or "/xyz/1234/56/extra/stuff"
         String path = request.getPathInfo();
 
+        DSpaceIdentifier di = IdentifierFactory.resolve(context, path);
         /*
-        try
-        {
-            path = URLDecoder.decode(path, "UTF-8");
-        }
-        catch (UnsupportedEncodingException uee)
-        {
-            throw new RuntimeException(uee);
-        }*/
-
         oi = ObjectIdentifier.extractURLIdentifier(path);
 
-        /*
-        // Here, we iterate through the path, one slash at a time, to see if we
-        // can match any portion of it (left to right) to an object URI.
-        if (path != null)
-        {
-            // eliminate leading '/'
-            path = path.substring(1);
-
-            int index = path.indexOf('/');
-
-            while (index != -1)
-            {
-                String chunk = path.substring(0, index);
-                oi = IdentifierUtils.fromString(context, chunk);
-                if (oi != null)
-                {
-                    // If we've found an object using a chunk of the URL, we
-                    // check to see if there's anything after that to process
-                    String tail = path.substring(index);
-                    if (tail != null && !tail.equals("") && !tail.equals("/"))
-                    {
-                        extraPathInfo = tail;
-                    }
-                    break;
-                }
-                index = path.indexOf('/', index + 1);
-            }
-
-            // If we haven't matched a chunk of the path, try the whole thing.
-            if (oi == null)
-            {
-                oi = IdentifierUtils.fromString(context, path);
-            }
-        }
-*/
         if (oi == null)
+        {
+            ei = ExternalIdentifierMint.extractURLIdentifier(context, path);
+        }
+        */
+
+        if (di == null)
         {
             log.info(LogManager
                     .getHeader(context, "invalid_id", "path=" + path));
@@ -151,16 +118,42 @@ public class URIServlet extends DSpaceServlet
         }
         else
         {
-            // get the index of the identifier in the url
-            String urlForm = oi.getURLForm();
+            String urlForm = di.getURLForm();
             int index = path.indexOf(urlForm);
             int startFrom = index + urlForm.length();
             if (startFrom < path.length())
             {
                 extraPathInfo = path.substring(startFrom);
             }
+            dso = di.getObject(context);
+            /*
+            if (oi != null)
+            {
+                // get the index of the identifier in the url
+                String urlForm = oi.getURLForm();
+                int index = path.indexOf(urlForm);
+                int startFrom = index + urlForm.length();
+                if (startFrom < path.length())
+                {
+                    extraPathInfo = path.substring(startFrom);
+                }
 
-            dso = oi.getObject(context);
+                dso = oi.getObject(context);
+            }
+            else
+            {
+                // get the index of the identifier in the url
+                String urlForm = ei.getURLForm();
+                int index = path.indexOf(urlForm);
+                int startFrom = index + urlForm.length();
+                if (startFrom < path.length())
+                {
+                    extraPathInfo = path.substring(startFrom);
+                }
+
+                dso = ei.getObjectIdentifier().getObject(context);
+            }*/
+
             processDSpaceObject(context, request, response, dso, extraPathInfo);
         }
     }

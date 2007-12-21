@@ -163,11 +163,16 @@ public abstract class DSpaceObject
 
     public void addExternalIdentifier(ExternalIdentifier identifier)
     {
+        identifier.setObjectIdentifier(this.getIdentifier());
         this.identifiers.add(identifier);
     }
 
     public void setExternalIdentifiers(List<ExternalIdentifier> identifiers)
     {
+        for (ExternalIdentifier eid :  identifiers)
+        {
+            eid.setObjectIdentifier(this.getIdentifier());
+        }
         this.identifiers = identifiers;
     }
 

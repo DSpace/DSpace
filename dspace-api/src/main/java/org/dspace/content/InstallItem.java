@@ -112,6 +112,9 @@ public class InstallItem
             item.addDC("date", "issued", null, now.toString());
         }
 
+        /*  FIXME: items should get persistent identifiers anyway, so this should no longer be necessary
+
+        BUT: what do we do about adding identifiers to metadata!
         // if no previous identifier supplied, create one
         if (value == null)
         {
@@ -129,7 +132,7 @@ public class InstallItem
 
         // Add uri as identifier.uri DC value
         item.addDC("identifier", "uri", null, uri);
-
+*/
         String provDescription = "Made available in DSpace on " + now
                 + " (GMT). " + getBitstreamProvenanceMessage(item);
 

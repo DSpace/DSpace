@@ -246,6 +246,7 @@
 
   <p class="copyrightText"><%= copyright %></p>
 
+
   <dspace:sidebar>
 <% if(admin_button || editor_button ) { %>
     <table class="miscTable" align="center">

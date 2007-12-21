@@ -59,10 +59,12 @@ import org.dspace.eperson.Group;
 import org.dspace.event.Event;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ExternalIdentifierMint;
 import org.dspace.workflow.WorkflowItem;
 
 /**
  * @author James Rutherford
+ * @author Richard Jones
  */
 public class CollectionDAOCore extends CollectionDAO
 {
@@ -82,8 +84,12 @@ public class CollectionDAOCore extends CollectionDAO
 
         // Create a default persistent identifier for this Collection, and
         // add it to the in-memory Colleciton object.
-        ExternalIdentifier identifier = identifierDAO.create(collection);
-        collection.addExternalIdentifier(identifier);
+        //ExternalIdentifier identifier = identifierDAO.create(collection);
+        //collection.addExternalIdentifier(identifier);
+
+        // now assign any required external identifiers
+        List<ExternalIdentifier> eids = ExternalIdentifierMint.mintAll(context, collection);
+        collection.setExternalIdentifiers(eids);
 
         // create the default authorization policy for collections
         // of 'anonymous' READ

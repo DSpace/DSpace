@@ -1,9 +1,5 @@
 /*
- * HandleType.java
- *
- * Version: $Revision: 1727 $
- *
- * Date: $Date: 2007-01-19 10:52:10 +0000 (Fri, 19 Jan 2007) $
+ * HandleDAOPostgres.java
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -37,44 +33,45 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.uri.handle;
+package org.dspace.uri.handle.dao.postgres;
 
-import org.dspace.core.ConfigurationManager;
-import org.dspace.uri.ExternalIdentifierType;
-import org.dspace.uri.ObjectIdentifier;
+import org.dspace.core.Context;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.uri.handle.dao.HandleDAO;
+
+import java.sql.SQLException;
 
 /**
- * @author James Rutherford
  * @author Richard Jones
  */
-public class HandleType extends ExternalIdentifierType
+public class HandleDAOPostgres extends HandleDAO
 {
-    public HandleType()
+    private String nextSQL = "SELECT getnextid('handle') AS hdl";
+
+    public HandleDAOPostgres(Context context)
     {
-        super("hdl", "http", "hdl.handle.net", "://", "/");
+        super(context);
     }
 
-    public String getPrefix()
+    public int getNextHandle()
     {
-        String prefix = ConfigurationManager.getProperty("handle.prefix");
-        if (prefix == null || "".equals(prefix))
+        try
         {
-            throw new RuntimeException("No configuration, or configuration is invalid for handle.prefix");
+            TableRowIterator tri = DatabaseManager.query(context, nextSQL);
+            if (!tri.hasNext())
+            {
+                throw new RuntimeException("Unable to generate new handle");
+            }
+            TableRow row = tri.next();
+            int handle = row.getIntColumn("hdl");
+            tri.close();
+            return handle;
         }
-        return prefix + "/";
-    }
-
-    public Handle getInstance(String value, ObjectIdentifier oid)
-    {
-        return new Handle(value, oid);
-    }
-
-    public boolean equals(ExternalIdentifierType type)
-    {
-        if (type instanceof HandleType)
+        catch (SQLException e)
         {
-            return true;
+            throw new RuntimeException(e);
         }
-        return false;
     }
 }

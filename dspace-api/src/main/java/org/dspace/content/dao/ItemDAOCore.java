@@ -43,9 +43,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
@@ -54,17 +52,18 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ExternalIdentifierMint;
 import org.dspace.uri.ObjectIdentifier;
 
-import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author James Rutherford
+ * @author Richard Jones
  */
 public class ItemDAOCore extends ItemDAO
 {
@@ -81,6 +80,10 @@ public class ItemDAOCore extends ItemDAO
         // now assign an object identifier
         ObjectIdentifier oid = new ObjectIdentifier(true);
         item.setIdentifier(oid);
+
+        // now assign any required external identifiers
+        List<ExternalIdentifier> eids = ExternalIdentifierMint.mintAll(context, item);
+        item.setExternalIdentifiers(eids);
 
         log.info(LogManager.getHeader(context, "create_item",
                 "item_id=" + item.getID() + ",uuid=" + oid.getCanonicalForm()));
@@ -99,6 +102,10 @@ public class ItemDAOCore extends ItemDAO
         {
             item = childDAO.retrieve(id);
         }
+
+        // get the external identifiers for the item
+        List<ExternalIdentifier> eids = identifierDAO.retrieve(item);
+        item.setExternalIdentifiers(eids);
 
         return item;
     }
@@ -286,7 +293,7 @@ public class ItemDAOCore extends ItemDAO
             }
         }
 
-        // finally, deal with the item identifier/uuid
+        // deal with the item identifier/uuid
         ObjectIdentifier oid = item.getIdentifier();
         if (oid == null)
         {
@@ -294,6 +301,13 @@ public class ItemDAOCore extends ItemDAO
             item.setIdentifier(oid);
         }
         oidDAO.update(item.getIdentifier());
+
+        // deal with the external identifiers
+        List<ExternalIdentifier> eids = item.getExternalIdentifiers();
+        for (ExternalIdentifier eid : eids)
+        {
+            identifierDAO.update(eid);
+        }
 
         childDAO.update(item);
     }
@@ -315,6 +329,20 @@ public class ItemDAOCore extends ItemDAO
 
         // remove all of our authorization policies
         AuthorizeManager.removeAllPolicies(context, item);
+
+        // remove/tombstone the external identifiers
+        List<ExternalIdentifier> eids = item.getExternalIdentifiers();
+        for (ExternalIdentifier eid : eids)
+        {
+            if (eid.leaveTombstone())
+            {
+                identifierDAO.tombstone(eid);
+            }
+            else
+            {
+                identifierDAO.delete(eid);
+            }
+        }
 
         // remove the object identifier
         oidDAO.delete(item);

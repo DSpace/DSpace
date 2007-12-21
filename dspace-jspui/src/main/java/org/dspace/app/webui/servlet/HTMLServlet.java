@@ -39,15 +39,6 @@
  */
 package org.dspace.app.webui.servlet;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLDecoder;
-import java.sql.SQLException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
@@ -55,15 +46,25 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.dao.ItemDAOFactory;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
+import org.dspace.uri.DSpaceIdentifier;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLDecoder;
+import java.sql.SQLException;
 
 /**
  * Servlet for HTML bitstream support.
@@ -219,9 +220,10 @@ public class HTMLServlet extends DSpaceServlet
                 }
                 else
                 {
-                    ExternalIdentifier identifier = identifierDAO.retrieve(uri);
-                    ObjectIdentifier oi = identifier.getObjectIdentifier();
-                    item = (Item) oi.getObject(context);
+                    DSpaceIdentifier di = IdentifierFactory.resolveCanonical(context, uri);
+                    //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
+                    //ObjectIdentifier oi = identifier.getObjectIdentifier();
+                    item = (Item) di.getObject(context);
                 }
             }
             catch (NumberFormatException nfe)

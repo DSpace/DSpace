@@ -39,42 +39,6 @@
  */
 package org.dspace.app.mets;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URLEncoder;
-import java.util.Date;
-import java.util.Properties;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
-import org.dspace.app.util.Util;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
-import org.dspace.core.Utils;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierType;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import edu.harvard.hul.ois.mets.Agent;
 import edu.harvard.hul.ois.mets.AmdSec;
 import edu.harvard.hul.ois.mets.BinData;
@@ -101,6 +65,43 @@ import edu.harvard.hul.ois.mets.helper.MetsValidator;
 import edu.harvard.hul.ois.mets.helper.MetsWriter;
 import edu.harvard.hul.ois.mets.helper.PCData;
 import edu.harvard.hul.ois.mets.helper.PreformedXML;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
+import org.dspace.app.util.Util;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
+import org.dspace.content.DCValue;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.PluginManager;
+import org.dspace.core.Utils;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ExternalIdentifierType;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.util.Date;
+import java.util.Properties;
 
 /**
  * Tool for exporting DSpace AIPs with the metadata serialised in METS format
@@ -170,6 +171,7 @@ public class METSExport
 
         if (line.hasOption('i'))
         {
+            /*
             uri = getCanonicalForm(line.getOptionValue('i'));
 
             // Exporting a single item
@@ -183,6 +185,20 @@ public class METSExport
             ExternalIdentifier identifier = identifierDAO.retrieve(uri);
             ObjectIdentifier oi = identifier.getObjectIdentifier();
             DSpaceObject o = oi.getObject(context);
+            */
+
+            String uriPassed = line.getOptionValue("i");
+            DSpaceObject o = null;
+            ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(uriPassed);
+            if (oi == null)
+            {
+                ExternalIdentifier eid = ExternalIdentifierMint.parseCanonicalForm(context, uriPassed);
+                oi = eid.getObjectIdentifier();
+            }
+            if (oi != null)
+            {
+                o = oi.getObject(context);
+            }
 
             if ((o != null) && o instanceof Item)
             {
@@ -200,6 +216,7 @@ public class METSExport
 
         if (line.hasOption('c'))
         {
+            /*
             uri = getCanonicalForm(line.getOptionValue('c'));
 
             // Exporting a collection's worth of items
@@ -213,7 +230,21 @@ public class METSExport
             ExternalIdentifier identifier = identifierDAO.retrieve(uri);
             ObjectIdentifier oi = identifier.getObjectIdentifier();
             DSpaceObject o = oi.getObject(context);
+*/
 
+            String uriPassed = line.getOptionValue("i");
+            DSpaceObject o = null;
+            ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(uriPassed);
+            if (oi == null)
+            {
+                ExternalIdentifier eid = ExternalIdentifierMint.parseCanonicalForm(context, uriPassed);
+                oi = eid.getObjectIdentifier();
+            }
+            if (oi != null)
+            {
+                o = oi.getObject(context);
+            }
+            
             if ((o != null) && o instanceof Collection)
             {
                 items = ((Collection) o).getItems();

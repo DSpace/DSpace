@@ -211,7 +211,20 @@
       <rtexprvalue>true</rtexprvalue>
     </attribute>
   </tag>
- 
+
+  <tag>
+    <name>external-identifiers</name>
+    <tagclass>org.dspace.app.webui.jsptag.ExternalIdentifiersTag</tagclass>
+    <info>
+      Tag for displaying the external identifiers for an item
+    </info>
+    <attribute>
+      <name>ids</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
   <tag>
     <name>item-preview</name>
     <tagclass>org.dspace.app.webui.jsptag.ItemPreviewTag</tagclass>

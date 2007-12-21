@@ -33,6 +33,29 @@
  */
 package org.dspace.app.webui.servlet;
 
+import org.apache.log4j.Logger;
+import org.dspace.app.webui.util.JSPManager;
+import org.dspace.app.webui.util.UIUtil;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
+import org.dspace.search.DSQuery;
+import org.dspace.search.QueryArgs;
+import org.dspace.search.QueryResults;
+import org.dspace.uri.DSpaceIdentifier;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -41,28 +64,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.dspace.app.webui.util.JSPManager;
-import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Item;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.LogManager;
-import org.dspace.search.DSQuery;
-import org.dspace.search.QueryArgs;
-import org.dspace.search.QueryResults;
 
 /**
  * Servlet that provides funcionality for searching the repository using a
@@ -281,9 +282,10 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             String uri = (String) itemIdentifiers.get(i);
 
-            ExternalIdentifier identifier = identifierDAO.retrieve(uri);
-            ObjectIdentifier oi = identifier.getObjectIdentifier();
-            Item item = (Item) oi.getObject(context);
+            DSpaceIdentifier di = IdentifierFactory.resolveCanonical(context, uri);
+            //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
+            //ObjectIdentifier oi = identifier.getObjectIdentifier();
+            Item item = (Item) di.getObject(context);
 
             resultsItems[i] = item;
 
@@ -298,9 +300,10 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             String uri = (String) collectionIdentifiers.get(i);
 
-            ExternalIdentifier identifier = identifierDAO.retrieve(uri);
-            ObjectIdentifier oi = identifier.getObjectIdentifier();
-            Collection c = (Collection) oi.getObject(context);
+            DSpaceIdentifier di = IdentifierFactory.resolveCanonical(context, uri);
+            //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
+            //ObjectIdentifier oi = identifier.getObjectIdentifier();
+            Collection c = (Collection) di.getObject(context);
 
             resultsCollections[i] = collection;
 
@@ -315,9 +318,10 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             String uri = (String) communityIdentifiers.get(i);
 
-            ExternalIdentifier identifier = identifierDAO.retrieve(uri);
-            ObjectIdentifier oi = identifier.getObjectIdentifier();
-            Community c = (Community) oi.getObject(context);
+            DSpaceIdentifier di = IdentifierFactory.resolveCanonical(context, uri);
+            //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
+            //ObjectIdentifier oi = identifier.getObjectIdentifier();
+            Community c = (Community) di.getObject(context);
 
             resultsCommunities[i] = c;
 

@@ -1,5 +1,5 @@
 /*
- * HandleType.java
+ * IdentifierFactory.java
  *
  * Version: $Revision: 1727 $
  *
@@ -37,44 +37,67 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.uri.handle;
+package org.dspace.uri;
 
-import org.dspace.core.ConfigurationManager;
-import org.dspace.uri.ExternalIdentifierType;
-import org.dspace.uri.ObjectIdentifier;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 
 /**
- * @author James Rutherford
  * @author Richard Jones
  */
-public class HandleType extends ExternalIdentifierType
+public class IdentifierFactory
 {
-    public HandleType()
+    public static DSpaceIdentifier resolve(Context context, String path)
     {
-        super("hdl", "http", "hdl.handle.net", "://", "/");
-    }
+        ObjectIdentifier oi = ObjectIdentifier.extractURLIdentifier(path);
+        ExternalIdentifier ei = null;
 
-    public String getPrefix()
-    {
-        String prefix = ConfigurationManager.getProperty("handle.prefix");
-        if (prefix == null || "".equals(prefix))
+        if (oi == null)
         {
-            throw new RuntimeException("No configuration, or configuration is invalid for handle.prefix");
+            ei = ExternalIdentifierMint.extractURLIdentifier(context, path);
         }
-        return prefix + "/";
-    }
 
-    public Handle getInstance(String value, ObjectIdentifier oid)
-    {
-        return new Handle(value, oid);
-    }
-
-    public boolean equals(ExternalIdentifierType type)
-    {
-        if (type instanceof HandleType)
+        if (oi == null && ei == null)
         {
-            return true;
+            return null;
         }
-        return false;
+        else
+        {
+            if (oi != null)
+            {
+                return oi;
+            }
+            else
+            {
+                return ei;
+            }
+        }
+    }
+
+    public static DSpaceIdentifier resolveCanonical(Context context, String canonicalForm)
+    {
+        ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(canonicalForm);
+        ExternalIdentifier ei = null;
+
+        if (oi == null)
+        {
+            ei = ExternalIdentifierMint.parseCanonicalForm(context, canonicalForm);
+        }
+
+        if (oi == null && ei == null)
+        {
+            return null;
+        }
+        else
+        {
+            if (oi != null)
+            {
+                return oi;
+            }
+            else
+            {
+                return ei;
+            }
+        }
     }
 }

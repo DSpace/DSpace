@@ -39,16 +39,6 @@
  */
 package org.dspace.app.webui.servlet.admin;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -66,20 +56,31 @@ import org.dspace.content.dao.BitstreamDAO;
 import org.dspace.content.dao.BitstreamDAOFactory;
 import org.dspace.content.dao.BundleDAO;
 import org.dspace.content.dao.BundleDAOFactory;
-import org.dspace.content.dao.ItemDAO;
-import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.content.dao.CollectionDAO;
 import org.dspace.content.dao.CollectionDAOFactory;
 import org.dspace.content.dao.CommunityDAO;
 import org.dspace.content.dao.CommunityDAOFactory;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.content.dao.ItemDAO;
+import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.uri.DSpaceIdentifier;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Servlet for editing permissions
@@ -193,9 +194,10 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             else if ((uri != null) && !uri.equals(""))
             {
                 // otherwise, attempt to resolve uri
-                ExternalIdentifier identifier = identifierDAO.retrieve(uri);
-                ObjectIdentifier oi = identifier.getObjectIdentifier();
-                DSpaceObject dso = oi.getObject(c);
+                DSpaceIdentifier di = IdentifierFactory.resolveCanonical(c, uri);
+                //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
+                //ObjectIdentifier oi = identifier.getObjectIdentifier();
+                DSpaceObject dso = di.getObject(c);
 
                 // make sure it's an item
                 if ((dso != null) && (dso.getType() == Constants.ITEM))

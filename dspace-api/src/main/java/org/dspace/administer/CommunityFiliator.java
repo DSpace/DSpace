@@ -39,26 +39,26 @@
  */
 package org.dspace.administer;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
 import org.dspace.content.dao.CommunityDAO;
 import org.dspace.content.dao.CommunityDAOFactory;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.ArchiveManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * A command-line tool for setting/removing community/sub-community
@@ -243,8 +243,8 @@ public class CommunityFiliator
                 System.out.println("no namespace provided. assuming handles.");
             }
 
-            ExternalIdentifier identifier =
-                identifierDAO.retrieve(communityID);
+            ExternalIdentifier identifier = ExternalIdentifierMint.parseCanonicalForm(c, communityID);
+            // ExternalIdentifier identifier = identifierDAO.retrieve(communityID);
 
             ObjectIdentifier oi = identifier.getObjectIdentifier();
             community = (Community) oi.getObject(c);
