@@ -117,7 +117,7 @@
             <%-- <th class="oddRowEvenCol"><strong><a href="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=email">E-mail Address</a></strong></th> --%>
             <th id="t2" class="oddRowEvenCol"><strong><a href="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=email"><fmt:message key="jsp.dspace-admin.eperson-browse.email"/></a></strong></th>
             <%-- <th class="oddRowOddCol"> <strong><a href="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=lastname">Last Name</a></strong></th> --%>
-            <th id="t3" class="oddRowOddCol"> <strong><a href="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=lastname"><fmt:message key="jsp.dspace-admin.eperson.general.firstname"/></a></strong></th>
+            <th id="t3" class="oddRowOddCol"> <strong><a href="<%= request.getContextPath() %>/dspace-admin/edit-epeople?submit_browse=1&sortby=lastname"><fmt:message key="jsp.dspace-admin.eperson.general.lastname"/></a></strong></th>
             <%-- <th class="oddRowEvenCol"><strong>First Name</strong></th> --%>
             <th id="t4" class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.eperson.general.lastname"/></strong></th>
             <%-- <th class="oddRowOddCol"> <strong>Can Log In?</strong></th> --%>
