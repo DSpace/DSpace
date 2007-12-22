@@ -173,8 +173,8 @@ jsp.dspace-admin.confirm-delete-format.title = 刪除位元串流格式
 jsp.dspace-admin.confirm-delete-format.warning = 所有此格式之位元串流將回復成  <em>未知</em> 格式.
 jsp.dspace-admin.confirm-delete-format.returntoedit = 回到管理 EPeople 頁面
 
-jsp.dspace-admin.eperson.general.firstname = 姓氏
-jsp.dspace-admin.eperson.general.lastname = 名字
+jsp.dspace-admin.eperson.general.firstname = 名字
+jsp.dspace-admin.eperson.general.lastname = 姓氏
 
 jsp.dspace-admin.eperson-browse.email = E-mail
 jsp.dspace-admin.eperson-browse.canlogin = 登入?

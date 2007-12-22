@@ -192,8 +192,8 @@ jsp.dspace-admin.confirm-delete-format.title = ビットストリームフォマ
 jsp.dspace-admin.confirm-delete-format.warning = このフォーマットのビットストールが存在する場合は、<em>未知</em>のビットストリーム･フォーマットになります。
 jsp.dspace-admin.confirm-delete-format.returntoedit = 管理者画面に戻る
 
-jsp.dspace-admin.eperson.general.firstname = 姓
-jsp.dspace-admin.eperson.general.lastname = 名
+jsp.dspace-admin.eperson.general.firstname = 名
+jsp.dspace-admin.eperson.general.lastname = 姓
 
 jsp.dspace-admin.eperson-browse.email = メールアドレス
 jsp.dspace-admin.eperson-browse.canlogin = ログイン可能ですか?
