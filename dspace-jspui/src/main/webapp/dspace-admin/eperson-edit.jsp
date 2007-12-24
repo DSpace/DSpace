@@ -135,7 +135,7 @@
 
         <tr>
             <%-- <td>Last Name:</td> --%>
-            <td><label for="tlastname"><fmt:message key="jsp.dspace-admin.eperson.general.firstname"/></label></td>
+            <td><label for="tlastname"><fmt:message key="jsp.dspace-admin.eperson.general.lastname"/></label></td>
             <td>
                 <input name="lastname" id="tlastname" size="24" value="<%=lastName == null ? "" : lastName%>"/>
             </td>
@@ -143,7 +143,7 @@
 
         <tr>           
             <%-- <td>First Name:</td> --%>
-            <td><label for="tfirstname"><fmt:message key="jsp.dspace-admin.eperson.general.lastname"/></label></td>
+            <td><label for="tfirstname"><fmt:message key="jsp.dspace-admin.eperson.general.firstname"/></label></td>
             <td>
                 <input name="firstname" id="tfirstname" size="24" value="<%=firstName == null ? "" : firstName%>"/>
             </td>
