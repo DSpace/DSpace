@@ -190,8 +190,8 @@ jsp.dspace-admin.confirm-delete-format.title = Slett bitstrøm format
 jsp.dspace-admin.confirm-delete-format.warning = Alle bitstrømmer i dette formatet vil bli tilbakeført til <em>ukjent</em>.
 jsp.dspace-admin.confirm-delete-format.returntoedit = Tilbake til administrasjonssiden for e-personer
 
-jsp.dspace-admin.eperson.general.firstname = Etternavn
-jsp.dspace-admin.eperson.general.lastname = Fornavn
+jsp.dspace-admin.eperson.general.firstname = Fornavn
+jsp.dspace-admin.eperson.general.lastname = Etternavn
 
 jsp.dspace-admin.eperson-browse.email = e-postadresse
 jsp.dspace-admin.eperson-browse.canlogin = Kan logge på?
