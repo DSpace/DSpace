@@ -527,10 +527,13 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             
             for (int i = 0; i < commID.length; i++)
             {
-                TableRow row = DatabaseManager.create(context, "Communities2Item");
-                row.setColumn("item_id", itemID);
-                row.setColumn("community_id", commID[i]);
-                DatabaseManager.update(context, row);
+                if (isFirstOccurrence(commID, i))
+                {
+                    TableRow row = DatabaseManager.create(context, "Communities2Item");
+                    row.setColumn("item_id", itemID);
+                    row.setColumn("community_id", commID[i]);
+                    DatabaseManager.update(context, row);
+                }
             }
         }
         catch (SQLException e)
@@ -831,5 +834,28 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
         }
 
         return null;
+    }
+
+    /**
+     * Check to see if the integer at pos is the first occurrence of that value
+     * in the array.
+     *
+     * @param ids
+     * @param pos
+     * @return
+     */
+    private boolean isFirstOccurrence(int[] ids, int pos)
+    {
+        if (pos < 0 || pos >= ids.length)
+            return false;
+
+        int id = ids[pos];
+        for (int i = 0; i < pos; i++)
+        {
+            if (id == ids[i])
+                return false;
+        }
+
+        return true;
     }
 }
