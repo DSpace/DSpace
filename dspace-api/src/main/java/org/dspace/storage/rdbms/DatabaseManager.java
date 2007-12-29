@@ -96,6 +96,9 @@ public class DatabaseManager
 
     /** True if initialization has been done */
     private static boolean initialized = false;
+
+    /** Name to use for the pool */
+    private static String poolName = "dspacepool";
     
     /** 
      * This regular expression is used to perform sanity checks 
@@ -509,7 +512,7 @@ public class DatabaseManager
         initialize();
 
         return DriverManager
-                .getConnection("jdbc:apache:commons:dbcp:dspacepool");
+                .getConnection("jdbc:apache:commons:dbcp:" + poolName);
     }
 
     /**
@@ -1386,9 +1389,24 @@ public class DatabaseManager
     }
 
     /**
+     * Provide a means for a (web) application to cleanly terminate the connection pool.
+     * @throws SQLException
+     */
+    public static synchronized void shutdown() throws SQLException
+    {
+        if (initialized)
+        {
+            initialized = false;
+            PoolingDriver driver = (PoolingDriver)DriverManager.getDriver("jdbc:apache:commons:dbcp:" + poolName);
+            if (driver != null)
+                driver.closePool(poolName);
+        }
+    }
+
+    /**
      * Initialize the DatabaseManager.
      */
-    private static void initialize() throws SQLException
+    private static synchronized void initialize() throws SQLException
     {
         if (initialized)
         {
@@ -1491,6 +1509,12 @@ public class DatabaseManager
                     false, // read only is not default for now
                     false); // Autocommit defaults to none
 
+            // Obtain a poolName from the config, default is "dspacepool"
+            if (ConfigurationManager.getProperty("db.poolname") != null)
+            {
+                poolName = ConfigurationManager.getProperty("db.poolname");
+            }
+
             //
             // Finally, we create the PoolingDriver itself...
             //
@@ -1499,7 +1523,7 @@ public class DatabaseManager
             //
             // ...and register our pool with it.
             //
-            driver.registerPool("dspacepool", connectionPool);
+            driver.registerPool(poolName, connectionPool);
 
             // Old SimplePool init
             //DriverManager.registerDriver(new SimplePool());
