@@ -48,6 +48,8 @@ import org.dspace.content.Bundle;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.Thumbnail;
+import org.dspace.content.service.ItemService;
 
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -524,118 +526,51 @@ public class ItemListTag extends TagSupport
     private String getThumbMarkup(HttpServletRequest hrq, Item item)
             throws JspException
     {
-        Bundle[] original = null;
-        
         try
         {
-        	original = item.getBundles("ORIGINAL");
-        }
-        catch(SQLException sqle)
-        {
-        	throw new JspException(sqle.getMessage());       	
-        }
+            Context c = UIUtil.obtainContext(hrq);
+            Thumbnail thumbnail = ItemService.getThumbnail(c, item.getID(), linkToBitstream);
 
-        if (original.length == 0)
-        {
-        	return "";
-        }
-        
-        boolean html = false;
-
-        // if multiple bitstreams, check if the primary one is HTML
-        if (original[0].getBitstreams().length > 1)
-        {
-            Bitstream[] bitstreams = original[0].getBitstreams();
-
-            for (int i = 0; (i < bitstreams.length) && !html; i++)
+            if (thumbnail == null)
             {
-                if (bitstreams[i].getID() == original[0]
-                        .getPrimaryBitstreamID())
-                {
-                    html = bitstreams[i].getFormat().getMIMEType().equals(
-                            "text/html");
-                }
+                return "";
             }
-        }
+            StringBuffer thumbFrag = new StringBuffer();
 
-        try
-        {
-        	Bundle[] thumbs = item.getBundles("THUMBNAIL");
-
-        	// if there are thumbs and we're not dealing with an HTML item
-        	// then show the thumbnail
-        	if ((thumbs.length > 0) && !html)
-        	{
-                Context c = UIUtil.obtainContext(hrq);
-
-                Bitstream thumbnailBitstream;
-                Bitstream originalBitstream;
-
-                if ((original[0].getBitstreams().length > 1)
-                        && (original[0].getPrimaryBitstreamID() > -1))
-                {
-                    originalBitstream = Bitstream.find(c, original[0]
-                            .getPrimaryBitstreamID());
-                    thumbnailBitstream = thumbs[0]
-                            .getBitstreamByName(originalBitstream.getName()
-                                    + ".jpg");
-                }
-                else
-                {
-                    originalBitstream = original[0].getBitstreams()[0];
-                    thumbnailBitstream = thumbs[0].getBitstreams()[0];
-                }
-
-                if ((thumbnailBitstream != null)
-                        && (AuthorizeManager.authorizeActionBoolean(c,
-                                thumbnailBitstream, Constants.READ)))
-                {
-                    StringBuffer thumbLink;
-
-                    if (linkToBitstream)
-                    {
-                        thumbLink = new StringBuffer(
-                                "<br/><a target=\"_blank\" href=\"").append(
-                                hrq.getContextPath()).append("/bitstream/")
-                                .append(item.getHandle()).append("/").append(
-                                        originalBitstream.getSequenceID())
-                                .append("/").append(
-                                		UIUtil.encodeBitstreamName(originalBitstream
-                                                .getName(),
-                                                Constants.DEFAULT_ENCODING));
-                    }
-                    else
-                    {
-                        thumbLink = new StringBuffer("<br/><a href=\"").append(
-                                hrq.getContextPath()).append("/handle/")
-                                .append(item.getHandle());
-                    }
-
-                    thumbLink.append("\"><img src=\"").append(
-                            hrq.getContextPath()).append("/retrieve/").append(
-                            thumbnailBitstream.getID()).append("/").append(
-                            		UIUtil.encodeBitstreamName(thumbnailBitstream.getName(),
-                                    Constants.DEFAULT_ENCODING)).append(
-                            "\" alt=\"").append(thumbnailBitstream.getName())
-                            .append("\" ").append(
-                                    getScalingAttr(hrq, thumbnailBitstream))
-                            .append("/></a>");
-
-                    return thumbLink.toString();
-                }
+            if (linkToBitstream)
+            {
+                Bitstream original = thumbnail.getOriginal();
+                String link = hrq.getContextPath() + "/bitstream/" + item.getHandle() + "/" + original.getSequenceID() + "/" +
+                                UIUtil.encodeBitstreamName(original.getName(), Constants.DEFAULT_ENCODING);
+                thumbFrag.append("<a target=\"_blank\" href=\"" + link + "\" />");
             }
+            else
+            {
+                String link = hrq.getContextPath() + "/handle/" + item.getHandle();
+                thumbFrag.append("<a href=\"" + link + "\" />");
+            }
+
+            Bitstream thumb = thumbnail.getThumb();
+            String img = hrq.getContextPath() + "/retrieve/" + thumb.getID() + "/" +
+                        UIUtil.encodeBitstreamName(thumb.getName(), Constants.DEFAULT_ENCODING);
+            String alt = thumb.getName();
+            String scAttr = getScalingAttr(hrq, thumb);
+            thumbFrag.append("<img src=\"")
+                     .append(img)
+                     .append("\" alt=\"")
+                     .append(alt + "\" ")
+                     .append(scAttr)
+                     .append("/></a>");
+
+            return thumbFrag.toString();
         }
         catch (SQLException sqle)
         {
-        	throw new JspException(sqle.getMessage());
+            throw new JspException(sqle.getMessage());
         }
         catch (UnsupportedEncodingException e)
         {
-            throw new JspException(
-                        "Server does not support DSpace's default encoding. ",
-                        e);
+            throw new JspException("Server does not support DSpace's default encoding. ", e);
         }
-
-        return "";
     }
 }

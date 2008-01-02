@@ -46,6 +46,8 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.Thumbnail;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -743,9 +745,10 @@ public class BrowseListTag extends TagSupport
     {
     	try
     	{
-    		Thumbnail thumbnail = item.getThumbnail();
-    		
-    		if (thumbnail == null)
+            Context c = UIUtil.obtainContext(hrq);
+            Thumbnail thumbnail = ItemService.getThumbnail(c, item.getID(), linkToBitstream);
+
+            if (thumbnail == null)
     		{
     			return "";
     		}
@@ -768,7 +771,13 @@ public class BrowseListTag extends TagSupport
         	String img = hrq.getContextPath() + "/retrieve/" + thumb.getID() + "/" + 
         				UIUtil.encodeBitstreamName(thumb.getName(), Constants.DEFAULT_ENCODING);
         	String alt = thumb.getName();
-        	thumbFrag.append("<img src=\"" + img + "\" alt=\"" + alt + "\" /></a>");
+            String scAttr = getScalingAttr(hrq, thumb);
+            thumbFrag.append("<img src=\"")
+                     .append(img)
+                     .append("\" alt=\"")
+                     .append(alt + "\" ")
+                     .append(scAttr)
+                     .append("/></a>");
         	
         	return thumbFrag.toString();
         }

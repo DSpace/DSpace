@@ -33,7 +33,7 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.browse;
+package org.dspace.content;
 
 import org.dspace.content.Bitstream;
 
@@ -96,5 +96,5 @@ public class Thumbnail
 		this.thumb = thumb;
 	}
 
-	
+
 }
