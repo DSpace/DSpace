@@ -88,7 +88,7 @@ public class Bundle extends DSpaceObject
 
     /** Flag set when metadata is modified, for events */
     private boolean modifiedMetadata;
-    
+
     public Bundle(Context context, int id)
     {
         this.id = id;

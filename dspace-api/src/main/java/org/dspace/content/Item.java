@@ -1257,14 +1257,14 @@ public class Item extends DSpaceObject
     public Collection[] getCollections()
     {
         List<Collection> parents = collectionDAO.getParentCollections(this);
-        return (Collection[]) parents.toArray(new Collection[0]);
+        return parents.toArray(new Collection[0]);
     }
 
     @Deprecated
     public Community[] getCommunities()
     {
         List<Community> parents = communityDAO.getParentCommunities(this);
-        return (Community[]) parents.toArray(new Community[0]);
+        return parents.toArray(new Community[0]);
     }
 
     @Deprecated

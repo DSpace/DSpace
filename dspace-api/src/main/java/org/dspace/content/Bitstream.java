@@ -56,7 +56,6 @@ import org.dspace.event.Event;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.uri.ObjectIdentifier;
 
-
 /**
  * Class representing bitstreams stored in the DSpace system.
  * <P>
@@ -93,7 +92,7 @@ public class Bitstream extends DSpaceObject
 
     /** Flag set when metadata is modified, for events */
     private boolean modifiedMetadata;
-    
+
     public Bitstream(Context context, int id)
     {
         this.id = id;
