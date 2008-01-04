@@ -122,7 +122,7 @@
 
 <dspace:layout title="<%= title %>">
 
-    <dspace:external-identifiers ids="<%= eids %>"/>
+    <dspace:external-identifiers ids="<%= eids %>" type="<%= item.getType() %>"/>
 
 <%
     String displayStyle = (displayAll ? "full" : "");

@@ -61,9 +61,16 @@
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.browse.ItemCounter" %>
-<%@ page import="org.dspace.content.*" %>
+<%@ page import="org.dspace.content.Bitstream" %>
+<%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.content.Community" %>
+<%@ page import="org.dspace.content.DCValue" %>
+<%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.uri.ExternalIdentifier" %>
+<%@ page import="org.dspace.uri.ObjectIdentifier" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="java.util.List" %>
 
 
 <%
@@ -86,6 +93,10 @@
 	// get the browse indices
     BrowseIndex[] bis = BrowseIndex.getBrowseIndices();
 
+    // get the identifiers for the community
+    List<ExternalIdentifier> eids = community.getExternalIdentifiers();
+    ObjectIdentifier oid = community.getIdentifier();
+
     // Put the metadata values into guaranteed non-null variables
     String name = community.getMetadata("name");
     String intro = community.getMetadata("introductory_text");
@@ -104,6 +115,8 @@
 %>
 
 <dspace:layout locbar="commLink" title="<%= name %>" feedData="<%= feedData %>">
+
+<dspace:external-identifiers ids="<%= eids %>" type="<%= community.getType() %>"/>
 
   <table border="0" cellpadding="5" width="100%">
     <tr>
@@ -293,6 +306,9 @@
 %>
 
   <p class="copyrightText"><%= copyright %></p>
+
+    <%-- the UUID of the community --%>
+    <p class="page_identifier"><%= oid.getCanonicalForm() %></p>
 
   <dspace:sidebar>
     <% if(editor_button || add_button)  // edit button(s)

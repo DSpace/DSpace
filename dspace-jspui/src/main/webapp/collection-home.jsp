@@ -63,11 +63,17 @@
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.browse.ItemCounter"%>
-<%@ page import="org.dspace.content.*"%>
-<%@ page import="org.dspace.core.Utils" %>
-<%@ page import="org.dspace.core.ConfigurationManager"%>
-<%@ page import="org.dspace.eperson.Group"     %>
+<%@ page import="org.dspace.content.Bitstream"%>
+<%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.content.Community"%>
+<%@ page import="org.dspace.content.DCValue"     %>
+<%@ page import="org.dspace.content.Item" %>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.eperson.Group" %>
+<%@ page import="org.dspace.uri.ExternalIdentifier" %>
+<%@ page import="org.dspace.uri.ObjectIdentifier" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="java.util.List" %>
 
 
 <%
@@ -93,6 +99,10 @@
 
 	// get the browse indices
     BrowseIndex[] bis = BrowseIndex.getBrowseIndices();
+
+    // get the external identifiers for the community
+    List<ExternalIdentifier> eids = collection.getExternalIdentifiers();
+    ObjectIdentifier oid = collection.getIdentifier();
 
     // Put the metadata values into guaranteed non-null variables
     String name = collection.getMetadata("name");
@@ -128,6 +138,8 @@
 %>
 
 <dspace:layout locbar="commLink" title="<%= name %>" feedData="<%= feedData %>">
+
+<dspace:external-identifiers ids="<%= eids %>" type="<%= collection.getType() %>"/>
 
   <table border="0" cellpadding="5" width="100%">
     <tr>
@@ -246,6 +258,8 @@
 
   <p class="copyrightText"><%= copyright %></p>
 
+    <%-- the UUID of the collection --%>
+    <p class="page_identifier"><%= oid.getCanonicalForm() %></p>
 
   <dspace:sidebar>
 <% if(admin_button || editor_button ) { %>

@@ -39,6 +39,7 @@
  */
 package org.dspace.app.webui.jsptag;
 
+import org.dspace.core.Constants;
 import org.dspace.uri.ExternalIdentifier;
 
 import javax.servlet.jsp.JspException;
@@ -56,6 +57,8 @@ public class ExternalIdentifiersTag extends TagSupport
 {
     private List<ExternalIdentifier> ids;
 
+    private int type;
+
     public List<ExternalIdentifier> getIds()
     {
         return ids;
@@ -64,6 +67,16 @@ public class ExternalIdentifiersTag extends TagSupport
     public void setIds(List<ExternalIdentifier> ids)
     {
         this.ids = ids;
+    }
+
+    public int getType()
+    {
+        return type;
+    }
+
+    public void setType(int type)
+    {
+        this.type = type;
     }
 
     public int doStartTag() throws JspException
@@ -78,15 +91,7 @@ public class ExternalIdentifiersTag extends TagSupport
 
             JspWriter out = pageContext.getOut();
 
-            String header = "";
-            if (ids.size() == 1)
-            {
-                header = LocaleSupport.getLocalizedMessage(pageContext, "jsp.external-identifier.header.single");
-            }
-            else
-            {
-                header = LocaleSupport.getLocalizedMessage(pageContext, "jsp.external-identifier.header.many");
-            }
+            String header = this.getHeaderText();
             
             out.println("<table class=\"external_identifiers_table\"><tr>");
             out.println("<th>" + header + "</th></tr>");
@@ -109,5 +114,39 @@ public class ExternalIdentifiersTag extends TagSupport
         URI link = eid.getURI();
         String msg = "<a href=\"" + link + "\">" + link  + "</a>";
         out.println("<tr><td>" + msg + "</td></tr></table>");
+    }
+
+    private String getHeaderText()
+    {
+        String key = "jsp.external-identifier.header.";
+
+        switch (this.type)
+        {
+            case Constants.COLLECTION:
+                key = key + "collection.";
+                break;
+            case Constants.COMMUNITY:
+                key = key + "community.";
+                break;
+            case Constants.ITEM:
+                key = key + "item.";
+                break;
+            default:
+                key = key + "default.";
+                break;
+        }
+
+        if (ids.size() == 1)
+        {
+            key = key + "single";
+        }
+        else
+        {
+            key = key + "many";
+        }
+
+        String header = LocaleSupport.getLocalizedMessage(pageContext, key);
+
+        return header;
     }
 }
