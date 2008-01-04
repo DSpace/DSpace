@@ -92,28 +92,26 @@ public class URIServlet extends DSpaceServlet
             SQLException, AuthorizeException
     {
         String extraPathInfo = null;
-        //ObjectIdentifier oi = null;
         DSpaceObject dso = null;
-        //ExternalIdentifier ei = null;
 
-        // Original path info, of the form "/xyz/1234/56"
-        // or "/xyz/1234/56/extra/stuff"
+        // Original path info of the form:
+        //
+        // /<identifier namespace>/<identifier>[/<optional path info>]
         String path = request.getPathInfo();
 
+        // get the identifier if there is one
         DSpaceIdentifier di = IdentifierFactory.resolve(context, path);
-        /*
-        oi = ObjectIdentifier.extractURLIdentifier(path);
 
-        if (oi == null)
+        // get the object if there is one
+        if (di != null)
         {
-            ei = ExternalIdentifierMint.extractURLIdentifier(context, path);
+            dso = di.getObject(context);
         }
-        */
 
-        if (di == null)
+        // if there is no object, display the invalid id error
+        if (dso == null)
         {
-            log.info(LogManager
-                    .getHeader(context, "invalid_id", "path=" + path));
+            log.info(LogManager.getHeader(context, "invalid_id", "path=" + path));
             JSPManager.showInvalidIDError(request, response, path, -1);
         }
         else
@@ -125,34 +123,6 @@ public class URIServlet extends DSpaceServlet
             {
                 extraPathInfo = path.substring(startFrom);
             }
-            dso = di.getObject(context);
-            /*
-            if (oi != null)
-            {
-                // get the index of the identifier in the url
-                String urlForm = oi.getURLForm();
-                int index = path.indexOf(urlForm);
-                int startFrom = index + urlForm.length();
-                if (startFrom < path.length())
-                {
-                    extraPathInfo = path.substring(startFrom);
-                }
-
-                dso = oi.getObject(context);
-            }
-            else
-            {
-                // get the index of the identifier in the url
-                String urlForm = ei.getURLForm();
-                int index = path.indexOf(urlForm);
-                int startFrom = index + urlForm.length();
-                if (startFrom < path.length())
-                {
-                    extraPathInfo = path.substring(startFrom);
-                }
-
-                dso = ei.getObjectIdentifier().getObject(context);
-            }*/
 
             processDSpaceObject(context, request, response, dso, extraPathInfo);
         }
