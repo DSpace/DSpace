@@ -398,7 +398,7 @@ public class ItemImport
             // validate each collection arg to see if it's a real collection
             for (int i = 0; i < collections.length; i++)
             {
-                ObjectIdentifier oid = ObjectIdentifier.fromString(collections[i]);
+                ObjectIdentifier oid = ObjectIdentifier.parseCanonicalForm(collections[i]);
                 DSpaceObject dso = oid.getObject(c);
                 if (!(dso instanceof Collection))
                 {
@@ -1625,7 +1625,7 @@ public class ItemImport
         String line = null;
         while ((line = br.readLine()) != null)
         {
-            ObjectIdentifier oid = ObjectIdentifier.fromString(line);
+            ObjectIdentifier oid = ObjectIdentifier.parseCanonicalForm(line);
             if (oid != null)
             {
                 return oid;

@@ -39,11 +39,6 @@
  */
 package org.dspace.content.dao;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
@@ -58,9 +53,15 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
 import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ObjectIdentifierMint;
 import org.dspace.workflow.WorkflowItem;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author James Rutherford
@@ -79,8 +80,10 @@ public class CollectionDAOCore extends CollectionDAO
         Collection collection = childDAO.create();
 
         // now assign an object identifier
+        /*
         ObjectIdentifier oid = new ObjectIdentifier(true);
-        collection.setIdentifier(oid);
+        collection.setIdentifier(oid);*/
+        ObjectIdentifier oid = ObjectIdentifierMint.mint(context, collection);
 
         // Create a default persistent identifier for this Collection, and
         // add it to the in-memory Colleciton object.
@@ -162,8 +165,10 @@ public class CollectionDAOCore extends CollectionDAO
         ObjectIdentifier oid = collection.getIdentifier();
         if (oid == null)
         {
+            /*
             oid = new ObjectIdentifier(true);
-            collection.setIdentifier(oid);
+            collection.setIdentifier(oid);*/
+            oid = ObjectIdentifierMint.mint(context, collection);
         }
         oidDAO.update(collection.getIdentifier());
 

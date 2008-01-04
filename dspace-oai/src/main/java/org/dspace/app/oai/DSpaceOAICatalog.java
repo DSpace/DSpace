@@ -140,7 +140,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
                 String canonicalForm =
                     oaiIdentifier.substring(OAI_ID_PREFIX.length());
                 ObjectIdentifier identifier =
-                    ObjectIdentifier.fromString(canonicalForm);
+                    ObjectIdentifier.parseCanonicalForm(canonicalForm);
 
                 itemInfo = Harvest.getSingle(context, identifier, false);
             }
@@ -355,7 +355,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
                 String canonicalForm =
                     oaiIdentifier.substring(OAI_ID_PREFIX.length());
                 ObjectIdentifier identifier =
-                    ObjectIdentifier.fromString(canonicalForm);
+                    ObjectIdentifier.parseCanonicalForm(canonicalForm);
 
                 itemInfo = Harvest.getSingle(context, identifier, true);
             }
@@ -807,7 +807,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
         // colon, and all subsequent underscores into forward slashes.
         String uri = set.replaceFirst("_", ":").replace('_', '/');
 
-        ObjectIdentifier oi = ObjectIdentifier.fromString(uri);
+        ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(uri);
         o = oi.getObject(context);
 
         // If it corresponds to a collection or a community, that's the set we

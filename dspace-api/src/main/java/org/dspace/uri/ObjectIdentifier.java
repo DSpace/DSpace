@@ -79,40 +79,23 @@ public class ObjectIdentifier implements DSpaceIdentifier
     private int resourceTypeID = -1;
     private UUID uuid = null;
 
-    public ObjectIdentifier()
-    {
-        // a blank identifier
-    }
-
-    public ObjectIdentifier(boolean generate)
-    {
-        if (generate)
-        {
-            // generate a new unique UUID
-            this.uuid = UUID.randomUUID();
-        }
-    }
-
-    public ObjectIdentifier(int resourceID, int resourceTypeID)
-    {
-        this.resourceID = resourceID;
-        this.resourceTypeID = resourceTypeID;
-
-        // we are now ready to have a UUID assigned
-    }
-
+    // FIXME: it is acceptable to have an object identifier with only a UUID provided that it can be
+    // looked up in the database.  That is, this class can go and look up the resource id and the type
+    //
+    // What to do in instances where the oid isn't already bound to an object?
+    // - First, new DSpaceObjects get ObjectIdentifiers through the Mint, so shouldn't be an issue
+    // - Second, non-DSpaceObjects which have ObjectIdentifiers need to exist without resource types, so this is required
+    // - Third, worst case scenario we throw a NotSupportedException or somesuch when getObject can't be run
+    //
+    // Thoughts?
     public ObjectIdentifier(UUID uuid)
     {
         this.uuid = uuid;
-
-        // we are now ready to be told who we belong to
     }
 
     public ObjectIdentifier(String uuid)
     {
         this.uuid = UUID.fromString(uuid);
-
-        // we are now ready to be told who we belong to
     }
 
     public ObjectIdentifier(String uuid, int resourceType, int resourceID)
@@ -127,24 +110,6 @@ public class ObjectIdentifier implements DSpaceIdentifier
         this.uuid = uuid;
         this.resourceTypeID = resourceType;
         this.resourceID = resourceID;
-    }
-
-    public static ObjectIdentifier parseCanonicalForm(String canonicalForm)
-    {
-        return fromString(canonicalForm);
-    }
-
-    @Deprecated
-    public static ObjectIdentifier fromString(String canonicalForm)
-    {
-        if (!canonicalForm.startsWith("uuid:"))
-        {
-            return null;
-        }
-
-        String value = canonicalForm.substring(5);
-
-        return new ObjectIdentifier(value);
     }
 
     public int getResourceID()
@@ -170,55 +135,6 @@ public class ObjectIdentifier implements DSpaceIdentifier
     public void setResourceTypeID(int resourceTypeID)
     {
         this.resourceTypeID = resourceTypeID;
-    }
-
-    public DSpaceObject getObject(Context context)
-    {
-        // do we know what the resource type and id is?
-        if (this.resourceTypeID == -1 || this.resourceID == -1)
-        {
-            // we don't have resource type or resource id for this item
-            // check the UUID cache and see if we can find them
-            ObjectIdentifierDAO dao = ObjectIdentifierDAOFactory.getInstance(context);
-            ObjectIdentifier noid = dao.retrieve(uuid);
-
-            // if there is no object identifier, just return null
-            if (noid == null)
-            {
-                return null;
-            }
-
-            // move the values up to this object for convenience
-            this.resourceTypeID = noid.getResourceTypeID();
-            this.resourceID = noid.getResourceID();
-        }
-
-        // now we can select the object based on its resource type and id
-        return this.getObjectByResourceID(context);
-    }
-
-    private DSpaceObject getObjectByResourceID(Context context)
-    {
-        switch(resourceTypeID)
-        {
-            case (Constants.BITSTREAM):
-                BitstreamDAO bitstreamDAO = BitstreamDAOFactory.getInstance(context);
-                return bitstreamDAO.retrieve(resourceID);
-            case (Constants.BUNDLE):
-                BundleDAO bundleDAO = BundleDAOFactory.getInstance(context);
-                return bundleDAO.retrieve(resourceID);
-            case (Constants.ITEM):
-                ItemDAO itemDAO = ItemDAOFactory.getInstance(context);
-                return itemDAO.retrieve(resourceID);
-            case (Constants.COLLECTION):
-                CollectionDAO collectionDAO = CollectionDAOFactory.getInstance(context);
-                return collectionDAO.retrieve(resourceID);
-            case (Constants.COMMUNITY):
-                CommunityDAO communityDAO = CommunityDAOFactory.getInstance(context);
-                return communityDAO.retrieve(resourceID);
-            default:
-                throw new RuntimeException("Not a valid DSpaceObject type");
-        }
     }
 
     public String getURLForm()
@@ -268,6 +184,45 @@ public class ObjectIdentifier implements DSpaceIdentifier
         return "uuid:" + uuid.toString();
     }
 
+    public DSpaceObject getObject(Context context)
+    {
+        // do we know what the resource type and id is?
+        if (this.resourceTypeID == -1 || this.resourceID == -1)
+        {
+            // we don't have resource type or resource id for this item
+            // check the UUID cache and see if we can find them
+            ObjectIdentifierDAO dao = ObjectIdentifierDAOFactory.getInstance(context);
+            ObjectIdentifier noid = dao.retrieve(uuid);
+
+            // if there is no object identifier, just return null
+            if (noid == null)
+            {
+                return null;
+            }
+
+            // move the values up to this object for convenience
+            this.resourceTypeID = noid.getResourceTypeID();
+            this.resourceID = noid.getResourceID();
+        }
+
+        // now we can select the object based on its resource type and id
+        return this.getObjectByResourceID(context);
+    }
+
+    // STATIC METHODS
+
+    public static ObjectIdentifier parseCanonicalForm(String canonicalForm)
+    {
+        if (!canonicalForm.startsWith("uuid:"))
+        {
+            return null;
+        }
+
+        String value = canonicalForm.substring(5);
+
+        return new ObjectIdentifier(value);
+    }
+
     public static ObjectIdentifier extractURLIdentifier(String str)
     {
         String oidRX = ".*uuid/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}).*";
@@ -280,6 +235,33 @@ public class ObjectIdentifier implements DSpaceIdentifier
         String value = m.group(1);
         ObjectIdentifier oid = new ObjectIdentifier(value);
         return oid;
+    }
+
+
+    // PRIVATE METHODS
+
+    private DSpaceObject getObjectByResourceID(Context context)
+    {
+        switch(resourceTypeID)
+        {
+            case (Constants.BITSTREAM):
+                BitstreamDAO bitstreamDAO = BitstreamDAOFactory.getInstance(context);
+                return bitstreamDAO.retrieve(resourceID);
+            case (Constants.BUNDLE):
+                BundleDAO bundleDAO = BundleDAOFactory.getInstance(context);
+                return bundleDAO.retrieve(resourceID);
+            case (Constants.ITEM):
+                ItemDAO itemDAO = ItemDAOFactory.getInstance(context);
+                return itemDAO.retrieve(resourceID);
+            case (Constants.COLLECTION):
+                CollectionDAO collectionDAO = CollectionDAOFactory.getInstance(context);
+                return collectionDAO.retrieve(resourceID);
+            case (Constants.COMMUNITY):
+                CommunityDAO communityDAO = CommunityDAOFactory.getInstance(context);
+                return communityDAO.retrieve(resourceID);
+            default:
+                throw new RuntimeException("Not a valid DSpaceObject type");
+        }
     }
 
     ////////////////////////////////////////////////////////////////////

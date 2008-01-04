@@ -228,7 +228,7 @@ public class ItemExport
             }
         }
 
-        ObjectIdentifier oi = IdentifierUtils.fromString(c, myIDString);
+        ObjectIdentifier oi = IdentifierUtils.parseCanonicalForm(c, myIDString);
 */
 
         if (oi == null)

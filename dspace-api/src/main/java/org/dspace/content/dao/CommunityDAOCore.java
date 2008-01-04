@@ -39,11 +39,6 @@
  */
 package org.dspace.content.dao;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
@@ -52,13 +47,18 @@ import org.dspace.authorize.dao.ResourcePolicyDAOFactory;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ExternalIdentifierMint;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ObjectIdentifierMint;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author James Rutherford
@@ -84,8 +84,10 @@ public class CommunityDAOCore extends CommunityDAO
         Community community = childDAO.create();
 
         // now assign an object identifier
+        /*
         ObjectIdentifier oid = new ObjectIdentifier(true);
-        community.setIdentifier(oid);
+        community.setIdentifier(oid);*/
+        ObjectIdentifier oid = ObjectIdentifierMint.mint(context, community);
 
         // Create a default persistent identifier for this Community, and
         // add it to the in-memory Community object.
@@ -147,8 +149,10 @@ public class CommunityDAOCore extends CommunityDAO
         ObjectIdentifier oid = community.getIdentifier();
         if (oid == null)
         {
+            /*
             oid = new ObjectIdentifier(true);
-            community.setIdentifier(oid);
+            community.setIdentifier(oid);*/
+            oid = ObjectIdentifierMint.mint(context, community);
         }
         oidDAO.update(community.getIdentifier());
 

@@ -39,10 +39,6 @@
  */
 package org.dspace.search;
 
-import java.text.ParseException;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
@@ -51,9 +47,14 @@ import org.dspace.content.dao.CollectionDAO;
 import org.dspace.content.dao.CollectionDAOFactory;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
-import org.dspace.uri.ObjectIdentifier;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ObjectIdentifierMint;
+
+import java.text.ParseException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Utility class for extracting information about items, possibly just within a
@@ -218,7 +219,8 @@ public class Harvest
     {
         CollectionDAO collectionDAO = CollectionDAOFactory.getInstance(context);
 
-        ObjectIdentifier oi = new ObjectIdentifier(itemInfo.itemID, Constants.ITEM);
+        ObjectIdentifier oi = ObjectIdentifierMint.get(context, itemInfo.itemID, Constants.ITEM);
+        // ObjectIdentifier oi = new ObjectIdentifier(itemInfo.itemID, Constants.ITEM);
         Item item = (Item) oi.getObject(context);
 
         List<Collection> parents = collectionDAO.getParentCollections(item);

@@ -40,18 +40,19 @@
 
 package org.dspace.event;
 
+import org.apache.log4j.Logger;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ObjectIdentifierMint;
+
 import java.io.Serializable;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.dspace.content.DSpaceObject;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
 
 /**
  * An Event object represents a single action that changed one object in the
@@ -327,7 +328,8 @@ public class Event implements Serializable
         }
         else
         {
-            ObjectIdentifier oid = new ObjectIdentifier(id, type);
+            ObjectIdentifier oid = ObjectIdentifierMint.get(context, type, id);
+            // ObjectIdentifier oid = new ObjectIdentifier(id, type);
             return oid.getObject(context);
         }
     }
@@ -340,7 +342,8 @@ public class Event implements Serializable
      */
     public DSpaceObject getSubject(Context context)
     {
-        ObjectIdentifier oid = new ObjectIdentifier(getSubjectID(), getSubjectType());
+        ObjectIdentifier oid = ObjectIdentifierMint.get(context, getSubjectType(), getSubjectID());
+        // ObjectIdentifier oid = new ObjectIdentifier(getSubjectID(), getSubjectType());
         return oid.getObject(context);
     }
 

@@ -40,7 +40,6 @@
 package org.dspace.content.dao;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
@@ -49,6 +48,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ObjectIdentifierMint;
 
 /**
  * @author James Rutherford
@@ -72,8 +72,10 @@ public class BundleDAOCore extends BundleDAO
         Bundle bundle =  childDAO.create();
 
         // now assign an object identifier
+        /*
         ObjectIdentifier oid = new ObjectIdentifier(true);
-        bundle.setIdentifier(oid);
+        bundle.setIdentifier(oid);*/
+        ObjectIdentifier oid = ObjectIdentifierMint.mint(context, bundle);
 
         log.info(LogManager.getHeader(context, "create_bundle", "bundle_id="
                 + bundle.getID()));
@@ -133,8 +135,10 @@ public class BundleDAOCore extends BundleDAO
         ObjectIdentifier oid = bundle.getIdentifier();
         if (oid == null)
         {
+            /*
             oid = new ObjectIdentifier(true);
-            bundle.setIdentifier(oid);
+            bundle.setIdentifier(oid);*/
+            oid = ObjectIdentifierMint.mint(context, bundle);
         }
         oidDAO.update(bundle.getIdentifier());
 

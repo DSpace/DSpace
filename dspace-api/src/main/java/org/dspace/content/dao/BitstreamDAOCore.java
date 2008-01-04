@@ -39,9 +39,6 @@
  */
 package org.dspace.content.dao;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
@@ -50,6 +47,10 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ObjectIdentifierMint;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author James Rutherford
@@ -86,8 +87,11 @@ public class BitstreamDAOCore extends BitstreamDAO
         Bitstream bitstream = childDAO.create();
 
         // now assign an object identifier
+        /*
         ObjectIdentifier oid = new ObjectIdentifier(true);
         bitstream.setIdentifier(oid);
+*/
+        ObjectIdentifier oid = ObjectIdentifierMint.mint(context, bitstream);
 
         // FIXME: Think about this
         AuthorizeManager.addPolicy(
@@ -125,8 +129,10 @@ public class BitstreamDAOCore extends BitstreamDAO
         ObjectIdentifier oid = bitstream.getIdentifier();
         if (oid == null)
         {
+            /*
             oid = new ObjectIdentifier(true);
-            bitstream.setIdentifier(oid);
+            bitstream.setIdentifier(oid);*/
+            oid = ObjectIdentifierMint.mint(context, bitstream);
         }
         oidDAO.update(bitstream.getIdentifier());
 

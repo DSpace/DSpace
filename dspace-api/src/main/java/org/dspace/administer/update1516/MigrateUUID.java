@@ -18,6 +18,7 @@ import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.Context;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ObjectIdentifierMint;
 import org.dspace.uri.dao.ObjectIdentifierDAO;
 import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
 
@@ -50,25 +51,34 @@ public class MigrateUUID
         List<Item> items = itemDAO.getItems();
         for (Item item : items)
         {
+            /*
             ObjectIdentifier oid = new ObjectIdentifier(true);
             item.setIdentifier(oid);
-            oidDAO.update(item.getIdentifier());
+            oidDAO.update(item.getIdentifier());*/
+            ObjectIdentifier oid = ObjectIdentifierMint.mint(context, item);
+            oidDAO.update(oid);
 
             // do the bundles while we're at it
             Bundle[] bundles = item.getBundles();
             for (int i = 0; i < bundles.length; i++)
             {
+                /*
                 ObjectIdentifier oidb = new ObjectIdentifier(true);
                 bundles[i].setIdentifier(oidb);
-                oidDAO.update(bundles[i].getIdentifier());
+                oidDAO.update(bundles[i].getIdentifier());*/
+                ObjectIdentifier oidb = ObjectIdentifierMint.mint(context, bundles[i]);
+                oidDAO.update(oidb);
 
                 // do the bitstreams while we're at it
                 Bitstream[] bss = bundles[i].getBitstreams();
                 for (int j = 0; j < bss.length; j++)
                 {
+                    /*
                     ObjectIdentifier oidc = new ObjectIdentifier(true);
                     bss[j].setIdentifier(oidc);
-                    oidDAO.update(bss[j].getIdentifier());
+                    oidDAO.update(bss[j].getIdentifier());*/
+                    ObjectIdentifier oidc = ObjectIdentifierMint.mint(context, bss[j]);
+                    oidDAO.update(oidc);
                     bitstreamDAO.update(bss[j]);
                 }
 
@@ -82,8 +92,11 @@ public class MigrateUUID
         List<Collection> cols = collectionDAO.getCollections();
         for (Collection col : cols)
         {
+            /*
             ObjectIdentifier oid = new ObjectIdentifier(true);
             col.setIdentifier(oid);
+            oidDAO.update(oid);*/
+            ObjectIdentifier oid = ObjectIdentifierMint.mint(context, col);
             oidDAO.update(oid);
             collectionDAO.update(col);
         }
@@ -91,8 +104,11 @@ public class MigrateUUID
         List<Community> coms = communityDAO.getCommunities();
         for (Community com : coms)
         {
+            /*
             ObjectIdentifier oid = new ObjectIdentifier(true);
             com.setIdentifier(oid);
+            oidDAO.update(oid);*/
+            ObjectIdentifier oid = ObjectIdentifierMint.mint(context, com);
             oidDAO.update(oid);
             communityDAO.update(com);
         }

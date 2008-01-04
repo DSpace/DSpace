@@ -247,7 +247,7 @@ public class SimpleSearchServlet extends DSpaceServlet
         {
             String uri = (String) itemIdentifiers.get(i);
 
-            ObjectIdentifier oi = ObjectIdentifier.fromString(uri);
+            ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(uri);
             Item item = (Item) oi.getObject(context);
 
             resultsItems[i] = item;
@@ -263,7 +263,7 @@ public class SimpleSearchServlet extends DSpaceServlet
         {
             String uri = (String) collectionIdentifiers.get(i);
 
-            ObjectIdentifier oi = ObjectIdentifier.fromString(uri);
+            ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(uri);
             Collection c = (Collection) oi.getObject(context);
 
             resultsCollections[i] = c;
@@ -279,7 +279,7 @@ public class SimpleSearchServlet extends DSpaceServlet
         {
             String uri = (String) communityIdentifiers.get(i);
 
-            ObjectIdentifier oi = ObjectIdentifier.fromString(uri);
+            ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(uri);
             Community c = (Community) oi.getObject(context);
 
             resultsCommunities[i] = c;

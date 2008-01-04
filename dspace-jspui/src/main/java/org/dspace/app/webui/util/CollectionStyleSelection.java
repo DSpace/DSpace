@@ -110,7 +110,7 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
                 for (int i = 0; i < collections.length; i++)
                 {
                     styles.put(
-                            ObjectIdentifier.fromString(collections[i].trim()),
+                            ObjectIdentifier.parseCanonicalForm(collections[i].trim()),
                             styleName.toLowerCase());
                 }
             }

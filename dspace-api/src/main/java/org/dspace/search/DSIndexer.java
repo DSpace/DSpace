@@ -589,7 +589,7 @@ public class DSIndexer
     			Document doc = reader.document(i);
         		String uri = doc.get("uri");
 
-                oi = ObjectIdentifier.fromString(uri);
+                oi = ObjectIdentifier.parseCanonicalForm(uri);
         		DSpaceObject o = oi.getObject(context);
 
                 if (o == null)

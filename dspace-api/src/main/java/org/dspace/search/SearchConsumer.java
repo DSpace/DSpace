@@ -147,7 +147,7 @@ public class SearchConsumer implements Consumer
             if (detail == null)
                 log.warn("got null detail on DELETE event, skipping it.");
             else
-                objectsToDelete.add(ObjectIdentifier.fromString(detail));
+                objectsToDelete.add(ObjectIdentifier.parseCanonicalForm(detail));
             break;
         default:
             log.warn("SearchConsumer should not have been "

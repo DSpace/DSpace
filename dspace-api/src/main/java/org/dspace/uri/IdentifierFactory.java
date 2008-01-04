@@ -47,7 +47,24 @@ import org.dspace.core.LogManager;
  */
 public class IdentifierFactory
 {
-    public static DSpaceIdentifier resolve(Context context, String path)
+    public static DSpaceIdentifier resolve(Context context, String str)
+    {
+        DSpaceIdentifier dsi = null;
+
+        if (dsi == null)
+        {
+            dsi = IdentifierFactory.resolveAsURLSubstring(context, str);
+        }
+
+        if (dsi == null)
+        {
+            dsi = IdentifierFactory.resolve(context, str);
+        }
+
+        return dsi;
+    }
+
+    public static DSpaceIdentifier resolveAsURLSubstring(Context context, String path)
     {
         ObjectIdentifier oi = ObjectIdentifier.extractURLIdentifier(path);
         ExternalIdentifier ei = null;

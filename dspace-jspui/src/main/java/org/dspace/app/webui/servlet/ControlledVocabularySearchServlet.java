@@ -282,7 +282,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             String uri = (String) itemIdentifiers.get(i);
 
-            DSpaceIdentifier di = IdentifierFactory.resolveCanonical(context, uri);
+            DSpaceIdentifier di = IdentifierFactory.resolve(context, uri);
             //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
             //ObjectIdentifier oi = identifier.getObjectIdentifier();
             Item item = (Item) di.getObject(context);
@@ -300,7 +300,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             String uri = (String) collectionIdentifiers.get(i);
 
-            DSpaceIdentifier di = IdentifierFactory.resolveCanonical(context, uri);
+            DSpaceIdentifier di = IdentifierFactory.resolve(context, uri);
             //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
             //ObjectIdentifier oi = identifier.getObjectIdentifier();
             Collection c = (Collection) di.getObject(context);
@@ -318,7 +318,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             String uri = (String) communityIdentifiers.get(i);
 
-            DSpaceIdentifier di = IdentifierFactory.resolveCanonical(context, uri);
+            DSpaceIdentifier di = IdentifierFactory.resolve(context, uri);
             //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
             //ObjectIdentifier oi = identifier.getObjectIdentifier();
             Community c = (Community) di.getObject(context);

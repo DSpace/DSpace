@@ -117,7 +117,7 @@ public class URIDispatcher implements BitstreamDispatcher
         {
             context = new Context();
 
-            DSpaceIdentifier di = IdentifierFactory.resolveCanonical(context, uri);
+            DSpaceIdentifier di = IdentifierFactory.resolve(context, uri);
             DSpaceObject dso = di.getObject(context);
             /*
             ExternalIdentifierDAO identifierDAO =

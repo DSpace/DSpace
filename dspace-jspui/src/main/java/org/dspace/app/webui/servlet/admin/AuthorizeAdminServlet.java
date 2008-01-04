@@ -194,7 +194,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             else if ((uri != null) && !uri.equals(""))
             {
                 // otherwise, attempt to resolve uri
-                DSpaceIdentifier di = IdentifierFactory.resolveCanonical(c, uri);
+                DSpaceIdentifier di = IdentifierFactory.resolve(c, uri);
                 //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
                 //ObjectIdentifier oi = identifier.getObjectIdentifier();
                 DSpaceObject dso = di.getObject(c);
