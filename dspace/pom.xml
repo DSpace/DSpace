@@ -208,7 +208,6 @@
       <!-- 
          Builds LNI WAR for DSpace
       -->
-       <!--
       <profile>
          <id>lni</id>
          <activation>
@@ -220,11 +219,10 @@
             <module>../dspace-lni</module>
          </modules>
       </profile>
--->
+
       <!-- 
          Builds each separate LNI module for the LNI war (for development/Eclipse)
       -->
-       <!--
       <profile>
          <id>lni-core</id>
          <activation>
@@ -236,9 +234,7 @@
             <module>../dspace-lni-core</module>
          </modules>
       </profile>
--->
 
-       <!--
       <profile>
          <id>lni-client</id>
          <activation>
@@ -262,7 +258,6 @@
             <module>../dspace-lni-webapp</module>
          </modules>
       </profile>
--->
 
       <!-- 
          Builds Language Packs for DSpace

@@ -39,12 +39,6 @@
  */
 package org.dspace.app.dav;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
@@ -52,12 +46,19 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.uri.DSpaceIdentifier;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.jdom.Element;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
 
 
 /**
@@ -103,12 +104,12 @@ abstract class DAVDSpaceObject extends DAVResource
      */
     protected static String getPathElt(DSpaceObject dso)
     {
-        String handle = dso.getIdentifier().getCanonicalForm();
-        if (handle == null)
+        String oid = dso.getIdentifier().getCanonicalForm();
+        if (oid == null)
         {
             return null;
         }
-        return getPathElt(handle);
+        return getPathElt(oid);
     }
 
     /**
@@ -118,16 +119,16 @@ abstract class DAVDSpaceObject extends DAVResource
      * 
      * @return path element string or null if no handle.
      */
-    protected static String getPathElt(String handle)
+    protected static String getPathElt(String identifier)
     {
         int hs;
-        if (handleSeparator != '/' && (hs = handle.indexOf('/')) >= 0)
+        if (handleSeparator != '/' && (hs = identifier.indexOf('/')) >= 0)
         {
-            char hc[] = handle.toCharArray();
+            char hc[] = identifier.toCharArray();
             hc[hs] = handleSeparator;
-            handle = String.copyValueOf(hc);
+            identifier = String.copyValueOf(hc);
         }
-        return "dso_" + encodeHandle(handle);
+        return "dso_" + encodeHandle(identifier);
     }
 
     /**
@@ -172,10 +173,11 @@ abstract class DAVDSpaceObject extends DAVResource
                 handle = String.copyValueOf(hc);
             }
 
+            // FIXME: in reality, these aren't handles any more, they are UUIDs from the ObjectIdentifiers, but
+            // it's too big a job at the moment to modify all the semantics, so I have just done so where necessary
 //            DSpaceObject dso = HandleManager.resolveToObject(context, handle);
-            ExternalIdentifierDAO identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
-            ExternalIdentifier identifier = identifierDAO.retrieve(handle);
-            DSpaceObject dso = identifier.getObjectIdentifier().getObject(context);
+            DSpaceIdentifier dsi = IdentifierFactory.resolve(context, handle);
+            DSpaceObject dso = dsi.getObject(context);
 
             if (dso == null)
             {

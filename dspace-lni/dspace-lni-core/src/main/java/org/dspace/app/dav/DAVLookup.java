@@ -39,23 +39,24 @@
  */
 package org.dspace.app.dav;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Vector;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.uri.ExternalIdentifier;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.uri.DSpaceIdentifier;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.IdentifierFactory;
 import org.jdom.Element;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Vector;
 
 
 /**
@@ -212,8 +213,13 @@ class DAVLookup extends DAVResource
         // did handle lookup fail?
 //        dso = HandleManager.resolveToObject(this.context, handle);
         // FIXME: I don't think this will work. It will need an hdl: prefix.
+        /*
         ExternalIdentifier identifier = externalIdentifierDAO.retrieve(handle);
-        dso = identifier.getObjectIdentifier().getObject(context);
+        dso = identifier.getObjectIdentifier().getObject(context);*/
+
+        DSpaceIdentifier dsi = IdentifierFactory.resolve(context, handle);
+        dso = dsi.getObject(context);
+
         if (dso == null)
         {
             throw new DAVStatusException(HttpServletResponse.SC_NOT_FOUND,
@@ -260,8 +266,13 @@ class DAVLookup extends DAVResource
     {
 //        DSpaceObject dso = HandleManager.resolveToObject(this.context, handle);
         // FIXME: I don't think this will work. It will need an hdl: prefix.
+        /*
         ExternalIdentifier identifier = externalIdentifierDAO.retrieve(handle);
-        DSpaceObject dso = identifier.getObjectIdentifier().getObject(context);
+        DSpaceObject dso = identifier.getObjectIdentifier().getObject(context);*/
+
+        DSpaceIdentifier dsi = IdentifierFactory.resolve(context, handle);
+        DSpaceObject dso = dsi.getObject(context);
+
         if (dso == null)
         {
             return null;
