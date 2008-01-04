@@ -47,6 +47,7 @@
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
+<%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
 <%@ page import="org.dspace.submit.AbstractProcessingStep" %>
@@ -66,6 +67,8 @@
 	//get submission information object
     SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
    
+ 	// Determine whether a file is REQUIRED to be uploaded (default to true)
+ 	boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
 %>
 
 
@@ -157,7 +160,19 @@
 				<%  } %>
                     <td>
                         <input type="submit" name="<%=UploadStep.SUBMIT_UPLOAD_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
-                    </td>           
+                    </td> 
+                    <%
+                        //if upload is set to optional, or user returned to this page after pressing "Add Another File" button
+                    	if (!fileRequired || UIUtil.getSubmitButton(request, "").equals(UploadStep.SUBMIT_MORE_BUTTON))
+                        {
+                    %>
+                        	<td>
+                                <input type="submit" name="<%=UploadStep.SUBMIT_SKIP_BUTTON%>" value="<fmt:message key="jsp.submit.choose-file.skip"/>" />
+                            </td>
+                    <%
+                        }
+                    %>   
+                              
                     <td>&nbsp;&nbsp;&nbsp;</td>
                     <td align="right">
                         <input type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>" />

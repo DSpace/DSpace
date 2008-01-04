@@ -96,7 +96,7 @@
 <%-- HACK: <center> tag needed for broken Netscape 4.78 behaviour --%>
         <center>
             <p>
-                <input type="submit" name="submit" value="<fmt:message key="jsp.submit.upload-error.retry.button"/>" />
+                <input type="submit" name="submit_retry" value="<fmt:message key="jsp.submit.upload-error.retry.button"/>" />
             </p>
         </center>
     </form>

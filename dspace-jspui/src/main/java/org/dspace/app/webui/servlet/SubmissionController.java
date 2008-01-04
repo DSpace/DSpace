@@ -402,6 +402,13 @@ public class SubmissionController extends DSpaceServlet
             //if this step is finished, continue to next step
             if(stepFinished)
             {
+                // If we finished up an upload, then we need to change
+                // the FileUploadRequest object back to a normal HTTPServletRequest
+                if(request instanceof FileUploadRequest)
+                {    
+                    request = ((FileUploadRequest)request).getOriginalRequest();
+                }
+                
                 //retrieve any changes to the SubmissionInfo object
                 subInfo = getSubmissionInfo(context, request);
                 

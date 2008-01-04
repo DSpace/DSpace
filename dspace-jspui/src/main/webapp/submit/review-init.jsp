@@ -74,7 +74,7 @@
   <%-- ====================================================== --%>
                
 				<tr>
-                   <td class="oddRowOddCol">
+                   <td class="evenRowOddCol">
                        <table>
                            <tr>
                                <td width="100%">

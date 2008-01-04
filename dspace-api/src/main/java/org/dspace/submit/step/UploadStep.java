@@ -81,6 +81,9 @@ public class UploadStep extends AbstractProcessingStep
     /** Button to upload a file * */
     public static final String SUBMIT_UPLOAD_BUTTON = "submit_upload";
 
+    /** Button to skip uploading a file * */
+    public static final String SUBMIT_SKIP_BUTTON = "submit_skip";
+
     /** Button to submit more files * */
     public static final String SUBMIT_MORE_BUTTON = "submit_more";
 
@@ -259,7 +262,7 @@ public class UploadStep extends AbstractProcessingStep
                 // (return any status messages or errors reported)
                 int status = processUploadFile(context, request, response,
                         subInfo);
-
+                
                 // if error occurred, return immediately
                 if (status != STATUS_COMPLETE)
                     return status;
@@ -317,8 +320,8 @@ public class UploadStep extends AbstractProcessingStep
         // Step #7: Determine if there is an error because no
         // files have been uploaded.
         // ---------------------------------------------------
-        // if "submit_skip" is unspecified, then a file is required!
-        boolean allowEmptyItems = (request.getParameter("submit_skip") != null);
+        // if "submit_skip" button was not pressed, then a file is required!
+        boolean allowEmptyItems = (request.getParameter(SUBMIT_SKIP_BUTTON) != null);
         if (!allowEmptyItems)
         {
             Bundle[] bundles = item.getBundles("ORIGINAL");
@@ -484,7 +487,7 @@ public class UploadStep extends AbstractProcessingStep
                 String filePath = (String) request.getAttribute(param + "-path");
                 InputStream fileInputStream = (InputStream) request
                                     .getAttribute(param + "-inputstream");
-
+                
                 //attempt to get description from attribute first, then direct from a parameter
                 String fileDescription =  (String) request
                                     .getAttribute(param + "-description");
