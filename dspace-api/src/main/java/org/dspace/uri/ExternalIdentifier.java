@@ -143,8 +143,10 @@ public abstract class ExternalIdentifier implements DSpaceIdentifier
         return type.getNamespace() + "/" + this.value;        
     }
 
+    @Deprecated
     public URL getURL()
     {
+        /*
         try
         {
             String base = ConfigurationManager.getProperty("dspace.url");
@@ -168,7 +170,8 @@ public abstract class ExternalIdentifier implements DSpaceIdentifier
         {
             log.error("caught exception: ", e);
             throw new RuntimeException(e);
-        }
+        }*/
+        return IdentifierFactory.getURL(this);
     }
 
     public URI getURI()

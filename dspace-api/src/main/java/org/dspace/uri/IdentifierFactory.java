@@ -39,14 +39,22 @@
  */
 package org.dspace.uri;
 
+import org.apache.log4j.Logger;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
 
 /**
  * @author Richard Jones
  */
 public class IdentifierFactory
 {
+    private static final Logger log = Logger.getLogger(IdentifierFactory.class);
+
     public static DSpaceIdentifier resolve(Context context, String str)
     {
         DSpaceIdentifier dsi = null;
@@ -116,5 +124,64 @@ public class IdentifierFactory
                 return ei;
             }
         }
+    }
+
+    public static URL getURL(DSpaceIdentifier dsi)
+    {
+        try
+        {
+            String base = ConfigurationManager.getProperty("dspace.url");
+            String urlForm = dsi.getURLForm();
+
+            if (base == null || "".equals(base))
+            {
+                throw new RuntimeException("No configuration, or configuration invalid for dspace.url");
+            }
+
+            if (urlForm == null)
+            {
+                throw new RuntimeException("Unable to assign URL: no identifier available");
+            }
+
+            String url = base + "/resource/" + urlForm;
+
+            return new URL(url);
+        }
+        catch (MalformedURLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static URL getURL(DSpaceObject dso)
+    {
+        URL url = null;
+
+        String ns = ConfigurationManager.getProperty("identifier.url-scheme");
+        if (!"".equals(ns) && ns != null)
+        {
+            ExternalIdentifierType type = ExternalIdentifierMint.getType(ns);
+            List<ExternalIdentifier> eids = dso.getExternalIdentifiers();
+            for (ExternalIdentifier eid : eids)
+            {
+                if (eid.getType().equals(type))
+                {
+                    url = IdentifierFactory.getURL(eid);
+                }
+            }
+        }
+
+        if (url == null)
+        {
+            ObjectIdentifier oid = dso.getIdentifier();
+            if (oid == null)
+            {
+                return null;
+            }
+            url = IdentifierFactory.getURL(oid);
+        }
+
+        return url;
     }
 }

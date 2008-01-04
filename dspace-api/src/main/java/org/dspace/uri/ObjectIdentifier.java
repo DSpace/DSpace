@@ -146,8 +146,10 @@ public class ObjectIdentifier implements DSpaceIdentifier
         return "uuid/" + uuid.toString();
     }
 
+    @Deprecated
     public URL getURL()
     {
+        /*
         try
         {
             String base = ConfigurationManager.getProperty("dspace.url");
@@ -172,7 +174,8 @@ public class ObjectIdentifier implements DSpaceIdentifier
         {
             log.error("caught exception: ", e);
             throw new RuntimeException(e);
-        }
+        }*/
+        return IdentifierFactory.getURL(this);
     }
 
     public String getCanonicalForm()

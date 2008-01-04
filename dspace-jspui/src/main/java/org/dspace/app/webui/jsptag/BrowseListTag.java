@@ -41,7 +41,12 @@ package org.dspace.app.webui.jsptag;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.browse.*;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.BrowseIndex;
+import org.dspace.browse.BrowseInfo;
+import org.dspace.browse.CrossLinks;
+import org.dspace.browse.SortOption;
+import org.dspace.browse.Thumbnail;
 import org.dspace.content.Bitstream;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
@@ -51,6 +56,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
+import org.dspace.uri.IdentifierFactory;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -356,8 +362,9 @@ public class BrowseListTag extends TagSupport
 //                            + items[i].getHandle() + "\">" 
 //                            + Utils.addEntities(metadataArray[0].value)
 //                            + "</a>";
+                            // IdentifierFactory.getURL(items[i]).toString()
                             metadata = "<a href=\""
-                            + items[i].getIdentifier().getURL().toString() + "\">" 
+                            + IdentifierFactory.getURL(items[i]).toString() + "\">"
                             + Utils.addEntities(metadataArray[0].value)
                             + "</a>";
                         }
@@ -760,13 +767,13 @@ public class BrowseListTag extends TagSupport
         	{
         		Bitstream original = thumbnail.getOriginal();
 //        		String link = hrq.getContextPath() + "/bitstream/" + item.getHandle() + "/" + original.getSequenceID() + "/" +
-        		String link = original.getIdentifier().getURL().toString();
+        		String link = IdentifierFactory.getURL(original).toString();
         		thumbFrag.append("<a target=\"_blank\" href=\"" + link + "\" />");
         	}
         	else
         	{
 //        		String link = hrq.getContextPath() + "/handle/" + item.getHandle();
-        		String link = item.getIdentifier().getURL().toString();
+        		String link = IdentifierFactory.getURL(item).toString();
         		thumbFrag.append("<a href=\"" + link + "\" />");
         	}
         	
