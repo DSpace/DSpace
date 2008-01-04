@@ -68,7 +68,7 @@ import org.dspace.eperson.dao.GroupDAO;
 import org.dspace.eperson.dao.GroupDAOFactory;
 import org.dspace.uri.ExternalIdentifier;
 
-public class ArchiveManager
+public abstract class ArchiveManager
 {
     private static Logger log = Logger.getLogger(ArchiveManager.class);
 
