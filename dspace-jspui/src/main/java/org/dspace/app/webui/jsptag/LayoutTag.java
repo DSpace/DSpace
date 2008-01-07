@@ -58,6 +58,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.app.webui.servlet.FeedServlet;
+import org.dspace.uri.IdentifierFactory;
 
 /**
  * Tag for HTML page layout ("skin").
@@ -221,8 +222,7 @@ public class LayoutTag extends TagSupport
                     for (int i = 0; i < comms.length; i++)
                     {
                         parents.add(comms[i].getMetadata("name"));
-                        parentLinks.add(
-                                comms[i].getIdentifier().getURL().toString());
+                        parentLinks.add(IdentifierFactory.getURL(comms[i]).toString());
                     }
                 }
             }
@@ -250,15 +250,13 @@ public class LayoutTag extends TagSupport
                     for (int i = 0; i < comms.length; i++)
                     {
                         parents.add(comms[i].getMetadata("name"));
-                        parentLinks.add(
-                                comms[i].getIdentifier().getURL().toString());
+                        parentLinks.add(IdentifierFactory.getURL(comms[i]).toString());
                     }
 
                     if (col != null)
                     {
                         parents.add(col.getMetadata("name"));
-                        parentLinks.add(
-                                col.getIdentifier().getURL().toString());
+                        parentLinks.add(IdentifierFactory.getURL(col).toString());
                     }
                 }
             }

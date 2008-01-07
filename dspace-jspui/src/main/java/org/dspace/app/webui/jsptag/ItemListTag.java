@@ -67,6 +67,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
+import org.dspace.uri.IdentifierFactory;
 
 /**
  * Tag for display a list of items
@@ -249,7 +250,7 @@ public class ItemListTag extends TagSupport
                         else if (field.equals(titleField))
                         {
                             metadata = "<a href=\"" 
-                            + items[i].getIdentifier().getURL().toString() + "\">" 
+                            + IdentifierFactory.getURL(items[i]).toString() + "\">"
                             + Utils.addEntities(metadataArray[0].value)
                             + "</a>";
                         }
@@ -588,8 +589,7 @@ public class ItemListTag extends TagSupport
                     }
                     else
                     {
-                        thumbLink = "<br/><a href=\"" +
-                            item.getIdentifier().getURL().toString();
+                        thumbLink = "<br/><a href=\"" + IdentifierFactory.getURL(item).toString();
                     }
 
                     thumbLink = thumbLink + "\"><img src=\"" +

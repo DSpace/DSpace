@@ -51,16 +51,15 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="java.io.File" %>
-<%@ page import="java.util.Enumeration"%>
-<%@ page import="java.util.Locale"%>
-<%@ page import="javax.servlet.jsp.jstl.core.*" %>
-<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
-<%@ page import="org.dspace.core.I18nUtil" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
-<%@ page import="org.dspace.content.Community" %>
+<%@ page import="org.dspace.browse.ItemCounter"%>
+<%@ page import="org.dspace.content.Community"%>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
-<%@ page import="org.dspace.browse.ItemCounter" %>
+<%@ page import="org.dspace.core.I18nUtil" %>
+<%@ page import="org.dspace.uri.IdentifierFactory" %>
+<%@ page import="javax.servlet.jsp.jstl.core.Config" %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="java.util.Locale" %>
 
 <%
     Community[] communities = (Community[]) request.getAttribute("communities");
@@ -142,7 +141,7 @@ for (int i = supportedLocales.length-1; i >= 0; i--)
     {
 %>                  <tr>
                         <td class="standard">
-                            <a href="<%= communities[i].getIdentifier().getURL().toString() %>"><%= communities[i].getMetadata("name") %></a>
+                            <a href="<%= IdentifierFactory.getURL(communities[i]).toString() %>"><%= communities[i].getMetadata("name") %></a>
 <%
         if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
         {

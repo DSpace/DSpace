@@ -39,15 +39,15 @@
  */
 package org.dspace.app.webui.jsptag;
 
-import java.io.IOException;
+import org.dspace.content.Community;
+import org.dspace.uri.IdentifierFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
-
-import org.dspace.content.Community;
+import java.io.IOException;
 
 /**
  * Tag for display a list of communities
@@ -93,7 +93,7 @@ public class CommunityListTag extends TagSupport
 
                 HttpServletRequest hrq = (HttpServletRequest) pageContext
                         .getRequest();
-                out.print(communities[i].getIdentifier().getURL().toString());
+                out.print(IdentifierFactory.getURL(communities[i]).toString());
                 out.print("\">");
                 out.print(name);
                 out.print("</a>");

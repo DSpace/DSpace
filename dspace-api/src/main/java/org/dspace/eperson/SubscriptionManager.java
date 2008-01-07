@@ -39,16 +39,6 @@
  */
 package org.dspace.eperson;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.mail.MessagingException;
-
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -58,7 +48,6 @@ import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.dao.CollectionDAO;
 import org.dspace.content.dao.CollectionDAOFactory;
-import org.dspace.uri.ObjectIdentifier;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -70,6 +59,17 @@ import org.dspace.eperson.dao.SubscriptionDAO;
 import org.dspace.eperson.dao.SubscriptionDAOFactory;
 import org.dspace.search.Harvest;
 import org.dspace.search.HarvestedItemInfo;
+import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.ObjectIdentifier;
+
+import javax.mail.MessagingException;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Class defining methods for sending new item e-mail alerts to users
@@ -396,12 +396,13 @@ public class SubscriptionManager
                                         authors[k].value);
                             }
                         }
-    
+
+                        // FIXME: what's going on here?  This is not consistent with other Identifier Lore.
                         identifier = hii.identifier;
 
                         emailText.append("\n         ").append(labels.getString(
                                     "org.dspace.eperson.Subscribe.id")).append(
-                                    identifier.getURL()).append(
+                                    IdentifierFactory.getURL(identifier).toString()).append(
                                     "\n\n");
                     }
                 }

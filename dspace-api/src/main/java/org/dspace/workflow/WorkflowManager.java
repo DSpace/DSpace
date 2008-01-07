@@ -62,6 +62,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.dao.WorkspaceItemDAO;
 import org.dspace.content.dao.WorkspaceItemDAOFactory;
 import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.IdentifierFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -645,7 +646,7 @@ public class WorkflowManager
             }
             else
             {
-                uri = i.getIdentifier().getURL().toString();
+                uri = IdentifierFactory.getURL(i).toString();
             }
 
             // Get title

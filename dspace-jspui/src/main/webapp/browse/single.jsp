@@ -48,14 +48,15 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="org.dspace.browse.BrowseInfo" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.browse.BrowseIndex" %>
+<%@ page import="org.dspace.browse.BrowseInfo" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.DCDate" %>
-<%@ page import="java.net.URLEncoder" %>
 <%@ page import="org.dspace.core.Utils" %>
-<%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.uri.IdentifierFactory" %>
+<%@ page import="java.net.URLEncoder" %>
 
 <%
     request.setAttribute("LanguageSwitch", "hide");
@@ -101,12 +102,12 @@
 	if (collection != null)
 	{
 //		linkBase = linkBase + "handle/" + collection.getHandle() + "/";
-		linkBase = collection.getIdentifier().getURL().toString() + "/";
+		linkBase = IdentifierFactory.getURL(collection).toString() + "/";
 	}
 	if (community != null)
 	{
 //		linkBase = linkBase + "handle/" + community.getHandle() + "/";
-		linkBase = community.getIdentifier().getURL().toString() + "/";
+		linkBase = IdentifierFactory.getURL(community).toString() + "/";
 	}
 	
 	String direction = (bi.isAscending() ? "ASC" : "DESC");
@@ -141,12 +142,12 @@
 	if (collection != null)
 	{
 //		formaction = formaction + "handle/" + collection.getHandle() + "/";
-		formaction = collection.getIdentifier().getURL().toString() + "/";
+		formaction = IdentifierFactory.getURL(collection).toString() + "/";
 	}
 	if (community != null)
 	{
 //		formaction = formaction + "handle/" + community.getHandle() + "/";
-		formaction = community.getIdentifier().getURL().toString() + "/";
+		formaction = IdentifierFactory.getURL(community).toString() + "/";
 	}
 	formaction = formaction + "browse";
 	

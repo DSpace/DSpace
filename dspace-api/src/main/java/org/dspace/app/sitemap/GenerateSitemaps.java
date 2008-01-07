@@ -65,6 +65,7 @@ import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.uri.IdentifierFactory;
 
 /**
  * Command-line utility for generating HTML and Sitemaps.org protocol Sitemaps.
@@ -211,7 +212,7 @@ public class GenerateSitemaps
 
         for (int i = 0; i < comms.length; i++)
         {
-            String url = comms[i].getIdentifier().getURL().toString();
+            String url = IdentifierFactory.getURL(comms[i]).toString();
 
             if (makeHTMLMap)
                 html.addURL(url, null);
@@ -223,7 +224,7 @@ public class GenerateSitemaps
 
         for (int i = 0; i < colls.length; i++)
         {
-            String url = colls[i].getIdentifier().getURL().toString();
+            String url = IdentifierFactory.getURL(colls[i]).toString();
 
             if (makeHTMLMap)
                 html.addURL(url, null);
@@ -237,7 +238,7 @@ public class GenerateSitemaps
         while (allItems.hasNext())
         {
             Item i = allItems.next();
-            String url = i.getIdentifier().getURL().toString();
+            String url = IdentifierFactory.getURL(i).toString();
             Date lastMod = i.getLastModified();
 
             if (makeHTMLMap)

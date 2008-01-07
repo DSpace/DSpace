@@ -55,6 +55,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierMint;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.IdentifierFactory;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
@@ -99,7 +100,7 @@ public class SuggestServlet extends DSpaceServlet
         if (identifier != null)
         {
             item = (Item) oi.getObject(context);
-            link = item.getIdentifier().getURL().toString();
+            link = IdentifierFactory.getURL(item).toString();
             request.setAttribute("link", link);
 
             if (item != null)

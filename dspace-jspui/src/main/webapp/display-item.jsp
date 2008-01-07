@@ -66,6 +66,7 @@
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.license.CreativeCommons" %>
 <%@ page import="org.dspace.uri.ExternalIdentifier" %>
+<%@ page import="org.dspace.uri.IdentifierFactory" %>
 <%@ page import="org.dspace.uri.ObjectIdentifier" %>
 <%@ page import="java.util.List" %>
 
@@ -89,7 +90,7 @@
     ObjectIdentifier oid = item.getIdentifier();
     String uri = "";
     String citationLink = "";
-    String link = item.getIdentifier().getURL().toString();
+    String link = IdentifierFactory.getURL(item).toString();
 
     // CC URL & RDF
     String cc_url = CreativeCommons.getLicenseURL(item);

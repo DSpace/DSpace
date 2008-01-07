@@ -53,10 +53,11 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.browse.BrowseInfo" %>
-<%@ page  import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page  import="org.dspace.content.Collection" %>
 
 <%@ page import="org.dspace.content.Community" %>
-<%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.uri.IdentifierFactory" %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%
     request.setAttribute("LanguageSwitch", "hide");
@@ -92,12 +93,12 @@
     if (collection != null)
     {
         linkText = collection.getMetadata("name");
-        linkBack = collection.getIdentifier().getURL().toString();
+        linkBack = IdentifierFactory.getURL(collection).toString();
     }
     else if (community != null)
     {
         linkText = community.getMetadata("name");
-        linkBack = community.getIdentifier().getURL().toString();
+        linkBack = IdentifierFactory.getURL(community).toString();
     }
 %>
 

@@ -371,7 +371,7 @@ public class URIServlet extends DSpaceServlet
             throws ServletException, IOException, SQLException
     {
         // Handle click on a browse or search button
-        if (!handleButton(request, response, community.getIdentifier().getURL()))
+        if (!handleButton(request, response, IdentifierFactory.getURL(community)))
         {
             // No button pressed, display community home page
             log.info(LogManager.getHeader(context, "view_community",
@@ -456,7 +456,7 @@ public class URIServlet extends DSpaceServlet
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         // Handle click on a browse or search button
-        if (!handleButton(request, response, community.getIdentifier().getURL()))
+        if (!handleButton(request, response, IdentifierFactory.getURL(community)))
         {
             // Will need to know whether to commit to DB
             boolean updated = false;
@@ -706,7 +706,7 @@ public class URIServlet extends DSpaceServlet
         for (int i = 0; i < items.size(); i++)
         {
             Item item = (Item) items.get(i);
-            urls[i] = item.getIdentifier().getURL().toString();
+            urls[i] = IdentifierFactory.getURL(item).toString();
         }
 
         return urls;
