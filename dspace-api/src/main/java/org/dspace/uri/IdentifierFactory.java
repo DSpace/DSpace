@@ -66,7 +66,7 @@ public class IdentifierFactory
 
         if (dsi == null)
         {
-            dsi = IdentifierFactory.resolve(context, str);
+            dsi = IdentifierFactory.resolveCanonical(context, str);
         }
 
         return dsi;
