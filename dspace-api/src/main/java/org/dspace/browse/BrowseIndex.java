@@ -67,10 +67,13 @@ public class BrowseIndex
 
     /** the SortOption for this index (only valid for item indexes) */
     private SortOption sortOption;
-    
+
     /** the value of the metadata, as specified in the config */
-    private String metadata;
-    
+    private String metadataAll;
+
+    /** the metadata fields, as an array */
+    private String[] metadata;
+
     /** the datatype of the index, as specified in the config */
     private String datatype;
     
@@ -81,7 +84,7 @@ public class BrowseIndex
     private String tableBaseName;
     
     /** a three part array of the metadata bits (e.g. dc.contributor.author) */
-    private String[] mdBits;
+    private String[][] mdBits;
 
     /** default order (asc / desc) for this index */
     private String defaultOrder;
@@ -141,7 +144,7 @@ public class BrowseIndex
         this.defaultOrder = SortOption.ASCENDING;
         this.number = number;
         
-        String rx = "(\\w+):(\\w+):([\\w\\.\\*]+):?(\\w*):?(\\w*)";
+        String rx = "(\\w+):(\\w+):([\\w\\.\\*,]+):?(\\w*):?(\\w*)";
         Pattern pattern = Pattern.compile(rx);
         Matcher matcher = pattern.matcher(definition);
         
@@ -152,10 +155,13 @@ public class BrowseIndex
             
             if (isMetadataIndex())
             {
-                metadata = matcher.group(3);
+                metadataAll = matcher.group(3);
                 datatype = matcher.group(4);
 
-                if (metadata == null || metadata.equals(""))
+                if (metadataAll != null)
+                    metadata = metadataAll.split(",");
+
+                if (metadata == null || metadata.length == 0)
                     valid = false;
                 
                 if (datatype == null || datatype.equals(""))
@@ -233,14 +239,6 @@ public class BrowseIndex
 	}
 
 	/**
-	 * @param datatype The datatype to set.
-	 */
-//	public void setDataType(String datatype)
-//	{
-//		this.datatype = datatype;
-//	}
-
-	/**
 	 * @return Returns the displayType.
 	 */
 	public String getDisplayType()
@@ -248,48 +246,40 @@ public class BrowseIndex
         return displayType;
 	}
 
-	/**
-	 * @param displayType The displayType to set.
-	 */
-//	public void setDisplayType(String displayType)
-//	{
-//		this.displayType = displayType;
-//	}
+    /**
+     * @return Returns the number of metadata fields for this index
+     */
+    public int getMetadataCount()
+    {
+        if (isMetadataIndex())
+            return metadata.length;
 
-	/**
+        return 0;
+    }
+
+    /**
 	 * @return Returns the mdBits.
 	 */
-	public String[] getMdBits()
+	public String[] getMdBits(int idx)
 	{
 	    if (isMetadataIndex())
-	        return mdBits;
+	        return mdBits[idx];
 	    
 	    return null;
 	}
-
-	/**
-	 * @param mdBits The mdBits to set.
-	 */
-//	public void setMdBits(String[] mdBits)
-//	{
-//		this.mdBits = mdBits;
-//	}
 
 	/**
 	 * @return Returns the metadata.
 	 */
 	public String getMetadata()
 	{
-		return metadata;
+        return metadataAll;
 	}
 
-	/**
-	 * @param metadata The metadata to set.
-	 */
-//	public void setMetadata(String metadata)
-//	{
-//		this.metadata = metadata;
-//	}
+    public String getMetadata(int idx)
+    {
+        return metadata[idx];
+    }
 
 	/**
 	 * @return Returns the name.
@@ -324,8 +314,14 @@ public class BrowseIndex
     	try
     	{
     	    if (isMetadataIndex())
-    	        mdBits = interpretField(metadata, null);
-    	}
+            {
+                mdBits = new String[metadata.length][];
+                for (int i = 0; i < metadata.length; i++)
+                {
+                    mdBits[i] = interpretField(metadata[i], null);
+                }
+            }
+        }
     	catch(IOException e)
     	{
     		// it's not obvious what we really ought to do here

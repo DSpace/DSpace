@@ -425,25 +425,28 @@ public class IndexBrowse
                     if (item.isArchived() && !item.isWithdrawn())
                     {
                         // get the metadata from the item
-                        String[] md = bis[i].getMdBits();
-                        DCValue[] values = item.getMetadata(md[0], md[1], md[2], Item.ANY);
-                        
-                        // if we have values to index on, then do so
-                        if (values != null)
+                        for (int mdIdx = 0; mdIdx < bis[i].getMetadataCount(); mdIdx++)
                         {
-                            for (int x = 0; x < values.length; x++)
+                            String[] md = bis[i].getMdBits(mdIdx);
+                            DCValue[] values = item.getMetadata(md[0], md[1], md[2], Item.ANY);
+
+                            // if we have values to index on, then do so
+                            if (values != null)
                             {
-                                // get the normalised version of the value
-                                String nVal = BrowseOrder.makeSortString(values[x].value, values[x].language, bis[i].getDataType()); 
-            
-                                Map sortMap = getSortValues(item, itemMDMap);
-                                
-                                dao.insertIndex(bis[i].getTableName(), item.getID(), values[x].value, nVal, sortMap);
-                                
-                                if (bis[i].isMetadataIndex())
+                                for (int x = 0; x < values.length; x++)
                                 {
-                                    int distinctID = dao.getDistinctID(bis[i].getTableName(true, false, false), values[x].value, nVal);
-                                    dao.createDistinctMapping(bis[i].getMapName(), item.getID(), distinctID);
+                                    // get the normalised version of the value
+                                    String nVal = BrowseOrder.makeSortString(values[x].value, values[x].language, bis[i].getDataType());
+
+                                    Map sortMap = getSortValues(item, itemMDMap);
+
+                                    dao.insertIndex(bis[i].getTableName(), item.getID(), values[x].value, nVal, sortMap);
+
+                                    if (bis[i].isMetadataIndex())
+                                    {
+                                        int distinctID = dao.getDistinctID(bis[i].getTableName(true, false, false), values[x].value, nVal);
+                                        dao.createDistinctMapping(bis[i].getMapName(), item.getID(), distinctID);
+                                    }
                                 }
                             }
                         }
