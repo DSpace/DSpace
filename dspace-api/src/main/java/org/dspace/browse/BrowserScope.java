@@ -416,7 +416,7 @@ public class BrowserScope
 				    // Create a dummy sortOption for the metadata sort
 					String dataType = browseIndex.getDataType();
 					String type = ("date".equals(dataType) ? "date" : "text");
-                    sortOption = new SortOption(0, browseIndex.getName(), browseIndex.getMetadata(), type);
+                    sortOption = new SortOption(0, browseIndex.getName(), browseIndex.getMetadata(0), type);
 				}
 				else
 				{
