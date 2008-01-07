@@ -156,6 +156,13 @@ public class CommunityDAOCore extends CommunityDAO
         }
         oidDAO.update(community.getIdentifier());
 
+        // deal with the external identifiers
+        List<ExternalIdentifier> eids = community.getExternalIdentifiers();
+        for (ExternalIdentifier eid : eids)
+        {
+            identifierDAO.update(eid);
+        }
+
         childDAO.update(community);
     }
 

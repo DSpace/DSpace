@@ -7,6 +7,8 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.dao.CRUD;
 import org.dspace.dao.Link;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.uri.dao.ObjectIdentifierDAO;
 import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
 
@@ -20,12 +22,14 @@ public abstract class BundleDAO extends ContentDAO<BundleDAO>
 
     protected BundleDAO childDAO;
     protected ObjectIdentifierDAO oidDAO;
+    protected ExternalIdentifierDAO identifierDAO;
 
     public BundleDAO(Context context)
     {
         this.context = context;
 
         oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
+        identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
     }
 
     public BundleDAO getChild()

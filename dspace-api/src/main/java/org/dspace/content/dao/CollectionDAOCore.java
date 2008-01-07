@@ -172,6 +172,13 @@ public class CollectionDAOCore extends CollectionDAO
         }
         oidDAO.update(collection.getIdentifier());
 
+        // deal with the external identifiers
+        List<ExternalIdentifier> eids = collection.getExternalIdentifiers();
+        for (ExternalIdentifier eid : eids)
+        {
+            identifierDAO.update(eid);
+        }
+
         childDAO.update(collection);
     }
 

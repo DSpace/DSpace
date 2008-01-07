@@ -48,9 +48,12 @@ import org.dspace.core.LogManager;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ObjectIdentifierMint;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ExternalIdentifierMint;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author James Rutherford
@@ -92,6 +95,10 @@ public class BitstreamDAOCore extends BitstreamDAO
         bitstream.setIdentifier(oid);
 */
         ObjectIdentifier oid = ObjectIdentifierMint.mint(context, bitstream);
+
+        // now assign any required external identifiers
+        List<ExternalIdentifier> eids = ExternalIdentifierMint.mintAll(context, bitstream);
+        bitstream.setExternalIdentifiers(eids);
 
         // FIXME: Think about this
         AuthorizeManager.addPolicy(
@@ -135,6 +142,13 @@ public class BitstreamDAOCore extends BitstreamDAO
             oid = ObjectIdentifierMint.mint(context, bitstream);
         }
         oidDAO.update(bitstream.getIdentifier());
+
+        // deal with the external identifiers
+        List<ExternalIdentifier> eids = bitstream.getExternalIdentifiers();
+        for (ExternalIdentifier eid : eids)
+        {
+            identifierDAO.update(eid);
+        }
 
         childDAO.update(bitstream);
     }
