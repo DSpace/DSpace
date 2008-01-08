@@ -555,7 +555,7 @@ public class MyDSpaceServlet extends DSpaceServlet
             // Load the Submission Process for the collection this WSI is
             // associated with
             Collection c = wsi.getCollection();
-            SubmissionConfigReader subConfigReader = new SubmissionConfigReader(SubmissionController.UI_NAME);
+            SubmissionConfigReader subConfigReader = new SubmissionConfigReader();
             SubmissionConfig subConfig = subConfigReader.getSubmissionConfig(c
                     .getIdentifier().getCanonicalForm(), false);
 

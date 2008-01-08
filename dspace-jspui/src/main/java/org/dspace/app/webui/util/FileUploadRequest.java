@@ -181,8 +181,9 @@ public class FileUploadRequest extends HttpServletRequestWrapper
 
     public File getFile(String name)
     {
-        String filename = getFilename(((FileItem) fileitems.get(name))
-                .getName());
+        FileItem temp = (FileItem) fileitems.get(name);
+        String tempName = temp.getName();
+        String filename = getFilename(tempName);
         if ("".equals(filename.trim()))
         {
             return null;
@@ -190,6 +191,12 @@ public class FileUploadRequest extends HttpServletRequestWrapper
         return new File(tempDir + File.separator + filename);
     }
 
+    public Enumeration getFileParameterNames()
+    {
+        Collection c = fileitems.keySet();
+        return Collections.enumeration(c);
+    }
+    
     public Enumeration getFileNames()
     {
         return filenames.elements();

@@ -64,10 +64,10 @@ import org.dspace.license.CreativeCommons;
 import org.dspace.submit.step.LicenseStep;
 
 /**
- * License servlet for DSpace. Presents the user with license information
+ * License step for DSpace JSP-UI. Presents the user with license information
  * required for all items submitted into DSpace.
  * <P>
- * This JSPStepManager class works with the SubmissionController servlet
+ * This JSPStep class works with the SubmissionController servlet
  * for the JSP-UI
  * <P>
  * The following methods are called in this order:
@@ -77,7 +77,7 @@ import org.dspace.submit.step.LicenseStep;
  * specified will be displayed</li>
  * <li>If showJSP() was not specified from doPreProcessing(), then the
  * doProcessing() method is called an the step completes immediately</li>
- * <li>Call doProcessing() method after the user returns from the JSP, in order
+ * <li>Call doProcessing() method on appropriate AbstractProcessingStep after the user returns from the JSP, in order
  * to process the user input</li>
  * <li>Call doPostProcessing() method to determine if more user interaction is
  * required, and if further JSPs need to be called.</li>
@@ -94,7 +94,7 @@ import org.dspace.submit.step.LicenseStep;
  * @author Tim Donohue
  * @version $Revision$
  */
-public class JSPLicenseStep extends LicenseStep implements JSPStep
+public class JSPLicenseStep extends JSPStep
 {
     /** JSP which displays default license information * */
     private static final String LICENSE_JSP = "/submit/show-license.jsp";
@@ -137,7 +137,7 @@ public class JSPLicenseStep extends LicenseStep implements JSPStep
             AuthorizeException
     {
         // if creative commons licensing is enabled, then it is page #1
-        if (CreativeCommons.isEnabled() && getCurrentPage(request) == 1)
+        if (CreativeCommons.isEnabled() && LicenseStep.getCurrentPage(request) == 1)
         {
             showCCLicense(context, request, response, subInfo);
         }
@@ -176,7 +176,7 @@ public class JSPLicenseStep extends LicenseStep implements JSPStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        String buttonPressed = Util.getSubmitButton(request, CANCEL_BUTTON);
+        String buttonPressed = Util.getSubmitButton(request, LicenseStep.CANCEL_BUTTON);
 
         //  JSP-UI Specific (only JSP UI has a "reject" button): 
         //  License was explicitly rejected
@@ -250,5 +250,28 @@ public class JSPLicenseStep extends LicenseStep implements JSPStep
         request.setAttribute("cclicense.exists", new Boolean(exists));
 
         JSPStepManager.showJSP(request, response, subInfo, CC_LICENSE_JSP);
+    }
+    
+    /**
+     * Return the URL path (e.g. /submit/review-metadata.jsp) of the JSP
+     * which will review the information that was gathered in this Step.
+     * <P>
+     * This Review JSP is loaded by the 'Verify' Step, in order to dynamically
+     * generate a submission verification page consisting of the information
+     * gathered in all the enabled submission steps.
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
+     */
+    public String getReviewJSP(Context context, HttpServletRequest request,
+            HttpServletResponse response, SubmissionInfo subInfo)
+    {
+        return NO_JSP; //signing off on license does not require reviewing
     }
 }

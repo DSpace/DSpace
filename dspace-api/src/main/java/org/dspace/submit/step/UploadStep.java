@@ -493,8 +493,8 @@ public class UploadStep extends AbstractProcessingStep
         Bitstream b = null;
  
         //NOTE: File should already be uploaded. 
-        //Manakin does this automatically.
-        //For JSP-UI, the JSPUploadStep.doProcessing() does the actual upload
+        //Manakin does this automatically via Cocoon.
+        //For JSP-UI, the SubmissionController.uploadFiles() does the actual upload
 
         Enumeration attNames = request.getAttributeNames();
         

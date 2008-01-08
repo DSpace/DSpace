@@ -281,7 +281,9 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
 		while(i.hasNext())
 		{
 			String entryNum = (String) i.next();
-			String entryNameKey = (String) progBarInfo.get(entryNum);
+			
+			//Since we are using XML-UI, we need to prepend the heading key with "xmlui.Submission."
+			String entryNameKey = "xmlui.Submission." + (String) progBarInfo.get(entryNum);
 			
 			//the value of entryNum is current step & page 
 			//(e.g. 1.2 is page 2 of step 1) 

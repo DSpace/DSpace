@@ -109,12 +109,8 @@ public class DescribeStep extends AbstractProcessingStep
     /** Constructor */
     public DescribeStep() throws ServletException
     {
-        // load inputsReader only the first time
-        if (inputsReader == null)
-        {
-            // read configurable submissions forms data
-            inputsReader = new DCInputsReader();
-        }
+        //load the DCInputsReader
+        getInputsReader();
     }
 
    
@@ -274,7 +270,7 @@ public class DescribeStep extends AbstractProcessingStep
 
         // Step 3:
         // Check to see if any fields are missing
-        clearErrorFields();
+        clearErrorFields(request);
         for (int i = 0; i < inputs.length; i++)
         {
             DCValue[] values = item.getMetadata(inputs[i].getSchema(),
@@ -283,7 +279,7 @@ public class DescribeStep extends AbstractProcessingStep
             if (inputs[i].isRequired() && values.length == 0)
             {
                 // since this field is missing add to list of error fields
-                addErrorField(getFieldName(inputs[i]));
+                addErrorField(request, getFieldName(inputs[i]));
             }
         }
 
@@ -300,7 +296,7 @@ public class DescribeStep extends AbstractProcessingStep
             return STATUS_MORE_INPUT_REQUESTED;
         }
         // if one or more fields errored out, return
-        else if (getErrorFields() != null && getErrorFields().size() > 0)
+        else if (getErrorFields(request) != null && getErrorFields(request).size() > 0)
         {
             return STATUS_MISSING_REQUIRED_FIELDS;
         }
@@ -359,8 +355,15 @@ public class DescribeStep extends AbstractProcessingStep
      * 
      * @return the current DCInputsReader
      */
-    public static DCInputsReader getInputsReader()
+    public static DCInputsReader getInputsReader() throws ServletException
     {
+        // load inputsReader only the first time
+        if (inputsReader == null)
+        {
+            // read configurable submissions forms data
+            inputsReader = new DCInputsReader();
+        }
+        
         return inputsReader;
     }
 

@@ -539,7 +539,7 @@ function processPage(workspaceID, stepConfig, page)
 	{
 		//save error fields to global ERROR_FIELDS variable,
 		//for step-specific post-processing
-		saveErrorFields(stepClass.getErrorFields());
+		saveErrorFields(stepClass.getErrorFields(getHttpRequest()));
 	}
 	else //otherwise, no errors at all
 	{

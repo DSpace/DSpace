@@ -232,6 +232,11 @@ public class InitialQuestionsStep extends AbstractProcessingStep
             // to inform the user and make sure that's OK, before saving!
             if (willRemoveTitles || willRemoveDate || willRemoveFiles)
             {
+                //save what we will need to prune to request (for UI to process)
+                request.setAttribute("will.remove.titles", new Boolean(willRemoveTitles));
+                request.setAttribute("will.remove.date", new Boolean(willRemoveDate));
+                request.setAttribute("will.remove.files", new Boolean(willRemoveFiles));
+                
                 return STATUS_VERIFY_PRUNE; // we will need to do pruning!
             }
         }

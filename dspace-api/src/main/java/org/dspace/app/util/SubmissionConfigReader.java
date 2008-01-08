@@ -56,7 +56,7 @@ import org.dspace.core.ConfigurationManager;
 
 /**
  * Item Submission configuration generator for DSpace. Reads and parses the
- * installed submission process configuration file, item-submission-[UI name].xml, from
+ * installed submission process configuration file, item-submission.xml, from
  * the configuration directory. This submission process definiton details the
  * ordering of the steps (and number of steps) that occur during the Item
  * Submission Process. There may be multiple Item Submission processes defined,
@@ -96,9 +96,6 @@ public class SubmissionConfigReader
     private String configDir = ConfigurationManager.getProperty("dspace.dir")
             + File.separator + "config" + File.separator;
             
-    /** Name of the User Interface which this Submission Configuration corresponds to */
-    private String UIName;
-    
     /**
      * Hashmap which stores which submission process configuration is used by
      * which collection, computed from the item submission config file
@@ -125,27 +122,12 @@ public class SubmissionConfigReader
     private SubmissionConfig lastSubmissionConfig = null;
 
     /**
-     * Default Constructor - PRIVATE
+     * Load Submission Configuration from the
+     * item-submission.xml configuration file 
      */
-    private SubmissionConfigReader()
+    public SubmissionConfigReader() throws ServletException
     {
-    }
-    
-    /**
-     * Load Submission Configuration for a specific user interface(UI).
-     * The submission configuration file name is formatted as follows:
-     * item-submission-UIName.xml
-     * <P>
-     * E.g. for a value of "XMLUI", uses the config file named
-     * item-submission-XMLUI.xml
-     * 
-     * @param UIName
-     * 			the name of the UI to load the Submission configuration for
-     */
-    public SubmissionConfigReader(String UIName) throws ServletException
-    {
-        this.UIName = UIName;
-        buildInputs(configDir + SUBMIT_DEF_FILE_PREFIX + "-" + UIName + SUBMIT_DEF_FILE_SUFFIX);
+        buildInputs(configDir + SUBMIT_DEF_FILE_PREFIX + SUBMIT_DEF_FILE_SUFFIX);
     }
 
     /**
@@ -218,7 +200,7 @@ public class SubmissionConfigReader
         if (submitName == null)
         {
             throw new ServletException(
-                    "No item submission process configuration designated as 'default' in 'submission-map' section of 'item-submission-" + getUIName() + ".xml'.");
+                    "No item submission process configuration designated as 'default' in 'submission-map' section of 'item-submission.xml'.");
         }
 
         log.debug("Loading submission process config named '" + submitName
@@ -242,7 +224,7 @@ public class SubmissionConfigReader
         {
             throw new ServletException(
                     "Missing the Item Submission process config '" + submitName
-                            + "' (or unable to load) from 'item-submission-" + getUIName() + ".xml'.");
+                            + "' (or unable to load) from 'item-submission.xml'.");
         }
 
         log.debug("Submission process config '" + submitName
@@ -332,16 +314,16 @@ public class SubmissionConfigReader
         if (!foundMap)
         {
             throw new ServletException(
-                    "No collection to item submission map ('submission-map') found in 'item-submission-" + getUIName() + ".xml'");
+                    "No collection to item submission map ('submission-map') found in 'item-submission.xml'");
         }
         if (!foundStepDefs)
         {
-            throw new ServletException("No 'step-definitions' section found in 'item-submission-" + getUIName() + ".xml'");
+            throw new ServletException("No 'step-definitions' section found in 'item-submission.xml'");
         }
         if (!foundSubmitDefs)
         {
             throw new ServletException(
-                    "No 'submission-definitions' section found in 'item-submission-" + getUIName() + ".xml'");
+                    "No 'submission-definitions' section found in 'item-submission.xml'");
         }
     }
 
@@ -367,17 +349,17 @@ public class SubmissionConfigReader
                 if (id == null)
                 {
                     throw new SAXException(
-                            "name-map element is missing collection-uri attribute in 'item-submission-" + getUIName() + ".xml'");
+                            "name-map element is missing collection-uri attribute in 'item-submission.xml'");
                 }
                 if (value == null)
                 {
                     throw new SAXException(
-                            "name-map element is missing submission-name attribute in 'item-submission-" + getUIName() + ".xml'");
+                            "name-map element is missing submission-name attribute in 'item-submission.xml'");
                 }
                 if (content != null && content.length() > 0)
                 {
                     throw new SAXException(
-                            "name-map element has content in 'item-submission-" + getUIName() + ".xml', it should be empty.");
+                            "name-map element has content in 'item-submission.xml', it should be empty.");
                 }
                 collectionToSubmissionConfig.put(id, value);
             } // ignore any child node that isn't a "name-map"
@@ -411,12 +393,12 @@ public class SubmissionConfigReader
                 if (stepID == null)
                 {
                     throw new SAXException(
-                            "step element has no 'id' attribute in 'item-submission-" + getUIName() + ".xml', which is required in the 'step-definitions' section");
+                            "step element has no 'id' attribute in 'item-submission.xml', which is required in the 'step-definitions' section");
                 }
                 else if (stepDefns.containsKey(stepID))
                 {
                     throw new SAXException(
-                            "There are two step elements with the id '" + stepID + "' in 'item-submission-" + getUIName() + ".xml'");
+                            "There are two step elements with the id '" + stepID + "' in 'item-submission.xml'");
                 }
 
                 HashMap stepInfo = processStepChildNodes("step-definition", nd);
@@ -429,7 +411,7 @@ public class SubmissionConfigReader
         if (stepDefns.size() < 1)
         {
             throw new ServletException(
-                    "step-definition section has no steps! A step with id='collection' is required in 'item-submission-" + getUIName() + ".xml'!");
+                    "step-definition section has no steps! A step with id='collection' is required in 'item-submission.xml'!");
         }
 
         // Sanity check to see that the required "collection" step is defined
@@ -438,7 +420,7 @@ public class SubmissionConfigReader
             throw new ServletException(
                     "The step-definition section is REQUIRED to have a step with id='"
                             + SubmissionStepConfig.SELECT_COLLECTION_STEP
-                            + "' in 'item-submission-" + getUIName() + ".xml'!  This step is used to ensure that a new item submission is assigned to a collection.");
+                            + "' in 'item-submission.xml'!  This step is used to ensure that a new item submission is assigned to a collection.");
         }
 
         // Sanity check to see that the required "complete" step is defined
@@ -447,7 +429,7 @@ public class SubmissionConfigReader
             throw new ServletException(
                     "The step-definition section is REQUIRED to have a step with id='"
                             + SubmissionStepConfig.COMPLETE_STEP
-                            + "' in 'item-submission-" + getUIName() + ".xml'!  This step is used to perform all processing necessary at the completion of the submission (e.g. starting workflow).");
+                            + "' in 'item-submission.xml'!  This step is used to perform all processing necessary at the completion of the submission (e.g. starting workflow).");
         }
     }
 
@@ -483,13 +465,13 @@ public class SubmissionConfigReader
                 if (submitName == null)
                 {
                     throw new SAXException(
-                            "'submission-process' element has no 'name' attribute in 'item-submission-" + getUIName() + ".xml'");
+                            "'submission-process' element has no 'name' attribute in 'item-submission.xml'");
                 }
                 else if (submitNames.contains(submitName))
                 {
                     throw new SAXException(
                             "There are two 'submission-process' elements with the name '"
-                                    + submitName + "' in 'item-submission-" + getUIName() + ".xml'.");
+                                    + submitName + "' in 'item-submission.xml'.");
                 }
                 submitNames.add(submitName);
 
@@ -531,7 +513,7 @@ public class SubmissionConfigReader
                                                 + submitName
                                                 + " contains a step with id="
                                                 + stepID
-                                                + ".  There is no step with this 'id' defined in the 'step-definition' section of 'item-submission-" + getUIName() + ".xml'.");
+                                                + ".  There is no step with this 'id' defined in the 'step-definition' section of 'item-submission.xml'.");
                             }
 
                             // Ignore all children of a step element with an
@@ -555,7 +537,7 @@ public class SubmissionConfigReader
                 {
                     throw new ServletException(
                             "Item Submission process config named "
-                                    + submitName + " has no steps defined in 'item-submission-" + getUIName() + ".xml'");
+                                    + submitName + " has no steps defined in 'item-submission.xml'");
                 }
 
                 // ALL Item Submission processes MUST BEGIN with selecting a
@@ -580,7 +562,7 @@ public class SubmissionConfigReader
         if (numSubmitProcesses == 0)
         {
             throw new ServletException(
-                    "No 'submission-process' elements/definitions found in 'item-submission-" + getUIName() + ".xml'");
+                    "No 'submission-process' elements/definitions found in 'item-submission.xml'");
         }
     }
 
@@ -628,7 +610,7 @@ public class SubmissionConfigReader
         {
             String msg = "Required field " + missing
                     + " missing in a 'step' in the " + configSection
-                    + " of the item submission configuration file ('item-submission-" + getUIName() + ".xml')";
+                    + " of the item submission configuration file ('item-submission.xml')";
             throw new SAXException(msg);
         }
 
@@ -707,12 +689,4 @@ public class SubmissionConfigReader
         // Didn't find a text node
         return null;
     }
-
-	public String getUIName() {
-		return UIName;
-	}
-
-	private void setUIName(String name) {
-		UIName = name;
-	}
 }

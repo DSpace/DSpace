@@ -127,11 +127,7 @@ public class SubmissionInfo
      * for a new submission.
      * 
      * @param request
-     *            The HTTP Servlet Request object
-     * @param briefUIName
-     *            The brief name of the User Interface to 
-     *            load the Submission Configuration and Information for
-     *            (e.g. "jspui" or "xmlui")           
+     *            The HTTP Servlet Request object          
      * @param subItem
      *            The in-progress submission we are loading information for
      * 
@@ -140,19 +136,16 @@ public class SubmissionInfo
      * @throws ServletException
      *             if an error occurs
      */
-    public static SubmissionInfo load(HttpServletRequest request,
-    		String briefUIName, InProgressSubmission subItem) throws ServletException
+    public static SubmissionInfo load(HttpServletRequest request, InProgressSubmission subItem) throws ServletException
     {
         boolean forceReload = false;
     	SubmissionInfo subInfo = new SubmissionInfo();
         
         // load SubmissionConfigReader only the first time
         // or if we're using a different UI now.
-        if (submissionConfigReader == null || 
-        		submissionConfigReader.getUIName() == null ||
-        		!submissionConfigReader.getUIName().equals(briefUIName))
+        if (submissionConfigReader == null)
         {
-            submissionConfigReader = new SubmissionConfigReader(briefUIName);
+            submissionConfigReader = new SubmissionConfigReader();
             forceReload=true;
         }
 
@@ -223,7 +216,7 @@ public class SubmissionInfo
 
     /**
      * Causes the SubmissionConfig to be completely reloaded from the XML
-     * configuration file (item-submission-[UI Name].xml).
+     * configuration file (item-submission.xml).
      * <P>
      * Note: This also reloads the progress bar info, since the progress bar
      * depends entirely on the submission process (and its steps).

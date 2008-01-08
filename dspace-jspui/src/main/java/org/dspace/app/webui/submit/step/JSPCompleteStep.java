@@ -55,7 +55,7 @@ import org.dspace.core.Context;
 import org.dspace.submit.step.CompleteStep;
 
 /**
- * This is the class which defines what happens once a submission completes!
+ * This is the JSP binding class which defines what happens once a submission completes!
  * <P>
  * This JSPCompleteStep class works with the SubmissionController servlet and
  * when using the JSP-UI
@@ -68,12 +68,11 @@ import org.dspace.submit.step.CompleteStep;
  * 
  * @see org.dspace.app.webui.servlet.SubmissionController
  * @see org.dspace.app.webui.submit.JSPStep
- * @see org.dspace.submit.step.CompleteStep
  * 
  * @author Tim Donohue
  * @version $Revision$
  */
-public class JSPCompleteStep extends CompleteStep implements JSPStep
+public class JSPCompleteStep extends JSPStep
 {
     /** log4j logger */
     private static Logger log = Logger.getLogger(JSPCompleteStep.class);
@@ -142,5 +141,28 @@ public class JSPCompleteStep extends CompleteStep implements JSPStep
         //No post-processing necessary, since submission is complete!
     }
 
+    /**
+     * Return the URL path (e.g. /submit/review-metadata.jsp) of the JSP
+     * which will review the information that was gathered in this Step.
+     * <P>
+     * This Review JSP is loaded by the 'Verify' Step, in order to dynamically
+     * generate a submission verification page consisting of the information
+     * gathered in all the enabled submission steps.
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
+     */
+    public String getReviewJSP(Context context, HttpServletRequest request,
+            HttpServletResponse response, SubmissionInfo subInfo)
+    {
+        return NO_JSP; //no need to return a Review JSP as we are completed!
+    }
+    
    
 }

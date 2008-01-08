@@ -43,8 +43,6 @@ package org.dspace.app.xmlui.aspect.submission;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -77,8 +75,8 @@ import org.dspace.workflow.WorkflowManager;
  * Since data validation is cumbersome inside a flow script this 
  * is a collection of methods to preform processing at each step 
  * of the flow, the flow script will ties these operations 
- * together in a meaningfull order but all actualy processing 
- * is done through these variaus processes.
+ * together in a meaningful order but all actually processing 
+ * is done through these various processes.
  * 
  * @author Scott Phillips
  * @author Tim Donohue (modified for Configurable Submission)
@@ -87,10 +85,6 @@ import org.dspace.workflow.WorkflowManager;
 public class FlowUtils {
 
     private static Logger log = Logger.getLogger(FlowUtils.class);
-    
-    /** "Name" of the XML-based User Interface - Used to load SubmissionInfo **/
-    private static String UI_NAME = "XMLUI";
-
     
     /** Where the submissionInfo is stored on an HTTP Request object */
     private final static String DSPACE_SUBMISSION_INFO = "dspace.submission.info";
@@ -189,7 +183,7 @@ public class FlowUtils {
                     .get(HttpEnvironment.HTTP_REQUEST_OBJECT);
             
                 // load submission info
-                subInfo = SubmissionInfo.load(httpRequest, UI_NAME, submission);
+                subInfo = SubmissionInfo.load(httpRequest, submission);
     
                 // Set the session ID
                 context.setExtraLogInfo("session_id="
@@ -456,7 +450,7 @@ public class FlowUtils {
 			
 			//Load the Submission Process for the collection this WSI is associated with
             Collection c = wsi.getCollection();
-            SubmissionConfigReader subConfigReader = new SubmissionConfigReader(UI_NAME);
+            SubmissionConfigReader subConfigReader = new SubmissionConfigReader();
             SubmissionConfig subConfig = subConfigReader.getSubmissionConfig(c.getExternalIdentifier().getCanonicalForm(), false);
             
             // Set the "stage_reached" column on the workspace item

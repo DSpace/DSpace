@@ -51,10 +51,10 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 
 /**
- * Interface for DSpace Submission Steps which use the JSP UI.
+ * Abstract 'binding' class for DSpace Submission Steps which use the JSP-UI.
  * <P>
  * These methods revolve around the following: (1) pre-processing of data to
- * prepare for display, (2) displaying data on JSP, and (3) processing of any
+ * prepare for display, (2) displaying the JSP, and (3) post-processing of any
  * user input (or alternatively backend processing, for non-interactive steps).
  * <P>
  * For the JSP UI, the job of this class is to maintain the context of where the
@@ -69,7 +69,7 @@ import org.dspace.core.Context;
  * specified will be displayed</li>
  * <li>If showJSP() was not specified from doPreProcessing(), then the
  * doProcessing() method is called an the step completes immediately</li>
- * <li>Call doProcessing() method after the user returns from the JSP, in order
+ * <li>Call doProcessing() method on appropriate AbstractProcessingStep after the user returns from the JSP, in order
  * to process the user input</li>
  * <li>Call doPostProcessing() method to determine if more user interaction is
  * required, and if further JSPs need to be called.</li>
@@ -87,7 +87,7 @@ import org.dspace.core.Context;
  * @author Tim Donohue
  * @version $Revision$
  */
-public interface JSPStep 
+public abstract class JSPStep 
 {
     /**
      * Value to return from doPreProcessing to specify not to load any JSP Page
@@ -118,7 +118,7 @@ public interface JSPStep
      * @param subInfo
      *            submission info object
      */
-    public void doPreProcessing(Context context, HttpServletRequest request,
+    public abstract void doPreProcessing(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
             AuthorizeException;
@@ -146,8 +146,29 @@ public interface JSPStep
      * @param status
      *            any status/errors reported by doProcessing() method
      */
-    public void doPostProcessing(Context context, HttpServletRequest request,
+    public abstract void doPostProcessing(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo, int status)
             throws ServletException, IOException, SQLException,
             AuthorizeException;
+    
+    
+    /**
+     * Return the URL path (e.g. /submit/review-metadata.jsp) of the JSP
+     * which will review the information that was gathered in this Step.
+     * <P>
+     * This Review JSP is loaded by the 'Verify' Step, in order to dynamically
+     * generate a submission verification page consisting of the information
+     * gathered in all the enabled submission steps.
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
+     */
+    public abstract String getReviewJSP(Context context, HttpServletRequest request,
+            HttpServletResponse response, SubmissionInfo subInfo);
 }

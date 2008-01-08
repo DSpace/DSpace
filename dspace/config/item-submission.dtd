@@ -23,8 +23,8 @@
  
  <!ELEMENT heading (#PCDATA) >
  <!ELEMENT processing-class (#PCDATA)>
- <!ELEMENT xml-ui-class (#PCDATA)>
- <!ELEMENT review-jsp (#PCDATA)>
+ <!ELEMENT jspui-binding (#PCDATA)>
+ <!ELEMENT xmlui-binding (#PCDATA)>
  <!ELEMENT workflow-editable (#PCDATA)>
  
  <!-- 'submission-definitions' must contain at least one       -->

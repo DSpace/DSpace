@@ -61,12 +61,12 @@ import org.dspace.core.LogManager;
 import org.dspace.submit.step.DescribeStep;
 
 /**
- * Describe step for DSpace submission process. Handles the pages that gather
+ * Describe step for DSpace JSP-UI submission process. Handles the pages that gather
  * descriptive information (i.e. metadata) for an item being submitted into
  * DSpace.
  * <P>
- * This JSPStepManager class works with the SubmissionController servlet
- * for the JSP-UI
+ * This JSPStep class works with the SubmissionController servlet
+ * for the JSP-UI.
  * <P>
  * The following methods are called in this order:
  * <ul>
@@ -75,7 +75,7 @@ import org.dspace.submit.step.DescribeStep;
  * specified will be displayed</li>
  * <li>If showJSP() was not specified from doPreProcessing(), then the
  * doProcessing() method is called an the step completes immediately</li>
- * <li>Call doProcessing() method after the user returns from the JSP, in order
+ * <li>Call doProcessing() method on appropriate AbstractProcessingStep after the user returns from the JSP, in order
  * to process the user input</li>
  * <li>Call doPostProcessing() method to determine if more user interaction is
  * required, and if further JSPs need to be called.</li>
@@ -92,10 +92,13 @@ import org.dspace.submit.step.DescribeStep;
  * @author Tim Donohue
  * @version $Revision$
  */
-public class JSPDescribeStep extends DescribeStep implements JSPStep
+public class JSPDescribeStep extends JSPStep
 {
     /** JSP which displays HTML for this Class * */
     private static final String DISPLAY_JSP = "/submit/edit-metadata.jsp";
+    
+    /** JSP which reviews information gathered by DISPLAY_JSP * */
+    private static final String REVIEW_JSP = "/submit/review-metadata.jsp";
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(JSPDescribeStep.class);
@@ -168,7 +171,7 @@ public class JSPDescribeStep extends DescribeStep implements JSPStep
             AuthorizeException
     {
         // check what submit button was pressed in User Interface
-        String buttonPressed = UIUtil.getSubmitButton(request, NEXT_BUTTON);
+        String buttonPressed = UIUtil.getSubmitButton(request, DescribeStep.NEXT_BUTTON);
 
         // this shouldn't happen...but just in case!
         if (subInfo.getSubmissionItem() == null)
@@ -181,7 +184,7 @@ public class JSPDescribeStep extends DescribeStep implements JSPStep
         }
 
         // if user added an extra input field, stay on the same page
-        if (status == STATUS_MORE_INPUT_REQUESTED)
+        if (status == DescribeStep.STATUS_MORE_INPUT_REQUESTED)
         {
             // reload this same JSP to display extra input boxes
             showEditMetadata(context, request, response, subInfo);
@@ -192,9 +195,9 @@ public class JSPDescribeStep extends DescribeStep implements JSPStep
             // reload this same JSP to display removed entries
             showEditMetadata(context, request, response, subInfo);
         }
-        else if (status == STATUS_MISSING_REQUIRED_FIELDS)
+        else if (status == DescribeStep.STATUS_MISSING_REQUIRED_FIELDS)
         {
-            List missingFields = getErrorFields();
+            List missingFields = DescribeStep.getErrorFields(request);
 
             // return to current edit metadata screen if any fields missing
             if (missingFields.size() > 0)
@@ -229,11 +232,34 @@ public class JSPDescribeStep extends DescribeStep implements JSPStep
         Collection c = subInfo.getSubmissionItem().getCollection();
 
         // requires configurable form info per collection
-        request.setAttribute("submission.inputs", getInputsReader().getInputs(c
+        request.setAttribute("submission.inputs", DescribeStep.getInputsReader().getInputs(c
                 .getIdentifier().getCanonicalForm()));
 
         // forward to edit-metadata JSP
         JSPStepManager.showJSP(request, response, subInfo, DISPLAY_JSP);
+    }
+    
+    /**
+     * Return the URL path (e.g. /submit/review-metadata.jsp) of the JSP
+     * which will review the information that was gathered in this Step.
+     * <P>
+     * This Review JSP is loaded by the 'Verify' Step, in order to dynamically
+     * generate a submission verification page consisting of the information
+     * gathered in all the enabled submission steps.
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
+     */
+    public String getReviewJSP(Context context, HttpServletRequest request,
+            HttpServletResponse response, SubmissionInfo subInfo)
+    {
+        return REVIEW_JSP;
     }
 }
 

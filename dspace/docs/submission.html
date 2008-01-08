@@ -31,20 +31,10 @@
   <a name="configurationFile" id="configurationFile"></a>
   <H2>Understanding the Submission Configuration File</H2>
   
-  <p><em>PLEASE NOTE:  There are separate submission configuration files based on whether
-  you plan to use the DSpace JSP User Interface (JSP-UI) or the DSpace XML User Interface (XML-UI, aka. Manakin)</em>
-  <ul>
-  	<li><code><i>[dspace]</i>/config/item-submission-JSPUI.xml</code> - This is the JSP-UI configuration file</li>
-	<li><code><i>[dspace]</i>/config/item-submission-XMLUI.xml</code> - This is the XML-UI configuration file</li>
-  </ul>
+  <p>The <code>[dspace]/config/item-submission.xml</code> contains the submission configurations for <em>both</em> the DSpace JSP user interface (JSP-UI) or the DSpace XML user interface
+  (XML-UI or Manakin). This configuration file contains detailed documentation within the file itself,
+  which should help you better understand how to best utilize it.
   </p>
-  
-  <p>DSpace will automatically know which <code>item-submission.xml</code> to utilize based on the DSpace user interface being used.
-  <em>However, should you wish to make configuration changes, you must make sure to do so in the correct <code>item-submission.xml</code> 
-  file based on the DSpace user interface you are using!</em></p>
-  
-  <p>Each of the <code>item-submission.xml</code> configuration files contains detailed documentation within the file itself,
-  which should help you better undertand how to best utilize it.</p>
   
   <H3>The Structure of <CODE>item-submission.xml</CODE></H3>
   <pre><code>
@@ -91,14 +81,14 @@
   <a name="#stepDefinitions" id="#stepDefinitions"></a>
   <H3>Defining Steps (<code>&lt;step&gt;</code>) within the <CODE>item-submission.xml</CODE></H3>
   
-  <p>This section decribes how Steps of the Submission Process are defined within the <CODE>item-submission.xml</CODE>.</p>
+  <p>This section describes how Steps of the Submission Process are defined within the <CODE>item-submission.xml</CODE>.</p>
   
   <H4>Where to place your <code>&lt;step&gt;</code> definitions</H4>
   <p><code>&lt;step&gt;</code> definitions can appear in one of two places within the <CODE>item-submission.xml</CODE> configuration file.
   		<ol>
   		<li>Within the <code>&lt;step-definitions&gt;</code> section
   			<ul>
-  			  	<li>This is for globally definied <code>&lt;step&gt;</code> definitions 
+  			  	<li>This is for globally defined <code>&lt;step&gt;</code> definitions 
   			  	(i.e. steps which are used in multiple <code>&lt;submission-process&gt;</code>
   			  	 definitions).  Steps defined in this section <strong>must</strong> define
   			  	 a unique <code>id</code> which can be used to reference this step.</li>
@@ -136,30 +126,32 @@
   in which those steps will appear!</p>
   
   <p>For example, the following defines a Submission Process where the
-  <em>License</em> step directly precedes the <em>Describe</em> step 
+  <em>License</em> step directly precedes the <em>Initial Questions</em> step 
   (more information about the structure of the information under each &lt;step&gt;
    tag can be found in the section on <a href="#stepStructure">Structure of the &lt;step&gt; Definition</a> below):
   </p>
-  
-  <p><em>(PLEASE NOTE: This example uses some syntax that is specific to the DSpace JSP user interface.)</em>
   
   <pre><code>
 &lt;submission-process&gt;   			  	
       <em>&lt;!--Step 1 will be to Sign off on the License--&gt;</em>
       &lt;step&gt;
-        &lt;heading&gt;jsp.submit.progressbar.license&lt;/heading&gt;
-        &lt;processing-class&gt;org.dspace.app.webui.submit.step.JSPLicenseStep&lt;/processing-class&gt;
+        &lt;heading&gt;submit.progressbar.license&lt;/heading&gt;
+        &lt;processing-class&gt;org.dspace.submit.step.LicenseStep&lt;/processing-class&gt;
+        &lt;jspui-binding&gt;org.dspace.app.webui.submit.step.JSPLicenseStep&lt;/jspui-binding&gt;
+        &lt;xmlui-binding&gt;org.dspace.app.xmlui.aspect.submission.submit.LicenseStep&lt;/xmlui-binding&gt;
         &lt;workflow-editable&gt;false&lt;/workflow-editable&gt;
       &lt;/step&gt;
       
-      <em>&lt;!--Step 2 will be to Describe the Item--&gt;</em>
+      <em>&lt;!--Step 2 will be to Ask Initial Questions--&gt;</em>
       &lt;step&gt;
-        &lt;heading&gt;jsp.submit.progressbar.describe&lt;/heading&gt;
-        &lt;processing-class&gt;org.dspace.app.webui.submit.step.JSPDescribeStep&lt;/processing-class&gt;
-        &lt;review-jsp&gt;/submit/review-metadata.jsp&lt;/review-jsp&gt;
+        &lt;heading&gt;submit.progressbar.initial-questions&lt;/heading&gt;
+        &lt;processing-class&gt;org.dspace.submit.step.InitialQuestionsStep&lt;/processing-class&gt;
+        &lt;jspui-binding&gt;org.dspace.app.webui.submit.step.JSPInitialQuestionsStep&lt;/jspui-binding&gt;  	    
+        &lt;xmlui-binding&gt;org.dspace.app.xmlui.aspect.submission.submit.InitialQuestionsStep&lt;/xmlui-binding&gt;
         &lt;workflow-editable&gt;true&lt;/workflow-editable&gt;
       &lt;/step&gt;
-      ...
+      
+      ...[other steps]...
 &lt;/submission-process&gt; 
 	 </code></pre>
   </p>
@@ -167,59 +159,65 @@
   <a name="stepStructure" id="stepStructure"></a>
   <H4>Structure of the &lt;step&gt; Definition</H4>
   
-  <p>The actual structure of the &lt;step&gt; definition differs slightly, based on whether
-  you are using the DSpace JSP user interface (JSP-UI) or the DSpace XML user interface
-  (XML-UI or Manakin).  Unfortunately the same structure cannot be shared between
-  these user interfaces, since they each use different manners of generating the user interface.</p>
-  <ul>
-    <li><a href="#stepStructureJSP">Structure of the &lt;step&gt; Definition for the JSP User Interface</a></li>
-    <li><a href="#stepStructureXML">Structure of the &lt;step&gt; Definition for the XML User Interface (Manakin)</a></li>
-  </ul>
+  <p>The same &lt;step&gt; definition is used by both the DSpace JSP user interface (JSP-UI) an the DSpace XML user interface
+  (XML-UI or Manakin).  Therefore, you will notice each &lt;step&gt; definition contains information
+  specific to each of these two interfaces.</p>
   
-  <a name="stepStructureJSP" id="stepStructureJSP"></a>
-  <H5>Structure of the &lt;step&gt; Definition for the JSP User Interface</H5>
-  
-  <p>The structure of the &lt;step&gt; Definition for the JSP UI is as follows:
+  <p>The structure of the &lt;step&gt; Definition is as follows:
   <pre><code>  
      &lt;step&gt;
-        &lt;heading&gt;jsp.submit.progressbar.describe&lt;/heading&gt;
-        &lt;processing-class&gt;org.dspace.app.webui.submit.step.JSPDescribeStep&lt;/processing-class&gt;
-        &lt;review-jsp&gt;/submit/review-metadata.jsp&lt;/review-jsp&gt;
+     	&lt;heading&gt;submit.progressbar.describe&lt;/heading&gt;
+        &lt;processing-class&gt;org.dspace.submit.step.DescribeStep&lt;/processing-class&gt;
+        &lt;jspui-binding&gt;org.dspace.app.webui.submit.step.JSPDescribeStep&lt;/jspui-binding&gt;
+        &lt;xmlui-binding&gt;org.dspace.app.xmlui.aspect.submission.submit.DescribeStep&lt;/xmlui-binding&gt;
         &lt;workflow-editable&gt;true&lt;/workflow-editable&gt;
-      &lt;/step&gt;
+     &lt;/step&gt;
   </code></pre>    
   </p>
   
-  <P>Each <CODE>step</CODE> contains the following elements, for the JSP UI. The required elements are so marked:</P>
+  <P>Each <CODE>step</CODE> contains the following elements. The required elements are so marked:</P>
 
   <DL>
     <DT><STRONG><CODE>heading</CODE></STRONG></DT>
 
-    <DD>Full I18N key (defined in <code>Messages.properties</code>) which corresponds to
-        the text that should be displayed in the Submission Progress Bar for this step.
-        <em>This need not be defined, if the step should not appear in the progress bar
-        (e.g. steps which are automatic and require no user interaction should not appear
-		in the progress bar).</em></DD>
+    <DD>Partial I18N key (defined in <code>Messages.properties</code> for JSP-UI or <code>messages.xml</code> for XML-UI) which corresponds to
+        the text that should be displayed in the submission Progress Bar for this step.
+        This partial I18N key is prefixed within either the Messages.properties or messages.xml file, depending on the interface you are using.
+        Therefore, to find the actual key, you will need to search for the partial key with the following prefix:
+        <ul>
+        	<li>XML-UI: prefix is <code>xmlui.Submission.</code> (e.g. "xmlui.Submission.submit.progressbar.describe" for 'Describe' step)</li>
+        	<li>JSP-UI: prefix is <code>jsp.</code> (e.g. "jsp.submit.progressbar.describe" for 'Describe' step)</li>
+        </ul>
+        <em>The 'heading' need not be defined if the step should not appear in the progress bar
+        (e.g. steps which perform automated processing, i.e. non-interactive, should not appear
+		in the progress bar).</em>
+		</DD>
 
     <DT><STRONG><CODE>processing-class</CODE></STRONG> <EM>(Required)</EM></DT>
 
-    <DD>Full Java path to the JSP Processing Class for this Step. 
-    All valid JSP step processing classes must implement the interface 
-	`<code>org.dspace.app.webui.submit.JSPStep</code>` <strong>AND</strong>
-	extend the abstract `<code>org.dspace.submit.AbstractProcessingStep</code>` class
-    (or alternatively, extend one of the existing step processing classes in 
+    <DD>Full Java path to the Processing Class for this Step.  This Processing Class
+    <em>must</em> perform the primary processing of any information gathered in this step, <em>for both the XML-UI and JSP-UI</em>.
+    All valid step processing classes must extend the abstract `<code>org.dspace.submit.AbstractProcessingStep</code>` class
+    (or alternatively, extend one of the pre-existing step processing classes in 
 	<code>org.dspace.submit.step.*</code>)</DD>
 
-    <DT><STRONG><CODE>review-jsp</CODE></STRONG></DT>
+    <DT><STRONG><CODE>jspui-binding</CODE></STRONG></DT>
 
-    <DD>The relative path to the JSP which displays a read-only version
-    of the information gathered during this step.  This JSP should be very
-    simplistic in its form (most just display a simple table listing all
-    gathered information).  For examples, see the JSPs beginning with <code>review-</code>
-    that exist within the <code>/jsp/submit</code> directory of DSpace.
-	<em>This need not be defined if the step has no information that should be later reviewed 
-	(e.g. The License step doesn't need a review JSP as the act of
-	agreeing to a submission license is not considered reviewable)</em></DD>
+    <DD>Full Java path of the JSP-UI "binding" class for this Step.  This "binding" class
+    should initialize and call the appropriate JSPs to display the step's user interface.  A valid
+    JSP-UI "binding" class <em>must</em> extend the abstract `<code>org.dspace.app.webui.submit.JSPStep</code>` class.
+    <em>This property need not be defined if you are using the XML-UI interface, or for steps which
+    only perform automated processing, i.e. non-interactive steps.</em>
+    </DD>
+    
+    <DT><STRONG><CODE>xmlui-binding</CODE></STRONG></DT>
+
+    <DD>Full Java path of the XML-UI "binding" class for this Step.  This "binding" class
+    should generate the Manakin XML (DRI document) necessary to generate the step's user interface.  A valid
+    XML-UI "binding" class <em>must</em> extend the abstract `<code>org.dspace.app.xmlui.submission.AbstractSubmissionStep</code>` class.
+    <em>This property need not be defined if you are using the JSP-UI interface, or for steps which
+    only perform automated processing, i.e. non-interactive steps.</em>
+    </DD>
   
     <DT><STRONG><CODE>workflow-editable</CODE></STRONG></DT>
 
@@ -229,56 +227,6 @@
     means that workflow reviewers would be allowed to edit information gathered
     during that step).</DD>
   </DL>
-  
-  <a name="stepStructureXML" id="stepStructureXML"></a>
-  <H5>Structure of the &lt;step&gt; Definition for the XML User Interface (Manakin)</H5>
-  
-  <p>The structure of the &lt;step&gt; Definition for the XML UI is as follows:
-  <pre><code>  
-     &lt;step&gt;
-        &lt;heading&gt;jsp.submit.progressbar.describe&lt;/heading&gt;
-        &lt;processing-class&gt;org.dspace.submit.step.DescribeStep&lt;/processing-class&gt;
-        &lt;xml-ui-class&gt;org.dspace.app.xmlui.submission.submit.DescribeStep&lt;/xml-ui-class&gt;
-        &lt;workflow-editable&gt;true&lt;/workflow-editable&gt;
-      &lt;/step&gt;
-  </code></pre>    
-  </p>
-  
-  <P>Each <CODE>step</CODE> contains the following elements, for the XML UI. The required elements are so marked:</P>
-
-  <DL>
-    <DT><STRONG><CODE>heading</CODE></STRONG></DT>
-
-    <DD>Full I18N key (defined in Manakin's <code>config/i18n/messages.xml</code>) which corresponds to
-        the text that should be displayed in the Submission Progress Bar for this step.
-        <em>This need not be defined, if the step should not appear in the progress bar
-        (e.g. steps which are automatic and require no user interaction should not appear
-		in the progress bar).</em></DD>
-
-    <DT><STRONG><CODE>processing-class</CODE></STRONG> <EM>(Required)</EM></DT>
-
-    <DD>Full Java path to the Processing Class for this Step. 
-    All step processing classes must extend the abstract `<code>org.dspace.submit.AbstractProcessingStep</code>` class,
-    and implement all necessary methods in that class.</DD>
-
-    <DT><STRONG><CODE>xml-ui-class</CODE></STRONG></DT>
-
-    <DD>Full Java path to the XML UI Transformer Class for this Step.
-    The Transformer class is responsible for generating the XML structure
-    which Manakin is able to understand (called DRI: Digital Repository Interface).
-    This class must extend the abstract `<code>org.dspace.app.xmlui.submission.AbstractSubmissionStep</code>` class,
-    and implement all necessary methods in that class.
-	<em>Note: This need not be defined if the step is automated and requires no user interaction (i.e. requires no user interface)</em></DD>
-  
-    <DT><STRONG><CODE>workflow-editable</CODE></STRONG></DT>
-
-    <DD>Defines whether or not this step can be edited during the <em>Edit Metadata</em>
-    process with the DSpace approval/rejection workflow process. Possible values include <code>true</code>
-    and <code>false</code>.  If undefined, defaults to <code>true</code> (which
-    means that workflow reviewers would be allowed to edit information gathered
-    during that step).</DD>
-  </DL>
-  
   
   <a name="stepOrdering" id="stepOrdering"></a>
   <H2>Reordering/Removing Submission Steps</H2>
@@ -677,7 +625,7 @@
   <a name="createStep" id="createStep"></a>
   <H2>Creating new Submission Steps</H2>
   
-  <P>First, a warning: <em>Creating a new Submission Step requires some Java knowledge, 
+  <P>First, a brief warning: <em>Creating a new Submission Step requires some Java knowledge, 
   and is therefore recommended to be undertaken by a Java programmer whenever possible</em></P>
   
   <P>That being said, at a higher level, creating a new Submission Step
@@ -686,51 +634,38 @@
   <ol>
   	<li>(<strong>Required</strong>) Create a new Step Processing class
   		<ul>
-  		<li><strong>For JSP-UI only:</strong> If you need to create a step which <em>only</em> 
-		works with the JSP UI, 
-		then your step processing class <strong>must</strong> implement
-		the interface <code>org.dspace.app.webui.submit.JSPStep</code>
-		<strong>AND</strong> extend the abstract
-  		<code>org.dspace.submit.AbstractProcessingStep</code> class.</li>
-  		<li><strong>For XML-UI only:</strong> If you wish to create a step which <em>only</em> 
-		works with the Manakin UI, you just need to extend and
-  		implement all necessary methods within the abstract
-  		<code>org.dspace.submit.AbstractProcessingStep</code> class.</li>
-		<li><strong>Both JSP-UI and XML-UI:</strong> If you wish to create a step which works
-		with either interface, you just need to create two classes:
-			<ol>
-				<li>First, a generic processing class which extends the
-				<code>org.dspace.submit.AbstractProcessingStep</code> class, which
-				will perform the backend processing for <strong>both</strong> the
-				JSP-UI and the XML-UI.
-				</li>
-				<li>Second, you need to create a JSP-specific processing class
-				which will implement the interface 
-				<code>org.dspace.app.webui.submit.JSPStep</code>, and extends the
-				generic processing class you just created in #1 above.</li>
-			</ol>
-  		</li>
+  		<li>This class <strong>must</strong> extend the abstract
+  		<code>org.dspace.submit.AbstractProcessingStep</code> class and
+  		implement all methods defined by that abstract class.</li>
+  		<li>This class should be built in such a way that it can process the
+  		input gathered from <em>either</em> the XML-UI or JSP-UI interface.</li>
   		</ul>
   	</li>
-  	<li>(<em>For JSP UI Steps only</em>) Create the JSPs to display
-  	the user interface (<em>only necessary if your step requires user interaction</em>).
+  	<li>(<em>For steps using JSP-UI</em>) Create the JSPs to display
+  	the user interface.  Create a new JSP-UI "binding" class to initialize
+  	and call these JSPs.</li>
   		<ul>
-  		<li>Any JSPs created should be loaded by the Step Processing
-  		class by using one of the showJSP() method</li>
+  		<li>Your JSP-UI "binding" class must extend the abstract class <code>org.dspace.app.webui.submit.JSPStep</code>
+  		and implement all methods defined there.  It's recommended to use one
+  		of the classes in <code>org.dspace.app.webui.submit.step.*</code> as a reference.</li>
+  		<li>Any JSPs created should be loaded by calling the showJSP() method of
+  		the <code>org.dspace.app.webui.submit.JSPStepManager</code> class</li>
   		<li>If this step gathers information to be reviewed, you must
   		also create a Review JSP which will display a read-only view of
-  		all data gathered during this step.  You will find examples
+  		all data gathered during this step.  The path to this JSP must be returned
+  		by your getReviewJSP() method.  You will find examples
   		of Review JSPs (named similar to <code>review-<em>[step]</em>.jsp</code>) in the
   		<code><em>[dspace-source]</em>/jsp/submit</code> directory.</li>
   		</ul>
  	</li>
- 	<li>(<em>For XML UI Steps only</em>)  Create a Step Transformer
- 	which will generate the DRI XML which Manakin requires
- 	(<em>only necessary if your step requires user interaction</em>).
+ 	<li>(<em>For steps using XML-UI</em>)  Create an XML-UI "binding" Step Transformer
+ 	which will generate the DRI XML which Manakin requires.
   		<ul>
   		<li>The Step Transformer must extend and implement
-  		all necessary methods within the abstract
-  		<code>org.dspace.app.xmlui.submission.AbstractSubmissionStep</code> class.</li>
+  		all necessary methods within the abstract class 
+  		<code>org.dspace.app.xmlui.submission.AbstractSubmissionStep</code></li>
+  		<li>It is useful to use the existing classes in 
+  		<code>org.dspace.app.xmlui.submission.submit.*</code> as references</li>
   		</ul>
  	</li>
   	<li>(<strong>Required</strong>) Add a valid Step Definition to the <code>item-submission.xml</code> configuration file.
@@ -747,6 +682,37 @@
   	</li>
  </ol>
   
+  <a name="createStep" id="createStep"></a>
+  <H3>Creating a Non-Interactive Step</H3>
+  
+  <p>
+  Non-interactive steps are ones that have no user interface and only perform backend processing.
+  You may find a need to create non-interactive steps which perform further processing of previously entered information.
+  </p>
+  
+  <p>To create a non-interactive step, do the following:
+  <ol>
+  	<li>Create the required Step Processing class, which extends the abstract
+  		<code>org.dspace.submit.AbstractProcessingStep</code> class.  In this class
+  		add any processing which this step will perform.</li>
+    <li>Add your non-interactive step to your <code>item-submission.xml</code> at
+        the place where you wish this step to be called during the submission process.
+        For example, if you want it to be called <em>immediately after</em> the
+        existing 'Upload File' step, then place its configuration immediately after
+        the configuration for that 'Upload File' step.  The configuration should look
+  		similar to the following:<pre><code>&lt;step&gt;
+   &lt;processing-class&gt;org.dspace.submit.step.MyNonInteractveStep&lt;/processing-class&gt;
+   &lt;workflow-editable&gt;false&lt;/workflow-editable&gt;
+&lt;/step&gt;</code></pre>
+  	</li>
+  </ol>
+  </p>
+  <p>
+  Note: Non-interactive steps will not appear in the Progress Bar!  Therefore,
+  	your submitters will not even know they are there.  However, because they are not
+  	visible to your users, you should make sure that your non-interactive step does not
+  	take a large amount of time to finish its processing and return control to the next step 
+  	(otherwise there will be a visible time delay in the user interface).</p>
  
   <HR>
 
