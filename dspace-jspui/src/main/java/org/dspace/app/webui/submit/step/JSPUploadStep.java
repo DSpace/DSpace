@@ -67,6 +67,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.submit.step.UploadStep;
@@ -201,7 +202,9 @@ public class JSPUploadStep extends JSPStep
         String buttonPressed = UIUtil.getSubmitButton(request, UploadStep.NEXT_BUTTON);
 
         // Do we need to skip the upload entirely?
-        if (buttonPressed.equalsIgnoreCase(UploadStep.SUBMIT_SKIP_BUTTON))
+        boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
+        if (buttonPressed.equalsIgnoreCase(UploadStep.SUBMIT_SKIP_BUTTON) ||
+            (buttonPressed.equalsIgnoreCase(UploadStep.SUBMIT_UPLOAD_BUTTON) && !fileRequired))
         {
             Bundle[] bundles = subInfo.getSubmissionItem().getItem()
                     .getBundles("ORIGINAL");

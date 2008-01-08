@@ -321,9 +321,9 @@ public class UploadStep extends AbstractProcessingStep
         // Step #7: Determine if there is an error because no
         // files have been uploaded.
         // ---------------------------------------------------
-        // if "submit_skip" button was not pressed, then a file is required!
-        boolean allowEmptyItems = (request.getParameter(SUBMIT_SKIP_BUTTON) != null);
-        if (!allowEmptyItems)
+        //check if a file is required to be uploaded
+        boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);     
+        if (fileRequired)
         {
             Bundle[] bundles = item.getBundles("ORIGINAL");
             if (bundles.length == 0)
