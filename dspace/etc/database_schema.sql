@@ -123,7 +123,8 @@ CREATE TABLE BitstreamFormatRegistry
   description         TEXT,
   support_level       INTEGER,
   -- Identifies internal types
-  internal             BOOL
+  internal            BOOL,
+  uuid                VARCHAR(36)
 );
 
 -------------------------------------------------------
@@ -153,7 +154,8 @@ CREATE TABLE Bitstream
    internal_id             VARCHAR(256),
    deleted                 BOOL,
    store_number            INTEGER,
-   sequence_id             INTEGER
+   sequence_id             INTEGER,
+   uuid                    VARCHAR(36)
 );
 
 -------------------------------------------------------
@@ -173,7 +175,8 @@ CREATE TABLE EPerson
   sub_frequency       INTEGER,
   phone	              VARCHAR(32),
   netid               VARCHAR(64),
-  language            VARCHAR(64)
+  language            VARCHAR(64),
+  uuid                VARCHAR(36)
 );
 
 -- index by email
@@ -188,7 +191,8 @@ CREATE INDEX eperson_netid_idx ON EPerson(netid);
 CREATE TABLE EPersonGroup
 (
   eperson_group_id INTEGER PRIMARY KEY,
-  name             VARCHAR(256) UNIQUE
+  name             VARCHAR(256) UNIQUE,
+  uuid             VARCHAR(36)
 );
 
 ------------------------------------------------------
@@ -227,7 +231,8 @@ CREATE TABLE Item
   in_archive      BOOL,
   withdrawn       BOOL,
   last_modified   TIMESTAMP WITH TIME ZONE,
-  owning_collection INTEGER
+  owning_collection INTEGER,
+  uuid            VARCHAR(36)
 );
 
 -------------------------------------------------------
@@ -236,8 +241,9 @@ CREATE TABLE Item
 CREATE TABLE Bundle
 (
   bundle_id          INTEGER PRIMARY KEY,
-  name               VARCHAR(16),  -- ORIGINAL | THUMBNAIL | TEXT 
-  primary_bitstream_id	INTEGER REFERENCES Bitstream(bitstream_id)
+  name               VARCHAR(16),  -- ORIGINAL | THUMBNAIL | TEXT
+  primary_bitstream_id	INTEGER REFERENCES Bitstream(bitstream_id),
+  uuid               VARCHAR(36)
 );
 
 -------------------------------------------------------
@@ -273,7 +279,8 @@ CREATE TABLE MetadataSchemaRegistry
 (
   metadata_schema_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadataschemaregistry_seq'),
   namespace          VARCHAR(256) UNIQUE,
-  short_id           VARCHAR(32) UNIQUE
+  short_id           VARCHAR(32) UNIQUE,
+  uuid               VARCHAR(36)
 );
 
 CREATE TABLE MetadataFieldRegistry
@@ -283,8 +290,15 @@ CREATE TABLE MetadataFieldRegistry
   metadata_schema_id  INTEGER REFERENCES MetadataSchemaRegistry(metadata_schema_id),
   element             VARCHAR(64),
   qualifier           VARCHAR(64),
-  scope_note          TEXT
+  scope_note          TEXT,
+  uuid                VARCHAR(36)
 );
+
+-- FIXME: Sort this out before the 1.6 release.
+-- This is necessary because of the way in which entries in the field registry
+-- are created. Eventually, it should be possible to re-introduce this
+-- constraint.
+ALTER TABLE metadatafieldregistry ALTER COLUMN metadata_schema_id DROP NOT NULL;
 
 CREATE TABLE MetadataValue
 (
@@ -293,7 +307,8 @@ CREATE TABLE MetadataValue
   metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
   text_value         TEXT,
   text_lang          VARCHAR(24),
-  place              INTEGER
+  place              INTEGER,
+  uuid               VARCHAR(36)
 );
 
 -- Create a dcvalue view for backwards compatibilty
@@ -323,7 +338,8 @@ CREATE TABLE Community
   introductory_text TEXT,
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
   copyright_text    TEXT,
-  side_bar_text     TEXT
+  side_bar_text     TEXT,
+  uuid              VARCHAR(36)
 );
 
 -------------------------------------------------------
@@ -345,7 +361,8 @@ CREATE TABLE Collection
   workflow_step_2   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_3   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   submitter         INTEGER REFERENCES EPersonGroup( eperson_group_id ),
-  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id)
+  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id ),
+  uuid              VARCHAR(36)
 );
 
 -------------------------------------------------------
@@ -400,7 +417,8 @@ CREATE TABLE ResourcePolicy
   eperson_id           INTEGER REFERENCES EPerson(eperson_id),
   epersongroup_id      INTEGER REFERENCES EPersonGroup(eperson_group_id),
   start_date           DATE,
-  end_date             DATE
+  end_date             DATE,
+  uuid                 VARCHAR(36)
 );
 
 -- index by resource_type,resource_id - all queries by
@@ -452,7 +470,8 @@ CREATE TABLE WorkspaceItem
   multiple_files    BOOL,
   -- How for the user has got in the submit process
   stage_reached     INTEGER,
-  page_reached      INTEGER
+  page_reached      INTEGER,
+  uuid              VARCHAR(36)
 );
 
 -------------------------------------------------------
@@ -469,10 +488,10 @@ CREATE TABLE WorkflowItem
   -- Answers to questions on first page of submit UI
   multiple_titles       BOOL,
   published_before      BOOL,
-  multiple_files        BOOL
+  multiple_files        BOOL,
   -- Note: stage reached not applicable here - people involved in workflow
   -- can always jump around submission UI
-
+  uuid           VARCHAR(36)
 );
 
 -------------------------------------------------------
@@ -505,7 +524,8 @@ CREATE TABLE Subscription
 (
   subscription_id   INTEGER PRIMARY KEY,
   eperson_id        INTEGER REFERENCES EPerson(eperson_id),
-  collection_id     INTEGER REFERENCES Collection(collection_id)
+  collection_id     INTEGER REFERENCES Collection(collection_id),
+  uuid              VARCHAR(36)
 );
 
 
@@ -586,10 +606,13 @@ CREATE TABLE community_item_count (
 -------------------------------------------------------
 --  Create 'special' groups, for anonymous access
 --  and administrators
+--
+-- FIXME: This should be done in Java using the Group API. If it did, we
+-- wouldn't need these horrible hard-coded UUIDs.
 -------------------------------------------------------
 -- We don't use getnextid() for 'anonymous' since the sequences start at '1'
-INSERT INTO epersongroup VALUES(0, 'Anonymous');
-INSERT INTO epersongroup VALUES(getnextid('epersongroup'), 'Administrator');
+INSERT INTO epersongroup VALUES(0, 'Anonymous', '3aa7309d-1bef-4f24-bd1e-ff7921238259');
+INSERT INTO epersongroup VALUES(getnextid('epersongroup'), 'Administrator', 'd3e477f0-d28f-413f-8a38-4379279814ed');
 
 
 -------------------------------------------------------
