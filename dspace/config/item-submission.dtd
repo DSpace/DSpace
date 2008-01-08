@@ -18,7 +18,7 @@
  <!-- (The "select collection" step *must* be here)            -->
  <!ELEMENT step-definitions (step+) >
  
- <!ELEMENT step (heading?, processing-class, review-jsp?, xml-ui-class?, workflow-editable?) >
+ <!ELEMENT step (heading?, processing-class, jspui-binding?, xmlui-binding?, workflow-editable?) >
  <!ATTLIST step id NMTOKEN #IMPLIED>
  
  <!ELEMENT heading (#PCDATA) >
