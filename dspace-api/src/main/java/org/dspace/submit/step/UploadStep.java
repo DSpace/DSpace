@@ -88,6 +88,9 @@ public class UploadStep extends AbstractProcessingStep
     /** Button to upload a file * */
     public static final String SUBMIT_UPLOAD_BUTTON = "submit_upload";
 
+    /** Button to skip uploading a file * */
+    public static final String SUBMIT_SKIP_BUTTON = "submit_skip";
+    
     /** Button to submit more files * */
     public static final String SUBMIT_MORE_BUTTON = "submit_more";
 
@@ -326,8 +329,8 @@ public class UploadStep extends AbstractProcessingStep
         // Step #7: Determine if there is an error because no
         // files have been uploaded.
         // ---------------------------------------------------
-        // if "submit_skip" is unspecified, then a file is required!
-        boolean allowEmptyItems = (request.getParameter("submit_skip") != null);
+        // if "submit_skip" button was not pressed, then a file is required!
+        boolean allowEmptyItems = (request.getParameter(SUBMIT_SKIP_BUTTON) != null);
         if (!allowEmptyItems)
         {
             Bundle[] bundles = item.getBundles("ORIGINAL");

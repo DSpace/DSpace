@@ -224,6 +224,8 @@ public class JSPUploadStep extends UploadStep implements JSPStep
                     }
                     
                     File temp = wrapper.getFile("file");
+                    
+                    //if file exists and has a size greater than zero
                     if (temp != null && temp.length() > 0)
                     {
                         // Read the temp file into an inputstream
@@ -231,10 +233,8 @@ public class JSPUploadStep extends UploadStep implements JSPStep
                                 new FileInputStream(temp));
 
                         filePath = wrapper.getFilesystemName("file");
-                    }
-                    if (temp != null)
-                    {
-                        // remove our temp file
+                        
+                        // cleanup our temp file
                         temp.delete();
                     }
                     
@@ -290,7 +290,7 @@ public class JSPUploadStep extends UploadStep implements JSPStep
         String buttonPressed = UIUtil.getSubmitButton(request, NEXT_BUTTON);
 
         // Do we need to skip the upload entirely?
-        if (request.getParameter("submit_skip") != null)
+        if (buttonPressed.equalsIgnoreCase(SUBMIT_SKIP_BUTTON))
         {
             Bundle[] bundles = subInfo.getSubmissionItem().getItem()
                     .getBundles("ORIGINAL");
@@ -305,6 +305,13 @@ public class JSPUploadStep extends UploadStep implements JSPStep
 
             return; // return immediately, since we are skipping upload
         }
+        
+        //If upload failed in JSPUI (just came from upload-error.jsp), user can retry the upload
+        if(buttonPressed.equalsIgnoreCase("submit_retry"))
+        {
+            showUploadPage(context, request, response, subInfo, false);
+        }
+        
         // ------------------------------
         // Check for Errors!
         // ------------------------------
@@ -318,20 +325,28 @@ public class JSPUploadStep extends UploadStep implements JSPStep
                         UIUtil.getRequestLogInfo(request)));
                 JSPManager.showIntegrityError(request, response);
             }
-            else if (status == STATUS_UPLOAD_ERROR)
+            else if (status == STATUS_UPLOAD_ERROR || status == STATUS_NO_FILES_ERROR)
             {
                 // There was a problem uploading the file!
 
-                // So, we need to show the file upload error page
-                if (subInfo != null)
+                //First, check if we just removed our uploaded file
+                if(buttonPressed.startsWith("submit_remove_"))
                 {
-                    Collection c = subInfo.getSubmissionItem().getCollection();
-                    DCInputsReader inputsReader = new DCInputsReader();
-                    request.setAttribute("submission.inputs", inputsReader
-                            .getInputs(c.getIdentifier().getCanonicalForm()));
+                    //if file was just removed, go back to upload page
+                    showUploadPage(context, request, response, subInfo, false);
                 }
-                JSPStepManager.showJSP(request, response, subInfo, UPLOAD_ERROR_JSP);
-
+                else
+                {    
+                    // So, we need to show the file upload error page
+                    if (subInfo != null)
+                    {
+                        Collection c = subInfo.getSubmissionItem().getCollection();
+                        DCInputsReader inputsReader = new DCInputsReader();
+                        request.setAttribute("submission.inputs", inputsReader
+                                .getInputs(c.getIdentifier().getCanonicalForm()));
+                    }
+                    JSPStepManager.showJSP(request, response, subInfo, UPLOAD_ERROR_JSP);
+                }
             }
             else if (status == STATUS_UNKNOWN_FORMAT)
             {

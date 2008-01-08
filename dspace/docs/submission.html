@@ -24,6 +24,7 @@
       <li><a href="#stepOrdering">Reordering/Removing Submission Steps</a></li>
       <li><a href="#collectionSubmission">Assigning a custom Submission Process to a Collection</a></li>
       <li><a href="#metadataEntry">Customizing the Metadata-entry pages</a></li>
+      <li><a href="#uploadStep">Configuring the File Upload step</a></li>
       <li><a href="#createStep">Creating new Submission Steps</a></li>
   </ul>
   
@@ -660,6 +661,18 @@
 
   <P>Any mistake in the syntax or semantics of the form definitions, such as poorly formed XML or a reference to a nonexistent field name, will cause a fatal error in the DSpace UI. The exception message (at the top of the stack trace in the <CODE>dspace.log</CODE> file) usually has a concise and helpful explanation of what went wrong. Don't forget to stop and restart the servlet container before testing your fix to a bug.</P>
 
+
+  <a name="uploadStep" id="uploadStep"></a>
+  <H2>Configuring the File Upload step</H2>
+
+  <P>The <em>Upload</em> step in the DSpace submission process has two configuration options 
+  which can be set with your <code>[dspace]/config/dspace.cfg</code> configuration file.  They are as follows:</P>
+  <UL>
+  	<LI><code>upload.max</code> - The maximum size of a file (in bytes) that can be uploaded from the JSP-UI (not applicable for the XML-UI).  It defaults to 536870912 bytes (512MB).  You may set this to -1 to disable any file size limitation. 
+  		<UL><LI><em>Note:</em> Increasing this value or setting to -1 does <strong>not</strong> guarantee that DSpace will be able to successfully upload larger files via the web, as large uploads depend on many other factors including bandwidth, web server settings, internet connection speed, etc.</LI></UL>
+  	</LI>
+  	<LI><code>webui.submit.upload.required</code> - Whether or not all users are <em>required</em> to upload a file when they submit an item to DSpace.  It defaults to 'true'.  When set to 'false' users will see an option to skip the upload step when they submit a new item.</LI>
+  </UL>
 
   <a name="createStep" id="createStep"></a>
   <H2>Creating new Submission Steps</H2>
