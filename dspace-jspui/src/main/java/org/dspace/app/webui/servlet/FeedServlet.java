@@ -329,8 +329,9 @@ public class FeedServlet extends DSpaceServlet
                 if (so.getName().equals(idx))
                     scope.setSortBy(so.getNumber());
             }
+            scope.setOrder(SortOption.DESCENDING);
     		
-    		// the feed
+            // the feed
     		Channel channel = new Channel();
     		
     		//Special Case: if DSpace Object passed in is null, 
