@@ -196,8 +196,6 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
 			final AuthenticationMethod authMethod = (AuthenticationMethod) authMethods
 					.next();
 
-			final Item item = list.addItem();
-
             HttpServletRequest hreq = (HttpServletRequest) this.objectModel
                     .get(HttpEnvironment.HTTP_REQUEST_OBJECT);
 
@@ -225,6 +223,7 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
                     loginURL = location.toString();
                 }
 
+                final Item item = list.addItem();
                 item.addXref(loginURL, message(authTitle));
             }
 
