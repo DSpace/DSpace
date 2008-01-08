@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE item-submission SYSTEM "item-submission.dtd">
 
-<!-- JSP-UI Configurable Submission configuration file  -->
+<!-- Configurable Submission configuration file  -->
 
 <!-- This XML configuration file allows you to configure the ordering     -->
 <!-- and number of the steps that occur in the Item Submission Process.   -->
@@ -29,27 +29,38 @@
  <!-- unique identifier in the 'id' attribute!                             -->
  <!--                                                                      -->
  <!-- Each <step> REQUIRES the following attributes (@) and properties:    --> 
- <!-- @id       - The unique identifier for this step                      -->
+ <!-- @id                - The unique identifier for this step             -->
+ <!-- 																	   -->
  <!-- <processing-class> - The class which will process all information for-->
- <!--             this step. The class must implement the                  -->
- <!--             'org.dspace.app.webui.submit.JSPStep' interface AND      -->
- <!--             extend 'org.dspace.submit.AbstractProcessingStep'        -->
+ <!--             this step. The class must extend						   -->
+ <!--             'org.dspace.submit.AbstractProcessingStep'               -->
  <!--             (or one of the org.dspace.submit.step.* classes)         -->
  <!--             This property should reference the full path of the class-->
- <!--			  (e.g. org.dspace.app.webui.submit.MyCustomJSPStep)       -->
+ <!--			  (e.g. org.dspace.submit.step.MyCustomStep)               -->
  <!--																	   -->
  <!-- The following properties are OPTIONAL for each <step>:			   -->
- <!-- <heading> -    References the message text (from the 				   -->
- <!--			     Messages.properties file) which will be used as this  -->
- <!--			     step's heading in the progress-bar.  If unspecified,  -->
- <!--			     the step does not show up in the Progress Bar.	       -->
- <!-- <review-jsp> - The context path (e.g. /submit/myJSP.jsp) of the JSP  -->
- <!--				 which will give a READ-ONLY view of the users answers -->
- <!--				 for this entire step.  This JSP is used by the        -->
- <!--				 "Verify" step to allow the users to review his/her    -->
- <!--				 for each previous step.  If the <review-jsp> is       -->
- <!--				 unspecified, the user will not be able to review      -->
- <!--				 his/her answers for this <step> in the "Verify" step. -->
+ <!-- <heading> -    References the message key, from the 				   -->
+ <!--			     Messages.properties file (JSP-UI) or messages.xml     -->
+ <!--                (XML-UI) which will be used as this step's heading in -->
+ <!--			     the progress-bar.  If unspecified, the step does not  -->
+ <!--			     show up in the Progress Bar.  Keys in the <heading>   -->
+ <!--				 are prefixed as follows in the appropriate 		   -->
+ <!--				 "messages" file:							           -->
+ <!--						XML-UI:  "xmlui.Submission." prefix			   -->
+ <!--						JSP-UI:  "jsp." prefix			   			   -->
+ <!-- <jspui-binding> - JSP-UI binding step class which will generate the JSP-->
+ <!--                 based user interface for this step.  The class must  -->
+ <!--                 extend 'org.dspace.app.webui.submit.JSPStep'.        -->
+ <!--                 This property should reference the full path of the  -->
+ <!--                 class.  It is only necessary if you are using the    -->
+ <!--                 DSpace JSP-UI, and the step requires user interaction-->
+ <!-- <xmlui-binding> - XML-UI binding step class which will generate the  -->
+ <!--                 Manakin XML (DRI) structure for this step.  The class-->
+ <!--                 must extend                                          -->
+ <!--                 'org.dspace.app.xmlui.aspect.submission.StepTransformer'.-->
+ <!--                 This property should reference the full path of the  -->
+ <!--                 class.  It is only necessary if you are using the    -->
+ <!--                 DSpace XML-UI, and the step requires user interaction-->
  <!-- <workflow-editable> - whether or not this step will appear during the-->
  <!--				 "Edit Metadata" workflow approval process.  This field-->
  <!--				 defaults to TRUE (which means it can be edited during -->
@@ -71,7 +82,9 @@
      <!-- a special step, it is currently NEVER editable in a workflow.      -->                              
      <step id="collection">
        <heading></heading> <!--can specify heading, if you want it to appear in Progress Bar-->
-       <processing-class>org.dspace.app.webui.submit.step.JSPSelectCollectionStep</processing-class>
+	   <processing-class>org.dspace.submit.step.SelectCollectionStep</processing-class>
+       <jspui-binding>org.dspace.app.webui.submit.step.JSPSelectCollectionStep</jspui-binding>
+       <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep</xmlui-binding>
        <workflow-editable>false</workflow-editable>
      </step>
    
@@ -85,18 +98,18 @@
      <!-- referenced by any of the below 'submission-process' tags).  Also as-->
      <!-- a special step, it is currently NEVER editable in a workflow.      -->                               
      <step id="complete">
-       <heading>jsp.submit.progressbar.complete</heading>
-       <processing-class>org.dspace.app.webui.submit.step.JSPCompleteStep</processing-class>
+       <heading>submit.progressbar.complete</heading>
+       <processing-class>org.dspace.submit.step.CompleteStep</processing-class>
+       <jspui-binding>org.dspace.app.webui.submit.step.JSPCompleteStep</jspui-binding>
        <workflow-editable>false</workflow-editable>
      </step>
    
-   
      <!-- This is the Sample Step which utilizes the JSPSampleStep class-->
      <step id="sample">
-            <heading>Sample</heading>
-            <processing-class>org.dspace.app.webui.submit.step.JSPSampleStep</processing-class>
-            <review-jsp>/submit/sample-review.jsp</review-jsp>
-            <workflow-editable>true</workflow-editable>
+       <heading>Sample</heading>
+       <processing-class>org.dspace.submit.step.SampleStep</processing-class>
+       <jspui-binding>org.dspace.app.webui.submit.step.JSPSampleStep</jspui-binding>
+       <workflow-editable>true</workflow-editable>
      </step>
  </step-definitions>
 
@@ -124,17 +137,28 @@
  <!--			  (e.g. org.dspace.app.webui.submit.MyCustomJSPStep)       -->
  <!--                                                                      -->
  <!-- The following properties are OPTIONAL for each <step>:			   -->
- <!-- <heading> -    References the message text (from the 				   -->
- <!--			     Messages.properties file) which will be used as this  -->
- <!--			     step's heading in the progress-bar.  If unspecified,  -->
- <!--			     the Step does not show up in the Progress Bar.	       -->
- <!-- <review-jsp> - The context path (e.g. /submit/myJSP.jsp) of the JSP  -->
- <!--				 which will give a READ-ONLY view of the users answers -->
- <!--				 for this entire step.  This JSP is used by the        -->
- <!--				 "Verify" step to allow the users to review his/her    -->
- <!--				 for each previous step.  If the <review-jsp> is       -->
- <!--				 unspecified, the user will not be able to review      -->
- <!--				 his/her answers for this <step> in the "Verify" step. -->
+ <!-- <heading> -    References the message key, from the 				   -->
+ <!--			     Messages.properties file (JSP-UI) or messages.xml     -->
+ <!--                (XML-UI) which will be used as this step's heading in -->
+ <!--			     the progress-bar.  If unspecified, the step does not  -->
+ <!--			     show up in the Progress Bar.  Keys in the <heading>   -->
+ <!--				 are prefixed as follows in the appropriate 		   -->
+ <!--				 "messages" file:							           -->
+ <!--						XML-UI:  "xmlui.Submission." prefix			   -->
+ <!--						JSP-UI:  "jsp." prefix			   			   -->
+ <!-- <jspui-binding> - JSP-UI binding step class which will generate the JSP-->
+ <!--                 based user interface for this step.  The class must  -->
+ <!--                 extend 'org.dspace.app.webui.submit.JSPStep'.        -->
+ <!--                 This property should reference the full path of the  -->
+ <!--                 class.  It is only necessary if you are using the    -->
+ <!--                 DSpace JSP-UI, and the step requires user interaction-->
+ <!-- <xmlui-binding> - XML-UI binding step class which will generate the  -->
+ <!--                 Manakin XML (DRI) structure for this step.  The class-->
+ <!--                 must extend                                          -->
+ <!--                 'org.dspace.app.xmlui.aspect.submission.StepTransformer'.-->
+ <!--                 This property should reference the full path of the  -->
+ <!--                 class.  It is only necessary if you are using the    -->
+ <!--                 DSpace XML-UI, and the step requires user interaction-->
  <!-- <workflow-editable> - whether or not this step will appear during the-->
  <!--				 "Edit Metadata" workflow approval process.  This field-->
  <!--				 defaults to TRUE (which means it can be edited during -->
@@ -151,41 +175,47 @@
           
      <!--Step 1 will be to gather initial information-->
 	  <step>
-	    <heading>jsp.submit.progressbar.describe</heading>
-	    <processing-class>org.dspace.app.webui.submit.step.JSPInitialQuestionsStep</processing-class>
-	    <review-jsp>/submit/review-init.jsp</review-jsp>
+	    <heading>submit.progressbar.initial-questions</heading>
+		<processing-class>org.dspace.submit.step.InitialQuestionsStep</processing-class>
+		<jspui-binding>org.dspace.app.webui.submit.step.JSPInitialQuestionsStep</jspui-binding>   	    
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.InitialQuestionsStep</xmlui-binding>
 	    <workflow-editable>true</workflow-editable>
 	  </step>  
           
       <!--Step 2 will be to Describe the item.-->
       <step>
-        <heading>jsp.submit.progressbar.describe</heading>
-        <processing-class>org.dspace.app.webui.submit.step.JSPDescribeStep</processing-class>
-        <review-jsp>/submit/review-metadata.jsp</review-jsp>
+        <heading>submit.progressbar.describe</heading>
+        <processing-class>org.dspace.submit.step.DescribeStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPDescribeStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.DescribeStep</xmlui-binding>
         <workflow-editable>true</workflow-editable>
       </step>
           
       <!--Step 3 will be to Upload the item-->
       <step>
-        <heading>jsp.submit.progressbar.upload</heading>
-        <processing-class>org.dspace.app.webui.submit.step.JSPUploadStep</processing-class>
-        <review-jsp>/submit/review-upload.jsp</review-jsp>
+        <heading>submit.progressbar.upload</heading>
+        <processing-class>org.dspace.submit.step.UploadStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
         <workflow-editable>true</workflow-editable>
       </step>
      
- 	  <!--Step 4 will be to Verify everything -->
- 	  <!--(this uses all the "review-jsp" tags set in the above steps to load the "Verify" page).-->
-      <step>
-        <heading>jsp.submit.progressbar.verify</heading>
-        <processing-class>org.dspace.app.webui.submit.step.JSPVerifyStep</processing-class>
-        <workflow-editable>true</workflow-editable>
+ 	  <!--Step 4 will be to Verify/Review everything -->
+ 	  <step>
+        <heading>submit.progressbar.verify</heading>
+        <processing-class>org.dspace.submit.step.VerifyStep</processing-class>
+ 	    <jspui-binding>org.dspace.app.webui.submit.step.JSPVerifyStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.ReviewStep</xmlui-binding>
+		<workflow-editable>true</workflow-editable>
       </step>
      
       <!--Step 5 will be to Sign off on the License-->
       <step>
-        <heading>jsp.submit.progressbar.license</heading>
-        <processing-class>org.dspace.app.webui.submit.step.JSPLicenseStep</processing-class>
-        <workflow-editable>false</workflow-editable>
+        <heading>submit.progressbar.license</heading>
+        <processing-class>org.dspace.submit.step.LicenseStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPLicenseStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.LicenseStep</xmlui-binding>
+		<workflow-editable>false</workflow-editable>
       </step>
      
    </submission-process>

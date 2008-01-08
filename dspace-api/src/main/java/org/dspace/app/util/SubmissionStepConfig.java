@@ -48,7 +48,7 @@ import org.apache.log4j.Logger;
  * Class representing configuration for a single step within an Item Submission
  * Process. In other words, this is a single step in the SubmissionConfig class.
  * This class represents the structure of a single 'step' node in the
- * item-submission-[UI Name].xml configuration file.
+ * item-submission.xml configuration file.
  * 
  * @see org.dspace.app.util.SubmissionConfigReader
  * @see org.dspace.app.util.SubmissionConfig
@@ -79,19 +79,22 @@ public class SubmissionStepConfig
 
     /** the name of the java processing class for this step */
     private String processingClassName = null;
-
-    /** the review-jsp for this step */
-    private String reviewJSP = null;
-
+   
     /** whether or not this step is editable during workflow (default=true) */
     private boolean workflowEditable = true;
+
+    /** 
+     * The full name of the JSP-UI binding class for this step. This field is
+     * ONLY used by the JSP-UI.
+     **/
+    private String jspBindingClassName = null;
 
     /**
      * The full name of the Manakin XML-UI Transformer class which will generate
      * the necessary DRI for displaying this class in Manakin. This field is
      * ONLY used by the Manakin XML-UI.
      */
-    private String xmlUIClassName = null;
+    private String xmlBindingClassName = null;
 
     /** The number of this step in the current SubmissionConfig */
     private int number = -1;
@@ -119,8 +122,8 @@ public class SubmissionStepConfig
         id = (String) stepMap.get("id");
         heading = (String) stepMap.get("heading");
         processingClassName = (String) stepMap.get("processing-class");
-        reviewJSP = (String) stepMap.get("review-jsp");
-        xmlUIClassName = (String) stepMap.get("xml-ui-class");
+        jspBindingClassName = (String) stepMap.get("jspui-binding");
+        xmlBindingClassName = (String) stepMap.get("xmlui-binding");
 
         String wfEditString = (String) stepMap.get("workflow-editable");
         if (wfEditString != null && wfEditString.length() > 0)
@@ -156,9 +159,8 @@ public class SubmissionStepConfig
     /**
      * Get the class which handles all processing for this step.
      * <p>
-     * This class must extend either the org.dspace.submit.SubmissionStep class
-     * (for JSP UI) or org.dspace.submit.AbstractProcessingStep class (for
-     * Manakin XML UI).
+     * This class must extend the org.dspace.submit.AbstractProcessingStep class,
+     * and provide processing for BOTH the JSP-UI and XML-UI
      * 
      * @return the class's full class path (e.g.
      *         "org.dspace.submit.step.MySampleStep")
@@ -169,35 +171,37 @@ public class SubmissionStepConfig
     }
 
     /**
-     * Get the review jsp for this step. The "review jsp" is a JSP page which
-     * will load all the user's answers given for this step to allow the user to
-     * review his/her answers.
-     * 
-     * This "review jsp" is used by the "Verify" step to allow the user to
-     * verify/review all of his/her answers.
-     * 
-     * @return the JSPs full path
-     */
-    public String getReviewJSP()
-    {
-        return reviewJSP;
-    }
-
-    /**
      * Retrieve the full class name of the Manakin Transformer which will
      * generate this step's DRI, for display in Manakin XML-UI.
      * <P>
      * This class must extend the
-     * org.dspace.app.xmlui.submit.step.SubmissionStep class.
+     * org.dspace.app.xmlui.aspect.submission.StepTransformer class.
      * <P>
      * This property is only used by the Manakin XML-UI, and therefore is not
-     * relevant if you are using JSPs.
+     * relevant if you are using the JSP-UI.
      * 
-     * @return the full java class name of the Transformer for this class
+     * @return the full java class name of the Transformer to use for this step
      */
     public String getXMLUIClassName()
     {
-        return xmlUIClassName;
+        return xmlBindingClassName;
+    }
+    
+    /**
+     * Retrieve the full class name of the JSP-UI "binding" class which will
+     * initialize and call the necessary JSPs for display in the JSP-UI
+     * <P>
+     * This class must extend the
+     * org.dspace.app.webui.submit.JSPStep class.
+     * <P>
+     * This property is only used by the JSP-UI, and therefore is not
+     * relevant if you are using the XML-UI (aka. Manakin).
+     * 
+     * @return the full java class name of the JSPStep to use for this step
+     */
+    public String getJSPUIClassName()
+    {
+        return jspBindingClassName;
     }
 
     /**

@@ -125,6 +125,9 @@ public abstract class AbstractProcessingStep
 
     /** List of all user interface fields which had errors during processing * */
     private List errorFields = null;
+    
+    private static String ERROR_FIELDS_ATTRIBUTE = "dspace.submit.error_fields";
+    
 
     /**
      * Do any processing of the information input by the user, and/or perform
@@ -159,47 +162,84 @@ public abstract class AbstractProcessingStep
      * step processing. This list is for usage in generating the appropriate
      * error message(s) in the UI.
      * <P>
-     * The list of fields which had errors should be set by the step's
+     * The list of fields which had errors should be set by the AbstractProcessingStep's
      * doProcessing() method, so that it can be accessed later by whatever UI is
      * generated.
      * 
+     * @param request
+     *            current servlet request object
      * @return List of error fields (as Strings)
      */
-    public final List getErrorFields()
+    public static final List getErrorFields(HttpServletRequest request)
     {
-        return this.errorFields;
+        return (List) request.getAttribute(ERROR_FIELDS_ATTRIBUTE);
+    }
+    
+    /**
+     * Sets th list of all UI fields which had errors that occurred during the
+     * step processing. This list is for usage in generating the appropriate
+     * error message(s) in the UI.
+     * <P>
+     * The list of fields which had errors should be set by the AbstractProcessingStep's
+     * doProcessing() method, so that it can be accessed later by whatever UI is
+     * generated.
+     * 
+     * @param request
+     *            current servlet request object
+     * @param errorFields
+     *            List of all fields (as Strings) which had errors
+     */
+    private static final void setErrorFields(HttpServletRequest request, List errorFields)
+    {
+        if(errorFields==null)
+            request.removeAttribute(ERROR_FIELDS_ATTRIBUTE);
+        else
+            request.setAttribute(ERROR_FIELDS_ATTRIBUTE, errorFields);
     }
 
     /**
-     * Add a single UI field to the internal list of all error fields (which can
+     * Add a single UI field to the list of all error fields (which can
      * later be retrieved using getErrorFields())
      * <P>
-     * The list of fields which had errors should be set by the step's
+     * The list of fields which had errors should be set by the AbstractProcessingStep's
      * doProcessing() method, so that it can be accessed later by whatever UI is
      * generated.
      * 
      * @param fieldName
      *            the name of the field which had an error
      */
-    protected final void addErrorField(String fieldName)
+    protected static final void addErrorField(HttpServletRequest request, String fieldName)
     {
-        if (this.errorFields == null)
+        //get current list
+        List errorFields = getErrorFields(request);
+        
+        if (errorFields == null)
         {
-            this.errorFields = new ArrayList();
+            errorFields = new ArrayList();
         }
 
-        this.errorFields.add(fieldName);
+        //add this field
+        errorFields.add(fieldName);
+        
+        //save updated list
+        setErrorFields(request, errorFields);
     }
 
     /**
      * Clears the list of all fields that errored out during the previous step's
      * processing.
      * 
+     * @param request
+     *        current servlet request object
+     * 
      */
-    protected final void clearErrorFields()
+    protected static final void clearErrorFields(HttpServletRequest request)
     {
-        if (this.errorFields != null)
-            this.errorFields.clear();
+        //get current list
+        List errorFields = getErrorFields(request);
+        
+        if (errorFields != null)
+            setErrorFields(request,null);
     }
 
     /**

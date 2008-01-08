@@ -489,15 +489,6 @@
 	<message key="xmlui.Submission.general.showfull">Show full item record</message>
 	<message key="xmlui.Submission.general.showsimple">Show simple item record</message>
 	
-	<!-- submission progress bar messages -->
-	<message key="xmlui.Submission.general.progress.initial-questions">Initial Questions</message>
-	<message key="xmlui.Submission.general.progress.describe">Describe</message>
-	<message key="xmlui.Submission.general.progress.upload">Upload</message>
-	<message key="xmlui.Submission.general.progress.review">Review</message>
-	<message key="xmlui.Submission.general.progress.creative-commons">Creative Commons</message>
-	<message key="xmlui.Submission.general.progress.license">License</message>
-	<message key="xmlui.Submission.general.progress.complete">Complete</message>
-	
 	<!-- org.dspace.app.xmlui.submission.CollectiovViewer -->
 	<message key="xmlui.Submission.CollectionViewer.link1">Submit a new item to this collection</message>
 	
@@ -559,6 +550,15 @@
 	<message key="xmlui.Submission.Submissions.status_7">Submission has been archived</message>
 	<message key="xmlui.Submission.Submissions.status_unknown">Unknown state</message>
 
+	<!-- submission progress bar messages -->
+	<message key="xmlui.Submission.submit.progressbar.initial-questions">Initial Questions</message>
+	<message key="xmlui.Submission.submit.progressbar.describe">Describe</message>
+	<message key="xmlui.Submission.submit.progressbar.upload">Upload</message>
+	<message key="xmlui.Submission.submit.progressbar.verify">Review</message>
+	<message key="xmlui.Submission.submit.progressbar.creative-commons">Creative Commons</message>
+	<message key="xmlui.Submission.submit.progressbar.license">License</message>
+	<message key="xmlui.Submission.submit.progressbar.complete">Complete</message>
+	
 	<!-- org.dspace.app.xmlui.Submission.submit.ResumeStep -->
 	<message key="xmlui.Submission.submit.ResumeStep.submit_resume">Resume</message>
 	<message key="xmlui.Submission.submit.ResumeStep.submit_cancel">Cancel</message>

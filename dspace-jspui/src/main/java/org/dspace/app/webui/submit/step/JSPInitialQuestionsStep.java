@@ -59,11 +59,11 @@ import org.dspace.core.Context;
 import org.dspace.submit.step.InitialQuestionsStep;
 
 /**
- * Initial Submission servlet for DSpace. Handles the initial questions which
+ * Initial Submission servlet for DSpace JSP-UI. Handles the initial questions which
  * are asked to users to gather information regarding what metadata needs to be
  * gathered.
  * <P>
- * This JSPStepManager class works with the SubmissionController servlet
+ * This JSPStep class works with the SubmissionController servlet
  * for the JSP-UI
  * 
  * The following methods are called in this order:
@@ -73,7 +73,7 @@ import org.dspace.submit.step.InitialQuestionsStep;
  * specified will be displayed</li>
  * <li>If showJSP() was not specified from doPreProcessing(), then the
  * doProcessing() method is called an the step completes immediately</li>
- * <li>Call doProcessing() method after the user returns from the JSP, in order
+ * <li>Call doProcessing() method on appropriate AbstractProcessingStep after the user returns from the JSP, in order
  * to process the user input</li>
  * <li>Call doPostProcessing() method to determine if more user interaction is
  * required, and if further JSPs need to be called.</li>
@@ -90,7 +90,7 @@ import org.dspace.submit.step.InitialQuestionsStep;
  * @author Tim Donohue
  * @version $Revision$
  */
-public class JSPInitialQuestionsStep extends InitialQuestionsStep implements JSPStep
+public class JSPInitialQuestionsStep extends JSPStep
 {
     /** JSP which displays initial questions * */
     private static final String INITIAL_QUESTIONS_JSP = "/submit/initial-questions.jsp";
@@ -101,6 +101,9 @@ public class JSPInitialQuestionsStep extends InitialQuestionsStep implements JSP
     /** JSP which tells the user that theses are not allowed * */
     private static final String NO_THESES_JSP = "/submit/no-theses.jsp";
 
+    /** JSP which displays information to be reviewed during 'verify step' * */
+    private static final String REVIEW_JSP = "/submit/review-init.jsp";
+    
     /** log4j logger */
     private static Logger log = Logger.getLogger(JSPInitialQuestionsStep.class);
 
@@ -178,7 +181,7 @@ public class JSPInitialQuestionsStep extends InitialQuestionsStep implements JSP
         // then prune any excess data.
         if (JSPStepManager.getLastJSPDisplayed(request).equals(VERIFY_PRUNE_JSP))
         {
-            if (status == STATUS_CANCEL_PRUNE)
+            if (status == InitialQuestionsStep.STATUS_CANCEL_PRUNE)
             {
                 // User cancelled pruning (show initial questions again)
                 showInitialQuestions(context, request, response, subInfo);
@@ -188,7 +191,7 @@ public class JSPInitialQuestionsStep extends InitialQuestionsStep implements JSP
         else
         // Otherwise, if just coming from "initial questions" page
         {
-            if (status == STATUS_THESIS_REJECTED)
+            if (status == InitialQuestionsStep.STATUS_THESIS_REJECTED)
             {
                 // Display no-theses JSP to user
                 JSPStepManager.showJSP(request, response, subInfo, NO_THESES_JSP);
@@ -199,7 +202,7 @@ public class JSPInitialQuestionsStep extends InitialQuestionsStep implements JSP
             // If anything is going to be removed from the item as a result
             // of changing the answer to one of the questions, we need
             // to inform the user and make sure that's OK
-            if (status == STATUS_VERIFY_PRUNE)
+            if (status == InitialQuestionsStep.STATUS_VERIFY_PRUNE)
             {
                 showVerifyPrune(context, request, response, subInfo,
                         multipleTitles, publishedBefore, multipleFiles);
@@ -276,15 +279,33 @@ public class JSPInitialQuestionsStep extends InitialQuestionsStep implements JSP
         request.setAttribute("multiple.titles", new Boolean(multipleTitles));
         request.setAttribute("published.before", new Boolean(publishedBefore));
         request.setAttribute("multiple.files", new Boolean(multipleFiles));
-        request.setAttribute("will.remove.titles",
-                new Boolean(willRemoveTitles));
-        request.setAttribute("will.remove.date", new Boolean(willRemoveDate));
-        request.setAttribute("will.remove.files", new Boolean(willRemoveFiles));
         request.setAttribute("button.pressed", UIUtil.getSubmitButton(request,
-                NEXT_BUTTON));
+                InitialQuestionsStep.NEXT_BUTTON));
 
         // forward to verify prune JSP
-        // forward to initial questions JSP
         JSPStepManager.showJSP(request, response, subInfo, VERIFY_PRUNE_JSP);
+    }
+    
+    /**
+     * Return the URL path (e.g. /submit/review-metadata.jsp) of the JSP
+     * which will review the information that was gathered in this Step.
+     * <P>
+     * This Review JSP is loaded by the 'Verify' Step, in order to dynamically
+     * generate a submission verification page consisting of the information
+     * gathered in all the enabled submission steps.
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
+     */
+    public String getReviewJSP(Context context, HttpServletRequest request,
+            HttpServletResponse response, SubmissionInfo subInfo)
+    {
+        return REVIEW_JSP;
     }
 }

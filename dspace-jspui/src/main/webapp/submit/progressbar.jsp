@@ -122,10 +122,11 @@
 		  String heading = (String) progressBarInfo.get(stepAndPage);
 
 		  //if the heading contains a period (.), then assume
-          //it is referencing a property in Messages.properties
+          //it is referencing a key in Messages.properties
           if(heading.indexOf(".") >= 0)
           {
-             heading = LocaleSupport.getLocalizedMessage(pageContext, heading);
+             //prepend the existing key with "jsp." since we are using JSP-UI
+             heading = LocaleSupport.getLocalizedMessage(pageContext, "jsp." + heading);
           }
 
 		  //split into stepNum and pageNum

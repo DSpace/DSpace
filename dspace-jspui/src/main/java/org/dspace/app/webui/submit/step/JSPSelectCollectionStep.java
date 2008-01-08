@@ -62,9 +62,9 @@ import org.dspace.submit.step.SelectCollectionStep;
 
 /**
  * Step which controls selecting a Collection for the Item Submission process
- * for DSpace.
+ * for DSpace JSP-UI
  * <P>
- * This JSPStepManager class works with the SubmissionController servlet
+ * This JSPStep class works with the SubmissionController servlet
  * for the JSP-UI
  * <P>
  * The following methods are called in this order:
@@ -74,7 +74,7 @@ import org.dspace.submit.step.SelectCollectionStep;
  * specified will be displayed</li>
  * <li>If showJSP() was not specified from doPreProcessing(), then the
  * doProcessing() method is called an the step completes immediately</li>
- * <li>Call doProcessing() method after the user returns from the JSP, in order
+ * <li>Call doProcessing() method on appropriate AbstractProcessingStep after the user returns from the JSP, in order
  * to process the user input</li>
  * <li>Call doPostProcessing() method to determine if more user interaction is
  * required, and if further JSPs need to be called.</li>
@@ -91,7 +91,7 @@ import org.dspace.submit.step.SelectCollectionStep;
  * @author Tim Donohue
  * @version $Revision$
  */
-public class JSPSelectCollectionStep extends SelectCollectionStep implements JSPStep
+public class JSPSelectCollectionStep extends JSPStep
 {
     /** JSP which displays HTML for this Class * */
     private static final String SELECT_COLLECTION_JSP = "/submit/select-collection.jsp";
@@ -219,7 +219,7 @@ public class JSPSelectCollectionStep extends SelectCollectionStep implements JSP
     {
         // if the user didn't select a collection,
         // send him/her back to "select a collection" page
-        if (status == STATUS_NO_COLLECTION)
+        if (status == SelectCollectionStep.STATUS_NO_COLLECTION)
         {
             // specify "no collection" error message should be displayed
             request.setAttribute("no.collection", new Boolean(true));
@@ -227,10 +227,33 @@ public class JSPSelectCollectionStep extends SelectCollectionStep implements JSP
             // reload this page, by re-calling doPreProcessing()
             doPreProcessing(context, request, response, subInfo);
         }
-        else if (status == STATUS_INVALID_COLLECTION)
+        else if (status == SelectCollectionStep.STATUS_INVALID_COLLECTION)
         {
             JSPManager.showInvalidIDError(request, response, request
                     .getParameter("collection"), Constants.COLLECTION);
         }
+    }
+    
+    /**
+     * Return the URL path (e.g. /submit/review-metadata.jsp) of the JSP
+     * which will review the information that was gathered in this Step.
+     * <P>
+     * This Review JSP is loaded by the 'Verify' Step, in order to dynamically
+     * generate a submission verification page consisting of the information
+     * gathered in all the enabled submission steps.
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
+     */
+    public String getReviewJSP(Context context, HttpServletRequest request,
+            HttpServletResponse response, SubmissionInfo subInfo)
+    {
+        return NO_JSP;  //at this time, you cannot review what collection you selected.
     }
 }

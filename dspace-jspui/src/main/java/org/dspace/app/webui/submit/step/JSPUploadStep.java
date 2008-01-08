@@ -72,10 +72,10 @@ import org.dspace.core.LogManager;
 import org.dspace.submit.step.UploadStep;
 
 /**
- * Upload step for DSpace. Handles the pages that revolve around uploading files
+ * Upload step for DSpace JSP-UI. Handles the pages that revolve around uploading files
  * (and verifying a successful upload) for an item being submitted into DSpace.
  * <P>
- * This JSPStepManager class works with the SubmissionController servlet
+ * This JSPStep class works with the SubmissionController servlet
  * for the JSP-UI
  * <P>
  * The following methods are called in this order:
@@ -85,7 +85,7 @@ import org.dspace.submit.step.UploadStep;
  * specified will be displayed</li>
  * <li>If showJSP() was not specified from doPreProcessing(), then the
  * doProcessing() method is called an the step completes immediately</li>
- * <li>Call doProcessing() method after the user returns from the JSP, in order
+ * <li>Call doProcessing() method on appropriate AbstractProcessingStep after the user returns from the JSP, in order
  * to process the user input</li>
  * <li>Call doPostProcessing() method to determine if more user interaction is
  * required, and if further JSPs need to be called.</li>
@@ -102,7 +102,7 @@ import org.dspace.submit.step.UploadStep;
  * @author Tim Donohue
  * @version $Revision$
  */
-public class JSPUploadStep extends UploadStep implements JSPStep
+public class JSPUploadStep extends JSPStep
 {
     /** JSP to choose files to upload * */
     private static final String CHOOSE_FILE_JSP = "/submit/choose-file.jsp";
@@ -121,6 +121,9 @@ public class JSPUploadStep extends UploadStep implements JSPStep
 
     /** JSP to show any upload errors * */
     private static final String UPLOAD_ERROR_JSP = "/submit/upload-error.jsp";
+    
+    /** JSP to review uploaded files * */
+    private static final String REVIEW_JSP = "/submit/review-upload.jsp";
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(JSPUploadStep.class);
@@ -166,99 +169,6 @@ public class JSPUploadStep extends UploadStep implements JSPStep
         // (based on if this item already has files or not)
         showUploadPage(context, request, response, subInfo, false);
     }
-
-    /**
-     * Do any processing of the information input by the user, and/or perform
-     * step processing (if no user interaction required)
-     * <P>
-     * It is this method's job to save any data to the underlying database, as
-     * necessary, and return error messages (if any) which can then be processed
-     * by the appropriate user interface (JSP-UI or XML-UI)
-     * <P>
-     * NOTE: If this step is a non-interactive step (i.e. requires no UI), then
-     * it should perform *all* of its processing in this method!
-     * 
-     * @param context
-     *            current DSpace context
-     * @param request
-     *            current servlet request object
-     * @param response
-     *            current servlet response object
-     * @param subInfo
-     *            submission info object
-     * @return Status or error flag which will be processed by
-     *         doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
-     *         no errors occurred!)
-     */
-    public int doProcessing(Context context, HttpServletRequest request,
-            HttpServletResponse response, SubmissionInfo subInfo)
-            throws ServletException, IOException, SQLException,
-            AuthorizeException
-    {
-        //get button user pressed
-        String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
-
-        //JSP UI has to upload the file before it can do other UI-generic processing
-        FileUploadRequest wrapper = null;
-        String filePath = null;
-        InputStream fileInputStream = null;
-        String contentType = request.getContentType();
-
-        if (buttonPressed.equalsIgnoreCase(SUBMIT_UPLOAD_BUTTON))
-        {
-            // if multipart form, then we are uploading a file
-            if ((contentType != null)
-                    && (contentType.indexOf("multipart/form-data") != -1))
-            {
-                try
-                {
-                    // if we already have a FileUploadRequest, use it
-                    if (Class.forName("org.dspace.app.webui.util.FileUploadRequest")
-                            .isInstance(request))
-                    {
-                        wrapper = (FileUploadRequest) request;
-                    }
-                    else
-                    {
-                        // Wrap multipart request to get the submission info
-                        wrapper = new FileUploadRequest(request);
-                    }
-                    
-                    File temp = wrapper.getFile("file");
-                    
-                    //if file exists and has a size greater than zero
-                    if (temp != null && temp.length() > 0)
-                    {
-                        // Read the temp file into an inputstream
-                        fileInputStream = new BufferedInputStream(
-                                new FileInputStream(temp));
-
-                        filePath = wrapper.getFilesystemName("file");
-                    
-                        // cleanup our temp file
-                        temp.delete();
-                    }
-                    
-                    //save file info to request (for UploadStep class)
-                    request.setAttribute("file-path", filePath);
-                    request.setAttribute("file-inputstream", fileInputStream);
-                    request.setAttribute("file-description", wrapper.getParameter("description"));
-                }
-                catch (IOException ie)
-                {
-                    // Problem with uploading
-                    log.warn(LogManager.getHeader(context, "upload_error", ""), ie);
-                }
-                catch (Exception e)
-                {
-                    throw new ServletException(e);
-                }
-            }
-        }
-        
-        //call super method to finish UploadStep processing
-        return super.doProcessing(context, request, response, subInfo);
-    }
     
     /**
      * Do any post-processing after the step's backend processing occurred (in
@@ -288,10 +198,10 @@ public class JSPUploadStep extends UploadStep implements JSPStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        String buttonPressed = UIUtil.getSubmitButton(request, NEXT_BUTTON);
+        String buttonPressed = UIUtil.getSubmitButton(request, UploadStep.NEXT_BUTTON);
 
         // Do we need to skip the upload entirely?
-        if (buttonPressed.equalsIgnoreCase(SUBMIT_SKIP_BUTTON))
+        if (buttonPressed.equalsIgnoreCase(UploadStep.SUBMIT_SKIP_BUTTON))
         {
             Bundle[] bundles = subInfo.getSubmissionItem().getItem()
                     .getBundles("ORIGINAL");
@@ -317,16 +227,16 @@ public class JSPUploadStep extends UploadStep implements JSPStep
         // Check for Errors!
         // ------------------------------
         // if an error or message was passed back, determine what to do!
-        if (status != STATUS_COMPLETE)
+        if (status != UploadStep.STATUS_COMPLETE)
         {
-            if (status == STATUS_INTEGRITY_ERROR)
+            if (status == UploadStep.STATUS_INTEGRITY_ERROR)
             {
                 // Some type of integrity error occurred
                 log.warn(LogManager.getHeader(context, "integrity_error",
                         UIUtil.getRequestLogInfo(request)));
                 JSPManager.showIntegrityError(request, response);
             }
-            else if (status == STATUS_UPLOAD_ERROR || status == STATUS_NO_FILES_ERROR)
+            else if (status == UploadStep.STATUS_UPLOAD_ERROR || status == UploadStep.STATUS_NO_FILES_ERROR)
             {
                 // There was a problem uploading the file!
 
@@ -349,7 +259,7 @@ public class JSPUploadStep extends UploadStep implements JSPStep
                     JSPStepManager.showJSP(request, response, subInfo, UPLOAD_ERROR_JSP);
                 }
             }
-            else if (status == STATUS_UNKNOWN_FORMAT)
+            else if (status == UploadStep.STATUS_UNKNOWN_FORMAT)
             {
                 // user uploaded a file where the format is unknown to DSpace
 
@@ -360,7 +270,7 @@ public class JSPUploadStep extends UploadStep implements JSPStep
         
         // As long as there are no errors, clicking Next
         // should immediately send them to the next step
-        if (status == STATUS_COMPLETE && buttonPressed.equals(NEXT_BUTTON))
+        if (status == UploadStep.STATUS_COMPLETE && buttonPressed.equals(UploadStep.NEXT_BUTTON))
         {
             // just return, so user will continue on to next step!
             return;
@@ -369,7 +279,7 @@ public class JSPUploadStep extends UploadStep implements JSPStep
         // ------------------------------
         // Check for specific buttons
         // ------------------------------
-        if (buttonPressed.equals(SUBMIT_MORE_BUTTON))
+        if (buttonPressed.equals(UploadStep.SUBMIT_MORE_BUTTON))
         {
             // Upload another file (i.e. show the Choose File jsp again)
             showChooseFile(context, request, response, subInfo);
@@ -614,4 +524,27 @@ public class JSPUploadStep extends UploadStep implements JSPStep
         // load JSP which allows the user to select a file to upload
         JSPStepManager.showJSP(request, response, subInfo, FILE_DESCRIPTION_JSP);
     }
+    
+    /**
+     * Return the URL path (e.g. /submit/review-metadata.jsp) of the JSP
+     * which will review the information that was gathered in this Step.
+     * <P>
+     * This Review JSP is loaded by the 'Verify' Step, in order to dynamically
+     * generate a submission verification page consisting of the information
+     * gathered in all the enabled submission steps.
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
+     */
+    public String getReviewJSP(Context context, HttpServletRequest request,
+            HttpServletResponse response, SubmissionInfo subInfo)
+    {
+        return REVIEW_JSP;
+    } 
 }

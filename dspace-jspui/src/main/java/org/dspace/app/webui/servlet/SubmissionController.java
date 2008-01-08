@@ -39,8 +39,13 @@
  */
 package org.dspace.app.webui.servlet;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -50,6 +55,7 @@ import org.apache.log4j.Logger;
 
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.SubmissionStepConfig;
+import org.dspace.app.util.Util;
 import org.dspace.app.webui.submit.JSPStepManager;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
@@ -62,6 +68,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.submit.AbstractProcessingStep;
+import org.dspace.submit.step.UploadStep;
 
 /**
  * Submission Manager servlet for DSpace. Handles the initial submission of
@@ -124,9 +131,6 @@ public class SubmissionController extends DSpaceServlet
     /** First step after "select collection" */
     public static int FIRST_STEP = 1;
     
-    /** "Name" of the JSP User Interface - Used to load SubmissionInfo **/
-    public static String UI_NAME = "JSPUI";
-
     /** path to the JSP shown once the submission is completed */
     private static String COMPLETE_JSP = "/submit/complete.jsp";
 
@@ -170,7 +174,7 @@ public class SubmissionController extends DSpaceServlet
                         .parseInt(workspaceID));
 
                 //load submission information
-                SubmissionInfo si = SubmissionInfo.load(request, UI_NAME, wi);
+                SubmissionInfo si = SubmissionInfo.load(request, wi);
                 
                 //TD: Special case - If a user is resuming a submission
                 //where the submission process now has less steps, then
@@ -214,7 +218,7 @@ public class SubmissionController extends DSpaceServlet
                         .parseInt(workflowID));
 
                 //load submission information
-                SubmissionInfo si = SubmissionInfo.load(request, UI_NAME, wi);
+                SubmissionInfo si = SubmissionInfo.load(request, wi);
                 
                 //For workflows, first step is step #0 
                 //(since Select Collection is already filtered out)
@@ -254,6 +258,9 @@ public class SubmissionController extends DSpaceServlet
                 && (contentType.indexOf("multipart/form-data") != -1))
         {
             request = wrapMultipartRequest(request);
+            
+            //also, upload any files and save their contents to Request (for later processing by UploadStep)
+            uploadFiles(context, request);
         }
         
         // Reload submission info from request parameters
@@ -394,7 +401,7 @@ public class SubmissionController extends DSpaceServlet
         try
         {
             
-            JSPStepManager stepManager = JSPStepManager.loadStep(currentStepConfig.getProcessingClassName());
+            JSPStepManager stepManager = JSPStepManager.loadStep(currentStepConfig);
            
             //tell the step class to do its processing
             boolean stepFinished = stepManager.processStep(context, request, response, subInfo);   
@@ -482,20 +489,7 @@ public class SubmissionController extends DSpaceServlet
             else
             {
                 // The Submission is COMPLETE!!
-                /*
-                log.info(LogManager.getHeader(context, "submission_complete",
-                        "Completed submission with id="
-                                + subInfo.getSubmissionItem().getID()));
-    
-                // save that user has reached last step
-                userHasReached(subInfo, currentStepNum + 1);
-    
-                // Start the workflow
-                WorkflowManager.start(context, (WorkspaceItem)subInfo.getSubmissionItem());
-    
-                // commit changes to database & close context
-                context.complete();
-                */
+               
                 // save our current Submission information into the Request object
                 saveSubmissionInfo(request, subInfo);
     
@@ -905,19 +899,19 @@ public class SubmissionController extends DSpaceServlet
             {
                 int workflowID = UIUtil.getIntParameter(request, "workflow_id");
                 
-                info = SubmissionInfo.load(request, UI_NAME, WorkflowItem.find(context, workflowID));
+                info = SubmissionInfo.load(request, WorkflowItem.find(context, workflowID));
             }
             else if(request.getParameter("workspace_item_id") != null)
             {
                 int workspaceID = UIUtil.getIntParameter(request,
                         "workspace_item_id");
                 
-                info = SubmissionInfo.load(request, UI_NAME, WorkspaceItem.find(context, workspaceID));
+                info = SubmissionInfo.load(request, WorkspaceItem.find(context, workspaceID));
             }
             else
             {
                 //by default, initialize Submission Info with no item
-                info = SubmissionInfo.load(request, UI_NAME, null);
+                info = SubmissionInfo.load(request, null);
             }
             
             // We must have a submission object if after the first step,
@@ -1297,4 +1291,70 @@ public class SubmissionController extends DSpaceServlet
             throw new ServletException(e);
         }
     }
+    
+    
+    /**
+     * Upload any files found on the Request, and save them back as 
+     * Request attributes, for further processing by the appropriate user interface.
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     */
+    public void uploadFiles(Context context, HttpServletRequest request)
+            throws ServletException
+    {
+        FileUploadRequest wrapper = null;
+        String filePath = null;
+        InputStream fileInputStream = null;
+
+        try
+        {
+            // if we already have a FileUploadRequest, use it
+            if (Class.forName("org.dspace.app.webui.util.FileUploadRequest")
+                    .isInstance(request))
+            {
+                wrapper = (FileUploadRequest) request;
+            }
+            else
+            {
+                // Wrap multipart request to get the submission info
+                wrapper = new FileUploadRequest(request);
+            }
+            
+            Enumeration fileParams = wrapper.getFileParameterNames();
+            while(fileParams.hasMoreElements())
+            {
+                String fileName = (String) fileParams.nextElement();
+                
+                File temp = wrapper.getFile(fileName);
+                
+                //if file exists and has a size greater than zero
+                if (temp != null && temp.length() > 0)
+                {
+                    // Read the temp file into an inputstream
+                    fileInputStream = new BufferedInputStream(
+                            new FileInputStream(temp));
+
+                    filePath = wrapper.getFilesystemName(fileName);
+                
+                    // cleanup our temp file
+                    temp.delete();
+                    
+                    //save this file's info to request (for UploadStep class)
+                    request.setAttribute(fileName + "-path", filePath);
+                    request.setAttribute(fileName + "-inputstream", fileInputStream);
+                    request.setAttribute(fileName + "-description", wrapper.getParameter("description"));
+                }         
+            }
+        }
+        catch (Exception e)
+        {
+            // Problem with uploading
+            log.warn(LogManager.getHeader(context, "upload_error", ""), e);
+            throw new ServletException(e);
+        }
+    }
+    
 }

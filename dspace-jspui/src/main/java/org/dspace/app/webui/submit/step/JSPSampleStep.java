@@ -68,11 +68,12 @@ import org.dspace.submit.step.SampleStep;
  * <p>
  * This step can be added to any Submission process (for testing purposes) by
  * adding the following to the appropriate <submission-process> tag in the
- * /config/item-submission-JSPUI.xml:
+ * /config/item-submission.xml:
  * 
- * <step> <heading>Sample</heading>
- * <class-name>org.dspace.app.webui.submit.step.JSPSampleStep</class-name>
- * <review-jsp>/submit/sample-review.jsp</review-jsp> 
+ * <step> 
+ * <heading>Sample</heading>
+ * <processing-class>org.dspace.submit.step.SampleStep</processing-class>
+ * <jspui-binding>org.dspace.app.webui.submit.step.JSPSampleStep</jspui-binding> 
  * <workflow-editable>true</workflow-editable>
  * </step>
  *
@@ -84,7 +85,7 @@ import org.dspace.submit.step.SampleStep;
  * specified will be displayed</li>
  * <li>If showJSP() was not specified from doPreProcessing(), then the
  * doProcessing() method is called an the step completes immediately</li>
- * <li>Call doProcessing() method after the user returns from the JSP, in order
+ * <li>Call doProcessing() method on appropriate AbstractProcessingStep after the user returns from the JSP, in order
  * to process the user input</li>
  * <li>Call doPostProcessing() method to determine if more user interaction is
  * required, and if further JSPs need to be called.</li>
@@ -101,10 +102,17 @@ import org.dspace.submit.step.SampleStep;
  * @author Tim Donohue
  * @version $Revision$
  */
-public class JSPSampleStep extends SampleStep implements JSPStep
+public class JSPSampleStep extends JSPStep
 {
     /** log4j logger */
     private static Logger log = Logger.getLogger(JSPSampleStep.class);
+    
+    /** JSP which displays the step to the user * */
+    private static final String DISPLAY_JSP = "/submit/sample-step.jsp";
+
+    
+    /** JSP which displays information to be reviewed during 'verify step' * */
+    private static final String REVIEW_JSP = "/submit/review-sample.jsp";
 
     /**
      * Do any pre-processing to determine which JSP (if any) is used to generate
@@ -181,7 +189,7 @@ public class JSPSampleStep extends SampleStep implements JSPStep
         request.setAttribute("my.url", myDSpaceURL);
 
         // Tell JSPStepManager class to load "sample-step.jsp"
-        JSPStepManager.showJSP(request, response, subInfo, "/submit/sample-step.jsp");
+        JSPStepManager.showJSP(request, response, subInfo, DISPLAY_JSP);
     }
 
     /**
@@ -251,7 +259,7 @@ public class JSPSampleStep extends SampleStep implements JSPStep
         // has more than one "page" within the Progress Bar. It can
         // help you determine which Page the user just came from,
         // as well as determine which JSP to load in doPreProcessing()
-        int currentPageNum = getCurrentPage(request);
+        int currentPageNum = SampleStep.getCurrentPage(request);
 
         // This function returns the NAME of the button the user
         // just pressed in order to submit the form.
@@ -289,7 +297,7 @@ public class JSPSampleStep extends SampleStep implements JSPStep
         }
 
         // Here's some sample error message processing!
-        if (status == STATUS_USER_INPUT_ERROR)
+        if (status == SampleStep.STATUS_USER_INPUT_ERROR)
         {
             // special processing for this error message
         }
@@ -378,4 +386,28 @@ public class JSPSampleStep extends SampleStep implements JSPStep
         // in most cases, you'll want to just return 1
         return 1;
     }
+    
+    /**
+     * Return the URL path (e.g. /submit/review-metadata.jsp) of the JSP
+     * which will review the information that was gathered in this Step.
+     * <P>
+     * This Review JSP is loaded by the 'Verify' Step, in order to dynamically
+     * generate a submission verification page consisting of the information
+     * gathered in all the enabled submission steps.
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
+     */
+    public String getReviewJSP(Context context, HttpServletRequest request,
+            HttpServletResponse response, SubmissionInfo subInfo)
+    {
+        return REVIEW_JSP;
+    }
+    
 }

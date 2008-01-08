@@ -94,7 +94,7 @@ import org.dspace.submit.step.VerifyStep;
  * @author Tim Donohue
  * @version $Revision$
  */
-public class JSPVerifyStep extends VerifyStep implements JSPStep
+public class JSPVerifyStep extends JSPStep
 {
     /** JSP which displays initial questions * */
     public static final String VERIFY_JSP = "/submit/review.jsp";
@@ -173,14 +173,25 @@ public class JSPVerifyStep extends VerifyStep implements JSPStep
                 // load this step's information
                 SubmissionStepConfig s = subProcessConfig.getStep(stepNum);
 
-                // get this step's review JSP
-                String reviewJSP = s.getReviewJSP();
-
-                if ((reviewJSP != null) && (reviewJSP.length() > 0))
+                try
                 {
-                    // save the path to this steps JSP to our reviewData Hashmap
-                    // (with the key = stepNum.pageNum)
-                    reviewData.put(stepAndPage, reviewJSP);
+                    JSPStepManager stepManager = JSPStepManager.loadStep(s);
+                
+                    // get this step's review JSP
+                    String reviewJSP = stepManager.getReviewJSP(context, request, response, subInfo);
+
+                    if ((reviewJSP != null) && (reviewJSP.length() > 0))
+                    {
+                        // save the path to this steps JSP to our reviewData Hashmap
+                        // (with the key = stepNum.pageNum)
+                        reviewData.put(stepAndPage, reviewJSP);
+                    }
+                }
+                catch(Exception e)
+                {
+                    log.error("Problem loading Review JSP for step #" + s.getStepNumber() + ".  ", e);
+                    JSPManager.showIntegrityError(request, response);
+                    return;
                 }
             }
         }
@@ -232,5 +243,28 @@ public class JSPVerifyStep extends VerifyStep implements JSPStep
             AuthorizeException
     {
         // nothing to do from the Verify Step.
+    }
+    
+    /**
+     * Return the URL path (e.g. /submit/review-metadata.jsp) of the JSP
+     * which will review the information that was gathered in this Step.
+     * <P>
+     * This Review JSP is loaded by the 'Verify' Step, in order to dynamically
+     * generate a submission verification page consisting of the information
+     * gathered in all the enabled submission steps.
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
+     */
+    public String getReviewJSP(Context context, HttpServletRequest request,
+            HttpServletResponse response, SubmissionInfo subInfo)
+    {
+        return NO_JSP; //no review JSP, since this is the verification step
     }
 }
