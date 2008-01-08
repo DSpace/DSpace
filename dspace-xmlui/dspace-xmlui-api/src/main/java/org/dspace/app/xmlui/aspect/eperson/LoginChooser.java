@@ -197,33 +197,36 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
 					.next();
 
 			final Item item = list.addItem();
-			String loginURL;
-			if (ConfigurationManager.getBooleanProperty("xmlui.force.ssl")
-					&& !request.isSecure()) {
-				StringBuffer location = new StringBuffer("https://");
-				location
-						.append(ConfigurationManager.getProperty("dspace.hostname"))
-						.append(
-								authMethod
-										.loginPageURL(
-												context,
-												(HttpServletRequest) this.objectModel
-														.get(HttpEnvironment.HTTP_REQUEST_OBJECT),
-												(HttpServletResponse) this.objectModel
-														.get(HttpEnvironment.HTTP_RESPONSE_OBJECT)))
-						.append(
-								request.getQueryString() == null ? ""
-										: ("?" + request.getQueryString()));
-				loginURL = location.toString();
-			} else {
-				loginURL = authMethod.loginPageURL(context,
-						(HttpServletRequest) this.objectModel
-								.get(HttpEnvironment.HTTP_REQUEST_OBJECT),
-						(HttpServletResponse) this.objectModel
-								.get(HttpEnvironment.HTTP_RESPONSE_OBJECT));
-			}
 
-			item.addXref(loginURL, message(authMethod.loginPageTitle(context)));
+            HttpServletRequest hreq = (HttpServletRequest) this.objectModel
+                    .get(HttpEnvironment.HTTP_REQUEST_OBJECT);
+
+            HttpServletResponse hresp = (HttpServletResponse) this.objectModel
+                    .get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+            
+            String loginURL = authMethod.loginPageURL(context, hreq, hresp);
+
+            String authTitle = authMethod.loginPageTitle(context);
+
+            if (loginURL != null && authTitle != null)
+            {
+
+                if (ConfigurationManager.getBooleanProperty("xmlui.force.ssl")
+                        && !request.isSecure())
+                {
+                    StringBuffer location = new StringBuffer("https://");
+                    location
+                            .append(
+                                    ConfigurationManager
+                                            .getProperty("dspace.hostname"))
+                            .append(loginURL).append(
+                                    request.getQueryString() == null ? ""
+                                            : ("?" + request.getQueryString()));
+                    loginURL = location.toString();
+                }
+
+                item.addXref(loginURL, message(authTitle));
+            }
 
 		}
 	}
