@@ -54,6 +54,7 @@ import org.dspace.content.Item;
 import org.dspace.content.dao.CollectionDAO;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.UnsupportedIdentifierException;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -326,22 +327,29 @@ public class CollectionDAOPostgres extends CollectionDAO
 
     private Collection retrieve(TableRow row)
     {
-        if (row == null)
+        try
         {
-            return null;
+            if (row == null)
+            {
+                return null;
+            }
+
+            int id = row.getIntColumn("collection_id");
+            Collection collection = new Collection(context, id);
+            populateCollectionFromTableRow(collection, row);
+
+            // FIXME: I'd like to bump the rest of this up into the superclass
+            // so we don't have to do it for every implementation, but I can't
+            // figure out a clean way of doing this yet.
+            List<ExternalIdentifier> identifiers = identifierDAO.retrieve(collection);
+            collection.setExternalIdentifiers(identifiers);
+
+            return collection;
         }
-
-        int id = row.getIntColumn("collection_id");
-        Collection collection = new Collection(context, id);
-        populateCollectionFromTableRow(collection, row);
-
-        // FIXME: I'd like to bump the rest of this up into the superclass
-        // so we don't have to do it for every implementation, but I can't
-        // figure out a clean way of doing this yet.
-        List<ExternalIdentifier> identifiers = identifierDAO.retrieve(collection);
-        collection.setExternalIdentifiers(identifiers);
-
-        return collection;
+        catch (UnsupportedIdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     private List<Collection> returnAsList(TableRowIterator tri)

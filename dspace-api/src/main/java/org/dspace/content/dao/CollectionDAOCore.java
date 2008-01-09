@@ -56,6 +56,7 @@ import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierMint;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ObjectIdentifierMint;
+import org.dspace.uri.UnsupportedIdentifierException;
 import org.dspace.workflow.WorkflowItem;
 
 import java.io.IOException;
@@ -77,50 +78,49 @@ public class CollectionDAOCore extends CollectionDAO
     @Override
     public Collection create() throws AuthorizeException
     {
-        Collection collection = childDAO.create();
-
-        // now assign an object identifier
-        /*
-        ObjectIdentifier oid = new ObjectIdentifier(true);
-        collection.setIdentifier(oid);*/
-        ObjectIdentifier oid = ObjectIdentifierMint.mint(context, collection);
-
-        // Create a default persistent identifier for this Collection, and
-        // add it to the in-memory Colleciton object.
-        //ExternalIdentifier identifier = identifierDAO.create(collection);
-        //collection.addExternalIdentifier(identifier);
-
-        // now assign any required external identifiers
-        List<ExternalIdentifier> eids = ExternalIdentifierMint.mintAll(context, collection);
-        collection.setExternalIdentifiers(eids);
-
-        // create the default authorization policy for collections
-        // of 'anonymous' READ
-        Group anonymousGroup = groupDAO.retrieve(0);
-
-        int actions[] = {
-            Constants.READ,
-            Constants.DEFAULT_ITEM_READ,
-            Constants.DEFAULT_BITSTREAM_READ
-        };
-
-        for (int action : actions)
+        try
         {
-            ResourcePolicy policy = ResourcePolicy.create(context);
-            policy.setResource(collection);
-            policy.setAction(action);
-            policy.setGroup(anonymousGroup);
-            policy.update();
+            Collection collection = childDAO.create();
+
+            // now assign an object identifier
+            ObjectIdentifier oid = ObjectIdentifierMint.mint(context, collection);
+
+            // now assign any required external identifiers
+            List<ExternalIdentifier> eids = ExternalIdentifierMint.mintAll(context, collection);
+            collection.setExternalIdentifiers(eids);
+
+            // create the default authorization policy for collections
+            // of 'anonymous' READ
+            Group anonymousGroup = groupDAO.retrieve(0);
+
+            int actions[] = {
+                Constants.READ,
+                Constants.DEFAULT_ITEM_READ,
+                Constants.DEFAULT_BITSTREAM_READ
+            };
+
+            for (int action : actions)
+            {
+                ResourcePolicy policy = ResourcePolicy.create(context);
+                policy.setResource(collection);
+                policy.setAction(action);
+                policy.setGroup(anonymousGroup);
+                policy.update();
+            }
+
+            update(collection);
+
+            log.info(LogManager.getHeader(context, "create_collection",
+                    "collection_id=" + collection.getID())
+                    + ",uri=" +
+                    collection.getIdentifier().getCanonicalForm());
+
+            return collection;
         }
-
-        update(collection);
-
-        log.info(LogManager.getHeader(context, "create_collection",
-                "collection_id=" + collection.getID())
-                + ",uri=" +
-                collection.getIdentifier().getCanonicalForm());
-
-        return collection;
+        catch (UnsupportedIdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

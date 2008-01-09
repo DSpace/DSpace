@@ -53,6 +53,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.dao.BitstreamDAO;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.UnsupportedIdentifierException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -246,22 +247,29 @@ public class BitstreamDAOPostgres extends BitstreamDAO
 
     private Bitstream retrieve(TableRow row)
     {
-        if (row == null)
+        try
         {
-            return null;
+            if (row == null)
+            {
+                return null;
+            }
+
+            int id = row.getIntColumn("bitstream_id");
+            Bitstream bitstream = new Bitstream(context, id);
+            populateBitstreamFromTableRow(bitstream, row);
+
+            // FIXME: I'd like to bump the rest of this up into the superclass
+            // so we don't have to do it for every implementation, but I can't
+            // figure out a clean way of doing this yet.
+            List<ExternalIdentifier> identifiers = identifierDAO.retrieve(bitstream);
+            bitstream.setExternalIdentifiers(identifiers);
+
+            return bitstream;
         }
-
-        int id = row.getIntColumn("bitstream_id");
-        Bitstream bitstream = new Bitstream(context, id);
-        populateBitstreamFromTableRow(bitstream, row);
-
-        // FIXME: I'd like to bump the rest of this up into the superclass
-        // so we don't have to do it for every implementation, but I can't
-        // figure out a clean way of doing this yet.
-        List<ExternalIdentifier> identifiers = identifierDAO.retrieve(bitstream);
-        bitstream.setExternalIdentifiers(identifiers);
-
-        return bitstream;
+        catch (UnsupportedIdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     private List<Bitstream> returnAsList(TableRowIterator tri)

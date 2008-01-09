@@ -39,10 +39,6 @@
  */
 package org.dspace.eperson;
 
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -52,6 +48,12 @@ import org.dspace.core.Utils;
 import org.dspace.eperson.dao.EPersonDAO;
 import org.dspace.eperson.dao.EPersonDAOFactory;
 import org.dspace.event.Event;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.UnsupportedIdentifierException;
+
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Class representing an e-person.
@@ -192,6 +194,27 @@ public class EPerson extends DSpaceObject
         return getEmail();
     }
 
+    // Identifier handling methods; override some default functionality
+
+    public List<ExternalIdentifier> getExternalIdentifiers()
+    {
+        return null;
+    }
+
+    public void addExternalIdentifier(ExternalIdentifier identifier)
+            throws UnsupportedIdentifierException
+    {
+        throw new UnsupportedIdentifierException("EPerson object cannot have ExternalIdentifiers");
+    }
+
+    public void setExternalIdentifiers(List<ExternalIdentifier> identifiers)
+            throws UnsupportedIdentifierException
+    {
+        throw new UnsupportedIdentifierException("EPerson object cannot have ExternalIdentifiers");
+    }
+
+    // end identifier handling methos
+    
     /**
      * Get the e-person's full name, combining first and last name in a
      * displayable string.

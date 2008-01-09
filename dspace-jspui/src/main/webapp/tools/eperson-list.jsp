@@ -60,6 +60,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.eperson.EPerson" %>
+<%@ page import="org.dspace.uri.SimpleIdentifier" %>
 
 <%
 	int PAGESIZE = 50;
@@ -241,26 +242,16 @@ function clearEPeople()
    {  %>
        <tr>
             <th class="oddRowOddCol">&nbsp;</th>
-            <th class="oddRowEvenCol"><fmt:message key="jsp.tools.eperson-list.th.id" /></th>
             <th class="oddRowOddCol"><fmt:message key="jsp.tools.eperson-list.th.email" /></th>
             <th class="oddRowEvenCol"><fmt:message key="jsp.tools.eperson-list.th.lastname" /></th>
             <th class="oddRowOddCol"><fmt:message key="jsp.tools.eperson-list.th.lastname" /></th>
+           <th class="oddRowEvenCol"><fmt:message key="jsp.tools.eperson-list.th.id" /></th>
         </tr>
 <% }
    else 
    {  %>
         <tr>
             <th id="t1" class="oddRowOddCol">&nbsp;</th>
-            <th id="t2" class="oddRowEvenCol"><%
-                if (sortBy == EPerson.ID)
-                {
-                    %><strong><fmt:message key="jsp.tools.eperson-list.th.id.sortedby" /></strong><%
-                }
-                else
-                {
-                    %><a href="<%= sortLink %>id"><fmt:message key="jsp.tools.eperson-list.th.id" /></a><%
-                }
-            %></th>
             <th id="t3" class="oddRowOddCol"><%
                 if (sortBy == EPerson.EMAIL)
                 {
@@ -295,6 +286,16 @@ function clearEPeople()
                     %><a href="<%= sortLink %>language"><fmt:message key="jsp.tools.eperson-list.th.language" /></a><%
                 }
             %></th>
+            <th id="t2" class="oddRowEvenCol"><%
+                if (sortBy == EPerson.ID)
+                {
+                    %><strong><fmt:message key="jsp.tools.eperson-list.th.id.sortedby" /></strong><%
+                }
+                else
+                {
+                    %><a href="<%= sortLink %>id"><fmt:message key="jsp.tools.eperson-list.th.id" /></a><%
+                }
+            %></th>
             
         </tr>
 <%  }
@@ -312,13 +313,18 @@ function clearEPeople()
         EPerson e = epeople[i];
 		// Make sure no quotes in full name will mess up our Javascript
         String fullname = e.getFullName().replace('\'', ' ');
+        SimpleIdentifier sid = e.getSimpleIdentifier();
+        String identifier = "ERROR";
+        if (sid != null)
+        {
+            identifier = sid.getCanonicalForm();
+        }
 %>
         <tr>
 			<td headers="t1" class="<%= row %>RowOddCol">
 			    <input type="button" value="<%
 	if (multiple) { %><fmt:message key="jsp.tools.general.add"/><% }
 	else {          %><fmt:message key="jsp.tools.general.select"/><% } %>" onclick="javascript:<%= clearList %>addEPerson(<%= e.getID() %>, '<%= e.getEmail() %>', '<%= fullname %>');<%= closeWindow %>"/></td>
-			<td headers="t2" class="<%= row %>RowEvenCol"><%= e.getID() %></td>
 			<td headers="t3" class="<%= row %>RowOddCol"><%= e.getEmail() %></td>
             <td headers="t4" class="<%= row %>RowEvenCol">
                 <%= (e.getLastName() == null ? "" : e.getLastName()) %>
@@ -329,6 +335,7 @@ function clearEPeople()
             <td headers="t6" class="<%= row %>RowOddCol">
                 <%= (e.getLanguage() == null ? "" : e.getLanguage()) %>
             </td>
+            <td headers="t2" class="<%= row %>RowEvenCol"><%= identifier %></td>
         </tr>
 <%
         row = (row.equals("odd") ? "even" : "odd");

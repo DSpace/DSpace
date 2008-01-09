@@ -57,6 +57,8 @@ import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.dao.EPersonDAO;
+import org.dspace.eperson.dao.EPersonDAOFactory;
 import org.dspace.uri.dao.ObjectIdentifierDAO;
 import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
 
@@ -222,6 +224,9 @@ public class ObjectIdentifier extends SimpleIdentifier implements ResolvableIden
             case (Constants.COMMUNITY):
                 CommunityDAO communityDAO = CommunityDAOFactory.getInstance(context);
                 return communityDAO.retrieve(resourceID);
+            case (Constants.EPERSON):
+                EPersonDAO epDAO = EPersonDAOFactory.getInstance(context);
+                return epDAO.retrieve(resourceID);
             default:
                 throw new RuntimeException("Not a valid DSpaceObject type");
         }

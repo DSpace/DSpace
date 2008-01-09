@@ -56,6 +56,7 @@ import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierMint;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ObjectIdentifierMint;
+import org.dspace.uri.UnsupportedIdentifierException;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -75,42 +76,57 @@ public class ItemDAOCore extends ItemDAO
 
     public Item create() throws AuthorizeException
     {
-        // first create the item record
-        Item item = childDAO.create();
 
-        // now assign an object identifier
-        /*
-        ObjectIdentifier oid = new ObjectIdentifier(true);
-        item.setIdentifier(oid);*/
-        ObjectIdentifier oid = ObjectIdentifierMint.mint(context, item);
+        try
+        {
+            // first create the item record
+            Item item = childDAO.create();
 
-        // now assign any required external identifiers
-        List<ExternalIdentifier> eids = ExternalIdentifierMint.mintAll(context, item);
-        item.setExternalIdentifiers(eids);
+            // now assign an object identifier
+            /*
+            ObjectIdentifier oid = new ObjectIdentifier(true);
+                item.setIdentifier(oid);*/
+            ObjectIdentifier oid = ObjectIdentifierMint.mint(context, item);
 
-        log.info(LogManager.getHeader(context, "create_item",
-                "item_id=" + item.getID() + ",uuid=" + oid.getCanonicalForm()));
+            // now assign any required external identifiers
+            List<ExternalIdentifier> eids = ExternalIdentifierMint.mintAll(context, item);
+            item.setExternalIdentifiers(eids);
 
-        item.setLastModified(new Date());
-        update(item);
+            log.info(LogManager.getHeader(context, "create_item",
+                    "item_id=" + item.getID() + ",uuid=" + oid.getCanonicalForm()));
 
-        return item;
+            item.setLastModified(new Date());
+            update(item);
+
+            return item;
+        }
+        catch (UnsupportedIdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public Item retrieve(int id)
     {
-        Item item = (Item) context.fromCache(Item.class, id);
-
-        if (item == null)
+        try
         {
-            item = childDAO.retrieve(id);
+            Item item = (Item) context.fromCache(Item.class, id);
+
+            if (item == null)
+            {
+                item = childDAO.retrieve(id);
+            }
+
+            // get the external identifiers for the item
+            List<ExternalIdentifier> eids = identifierDAO.retrieve(item);
+            item.setExternalIdentifiers(eids);
+
+            return item;
         }
-
-        // get the external identifiers for the item
-        List<ExternalIdentifier> eids = identifierDAO.retrieve(item);
-        item.setExternalIdentifiers(eids);
-
-        return item;
+        catch (UnsupportedIdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public void update(Item item) throws AuthorizeException

@@ -39,11 +39,7 @@
  */
 package org.dspace.eperson.dao;
 
-import java.util.List;
-import java.util.UUID;
-
 import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.dao.CRUD;
@@ -51,6 +47,11 @@ import org.dspace.dao.StackableDAO;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPerson.EPersonMetadataField;
 import org.dspace.eperson.Group;
+import org.dspace.uri.dao.ObjectIdentifierDAO;
+import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author James Rutherford
@@ -62,6 +63,8 @@ public abstract class EPersonDAO extends StackableDAO<EPersonDAO>
 
     protected EPersonDAO childDAO;
 
+    protected ObjectIdentifierDAO oidDAO;
+
     protected Context context;
 
     public EPersonDAO()
@@ -71,6 +74,7 @@ public abstract class EPersonDAO extends StackableDAO<EPersonDAO>
     public EPersonDAO(Context context)
     {
         this.context = context;
+        oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
     }
 
     public EPersonDAO getChild()

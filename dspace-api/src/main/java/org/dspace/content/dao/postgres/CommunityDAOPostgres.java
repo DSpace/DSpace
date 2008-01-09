@@ -53,6 +53,7 @@ import org.dspace.content.Item;
 import org.dspace.content.dao.CommunityDAO;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.UnsupportedIdentifierException;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -392,23 +393,30 @@ public class CommunityDAOPostgres extends CommunityDAO
 
     private Community retrieve(TableRow row)
     {
-        if (row == null)
+        try
         {
-            return null;
+            if (row == null)
+            {
+                return null;
+            }
+
+            int id = row.getIntColumn("community_id");
+            Community community = new Community(context, id);
+            populateCommunityFromTableRow(community, row);
+
+            // FIXME: I'd like to bump the rest of this up into the superclass
+            // so we don't have to do it for every implementation, but I can't
+            // figure out a clean way of doing this yet.
+            List<ExternalIdentifier> identifiers = identifierDAO.retrieve(community);
+            // List<ExternalIdentifier> identifiers = identifierDAO.getExternalIdentifiers(community);
+            community.setExternalIdentifiers(identifiers);
+
+            return community;
         }
-
-        int id = row.getIntColumn("community_id");
-        Community community = new Community(context, id);
-        populateCommunityFromTableRow(community, row);
-
-        // FIXME: I'd like to bump the rest of this up into the superclass
-        // so we don't have to do it for every implementation, but I can't
-        // figure out a clean way of doing this yet.
-        List<ExternalIdentifier> identifiers = identifierDAO.retrieve(community);
-        // List<ExternalIdentifier> identifiers = identifierDAO.getExternalIdentifiers(community);
-        community.setExternalIdentifiers(identifiers);
-
-        return community;
+        catch (UnsupportedIdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     private List<Community> returnAsList(TableRowIterator tri)

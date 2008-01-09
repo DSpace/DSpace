@@ -55,6 +55,7 @@ import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierMint;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ObjectIdentifierMint;
+import org.dspace.uri.UnsupportedIdentifierException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -74,49 +75,48 @@ public class CommunityDAOCore extends CommunityDAO
     @Override
     public Community create() throws AuthorizeException
     {
-        // Only administrators and adders can create communities
-        if (!(AuthorizeManager.isAdmin(context)))
+        try
         {
-            throw new AuthorizeException(
-                    "Only administrators can create communities");
+            // Only administrators and adders can create communities
+            if (!(AuthorizeManager.isAdmin(context)))
+            {
+                throw new AuthorizeException(
+                        "Only administrators can create communities");
+            }
+
+            Community community = childDAO.create();
+
+            // now assign an object identifier
+            ObjectIdentifier oid = ObjectIdentifierMint.mint(context, community);
+
+            // now assign any required external identifiers
+            List<ExternalIdentifier> eids = ExternalIdentifierMint.mintAll(context, community);
+            community.setExternalIdentifiers(eids);
+
+            // create the default authorization policy for communities
+            // of 'anonymous' READ
+            Group anonymousGroup = groupDAO.retrieve(0);
+
+            ResourcePolicyDAO policyDAO =
+                    ResourcePolicyDAOFactory.getInstance(context);
+            ResourcePolicy policy = policyDAO.create();
+            policy.setResource(community);
+            policy.setAction(Constants.READ);
+            policy.setGroup(anonymousGroup);
+            policyDAO.update(policy);
+
+            log.info(LogManager.getHeader(context, "create_community",
+                    "community_id=" + community.getID()) + ",uri=" +
+                    community.getIdentifier().getCanonicalForm());
+
+            update(community);
+
+            return community;
         }
-
-        Community community = childDAO.create();
-
-        // now assign an object identifier
-        /*
-        ObjectIdentifier oid = new ObjectIdentifier(true);
-        community.setIdentifier(oid);*/
-        ObjectIdentifier oid = ObjectIdentifierMint.mint(context, community);
-
-        // Create a default persistent identifier for this Community, and
-        // add it to the in-memory Community object.
-        //ExternalIdentifier identifier = identifierDAO.create(community);
-        //community.addExternalIdentifier(identifier);
-
-        // now assign any required external identifiers
-        List<ExternalIdentifier> eids = ExternalIdentifierMint.mintAll(context, community);
-        community.setExternalIdentifiers(eids);
-
-        // create the default authorization policy for communities
-        // of 'anonymous' READ
-        Group anonymousGroup = groupDAO.retrieve(0);
-
-        ResourcePolicyDAO policyDAO =
-                ResourcePolicyDAOFactory.getInstance(context);
-        ResourcePolicy policy = policyDAO.create();
-        policy.setResource(community);
-        policy.setAction(Constants.READ);
-        policy.setGroup(anonymousGroup);
-        policyDAO.update(policy);
-
-        log.info(LogManager.getHeader(context, "create_community",
-                "community_id=" + community.getID()) + ",uri=" +
-                community.getIdentifier().getCanonicalForm());
-
-        update(community);
-
-        return community;
+        catch (UnsupportedIdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

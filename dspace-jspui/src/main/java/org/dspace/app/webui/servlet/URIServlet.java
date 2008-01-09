@@ -231,8 +231,7 @@ public class URIServlet extends DSpaceServlet
             else
             {
                 // Forward to another servlet
-                request.getRequestDispatcher(extraPathInfo).forward(request,
-                        response);
+                request.getRequestDispatcher(extraPathInfo).forward(request, response);
             }
         }
         else
@@ -241,8 +240,7 @@ public class URIServlet extends DSpaceServlet
             log.info(LogManager.getHeader(context,
                     "URI not an item, collection or community", "identifier="
                             + dso.getIdentifier().toString()));
-            JSPManager.showInvalidIDError(request, response,
-                    request.getPathInfo(), -1);
+            JSPManager.showInvalidIDError(request, response, request.getPathInfo(), -1);
 
             return;
         }

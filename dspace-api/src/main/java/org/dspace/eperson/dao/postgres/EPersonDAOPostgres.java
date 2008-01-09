@@ -39,6 +39,19 @@
  */
 package org.dspace.eperson.dao.postgres;
 
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.EPerson.EPersonMetadataField;
+import org.dspace.eperson.EPersonDeletionException;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.dao.EPersonDAO;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.SimpleIdentifier;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -46,18 +59,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
-
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.EPersonDeletionException;
-import org.dspace.eperson.Group;
-import org.dspace.eperson.EPerson.EPersonMetadataField;
-import org.dspace.eperson.dao.EPersonDAO;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
  * @author James Rutherford
@@ -72,17 +73,13 @@ public class EPersonDAOPostgres extends EPersonDAO
     @Override
     public EPerson create() throws AuthorizeException
     {
-        UUID uuid = UUID.randomUUID();
-
         try
         {
             TableRow row = DatabaseManager.create(context, "eperson");
-            row.setColumn("uuid", uuid.toString());
             DatabaseManager.update(context, row);
 
             int id = row.getIntColumn("eperson_id");
             EPerson eperson = new EPerson(context, id);
-            eperson.setIdentifier(new ObjectIdentifier(uuid));
 
             return eperson;
         }
@@ -421,8 +418,7 @@ public class EPersonDAOPostgres extends EPersonDAO
 
         eperson.setIdentifier(new ObjectIdentifier(uuid));
         eperson.setCanLogIn(row.getBooleanColumn("can_log_in"));
-        eperson.setRequireCertificate(
-                row.getBooleanColumn("require_certificate"));
+        eperson.setRequireCertificate(row.getBooleanColumn("require_certificate"));
         eperson.setSelfRegistered(row.getBooleanColumn("self_registered"));
     }
 
@@ -436,6 +432,7 @@ public class EPersonDAOPostgres extends EPersonDAO
         row.setColumn("can_log_in", eperson.canLogIn());
         row.setColumn("require_certificate", eperson.getRequireCertificate());
         row.setColumn("self_registered", eperson.getSelfRegistered());
+        row.setColumn("uuid", eperson.getIdentifier().getUUID().toString());
     }
 
     /**

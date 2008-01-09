@@ -1,5 +1,7 @@
 ALTER TABLE resourcepolicy ADD uuid VARCHAR(36);
 
+ALTER TABLE eperson ADD uuid VARCHAR(36);
+
 CREATE TABLE uuid (
     uuid VARCHAR(36) not null,
     resource_type integer,

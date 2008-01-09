@@ -51,6 +51,7 @@ import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ObjectIdentifierMint;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.UnsupportedIdentifierException;
 
 import java.util.List;
 
@@ -73,22 +74,26 @@ public class BundleDAOCore extends BundleDAO
     @Override
     public Bundle create() throws AuthorizeException
     {
-        Bundle bundle =  childDAO.create();
+        try
+        {
+            Bundle bundle =  childDAO.create();
 
-        // now assign an object identifier
-        /*
-        ObjectIdentifier oid = new ObjectIdentifier(true);
-        bundle.setIdentifier(oid);*/
-        ObjectIdentifier oid = ObjectIdentifierMint.mint(context, bundle);
+            // now assign an object identifier
+            ObjectIdentifier oid = ObjectIdentifierMint.mint(context, bundle);
 
-        // now assign any required external identifiers
-        List<ExternalIdentifier> eids = ExternalIdentifierMint.mintAll(context, bundle);
-        bundle.setExternalIdentifiers(eids);
+            // now assign any required external identifiers
+            List<ExternalIdentifier> eids = ExternalIdentifierMint.mintAll(context, bundle);
+            bundle.setExternalIdentifiers(eids);
 
-        log.info(LogManager.getHeader(context, "create_bundle", "bundle_id="
-                + bundle.getID()));
+            log.info(LogManager.getHeader(context, "create_bundle", "bundle_id="
+                    + bundle.getID()));
 
-        return bundle;
+            return bundle;
+        }
+        catch (UnsupportedIdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

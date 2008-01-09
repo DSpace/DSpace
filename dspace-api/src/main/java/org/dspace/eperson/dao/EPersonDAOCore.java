@@ -49,6 +49,8 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPerson.EPersonMetadataField;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ObjectIdentifierMint;
 
 /**
  * @author James Rutherford
@@ -69,6 +71,10 @@ public class EPersonDAOCore extends EPersonDAO
         }
 
         EPerson eperson = childDAO.create();
+
+        ObjectIdentifier oid = ObjectIdentifierMint.mint(context, eperson);
+
+        update(eperson);
 
         log.info(LogManager.getHeader(context, "create_eperson", "eperson_id="
                     + eperson.getID()));
@@ -115,6 +121,14 @@ public class EPersonDAOCore extends EPersonDAO
             AuthorizeManager.authorizeAction(context, eperson, Constants.WRITE);
         }
 
+        // deal with the item identifier/uuid
+        ObjectIdentifier oid = eperson.getIdentifier();
+        if (oid == null)
+        {
+            oid = ObjectIdentifierMint.mint(context, eperson);
+        }
+        oidDAO.update(eperson.getIdentifier());
+
         log.info(LogManager.getHeader(context, "update_eperson",
                 "eperson_id=" + eperson.getID()));
 
@@ -133,6 +147,9 @@ public class EPersonDAOCore extends EPersonDAO
         EPerson eperson = retrieve(id);
 
         context.removeCached(eperson, id);
+
+        // remove the object identifier
+        oidDAO.delete(eperson);
 
         log.info(LogManager.getHeader(context, "delete_eperson",
                 "eperson_id=" + id));

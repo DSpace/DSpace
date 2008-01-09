@@ -59,7 +59,7 @@ public class ObjectIdentifierDAOPostgres extends ObjectIdentifierDAO
 
     private String insertSQL = "INSERT INTO uuid (uuid, resource_type, resource_id) VALUES (?, ?, ?)";
 
-    private String deleteObjectSQL = "DELETE FROM uuid WHERE resource_type = ?, resource_id = ?";
+    private String deleteObjectSQL = "DELETE FROM uuid WHERE resource_type = ? AND resource_id = ?";
 
     public ObjectIdentifierDAOPostgres(Context context)
     {

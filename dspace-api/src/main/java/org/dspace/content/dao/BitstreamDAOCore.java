@@ -50,6 +50,7 @@ import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ObjectIdentifierMint;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.UnsupportedIdentifierException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -87,27 +88,30 @@ public class BitstreamDAOCore extends BitstreamDAO
 
     public Bitstream create() throws AuthorizeException
     {
-        Bitstream bitstream = childDAO.create();
+        try
+        {
+            Bitstream bitstream = childDAO.create();
 
-        // now assign an object identifier
-        /*
-        ObjectIdentifier oid = new ObjectIdentifier(true);
-        bitstream.setIdentifier(oid);
-*/
-        ObjectIdentifier oid = ObjectIdentifierMint.mint(context, bitstream);
+            // now assign an object identifier
+            ObjectIdentifier oid = ObjectIdentifierMint.mint(context, bitstream);
 
-        // now assign any required external identifiers
-        List<ExternalIdentifier> eids = ExternalIdentifierMint.mintAll(context, bitstream);
-        bitstream.setExternalIdentifiers(eids);
+            // now assign any required external identifiers
+            List<ExternalIdentifier> eids = ExternalIdentifierMint.mintAll(context, bitstream);
+            bitstream.setExternalIdentifiers(eids);
 
-        // FIXME: Think about this
-        AuthorizeManager.addPolicy(
+            // FIXME: Think about this
+            AuthorizeManager.addPolicy(
                 context, bitstream, Constants.WRITE, context.getCurrentUser());
 
-        log.info(LogManager.getHeader(context, "create_bitstream",
-                "bitstream_id=" + bitstream.getID()));
+            log.info(LogManager.getHeader(context, "create_bitstream",
+                    "bitstream_id=" + bitstream.getID()));
 
-        return bitstream;
+            return bitstream;
+        }
+        catch (UnsupportedIdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

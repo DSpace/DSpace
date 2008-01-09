@@ -183,12 +183,14 @@ public abstract class DSpaceObject implements Identifiable
     }
 
     public void addExternalIdentifier(ExternalIdentifier identifier)
+            throws UnsupportedIdentifierException
     {
         identifier.setObjectIdentifier(this.getIdentifier());
         this.identifiers.add(identifier);
     }
 
     public void setExternalIdentifiers(List<ExternalIdentifier> identifiers)
+            throws UnsupportedIdentifierException
     {
         for (ExternalIdentifier eid :  identifiers)
         {
