@@ -67,12 +67,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.search.Harvest;
-import org.dspace.uri.DSpaceIdentifier;
-import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierFactory;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -195,7 +191,7 @@ public class FeedServlet extends DSpaceServlet
         if(!uri.equals(SITE_FEED_KEY))
         { 	
         	// Determine if the URI is a valid reference
-            DSpaceIdentifier di = IdentifierFactory.resolve(context, uri);
+            ResolvableIdentifier di = IdentifierFactory.resolve(context, uri);
             //ExternalIdentifierDAO dao = ExternalIdentifierDAOFactory.getInstance(context);
             //ExternalIdentifier identifier = dao.retrieve(uri);
             //ObjectIdentifier oi = identifier.getObjectIdentifier();

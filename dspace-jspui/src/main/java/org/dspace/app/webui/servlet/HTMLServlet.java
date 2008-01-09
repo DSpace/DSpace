@@ -51,10 +51,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
-import org.dspace.uri.DSpaceIdentifier;
-import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierFactory;
-import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
@@ -220,7 +218,7 @@ public class HTMLServlet extends DSpaceServlet
                 }
                 else
                 {
-                    DSpaceIdentifier di = IdentifierFactory.resolveCanonical(context, uri);
+                    ResolvableIdentifier di = IdentifierFactory.resolveCanonical(context, uri);
                     //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
                     //ObjectIdentifier oi = identifier.getObjectIdentifier();
                     item = (Item) di.getObject(context);

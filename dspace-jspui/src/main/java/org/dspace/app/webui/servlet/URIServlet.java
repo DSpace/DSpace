@@ -62,11 +62,8 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.SubscriptionManager;
 import org.dspace.plugin.CollectionHomeProcessor;
 import org.dspace.plugin.CommunityHomeProcessor;
-import org.dspace.uri.DSpaceIdentifier;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierFactory;
-import org.dspace.uri.ObjectIdentifier;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -100,7 +97,7 @@ public class URIServlet extends DSpaceServlet
         String path = request.getPathInfo();
 
         // get the identifier if there is one
-        DSpaceIdentifier di = IdentifierFactory.resolve(context, path);
+        ResolvableIdentifier di = IdentifierFactory.resolve(context, path);
 
         // get the object if there is one
         if (di != null)

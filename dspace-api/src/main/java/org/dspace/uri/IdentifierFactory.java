@@ -55,9 +55,9 @@ public class IdentifierFactory
 {
     private static final Logger log = Logger.getLogger(IdentifierFactory.class);
 
-    public static DSpaceIdentifier resolve(Context context, String str)
+    public static ResolvableIdentifier resolve(Context context, String str)
     {
-        DSpaceIdentifier dsi = null;
+        ResolvableIdentifier dsi = null;
 
         if (dsi == null)
         {
@@ -72,7 +72,7 @@ public class IdentifierFactory
         return dsi;
     }
 
-    public static DSpaceIdentifier resolveAsURLSubstring(Context context, String path)
+    public static ResolvableIdentifier resolveAsURLSubstring(Context context, String path)
     {
         ObjectIdentifier oi = ObjectIdentifier.extractURLIdentifier(path);
         ExternalIdentifier ei = null;
@@ -99,7 +99,7 @@ public class IdentifierFactory
         }
     }
 
-    public static DSpaceIdentifier resolveCanonical(Context context, String canonicalForm)
+    public static ResolvableIdentifier resolveCanonical(Context context, String canonicalForm)
     {
         ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(canonicalForm);
         ExternalIdentifier ei = null;
@@ -126,7 +126,7 @@ public class IdentifierFactory
         }
     }
 
-    public static URL getURL(DSpaceIdentifier dsi)
+    public static URL getURL(ResolvableIdentifier dsi)
     {
         try
         {

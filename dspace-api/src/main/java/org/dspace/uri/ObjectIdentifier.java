@@ -55,13 +55,11 @@ import org.dspace.content.dao.CommunityDAO;
 import org.dspace.content.dao.CommunityDAOFactory;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.uri.dao.ObjectIdentifierDAO;
 import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -71,13 +69,13 @@ import java.util.regex.Pattern;
  * @author Richard Jones
  * @author James Rutherford
  */
-public class ObjectIdentifier implements DSpaceIdentifier
+public class ObjectIdentifier extends SimpleIdentifier implements ResolvableIdentifier
 {
     private static Logger log = Logger.getLogger(ObjectIdentifier.class);
 
-    private int resourceID = -1;
-    private int resourceTypeID = -1;
-    private UUID uuid = null;
+    protected int resourceID = -1;
+
+    protected int resourceTypeID = -1;
 
     // FIXME: it is acceptable to have an object identifier with only a UUID provided that it can be
     // looked up in the database.  That is, this class can go and look up the resource id and the type
@@ -90,24 +88,24 @@ public class ObjectIdentifier implements DSpaceIdentifier
     // Thoughts?
     public ObjectIdentifier(UUID uuid)
     {
-        this.uuid = uuid;
+        super(uuid);
     }
 
     public ObjectIdentifier(String uuid)
     {
-        this.uuid = UUID.fromString(uuid);
+        super(uuid);
     }
 
     public ObjectIdentifier(String uuid, int resourceType, int resourceID)
     {
-        this.uuid = UUID.fromString(uuid);
+        super(uuid);
         this.resourceTypeID = resourceType;
         this.resourceID = resourceID;
     }
 
     public ObjectIdentifier(UUID uuid, int resourceType, int resourceID)
     {
-        this.uuid = uuid;
+        super(uuid);
         this.resourceTypeID = resourceType;
         this.resourceID = resourceID;
     }
@@ -122,11 +120,6 @@ public class ObjectIdentifier implements DSpaceIdentifier
         return resourceTypeID;
     }
 
-    public UUID getUUID()
-    {
-        return uuid;
-    }
-
     public void setResourceID(int resourceID)
     {
         this.resourceID = resourceID;
@@ -137,6 +130,14 @@ public class ObjectIdentifier implements DSpaceIdentifier
         this.resourceTypeID = resourceTypeID;
     }
 
+    @Deprecated
+    public URL getURL()
+    {
+        return IdentifierFactory.getURL(this);
+    }
+
+    // ResolvableIdentifier Methods
+
     public String getURLForm()
     {
         if (uuid == null)
@@ -144,47 +145,6 @@ public class ObjectIdentifier implements DSpaceIdentifier
             return null;
         }
         return "uuid/" + uuid.toString();
-    }
-
-    @Deprecated
-    public URL getURL()
-    {
-        /*
-        try
-        {
-            String base = ConfigurationManager.getProperty("dspace.url");
-            String urlForm = this.getURLForm();
-
-            if (base == null || "".equals(base))
-            {
-                throw new RuntimeException("No configuration, or configuration invalid for dspace.url");
-            }
-
-            if (urlForm == null)
-            {
-                throw new RuntimeException("Unable to assign URL: no UUID available");
-            }
-
-            String url = base + "/resource/" + urlForm;
-
-
-            return new URL(url);
-        }
-        catch (MalformedURLException e)
-        {
-            log.error("caught exception: ", e);
-            throw new RuntimeException(e);
-        }*/
-        return IdentifierFactory.getURL(this);
-    }
-
-    public String getCanonicalForm()
-    {
-        if (uuid == null)
-        {
-            return null;
-        }
-        return "uuid:" + uuid.toString();
     }
 
     public DSpaceObject getObject(Context context)
@@ -270,6 +230,8 @@ public class ObjectIdentifier implements DSpaceIdentifier
     ////////////////////////////////////////////////////////////////////
     // Utility methods
     ////////////////////////////////////////////////////////////////////
+
+    // FIXME: are these actually used?
 
     public String toString()
     {

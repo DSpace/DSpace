@@ -17,6 +17,13 @@ public class ObjectIdentifierMint
         return oid;
     }
 
+    public static SimpleIdentifier mintSimple()
+    {
+        UUID uuid = UUID.randomUUID();
+        SimpleIdentifier sid = new SimpleIdentifier(uuid);
+        return sid;
+    }
+
     public static ObjectIdentifier get(Context context, int type, int id)
     {
         ObjectIdentifierDAO dao = ObjectIdentifierDAOFactory.getInstance(context);

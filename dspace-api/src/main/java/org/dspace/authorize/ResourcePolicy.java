@@ -39,26 +39,30 @@
  */
 package org.dspace.authorize;
 
-import java.util.Date;
-
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.log4j.Logger;
 import org.dspace.authorize.dao.ResourcePolicyDAO;
 import org.dspace.authorize.dao.ResourcePolicyDAOFactory;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.uri.ObjectIdentifier;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.dao.EPersonDAO;
 import org.dspace.eperson.dao.EPersonDAOFactory;
 import org.dspace.eperson.dao.GroupDAO;
 import org.dspace.eperson.dao.GroupDAOFactory;
+import org.dspace.uri.Identifiable;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.SimpleIdentifier;
+import org.dspace.uri.UnsupportedIdentifierException;
+import org.dspace.uri.ExternalIdentifier;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
-import org.apache.log4j.Logger;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Class representing a ResourcePolicy
@@ -66,7 +70,7 @@ import org.apache.log4j.Logger;
  * @author David Stuve
  * @version $Revision$
  */
-public class ResourcePolicy
+public class ResourcePolicy implements Identifiable
 {
     private static Logger log = Logger.getLogger(ResourcePolicy.class);
 
@@ -76,7 +80,9 @@ public class ResourcePolicy
     private GroupDAO groupDAO;
 
     private int id;
-    private ObjectIdentifier oid;
+    // private ObjectIdentifier oid;
+
+    private SimpleIdentifier sid;
 
     // FIXME: Figure out a way to replace all of this using the
     // ObjectIdentifier class.
@@ -113,14 +119,41 @@ public class ResourcePolicy
         return id;
     }
 
+    public SimpleIdentifier getSimpleIdentifier()
+    {
+        return sid;
+    }
+
+    public void setSimpleIdentifier(SimpleIdentifier sid)
+    {
+        this.sid = sid;
+    }
+
     public ObjectIdentifier getIdentifier()
     {
-        return oid;
+        return null;
     }
 
     public void setIdentifier(ObjectIdentifier oid)
     {
-        this.oid = oid;
+        this.sid = oid;
+    }
+
+    public List<ExternalIdentifier> getExternalIdentifiers()
+    {
+        return null;
+    }
+
+    public void setExternalIdentifiers(List<ExternalIdentifier> eids)
+            throws UnsupportedIdentifierException
+    {
+        throw new UnsupportedIdentifierException("ResourcePolicy does not support the use of ExternalIdentifiers");
+    }
+
+    public void addExternalIdentifier(ExternalIdentifier eid)
+            throws UnsupportedIdentifierException
+    {
+        throw new UnsupportedIdentifierException("ResourcePolicy does not support the use of ExternalIdentifiers");
     }
 
     /**

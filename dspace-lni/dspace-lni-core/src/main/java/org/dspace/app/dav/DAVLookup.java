@@ -45,8 +45,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.uri.DSpaceIdentifier;
-import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierFactory;
 import org.jdom.Element;
 
@@ -217,7 +216,7 @@ class DAVLookup extends DAVResource
         ExternalIdentifier identifier = externalIdentifierDAO.retrieve(handle);
         dso = identifier.getObjectIdentifier().getObject(context);*/
 
-        DSpaceIdentifier dsi = IdentifierFactory.resolve(context, handle);
+        ResolvableIdentifier dsi = IdentifierFactory.resolve(context, handle);
         dso = dsi.getObject(context);
 
         if (dso == null)
@@ -270,7 +269,7 @@ class DAVLookup extends DAVResource
         ExternalIdentifier identifier = externalIdentifierDAO.retrieve(handle);
         DSpaceObject dso = identifier.getObjectIdentifier().getObject(context);*/
 
-        DSpaceIdentifier dsi = IdentifierFactory.resolve(context, handle);
+        ResolvableIdentifier dsi = IdentifierFactory.resolve(context, handle);
         DSpaceObject dso = dsi.getObject(context);
 
         if (dso == null)

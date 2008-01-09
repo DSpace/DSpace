@@ -46,10 +46,8 @@ import org.dspace.core.LogManager;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
-import org.dspace.uri.DSpaceIdentifier;
-import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierFactory;
-import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
@@ -282,7 +280,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             String uri = (String) itemIdentifiers.get(i);
 
-            DSpaceIdentifier di = IdentifierFactory.resolve(context, uri);
+            ResolvableIdentifier di = IdentifierFactory.resolve(context, uri);
             //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
             //ObjectIdentifier oi = identifier.getObjectIdentifier();
             Item item = (Item) di.getObject(context);
@@ -300,7 +298,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             String uri = (String) collectionIdentifiers.get(i);
 
-            DSpaceIdentifier di = IdentifierFactory.resolve(context, uri);
+            ResolvableIdentifier di = IdentifierFactory.resolve(context, uri);
             //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
             //ObjectIdentifier oi = identifier.getObjectIdentifier();
             Collection c = (Collection) di.getObject(context);
@@ -318,7 +316,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             String uri = (String) communityIdentifiers.get(i);
 
-            DSpaceIdentifier di = IdentifierFactory.resolve(context, uri);
+            ResolvableIdentifier di = IdentifierFactory.resolve(context, uri);
             //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
             //ObjectIdentifier oi = identifier.getObjectIdentifier();
             Community c = (Community) di.getObject(context);

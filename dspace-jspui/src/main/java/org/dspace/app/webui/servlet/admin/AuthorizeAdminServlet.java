@@ -66,10 +66,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.uri.DSpaceIdentifier;
-import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierFactory;
-import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
@@ -194,7 +192,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             else if ((uri != null) && !uri.equals(""))
             {
                 // otherwise, attempt to resolve uri
-                DSpaceIdentifier di = IdentifierFactory.resolve(c, uri);
+                ResolvableIdentifier di = IdentifierFactory.resolve(c, uri);
                 //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
                 //ObjectIdentifier oi = identifier.getObjectIdentifier();
                 DSpaceObject dso = di.getObject(c);

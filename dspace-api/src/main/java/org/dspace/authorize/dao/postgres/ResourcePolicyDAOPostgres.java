@@ -39,21 +39,24 @@
  */
 package org.dspace.authorize.dao.postgres;
 
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.dao.ResourcePolicyDAO;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
+import org.dspace.eperson.Group;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ObjectIdentifierMint;
+import org.dspace.uri.SimpleIdentifier;
+import org.dspace.uri.UnsupportedIdentifierException;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
-import org.dspace.authorize.ResourcePolicy;
-import org.dspace.authorize.dao.ResourcePolicyDAO;
-import org.dspace.core.Context;
-import org.dspace.content.DSpaceObject;
-import org.dspace.eperson.Group;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
  * @author James Rutherford
@@ -68,17 +71,16 @@ public class ResourcePolicyDAOPostgres extends ResourcePolicyDAO
     @Override
     public ResourcePolicy create()
     {
-        UUID uuid = UUID.randomUUID();
-
         try
         {
+            SimpleIdentifier sid = ObjectIdentifierMint.mintSimple();
             TableRow row = DatabaseManager.create(context, "resourcepolicy");
-            row.setColumn("uuid", uuid.toString());
+            row.setColumn("uuid", sid.getUUID().toString());
             DatabaseManager.update(context, row);
 
             int id = row.getIntColumn("policy_id");
             ResourcePolicy rp = new ResourcePolicy(context, id);
-            rp.setIdentifier(new ObjectIdentifier(uuid));
+            rp.setSimpleIdentifier(sid);
 
             return rp;
         }
@@ -295,7 +297,7 @@ public class ResourcePolicyDAOPostgres extends ResourcePolicyDAO
         Date startDate = row.getDateColumn("start_date");
         Date endDate = row.getDateColumn("end_date");
 
-        rp.setIdentifier(new ObjectIdentifier(uuid));
+        rp.setSimpleIdentifier(new SimpleIdentifier(uuid));
         rp.setResourceID(resourceID);
         rp.setResourceType(resourceTypeID);
         rp.setAction(actionID);

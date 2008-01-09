@@ -90,8 +90,7 @@
       <td align="left">
 	<h1><fmt:message key="jsp.dspace-admin.authorize-community-edit.policies">
         <fmt:param><%= community.getMetadata("name") %></fmt:param>
-        <fmt:param>hdl:<%= community.getIdentifier().getCanonicalForm() %></fmt:param>
-        <fmt:param><%=community.getID()%></fmt:param>
+        <fmt:param><%= community.getIdentifier().getCanonicalForm() %></fmt:param>
     </fmt:message></h1>
       </td>
       <td align="right" class="standard">
@@ -126,7 +125,7 @@
         ResourcePolicy rp = (ResourcePolicy) i.next();
 %>
         <tr>
-            <td headers="t1" class="<%= row %>RowOddCol"><%= rp.getID() %></td>
+            <td headers="t1" class="<%= row %>RowOddCol"><%= rp.getSimpleIdentifier().getCanonicalForm() %></td>
             <td headers="t2" class="<%= row %>RowEvenCol">
                     <%= rp.getActionText() %>
             </td>
@@ -134,14 +133,14 @@
                     <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>  
              </td>
              <td headers="t4" class="<%= row %>RowEvenCol">
-                <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">-->
+                <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">
                     <input type="hidden" name="policy_id" value="<%= rp.getID() %>" />
                     <input type="hidden" name="community_id" value="<%= community.getID() %>" />
                     <input type="submit" name="submit_community_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" />
                 </form>
              </td>
              <td headers="t5" class="<%= row %>RowOddCol">
-                <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">-->
+                <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">
                     <input type="hidden" name="policy_id" value="<%= rp.getID() %>" />
                     <input type="hidden" name="community_id" value="<%= community.getID() %>" />
                     <input type="submit" name="submit_community_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />

@@ -45,10 +45,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -59,7 +57,7 @@ import java.util.Map;
  * @author Richard Jones
  * @author James Rutherford
  */
-public abstract class ExternalIdentifier implements DSpaceIdentifier
+public abstract class ExternalIdentifier implements ResolvableIdentifier
 {
     private static final Logger log = Logger.getLogger(ExternalIdentifier.class);
 

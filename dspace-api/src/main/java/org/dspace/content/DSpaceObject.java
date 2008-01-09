@@ -39,25 +39,25 @@
  */
 package org.dspace.content;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import org.dspace.core.Context;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.log4j.Logger;
-
+import org.dspace.core.Context;
 import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.Identifiable;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.SimpleIdentifier;
+import org.dspace.uri.UnsupportedIdentifierException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Abstract base class for DSpace objects
  */
-public abstract class DSpaceObject
+public abstract class DSpaceObject implements Identifiable
 {
     private static Logger log = Logger.getLogger(DSpaceObject.class);
     
@@ -123,6 +123,24 @@ public abstract class DSpaceObject
         return id;
     }
 
+    public SimpleIdentifier getSimpleIdentifier()
+    {
+        return oid;
+    }
+
+    public void setSimpleIdentifier(SimpleIdentifier sid)
+        throws UnsupportedIdentifierException
+    {
+        if (sid instanceof ObjectIdentifier)
+        {
+            this.setIdentifier((ObjectIdentifier) sid);
+        }
+        else
+        {
+            throw new UnsupportedIdentifierException("DSpaceObjects must use ObjectIdentifiers, not SimpleIdentifiers");
+        }
+    }
+
     public ObjectIdentifier getIdentifier()
     {
         return oid;
@@ -136,7 +154,10 @@ public abstract class DSpaceObject
 
     /**
      * For those cases where you only want one, and you don't care what sort.
+     *
+     * FIXME: this shouldn't be here
      */
+    @Deprecated
     public ExternalIdentifier getExternalIdentifier()
     {
         if ((identifiers != null) && (identifiers.size() > 0))

@@ -95,8 +95,7 @@
       <td align="left">
             <h1><fmt:message key="jsp.dspace-admin.authorize-collection-edit.policies">
             <fmt:param><%= collection.getMetadata("name") %></fmt:param>
-            <fmt:param>hdl:<%= collection.getIdentifier().getCanonicalForm() %></fmt:param>
-            <fmt:param><%= collection.getID() %></fmt:param>
+            <fmt:param><%= collection.getIdentifier().getCanonicalForm() %></fmt:param>
         </fmt:message></h1>
       </td>
       <td align="right" class="standard">
@@ -112,6 +111,15 @@
     </p>
  </form>
 
+        <table class="miscTable" align="center" summary="Collection Policy Edit Form">
+        <tr>
+
+            <th id="t1" class="oddRowOddCol"><strong><fmt:message key="jsp.general.id" /></strong></th>
+            <th id="t2" class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
+            <th id="t3" class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.general.group"/></strong></th>
+            <th id="t4" class="oddRowEvenCol">&nbsp;</th>
+            <th id="t5" class="oddRowOddCol">&nbsp;</th>
+        </tr>
 <%
     String row = "even";
     Iterator i = policies.iterator();
@@ -120,18 +128,8 @@
     {
         ResourcePolicy rp = (ResourcePolicy) i.next();
 %>
-      <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">
-        <table class="miscTable" align="center" summary="Collection Policy Edit Form">
             <tr>
-               <th class="oddRowOddCol"><strong><fmt:message key="jsp.general.id" /></strong></th>
-               <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
-               <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.general.group"/></strong></th>
-               <th class="oddRowEvenCol">&nbsp;</th>
-               <th class="oddRowOddCol">&nbsp;</th>
-            </tr>
-
-            <tr>
-               <td class="<%= row %>RowOddCol"><%= rp.getID() %></td>
+               <td class="<%= row %>RowOddCol"><%= rp.getSimpleIdentifier().getCanonicalForm() %></td>
                <td class="<%= row %>RowEvenCol">
                     <%= rp.getActionText() %>
                </td>
@@ -139,19 +137,24 @@
                     <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>
                </td>
                <td class="<%= row %>RowEvenCol">
+                   <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">
                     <input type="hidden" name="policy_id" value="<%= rp.getID() %>" />
                     <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
                     <input type="submit" name="submit_collection_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" />
+                   </form>
                </td>
                <td class="<%= row %>RowOddCol">
+                   <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">
+                    <input type="hidden" name="policy_id" value="<%= rp.getID() %>" />
+                    <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
                     <input type="submit" name="submit_collection_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
+                   </form>
                </td>
             </tr>
-       </table>
-     </form>
 
 <%
         row = (row.equals("odd") ? "even" : "odd");
     }
 %>
+    </table>
 </dspace:layout>
