@@ -65,6 +65,7 @@ import org.dspace.content.dao.BundleDAOFactory;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.Context;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.submit.AbstractProcessingStep;
 
 /**
