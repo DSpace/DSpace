@@ -60,9 +60,9 @@
     -->
     <aspects>
         <aspect name="Artifact Browser" path="resource://aspects/ArtifactBrowser/" />
-        <aspect name="Submission and Workflow" path="resource://aspects/Submission/" />
         <aspect name="Administration" path="resource://aspects/Administrative/" />
         <aspect name="E-Person" path="resource://aspects/EPerson/" />
+        <aspect name="Submission and Workflow" path="resource://aspects/Submission/" />
 
         <!-- 
             This aspect tests the various possible DRI features, 
