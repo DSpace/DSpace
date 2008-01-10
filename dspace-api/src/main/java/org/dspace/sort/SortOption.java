@@ -33,7 +33,7 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.browse;
+package org.dspace.sort;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -86,10 +86,10 @@ public class SortOption
 	 * @param name
 	 * @param md
 	 * @param type
-	 * @throws BrowseException
+	 * @throws SortException
 	 */
 	public SortOption(int number, String name, String md, String type)
-		throws BrowseException
+		throws SortException
 	{
 		this.name = name;
 		this.type = type;
@@ -104,10 +104,10 @@ public class SortOption
 	 * 
 	 * @param number
 	 * @param definition
-	 * @throws BrowseException
+	 * @throws SortException
 	 */
 	public SortOption(int number, String definition)
-		throws BrowseException
+		throws SortException
 	{
 		this.number = number;
 		
@@ -117,7 +117,7 @@ public class SortOption
         
         if (!matcher.matches())
         {
-            throw new BrowseException("Sort Order configuration is not valid: webui.browse.sort-order." + 
+            throw new SortException("Sort Order configuration is not valid: webui.itemlist.sort-option." +
                     number + " = " + definition);
         }
         
@@ -219,10 +219,10 @@ public class SortOption
 	/**
 	 * Tell the class to generate the metadata bits
 	 * 
-	 * @throws BrowseException
+	 * @throws SortException
 	 */
     public void generateMdBits()
-    	throws BrowseException
+    	throws SortException
     {
     	try
     	{
@@ -230,7 +230,7 @@ public class SortOption
     	}
     	catch(IOException e)
     	{
-    		throw new BrowseException(e);
+    		throw new SortException(e);
     	}
     }
     
@@ -300,7 +300,7 @@ public class SortOption
     /**
      * @return	a map of the configured sort options
      */
-    public static Map<Integer, SortOption> getSortOptionsMap() throws BrowseException
+    public static Map<Integer, SortOption> getSortOptionsMap() throws SortException
     {
         if (SortOption.sortOptionsMap != null)
             return SortOption.sortOptionsMap;
@@ -320,9 +320,9 @@ public class SortOption
     /**
      * Return all the configured sort options
      * @return
-     * @throws BrowseException
+     * @throws SortException
      */
-    public static Set<SortOption> getSortOptions() throws BrowseException
+    public static Set<SortOption> getSortOptions() throws SortException
     {
         if (SortOption.sortOptionsSet != null)
             return SortOption.sortOptionsSet;
@@ -333,7 +333,7 @@ public class SortOption
             int idx = 1;
             String option;
 
-            while ( ((option = ConfigurationManager.getProperty("webui.browse.sort-option." + idx))) != null)
+            while ( ((option = ConfigurationManager.getProperty("webui.itemlist.sort-option." + idx))) != null)
             {
                 SortOption so = new SortOption(idx, option);
                 SortOption.sortOptionsSet.add(so);
@@ -348,9 +348,9 @@ public class SortOption
      * Get the defined sort option by number (.1, .2, etc)
      * @param number
      * @return
-     * @throws BrowseException
+     * @throws SortException
      */
-    public static SortOption getSortOption(int number) throws BrowseException
+    public static SortOption getSortOption(int number) throws SortException
     {
         for (SortOption so : SortOption.getSortOptions())
         {
@@ -364,9 +364,9 @@ public class SortOption
     /**
      * Get the default sort option - initially, just the first one defined
      * @return
-     * @throws BrowseException
+     * @throws SortException
      */
-    public static SortOption getDefaultSortOption() throws BrowseException
+    public static SortOption getDefaultSortOption() throws SortException
     {
         for (SortOption so : getSortOptions())
             return so;

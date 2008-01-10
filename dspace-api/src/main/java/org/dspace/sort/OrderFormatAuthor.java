@@ -1,5 +1,5 @@
 /*
- * BrowseOrderText.java
+ * OrderFormatAuthor.java
  *
  * Version: $Revision: 1.0 $
  *
@@ -38,18 +38,19 @@
  * DAMAGE.
  */
 
-package org.dspace.browse;
+package org.dspace.sort;
 
 import org.dspace.text.filter.DecomposeDiactritics;
 import org.dspace.text.filter.LowerCaseAndTrim;
 import org.dspace.text.filter.TextFilter;
+import org.dspace.browse.AbstractTextFilterOFD;
 
 /**
- * Standard text ordering delegate implementation
+ * Standard author ordering delegate implementation
  * 
  * @author Graham Triggs
  */
-public class BrowseOrderText extends AbstractTextFilterBOD
+public class OrderFormatAuthor extends AbstractTextFilterOFD
 {
 	{
 		filters = new TextFilter[] { new DecomposeDiactritics(),

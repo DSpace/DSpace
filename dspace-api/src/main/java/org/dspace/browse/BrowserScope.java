@@ -39,6 +39,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.sort.SortOption;
+import org.dspace.sort.SortException;
 import org.apache.log4j.Logger;
 
 /**
@@ -404,53 +406,60 @@ public class BrowserScope
 	public SortOption getSortOption()
 		throws BrowseException
 	{
-	    // If a sortOption hasn't been set, work out the default
-		if (sortOption == null)
-		{
-		    // We need a browse index first though
-			if (browseIndex != null)
-			{
-			    // If a sorting hasn't been specified, and it's a metadata browse
-				if (sortBy <= 0 && browseIndex.isMetadataIndex())
-				{
-				    // Create a dummy sortOption for the metadata sort
-					String dataType = browseIndex.getDataType();
-					String type = ("date".equals(dataType) ? "date" : "text");
-                    sortOption = new SortOption(0, browseIndex.getName(), browseIndex.getMetadata(0), type);
-				}
-				else
-				{
-				    // If a sorting hasn't been specified
-	                if (sortBy <= 0)
-	                {
-	                    // Get the sort option from the index
-	                    sortOption = browseIndex.getSortOption();
-	                    
-	                    if (sortOption == null)
-	                    {
-	                        // No sort option, so default to the first one defined in the config
-	                        for (SortOption so : SortOption.getSortOptions())
-	                        {
-	                            sortOption = so;
-	                            break;
-	                        }
-	                    }
-	                }
-					else
-					{
-					    // A sorting has been specified, so get it from the configured sort columns
-                        for (SortOption so : SortOption.getSortOptions())
+        try
+        {
+            // If a sortOption hasn't been set, work out the default
+            if (sortOption == null)
+            {
+                // We need a browse index first though
+                if (browseIndex != null)
+                {
+                    // If a sorting hasn't been specified, and it's a metadata browse
+                    if (sortBy <= 0 && browseIndex.isMetadataIndex())
+                    {
+                        // Create a dummy sortOption for the metadata sort
+                        String dataType = browseIndex.getDataType();
+                        String type = ("date".equals(dataType) ? "date" : "text");
+                        sortOption = new SortOption(0, browseIndex.getName(), browseIndex.getMetadata(0), type);
+                    }
+                    else
+                    {
+                        // If a sorting hasn't been specified
+                        if (sortBy <= 0)
                         {
-                            if (so.getNumber() == sortBy)
-                                sortOption = so;
+                            // Get the sort option from the index
+                            sortOption = browseIndex.getSortOption();
+
+                            if (sortOption == null)
+                            {
+                                // No sort option, so default to the first one defined in the config
+                                for (SortOption so : SortOption.getSortOptions())
+                                {
+                                    sortOption = so;
+                                    break;
+                                }
+                            }
                         }
-					}
-				}
-			}
-		}
-		
-		return sortOption;
-	}
+                        else
+                        {
+                            // A sorting has been specified, so get it from the configured sort columns
+                            for (SortOption so : SortOption.getSortOptions())
+                            {
+                                if (so.getNumber() == sortBy)
+                                    sortOption = so;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return sortOption;
+        }
+        catch (SortException se)
+        {
+            throw new BrowseException("Error in SortOptions", se);
+        }
+    }
 	
 	/**
 	 * @return Returns the startsWith.

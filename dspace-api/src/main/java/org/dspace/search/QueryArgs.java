@@ -47,6 +47,7 @@ import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.core.Constants;
+import org.dspace.sort.SortOption;
 
 import org.apache.oro.text.perl.Perl5Util;
 
@@ -63,6 +64,10 @@ public class QueryArgs
     private int start = 0; // default values
 
     private int pageSize = 10;
+
+    private SortOption sortOption = null;
+
+    private String sortOrder = SortOption.ASCENDING;
 
     /**
      * set the query string
@@ -126,6 +131,26 @@ public class QueryArgs
     public int getPageSize()
     {
         return pageSize;
+    }
+
+    public SortOption getSortOption()
+    {
+        return sortOption;
+    }
+
+    public void setSortOption(SortOption sortOption)
+    {
+        this.sortOption = sortOption;
+    }
+
+    public String getSortOrder()
+    {
+        return sortOrder;
+    }
+
+    public void setSortOrder(String sortOrder)
+    {
+        this.sortOrder = sortOrder;
     }
 
     /**

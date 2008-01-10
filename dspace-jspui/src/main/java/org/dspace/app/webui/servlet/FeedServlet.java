@@ -66,7 +66,8 @@ import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
-import org.dspace.browse.SortOption;
+import org.dspace.sort.SortOption;
+import org.dspace.sort.SortException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -436,6 +437,11 @@ public class FeedServlet extends DSpaceServlet
 
             return channel;
     	}
+        catch (SortException se)
+        {
+            log.error("caught exception: ", se);
+            throw new IOException(se);
+        }
     	catch (BrowseException e)
     	{
     		log.error("caught exception: ", e);

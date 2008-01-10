@@ -66,10 +66,10 @@ import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
-import org.dspace.browse.SortOption;
+import org.dspace.sort.SortOption;
+import org.dspace.sort.SortException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
@@ -323,6 +323,10 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 
         	BrowseEngine be = new BrowseEngine(context);
         	this.recentSubmissionItems = be.browse(scope).getResults();
+        }
+        catch (SortException se)
+        {
+            log.error("Caught SortException", se);
         }
         catch (BrowseException bex)
         {

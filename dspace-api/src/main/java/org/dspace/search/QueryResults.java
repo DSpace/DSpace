@@ -56,8 +56,8 @@ public class QueryResults
     private List hitHandles; // handles of content (items, collections,
                              // communities)
 
-    private List hitTypes; // Integers from Constants defng types of
-                           // corresponding handles
+    private List hitTypes; // Resource type - from Constants
+    private List hitIds;   // Resource ids 
 
     private String errorMsg; //error string, if there is one
 
@@ -110,6 +110,18 @@ public class QueryResults
     public List getHitHandles()
     {
         return hitHandles;
+    }
+
+    /** set the List of ids corresponding to hits */
+    public void setHitIds(List myHits)
+    {
+        hitIds = myHits;
+    }
+
+    /** get the List of handles corresponding to hits */
+    public List getHitIds()
+    {
+        return hitIds;
     }
 
     /** set the List of types corresponding to handles */

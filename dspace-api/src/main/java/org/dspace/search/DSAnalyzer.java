@@ -48,6 +48,7 @@ import org.apache.lucene.analysis.PorterStemFilter;
 import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardFilter;
+import org.dspace.core.ConfigurationManager;
 
 /**
  * Custom Lucene Analyzer that combines the standard filter, lowercase filter,
@@ -93,5 +94,15 @@ public class DSAnalyzer extends Analyzer
         result = new PorterStemFilter(result);
 
         return result;
+    }
+
+    public int getPositionIncrementGap(String fieldName)
+    {
+        // If it is the default field, or bounded fields is turned off in the config, return the default value
+        if ("default".equalsIgnoreCase(fieldName) || !ConfigurationManager.getBooleanProperty("search.boundedfields", false))
+            return super.getPositionIncrementGap(fieldName);
+
+        // Not the default field, and we want bounded fields, so return an large gap increment
+        return 10;
     }
 }

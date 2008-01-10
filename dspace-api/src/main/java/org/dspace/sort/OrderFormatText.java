@@ -1,5 +1,5 @@
 /*
- * BrowseOrderDelegate.java
+ * OrderFormatText.java
  *
  * Version: $Revision: 1.0 $
  *
@@ -38,22 +38,22 @@
  * DAMAGE.
  */
 
-package org.dspace.browse;
+package org.dspace.sort;
+
+import org.dspace.text.filter.DecomposeDiactritics;
+import org.dspace.text.filter.LowerCaseAndTrim;
+import org.dspace.text.filter.TextFilter;
+import org.dspace.browse.AbstractTextFilterOFD;
 
 /**
- * Interface for browse order delegates
+ * Standard text ordering delegate implementation
  * 
  * @author Graham Triggs
  */
-public interface BrowseOrderDelegate
+public class OrderFormatText extends AbstractTextFilterOFD
 {
-	/**
-	 * Prepare the appropriate sort string for the given value in the
-	 * given language.  Languate should be supplied with the ISO-6390-1
-	 * or ISO-639-2 standards.  For example "en" or "eng".
-	 * 
-	 * @param	value	the string value
-	 * @param	language	the language to interpret in
-	 */
-    public String makeSortString(String value, String language);
+	{
+		filters = new TextFilter[] { new DecomposeDiactritics(),
+				                     new LowerCaseAndTrim() };
+	}
 }

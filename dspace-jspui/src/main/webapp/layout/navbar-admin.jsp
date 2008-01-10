@@ -50,7 +50,7 @@
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.browse.BrowseInfo" %>
-<%@ page import="org.dspace.browse.SortOption" %>
+<%@ page import="org.dspace.sort.SortOption" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
 

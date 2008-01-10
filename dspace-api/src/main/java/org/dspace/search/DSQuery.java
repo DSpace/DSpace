@@ -40,7 +40,6 @@
 package org.dspace.search;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -56,6 +55,8 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Searcher;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 import org.apache.oro.text.perl.Perl5Util;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -63,6 +64,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.sort.SortOption;
 
 // issues
 // need to filter query string for security
@@ -123,10 +125,12 @@ public class DSQuery
         String querystring = args.getQuery();
         QueryResults qr = new QueryResults();
         List hitHandles = new ArrayList();
-        List hitTypes = new ArrayList();
+        List hitIds     = new ArrayList();
+        List hitTypes   = new ArrayList();
 
         // set up the QueryResults object
         qr.setHitHandles(hitHandles);
+        qr.setHitIds(hitIds);
         qr.setHitTypes(hitTypes);
         qr.setStart(args.getStart());
         qr.setPageSize(args.getPageSize());
@@ -159,8 +163,18 @@ public class DSQuery
             }
             
             Query myquery = qp.parse(querystring);
-            Hits hits = searcher.search(myquery);
+            Hits hits = null;
 
+            if (args.getSortOption() == null)
+            {
+                hits = searcher.search(myquery, new Sort(new SortField[] { new SortField("type"), SortField.FIELD_SCORE }));
+            }
+            else
+            {
+                SortField[] sortFields = new SortField[] { new SortField("type"), new SortField("sort_" + args.getSortOption().getName(), SortOption.DESCENDING.equals(args.getSortOrder())), SortField.FIELD_SCORE };
+                hits = searcher.search(myquery, new Sort(sortFields));
+            }
+            
             // set total number of hits
             qr.setHitCount(hits.length());
 
@@ -181,52 +195,47 @@ public class DSQuery
                 {
                     Document d = hits.doc(i);
 
+                    String resourceId   = d.get("search.resourceid");
+                    String resourceType = d.get("search.resourcetype");
+
                     String handleText = d.get("handle");
-                    String handletype = d.get("type");
+                    String handleType = d.get("type");
 
-                    hitHandles.add(handleText);
+                    switch (Integer.parseInt( resourceType != null ? resourceType : handleType))
+                    {
+                        case Constants.ITEM:
+                            hitTypes.add(new Integer(Constants.ITEM));
+                            break;
 
-                    if (handletype.equals("" + Constants.ITEM))
-                    {
-                        hitTypes.add(new Integer(Constants.ITEM));
+                        case Constants.COLLECTION:
+                            hitTypes.add(new Integer(Constants.COLLECTION));
+                            break;
+
+                        case Constants.COMMUNITY:
+                            hitTypes.add(new Integer(Constants.COMMUNITY));
+                            break;
                     }
-                    else if (handletype.equals("" + Constants.COLLECTION))
-                    {
-                        hitTypes.add(new Integer(Constants.COLLECTION));
-                    }
-                    else if (handletype.equals("" + Constants.COMMUNITY))
-                    {
-                        hitTypes.add(new Integer(Constants.COMMUNITY));
-                    }
-                    else
-                    {
-                        // error! unknown type!
-                    }
+
+                    hitHandles.add( handleText );
+                    hitIds.add( resourceId == null ? null: Integer.parseInt(resourceId) );
                 }
             }
         }
         catch (NumberFormatException e)
         {
-            log
-                    .warn(LogManager.getHeader(c, "Number format exception", ""
-                            + e));
-
+            log.warn(LogManager.getHeader(c, "Number format exception", "" + e));
             qr.setErrorMsg("Number format exception");
         }
         catch (ParseException e)
         {
             // a parse exception - log and return null results
             log.warn(LogManager.getHeader(c, "Invalid search string", "" + e));
-
             qr.setErrorMsg("Invalid search string");
         }
         catch (TokenMgrError tme)
         {
             // Similar to parse exception
-            log
-                    .warn(LogManager.getHeader(c, "Invalid search string", ""
-                            + tme));
-
+            log.warn(LogManager.getHeader(c, "Invalid search string", "" + tme));
             qr.setErrorMsg("Invalid search string");
         }
         catch(BooleanQuery.TooManyClauses e)
@@ -387,6 +396,25 @@ public class DSQuery
         }
     }
 
+    /**
+     * Close any IndexSearcher that is currently open.
+     */
+    public static void close()
+    {
+        if (searcher != null)
+        {
+            try
+            {
+                searcher.close();
+                searcher = null;
+            }
+            catch (IOException ioe)
+            {
+                log.error("DSQuery: Unable to close open IndexSearcher", ioe);
+            }
+        }
+    }
+    
     public static void main(String[] args)
     {
         if (args.length > 0)

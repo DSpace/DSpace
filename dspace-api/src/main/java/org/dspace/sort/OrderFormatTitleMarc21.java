@@ -1,5 +1,5 @@
 /*
- * BrowseOrderTitleMarc21.java
+ * OrderFormatTitleMarc21.java
  *
  * Version: $Revision: 1.0 $
  *
@@ -38,16 +38,17 @@
  * DAMAGE.
  */
 
-package org.dspace.browse;
+package org.dspace.sort;
 
 import org.dspace.text.filter.*;
+import org.dspace.browse.AbstractTextFilterOFD;
 
 /**
  * MARC 21 title ordering delegate implementation
  * 
  * @author Graham Triggs
  */
-public class BrowseOrderTitleMarc21 extends AbstractTextFilterBOD
+public class OrderFormatTitleMarc21 extends AbstractTextFilterOFD
 {
 	{
 		filters = new TextFilter[] { new MARC21InitialArticleWord(),

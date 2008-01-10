@@ -1,5 +1,5 @@
 /*
- * BrowseOrder.java
+ * OrderFormat.java
  *
  * Version: $Revision: 1.0 $
  *
@@ -38,11 +38,15 @@
  * DAMAGE.
  */
 
-package org.dspace.browse;
+package org.dspace.sort;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.core.PluginManager;
+import org.dspace.sort.OrderFormatDelegate;
+import org.dspace.sort.OrderFormatAuthor;
+import org.dspace.sort.OrderFormatTitle;
+import org.dspace.sort.OrderFormatText;
 
 /**
  * Class implementing static helpers for anywhere that interacts with the sort columns
@@ -52,16 +56,16 @@ import org.dspace.core.PluginManager;
  * 
  * Types can be defined or configured using the plugin manager:
  * 
- * plugin.named.org.dspace.browse.BrowseOrderDelegate=
- * 		org.dspace.browse.BrowseOrderTitleMarc21=title
- * 		org.dspace.browse.BrowseOrderAuthor=author
+ * plugin.named.org.dspace.sort.OrderFormatDelegate=
+ * 		org.dspace.sort.OrderFormatTitleMarc21=title
+ * 		org.dspace.sort.OrderFormatAuthor=author
  * 
  * The following standard types have been defined by default, but can be reconfigured
  * via the plugin manager:
  * 
- * author	= org.dspace.browse.BrowseOrderAuthor
- * title	= org.dspace.browse.BrowseOrderTitle
- * text 	= org.dspace.browse.BrowseOrderText
+ * author	= org.dspace.sort.OrderFormatAuthor
+ * title	= org.dspace.sort.OrderFormatTitle
+ * text 	= org.dspace.sort.OrderFormatText
  * 
  * IMPORTANT - If you change any of the orderings, you need to rebuild the browse sort columns
  * (ie. run 'index-all', or 'dsrun org.dspace.browse.InitializeBrowse')
@@ -69,50 +73,50 @@ import org.dspace.core.PluginManager;
  * @author Graham Triggs
  * @version $Revision: 1.0 $
  */
-public class BrowseOrder
+public class OrderFormat
 {
-	private final static Logger log = LogManager.getLogger(BrowseOrder.class);
+	private final static Logger log = LogManager.getLogger(OrderFormat.class);
 
 	public final static String AUTHOR = "author";
 	public final static String TITLE  = "title";
 	public final static String TEXT   = "text";
 	
 	// Array of all available order delegates - avoids excessive calls to plugin manager
-	private final static String[] delegates = PluginManager.getAllPluginNames(BrowseOrderDelegate.class);
+	private final static String[] delegates = PluginManager.getAllPluginNames(OrderFormatDelegate.class);
 
-    private final static BrowseOrderDelegate authorDelegate = new BrowseOrderAuthor();
-    private final static BrowseOrderDelegate titleDelegate  = new BrowseOrderTitle();
-    private final static BrowseOrderDelegate textDelegate   = new BrowseOrderText();
+    private final static OrderFormatDelegate authorDelegate = new OrderFormatAuthor();
+    private final static OrderFormatDelegate titleDelegate  = new OrderFormatTitle();
+    private final static OrderFormatDelegate textDelegate   = new OrderFormatText();
     
     /**
      * Generate a sort string for the given DC metadata
      */
     public static String makeSortString(String value, String language, String type)
     {
-    	BrowseOrderDelegate delegate = null;
+    	OrderFormatDelegate delegate = null;
     	
     	// If a named index has been supplied
     	if (type != null && type.length() > 0)
     	{
     		// Use a delegate if one is configured
-        	if ((delegate = BrowseOrder.getDelegate(type)) != null)
+        	if ((delegate = OrderFormat.getDelegate(type)) != null)
         	{
         		return delegate.makeSortString(value, language);
         	}
     	}
     	
       	// No delegates found, so apply defaults
-    	if (type.equalsIgnoreCase(BrowseOrder.AUTHOR) && authorDelegate != null)
+    	if (type.equalsIgnoreCase(OrderFormat.AUTHOR) && authorDelegate != null)
     	{
     		return authorDelegate.makeSortString(value, language);
     	}
 
-    	if (type.equalsIgnoreCase(BrowseOrder.TITLE) && titleDelegate != null)
+    	if (type.equalsIgnoreCase(OrderFormat.TITLE) && titleDelegate != null)
     	{
     		return titleDelegate.makeSortString(value, language);
     	}
 
-    	if (type.equalsIgnoreCase(BrowseOrder.TEXT) && textDelegate != null)
+    	if (type.equalsIgnoreCase(OrderFormat.TEXT) && textDelegate != null)
     	{
     		return textDelegate.makeSortString(value, language);
     	}
@@ -123,7 +127,7 @@ public class BrowseOrder
     /**
      * Retrieve the named delegate
      */
-    private static BrowseOrderDelegate getDelegate(String name)
+    private static OrderFormatDelegate getDelegate(String name)
     {
    		if (name != null && name.length() > 0)
    		{
@@ -132,7 +136,7 @@ public class BrowseOrder
 	   		{
 	   			if (delegates[idx].equals(name))
 	   			{
-	   				return (BrowseOrderDelegate)PluginManager.getNamedPlugin(BrowseOrderDelegate.class, name);
+	   				return (OrderFormatDelegate)PluginManager.getNamedPlugin(OrderFormatDelegate.class, name);
 	   			}
 	   		}
    		}

@@ -42,8 +42,6 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Locale;
@@ -80,13 +78,13 @@ import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
-import org.dspace.browse.SortOption;
+import org.dspace.sort.SortOption;
+import org.dspace.sort.SortException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.xml.sax.SAXException;
 
@@ -473,9 +471,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                     }
                 }
             }
-            catch (BrowseException be)
+            catch (SortException se)
             {
-                throw new WingException("Unable to get sort options", be);
+                throw new WingException("Unable to get sort options", se);
             }
         }
 
@@ -623,20 +621,27 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             }
             else if (bi.isItemIndex() && !bi.isInternalIndex())
             {
-                // If a default sort option is specified by the index, but it isn't
-                // the same as sort option requested, attempt to find an index that
-                // is configured to use that sort by default
-                // This is so that we can then highlight the correct option in the navigation
-                SortOption bso = bi.getSortOption();
-                SortOption so = SortOption.getSortOption(sortBy);
-                if ( bso != null && bso != so)
+                try
                 {
-                    BrowseIndex newBi = BrowseIndex.getBrowseIndex(so);
-                    if (newBi != null)
+                    // If a default sort option is specified by the index, but it isn't
+                    // the same as sort option requested, attempt to find an index that
+                    // is configured to use that sort by default
+                    // This is so that we can then highlight the correct option in the navigation
+                    SortOption bso = bi.getSortOption();
+                    SortOption so = SortOption.getSortOption(sortBy);
+                    if ( bso != null && bso != so)
                     {
-                        bi   = newBi;
-                        type = bi.getName();
+                        BrowseIndex newBi = BrowseIndex.getBrowseIndex(so);
+                        if (newBi != null)
+                        {
+                            bi   = newBi;
+                            type = bi.getName();
+                        }
                     }
+                }
+                catch (SortException se)
+                {
+                    throw new UIException("Unable to get sort options", se);
                 }
             }
             

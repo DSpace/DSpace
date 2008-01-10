@@ -53,6 +53,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
+import org.dspace.sort.SortOption;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
