@@ -440,7 +440,7 @@ public class FeedServlet extends DSpaceServlet
         catch (SortException se)
         {
             log.error("caught exception: ", se);
-            throw new IOException(se);
+            throw new IOException(se.getMessage());
         }
     	catch (BrowseException e)
     	{
