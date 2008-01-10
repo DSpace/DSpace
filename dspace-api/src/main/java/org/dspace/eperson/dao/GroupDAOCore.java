@@ -39,11 +39,6 @@
  */
 package org.dspace.eperson.dao;
 
-import java.util.List;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Constants;
@@ -51,6 +46,11 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.ObjectIdentifierMint;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * FIXME: We actually implement the Link interface for two other pairs of
@@ -75,8 +75,11 @@ public class GroupDAOCore extends GroupDAO
 
         Group group = childDAO.create();
 
+        ObjectIdentifier oid = ObjectIdentifierMint.mint(context, group);
+        update(group);
+
         log.info(LogManager.getHeader(context, "create_group", "group_id="
-                + group.getID()));
+                + group.getID() + ",uuid=" + oid.getCanonicalForm()));
 
         return group;
     }
@@ -160,6 +163,14 @@ public class GroupDAOCore extends GroupDAO
             link(group, eperson);
         }
 
+        // deal with the item identifier/uuid
+        ObjectIdentifier oid = group.getIdentifier();
+        if (oid == null)
+        {
+            oid = ObjectIdentifierMint.mint(context, group);
+        }
+        oidDAO.update(group.getIdentifier());
+
         childDAO.update(group);
     }
 
@@ -177,6 +188,9 @@ public class GroupDAOCore extends GroupDAO
 
         // Remove any ResourcePolicies that reference this group
         AuthorizeManager.removeGroupPolicies(context, id);
+
+        // delete the identifier cache
+        oidDAO.delete(group);
 
         log.info(LogManager.getHeader(context, "delete_group", "group_id=" +
                     id));

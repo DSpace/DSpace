@@ -80,7 +80,7 @@
   <table width="95%">
     <tr>
       <td align="left">
-	<h1><fmt:message key="jsp.tools.group-edit.title"/> : <%=group.getName()%> (id: <%=group.getID()%>)</h1>
+	<h1><fmt:message key="jsp.tools.group-edit.title"/> : <%=group.getName()%> (<%=group.getIdentifier().getCanonicalForm() %>)</h1>
       </td>
       <td align="right" class="standard">
 	<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.collection-admin\") +\"#groupeditor\"%>"><fmt:message key="jsp.help"/></dspace:popup>

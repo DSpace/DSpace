@@ -51,6 +51,7 @@ import org.dspace.event.Event;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.UnsupportedIdentifierException;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -194,12 +195,9 @@ public class EPerson extends DSpaceObject
         return getEmail();
     }
 
+    /////////////////////////////////////////////////////////////////////
     // Identifier handling methods; override some default functionality
-
-    public List<ExternalIdentifier> getExternalIdentifiers()
-    {
-        return null;
-    }
+    /////////////////////////////////////////////////////////////////////
 
     public void addExternalIdentifier(ExternalIdentifier identifier)
             throws UnsupportedIdentifierException

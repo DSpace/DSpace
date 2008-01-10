@@ -105,7 +105,7 @@
     {
 %>
             <tr>
-                <td class="<%= row %>RowOddCol"><%= groups[i].getID() %></td>
+                <td class="<%= row %>RowOddCol"><%= groups[i].getIdentifier().getCanonicalForm() %></td>
                 <td class="<%= row %>RowEvenCol">
                     <%= groups[i].getName() %>
                 </td>

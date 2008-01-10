@@ -39,12 +39,7 @@
  */
 package org.dspace.eperson.dao;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
@@ -53,6 +48,12 @@ import org.dspace.dao.Link;
 import org.dspace.dao.StackableDAO;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.uri.dao.ObjectIdentifierDAO;
+import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
+
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * FIXME: We actually implement the Link interface for two other pairs of
@@ -67,6 +68,7 @@ public abstract class GroupDAO extends StackableDAO<GroupDAO>
 
     protected Context context;
     protected EPersonDAO epersonDAO;
+    protected ObjectIdentifierDAO oidDAO;
 
     protected GroupDAO childDAO;
 
@@ -79,6 +81,7 @@ public abstract class GroupDAO extends StackableDAO<GroupDAO>
         this.context = context;
 
         epersonDAO = EPersonDAOFactory.getInstance(context);
+        oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
     }
 
     public GroupDAO getChild()

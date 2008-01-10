@@ -52,6 +52,8 @@ import org.dspace.eperson.dao.EPersonDAOFactory;
 import org.dspace.eperson.dao.GroupDAO;
 import org.dspace.eperson.dao.GroupDAOFactory;
 import org.dspace.event.Event;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.UnsupportedIdentifierException;
 
 /**
  * Class representing a group of e-people.
@@ -201,6 +203,22 @@ public class Group extends DSpaceObject
         {
             return false;
         }
+    }
+
+    ////////////////////////////////////////////////////////////////////
+    // Override some identification methods
+    ////////////////////////////////////////////////////////////////////
+
+    public void addExternalIdentifier(ExternalIdentifier identifier)
+            throws UnsupportedIdentifierException
+    {
+        throw new UnsupportedIdentifierException("Groups cannot have ExternalIdentifiers");
+    }
+
+    public void setExternalIdentifiers(List<ExternalIdentifier> identifiers)
+            throws UnsupportedIdentifierException
+    {
+        throw new UnsupportedIdentifierException("Groups cannot have ExternalIdentifiers");
     }
 
     ////////////////////////////////////////////////////////////////////

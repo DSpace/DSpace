@@ -2,6 +2,18 @@ ALTER TABLE resourcepolicy ADD uuid VARCHAR(36);
 
 ALTER TABLE eperson ADD uuid VARCHAR(36);
 
+ALTER TABLE epersongroup ADD uuid VARCHAR(36);
+
+ALTER TABLE item ADD uuid VARCHAR(36);
+
+ALTER TABLE bitstream ADD uuid VARCHAR(36);
+
+ALTER TABLE bundle ADD uuid VARCHAR(36);
+
+ALTER TABLE collection ADD uuid VARCHAR(36);
+
+ALTER TABLE community ADD uuid VARCHAR(36);
+
 CREATE TABLE uuid (
     uuid VARCHAR(36) not null,
     resource_type integer,

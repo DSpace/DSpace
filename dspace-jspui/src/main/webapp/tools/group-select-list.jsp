@@ -213,7 +213,7 @@ function clearGroups()
 				<input type="button" value="<%
 	if (multiple) { %><fmt:message key="jsp.tools.general.add"/><% }
 	else {          %><fmt:message key="jsp.tools.general.select"/><% } %>" onclick="javascript:<%= clearList %>addGroup(<%= g.getID() %>, '<%= fullname %>');<%= closeWindow %>"/></td>
-			<td headers="t2" class="<%= row %>RowEvenCol"><%= g.getID() %></td>
+			<td headers="t2" class="<%= row %>RowEvenCol"><%= g.getIdentifier().getCanonicalForm() %></td>
 			<td headers="t3" class="<%= row %>RowOddCol"> <%= g.getName()%></td>
         </tr>
 <%

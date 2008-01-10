@@ -76,17 +76,13 @@ public class GroupDAOPostgres extends GroupDAO
     @Override
     public Group create() throws AuthorizeException
     {
-        UUID uuid = UUID.randomUUID();
-
         try
         {
             TableRow row = DatabaseManager.create(context, "epersongroup");
-            row.setColumn("uuid", uuid.toString());
             DatabaseManager.update(context, row);
 
             int id = row.getIntColumn("eperson_group_id");
             Group group = new GroupProxy(context, id);
-            group.setIdentifier(new ObjectIdentifier(uuid));
 
             return group;
         }
@@ -692,6 +688,7 @@ public class GroupDAOPostgres extends GroupDAO
     private void populateTableRowFromGroup(Group group, TableRow row)
     {
         row.setColumn("name", group.getName());
+        row.setColumn("uuid", group.getIdentifier().getUUID().toString());
     }
 
     /**
