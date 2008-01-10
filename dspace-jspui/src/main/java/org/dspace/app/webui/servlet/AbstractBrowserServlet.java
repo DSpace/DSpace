@@ -15,7 +15,8 @@ import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
-import org.dspace.browse.SortOption;
+import org.dspace.sort.SortOption;
+import org.dspace.sort.SortException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
@@ -252,6 +253,11 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             }
             
             return scope;
+        }
+        catch (SortException se)
+        {
+            log.error("caught exception: ", se);
+            throw new ServletException(se);
         }
         catch (BrowseException e)
         {

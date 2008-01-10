@@ -65,6 +65,7 @@ import org.dspace.core.LogManager;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
+import org.dspace.sort.SortOption;
 
 /**
  * Servlet for handling a simple search.
@@ -97,6 +98,8 @@ public class SimpleSearchServlet extends DSpaceServlet
         int start = UIUtil.getIntParameter(request, "start");
         String advanced = request.getParameter("advanced");
         String fromAdvanced = request.getParameter("from_advanced");
+        int sortBy = UIUtil.getIntParameter(request, "sort_by");
+        String order = request.getParameter("order");
         String advancedQuery = "";
         HashMap queryHash = new HashMap();
 
@@ -116,6 +119,22 @@ public class SimpleSearchServlet extends DSpaceServlet
 
         QueryResults qResults = null;
         QueryArgs qArgs = new QueryArgs();
+
+        try
+        {
+            qArgs.setSortOption(SortOption.getSortOption(sortBy));
+            if (SortOption.DESCENDING.equalsIgnoreCase(order))
+            {
+                qArgs.setSortOrder(SortOption.DESCENDING);
+            }
+            else
+            {
+                qArgs.setSortOrder(SortOption.ASCENDING);
+            }
+        }
+        catch (Exception e)
+        {
+        }
 
         // if the "advanced" flag is set, build the query string from the
         // multiple query fields

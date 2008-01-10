@@ -52,6 +52,8 @@ import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.sort.SortOption;
+import org.dspace.sort.OrderFormat;
 
 /**
  * This class does most of the actual grunt work of preparing a browse
@@ -289,7 +291,7 @@ public class BrowseEngine
 				rawValue = value;
 				
 				// make sure the incoming value is normalised
-                value = BrowseOrder.makeSortString(value, scope.getFilterValueLang(),
+                value = OrderFormat.makeSortString(value, scope.getFilterValueLang(),
                             scope.getBrowseIndex().getDataType());
 				
 				// set the values in the Browse Query
@@ -745,12 +747,12 @@ public class BrowseEngine
         if (scope.hasJumpToValue())
         {
             // Normalize it based on the specified language as appropriate for this index
-            return BrowseOrder.makeSortString(scope.getJumpToValue(), scope.setJumpToValueLang(), scope.getBrowseIndex().getDataType());
+            return OrderFormat.makeSortString(scope.getJumpToValue(), scope.setJumpToValueLang(), scope.getBrowseIndex().getDataType());
         }
         else if (scope.hasStartsWith())
         {
             // Scope has a starts with, so normalize that instead
-            return BrowseOrder.makeSortString(scope.getStartsWith(), null, scope.getBrowseIndex().getDataType());
+            return OrderFormat.makeSortString(scope.getStartsWith(), null, scope.getBrowseIndex().getDataType());
         }
         
         // No focus value on the scope (ie. focus by id), so just return the passed focus value

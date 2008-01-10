@@ -55,6 +55,8 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Searcher;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 import org.apache.oro.text.perl.Perl5Util;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -62,6 +64,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.sort.SortOption;
 import org.dspace.core.PluginManager;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierType;
@@ -124,10 +127,12 @@ public class DSQuery
     {
         String querystring = args.getQuery();
         QueryResults qr = new QueryResults();
+        List<Integer> hitIds     = new ArrayList<Integer>();
         List<String> hitURIs = new ArrayList<String>();
         List<Integer> hitTypes = new ArrayList<Integer>();
 
         // set up the QueryResults object
+        qr.setHitIds(hitIds);
         qr.setHitURIs(hitURIs);
         qr.setHitTypes(hitTypes);
         qr.setStart(args.getStart());
@@ -161,7 +166,16 @@ public class DSQuery
             }
             
             Query myquery = qp.parse(querystring);
-            Hits hits = searcher.search(myquery);
+            Hits hits = null;
+            if (args.getSortOption() == null)
+            {
+                hits = searcher.search(myquery, new Sort(new SortField[] { new SortField("type"), SortField.FIELD_SCORE }));
+            }
+            else
+            {
+                SortField[] sortFields = new SortField[] { new SortField("type"), new SortField("sort_" + args.getSortOption().getName(), SortOption.DESCENDING.equals(args.getSortOrder())), SortField.FIELD_SCORE };
+                hits = searcher.search(myquery, new Sort(sortFields));
+            }
 
             // set total number of hits
             qr.setHitCount(hits.length());
@@ -183,52 +197,47 @@ public class DSQuery
                 {
                     Document d = hits.doc(i);
 
+                    String resourceId   = d.get("search.resourceid");
+                    String resourceType = d.get("search.resourcetype");
+
                     String uriText = d.get("uri");
                     String uriType = d.get("type");
 
-                    hitURIs.add(uriText);
+                    switch (Integer.parseInt( resourceType != null ? resourceType : uriType))
+                    {
+                        case Constants.ITEM:
+                            hitTypes.add(new Integer(Constants.ITEM));
+                            break;
 
-                    if (uriType.equals("" + Constants.ITEM))
-                    {
-                        hitTypes.add(Constants.ITEM);
+                        case Constants.COLLECTION:
+                            hitTypes.add(new Integer(Constants.COLLECTION));
+                            break;
+
+                        case Constants.COMMUNITY:
+                            hitTypes.add(new Integer(Constants.COMMUNITY));
+                            break;
                     }
-                    else if (uriType.equals("" + Constants.COLLECTION))
-                    {
-                        hitTypes.add(Constants.COLLECTION);
-                    }
-                    else if (uriType.equals("" + Constants.COMMUNITY))
-                    {
-                        hitTypes.add(Constants.COMMUNITY);
-                    }
-                    else
-                    {
-                        // error! unknown type!
-                    }
+
+                    hitURIs.add(uriText);
+                    hitIds.add( resourceId == null ? null: Integer.parseInt(resourceId) );
                 }
             }
         }
         catch (NumberFormatException e)
         {
-            log
-                    .warn(LogManager.getHeader(c, "Number format exception", ""
-                            + e));
-
+            log.warn(LogManager.getHeader(c, "Number format exception", "" + e));
             qr.setErrorMsg("Number format exception");
         }
         catch (ParseException e)
         {
             // a parse exception - log and return null results
             log.warn(LogManager.getHeader(c, "Invalid search string", "" + e));
-
             qr.setErrorMsg("Invalid search string");
         }
         catch (TokenMgrError tme)
         {
             // Similar to parse exception
-            log
-                    .warn(LogManager.getHeader(c, "Invalid search string", ""
-                            + tme));
-
+            log.warn(LogManager.getHeader(c, "Invalid search string", "" + tme));
             qr.setErrorMsg("Invalid search string");
         }
         catch(BooleanQuery.TooManyClauses e)
@@ -394,6 +403,25 @@ public class DSQuery
         catch (Exception e)
         {
             System.out.println("Exception caught: " + e);
+        }
+    }
+
+    /**
+     * Close any IndexSearcher that is currently open.
+     */
+    public static void close()
+    {
+        if (searcher != null)
+        {
+            try
+            {
+                searcher.close();
+                searcher = null;
+            }
+            catch (IOException ioe)
+            {
+                log.error("DSQuery: Unable to close open IndexSearcher", ioe);
+            }
         }
     }
 

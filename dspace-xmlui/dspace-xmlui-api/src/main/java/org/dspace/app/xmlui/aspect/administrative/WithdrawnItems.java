@@ -77,7 +77,8 @@ import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
-import org.dspace.browse.SortOption;
+import org.dspace.sort.SortOption;
+import org.dspace.sort.SortException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
@@ -475,7 +476,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                     }
                 }
             }
-            catch (BrowseException be)
+            catch (SortException be)
             {
                 throw new WingException("Unable to get sort options", be);
             }

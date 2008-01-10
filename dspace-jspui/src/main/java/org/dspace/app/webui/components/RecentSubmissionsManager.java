@@ -46,7 +46,8 @@ import org.dspace.browse.BrowserScope;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowseException;
-import org.dspace.browse.SortOption;
+import org.dspace.sort.SortOption;
+import org.dspace.sort.SortException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.content.Item;
 
@@ -120,6 +121,11 @@ public class RecentSubmissionsManager
 			
 			return rs;
 		}
+        catch (SortException se)
+        {
+            log.error("caught exception: ", se);
+            throw new RecentSubmissionsException(se);
+        }
 		catch (BrowseException e)
 		{
 			log.error("caught exception: ", e);

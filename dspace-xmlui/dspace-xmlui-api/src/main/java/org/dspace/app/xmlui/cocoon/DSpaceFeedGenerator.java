@@ -70,7 +70,7 @@ import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowserScope;
-import org.dspace.browse.SortOption;
+import org.dspace.sort.SortOption;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;

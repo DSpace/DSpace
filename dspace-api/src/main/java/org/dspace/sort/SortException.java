@@ -1,11 +1,11 @@
 /*
- * BrowseOrderTitle.java
+ * SortException.java
  *
- * Version: $Revision: 1.0 $
+ * Version: $Revision: $
  *
- * Date: $Date: 2007/03/02 11:22:13 $
+ * Date: $Date:  $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+ * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,24 +37,32 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-
-package org.dspace.browse;
-
-import org.dspace.text.filter.DecomposeDiactritics;
-import org.dspace.text.filter.LowerCaseAndTrim;
-import org.dspace.text.filter.StandardInitialArticleWord;
-import org.dspace.text.filter.TextFilter;
+package org.dspace.sort;
 
 /**
- * Standard title ordering delegate implementation
- * 
- * @author Graham Triggs
+ * Just a quick SortException class to give us the relevant data type
  */
-public class BrowseOrderTitle extends AbstractTextFilterBOD
+public class SortException extends Exception
 {
+
+    public SortException()
+    {
+        super();
+    }
+
+    public SortException(String message)
+    {
+        super(message);
+    }
+
+	public SortException(String message, Throwable cause)
 	{
-		filters = new TextFilter[] { new StandardInitialArticleWord(),
-									 new DecomposeDiactritics(),
-									 new LowerCaseAndTrim() };
+		super(message, cause);
 	}
+
+	public SortException(Throwable cause)
+	{
+		super(cause);
+	}
+
 }

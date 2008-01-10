@@ -66,12 +66,13 @@ import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowserScope;
-import org.dspace.browse.SortOption;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.sort.SortException;
+import org.dspace.sort.SortOption;
 import org.xml.sax.SAXException;
 
 /**
@@ -373,6 +374,10 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 
         	BrowseEngine be = new BrowseEngine(context);
         	this.recentSubmittedItems = be.browse(scope).getResults();
+        }
+        catch (SortException se)
+        {
+            log.error("Caught SortException", se);
         }
         catch (BrowseException bex)
         {

@@ -41,12 +41,13 @@ package org.dspace.browse;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.dspace.core.ConfigurationManager;
+import org.dspace.sort.SortOption;
+import org.dspace.sort.SortException;
 
 /**
  * This class holds all the information about a specifically configured 
@@ -113,7 +114,7 @@ public class BrowseIndex
             displayType = "item";
             sortOption = SortOption.getDefaultSortOption();
         }
-        catch (BrowseException be)
+        catch (SortException se)
         {
             // FIXME Exception handling
         }
@@ -140,82 +141,89 @@ public class BrowseIndex
     private BrowseIndex(String definition, int number)
     	throws BrowseException
     {
-        boolean valid = true;
-        this.defaultOrder = SortOption.ASCENDING;
-        this.number = number;
-        
-        String rx = "(\\w+):(\\w+):([\\w\\.\\*,]+):?(\\w*):?(\\w*)";
-        Pattern pattern = Pattern.compile(rx);
-        Matcher matcher = pattern.matcher(definition);
-        
-        if (matcher.matches())
+        try
         {
-            name = matcher.group(1);
-            displayType = matcher.group(2);
-            
-            if (isMetadataIndex())
+            boolean valid = true;
+            this.defaultOrder = SortOption.ASCENDING;
+            this.number = number;
+
+            String rx = "(\\w+):(\\w+):([\\w\\.\\*,]+):?(\\w*):?(\\w*)";
+            Pattern pattern = Pattern.compile(rx);
+            Matcher matcher = pattern.matcher(definition);
+
+            if (matcher.matches())
             {
-                metadataAll = matcher.group(3);
-                datatype = matcher.group(4);
+                name = matcher.group(1);
+                displayType = matcher.group(2);
 
-                if (metadataAll != null)
-                    metadata = metadataAll.split(",");
-
-                if (metadata == null || metadata.length == 0)
-                    valid = false;
-                
-                if (datatype == null || datatype.equals(""))
-                    valid = false;
-
-                // If an optional ordering configuration is supplied,
-                // set the defaultOrder appropriately (asc or desc)
-                if (matcher.groupCount() > 4)
+                if (isMetadataIndex())
                 {
-                    String order = matcher.group(5);
-                    if (SortOption.DESCENDING.equalsIgnoreCase(order))
-                        this.defaultOrder = SortOption.DESCENDING;
+                    metadataAll = matcher.group(3);
+                    datatype = matcher.group(4);
+
+                    if (metadataAll != null)
+                        metadata = metadataAll.split(",");
+
+                    if (metadata == null || metadata.length == 0)
+                        valid = false;
+
+                    if (datatype == null || datatype.equals(""))
+                        valid = false;
+
+                    // If an optional ordering configuration is supplied,
+                    // set the defaultOrder appropriately (asc or desc)
+                    if (matcher.groupCount() > 4)
+                    {
+                        String order = matcher.group(5);
+                        if (SortOption.DESCENDING.equalsIgnoreCase(order))
+                            this.defaultOrder = SortOption.DESCENDING;
+                    }
+
+                    tableBaseName = makeTableBaseName(number);
                 }
-
-                tableBaseName = makeTableBaseName(number);
-            }
-            else if (isItemIndex())
-            {
-                String sortName = matcher.group(3);
-
-                for (SortOption so : SortOption.getSortOptions())
+                else if (isItemIndex())
                 {
-                    if (so.getName().equals(sortName))
-                        sortOption = so;
-                }
+                    String sortName = matcher.group(3);
 
-                if (sortOption == null)
+                    for (SortOption so : SortOption.getSortOptions())
+                    {
+                        if (so.getName().equals(sortName))
+                            sortOption = so;
+                    }
+
+                    if (sortOption == null)
+                        valid = false;
+
+                    // If an optional ordering configuration is supplied,
+                    // set the defaultOrder appropriately (asc or desc)
+                    if (matcher.groupCount() > 3)
+                    {
+                        String order = matcher.group(4);
+                        if (SortOption.DESCENDING.equalsIgnoreCase(order))
+                            this.defaultOrder = SortOption.DESCENDING;
+                    }
+
+                    tableBaseName = getItemBrowseIndex().tableBaseName;
+                }
+                else
+                {
                     valid = false;
-
-                // If an optional ordering configuration is supplied,
-                // set the defaultOrder appropriately (asc or desc)
-                if (matcher.groupCount() > 3)
-                {
-                    String order = matcher.group(4);
-                    if (SortOption.DESCENDING.equalsIgnoreCase(order))
-                        this.defaultOrder = SortOption.DESCENDING;
                 }
-
-                tableBaseName = getItemBrowseIndex().tableBaseName;
             }
             else
             {
                 valid = false;
             }
+
+            if (!valid)
+            {
+                throw new BrowseException("Browse Index configuration is not valid: webui.browse.index." +
+                        number + " = " + definition);
+            }
         }
-        else
+        catch (SortException se)
         {
-            valid = false;
-        }
-        
-        if (!valid)
-        {
-            throw new BrowseException("Browse Index configuration is not valid: webui.browse.index." + 
-                    number + " = " + definition);
+            throw new BrowseException("Error in SortOptions", se);
         }
     }
 

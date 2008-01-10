@@ -44,18 +44,25 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Calendar;
+import java.util.TimeZone;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.DateTools;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
@@ -75,6 +82,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.LogManager;
+import org.dspace.sort.SortOption;
+import org.dspace.sort.OrderFormat;
 
 /**
  * DSIndexer contains the methods that index Items and their metadata,
@@ -113,6 +122,20 @@ public class DSIndexer
         String schema;
         String element;
         String qualifier = null;
+        String type = "text";
+
+        IndexConfig()
+        {
+        }
+
+        IndexConfig(String indexName, String schema, String element, String qualifier, String type)
+        {
+            this.indexName = indexName;
+            this.schema = schema;
+            this.element = element;
+            this.qualifier = qualifier;
+            this.type = type;
+        }
     }
 
     private static String index_directory = ConfigurationManager.getProperty("search.dir");
@@ -123,8 +146,22 @@ public class DSIndexer
     /** The analyzer for this DSpace instance */
     private static Analyzer analyzer = null;
 
-    // Static initialisation of index configuration /
-    private static IndexConfig[] indexConfigArr = new IndexConfig[0];
+    /** Static initialisation of index configuration */
+    /** Includes backwards compatible default configuration */
+    private static IndexConfig[] indexConfigArr = new IndexConfig[]
+    {
+        new IndexConfig("author",     "dc", "contributor", Item.ANY,          "text") ,
+        new IndexConfig("author",     "dc", "creator",     Item.ANY,          "text"),
+        new IndexConfig("author",     "dc", "description", "statementofresponsibility", "text"),
+        new IndexConfig("title",      "dc", "title",       Item.ANY,          "text"),
+        new IndexConfig("keyword",    "dc", "subject",     Item.ANY,          "text"),
+        new IndexConfig("abstract",   "dc", "description", "abstract",        "text"),
+        new IndexConfig("abstract",   "dc", "description", "tableofcontents", "text"),
+        new IndexConfig("series",     "dc", "relation",    "ispartofseries",  "text"),
+        new IndexConfig("mimetype",   "dc", "format",      "mimetype",        "text"),
+        new IndexConfig("sponsor",    "dc", "description", "sponsorship",     "text"),
+        new IndexConfig("identifier", "dc", "identifier",  Item.ANY,          "text")
+    };
 
     static {
 
@@ -135,7 +172,7 @@ public class DSIndexer
         }
 
         // read in indexes from the config
-        ArrayList indexConfigList = new ArrayList();
+        ArrayList<String> indexConfigList = new ArrayList<String>();
 
         // read in search.index.1, search.index.2....
         for (int i = 1; ConfigurationManager.getProperty("search.index." + i) != null; i++)
@@ -150,7 +187,7 @@ public class DSIndexer
             for (int i = 0; i < indexConfigList.size(); i++)
             {
                 indexConfigArr[i] = new IndexConfig();
-                String index = (String) indexConfigList.get(i);
+                String index = indexConfigList.get(i);
 
                 String[] configLine = index.split(":");
 
@@ -173,6 +210,11 @@ public class DSIndexer
                     // FIXME: Can't proceed here, no suitable exception to throw
                     throw new RuntimeException(
                             "Malformed configuration line: search.index." + i);
+                }
+
+                if (configLine.length > 2)
+                {
+                    indexConfigArr[i].type = configLine[2];
                 }
             }
         }
@@ -249,7 +291,7 @@ public class DSIndexer
                 Item item = (Item)dso;
                 if (item.isArchived() && !item.isWithdrawn())
                 {
-                    if(requiresIndexing(uri, ((Item)dso).getLastModified()) || force)
+                    if (requiresIndexing(uri, ((Item)dso).getLastModified()) || force)
                     {
                         Document doc = buildDocument(context, (Item) dso);
 
@@ -417,7 +459,7 @@ public class DSIndexer
      * @throws IOException
      * @throws SQLException
      */
-    public static void main(String[] args) throws IOException, java.sql.SQLException
+    public static void main(String[] args) throws IOException, SQLException
     {
 
         Context context = new Context();
@@ -695,7 +737,7 @@ public class DSIndexer
 	 * to determine if the index is stale.
 	 *
 	 * @param uri
-	 * @param dso
+	 * @param lastModified
 	 * @return
 	 * @throws IOException
 	 */
@@ -806,15 +848,15 @@ public class DSIndexer
     {
         // Create Lucene Document
         String uri = community.getIdentifier().getCanonicalForm();
-        Document doc = buildDocument(Constants.COMMUNITY, uri, null);
+        Document doc = buildDocument(Constants.COMMUNITY, community.getID(), uri, null);
 
         // and populate it
         String name = community.getMetadata("name");
 
-        if(name != null)
+        if (name != null)
         {
-        	doc.add(new Field("name", name, Field.Store.YES, Field.Index.TOKENIZED));
-        	doc.add(new Field("default", name, Field.Store.YES, Field.Index.TOKENIZED));
+        	doc.add(new Field("name", name, Field.Store.NO, Field.Index.TOKENIZED));
+        	doc.add(new Field("default", name, Field.Store.NO, Field.Index.TOKENIZED));
         }
 
         return doc;
@@ -835,15 +877,15 @@ public class DSIndexer
 
         // Create Lucene Document
         String uri = collection.getIdentifier().getCanonicalForm();
-        Document doc = buildDocument(Constants.COLLECTION, uri, location_text);
+        Document doc = buildDocument(Constants.COLLECTION, collection.getID(), uri, location_text);
 
         // and populate it
         String name = collection.getMetadata("name");
 
         if(name != null)
         {
-        	doc.add(new Field("name", name, Field.Store.YES, Field.Index.TOKENIZED));
-        	doc.add(new Field("default", name, Field.Store.YES, Field.Index.TOKENIZED));
+        	doc.add(new Field("name", name, Field.Store.NO, Field.Index.TOKENIZED));
+        	doc.add(new Field("default", name, Field.Store.NO, Field.Index.TOKENIZED));
         }
 
         return doc;
@@ -868,7 +910,7 @@ public class DSIndexer
         // identifier?
         String uri = item.getIdentifier().getCanonicalForm();
 
-        Document doc = buildDocument(Constants.ITEM, uri, location);
+        Document doc = buildDocument(Constants.ITEM, item.getID(), uri, location);
 
         log.debug("Building Item: " + uri);
 
@@ -893,130 +935,70 @@ public class DSIndexer
                     mydc = item.getMetadata(indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier, Item.ANY);
                 }
 
-                // put them all from an array of strings to one string for
-                // writing out pack all of the arrays of DCValues into plain
-                // text strings for the indexer
-                String content_text = "";
-
                 for (j = 0; j < mydc.length; j++)
                 {
-                    content_text = content_text + mydc[j].value + " ";
+                    if (!StringUtils.isEmpty(mydc[j].value))
+                    {
+                        if ("timestamp".equalsIgnoreCase(indexConfigArr[i].type))
+                        {
+                            Date d = toDate(mydc[j].value);
+                            if (d != null)
+                            {
+                                doc.add( new Field(indexConfigArr[i].indexName,
+                                                   DateTools.dateToString(d, DateTools.Resolution.SECOND),
+                                                   Field.Store.NO,
+                                                   Field.Index.TOKENIZED));
+                            }
+                        }
+                        else if ("date".equalsIgnoreCase(indexConfigArr[i].type))
+                        {
+                            Date d = toDate(mydc[j].value);
+                            if (d != null)
+                            {
+                                doc.add( new Field(indexConfigArr[i].indexName,
+                                                   DateTools.dateToString(d, DateTools.Resolution.DAY),
+                                                   Field.Store.NO,
+                                                   Field.Index.TOKENIZED));
+                            }
+                        }
+                        else
+                        {
+                            // TODO: use a delegate to allow custom 'types' to be used to reformat the field
+                            doc.add( new Field(indexConfigArr[i].indexName,
+                                               mydc[j].value,
+                                               Field.Store.NO,
+                                               Field.Index.TOKENIZED));
+                        }
+
+                        doc.add( new Field("default", mydc[j].value, Field.Store.NO, Field.Index.TOKENIZED));
+                    }
                 }
-
-                // arranges content with fields in ArrayLists with same index to
-                // put
-                // into hash later
-                k = fields.indexOf(indexConfigArr[i].indexName);
-
-                if (k < 0)
-                {
-                    fields.add(indexConfigArr[i].indexName);
-                    content.add(content_text);
-                }
-                else
-                {
-                    content_text = content_text + (String) content.get(k) + " ";
-                    content.set(k, content_text);
-                }
-            }
-
-            // build the hash
-            for (int i = 0; i < fields.size(); i++)
-            {
-            
-            	doc.add(
-            		new Field(
-                                    (String) fields.get(i),
-            			(String) content.get(i),
-            			Field.Store.YES, Field.Index.TOKENIZED
-                    ));
-    
-            	doc.add(new Field("default", (String) content.get(i), Field.Store.YES, Field.Index.TOKENIZED));
-            }
-        }
-        else
-        // if no search indexes found in cfg file, for backward compatibility
-        {
-            // extract metadata (ANY is wildcard from Item class)
-            DCValue[] authors = item.getDC("contributor", Item.ANY, Item.ANY);
-            for (j = 0; j < authors.length; j++)
-            {
-            	doc.add(new Field("author", authors[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            	doc.add(new Field("default", authors[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            }
-
-            DCValue[] creators = item.getDC("creator", Item.ANY, Item.ANY);
-            for (j = 0; j < creators.length; j++) //also authors
-            {
-                doc.add(new Field("author", creators[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-                doc.add(new Field("default", creators[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            }
-
-            DCValue[] sors = item.getDC("description", "statementofresponsibility", Item.ANY);
-            for (j = 0; j < sors.length; j++) //also authors
-            {
-                doc.add(new Field("author", sors[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-                doc.add(new Field("default", sors[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            }
-
-            DCValue[] titles = item.getDC("title", Item.ANY, Item.ANY);
-            for (j = 0; j < titles.length; j++)
-            {
-            	doc.add(new Field("title", titles[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            	doc.add(new Field("default", titles[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            }
-
-            DCValue[] keywords = item.getDC("subject", Item.ANY, Item.ANY);
-            for (j = 0; j < keywords.length; j++)
-            {
-            	doc.add(new Field("keyword", keywords[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            	doc.add(new Field("default", keywords[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            }
-
-            DCValue[] abstracts = item.getDC("description", "abstract", Item.ANY);
-            for (j = 0; j < abstracts.length; j++)
-            {
-            	doc.add(new Field("abstract", abstracts[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            	doc.add(new Field("default", abstracts[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            }
-
-            DCValue[] tocs = item.getDC("description", "tableofcontents", Item.ANY);
-            for (j = 0; j < tocs.length; j++)
-            {
-            	doc.add(new Field("abstract", tocs[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            	doc.add(new Field("default", tocs[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            }
-
-            DCValue[] series = item.getDC("relation", "ispartofseries", Item.ANY);
-            for (j = 0; j < series.length; j++)
-            {
-            	doc.add(new Field("series", series[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            	doc.add(new Field("default", series[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            }
-
-            DCValue[] mimetypes = item.getDC("format", "mimetype", Item.ANY);
-            for (j = 0; j < mimetypes.length; j++)
-            {
-            	doc.add(new Field("mimetype", mimetypes[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            	doc.add(new Field("default", mimetypes[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            }
-
-            DCValue[] sponsors = item.getDC("description", "sponsorship", Item.ANY);
-            for (j = 0; j < sponsors.length; j++)
-            {
-            	doc.add(new Field("sponsor", sponsors[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            	doc.add(new Field("default", sponsors[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            }
-
-            DCValue[] identifiers = item.getDC("identifier", Item.ANY, Item.ANY);
-            for (j = 0; j < identifiers.length; j++)
-            {
-            	doc.add(new Field("identifier", identifiers[j].value, Field.Store.YES, Field.Index.TOKENIZED));
-            	doc.add(new Field("default", identifiers[j].value, Field.Store.YES, Field.Index.TOKENIZED));
             }
         }
 
         log.debug("  Added Metadata");
+
+        try
+        {
+            // Now get the configured sort options, and add those as untokenized fields
+            // Note that we will use the sort order delegates to normalise the values written
+            for (SortOption so : SortOption.getSortOptions())
+            {
+                String[] somd = so.getMdBits();
+                DCValue[] dcv = item.getMetadata(somd[0], somd[1], somd[2], Item.ANY);
+                if (dcv.length > 0)
+                {
+                    String value = OrderFormat.makeSortString(dcv[0].value, dcv[0].language, so.getType());
+                    doc.add( new Field("sort_" + so.getName(), value, Field.Store.NO, Field.Index.UN_TOKENIZED) );
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            log.error(e.getMessage(),e);
+        }
+
+        log.debug("  Added Sorting");
 
         try
         {
@@ -1067,11 +1049,12 @@ public class DSIndexer
      * Create Lucene document with all the shared fields initialized.
      * 
      * @param type Type of DSpace Object
+     * @param id
      * @param uri
      * @param location
      * @return
      */
-    private static Document buildDocument(int type, String uri, String location)
+    private static Document buildDocument(int type, int id, String uri, String location)
     {
         Document doc = new Document();
 
@@ -1079,9 +1062,13 @@ public class DSIndexer
         // (not tokenized, but it is indexed)
         doc.add(new Field(LAST_INDEXED_FIELD, Long.toString(System.currentTimeMillis()), Field.Store.YES, Field.Index.UN_TOKENIZED));
 
-        
+        // KEPT FOR BACKWARDS COMPATIBILITY
         // do location, type, uri first
         doc.add(new Field("type", Integer.toString(type), Field.Store.YES, Field.Index.NO));
+
+        // New fields to weaken the dependence on handles, and allow for faster list display
+        doc.add(new Field("search.resourcetype", Integer.toString(type), Field.Store.YES, Field.Index.NO));
+        doc.add(new Field("search.resourceid",   Integer.toString(id),   Field.Store.YES, Field.Index.NO));
 
         // want to be able to search for uri, so use keyword
         // (not tokenized, but it is indexed)
@@ -1097,17 +1084,72 @@ public class DSIndexer
             doc.add(new Field("uri", uri, Field.Store.YES, Field.Index.UN_TOKENIZED));
 
             // add to full text index
-            doc.add(new Field("default", uri, Field.Store.YES, Field.Index.TOKENIZED));
+            doc.add(new Field("default", uri, Field.Store.NO, Field.Index.TOKENIZED));
         }
 
         if(location != null)
         {
-            doc.add(new Field("location", location, Field.Store.YES, Field.Index.TOKENIZED));
-    	    doc.add(new Field("default", location, Field.Store.YES, Field.Index.TOKENIZED));
+            doc.add(new Field("location", location, Field.Store.NO, Field.Index.TOKENIZED));
+    	    doc.add(new Field("default", location, Field.Store.NO, Field.Index.TOKENIZED));
         }
 
         return doc;
     }
 
+    /**
+     * Helper function to retrieve a date using a best guess of the potential date encodings on a field
+     *
+     * @param t
+     * @return
+     */
+    private static Date toDate(String t)
+    {
+        SimpleDateFormat[] dfArr;
 
+        // Choose the likely date formats based on string length
+        switch (t.length())
+        {
+            case 4:
+                dfArr = new SimpleDateFormat[] { new SimpleDateFormat("yyyy") };
+                break;
+            case 6:
+                dfArr = new SimpleDateFormat[] { new SimpleDateFormat("yyyyMM") };
+                break;
+            case 7:
+                dfArr = new SimpleDateFormat[] { new SimpleDateFormat("yyyy-MM") };
+                break;
+            case 8:
+                dfArr = new SimpleDateFormat[] { new SimpleDateFormat("yyyyMMdd"), new SimpleDateFormat("yyyy MMM") };
+                break;
+            case 10:
+                dfArr = new SimpleDateFormat[] { new SimpleDateFormat("yyyy-MM-dd") };
+                break;
+            case 11:
+                dfArr = new SimpleDateFormat[] { new SimpleDateFormat("yyyy MMM dd") };
+                break;
+            case 20:
+                dfArr = new SimpleDateFormat[] { new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'") };
+                break;
+            default:
+                dfArr = new SimpleDateFormat[] { new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'") };
+                break;
+        }
+
+
+        for (SimpleDateFormat df : dfArr)
+        {
+            try
+            {
+                // Parse the date
+                df.setCalendar(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
+                return df.parse(t);
+            }
+            catch (ParseException pe)
+            {
+                log.error("Unable to parse date format", pe);
+            }
+        }
+
+        return null;
+    }
 }

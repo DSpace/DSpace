@@ -57,6 +57,9 @@ import org.dspace.content.Item;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.Context;
+import org.dspace.sort.SortOption;
+import org.dspace.sort.SortException;
+import org.dspace.sort.OrderFormat;
 
 /**
  * Tool to create Browse indexes.  This class is used from the command line to
@@ -436,7 +439,7 @@ public class IndexBrowse
                                 for (int x = 0; x < values.length; x++)
                                 {
                                     // get the normalised version of the value
-                                    String nVal = BrowseOrder.makeSortString(values[x].value, values[x].language, bis[i].getDataType());
+                                    String nVal = OrderFormat.makeSortString(values[x].value, values[x].language, bis[i].getDataType());
 
                                     Map sortMap = getSortValues(item, itemMDMap);
 
@@ -472,51 +475,59 @@ public class IndexBrowse
     private Map<Integer, String> getSortValues(ItemMetadataProxy item, Map itemMDMap)
             throws BrowseException, SQLException
     {
-        // now obtain the sort order values that we will use
-        Map<Integer, String> sortMap = new HashMap<Integer, String>();
-        for (SortOption so : SortOption.getSortOptions())
+        try
         {
-            Integer key = new Integer(so.getNumber());
-            String metadata = so.getMetadata();
-            
-            // If we've already used the metadata for this Item
-            // it will be cached in the map
-            DCValue value = null;
-            
-            if (itemMDMap != null)
-                value = (DCValue) itemMDMap.get(metadata);
-            
-            // We haven't used this metadata before, so grab it from the item
-            if (value == null)
+            // now obtain the sort order values that we will use
+            Map<Integer, String> sortMap = new HashMap<Integer, String>();
+            for (SortOption so : SortOption.getSortOptions())
             {
-                String[] somd = so.getMdBits();
-                DCValue[] dcv = item.getMetadata(somd[0], somd[1], somd[2], Item.ANY);
-                
-                if (dcv == null)
+                Integer key = new Integer(so.getNumber());
+                String metadata = so.getMetadata();
+
+                // If we've already used the metadata for this Item
+                // it will be cached in the map
+                DCValue value = null;
+
+                if (itemMDMap != null)
+                    value = (DCValue) itemMDMap.get(metadata);
+
+                // We haven't used this metadata before, so grab it from the item
+                if (value == null)
                 {
-                    continue;
+                    String[] somd = so.getMdBits();
+                    DCValue[] dcv = item.getMetadata(somd[0], somd[1], somd[2], Item.ANY);
+
+                    if (dcv == null)
+                    {
+                        continue;
+                    }
+
+                    // we only use the first dc value
+                    if (dcv.length > 0)
+                    {
+                        // Set it as the current metadata value to use
+                        // and add it to the map
+                        value = dcv[0];
+
+                        if (itemMDMap != null)
+                            itemMDMap.put(metadata, dcv[0]);
+                    }
                 }
-                
-                // we only use the first dc value
-                if (dcv.length > 0)
+
+                // normalise the values as we insert into the sort map
+                if (value != null && value.value != null)
                 {
-                    // Set it as the current metadata value to use
-                    // and add it to the map
-                    value = dcv[0];
-                    
-                    if (itemMDMap != null)
-                        itemMDMap.put(metadata, dcv[0]);
+                    String nValue = OrderFormat.makeSortString(value.value, value.language, so.getType());
+                    sortMap.put(key, nValue);
                 }
             }
-            
-            // normalise the values as we insert into the sort map
-            if (value != null && value.value != null)
-            {
-                String nValue = BrowseOrder.makeSortString(value.value, value.language, so.getType());
-                sortMap.put(key, nValue);
-            }
+
+            return sortMap;
         }
-        return sortMap;
+        catch (SortException se)
+        {
+            throw new BrowseException("Error in SortOptions", se);
+        }
     }
     
     /**
@@ -705,26 +716,33 @@ public class IndexBrowse
 	private void prepTables()
     	throws BrowseException
     {
-    	// first, erase the existing indexes
-    	clearDatabase();
-    	
-    	createItemTables();
-    	
-    	// for each current browse index, make all the relevant tables
-    	for (int i = 0; i < bis.length; i++)
+        try
         {
-    		createTables(bis[i]);
-    		
-    		// prepare some CLI output
-    		StringBuffer logMe = new StringBuffer();
-    		for (SortOption so : SortOption.getSortOptions())
-    		{
-    			logMe.append(" " + so.getMetadata() + " ");
-    		}
-    		
-    		output.message("Creating browse index " + bis[i].getName() + 
-    				": index by " + bis[i].getMetadata() + 
-    				" sortable by: " + logMe.toString());
+            // first, erase the existing indexes
+            clearDatabase();
+
+            createItemTables();
+
+            // for each current browse index, make all the relevant tables
+            for (int i = 0; i < bis.length; i++)
+            {
+                createTables(bis[i]);
+
+                // prepare some CLI output
+                StringBuffer logMe = new StringBuffer();
+                for (SortOption so : SortOption.getSortOptions())
+                {
+                    logMe.append(" " + so.getMetadata() + " ");
+                }
+
+                output.message("Creating browse index " + bis[i].getName() +
+                        ": index by " + bis[i].getMetadata() +
+                        " sortable by: " + logMe.toString());
+            }
+        }
+        catch (SortException se)
+        {
+            throw new BrowseException("Error in SortOptions", se);
         }
     }
     
@@ -893,6 +911,10 @@ public class IndexBrowse
                 context.commit();
             }
         }
+        catch (SortException se)
+        {
+            throw new BrowseException("Error in SortOptions", se);
+        }
         catch (SQLException e)
         {
             log.error("caught exception: ", e);
@@ -1003,6 +1025,10 @@ public class IndexBrowse
 				context.commit();
 			}
 		}
+        catch (SortException se)
+        {
+            throw new BrowseException("Error in SortOptions", se);
+        }
 		catch (SQLException e)
 		{
 			log.error("caught exception: ", e);

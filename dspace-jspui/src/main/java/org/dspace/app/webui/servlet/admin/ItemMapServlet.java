@@ -56,6 +56,7 @@ import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.sort.SortOption;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

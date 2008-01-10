@@ -1,5 +1,5 @@
 /*
- * AbstractTextFilterBOD.java
+ * AbstractTextFilterOFD.java
  *
  * Version: $Revision: 1.0 $
  *
@@ -42,6 +42,7 @@ package org.dspace.browse;
 
 import org.apache.log4j.Logger;
 import org.dspace.text.filter.TextFilter;
+import org.dspace.sort.OrderFormatDelegate;
 
 /**
  * Helper class for creating order delegates.
@@ -49,7 +50,7 @@ import org.dspace.text.filter.TextFilter;
  * To configure the filters create a subclass and, in an object initializer,
  * create an array of classes that implement TextFilter:
  * 
- * class MyLocaleDelegate extends AbstractTextFilterBOD {
+ * class MyLocaleDelegate extends AbstractTextFilterOFD {
  *   {
  *      filters = new TextFilter[] { new LocaleOrderingFilter(); }
  *   }
@@ -72,9 +73,9 @@ import org.dspace.text.filter.TextFilter;
  * 
  * @author Graham Triggs
  */
-public abstract class AbstractTextFilterBOD implements BrowseOrderDelegate
+public abstract class AbstractTextFilterOFD implements OrderFormatDelegate
 {
-	private final static Logger log = Logger.getLogger(AbstractTextFilterBOD.class);
+	private final static Logger log = Logger.getLogger(AbstractTextFilterOFD.class);
 	
 	// Initialised in subclass in an object initializer
 	protected TextFilter[] filters;

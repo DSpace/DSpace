@@ -39,7 +39,6 @@
  */
 package org.dspace.browse;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -50,6 +49,7 @@ import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.sort.SortOption;
 
 /**
  * The results of a Browse, including all the contextual information about

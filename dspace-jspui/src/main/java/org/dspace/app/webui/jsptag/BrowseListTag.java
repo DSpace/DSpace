@@ -45,7 +45,6 @@ import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.CrossLinks;
-import org.dspace.browse.SortOption;
 import org.dspace.browse.Thumbnail;
 import org.dspace.content.Bitstream;
 import org.dspace.content.DCDate;
@@ -57,6 +56,7 @@ import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.uri.IdentifierFactory;
+import org.dspace.sort.SortOption;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
