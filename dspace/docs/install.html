@@ -10,17 +10,35 @@
 
     <P><A HREF="index.html">Back to contents</A></P>
 
+    <P>&nbsp;</P>
+	<P><strong>Installation Table of Contents</strong>
+        <UL>
+          <LI><A HREF="install.html#prerequisite">Prerequisite Software</A></LI>
+          <LI><A HREF="install.html#installoptions">Installation Options</A>
+          	<UL>
+          		<LI><A HREF="install.html#options">Overview of Install Options</A></LI>
+          		<LI><A HREF="install.html#options">Overview of DSpace Directories</A></LI>
+          		<LI><A HREF="install.html#installsteps">Quick Installation Method</A></LI>
+          		<LI><A HREF="install.html#maveninstall">Maven-based Installation Method</A></LI>
+          	</UL>
+          </LI> 
+          <LI><A HREF="install.html#advancedinstall">Advanced Installation Options</A></LI>
+		  <li><a href="install.html#windows">Windows Installation</a></li>
+          <LI><A HREF="install.html#knownbugs">Known Bugs</A></LI>
+          <LI><A HREF="install.html#problems">Common Problems</A></LI>
+        </UL>
+    </P>
+     
+    <H2><A NAME="prerequisite">Prerequisite Software</A></H2>
 
-    <H2><A NAME="prerequisite">Prerequisites</A></H2>
-
-    <P>The list below describes the third-party components and tools you'll need to run a DSpace server.  These are simply recommendations based on our setup at MIT; since DSpace is built on open source, standards-based tools, there are numerous other possibilities and setups.</P>
+    <P>The list below describes the third-party components and tools you'll need to run a DSpace server.  These are just guidelines.  Since DSpace is built on open source, standards-based tools, there are numerous other possibilities and setups.</P>
 
     <P>Also, please note that the configuration and installation guidelines relating to a particular tool below are here for convenience.  You should refer to the documentation for each individual component for complete and up-to-date details.  Many of the tools are updated on a frequent basis, and the guidelines below may become out of date.</P>
 
     <ol>
-      <li><P>UNIX-like OS (Linux, HP/UX etc)</P></li>
+      <li><P>UNIX-like OS (Linux, HP/UX etc) or Microsoft Windows (see full <a href="#windows">Windows Instructions</a> for full set of Windows prerequisites)</P> </li>
 
-      <li><P><A HREF="http://java.sun.com/">Java 1.4</A> or later (standard SDK is fine, you don't need J2EE)</P></li>
+      <li><P><A HREF="http://java.sun.com/">Java SDK 1.5</A> or later (standard SDK is fine, you don't need J2EE)</P></li>
 
       <li><P><A HREF="http://ant.apache.org/">Apache Ant 1.6.2</A> or later (Java make-like tool)</P></li>
 
@@ -65,7 +83,7 @@
 
       </li>
 
-      <li><P><A HREF="http://jakarta.apache.org/tomcat/">Jakarta Tomcat 4.x/5.x</A> or equivalent, such as <A HREF="http://www.mortbay.org/jetty/index.html">Jetty</A> or <A HREF="http://www.caucho.com/">Caucho Resin</A>.</P>
+      <li><P><A HREF="http://jakarta.apache.org/tomcat/">Jakarta Tomcat 4.x</A> or later.  DSpace will also run on an equivalent, such as <A HREF="http://www.mortbay.org/jetty/index.html">Jetty</A> or <A HREF="http://www.caucho.com/">Caucho Resin</A>. </P>
 
       <P>Note that DSpace will need to run as the same user as Tomcat, so you might want to install and run Tomcat as a user called '<code>dspace</code>'.</P>
 
@@ -88,25 +106,102 @@
 
        <P>Jetty and Resin are configured for correct handling of UTF-8 by default.</P>
       </li>
+      
+      <li><P>(<em>Optional</em>) <A HREF="http://maven.apache.org/">Apache Maven 2</A> (Java project build manager)</P>
+      	  <P>Maven is only necessary to install if you want to re-package and re-build all of DSpace from its source code. 
+      	     Therefore, Maven is only <em>required</em> if you want to do one or more of the following:</P>
+      	     <ul>
+      	      <li>Change the underlying Java API of DSpace</li>
+      	      <li>Completely re-package DSpace with your own custom API or custom interfaces</li>
+      	      <li>Create DSpace interface "overlays"</li>
+      	     </ul>
+      	  <P>If your institution does not have a developer who actually customizes
+      	     the underlying Java API for DSpace, chances are you don't need Maven.</P>
+      </li>
+      
     </ol>
 
+	<H2><A NAME="installoptions">Installation Options</A></H2>
+	
+	<H3><A NAME="options">Overview of Install Options</A></H3>
 
-    <H2><A NAME="installsteps">Quick Installation Steps</A></H2>
+	<p>With the advent of a new Maven-based build architecture in DSpace 1.5.x,
+	you now have a few options in how you may wish to install and manage your
+	local installation of DSpace.  There are now two different methods to installing
+	DSpace software.  Which path you choose may be entirely dependent on your 
+	institution's DSpace resources and technical knowledge:</p>
+	<p>
+		<ul>
+		  <li><A href="#installsteps">Quick Installation Method</A>
+			<ul>
+			<li>As its name implies, this installation method is the quickest
+			and easiest.  This method will be very familiar to you 
+			if you've used DSpace 1.4.x or below, as it mirrors the old path
+			of installing and managing DSpace</li>
+			<li>This method allows you to customize DSpace configurations (in dspace.cfg) 
+			or user interfaces (either JSP-UI or XML-UI) similar to how it was done with 
+			DSpace 1.4.x.  However, it will not allow you to customize or change the 
+			underlying DSpace Java API, as <em>all Java code comes pre-compiled.</em></li>
+			<li><strong>This method is highly recommended for those who are new to DSpace, 
+			may not have available technical staff for DSpace at their institutions, 
+			or do not wish to make changes to the underlying DSpace Java API.</strong></li>
+			</ul>
+		  </li>
+		  <li><A href="#maveninstall">Maven-based Installation Method</A>
+		  	<ul>
+		  	<li>This installation method requires the 
+		  	<A HREF="http://maven.apache.org/">Apache Maven 2</A> prerequisite.
+		  	This method provides your institution with more control over how DSpace
+		  	builds itself (especially in terms of selecting specific DSpace "modules" you 
+		  	wish to use).  However, this route also requires that you (or someone at
+		  	your institution) learn the basics of how to use Maven, and potentially how to create
+		  	your own Maven Project Object Model (POM).</li>
+		  	<li>This method allows you the ability to create user interface "overlays" in Maven.
+		  	An interface "overlay" allows you to only manage your local custom code (in your local CVS or SVN),
+		  	and automatically download the rest of the interface code from DSpace SVN whenever
+		  	you build DSpace.  This means you wouldn't have to manage any of the out-of-the-box
+		  	DSpace interface code in your local CVS/SVN.</li>
+		  	<li><strong>This method is recommended for those who have technical staff at their
+		  	institutions devoted to DSpace, wish to create new DSpace modules or customize
+		  	the DSpace Java API, or just want to learn more about how Maven works.</strong></li>
+			</ul>
+		  </li>
+		</ul>
+	</p>
 
-    <p><strong>But First, a Word on Directories and Path Names</strong></p>
+	<H3><A NAME="options">Overview of DSpace Directories</A></H3>
 
-    <p>DSpace uses three separate directory trees. Although you don't need to know all the details
+	<p>Before beginning an installation, it is important to get a general understanding
+	of the DSpace directories and the names by which they are generally referred.
+	(Please attempt to use these below directory names when asking for help on the
+	DSpace Mailing Lists, as it will help everyone better understand what directory
+	you may be referring to.)</p>
+
+	<p>DSpace uses three separate directory trees. Although you don't need to know all the details
 of them in order to install DSpace, you do need to know they exist and also know how they're referred to in this document:<p>
-    <ul>
-    <li>the source directory, referred to as <i><code>[dspace-source]</code></i></li>
-    <li>the install directory, referred to as <i><code>[dspace]</code></i></li>
-    <li>the web deployment directory. If you're using Tomcat, this will be <code><i>[tomcat]</i>/webapps/dspace</code> (with <code><i>[tomcat]</i></code> being wherever
-you installed Tomcat--also known as $CATALINA_HOME). This directory is generated by the web server when it unpacks dspace.war, and should never be edited.</li>
-    </ul>
+    <ol>
+    <li><strong>the installation directory</strong>, referred to as <i><code>[dspace]</code></i>.  This is the location where
+    all the DSpace configuration files, command line scripts, documentation and webapps exist.</li>
+    <li><strong>the source directory</strong>, referred to as <i><code>[dspace-source]</code></i>.  This is the location
+    where the DSpace module source code resides.  <em>Please note that in DSpace 1.5.x and above,
+    this location only exists if you install DSpace using the <A href="#maveninstall">Maven-based Installation</A> method.</em></li>
+    <li><strong>the web deployment directory</strong>.  This is the directory that contains
+    your DSpace web application(s).  In DSpace 1.5.x and above, this corresponds
+    to <i><code>[dspace]/webapps</code></i> by default.  However, if you are using Tomcat,
+    you may decide to copy your DSpace web applications from <i><code>[dspace]/webapps/</code></i> to <code><i>[tomcat]</i>/webapps/</code> (with <code><i>[tomcat]</i></code> being wherever
+    you installed Tomcat--also known as <code>$CATALINA_HOME</code>).</li>
+    </ol>
 
     <p>For details on the contents of these separate directory trees, refer to
     <a href="directories.html">directories.html</a>.
-    <strong>Note that the source directory and install directory should always be separate!</strong></p>
+    <em>Note that the <code>[dspace-source]</code> and <code>[dspace]</code> directories are always separate!</em></p>
+
+
+    <H3><A NAME="installsteps">Quick Installation Method</A></H3>
+
+	This method gets you up and running with DSpace quickly and easily.  However, you should be aware
+	that it provides you with pre-compiled DSpace Java code.  This means that if you are wanting to
+	change any of the underlying DSpace Java code, you should use the <A href="#maveninstall">Maven-based Installation Method</A> instead.
 
     <ol>
       <li>
@@ -114,13 +209,19 @@ you installed Tomcat--also known as $CATALINA_HOME). This directory is generated
 
         <PRE>useradd -m dspace</PRE>
       </li>
-
       <li>
-        <P>Download the <A HREF="http://sourceforge.net/projects/dspace/">latest DSpace source code release</A> and unpack it:</P>
-
-        <PRE>gunzip -c dspace-source-1.x.tar.gz | tar -xf -</PRE>
-
-        </li>
+        <P>Download the <A HREF="http://sourceforge.net/projects/dspace/">latest DSpace installation package</A> and unpack it
+        into a temporary location.  It is not necessary to keep this directory around after you install DSpace.</P>
+       
+        <PRE>gunzip -c dspace-1.x.tar.gz | tar -xf -</PRE>
+      
+      	<P>For ease of reference, we will refer to the location of this unzipped version 
+      	of the DSpace installation package as <code><i>[dspace-package]</i> in the
+      	remainder of these instructions.</code>
+      	
+      	</P>
+      	
+      </li>
 
       <li>
         <p>Database Setup</p>
@@ -128,11 +229,12 @@ you installed Tomcat--also known as $CATALINA_HOME). This directory is generated
 	<ol type="i">
 	<li>
 	<p><a name="pgdriver"></a>Copy the PostgreSQL JDBC driver (<code>.jar</code> file) into
-<code><i>[dspace-source]</i>/lib</code>.  If you compiled PostgreSQL yourself, it'll be in <code>postgresql-7.x.x/src/interfaces/jdbc/jars/postgresql.jar</code>.  Alternatively you can download it directly from <a href="http://jdbc.postgresql.org/download.html">the PostgreSQL JDBC site</a>.  Make sure you get the driver for the version of PostgreSQL you're running and for JDBC2.</p></li>
+<code><i>[dspace-package]</i>/lib</code>.  If you compiled PostgreSQL yourself, it'll be in <code>postgresql-7.x.x/src/interfaces/jdbc/jars/postgresql.jar</code>.  Alternatively you can download it directly from <a href="http://jdbc.postgresql.org/download.html">the PostgreSQL JDBC site</a>.  Make sure you get the recommended driver for the version of PostgreSQL you're running.</p></li>
         <li>
 	      <p>Create a <code>dspace</code> database, owned by the <code>dspace</code> PostgreSQL user:</p>
 
-	        <pre>createuser -U postgres -d -A -P dspace ; createdb -U dspace -E UNICODE dspace</pre>
+	        <pre>createuser -U postgres -d -A -P dspace
+createdb -U dspace -E UNICODE dspace</pre>
 
 	        <p>Enter a password for the DSpace database.  (This isn't the same as the <code>dspace</code> user's UNIX password.)</p>
 	</li>
@@ -140,7 +242,7 @@ you installed Tomcat--also known as $CATALINA_HOME). This directory is generated
 	<p><strong>Oracle:</strong>
 	<ol type="i">
 	   <li>
-            <p>Copy the Oracle JDBC driver into <code><i>[dspace-source]</i>/lib</code>.</p>
+            <p>Copy the Oracle JDBC driver into <code><i>[dspace-package]</i>/lib</code>.</p>
 	   </li>
 	   <li>
             <p>Create a database for DSpace.  Make sure that the character set is one of the Unicode character sets.  DSpace uses UTF-8 natively, and it is suggested that the Oracle database use the same character set.  Create a user account for DSpace (e.g. <code>dspace</code>,) and ensure that it has permissions to add and remove tables in the database.</p>
@@ -152,9 +254,9 @@ db.url    = jdbc.oracle.thin:@//host:port/dspace
 db.driver = oracle.jdbc.OracleDriver</pre>
 	   </li>
 	   <li>
-            <p>Go to <code><i>[dspace-source]</i>/etc/oracle</code> and copy the contents to their parent directory, overwriting the versions in the parent:
+            <p>Go to <code><i>[dspace-package]</i>/etc/oracle</code> and copy the contents to their parent directory, overwriting the versions in the parent:
 
-<pre>cd dspace_source/etc/oracle
+<pre>cd [dspace-package]/etc/oracle
 cp * ..</pre>
             <p>You now have Oracle-specific <code>.sql</code> files in your <code>etc</code> directory, and your dspace.cfg is modified to point to your Oracle database.</p>
 	   </li>
@@ -162,7 +264,7 @@ cp * ..</pre>
       </li>
 
       <li>
-        <P>Edit <code><i>[dspace-source]</i>/config/dspace.cfg</code>, in particular you'll need to set these properties:
+        <P>Edit <code><i>[dspace-package]</i>/config/dspace.cfg</code>, in particular you'll need to set these properties:
 
 <br><code>dspace.dir</code> -- must be set to the <code>[dspace]</code> (installation) directory.
 
@@ -196,17 +298,19 @@ See the <code>dspace.cfg</code> file for examples.
       </li>
 
       <li>
-        <P>Create the directory for the DSpace installation.  As root, run:</P>
+        <P>Create the directory for the DSpace installation (i.e. <code>[dspace]</code>).  As <em>root</em> (or a user with appropriate permissions), run:</P>
 
-        <PRE>mkdir <i>[dspace]</i> ; chown dspace <i>[dspace]</i></PRE>
+        <PRE>mkdir <i>[dspace]</i>
+chown dspace <i>[dspace]</i></PRE>
 
         <P>(Assuming the <code>dspace</code> UNIX username.)</P>
       </li>
 
       <li>
-        <P>As the <code>dspace</code> UNIX user, compile and install DSpace:</P>
+        <P>As the <code>dspace</code> UNIX user, initialize the DSpace database and install DSpace to <code><i>[dspace]</i></code>:</P>
 
-        <pre>cd <i>[dspace-source]</i> ; ant fresh_install</pre>
+        <pre>cd <i>[dspace-package]</i> 
+ant fresh_install</pre>
 
 		<P><strong>Note:</strong> to see a complete list of build targets, run</P>
 
@@ -216,9 +320,21 @@ See the <code>dspace.cfg</code> file for examples.
       </li>
 
       <li>
-        <P>Copy the DSpace Web application archives (<code>.war</code> files) to the appropriate directory in your Tomcat/Jetty/Resin installation.  For example:</P>
+        <P>Tell your Tomcat/Jetty/Resin installation where to find your DSpace web application(s).  
+        As an example, in the <code>&lt;Host&gt;</code> section of your <code><em>[tomcat]</em>/conf/server.xml</code> you could add lines similar to the following
+        (but replace <code><em>[dspace]</em></code> with your installation location):</P>
+        
+        <PRE>&lt;!-- DEFINE A CONTEXT PATH FOR DSpace JSP User Interface  --&gt;
+&lt;Context path="/dspace-jspui" docBase="[dspace]\webapps\dspace-jspui" debug="0" reloadable="true" cachingAllowed="false" allowLinking="true"/&gt;
+	
+&lt;!-- DEFINE A CONTEXT PATH FOR DSpace OAI User Interface  --&gt;
+&lt;Context path="/dspace-oai" docBase="[dspace]\webapps\dspace-oai" debug="0" reloadable="true" cachingAllowed="false" allowLinking="true"/&gt;</PRE>
+        
+        <P>Alternatively, you could copy only the DSpace Web application(s) you wish to use from <code><em>[dspace]</em>/webapps</code> to the appropriate directory in your Tomcat/Jetty/Resin installation.  For example:</P>
 
-        <PRE>cp <i>[dspace-source]</i>/build/*.war <i>[tomcat]</i>/webapps</PRE>
+        <PRE>cp -r <i>[dspace]</i>/webapps/dspace-jspui <i>[tomcat]</i>/webapps
+cp -r <i>[dspace]</i>/webapps/dspace-oai <i>[tomcat]</i>/webapps</PRE>
+
       </li>
 
       <LI>
@@ -228,12 +344,117 @@ See the <code>dspace.cfg</code> file for examples.
       </LI>
 
       <LI>
-        <P>Now the moment of truth!  Start up (or restart) Tomcat.  Visit the base URL of your server, e.g. http://dspace.myu.edu:8080/dspace.  You should see the DSpace home page.  Congratulations!</P>
+        <P>Now the moment of truth!  Start up (or restart) Tomcat/Jetty/Resin.  Visit the base URL(s) of your server, depending on which DSpace web applications you want to use.  You should see the DSpace home page.  Congratulations!</P>
+        
+        <P>Base URLs of DSpace Web Applications:</P>
+        <UL>
+        <li><em>JSP User Interface</em> - (e.g.) http://dspace.myu.edu:8080/dspace-jspui</li>
+        <li><em>XML User Interface (aka. Manakin)</em> -  (e.g.) http://dspace.myu.edu:8080/dspace-xmlui-webapp</li>
+        <li><em>OAI-PMH Interface</em> -  (e.g.) http://dspace.myu.edu:8080/dspace-oai/request?verb=identify  (Should return an XML-based response)</li>
+        </UL>
       </LI>
     </ol>
 
-    <p>In order to set up some communities and collections, you'll need to access the administration UI.  To do this, append 'admin' to your server's URL, e.g. http://dspace.myu.edu:8080/dspace/dspace-admin.</P>
+    <p>In order to set up some communities and collections, you'll need to login as your DSpace Administrator (which you created with <code>create-administrator</code> above) and access the administration UI in either the JSP or XML user interface.</P>
 
+	<H3><A NAME="maveninstall">Maven-based Installation Method</A></H3>
+
+	<P>This method allows you to build your own custom version of DSpace using <A HREF="http://maven.apache.org/">Apache Maven 2</A>.  
+	If you are not wanting to custom any of DSpace's Java API, or just want to get up and running quickly,
+	it is recommend that you use the <A href="#installsteps">Quick Installation Method</A> instead.</P>
+	
+	<P><strong>Additional Prerequisites</strong>
+	<ul>
+		<li><A HREF="http://maven.apache.org/">Apache Maven 2</A> - This is obviously required if you are doing a Maven-based install</li>
+		<li><A href="http://subversion.tigris.org/">Subversion (SVN)</A> - Necessary to checkout the DSpace source code from SourceForge SVN</li>
+	</ul>
+	</P>
+
+	<ol>
+      <li>
+        <P>Create the DSpace user.  This needs to be the same user that Tomcat (or Jetty etc) will run as.  e.g. as root run:</P>
+
+        <PRE>useradd -m dspace</PRE>
+      </li>
+      <li>
+        <P>Create the directory for the DSpace source to reside (i.e. <code>[dspace-source]</code>).  As <em>root</em> (or a user with appropriate permissions), run:</P>
+
+        <PRE>mkdir <i>[dspace-source]</i>
+chown dspace <i>[dspace-source]</i></PRE>
+
+        <P>(Assuming the <code>dspace</code> UNIX username.)</P>
+      </li>
+	  <li>
+	  	<P>Checkout the DSpace Source code from SourceForge SVN into <code>[dspace-source]</code>.  For example:</P>
+	  	
+	  	<PRE>svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5 [dspace-source]</PRE>
+	  	
+	  	<P>If you wish, you can choose to <em>only</em> checkout the source code for the specific DSpace "modules"
+	  	which you want to install.  However, you must <em>always</em> checkout the <code>'dspace'</code> module, as
+	  	it is the module which builds DSpace.  For example, if you only want to install the XML-UI and the OAI-PMH interface
+	  	you can perform the following checkouts:</P>
+	  	
+	  	<PRE>svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace [dspace-source]
+svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace-xmlui [dspace-source]
+svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace-oai [dspace-source]	  	
+	  	</PRE>
+		
+		<P>In order, you are checking out the <code>'dspace'</code> module (builds DSpace), 
+		<code>'dspace-xmlui'</code> module (provides XML-UI), and <code>'dspace-oai'</code> module (provides OAI-PMH).</P>
+	  
+	  	<P>In the end, you should have a folder structure similar to the following in <code><i>[dspace-source]</i></code>:
+	  	<ul>
+	  		<li><code><i>[dspace-source]</i></code>
+	  		  <ul>
+	  	 		<li><code>dspace/</code> - DSpace 'build' and configuration module</li>
+	  	 		<li><code>dspace-api/</code> - DSpace Java API module</li>
+	  	 		<li><code>dspace-jspui/</code> - DSpace JSP-UI module</li>
+	  	 		<li><code>dspace-oai/</code> - DSpace OAI-PMH interface module</li>
+	  	 		<li><code>dspace-xmlui/</code> - DSpace XML-UI module</li>
+	  	 	  </ul>
+	  		</li>
+	  	</ul>
+	  </li>
+	  <li>
+	     <P>Build your custom DSpace installation package (from within the <code>'dspace'</code> module)</P>
+	    
+	     <PRE>cd [dspace-source]/dspace/
+mvn package</PRE>
+	     
+	     <P>Note: without any extra arguments, DSpace is built for PostgreSQL.  If you want to use Oracle instead,
+	     you should build DSpace as follows:</P>
+	     
+	     <PRE>mvn -Ddb.name=oracle package</PRE>
+	  </li>
+	  <li>
+	  	 <P>Building DSpace may take awhile.  But, once it is complete, you should have your
+	  	 custom DSpace installation package ready in your 
+	  	 <code><i>[dspace-source]</i>/dspace/target/dspace-[version].dir/</code> directory.</P>
+	  	 <P>Note: Although we won't go into this in detail, you can also create your own
+	  	 completely custom Maven-based modules in your <code><i>[dspace-source]</i></code> directory.
+	  	 To build your custom modules into DSpace, you would need to modify the <code>'dspace'</code>
+	  	 module's <code>pom.xml</code> (Project Object Model) to look for those custom modules, and
+	  	 then re-build your DSpace installation package.  Look
+	  	 at the <a href="http://maven.apache.org/">Maven Documentation</a> or 
+	  	 <a href="http://wiki.dspace.org/">DSpace Wiki</a> for more hints and tricks.</P>
+	  </li>
+	  <li><P>Once your DSpace installation package has been built, you can follow the steps in the
+	  <A href="#installsteps">Quick Installation Method</A> above to install and configure DSpace.  
+	  Just remember that you can <em>skip</em> downloading the DSpace Installation Package from
+	  SourceForge (<em>Step #2 in the Quick Installation Method</em>), since you just built
+	  your own custom DSpace Installation Package into <code><i>[dspace-source]</i>/dspace/target/dspace-[version].dir/</code></P>
+	  </li>
+	</ol>
+    
+    <P><strong>Useful Maven References</strong>
+	<ul>
+		<li><A HREF="http://maven.apache.org/">Maven Homepage</A> - The place to go for all things Maven...it also includes links to the below resources.</li>
+		<li><A HREF="http://maven.apache.org/users/">Maven User Centre</A> - Basic documentation and Tutorials for Maven.  Also has a Project Object Model (POM) reference.</li>
+		<li><A href="http://maven.apache.org/plugins/">Maven Plugins</A> - Various Maven plugins you can take advantage of in your Maven POMs.</li>
+	</ul>
+	</P>
+	
+    
     <H2><A NAME="advancedinstall">Advanced Installation</A></H2>
 
     <P>The above installation steps are sufficient to set up a test server to play around with, but there are a few other steps and options you should probably consider before deploying a DSpace production site.</P>
@@ -572,7 +793,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize 1024 \
 	<p>You'll need to install this pre-requisite software:
 
 	<ul>
-	<li><p><a href="http://java.sun.com/">Java SDK 1.4</a> or later (standard SDK is fine, you don't need J2EE)</p></li>
+	<li><p><a href="http://java.sun.com/">Java SDK 1.5</a> or later (standard SDK is fine, you don't need J2EE)</p></li>
 	<li><p><a href="http://www.postgresql.org/ftp/">PostgreSQL 8.x for Windows</a>. This comes with an installer application now, so Cygwin is no longer required. Make sure the ODBC + JDBC options are selected, as well as the pgAdmin III tool<p></li>
 	<li><p><a href="http://ant.apache.org/">Apache Ant 1.6.x</a>. Unzip the package in <code>C:\</code> and add <code>C:\apache-ant-1.6.2\bin</code> to the <code>PATH</code> environment variable. For Ant to work properly, you should ensure that <code>JAVA_HOME</code> is set.</p></li>
 	<li><p><a href="http://tomcat.apache.org/">Jakarta Tomcat 5.x+<p></a>
