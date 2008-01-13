@@ -41,7 +41,7 @@
 package org.dspace.sort;
 
 import org.dspace.text.filter.*;
-import org.dspace.browse.AbstractTextFilterOFD;
+import org.dspace.sort.AbstractTextFilterOFD;
 
 /**
  * MARC 21 title ordering delegate implementation
