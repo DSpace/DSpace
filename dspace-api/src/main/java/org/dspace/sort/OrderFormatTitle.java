@@ -44,7 +44,7 @@ import org.dspace.text.filter.DecomposeDiactritics;
 import org.dspace.text.filter.LowerCaseAndTrim;
 import org.dspace.text.filter.StandardInitialArticleWord;
 import org.dspace.text.filter.TextFilter;
-import org.dspace.browse.AbstractTextFilterOFD;
+import org.dspace.sort.AbstractTextFilterOFD;
 
 /**
  * Standard title ordering delegate implementation

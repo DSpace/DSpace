@@ -38,7 +38,7 @@
  * DAMAGE.
  */
 
-package org.dspace.browse;
+package org.dspace.sort;
 
 import org.apache.log4j.Logger;
 import org.dspace.text.filter.TextFilter;

@@ -43,7 +43,7 @@ package org.dspace.sort;
 import org.dspace.text.filter.DecomposeDiactritics;
 import org.dspace.text.filter.LowerCaseAndTrim;
 import org.dspace.text.filter.TextFilter;
-import org.dspace.browse.AbstractTextFilterOFD;
+import org.dspace.sort.AbstractTextFilterOFD;
 
 /**
  * Standard text ordering delegate implementation
