@@ -136,14 +136,11 @@ public class DSQuery
         qr.setPageSize(args.getPageSize());
 
         // massage the query string a bit
-        querystring = checkEmptyQuery(querystring); // change nulls to an empty
-        // string
-        querystring = workAroundLuceneBug(querystring); // logicals changed to
-        // && ||, etc.
-        querystring = stripHandles(querystring); // remove handles from query
-        // string
-        querystring = stripAsterisk(querystring); // remove asterisk from
-        // beginning of string
+        querystring = checkEmptyQuery(querystring); // change nulls to an empty string
+        // We no longer need to work around the Lucene bug with recent versions
+        //querystring = workAroundLuceneBug(querystring); // logicals changed to && ||, etc.
+        querystring = stripHandles(querystring); // remove handles from query string
+        querystring = stripAsterisk(querystring); // remove asterisk from beginning of string
 
         try
         {
@@ -267,6 +264,14 @@ public class DSQuery
         return myquery;
     }
 
+    /**
+     * Workaround Lucene bug that breaks wildcard searching.
+     * This is no longer required with Lucene upgrades.
+     * 
+     * @param myquery
+     * @return
+     * @deprecated
+     */
     static String workAroundLuceneBug(String myquery)
     {
         // Lucene currently has a bug which breaks wildcard
