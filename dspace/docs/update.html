@@ -12,21 +12,24 @@
 
     <P>This section describes how to update a DSpace installation from one version to the next.  Details of the differences between the functionality of each version are given in the <A HREF="history.html">Version History</A> section.</P>
 
-    <h2><a name="14_141">Updating From 1.4 to 1.4.1</a></h2>
+    <h2><a name="141_142">Updating From 1.4.1 to 1.4.2</a></h2>
+See <A HREF="#14_14x">Updating From 1.4 to 1.4.x</A>; the same instructions apply.
 
-   <p>The changes in 1.4.1 are only code and configuration changes so the update is simply a matter of rebuilding the wars and slight changes to your config file.</p>
+    <h2><a name="14_14x">Updating From 1.4 to 1.4.x</a></h2>
 
-     <p>In the notes below <code><i>[dspace]</i></code> refers to the install directory for your existing DSpace installation, and <code><i>[dspace-1.4.1-source]</i></code> to the source directory for DSpace 1.4.1. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
+   <p>The changes in 1.4.x releases are only code and configuration changes so the update is simply a matter of rebuilding the wars and slight changes to your config file.</p>
+
+     <p>In the notes below <code><i>[dspace]</i></code> refers to the install directory for your existing DSpace installation, and <code><i>[dspace-1.4.x-source]</i></code> to the source directory for DSpace 1.4.x. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
 
      <ol>
-      <li><p>Get the new DSpace 1.4.1 source code from <a href="http://sourceforge.net/projects/dspace/">the DSpace page on SourceForge</a> and unpack it somewhere.  Do not unpack it on top of your existing installation!!</p></li>
+      <li><p>Get the new DSpace 1.4.x source code from <a href="http://sourceforge.net/projects/dspace/">the DSpace page on SourceForge</a> and unpack it somewhere.  Do not unpack it on top of your existing installation!!</p></li>
 
       <li><p>Copy the PostgreSQL driver JAR to the source tree.  For example:</p>
 
       <pre>cd <i>[dspace]</i>/lib
-cp postgresql.jar <i>[dspace-1.4.1-source]</i>/lib</pre></li>
+cp postgresql.jar <i>[dspace-1.4.x-source]</i>/lib</pre></li>
 
-      <li><strong>Note:</strong> Licensing conditions for the <code>handle.jar</code> file have changed. As a result, the latest version of the <code>handle.jar</code> file is not included in this distribution. It is recommended you read the <a href="http://www.handle.net/upgrade_6-2_DSpace.html">new license conditions</a> and decide whether you wish to update your installation's <code>handle.jar</code>. If you decide to update, you should replace the existing <code>handle.jar</code> in <i>[dspace-1.4.1-source]</i>/lib with the new version.</li>
+      <li><strong>Note:</strong> Licensing conditions for the <code>handle.jar</code> file have changed. As a result, the latest version of the <code>handle.jar</code> file is not included in this distribution. It is recommended you read the <a href="http://www.handle.net/upgrade_6-2_DSpace.html">new license conditions</a> and decide whether you wish to update your installation's <code>handle.jar</code>. If you decide to update, you should replace the existing <code>handle.jar</code> in <i>[dspace-1.4.x-source]</i>/lib with the new version.</li>
 
       <li><p>Take down Tomcat (or whichever servlet container you're using).</p></li>
 
@@ -48,15 +51,15 @@ cp postgresql.jar <i>[dspace-1.4.1-source]</i>/lib</pre></li>
 webui.html.max-depth-guess = 3</pre>
 	<p>If <code>webui.html.max-depth-guess</code> is not present in <code>dspace.cfg</code> the default value is used. If archiving entire web sites or deeply nested HTML documents it is advisable to change the default to a higher value more suitable for these types of materials.</p></li>
 
-      <li><p>Your 'localized' JSPs (those in jsp/local) now need to be maintained in the <em>source</em> directory. If you have locally modified JSPs in your <code><i>[dspace]</i>/jsp/local</code> directory, you will need to merge the changes in the new 1.4.1 versions into your locally modified ones. You can use the <code>diff</code> command to compare your JSPs against the 1.4.1 versions to do this. You can also check against the <a href="http://dspace.cvs.sourceforge.net/dspace/">DSpace CVS</a>.</p></li>
+      <li><p>Your 'localized' JSPs (those in jsp/local) now need to be maintained in the <em>source</em> directory. If you have locally modified JSPs in your <code><i>[dspace]</i>/jsp/local</code> directory, you will need to merge the changes in the new 1.4.x versions into your locally modified ones. You can use the <code>diff</code> command to compare your JSPs against the 1.4.x versions to do this. You can also check against the <a href="http://dspace.cvs.sourceforge.net/dspace/">DSpace CVS</a>.</p></li>
 
-      <li><p>In <code><i>[dspace-1.4.1-source]</i></code> run:</p>
+      <li><p>In <code><i>[dspace-1.4.x-source]</i></code> run:</p>
 
       <pre>ant -Dconfig=<i>[dspace]</i>/config/dspace.cfg update</pre></li>
 
-      <li><p>Copy the <code>.war</code> Web application files in <code><i>[dspace-1.4.1-source]</i>/build</code> to the <code>webapps</code> sub-directory of your servlet container (e.g. Tomcat).  e.g.:</p>
+      <li><p>Copy the <code>.war</code> Web application files in <code><i>[dspace-1.4.x-source]</i>/build</code> to the <code>webapps</code> sub-directory of your servlet container (e.g. Tomcat).  e.g.:</p>
 
-      <pre>cp <i>[dspace-1.4.1-source]</i>/build/*.war <i>[tomcat]</i>/webapps</pre>
+      <pre>cp <i>[dspace-1.4.x-source]</i>/build/*.war <i>[tomcat]</i>/webapps</pre>
 
       <p>If you're using Tomcat, you need to delete the directories corresponding to the old <code>.war</code> files.  For example, if <code>dspace.war</code> is installed in <code><i>[tomcat]</i>/webapps/dspace.war</code>, you should delete the <code><i>[tomcat]</i>/webapps/dspace</code> directory.  Otherwise, Tomcat will continue to use the old code in that directory. </p></li>
 
@@ -86,7 +89,7 @@ webui.html.max-depth-guess = 3</pre>
       <pre>cd <i>[dspace]</i>/lib
 cp postgresql.jar <i>[dspace-1.4.x-source]</i>/lib</pre></li>
 
-      <li><strong>Note:</strong> Licensing conditions for the <code>handle.jar</code> file have changed. As a result, the latest version of the <code>handle.jar</code> file is not included in this distribution. It is recommended you read the <a href="http://www.handle.net/upgrade_6-2_DSpace.html">new license conditions</a> and decide whether you wish to update your installation's <code>handle.jar</code>. If you decide to update, you should replace the existing <code>handle.jar</code> in <i>[dspace-1.4.1-source]</i>/lib with the new version.</li>
+      <li><strong>Note:</strong> Licensing conditions for the <code>handle.jar</code> file have changed. As a result, the latest version of the <code>handle.jar</code> file is not included in this distribution. It is recommended you read the <a href="http://www.handle.net/upgrade_6-2_DSpace.html">new license conditions</a> and decide whether you wish to update your installation's <code>handle.jar</code>. If you decide to update, you should replace the existing <code>handle.jar</code> in <i>[dspace-1.4.x-source]</i>/lib with the new version.</li>
 
       <li><p>Take down Tomcat (or whichever servlet container you're using).</p></li>
 
