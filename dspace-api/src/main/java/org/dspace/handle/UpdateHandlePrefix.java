@@ -45,6 +45,8 @@ import java.io.InputStreamReader;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.search.DSIndexer;
+import org.dspace.browse.IndexBrowse;
 
 /**
  * A sciprt to update the handle values in the database. This is typically used
@@ -83,22 +85,38 @@ public class UpdateHandlePrefix
             {
                 // Make the changes
                 System.out.print("Updating handle table... ");
-                sql = "update handle set handle = " +
-                      "overlay ( handle placing '" + newH + "' from 1 for " +
-                      oldH.length() + ") where handle like '" + oldH + "%'";
+                sql = "update handle set handle = '" + newH + "' || '/' || handle_id " +
+                      "where handle like '" + oldH + "/%'";
                 int updated = DatabaseManager.updateQuery(context, sql, new Object[] {});
                 System.out.println(updated + " items updated");
 
                 System.out.print("Updating metadatavalues table... ");
-                sql = "update metadatavalue set " +
-                      "text_value = overlay ( text_value placing '" + newH + "' " +
-                      "from 23 for " + oldH.length() + ") where text_value like " +
-                      "'http://hdl.handle.net/" + oldH + "%'";
+                sql = "UPDATE metadatavalue SET text_value= (SELECT 'http://hdl.handle.net/' || " +
+                      "handle FROM handle WHERE handle.resource_id=item_id AND " +
+                      "handle.resource_type_id=2) WHERE  text_value LIKE 'http://hdl.handle.net/%';";
                 updated = DatabaseManager.updateQuery(context, sql, new Object[] {});
                 System.out.println(updated + " metadata values updated");
 
                 // Commit the changes
                 context.complete();
+
+                System.out.print("Re-creating browse and search indexes... ");                
+
+                // Reinitialise the browse system
+                IndexBrowse.main(new String[] {"-i"});
+
+                // Reinitialise the browse system
+                try
+                {
+                    DSIndexer.main(new String[0]);
+                }
+                catch (Exception e)
+                {
+                    // Not a lot we can do
+                    System.out.println("Error re-indexing:");
+                    e.printStackTrace();
+                    System.out.println("\nPlease manually run [dspace]/bin/index-all");
+                }
 
                 // All done
                 System.out.println("\nHandles successfully updated.");

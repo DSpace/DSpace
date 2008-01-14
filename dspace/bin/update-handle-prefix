@@ -44,12 +44,8 @@
 
 # Shell script for updating a handle prefix (e.g. when moving from development
 # to production).
-#
-# NOTE: Currently only compatible with installs running a PostgreSQL database
-#
 
 # Get the DSPACE/bin directory
 BINDIR=`dirname $0`
 
 $BINDIR/dsrun org.dspace.handle.UpdateHandlePrefix $@
-$BINDIR/index-all
