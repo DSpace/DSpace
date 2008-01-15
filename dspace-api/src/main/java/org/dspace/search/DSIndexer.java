@@ -1067,7 +1067,7 @@ public class DSIndexer
         doc.add(new Field("type", Integer.toString(type), Field.Store.YES, Field.Index.NO));
 
         // New fields to weaken the dependence on handles, and allow for faster list display
-        doc.add(new Field("search.resourcetype", Integer.toString(type), Field.Store.YES, Field.Index.NO));
+        doc.add(new Field("search.resourcetype", Integer.toString(type), Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field("search.resourceid",   Integer.toString(id),   Field.Store.YES, Field.Index.NO));
 
         // want to be able to search for uri, so use keyword
