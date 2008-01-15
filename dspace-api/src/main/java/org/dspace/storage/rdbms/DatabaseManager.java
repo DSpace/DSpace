@@ -1345,6 +1345,7 @@ public class DatabaseManager
 
         try
         {
+            String schema = ConfigurationManager.getProperty("db.schema");
             connection = getConnection();
 
             DatabaseMetaData metadata = connection.getMetaData();
@@ -1354,13 +1355,13 @@ public class DatabaseManager
             String tname = (table.length() >= max) ? table
                     .substring(0, max - 1) : table;
 
-            ResultSet pkcolumns = metadata.getPrimaryKeys(null, null, tname);
+            ResultSet pkcolumns = metadata.getPrimaryKeys(null, schema, tname);
             Set pks = new HashSet();
 
             while (pkcolumns.next())
                 pks.add(pkcolumns.getString(4));
 
-            ResultSet columns = metadata.getColumns(null, null, tname, null);
+            ResultSet columns = metadata.getColumns(null, schema, tname, null);
 
             while (columns.next())
             {
