@@ -507,26 +507,6 @@ CREATE TABLE Subscription
 );
 
 
--------------------------------------------------------
---  History table
--------------------------------------------------------
-CREATE TABLE History
-(
-  history_id           INTEGER PRIMARY KEY,
-  -- When it was stored
-  creation_date        TIMESTAMP,
-  -- A checksum to keep INTEGERizations from being stored more than once
-  checksum             VARCHAR(32) UNIQUE
-);
-
--------------------------------------------------------
---  HistoryState table
--------------------------------------------------------
-CREATE TABLE HistoryState
-(
-  history_state_id           INTEGER PRIMARY KEY,
-  object_id                  VARCHAR(64)
-);
 
 -------------------------------------------------------------------------------
 -- EPersonGroup2WorkspaceItem table
