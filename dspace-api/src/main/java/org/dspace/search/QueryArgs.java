@@ -68,7 +68,7 @@ public class QueryArgs
 
     private SortOption sortOption = null;
 
-    private String sortOrder = SortOption.ASCENDING;
+    private String sortOrder = SortOption.DESCENDING;
 
     /**
      * set the query string
