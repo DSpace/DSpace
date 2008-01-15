@@ -73,8 +73,17 @@
 <%@ page import="org.dspace.search.QueryResults" %>
 <%@ page import="org.dspace.uri.IdentifierFactory" %>
 <%@ page import="java.net.URLEncoder" %>
+<%@ page import="org.dspace.sort.SortOption" %>
+<%@ page import="java.util.Enumeration" %>
+<%@ page import="java.util.Set" %>
 
 <%
+    String order = (String)request.getAttribute("order");
+    String ascSelected = (SortOption.ASCENDING.equalsIgnoreCase(order)   ? "selected=\"selected\"" : "");
+    String descSelected = (SortOption.DESCENDING.equalsIgnoreCase(order) ? "selected=\"selected\"" : "");
+    SortOption so = (SortOption)request.getAttribute("sortedBy");
+    String sortedBy = (so == null) ? null : so.getName();
+
     // Get the attributes
     Community community = (Community) request.getAttribute("community" );
     Collection collection = (Collection) request.getAttribute("collection");
@@ -93,6 +102,22 @@
     int pageCurrent = ((Integer)request.getAttribute("pagecurrent")).intValue();
     int pageLast = ((Integer)request.getAttribute("pagelast")).intValue();
     int pageFirst = ((Integer)request.getAttribute("pagefirst")).intValue();
+    int rpp         = qResults.getPageSize();
+
+    // retain scope when navigating result sets
+    String searchScope = "";
+    if (community == null && collection == null)
+    {
+	    searchScope = "";
+    }
+    else if (collection == null)
+    {
+	    searchScope = IdentifierFactory.getURL(community).toString();
+    }
+    else
+    {
+	    searchScope = IdentifierFactory.getURL(collection).toString();
+    }
 %>
 
 <dspace:layout titlekey="jsp.search.results.title">
@@ -187,7 +212,59 @@ else
 <%
 }
 %>
-
+<%-- Include a component for modifying sort by, order, results per page, and et-al limit --%>
+   <div align="center">
+   <form method="get" action="<%= request.getContextPath() + searchScope + "/simple-search" %>">
+   <table border="0">
+   <tr><td>
+       <input type="hidden" name="query" value="<%= query %>" />
+       <fmt:message key="search.results.perpage"/>
+       <select name="rpp">
+<%
+           for (int i = 5; i <= 100 ; i += 5)
+           {
+               String selected = (i == rpp ? "selected=\"selected\"" : "");
+%>
+               <option value="<%= i %>" <%= selected %>><%= i %></option>
+<%
+           }
+%>
+       </select>
+       &nbsp;|&nbsp;
+<%
+       Set<SortOption> sortOptions = SortOption.getSortOptions();
+       if (sortOptions.size() > 1)
+       {
+%>
+           <fmt:message key="search.results.sort-by"/>
+           <select name="sort_by">
+               <option value="0"><fmt:message key="search.sort-by.relevance"/></option>
+<%
+           for (SortOption sortBy : sortOptions)
+           {
+               if (sortBy.isVisible())
+               {
+                   String selected = (sortBy.getName().equals(sortedBy) ? "selected=\"selected\"" : "");
+                   String mKey = "search.sort-by." + sortBy.getName();
+                   %> <option value="<%= sortBy.getNumber() %>" <%= selected %>><fmt:message key="<%= mKey %>"/></option><%
+               }
+           }
+%>
+           </select>
+<%
+       }
+%>
+       <fmt:message key="search.results.order"/>
+       <select name="order">
+           <option value="ASC" <%= ascSelected %>><fmt:message key="search.order.asc" /></option>
+           <option value="DESC" <%= descSelected %>><fmt:message key="search.order.desc" /></option>
+       </select>
+       <%-- add results per page, etc. --%>
+       <input type="submit" name="submit_search" value="<fmt:message key="search.update" />" />
+   </td></tr>
+   </table>
+   </form>
+   </div>
 <%
 if (communities.length > 0)
 {
@@ -217,26 +294,14 @@ if (items.length > 0)
 <p align="center">
 
 <%
-    // retain scope when navigating result sets
-    String searchScope = "";
-    if (community == null && collection == null)
-    {
-	    searchScope = "";
-    }
-    else if (collection == null)
-    {
-	    searchScope = IdentifierFactory.getURL(community).toString();
-    }
-    else
-    {
-	    searchScope = IdentifierFactory.getURL(collection).toString();
-    }
-
     // create the URLs accessing the previous and next search result pages
     String prevURL =  request.getContextPath()
                     + searchScope
                     + "/simple-search?query="
                     + URLEncoder.encode(query)
+                    + "&amp;sort_by=" + (so != null ? so.getNumber() : 0)
+                    + "&amp;order=" + order
+                    + "&amp;rpp=" + rpp
                     + "&amp;start=";
 
     String nextURL = prevURL;
@@ -261,6 +326,9 @@ for (int q = pageFirst; q <= pageLast; q++)
                     + searchScope
                     + "/simple-search?query="
                     + URLEncoder.encode(query)
+                    + "&amp;sort_by=" + (so != null ? so.getNumber() : 0)
+                    + "&amp;order=" + order
+                    + "&amp;rpp=" + rpp
                     + "&amp;start=";
 
 
