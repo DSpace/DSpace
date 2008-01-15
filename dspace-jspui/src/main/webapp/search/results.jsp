@@ -321,6 +321,7 @@ for( int q = pageFirst; q <= pageLast; q++ )
                     + "/simple-search?query="
                     + URLEncoder.encode(query)
                     + "&amp;sort_by=" + (so != null ? so.getNumber() : 0)
+                    + "&amp;order=" + order
                     + "&amp;rpp=" + rpp
                     + "&amp;start=";
 
