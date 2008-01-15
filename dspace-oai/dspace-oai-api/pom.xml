@@ -4,11 +4,11 @@
    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace</groupId>
-   <artifactId>dspace-oai</artifactId>
-   <packaging>pom</packaging>
-   <name>DSpace OAI :: Parent</name>
-   <description>Parent for DSpace OAI Service Provider Webapplication</description>
-   <url>http://projects.dspace.org/dspace-oai</url>
+   <artifactId>dspace-oai-api</artifactId>
+   <packaging>jar</packaging>
+   <name>DSpace OAI :: Libraries to support Web Application</name>
+   <description>Libraries to support DSpace OAI Service Provider Webapplication</description>
+   <url>http://projects.dspace.org/dspace-oai/dspace-oai-api</url>
 
    <!-- 
       A Parent POM that Maven inherits DSpace Default 
@@ -16,7 +16,7 @@
    -->
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace-parent</artifactId>
+      <artifactId>dspace-oai</artifactId>
       <version>SNAPSHOT</version>
    </parent>
 
@@ -59,18 +59,35 @@
    -->
    <scm>
       <connection>
-         scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-oai
+         scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-oai/dspace-oai-api
       </connection>
       <developerConnection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-oai
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-oai/dspace-oai-api
       </developerConnection>
       <url>
-         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-oai
+         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-oai/dspace-oai-api
       </url>
    </scm>
-   
-   <modules>
-      <module>dspace-oai-api</module>
-      <module>dspace-oai-webapp</module>
-   </modules>
+
+   <dependencies>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-api</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>language-packs</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>oaicat</artifactId>
+         <version>1.5.48</version>
+      </dependency>
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>servlet-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+   </dependencies>
+
 </project>
