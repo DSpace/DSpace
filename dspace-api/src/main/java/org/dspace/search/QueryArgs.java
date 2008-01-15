@@ -44,12 +44,13 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.core.Constants;
 import org.dspace.sort.SortOption;
 
-import org.apache.oro.text.perl.Perl5Util;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Contains the arguments for a query. Fill it out and pass to the query engine
@@ -234,23 +235,80 @@ public class QueryArgs
      */
     private String buildQueryPart(String myquery, String myfield)
     {
-        Perl5Util util = new Perl5Util();
-        String newquery = "(";
+        StringBuilder newQuery = new StringBuilder();
+        newQuery.append("(");
 
-        if (!myfield.equals("ANY"))
+        boolean newTerm = true;
+        boolean inPhrase = false;
+        char phraseChar = '\"';
+
+        StringTokenizer qtok = new StringTokenizer(myquery, " \t\n\r\f\"\'", true);
+
+        while (qtok.hasMoreTokens())
         {
-            newquery = newquery + myfield + ":";
-            myquery = util.substitute("s/\'(.*)\'/\"$1\"/g", myquery);
-
-            if (!util.match("/\".*\"/", myquery))
+            String token = qtok.nextToken();
+            if (StringUtils.isWhitespace(token))
             {
-                myquery = util.substitute("s/ / " + myfield + ":/g", myquery);
+                if (!inPhrase)
+                {
+                    newTerm = true;
+                }
+
+                newQuery.append(token);
+            }
+            else
+            {
+                // Matched the end of the phrase
+                if (inPhrase && token.charAt(0) == phraseChar)
+                {
+                    newQuery.append("\"");
+                    inPhrase = false;
+                }
+                else
+                {
+                    // If we aren't dealing with a new term, and have a single quote
+                    // don't touch it. (for example, the apostrophe in it's).
+                    if (!newTerm && token.charAt(0) == '\'')
+                    {
+                        newQuery.append(token);
+                    }
+                    else
+                    {
+                        // Treat - my"phrased query" - as - my "phrased query"
+                        if (!newTerm && token.charAt(0) == '\"')
+                        {
+                            newQuery.append(" ");
+                            newTerm = true;
+                        }
+
+                        // This is a new term in the query (ie. preceeded by nothing or whitespace)
+                        // so apply a field restriction if specified
+                        if (newTerm && !myfield.equals("ANY"))
+                        {
+                            newQuery.append(myfield).append(":");
+                        }
+
+                        // Open a new phrase, and closing at the corresponding character
+                        // ie. 'my phrase' or "my phrase"
+                        if (token.charAt(0) == '\"' || token.charAt(0) == '\'')
+                        {
+                            newQuery.append("\"");
+                            inPhrase = true;
+                            newTerm = false;
+                            phraseChar = token.charAt(0);
+                        }
+                        else
+                        {
+                            newQuery.append(token);
+                            newTerm = false;
+                        }
+                    }
+                }
             }
         }
 
-        newquery = newquery + myquery + ")";
-
-        return (newquery);
+        newQuery.append(")");
+        return newQuery.toString();
     }
 
     /**

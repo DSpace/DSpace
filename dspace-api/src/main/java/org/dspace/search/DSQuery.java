@@ -57,7 +57,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.apache.oro.text.perl.Perl5Util;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
@@ -279,40 +278,26 @@ public class DSQuery
         // Here we substitute the boolean operators -- which
         // have to be uppercase -- before tranforming the
         // query string to lowercase.
-        Perl5Util util = new Perl5Util();
-
-        myquery = util.substitute("s/ AND / && /g", myquery);
-        myquery = util.substitute("s/ OR / || /g", myquery);
-        myquery = util.substitute("s/ NOT / ! /g", myquery);
-
-        myquery = myquery.toLowerCase();
-
-        return myquery;
+        return myquery.replaceAll(" AND ", " && ")
+                      .replaceAll(" OR ", " || ")
+                      .replaceAll(" NOT ", " ! ")
+                      .toLowerCase();
     }
 
     static String stripHandles(String myquery)
     {
         // Drop beginning pieces of full handle strings
-        Perl5Util util = new Perl5Util();
-
-        myquery = util.substitute("s|^(\\s+)?http://hdl\\.handle\\.net/||",
-                myquery);
-        myquery = util.substitute("s|^(\\s+)?hdl:||", myquery);
-
-        return myquery;
+        return myquery.replaceAll("^\\s*http://hdl\\.handle\\.net/", "")
+                      .replaceAll("^\\s*hdl:", "");
     }
 
     static String stripAsterisk(String myquery)
     {
         // query strings (or words) begining with "*" cause a null pointer error
-        Perl5Util util = new Perl5Util();
-
-        myquery = util.substitute("s/^\\*//", myquery);
-        myquery = util.substitute("s| \\*| |", myquery);
-        myquery = util.substitute("s|\\(\\*|\\(|", myquery);
-        myquery = util.substitute("s|:\\*|:|", myquery);
-
-        return myquery;
+        return myquery.replaceAll("^\\*", "")
+                      .replaceAll("\\s\\*", " ")
+                      .replaceAll("\\(\\*", "(")
+                      .replaceAll(":\\*", ":");
     }
 
     /**
