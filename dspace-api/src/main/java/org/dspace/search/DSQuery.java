@@ -166,7 +166,7 @@ public class DSQuery
                 if (args.getSortOption() == null)
                 {
                     SortField[] sortFields = new SortField[] {
-                            new SortField("search.resourcetype"),
+                            new SortField("search.resourcetype", true),
                             new SortField(null, SortField.SCORE, SortOption.ASCENDING.equals(args.getSortOrder()))
                         };
                     hits = searcher.search(myquery, new Sort(sortFields));
@@ -174,7 +174,7 @@ public class DSQuery
                 else
                 {
                     SortField[] sortFields = new SortField[] {
-                            new SortField("search.resourcetype"),
+                            new SortField("search.resourcetype", true),
                             new SortField("sort_" + args.getSortOption().getName(), SortOption.DESCENDING.equals(args.getSortOrder())),
                             SortField.FIELD_SCORE
                         };

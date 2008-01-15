@@ -100,6 +100,7 @@ public class SimpleSearchServlet extends DSpaceServlet
         String fromAdvanced = request.getParameter("from_advanced");
         int sortBy = UIUtil.getIntParameter(request, "sort_by");
         String order = request.getParameter("order");
+        int rpp = UIUtil.getIntParameter(request, "rpp");
         String advancedQuery = "";
         HashMap queryHash = new HashMap();
 
@@ -119,23 +120,34 @@ public class SimpleSearchServlet extends DSpaceServlet
 
         QueryResults qResults = null;
         QueryArgs qArgs = new QueryArgs();
+        SortOption sortOption = null;
 
         try
         {
-            qArgs.setSortOption(SortOption.getSortOption(sortBy));
-            if (SortOption.DESCENDING.equalsIgnoreCase(order))
+            if (sortBy > 0)
             {
-                qArgs.setSortOrder(SortOption.DESCENDING);
+                sortOption = SortOption.getSortOption(sortBy);
+                qArgs.setSortOption(sortOption);
+            }
+
+            if (SortOption.ASCENDING.equalsIgnoreCase(order))
+            {
+                qArgs.setSortOrder(SortOption.ASCENDING);
             }
             else
             {
-                qArgs.setSortOrder(SortOption.ASCENDING);
+                qArgs.setSortOrder(SortOption.DESCENDING);
             }
         }
         catch (Exception e)
         {
         }
 
+        if (rpp > 0)
+        {
+            qArgs.setPageSize(rpp);
+        }
+        
         // if the "advanced" flag is set, build the query string from the
         // multiple query fields
         if (advanced != null)
@@ -360,6 +372,9 @@ public class SimpleSearchServlet extends DSpaceServlet
         // And the original query string
         request.setAttribute("query", query);
 
+        request.setAttribute("order",  qArgs.getSortOrder());
+        request.setAttribute("sortedBy", sortOption);
+        
         if ((fromAdvanced != null) && (qResults.getHitCount() == 0))
         {
             // send back to advanced form if no results
