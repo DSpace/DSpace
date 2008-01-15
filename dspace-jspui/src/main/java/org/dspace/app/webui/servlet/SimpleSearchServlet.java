@@ -109,9 +109,9 @@ public class SimpleSearchServlet extends DSpaceServlet
             start = 0;
         }
 
-        List itemIdentifiers = new ArrayList();
-        List collectionIdentifiers = new ArrayList();
-        List communityIdentifiers = new ArrayList();
+        int collCount = 0;
+        int commCount = 0;
+        int itemCount = 0;
 
         Item[] resultsItems;
         Collection[] resultsCollections;
@@ -228,7 +228,7 @@ public class SimpleSearchServlet extends DSpaceServlet
         }
 
         // now instantiate the results and put them in their buckets
-        for (int i = 0; i < qResults.getHitURIs().size(); i++)
+        for (int i = 0; i < qResults.getHitTypes().size(); i++)
         {
             String myURI = (String) qResults.getHitURIs().get(i);
             Integer myType = (Integer) qResults.getHitTypes().get(i);
@@ -237,76 +237,90 @@ public class SimpleSearchServlet extends DSpaceServlet
             switch (myType.intValue())
             {
             case Constants.ITEM:
-                itemIdentifiers.add(myURI);
-
+                itemCount++;
                 break;
 
             case Constants.COLLECTION:
-                collectionIdentifiers.add(myURI);
-
+                collCount++;
                 break;
 
             case Constants.COMMUNITY:
-                communityIdentifiers.add(myURI);
-
+                commCount++;
                 break;
             }
         }
 
-        int numCommunities = communityIdentifiers.size();
-        int numCollections = collectionIdentifiers.size();
-        int numItems = itemIdentifiers.size();
-
         // Make objects from the URIs - make arrays, fill them out
-        resultsCommunities = new Community[numCommunities];
-        resultsCollections = new Collection[numCollections];
-        resultsItems = new Item[numItems];
+        resultsCommunities = new Community[commCount];
+        resultsCollections = new Collection[collCount];
+        resultsItems = new Item[itemCount];
 
-        for (int i = 0; i < numItems; i++)
+        for (int i = 0; i < qResults.getHitTypes().size(); i++)
         {
-            String uri = (String) itemIdentifiers.get(i);
+            Integer myId    = (Integer) qResults.getHitIds().get(i);
+            String myURI = (String) qResults.getHitURIs().get(i);
+            Integer myType  = (Integer) qResults.getHitTypes().get(i);
 
-            ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(uri);
-            Item item = (Item) oi.getObject(context);
-
-            resultsItems[i] = item;
-
-            if (resultsItems[i] == null)
+            switch (myType.intValue())
             {
-                throw new SQLException("Query \"" + query
-                        + "\" returned unresolvable uri: " + uri);
-            }
-        }
+            case Constants.ITEM:
+                if (myId != null)
+                {
+                    resultsItems[itemCount] = Item.find(context, myId);
+                }
+                else
+                {
+                    ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(myURI);
+                    resultsItems[itemCount] = (Item)oi.getObject(context);
+                }
 
-        for (int i = 0; i < collectionIdentifiers.size(); i++)
-        {
-            String uri = (String) collectionIdentifiers.get(i);
+                if (resultsItems[itemCount] == null)
+                {
+                    throw new SQLException("Query \"" + query
+                            + "\" returned unresolvable item");
+                }
+                itemCount++;
+                break;
 
-            ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(uri);
-            Collection c = (Collection) oi.getObject(context);
+            case Constants.COLLECTION:
+                if (myId != null)
+                {
+                    resultsCollections[collCount] = Collection.find(context, myId);
+                }
+                else
+                {
+                    ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(myURI);
+                    resultsCollections[collCount] = (Collection)oi.getObject(context);
+                }
 
-            resultsCollections[i] = c;
+                if (resultsCollections[collCount] == null)
+                {
+                    throw new SQLException("Query \"" + query
+                            + "\" returned unresolvable collection");
+                }
 
-            if (resultsCollections[i] == null)
-            {
-                throw new SQLException("Query \"" + query
-                        + "\" returned unresolvable uri: " + uri);
-            }
-        }
+                collCount++;
+                break;
 
-        for (int i = 0; i < communityIdentifiers.size(); i++)
-        {
-            String uri = (String) communityIdentifiers.get(i);
+            case Constants.COMMUNITY:
+                if (myId != null)
+                {
+                    resultsCommunities[commCount] = Community.find(context, myId);
+                }
+                else
+                {
+                    ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(myURI);
+                    resultsCommunities[commCount] = (Community)oi.getObject(context);
+                }
 
-            ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(uri);
-            Community c = (Community) oi.getObject(context);
+                if (resultsCommunities[commCount] == null)
+                {
+                    throw new SQLException("Query \"" + query
+                            + "\" returned unresolvable community");
+                }
 
-            resultsCommunities[i] = c;
-
-            if (resultsCommunities[i] == null)
-            {
-                throw new SQLException("Query \"" + query
-                        + "\" returned unresolvable uri: " + uri);
+                commCount++;
+                break;
             }
         }
 
