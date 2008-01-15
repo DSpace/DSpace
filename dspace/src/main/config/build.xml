@@ -213,19 +213,23 @@ Common usage:
 
 		<echo>
 ====================================================================
- Updated Web application (.war) files are in the '${dspace.dir}/webapps' 
- directory.
+ Updated DSpace Web application directories are in the 
+ '${dspace.dir}/webapps' directory.
 
  * Stop your Web servlet container (Tomcat, Jetty, Resin etc.)
  
- * If you're using Tomcat, you need delete the directories
-   corresponding to the old .war files.  For example, if dspace.war
-   is installed in CATALINA_HOME/webapps/dspace.war, you should
-   delete the CATALINA_HOME/webapps/dspace directory.  Otherwise,
-   Tomcat will continue to use the old code in that directory.
+ * If your Web servlet container already loads the DSpace
+   UI web applications from ${dspace.dir}/webapps/, then you
+   can jump straight to restarting your Web servlet container
 
- * Copy the new dspace.war and dspace-oai.war from the 'build'
-   directory over the old ones
+ * Otherwise, you will need to copy any web applications from 
+   ${dspace.dir}/webapps/ to the appropriate place for your servlet 
+   container.  (e.g. '$CATALINA_HOME/webapps' for Tomcat)
+
+   If you're using Tomcat, you should first delete any existing
+   DSpace directories in '$CATALINA_HOME/webapps/' (e.g. you would
+   delete an existing $CATALINA_HOME/webapps/dspace/ directory).  
+   Otherwise, Tomcat may continue to use old code in that directory.
 
  * Start up your Web servlet container again.
 ====================================================================
@@ -430,9 +434,12 @@ Common usage:
  
  To complete installation, you should do the following:
  
- * Install the DSpace UI (dspace.war) and OAI-PMH (dspace-oai.war)
-   Web applications from the 'build' directory in the appropriate
-   place for your servlet container.  e.g. '/opt/tomcat/webapps'
+ * Setup your Web servlet container (e.g. Tomcat) to look for your 
+   DSpace web applications in: ${dspace.dir}/webapps/
+
+   OR, copy any web applications from ${dspace.dir}/webapps/ to
+   the appropriate place for your servlet container.  
+   (e.g. '$CATALINA_HOME/webapps' for Tomcat)
 
  * Make an initial administrator account (an e-person) in DSpace:
  
