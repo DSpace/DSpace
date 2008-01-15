@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace</groupId>
+   <artifactId>dspace-oai-webapp</artifactId>
+   <packaging>war</packaging>
+   <name>DSpace OAI :: Web Application</name>
+   <description>DSpace OAI Service Provider Webapplication</description>
+   <url>http://projects.dspace.org/dspace-oai/dspace-oai-webapp</url>
+
+   <!-- 
+      A Parent POM that Maven inherits DSpace Default 
+      POM atrributes from. 
+   -->
+   <parent>
+      <groupId>org.dspace</groupId>
+      <artifactId>dspace-oai</artifactId>
+      <version>1.5-SNAPSHOT</version>
+   </parent>
+
+   <repositories>
+      <repository>
+         <id>maven.dspace.org/snapshot</id>
+         <name>DSpace Maven Snapshot Repository</name>
+         <url>http://maven.dspace.org/snapshot</url>
+         <releases>
+            <enabled>false</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <enabled>true</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </repository>
+   </repositories>
+
+   <pluginRepositories>
+      <pluginRepository>
+         <id>maven.dspace.org/snapshot</id>
+         <name>DSpace Maven Repository</name>
+         <url>http://maven.dspace.org/snapshot</url>
+         <releases>
+            <updatePolicy>never</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </pluginRepository>
+   </pluginRepositories>
+
+   <!-- 
+      The Subversion repository location is used by Continuum to update against
+      when changes have occured, this spawns a new build cycle and releases snapshots
+      into the snapshot repository below.
+   -->
+   <scm>
+      <connection>
+         scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-oai/dspace-oai-webapp
+      </connection>
+      <developerConnection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-oai/dspace-oai-webapp
+      </developerConnection>
+      <url>
+         http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace-oai/dspace-oai-webapp
+      </url>
+   </scm>
+   
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+               <archiveClasses>false</archiveClasses>
+               <webResources>
+                  <resource>
+                     <filtering>true</filtering>
+                     <directory>${basedir}/src/main/webapp</directory>
+                     <includes>
+                        <include>WEB-INF/web.xml</include>
+                     </includes>
+                  </resource>
+               </webResources>
+            </configuration>
+            <executions>
+               <execution>
+                  <phase>prepare-package</phase>
+               </execution>
+            </executions>
+         </plugin>
+             
+         <!-- Secondary Artifact: Skinny war. -->
+         <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+               <descriptorRefs>
+                  <descriptorRef>skinny</descriptorRef>
+               </descriptorRefs>
+            </configuration>
+            <executions>
+               <execution>
+                  <phase>package</phase>
+                  <goals>
+                     <goal>attached</goal>
+                  </goals>
+               </execution>
+            </executions>
+            <dependencies>
+               <dependency>
+                  <groupId>org.dspace.maven.plugins</groupId>
+                  <artifactId>dspace-assembly-plugin</artifactId>
+                  <version>1.5-SNAPSHOT</version>
+               </dependency>
+            </dependencies>
+         </plugin>
+
+      </plugins>
+   </build>
+
+   <profiles>
+      <!-- 
+         when activated a dspace.config configuration
+         file location passed on the commandline 
+         (-Ddspace.config=...) can be passed through 
+         to be used as a filter source by projects for 
+         tasks such as updating the ${dspace.dir} in
+         web.xml etc.
+      -->
+      <profile>
+         <activation>
+            <property>
+               <name>dspace.config</name>
+            </property>
+         </activation>
+         <build>
+            <filters>
+               <filter>${dspace.config}</filter>
+            </filters>
+         </build>
+      </profile>
+      <profile>
+         <id>oracle-support</id>
+         <activation>
+            <property>
+               <name>db.name</name>
+               <value>oracle</value>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>com.oracle</groupId>
+               <artifactId>ojdbc14</artifactId>
+            </dependency>
+         </dependencies>
+      </profile>
+      <profile>
+         <id>postgres-support</id>
+         <activation>
+            <property>
+               <name>!db.name</name>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>postgresql</groupId>
+               <artifactId>postgresql</artifactId>
+            </dependency>
+         </dependencies>
+      </profile>
+   </profiles>
+
+   <dependencies>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-api</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>language-packs</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-oai-api</artifactId>
+         <version>${pom.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>oaicat</artifactId>
+         <version>1.5.48</version>
+      </dependency>
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>servlet-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+   </dependencies>
+
+</project>
