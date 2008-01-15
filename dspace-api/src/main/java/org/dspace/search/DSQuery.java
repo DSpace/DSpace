@@ -165,11 +165,11 @@ public class DSQuery
             {
                 if (args.getSortOption() == null)
                 {
-                    hits = searcher.search(myquery, new Sort(new SortField[] { new SortField("type"), SortField.FIELD_SCORE }));
+                    hits = searcher.search(myquery, new Sort(new SortField[] { new SortField("search.resourcetype"), SortField.FIELD_SCORE }));
                 }
                 else
                 {
-                    SortField[] sortFields = new SortField[] { new SortField("type"), new SortField("sort_" + args.getSortOption().getName(), SortOption.DESCENDING.equals(args.getSortOrder())), SortField.FIELD_SCORE };
+                    SortField[] sortFields = new SortField[] { new SortField("search.resourcetype"), new SortField("sort_" + args.getSortOption().getName(), SortOption.DESCENDING.equals(args.getSortOrder())), SortField.FIELD_SCORE };
                     hits = searcher.search(myquery, new Sort(sortFields));
                 }
             }
