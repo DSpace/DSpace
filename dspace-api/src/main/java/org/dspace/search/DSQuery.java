@@ -271,15 +271,10 @@ public class DSQuery
         // Here we substitute the boolean operators -- which
         // have to be uppercase -- before tranforming the
         // query string to lowercase.
-        Perl5Util util = new Perl5Util();
-
-        myquery = util.substitute("s/ AND / && /g", myquery);
-        myquery = util.substitute("s/ OR / || /g", myquery);
-        myquery = util.substitute("s/ NOT / ! /g", myquery);
-
-        myquery = myquery.toLowerCase();
-
-        return myquery;
+        return myquery.replaceAll(" AND ", " && ")
+                      .replaceAll(" OR ", " || ")
+                      .replaceAll(" NOT ", " ! ")
+                      .toLowerCase();
     }
 
     static String stripURIs(String myquery)
@@ -311,14 +306,10 @@ public class DSQuery
     static String stripAsterisk(String myquery)
     {
         // query strings (or words) begining with "*" cause a null pointer error
-        Perl5Util util = new Perl5Util();
-
-        myquery = util.substitute("s/^\\*//", myquery);
-        myquery = util.substitute("s| \\*| |", myquery);
-        myquery = util.substitute("s|\\(\\*|\\(|", myquery);
-        myquery = util.substitute("s|:\\*|:|", myquery);
-
-        return myquery;
+        return myquery.replaceAll("^\\*", "")
+                      .replaceAll("\\s\\*", " ")
+                      .replaceAll("\\(\\*", "(")
+                      .replaceAll(":\\*", ":");
     }
 
     /**
