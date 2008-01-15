@@ -164,14 +164,33 @@ public class DSQuery
             
             Query myquery = qp.parse(querystring);
             Hits hits = null;
-            if (args.getSortOption() == null)
+
+            try
             {
-                hits = searcher.search(myquery, new Sort(new SortField[] { new SortField("search.resourcetype"), SortField.FIELD_SCORE }));
+                if (args.getSortOption() == null)
+                {
+                    SortField[] sortFields = new SortField[] {
+                            new SortField("search.resourcetype"),
+                            new SortField(null, SortField.SCORE, SortOption.ASCENDING.equals(args.getSortOrder()))
+                        };
+                    hits = searcher.search(myquery, new Sort(sortFields));
+                }
+                else
+                {
+                    SortField[] sortFields = new SortField[] {
+                            new SortField("search.resourcetype"),
+                            new SortField("sort_" + args.getSortOption().getName(), SortOption.DESCENDING.equals(args.getSortOrder())),
+                            SortField.FIELD_SCORE
+                        };
+                    hits = searcher.search(myquery, new Sort(sortFields));
+                }
             }
-            else
+            catch (Exception e)
             {
-                SortField[] sortFields = new SortField[] { new SortField("search.resourcetype"), new SortField("sort_" + args.getSortOption().getName(), SortOption.DESCENDING.equals(args.getSortOrder())), SortField.FIELD_SCORE };
-                hits = searcher.search(myquery, new Sort(sortFields));
+                // Lucene can throw an exception if it is unable to determine a sort time from the specified field
+                // Provide a fall back that just works on relevancy.
+                log.error("Unable to use speficied sort option: " + (args.getSortOption() == null ? "type/relevance": args.getSortOption().getName()));
+                hits = searcher.search(myquery, new Sort(SortField.FIELD_SCORE));
             }
 
             // set total number of hits
