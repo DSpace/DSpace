@@ -102,6 +102,7 @@
     int pageLast    = ((Integer)request.getAttribute("pagelast"   )).intValue();
     int pageFirst   = ((Integer)request.getAttribute("pagefirst"  )).intValue();
     int rpp         = qResults.getPageSize();
+    int etAl        = qResults.getEtAl();
 
     // retain scope when navigating result sets
     String searchScope = "";
@@ -258,6 +259,48 @@ else
                <option value="ASC" <%= ascSelected %>><fmt:message key="search.order.asc" /></option>
                <option value="DESC" <%= descSelected %>><fmt:message key="search.order.desc" /></option>
            </select>
+           <fmt:message key="search.results.etal" />
+           <select name="etal">
+<%
+               String unlimitedSelect = "";
+               if (qResults.getEtAl() < 1)
+               {
+                   unlimitedSelect = "selected=\"selected\"";
+               }
+%>
+               <option value="0" <%= unlimitedSelect %>><fmt:message key="browse.full.etal.unlimited"/></option>
+<%
+               boolean insertedCurrent = false;
+               for (int i = 0; i <= 50 ; i += 5)
+               {
+                   // for the first one, we want 1 author, not 0
+                   if (i == 0)
+                   {
+                       String sel = (i + 1 == qResults.getEtAl() ? "selected=\"selected\"" : "");
+                       %><option value="1" <%= sel %>>1</option><%
+                   }
+
+                   // if the current i is greated than that configured by the user,
+                   // insert the one specified in the right place in the list
+                   if (i > qResults.getEtAl() && !insertedCurrent && qResults.getEtAl() > 1)
+                   {
+                       %><option value="<%= qResults.getEtAl() %>" selected="selected"><%= qResults.getEtAl() %></option><%
+                       insertedCurrent = true;
+                   }
+
+                   // determine if the current not-special case is selected
+                   String selected = (i == qResults.getEtAl() ? "selected=\"selected\"" : "");
+
+                   // do this for all other cases than the first and the current
+                   if (i != 0 && i != qResults.getEtAl())
+                   {
+%>
+                       <option value="<%= i %>" <%= selected %>><%= i %></option>
+<%
+                   }
+               }
+%>
+           </select>
            <%-- add results per page, etc. --%>
            <input type="submit" name="submit_search" value="<fmt:message key="search.update" />" />
        </td></tr>
@@ -282,7 +325,7 @@ else
     <br/>
     <%-- <h3>Item hits:</h3> --%>
     <h3><fmt:message key="jsp.search.results.itemhits"/></h3>
-    <dspace:itemlist items="<%= items %>" />
+    <dspace:itemlist items="<%= items %>" sortOption="<%= so %>" authorLimit="<%= qResults.getEtAl() %>" />
 <% } %>
 
 <p align="center">
@@ -296,6 +339,7 @@ else
                     + "&amp;sort_by=" + (so != null ? so.getNumber() : 0)
                     + "&amp;order=" + order
                     + "&amp;rpp=" + rpp
+                    + "&amp;etal=" + etAl
                     + "&amp;start=";
 
     String nextURL = prevURL;
@@ -323,6 +367,7 @@ for( int q = pageFirst; q <= pageLast; q++ )
                     + "&amp;sort_by=" + (so != null ? so.getNumber() : 0)
                     + "&amp;order=" + order
                     + "&amp;rpp=" + rpp
+                    + "&amp;etal=" + etAl
                     + "&amp;start=";
 
 

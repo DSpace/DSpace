@@ -133,6 +133,7 @@ public class DSQuery
         qr.setHitTypes(hitTypes);
         qr.setStart(args.getStart());
         qr.setPageSize(args.getPageSize());
+        qr.setEtAl(args.getEtAl());
 
         // massage the query string a bit
         querystring = checkEmptyQuery(querystring); // change nulls to an empty string

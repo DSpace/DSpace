@@ -411,7 +411,7 @@ public class BrowseListTag extends TagSupport
                             }
                             if (truncated)
                             {
-                            	String etal = LocaleSupport.getLocalizedMessage(pageContext, "browse.et-al");
+                            	String etal = LocaleSupport.getLocalizedMessage(pageContext, "itemlist.et-al");
                             	sb.append(", " + etal);
                             }
                             metadata = "<em>" + sb.toString() + "</em>";
@@ -447,6 +447,7 @@ public class BrowseListTag extends TagSupport
                 colCount++;
                 isDate = false;
                 emph = false;
+                isAuthor = false;
             }
 
             // Add column for 'edit item' links

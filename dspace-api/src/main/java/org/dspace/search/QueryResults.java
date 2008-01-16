@@ -41,6 +41,8 @@ package org.dspace.search;
 
 import java.util.List;
 
+import org.dspace.core.ConfigurationManager;
+
 /**
  * Contains the results of a query. Use access methods to examine and retrieve
  * the results.
@@ -60,6 +62,27 @@ public class QueryResults
     private List hitIds;   // Resource ids 
 
     private String errorMsg; //error string, if there is one
+
+    /** number of metadata elements to display before truncating using "et al" */
+    private int etAl = ConfigurationManager.getIntProperty("webui.itemlist.author-limit");
+
+    /**
+     * @return  the number of metadata fields at which to truncate with "et al"
+     */
+    public int getEtAl()
+    {
+        return etAl;
+    }
+
+    /**
+     * set the number of metadata fields at which to truncate with "et al"
+     *
+     * @param etAl
+     */
+    public void setEtAl(int etAl)
+    {
+        this.etAl = etAl;
+    }
 
     /** set total number of hits found by search engine, not number in hitHandles */
     public void setHitCount(int newCount)
