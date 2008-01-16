@@ -122,6 +122,9 @@ public class SimpleSearchServlet extends DSpaceServlet
         QueryArgs qArgs = new QueryArgs();
         SortOption sortOption = null;
 
+        if (request.getParameter("etal") != null)
+            qArgs.setEtAl(UIUtil.getIntParameter(request, "etal"));
+
         try
         {
             if (sortBy > 0)

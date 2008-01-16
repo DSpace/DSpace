@@ -47,6 +47,7 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.sort.SortOption;
 
@@ -69,6 +70,27 @@ public class QueryArgs
     private SortOption sortOption = null;
 
     private String sortOrder = SortOption.DESCENDING;
+
+    /** number of metadata elements to display before truncating using "et al" */
+    private int etAl = ConfigurationManager.getIntProperty("webui.itemlist.author-limit");
+
+    /**
+     * @return  the number of metadata fields at which to truncate with "et al"
+     */
+    public int getEtAl()
+    {
+        return etAl;
+    }
+
+    /**
+     * set the number of metadata fields at which to truncate with "et al"
+     *
+     * @param etAl
+     */
+    public void setEtAl(int etAl)
+    {
+        this.etAl = etAl;
+    }
 
     /**
      * set the query string

@@ -54,9 +54,11 @@ import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.BrowseIndex;
+import org.dspace.browse.CrossLinks;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DCDate;
@@ -66,6 +68,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.sort.SortOption;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.uri.IdentifierFactory;
 
@@ -77,6 +80,8 @@ import org.dspace.uri.IdentifierFactory;
  */
 public class ItemListTag extends TagSupport
 {
+    private static Logger log = Logger.getLogger(ItemListTag.class);
+
     /** Items to display */
     private Item[] items;
 
@@ -96,6 +101,12 @@ public class ItemListTag extends TagSupport
 
     /** Config browse/search thumbnail link behaviour */
     private boolean linkToBitstream = false;
+
+    /** Config to include an edit link */
+    private boolean linkToEdit = false;
+
+    /** Config to disable cross links */
+    private boolean disableCrossLinks = false;
     
     /** The default fields to be displayed when listing items */
     private static String listFields = "dc.date.issued(date), dc.title, dc.contributor.*";
@@ -106,6 +117,12 @@ public class ItemListTag extends TagSupport
     /** The default field which is bound to the browse by title */
     private static String titleField = "dc.title";
     
+    private static String authorField = "dc.contributor.*";
+
+    private static int authorLimit = -1;
+
+    private SortOption sortOption = null;
+
     public ItemListTag()
     {
         super();
@@ -127,7 +144,21 @@ public class ItemListTag extends TagSupport
         }
         
         // get the elements to display
-        String configLine = ConfigurationManager.getProperty("webui.itemlist.columns");
+        String configLine = null;
+        if (sortOption != null)
+        {
+            if (configLine == null)
+                configLine = ConfigurationManager.getProperty("webui.itemlist.sort." + sortOption.getName() + ".columns");
+
+            if (configLine == null)
+                configLine = ConfigurationManager.getProperty("webui.itemlist." + sortOption.getName() + ".columns");
+        }
+
+        if (configLine == null)
+        {
+            configLine = ConfigurationManager.getProperty("webui.itemlist.columns");
+        }
+
         if (configLine != null)
         {
             listFields = configLine;
@@ -146,14 +177,24 @@ public class ItemListTag extends TagSupport
             titleField = titleLine;
         }
         
+        String authorLine = ConfigurationManager.getProperty("webui.browse.author-field");
+        if (authorLine != null)
+        {
+            authorField = authorLine;
+        }
+        
         StringTokenizer st = new StringTokenizer(listFields, ",");
         
 //      make an array to hold all the frags that we will use
         int columns = st.countTokens();
+        if (linkToEdit)
+            columns++;
         String[] frags = new String[columns * items.length];
         
         try 
         {
+            CrossLinks cl = new CrossLinks();
+
             out.println("<table align=\"center\" class=\"miscTable\" summary=\"This table browse all dspace content\">");
             out.println("<tr>");
             
@@ -161,7 +202,8 @@ public class ItemListTag extends TagSupport
             int colCount = 1;
             boolean isDate = false;
             boolean emph = false;
-            
+            boolean isAuthor = false;
+
             while (st.hasMoreTokens())
             {
                 String field = st.nextToken().toLowerCase().trim();
@@ -172,6 +214,21 @@ public class ItemListTag extends TagSupport
                 {
                     field = field.replaceAll("\\(date\\)", "");
                     isDate = true;
+                }
+
+                // find out if this is the author column
+                if (field.equals(authorField))
+                {
+                    isAuthor = true;
+                }
+
+                // find out if this field needs to link out to other browse views
+                String browseType = "";
+                boolean viewFull = false;
+                if (cl.hasLink(field))
+                {
+                    browseType = cl.getLinkType(field);
+                    viewFull = BrowseIndex.getBrowseIndex(browseType).isItemIndex();
                 }
                 
                 // get the schema and the element qualifier pair
@@ -194,8 +251,12 @@ public class ItemListTag extends TagSupport
                 String qualifier = tokens[2];
                 
                 // find out if we are emphasising this field
-                if ((field.equals(dateField) && emphasiseDate) || 
-                        (field.equals(titleField) && emphasiseTitle))
+                if (field.equals(emphColumn))
+                {
+                    emph = true;
+                }
+                else if ((field.equals(dateField) && emphasiseDate) ||
+                         (field.equals(titleField) && emphasiseTitle))
                 {
                     emph = true;
                 }
@@ -228,6 +289,12 @@ public class ItemListTag extends TagSupport
                     {
                         metadataArray = items[i].getMetadata(schema, element, qualifier, Item.ANY);
                     }
+
+                    // save on a null check which would make the code untidy
+                    if (metadataArray == null)
+                    {
+                        metadataArray = new DCValue[0];
+                    }
                     
                     // now prepare the content of the table division
                     String metadata = "-";
@@ -246,7 +313,12 @@ public class ItemListTag extends TagSupport
                             DCDate dd = new DCDate(metadataArray[0].value);
                             metadata = UIUtil.displayDate(dd, false, false, (HttpServletRequest)pageContext.getRequest()) + thumbs;
                         }
-                        // format the title field correctly                        
+                        // format the title field correctly for withdrawn items (ie. don't link)
+                        else if (field.equals(titleField) && items[i].isWithdrawn())
+                        {
+                            metadata = Utils.addEntities(metadataArray[0].value);
+                        }
+                        // format the title field correctly
                         else if (field.equals(titleField))
                         {
                             metadata = "<a href=\"" 
@@ -257,14 +329,57 @@ public class ItemListTag extends TagSupport
                         // format all other fields
                         else
                         {
-                            StringBuffer sb = new StringBuffer();
-                            for (int j = 0; j < metadataArray.length; j++)
+                            // limit the number of records if this is the author field (if
+                            // -1, then the limit is the full list)
+                            boolean truncated = false;
+                            int loopLimit = metadataArray.length;
+                            if (isAuthor)
                             {
+                                int fieldMax = (authorLimit > 0 ? authorLimit : metadataArray.length);
+                                loopLimit = (fieldMax > metadataArray.length ? metadataArray.length : fieldMax);
+                                truncated = (fieldMax < metadataArray.length);
+                                log.debug("Limiting output of field " + field + " to " + Integer.toString(loopLimit) + " from an original " + Integer.toString(metadataArray.length));
+                            }
+
+                            StringBuffer sb = new StringBuffer();
+                            for (int j = 0; j < loopLimit; j++)
+                            {
+                                String startLink = "";
+                                String endLink = "";
+                                if (!"".equals(browseType) && !disableCrossLinks)
+                                {
+                                    String argument = "value";
+                                    if (viewFull)
+                                    {
+                                        argument = "vfocus";
+                                    }
+                                    startLink = "<a href=\"" + hrq.getContextPath() + "/browse?type=" + browseType + "&amp;" +
+                                            argument + "=" + Utils.addEntities(metadataArray[j].value);
+
+                                    if (metadataArray[j].language != null)
+                                    {
+                                        startLink = startLink + "&amp;" +
+                                            argument + "_lang=" + Utils.addEntities(metadataArray[j].language) +
+                                            "\">";
+                                    }
+                                    else
+                                    {
+                                        startLink = startLink + "\">";
+                                    }
+                                    endLink = "</a>";
+                                }
+                                sb.append(startLink);
                                 sb.append(Utils.addEntities(metadataArray[j].value));
-                                if (j < (metadataArray.length - 1))
+                                sb.append(endLink);
+                                if (j < (loopLimit - 1))
                                 {
                                     sb.append("; ");
                                 }
+                            }
+                            if (truncated)
+                            {
+                                String etal = LocaleSupport.getLocalizedMessage(pageContext, "itemlist.et-al");
+                                sb.append(", " + etal);
                             }
                             metadata = "<em>" + sb.toString() + "</em>";
                         }
@@ -299,8 +414,45 @@ public class ItemListTag extends TagSupport
                 colCount++;
                 isDate = false;
                 emph = false;
+                isAuthor = false;
             }
             
+            // Add column for 'edit item' links
+            if (linkToEdit)
+            {
+                String cOddOrEven = ((columns % 2) == 0 ? "Odd" : "Even");
+                String id = "t" + Integer.toString(colCount);
+                String css = "oddRow" + cOddOrEven + "Col";
+
+                // output the header
+                out.print("<th id=\"" + id +  "\" class=\"" + css + "\">"
+                        + (emph ? "<strong>" : "")
+                        + "&nbsp;" //LocaleSupport.getLocalizedMessage(pageContext, message)
+                        + (emph ? "</strong>" : "") + "</th>");
+
+                for (int i = 0; i < items.length; i++)
+                {
+                    // now prepare the XHTML frag for this division
+                    String rOddOrEven;
+                    if (i == highlightRow)
+                    {
+                        rOddOrEven = "highlight";
+                    }
+                    else
+                    {
+                        rOddOrEven = ((i % 2) == 1 ? "odd" : "even");
+                    }
+
+                    int idx = ((i + 1) * columns) - 1;
+                    frags[idx] = "<td headers=\"" + id + "\" class=\""
+                        + rOddOrEven + "Row" + cOddOrEven + "Col\" nowrap>"
+                        + "<form method=get action=\"" + hrq.getContextPath() + "/tools/edit-item\">"
+                        + "<input type=\"hidden\" name=\"item_id\" value=\"" + items[i].getID() + "\" />"
+                        + "<input type=\"submit\" value=\"Edit Item\" /></form>"
+                        + "</td>";
+                }
+            }
+
             out.println("</tr>");
             
             // now output all the frags in the right order for the page
@@ -324,8 +476,52 @@ public class ItemListTag extends TagSupport
         {
             throw new JspException(ie);
         }
+        catch (BrowseException e)
+        {
+            throw new JspException(e);
+        }
 
         return SKIP_BODY;
+    }
+
+    public int getAuthorLimit()
+    {
+        return authorLimit;
+   }
+
+    public void setAuthorLimit(int al)
+    {
+        authorLimit = al;
+    }
+
+    public boolean getLinkToEdit()
+    {
+        return linkToEdit;
+    }
+
+    public void setLinkToEdit(boolean edit)
+    {
+        this.linkToEdit = edit;
+    }
+
+    public boolean getDisableCrossLinks()
+    {
+        return disableCrossLinks;
+    }
+
+    public void setDisableCrossLinks(boolean links)
+    {
+        this.disableCrossLinks = links;
+    }
+
+    public SortOption getSortOption()
+    {
+        return sortOption;
+    }
+
+    public void setSortOption(SortOption so)
+    {
+        sortOption = so;
     }
 
     /**
