@@ -948,6 +948,11 @@ public class DSIndexer
                                                    DateTools.dateToString(d, DateTools.Resolution.SECOND),
                                                    Field.Store.NO,
                                                    Field.Index.TOKENIZED));
+
+                                doc.add( new Field(indexConfigArr[i].indexName  + ".year",
+                                                    DateTools.dateToString(d, DateTools.Resolution.YEAR),
+                                                    Field.Store.NO,
+                                                    Field.Index.TOKENIZED));
                             }
                         }
                         else if ("date".equalsIgnoreCase(indexConfigArr[i].type))
@@ -959,6 +964,11 @@ public class DSIndexer
                                                    DateTools.dateToString(d, DateTools.Resolution.DAY),
                                                    Field.Store.NO,
                                                    Field.Index.TOKENIZED));
+
+                                doc.add( new Field(indexConfigArr[i].indexName  + ".year",
+                                                    DateTools.dateToString(d, DateTools.Resolution.YEAR),
+                                                    Field.Store.NO,
+                                                    Field.Index.TOKENIZED));
                             }
                         }
                         else
