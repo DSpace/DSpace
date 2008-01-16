@@ -156,8 +156,8 @@ Common usage:
 			</fileset>
 		</move>
 
-		<copy todir="${dspace.dir}/etc" preservelastmodified="true">
-			<fileset dir="etc" />
+		<copy todir="${dspace.dir}/lib" preservelastmodified="true">
+			<fileset dir="lib" />
 		</copy>
 
 		<move todir="${dspace.dir}/etc.bak-${build.date}" failonerror="no">
@@ -166,8 +166,8 @@ Common usage:
 			</fileset>
 		</move>
 
-		<copy todir="${dspace.dir}/lib" preservelastmodified="true">
-			<fileset dir="lib" />
+		<copy todir="${dspace.dir}/etc" preservelastmodified="true">
+			<fileset dir="etc" />
 		</copy>
 
 		<echo>
@@ -175,8 +175,12 @@ Common usage:
  ${dspace.dir}/lib was backed up to
 			
  ${dspace.dir}/lib.bak-${build.date}
+
+ ${dspace.dir}/etc was backed up to
 			
- Please review this directory and delete it if its no longer needed.
+ ${dspace.dir}/etc.bak-${build.date}
+			
+ Please review these directories and delete if no longer needed.
 ====================================================================
 		</echo>
 
