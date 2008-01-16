@@ -38,6 +38,7 @@ import java.io.BufferedInputStream;
 import java.util.Date;
 import java.util.Properties;
 
+import org.apache.commons.codec.binary.Base64;
 import org.dspace.app.didl.UUIDFactory;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -49,7 +50,6 @@ import org.dspace.core.Context;
 import org.dspace.search.HarvestedItemInfo;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 
-import sun.misc.BASE64Encoder;
 import ORG.oclc.oai.server.crosswalk.Crosswalk;
 import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
 import ORG.oclc.oai.server.verb.ServerVerb;
@@ -232,8 +232,7 @@ public class DIDLCrosswalk extends Crosswalk
                                 int size=bis.read(buffer);
                                 contextl.complete();
                                 
-                                BASE64Encoder encoder=(BASE64Encoder) Class.forName("sun.misc.BASE64Encoder").newInstance();
-                                String encoding = encoder.encodeBuffer(buffer);
+                                String encoding = new String(Base64.encodeBase64(buffer), "ASCII");
                                 metadata.append(encoding);
                             }
                             catch (Exception ex)
