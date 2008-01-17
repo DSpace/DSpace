@@ -44,6 +44,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -61,6 +62,9 @@ import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Select;
+import org.dspace.app.xmlui.wing.element.Table;
+import org.dspace.app.xmlui.wing.element.Row;
+import org.dspace.app.xmlui.wing.element.Cell;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -71,6 +75,8 @@ import org.dspace.handle.HandleManager;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
+import org.dspace.sort.SortOption;
+import org.dspace.sort.SortException;
 import org.xml.sax.SAXException;
 
 /**
@@ -108,16 +114,23 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     
     private static final Message T_all_of_dspace =
         message("xmlui.ArtifactBrowser.AbstractSearch.all_of_dspace");
-    /** How many results should appear on one page? */
-    public static final int RESULTS_PER_PAGE = 10;
+
+    private static final Message T_sort_by_relevance =
+        message("xmlui.ArtifactBrowser.AbstractSearch.sort_by.relevance");
+
+    private final static Message T_sort_by = message("xmlui.ArtifactBrowser.AbstractSearch.sort_by");
+
+    private final static Message T_order      = message("xmlui.ArtifactBrowser.AbstractSearch.order");
+    private final static Message T_order_asc  = message("xmlui.ArtifactBrowser.AbstractSearch.order.asc");
+    private final static Message T_order_desc = message("xmlui.ArtifactBrowser.AbstractSearch.order.desc");
+
+    private final static Message T_rpp = message("xmlui.ArtifactBrowser.AbstractSearch.rpp");
     
     /** Cached query results */
     private QueryResults queryResults;
     
     /** Cached validity object */
     private SourceValidity validity;
-    
-    
     
     /**
      * Generate the unique caching key.
@@ -131,8 +144,12 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             
             // Page Parameter
             Request request = ObjectModelHelper.getRequest(objectModel);
-            key += "-" + request.getParameter("page");
-            
+            key += "-" + getParameterPage();
+            key += "-" + getParameterRpp();
+            key += "-" + getParameterSortBy();
+            key += "-" + getParameterOrder();
+            key += "-" + getParameterEtAl();
+
             // What scope the search is at
             DSpaceObject scope = getScope();
             if (scope != null)
@@ -154,7 +171,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
      * Generate the cache validity object.
      * 
      * This validity object should never "over cache" because it will
-     * preform the search, and serialize the results using the
+     * perform the search, and serialize the results using the
      * DSpaceValidity object.
      */
     public SourceValidity getValidity()
@@ -174,8 +191,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 	            java.util.List<String> handles = queryResults.getHitHandles();
 	            for (String handle : handles)
 	            {
-	                DSpaceObject resultDSO = HandleManager.resolveToObject(
-	                        context, handle);
+	                DSpaceObject resultDSO = HandleManager.resolveToObject(context, handle);
 	                validity.add(resultDSO);
 	            }
 	            
@@ -391,25 +407,24 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             return;
         
         Context context = ContextUtil.obtainContext(objectModel);
-        Request request = ObjectModelHelper.getRequest(objectModel);
         String query = getQuery();
         DSpaceObject scope = getScope();
-        String page = request.getParameter("page");
-        int resultsPerPage = RESULTS_PER_PAGE;
-        try {
-        	String resultsPerPageStr = request.getParameter("results_per_page");
-        	resultsPerPage = Integer.valueOf(resultsPerPageStr);
-        }
-        catch (NumberFormatException nfe)
-        {
-        	resultsPerPage = RESULTS_PER_PAGE;
-        }
+        int page = getParameterPage();
 
         QueryArgs qArgs = new QueryArgs();
-        qArgs.setPageSize(resultsPerPage);
+        qArgs.setPageSize(getParameterRpp());
+        try
+        {
+            qArgs.setSortOption(SortOption.getSortOption(getParameterSortBy()));
+        }
+        catch (SortException se)
+        {
+        }
+        
+        qArgs.setSortOrder(getParameterOrder());
 
         qArgs.setQuery(query);
-        if (page != null)
+        if (page > 1)
             qArgs.setStart((Integer.valueOf(page) - 1) * qArgs.getPageSize());
         else
             qArgs.setStart(0);
@@ -453,6 +468,60 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             dso = HandleManager.resolveToObject(context, scopeString);
 
         return dso;
+    }
+
+    protected int getParameterPage()
+    {
+        try
+        {
+            return Integer.parseInt(ObjectModelHelper.getRequest(objectModel).getParameter("page"));
+        }
+        catch (Exception e)
+        {
+            return 1;
+        }
+    }
+
+    protected int getParameterRpp()
+    {
+        try
+        {
+            return Integer.parseInt(ObjectModelHelper.getRequest(objectModel).getParameter("rpp"));
+        }
+        catch (Exception e)
+        {
+            return 10;
+        }
+    }
+
+    protected int getParameterSortBy()
+    {
+        try
+        {
+            return Integer.parseInt(ObjectModelHelper.getRequest(objectModel).getParameter("sort_by"));
+        }
+        catch (Exception e)
+        {
+            return 0;
+        }
+    }
+
+    protected String getParameterOrder()
+    {
+        String s = ObjectModelHelper.getRequest(objectModel).getParameter("order");
+        return s != null ? s : "DESC";
+    }
+
+    protected int getParameterEtAl()
+    {
+        try
+        {
+            return Integer.parseInt(ObjectModelHelper.getRequest(objectModel).getParameter("etal"));
+        }
+        catch (Exception e)
+        {
+            return 0;
+        }
     }
 
     /**
@@ -499,5 +568,66 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         this.queryResults = null;
         this.validity = null;
         super.recycle();
+    }
+
+    protected void buildSearchControls(Division div)
+            throws WingException
+    {
+        Table controlsTable = div.addTable("search-controls", 1, 3);
+        Row controlsRow = controlsTable.addRow(Row.ROLE_DATA);
+
+        // Create a control for the number of records to display
+        Cell rppCell = controlsRow.addCell();
+        rppCell.addContent(T_rpp);
+        Select rppSelect = rppCell.addSelect("rpp");
+        for (int i = 5; i <= 100; i += 5)
+        {
+            rppSelect.addOption((i == getParameterRpp()), i, Integer.toString(i));
+        }
+
+        Cell sortCell = controlsRow.addCell();
+        try
+        {
+            // Create a drop down of the different sort columns available
+            sortCell.addContent(T_sort_by);
+            Select sortSelect = sortCell.addSelect("sort_by");
+            sortSelect.addOption(false, 0, T_sort_by_relevance);
+            for (SortOption so : SortOption.getSortOptions())
+            {
+                if (so.isVisible())
+                {
+                    sortSelect.addOption((so.getNumber() == getParameterSortBy()), so.getNumber(),
+                            message("xmlui.ArtifactBrowser.AbstractSearch.sort_by." + so.getName()));
+                }
+            }
+        }
+        catch (SortException se)
+        {
+            throw new WingException("Unable to get sort options", se);
+        }
+
+        // Create a control to changing ascending / descending order
+        Cell orderCell = controlsRow.addCell();
+        orderCell.addContent(T_order);
+        Select orderSelect = orderCell.addSelect("order");
+        orderSelect.addOption(SortOption.ASCENDING.equals(getParameterOrder()), SortOption.ASCENDING, T_order_asc);
+        orderSelect.addOption(SortOption.DESCENDING.equals(getParameterOrder()), SortOption.DESCENDING, T_order_desc);
+
+        // Create a control for the number of authors per item to display
+        // FIXME This is currently disabled, as the supporting functionality
+        // is not currently present in xmlui
+        //if (isItemBrowse(info))
+        //{
+        //    controlsForm.addContent(T_etal);
+        //    Select etalSelect = controlsForm.addSelect(BrowseParams.ETAL);
+        //
+        //    etalSelect.addOption((info.getEtAl() < 0), 0, T_etal_all);
+        //    etalSelect.addOption(1 == info.getEtAl(), 1, Integer.toString(1));
+        //
+        //    for (int i = 5; i <= 50; i += 5)
+        //    {
+        //        etalSelect.addOption(i == info.getEtAl(), i, Integer.toString(i));
+        //    }
+        //}
     }
 }
