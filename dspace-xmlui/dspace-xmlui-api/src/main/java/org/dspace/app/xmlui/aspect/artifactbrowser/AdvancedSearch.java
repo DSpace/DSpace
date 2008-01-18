@@ -159,7 +159,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         
         // Use these fields to change the number of search fields, or change the results per page.
         query.addHidden("num_search_field").setValue(numSearchField);
-        query.addHidden("results_per_page").setValue(RESULTS_PER_PAGE);
+        query.addHidden("results_per_page").setValue(getParameterRpp());
         
         List queryList = query.addList("search-query",List.TYPE_FORM);
         
@@ -197,6 +197,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         	query.addHidden("query"+i).setValue(field.getQuery());
         }
         
+        buildSearchControls(query);
         query.addPara(null, "button-list").addButton("submit").setValue(T_go);
         
         // Add the result division

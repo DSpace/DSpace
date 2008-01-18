@@ -138,6 +138,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         text.setLabel(T_full_text_search);
         text.setValue(queryString);
         
+        buildSearchControls(query);
         queryList.addItem().addButton("submit").setValue(T_go);
 
         // Add the result division
