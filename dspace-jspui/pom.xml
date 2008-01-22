@@ -184,6 +184,10 @@
          <groupId>org.dspace</groupId>
          <artifactId>language-packs</artifactId>
       </dependency>
+       <dependency>
+          <groupId>commons-validator</groupId>
+          <artifactId>commons-validator</artifactId>
+       </dependency>
       <dependency>
          <groupId>javax.servlet</groupId>
          <artifactId>servlet-api</artifactId>
