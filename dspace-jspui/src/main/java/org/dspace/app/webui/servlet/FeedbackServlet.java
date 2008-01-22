@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.apache.commons.validator.EmailValidator;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
@@ -120,11 +121,12 @@ public class FeedbackServlet extends DSpaceServlet
         // Has the user just posted their feedback?
         if (request.getParameter("submit") != null)
         {
+            EmailValidator ev = EmailValidator.getInstance();
             String feedback = request.getParameter("feedback");
 
             // Check all data is there
             if ((formEmail == null) || formEmail.equals("")
-                    || (feedback == null) || feedback.equals(""))
+                    || (feedback == null) || feedback.equals("") || !ev.isValid(formEmail))
             {
                 log.info(LogManager.getHeader(context, "show_feedback_form",
                         "problem=true"));
