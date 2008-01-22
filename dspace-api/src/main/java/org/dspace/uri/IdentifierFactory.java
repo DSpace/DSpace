@@ -184,4 +184,34 @@ public class IdentifierFactory
 
         return url;
     }
+
+    public static String getCanonicalForm(DSpaceObject dso)
+    {
+        String cf = "";
+        String ns = ConfigurationManager.getProperty("identifier.url-scheme");
+        if (!"".equals(ns) && ns != null)
+        {
+            ExternalIdentifierType type = ExternalIdentifierMint.getType(ns);
+            List<ExternalIdentifier> eids = dso.getExternalIdentifiers();
+            for (ExternalIdentifier eid : eids)
+            {
+                if (eid.getType().equals(type))
+                {
+                    cf = eid.getCanonicalForm();
+                }
+            }
+        }
+
+        if ("".equals(cf))
+        {
+            ObjectIdentifier oid = dso.getIdentifier();
+            if (oid == null)
+            {
+                return cf;
+            }
+            cf = oid.getCanonicalForm();
+        }
+
+        return cf;
+    }
 }

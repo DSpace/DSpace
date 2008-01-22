@@ -62,6 +62,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.license.CreativeCommons" %>
@@ -97,28 +98,17 @@
     String cc_rdf = CreativeCommons.getLicenseRDF(item);
 
     // Full title needs to be put into a string to use as tag argument
-
+    String cf = IdentifierFactory.getCanonicalForm(item);
     String title = "FIXME";
-    /*
-    if (identifier == null)
- 	{
-		title = "Workspace Item";
-	}
-	else 
-	{
-        uri = identifier.getCanonicalForm();
-        citationLink = identifier.getURI().toString();
-
-		DCValue[] titleValue = item.getDC("title", null, Item.ANY);
-		if (titleValue.length != 0)
-		{
-			title = titleValue[0].value;
-		}
-		else
-		{
-			title = "Item " + uri;
-		}
-	}*/
+    DCValue[] titleValue = item.getMetadata("dc", "title", null, Item.ANY);
+    if (titleValue.length != 0)
+    {
+        title = titleValue[0].value + " (" + cf + ")";
+    }
+    else
+    {
+        title = "Item " + cf;
+    }
 %>
 
 <dspace:layout title="<%= title %>">

@@ -1,6 +1,7 @@
 package org.dspace.administer.update1516;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.dao.ResourcePolicyDAO;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -34,6 +35,14 @@ import java.util.List;
  */
 public class MigrateUUID
 {
+    public static void main(String[] args)
+            throws Exception
+    {
+        MigrateUUID migrate = new MigrateUUID();
+        migrate.migrate();
+    }
+
+
     public void migrate()
             throws SQLException, AuthorizeException
     {
@@ -112,6 +121,13 @@ public class MigrateUUID
             oidDAO.update(oid);
             communityDAO.update(com);
         }
+
+        // FIXME: we still need to do uuid generation for the following
+        
+        // ResourcePolicy
+
+        // EPerson
+
 
         context.complete();
     }
