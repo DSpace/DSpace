@@ -154,6 +154,18 @@ public class IdentifierFactory
         }
     }
 
+    public static URL getLocalURL(DSpaceObject dso)
+    {
+        URL url = null;
+        ObjectIdentifier oid = dso.getIdentifier();
+        if (oid == null)
+        {
+            return null;
+        }
+        url = IdentifierFactory.getURL(oid);
+        return url;
+    }
+
     public static URL getURL(DSpaceObject dso)
     {
         URL url = null;

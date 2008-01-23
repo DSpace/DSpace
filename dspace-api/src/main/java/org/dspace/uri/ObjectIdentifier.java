@@ -134,12 +134,6 @@ public class ObjectIdentifier extends SimpleIdentifier implements ResolvableIden
         this.resourceTypeID = resourceTypeID;
     }
 
-    @Deprecated
-    public URL getURL()
-    {
-        return IdentifierFactory.getURL(this);
-    }
-
     // ResolvableIdentifier Methods
 
     public String getURLForm()

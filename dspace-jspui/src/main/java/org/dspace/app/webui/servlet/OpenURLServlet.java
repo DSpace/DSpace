@@ -165,7 +165,8 @@ public class OpenURLServlet extends URIServlet
         }
         else
         {
-            processDSpaceObject(context, request, response, dso, null);
+            DSpaceObjectServlet dos = new DSpaceObjectServlet();
+            dos.processDSpaceObject(context, request, response, dso, null);
         }
     }
 }
