@@ -48,6 +48,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+import org.dspace.core.ConfigurationManager;
+
 /**
  * Implements MARC 21 standards to disregard initial
  * definite or indefinite article in sorting.
@@ -76,8 +79,8 @@ public class MARC21InitialArticleWord extends InitialArticleWord
     protected String[] getArticleWords(String lang)
     {
         // No language - no words
-        if (lang == null)
-            return null;
+        if (StringUtils.isEmpty(lang))
+            return defaultWords;
 
         Language l = Language.getLanguage(lang);
         
@@ -96,6 +99,8 @@ public class MARC21InitialArticleWord extends InitialArticleWord
     
     // Mapping of IANA codes to article word lists
     private static Map ianaArticleMap = new HashMap();
+
+    private static String[] defaultWords = null;
 
     // Static initialisation - convert word -> languages map 
     // into language -> words map
@@ -299,6 +304,45 @@ public class MARC21InitialArticleWord extends InitialArticleWord
             
             // Add language/article entry to map
             ianaArticleMap.put(lang.IANA, new MARC21InitialArticleWord.ArticlesForLang(lang, words));
+        }
+
+        // Setup default stop words for null languages
+        String defaultLangs = ConfigurationManager.getProperty("marc21wordfilter.defaultlang");
+        if (!StringUtils.isEmpty(defaultLangs))
+        {
+            String[] langArr = defaultLangs.split("[, ]+");
+            if (langArr != null && langArr.length > 0)
+            {
+                int wordCount = 0;
+                ArticlesForLang[] afl = new ArticlesForLang[langArr.length];
+
+                for (int idx = 0; idx < afl.length; idx++)
+                {
+                    Language l = Language.getLanguage(langArr[idx]);
+                    if (l != null && ianaArticleMap.containsKey(l.IANA))
+                    {
+                        afl[idx] = (ArticlesForLang)ianaArticleMap.get(l.IANA);
+                        if (afl[idx] != null)
+                        {
+                            wordCount += afl[idx].words.length;
+                        }
+                    }
+                }
+
+                if (wordCount > 0)
+                {
+                    int destPos = 0;
+                    defaultWords = new String[wordCount];
+                    for (int idx = 0; idx < afl.length; idx++)
+                    {
+                        if (afl[idx] != null)
+                        {
+                            System.arraycopy(afl[idx].words, 0, defaultWords, destPos, afl[idx].words.length);
+                            destPos += afl[idx].words.length;
+                        }
+                    }
+                }
+            }
         }
     }
 

@@ -50,11 +50,11 @@ package org.dspace.text.filter;
 public abstract class InitialArticleWord implements TextFilter
 {
     /**
-     * When no language is passed, just return the string
+     * When no language is passed, use null and let implementation decide what to do
      */
     public String filter(String str)
     {
-        return str;
+        return filter(str, null);
     }
     
     /**
