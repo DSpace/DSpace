@@ -123,6 +123,36 @@
          Builds OAI Gateway WAR for DSpace
       -->
       <profile>
+         <id>oai-api</id>
+         <activation>
+            <file>
+               <exists>../dspace-oai-api/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-oai-api</module>
+         </modules>
+      </profile>
+
+      <!-- 
+         Builds OAI Gateway WAR for DSpace
+      -->
+      <profile>
+         <id>oai-webapp</id>
+         <activation>
+            <file>
+               <exists>../dspace-oai-webapp/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-oai-webapp</module>
+         </modules>
+      </profile>
+      
+      <!-- 
+         Builds OAI Gateway WAR for DSpace
+      -->
+      <profile>
          <id>oai</id>
          <activation>
             <file>
@@ -139,6 +169,38 @@
       -->
       <profile>
 
+         <id>jspui-api</id>
+         <activation>
+            <file>
+               <exists>../dspace-jspui-api/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-jspui-api</module>
+         </modules>
+      </profile>
+      
+      <!-- 
+         Builds JSPUI WAR for DSpace
+      -->
+      <profile>
+
+         <id>jspui-webapp</id>
+         <activation>
+            <file>
+               <exists>../dspace-jspui-webapp/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-jspui-webapp</module>
+         </modules>
+      </profile>
+            
+      <!-- 
+         Builds JSPUI WAR for DSpace
+      -->
+      <profile>
+
          <id>jspui</id>
          <activation>
             <file>
@@ -147,21 +209,6 @@
          </activation>
          <modules>
             <module>../dspace-jspui</module>
-         </modules>
-      </profile>
-
-      <!-- 
-         Builds XMLUI WAR for DSpace
-      -->
-      <profile>
-         <id>xmlui</id>
-         <activation>
-            <file>
-               <exists>../dspace-xmlui/pom.xml</exists>
-            </file>
-         </activation>
-         <modules>
-            <module>../dspace-xmlui</module>
          </modules>
       </profile>
 
@@ -205,17 +252,17 @@
       </profile>
 
       <!-- 
-         Builds LNI WAR for DSpace
+         Builds XMLUI WAR for DSpace
       -->
       <profile>
-         <id>lni</id>
+         <id>xmlui</id>
          <activation>
             <file>
-               <exists>../dspace-lni/pom.xml</exists>
+               <exists>../dspace-xmlui/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>../dspace-lni</module>
+            <module>../dspace-xmlui</module>
          </modules>
       </profile>
 
@@ -235,6 +282,18 @@
       </profile>
 
       <profile>
+         <id>lni-webapp</id>
+         <activation>
+            <file>
+               <exists>../dspace-lni-webapp/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-lni-webapp</module>
+         </modules>
+      </profile>
+      
+      <profile>
          <id>lni-client</id>
          <activation>
             <file>
@@ -246,19 +305,21 @@
          </modules>
       </profile>
 
+      <!-- 
+         Builds LNI WAR for DSpace
+      -->
       <profile>
-         <id>lni-webapp</id>
+         <id>lni</id>
          <activation>
             <file>
-               <exists>../dspace-lni-webapp/pom.xml</exists>
+               <exists>../dspace-lni/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>../dspace-lni-webapp</module>
+            <module>../dspace-lni</module>
          </modules>
       </profile>
-
-
+      
       <!-- 
          Builds Language Packs for DSpace
       -->
