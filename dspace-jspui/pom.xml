@@ -5,8 +5,8 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace</groupId>
    <artifactId>dspace-jspui</artifactId>
-   <name>DSpace JSPUI :: Web Application</name>
-   <packaging>war</packaging>
+   <name>DSpace JSPUI</name>
+   <packaging>pom</packaging>
    <url>http://projects.dspace.org/dspace-jspui</url>
    <description>DSpace JSP Based Webapplication</description>
 
@@ -70,141 +70,10 @@
       </url>
    </scm>
 
-   <build>
-      <plugins>
-
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <configuration>
-               <archiveClasses>false</archiveClasses>
-               <webResources>
-                  <resource>
-                     <filtering>true</filtering>
-                     <directory>${basedir}/src/main/webapp</directory>
-                     <includes>
-                        <include>WEB-INF/web.xml</include>
-                     </includes>
-                  </resource>
-               </webResources>
-            </configuration>
-            <executions>
-               <execution>
-                  <phase>prepare-package</phase>
-               </execution>
-            </executions>
-         </plugin>
-
-         <!-- Secondary Artifact: Skinny war. -->
-         <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <configuration>
-               <descriptorRefs>
-                  <descriptorRef>skinny</descriptorRef>
-               </descriptorRefs>
-            </configuration>
-            <executions>
-               <execution>
-                  <phase>package</phase>
-                  <goals>
-                     <goal>attached</goal>
-                  </goals>
-               </execution>
-            </executions>
-            <dependencies>
-               <dependency>
-                  <groupId>org.dspace.maven.plugins</groupId>
-                  <artifactId>dspace-assembly-plugin</artifactId>
-                  <version>1.5-SNAPSHOT</version>
-               </dependency>
-            </dependencies>
-         </plugin>
-
-      </plugins>
-   </build>
-
-   <profiles>
-      <!-- 
-         when activated a dspace.config configuration
-         file location passed on the commandline 
-         (-Ddspace.config=...) can be passed through 
-         to be used as a filter source by projects for 
-         tasks such as updating the ${dspace.dir} in
-         web.xml etc.
-      -->
-      <profile>
-         <activation>
-            <property>
-               <name>dspace.config</name>
-            </property>
-         </activation>
-         <build>
-            <filters>
-               <filter>${dspace.config}</filter>
-            </filters>
-         </build>
-      </profile>
-      <profile>
-         <id>oracle-support</id>
-         <activation>
-            <property>
-               <name>db.name</name>
-               <value>oracle</value>
-            </property>
-         </activation>
-         <dependencies>
-            <dependency>
-               <groupId>com.oracle</groupId>
-               <artifactId>ojdbc14</artifactId>
-            </dependency>
-         </dependencies>
-      </profile>
-      <profile>
-         <id>postgres-support</id>
-         <activation>
-            <property>
-               <name>!db.name</name>
-            </property>
-         </activation>
-         <dependencies>
-            <dependency>
-               <groupId>postgresql</groupId>
-               <artifactId>postgresql</artifactId>
-            </dependency>
-         </dependencies>
-      </profile>
-   </profiles>
-
-   <dependencies>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-api</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>language-packs</artifactId>
-      </dependency>
-       <dependency>
-          <groupId>commons-validator</groupId>
-          <artifactId>commons-validator</artifactId>
-       </dependency>
-      <dependency>
-         <groupId>javax.servlet</groupId>
-         <artifactId>servlet-api</artifactId>
-         <version>2.3</version>
-         <scope>provided</scope>
-      </dependency>
-      <dependency>
-         <groupId>javax.servlet</groupId>
-         <artifactId>jstl</artifactId>
-         <version>1.1.2</version>
-      </dependency>
-      <dependency>
-         <groupId>taglibs</groupId>
-         <artifactId>standard</artifactId>
-         <version>1.1.2</version>
-      </dependency>
-   </dependencies>
+   <modules>
+      <module>dspace-jspui-api</module>
+      <module>dspace-jspui-webapp</module>
+   </modules>
 
 </project>
 
