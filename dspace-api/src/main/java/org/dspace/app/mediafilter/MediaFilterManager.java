@@ -674,8 +674,15 @@ public class MediaFilterManager
 
             return false;
         }
-
+        
         InputStream destStream = formatFilter.getDestinationStream(source.retrieve());
+        if (destStream == null)
+        {
+            System.out.println("SKIPPED: bitstream " + source.getID()
+                    + " because of filtering error");
+
+            return false;
+        }
 
         // create new bundle if needed
         if (bundles.length < 1)
