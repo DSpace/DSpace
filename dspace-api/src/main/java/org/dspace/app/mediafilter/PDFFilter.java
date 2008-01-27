@@ -41,11 +41,25 @@ package org.dspace.app.mediafilter;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Writer;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.FileOutputStream;
+import java.io.CharArrayWriter;
+import java.io.ByteArrayOutputStream;
+import java.util.List;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.pdfbox.pdfparser.PDFParser;
 import org.pdfbox.pdmodel.PDDocument;
+import org.pdfbox.pdmodel.PDPage;
+import org.pdfbox.pdmodel.common.PDStream;
 import org.pdfbox.util.PDFTextStripper;
+import org.dspace.core.ConfigurationManager;
 
 /*
  *
@@ -97,44 +111,76 @@ public class PDFFilter extends MediaFilter
     public InputStream getDestinationStream(InputStream source)
             throws Exception
     {
-        // get input stream from bitstream
-        // pass to filter, get string back
-        PDFTextStripper pts = new PDFTextStripper();
-        PDFParser parser = null;
-        String extractedText = null;
-
         try
         {
-            parser = new PDFParser(source);
-            parser.parse();
-            extractedText = pts.getText(new PDDocument(parser.getDocument()));
-        }
-        finally
-        {
+            boolean useTemporaryFile = ConfigurationManager.getBooleanProperty("pdffilter.largepdfs", false);
+
+            // get input stream from bitstream
+            // pass to filter, get string back
+            PDFTextStripper pts = new PDFTextStripper();
+            PDDocument pdfDoc = null;
+            Writer writer = null;
+            File tempTextFile = null;
+            ByteArrayOutputStream byteStream = null;
+
+            if (useTemporaryFile)
+            {
+                tempTextFile = File.createTempFile("dspacepdfextract" + source.hashCode(), ".txt");
+                tempTextFile.deleteOnExit();
+                writer = new OutputStreamWriter(new FileOutputStream(tempTextFile));
+            }
+            else
+            {
+                byteStream = new ByteArrayOutputStream();
+                writer = new OutputStreamWriter(byteStream);
+            }
+            
             try
             {
-                parser.getDocument().close();
+                pdfDoc = PDDocument.load(source);
+                pts.writeText(pdfDoc, writer);
             }
-            catch(Exception e)
+            finally
             {
-               log.error("Error closing temporary PDF file: " + e.getMessage(), e);
+                try
+                {
+                    if (pdfDoc != null)
+                        pdfDoc.close();
+                }
+                catch(Exception e)
+                {
+                   log.error("Error closing PDF file: " + e.getMessage(), e);
+                }
+
+                try
+                {
+                    writer.close();
+                }
+                catch(Exception e)
+                {
+                   log.error("Error closing temporary extract file: " + e.getMessage(), e);
+                }
+            }
+
+            if (useTemporaryFile)
+            {
+                return new FileInputStream(tempTextFile);
+            }
+            else
+            {
+                byte[] bytes = byteStream.toByteArray();
+                return new ByteArrayInputStream(bytes);
+            }
+        }
+        catch (OutOfMemoryError oome)
+        {
+            log.error("Error parsing PDF document " + oome.getMessage(), oome);
+            if (!ConfigurationManager.getBooleanProperty("pdffilter.skiponmemoryexception", false))
+            {
+                throw oome;
             }
         }
 
-        // if verbose flag is set, print out extracted text
-        // to STDOUT
-        if (MediaFilterManager.isVerbose)
-        {
-            System.out.println(extractedText);
-        }
-
-
-        // generate an input stream with the extracted text
-        byte[] textBytes = extractedText.getBytes();
-        ByteArrayInputStream bais = new ByteArrayInputStream(textBytes);
-
-        return bais; // will this work? or will the byte array be out of scope?
-
-
+        return null;
     }
 }

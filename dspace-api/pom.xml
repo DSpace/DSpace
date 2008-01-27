@@ -159,6 +159,14 @@
          <groupId>pdfbox</groupId>
          <artifactId>pdfbox</artifactId>
       </dependency>
+       <dependency>
+          <groupId>org.fontbox</groupId>
+          <artifactId>fontbox</artifactId>
+       </dependency>          
+       <dependency>
+          <groupId>org.jempbox</groupId>
+          <artifactId>jempbox</artifactId>
+       </dependency>
       <dependency>
          <groupId>poi</groupId>
          <artifactId>poi</artifactId>
