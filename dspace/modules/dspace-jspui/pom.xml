@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.dspace.modules</groupId>
+	<artifactId>dspace-jspui</artifactId>
+	<packaging>war</packaging>
+	<name>DSpace JSPUI :: Web Application</name>
+	<url>http://www.dspace.org</url>
+	<description>DSpace JSPUI :: Overlay</description>
+
+	<parent>
+		<groupId>org.dspace</groupId>
+		<artifactId>modules</artifactId>
+		<version>1.5-SNAPSHOT</version>
+	</parent>
+
+	<profiles>
+
+		<!-- 
+			This profile is used by all children such that
+			when activated a dspace.config configuration
+			file location passed on the commandline 
+			(-Ddspace.config=...) can be passed through 
+			to be used as a filter source by projects for 
+			tasks such as updating the ${dspace.dir} in
+			web.xml etc.
+			
+			When activated, the child project will inherit
+			the configuration.
+		-->
+		<profile>
+			<activation>
+				<property>
+					<name>dspace.config</name>
+				</property>
+			</activation>
+			<build>
+				<filters>
+					<filter>${dspace.config}</filter>
+				</filters>
+			</build>
+		</profile>
+
+		<profile>
+			<id>postgres-support</id>
+			<activation>
+				<property>
+					<name>!db.name</name>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>postgresql</groupId>
+					<artifactId>postgresql</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>oracle-support</id>
+			<activation>
+				<property>
+					<name>db.name</name>
+					<value>oracle</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.oracle</groupId>
+					<artifactId>ojdbc14</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+
+	</profiles>
+
+	<repositories>
+		<repository>
+			<id>maven.dspace.org-snapshot</id>
+			<name>DSpace Maven Snapshot Repository</name>
+			<url>http://maven.dspace.org/snapshot</url>
+			<releases>
+				<enabled>false</enabled>
+				<checksumPolicy>fail</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<checksumPolicy>fail</checksumPolicy>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<scm>
+		<connection>
+			scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/dspace-jspui
+		</connection>
+		<developerConnection>
+			scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/dspace-jspui
+		</developerConnection>
+		<url>
+			http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace/modules/dspace-jspui
+		</url>
+	</scm>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.0</version>
+				<configuration>
+					<archiveClasses>false</archiveClasses>
+					<webResources>
+						<resource>
+							<filtering>true</filtering>
+							<directory>
+								${basedir}/src/main/webapp
+							</directory>
+							<includes>
+								<include>WEB-INF/web.xml</include>
+							</includes>
+						</resource>
+					</webResources>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-jspui-webapp</artifactId>
+			<version>${pom.version}</version>
+			<type>war</type>
+			<classifier>skinny</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-jspui-api</artifactId>
+			<version>${pom.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>language-packs</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.3</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>taglibs</groupId>
+			<artifactId>standard</artifactId>
+			<version>1.1.2</version>
+		</dependency>
+	</dependencies>
+
+</project>
+

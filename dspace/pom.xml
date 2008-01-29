@@ -422,8 +422,24 @@
             </dependency>
          </dependencies>
       </profile>
+      
+      <!-- 
+         Builds Overlay Modules for DSpace
+      -->
+      <profile>
+         <id>modules</id>
+         <activation>
+            <file>
+               <exists>modules/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>modules</module>
+         </modules>
+      </profile>
+      
    </profiles>
-
+	
    <build>
       <plugins>
          <!--  overall project assembly -->
@@ -446,14 +462,15 @@
       </plugins>
    </build>
 
-   <dependencies>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-api</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>language-packs</artifactId>
-      </dependency>
-   </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>language-packs</artifactId>
+		</dependency>
+	</dependencies>
+	
 </project>
