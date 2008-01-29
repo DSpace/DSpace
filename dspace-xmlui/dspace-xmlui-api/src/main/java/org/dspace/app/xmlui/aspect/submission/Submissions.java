@@ -39,9 +39,6 @@
  */
 package org.dspace.app.xmlui.aspect.submission;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -62,9 +59,13 @@ import org.dspace.content.SupervisedItem;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
+import org.dspace.uri.IdentifierFactory;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * @author Scott Phillips
@@ -245,7 +246,7 @@ public class Submissions extends AbstractDSpaceTransformer
         	for (WorkflowItem owned : ownedItems)
         	{
         		int workflowItemID = owned.getID();
-        		String url = contextPath+"/handle/"+owned.getCollection().getExternalIdentifier().getCanonicalForm()+"/workflow?workflowID="+workflowItemID;
+        		String url = IdentifierFactory.getURL(owned.getCollection()).toString()+"/workflow?workflowID="+workflowItemID;
         		DCValue[] titles = owned.getItem().getDC("title", null, Item.ANY);
         		String collectionName = owned.getCollection().getMetadata("name");
         		EPerson submitter = owned.getSubmitter();
@@ -308,7 +309,7 @@ public class Submissions extends AbstractDSpaceTransformer
         	for (WorkflowItem pooled : pooledItems)
         	{
         		int workflowItemID = pooled.getID();
-        		String url = contextPath+"/handle/"+pooled.getCollection().getExternalIdentifier().getCanonicalForm()+"/workflow?workflowID="+workflowItemID;
+        		String url = IdentifierFactory.getURL(pooled.getCollection()).toString()+"/workflow?workflowID="+workflowItemID;
         		DCValue[] titles = pooled.getItem().getDC("title", null, Item.ANY);
         		String collectionName = pooled.getCollection().getMetadata("name");
         		EPerson submitter = pooled.getSubmitter();

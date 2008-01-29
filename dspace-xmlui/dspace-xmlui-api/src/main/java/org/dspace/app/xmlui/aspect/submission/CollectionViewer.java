@@ -39,10 +39,6 @@
  */
 package org.dspace.app.xmlui.aspect.submission;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
@@ -58,7 +54,12 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.eperson.Group;
+import org.dspace.uri.IdentifierFactory;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
 
 /**
  * Add a single link to the display item page that allows
@@ -89,7 +90,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             if (dso == null)
                 return "0";
                 
-            return HashUtil.hash(dso.getExternalIdentifier().getCanonicalForm());
+            return HashUtil.hash(IdentifierFactory.getCanonicalForm(dso));
         }
         catch (SQLException sqle)
         {
@@ -163,7 +164,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
         
         Division home = body.addDivision("collection-home","primary repository collection");
         Division viewer = home.addDivision("collection-view","secondary");
-        String submitURL = contextPath + "/handle/" + collection.getExternalIdentifier().getCanonicalForm() + "/submit";
+        String submitURL = IdentifierFactory.getURL(collection) + "/submit";
         viewer.addPara().addXref(submitURL,"Submit a new item to this collection"); 
         
     }

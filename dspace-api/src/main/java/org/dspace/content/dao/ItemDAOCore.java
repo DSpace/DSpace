@@ -264,8 +264,7 @@ public class ItemDAOCore extends ItemDAO
                 schema = msDAO.retrieve(MetadataSchema.DC_SCHEMA_ID);
             }
 
-            field = mfDAO.retrieve(
-                    schema.getID(), memValue.element, memValue.qualifier);
+            field = mfDAO.retrieve(schema.getID(), memValue.element, memValue.qualifier);
 
             // Work out the place number for ordering
             int current = 0;

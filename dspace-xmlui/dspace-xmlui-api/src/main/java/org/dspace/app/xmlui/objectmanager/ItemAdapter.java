@@ -50,6 +50,7 @@ import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.uri.IdentifierFactory;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.SAXOutputter;
@@ -60,7 +61,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -138,9 +138,7 @@ public class ItemAdapter extends AbstractAdapter
      */
     protected String getMETSOBJID()
     {
-    	if (item.getExternalIdentifier().getCanonicalForm() != null)
-    		return contextPath+"/handle/" + item.getExternalIdentifier().getCanonicalForm();
-    	return null;
+        return IdentifierFactory.getURL(item).toString();
     }
 
     /**
@@ -156,10 +154,7 @@ public class ItemAdapter extends AbstractAdapter
      */
     protected String getMETSID()
     {
-        if (item.getExternalIdentifier().getCanonicalForm() == null)
-        	return "item:"+item.getID();
-        else
-        	return item.getExternalIdentifier().getCanonicalForm();
+        return IdentifierFactory.getCanonicalForm(item);
     }
 
     /**

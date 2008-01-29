@@ -59,9 +59,8 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.ResolvableIdentifier;
+import org.dspace.uri.IdentifierFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.xml.sax.SAXException;
@@ -172,12 +171,15 @@ public class DSpaceMETSGenerator extends AbstractGenerator
 			// Specified using a regular handle. 
 //         	DSpaceObject dso = HandleManager.resolveToObject(context, handle);
          	// FIXME: This could be totally broken, I have no idea
+             /*
             ExternalIdentifierDAO identifierDAO =
                 ExternalIdentifierDAOFactory.getInstance(context);
             ExternalIdentifier eid = identifierDAO.retrieve(uri);
-            DSpaceObject dso = eid.getObjectIdentifier().getObject(context);
-         	
-         	// Handles can be either items or containers.
+            DSpaceObject dso = eid.getObjectIdentifier().getObject(context);*/
+            ResolvableIdentifier ri = IdentifierFactory.resolve(context, uri);
+            DSpaceObject dso = ri.getObject(context);
+
+             // Handles can be either items or containers.
          	if (dso instanceof Item)
          		adapter = new ItemAdapter((Item) dso, contextPath);
          	else if (dso instanceof Collection || dso instanceof Community)

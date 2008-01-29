@@ -67,6 +67,7 @@ import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
+import org.dspace.uri.IdentifierFactory;
 import org.jdom.Element;
 
 
@@ -508,7 +509,7 @@ class DAVCollection extends DAVDSpaceObject
                 Item ni = wfi.getItem();
 
                 // FIXME: I'm not sure this is what we want
-                String handle = ni.getExternalIdentifier().getCanonicalForm();
+                String handle = IdentifierFactory.getCanonicalForm(ni);
 //                String handle = HandleManager.findHandle(this.context, ni);
 
                 String end = (handle != null) ? DAVDSpaceObject

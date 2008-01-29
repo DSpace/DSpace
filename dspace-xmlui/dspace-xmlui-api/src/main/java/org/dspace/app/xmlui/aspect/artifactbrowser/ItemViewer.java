@@ -39,11 +39,6 @@
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.Map;
-
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -57,15 +52,21 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
+import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.uri.IdentifierFactory;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * Display a single item.
@@ -104,7 +105,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             if (dso == null)
                 return "0"; // no item, something is wrong.
             
-            return HashUtil.hash(dso.getExternalIdentifier().getCanonicalForm() + "full:" + showFullItem(objectModel));
+            return HashUtil.hash(IdentifierFactory.getCanonicalForm(dso) + "full:" + showFullItem(objectModel));
         } 
         catch (SQLException sqle)
         {
@@ -158,7 +159,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         if (title != null)
             pageMeta.addMetadata("title").addContent(title);
         else
-            pageMeta.addMetadata("title").addContent(item.getExternalIdentifier().getCanonicalForm());
+            pageMeta.addMetadata("title").addContent(IdentifierFactory.getCanonicalForm(item));
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         HandleUtil.buildHandleTrail(item,pageMeta,contextPath);
@@ -183,19 +184,18 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         if (title != null)
             division.setHead(title);
         else
-            division.setHead(item.getExternalIdentifier().getCanonicalForm());
+            division.setHead(IdentifierFactory.getCanonicalForm(item));
 
         Para showfullPara = division.addPara(null, "item-view-toggle item-view-toggle-top");
 
         if (showFullItem(objectModel))
         {
-            String link = contextPath + "/handle/" + item.getExternalIdentifier().getCanonicalForm();
+            String link = IdentifierFactory.getURL(item).toString();
             showfullPara.addXref(link).addContent(T_show_simple);
         }
         else
         {
-            String link = contextPath + "/handle/" + item.getExternalIdentifier().getCanonicalForm()
-                    + "?show=full";
+            String link = IdentifierFactory.getURL(item).toString() + "?show=full";
             showfullPara.addXref(link).addContent(T_show_full);
         }
         
@@ -225,13 +225,12 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
         if (showFullItem(objectModel))
         {
-            String link = contextPath + "/handle/" + item.getExternalIdentifier().getCanonicalForm();
+            String link = IdentifierFactory.getURL(item).toString();
             showfullPara.addXref(link).addContent(T_show_simple);
         }
         else
         {
-            String link = contextPath + "/handle/" + item.getExternalIdentifier().getCanonicalForm()
-                    + "?show=full";
+            String link = IdentifierFactory.getURL(item).toString() + "?show=full";
             showfullPara.addXref(link).addContent(T_show_full);
         }
     }

@@ -39,11 +39,8 @@
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
-import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -54,7 +51,11 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.uri.IdentifierFactory;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * This is the first official step of the item submission processes. This
@@ -123,7 +124,7 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
     	// Get any metadata that may be removed by unselecting one of these options.
     	Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getExternalIdentifier().getCanonicalForm() + "/submit";
+		String actionURL = IdentifierFactory.getURL(collection).toString() + "/submit";
 		
 		DCValue[] titles = item.getDC("title", "alternative", Item.ANY);
 		

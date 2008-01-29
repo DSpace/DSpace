@@ -39,23 +39,24 @@
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
-import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractStep;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.app.xmlui.wing.element.List;
+import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.uri.IdentifierFactory;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * This step is used when the a user clicks an unfinished submission 
@@ -94,7 +95,7 @@ public class ResumeStep extends AbstractStep
 		// Get any metadata that may be removed by unselecting one of these options.
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getExternalIdentifier().getCanonicalForm() + "/submit";
+		String actionURL = IdentifierFactory.getURL(collection).toString() + "/submit";
 
 		Request request = ObjectModelHelper.getRequest(objectModel);
 		String showfull = request.getParameter("showfull");

@@ -39,21 +39,13 @@
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Locale;
-
-import javax.servlet.ServletException;
-
 import org.apache.log4j.Logger;
-
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
-import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.aspect.submission.FlowUtils;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -73,9 +65,14 @@ import org.dspace.content.DCPersonName;
 import org.dspace.content.DCSeriesNumber;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-
-
+import org.dspace.uri.IdentifierFactory;
 import org.xml.sax.SAXException;
+
+import javax.servlet.ServletException;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * This is a step of the item submission processes. The describe step queries 
@@ -171,13 +168,13 @@ public class DescribeStep extends AbstractSubmissionStep
 		// Obtain the inputs (i.e. metadata fields we are going to display)
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getExternalIdentifier().getCanonicalForm() + "/submit";
+		String actionURL = IdentifierFactory.getURL(collection).toString() + "/submit";
 
 		DCInputSet inputSet = null;
 		DCInput[] inputs = {};
 		try 
 		{
-			inputSet = getInputsReader().getInputs(submission.getCollection().getExternalIdentifier().getCanonicalForm());
+			inputSet = getInputsReader().getInputs(IdentifierFactory.getCanonicalForm(submission.getCollection()));
 			inputs = inputSet.getPageRows(getPage()-1, submission.hasMultipleTitles(), submission.isPublishedBefore());
 		} 
 		catch (ServletException se) 
@@ -317,7 +314,7 @@ public class DescribeStep extends AbstractSubmissionStep
         DCInputSet inputSet = null;
         try 
         {
-            inputSet = getInputsReader().getInputs(submission.getCollection().getExternalIdentifier().getCanonicalForm());
+            inputSet = getInputsReader().getInputs(IdentifierFactory.getCanonicalForm(submission.getCollection()));
         } 
         catch (ServletException se) 
         {

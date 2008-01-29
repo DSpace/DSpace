@@ -39,14 +39,11 @@
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.utils.HandleUtil;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -57,7 +54,11 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.uri.IdentifierFactory;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * Display an item restricted message.
@@ -125,7 +126,7 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
         } 
         else 
         {
-        	String handle = dso.getExternalIdentifier().getCanonicalForm();
+        	String handle = IdentifierFactory.getCanonicalForm(dso);
         	type = "item";
         	if (handle == null || "".equals(handle))
         	{

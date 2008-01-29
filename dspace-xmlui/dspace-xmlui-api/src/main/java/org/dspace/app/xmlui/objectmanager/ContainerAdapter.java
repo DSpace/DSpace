@@ -40,10 +40,6 @@
 
 package org.dspace.app.xmlui.objectmanager;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.sql.SQLException;
-
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
@@ -54,12 +50,17 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.Constants;
+import org.dspace.uri.IdentifierFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.SAXOutputter;
 import org.xml.sax.SAXException;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * This is an adapter which translates DSpace containers 
@@ -123,9 +124,7 @@ public class ContainerAdapter extends AbstractAdapter
      */
     protected String getMETSOBJID()
     {
-    	if (dso.getExternalIdentifier() != null)
-    		return contextPath+"/handle/" + dso.getExternalIdentifier().getCanonicalForm();
-    	return null;
+    	return IdentifierFactory.getURL(dso).toString();
     }
 
     /**
@@ -141,15 +140,7 @@ public class ContainerAdapter extends AbstractAdapter
      */
     protected String getMETSID()
     {
-    	if (dso.getExternalIdentifier().getCanonicalForm() == null)
-    	{
-        	if (dso instanceof Collection)
-        		return "collection:"+dso.getID();
-        	else
-        		return "community:"+dso.getID();
-    	}
-        else
-        	return dso.getExternalIdentifier().getCanonicalForm();
+        return IdentifierFactory.getCanonicalForm(dso);
     }
 
     /**
@@ -270,7 +261,7 @@ public class ContainerAdapter extends AbstractAdapter
                 String description_abstract = collection.getMetadata("short_description");
                 String description_table = collection.getMetadata("side_bar_text");
                 // FIXME: Oh, so broken.
-                String identifier_uri = "http://hdl.handle.net/" + collection.getExternalIdentifier().getValue();
+                String identifier_uri = IdentifierFactory.getURL(collection).toString();
                 String provenance = collection.getMetadata("provenance_description");
                 String rights = collection.getMetadata("copyright_text");
                 String rights_license = collection.getMetadata("license");
@@ -293,7 +284,7 @@ public class ContainerAdapter extends AbstractAdapter
                 String description_abstract = community.getMetadata("short_description");
                 String description_table = community.getMetadata("side_bar_text");
                 // FIXME: Oh, so broken.
-                String identifier_uri = "http://hdl.handle.net/" + community.getExternalIdentifier().getValue();
+                String identifier_uri = IdentifierFactory.getURL(community).toString();
                 String rights = community.getMetadata("copyright_text");
                 String title = community.getMetadata("name");
                 

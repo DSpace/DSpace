@@ -40,9 +40,6 @@
 
 package org.dspace.app.xmlui.utils;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.dspace.content.Bitstream;
@@ -54,6 +51,10 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.uri.IdentifierFactory;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * This is a validity object specificaly implemented for the caching 
@@ -262,7 +263,8 @@ public class DSpaceValidity implements SourceValidity
             Community community = (Community) dso;
 
             validityKey.append("Community:");
-            validityKey.append(community.getExternalIdentifier().getCanonicalForm());
+            validityKey.append(IdentifierFactory.getCanonicalForm(community));
+            // validityKey.append(community.getExternalIdentifier().getCanonicalForm());
             validityKey.append(community.getMetadata("introductory_text"));
             validityKey.append(community.getMetadata("short_description"));
             validityKey.append(community.getMetadata("side_bar_text"));
@@ -278,7 +280,8 @@ public class DSpaceValidity implements SourceValidity
             Collection collection = (Collection) dso;
             
             validityKey.append("Collection:");
-            validityKey.append(collection.getExternalIdentifier().getCanonicalForm());
+            validityKey.append(IdentifierFactory.getCanonicalForm(collection));
+            // validityKey.append(collection.getExternalIdentifier().getCanonicalForm());
             validityKey.append(collection.getMetadata("introductory_text"));
             validityKey.append(collection.getMetadata("short_description"));
             validityKey.append(collection.getMetadata("side_bar_text"));
@@ -296,7 +299,8 @@ public class DSpaceValidity implements SourceValidity
             Item item = (Item) dso;
             
             validityKey.append("Item:");
-            validityKey.append(item.getExternalIdentifier().getCanonicalForm());
+            validityKey.append(IdentifierFactory.getCanonicalForm(item));
+            //validityKey.append(item.getExternalIdentifier().getCanonicalForm());
             // Include all metadata values in the validity key.
             DCValue[] dcvs = item.getDC(Item.ANY,Item.ANY,Item.ANY);
             for (DCValue dcv : dcvs)

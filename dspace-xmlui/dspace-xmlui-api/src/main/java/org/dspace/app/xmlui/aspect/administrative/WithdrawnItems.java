@@ -40,14 +40,6 @@
 
 package org.dspace.app.xmlui.aspect.administrative;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -77,8 +69,6 @@ import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
-import org.dspace.sort.SortOption;
-import org.dspace.sort.SortException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
@@ -86,7 +76,18 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.sort.SortException;
+import org.dspace.sort.SortOption;
+import org.dspace.uri.IdentifierFactory;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implements all the browse functionality (browse by title, subject, authors,
@@ -171,7 +172,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             {
                 DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
                 if (dso != null)
-                    key += "-" + dso.getExternalIdentifier().getCanonicalForm();
+                    key += "-" + IdentifierFactory.getCanonicalForm(dso);
 
                 return HashUtil.hash(key);
             }

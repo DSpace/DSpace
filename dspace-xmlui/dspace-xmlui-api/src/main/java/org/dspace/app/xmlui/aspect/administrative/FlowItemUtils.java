@@ -58,7 +58,8 @@ import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
-import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ResolvableIdentifier;
+import org.dspace.uri.IdentifierFactory;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.Constants;
@@ -109,10 +110,13 @@ public class FlowItemUtils
 		if (identifier.contains("/")) 
 		{
 //			DSpaceObject dso = HandleManager.resolveToObject(context, identifier);
+            /*
             ExternalIdentifier eid = identifierDAO.retrieve(identifier);
-            DSpaceObject dso = eid.getObjectIdentifier().getObject(context);
+            DSpaceObject dso = eid.getObjectIdentifier().getObject(context);*/
+            ResolvableIdentifier ri = IdentifierFactory.resolve(context, identifier);
+            DSpaceObject dso = ri.getObject(context);
 	
-			if (dso != null && dso.getType() == Constants.ITEM) 
+            if (dso != null && dso.getType() == Constants.ITEM)
 			{ 
 				result.setParameter("itemID", dso.getID());
 				result.setParameter("type", Constants.ITEM);

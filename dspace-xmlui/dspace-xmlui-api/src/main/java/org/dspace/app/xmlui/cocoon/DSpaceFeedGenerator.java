@@ -40,14 +40,11 @@
 
 package org.dspace.app.xmlui.cocoon;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
+import com.sun.syndication.feed.rss.Channel;
+import com.sun.syndication.feed.rss.Description;
+import com.sun.syndication.feed.rss.Image;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.WireFeedOutput;
 import org.apache.avalon.excalibur.pool.Recyclable;
 import org.apache.avalon.framework.configuration.Configurable;
 import org.apache.avalon.framework.configuration.Configuration;
@@ -70,7 +67,6 @@ import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowserScope;
-import org.dspace.sort.SortOption;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -78,23 +74,26 @@ import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.sort.SortException;
+import org.dspace.sort.SortOption;
+import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.ResolvableIdentifier;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.sun.syndication.feed.rss.Channel;
-import com.sun.syndication.feed.rss.Description;
-import com.sun.syndication.feed.rss.Image;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.WireFeedOutput;
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * 
@@ -190,10 +189,13 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     			if (uri != null)
                 {
 //    				dso = HandleManager.resolveToObject(context, handle);
+                    /*
                     ExternalIdentifierDAO dao =
                         ExternalIdentifierDAOFactory.getInstance(context);
                     ExternalIdentifier identifier = dao.retrieve(uri);
-                    dso = identifier.getObjectIdentifier().getObject(context);
+                    dso = identifier.getObjectIdentifier().getObject(context);*/
+                    ResolvableIdentifier ri = IdentifierFactory.resolve(context, uri);
+                    dso = ri.getObject(context);
                 }
     			
     			validity.add(dso);
@@ -258,12 +260,15 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 			if (uri != null)
 			{
 //                dso = HandleManager.resolveToObject(context, handle);
+                /*
                 ExternalIdentifierDAO dao =
                     ExternalIdentifierDAOFactory.getInstance(context);
                 ExternalIdentifier identifier = dao.retrieve(uri);
-                dso = identifier.getObjectIdentifier().getObject(context);
+                dso = identifier.getObjectIdentifier().getObject(context);*/
+                ResolvableIdentifier ri = IdentifierFactory.resolve(context, uri);
+                dso = ri.getObject(context);
 				
-				if (dso == null)
+                if (dso == null)
 				{
 					// If we were unable to find a uri then return page not found.
 					throw new ResourceNotFoundException("Unable to find DSpace object matching the given URI: "+uri);
@@ -588,7 +593,11 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     	{
     		log.error("Caught browse exception", bex);
     	}
-    	return this.recentSubmissionItems;
+        catch (SortException sex) // apparently it's contageous
+        {
+            log.error("Caught sort exception", sex);
+        }
+        return this.recentSubmissionItems;
     }
     
     /**
@@ -615,10 +624,10 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 			return url;	
     	}
     	
-		if (ConfigurationManager.getBooleanProperty("webui.feed.localresolve")
-                || dso.getExternalIdentifier() == null)
+		if (ConfigurationManager.getBooleanProperty("webui.feed.localresolve"))
 		{
-			Request request = ObjectModelHelper.getRequest(objectModel);
+            /*
+            Request request = ObjectModelHelper.getRequest(objectModel);
 
 			String url = (request.isSecure()) ? "https://" : "http://";
 			url += ConfigurationManager.getProperty("dspace.hostname");
@@ -626,10 +635,12 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 			url += request.getContextPath();
 			url += "/handle/" + dso.getExternalIdentifier().getCanonicalForm();
 			return url;
-		}
+			*/
+            return IdentifierFactory.getLocalURL(dso).toString();
+        }
 		else
 		{
-            return dso.getExternalIdentifier().getURI().toString();
+            return IdentifierFactory.getURL(dso).toString();
 		}
     }
     

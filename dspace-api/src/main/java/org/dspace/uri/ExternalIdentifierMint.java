@@ -35,7 +35,9 @@
  */
 package org.dspace.uri;
 
+import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
@@ -131,5 +133,19 @@ public class ExternalIdentifierMint
             }
         }
         return null;
+    }
+
+    public static DCValue getCanonicalField(ExternalIdentifierType type)
+    {
+        String cfg = "identifier.metadata.canonical-field." + type.getNamespace();
+        DCValue dcv = ConfigurationManager.getMetadataProperty(cfg);
+        return dcv;
+    }
+
+    public static DCValue getURLField(ExternalIdentifierType type)
+    {
+        String cfg = "identifier.metadata.url-field." + type.getNamespace();
+        DCValue dcv = ConfigurationManager.getMetadataProperty(cfg);
+        return dcv;
     }
 }

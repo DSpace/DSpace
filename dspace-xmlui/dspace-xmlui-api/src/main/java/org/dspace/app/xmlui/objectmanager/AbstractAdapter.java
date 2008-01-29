@@ -40,12 +40,6 @@
 
 package org.dspace.app.xmlui.objectmanager;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.Namespace;
@@ -56,11 +50,18 @@ import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.PluginManager;
+import org.dspace.uri.IdentifierFactory;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.NamespaceSupport;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -398,6 +399,7 @@ public abstract class AbstractAdapter
         // be null if a handle has not yet been assigned. In this case refrence the
         // item its internal id. In the last case where the bitstream is not associated
         // with an item (such as a community logo) then refrence the bitstreamID directly.
+        /*
         String identifier = null;
         if (item != null && item.getExternalIdentifier().getCanonicalForm() != null)
         	identifier = "handle/"+item.getExternalIdentifier().getCanonicalForm();
@@ -408,6 +410,8 @@ public abstract class AbstractAdapter
         
         
         String url = contextPath + "/bitstream/"+identifier+"/";
+        */
+        String url = contextPath + IdentifierFactory.getURL(bitstream).toString();
         
         // If we can put the pretty name of the bitstream on the end of the URL
         try

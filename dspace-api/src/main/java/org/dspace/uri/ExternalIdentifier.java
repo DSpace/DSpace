@@ -141,37 +141,6 @@ public abstract class ExternalIdentifier implements ResolvableIdentifier
         return type.getNamespace() + "/" + this.value;        
     }
 
-    @Deprecated
-    public URL getURL()
-    {
-        /*
-        try
-        {
-            String base = ConfigurationManager.getProperty("dspace.url");
-            String urlForm = this.getURLForm();
-
-            if (base == null || "".equals(base))
-            {
-                throw new RuntimeException("No configuration, or configuration invalid for dspace.url");
-            }
-
-            if (urlForm == null)
-            {
-                throw new RuntimeException("Unable to assign URL: no ExternalIdentifier available");
-            }
-
-            String url = base + "/resource/" + urlForm;
-
-            return new URL(url);
-        }
-        catch (MalformedURLException e)
-        {
-            log.error("caught exception: ", e);
-            throw new RuntimeException(e);
-        }*/
-        return IdentifierFactory.getURL(this);
-    }
-
     public URI getURI()
     {
         try

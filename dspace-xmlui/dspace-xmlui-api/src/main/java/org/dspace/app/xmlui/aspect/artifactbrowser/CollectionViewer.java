@@ -71,6 +71,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.uri.IdentifierFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -130,7 +131,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             if (dso == null)
                 return "0";
                 
-            return HashUtil.hash(dso.getExternalIdentifier().getCanonicalForm());
+            return HashUtil.hash(IdentifierFactory.getCanonicalForm(dso));
         }
         catch (SQLException sqle)
         {
@@ -218,7 +219,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 				
 				String feedFormat = parts[0].trim()+"+xml";
 					
-				String feedURL = contextPath+"/feed/"+collection.getExternalIdentifier().getCanonicalForm()+"/"+format.trim();
+				String feedURL = IdentifierFactory.getURL(collection).toString() + "/"+format.trim();
 				pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
 			}
 		}
@@ -248,7 +249,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 
             // Search query
             Division query = search.addInteractiveDivision("collection-search",
-                    contextPath + "/handle/" + collection.getExternalIdentifier().getCanonicalForm() + "/search",
+                    IdentifierFactory.getURL(collection).toString() + "/search",
                     Division.METHOD_POST, "secondary search");
             
             Para para = query.addPara("search-query", null);
@@ -263,7 +264,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             List browse = browseDiv.addList("collection-browse", List.TYPE_SIMPLE,
                     "collection-browse");
             browse.setHead(T_head_browse);
-            String url = contextPath + "/handle/" + collection.getExternalIdentifier().getCanonicalForm();
+            String url = IdentifierFactory.getURL(collection).toString();
             browse.addItemXref(url + "/browse-title",T_browse_titles);
             browse.addItemXref(url + "/browse-author",T_browse_authors);
             browse.addItemXref(url + "/browse-date",T_browse_dates);

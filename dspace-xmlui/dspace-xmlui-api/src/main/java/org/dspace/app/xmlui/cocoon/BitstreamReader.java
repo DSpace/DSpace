@@ -68,6 +68,8 @@ import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ResolvableIdentifier;
+import org.dspace.uri.IdentifierFactory;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.ConfigurationManager;
@@ -221,12 +223,16 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             else if (handle != null)
             {
             	// Reference by an item's handle.
+                /*
                 ExternalIdentifierDAO identifierDAO =
                         ExternalIdentifierDAOFactory.getInstance(context);
                 ExternalIdentifier eid = identifierDAO.retrieve(handle);
-                dso = eid.getObjectIdentifier().getObject(context);
+                dso = eid.getObjectIdentifier().getObject(context);*/
 
-            	if (dso instanceof Item && sequence > -1)
+                ResolvableIdentifier ri = IdentifierFactory.resolve(context, handle);
+                dso = ri.getObject(context);
+
+                if (dso instanceof Item && sequence > -1)
             	{
             		bitstream = findBitstreamBySequence((Item) dso,sequence);
             	}
@@ -253,11 +259,11 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             		String redictURL = request.getContextPath() + "/handle/";
             		if (item!=null){
 //                        redictURL += item.getHandle();
-            			redictURL += item.getExternalIdentifier().getCanonicalForm();
+            			redictURL += IdentifierFactory.getCanonicalForm(item);
             		}
             		else if(dso!=null){
 //            			redictURL += dso.getHandle();
-                        redictURL += dso.getExternalIdentifier().getCanonicalForm();
+                        redictURL += IdentifierFactory.getCanonicalForm(dso);
             		}
             		redictURL += "/restricted-resource?bitstreamId=" + bitstream.getID();
 

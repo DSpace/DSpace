@@ -39,12 +39,8 @@
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
-
-import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractStep;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -52,7 +48,11 @@ import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.uri.IdentifierFactory;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * This is sort-of a step of the submission processes (not
@@ -96,7 +96,7 @@ public class SaveOrRemoveStep extends AbstractStep
 	UIException, SQLException, IOException, AuthorizeException
 	{	
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getExternalIdentifier().getCanonicalForm() + "/submit";
+		String actionURL = IdentifierFactory.getURL(collection).toString() + "/submit";
 		
 		Division div = body.addInteractiveDivision("submit-save-or-cancel",actionURL, Division.METHOD_POST,"primary submission");
 		div.setHead(T_submission_head);

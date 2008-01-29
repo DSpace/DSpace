@@ -39,9 +39,6 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.authorization;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -60,6 +57,10 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
+import org.dspace.uri.IdentifierFactory;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * @author Alexey Maslov
@@ -125,13 +126,13 @@ public class EditContainerPolicies extends AbstractDSpaceTransformer
 		if (containerType == Constants.COLLECTION)
 	    {
 			Collection col = Collection.find(context, containerID); 
-			main.setHead(T_main_head_collection.parameterize(col.getMetadata("name"),col.getExternalIdentifier().getCanonicalForm(),col.getID()));
+			main.setHead(T_main_head_collection.parameterize(col.getMetadata("name"), IdentifierFactory.getCanonicalForm(col),col.getID()));
 			policies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, col);
 	    }
 		else 
 		{
 			Community com = Community.find(context, containerID);
-			main.setHead(T_main_head_community.parameterize(com.getMetadata("name"),com.getExternalIdentifier().getCanonicalForm(),com.getID()));
+			main.setHead(T_main_head_community.parameterize(com.getMetadata("name"),IdentifierFactory.getCanonicalForm(com),com.getID()));
 			policies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, com);
 		}
 		

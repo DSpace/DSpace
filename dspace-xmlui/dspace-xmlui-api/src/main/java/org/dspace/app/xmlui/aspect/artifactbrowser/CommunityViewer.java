@@ -39,10 +39,6 @@
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
@@ -56,11 +52,11 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.Reference;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
+import org.dspace.app.xmlui.wing.element.Reference;
+import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
@@ -73,7 +69,12 @@ import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
+import org.dspace.uri.IdentifierFactory;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
 
 /**
  * Display a single community. This includes a full text search, browse by list,
@@ -137,7 +138,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             if (dso == null)
                 return "0"; // no item, something is wrong
             
-            return HashUtil.hash(dso.getExternalIdentifier().getCanonicalForm());
+            return HashUtil.hash(IdentifierFactory.getCanonicalForm(dso));
         } 
         catch (SQLException sqle)
         {
@@ -234,7 +235,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 				
 				String feedFormat = parts[0].trim()+"+xml";
 					
-				String feedURL = contextPath+"/feed/"+community.getExternalIdentifier().getCanonicalForm()+"/"+format.trim();
+				String feedURL = IdentifierFactory.getURL(community).toString() +"/"+format.trim();
 				pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
 			}
 		}
@@ -268,7 +269,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 
             // Search query
             Division query = search.addInteractiveDivision("community-search",
-                    contextPath + "/handle/" + community.getExternalIdentifier().getCanonicalForm() + "/search",
+                    IdentifierFactory.getURL(community).toString() + "/search",
                     Division.METHOD_POST, "secondary search");
             
             Para para = query.addPara("search-query", null);
@@ -283,7 +284,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             List browse = browseDiv.addList("community-browse", List.TYPE_SIMPLE,
                     "community-browse");
             browse.setHead(T_head_browse);
-            String url = contextPath + "/handle/" + community.getExternalIdentifier().getCanonicalForm();
+            String url = IdentifierFactory.getURL(community).toString();
             browse.addItemXref(url + "/browse-title",T_browse_titles);
             browse.addItemXref(url + "/browse-author",T_browse_authors);
             browse.addItemXref(url + "/browse-date",T_browse_dates);

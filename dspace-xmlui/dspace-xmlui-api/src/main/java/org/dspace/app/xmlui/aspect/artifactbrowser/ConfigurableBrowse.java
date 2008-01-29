@@ -89,6 +89,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
+import org.dspace.uri.IdentifierFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -174,7 +175,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             {
                 DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
                 if (dso != null)
-                    key += "-" + dso.getExternalIdentifier().getCanonicalForm();            
+                    key += "-" + IdentifierFactory.getCanonicalForm(dso);            
 
                 return HashUtil.hash(key);
             }

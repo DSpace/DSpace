@@ -39,15 +39,11 @@
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Map;
-
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.SourceResolver;
-import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -57,7 +53,12 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.license.CreativeCommons;
+import org.dspace.uri.IdentifierFactory;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * This is the last step of the item submission processes. During this
@@ -146,7 +147,7 @@ public class LicenseStep extends AbstractSubmissionStep
         
         // Get the full text for the actuial licese
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getExternalIdentifier().getCanonicalForm() + "/submit";
+		String actionURL = IdentifierFactory.getURL(collection).toString() + "/submit";
 		String licenseText = collection.getLicense();
 		
 		Division div = body.addInteractiveDivision("submit-license",actionURL, Division.METHOD_POST,"primary submission");

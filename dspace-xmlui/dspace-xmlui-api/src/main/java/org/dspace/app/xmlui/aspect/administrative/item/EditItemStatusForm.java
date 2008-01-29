@@ -39,8 +39,6 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.item;
 
-import java.sql.SQLException;
-
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -53,6 +51,9 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.uri.IdentifierFactory;
+
+import java.sql.SQLException;
 
 /**
  * Display basic meta-meta information about the item and allow the user to change 
@@ -146,7 +147,7 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		
 		itemInfo.addLabel(T_label_handle);
 //      itemInfo.addItem(item.getHandle()==null?"None":item.getHandle());
-        itemInfo.addItem(item.getExternalIdentifier()==null?"None":item.getExternalIdentifier().getCanonicalForm());
+        itemInfo.addItem(IdentifierFactory.getCanonicalForm(item));
 
 		itemInfo.addLabel(T_label_modified);
 		itemInfo.addItem(item.getLastModified().toString());
@@ -161,6 +162,7 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		
 		itemInfo.addLabel(T_label_page);
 //		if(item.getHandle()==null){
+        /*
         if(item.getExternalIdentifier()==null){
 			itemInfo.addItem(T_na);
 		}
@@ -168,8 +170,11 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 //            itemInfo.addItem().addXref(ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getHandle(),ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getHandle());
             itemInfo.addItem().addXref(ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getExternalIdentifier().getCanonicalForm(),ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getExternalIdentifier().getCanonicalForm());
         }
-		
-		itemInfo.addLabel(T_label_auth);
+		*/
+        String url = IdentifierFactory.getURL(item).toString();
+        itemInfo.addItem().addXref(url, url);
+
+        itemInfo.addLabel(T_label_auth);
 		addAdministratorOnlyButton(itemInfo.addItem(), "submit_authorization", T_submit_authorizations);
 	
 		if(!item.isWithdrawn())

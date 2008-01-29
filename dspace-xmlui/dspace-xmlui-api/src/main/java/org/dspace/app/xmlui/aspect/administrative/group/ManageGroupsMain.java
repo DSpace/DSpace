@@ -39,8 +39,6 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.group;
 
-import java.sql.SQLException;
-
 import org.dspace.app.xmlui.aspect.administrative.FlowGroupUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -57,6 +55,9 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Collection;
 import org.dspace.eperson.Group;
+import org.dspace.uri.IdentifierFactory;
+
+import java.sql.SQLException;
 
 /**
  * Manage groups page is the entry point for group management. From here the user
@@ -265,7 +266,7 @@ public class ManageGroupsMain extends AbstractDSpaceTransformer
 	        		Highlight highlight = cell.addHighlight("fade");
 	        		
 	        		highlight.addContent("[");
-	        		highlight.addXref(contextPath+"/handle/"+collection.getExternalIdentifier().getCanonicalForm(), T_collection_link);
+	        		highlight.addXref(IdentifierFactory.getURL(collection).toString(), T_collection_link);
 	        		highlight.addContent("]");
         		}
         	}

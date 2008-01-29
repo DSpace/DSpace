@@ -638,6 +638,7 @@ public class WorkflowManager
             // Here, we try to get an external identifier for the item to send
             // in the notification email. If no external identifier exists, we
             // just send the "local" item URL.
+            /*
             ExternalIdentifier identifier = i.getExternalIdentifier();
             String uri = "";
             if (identifier != null)
@@ -647,7 +648,8 @@ public class WorkflowManager
             else
             {
                 uri = IdentifierFactory.getURL(i).toString();
-            }
+            }*/
+            String uri = IdentifierFactory.getURL(i).toString();
 
             // Get title
             DCValue[] titles = i.getDC("title", null, Item.ANY);

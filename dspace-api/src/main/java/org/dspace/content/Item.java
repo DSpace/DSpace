@@ -39,15 +39,6 @@
  */
 package org.dspace.content;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.StringTokenizer;
-
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -65,9 +56,8 @@ import org.dspace.content.dao.CommunityDAO;
 import org.dspace.content.dao.CommunityDAOFactory;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ObjectIdentifier;
 import org.dspace.core.ArchiveManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -76,6 +66,20 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.dao.EPersonDAO;
 import org.dspace.eperson.dao.EPersonDAOFactory;
 import org.dspace.event.Event;
+import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.UnsupportedIdentifierException;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Class representing an item in DSpace. Note that everything is held in memory
@@ -226,12 +230,85 @@ public class Item extends DSpaceObject
         return metadata;
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // Identifier Methods
+    ////////////////////////////////////////////////////////////////////////
+
     public void setIdentifier(ObjectIdentifier oid)
     {
+        // enxsure the identifier is localised to the item
         oid.setResourceTypeID(this.getType());
         oid.setResourceID(this.getID());
+
+        // FIXME: this can clearly result in duplicate fields, and once the principal is sound then we
+        // need to come back and tidy this up
+        
+        // store the canonical form of the identifier
+        DCValue dcv = ConfigurationManager.getMetadataProperty("identifier.metadata.canonical-field.internal");
+        if (dcv != null)
+        {
+            this.addMetadata(dcv.schema, dcv.element, dcv.qualifier, null, oid.getCanonicalForm());
+        }
+
+        // now, should we store the full form
+        if (ConfigurationManager.getBooleanProperty("identifier.metadata.store-url.internal"))
+        {
+            DCValue dc = ConfigurationManager.getMetadataProperty("identifier.metadata.url-field.internal");
+            if (dc != null)
+            {
+                this.addMetadata(dc.schema, dc.element, dc.qualifier, null, IdentifierFactory.getURL(oid).toString());
+            }
+        }
+
+        // now let the superclass do its thing
         super.setIdentifier(oid);
     }
+
+    public void addExternalIdentifier(ExternalIdentifier identifier)
+            throws UnsupportedIdentifierException
+    {
+        // FIXME: this can clearly result in duplicate fields, and once the principal is sound then we
+        // need to come back and tidy this up
+        
+        // store the canonical form of the identifier
+        DCValue dcv = ExternalIdentifierMint.getCanonicalField(identifier.getType());
+        if (dcv != null)
+        {
+            this.addMetadata(dcv.schema, dcv.element, dcv.qualifier, null, identifier.getCanonicalForm());
+        }
+
+        // now, store the full form
+        DCValue dc = ExternalIdentifierMint.getURLField(identifier.getType());
+        if (dc != null)
+        {
+            this.addMetadata(dc.schema, dc.element, dc.qualifier, null, IdentifierFactory.getURL(identifier).toString());
+        }
+
+        // now let the superclass do its thing
+        super.addExternalIdentifier(identifier);
+    }
+
+    public void setExternalIdentifiers(List<ExternalIdentifier> identifiers)
+            throws UnsupportedIdentifierException
+    {
+        for (ExternalIdentifier eid : identifiers)
+        {
+            // store the canonical form of the identifier
+            DCValue dcv = ExternalIdentifierMint.getCanonicalField(eid.getType());
+            this.addMetadata(dcv.schema, dcv.element, dcv.qualifier, null, eid.getCanonicalForm());
+
+            // now, store the full form
+            DCValue dc = ExternalIdentifierMint.getURLField(eid.getType());
+            this.addMetadata(dc.schema, dc.element, dc.qualifier, null, IdentifierFactory.getURL(eid).toString());
+        }
+
+        // now let the superclass do its thing
+        super.setExternalIdentifiers(identifiers);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // End of Identifier Methods
+    ///////////////////////////////////////////////////////////////////////////
 
     public void setMetadata(List<DCValue> metadata)
     {

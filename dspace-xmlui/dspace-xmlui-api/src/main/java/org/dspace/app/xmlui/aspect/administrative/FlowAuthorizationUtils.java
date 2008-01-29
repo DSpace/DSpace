@@ -40,9 +40,6 @@
 
 package org.dspace.app.xmlui.aspect.administrative;
 
-import java.sql.SQLException;
-import java.util.List;
-
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -54,12 +51,14 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
+import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.ResolvableIdentifier;
+
+import java.sql.SQLException;
+import java.util.List;
 
 
 
@@ -93,12 +92,15 @@ public class FlowAuthorizationUtils {
 		//Check whether it's a handle or internal id (by check ing if it has a slash in the string)
 		if (identifier.contains("/")) {
 //			DSpaceObject dso = HandleManager.resolveToObject(context, identifier);
+            /*
             ExternalIdentifierDAO identifierDAO =
                     ExternalIdentifierDAOFactory.getInstance(context);
             ExternalIdentifier eid = identifierDAO.retrieve(identifier);
-            DSpaceObject dso = eid.getObjectIdentifier().getObject(context);
+            DSpaceObject dso = eid.getObjectIdentifier().getObject(context);*/
+            ResolvableIdentifier ri = IdentifierFactory.resolve(context, identifier);
+            DSpaceObject dso = ri.getObject(context);
 			
-			if (dso != null && dso.getType() == Constants.ITEM) { 
+            if (dso != null && dso.getType() == Constants.ITEM) {
 				result.setParameter("itemID", dso.getID());
 				result.setParameter("type", Constants.ITEM);
 				result.setContinue(true);

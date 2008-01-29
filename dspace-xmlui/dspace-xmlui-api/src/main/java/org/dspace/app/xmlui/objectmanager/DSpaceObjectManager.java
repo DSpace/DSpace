@@ -40,10 +40,6 @@
 
 package org.dspace.app.xmlui.objectmanager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import org.dspace.app.xmlui.wing.ObjectManager;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.content.Collection;
@@ -51,6 +47,11 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.uri.IdentifierFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -112,7 +113,8 @@ public class DSpaceObjectManager implements ObjectManager
 		if (object instanceof DSpaceObject)
 		{
 			DSpaceObject dso = (DSpaceObject) object;
-			String handle = dso.getExternalIdentifier().getCanonicalForm();
+            String handle = IdentifierFactory.getCanonicalForm(dso);
+            // String handle = dso.getExternalIdentifier().getCanonicalForm();
 			
 			// If the object has a handle then refrence it by it's handle.
 			if (handle != null)

@@ -39,21 +39,16 @@
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionStepConfig;
-import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.aspect.submission.FlowUtils;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -62,7 +57,13 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.submit.step.UploadStep;
+import org.dspace.uri.IdentifierFactory;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This is a step of the item submission processes. This is where the user
@@ -137,7 +138,7 @@ public class ReviewStep extends AbstractSubmissionStep
 	{
 		// Get actionable URL
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getExternalIdentifier().getCanonicalForm() + "/submit";
+		String actionURL = IdentifierFactory.getURL(collection).toString() + "/submit";
 		
         SubmissionConfig subConfig = submissionInfo.getSubmissionConfig();
         

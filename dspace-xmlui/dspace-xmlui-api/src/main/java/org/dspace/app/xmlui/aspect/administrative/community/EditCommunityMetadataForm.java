@@ -39,8 +39,6 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.community;
 
-import java.sql.SQLException;
-
 import org.dspace.app.xmlui.aspect.administrative.FlowContainerUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -56,6 +54,9 @@ import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Community;
+import org.dspace.uri.IdentifierFactory;
+
+import java.sql.SQLException;
 
 /**
  * Presents the user (in this case an administrator over the community) with the
@@ -106,7 +107,7 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 	    
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("community-metadata-edit",contextPath+"/admin/community",Division.METHOD_MULTIPART,"primary administrative community");
-	    main.setHead(T_main_head.parameterize(thisCommunity.getExternalIdentifier().getCanonicalForm()));
+	    main.setHead(T_main_head.parameterize(IdentifierFactory.getCanonicalForm(thisCommunity)));
 	    
 	    if (AuthorizeManager.isAdmin(context))
 	    {

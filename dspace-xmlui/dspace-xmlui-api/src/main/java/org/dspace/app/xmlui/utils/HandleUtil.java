@@ -53,9 +53,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.ResolvableIdentifier;
+import org.dspace.uri.IdentifierFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
@@ -112,10 +111,13 @@ public class HandleUtil
 
             Context context = ContextUtil.obtainContext(objectModel);
 //            dso = HandleManager.resolveToObject(context, handle);
+            /*
             ExternalIdentifierDAO dao =
                 ExternalIdentifierDAOFactory.getInstance(context);
             ExternalIdentifier identifier = dao.retrieve(handle);
-            dso = identifier.getObjectIdentifier().getObject(context);
+            dso = identifier.getObjectIdentifier().getObject(context);*/
+            ResolvableIdentifier ri = IdentifierFactory.resolve(context, handle);
+            dso = ri.getObject(context);
 
             request.setAttribute(DSPACE_OBJECT, dso);
         }

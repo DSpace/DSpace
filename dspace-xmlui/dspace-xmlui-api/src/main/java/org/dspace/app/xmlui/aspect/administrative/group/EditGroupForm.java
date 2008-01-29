@@ -39,12 +39,6 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.group;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Queue;
-
 import org.dspace.app.xmlui.aspect.administrative.FlowGroupUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -62,6 +56,13 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.uri.IdentifierFactory;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Present the user with the group's current state. The user may select to 
@@ -288,9 +289,8 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	    {
 	    	Para para = main.addPara();
 	    	para.addContent(T_collection_para);
-	    	para.addXref(contextPath+"/handle/"+collection.getExternalIdentifier().getCanonicalForm(), collection.getMetadata("name"));
+	    	para.addXref(IdentifierFactory.getURL(collection).toString(), collection.getMetadata("name"));
 	    }
-	   
 
 	    // DIVISION: group-actions
 	    Division actions = main.addDivision("group-edit-actions");
@@ -498,7 +498,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	        		
 	        		Highlight highlight = cell.addHighlight("fade");
 	        		highlight.addContent("[");
-	        		highlight.addXref(contextPath+"/handle/"+collection.getExternalIdentifier().getCanonicalForm(), T_groups_collection_link);
+	        		highlight.addXref(IdentifierFactory.getURL(collection).toString(), T_groups_collection_link);
 	        		highlight.addContent("]");
         		}
         	}

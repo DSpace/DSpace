@@ -496,8 +496,6 @@ public abstract class ArchiveManager
      */
     private static void printExternalIdentifiers(Item item)
     {
-    	System.out.println("one pi: " + item.getExternalIdentifier().getCanonicalForm());
-        System.out.println(item.getExternalIdentifiers().toString());
         for (ExternalIdentifier id : item.getExternalIdentifiers())
         {
             System.out.println(id.getCanonicalForm());

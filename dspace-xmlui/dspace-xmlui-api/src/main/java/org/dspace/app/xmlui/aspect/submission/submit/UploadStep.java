@@ -39,16 +39,12 @@
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Map;
-
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.log4j.Logger;
-import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -67,8 +63,13 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.uri.IdentifierFactory;
 import org.dspace.workflow.WorkflowItem;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * This is a step of the item submission processes. The upload
@@ -185,7 +186,7 @@ public class UploadStep extends AbstractSubmissionStep
         // Get a list of all files in the original bundle
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getExternalIdentifier().getCanonicalForm() + "/submit";
+		String actionURL = IdentifierFactory.getURL(collection).toString() + "/submit";
 		boolean workflow = submission instanceof WorkflowItem;
 		Bundle[] bundles = item.getBundles("ORIGINAL");
 		Bitstream[] bitstreams = new Bitstream[0];

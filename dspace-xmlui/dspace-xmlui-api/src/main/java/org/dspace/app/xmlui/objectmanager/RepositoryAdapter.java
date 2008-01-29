@@ -39,8 +39,6 @@
  */
 package org.dspace.app.xmlui.objectmanager;
 
-import java.sql.SQLException;
-
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.Namespace;
 import org.dspace.app.xmlui.wing.WingException;
@@ -50,7 +48,10 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.uri.IdentifierFactory;
 import org.xml.sax.SAXException;
+
+import java.sql.SQLException;
 
 /**
  * This is an an adapter which translates a DSpace repository into a METS 
@@ -323,7 +324,7 @@ public class RepositoryAdapter extends AbstractAdapter
         attributesXLINK.setNamespace(XLINK);
         
         attributes.put("LOCTYPE", "URL");
-        attributesXLINK.put("href", "/metadata/handle/"+ dso.getExternalIdentifier().getCanonicalForm() +"/mets.xml");
+        attributesXLINK.put("href", "/metadata/handle/"+ IdentifierFactory.getCanonicalForm(dso) +"/mets.xml"); // FIXME this isn't right
         startElement(METS,"mptr",attributes,attributesXLINK);
         endElement(METS,"mptr");
         
