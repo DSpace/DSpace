@@ -40,20 +40,20 @@
 
 package org.dspace.app.xmlui.aspect.general;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.avalon.framework.logger.AbstractLogEnabled;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.matching.Matcher;
 import org.apache.cocoon.sitemap.PatternException;
-import org.dspace.app.xmlui.utils.HandleUtil;
+import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Test the current URL to see if it or any of it's parants match against the
@@ -81,7 +81,7 @@ public class HandleMatcher extends AbstractLogEnabled implements Matcher
     {
         try
         {
-            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+            DSpaceObject dso = URIUtil.resolve(objectModel);
             if (dso == null)
                 return null;
 

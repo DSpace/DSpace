@@ -60,6 +60,9 @@ import org.dspace.core.Context;
 
 /**
  * Simple utility class for extracting handles.
+ *
+ * NOTE: this class is effectively deprecated, and exists to provide legacy support for
+ * handle resolution
  * 
  * @author Scott Phillips
  */
@@ -96,26 +99,11 @@ public class HandleUtil
 
             String handle = uri.substring(HANDLE_PREFIX.length());
 
-            int firstSlash = handle.indexOf('/');
-            if (firstSlash < 0)
-                // If there is no first slash then no match
-                return null;
-
-            int secondSlash = handle.indexOf('/', firstSlash + 1);
-            if (secondSlash < 0)
-                // A trailing slash is not nesssary if there is nothing after
-                // the handle.
-                secondSlash = handle.length();
-
-            handle = handle.substring(0, secondSlash);
+            // now fudge the legacy version of the handle
+            handle = "hdl:" + handle;
 
             Context context = ContextUtil.obtainContext(objectModel);
-//            dso = HandleManager.resolveToObject(context, handle);
-            /*
-            ExternalIdentifierDAO dao =
-                ExternalIdentifierDAOFactory.getInstance(context);
-            ExternalIdentifier identifier = dao.retrieve(handle);
-            dso = identifier.getObjectIdentifier().getObject(context);*/
+
             ResolvableIdentifier ri = IdentifierFactory.resolve(context, handle);
             dso = ri.getObject(context);
 

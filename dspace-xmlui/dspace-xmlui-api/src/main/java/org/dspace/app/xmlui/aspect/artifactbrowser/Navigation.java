@@ -46,8 +46,8 @@ import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
@@ -114,7 +114,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             Request request = ObjectModelHelper.getRequest(objectModel);
             String key = request.getScheme() + request.getServerName() + request.getServerPort() + request.getSitemapURI() + request.getQueryString();
             
-            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+            DSpaceObject dso = URIUtil.resolve(objectModel);
             if (dso != null)
                 key += "-" + IdentifierFactory.getCanonicalForm(dso);
 
@@ -173,7 +173,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         // Add the configured browse lists for 'top level' browsing
         addBrowseOptions(browseGlobal, contextPath + "/browse");
 
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
         if (dso != null)
         {
             if (dso instanceof Item)
@@ -225,7 +225,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         pageMeta.addMetadata("page","contactURL").addContent(contextPath + "/contact");
         pageMeta.addMetadata("page","feedbackURL").addContent(contextPath + "/feedback");
         
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
         if (dso != null)
         {
             if (dso instanceof Item)

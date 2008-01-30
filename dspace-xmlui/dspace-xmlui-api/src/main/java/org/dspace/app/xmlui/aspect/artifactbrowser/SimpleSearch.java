@@ -39,15 +39,12 @@
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Map;
-
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -61,6 +58,10 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * Preform a simple search of the repository. The user provides a simple one
@@ -100,7 +101,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
 		
-		DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+		DSpaceObject dso = URIUtil.resolve(objectModel);
         if ((dso instanceof Collection) || (dso instanceof Community))
         {
 	        HandleUtil.buildHandleTrail(dso,pageMeta,contextPath);

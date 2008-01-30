@@ -40,17 +40,17 @@
 
 package org.dspace.app.xmlui.aspect.general;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.avalon.framework.logger.AbstractLogEnabled;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.matching.Matcher;
 import org.apache.cocoon.sitemap.PatternException;
-import org.dspace.app.xmlui.utils.HandleUtil;
+import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Test the current URL to see if it contains a reference to a DSpaceObject, if
@@ -106,7 +106,7 @@ public class HandleTypeMatcher extends AbstractLogEnabled implements Matcher
         try
         {
             // HandleUtil handles caching if needed.
-            dso = HandleUtil.obtainHandle(objectModel);
+            dso = URIUtil.resolve(objectModel);
         }
         catch (SQLException sqle)
         {

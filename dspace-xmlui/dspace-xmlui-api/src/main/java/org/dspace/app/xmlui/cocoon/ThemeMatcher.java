@@ -40,22 +40,23 @@
 
 package org.dspace.app.xmlui.cocoon;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import org.apache.avalon.framework.logger.AbstractLogEnabled;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.matching.Matcher;
 import org.apache.cocoon.sitemap.PatternException;
-import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 import org.dspace.app.xmlui.configuration.Theme;
+import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 import org.dspace.app.xmlui.utils.HandleUtil;
+import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.content.DSpaceObject;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * This class determines the correct Aspect to use. This is determined by the
@@ -94,7 +95,7 @@ public class ThemeMatcher extends AbstractLogEnabled implements Matcher {
 		try {
 			Request request = ObjectModelHelper.getRequest(objectModel);
 			String uri = request.getSitemapURI();
-			DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+			DSpaceObject dso = URIUtil.resolve(objectModel);
 
 			List<Theme> rules = XMLUIConfiguration.getThemeRules();
 			getLogger().debug("Checking if URL=" + uri + " matches any theme rules.");

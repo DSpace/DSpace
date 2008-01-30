@@ -44,6 +44,7 @@ import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -87,7 +88,7 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
-    	DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+    	DSpaceObject dso = URIUtil.resolve(objectModel);
     	
     	pageMeta.addMetadata("title").addContent(T_title);
                
@@ -103,7 +104,7 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
             UIException, SQLException, IOException, AuthorizeException
     {   
     	Request  request = ObjectModelHelper.getRequest(objectModel);
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
         
         String type = null;
         String identifier = null;

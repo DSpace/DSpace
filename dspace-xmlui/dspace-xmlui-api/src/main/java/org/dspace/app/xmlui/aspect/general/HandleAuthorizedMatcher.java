@@ -40,20 +40,20 @@
 
 package org.dspace.app.xmlui.aspect.general;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.avalon.framework.logger.AbstractLogEnabled;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.matching.Matcher;
 import org.apache.cocoon.sitemap.PatternException;
 import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.app.xmlui.utils.HandleUtil;
+import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Test the current URL to see if the user has access to the described
@@ -108,7 +108,7 @@ public class HandleAuthorizedMatcher extends AbstractLogEnabled implements Match
         try
         {
         	Context context = ContextUtil.obtainContext(objectModel);
-            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+            DSpaceObject dso = URIUtil.resolve(objectModel);
             
             if (dso == null)
             	return null;

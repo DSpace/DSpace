@@ -48,6 +48,7 @@ import org.dspace.app.xmlui.cocoon.DSpaceFeedGenerator;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -133,7 +134,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
      */
     public Serializable getKey() {
         try {
-            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+            DSpaceObject dso = URIUtil.resolve(objectModel);
             
             if (dso == null)
                 return "0"; // no item, something is wrong
@@ -159,7 +160,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
     	if (this.validity == null)
     	{
 	        try {
-	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+	            DSpaceObject dso = URIUtil.resolve(objectModel);
 	            
 	            if (dso == null)
 	                return null;
@@ -209,7 +210,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
         if (!(dso instanceof Community))
             return;
 
@@ -249,7 +250,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             UIException, SQLException, IOException, AuthorizeException
     {
 
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
         if (!(dso instanceof Community))
             return;
 

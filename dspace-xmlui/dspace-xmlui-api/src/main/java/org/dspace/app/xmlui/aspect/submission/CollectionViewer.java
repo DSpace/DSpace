@@ -44,8 +44,8 @@ import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
-import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -85,7 +85,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     {
         try
         {
-            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+            DSpaceObject dso = URIUtil.resolve(objectModel);
 
             if (dso == null)
                 return "0";
@@ -113,7 +113,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     	{
 	        try
 	        {
-	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+	            DSpaceObject dso = URIUtil.resolve(objectModel);
 	
 	            if (dso == null)
 	                return null;
@@ -155,7 +155,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
         if (!(dso instanceof Collection))
             return;
  

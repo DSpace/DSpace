@@ -51,6 +51,7 @@ import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.RequestUtils;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -170,7 +171,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
             if (key != null)
             {
-                DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+                DSpaceObject dso = URIUtil.resolve(objectModel);
                 if (dso != null)
                     key += "-" + IdentifierFactory.getCanonicalForm(dso);
 
@@ -192,7 +193,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             try
             {
                 DSpaceValidity validity = new DSpaceValidity();
-                DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+                DSpaceObject dso = URIUtil.resolve(objectModel);
 
                 if (dso != null)
                     validity.add(dso);
@@ -240,7 +241,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
         pageMeta.addMetadata("title").addContent(getTitleMessage(info));
 
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
 
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         if (dso != null)
@@ -598,7 +599,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
         params.scope = new BrowserScope(context);
 
         // Are we in a community or collection?
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
         if (dso instanceof Community)
             params.scope.setCommunity((Community) dso);
         if (dso instanceof Collection)

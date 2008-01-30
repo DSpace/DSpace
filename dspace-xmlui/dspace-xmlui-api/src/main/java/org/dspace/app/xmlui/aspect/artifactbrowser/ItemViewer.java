@@ -48,6 +48,7 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -100,7 +101,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
      */
     public Serializable getKey() {
         try {
-            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+            DSpaceObject dso = URIUtil.resolve(objectModel);
             
             if (dso == null)
                 return "0"; // no item, something is wrong.
@@ -125,7 +126,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
     	if (this.validity == null)
     	{
 	        try {
-	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+	            DSpaceObject dso = URIUtil.resolve(objectModel);
 	            
 	            DSpaceValidity validity = new DSpaceValidity();
 	            validity.add(dso);
@@ -148,7 +149,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             AuthorizeException
     {
 
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
         if (!(dso instanceof Item))
             return;
         Item item = (Item) dso;
@@ -173,7 +174,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             UIException, SQLException, IOException, AuthorizeException
     {
 
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
         if (!(dso instanceof Item))
             return;
         Item item = (Item) dso;

@@ -39,10 +39,6 @@
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -51,8 +47,8 @@ import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
-import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
@@ -66,6 +62,10 @@ import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
 
 /**
  * 
@@ -187,7 +187,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         List admin = options.addList("administrative");
         
         // Context Administrative options
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
     	if (dso instanceof Item)
     	{
     		
@@ -270,7 +270,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     	// How many options were added.
     	int options = 0;
     	
-    	DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+    	DSpaceObject dso = URIUtil.resolve(objectModel);
     	
     	if (dso instanceof Item)
     	{

@@ -40,16 +40,6 @@
 
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -61,6 +51,7 @@ import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.RequestUtils;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -85,12 +76,19 @@ import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 import org.dspace.uri.IdentifierFactory;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implements all the browse functionality (browse by title, subject, authors,
@@ -173,7 +171,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             
             if (key != null)
             {
-                DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+                DSpaceObject dso = URIUtil.resolve(objectModel);
                 if (dso != null)
                     key += "-" + IdentifierFactory.getCanonicalForm(dso);            
 
@@ -195,7 +193,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             try
             {
                 DSpaceValidity validity = new DSpaceValidity();
-                DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+                DSpaceObject dso = URIUtil.resolve(objectModel);
 
                 if (dso != null)
                     validity.add(dso);
@@ -243,7 +241,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         
         pageMeta.addMetadata("title").addContent(getTitleMessage(info));
 
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
 
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         if (dso != null)
@@ -596,7 +594,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         params.scope = new BrowserScope(context);
 
         // Are we in a community or collection?
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
         if (dso instanceof Community)
             params.scope.setCommunity((Community) dso);
         if (dso instanceof Collection)

@@ -39,12 +39,6 @@
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
@@ -54,32 +48,39 @@ import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
+import org.dspace.app.xmlui.wing.element.Cell;
 import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.app.xmlui.wing.element.Para;
+import org.dspace.app.xmlui.wing.element.ReferenceSet;
+import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Cell;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierFactory;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.Context;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
-import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
+import org.dspace.sort.SortOption;
+import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.ResolvableIdentifier;
+import org.dspace.uri.dao.ExternalIdentifierDAO;
+import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This is an abstract search page. It is a collection of search methods that
@@ -498,22 +499,20 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             ExternalIdentifierDAOFactory.getInstance(context);
 
         // Are we in a community or collection?
+        /*
         DSpaceObject dso;
-        if (scopeString == null
-                || "".equals(scopeString)
-                || "/".equals(scopeString))
+        if (scopeString == null || "".equals(scopeString) || "/".equals(scopeString))
+        {
             // get the search scope from the url handle
-            dso = HandleUtil.obtainHandle(objectModel);
+            dso = URIUtil.resolve(objectModel);
+        }
         else
         {
             // Get the search scope from the location parameter
-//            dso = HandleManager.resolveToObject(context, scopeString);
             ResolvableIdentifier ri = IdentifierFactory.resolve(context, scopeString);
             dso = ri.getObject(context);
-            /*
-            ExternalIdentifier identifier = dao.retrieve(scopeString);
-            dso = identifier.getObjectIdentifier().getObject(context);*/
-        }
+        }*/
+        DSpaceObject dso = URIUtil.resolve(objectModel);
 
         return dso;
     }
@@ -583,7 +582,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
      */
     protected boolean variableScope() throws SQLException
     {
-        if (HandleUtil.obtainHandle(objectModel) == null)
+        if (URIUtil.resolve(objectModel) == null)
             return true;
         else 
             return false;
