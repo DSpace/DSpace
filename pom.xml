@@ -14,6 +14,15 @@
       <url>http://www.dspace.org</url>
    </organization>
 
+   <modules>
+      <module>language-packs</module>
+      <module>dspace-api</module>
+      <module>dspace-jspui</module>
+      <module>dspace-xmlui</module>
+      <module>dspace-lni</module>
+      <module>dspace-oai</module>
+   </modules>
+
    <build>
       <plugins>
          <!-- 
@@ -27,7 +36,7 @@
                <target>1.5</target>
             </configuration>
          </plugin>
-         
+
          <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
             <dependencies>
@@ -38,19 +47,43 @@
                </dependency>
             </dependencies>
          </plugin>
-         
+
       </plugins>
    </build>
 
-   <modules>      
-      <module>language-packs</module>
-      <module>dspace-api</module>
-      <module>dspace-jspui</module>
-      <module>dspace-xmlui</module>
-      <module>dspace-lni</module>
-      <module>dspace-oai</module>
-   </modules>
-   
+   <profiles>
+      <profile>
+         <id>release</id>
+         <activation>
+            <activeByDefault>false</activeByDefault>
+         </activation>
+         <build>
+            <plugins>
+               <plugin>
+                  <artifactId>maven-assembly-plugin</artifactId>
+                  <configuration>
+                     <descriptorRefs>
+                        <descriptorRef>bootstrap-release</descriptorRef>
+                        <descriptorRef>source-release</descriptorRef>
+                     </descriptorRefs>
+                     <finalName>dspace-${pom.version}</finalName>
+                  </configuration>
+                  <inherited>false</inherited>
+                  <executions>
+                     <execution>
+                        <phase>package</phase>
+                        <goals>
+                           <goal>attached</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+
+   </profiles>
+
    <repositories>
       <repository>
          <id>maven.dspace.org/snapshot</id>
@@ -234,11 +267,11 @@
             <artifactId>commons-pool</artifactId>
             <version>1.3</version>
          </dependency>
-          <dependency>
-             <groupId>commons-validator</groupId>
-             <artifactId>commons-validator</artifactId>
-             <version>1.3.1</version>
-          </dependency>
+         <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>1.3.1</version>
+         </dependency>
          <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
@@ -286,7 +319,7 @@
             <groupId>org.fontbox</groupId>
             <artifactId>fontbox</artifactId>
             <version>0.1.0</version>
-         </dependency>          
+         </dependency>
          <dependency>
             <groupId>org.jempbox</groupId>
             <artifactId>jempbox</artifactId>
