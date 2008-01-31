@@ -947,12 +947,12 @@ public class DSIndexer
                                 doc.add( new Field(indexConfigArr[i].indexName,
                                                    DateTools.dateToString(d, DateTools.Resolution.SECOND),
                                                    Field.Store.NO,
-                                                   Field.Index.TOKENIZED));
+                                                   Field.Index.UN_TOKENIZED));
 
                                 doc.add( new Field(indexConfigArr[i].indexName  + ".year",
                                                     DateTools.dateToString(d, DateTools.Resolution.YEAR),
                                                     Field.Store.NO,
-                                                    Field.Index.TOKENIZED));
+                                                    Field.Index.UN_TOKENIZED));
                             }
                         }
                         else if ("date".equalsIgnoreCase(indexConfigArr[i].type))
@@ -963,12 +963,12 @@ public class DSIndexer
                                 doc.add( new Field(indexConfigArr[i].indexName,
                                                    DateTools.dateToString(d, DateTools.Resolution.DAY),
                                                    Field.Store.NO,
-                                                   Field.Index.TOKENIZED));
+                                                   Field.Index.UN_TOKENIZED));
 
                                 doc.add( new Field(indexConfigArr[i].indexName  + ".year",
                                                     DateTools.dateToString(d, DateTools.Resolution.YEAR),
                                                     Field.Store.NO,
-                                                    Field.Index.TOKENIZED));
+                                                    Field.Index.UN_TOKENIZED));
                             }
                         }
                         else
@@ -1152,6 +1152,7 @@ public class DSIndexer
             {
                 // Parse the date
                 df.setCalendar(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
+                df.setLenient(false);
                 return df.parse(t);
             }
             catch (ParseException pe)
