@@ -76,18 +76,6 @@ public class Handle extends ExternalIdentifier implements IdentifierAssigner<Han
         super(new HandleType(), value);
     }
 
-    /*
-    public Handle(Context context, DSpaceObject dso, String value)
-    {
-        super(context, dso, new HandleType(), value);
-    }
-
-    public Handle(Context context, DSpaceObject dso,
-                  ExternalIdentifierType type, String value)
-    {
-        super(context, dso, type, value);
-    }*/
-
     public Handle parseCanonicalForm(String canonical)
     {
         // canonical form: hdl:xxxxx/yyyy

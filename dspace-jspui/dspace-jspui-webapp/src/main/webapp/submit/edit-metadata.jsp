@@ -133,7 +133,7 @@
       throws java.io.IOException 
     {
 
-      DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
+      DCValue[] defaults = item.getUnControlledMetadata(schema, element, qualifier, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer headers = new StringBuffer();
       StringBuffer sb = new StringBuffer();
@@ -235,7 +235,7 @@
       throws java.io.IOException 
     {
 
-      DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
+      DCValue[] defaults = item.getUnControlledMetadata(schema, element, qualifier, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       org.dspace.content.DCDate dateIssued;
@@ -344,7 +344,7 @@
       throws java.io.IOException 
     {
 
-      DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
+      DCValue[] defaults = item.getUnControlledMetadata(schema, element, qualifier, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       org.dspace.content.DCSeriesNumber sn;
@@ -421,7 +421,7 @@
       throws java.io.IOException 
     {
 
-      DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
+      DCValue[] defaults = item.getUnControlledMetadata(schema, element, qualifier, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       String val;
@@ -493,7 +493,7 @@
       throws java.io.IOException 
     {
 
-      DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
+      DCValue[] defaults = item.getUnControlledMetadata(schema, element, qualifier, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       String val;
@@ -565,7 +565,7 @@
       int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary) 
       throws java.io.IOException 
     {
-      DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
+      DCValue[] defaults = item.getUnControlledMetadata(schema, element, qualifier, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       StringBuffer headers = new StringBuffer();
@@ -691,8 +691,9 @@
       int fieldCountIncr, List qualMap, String label, PageContext pageContext) 
       throws java.io.IOException 
     {
-		DCValue[] unfiltered = item.getMetadata(schema, element, Item.ANY, Item.ANY);
-		// filter out both unqualified and qualified values occuring elsewhere in inputs
+		// DCValue[] unfiltered = item.getMetadata(schema, element, Item.ANY, Item.ANY);
+        DCValue[] unfiltered = item.getUnControlledMetadata(schema, element, Item.ANY, Item.ANY);
+        // filter out both unqualified and qualified values occuring elsewhere in inputs
 		ArrayList filtered = new ArrayList();
 		for (int i = 0; i < unfiltered.length; i++)
 		{
@@ -803,7 +804,7 @@
       List valueList, String label) 
       throws java.io.IOException 
     {
-      DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
+      DCValue[] defaults = item.getUnControlledMetadata(schema, element, qualifier, Item.ANY);
       StringBuffer sb = new StringBuffer();
       Iterator vals;
       String display, value;
@@ -850,7 +851,7 @@
             List valueList, String label) 
             throws java.io.IOException 
           {
-        	DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
+        	DCValue[] defaults = item.getUnControlledMetadata(schema, element, qualifier, Item.ANY);
         	int valueCount = valueList.size();
         	
             StringBuffer sb = new StringBuffer();

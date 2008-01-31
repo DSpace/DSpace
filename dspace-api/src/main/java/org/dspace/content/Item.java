@@ -240,14 +240,16 @@ public class Item extends DSpaceObject
         oid.setResourceTypeID(this.getType());
         oid.setResourceID(this.getID());
 
-        // FIXME: this can clearly result in duplicate fields, and once the principal is sound then we
-        // need to come back and tidy this up
-        
         // store the canonical form of the identifier
         DCValue dcv = ConfigurationManager.getMetadataProperty("identifier.metadata.canonical-field.internal");
         if (dcv != null)
         {
-            this.addMetadata(dcv.schema, dcv.element, dcv.qualifier, null, oid.getCanonicalForm());
+            if (log.isDebugEnabled())
+            {
+                log.debug("setIdentifier: schema=" + dcv.schema + ",element=" + dcv.element + ",qualifier="
+                          + dcv.qualifier + ",uuid=" + oid.getCanonicalForm());
+            }
+            this.addUniqueMetadata(dcv.schema, dcv.element, dcv.qualifier, null, oid.getCanonicalForm());
         }
 
         // now, should we store the full form
@@ -256,7 +258,12 @@ public class Item extends DSpaceObject
             DCValue dc = ConfigurationManager.getMetadataProperty("identifier.metadata.url-field.internal");
             if (dc != null)
             {
-                this.addMetadata(dc.schema, dc.element, dc.qualifier, null, IdentifierFactory.getURL(oid).toString());
+                if (log.isDebugEnabled())
+                {
+                    log.debug("setIdentifier: schema=" + dc.schema + ",element=" + dc.element + ",qualifier="
+                              + dc.qualifier + ",url=" + IdentifierFactory.getURL(oid).toString());
+                }
+                this.addUniqueMetadata(dc.schema, dc.element, dc.qualifier, null, IdentifierFactory.getURL(oid).toString());
             }
         }
 
@@ -267,21 +274,28 @@ public class Item extends DSpaceObject
     public void addExternalIdentifier(ExternalIdentifier identifier)
             throws UnsupportedIdentifierException
     {
-        // FIXME: this can clearly result in duplicate fields, and once the principal is sound then we
-        // need to come back and tidy this up
-        
         // store the canonical form of the identifier
         DCValue dcv = ExternalIdentifierMint.getCanonicalField(identifier.getType());
         if (dcv != null)
         {
-            this.addMetadata(dcv.schema, dcv.element, dcv.qualifier, null, identifier.getCanonicalForm());
+            if (log.isDebugEnabled())
+            {
+                log.debug("setExternalIdentifier: schema=" + dcv.schema + ",element=" + dcv.element + ",qualifier="
+                          + dcv.qualifier + ",identifier=" + identifier.getCanonicalForm());
+            }
+            this.addUniqueMetadata(dcv.schema, dcv.element, dcv.qualifier, null, identifier.getCanonicalForm());
         }
 
         // now, store the full form
         DCValue dc = ExternalIdentifierMint.getURLField(identifier.getType());
         if (dc != null)
         {
-            this.addMetadata(dc.schema, dc.element, dc.qualifier, null, IdentifierFactory.getURL(identifier).toString());
+            if (log.isDebugEnabled())
+            {
+                log.debug("setExternalIdentifier: schema=" + dc.schema + ",element=" + dc.element + ",qualifier="
+                          + dc.qualifier + ",url=" + identifier.getURI().toString());
+            }
+            this.addUniqueMetadata(dc.schema, dc.element, dc.qualifier, null, identifier.getURI().toString());
         }
 
         // now let the superclass do its thing
@@ -295,11 +309,21 @@ public class Item extends DSpaceObject
         {
             // store the canonical form of the identifier
             DCValue dcv = ExternalIdentifierMint.getCanonicalField(eid.getType());
-            this.addMetadata(dcv.schema, dcv.element, dcv.qualifier, null, eid.getCanonicalForm());
+            this.addUniqueMetadata(dcv.schema, dcv.element, dcv.qualifier, null, eid.getCanonicalForm());
+            if (log.isDebugEnabled())
+            {
+                log.debug("setExternalIdentifiers: schema=" + dcv.schema + ",element=" + dcv.element + ",qualifier="
+                          + dcv.qualifier + ",identifier=" + eid.getCanonicalForm());
+            }
 
             // now, store the full form
             DCValue dc = ExternalIdentifierMint.getURLField(eid.getType());
-            this.addMetadata(dc.schema, dc.element, dc.qualifier, null, IdentifierFactory.getURL(eid).toString());
+            this.addUniqueMetadata(dc.schema, dc.element, dc.qualifier, null, eid.getURI().toString());
+            if (log.isDebugEnabled())
+            {
+                log.debug("setExternalIdentifiers: schema=" + dc.schema + ",element=" + dc.element + ",qualifier="
+                          + dc.qualifier + ",url=" + eid.getURI().toString());
+            }
         }
 
         // now let the superclass do its thing
@@ -489,6 +513,74 @@ public class Item extends DSpaceObject
 
             addDetails(schema+"."+element+((qualifier==null)? "": "."+qualifier));
         }
+    }
+
+    public void addUniqueMetadata(String schema, String element, String qualifier, String lang, String value)
+    {
+        DCValue[] dcvs = this.getMetadata(schema, element, qualifier, lang);
+        for (int i = 0; i < dcvs.length; i++)
+        {
+            if (dcvs[i].value.equals(value))
+            {
+                return;
+            }
+        }
+        this.addMetadata(schema, element, qualifier, lang, value);
+    }
+
+    public DCValue[] getUnControlledMetadata(String schema, String element, String qualifier, String lang)
+    {
+        List<DCValue> filtered = new ArrayList<DCValue>();
+        DCValue[] all = this.getMetadata(schema, element, qualifier, lang);
+        List<DCValue> controlled = getControlledMetadata();
+        for (int i = 0; i < all.length; i++)
+        {
+            if (!controlled.contains(all[i]))
+            {
+                filtered.add(all[i]);
+            }
+        }
+        DCValue[] ret = new DCValue[filtered.size()];
+        return filtered.toArray((DCValue[]) ret);
+    }
+
+    public List<DCValue> getControlledMetadata()
+    {
+        List<DCValue> dc = new ArrayList<DCValue>();
+
+        DCValue cfi = ConfigurationManager.getMetadataProperty("identifier.metadata.canonical-field.internal");
+        if (cfi != null)
+        {
+            cfi.value = oid.getCanonicalForm();
+            dc.add(cfi);
+        }
+
+
+        DCValue ufi = ConfigurationManager.getMetadataProperty("identifier.metadata.url-field.internal");
+        if (ufi != null)
+        {
+            ufi.value = IdentifierFactory.getURL(oid).toString();
+            dc.add(ufi);
+        }
+
+        for (ExternalIdentifier eid : identifiers)
+        {
+            DCValue cfe = ExternalIdentifierMint.getCanonicalField(eid.getType());
+            if (cfe != null)
+            {
+                cfe.value = eid.getCanonicalForm();
+                dc.add(cfe);
+            }
+
+            DCValue ufe = ExternalIdentifierMint.getURLField(eid.getType());
+            if (ufe != null)
+            {
+                ufe.value = eid.getURI().toString();
+                dc.add(ufe);
+            }
+        }
+
+        return dc;
     }
 
     /**

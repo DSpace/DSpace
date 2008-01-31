@@ -83,9 +83,6 @@ public class ItemDAOCore extends ItemDAO
             Item item = childDAO.create();
 
             // now assign an object identifier
-            /*
-            ObjectIdentifier oid = new ObjectIdentifier(true);
-                item.setIdentifier(oid);*/
             ObjectIdentifier oid = ObjectIdentifierMint.mint(context, item);
 
             // now assign any required external identifiers
@@ -265,6 +262,12 @@ public class ItemDAOCore extends ItemDAO
             }
 
             field = mfDAO.retrieve(schema.getID(), memValue.element, memValue.qualifier);
+
+            if (field == null)
+            {
+                throw new RuntimeException("Bad Metadata Field: " + schema.getName()
+                                           + "." + memValue.element + "." + memValue.qualifier);
+            }
 
             // Work out the place number for ordering
             int current = 0;

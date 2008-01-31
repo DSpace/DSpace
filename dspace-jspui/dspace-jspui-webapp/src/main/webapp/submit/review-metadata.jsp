@@ -132,13 +132,14 @@
           row.append("</td>");
           row.append("<td width=\"60%\" class=\"metadataFieldValue\">");
 
+           // FIXME: assumes DC
           if (inputType.equals("qualdrop_value"))
           {
-             values = item.getDC(inputs[z].getElement(), Item.ANY, Item.ANY);
+             values = item.getUnControlledMetadata("dc", inputs[z].getElement(), Item.ANY, Item.ANY);
           }
           else
           {
-             values = item.getDC(inputs[z].getElement(), inputs[z].getQualifier(), Item.ANY);
+             values = item.getUnControlledMetadata("dc", inputs[z].getElement(), inputs[z].getQualifier(), Item.ANY);
           }
           if (values.length == 0) 
           {

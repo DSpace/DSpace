@@ -157,79 +157,83 @@ and searching the repository.
             <!-- general identifier features -->
 			<map:match pattern="resource/**">
 
-                				<!-- Inform the user that the item they are viewing is a restricted resource -->
-                				<map:match pattern="resource/*/restricted-resource">
-                					<map:transform type="RestrictedItem"/>
-                					<map:serialize type="xml"/>
-                				</map:match>
+                <!-- Inform the user that the item they are viewing is a restricted resource -->
+                <map:match pattern="resource/*/restricted-resource">
+                    <map:transform type="RestrictedItem"/>
+                    <map:serialize type="xml"/>
+                </map:match>
 
-                				<!-- Scoped browse by features -->
-                				<map:match type="HandleAuthorizedMatcher" pattern="READ">
-                					<map:match type="HandleTypeMatcher" pattern="community,collection">
+                <!-- Scoped browse by features -->
+                <map:match type="HandleAuthorizedMatcher" pattern="READ">
+                    <map:match type="HandleTypeMatcher" pattern="community,collection">
 
-                						<!-- Browse (by anything) -->
-                						<map:match pattern="resource/*/browse">
-                							<map:transform type="ConfigurableBrowse"/>
-                							<map:serialize type="xml"/>
-                						</map:match>
+                        <!-- Browse (by anything) -->
+                        <map:match pattern="resource/*/browse">
+                            <map:transform type="ConfigurableBrowse"/>
+                            <map:serialize type="xml"/>
+                        </map:match>
 
-                						<!-- Simple search -->
-                						<map:match pattern="resource/*/search">
-                							<map:transform type="SimpleSearch"/>
-                							<map:serialize type="xml"/>
-                						</map:match>
+                        <!-- Simple search -->
+                        <map:match pattern="resource/*/search">
+                            <map:transform type="SimpleSearch"/>
+                            <map:serialize type="xml"/>
+                        </map:match>
 
-                						<!-- Simple search again, but this time they said it -->
-                						<map:match pattern="resource/*/simple-search">
-                							<map:transform type="SimpleSearch"/>
-                							<map:serialize type="xml"/>
-                						</map:match>
+                        <!-- Simple search again, but this time they said it -->
+                        <map:match pattern="resource/*/simple-search">
+                            <map:transform type="SimpleSearch"/>
+                            <map:serialize type="xml"/>
+                        </map:match>
 
-                						<!-- Advanced search -->
-                						<map:match pattern="resource/*/advanced-search">
-                							<map:transform type="AdvancedSearch"/>
-                							<map:serialize type="xml"/>
-                						</map:match>
+                        <!-- Advanced search -->
+                        <map:match pattern="resource/*/advanced-search">
+                            <map:transform type="AdvancedSearch"/>
+                            <map:serialize type="xml"/>
+                        </map:match>
 
-                					</map:match> <!-- End match community or collection -->
-                				</map:match> <!-- End match can read -->
+                    </map:match>
+                    <!-- End match community or collection -->
+                </map:match>
+                <!-- End match can read -->
 
 
-                				<!-- Community, Collection, and Item Viewers -->
-                				<map:match pattern="resource/**">
-                					<map:match type="HandleAuthorizedMatcher" pattern="READ">
-                						<map:match type="HandleTypeMatcher" pattern="community">
-                							<map:transform type="CommunityViewer"/>
-                							<map:serialize type="xml"/>
-                						</map:match>
-                						<map:match type="HandleTypeMatcher" pattern="collection">
-                							<map:transform type="CollectionViewer"/>
-                							<map:serialize type="xml"/>
-                						</map:match>
-                						<map:match type="HandleTypeMatcher" pattern="item">
-                							<map:transform type="ItemViewer"/>
-                							<map:serialize type="xml"/>
-                						</map:match>
-                					</map:match>
+                <!-- Community, Collection, and Item Viewers -->
+                <map:match pattern="resource/**">
+                    <map:match type="HandleAuthorizedMatcher" pattern="READ">
+                        <map:match type="HandleTypeMatcher" pattern="community">
+                            <map:transform type="CommunityViewer"/>
+                            <map:serialize type="xml"/>
+                        </map:match>
+                        <map:match type="HandleTypeMatcher" pattern="collection">
+                            <map:transform type="CollectionViewer"/>
+                            <map:serialize type="xml"/>
+                        </map:match>
+                        <map:match type="HandleTypeMatcher" pattern="item">
+                            <map:transform type="ItemViewer"/>
+                            <map:serialize type="xml"/>
+                        </map:match>
+                    </map:match>
 
-                					<map:match type="HandleAuthorizedMatcher" pattern="!READ">
-                						<map:select type="AuthenticatedSelector">
-                							<map:when test="eperson">
-                								<map:transform type="RestrictedItem"/>
-                								<map:serialize/>
-                							</map:when>
-                							<map:otherwise>
-                								<map:act type="StartAuthentication">
-                									<map:parameter name="header" value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
-                									<map:parameter name="message" value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"/>
-                								</map:act>
-                								<map:serialize/>
-                							</map:otherwise>
-                						</map:select>
-                					</map:match>
-                				</map:match>
+                    <map:match type="HandleAuthorizedMatcher" pattern="!READ">
+                        <map:select type="AuthenticatedSelector">
+                            <map:when test="eperson">
+                                <map:transform type="RestrictedItem"/>
+                                <map:serialize/>
+                            </map:when>
+                            <map:otherwise>
+                                <map:act type="StartAuthentication">
+                                    <map:parameter name="header"
+                                                   value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
+                                    <map:parameter name="message"
+                                                   value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"/>
+                                </map:act>
+                                <map:serialize/>
+                            </map:otherwise>
+                        </map:select>
+                    </map:match>
+                </map:match>
 
-			</map:match>
+            </map:match>
 
 			<!-- Handle specific features -->
 			<map:match pattern="handle/*/**">

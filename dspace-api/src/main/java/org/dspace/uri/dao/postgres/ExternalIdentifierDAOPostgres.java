@@ -72,7 +72,7 @@ public class ExternalIdentifierDAOPostgres extends ExternalIdentifierDAO
     private String deleteSQL = "DELETE FROM externalidentifier WHERE namespace = ? AND identifier = ? " +
                                "AND resource_type_id = ? AND resource_id = ?";
 
-    private String tombSQL = "UPDATE externalidentifier SET namespace = ?, identifier = ?, resource_type = null, " +
+    private String tombSQL = "UPDATE externalidentifier SET namespace = ?, identifier = ?, resource_type_id = null, " +
                              "resource_id = null, tombstone = 1";
 
     private String nsValueSQL = "SELECT * FROM externalidentifier WHERE namespace = ? AND identifier = ?";
