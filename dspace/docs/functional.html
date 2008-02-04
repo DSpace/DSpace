@@ -20,8 +20,8 @@
 
   <p class="caption">Data Model Diagram</p>
 
-  <p>The way data is organized in DSpace is intended to reflect the structure of the organization using the DSpace system. Each DSpace site is divided into <em>communities</em>; these typically correspond to a laboratory, research center or department. As of DSpace version 1.2, these communities can be organized into an hierarchy.</p>
-
+  <p>The way data is organized in DSpace is intended to reflect the structure of the organization using the DSpace system. Each DSpace site is divided into <em>communities</em>, which can be further divided into <em>sub-communities</em> reflecting the typical university structure of college, departement, research center, or laboratory. </p>
+  
   <p>Communities contain <em>collections</em>, which are groupings of related content. A collection may appear in more than one community.</p>
 
   <p>Each collection is composed of <em>items</em>, which are the basic archival elements of the archive. Each item is owned by one collection. Additionally, an item may appear in additional collections; however every item has one and only one owning collection.</p>
@@ -490,7 +490,7 @@ http://hdl.handle.net/1721.123/4567
 
   <h2><a name="bitstream_ids" id="bitstream_ids">Bitstream 'Persistent' Identifiers</a></h2>
 
-  <p>As of DSpace 1.2, bitstreams in DSpace also have more persistent identifiers. They are more volatile than Handles, since if the content is moved to a different server or organizaion, they will no longer work (hence the quotes around 'persistent'). However, they are more easily persisted than the simple URLs based on database primary key previously used. This means that external systems can more reliably refer to specific bitstreams stored in a DSpace instance.</p>
+  <p>Similar to handles for DSpace items, bitstreams also have 'Persistent' identifiers. They are more volatile than Handles, since if the content is moved to a different server or organizaion, they will no longer work (hence the quotes around 'persistent'). However, they are more easily persisted than the simple URLs based on database primary key previously used. This means that external systems can more reliably refer to specific bitstreams stored in a DSpace instance.</p>
 
   <p>Each bitstream has a sequence ID, unique within an item. This sequence ID is used to create a persistent ID, of the form:</p>
 
@@ -521,7 +521,7 @@ https://dspace.myu.edu/bitstream/123.456/789/24/foo.html
     <li>Browsing though title, author, date or subject indices, with optional image thumbnails</li>
   </ul>
 
-  <p>Search is an essential component of discovery in DSpace. Users' expectations from a search engine are quite high, so a goal for DSpace is to supply as many search features as possible. DSpace's indexing and search module has a very simple API which allows for indexing new content, regenerating the index, and performing searches on the entire corpus, a community, or collection. Behind the API is the Java freeware search engine <a href="http://jakarta.apache.org/lucene/">Lucene</a>. Lucene gives us fielded searching, stop word removal, stemming, and the ability to incrementally add new indexed content without regenerating the entire index. As of DSpace 1.2.1 the Lucene search indexes are configurable, enabling institutions to customise which DSpace metadata fields are indexed.</p>
+  <p>Search is an essential component of discovery in DSpace. Users' expectations from a search engine are quite high, so a goal for DSpace is to supply as many search features as possible. DSpace's indexing and search module has a very simple API which allows for indexing new content, regenerating the index, and performing searches on the entire corpus, a community, or collection. Behind the API is the Java freeware search engine <a href="http://jakarta.apache.org/lucene/">Lucene</a>. Lucene gives us fielded searching, stop word removal, stemming, and the ability to incrementally add new indexed content without regenerating the entire index. The specific Lucene search indexes are configurable enabling institutions to customize which DSpace metadata fields are indexed.</p>
 
   <p>Another important mechanism for discovery in DSpace is the browse. This is the process whereby the user views a particular index, such as the title index, and navigates around it in search of interesting items. The browse subsystem provides a simple API for achieving this by allowing a caller to specify an index, and a subsection of that index. The browse subsystem then discloses the portion of the index of interest. Indices that may be browsed are item title, item issue date, item author, and subject terms. Additionally, the browse can be limited to items within a particular collection or community.</p>
 
