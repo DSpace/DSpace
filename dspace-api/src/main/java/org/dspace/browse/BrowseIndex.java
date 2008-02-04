@@ -618,10 +618,10 @@ public class BrowseIndex
      * @return
      * @throws BrowseException
      */
-    public String getSortField() throws BrowseException
+    public String getSortField(boolean isSecondLevel) throws BrowseException
     {
         String focusField;
-        if (isMetadataIndex())
+        if (isMetadataIndex() && !isSecondLevel)
         {
             focusField = "sort_value";
         }
@@ -632,7 +632,7 @@ public class BrowseIndex
             else
                 focusField = "sort_1";  // Use the first sort column
         }
-        
+
         return focusField;
     }
     
