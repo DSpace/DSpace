@@ -87,7 +87,7 @@ import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.core.Utils;
 import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ExternalIdentifierType;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
@@ -192,7 +192,7 @@ public class METSExport
             ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(uriPassed);
             if (oi == null)
             {
-                ExternalIdentifier eid = ExternalIdentifierMint.parseCanonicalForm(context, uriPassed);
+                ExternalIdentifier eid = ExternalIdentifierService.parseCanonicalForm(context, uriPassed);
                 oi = eid.getObjectIdentifier();
             }
             if (oi != null)
@@ -237,7 +237,7 @@ public class METSExport
             ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(uriPassed);
             if (oi == null)
             {
-                ExternalIdentifier eid = ExternalIdentifierMint.parseCanonicalForm(context, uriPassed);
+                ExternalIdentifier eid = ExternalIdentifierService.parseCanonicalForm(context, uriPassed);
                 oi = eid.getObjectIdentifier();
             }
             if (oi != null)

@@ -210,12 +210,6 @@ class DAVLookup extends DAVResource
         }
 
         // did handle lookup fail?
-//        dso = HandleManager.resolveToObject(this.context, handle);
-        // FIXME: I don't think this will work. It will need an hdl: prefix.
-        /*
-        ExternalIdentifier identifier = externalIdentifierDAO.retrieve(handle);
-        dso = identifier.getObjectIdentifier().getObject(context);*/
-
         ResolvableIdentifier dsi = IdentifierFactory.resolve(context, handle);
         dso = dsi.getObject(context);
 
@@ -263,12 +257,6 @@ class DAVLookup extends DAVResource
     protected String makeURI(String handle, String bsPid) throws IOException,
             SQLException
     {
-//        DSpaceObject dso = HandleManager.resolveToObject(this.context, handle);
-        // FIXME: I don't think this will work. It will need an hdl: prefix.
-        /*
-        ExternalIdentifier identifier = externalIdentifierDAO.retrieve(handle);
-        DSpaceObject dso = identifier.getObjectIdentifier().getObject(context);*/
-
         ResolvableIdentifier dsi = IdentifierFactory.resolve(context, handle);
         DSpaceObject dso = dsi.getObject(context);
 

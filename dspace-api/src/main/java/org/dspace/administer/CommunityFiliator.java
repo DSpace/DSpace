@@ -52,7 +52,7 @@ import org.dspace.core.ArchiveManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
@@ -243,8 +243,7 @@ public class CommunityFiliator
                 System.out.println("no namespace provided. assuming handles.");
             }
 
-            ExternalIdentifier identifier = ExternalIdentifierMint.parseCanonicalForm(c, communityID);
-            // ExternalIdentifier identifier = identifierDAO.retrieve(communityID);
+            ExternalIdentifier identifier = ExternalIdentifierService.parseCanonicalForm(c, communityID);
 
             ObjectIdentifier oi = identifier.getObjectIdentifier();
             community = (Community) oi.getObject(c);

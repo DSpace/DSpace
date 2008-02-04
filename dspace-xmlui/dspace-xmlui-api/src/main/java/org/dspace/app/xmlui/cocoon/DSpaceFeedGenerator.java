@@ -188,12 +188,6 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     			DSpaceObject dso = null;
     			if (uri != null)
                 {
-//    				dso = HandleManager.resolveToObject(context, handle);
-                    /*
-                    ExternalIdentifierDAO dao =
-                        ExternalIdentifierDAOFactory.getInstance(context);
-                    ExternalIdentifier identifier = dao.retrieve(uri);
-                    dso = identifier.getObjectIdentifier().getObject(context);*/
                     ResolvableIdentifier ri = IdentifierFactory.resolve(context, uri);
                     dso = ri.getObject(context);
                 }
@@ -259,12 +253,6 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 			
 			if (uri != null)
 			{
-//                dso = HandleManager.resolveToObject(context, handle);
-                /*
-                ExternalIdentifierDAO dao =
-                    ExternalIdentifierDAOFactory.getInstance(context);
-                ExternalIdentifier identifier = dao.retrieve(uri);
-                dso = identifier.getObjectIdentifier().getObject(context);*/
                 ResolvableIdentifier ri = IdentifierFactory.resolve(context, uri);
                 dso = ri.getObject(context);
 				

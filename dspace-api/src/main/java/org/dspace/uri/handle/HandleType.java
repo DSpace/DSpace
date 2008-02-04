@@ -54,16 +54,6 @@ public class HandleType extends ExternalIdentifierType
         super("hdl", "http", "hdl.handle.net", "://", "/");
     }
 
-    public String getPrefix()
-    {
-        String prefix = ConfigurationManager.getProperty("handle.prefix");
-        if (prefix == null || "".equals(prefix))
-        {
-            throw new RuntimeException("No configuration, or configuration is invalid for handle.prefix");
-        }
-        return prefix + "/";
-    }
-
     public Handle getInstance(String value, ObjectIdentifier oid)
     {
         return new Handle(value, oid);

@@ -223,12 +223,6 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             else if (handle != null)
             {
             	// Reference by an item's handle.
-                /*
-                ExternalIdentifierDAO identifierDAO =
-                        ExternalIdentifierDAOFactory.getInstance(context);
-                ExternalIdentifier eid = identifierDAO.retrieve(handle);
-                dso = eid.getObjectIdentifier().getObject(context);*/
-
                 ResolvableIdentifier ri = IdentifierFactory.resolve(context, handle);
                 dso = ri.getObject(context);
 

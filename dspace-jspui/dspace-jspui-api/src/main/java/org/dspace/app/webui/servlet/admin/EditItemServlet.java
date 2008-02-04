@@ -73,7 +73,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.license.CreativeCommons;
 import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
@@ -160,7 +160,7 @@ public class EditItemServlet extends DSpaceServlet
         else if ((uri != null) && !uri.equals(""))
         {
             // resolve uri
-            ExternalIdentifier identifier = ExternalIdentifierMint.parseCanonicalForm(context, uri);
+            ExternalIdentifier identifier = ExternalIdentifierService.parseCanonicalForm(context, uri);
             // ExternalIdentifier identifier = identifierDAO.retrieve(uri);
             ObjectIdentifier oi = identifier.getObjectIdentifier();
             DSpaceObject dso = oi.getObject(context);

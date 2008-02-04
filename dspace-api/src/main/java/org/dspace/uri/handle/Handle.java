@@ -49,8 +49,6 @@ import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.handle.dao.HandleDAO;
 import org.dspace.uri.handle.dao.HandleDAOFactory;
 
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -93,22 +91,10 @@ public class Handle extends ExternalIdentifier implements IdentifierAssigner<Han
             return null;
         }
 
-        // ExternalIdentifierMint.get();
+        // ExternalIdentifierService.get();
 
         Handle handle = new Handle(bits[1]);
         return handle;
-    }
-
-    @Override
-    public Map<String, List<String>> getMetadata()
-    {
-        return null;
-    }
-
-    @Override
-    public List<String> getMetadata(String field)
-    {
-        return null;
     }
 
     // IdentifierAssigner implementation

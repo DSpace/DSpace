@@ -46,10 +46,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -147,7 +145,7 @@ public class OpenURLServlet extends URIServlet
 
         // The value of URI will be the persistent identifier in canonical
         // form, eg: xyz:1234/56
-        identifier = ExternalIdentifierMint.parseCanonicalForm(context, id);
+        identifier = ExternalIdentifierService.parseCanonicalForm(context, id);
         //ExternalIdentifierDAO identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
         //identifier = identifierDAO.retrieve(id);
 

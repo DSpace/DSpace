@@ -39,25 +39,47 @@
  */
 package org.dspace.uri;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
 /**
- * @author James Rutherford
+ * High level class to generally represent external identifier type definitions.  This allows all
+ * implementations to use a common description framework for identifiers.  Implementations need
+ * merely to extend the class and call super() in the constructor with the relevant parameters,
+ * as well as implementing two methods specifically for instantiating objects of their type
+ *
  * @author Richard Jones
+ * @author James Rutherford
  */
 public abstract class ExternalIdentifierType
 {
+    /** identifier implementation namespace */
     private String namespace;
+
+    /** protocol for resolving identifier */
     private String protocol;
+
+    /** base service/url for resolving identifiers */
     private String baseURI;
+
+    /** string used between protocol and base url to initialise resolution.  Defaults to "://" */
     private String protocolActivator = "://";
+
+    /** separator between the baseURI and the remainder of the identifier.  Defaults to "/" */
     private String baseSeparator = "/";
 
-    public ExternalIdentifierType(
-            String namespace, String protocol, String baseURI, String protocolActivator, String baseSeparator)
+    /**
+     * Construct a new instance of an ExternalIdentifierType using the full range of properties.
+     *
+     * Should only be used by implementing classes to save on implementation details
+     * @param namespace
+     * @param protocol
+     * @param baseURI
+     * @param protocolActivator
+     * @param baseSeparator
+     */
+    protected ExternalIdentifierType(String namespace, String protocol, String baseURI,
+                                  String protocolActivator, String baseSeparator)
     {
         this.protocol = protocol;
         this.namespace = namespace;
@@ -66,55 +88,98 @@ public abstract class ExternalIdentifierType
         this.baseSeparator = baseSeparator;
     }
 
+    /**
+     * Get the namespace (e.g. hdl for the Handle system)
+     *
+     * @return
+     */
     public String getNamespace()
     {
         return namespace;
     }
 
+    /**
+     * Get the protocol (e.g. http for the handle system)
+     *
+     * @return
+     */
     public String getProtocol()
     {
         return protocol;
     }
 
+    /**
+     * Get the base URI (e.g. hdl.handle.net for the Handle system)
+     * @return
+     */
     public String getBaseURI()
     {
         return baseURI;
     }
 
+    /**
+     * Get the protocol activator (e.g. :// for http and virtually everything else)
+     * @return
+     */
     public String getProtocolActivator()
     {
         return protocolActivator;
     }
 
+    /**
+     * Get the character used to separatre the baseURI from the rest of the identifier (.e.g "/" for a URL)
+     * @return
+     */
     public String getBaseSeparator()
     {
         return baseSeparator;
     }
 
-    public abstract String getPrefix();
-
+    /**
+     * Get an instance of the ExternalIdentifier associated with this type using the given value
+     * and ObjectIdentifier.  This is implementation specific.
+     *
+     * For example, the handle implementation of this method needs just to read:
+     *
+     * <code>return new Handle(value, oid);</code>
+     *
+     * @param value
+     * @param oid
+     * @return
+     */
     public abstract ExternalIdentifier getInstance(String value, ObjectIdentifier oid);
 
+    /**
+     * Is the given identifier type the same as the current instance.  This should not compare their
+     * in-memory equalness, but their value equalness.  For example, in:
+     *
+     * <code>
+     * HandleType ht1 = new HandleType();
+     * HandleType ht2 = new HandleType();
+     * boolean equal = ht1.equals(ht2);
+     * </code>
+     *
+     * the value of "equal" should be "true".  In implementation it should be sufficient to
+     * return the value of (for example, using the Handle system):
+     *
+     * <code>type instanceof HandleType</code>
+     *
+     * @param type
+     * @return
+     */
     public abstract boolean equals(ExternalIdentifierType type);
 
     ////////////////////////////////////////////////////////////////////
     // Utility methods
     ////////////////////////////////////////////////////////////////////
 
+    /**
+     * Render class as a string.  For debugging only
+     *
+     * @return
+     */
     public String toString()
     {
-        return ToStringBuilder.reflectionToString(this,
-                ToStringStyle.MULTI_LINE_STYLE);
-    }
-
-    public boolean equals(Object o)
-    {
-        return EqualsBuilder.reflectionEquals(this, o);
-    }
-
-    public int hashCode()
-    {
-        return HashCodeBuilder.reflectionHashCode(this);
+        return ToStringBuilder.reflectionToString(this,ToStringStyle.MULTI_LINE_STYLE);
     }
 }
-

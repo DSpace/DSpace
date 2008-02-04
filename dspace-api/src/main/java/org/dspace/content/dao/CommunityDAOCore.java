@@ -52,7 +52,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ObjectIdentifierMint;
 import org.dspace.uri.UnsupportedIdentifierException;
@@ -90,7 +90,7 @@ public class CommunityDAOCore extends CommunityDAO
             ObjectIdentifier oid = ObjectIdentifierMint.mint(context, community);
 
             // now assign any required external identifiers
-            List<ExternalIdentifier> eids = ExternalIdentifierMint.mintAll(context, community);
+            List<ExternalIdentifier> eids = ExternalIdentifierService.mintAll(context, community);
             community.setExternalIdentifiers(eids);
 
             // create the default authorization policy for communities

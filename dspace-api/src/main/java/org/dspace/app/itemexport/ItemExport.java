@@ -59,7 +59,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
@@ -212,7 +212,7 @@ public class ItemExport
         ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(myIDString);
         if (oi == null)
         {
-            ExternalIdentifier eid = ExternalIdentifierMint.parseCanonicalForm(c, myIDString);
+            ExternalIdentifier eid = ExternalIdentifierService.parseCanonicalForm(c, myIDString);
             oi = eid.getObjectIdentifier();
         }
         

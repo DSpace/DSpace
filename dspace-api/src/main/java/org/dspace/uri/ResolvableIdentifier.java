@@ -46,4 +46,6 @@ public interface ResolvableIdentifier
     DSpaceObject getObject(Context context);
 
     String getURLForm();
+
+    String getIdentifierType();
 }

@@ -55,6 +55,8 @@ public class IdentifierFactory
 {
     private static final Logger log = Logger.getLogger(IdentifierFactory.class);
 
+    private static final String RESOURCE_PATH_SEGMENT = "resource";
+
     public static ResolvableIdentifier resolve(Context context, String str)
     {
         ResolvableIdentifier dsi = null;
@@ -79,7 +81,7 @@ public class IdentifierFactory
 
         if (oi == null)
         {
-            ei = ExternalIdentifierMint.extractURLIdentifier(context, path);
+            ei = ExternalIdentifierService.extractURLIdentifier(context, path);
         }
 
         if (oi == null && ei == null)
@@ -106,7 +108,7 @@ public class IdentifierFactory
 
         if (oi == null)
         {
-            ei = ExternalIdentifierMint.parseCanonicalForm(context, canonicalForm);
+            ei = ExternalIdentifierService.parseCanonicalForm(context, canonicalForm);
         }
 
         if (oi == null && ei == null)
@@ -143,7 +145,7 @@ public class IdentifierFactory
                 throw new RuntimeException("Unable to assign URL: no identifier available");
             }
 
-            String url = base + "/resource/" + urlForm;
+            String url = base + "/" + IdentifierFactory.RESOURCE_PATH_SEGMENT + "/" + urlForm;
 
             return new URL(url);
         }
@@ -166,14 +168,23 @@ public class IdentifierFactory
         return url;
     }
 
+    public static String getContextPath(DSpaceObject dso)
+    {
+        ResolvableIdentifier ri = IdentifierFactory.getPreferredIdentifier(dso);
+        return IdentifierFactory.RESOURCE_PATH_SEGMENT + "/" + ri.getURLForm();
+    }
+
     public static URL getURL(DSpaceObject dso)
     {
         URL url = null;
 
+        ResolvableIdentifier ri = IdentifierFactory.getPreferredIdentifier(dso);
+        return IdentifierFactory.getURL(ri);
+        /*
         String ns = ConfigurationManager.getProperty("identifier.url-scheme");
         if (!"".equals(ns) && ns != null)
         {
-            ExternalIdentifierType type = ExternalIdentifierMint.getType(ns);
+            ExternalIdentifierType type = ExternalIdentifierService.getType(ns);
             List<ExternalIdentifier> eids = dso.getExternalIdentifiers();
             for (ExternalIdentifier eid : eids)
             {
@@ -194,7 +205,7 @@ public class IdentifierFactory
             url = IdentifierFactory.getURL(oid);
         }
 
-        return url;
+        return url;*/
     }
 
     public static String getCanonicalForm(DSpaceObject dso)
@@ -203,7 +214,7 @@ public class IdentifierFactory
         String ns = ConfigurationManager.getProperty("identifier.url-scheme");
         if (!"".equals(ns) && ns != null)
         {
-            ExternalIdentifierType type = ExternalIdentifierMint.getType(ns);
+            ExternalIdentifierType type = ExternalIdentifierService.getType(ns);
             List<ExternalIdentifier> eids = dso.getExternalIdentifiers();
             for (ExternalIdentifier eid : eids)
             {
@@ -225,5 +236,25 @@ public class IdentifierFactory
         }
 
         return cf;
+    }
+
+    public static ResolvableIdentifier getPreferredIdentifier(DSpaceObject dso)
+    {
+        String ns = ConfigurationManager.getProperty("identifier.url-scheme");
+        if (!"".equals(ns) && ns != null)
+        {
+            ExternalIdentifierType type = ExternalIdentifierService.getType(ns);
+            List<ExternalIdentifier> eids = dso.getExternalIdentifiers();
+            for (ExternalIdentifier eid : eids)
+            {
+                if (eid.getType().equals(type))
+                {
+                    return eid;
+                }
+            }
+        }
+
+        ObjectIdentifier oid = dso.getIdentifier();
+        return oid;
     }
 }

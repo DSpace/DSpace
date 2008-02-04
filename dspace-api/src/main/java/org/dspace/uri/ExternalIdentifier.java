@@ -39,8 +39,6 @@
  */
 package org.dspace.uri;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.log4j.Logger;
@@ -49,41 +47,73 @@ import org.dspace.core.Context;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
 /**
+ * High level class to generally represent any possible external identifier in DSpace.  It provides significant
+ * default functionality, so that extending and implementing classes need to do very little actual work.
+ *
+ * It represents all identifiers as a combination of a definition type, a value, and the object identifier
+ * of the DSpaceObject that it actually represents.  The value is any given string, and the object identifier
+ * must be the standard ObjectIdentifier class in DSpace.  The definition type is any implementation of the
+ * ExternalIdentifierType abstract class.
+ *
+ * This class also implements ResolvableIdentifier so that it can be used to obtain DSpaceObjects directly.
+ *
  * @author Richard Jones
  * @author James Rutherford
  */
 public abstract class ExternalIdentifier implements ResolvableIdentifier
 {
+    /** log4j logger */
     private static final Logger log = Logger.getLogger(ExternalIdentifier.class);
 
+    /** The value of the identifier */
     protected String value;
+
+    /** the native object identifier the external identifier represents */
     protected ObjectIdentifier oid;
+
+    /** the type definition of the external identifier */
     protected ExternalIdentifierType type;
 
+    /**
+     * DO NOT USE
+     *
+     * This is a required feature of the PluginManager, but should not actually be used.
+     *
+     * Instead refer to <code>ExternalIdentifierService.get()</code>
+     */
     public ExternalIdentifier()
     {
-        // create a blank identifier to be populated
+        // DO NOT USE
     }
 
-    /*
-    public ExternalIdentifier(ExternalIdentifierType type)
-    {
-        this.type = type;
-    }
-*/
-    
-    public ExternalIdentifier(ExternalIdentifierType type, String value)
+    /**
+     * Create an instance of the external identifier given the type definition and the value.  This will
+     * not resolve to an object (via its object identifier) until that identifier has been assigned
+     *
+     * This should only be used by implementing classes to save on implementation details
+     *
+     * @param type
+     * @param value
+     */
+    protected ExternalIdentifier(ExternalIdentifierType type, String value)
     {
         this.type = type;
         this.value = value;
     }
 
-    public ExternalIdentifier(ExternalIdentifierType type, String value, ObjectIdentifier oid)
+    /**
+     * Create an instance of the external identifier given the type definition, value, and object
+     * identifier which we are representing
+     *
+     * This should only be used by implementing classes to save on implementation details
+     *
+     * @param type
+     * @param value
+     * @param oid
+     */
+    protected ExternalIdentifier(ExternalIdentifierType type, String value, ObjectIdentifier oid)
     {
         // create a real, full size identifier
         this.type = type;
@@ -91,37 +121,57 @@ public abstract class ExternalIdentifier implements ResolvableIdentifier
         this.value = value;
     }
 
+    /**
+     * Set the value of the identifier
+     *
+     * @param value
+     */
     public void setValue(String value)
     {
         this.value = value;
     }
 
+    /**
+     * set the object identifier
+     *
+     * @param oid
+     */
     public void setObjectIdentifier(ObjectIdentifier oid)
     {
         this.oid = oid;
     }
 
+    /**
+     * set the external identifier's type definition
+     *
+     * @param type
+     */
     public void setType(ExternalIdentifierType type)
     {
         this.type = type;
     }
 
-    /* FIXME: do we need a replacement for this?
-    public ExternalIdentifier(Context context, DSpaceObject dso,
-            ExternalIdentifierType type, String value)
-    {
-        this(type);
-        // this.context = context;
-        this.value = value;
-
-        oid = dso.getIdentifier();
-    }*/
-
+    /**
+     * obtain the actual DSpaceObject the external identifier represents.  This is effectively
+     * the same as calling
+     *
+     * <code>getObjectIdentifier().getObject(context)</code>
+     *
+     * as the external identifiers have no inherent comprehension of the objects they represent
+     *
+     * @param context
+     * @return
+     */
     public DSpaceObject getObject(Context context)
     {
         return this.getObjectIdentifier().getObject(context);
     }
 
+    /**
+     * Get the native object identifier for the object we are representing
+     *
+     * @return
+     */
     public ObjectIdentifier getObjectIdentifier()
     {
         if (oid == null)
@@ -131,16 +181,36 @@ public abstract class ExternalIdentifier implements ResolvableIdentifier
         return oid;
     }
 
+    /**
+     * get the type definition object for the implementation of the external identifier
+     *
+     * @return
+     */
     public ExternalIdentifierType getType()
     {
         return type;
     }
 
+    /**
+     * Get the context path segment of the URL which the implementation of the external identifier
+     * will expose and will be able to subsequently resolve
+     *
+     * @return
+     */
     public String getURLForm()
     {
         return type.getNamespace() + "/" + this.value;        
     }
 
+    /**
+     * Get the implementation's specific external formulation of the url.  This is explicitly
+     * not the DSpace URL, but the url space controlled by the external identifier itself.
+     * For example, calling this method on a handle will result in a URL like:
+     *
+     * <code>http://hdl.handle.net/123456789/100</code>
+     * 
+     * @return
+     */
     public URI getURI()
     {
         try
@@ -154,95 +224,93 @@ public abstract class ExternalIdentifier implements ResolvableIdentifier
         }
     }
 
+    /**
+     * Get the canonical form of the identifier.  The default for this is to construct the following string:
+     *
+     * <code>[namespace]:[value]</code>
+     *
+     * For example, the canonical form for a handle will result in a string like
+     *
+     * <code>hdl:123456789/100</code>
+     *
+     * @return
+     */
     public String getCanonicalForm()
     {
         // eg: hdl:1234/56
         return type.getNamespace() + ":" + value;
     }
 
+    /**
+     * If the object represented by this external identifier should be removed, what behaviour
+     * should the tombstoning mechanism take.  The default is to leave a tombstone, but individual
+     * implementations may do otherwise.  If this method returns true, the identifier system will not
+     * delete the record of the identifier, and subsequent requests to the URL will result in a
+     * tombstone page.  If this method returns false, all record of the identifier will be removed
+     * from the system.
+     *
+     * The default is true
+     *
+     * @return
+     */
     public boolean leaveTombstone()
     {
         // default to true unless implementation overrides to the contrary
         return true;
     }
 
-    public abstract ExternalIdentifier parseCanonicalForm(String canonical);
-
-    /*
-    public static ExternalIdentifier parseCanonicalForm(String canonical)
+    /**
+     * Return a string representation of the identifier type; specifically for use when
+     * working with ResolvableIdentifiers with no notion of whether the underlying identifier
+     * is an ExternalIdentifier or an ObjectIdentifier
+     *
+     * @return
+     */
+    public String getIdentifierType()
     {
-        // first find out if it's the right form
-        int colon = canonical.indexOf(":");
-        if (colon == -1)
-        {
-            return null;
-        }
+        return type.getNamespace();
+    }
 
-        // obtain the two components of the canonical form
-        String ns = canonical.substring(0, colon);
-        String value = canonical.substring(colon + 1);
-
-        // see if we can tie a type to the namespace
-        ExternalIdentifierType type = null;
-        ExternalIdentifierType[] types = (ExternalIdentifierType[]) PluginManager.getPluginSequence(ExternalIdentifierType.class);
-        if (types != null)
-        {
-            for (ExternalIdentifierType t : (ExternalIdentifierType[]) types)
-            {
-                if (t.getNamespace().equals(ns))
-                {
-                    type = t;
-                    break;
-                }
-            }
-        }
-        if (type == null)
-        {
-            return null;
-        }
-
-        // assemble and return
-        ExternalIdentifier eid = new ExternalIdentifier(type, value);
-        return eid;
-    }*/
-
+    /**
+     * Get the value of the identifier
+     * 
+     * @return
+     */
     public String getValue()
     {
         return value;
     }
 
-    /**
-     * We can't say anything about the default behaviour here. This won't
-     * always be true for getObject(), but for now, it's easiest to leave the
-     * implementation in the Handle subclass.
-     */
-    public Map<String, List<String>> getMetadata()
-    {
-        return null;
-    }
+    /////////////////////////////////////////////////////////////////////
+    // Abstract Methods
+    /////////////////////////////////////////////////////////////////////
 
-    public List<String> getMetadata(String field)
-    {
-        return null;
-    }
+    /**
+     * Parse the canonical form of the given string and return an ExternalIdentifier object for that
+     * string.
+     *
+     * This remains abstract as it is impossible for this class to make any assumptions
+     * about the nature of the canonical form.  The canonical form implementation above is
+     * a default but may be overridden.  Furthermore, it cannot construct the relevant
+     * type definition classes with which to construct new external identifier objects
+     * based on the given string
+     *
+     * @param canonical
+     * @return
+     */
+    public abstract ExternalIdentifier parseCanonicalForm(String canonical);
 
     ////////////////////////////////////////////////////////////////////
     // Utility methods
     ////////////////////////////////////////////////////////////////////
 
+    /**
+     * string representation of the class.  For debugging only.
+     *
+     * @return
+     */
     public String toString()
     {
-        return ToStringBuilder.reflectionToString(this,
-                ToStringStyle.MULTI_LINE_STYLE);
-    }
-
-    public boolean equals(Object o)
-    {
-        return EqualsBuilder.reflectionEquals(this, o);
-    }
-
-    public int hashCode()
-    {
-        return HashCodeBuilder.reflectionHashCode(this);
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
 }

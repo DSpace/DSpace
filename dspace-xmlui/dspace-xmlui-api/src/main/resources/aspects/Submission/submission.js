@@ -49,9 +49,10 @@ importClass(Packages.org.dspace.core.Constants);
 importClass(Packages.org.dspace.workflow.WorkflowItem);
 importClass(Packages.org.dspace.workflow.WorkflowManager);
 importClass(Packages.org.dspace.content.WorkspaceItem);
-importClass(Packages.org.dspace.content.uri.ExternalIdentifier);
-importClass(Packages.org.dspace.content.uri.dao.ExternalIdentifierDAO);
-importClass(Packages.org.dspace.content.uri.dao.ExternalIdentifierDAOFactory);
+importClass(Packages.org.dspace.uri.ExternalIdentifier);
+importClass(Packages.org.dspace.uri.IdentifierFactory);
+importClass(Packages.org.dspace.uri.dao.ExternalIdentifierDAO);
+importClass(Packages.org.dspace.uri.dao.ExternalIdentifierDAOFactory);
 importClass(Packages.org.dspace.authorize.AuthorizeManager);
 importClass(Packages.org.dspace.license.CreativeCommons);
 
@@ -181,9 +182,10 @@ function doSubmission()
        do {
            if (handle != null)
            {
-               var dao = ExternalIdentifierDAOFactory.getInstance(getDSContext());
-               var identifier = dao.retrieve(handle);
-               var dso = identifier.getObjectIdentifier().getObject(getDSContext());
+               var identifier = IdentifierFactory.resolve(getDSContext(), handle);
+               // var dao = ExternalIdentifierDAOFactory.getInstance(getDSContext());
+               // var identifier = dao.retrieve(handle);
+               var dso = identifier.getObject(getDSContext());
 
                // Check that the dso is a collection
                if (dso != null && dso.getType() == Constants.COLLECTION)
@@ -224,14 +226,15 @@ function doSubmission()
        if (submitterID == currentID)
        {
            // Get the collection handle for this item.
-           var handle = workspace.getCollection().getExternalIdentifier().getCanonicalForm();
+           // var handle = workspace.getCollection().getExternalIdentifier().getCanonicalForm();
            
            // Record that this is a submission id, not a workflow id.
            //(specify "S" for submission item, for FlowUtils.findSubmission())
            workspaceID = "S"+workspaceID;
            do {
-               sendPageAndWait("handle/"+handle+"/submit/resumeStep",{"id":workspaceID,"step":"0"});
-               
+               // sendPageAndWait("handle/"+handle+"/submit/resumeStep",{"id":workspaceID,"step":"0"});
+               sendPageAndWait(IdentifierFactory.getContextPath(workspace.getCollection())+"/submit/resumeStep",{"id":workspaceID,"step":"0"});
+
                if (cocoon.request.get("submit_resume"))
                {
                    submissionControl(handle,workspaceID, step);

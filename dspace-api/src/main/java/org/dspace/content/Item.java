@@ -67,7 +67,7 @@ import org.dspace.eperson.dao.EPersonDAO;
 import org.dspace.eperson.dao.EPersonDAOFactory;
 import org.dspace.event.Event;
 import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.IdentifierFactory;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.UnsupportedIdentifierException;
@@ -275,7 +275,7 @@ public class Item extends DSpaceObject
             throws UnsupportedIdentifierException
     {
         // store the canonical form of the identifier
-        DCValue dcv = ExternalIdentifierMint.getCanonicalField(identifier.getType());
+        DCValue dcv = ExternalIdentifierService.getCanonicalField(identifier.getType());
         if (dcv != null)
         {
             if (log.isDebugEnabled())
@@ -287,7 +287,7 @@ public class Item extends DSpaceObject
         }
 
         // now, store the full form
-        DCValue dc = ExternalIdentifierMint.getURLField(identifier.getType());
+        DCValue dc = ExternalIdentifierService.getURLField(identifier.getType());
         if (dc != null)
         {
             if (log.isDebugEnabled())
@@ -308,7 +308,7 @@ public class Item extends DSpaceObject
         for (ExternalIdentifier eid : identifiers)
         {
             // store the canonical form of the identifier
-            DCValue dcv = ExternalIdentifierMint.getCanonicalField(eid.getType());
+            DCValue dcv = ExternalIdentifierService.getCanonicalField(eid.getType());
             this.addUniqueMetadata(dcv.schema, dcv.element, dcv.qualifier, null, eid.getCanonicalForm());
             if (log.isDebugEnabled())
             {
@@ -317,7 +317,7 @@ public class Item extends DSpaceObject
             }
 
             // now, store the full form
-            DCValue dc = ExternalIdentifierMint.getURLField(eid.getType());
+            DCValue dc = ExternalIdentifierService.getURLField(eid.getType());
             this.addUniqueMetadata(dc.schema, dc.element, dc.qualifier, null, eid.getURI().toString());
             if (log.isDebugEnabled())
             {
@@ -565,14 +565,14 @@ public class Item extends DSpaceObject
 
         for (ExternalIdentifier eid : identifiers)
         {
-            DCValue cfe = ExternalIdentifierMint.getCanonicalField(eid.getType());
+            DCValue cfe = ExternalIdentifierService.getCanonicalField(eid.getType());
             if (cfe != null)
             {
                 cfe.value = eid.getCanonicalForm();
                 dc.add(cfe);
             }
 
-            DCValue ufe = ExternalIdentifierMint.getURLField(eid.getType());
+            DCValue ufe = ExternalIdentifierService.getURLField(eid.getType());
             if (ufe != null)
             {
                 ufe.value = eid.getURI().toString();

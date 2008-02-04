@@ -199,12 +199,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 //	            for (String handle : handles)
 	            for (String uri : uris)
 	            {
-//	                DSpaceObject resultDSO = HandleManager.resolveToObject(
-//	                        context, handle);
-                    /*
-                    ExternalIdentifier identifier = dao.retrieve(uri);
-                    DSpaceObject resultDSO =
-                        identifier.getObjectIdentifier().getObject(context);*/
                     ResolvableIdentifier ri = IdentifierFactory.resolve(context, uri);
                     DSpaceObject resultDSO = ri.getObject(context);
                     validity.add(resultDSO);
@@ -302,12 +296,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 //                for (String handle : containerHandles)
                 for (String uri : containerURIs)
                 {
-//                    DSpaceObject resultDSO = HandleManager.resolveToObject(
-//                            context, handle);
-                    /*
-                    ExternalIdentifier identifier = dao.retrieve(uri);
-                    DSpaceObject resultDSO =
-                        identifier.getObjectIdentifier().getObject(context);*/
                     ResolvableIdentifier ri = IdentifierFactory.resolve(context, uri);
                     DSpaceObject resultDSO = ri.getObject(context);
 
@@ -335,13 +323,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 //                for (String handle : itemHandles)
                 for (String uri : itemURIs)
                 {
-//                    DSpaceObject resultDSO = HandleManager.resolveToObject(
-//                            context, handle);
-                    /*
-                    ExternalIdentifier identifier = dao.retrieve(uri);
-                    DSpaceObject resultDSO =
-                        identifier.getObjectIdentifier().getObject(context);*/
-
                     ResolvableIdentifier ri = IdentifierFactory.resolve(context, uri);
                     DSpaceObject resultDSO = ri.getObject(context);
                     if (resultDSO instanceof Item)

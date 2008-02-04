@@ -58,7 +58,7 @@ import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
@@ -265,7 +265,7 @@ public class Packager
                     System.out.println("no namespace provided. assuming handles.");
                 }
 
-                ExternalIdentifier identifier = ExternalIdentifierMint.parseCanonicalForm(context, collections[i]);
+                ExternalIdentifier identifier = ExternalIdentifierService.parseCanonicalForm(context, collections[i]);
                 // ExternalIdentifier identifier = identifierDAO.retrieve(collections[i]);
                 ObjectIdentifier oi = identifier.getObjectIdentifier();
 
@@ -351,7 +351,7 @@ public class Packager
                 System.out.println("no namespace provided. assuming handles.");
             }
 
-            ExternalIdentifier identifier = ExternalIdentifierMint.parseCanonicalForm(context, itemUri);
+            ExternalIdentifier identifier = ExternalIdentifierService.parseCanonicalForm(context, itemUri);
             // ExternalIdentifier identifier = identifierDAO.retrieve(itemUri);
             ObjectIdentifier oi = identifier.getObjectIdentifier();
 

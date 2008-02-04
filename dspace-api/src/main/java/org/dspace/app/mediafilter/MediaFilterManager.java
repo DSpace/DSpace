@@ -74,7 +74,7 @@ import org.dspace.core.PluginManager;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.search.DSIndexer;
 import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
@@ -379,7 +379,7 @@ public class MediaFilterManager
             }
             else  // restrict application scope to identifier
             {
-                ExternalIdentifier pid = ExternalIdentifierMint.parseCanonicalForm(c, identifier);
+                ExternalIdentifier pid = ExternalIdentifierService.parseCanonicalForm(c, identifier);
                 // ExternalIdentifier pid = identifierDAO.retrieve(identifier);
                 ObjectIdentifier oi = pid.getObjectIdentifier();
 

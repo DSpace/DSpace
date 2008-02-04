@@ -45,7 +45,7 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ExternalIdentifierType;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
@@ -113,7 +113,7 @@ public class ExternalIdentifierDAOPostgres extends ExternalIdentifierDAO
             {
                 TableRow row = tri.next();
                 String value = row.getStringColumn("identifier");
-                ExternalIdentifier eid = ExternalIdentifierMint.get(context, row.getStringColumn("namespace"), value);
+                ExternalIdentifier eid = ExternalIdentifierService.get(context, row.getStringColumn("namespace"), value);
                 // ExternalIdentifier eid = new ExternalIdentifier(type, value, dso.getIdentifier());
                 // eid.setValue(value);
                 eid.setObjectIdentifier(dso.getIdentifier());
@@ -143,7 +143,7 @@ public class ExternalIdentifierDAOPostgres extends ExternalIdentifierDAO
 
             ObjectIdentifierDAO oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
             ObjectIdentifier oid = oidDAO.retrieve(row.getIntColumn("resource_type_id"), row.getIntColumn("resource_id"));
-            ExternalIdentifier eid = ExternalIdentifierMint.get(context, type, value, oid);
+            ExternalIdentifier eid = ExternalIdentifierService.get(context, type, value, oid);
 
             tri.close();
             return eid;
@@ -208,7 +208,7 @@ public class ExternalIdentifierDAOPostgres extends ExternalIdentifierDAO
                 TableRow row = tri.next();
                 ObjectIdentifierDAO oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
                 ObjectIdentifier oid = oidDAO.retrieve(row.getIntColumn("resource_type_id"), row.getIntColumn("resource_id"));
-                ExternalIdentifier eid = ExternalIdentifierMint.get(context, type, row.getStringColumn("identifier"), oid);
+                ExternalIdentifier eid = ExternalIdentifierService.get(context, type, row.getStringColumn("identifier"), oid);
                 eids.add(eid);
             }
 

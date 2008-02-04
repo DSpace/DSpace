@@ -77,7 +77,7 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.dao.GroupDAO;
 import org.dspace.eperson.dao.GroupDAOFactory;
 import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
@@ -1646,7 +1646,7 @@ public class ItemImport
         // ExternalIdentifier[] eidPlugins = (ExternalIdentifier[]) PluginManager.getPluginSequence(ExternalIdentifier.class);
         while ((line = br.readLine()) != null)
         {
-            ExternalIdentifier eid = ExternalIdentifierMint.parseCanonicalForm(context, line);
+            ExternalIdentifier eid = ExternalIdentifierService.parseCanonicalForm(context, line);
             if (eid != null)
             {
                 eids.add(eid);

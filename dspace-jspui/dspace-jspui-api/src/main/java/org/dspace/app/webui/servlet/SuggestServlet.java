@@ -53,7 +53,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierMint;
+import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.IdentifierFactory;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
@@ -88,7 +88,7 @@ public class SuggestServlet extends DSpaceServlet
 
         // Obtain information from request
         String uri = request.getParameter("uri");
-        ExternalIdentifier identifier = ExternalIdentifierMint.parseCanonicalForm(context, uri);
+        ExternalIdentifier identifier = ExternalIdentifierService.parseCanonicalForm(context, uri);
         // ExternalIdentifier identifier = identifierDAO.retrieve(uri);
         ObjectIdentifier oi = identifier.getObjectIdentifier();
         

@@ -193,8 +193,6 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             {
                 // otherwise, attempt to resolve uri
                 ResolvableIdentifier di = IdentifierFactory.resolve(c, uri);
-                //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
-                //ObjectIdentifier oi = identifier.getObjectIdentifier();
                 DSpaceObject dso = di.getObject(c);
 
                 // make sure it's an item

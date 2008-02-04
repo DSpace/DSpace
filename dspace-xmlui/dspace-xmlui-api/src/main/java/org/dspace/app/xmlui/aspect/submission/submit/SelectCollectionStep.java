@@ -104,11 +104,6 @@ public class SelectCollectionStep extends AbstractSubmissionStep
             UIException, SQLException, IOException, AuthorizeException
     {     
 		Collection[] collections; // List of possible collections.
-//		DSpaceObject dso = HandleManager.resolveToObject(context, handle);
-        /*
-        ExternalIdentifierDAO identifierDAO =
-            ExternalIdentifierDAOFactory.getInstance(context);
-        ExternalIdentifier eid = identifierDAO.retrieve(handle);*/
         ResolvableIdentifier eid = IdentifierFactory.resolve(context, handle);
 
         DSpaceObject dso = null;

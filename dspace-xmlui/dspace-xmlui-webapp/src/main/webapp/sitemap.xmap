@@ -126,7 +126,7 @@
 				<map:parameter name="ignore-missing-tables" value="true"/>
 			</map:matcher>
 			<map:matcher name="request" src="org.apache.cocoon.matching.RequestParameterMatcher"/>
-		</map:matchers>
+        </map:matchers>
 		<map:selectors>
 			<map:selector name="browser" src="org.apache.cocoon.selection.BrowserSelector"
 				logger="sitemap.selector.browser">
@@ -198,6 +198,8 @@
 
 
 			<!--
+			(legacy)
+			
 				Bitstreams for items that have a handle assigned. If the
 				sequence parameter is given then that will be used to resolve the
 				bitstream, other wise the name will attempt to be matched.

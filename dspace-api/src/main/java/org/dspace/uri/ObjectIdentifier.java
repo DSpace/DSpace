@@ -145,6 +145,11 @@ public class ObjectIdentifier extends SimpleIdentifier implements ResolvableIden
         return "uuid/" + uuid.toString();
     }
 
+    public String getIdentifierType()
+    {
+        return "uuid";
+    }
+
     public DSpaceObject getObject(Context context)
     {
         // do we know what the resource type and id is?

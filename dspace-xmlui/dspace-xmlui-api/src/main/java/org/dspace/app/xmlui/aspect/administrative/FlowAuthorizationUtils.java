@@ -91,12 +91,6 @@ public class FlowAuthorizationUtils {
 		result.setContinue(false);
 		//Check whether it's a handle or internal id (by check ing if it has a slash in the string)
 		if (identifier.contains("/")) {
-//			DSpaceObject dso = HandleManager.resolveToObject(context, identifier);
-            /*
-            ExternalIdentifierDAO identifierDAO =
-                    ExternalIdentifierDAOFactory.getInstance(context);
-            ExternalIdentifier eid = identifierDAO.retrieve(identifier);
-            DSpaceObject dso = eid.getObjectIdentifier().getObject(context);*/
             ResolvableIdentifier ri = IdentifierFactory.resolve(context, identifier);
             DSpaceObject dso = ri.getObject(context);
 			
