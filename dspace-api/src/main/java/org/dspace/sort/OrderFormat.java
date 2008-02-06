@@ -95,6 +95,10 @@ public class OrderFormat
     {
     	OrderFormatDelegate delegate = null;
     	
+        // If there is no value, return null
+        if (value == null)
+            return null;
+
     	// If a named index has been supplied
     	if (type != null && type.length() > 0)
     	{
