@@ -69,7 +69,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.search.Harvest;
 import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -192,7 +192,7 @@ public class FeedServlet extends DSpaceServlet
         if(!uri.equals(SITE_FEED_KEY))
         { 	
         	// Determine if the URI is a valid reference
-            ResolvableIdentifier di = IdentifierFactory.resolve(context, uri);
+            ResolvableIdentifier di = IdentifierService.resolve(context, uri);
             //ExternalIdentifierDAO dao = ExternalIdentifierDAOFactory.getInstance(context);
             //ExternalIdentifier identifier = dao.retrieve(uri);
             //ObjectIdentifier oi = identifier.getObjectIdentifier();
@@ -373,13 +373,13 @@ public class FeedServlet extends DSpaceServlet
                         if (dso.getExternalIdentifier() != null)
                         {
                                 objectUrl = ConfigurationManager.getBooleanProperty("webui.feed.localresolve")
-                                    ? IdentifierFactory.getURL(dso).toString()
+                                    ? IdentifierService.getURL(dso).toString()
                                     : dso.getExternalIdentifier().getURI().toString();
                         }
                         else
                         {
                                 // If no external identifier is available, use the local URL
-                                objectUrl = IdentifierFactory.getURL(dso).toString();
+                                objectUrl = IdentifierService.getURL(dso).toString();
                         }
 
     			// put in container-level data
@@ -492,7 +492,7 @@ public class FeedServlet extends DSpaceServlet
         
         //Set item URI
     	String link = ConfigurationManager.getBooleanProperty("webui.feed.localresolve")
-            ? IdentifierFactory.getURL(dspaceItem).toString()
+            ? IdentifierService.getURL(dspaceItem).toString()
             : dspaceItem.getExternalIdentifier().getURI().toString();
 
         rssItem.setLink(link);

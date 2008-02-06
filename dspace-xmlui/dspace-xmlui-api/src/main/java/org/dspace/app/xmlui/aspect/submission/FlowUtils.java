@@ -59,7 +59,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.submit.AbstractProcessingStep;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 
@@ -451,7 +451,7 @@ public class FlowUtils {
 			//Load the Submission Process for the collection this WSI is associated with
             Collection c = wsi.getCollection();
             SubmissionConfigReader subConfigReader = new SubmissionConfigReader();
-            SubmissionConfig subConfig = subConfigReader.getSubmissionConfig(IdentifierFactory.getCanonicalForm(c), false);
+            SubmissionConfig subConfig = subConfigReader.getSubmissionConfig(IdentifierService.getCanonicalForm(c), false);
             
             // Set the "stage_reached" column on the workspace item
             // to the LAST page of the LAST step in the submission process 

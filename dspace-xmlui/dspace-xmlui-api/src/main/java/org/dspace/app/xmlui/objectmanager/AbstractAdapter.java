@@ -50,7 +50,7 @@ import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.PluginManager;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
@@ -411,7 +411,7 @@ public abstract class AbstractAdapter
         
         String url = contextPath + "/bitstream/"+identifier+"/";
         */
-        String url = contextPath + IdentifierFactory.getURL(bitstream).toString();
+        String url = contextPath + IdentifierService.getURL(bitstream).toString();
         
         // If we can put the pretty name of the bitstream on the end of the URL
         try

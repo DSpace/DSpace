@@ -54,7 +54,7 @@ import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Community;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 
 import java.sql.SQLException;
 
@@ -107,7 +107,7 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 	    
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("community-metadata-edit",contextPath+"/admin/community",Division.METHOD_MULTIPART,"primary administrative community");
-	    main.setHead(T_main_head.parameterize(IdentifierFactory.getCanonicalForm(thisCommunity)));
+	    main.setHead(T_main_head.parameterize(IdentifierService.getCanonicalForm(thisCommunity)));
 	    
 	    if (AuthorizeManager.isAdmin(context))
 	    {

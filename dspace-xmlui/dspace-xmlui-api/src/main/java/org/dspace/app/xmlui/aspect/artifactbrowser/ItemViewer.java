@@ -61,7 +61,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -106,7 +106,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             if (dso == null)
                 return "0"; // no item, something is wrong.
             
-            return HashUtil.hash(IdentifierFactory.getCanonicalForm(dso) + "full:" + showFullItem(objectModel));
+            return HashUtil.hash(IdentifierService.getCanonicalForm(dso) + "full:" + showFullItem(objectModel));
         } 
         catch (SQLException sqle)
         {
@@ -160,7 +160,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         if (title != null)
             pageMeta.addMetadata("title").addContent(title);
         else
-            pageMeta.addMetadata("title").addContent(IdentifierFactory.getCanonicalForm(item));
+            pageMeta.addMetadata("title").addContent(IdentifierService.getCanonicalForm(item));
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         HandleUtil.buildHandleTrail(item,pageMeta,contextPath);
@@ -185,18 +185,18 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         if (title != null)
             division.setHead(title);
         else
-            division.setHead(IdentifierFactory.getCanonicalForm(item));
+            division.setHead(IdentifierService.getCanonicalForm(item));
 
         Para showfullPara = division.addPara(null, "item-view-toggle item-view-toggle-top");
 
         if (showFullItem(objectModel))
         {
-            String link = IdentifierFactory.getURL(item).toString();
+            String link = IdentifierService.getURL(item).toString();
             showfullPara.addXref(link).addContent(T_show_simple);
         }
         else
         {
-            String link = IdentifierFactory.getURL(item).toString() + "?show=full";
+            String link = IdentifierService.getURL(item).toString() + "?show=full";
             showfullPara.addXref(link).addContent(T_show_full);
         }
         
@@ -226,12 +226,12 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
         if (showFullItem(objectModel))
         {
-            String link = IdentifierFactory.getURL(item).toString();
+            String link = IdentifierService.getURL(item).toString();
             showfullPara.addXref(link).addContent(T_show_simple);
         }
         else
         {
-            String link = IdentifierFactory.getURL(item).toString() + "?show=full";
+            String link = IdentifierService.getURL(item).toString() + "?show=full";
             showfullPara.addXref(link).addContent(T_show_full);
         }
     }

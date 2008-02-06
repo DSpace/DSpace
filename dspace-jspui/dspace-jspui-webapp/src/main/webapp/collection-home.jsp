@@ -74,7 +74,7 @@
 <%@ page import="org.dspace.uri.ObjectIdentifier" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="java.util.List" %>
-<%@ page import="org.dspace.uri.IdentifierFactory" %>
+<%@ page import="org.dspace.uri.IdentifierService" %>
 
 
 <%
@@ -124,7 +124,7 @@
     }
 
     String communityName = community.getMetadata("name");
-    String communityLink = IdentifierFactory.getURL(community).toString();
+    String communityLink = IdentifierService.getURL(community).toString();
 
     Bitstream logo = collection.getLogo();
 
@@ -200,7 +200,7 @@
 		String key = "browse.menu." + bis[i].getName();
 %>
 	<div class="browse_buttons">
-	<form method="get" action="<%= IdentifierFactory.getURL(collection).toString() %>/browse">
+	<form method="get" action="<%= IdentifierService.getURL(collection).toString() %>/browse">
 		<input type="hidden" name="type" value="<%= bis[i].getName() %>"/>
 		<%-- <input type="hidden" name="collection" value="<%= collection.getHandle() %>" /> --%>
 		<input type="submit" name="submit_browse" value="<fmt:message key="<%= key %>"/>"/>
@@ -336,7 +336,7 @@
 					displayTitle = dcv[0].value;
 				}
 			}
-			%><p class="recentItem"><a href="<%= IdentifierFactory.getURL(items[i]).toString() %>"><%= displayTitle %></a></p><%
+			%><p class="recentItem"><a href="<%= IdentifierService.getURL(items[i]).toString() %>"><%= displayTitle %></a></p><%
 		}
 	}
 %>

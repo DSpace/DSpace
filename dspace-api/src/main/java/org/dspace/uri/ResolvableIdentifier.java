@@ -48,4 +48,6 @@ public interface ResolvableIdentifier
     String getURLForm();
 
     String getIdentifierType();
+
+    String getCanonicalForm();
 }

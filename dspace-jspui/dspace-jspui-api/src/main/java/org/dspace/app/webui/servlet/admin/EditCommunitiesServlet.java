@@ -71,7 +71,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 
 /**
  * Servlet for editing communities and collections, including deletion,
@@ -259,7 +259,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             else
             // redirect to parent community page
             {
-                response.sendRedirect(response.encodeRedirectURL(IdentifierFactory.getURL(parents.get(0)).toString()));
+                response.sendRedirect(response.encodeRedirectURL(IdentifierService.getURL(parents.get(0)).toString()));
             }
 
             // Show main control page
@@ -320,7 +320,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
         if (community != null)
         {
-            response.sendRedirect(response.encodeRedirectURL(IdentifierFactory.getURL(community).toString()));
+            response.sendRedirect(response.encodeRedirectURL(IdentifierService.getURL(community).toString()));
         }
         else
         {
@@ -329,7 +329,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
             if (parent != null)
             {
-                response.sendRedirect(response.encodeRedirectURL(IdentifierFactory.getURL(parent).toString()));
+                response.sendRedirect(response.encodeRedirectURL(IdentifierService.getURL(parent).toString()));
             }
             else
             {

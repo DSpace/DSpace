@@ -54,7 +54,7 @@ import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.uri.ResolvableIdentifier;
 
 import java.sql.SQLException;
@@ -91,7 +91,7 @@ public class FlowAuthorizationUtils {
 		result.setContinue(false);
 		//Check whether it's a handle or internal id (by check ing if it has a slash in the string)
 		if (identifier.contains("/")) {
-            ResolvableIdentifier ri = IdentifierFactory.resolve(context, identifier);
+            ResolvableIdentifier ri = IdentifierService.resolve(context, identifier);
             DSpaceObject dso = ri.getObject(context);
 			
             if (dso != null && dso.getType() == Constants.ITEM) {

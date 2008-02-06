@@ -62,7 +62,7 @@
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
-<%@ page import="org.dspace.uri.IdentifierFactory" %>
+<%@ page import="org.dspace.uri.IdentifierService" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="java.io.IOException" %>
 <%@ page import="java.sql.SQLException" %>
@@ -94,7 +94,7 @@
     {
     	ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
         out.println( "<li class=\"communityLink\">" );
-        out.println( "<strong><a href=\"" + IdentifierFactory.getURL(c).toString() + "\">" + c.getMetadata("name") + "</a></strong>");
+        out.println( "<strong><a href=\"" + IdentifierService.getURL(c).toString() + "\">" + c.getMetadata("name") + "</a></strong>");
         if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
         {
             out.println(" <span class=\"communityStrength\">[" + ic.getCount(c) + "]</span>");
@@ -108,7 +108,7 @@
             for (int j = 0; j < cols.length; j++)
             {
                 out.println("<li class=\"collectionListItem\">");
-                out.println("<a href=\"" + IdentifierFactory.getURL(cols[j]).toString() + "\">" + cols[j].getMetadata("name") +"</a>");
+                out.println("<a href=\"" + IdentifierService.getURL(cols[j]).toString() + "\">" + cols[j].getMetadata("name") +"</a>");
 				if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
                 {
                     out.println(" [" + ic.getCount(cols[j]) + "]");
@@ -210,7 +210,7 @@
 %>		
             <li class="communityLink">
             <%-- HACK: <strong> tags here for broken Netscape 4.x CSS support --%>
-            <strong><a href="<%= IdentifierFactory.getURL(communities[i]).toString() %>"><%= communities[i].getMetadata("name") %></a></strong>
+            <strong><a href="<%= IdentifierService.getURL(communities[i]).toString() %>"><%= communities[i].getMetadata("name") %></a></strong>
 	    <ul>
 <%
             // Get the collections in this community from the map
@@ -221,7 +221,7 @@
             {
 %>
                 <li class="collectionListItem">
-                <a href="<%= IdentifierFactory.getURL(cols[j]).toString() %>"><%= cols[j].getMetadata("name") %></a>
+                <a href="<%= IdentifierService.getURL(cols[j]).toString() %>"><%= cols[j].getMetadata("name") %></a>
 <%
                 if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
                 {
@@ -246,7 +246,7 @@
             {
 %>
                 <li class="communityLink">
-                <a href="<%= IdentifierFactory.getURL(comms[k]).toString() %>"><%= comms[k].getMetadata("name") %></a>
+                <a href="<%= IdentifierService.getURL(comms[k]).toString() %>"><%= comms[k].getMetadata("name") %></a>
 <%
                 if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
                 {

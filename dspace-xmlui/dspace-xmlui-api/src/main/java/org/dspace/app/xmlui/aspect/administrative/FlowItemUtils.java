@@ -59,7 +59,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.Constants;
@@ -113,7 +113,7 @@ public class FlowItemUtils
             /*
             ExternalIdentifier eid = identifierDAO.retrieve(identifier);
             DSpaceObject dso = eid.getObjectIdentifier().getObject(context);*/
-            ResolvableIdentifier ri = IdentifierFactory.resolve(context, identifier);
+            ResolvableIdentifier ri = IdentifierService.resolve(context, identifier);
             DSpaceObject dso = ri.getObject(context);
 	
             if (dso != null && dso.getType() == Constants.ITEM)

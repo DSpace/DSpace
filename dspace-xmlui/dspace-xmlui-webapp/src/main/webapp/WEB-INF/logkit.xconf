@@ -168,7 +168,7 @@
       <log-target id-ref="deprecation"/>
     </category>
 
-    <category name="sitemap" log-level="ERROR">
+    <category name="sitemap" log-level="DEBUG">
       <log-target id-ref="sitemap"/>
       <log-target id-ref="error"/>
 

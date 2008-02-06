@@ -39,13 +39,25 @@
  */
 package org.dspace.uri;
 
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
 /**
+ * Generic Interface for external identifier mechanisms which wish to be able to assign
+ * new identifiers to DSpaceObjects.  The ExternalIdentifierService can load classes
+ * which conform to this interface and ask them to assign identifiers through this
+ * generic mechanism
+ *
  * @author Richard JOnes
  */
 public interface IdentifierAssigner<T extends ExternalIdentifier>
 {
-    T mint(Context context, DSpaceObject dso);
+    /**
+     * Mint a new identifier for the passed DSpaceObject.  The implementation should not
+     * attempt to assign the identifier to the DSpaceObject.
+     * 
+     * @param context
+     * @param dso
+     * @return
+     */
+    T mint(Context context, Identifiable dso);
 }

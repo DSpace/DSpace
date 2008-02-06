@@ -68,7 +68,7 @@ import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -132,7 +132,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             if (dso == null)
                 return "0";
                 
-            return HashUtil.hash(IdentifierFactory.getCanonicalForm(dso));
+            return HashUtil.hash(IdentifierService.getCanonicalForm(dso));
         }
         catch (SQLException sqle)
         {
@@ -220,7 +220,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 				
 				String feedFormat = parts[0].trim()+"+xml";
 					
-				String feedURL = IdentifierFactory.getURL(collection).toString() + "/"+format.trim();
+				String feedURL = IdentifierService.getURL(collection).toString() + "/"+format.trim();
 				pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
 			}
 		}
@@ -250,7 +250,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 
             // Search query
             Division query = search.addInteractiveDivision("collection-search",
-                    IdentifierFactory.getURL(collection).toString() + "/search",
+                    IdentifierService.getURL(collection).toString() + "/search",
                     Division.METHOD_POST, "secondary search");
             
             Para para = query.addPara("search-query", null);
@@ -265,7 +265,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             List browse = browseDiv.addList("collection-browse", List.TYPE_SIMPLE,
                     "collection-browse");
             browse.setHead(T_head_browse);
-            String url = IdentifierFactory.getURL(collection).toString();
+            String url = IdentifierService.getURL(collection).toString();
             browse.addItemXref(url + "/browse-title",T_browse_titles);
             browse.addItemXref(url + "/browse-author",T_browse_authors);
             browse.addItemXref(url + "/browse-date",T_browse_dates);

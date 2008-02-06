@@ -43,6 +43,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.Identifiable;
 import org.dspace.uri.IdentifierAssigner;
 import org.dspace.uri.IdentifierResolver;
 import org.dspace.uri.ObjectIdentifier;
@@ -98,7 +99,7 @@ public class Handle extends ExternalIdentifier implements IdentifierAssigner<Han
     }
 
     // IdentifierAssigner implementation
-    public Handle mint(Context context, DSpaceObject dso)
+    public Handle mint(Context context, Identifiable dso)
     {
         HandleDAO dao = HandleDAOFactory.getInstance(context);
         int next = dao.getNextHandle();

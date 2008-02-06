@@ -40,40 +40,19 @@
 package org.dspace.app.webui.servlet;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
-import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.core.PluginManager;
-import org.dspace.core.Utils;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
-import org.dspace.eperson.SubscriptionManager;
-import org.dspace.plugin.CollectionHomeProcessor;
-import org.dspace.plugin.CommunityHomeProcessor;
 import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.sql.SQLException;
-import java.util.List;
 
 /**
  * @author James Rutherford
@@ -103,7 +82,7 @@ public class URIServlet extends DSpaceServlet
         String path = request.getPathInfo();
 
         // get the identifier if there is one
-        ResolvableIdentifier di = IdentifierFactory.resolve(context, path);
+        ResolvableIdentifier di = IdentifierService.resolve(context, path);
 
         // get the object if there is one
         if (di != null)

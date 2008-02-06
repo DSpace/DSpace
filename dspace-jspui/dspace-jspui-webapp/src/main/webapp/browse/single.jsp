@@ -55,7 +55,7 @@
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.DCDate" %>
 <%@ page import="org.dspace.core.Utils" %>
-<%@ page import="org.dspace.uri.IdentifierFactory" %>
+<%@ page import="org.dspace.uri.IdentifierService" %>
 <%@ page import="java.net.URLEncoder" %>
 
 <%
@@ -102,12 +102,12 @@
 	if (collection != null)
 	{
 //		linkBase = linkBase + "handle/" + collection.getHandle() + "/";
-		linkBase = IdentifierFactory.getURL(collection).toString() + "/";
+		linkBase = IdentifierService.getURL(collection).toString() + "/";
 	}
 	if (community != null)
 	{
 //		linkBase = linkBase + "handle/" + community.getHandle() + "/";
-		linkBase = IdentifierFactory.getURL(community).toString() + "/";
+		linkBase = IdentifierService.getURL(community).toString() + "/";
 	}
 	
 	String direction = (bi.isAscending() ? "ASC" : "DESC");
@@ -142,12 +142,12 @@
 	if (collection != null)
 	{
 //		formaction = formaction + "handle/" + collection.getHandle() + "/";
-		formaction = IdentifierFactory.getURL(collection).toString() + "/";
+		formaction = IdentifierService.getURL(collection).toString() + "/";
 	}
 	if (community != null)
 	{
 //		formaction = formaction + "handle/" + community.getHandle() + "/";
-		formaction = IdentifierFactory.getURL(community).toString() + "/";
+		formaction = IdentifierService.getURL(community).toString() + "/";
 	}
 	formaction = formaction + "browse";
 	

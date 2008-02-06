@@ -72,7 +72,7 @@ import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 import org.dspace.workflow.dao.WorkflowItemDAO;
 import org.dspace.workflow.dao.WorkflowItemDAOFactory;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 
 /**
  * Servlet for constructing the components of the "My DSpace" page
@@ -452,7 +452,7 @@ public class MyDSpaceServlet extends DSpaceServlet
 
             if (item.isArchived())
             {
-                String uri = IdentifierFactory.getURL(item).toString();
+                String uri = IdentifierService.getURL(item).toString();
 
                 request.setAttribute("identifier", uri);
                 JSPManager.showJSP(request, response,

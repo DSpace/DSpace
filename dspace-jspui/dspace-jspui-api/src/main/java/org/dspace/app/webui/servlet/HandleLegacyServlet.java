@@ -4,7 +4,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.app.webui.util.JSPManager;
 import org.apache.log4j.Logger;
@@ -69,7 +69,7 @@ public class HandleLegacyServlet extends DSpaceServlet
         // now parse the handle in its canonical form to locate the item
         // NOTE: my god how good is the API?  It's great, that's how good it is
         handle = "hdl:" + handle;
-        ResolvableIdentifier ri = IdentifierFactory.resolve(context, handle);
+        ResolvableIdentifier ri = IdentifierService.resolve(context, handle);
         dso = ri.getObject(context);
 
         // if there is no object, display the invalid id error

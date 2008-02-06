@@ -67,7 +67,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.PluginManager;
 import org.dspace.core.Utils;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 
 /**
  * <P>
@@ -555,7 +555,7 @@ public class ItemTag extends TagSupport
             for (int i = 0; i < collections.length; i++)
             {
                 out.print("<a href=\"");
-                out.print(IdentifierFactory.getURL(collections[i]).toString());
+                out.print(IdentifierService.getURL(collections[i]).toString());
                 out.print("\">");
                 out.print(collections[i].getMetadata("name"));
                 out.print("</a><br/>");
@@ -592,7 +592,7 @@ public class ItemTag extends TagSupport
         else
         {
             boolean html = false;
-            String uri = IdentifierFactory.getURL(item).toString();
+            String uri = IdentifierService.getURL(item).toString();
 
             Bitstream primaryBitstream = null;
 
@@ -719,7 +719,7 @@ public class ItemTag extends TagSupport
                             // Work out what the bitstream link should be
                             // (persistent ID if item has URI)
                             String bsLink = "<a href=\""
-                                    + IdentifierFactory.getURL(bitstreams[k]).toString()
+                                    + IdentifierService.getURL(bitstreams[k]).toString()
                                     + "\">";
 
                             out.print("<tr><td headers=\"t1\" class=\"standard\">");
@@ -755,7 +755,7 @@ public class ItemTag extends TagSupport
 
                                 if (tb != null)
                                 {
-                                    String myPath = IdentifierFactory.getURL(tb).toString();
+                                    String myPath = IdentifierService.getURL(tb).toString();
                                     out.print(bsLink);
                                     out.print("<img src=\"" + myPath + "\" ");
                                     out.print("alt=\"" + tAltText
@@ -812,7 +812,7 @@ public class ItemTag extends TagSupport
             {
                 out.print("<div align=\"center\" class=\"standard\">");
                 out.print("<strong><a target=\"_blank\" href=\"");
-                out.print(IdentifierFactory.getURL(bitstreams[k]).toString());
+                out.print(IdentifierService.getURL(bitstreams[k]).toString());
                 out.print("\">" +
                         LocaleSupport.getLocalizedMessage(pageContext,
                             "org.dspace.app.webui.jsptag.ItemTag.viewlicence")

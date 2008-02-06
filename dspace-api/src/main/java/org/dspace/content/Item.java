@@ -68,7 +68,7 @@ import org.dspace.eperson.dao.EPersonDAOFactory;
 import org.dspace.event.Event;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierService;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.UnsupportedIdentifierException;
 
@@ -261,9 +261,9 @@ public class Item extends DSpaceObject
                 if (log.isDebugEnabled())
                 {
                     log.debug("setIdentifier: schema=" + dc.schema + ",element=" + dc.element + ",qualifier="
-                              + dc.qualifier + ",url=" + IdentifierFactory.getURL(oid).toString());
+                              + dc.qualifier + ",url=" + IdentifierService.getURL(oid).toString());
                 }
-                this.addUniqueMetadata(dc.schema, dc.element, dc.qualifier, null, IdentifierFactory.getURL(oid).toString());
+                this.addUniqueMetadata(dc.schema, dc.element, dc.qualifier, null, IdentifierService.getURL(oid).toString());
             }
         }
 
@@ -559,7 +559,7 @@ public class Item extends DSpaceObject
         DCValue ufi = ConfigurationManager.getMetadataProperty("identifier.metadata.url-field.internal");
         if (ufi != null)
         {
-            ufi.value = IdentifierFactory.getURL(oid).toString();
+            ufi.value = IdentifierService.getURL(oid).toString();
             dc.add(ufi);
         }
 

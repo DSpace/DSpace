@@ -61,8 +61,7 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.dao.WorkspaceItemDAO;
 import org.dspace.content.dao.WorkspaceItemDAOFactory;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -647,9 +646,9 @@ public class WorkflowManager
             }
             else
             {
-                uri = IdentifierFactory.getURL(i).toString();
+                uri = IdentifierService.getURL(i).toString();
             }*/
-            String uri = IdentifierFactory.getURL(i).toString();
+            String uri = IdentifierService.getURL(i).toString();
 
             // Get title
             DCValue[] titles = i.getDC("title", null, Item.ANY);

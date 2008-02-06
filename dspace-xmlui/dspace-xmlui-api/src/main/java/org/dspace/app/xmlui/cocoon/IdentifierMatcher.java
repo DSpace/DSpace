@@ -5,7 +5,7 @@ import org.apache.cocoon.matching.modular.WildcardMatcher;
 import org.apache.cocoon.sitemap.PatternException;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.Context;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.uri.ResolvableIdentifier;
 
 import java.sql.SQLException;
@@ -19,11 +19,10 @@ public class IdentifierMatcher extends WildcardMatcher
 {
     public Map match(String s, Map objectModel, Parameters parameters) throws PatternException
     {
-
         try
         {
             Context context = ContextUtil.obtainContext(objectModel);
-            ResolvableIdentifier ri = IdentifierFactory.resolve(context, s);
+            ResolvableIdentifier ri = IdentifierService.resolve(context, s);
 
             // if no identifier is resolved, then return null, and a page-not-found will be shown
             if (ri == null)

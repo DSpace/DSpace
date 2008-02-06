@@ -56,7 +56,7 @@
 
 <%@ page import="org.dspace.content.Collection" %>
 
-<%@ page import="org.dspace.uri.IdentifierFactory" %>
+<%@ page import="org.dspace.uri.IdentifierService" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%
@@ -113,7 +113,7 @@
                   --%>
 
                  <td class="<%= row %>RowOddCol">
-                      <a href="<%= IdentifierFactory.getURL(subscriptions[i]).toString() %>"><%= subscriptions[i].getMetadata("name") %></a>
+                      <a href="<%= IdentifierService.getURL(subscriptions[i]).toString() %>"><%= subscriptions[i].getMetadata("name") %></a>
                  </td>
                  <td class="<%= row %>RowEvenCol">
                     <form method="post" action=""> 

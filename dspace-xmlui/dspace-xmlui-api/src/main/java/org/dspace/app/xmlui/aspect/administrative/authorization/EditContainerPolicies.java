@@ -57,7 +57,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -126,13 +126,13 @@ public class EditContainerPolicies extends AbstractDSpaceTransformer
 		if (containerType == Constants.COLLECTION)
 	    {
 			Collection col = Collection.find(context, containerID); 
-			main.setHead(T_main_head_collection.parameterize(col.getMetadata("name"), IdentifierFactory.getCanonicalForm(col),col.getID()));
+			main.setHead(T_main_head_collection.parameterize(col.getMetadata("name"), IdentifierService.getCanonicalForm(col),col.getID()));
 			policies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, col);
 	    }
 		else 
 		{
 			Community com = Community.find(context, containerID);
-			main.setHead(T_main_head_community.parameterize(com.getMetadata("name"),IdentifierFactory.getCanonicalForm(com),com.getID()));
+			main.setHead(T_main_head_community.parameterize(com.getMetadata("name"), IdentifierService.getCanonicalForm(com),com.getID()));
 			policies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, com);
 		}
 		

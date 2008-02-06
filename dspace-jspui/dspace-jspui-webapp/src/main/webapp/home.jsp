@@ -56,7 +56,7 @@
 <%@ page import="org.dspace.content.Community"%>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.core.I18nUtil" %>
-<%@ page import="org.dspace.uri.IdentifierFactory" %>
+<%@ page import="org.dspace.uri.IdentifierService" %>
 <%@ page import="javax.servlet.jsp.jstl.core.Config" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="java.util.Locale" %>
@@ -141,7 +141,7 @@ for (int i = supportedLocales.length-1; i >= 0; i--)
     {
 %>                  <tr>
                         <td class="standard">
-                            <a href="<%= IdentifierFactory.getURL(communities[i]).toString() %>"><%= communities[i].getMetadata("name") %></a>
+                            <a href="<%= IdentifierService.getURL(communities[i]).toString() %>"><%= communities[i].getMetadata("name") %></a>
 <%
         if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
         {

@@ -71,7 +71,7 @@
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.search.QueryResults" %>
-<%@ page import="org.dspace.uri.IdentifierFactory" %>
+<%@ page import="org.dspace.uri.IdentifierService" %>
 <%@ page import="java.net.URLEncoder" %>
 
 <%
@@ -158,11 +158,11 @@ if (collections.length > 0)
     }
     else if (collection == null)
     {
-	    searchScope = IdentifierFactory.getURL(community).toString();
+	    searchScope = IdentifierService.getURL(community).toString();
     }
     else
     {
-	    searchScope = IdentifierFactory.getURL(collection).toString();
+	    searchScope = IdentifierService.getURL(collection).toString();
     } 
 
     // create the URLs accessing the previous and next search result pages

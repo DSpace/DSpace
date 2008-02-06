@@ -71,7 +71,7 @@
 <%@ page import="org.dspace.uri.ObjectIdentifier" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="java.util.List" %>
-<%@ page import="org.dspace.uri.IdentifierFactory" %>
+<%@ page import="org.dspace.uri.IdentifierService" %>
 
 
 <%
@@ -192,7 +192,7 @@
 		String key = "browse.menu." + bis[i].getName();
 %>
 	<div class="browse_buttons">
-	<form method="get" action="<%= IdentifierFactory.getURL(community).toString() %>/browse">
+	<form method="get" action="<%= IdentifierService.getURL(community).toString() %>/browse">
 		<input type="hidden" name="type" value="<%= bis[i].getName() %>"/>
 		<%-- <input type="hidden" name="community" value="<%= community.getHandle() %>" /> --%>
 		<input type="submit" name="submit_browse" value="<fmt:message key="<%= key %>"/>"/>
@@ -223,7 +223,7 @@
 	    <table>
 	    <tr>
 	    <td>
-	      <a href="<%= IdentifierFactory.getURL(collections[i]).toString() %>">
+	      <a href="<%= IdentifierService.getURL(collections[i]).toString() %>">
 	      <%= collections[i].getMetadata("name") %></a>
 <%
             if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
@@ -273,7 +273,7 @@
 			    <table>
 			    <tr>
 			    <td>
-	                <a href="<%= IdentifierFactory.getURL(subcommunities[j]).toString() %>">
+	                <a href="<%= IdentifierService.getURL(subcommunities[j]).toString() %>">
 	                <%= subcommunities[j].getMetadata("name") %></a>
 <%
                 if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
@@ -378,7 +378,7 @@
 					displayTitle = dcv[0].value;
 				}
 			}
-			%><p class="recentItem"><a href="<%= IdentifierFactory.getURL(items[i]).toString() %>"><%= displayTitle %></a></p><%
+			%><p class="recentItem"><a href="<%= IdentifierService.getURL(items[i]).toString() %>"><%= displayTitle %></a></p><%
 		}
 	}
 %>

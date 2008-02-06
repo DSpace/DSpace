@@ -67,7 +67,7 @@
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.license.CreativeCommons" %>
 <%@ page import="org.dspace.uri.ExternalIdentifier" %>
-<%@ page import="org.dspace.uri.IdentifierFactory" %>
+<%@ page import="org.dspace.uri.IdentifierService" %>
 <%@ page import="org.dspace.uri.ObjectIdentifier" %>
 <%@ page import="java.util.List" %>
 
@@ -91,14 +91,14 @@
     ObjectIdentifier oid = item.getIdentifier();
     String uri = "";
     String citationLink = "";
-    String link = IdentifierFactory.getURL(item).toString();
+    String link = IdentifierService.getURL(item).toString();
 
     // CC URL & RDF
     String cc_url = CreativeCommons.getLicenseURL(item);
     String cc_rdf = CreativeCommons.getLicenseRDF(item);
 
     // Full title needs to be put into a string to use as tag argument
-    String cf = IdentifierFactory.getCanonicalForm(item);
+    String cf = IdentifierService.getCanonicalForm(item);
     String title = "FIXME";
     DCValue[] titleValue = item.getMetadata("dc", "title", null, Item.ANY);
     if (titleValue.length != 0)

@@ -48,7 +48,7 @@ import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -96,7 +96,7 @@ public class SaveOrRemoveStep extends AbstractStep
 	UIException, SQLException, IOException, AuthorizeException
 	{	
 		Collection collection = submission.getCollection();
-		String actionURL = IdentifierFactory.getURL(collection).toString() + "/submit";
+		String actionURL = IdentifierService.getURL(collection).toString() + "/submit";
 		
 		Division div = body.addInteractiveDivision("submit-save-or-cancel",actionURL, Division.METHOD_POST,"primary submission");
 		div.setHead(T_submission_head);

@@ -48,7 +48,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
 import java.sql.SQLException;
@@ -324,7 +324,7 @@ public class RepositoryAdapter extends AbstractAdapter
         attributesXLINK.setNamespace(XLINK);
         
         attributes.put("LOCTYPE", "URL");
-        attributesXLINK.put("href", "/metadata/handle/"+ IdentifierFactory.getCanonicalForm(dso) +"/mets.xml"); // FIXME this isn't right
+        attributesXLINK.put("href", "/metadata/handle/"+ IdentifierService.getCanonicalForm(dso) +"/mets.xml"); // FIXME this isn't right
         startElement(METS,"mptr",attributes,attributesXLINK);
         endElement(METS,"mptr");
         

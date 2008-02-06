@@ -79,7 +79,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -173,7 +173,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             {
                 DSpaceObject dso = URIUtil.resolve(objectModel);
                 if (dso != null)
-                    key += "-" + IdentifierFactory.getCanonicalForm(dso);
+                    key += "-" + IdentifierService.getCanonicalForm(dso);
 
                 return HashUtil.hash(key);
             }

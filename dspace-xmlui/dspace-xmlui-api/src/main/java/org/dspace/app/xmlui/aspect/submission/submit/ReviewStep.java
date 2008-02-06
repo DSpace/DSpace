@@ -57,7 +57,7 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.submit.step.UploadStep;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -138,7 +138,7 @@ public class ReviewStep extends AbstractSubmissionStep
 	{
 		// Get actionable URL
 		Collection collection = submission.getCollection();
-		String actionURL = IdentifierFactory.getURL(collection).toString() + "/submit";
+		String actionURL = IdentifierService.getURL(collection).toString() + "/submit";
 		
         SubmissionConfig subConfig = submissionInfo.getSubmissionConfig();
         

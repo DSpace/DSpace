@@ -56,7 +56,7 @@
 <%@ page  import="org.dspace.content.Collection" %>
 
 <%@ page import="org.dspace.content.Community" %>
-<%@ page import="org.dspace.uri.IdentifierFactory" %>
+<%@ page import="org.dspace.uri.IdentifierService" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%
@@ -93,12 +93,12 @@
     if (collection != null)
     {
         linkText = collection.getMetadata("name");
-        linkBack = IdentifierFactory.getURL(collection).toString();
+        linkBack = IdentifierService.getURL(collection).toString();
     }
     else if (community != null)
     {
         linkText = community.getMetadata("name");
-        linkBack = IdentifierFactory.getURL(community).toString();
+        linkBack = IdentifierService.getURL(community).toString();
     }
 %>
 

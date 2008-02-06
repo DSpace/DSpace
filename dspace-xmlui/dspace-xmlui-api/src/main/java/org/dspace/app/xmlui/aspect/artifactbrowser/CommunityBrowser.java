@@ -62,7 +62,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -297,7 +297,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         else if (dso instanceof Collection)
         	name = ((Collection) dso).getMetadata("name");
         
-        String url = IdentifierFactory.getURL(dso).toString();
+        String url = IdentifierService.getURL(dso).toString();
         list.addItem().addHighlight("bold").addXref(url, name);
         
         List subList = null;
@@ -311,7 +311,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
             for (TreeNode collectionNode : collectionNodes)
             {
                 String collectionName = ((Collection) collectionNode.getDSO()).getMetadata("name");
-                String collectionUrl = IdentifierFactory.getURL(collectionNode.getDSO()).toString();
+                String collectionUrl = IdentifierService.getURL(collectionNode.getDSO()).toString();
                 subList.addItemXref(collectionUrl, collectionName);
             }
         }

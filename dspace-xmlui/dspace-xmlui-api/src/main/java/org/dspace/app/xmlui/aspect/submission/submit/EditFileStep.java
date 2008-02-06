@@ -56,7 +56,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
 import org.dspace.content.FormatIdentifier;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -140,7 +140,7 @@ public class EditFileStep extends AbstractStep
             UIException, SQLException, IOException, AuthorizeException
     {
 		Collection collection = submission.getCollection();
-		String actionURL = IdentifierFactory.getURL(collection).toString() + "/submit";
+		String actionURL = IdentifierService.getURL(collection).toString() + "/submit";
 		
     	// Get the bitstream and all the various formats
 		BitstreamFormat currentFormat = bitstream.getFormat();

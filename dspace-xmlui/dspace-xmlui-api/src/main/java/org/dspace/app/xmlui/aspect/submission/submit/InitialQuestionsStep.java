@@ -51,7 +51,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -124,7 +124,7 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
     	// Get any metadata that may be removed by unselecting one of these options.
     	Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = IdentifierFactory.getURL(collection).toString() + "/submit";
+		String actionURL = IdentifierService.getURL(collection).toString() + "/submit";
 		
 		DCValue[] titles = item.getDC("title", "alternative", Item.ANY);
 		

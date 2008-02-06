@@ -51,7 +51,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -263,7 +263,7 @@ public class DSpaceValidity implements SourceValidity
             Community community = (Community) dso;
 
             validityKey.append("Community:");
-            validityKey.append(IdentifierFactory.getCanonicalForm(community));
+            validityKey.append(IdentifierService.getCanonicalForm(community));
             // validityKey.append(community.getExternalIdentifier().getCanonicalForm());
             validityKey.append(community.getMetadata("introductory_text"));
             validityKey.append(community.getMetadata("short_description"));
@@ -280,7 +280,7 @@ public class DSpaceValidity implements SourceValidity
             Collection collection = (Collection) dso;
             
             validityKey.append("Collection:");
-            validityKey.append(IdentifierFactory.getCanonicalForm(collection));
+            validityKey.append(IdentifierService.getCanonicalForm(collection));
             // validityKey.append(collection.getExternalIdentifier().getCanonicalForm());
             validityKey.append(collection.getMetadata("introductory_text"));
             validityKey.append(collection.getMetadata("short_description"));
@@ -299,7 +299,7 @@ public class DSpaceValidity implements SourceValidity
             Item item = (Item) dso;
             
             validityKey.append("Item:");
-            validityKey.append(IdentifierFactory.getCanonicalForm(item));
+            validityKey.append(IdentifierService.getCanonicalForm(item));
             //validityKey.append(item.getExternalIdentifier().getCanonicalForm());
             // Include all metadata values in the validity key.
             DCValue[] dcvs = item.getDC(Item.ANY,Item.ANY,Item.ANY);

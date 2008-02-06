@@ -38,7 +38,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -113,7 +113,7 @@ public class URIDispatcher implements BitstreamDispatcher
         {
             context = new Context();
 
-            ResolvableIdentifier di = IdentifierFactory.resolve(context, uri);
+            ResolvableIdentifier di = IdentifierService.resolve(context, uri);
             DSpaceObject dso = di.getObject(context);
             /*
             ExternalIdentifierDAO identifierDAO =

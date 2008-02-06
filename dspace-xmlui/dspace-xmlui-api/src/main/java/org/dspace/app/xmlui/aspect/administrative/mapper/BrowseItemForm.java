@@ -59,7 +59,7 @@ import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.Constants;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
 /**
@@ -148,7 +148,7 @@ public class BrowseItemForm extends AbstractDSpaceTransformer {
 			if (dcTitles != null && dcTitles.length >= 1)
 				title = dcTitles[0].value;
 
-			String url = IdentifierFactory.getURL(item).toString();
+			String url = IdentifierService.getURL(item).toString();
 			
 			Row row = table.addRow();
 			

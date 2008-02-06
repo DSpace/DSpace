@@ -56,7 +56,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -289,7 +289,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	    {
 	    	Para para = main.addPara();
 	    	para.addContent(T_collection_para);
-	    	para.addXref(IdentifierFactory.getURL(collection).toString(), collection.getMetadata("name"));
+	    	para.addXref(IdentifierService.getURL(collection).toString(), collection.getMetadata("name"));
 	    }
 
 	    // DIVISION: group-actions
@@ -498,7 +498,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	        		
 	        		Highlight highlight = cell.addHighlight("fade");
 	        		highlight.addContent("[");
-	        		highlight.addXref(IdentifierFactory.getURL(collection).toString(), T_groups_collection_link);
+	        		highlight.addXref(IdentifierService.getURL(collection).toString(), T_groups_collection_link);
 	        		highlight.addContent("]");
         		}
         	}

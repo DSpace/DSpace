@@ -46,7 +46,6 @@ import org.apache.excalibur.source.SourceValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
-import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.app.xmlui.wing.Message;
@@ -70,7 +69,7 @@ import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
@@ -156,7 +155,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             // What scope the search is at
             DSpaceObject scope = getScope();
             if (scope != null)
-                key += "-" + IdentifierFactory.getCanonicalForm(scope);
+                key += "-" + IdentifierService.getCanonicalForm(scope);
             
             // The actualy search query.
             key += "-" + getQuery();
@@ -199,7 +198,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 //	            for (String handle : handles)
 	            for (String uri : uris)
 	            {
-                    ResolvableIdentifier ri = IdentifierFactory.resolve(context, uri);
+                    ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
                     DSpaceObject resultDSO = ri.getObject(context);
                     validity.add(resultDSO);
 	            }
@@ -296,7 +295,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 //                for (String handle : containerHandles)
                 for (String uri : containerURIs)
                 {
-                    ResolvableIdentifier ri = IdentifierFactory.resolve(context, uri);
+                    ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
                     DSpaceObject resultDSO = ri.getObject(context);
 
                     if (resultDSO instanceof Community
@@ -323,7 +322,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 //                for (String handle : itemHandles)
                 for (String uri : itemURIs)
                 {
-                    ResolvableIdentifier ri = IdentifierFactory.resolve(context, uri);
+                    ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
                     DSpaceObject resultDSO = ri.getObject(context);
                     if (resultDSO instanceof Item)
                     {
@@ -375,7 +374,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             scope.setOptionSelected("/");
             for (Community community : Community.findAll(context))
             {
-                scope.addOption(IdentifierFactory.getCanonicalForm(community),community.getMetadata("name"));
+                scope.addOption(IdentifierService.getCanonicalForm(community),community.getMetadata("name"));
             }
         }
         else if (scopeDSO instanceof Community)
@@ -384,12 +383,12 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             // within
             Community community = (Community) scopeDSO;
             scope.addOption("/",T_all_of_dspace);
-            scope.addOption(IdentifierFactory.getCanonicalForm(community),community.getMetadata("name"));
-            scope.setOptionSelected(IdentifierFactory.getCanonicalForm(community));
+            scope.addOption(IdentifierService.getCanonicalForm(community),community.getMetadata("name"));
+            scope.setOptionSelected(IdentifierService.getCanonicalForm(community));
 
             for (Collection collection : community.getCollections())
             {
-                scope.addOption(IdentifierFactory.getCanonicalForm(collection),collection.getMetadata("name"));
+                scope.addOption(IdentifierService.getCanonicalForm(collection),collection.getMetadata("name"));
             }
         }
         else if (scopeDSO instanceof Collection)
@@ -397,14 +396,14 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             // The scope is a collection, display all parent collections.
             Collection collection = (Collection) scopeDSO;
             scope.addOption("/",T_all_of_dspace);
-            scope.addOption(IdentifierFactory.getCanonicalForm(collection),collection.getMetadata("name"));
-            scope.setOptionSelected(IdentifierFactory.getCanonicalForm(collection));
+            scope.addOption(IdentifierService.getCanonicalForm(collection),collection.getMetadata("name"));
+            scope.setOptionSelected(IdentifierService.getCanonicalForm(collection));
             
             Community[] communities = collection.getCommunities()[0]
                     .getAllParents();
             for (Community community : communities)
             {
-                scope.addOption(IdentifierFactory.getCanonicalForm(community),community.getMetadata("name"));
+                scope.addOption(IdentifierService.getCanonicalForm(community),community.getMetadata("name"));
             }
         }
     }
@@ -490,7 +489,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         else
         {
             // Get the search scope from the location parameter
-            ResolvableIdentifier ri = IdentifierFactory.resolve(context, scopeString);
+            ResolvableIdentifier ri = IdentifierService.resolve(context, scopeString);
             dso = ri.getObject(context);
         }*/
         DSpaceObject dso = URIUtil.resolve(objectModel);

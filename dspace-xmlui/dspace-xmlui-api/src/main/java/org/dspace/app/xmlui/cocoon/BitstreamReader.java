@@ -67,11 +67,8 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierFactory;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -223,7 +220,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             else if (handle != null)
             {
             	// Reference by an item's handle.
-                ResolvableIdentifier ri = IdentifierFactory.resolve(context, handle);
+                ResolvableIdentifier ri = IdentifierService.resolve(context, handle);
                 dso = ri.getObject(context);
 
                 if (dso instanceof Item && sequence > -1)
@@ -253,11 +250,11 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             		String redictURL = request.getContextPath() + "/handle/";
             		if (item!=null){
 //                        redictURL += item.getHandle();
-            			redictURL += IdentifierFactory.getCanonicalForm(item);
+            			redictURL += IdentifierService.getCanonicalForm(item);
             		}
             		else if(dso!=null){
 //            			redictURL += dso.getHandle();
-                        redictURL += IdentifierFactory.getCanonicalForm(dso);
+                        redictURL += IdentifierService.getCanonicalForm(dso);
             		}
             		redictURL += "/restricted-resource?bitstreamId=" + bitstream.getID();
 

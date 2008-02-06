@@ -57,7 +57,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.core.Constants;
 import org.xml.sax.SAXException;
 
@@ -104,7 +104,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
             UIException, SQLException, IOException, AuthorizeException
     {     
 		Collection[] collections; // List of possible collections.
-        ResolvableIdentifier eid = IdentifierFactory.resolve(context, handle);
+        ResolvableIdentifier eid = IdentifierService.resolve(context, handle);
 
         DSpaceObject dso = null;
         if (eid != null)
@@ -138,7 +138,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         	String name = collection.getMetadata("name");
    		   	if (name.length() > 50)
    		   		name = name.substring(0, 47) + "...";
-        	select.addOption(IdentifierFactory.getCanonicalForm(collection),name);
+        	select.addOption(IdentifierService.getCanonicalForm(collection),name);
         }
         
         Button submit = list.addItem().addButton("submit");

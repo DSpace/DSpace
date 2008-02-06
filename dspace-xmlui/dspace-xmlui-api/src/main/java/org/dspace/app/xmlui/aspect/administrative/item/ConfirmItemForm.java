@@ -51,7 +51,7 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -115,7 +115,7 @@ public class ConfirmItemForm extends AbstractDSpaceTransformer {
 
 		// DIVISION: Main
 		Division main = body.addInteractiveDivision("confirm-item", contextPath+"/admin/item", Division.METHOD_POST,"primary administrative item");
-		main.setHead(T_head1.parameterize(IdentifierFactory.getCanonicalForm(item)));
+		main.setHead(T_head1.parameterize(IdentifierService.getCanonicalForm(item)));
 
 		// PARA: descriptive instructions
 		if("delete".equals(confirm))

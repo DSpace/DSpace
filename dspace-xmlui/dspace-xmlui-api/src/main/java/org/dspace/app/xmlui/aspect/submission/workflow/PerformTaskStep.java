@@ -53,7 +53,7 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 import org.xml.sax.SAXException;
@@ -134,7 +134,7 @@ public class PerformTaskStep extends AbstractStep
     	// Get any metadata that may be removed by unselecting one of these options.
     	Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = IdentifierFactory.getURL(collection).toString() + "/workflow";
+		String actionURL = IdentifierService.getURL(collection).toString() + "/workflow";
 		int state = ((WorkflowItem) submission).getState();
     	
     	Request request = ObjectModelHelper.getRequest(objectModel);

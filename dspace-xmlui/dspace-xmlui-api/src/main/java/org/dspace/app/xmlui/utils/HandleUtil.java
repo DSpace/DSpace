@@ -54,7 +54,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
@@ -104,7 +104,7 @@ public class HandleUtil
 
             Context context = ContextUtil.obtainContext(objectModel);
 
-            ResolvableIdentifier ri = IdentifierFactory.resolve(context, handle);
+            ResolvableIdentifier ri = IdentifierService.resolve(context, handle);
             dso = ri.getObject(context);
 
             request.setAttribute(DSPACE_OBJECT, dso);

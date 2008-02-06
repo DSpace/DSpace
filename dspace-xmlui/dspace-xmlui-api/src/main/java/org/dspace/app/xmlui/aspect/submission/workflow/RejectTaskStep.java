@@ -53,7 +53,7 @@ import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -97,7 +97,7 @@ public class RejectTaskStep extends AbstractStep
     {
     	Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = IdentifierFactory.getURL(collection).toString() + "/workflow";
+		String actionURL = IdentifierService.getURL(collection).toString() + "/workflow";
     	
     	Request request = ObjectModelHelper.getRequest(objectModel);
 		String showfull = request.getParameter("showfull");

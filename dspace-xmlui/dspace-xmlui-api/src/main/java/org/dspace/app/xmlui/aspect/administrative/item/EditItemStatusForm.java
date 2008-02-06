@@ -50,8 +50,7 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 
 import java.sql.SQLException;
 
@@ -147,7 +146,7 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		
 		itemInfo.addLabel(T_label_handle);
 //      itemInfo.addItem(item.getHandle()==null?"None":item.getHandle());
-        itemInfo.addItem(IdentifierFactory.getCanonicalForm(item));
+        itemInfo.addItem(IdentifierService.getCanonicalForm(item));
 
 		itemInfo.addLabel(T_label_modified);
 		itemInfo.addItem(item.getLastModified().toString());
@@ -171,7 +170,7 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
             itemInfo.addItem().addXref(ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getExternalIdentifier().getCanonicalForm(),ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getExternalIdentifier().getCanonicalForm());
         }
 		*/
-        String url = IdentifierFactory.getURL(item).toString();
+        String url = IdentifierService.getURL(item).toString();
         itemInfo.addItem().addXref(url, url);
 
         itemInfo.addLabel(T_label_auth);

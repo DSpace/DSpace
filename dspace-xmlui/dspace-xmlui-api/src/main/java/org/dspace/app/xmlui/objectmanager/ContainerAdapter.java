@@ -50,7 +50,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.Constants;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -124,7 +124,7 @@ public class ContainerAdapter extends AbstractAdapter
      */
     protected String getMETSOBJID()
     {
-    	return IdentifierFactory.getURL(dso).toString();
+    	return IdentifierService.getURL(dso).toString();
     }
 
     /**
@@ -140,7 +140,7 @@ public class ContainerAdapter extends AbstractAdapter
      */
     protected String getMETSID()
     {
-        return IdentifierFactory.getCanonicalForm(dso);
+        return IdentifierService.getCanonicalForm(dso);
     }
 
     /**
@@ -261,7 +261,7 @@ public class ContainerAdapter extends AbstractAdapter
                 String description_abstract = collection.getMetadata("short_description");
                 String description_table = collection.getMetadata("side_bar_text");
                 // FIXME: Oh, so broken.
-                String identifier_uri = IdentifierFactory.getURL(collection).toString();
+                String identifier_uri = IdentifierService.getURL(collection).toString();
                 String provenance = collection.getMetadata("provenance_description");
                 String rights = collection.getMetadata("copyright_text");
                 String rights_license = collection.getMetadata("license");
@@ -284,7 +284,7 @@ public class ContainerAdapter extends AbstractAdapter
                 String description_abstract = community.getMetadata("short_description");
                 String description_table = community.getMetadata("side_bar_text");
                 // FIXME: Oh, so broken.
-                String identifier_uri = IdentifierFactory.getURL(community).toString();
+                String identifier_uri = IdentifierService.getURL(community).toString();
                 String rights = community.getMetadata("copyright_text");
                 String title = community.getMetadata("name");
                 

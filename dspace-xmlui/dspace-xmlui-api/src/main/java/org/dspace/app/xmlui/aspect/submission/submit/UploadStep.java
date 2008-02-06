@@ -63,7 +63,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.workflow.WorkflowItem;
 import org.xml.sax.SAXException;
 
@@ -186,7 +186,7 @@ public class UploadStep extends AbstractSubmissionStep
         // Get a list of all files in the original bundle
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = IdentifierFactory.getURL(collection).toString() + "/submit";
+		String actionURL = IdentifierService.getURL(collection).toString() + "/submit";
 		boolean workflow = submission instanceof WorkflowItem;
 		Bundle[] bundles = item.getBundles("ORIGINAL");
 		Bitstream[] bitstreams = new Bitstream[0];

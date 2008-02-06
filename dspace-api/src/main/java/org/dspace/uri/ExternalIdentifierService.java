@@ -36,7 +36,6 @@
 package org.dspace.uri;
 
 import org.dspace.content.DCValue;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
@@ -68,7 +67,7 @@ public class ExternalIdentifierService
      * @param dso
      * @return
      */
-    public static List<ExternalIdentifier> mintAll(Context context, DSpaceObject dso)
+    public static List<ExternalIdentifier> mintAll(Context context, Identifiable dso)
     {
         List<ExternalIdentifier> eids = new ArrayList<ExternalIdentifier>();
         IdentifierAssigner[] assigners = (IdentifierAssigner[]) PluginManager.getPluginSequence(IdentifierAssigner.class);

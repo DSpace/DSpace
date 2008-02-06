@@ -3,7 +3,7 @@ package org.dspace.app.xmlui.utils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.ObjectModelHelper;
 
@@ -34,7 +34,7 @@ public class URIUtil
         {
             String uri = request.getSitemapURI();
             Context context = ContextUtil.obtainContext(objectModel);
-            ResolvableIdentifier ri = IdentifierFactory.resolve(context, uri);
+            ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
             if (ri == null)
             {
                 // FIXME: this is not right, but there's not much choice just now

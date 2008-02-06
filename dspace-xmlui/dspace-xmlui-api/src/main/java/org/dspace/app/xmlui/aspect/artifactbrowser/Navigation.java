@@ -60,7 +60,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -116,7 +116,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             
             DSpaceObject dso = URIUtil.resolve(objectModel);
             if (dso != null)
-                key += "-" + IdentifierFactory.getCanonicalForm(dso);
+                key += "-" + IdentifierService.getCanonicalForm(dso);
 
             return HashUtil.hash(key);
         } 
@@ -193,7 +193,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             }
 
             // Add the configured browse lists for scoped browsing
-            String handle = IdentifierFactory.getCanonicalForm(dso);
+            String handle = IdentifierService.getCanonicalForm(dso);
             addBrowseOptions(browseContext, contextPath + "/handle/" + handle + "/browse");
         }
     }
@@ -230,14 +230,14 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         {
             if (dso instanceof Item)
             {
-                pageMeta.addMetadata("focus","object").addContent(IdentifierFactory.getCanonicalForm(dso));
+                pageMeta.addMetadata("focus","object").addContent(IdentifierService.getCanonicalForm(dso));
                 this.getObjectManager().manageObject(dso);
                 dso = ((Item) dso).getOwningCollection();
             }
             
             if (dso instanceof Collection || dso instanceof Community)
             {
-                pageMeta.addMetadata("focus","container").addContent(IdentifierFactory.getCanonicalForm(dso));
+                pageMeta.addMetadata("focus","container").addContent(IdentifierService.getCanonicalForm(dso));
                 this.getObjectManager().manageObject(dso);
             }
         }

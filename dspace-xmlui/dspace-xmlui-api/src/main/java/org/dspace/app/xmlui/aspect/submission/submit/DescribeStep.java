@@ -65,7 +65,7 @@ import org.dspace.content.DCPersonName;
 import org.dspace.content.DCSeriesNumber;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
 import javax.servlet.ServletException;
@@ -168,13 +168,13 @@ public class DescribeStep extends AbstractSubmissionStep
 		// Obtain the inputs (i.e. metadata fields we are going to display)
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = IdentifierFactory.getURL(collection).toString() + "/submit";
+		String actionURL = IdentifierService.getURL(collection).toString() + "/submit";
 
 		DCInputSet inputSet = null;
 		DCInput[] inputs = {};
 		try 
 		{
-			inputSet = getInputsReader().getInputs(IdentifierFactory.getCanonicalForm(submission.getCollection()));
+			inputSet = getInputsReader().getInputs(IdentifierService.getCanonicalForm(submission.getCollection()));
 			inputs = inputSet.getPageRows(getPage()-1, submission.hasMultipleTitles(), submission.isPublishedBefore());
 		} 
 		catch (ServletException se) 
@@ -314,7 +314,7 @@ public class DescribeStep extends AbstractSubmissionStep
         DCInputSet inputSet = null;
         try 
         {
-            inputSet = getInputsReader().getInputs(IdentifierFactory.getCanonicalForm(submission.getCollection()));
+            inputSet = getInputsReader().getInputs(IdentifierService.getCanonicalForm(submission.getCollection()));
         } 
         catch (ServletException se) 
         {

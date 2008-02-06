@@ -79,7 +79,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.uri.ResolvableIdentifier;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -188,7 +188,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     			DSpaceObject dso = null;
     			if (uri != null)
                 {
-                    ResolvableIdentifier ri = IdentifierFactory.resolve(context, uri);
+                    ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
                     dso = ri.getObject(context);
                 }
     			
@@ -253,7 +253,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 			
 			if (uri != null)
 			{
-                ResolvableIdentifier ri = IdentifierFactory.resolve(context, uri);
+                ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
                 dso = ri.getObject(context);
 				
                 if (dso == null)
@@ -624,11 +624,11 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 			url += "/handle/" + dso.getExternalIdentifier().getCanonicalForm();
 			return url;
 			*/
-            return IdentifierFactory.getLocalURL(dso).toString();
+            return IdentifierService.getLocalURL(dso).toString();
         }
 		else
 		{
-            return IdentifierFactory.getURL(dso).toString();
+            return IdentifierService.getURL(dso).toString();
 		}
     }
     

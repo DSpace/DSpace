@@ -55,7 +55,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -127,7 +127,7 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
         } 
         else 
         {
-        	String handle = IdentifierFactory.getCanonicalForm(dso);
+        	String handle = IdentifierService.getCanonicalForm(dso);
         	type = "item";
         	if (handle == null || "".equals(handle))
         	{

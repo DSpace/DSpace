@@ -55,7 +55,7 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Collection;
 import org.dspace.eperson.Group;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 
 import java.sql.SQLException;
 
@@ -266,7 +266,7 @@ public class ManageGroupsMain extends AbstractDSpaceTransformer
 	        		Highlight highlight = cell.addHighlight("fade");
 	        		
 	        		highlight.addContent("[");
-	        		highlight.addXref(IdentifierFactory.getURL(collection).toString(), T_collection_link);
+	        		highlight.addXref(IdentifierService.getURL(collection).toString(), T_collection_link);
 	        		highlight.addContent("]");
         		}
         	}

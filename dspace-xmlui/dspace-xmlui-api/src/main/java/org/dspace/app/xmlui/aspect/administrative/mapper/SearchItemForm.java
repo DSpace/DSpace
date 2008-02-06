@@ -58,7 +58,7 @@ import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.search.DSQuery;
@@ -141,7 +141,7 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 			if (dcTitles != null && dcTitles.length >= 1)
 				title = dcTitles[0].value;
 
-			String url = IdentifierFactory.getURL(item).toString();
+			String url = IdentifierService.getURL(item).toString();
 			
 			Row row = table.addRow();
 			
@@ -196,7 +196,7 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
             ExternalIdentifier identifier = identifierDAO.retrieve(uri);
             DSpaceObject resultDSO =
                 identifier.getObjectIdentifier().getObject(context);*/
-            ResolvableIdentifier ri = IdentifierFactory.resolve(context, uri);
+            ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
             DSpaceObject resultDSO = ri.getObject(context);
 
             if (resultDSO instanceof Item)

@@ -59,7 +59,7 @@ import org.dspace.eperson.dao.SubscriptionDAO;
 import org.dspace.eperson.dao.SubscriptionDAOFactory;
 import org.dspace.search.Harvest;
 import org.dspace.search.HarvestedItemInfo;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.uri.ObjectIdentifier;
 
 import javax.mail.MessagingException;
@@ -402,7 +402,7 @@ public class SubscriptionManager
 
                         emailText.append("\n         ").append(labels.getString(
                                     "org.dspace.eperson.Subscribe.id")).append(
-                                    IdentifierFactory.getURL(identifier).toString()).append(
+                                    IdentifierService.getURL(identifier).toString()).append(
                                     "\n\n");
                     }
                 }

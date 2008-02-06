@@ -17,7 +17,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.plugin.CommunityHomeProcessor;
 import org.dspace.plugin.CollectionHomeProcessor;
 import org.dspace.eperson.SubscriptionManager;
@@ -281,7 +281,7 @@ public class DSpaceObjectServlet extends DSpaceServlet
             throws ServletException, IOException, SQLException
     {
         // Handle click on a browse or search button
-        if (!handleButton(request, response, IdentifierFactory.getURL(community)))
+        if (!handleButton(request, response, IdentifierService.getURL(community)))
         {
             // No button pressed, display community home page
             log.info(LogManager.getHeader(context, "view_community",
@@ -366,7 +366,7 @@ public class DSpaceObjectServlet extends DSpaceServlet
         throws ServletException, IOException, SQLException, AuthorizeException
     {
         // Handle click on a browse or search button
-        if (!handleButton(request, response, IdentifierFactory.getURL(community)))
+        if (!handleButton(request, response, IdentifierService.getURL(community)))
         {
             // Will need to know whether to commit to DB
             boolean updated = false;
@@ -616,7 +616,7 @@ public class DSpaceObjectServlet extends DSpaceServlet
         for (int i = 0; i < items.size(); i++)
         {
             Item item = (Item) items.get(i);
-            urls[i] = IdentifierFactory.getURL(item).toString();
+            urls[i] = IdentifierService.getURL(item).toString();
         }
 
         return urls;

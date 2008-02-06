@@ -55,7 +55,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.sort.SortOption;
 
 import javax.imageio.ImageIO;
@@ -362,9 +362,9 @@ public class BrowseListTag extends TagSupport
 //                            + items[i].getHandle() + "\">" 
 //                            + Utils.addEntities(metadataArray[0].value)
 //                            + "</a>";
-                            // IdentifierFactory.getURL(items[i]).toString()
+                            // IdentifierService.getURL(items[i]).toString()
                             metadata = "<a href=\""
-                            + IdentifierFactory.getURL(items[i]).toString() + "\">"
+                            + IdentifierService.getURL(items[i]).toString() + "\">"
                             + Utils.addEntities(metadataArray[0].value)
                             + "</a>";
                         }
@@ -768,13 +768,13 @@ public class BrowseListTag extends TagSupport
         	{
         		Bitstream original = thumbnail.getOriginal();
 //        		String link = hrq.getContextPath() + "/bitstream/" + item.getHandle() + "/" + original.getSequenceID() + "/" +
-        		String link = IdentifierFactory.getURL(original).toString();
+        		String link = IdentifierService.getURL(original).toString();
         		thumbFrag.append("<a target=\"_blank\" href=\"" + link + "\" />");
         	}
         	else
         	{
 //        		String link = hrq.getContextPath() + "/handle/" + item.getHandle();
-        		String link = IdentifierFactory.getURL(item).toString();
+        		String link = IdentifierService.getURL(item).toString();
         		thumbFrag.append("<a href=\"" + link + "\" />");
         	}
         	

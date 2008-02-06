@@ -40,7 +40,7 @@
 package org.dspace.app.webui.jsptag;
 
 import org.dspace.content.Community;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
@@ -93,7 +93,7 @@ public class CommunityListTag extends TagSupport
 
                 HttpServletRequest hrq = (HttpServletRequest) pageContext
                         .getRequest();
-                out.print(IdentifierFactory.getURL(communities[i]).toString());
+                out.print(IdentifierService.getURL(communities[i]).toString());
                 out.print("\">");
                 out.print(name);
                 out.print("</a>");

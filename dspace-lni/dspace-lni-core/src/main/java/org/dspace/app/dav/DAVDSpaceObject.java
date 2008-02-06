@@ -49,7 +49,7 @@ import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.jdom.Element;
 
 import javax.servlet.http.HttpServletRequest;
@@ -173,7 +173,7 @@ abstract class DAVDSpaceObject extends DAVResource
             // FIXME: in reality, these aren't handles any more, they are UUIDs from the ObjectIdentifiers, but
             // it's too big a job at the moment to modify all the semantics, so I have just done so where necessary
 //            DSpaceObject dso = HandleManager.resolveToObject(context, handle);
-            ResolvableIdentifier dsi = IdentifierFactory.resolve(context, handle);
+            ResolvableIdentifier dsi = IdentifierService.resolve(context, handle);
             DSpaceObject dso = dsi.getObject(context);
 
             if (dso == null)

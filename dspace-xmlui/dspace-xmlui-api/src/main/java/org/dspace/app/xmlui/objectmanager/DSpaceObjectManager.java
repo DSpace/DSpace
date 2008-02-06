@@ -47,7 +47,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -113,7 +113,7 @@ public class DSpaceObjectManager implements ObjectManager
 		if (object instanceof DSpaceObject)
 		{
 			DSpaceObject dso = (DSpaceObject) object;
-            String handle = IdentifierFactory.getCanonicalForm(dso);
+            String handle = IdentifierService.getCanonicalForm(dso);
             // String handle = dso.getExternalIdentifier().getCanonicalForm();
 			
 			// If the object has a handle then refrence it by it's handle.

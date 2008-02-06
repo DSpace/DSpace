@@ -68,7 +68,7 @@
 <%@ page import="org.dspace.content.MetadataField" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
-<%@ page import="org.dspace.uri.IdentifierFactory" %>
+<%@ page import="org.dspace.uri.IdentifierService" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
@@ -76,7 +76,7 @@
 <%
     Item item = (Item) request.getAttribute("item");
     String uri = item.getIdentifier().getCanonicalForm();
-    String link = IdentifierFactory.getURL(item).toString();
+    String link = IdentifierService.getURL(item).toString();
     Collection[] collections = (Collection[]) request.getAttribute("collections");
     MetadataField[] dcTypes = (MetadataField[])  request.getAttribute("dc.types");
     HashMap metadataFields = (HashMap) request.getAttribute("metadataFields");

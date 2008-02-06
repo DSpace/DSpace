@@ -60,7 +60,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.xml.sax.SAXException;
@@ -176,7 +176,7 @@ public class DSpaceMETSGenerator extends AbstractGenerator
                 ExternalIdentifierDAOFactory.getInstance(context);
             ExternalIdentifier eid = identifierDAO.retrieve(uri);
             DSpaceObject dso = eid.getObjectIdentifier().getObject(context);*/
-            ResolvableIdentifier ri = IdentifierFactory.resolve(context, uri);
+            ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
             DSpaceObject dso = ri.getObject(context);
 
              // Handles can be either items or containers.

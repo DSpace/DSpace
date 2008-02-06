@@ -47,7 +47,7 @@ import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
 import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
@@ -280,7 +280,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             String uri = (String) itemIdentifiers.get(i);
 
-            ResolvableIdentifier di = IdentifierFactory.resolve(context, uri);
+            ResolvableIdentifier di = IdentifierService.resolve(context, uri);
             Item item = (Item) di.getObject(context);
 
             resultsItems[i] = item;
@@ -296,7 +296,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             String uri = (String) collectionIdentifiers.get(i);
 
-            ResolvableIdentifier di = IdentifierFactory.resolve(context, uri);
+            ResolvableIdentifier di = IdentifierService.resolve(context, uri);
             Collection c = (Collection) di.getObject(context);
 
             resultsCollections[i] = collection;
@@ -312,7 +312,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             String uri = (String) communityIdentifiers.get(i);
 
-            ResolvableIdentifier di = IdentifierFactory.resolve(context, uri);
+            ResolvableIdentifier di = IdentifierService.resolve(context, uri);
             Community c = (Community) di.getObject(context);
 
             resultsCommunities[i] = c;

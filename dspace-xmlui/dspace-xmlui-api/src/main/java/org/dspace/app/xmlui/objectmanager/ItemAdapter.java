@@ -50,7 +50,7 @@ import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
-import org.dspace.uri.IdentifierFactory;
+import org.dspace.uri.IdentifierService;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.SAXOutputter;
@@ -138,7 +138,7 @@ public class ItemAdapter extends AbstractAdapter
      */
     protected String getMETSOBJID()
     {
-        return IdentifierFactory.getURL(item).toString();
+        return IdentifierService.getURL(item).toString();
     }
 
     /**
@@ -154,7 +154,7 @@ public class ItemAdapter extends AbstractAdapter
      */
     protected String getMETSID()
     {
-        return IdentifierFactory.getCanonicalForm(item);
+        return IdentifierService.getCanonicalForm(item);
     }
 
     /**
