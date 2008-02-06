@@ -50,6 +50,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.dspace.content.DCValue;
@@ -438,17 +439,29 @@ public class IndexBrowse
                             {
                                 for (int x = 0; x < values.length; x++)
                                 {
-                                    // get the normalised version of the value
-                                    String nVal = OrderFormat.makeSortString(values[x].value, values[x].language, bis[i].getDataType());
-
-                                    Map sortMap = getSortValues(item, itemMDMap);
-
-                                    dao.insertIndex(bis[i].getTableName(), item.getID(), values[x].value, nVal, sortMap);
-
-                                    if (bis[i].isMetadataIndex())
+                                    // Ensure that there is a value to index before inserting it
+                                    if (StringUtils.isEmpty(values[x].value))
                                     {
-                                        int distinctID = dao.getDistinctID(bis[i].getTableName(true, false, false), values[x].value, nVal);
-                                        dao.createDistinctMapping(bis[i].getMapName(), item.getID(), distinctID);
+                                        log.error("Null metadata value for item " + item.getID() + ", field: " +
+                                                values[x].schema + "." +
+                                                values[x].element +
+                                                (values[x].qualifier == null ? "" : "." + values[x].qualifier));
+                                    }
+                                    else
+                                    {
+                                        // get the normalised version of the value
+                                        String nVal = OrderFormat.makeSortString(values[x].value, values[x].language, bis[i].getDataType());
+
+                                        // get all the normalised values for sorting
+                                        Map sortMap = getSortValues(item, itemMDMap);
+
+                                        dao.insertIndex(bis[i].getTableName(), item.getID(), values[x].value, nVal, sortMap);
+
+                                        if (bis[i].isMetadataIndex())
+                                        {
+                                            int distinctID = dao.getDistinctID(bis[i].getTableName(true, false, false), values[x].value, nVal);
+                                            dao.createDistinctMapping(bis[i].getMapName(), item.getID(), distinctID);
+                                        }
                                     }
                                 }
                             }
