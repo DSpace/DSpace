@@ -1228,7 +1228,7 @@ The following vocabularies are currently available by default:
 
   <p>Thus, if possible, it is recommeded you limit your changes to the 'layout' JSPs and the stylesheet.</P>
 
-  <p>The JSPs are stored in <code><i>[dspace-source]</i>/jsp</code>. Place your edited version of a JSP in the <code><i>[dspace-source]</i>/jsp/local</code> directory, with the same path as the original. If they exist, these will be used in preference to the distributed versions in <code><i>[dspace-source]</i>/jsp</code>. For example:</p>
+  <p>The JSPs are stored in <code><i>[dspace-source]</i>/jsp</code>. Place your edited version of a JSP in the <code><i>[dspace-source]</i>/modules/dspace-jspui/src/main/webapp/</code> directory (<i>this is the replacement for the pre-1.5 <code>/jsp/local</code> directory</i>), with the same path as the original. If they exist, these will be used in preference to the distributed versions in <code><i>[dspace-source]</i>/jsp</code>. For example:</p>
 
   <table>
     <tbody>
@@ -1241,18 +1241,18 @@ The following vocabularies are currently available by default:
       <tr>
         <td><code><i>[dspace-source]</i>/jsp/community-list.jsp</code></td>
 
-        <td><code><i>[dspace-source]</i>/jsp/local/community-list.jsp</code></td>
+        <td><code><i>[dspace-source]</i>/modules/dspace-jspui/src/main/webapp/community-list.jsp</code></td>
       </tr>
 
       <tr>
         <td><code><i>[dspace-source]</i>/jsp/mydspace/main.jsp</code></td>
 
-        <td><code><i>[dspace-source]</i>/jsp/local/mydspace/main.jsp</code></td>
+        <td><code><i>[dspace-source]</i>/modules/dspace-jspui/src/main/webapp/mydspace/main.jsp</code></td>
       </tr>
     </tbody>
   </table>
 
-  <p>Heavy use is made of a style sheet, in <code><i>[dspace-source]</i>/jsp/styles.css.jsp</code>. If you make edits, call the local version <code><i>[dspace-source]</i>/jsp/local/styles.css.jsp</code>, and it will be used automatically in preference to the default, as described above.</p>
+  <p>Heavy use is made of a style sheet, in <code><i>[dspace-source]</i>/jsp/styles.css.jsp</code>. If you make edits, call the local version <code><i>[dspace-source]</i>/modules/dspace-jspui/src/main/webapp/styles.css.jsp</code>, and it will be used automatically in preference to the default, as described above.</p>
 
   <p>Fonts and colors can be easily changed using the stylesheet. The stylesheet is a JSP so that the user's browser version can be detected and the stylesheet tweaked accordingly.</p>
 
@@ -1262,21 +1262,24 @@ The following vocabularies are currently available by default:
 
   <ol>
     <li>
-      <p>Rebuild the <code>dspace.war</code> file by running the following command from your <code><i>[dspace-source]</i></code> directory:</p>
+      <p>Rebuild the DSpace installation package by running the following command from your <code><i>[dspace-source]</i></code> directory:</p>
+      <pre>mvn package</pre>
+    </li>
+    <li>
+      <p>Re-install the DSpace WAR(s) to <code><i>[dspace]</i>/webapps</code> by running the following command from your <code><i>[dspace-source]</i>/target/dspace-[version].dir</code> directory:</p>
       <pre>
-ant -Dconfig=<i>[dspace]</i>/config/dspace.cfg build_wars
+ant -Dconfig=<i>[dspace]</i>/config/dspace.cfg update
 </pre>
     </li>
 
     <li>
-      <p>Shut down Tomcat, and delete the existing <i>[tomcat]</i>/webapps/dspace directory.</p>
-    </li>
-
-    <li>
-      <p>Copy the new .war file to the Tomcat webapps directory:</p>
-      <pre>
-cp <i>[dspace-source]</i>/build/dspace.war <i>[tomcat]</i>/webapps
-</pre>
+      <p>Depending on your setup with Tomcat, you may also need to do the following:
+      <ul>
+      <li>Shut down Tomcat, and delete any existing <i>[tomcat]</i>/webapps/dspace directories.</li>
+   	  <li>Copy the new .war file(s) to the Tomcat webapps directory:</li>
+   	  <li>Restart Tomcat.</li>
+   	  </ul>
+   	  </p>
     </li>
   </ol>
 
