@@ -60,6 +60,7 @@
 			<excludes>
 				<exclude>org.dspace:dspace-xmlui-webapp</exclude>
 				<exclude>org.dspace:dspace-lni-webapp</exclude>
+				<exclude>org.dspace:dspace-sword-webapp</exclude>
 				<exclude>org.dspace:dspace-jspui-webapp</exclude>
 				<exclude>org.dspace:dspace-oai-webapp</exclude>
 			</excludes>
