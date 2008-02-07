@@ -37,6 +37,7 @@
 		<module>dspace-lni</module>
 		<module>dspace-oai</module>
 		<module>dspace-jspui</module>
+		<module>dspace-sword</module>
 	</modules>
 	
 </project>
