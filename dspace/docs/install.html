@@ -17,7 +17,7 @@
           <LI><A HREF="install.html#installoptions">Installation Options</A>
           	<UL>
           		<LI><A HREF="install.html#options">Overview of Install Options</A></LI>
-          		<LI><A HREF="install.html#options">Overview of DSpace Directories</A></LI>
+          		<LI><A HREF="install.html#directories">Overview of DSpace Directories</A></LI>
           		<LI><A HREF="install.html#installsteps">Quick Installation Method</A></LI>
           		<LI><A HREF="install.html#maveninstall">Maven-based Installation Method</A></LI>
           	</UL>
@@ -107,16 +107,8 @@
        <P>Jetty and Resin are configured for correct handling of UTF-8 by default.</P>
       </li>
       
-      <li><P>(<em>Optional</em>) <A HREF="http://maven.apache.org/">Apache Maven 2</A> (Java project build manager)</P>
-      	  <P>Maven is only necessary to install if you want to re-package and re-build all of DSpace from its source code. 
-      	     Therefore, Maven is only <em>required</em> if you want to do one or more of the following:</P>
-      	     <ul>
-      	      <li>Change the underlying Java API of DSpace</li>
-      	      <li>Completely re-package DSpace with your own custom API or custom interfaces</li>
-      	      <li>Create DSpace interface "overlays"</li>
-      	     </ul>
-      	  <P>If your institution does not have a developer who actually customizes
-      	     the underlying Java API for DSpace, chances are you don't need Maven.</P>
+      <li><P><A HREF="http://maven.apache.org/">Apache Maven 2</A> (Java project build manager)</P>
+      	  <P>Maven is necessary to build the installation package for DSpace, and apply any custom interface "overlay" changes.</P>
       </li>
       
     </ol>
@@ -139,8 +131,7 @@
 			if you've used DSpace 1.4.x or below, as it mirrors the old path
 			of installing and managing DSpace</li>
 			<li>This method allows you to customize DSpace configurations (in dspace.cfg) 
-			or user interfaces (either JSP-UI or XML-UI) similar to how it was done with 
-			DSpace 1.4.x.  However, it will not allow you to customize or change the 
+			or user interfaces, using basic pre-built interface "overlays".  However, it will not allow you to customize or change the 
 			underlying DSpace Java API, as <em>all Java code comes pre-compiled.</em></li>
 			<li><strong>This method is highly recommended for those who are new to DSpace, 
 			may not have available technical staff for DSpace at their institutions, 
@@ -149,14 +140,15 @@
 		  </li>
 		  <li><A href="#maveninstall">Maven-based Installation Method</A>
 		  	<ul>
-		  	<li>This installation method requires the 
-		  	<A HREF="http://maven.apache.org/">Apache Maven 2</A> prerequisite.
+		  	<li>This installation method requires much more familiarity with
+		  	how
+		  	<A HREF="http://maven.apache.org/">Apache Maven 2</A> works.
 		  	This method provides your institution with more control over how DSpace
-		  	builds itself (especially in terms of selecting specific DSpace "modules" you 
-		  	wish to use).  However, this route also requires that you (or someone at
+		  	builds itself (especially in terms of adding completely custom/3rd-party DSpace 
+		  	"modules" you wish to use).  However, this route also requires that you (or someone at
 		  	your institution) learn the basics of how to use Maven, and potentially how to create
 		  	your own Maven Project Object Model (POM).</li>
-		  	<li>This method allows you the ability to create user interface "overlays" in Maven.
+		  	<li>This method allows you the ability to create more complex user interface "overlays" in Maven.
 		  	An interface "overlay" allows you to only manage your local custom code (in your local CVS or SVN),
 		  	and automatically download the rest of the interface code from DSpace SVN whenever
 		  	you build DSpace.  This means you wouldn't have to manage any of the out-of-the-box
@@ -169,7 +161,7 @@
 		</ul>
 	</p>
 
-	<H3><A NAME="options">Overview of DSpace Directories</A></H3>
+	<H3><A NAME="directories">Overview of DSpace Directories</A></H3>
 
 	<p>Before beginning an installation, it is important to get a general understanding
 	of the DSpace directories and the names by which they are generally referred.
@@ -183,8 +175,7 @@ of them in order to install DSpace, you do need to know they exist and also know
     <li><strong>the installation directory</strong>, referred to as <i><code>[dspace]</code></i>.  This is the location where
     all the DSpace configuration files, command line scripts, documentation and webapps exist.</li>
     <li><strong>the source directory</strong>, referred to as <i><code>[dspace-source]</code></i>.  This is the location
-    where the DSpace module source code resides.  <em>Please note that in DSpace 1.5.x and above,
-    this location only exists if you install DSpace using the <A href="#maveninstall">Maven-based Installation</A> method.</em></li>
+    where DSpace was initially downloaded to.</li>
     <li><strong>the web deployment directory</strong>.  This is the directory that contains
     your DSpace web application(s).  In DSpace 1.5.x and above, this corresponds
     to <i><code>[dspace]/webapps</code></i> by default.  However, if you are using Tomcat,
@@ -210,13 +201,13 @@ of them in order to install DSpace, you do need to know they exist and also know
         <PRE>useradd -m dspace</PRE>
       </li>
       <li>
-        <P>Download the <A HREF="http://sourceforge.net/projects/dspace/">latest DSpace installation package</A> and unpack it
+        <P>Download the <A HREF="http://sourceforge.net/projects/dspace/">latest DSpace source code</A> and unpack it
         into a temporary location.  It is not necessary to keep this directory around after you install DSpace.</P>
        
         <PRE>gunzip -c dspace-1.x.tar.gz | tar -xf -</PRE>
       
       	<P>For ease of reference, we will refer to the location of this unzipped version 
-      	of the DSpace installation package as <code><i>[dspace-package]</i> in the
+      	of the DSpace installation package as <code><i>[dspace-source]</i> in the
       	remainder of these instructions.</code>
       	
       	</P>
@@ -229,7 +220,7 @@ of them in order to install DSpace, you do need to know they exist and also know
 	<ol type="i">
 	<li>
 	<p><a name="pgdriver"></a>Copy the PostgreSQL JDBC driver (<code>.jar</code> file) into
-<code><i>[dspace-package]</i>/lib</code>.  If you compiled PostgreSQL yourself, it'll be in <code>postgresql-7.x.x/src/interfaces/jdbc/jars/postgresql.jar</code>.  Alternatively you can download it directly from <a href="http://jdbc.postgresql.org/download.html">the PostgreSQL JDBC site</a>.  Make sure you get the recommended driver for the version of PostgreSQL you're running.</p></li>
+<code><i>[dspace-source]</i>/lib</code>.  If you compiled PostgreSQL yourself, it'll be in <code>postgresql-7.x.x/src/interfaces/jdbc/jars/postgresql.jar</code>.  Alternatively you can download it directly from <a href="http://jdbc.postgresql.org/download.html">the PostgreSQL JDBC site</a>.  Make sure you get the recommended driver for the version of PostgreSQL you're running.</p></li>
         <li>
 	      <p>Create a <code>dspace</code> database, owned by the <code>dspace</code> PostgreSQL user:</p>
 
@@ -242,7 +233,7 @@ createdb -U dspace -E UNICODE dspace</pre>
 	<p><strong>Oracle:</strong>
 	<ol type="i">
 	   <li>
-            <p>Copy the Oracle JDBC driver into <code><i>[dspace-package]</i>/lib</code>.</p>
+            <p>Copy the Oracle JDBC driver into <code><i>[dspace-source]</i>/lib</code>.</p>
 	   </li>
 	   <li>
             <p>Create a database for DSpace.  Make sure that the character set is one of the Unicode character sets.  DSpace uses UTF-8 natively, and it is suggested that the Oracle database use the same character set.  Create a user account for DSpace (e.g. <code>dspace</code>,) and ensure that it has permissions to add and remove tables in the database.</p>
@@ -254,9 +245,9 @@ db.url    = jdbc.oracle.thin:@//host:port/dspace
 db.driver = oracle.jdbc.OracleDriver</pre>
 	   </li>
 	   <li>
-            <p>Go to <code><i>[dspace-package]</i>/etc/oracle</code> and copy the contents to their parent directory, overwriting the versions in the parent:
+            <p>Go to <code><i>[dspace-source]</i>/etc/oracle</code> and copy the contents to their parent directory, overwriting the versions in the parent:
 
-<pre>cd [dspace-package]/etc/oracle
+<pre>cd [dspace-source]/etc/oracle
 cp * ..</pre>
             <p>You now have Oracle-specific <code>.sql</code> files in your <code>etc</code> directory, and your dspace.cfg is modified to point to your Oracle database.</p>
 	   </li>
@@ -264,7 +255,7 @@ cp * ..</pre>
       </li>
 
       <li>
-        <P>Edit <code><i>[dspace-package]</i>/config/dspace.cfg</code>, in particular you'll need to set these properties:
+        <P>Edit <code><i>[dspace-source]</i>/config/dspace.cfg</code>, in particular you'll need to set these properties:
 
 <br><code>dspace.dir</code> -- must be set to the <code>[dspace]</code> (installation) directory.
 
@@ -306,10 +297,20 @@ chown dspace <i>[dspace]</i></PRE>
         <P>(Assuming the <code>dspace</code> UNIX username.)</P>
       </li>
 
+	  <li>
+	  	<P>As the <code>dspace</code> UNIX user, generate the DSpace installation package in the <code><i>[dspace-source]</i>/target/dspace-[version].dir/</code> directory:</P>
+	  	<pre>cd <i>[dspace-source]</i>
+mvn package</pre>
+
+		<P>Note: without any extra arguments, the DSpace installation package is initialized for PostgreSQL.  If you want to use Oracle instead,
+	     you should build the DSpace installation package as follows:</P>
+	     
+	    <PRE>mvn -Ddb.name=oracle package</PRE>
+	  
       <li>
         <P>As the <code>dspace</code> UNIX user, initialize the DSpace database and install DSpace to <code><i>[dspace]</i></code>:</P>
 
-        <pre>cd <i>[dspace-package]</i> 
+        <pre>cd <i>[dspace-source]</i>/target/dspace-[version].dir/
 ant fresh_install</pre>
 
 		<P><strong>Note:</strong> to see a complete list of build targets, run</P>
@@ -365,11 +366,11 @@ cp -r <i>[dspace]</i>/webapps/dspace-oai <i>[tomcat]</i>/webapps</PRE>
 	
 	<P><strong>Additional Prerequisites</strong>
 	<ul>
-		<li><A HREF="http://maven.apache.org/">Apache Maven 2</A> - This is obviously required if you are doing a Maven-based install</li>
 		<li><A href="http://subversion.tigris.org/">Subversion (SVN)</A> - Necessary to checkout the DSpace source code from SourceForge SVN</li>
 	</ul>
 	</P>
 
+	<P><strong>Build &amp; Install Steps</strong>
 	<ol>
       <li>
         <P>Create the DSpace user.  This needs to be the same user that Tomcat (or Jetty etc) will run as.  e.g. as root run:</P>
@@ -377,36 +378,36 @@ cp -r <i>[dspace]</i>/webapps/dspace-oai <i>[tomcat]</i>/webapps</PRE>
         <PRE>useradd -m dspace</PRE>
       </li>
       <li>
-        <P>Create the directory for the DSpace source to reside (i.e. <code>[dspace-source]</code>).  As <em>root</em> (or a user with appropriate permissions), run:</P>
+        <P>Create the parent directory for the DSpace modules to reside (i.e. <code>[dspace-parent]</code>).  As <em>root</em> (or a user with appropriate permissions), run:</P>
 
-        <PRE>mkdir <i>[dspace-source]</i>
-chown dspace <i>[dspace-source]</i></PRE>
+        <PRE>mkdir <i>[dspace-parent]</i>
+chown dspace <i>[dspace-parent]</i></PRE>
 
         <P>(Assuming the <code>dspace</code> UNIX username.)</P>
       </li>
 	  <li>
-	  	<P>Checkout the DSpace Source code from SourceForge SVN into <code>[dspace-source]</code>.  For example:</P>
+	  	<P>Checkout the DSpace Source code from SourceForge SVN into <code>[dspace-parent]</code>.  For example:</P>
 	  	
-	  	<PRE>svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5 [dspace-source]</PRE>
+	  	<PRE>svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5 [dspace-parent]</PRE>
 	  	
 	  	<P>If you wish, you can choose to <em>only</em> checkout the source code for the specific DSpace "modules"
 	  	which you want to install.  However, you must <em>always</em> checkout the <code>'dspace'</code> module, as
 	  	it is the module which builds DSpace.  For example, if you only want to install the XML-UI and the OAI-PMH interface
 	  	you can perform the following checkouts:</P>
 	  	
-	  	<PRE>svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace [dspace-source]
-svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace-xmlui [dspace-source]
-svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace-oai [dspace-source]	  	
+	  	<PRE>svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace [dspace-parent]
+svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace-xmlui [dspace-parent]
+svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace-oai [dspace-parent]	  	
 	  	</PRE>
 		
 		<P>In order, you are checking out the <code>'dspace'</code> module (builds DSpace), 
 		<code>'dspace-xmlui'</code> module (provides XML-UI), and <code>'dspace-oai'</code> module (provides OAI-PMH).</P>
 	  
-	  	<P>In the end, you should have a folder structure similar to the following in <code><i>[dspace-source]</i></code>:
+	  	<P>In the end, you should have a folder structure similar to the following in <code><i>[dspace-parent]</i></code>:
 	  	<ul>
-	  		<li><code><i>[dspace-source]</i></code>
+	  		<li><code><i>[dspace-parent]</i></code>
 	  		  <ul>
-	  	 		<li><code>dspace/</code> - DSpace 'build' and configuration module</li>
+	  	 		<li><code>dspace/</code> - DSpace 'build' and configuration module (this is what is normally referred to as <code><i>[dspace-source]</i></code>)</li>
 	  	 		<li><code>dspace-api/</code> - DSpace Java API module</li>
 	  	 		<li><code>dspace-jspui/</code> - DSpace JSP-UI module</li>
 	  	 		<li><code>dspace-oai/</code> - DSpace OAI-PMH interface module</li>
@@ -418,7 +419,7 @@ svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace-
 	  <li>
 	     <P>Build your custom DSpace installation package (from within the <code>'dspace'</code> module)</P>
 	    
-	     <PRE>cd [dspace-source]/dspace/
+	     <PRE>cd [dspace-parent]/dspace/
 mvn package</PRE>
 	     
 	     <P>Note: without any extra arguments, DSpace is built for PostgreSQL.  If you want to use Oracle instead,
@@ -429,9 +430,9 @@ mvn package</PRE>
 	  <li>
 	  	 <P>Building DSpace may take awhile.  But, once it is complete, you should have your
 	  	 custom DSpace installation package ready in your 
-	  	 <code><i>[dspace-source]</i>/dspace/target/dspace-[version].dir/</code> directory.</P>
+	  	 <code><i>[dspace-parent]</i>/dspace/target/dspace-[version].dir/</code> directory.</P>
 	  	 <P>Note: Although we won't go into this in detail, you can also create your own
-	  	 completely custom Maven-based modules in your <code><i>[dspace-source]</i></code> directory.
+	  	 completely custom Maven-based modules in your <code><i>[dspace-parent]</i></code> directory.
 	  	 To build your custom modules into DSpace, you would need to modify the <code>'dspace'</code>
 	  	 module's <code>pom.xml</code> (Project Object Model) to look for those custom modules, and
 	  	 then re-build your DSpace installation package.  Look
@@ -439,12 +440,13 @@ mvn package</PRE>
 	  	 <a href="http://wiki.dspace.org/">DSpace Wiki</a> for more hints and tricks.</P>
 	  </li>
 	  <li><P>Once your DSpace installation package has been built, you can follow the steps in the
-	  <A href="#installsteps">Quick Installation Method</A> above to install and configure DSpace.  
-	  Just remember that you can <em>skip</em> downloading the DSpace Installation Package from
-	  SourceForge (<em>Step #2 in the Quick Installation Method</em>), since you just built
-	  your own custom DSpace Installation Package into <code><i>[dspace-source]</i>/dspace/target/dspace-[version].dir/</code></P>
+	  <A href="#installsteps">Quick Installation Method</A> above to finish installing and configure DSpace.  
+	  Just remember that you can <em>skip</em> downloading the DSpace Source Code from
+	  SourceForge.  In addition, remember that your <code><i>[dspace-parent]</i>/dspace</code> module is
+	  the <i>same</i> as what is referred to as <code><i>[dspace-source]</i></code></P>
 	  </li>
 	</ol>
+    </P>
     
     <P><strong>Useful Maven References</strong>
 	<ul>
