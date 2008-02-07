@@ -63,18 +63,18 @@
           	<ul>
           	  <li><code>dspace-jspui</code> - Contains all customizations for the JSP User Interface.
           	    <ul>
-          	  		<li><code>src/main/resources</code> - The overlay for JSP-UI Resources.  This is the location to place any custom Messages.properties files.</li>
-          	  		<li><code>src/main/webapp</code> - The overlay for JSP-UI Web Application.  This is the location to place any custom JSPs to be used by DSpace.</li>
+          	  		<li><code>src/main/resources/</code> - The overlay for JSP-UI Resources.  This is the location to place any custom Messages.properties files.</li>
+          	  		<li><code>src/main/webapp/</code> - The overlay for JSP-UI Web Application.  This is the location to place any custom JSPs to be used by DSpace.</li>
           		</ul>
           	  </li>
           	  <li><code>dspace-lni</code> - Contains all customizations for the Lightweight Network Interface.</li>
           	  <li><code>dspace-oai</code> - Contains all customizations for the OAI-PMH Interface.</li>
           	  <li><code>dspace-xmlui</code> - Contains all customizations for the XML User Interface (aka Manakin).
           	  	<ul>
-          	  		<li><code>src/main/webapp</code> - The overlay for XML-UI Web Application. This is the location to place custom Themes or Configurations.
+          	  		<li><code>src/main/webapp/</code> - The overlay for XML-UI Web Application. This is the location to place custom Themes or Configurations.
           	  			<ul>
-          	  				<li><code>i18n</code> - The location to place a custom version of the XML-UI's messages.xml</li>
-          	  			    <li><code>themes</code> - The location to place custom Themes for the XML-UI</li> 
+          	  				<li><code>i18n/</code> - The location to place a custom version of the XML-UI's messages.xml</li>
+          	  			    <li><code>themes/</code> - The location to place custom Themes for the XML-UI</li> 
           	  			</ul>
           	  		</li>
           		</ul>
@@ -116,7 +116,7 @@
 
     <H2><A NAME="webapp">Contents of JSP-UI Web Application</A></H2>
 
-    <P>DSpace's Ant build file creates a<code>dspace-jspui-webapp/</code> directory with the following structure:</P>
+    <P>DSpace's Ant build file creates a <code>dspace-jspui-webapp/</code> directory with the following structure:</P>
 
     <UL>
       <LI>(top level dir)
@@ -124,10 +124,10 @@
           <LI>The JSPs</LI>
           <LI><code>WEB-INF/</code>
             <UL>
-              <LI><code>web.xml</code> - DSpace Web Application configuration and Servlet mappings</li>
+              <LI><code>web.xml</code> - DSpace JSP-UI Web Application configuration and Servlet mappings</li>
               <LI><code>dspace-tags.tld</code> - DSpace custom tag descriptor</LI>
               <LI><code>fmt.tld</code> - JSTL message format tag descriptor, for internationalization</LI>
-              <LI><code>lib/</code> - All the third-party JARs and pre-compiled DSpace API JARs needed to run DSpace</lI>
+              <LI><code>lib/</code> - All the third-party JARs and pre-compiled DSpace API JARs needed to run JSP-UI</lI>
               <li><code>classes/</code> - Any additional necessary class files</LI>
             </UL>
           </LI>
@@ -138,7 +138,7 @@
     
     <H2><A NAME="webapp">Contents of XML-UI Web Application (aka Manakin)</A></H2>
 
-    <P>DSpace's Ant build file creates a<code>dspace-xmlui-webapp/</code> directory with the following structure:</P>
+    <P>DSpace's Ant build file creates a <code>dspace-xmlui-webapp/</code> directory with the following structure:</P>
 
     <UL>
       <LI>(top level dir)
@@ -160,7 +160,7 @@
               <LI><code>lib/</code> - All the third-party JARs and pre-compiled DSpace JARs needed to run XML-UI</lI>
               <li><code>classes/</code> - Any additional necessary class files</LI>
               <LI><code>cocoon.xconf</code> - XML-UI's Apache Cocoon configuration</li>
-              <LI><code>logkit.xconf</code> - XML-UI's Cocoon Logging configuration</li>
+              <LI><code>logkit.xconf</code> - XML-UI's Apache Cocoon Logging configuration</li>
               <LI><code>web.xml</code> - XML-UI Web Application configuration and Servlet mappings</li>
               </UL>
           </LI>
