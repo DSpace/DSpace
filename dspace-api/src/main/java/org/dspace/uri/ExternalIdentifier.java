@@ -152,22 +152,6 @@ public abstract class ExternalIdentifier implements ResolvableIdentifier
     }
 
     /**
-     * obtain the actual DSpaceObject the external identifier represents.  This is effectively
-     * the same as calling
-     *
-     * <code>getObjectIdentifier().getObject(context)</code>
-     *
-     * as the external identifiers have no inherent comprehension of the objects they represent
-     *
-     * @param context
-     * @return
-     */
-    public DSpaceObject getObject(Context context)
-    {
-        return this.getObjectIdentifier().getObject(context);
-    }
-
-    /**
      * Get the native object identifier for the object we are representing
      *
      * @return
@@ -189,17 +173,6 @@ public abstract class ExternalIdentifier implements ResolvableIdentifier
     public ExternalIdentifierType getType()
     {
         return type;
-    }
-
-    /**
-     * Get the context path segment of the URL which the implementation of the external identifier
-     * will expose and will be able to subsequently resolve
-     *
-     * @return
-     */
-    public String getURLForm()
-    {
-        return type.getNamespace() + "/" + this.value;        
     }
 
     /**
@@ -225,23 +198,6 @@ public abstract class ExternalIdentifier implements ResolvableIdentifier
     }
 
     /**
-     * Get the canonical form of the identifier.  The default for this is to construct the following string:
-     *
-     * <code>[namespace]:[value]</code>
-     *
-     * For example, the canonical form for a handle will result in a string like
-     *
-     * <code>hdl:123456789/100</code>
-     *
-     * @return
-     */
-    public String getCanonicalForm()
-    {
-        // eg: hdl:1234/56
-        return type.getNamespace() + ":" + value;
-    }
-
-    /**
      * If the object represented by this external identifier should be removed, what behaviour
      * should the tombstoning mechanism take.  The default is to leave a tombstone, but individual
      * implementations may do otherwise.  If this method returns true, the identifier system will not
@@ -260,6 +216,64 @@ public abstract class ExternalIdentifier implements ResolvableIdentifier
     }
 
     /**
+     * Get the value of the identifier
+     * 
+     * @return
+     */
+    public String getValue()
+    {
+        return value;
+    }
+
+    /////////////////////////////////////////////////////////////////////
+    // ResolvableIdentifier methods
+    /////////////////////////////////////////////////////////////////////
+
+    /**
+     * obtain the actual DSpaceObject the external identifier represents.  This is effectively
+     * the same as calling
+     *
+     * <code>getObjectIdentifier().getObject(context)</code>
+     *
+     * as the external identifiers have no inherent comprehension of the objects they represent
+     *
+     * @param context
+     * @return
+     */
+    public DSpaceObject getObject(Context context)
+    {
+        return this.getObjectIdentifier().getObject(context);
+    }
+
+    /**
+     * Get the context path segment of the URL which the implementation of the external identifier
+     * will expose and will be able to subsequently resolve
+     *
+     * @return
+     */
+    public String getURLForm()
+    {
+        return type.getNamespace() + "/" + this.value;
+    }
+
+    /**
+     * Get the canonical form of the identifier.  The default for this is to construct the following string:
+     *
+     * <code>[namespace]:[value]</code>
+     *
+     * For example, the canonical form for a handle will result in a string like
+     *
+     * <code>hdl:123456789/100</code>
+     *
+     * @return
+     */
+    public String getCanonicalForm()
+    {
+        // eg: hdl:1234/56
+        return type.getNamespace() + ":" + value;
+    }
+
+    /**
      * Return a string representation of the identifier type; specifically for use when
      * working with ResolvableIdentifiers with no notion of whether the underlying identifier
      * is an ExternalIdentifier or an ObjectIdentifier
@@ -269,16 +283,6 @@ public abstract class ExternalIdentifier implements ResolvableIdentifier
     public String getIdentifierType()
     {
         return type.getNamespace();
-    }
-
-    /**
-     * Get the value of the identifier
-     * 
-     * @return
-     */
-    public String getValue()
-    {
-        return value;
     }
 
     /////////////////////////////////////////////////////////////////////
