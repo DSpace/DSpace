@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<!-- web.xml
+   - This is the web application configuration for the DSpace SWORD
+   - module.  It is not advisable to change the contents of this
+   - file unless you know exactly what you are doing
+ -->
+
+<web-app>
+
+  <display-name>DSpace SWORD Server</display-name>
+
+  <!-- Configuration Information -->
+
+  <context-param>
+    <param-name>dspace-config</param-name>
+    <param-value>${dspace.dir}/config/dspace.cfg</param-value>
+    <description>
+      The location of the main DSpace configuration file
+    </description>
+  </context-param>
+
+  <context-param>
+    <param-name>server-class</param-name>
+    <param-value>org.dspace.sword.DSpaceSWORDServer</param-value>
+    <description>
+      The SWORDServer class name
+    </description>
+  </context-param>
+  
+  <context-param>
+    <param-name>authentication-method</param-name>
+    <param-value>Basic</param-value>
+    <description>
+      The type of authentication used : [Basic|None]
+    </description>
+  </context-param>
+  
+  <!-- Servlets -->
+
+<!-- DSpace configuration initialisation.  This needs to be loaded before
+       other servlets. -->
+  <servlet>
+    <servlet-name>load-dspace-config</servlet-name>
+    <servlet-class>org.dspace.sword.LoadDSpaceConfig</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet>
+    <servlet-name>servicedocument</servlet-name>
+    <servlet-class>org.purl.sword.server.ServiceDocumentServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>deposit</servlet-name>
+    <servlet-class>org.purl.sword.server.DepositServlet</servlet-class>
+  </servlet>
+
+  <!-- Servlet Mappings -->
+
+  <servlet-mapping>
+    <servlet-name>servicedocument</servlet-name>
+    <url-pattern>/servicedocument</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>deposit</servlet-name>
+    <url-pattern>/deposit/*</url-pattern>
+  </servlet-mapping>
+  
+</web-app>

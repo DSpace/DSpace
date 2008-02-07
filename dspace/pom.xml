@@ -212,6 +212,54 @@
          </modules>
       </profile>
 
+       <!--
+         Builds SWORD WAR for DSpace
+      -->
+      <profile>
+
+         <id>sword-api</id>
+         <activation>
+            <file>
+               <exists>../dspace-sword-api/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-sword-api</module>
+         </modules>
+      </profile>
+
+      <!--
+         Builds SWORD WAR for DSpace
+      -->
+      <profile>
+
+         <id>sword-webapp</id>
+         <activation>
+            <file>
+               <exists>../dspace-sword-webapp/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-sword-webapp</module>
+         </modules>
+      </profile>
+
+      <!--
+         Builds SWORD WAR for DSpace
+      -->
+      <profile>
+
+         <id>sword</id>
+         <activation>
+            <file>
+               <exists>../dspace-sword/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-sword</module>
+         </modules>
+      </profile>
+
       <!-- 
          Builds each separate XMLUI module for the XMLUI war (for development/Eclipse)
       -->

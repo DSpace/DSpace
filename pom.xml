@@ -21,6 +21,7 @@
       <module>dspace-xmlui</module>
       <module>dspace-lni</module>
       <module>dspace-oai</module>
+      <module>dspace-sword</module>
    </modules>
 
    <build>
@@ -135,6 +136,16 @@
             <artifactId>language-packs</artifactId>
             <version>${project.version}</version>
          </dependency>
+          <dependency>
+              <groupId>org.dspace</groupId>
+              <artifactId>dspace-sword-api</artifactId>
+              <version>${project.version}</version>
+          </dependency>
+          <dependency>
+              <groupId>org.dspace</groupId>
+              <artifactId>dspace-sword-webapp</artifactId>
+              <version>${project.version}</version>
+          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-api</artifactId>
