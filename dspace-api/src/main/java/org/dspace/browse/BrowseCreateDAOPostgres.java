@@ -181,6 +181,34 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             throw new BrowseException(e);
         }
     }
+
+    /* (non-Javadoc)
+     * @see org.dspace.browse.BrowseCreateDAO#createDatabaseIndices(java.lang.String, boolean)
+     */
+    public String[] createMapIndices(String disTable, String mapTable, boolean execute) throws BrowseException
+    {
+        try
+        {
+            String[] arr = new String[2];
+            arr[0] = "CREATE INDEX " + disTable + "_value_index ON " + disTable + "(sort_value);";
+            arr[1] = "CREATE INDEX " + mapTable + "_dist_index ON " + mapTable + "(distinct_id);";
+
+            if (execute)
+            {
+                for (String query : arr)
+                {
+                    DatabaseManager.updateQuery(context, query);
+                }
+            }
+
+            return arr;
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new BrowseException(e);
+        }
+    }
     
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#createDistinctMap(java.lang.String, java.lang.String, boolean)
@@ -279,46 +307,6 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             String createTable = "CREATE TABLE " + table + " (" +
                                     "id integer primary key," +
                                     "item_id integer references item(item_id)" +
-                                    sb.toString() + 
-                                    ");";
-            if (execute)
-            {
-                DatabaseManager.updateQuery(context, createTable);
-            }
-            return createTable;
-        }
-        catch (SQLException e)
-        {
-            log.error("caught exception: ", e);
-            throw new BrowseException(e);
-        }       
-    }
-    
-    /* (non-Javadoc)
-     * @see org.dspace.browse.BrowseCreateDAO#createPrimaryTable(java.lang.String, java.util.List, boolean)
-     */
-    public String createSecondaryTable(String table, List sortCols, boolean execute)
-        throws BrowseException
-    {
-        try
-        {
-            StringBuffer sb = new StringBuffer();
-            sb.append(", sort_value ");
-            sb.append(getSortColumnDefinition());
-            
-            Iterator itr = sortCols.iterator();
-            while (itr.hasNext())
-            {
-                Integer no = (Integer) itr.next();
-                sb.append(", sort_");
-                sb.append(no.toString());
-                sb.append(getSortColumnDefinition());
-            }
-            
-            String createTable = "CREATE TABLE " + table + " (" +
-                                    "id integer primary key," +
-                                    "item_id integer references item(item_id), " +
-                                    "value " + getValueColumnDefinition() +
                                     sb.toString() + 
                                     ");";
             if (execute)

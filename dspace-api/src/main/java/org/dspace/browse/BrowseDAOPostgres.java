@@ -81,14 +81,13 @@ public class BrowseDAOPostgres implements BrowseDAO
     /** the values to place in the SELECT --- FROM bit */
     private String[] selectValues = { "*" };
     
-    /** the values to place in the SELECT DISTINCT(---) bit */
-    private String[] distinctValues;
-    
     /** the values to place in the SELECT COUNT(---) bit */
     private String[] countValues;
     
-    /** table to select from */
+    /** table(s) to select from */
     private String table = null;
+    private String tableDis = null;
+    private String tableMap = null;
     
     /** field to look for focus value in */
     private String focusField = null;
@@ -370,14 +369,6 @@ public class BrowseDAOPostgres implements BrowseDAO
     }
 
     /* (non-Javadoc)
-     * @see org.dspace.browse.BrowseDAO#getDistinctValues()
-     */
-    public String[] getDistinctValues()
-    {
-        return this.distinctValues;
-    }
-    
-    /* (non-Javadoc)
      * @see org.dspace.browse.BrowseDAO#getFocusField()
      */
     public String getJumpToField()
@@ -465,15 +456,6 @@ public class BrowseDAOPostgres implements BrowseDAO
         return this.distinct;
     }
 
-    /* (non-Javadoc)
-     * @see org.dspace.browse.BrowseDAO#selectDistinctOn(java.lang.String[])
-     */
-    public void selectDistinctOn(String[] fields)
-    {
-        this.distinctValues = fields;
-        this.rebuildQuery = true;
-    }
-    
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseDAO#setAscending(boolean)
      */
@@ -615,6 +597,13 @@ public class BrowseDAOPostgres implements BrowseDAO
         this.rebuildQuery = true;
     }
 
+    public void setFilterMappingTables(String tableDis, String tableMap)
+    {
+        this.tableDis = tableDis;
+        this.tableMap = tableMap;
+
+    }
+
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseDAO#setValue(java.lang.String)
      */
@@ -673,7 +662,7 @@ public class BrowseDAOPostgres implements BrowseDAO
             }
         }
 
-        buildSelectStatement(queryBuf);
+        buildSelectStatementDistinct(queryBuf, params);
         buildWhereClauseOpReset();
         
         // assemble the focus clase if we are to have one
@@ -708,18 +697,13 @@ public class BrowseDAOPostgres implements BrowseDAO
         
         if (!buildSelectListCount(queryBuf))
         {
-            boolean hasSelectList = false;
-            
-            hasSelectList |= buildSelectListDistinctValues(queryBuf);
-            hasSelectList |= buildSelectListValues(queryBuf);
-            
-            if (!hasSelectList)
+            if (!buildSelectListValues(queryBuf))
             {
                 throw new BrowseException("No arguments for SELECT statement");
             }
         }
 
-        buildSelectStatement(queryBuf);
+        buildSelectStatement(queryBuf, params);
         buildWhereClauseOpReset();
         
         // assemble the focus clase if we are to have one
@@ -811,6 +795,90 @@ public class BrowseDAOPostgres implements BrowseDAO
             params.add(new Integer(offset));
         }
     }
+
+    /**
+     * Build the clauses required for the view used in focused or scoped queries.
+     *
+     * @param queryBuf
+     * @param params
+     */
+    private void buildFocusedSelectClauses(StringBuffer queryBuf, List params)
+    {
+        if (tableMap != null && tableDis != null)
+        {
+            queryBuf.append(tableMap).append(".distinct_id=").append(tableDis).append(".id");
+            queryBuf.append(" AND ");
+            queryBuf.append(tableDis).append(".sort_value");
+
+            if (valuePartial)
+            {
+                queryBuf.append(" LIKE ? ");
+
+                if (valueField.startsWith("sort_"))
+                {
+                    params.add("%" + utils.truncateSortValue(value) + "%");
+                }
+                else
+                {
+                    params.add("%" + utils.truncateValue(value) + "%");
+                }
+            }
+            else
+            {
+                queryBuf.append("=? ");
+
+                if (valueField.startsWith("sort_"))
+                {
+                    params.add(utils.truncateSortValue(value));
+                }
+                else
+                {
+                    params.add(utils.truncateValue(value));
+                }
+            }
+        }
+
+        if (containerTable != null && containerIDField != null && containerID != -1)
+        {
+            if (tableMap != null)
+            {
+                if (tableDis != null)
+                    queryBuf.append(" AND ");
+
+                queryBuf.append(tableMap).append(".item_id=")
+                        .append(containerTable).append(".item_id AND ");
+            }
+
+            queryBuf.append(containerTable).append(".").append(containerIDField);
+            queryBuf.append("=? ");
+
+            params.add(new Integer(containerID));
+        }
+    }
+
+    /**
+     * Build the table list for the view used in focused or scoped queries.
+     *
+     * @param queryBuf
+     */
+    private void buildFocusedSelectTables(StringBuffer queryBuf)
+    {
+        if (containerTable != null)
+        {
+            queryBuf.append(containerTable);
+        }
+
+        if (tableMap != null)
+        {
+            if (containerTable != null)
+                queryBuf.append(", ");
+
+            queryBuf.append(tableMap);
+
+            if (tableDis != null)
+                queryBuf.append(", ").append(tableDis);
+        }
+    }
     
     /**
      * Build a clause for counting results.  Will return something of the form:
@@ -826,43 +894,32 @@ public class BrowseDAOPostgres implements BrowseDAO
         if (countValues != null && countValues.length > 0)
         {
             queryBuf.append(" COUNT(");
-            queryBuf.append(countValues[0]);
+            if ("*".equals(countValues[0]))
+            {
+                queryBuf.append(countValues[0]);
+            }
+            else
+            {
+                queryBuf.append(table).append(".").append(countValues[0]);
+            }
+
             for (int i = 1; i < countValues.length; i++)
             {
                 queryBuf.append(", ");
-                queryBuf.append(countValues[i]);
+                if ("*".equals(countValues[i]))
+                {
+                    queryBuf.append(countValues[i]);
+                }
+                else
+                {
+                    queryBuf.append(table).append(".").append(countValues[i]);
+                }
             }
 
             queryBuf.append(") AS num");
             return true;
         }
-        
-        return false;
-    }
-    
-    /**
-     * Build a clause for selecting distinct values.  Will return something of the form
-     * 
-     * <code>
-     * DISTINCT( [value 1], [value 2] )
-     * </code>
-     * 
-     * @return the distinct clause
-     */
-    private boolean buildSelectListDistinctValues(StringBuffer queryBuf)
-    {
-        if (distinctValues != null && distinctValues.length > 0)
-        {
-            queryBuf.append(" DISTINCT(");
-            for (int i = 1; i < distinctValues.length; i++)
-            {
-                queryBuf.append(", ");
-                queryBuf.append(selectValues[i]);
-            }
-            queryBuf.append(") ");
-            return true;
-        }
-        
+
         return false;
     }
     
@@ -879,16 +936,16 @@ public class BrowseDAOPostgres implements BrowseDAO
     {
         if (selectValues != null && selectValues.length > 0)
         {
-            queryBuf.append(selectValues[0]);
+            queryBuf.append(table).append(".").append(selectValues[0]);
             for (int i = 1; i < selectValues.length; i++)
             {
                 queryBuf.append(", ");
-                queryBuf.append(selectValues[i]);
+                queryBuf.append(table).append(".").append(selectValues[i]);
             }
-            
+
             return true;
         }
-        
+
         return false;
     }
     
@@ -903,13 +960,56 @@ public class BrowseDAOPostgres implements BrowseDAO
      * @param queryBuf  the string value obtained from distinctClause, countClause or selectValues
      * @return  the SELECT part of the query
      */
-    private void buildSelectStatement(StringBuffer queryBuf) throws BrowseException
+    private void buildSelectStatement(StringBuffer queryBuf, List params) throws BrowseException
     {
         if (queryBuf.length() == 0)
         {
             throw new BrowseException("No arguments for SELECT statement");
         }
-        
+
+        if (table == null || "".equals(table))
+        {
+            throw new BrowseException("No table for SELECT statement");
+        }
+
+        // queryBuf already contains what we are selecting,
+        // so insert the statement at the beginning
+        queryBuf.insert(0, "SELECT ");
+
+        // Then append the table
+        queryBuf.append(" FROM ");
+        queryBuf.append(table);
+        if (containerTable != null || (value != null && valueField != null && tableDis != null && tableMap != null))
+        {
+            queryBuf.append(", (SELECT ");
+            queryBuf.append(containerTable != null ? containerTable : tableMap).append(".item_id");
+            queryBuf.append(" FROM ");
+            buildFocusedSelectTables(queryBuf);
+            queryBuf.append(" WHERE ");
+            buildFocusedSelectClauses(queryBuf, params);
+            queryBuf.append(") mappings");
+        }
+        queryBuf.append(" ");
+    }
+
+    /**
+     * Prepare the select clause using the pre-prepared arguments.  This will produce something
+     * of the form:
+     *
+     * <code>
+     * SELECT [arguments] FROM [table]
+     * </code>
+     *
+     * @param queryBuf  the string value obtained from distinctClause, countClause or selectValues
+     * @return  the SELECT part of the query
+     */
+    private void buildSelectStatementDistinct(StringBuffer queryBuf, List params) throws BrowseException
+    {
+        if (queryBuf.length() == 0)
+        {
+            throw new BrowseException("No arguments for SELECT statement");
+        }
+
         if (table == null || "".equals(table))
         {
             throw new BrowseException("No table for SELECT statement");
@@ -1016,13 +1116,13 @@ public class BrowseDAOPostgres implements BrowseDAO
     {
         // add the constraint to community or collection if necessary
         // and desired
-        if (containerIDField != null && containerID != -1)
+        if (tableDis == null || tableMap == null)
         {
-            buildWhereClauseOpInsert(queryBuf);
-            queryBuf.append(containerIDField);
-            queryBuf.append("=? ");
-            
-            params.add(new Integer(containerID));
+            if (containerIDField != null && containerID != -1)
+            {
+                buildWhereClauseOpInsert(queryBuf);
+                queryBuf.append(" ").append(table).append(".item_id=mappings.item_id ");
+            }
         }
     }
     
@@ -1049,31 +1149,38 @@ public class BrowseDAOPostgres implements BrowseDAO
         {
             buildWhereClauseOpInsert(queryBuf);
             queryBuf.append(" ");
-            queryBuf.append(valueField);
-            if (valuePartial)
+            if (tableDis != null && tableMap != null)
             {
-                queryBuf.append(" LIKE ? ");
-
-                if (valueField.startsWith("sort_"))
-                {
-                    params.add("%" + utils.truncateSortValue(value) + "%");
-                }
-                else
-                {
-                    params.add("%" + utils.truncateValue(value) + "%");
-                }
+                queryBuf.append(table).append(".item_id=mappings.item_id ");
             }
             else
             {
-                queryBuf.append("=? ");
-
-                if (valueField.startsWith("sort_"))
+                queryBuf.append(valueField);
+                if (valuePartial)
                 {
-                    params.add(utils.truncateSortValue(value));
+                    queryBuf.append(" LIKE ? ");
+
+                    if (valueField.startsWith("sort_"))
+                    {
+                        params.add("%" + utils.truncateSortValue(value) + "%");
+                    }
+                    else
+                    {
+                        params.add("%" + utils.truncateValue(value) + "%");
+                    }
                 }
                 else
                 {
-                    params.add(utils.truncateValue(value));
+                    queryBuf.append("=? ");
+
+                    if (valueField.startsWith("sort_"))
+                    {
+                        params.add(utils.truncateSortValue(value));
+                    }
+                    else
+                    {
+                        params.add(utils.truncateValue(value));
+                    }
                 }
             }
         }

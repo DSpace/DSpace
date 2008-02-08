@@ -160,7 +160,7 @@ public class BrowseEngine
 		browseIndex = scope.getBrowseIndex();
 		
 		// get the table name that we are going to be getting our data from
-		dao.setTable(browseIndex.getTableName(scope.inCommunity(), scope.inCollection()));
+        dao.setTable(browseIndex.getTableName());
 		
 		// tell the browse query whether we are ascending or descending on the value
 		dao.setAscending(scope.isAscending());
@@ -172,12 +172,14 @@ public class BrowseEngine
 			if (scope.inCollection())
 			{
 				Collection col = (Collection) scope.getBrowseContainer();
+                dao.setContainerTable("collection2item");
 				dao.setContainerIDField("collection_id");
 				dao.setContainerID(col.getID());
 			}
 			else if (scope.inCommunity())
 			{
 				Community com = (Community) scope.getBrowseContainer();
+                dao.setContainerTable("communities2item");
 				dao.setContainerIDField("community_id");
 				dao.setContainerID(com.getID());
 			}
@@ -238,8 +240,8 @@ public class BrowseEngine
         ItemDAO itemDAO = ItemDAOFactory.getInstance(context);
 		try
 		{
-			// get the table name that we are going to be getting our data from
-			dao.setTable(browseIndex.getTableName(scope.inCommunity(), scope.inCollection()));
+            // get the table name that we are going to be getting our data from
+            dao.setTable(browseIndex.getTableName());
 			
 			// tell the browse query whether we are ascending or descending on the value
 			dao.setAscending(scope.isAscending());
@@ -282,7 +284,7 @@ public class BrowseEngine
 				dao.setJumpToValue(focusValue);
 			}
 			
-			// assemble the value clause if we are to have one
+            // assemble the value clause
 			String value = null;
 			String rawValue = null;
 			if (scope.hasFilterValue() && scope.isSecondLevel())
@@ -298,7 +300,11 @@ public class BrowseEngine
 				dao.setFilterValueField("sort_value");
 				dao.setFilterValue(value);
                 dao.setFilterValuePartial(scope.getFilterValuePartial());
-			}
+
+                // to apply the filtering, we need the distinct and map tables for the index
+                dao.setFilterMappingTables(browseIndex.getTableName(false, false, true, false),
+                                           browseIndex.getTableName(false, false, false, true));
+            }
 			
 			// define a clause for the WHERE clause which will allow us to constraine
 			// our browse to a specified community or collection
@@ -307,12 +313,14 @@ public class BrowseEngine
 				if (scope.inCollection())
 				{
 					Collection col = (Collection) scope.getBrowseContainer();
+                    dao.setContainerTable("collection2item");
 					dao.setContainerIDField("collection_id");
 					dao.setContainerID(col.getID());
 				}
 				else if (scope.inCommunity())
 				{
 					Community com = (Community) scope.getBrowseContainer();
+                    dao.setContainerTable("communities2item");
 					dao.setContainerIDField("community_id");
 					dao.setContainerID(com.getID());
 				}
@@ -543,17 +551,21 @@ public class BrowseEngine
 			// set our constraints on community or collection
 			if (scope.inCollection() || scope.inCommunity())
 			{
+                // Scoped browsing of distinct metadata requires the mapping
+                // table to be specified.
+                dao.setFilterMappingTables(null, browseIndex.getTableName(false, false, false, true));
+
 				if (scope.inCollection())
 				{
 					Collection col = (Collection) scope.getBrowseContainer();
-					dao.setContainerTable(browseIndex.getTableName(false, true, false, true));
+                    dao.setContainerTable("collection2item");
 					dao.setContainerIDField("collection_id");
 					dao.setContainerID(col.getID());
 				}
 				else if (scope.inCommunity())
 				{
 					Community com = (Community) scope.getBrowseContainer();
-					dao.setContainerTable(browseIndex.getTableName(true, false, false, true));
+                    dao.setContainerTable("communities2item");
 					dao.setContainerIDField("community_id");
 					dao.setContainerID(com.getID());
 				}
