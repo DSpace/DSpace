@@ -2,7 +2,7 @@
 
 ###########################################################################
 #
-# index-all
+# index-update
 #
 # Version: $Revision$
 #
@@ -49,6 +49,7 @@ BINDIR=`dirname $0`
 
 echo "Creating browse index"
 $BINDIR/dsrun org.dspace.browse.IndexBrowse -i
+$BINDIR/dsrun org.dspace.browse.ItemCounter
 
 echo "Creating search index"
 $BINDIR/dsrun org.dspace.search.DSIndexer
