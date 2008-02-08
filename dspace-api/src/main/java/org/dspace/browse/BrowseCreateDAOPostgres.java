@@ -183,6 +183,34 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     }
     
     /* (non-Javadoc)
+     * @see org.dspace.browse.BrowseCreateDAO#createDatabaseIndices(java.lang.String, boolean)
+     */
+    public String[] createMapIndices(String disTable, String mapTable, boolean execute) throws BrowseException
+    {
+        try
+        {
+            String[] arr = new String[2];
+            arr[0] = "CREATE INDEX " + disTable + "_value_index ON " + disTable + "(sort_value);";
+            arr[1] = "CREATE INDEX " + mapTable + "_dist_index ON " + mapTable + "(distinct_id);";
+            
+            if (execute)
+            {
+                for (String query : arr)
+                {
+                    DatabaseManager.updateQuery(context, query);
+                }
+            }
+            
+            return arr;
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new BrowseException(e);
+        }
+    }
+
+    /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#createDistinctMap(java.lang.String, java.lang.String, boolean)
      */
     public String createDistinctMap(String table, String map, boolean execute)
@@ -279,46 +307,6 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             String createTable = "CREATE TABLE " + table + " (" +
                                     "id integer primary key," +
                                     "item_id integer references item(item_id)" +
-                                    sb.toString() + 
-                                    ");";
-            if (execute)
-            {
-                DatabaseManager.updateQuery(context, createTable);
-            }
-            return createTable;
-        }
-        catch (SQLException e)
-        {
-            log.error("caught exception: ", e);
-            throw new BrowseException(e);
-        }       
-    }
-    
-    /* (non-Javadoc)
-     * @see org.dspace.browse.BrowseCreateDAO#createPrimaryTable(java.lang.String, java.util.List, boolean)
-     */
-    public String createSecondaryTable(String table, List sortCols, boolean execute)
-        throws BrowseException
-    {
-        try
-        {
-            StringBuffer sb = new StringBuffer();
-            sb.append(", sort_value ");
-            sb.append(getSortColumnDefinition());
-            
-            Iterator itr = sortCols.iterator();
-            while (itr.hasNext())
-            {
-                Integer no = (Integer) itr.next();
-                sb.append(", sort_");
-                sb.append(no.toString());
-                sb.append(getSortColumnDefinition());
-            }
-            
-            String createTable = "CREATE TABLE " + table + " (" +
-                                    "id integer primary key," +
-                                    "item_id integer references item(item_id), " +
-                                    "value " + getValueColumnDefinition() +
                                     sb.toString() + 
                                     ");";
             if (execute)
@@ -515,7 +503,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             }
         }
     }
-
+    
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#insertCommunityMappings(java.lang.String, java.lang.String, java.lang.String)
      */
@@ -642,10 +630,10 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     {
         try
         {
-            String query = "DELETE FROM " + table +
-                            " WHERE id IN (SELECT id FROM " + table +
-                            " EXCEPT SELECT distinct_id AS id FROM " + map + ")";
-
+            String query = "DELETE FROM " + table + 
+                            " WHERE id NOT IN " +
+                            "(SELECT distinct_id FROM " + map + ")";
+            
             DatabaseManager.updateQuery(context, query);
         }
         catch (SQLException e)
@@ -661,27 +649,45 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     public void pruneExcess(String table, String map, boolean withdrawn)
         throws BrowseException
     {
+        TableRowIterator tri = null;
+        
         try
         {
-            String itemQuery = "SELECT item_id FROM item WHERE ";
+            String query = "SELECT item_id FROM " + table + " WHERE item_id NOT IN ( SELECT item_id FROM item WHERE ";
+
             if (withdrawn)
-                itemQuery += "withdrawn = true";
+                query += "withdrawn = true";
             else
-                itemQuery += "in_archive = true AND withdrawn = false";
+                query += "in_archive = true AND withdrawn = false";
 
-            String delete         = "DELETE FROM " + table + " WHERE item_id IN ( SELECT item_id FROM " + table + " EXCEPT " + itemQuery + ")";
-            DatabaseManager.updateQuery(context, delete);
+            query += ")";
 
-            if (map != null)
+            tri = DatabaseManager.query(context, query);
+            while (tri.hasNext())
             {
-                String deleteDistinct = "DELETE FROM " + map   + " WHERE item_id IN ( SELECT item_id FROM " + map   + " EXCEPT " + itemQuery + ")";
-                DatabaseManager.updateQuery(context, deleteDistinct);
+                TableRow row = tri.next();
+                String delete = "DELETE FROM " + table + " WHERE item_id = " + Integer.toString(row.getIntColumn("item_id"));
+                
+                DatabaseManager.updateQuery(context, delete);
+
+                if (map != null)
+                {
+                    String deleteDistinct = "DELETE FROM " + map + " WHERE item_id = " + Integer.toString(row.getIntColumn("item_id"));
+                    DatabaseManager.updateQuery(context, deleteDistinct);
+                }
             }
         }
         catch (SQLException e)
         {
             log.error("caught exception: ", e);
             throw new BrowseException(e);
+        }
+        finally
+        {
+            if (tri != null)
+            {
+                tri.close();
+            }
         }
     }
     

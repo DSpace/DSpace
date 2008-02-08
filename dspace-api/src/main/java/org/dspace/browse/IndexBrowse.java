@@ -294,37 +294,6 @@ public class IndexBrowse
     	return this.outFile;
     }
     
-    /**
-     * Remove any indexed information for the given item from the given index
-     * 
-     * @param item		the item to remove
-     * @param bi		the index to remove from
-     * @throws BrowseException
-     */
-    private void removeIndex(Item item, BrowseIndex bi)
-    	throws BrowseException
-    {
-        removeIndex(item.getID(), bi);
-    }
-    
-    /**
-     * Remove any indexed information for the given item from the given index
-     * 
-     * @param itemID    the ID of the item to remove
-     * @param bi        the index to remove from
-     * @throws BrowseException
-     */
-    private void removeIndex(int itemID, BrowseIndex bi)
-        throws BrowseException
-    {
-        if (bi.isMetadataIndex())
-        {
-            // remove old metadata from the item index
-            dao.deleteByItemID(bi.getTableName(), itemID);
-            dao.deleteByItemID(bi.getMapName(), itemID);
-        }
-    }
-    
     private void removeIndex(int itemID, String table)
         throws BrowseException
     {
@@ -420,7 +389,7 @@ public class IndexBrowse
                 if (bis[i].isMetadataIndex())
                 {
                     // remove old metadata from the item index
-                    removeIndex(item.getID(), bis[i]);
+                    removeIndex(item.getID(), bis[i].getMapName());
         
                     // now index the new details - but only if it's archived and not withdrawn
                     if (item.isArchived() && !item.isWithdrawn())
@@ -448,17 +417,8 @@ public class IndexBrowse
                                     {
                                         // get the normalised version of the value
                                         String nVal = OrderFormat.makeSortString(values[x].value, values[x].language, bis[i].getDataType());
-
-                                        // get all the normalised values for sorting
-                                        Map sortMap = getSortValues(item, itemMDMap);
-
-                                        dao.insertIndex(bis[i].getTableName(), item.getID(), values[x].value, nVal, sortMap);
-
-                                        if (bis[i].isMetadataIndex())
-                                        {
-                                            int distinctID = dao.getDistinctID(bis[i].getTableName(true, false, false), values[x].value, nVal);
-                                            dao.createDistinctMapping(bis[i].getMapName(), item.getID(), distinctID);
-                                        }
+                                        int distinctID = dao.getDistinctID(bis[i].getTableName(true, false, false), values[x].value, nVal);
+                                        dao.createDistinctMapping(bis[i].getMapName(), item.getID(), distinctID);
                                     }
                                 }
                             }
@@ -579,8 +539,11 @@ public class IndexBrowse
 		// go over the indices and index the item
 		for (int i = 0; i < bis.length; i++)
 		{
-			log.debug("Removing indexing for removed item " + item.getID() + ", for index: " + bis[i].getTableName());
-			removeIndex(item, bis[i]);
+		    if (bis[i].isMetadataIndex())
+		    {
+    			log.debug("Removing indexing for removed item " + item.getID() + ", for index: " + bis[i].getTableName());
+    			removeIndex(item.getID(), bis[i].getMapName());
+		    }
 	    }
 
         // Remove from the item indexes (archive and withdrawn)
@@ -781,9 +744,34 @@ public class IndexBrowse
     			String distinctSequence = BrowseIndex.getSequenceName(i, true, false);
 
     			output.message("Checking for " + tableName);
-    			if (!dao.testTableExistance(tableName))
+    			if (dao.testTableExistance(tableName))
     			{
-                    if (i < bis.length)
+                    output.message("...found");
+                    
+                    output.message("Deleting old index and associated resources: " + tableName);
+    			    
+                    // prepare a statement which will delete the table and associated
+                    // resources
+                    String dropper = dao.dropIndexAndRelated(tableName, this.execute());
+                    String dropSeq = dao.dropSequence(sequence, this.execute());
+                    String dropColView = dao.dropView( colViewName, this.execute() );
+                    String dropComView = dao.dropView( comViewName, this.execute() );
+                    
+                    output.sql(dropper);
+                    output.sql(dropSeq);
+                    output.sql(dropColView);
+                    output.sql(dropComView);
+    			}
+    			
+                // NOTE: we need a secondary context to check for the existance
+                // of the table, because if an SQLException is thrown, then
+                // the connection is aborted, and no more transaction stuff can be
+                // done.  Therefore we use a blank context to make the requests,
+                // not caring if it gets aborted or not
+                output.message("Checking for " + distinctTableName);
+                if (!dao.testTableExistance(distinctTableName))
+    			{
+                    if (i < bis.length || i < 10)
                     {
                         output.message("... doesn't exist; but will carry on as there may be something that conflicts");
                     }
@@ -797,56 +785,22 @@ public class IndexBrowse
                 {
         			output.message("...found");
         			
-        			output.message("Deleting old index and associated resources: " + tableName);
+        			output.message("Deleting old index and associated resources: " + distinctTableName);
         			
-        			// prepare a statement which will delete the table and associated
-        			// resources
-        			String dropper = dao.dropIndexAndRelated(tableName, this.execute());
-        			String dropSeq = dao.dropSequence(sequence, this.execute());
-                    String dropColView = dao.dropView( colViewName, this.execute() );
-                    String dropComView = dao.dropView( comViewName, this.execute() );
-        			
-        			output.sql(dropper);
-        			output.sql(dropSeq);
-                    output.sql(dropColView);
-                    output.sql(dropComView);
-    
-    
-        			// NOTE: we need a secondary context to check for the existance
-        			// of the table, because if an SQLException is thrown, then
-        			// the connection is aborted, and no more transaction stuff can be
-        			// done.  Therefore we use a blank context to make the requests,
-        			// not caring if it gets aborted or not
-        			
-        			output.message("Checking for " + distinctTableName);
-        			boolean distinct = true;
-        			if (!dao.testTableExistance(distinctTableName))
-        			{
-        				output.message("... no distinct index for this table");
-        				distinct = false;
-        			}
-        			else
-        			{
-        				output.message("...found");
-        			}
-        			
-        			if (distinct)
-        			{
-        				// prepare statements that will delete the distinct value tables
-        				String dropDistinctTable = dao.dropIndexAndRelated(distinctTableName, this.execute());
-        				String dropMap = dao.dropIndexAndRelated(distinctMapName, this.execute());
-        				String dropDistinctMapSeq = dao.dropSequence(mapSequence, this.execute());
-        				String dropDistinctSeq = dao.dropSequence(distinctSequence, this.execute());
-                        String dropDistinctColView = dao.dropView( distinctColViewName, this.execute() );
-                        String dropDistinctComView = dao.dropView( distinctComViewName, this.execute() );
-        				
-        				output.sql(dropDistinctTable);
-        				output.sql(dropMap);
-        				output.sql(dropDistinctMapSeq);
-        				output.sql(dropDistinctSeq);
-                        output.sql(dropDistinctColView);
-                        output.sql(dropDistinctComView);
-        			}
+    				// prepare statements that will delete the distinct value tables
+    				String dropDistinctTable = dao.dropIndexAndRelated(distinctTableName, this.execute());
+    				String dropMap = dao.dropIndexAndRelated(distinctMapName, this.execute());
+    				String dropDistinctMapSeq = dao.dropSequence(mapSequence, this.execute());
+    				String dropDistinctSeq = dao.dropSequence(distinctSequence, this.execute());
+                    String dropDistinctColView = dao.dropView( distinctColViewName, this.execute() );
+                    String dropDistinctComView = dao.dropView( distinctComViewName, this.execute() );
+    				
+    				output.sql(dropDistinctTable);
+    				output.sql(dropMap);
+    				output.sql(dropDistinctMapSeq);
+    				output.sql(dropDistinctSeq);
+                    output.sql(dropDistinctColView);
+                    output.sql(dropDistinctComView);
                 }
     			
     			i++;
@@ -937,14 +891,10 @@ public class IndexBrowse
             throws BrowseException
     {
         String tableName = bix.getTableName(false, false, false, false);
-        String colViewName = bix.getTableName(false, true, false, false);
-        String comViewName = bix.getTableName(true, false, false, false);
-        
+
         String itemSeq   = dao.createSequence(bix.getSequenceName(false, false), this.execute());
         String itemTable = dao.createPrimaryTable(tableName, sortCols, execute);
         String[] itemIndices = dao.createDatabaseIndices(tableName, sortCols, false, this.execute());
-        String itemColView = dao.createCollectionView(tableName, colViewName, this.execute());
-        String itemComView = dao.createCommunityView(tableName, comViewName, this.execute());
 
         output.sql(itemSeq);
         output.sql(itemTable);
@@ -952,8 +902,6 @@ public class IndexBrowse
         {
             output.sql(itemIndices[i]);
         }
-        output.sql(itemColView);
-        output.sql(itemComView);
     }
     /**
      * Create the browse tables for the given browse index
@@ -973,38 +921,15 @@ public class IndexBrowse
                 sortCols.add(new Integer(so.getNumber()));
             }
 
-	        // get the table names that the browse index is in charge of
-			String tableName   = bi.getTableName();
-			String sequence    = bi.getSequenceName(false, false);
-			String colViewName = bi.getTableName(false, true);
-			String comViewName = bi.getTableName(true, false);
-			
 			// if this is a single view, create the DISTINCT tables and views
 			if (bi.isMetadataIndex())
 			{
-	            String createSeq = dao.createSequence(sequence, this.execute());
-	            String createTable = dao.createSecondaryTable(tableName, sortCols, this.execute());
-	            String[] databaseIndices = dao.createDatabaseIndices(tableName, sortCols, true, this.execute());
-                String createColView = dao.createCollectionView(tableName, colViewName, this.execute());
-                String createComView = dao.createCommunityView(tableName, comViewName, this.execute());
-	            
-	            output.sql(createSeq);
-	            output.sql(createTable);
-	            for (int i = 0; i < databaseIndices.length; i++)
-	            {
-	                output.sql(databaseIndices[i]);
-	            }
-                output.sql(createColView);
-                output.sql(createComView);
-
 	            // if this is a single view, create the DISTINCT tables and views
 	            String distinctTableName = bi.getTableName(false, false, true, false);
 				String distinctSeq = bi.getSequenceName(true, false);
 				String distinctMapName = bi.getTableName(false, false, false, true);
 				String mapSeq = bi.getSequenceName(false, true);
-				String distinctColMapName = bi.getTableName(false, true, false, true);
-				String distinctComMapName = bi.getTableName(true, false, false, true);
-				
+
 				
 				// FIXME: at the moment we have not defined INDEXes for this data
 				// add this later when necessary
@@ -1013,15 +938,11 @@ public class IndexBrowse
 				String distinctMapSeq = dao.createSequence(mapSeq, this.execute());
 				String createDistinctTable = dao.createDistinctTable(distinctTableName, this.execute());
 				String createDistinctMap = dao.createDistinctMap(distinctTableName, distinctMapName, this.execute());
-				String createDistinctColView = dao.createCollectionView(distinctMapName, distinctColMapName, this.execute());
-				String createDistinctComView = dao.createCommunityView(distinctMapName, distinctComMapName, this.execute());
-				
+
 				output.sql(distinctTableSeq);
 				output.sql(distinctMapSeq);
 				output.sql(createDistinctTable);
 				output.sql(createDistinctMap);
-				output.sql(createDistinctColView);
-				output.sql(createDistinctComView);
 			}
 
 			if (execute())

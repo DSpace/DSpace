@@ -285,22 +285,6 @@ public interface BrowseDAO
 	public void setSelectValues(String[] selectValues);
 	
 	/**
-	 * Get the array of values that we will be selected distinct on (only selecting
-	 * one of each value).
-	 * 
-	 * @return	an array of values to select distinct on
-	 */
-	public String[] getDistinctValues();
-	
-	/**
-	 * Set an array of columns that will be selected distinct on (only selecting
-	 * one of each value) 
-	 * 
-	 * @param fields	an array of values to select distinct on
-	 */
-	public void selectDistinctOn(String[] fields);
-	
-	/**
 	 * Get the array of fields that we will be counting on.
 	 * 
 	 * @return	an array of fields to be counted over
@@ -328,6 +312,13 @@ public interface BrowseDAO
 	 * @param table		the name of the table
 	 */
 	public void setTable(String table);
+
+	/**
+	 * Set the name of the mapping tables to use for filtering
+	 * @param tableDis    the name of the table holding the distinct values
+	 * @param tableMap    the name of the table holding the mappings
+	 */
+    public void setFilterMappingTables(String tableDis, String tableMap);
 	
 	/**
 	 * Get the value which we are constraining all our browse results to contain.
@@ -344,14 +335,14 @@ public interface BrowseDAO
 	 * @param value	the value to which to constrain results
 	 */
 	public void setFilterValue(String value);
-
-    /**
-     * Sets whether we will treat the filter value as partial (like match), or exact
-     *
-     * @param part true if partial, false if exact
-     */
-    public void setFilterValuePartial(boolean part);
 	
+	/**
+	 * Sets whether we will treat the filter value as partial (like match), or exact
+	 * 
+	 * @param part true if partial, false if exact
+	 */
+	public void setFilterValuePartial(boolean part);
+
 	/**
 	 * Get the name of the field in which the value to constrain results is
 	 * contained

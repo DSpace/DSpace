@@ -83,6 +83,7 @@ public interface BrowseCreateDAO
     public void deleteCommunityMappings(int itemID) throws BrowseException;
     public void insertCommunityMappings(int itemID) throws BrowseException;
 	
+	
 	/**
 	 * Insert an index record into the given table for the given item id.  The Map should contain
 	 * key value pairs representing the sort column integer representation and the normalised
@@ -253,33 +254,6 @@ public interface BrowseCreateDAO
 	 * @throws BrowseException
 	 */
 	public String createSequence(String sequence, boolean execute) throws BrowseException;
-	
-	/**
-	 * Create the main index table.  This is the one which will contain a single row per
-	 * item.  If the boolean execute is true this operation should be carried out, and if it is false
-	 * it should not.  The returned string should contain the SQL (if relevant) that the caller
-	 * can do with what they like (for example, output to the screen)
-	 * 
-	 * This form is used for 'secondary' browses - ie. browse the items for an author
-	 * 
-	 * This should be used, for example, like this:
-	 * 
-	 * <code>
-	 * List list = new ArrayList();
-	 * list.add(new Integer(1));
-	 * list.add(new Integer(2));
-	 * 
-	 * BrowseCreateDAO dao = BrowseDAOFactory.getCreateInstance();
-	 * dao.createPrimaryTable("index_1", list, true);
-	 * </code>
-	 * 
-	 * @param table		the raw table to create
-	 * @param sortCols	a List of Integers numbering the sort columns required
-	 * @param execute	whether to action the create or not
-	 * @return			the instructions (SQL) that effect the creation
-	 * @throws BrowseException
-	 */
-	public String createSecondaryTable(String table, List sortCols, boolean execute) throws BrowseException;
 
     /**
      * Create the main index table.  This is the one which will contain a single row per
@@ -322,6 +296,21 @@ public interface BrowseCreateDAO
 	 * @throws BrowseException
 	 */
 	public String[] createDatabaseIndices(String table, List<Integer> sortCols, boolean value, boolean execute) throws BrowseException;
+
+    /**
+     * Create any indices that the implementing DAO sees fit to maximise performance.
+     * If the boolean execute is true this operation should be carried out, and if it is false
+     * it should not.  The returned string array should contain the SQL (if relevant) that the caller
+     * can do with what they like (for example, output to the screen).  It's an array so that
+     * you can return each bit of SQL as an element if you want.
+     * 
+     * @param disTable    the distinct table upon which to create indices
+     * @param mapTable    the mapping table upon which to create indices
+     * @param execute   whether to action the create or not
+     * @return          the instructions (SQL) that effect the indices
+     * @throws BrowseException
+     */
+    public String[] createMapIndices(String disTable, String mapTable, boolean execute) throws BrowseException;
 	
 	/**
 	 * Create the View of the full item index as seen from a collection.

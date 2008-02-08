@@ -179,7 +179,7 @@ public class BrowseIndex
                             this.defaultOrder = SortOption.DESCENDING;
                     }
 
-                    tableBaseName = makeTableBaseName(number);
+                    tableBaseName = getItemBrowseIndex().tableBaseName;
                 }
                 else if (isItemIndex())
                 {
@@ -346,6 +346,9 @@ public class BrowseIndex
 	 */
     public String getSequenceName(boolean isDistinct, boolean isMap)
     {
+        if (isDistinct || isMap)
+            return BrowseIndex.getSequenceName(number, isDistinct, isMap);
+        
         return BrowseIndex.getSequenceName(tableBaseName, isDistinct, isMap);
     }
     
@@ -450,7 +453,7 @@ public class BrowseIndex
      */
     public String getTableName(boolean isCommunity, boolean isCollection, boolean isDistinct, boolean isMap)
     {
-        if (this.isMetadataIndex())
+        if (isDistinct || isMap)
             return BrowseIndex.getTableName(number, isCommunity, isCollection, isDistinct, isMap);
         
         return BrowseIndex.getTableName(tableBaseName, isCommunity, isCollection, isDistinct, isMap);
@@ -632,7 +635,7 @@ public class BrowseIndex
             else
                 focusField = "sort_1";  // Use the first sort column
         }
-
+        
         return focusField;
     }
     
