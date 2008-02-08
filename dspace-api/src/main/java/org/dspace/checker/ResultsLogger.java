@@ -37,7 +37,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
-import org.dspace.core.I18N;
+import org.dspace.core.I18nUtil;
 
 /**
  * <p>
@@ -104,7 +104,7 @@ public class ResultsLogger implements ChecksumResultsCollector
      */
     private String msg(String key)
     {
-        return I18N.message(key, ResultsLogger.class);
+        return I18nUtil.getMessage("org.dspace.checker.ResultsLogger." + key);
     }
 
     /**
