@@ -523,6 +523,20 @@ WHERE Collection2Item.collection_id   = Community2Collection.collection_id
 -- Indexing browse tables update/re-index performance
 CREATE INDEX Communities2Item_item_id_idx ON Communities2Item( item_id );
 
+-------------------------------------------------------------------------
+-- Tables to manage cache of item counts for communities and collections
+-------------------------------------------------------------------------
+
+CREATE TABLE collection_item_count (
+	collection_id INTEGER PRIMARY KEY REFERENCES collection(collection_id),
+	count INTEGER
+);
+
+CREATE TABLE community_item_count (
+	community_id INTEGER PRIMARY KEY REFERENCES community(community_id),
+	count INTEGER
+);
+
 -------------------------------------------------------
 --  Create 'special' groups, for anonymous access
 --  and administrators
