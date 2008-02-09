@@ -314,13 +314,13 @@ public class IndexBrowse
             if (bis[i].isMetadataIndex())
             {
                 log.debug("Pruning metadata index: " + bis[i].getTableName());
-                dao.pruneExcess(bis[i].getTableName(false, false, false, false), bis[i].getTableName(false, false, false, true), false);
-                dao.pruneDistinct(bis[i].getTableName(false, false, true, false), bis[i].getTableName(false, false, false, true));
+                dao.pruneExcess(bis[i].getTableName(), bis[i].getMapTableName(), false);
+                dao.pruneDistinct(bis[i].getDistinctTableName(), bis[i].getMapTableName());
             }
         }
 
-        dao.pruneExcess(BrowseIndex.getItemBrowseIndex().getTableName(false, false, false, false), null, false);
-        dao.pruneExcess(BrowseIndex.getWithdrawnBrowseIndex().getTableName(false, false, false, false), null, true);
+        dao.pruneExcess(BrowseIndex.getItemBrowseIndex().getTableName(), null, false);
+        dao.pruneExcess(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), null, true);
     }
 
     /**
@@ -392,7 +392,7 @@ public class IndexBrowse
                 if (bis[i].isMetadataIndex())
                 {
                     // remove old metadata from the item index
-                    removeIndex(item.getID(), bis[i].getMapName());
+                    removeIndex(item.getID(), bis[i].getMapTableName());
         
                     // now index the new details - but only if it's archived and not withdrawn
                     if (item.isArchived() && !item.isWithdrawn())
@@ -420,8 +420,8 @@ public class IndexBrowse
                                     {
                                         // get the normalised version of the value
                                         String nVal = OrderFormat.makeSortString(values[x].value, values[x].language, bis[i].getDataType());
-                                        int distinctID = dao.getDistinctID(bis[i].getTableName(true, false, false), values[x].value, nVal);
-                                        dao.createDistinctMapping(bis[i].getMapName(), item.getID(), distinctID);
+                                        int distinctID = dao.getDistinctID(bis[i].getDistinctTableName(), values[x].value, nVal);
+                                        dao.createDistinctMapping(bis[i].getMapTableName(), item.getID(), distinctID);
                                     }
                                 }
                             }
@@ -551,7 +551,7 @@ public class IndexBrowse
 		    if (bis[i].isMetadataIndex())
 		    {
                 log.debug("Removing indexing for removed item " + itemID + ", for index: " + bis[i].getTableName());
-                removeIndex(itemID, bis[i].getMapName());
+                removeIndex(itemID, bis[i].getMapTableName());
             }
 	    }
 
@@ -708,7 +708,7 @@ public class IndexBrowse
                 StringBuffer logMe = new StringBuffer();
                 for (SortOption so : SortOption.getSortOptions())
                 {
-                    logMe.append(" " + so.getMetadata() + " ");
+                    logMe.append(" ").append(so.getMetadata()).append(" ");
                 }
 
                 output.message("Creating browse index " + bis[i].getName() +
@@ -742,15 +742,18 @@ public class IndexBrowse
     		while (true)
     		{
     			String tableName = BrowseIndex.getTableName(i, false, false, false, false);
+                String distinctTableName = BrowseIndex.getTableName(i, false, false, true, false);
+                String distinctMapName = BrowseIndex.getTableName(i, false, false, false, true);
+                String sequence = BrowseIndex.getSequenceName(i, false, false);
+                String mapSequence = BrowseIndex.getSequenceName(i, false, true);
+                String distinctSequence = BrowseIndex.getSequenceName(i, true, false);
+
+                // These views are no longer used, but as we are cleaning the database,
+                // they may exist and need to be removed
                 String colViewName = BrowseIndex.getTableName(i, false, true, false, false);
                 String comViewName = BrowseIndex.getTableName(i, true, false, false, false);
-    			String distinctTableName = BrowseIndex.getTableName(i, false, false, true, false);
-    			String distinctMapName = BrowseIndex.getTableName(i, false, false, false, true);
                 String distinctColViewName = BrowseIndex.getTableName(i, false, true, false, true);
                 String distinctComViewName = BrowseIndex.getTableName(i, true, false, false, true);
-    			String sequence = BrowseIndex.getSequenceName(i, false, false);
-    			String mapSequence = BrowseIndex.getSequenceName(i, false, true);
-    			String distinctSequence = BrowseIndex.getSequenceName(i, true, false);
 
     			output.message("Checking for " + tableName);
     			if (dao.testTableExistance(tableName))
@@ -763,11 +766,13 @@ public class IndexBrowse
                     // resources
                     String dropper = dao.dropIndexAndRelated(tableName, this.execute());
                     String dropSeq = dao.dropSequence(sequence, this.execute());
-                    String dropColView = dao.dropView( colViewName, this.execute() );
-                    String dropComView = dao.dropView( comViewName, this.execute() );
-
                     output.sql(dropper);
                     output.sql(dropSeq);
+
+                    // These views are no longer used, but as we are cleaning the database,
+                    // they may exist and need to be removed
+                    String dropColView = dao.dropView( colViewName, this.execute() );
+                    String dropComView = dao.dropView( comViewName, this.execute() );
                     output.sql(dropColView);
                     output.sql(dropComView);
                 }
@@ -801,13 +806,15 @@ public class IndexBrowse
     				String dropMap = dao.dropIndexAndRelated(distinctMapName, this.execute());
     				String dropDistinctMapSeq = dao.dropSequence(mapSequence, this.execute());
     				String dropDistinctSeq = dao.dropSequence(distinctSequence, this.execute());
+                    output.sql(dropDistinctTable);
+                    output.sql(dropMap);
+                    output.sql(dropDistinctMapSeq);
+                    output.sql(dropDistinctSeq);
+
+                    // These views are no longer used, but as we are cleaning the database,
+                    // they may exist and need to be removed
                     String dropDistinctColView = dao.dropView( distinctColViewName, this.execute() );
                     String dropDistinctComView = dao.dropView( distinctComViewName, this.execute() );
-
-    				output.sql(dropDistinctTable);
-    				output.sql(dropMap);
-    				output.sql(dropDistinctMapSeq);
-    				output.sql(dropDistinctSeq);
                     output.sql(dropDistinctColView);
                     output.sql(dropDistinctComView);
                 }
@@ -840,16 +847,18 @@ public class IndexBrowse
     {
         if (dao.testTableExistance(bix.getTableName()))
         {
-            String tableName = bix.getTableName(false, false, false, false);
-            String colViewName = bix.getTableName(false, true, false, false);
-            String comViewName = bix.getTableName(true, false, false, false);
+            String tableName = bix.getTableName();
             String dropper = dao.dropIndexAndRelated(tableName, this.execute());
             String dropSeq = dao.dropSequence( bix.getSequenceName(false, false), this.execute() );
-            String dropColView = dao.dropView( colViewName, this.execute() );
-            String dropComView = dao.dropView( comViewName, this.execute() );
-
             output.sql(dropper);
             output.sql(dropSeq);
+
+            // These views are no longer used, but as we are cleaning the database,
+            // they may exist and need to be removed
+            String colViewName = bix.getTableName(false, true, false, false);
+            String comViewName = bix.getTableName(true, false, false, false);
+            String dropColView = dao.dropView( colViewName, this.execute() );
+            String dropComView = dao.dropView( comViewName, this.execute() );
             output.sql(dropColView);
             output.sql(dropComView);
         }
@@ -899,7 +908,7 @@ public class IndexBrowse
     private void createItemTables(BrowseIndex bix, List<Integer> sortCols)
             throws BrowseException
     {
-        String tableName = bix.getTableName(false, false, false, false);
+        String tableName = bix.getTableName();
         
         String itemSeq   = dao.createSequence(bix.getSequenceName(false, false), this.execute());
         String itemTable = dao.createPrimaryTable(tableName, sortCols, execute);
@@ -923,20 +932,13 @@ public class IndexBrowse
     {
 		try
 		{
-	        // prepare the array list of sort options
-            List<Integer> sortCols = new ArrayList<Integer>();
-            for (SortOption so : SortOption.getSortOptions())
-            {
-                sortCols.add(new Integer(so.getNumber()));
-            }
-			
 			// if this is a single view, create the DISTINCT tables and views
 			if (bi.isMetadataIndex())
 			{
 	            // if this is a single view, create the DISTINCT tables and views
-	            String distinctTableName = bi.getTableName(false, false, true, false);
+	            String distinctTableName = bi.getDistinctTableName();
 				String distinctSeq = bi.getSequenceName(true, false);
-				String distinctMapName = bi.getTableName(false, false, false, true);
+				String distinctMapName = bi.getMapTableName();
 				String mapSeq = bi.getSequenceName(false, true);
 				
 				// FIXME: at the moment we have not defined INDEXes for this data
@@ -946,11 +948,16 @@ public class IndexBrowse
 				String distinctMapSeq = dao.createSequence(mapSeq, this.execute());
 				String createDistinctTable = dao.createDistinctTable(distinctTableName, this.execute());
 				String createDistinctMap = dao.createDistinctMap(distinctTableName, distinctMapName, this.execute());
+                String[] mapIndices = dao.createMapIndices(distinctTableName, distinctMapName, this.execute());
 				
 				output.sql(distinctTableSeq);
 				output.sql(distinctMapSeq);
 				output.sql(createDistinctTable);
 				output.sql(createDistinctMap);
+                for (int i = 0; i < mapIndices.length; i++)
+                {
+                    output.sql(mapIndices[i]);
+                }
 			}
 
 			if (execute())
@@ -958,10 +965,6 @@ public class IndexBrowse
 				context.commit();
 			}
 		}
-        catch (SortException se)
-        {
-            throw new BrowseException("Error in SortOptions", se);
-        }
 		catch (SQLException e)
 		{
 			log.error("caught exception: ", e);
