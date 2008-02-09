@@ -535,21 +535,27 @@ public class IndexBrowse
 	 */
 	public boolean itemRemoved(Item item)
 		throws BrowseException
+    {
+        return itemRemoved(item.getID());
+    }
+
+    public boolean itemRemoved(int itemID)
+            throws BrowseException
 	{
 		// go over the indices and index the item
 		for (int i = 0; i < bis.length; i++)
 		{
 		    if (bis[i].isMetadataIndex())
 		    {
-    			log.debug("Removing indexing for removed item " + item.getID() + ", for index: " + bis[i].getTableName());
-    			removeIndex(item.getID(), bis[i].getMapTableName());
+    			log.debug("Removing indexing for removed item " + itemID + ", for index: " + bis[i].getTableName());
+    			removeIndex(itemID, bis[i].getMapTableName());
 		    }
 	    }
 
         // Remove from the item indexes (archive and withdrawn)
-        removeIndex(item.getID(), BrowseIndex.getItemBrowseIndex().getTableName());
-        removeIndex(item.getID(), BrowseIndex.getWithdrawnBrowseIndex().getTableName());
-        dao.deleteCommunityMappings(item.getID());
+        removeIndex(itemID, BrowseIndex.getItemBrowseIndex().getTableName());
+        removeIndex(itemID, BrowseIndex.getWithdrawnBrowseIndex().getTableName());
+        dao.deleteCommunityMappings(itemID);
 
         // Ensure that we remove any invalid entries
         pruneIndexes();
