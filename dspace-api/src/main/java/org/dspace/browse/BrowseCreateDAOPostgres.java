@@ -630,10 +630,10 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     {
         try
         {
-            String query = "DELETE FROM " + table + 
-                            " WHERE id NOT IN " +
-                            "(SELECT distinct_id FROM " + map + ")";
-            
+            String query = "DELETE FROM " + table +
+                            " WHERE id IN (SELECT id FROM " + table +
+                            " EXCEPT SELECT distinct_id AS id FROM " + map + ")";
+
             DatabaseManager.updateQuery(context, query);
         }
         catch (SQLException e)
@@ -649,45 +649,27 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     public void pruneExcess(String table, String map, boolean withdrawn)
         throws BrowseException
     {
-        TableRowIterator tri = null;
-        
         try
         {
-            String query = "SELECT item_id FROM " + table + " WHERE item_id NOT IN ( SELECT item_id FROM item WHERE ";
-
+            String itemQuery = "SELECT item_id FROM item WHERE ";
             if (withdrawn)
-                query += "withdrawn = true";
+                itemQuery += "withdrawn = true";
             else
-                query += "in_archive = true AND withdrawn = false";
+                itemQuery += "in_archive = true AND withdrawn = false";
 
-            query += ")";
+            String delete         = "DELETE FROM " + table + " WHERE item_id IN ( SELECT item_id FROM " + table + " EXCEPT " + itemQuery + ")";
+            DatabaseManager.updateQuery(context, delete);
 
-            tri = DatabaseManager.query(context, query);
-            while (tri.hasNext())
+            if (map != null)
             {
-                TableRow row = tri.next();
-                String delete = "DELETE FROM " + table + " WHERE item_id = " + Integer.toString(row.getIntColumn("item_id"));
-                
-                DatabaseManager.updateQuery(context, delete);
-
-                if (map != null)
-                {
-                    String deleteDistinct = "DELETE FROM " + map + " WHERE item_id = " + Integer.toString(row.getIntColumn("item_id"));
-                    DatabaseManager.updateQuery(context, deleteDistinct);
-                }
+                String deleteDistinct = "DELETE FROM " + map + " WHERE item_id IN ( SELECT item_id FROM " + map   + " EXCEPT " + itemQuery + ")";
+                DatabaseManager.updateQuery(context, deleteDistinct);
             }
         }
         catch (SQLException e)
         {
             log.error("caught exception: ", e);
             throw new BrowseException(e);
-        }
-        finally
-        {
-            if (tri != null)
-            {
-                tri.close();
-            }
         }
     }
     
