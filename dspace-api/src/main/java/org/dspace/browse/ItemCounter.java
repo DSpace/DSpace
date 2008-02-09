@@ -145,7 +145,7 @@ public class ItemCounter
 		
 		if (dso instanceof Community)
 		{
-			return ((Collection) dso).countItems();
+			return ((Community) dso).countItems();
 		}
 		
 		return 0;

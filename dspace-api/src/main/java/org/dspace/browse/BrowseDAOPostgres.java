@@ -1046,12 +1046,10 @@ public class BrowseDAOPostgres implements BrowseDAO
             buildWhereClauseOpInsert(queryBuf);
             
             queryBuf.append(" EXISTS (SELECT 1 FROM ");
-            queryBuf.append(containerTable);
+            buildFocusedSelectTables(queryBuf);
             queryBuf.append(" WHERE ");
-            queryBuf.append(containerIDField);
-            queryBuf.append("=? AND distinct_id=" + table + ".id) ");
-            
-            params.add(new Integer(containerID));
+            buildFocusedSelectClauses(queryBuf, params);
+            queryBuf.append(" AND distinct_id=" + table + ".id) ");
         }
     }
     
