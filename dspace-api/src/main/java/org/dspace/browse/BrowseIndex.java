@@ -399,6 +399,7 @@ public class BrowseIndex
      * @param isDistinct	whether this is a distinct table
      * @param isMap			whether this is a distinct map table
      * @return				the name of the table
+     * @deprecated 1.5
      */
     public static String getTableName(int number, boolean isCommunity, boolean isCollection, boolean isDistinct, boolean isMap)
     {
@@ -450,6 +451,7 @@ public class BrowseIndex
      * @param isDistinct	whether this is a distinct table
      * @param isMap			whether this is a distinct map table
      * @return				the name of the table
+     * @deprecated 1.5
      */
     public String getTableName(boolean isCommunity, boolean isCollection, boolean isDistinct, boolean isMap)
     {
@@ -469,6 +471,7 @@ public class BrowseIndex
      * @param isCommunity	whether this is a community constrained index (view)
      * @param isCollection	whether this is a collection constrainted index (view)
      * @return				the name of the table
+     * @deprecated 1.5
      */
     public String getTableName(boolean isCommunity, boolean isCollection)
     {
@@ -502,27 +505,11 @@ public class BrowseIndex
      * @param isCommunity
      * @param isCollection
      * @return
+     * @deprecated 1.5
      */
     public String getTableName(boolean isDistinct, boolean isCommunity, boolean isCollection)
     {
     	return getTableName(isCommunity, isCollection, isDistinct, false);
-    }
-    
-    /**
-     * Get the name of the distinct map table for the given set of circumstances.  This
-     * is the same as calling
-     * 
-     * <code>
-     * getTableName(isCommunity, isCollection, false, true);
-     * </code>
-     * 
-     * @param isCommunity
-     * @param isCollection
-     * @return	the map table name
-     */
-    public String getMapName(boolean isCommunity, boolean isCollection)
-    {
-    	return getTableName(isCommunity, isCollection, false, true);
     }
     
     /**
@@ -534,11 +521,25 @@ public class BrowseIndex
      * 
      * @return
      */
-    public String getMapName()
+    public String getMapTableName()
     {
     	return getTableName(false, false, false, true);
     }
     
+    /**
+     * Get the default name of the distinct table.  This is the same as calling
+     *
+     * <code>
+     * getTableName(false, false, true, false);
+     * </code>
+     *
+     * @return
+     */
+    public String getDistinctTableName()
+    {
+    	return getTableName(false, false, true, false);
+    }
+
     /**
      * Get the name of the colum that is used to store the default value column
      * 

@@ -161,7 +161,7 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
             array.add("CREATE INDEX " + table + "_item_id_idx ON " + table + "(item_id)");
     
             if (value)
-                array.add("CREATE INDEX " + table + "_value_index ON " + table + "(sort_value)");
+                array.add("CREATE INDEX " + table + "_value_idx ON " + table + "(sort_value)");
     
             for (Integer i : sortCols)
             {
@@ -193,9 +193,10 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
     {
         try
         {
-            String[] arr = new String[2];
-            arr[0] = "CREATE INDEX " + disTable + "_value_index ON " + disTable + "(sort_value)";
-            arr[1] = "CREATE INDEX " + mapTable + "_dist_index ON " + mapTable + "(distinct_id)";
+            String[] arr = new String[3];
+            arr[0] = "CREATE INDEX " + disTable + "_value_idx ON " + disTable + "(sort_value)";
+            arr[1] = "CREATE INDEX " + mapTable + "_item_id_idx ON " + mapTable + "(item_id)";
+            arr[2] = "CREATE INDEX " + mapTable + "_dist_idx ON " + mapTable + "(distinct_id)";
             
             if (execute)
             {
