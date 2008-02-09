@@ -67,12 +67,12 @@ ALTER TABLE workspaceitem ADD page_reached INTEGER;
 -------------------------------------------------------------------------
 
 CREATE TABLE collection_item_count (
-	collection_id INTEGER REFERENCES collection(collection_id),
+	collection_id INTEGER PRIMARY KEY REFERENCES collection(collection_id),
 	count INTEGER
 );
 
 CREATE TABLE community_item_count (
-	community_id INTEGER REFERENCES community(community_id),
+	community_id INTEGER PRIMARY KEY REFERENCES community(community_id),
 	count INTEGER
 );
 
