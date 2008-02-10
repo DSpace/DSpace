@@ -78,7 +78,7 @@ public class BrowserScope
     private String filterValueLang;
     
 	/** the item id focus of the browse */
-	private int jumpItemId;
+	private int jumpItemId = -1;
 	
 	/** the string value to start with */
 	private String startsWith;

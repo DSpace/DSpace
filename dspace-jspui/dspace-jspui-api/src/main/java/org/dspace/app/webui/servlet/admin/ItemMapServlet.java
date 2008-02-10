@@ -372,7 +372,6 @@ public class ItemMapServlet extends DSpaceServlet
                 bs.setFilterValuePartial(true);
     			bs.setJumpToValue(null);
     			bs.setResultsPerPage(10000);	// an arbitrary number (large) for the time being
-    			bs.setSortBy(0);
     			bs.setBrowseLevel(1);
     			
     			BrowseEngine be = new BrowseEngine(context);

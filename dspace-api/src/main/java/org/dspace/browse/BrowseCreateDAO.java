@@ -81,8 +81,8 @@ public interface BrowseCreateDAO
 	public void deleteByItemID(String table, int itemID) throws BrowseException;
 
     public void deleteCommunityMappings(int itemID) throws BrowseException;
-    public void insertCommunityMappings(int itemID) throws BrowseException;
-	
+    public void updateCommunityMappings(int itemID) throws BrowseException;
+
 	
 	/**
 	 * Insert an index record into the given table for the given item id.  The Map should contain
