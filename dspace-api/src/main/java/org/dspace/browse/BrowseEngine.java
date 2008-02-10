@@ -727,12 +727,18 @@ public class BrowseEngine
 		// to select from that column instead.  Otherwise, we end up missing the focus value
 		// to do comparisons in other columns.  The use of the focus value needs to be consistent
 		// across the browse
-		SortOption so = scope.getSortOption();
-		String col = "sort_value";
-		if (so.getNumber() > 0)
-		{
-			col = "sort_" + Integer.toString(so.getNumber());
-		}
+        SortOption so = scope.getSortOption();
+        if (so == null || so.getNumber() == 0)
+        {
+            if (browseIndex.getSortOption() != null)
+                so = browseIndex.getSortOption();
+        }
+
+        String col = "sort_1";
+        if (so.getNumber() > 0)
+        {
+            col = "sort_" + Integer.toString(so.getNumber());
+        }
 		
 		// now get the DAO to do the query for us, returning the highest
 		// string value in the given column in the given table for the 

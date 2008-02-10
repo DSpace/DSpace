@@ -365,9 +365,7 @@ public class IndexBrowse
         
         try
         {
-            // Delete community mappings - we'll add them again if necessary
-            dao.deleteCommunityMappings(item.getID());
-
+            boolean reqCommunityMappings = false;
             Map<Integer, String> sortMap = getSortValues(item, itemMDMap);
             if (item.isArchived() && !item.isWithdrawn())
             {
@@ -379,7 +377,8 @@ public class IndexBrowse
                     removeIndex(item.getID(), BrowseIndex.getWithdrawnBrowseIndex().getTableName());
                     dao.insertIndex(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID(), sortMap);
                 }
-                dao.insertCommunityMappings(item.getID());
+
+                reqCommunityMappings = true;
             }
             else if (item.isWithdrawn())
             {
@@ -397,6 +396,16 @@ public class IndexBrowse
                 // This item shouldn't exist in either index - ensure that it is removed
                 removeIndex(item.getID(), BrowseIndex.getItemBrowseIndex().getTableName());
                 removeIndex(item.getID(), BrowseIndex.getWithdrawnBrowseIndex().getTableName());
+            }
+
+            // Update the community mappings if they are required, or remove them if they aren't
+            if (reqCommunityMappings)
+            {
+                dao.updateCommunityMappings(item.getID());
+            }
+            else
+            {
+                dao.deleteCommunityMappings(item.getID());
             }
 
             // Now update the metadata indexes
