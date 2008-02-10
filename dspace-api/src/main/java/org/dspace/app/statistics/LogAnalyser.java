@@ -100,19 +100,19 @@ public class LogAnalyser
     /////////////////
     
     /** aggregator for all actions performed in the system */
-    private static Map actionAggregator = new HashMap();
+    private static Map actionAggregator;
     
     /** aggregator for all searches performed */
-    private static Map searchAggregator = new HashMap();
+    private static Map searchAggregator;
     
     /** aggregator for user logins */
-    private static Map userAggregator = new HashMap();
+    private static Map userAggregator;
     
     /** aggregator for item views */
-    private static Map itemAggregator = new HashMap();
+    private static Map itemAggregator;
     
     /** aggregator for current archive state statistics */
-    private static Map archiveStats = new HashMap();
+    private static Map archiveStats;
     
     /** warning counter */
     private static int warnCount = 0;
@@ -125,19 +125,19 @@ public class LogAnalyser
     //////////////////
     
     /** list of actions to be included in the general summary */
-    private static List generalSummary = new ArrayList();
+    private static List generalSummary;
     
     /** list of words not to be aggregated */
-    private static List excludeWords = new ArrayList();
+    private static List excludeWords;
     
     /** list of search types to be ignored, such as "author:" */
-    private static List excludeTypes = new ArrayList();
+    private static List excludeTypes;
     
     /** list of characters to be excluded */
-    private static List excludeChars = new ArrayList();
+    private static List excludeChars;
     
     /** list of item types to be reported on in the current state */
-    private static List itemTypes = new ArrayList();
+    private static List itemTypes;
     
     /** bottom limit to output for search word analysis */
     private static int searchFloor;
@@ -350,11 +350,22 @@ public class LogAnalyser
         // together in a single aggregating object
         
         // if the timer has not yet been started, then start it
-        if (startTime != null)
-        {
-            startTime = new GregorianCalendar();
-        }
+        startTime = new GregorianCalendar();
+                
+        //instantiate aggregators
+        actionAggregator = new HashMap();
+        searchAggregator = new HashMap();
+        userAggregator = new HashMap();
+        itemAggregator = new HashMap();
+        archiveStats = new HashMap();
         
+        //instantiate lists
+        generalSummary = new ArrayList();
+        excludeWords = new ArrayList();
+        excludeTypes = new ArrayList();
+        excludeChars = new ArrayList();
+        itemTypes = new ArrayList();
+              
         // set the parameters for this analysis
         setParameters(myLogDir, myFileTemplate, myConfigFile, myOutFile, myStartDate, myEndDate, myLookUp);
         
@@ -767,6 +778,7 @@ public class LogAnalyser
         {
             BufferedWriter out = new BufferedWriter(new FileWriter(outFile));
             out.write(summary.toString());
+            out.flush();
             out.close();
         } 
         catch (IOException e) 

@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/bin/sh
 
 ###########################################################################
 #
@@ -43,63 +43,9 @@
 ###########################################################################
 # This script generates a report from the aggregation file which has been
 # run for the most recent month
-#
-# To customise for your own use change the $out_prefix, $out_suffix, 
-# $dsrun and $out_directory variables below.
-# 
-# If you wish to futher configure this script, you will need to edit the
-# command being executed, which appears near the bottom of the page, and is 
-# commented with "# The command to generate the report"
-#
-# For more information on using the LogAnalyser, use:
-#
-# [dspace]/bin/dsrun org.dspace.app.statistics.LogAnalyser -help
 ###########################################################################
 
-use POSIX qw(floor);
+# Get the DSPACE/bin directory
+BINDIR=`dirname $0`
 
-my $start;
-my $end;
-my $out;
-my $i;
-my $no_months;
-my $second; 
-my $minute; 
-my $hour;
-my $day;
-my $month;
-my $year; 
-my $week_day; 
-my $day_of_year; 
-my $is_dst;
-my $out_prefix;
-my $out_suffix;
-
-# Get the all the values for current time
-($second, $minute, $hour, $day, $month, $year, $week_day, $day_of_year, $is_dst) = localtime(time);
-
-# Details used
-################################################
-
-$in_prefix = "dspace-log-monthly-";
-$in_suffix = ".dat";
-$out_prefix = "report-";
-$out_suffix = ".html";
-$dsrun = "/dspace/bin/dsrun";
-$in_directory = "/dspace/log/";
-$out_directory = "/dspace/reports/";
-
-################################################
-
-$this_year = $year + 1900;
-$this_month = $month + 1;
-
-$in = $in_directory . $in_prefix . $this_year . "-" . $this_month . $in_suffix;
-$out = $out_directory . $out_prefix . $this_year . "-" . $this_month . $out_suffix;
-
-# The command to generate the report
-$execute = "$dsrun org.dspace.app.statistics.ReportGenerator -format html -in $in -out $out";
-
-$status = system($execute);
-
-exit($status);
+$BINDIR/dsrun org.dspace.app.statistics.CreateStatReport -r stat-report-monthly

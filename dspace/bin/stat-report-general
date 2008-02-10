@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/bin/sh
 
 ###########################################################################
 #
@@ -42,52 +42,9 @@
 
 ###########################################################################
 # This script generates a full report based on the full log period
-#
-# To customise for your own use change the $out_prefix, $out_suffix, 
-# $dsrun and $out_directory variables below.
-# 
-# If you wish to futher configure this script, you will need to edit the
-# command being executed, which is below under $general
-#
-# For more information on using the LogAnalyser, use:
-#
-# [dspace]/bin/dsrun org.dspace.app.statistics.LogAnalyser -help
 ###########################################################################
 
-my $second; 
-my $minute; 
-my $hour;
-my $day;
-my $month;
-my $year; 
-my $week_day; 
-my $day_of_year; 
-my $is_dst;
+# Get the DSPACE/bin directory
+BINDIR=`dirname $0`
 
-# Get the all the values for current time
-($second, $minute, $hour, $day, $month, $year, $week_day, $day_of_year, $is_dst) = localtime(time);
-
-my $this_year = $year + 1900;
-my $this_month = $month + 1;
-
-# Details used
-######################################################
-
-$in_prefix = "dspace-log-general-";
-$in_suffix = ".dat";
-$out_prefix = "report-general-";
-$out_suffix = ".html";
-$dsrun = "/dspace/bin/dsrun";
-$in_directory = "/dspace/log/";
-$out_directory = "/dspace/reports/";
-
-######################################################
-
-$in = $in_directory . $in_prefix . $this_year . "-" . $this_month . "-" . $day . $in_suffix;
-$out = $out_directory . $out_prefix . $this_year . "-" . $this_month . "-" . $day . $out_suffix;
-
-$execute = "$dsrun org.dspace.app.statistics.ReportGenerator -format html -in $in -out $out";
-
-$status = system($execute);
-
-exit($status);
+$BINDIR/dsrun org.dspace.app.statistics.CreateStatReport -r stat-report-general

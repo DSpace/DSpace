@@ -73,10 +73,11 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 - SF Patch #1799575 New EPersonConsumer event consumer
 - SF Patch #1642563 bin/update-handle-prefix rewritten in Java
 
-(Chris yates)
+(Chris Yates)
 - SF Patch #1724330 Removes "null" being displayed in community-home.jsp
 - SF Patch #1763535 Alert DSpace administrator of new user registration
 - SF Patch #1759438 Multilingualism Language Switch - DSpace Header
+- SF Patch #1888652 Statistics Rewritten In Java
 
 (Robert Tansley / Stuart Lewis)
 - SF Patch #1587225 Google and html sitemap generator
