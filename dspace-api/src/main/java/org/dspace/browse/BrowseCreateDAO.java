@@ -189,7 +189,19 @@ public interface BrowseCreateDAO
 	 * @throws BrowseException
 	 */
 	public void createDistinctMapping(String table, int itemID, int distinctID) throws BrowseException;
-	
+
+    /**
+     * Update a mapping between an item id and a distinct metadata field such as an author,
+     * who can appear in multiple items.  To get the id of the distinct record you should
+     * use either getDistinctID or insertDistinctRecord as defined above.
+     *
+     * @param table		 	the mapping table
+     * @param itemID		the item id
+     * @param distinctID	the id of the distinct record
+     * @throws BrowseException
+     */
+    public boolean updateDistinctMapping(String table, int itemID, int distinctID) throws BrowseException;
+
 	/**
 	 * Find out of a given table exists.
 	 * 

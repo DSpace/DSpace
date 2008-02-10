@@ -403,9 +403,8 @@ public class IndexBrowse
                 
                 if (bis[i].isMetadataIndex())
                 {
-                    // remove old metadata from the item index
-                    removeIndex(item.getID(), bis[i].getMapTableName());
-        
+                    boolean itemMapped = false;
+
                     // now index the new details - but only if it's archived and not withdrawn
                     if (item.isArchived() && !item.isWithdrawn())
                     {
@@ -433,12 +432,21 @@ public class IndexBrowse
                                         // get the normalised version of the value
                                         String nVal = OrderFormat.makeSortString(values[x].value, values[x].language, bis[i].getDataType());
                                         int distinctID = dao.getDistinctID(bis[i].getDistinctTableName(), values[x].value, nVal);
-                                        dao.createDistinctMapping(bis[i].getMapTableName(), item.getID(), distinctID);
+
+                                        // Update the existing mapping, or create a new one if it doesn't exist
+                                        if (!dao.updateDistinctMapping(bis[i].getMapTableName(), item.getID(), distinctID))
+                                            dao.createDistinctMapping(bis[i].getMapTableName(), item.getID(), distinctID);
+
+                                        itemMapped = true;
                                     }
                                 }
                             }
                         }
                     }
+
+                    // remove any old mappings
+                    if (!itemMapped)
+                        removeIndex(item.getID(), bis[i].getMapTableName());
                 }
             }
         }
