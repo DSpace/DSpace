@@ -591,39 +591,66 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
             throw new BrowseException(e);
         }
     }
-    
+
     /* (non-Javadoc)
-     * @see org.dspace.browse.BrowseCreateDAO#insertIndex(java.lang.String, int, java.lang.String, java.lang.String, java.util.Map)
+     * @see org.dspace.browse.BrowseCreateDAO#updateIndex(java.lang.String, int, java.util.Map)
      */
-    public void insertIndex(String table, int itemID, String value, String sortValue, Map sortCols)
+    public boolean updateIndex(String table, int itemID, Map sortCols)
             throws BrowseException
     {
         try
         {
-            // create us a row in the index
-            TableRow row = DatabaseManager.create(context, table);
-            
-            // set the primary information for the index
-            row.setColumn("item_id", itemID);
-            row.setColumn("value", utils.truncateValue(value));
-            row.setColumn("sort_value", utils.truncateSortValue(sortValue));
-            
-            // now set the columns for the other sort values
+            boolean rowUpdated = false;
+            TableRow row = DatabaseManager.findByUnique(context, table, "item_id", itemID);
+
+            // If the item does not exist in the table, return that it couldn't be found
+            if (row == null)
+                return false;
+
+            // Iterate through all the sort values
             Iterator itra = sortCols.keySet().iterator();
             while (itra.hasNext())
             {
                 Integer key = (Integer) itra.next();
-                String nValue = (String) sortCols.get(key);
-                row.setColumn("sort_" + key.toString(), utils.truncateSortValue(nValue));
+
+                // Generate the appropriate column name
+                String column = "sort_" + key.toString();
+
+                // Create the value that will be written in to the column
+                String newValue = utils.truncateSortValue( (String) sortCols.get(key) );
+
+                // Check the column exists - if it doesn't, something has gone seriously wrong
+                if (!row.hasColumn(column))
+                    throw new BrowseException("Column '" + column + "' does not exist in table " + table);
+
+                // Get the existing value from the column
+                String oldValue = row.getStringColumn(column);
+
+                // If the new value differs from the old value, update the column and flag that the row has changed
+                if (oldValue != null && !oldValue.equals(newValue))
+                {
+                    row.setColumn(column, newValue);
+                    rowUpdated = true;
+                }
+                else if (newValue != null && !newValue.equals(oldValue))
+                {
+                    row.setColumn(column, newValue);
+                    rowUpdated = true;
+                }
             }
-            
-            DatabaseManager.update(context, row);
+
+            // We've updated the row, so save it back to the database
+            if (rowUpdated)
+                DatabaseManager.update(context, row);
         }
         catch (SQLException e)
         {
             log.error("caught exception: ", e);
             throw new BrowseException(e);
         }
+
+        // Return that the original record was found
+        return true;
     }
 
     /* (non-Javadoc)

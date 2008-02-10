@@ -365,23 +365,38 @@ public class IndexBrowse
         
         try
         {
-            // Remove from the item indexes (archive and withdrawn)
-            removeIndex(item.getID(), BrowseIndex.getItemBrowseIndex().getTableName());
-            removeIndex(item.getID(), BrowseIndex.getWithdrawnBrowseIndex().getTableName());
+            // Delete community mappings - we'll add them again if necessary
             dao.deleteCommunityMappings(item.getID());
 
-            // Index any archived item that isn't withdrawn
+            Map<Integer, String> sortMap = getSortValues(item, itemMDMap);
             if (item.isArchived() && !item.isWithdrawn())
             {
-                Map<Integer, String> sortMap = getSortValues(item, itemMDMap);
-                dao.insertIndex(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID(), sortMap);
+                // Try to update an existing record in the item index
+                if (!dao.updateIndex(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID(), sortMap))
+                {
+                    // Record doesn't exist - ensure that it doesn't exist in the withdrawn index,
+                    // and add it to the archived item index
+                    removeIndex(item.getID(), BrowseIndex.getWithdrawnBrowseIndex().getTableName());
+                    dao.insertIndex(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID(), sortMap);
+                }
                 dao.insertCommunityMappings(item.getID());
             }
             else if (item.isWithdrawn())
             {
-                // If it's withdrawn, add it to the withdrawn items index
-                Map<Integer, String> sortMap = getSortValues(item, itemMDMap);
-                dao.insertIndex(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID(), sortMap);
+                // Try to update an existing record in the withdrawn index
+                if (!dao.updateIndex(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID(), sortMap))
+                {
+                    // Record doesn't exist - ensure that it doesn't exist in the item index,
+                    // and add it to the withdrawn item index
+                    removeIndex(item.getID(), BrowseIndex.getItemBrowseIndex().getTableName());
+                    dao.insertIndex(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID(), sortMap);
+                }
+            }
+            else
+            {
+                // This item shouldn't exist in either index - ensure that it is removed
+                removeIndex(item.getID(), BrowseIndex.getItemBrowseIndex().getTableName());
+                removeIndex(item.getID(), BrowseIndex.getWithdrawnBrowseIndex().getTableName());
             }
 
             // Now update the metadata indexes

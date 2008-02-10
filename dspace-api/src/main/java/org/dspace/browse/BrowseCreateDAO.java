@@ -107,31 +107,28 @@ public interface BrowseCreateDAO
     public void insertIndex(String table, int itemID, Map sortCols) throws BrowseException;
 
     /**
-     * Insert an index record into the given table for the given item id.  The value
-     * is the human readable value for the field, the sortValue is the normalised version
-     * (normalised in whatever way the caller sees fit), and the Map should contain
+     * Updates an index record into the given table for the given item id.  The Map should contain
      * key value pairs representing the sort column integer representation and the normalised
      * value for that field.
-     * 
+     *
      * For example, the caller might do as follows:
-     * 
+     *
      * <code>
      * Map map = new HashMap();
      * map.put(new Integer(1), "the title");
      * map.put(new Integer(2), "the subject");
-     * 
+     *
      * BrowseCreateDAO dao = BrowseDAOFactory.getCreateInstance();
-     * dao.insertIndex("index_1", 21, "Human Readable", "human readable", map);
+     * dao.updateIndex("index_1", 21, map);
      * </code>
-     * 
-     * @param table     the browse table to insert the index in
-     * @param itemID    the database id of the item being indexed
-     * @param value     the human readable value of the index
-     * @param sortValue the sortable value of the index
-     * @param sortCols  an Integer-String map of sort column numbers and values
+     *
+     * @param table		the browse table to insert the index in
+     * @param itemID	the database id of the item being indexed
+     * @param sortCols	an Integer-String map of sort column numbers and values
+     * @return true if the record is updated, false if not found
      * @throws BrowseException
      */
-    public void insertIndex(String table, int itemID, String value, String sortValue, Map sortCols) throws BrowseException;
+    public boolean updateIndex(String table, int itemID, Map sortCols) throws BrowseException;
 	
 	/**
 	 * Get the browse index's internal id for the location of the given string
