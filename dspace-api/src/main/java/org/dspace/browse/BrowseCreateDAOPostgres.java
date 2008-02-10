@@ -258,6 +258,35 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             throw new BrowseException(msg, e);
         }
     }
+
+    /* (non-Javadoc)
+     * @see org.dspace.browse.BrowseCreateDAO#updateDistinctMapping(java.lang.String, int, int)
+     */
+    public boolean updateDistinctMapping(String table, int itemID, int distinctID) throws BrowseException
+    {
+        try
+        {
+            TableRow tr = DatabaseManager.findByUnique(context, table, "item_id", itemID);
+            if (tr != null)
+            {
+                if (distinctID != tr.getIntColumn("distinct_id"))
+                {
+                    tr.setColumn("distinct_id", distinctID);
+                    DatabaseManager.update(context, tr);
+                }
+
+                return true;
+            }
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            String msg = "problem updating distinct mapping: table=" + table + ",item-id=" + itemID + ",distinct_id=" + distinctID;
+            throw new BrowseException(msg, e);
+        }
+
+        return false;
+    }
     
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#createDistinctTable(java.lang.String, boolean)
