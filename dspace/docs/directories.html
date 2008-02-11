@@ -30,64 +30,69 @@
     <ul>
       <li><code><i>[dspace-source]</i></code>
         <ul>
-          <li><code>build.xml</code> - The Build file for Ant -- used to preform a fresh_install, upgrade, or deploy new changes.</li>
-          <li><code>CHANGES</code> - Detailed list of code changes between versions.</li>
-          <li><code>KNOWN_BUGS</code> - Known bugs in the current version.</li>
-          <li><code>LICENSE</code> - DSpace source code license.</li>
-          <li><code>README</code> - Obligatory basic information file.</li>
-          <li><code>bin/</code> - Some shell and Perl scripts for running DSpace command-line tasks.</li>
-          <li><code>config/</code> - Configuration files:
-            <ul>
-              <li><code>controlled-vocabularies/</code> - Fixed, limited vocabularies used in metadata entry</li>
-              <li><code>crosswalks/</code> - Metadata crosswalks - property files or XSL stylesheets</li>
-              <li><code>dspace.cfg</code> - The Main DSpace configuration file (You will need to edit this).</li>
-              <li><code>dc2mods.cfg</code> - Mappings from Dublin Core metadata to <A HREF="http://www.loc.gov/standards/mods/">MODS</A> for the METS export.</li>
-              <li><code>default.license</code>  - The default license that users must grant when submitting items.</li>
-              <li><code>dstat.cfg</code>, <code>dstat.map</code> - Configuration for statistical reports.</li>
-              <li><code>input-forms.xml</code> - Submission UI metadata field configuration.</li>
-              <li><code>news-side.html</code> - Text of the front-page news in the sidebar, only used in JSPUI.</li>
-              <li><code>news-top.html</code> - Text of the front-page news in the top box, only used in teh JSPUI.</li>
-              <li><code>emails/</code> - Text and layout templates for emails sent out by the system.</li>
-              <li><code>language-packs/</code> - Contains "dictionary files" -- Java properties files that contain user interface text in different languages</li>
-              <li><code>registries/</code> - <strong>Initial</strong> contents of the bitstream format registry and Dublin Core element/qualifier registry.  These are only used on initial system setup, after which they are maintained in the database.</li>
-              <li><code>templates/</code> - Configuration files for libraries and external applications (e.g. Apache, Tomcat) are kept and edited here.  They can refer to properties in the main DSpace configuration - have a look at a couple.  When they're updated, a command line tool fills out these files with appropriate values from dspace.cfg, and copies them to their appropriate location (hence "templates".)</li>
-            </ul>
-          </li>
-          <li><code>docs/</code> - DSpace system documentation. The technical documentation for functionality, installation, configuration, etc.</li>
-          <li><code>etc/</code> - Miscelleanous configuration need to install DSpace that isn't really to do with system configuration - e.g. the PostgreSQL database schema, and a couple of configuration files that are used during the build process but not by the live system.  Also contains the deployment descriptors (<code>web.xml</code> files) for the Web UI and OAI-PMH support <code>.war</code> files.
-            <ul>
-              <li><code>oracle/</code> - Versions of the database schema and updater SQL scripts for Oracle.</li>
-            </ul>
-          </li>
-          <li><code>modules/</code> - The Web UI modules "overlay" directory.  DSpace uses Maven to automatically look here for any customizations you wish to make to DSpace Web interfaces.
-          	<ul>
-          	  <li><code>dspace-jspui</code> - Contains all customizations for the JSP User Interface.
-          	    <ul>
-          	  		<li><code>src/main/resources/</code> - The overlay for JSPUI Resources.  This is the location to place any custom Messages.properties files.</li>
-          	  		<li><code>src/main/webapp/</code> - The overlay for JSPUI Web Application.  This is the location to place any custom JSPs to be used by DSpace.</li>
-          		</ul>
-          	  </li>
-          	  <li><code>dspace-lni</code> - Contains all customizations for the Lightweight Network Interface.</li>
-          	  <li><code>dspace-oai</code> - Contains all customizations for the OAI-PMH Interface.</li>
-          	  <li><code>dspace-xmlui</code> - Contains all customizations for the XML User Interface (aka Manakin).
-          	  	<ul>
-          	  		<li><code>src/main/webapp/</code> - The overlay for XMLUI Web Application. This is the location to place custom Themes or Configurations.
-          	  			<ul>
-          	  				<li><code>i18n/</code> - The location to place a custom version of the XMLUI's messages.xml</li>
-          	  			    <li><code>themes/</code> - The location to place custom Themes for the XMLUI</li> 
-          	  			</ul>
-          	  		</li>
-          		</ul>
-          	  </li>
- 			</ul>
- 		  </li>
-          <li><code>src/</code> - Maven configurations for DSpace System.  This directory contains the Maven and Ant build files for DSpace.</li>
-          <li><code>target/</code> - (Only exists after building DSpace) This is the location Maven uses to build your DSpace installation package.
-          	<ul>
-          		<li><code>dspace-[version].dir</code> - The location of the DSpace Installation Package (which can then be installed by running <code>ant update</code>)</li>
-          	</ul>
-          </li>
-        </ul>
+      	  <li><code>dspace/</code> - Directory which contains all build and configuration information for DSpace
+        	
+	        <ul>
+	          <li><code>build.xml</code> - The Build file for Ant -- used to preform a fresh_install, upgrade, or deploy new changes.</li>
+	          <li><code>CHANGES</code> - Detailed list of code changes between versions.</li>
+	          <li><code>KNOWN_BUGS</code> - Known bugs in the current version.</li>
+	          <li><code>LICENSE</code> - DSpace source code license.</li>
+	          <li><code>README</code> - Obligatory basic information file.</li>
+	          <li><code>bin/</code> - Some shell and Perl scripts for running DSpace command-line tasks.</li>
+	          <li><code>config/</code> - Configuration files:
+	            <ul>
+	              <li><code>controlled-vocabularies/</code> - Fixed, limited vocabularies used in metadata entry</li>
+	              <li><code>crosswalks/</code> - Metadata crosswalks - property files or XSL stylesheets</li>
+	              <li><code>dspace.cfg</code> - The Main DSpace configuration file (You will need to edit this).</li>
+	              <li><code>dc2mods.cfg</code> - Mappings from Dublin Core metadata to <A HREF="http://www.loc.gov/standards/mods/">MODS</A> for the METS export.</li>
+	              <li><code>default.license</code>  - The default license that users must grant when submitting items.</li>
+	              <li><code>dstat.cfg</code>, <code>dstat.map</code> - Configuration for statistical reports.</li>
+	              <li><code>input-forms.xml</code> - Submission UI metadata field configuration.</li>
+	              <li><code>news-side.html</code> - Text of the front-page news in the sidebar, only used in JSPUI.</li>
+	              <li><code>news-top.html</code> - Text of the front-page news in the top box, only used in teh JSPUI.</li>
+	              <li><code>emails/</code> - Text and layout templates for emails sent out by the system.</li>
+	              <li><code>language-packs/</code> - Contains "dictionary files" -- Java properties files that contain user interface text in different languages</li>
+	              <li><code>registries/</code> - <strong>Initial</strong> contents of the bitstream format registry and Dublin Core element/qualifier registry.  These are only used on initial system setup, after which they are maintained in the database.</li>
+	              <li><code>templates/</code> - Configuration files for libraries and external applications (e.g. Apache, Tomcat) are kept and edited here.  They can refer to properties in the main DSpace configuration - have a look at a couple.  When they're updated, a command line tool fills out these files with appropriate values from dspace.cfg, and copies them to their appropriate location (hence "templates".)</li>
+	            </ul>
+	          </li>
+	          <li><code>docs/</code> - DSpace system documentation. The technical documentation for functionality, installation, configuration, etc.</li>
+	          <li><code>etc/</code> - Miscelleanous configuration need to install DSpace that isn't really to do with system configuration - e.g. the PostgreSQL database schema, and a couple of configuration files that are used during the build process but not by the live system.  Also contains the deployment descriptors (<code>web.xml</code> files) for the Web UI and OAI-PMH support <code>.war</code> files.
+	            <ul>
+	              <li><code>oracle/</code> - Versions of the database schema and updater SQL scripts for Oracle.</li>
+	            </ul>
+	          </li>
+	          <li><code>modules/</code> - The Web UI modules "overlay" directory.  DSpace uses Maven to automatically look here for any customizations you wish to make to DSpace Web interfaces.
+	          	<ul>
+	          	  <li><code>dspace-jspui</code> - Contains all customizations for the JSP User Interface.
+	          	    <ul>
+	          	  		<li><code>src/main/resources/</code> - The overlay for JSPUI Resources.  This is the location to place any custom Messages.properties files.</li>
+	          	  		<li><code>src/main/webapp/</code> - The overlay for JSPUI Web Application.  This is the location to place any custom JSPs to be used by DSpace.</li>
+	          		</ul>
+	          	  </li>
+	          	  <li><code>dspace-lni</code> - Contains all customizations for the Lightweight Network Interface.</li>
+	          	  <li><code>dspace-oai</code> - Contains all customizations for the OAI-PMH Interface.</li>
+	          	  <li><code>dspace-xmlui</code> - Contains all customizations for the XML User Interface (aka Manakin).
+	          	  	<ul>
+	          	  		<li><code>src/main/webapp/</code> - The overlay for XMLUI Web Application. This is the location to place custom Themes or Configurations.
+	          	  			<ul>
+	          	  				<li><code>i18n/</code> - The location to place a custom version of the XMLUI's messages.xml</li>
+	          	  			    <li><code>themes/</code> - The location to place custom Themes for the XMLUI</li> 
+	          	  			</ul>
+	          	  		</li>
+	          		</ul>
+	          	  </li>
+	 			</ul>
+	 		  </li>
+	          <li><code>src/</code> - Maven configurations for DSpace System.  This directory contains the Maven and Ant build files for DSpace.</li>
+	          <li><code>target/</code> - (Only exists after building DSpace) This is the location Maven uses to build your DSpace installation package.
+	          	<ul>
+	          		<li><code>dspace-[version].dir</code> - The location of the DSpace Installation Package (which can then be installed by running <code>ant update</code>)</li>
+	          	</ul>
+	          </li>
+	        </ul>
+	      </li>
+	    </ul>
       </li>
     </ul>
 

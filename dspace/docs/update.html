@@ -41,10 +41,10 @@
 <li><b>Build DSpace</b>
 <p>The build process has radically changed for DSpace 1.5. With this new release the build system has moved to a maven-based system enabling the various projects (JSPUI, XMLUI, OAI, and Core API) into separate projects. See the <a href="file:///Users/scott/Development/Workspaces/DSpace1.5/dspace-1.5/dspace/docs/install.html">Installation section</a> for more information on building DSpace using the new maven-based build system. Run the following commands to compile DSpace.</p>
 <pre>  
-  cd [dspace-source];
+  cd [dspace-source]/dspace/;
   mvn package
 </pre>
-<p>You will find the result in <code>[dspace-source]/target/dspace-1.5-build.dir/</code>; inside this directory is the compiled binary distribution of DSpace.</p>
+<p>You will find the result in <code>[dspace-source]/dspace/target/dspace-1.5-build.dir/</code>; inside this directory is the compiled binary distribution of DSpace.</p>
 </li>
 
 
@@ -133,7 +133,7 @@ event.consumer.eperson.filters = EPerson+Create
 <li><b>Add <code>xmlui.xconf</code> Manakin configuration</b>
 <p>The new Manakin user interface available with DSpace 1.5 requires an extra configuration file that you will need to manually copy over to your configuration directory. </p>
 <pre>
-cp [dspace-source]/config/xmlui.xconf [dspace]/config/xmlui.xconf
+cp [dspace-source]/dspace/config/xmlui.xconf [dspace]/config/xmlui.xconf
 </pre>
 </li>
 
@@ -143,10 +143,10 @@ cp [dspace-source]/config/xmlui.xconf [dspace]/config/xmlui.xconf
 <p>The database schema needs updating. SQL files contain the relevant updates are provided, note if you have made any local customizations to the database schema you should consult these updates and make sure they will work for you.</p>
 <ul>
 <li>For PostgreSQL
-<p><code>psql -U [dspace-user] -f [dspace-source]/etc/database_schema_14-15.sql [database-name]</code></p>
+<p><code>psql -U [dspace-user] -f [dspace-source]/dspace/etc/database_schema_14-15.sql [database-name]</code></p>
 </li>
 <li>For Oracle
-<p><code>[dspace-source]/etc/oracle/database_schema_142-15.sql</code> contains the 
+<p><code>[dspace-source]/dspace/etc/oracle/database_schema_142-15.sql</code> contains the 
 commands necessary to upgrade your database schema on oracle.</p>
 </li></ul></li>  
 
@@ -154,7 +154,7 @@ commands necessary to upgrade your database schema on oracle.</p>
 
 <li><b>Apply any customizations</b>
 <p>If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. Commonly these modifications are made to "JSP" pages located inside the <code>[dspace 1.4.2]/jsp/local</code> directory. These should be moved 
-<code>[dspace-source]/modules/dspace-jspui/src/main/webapp/</code> in the new build structure. See <a href="file:///Users/scott/Development/Workspaces/DSpace1.5/dspace-1.5/dspace/docs/configure.html#jspui-jsp">Customizing the JSP Pages</a> for more information.  
+<code>[dspace-source]/dspace/modules/dspace-jspui/src/main/webapp/</code> in the new build structure. See <a href="file:///Users/scott/Development/Workspaces/DSpace1.5/dspace-1.5/dspace/docs/configure.html#jspui-jsp">Customizing the JSP Pages</a> for more information.  
 </li>
 	
 	
@@ -162,9 +162,9 @@ commands necessary to upgrade your database schema on oracle.</p>
 	
 	
 <li><b>Update DSpace</b>
-<p> Update the DSpace installed directory with new code and libraries. Inside the <code>[dspace-source]/target/dspace-1.5-build.dir/</code> directory run:</p>
+<p> Update the DSpace installed directory with new code and libraries. Inside the <code>[dspace-source]/dspace/target/dspace-1.5-build.dir/</code> directory run:</p>
 <pre>
-cd [dspace-source]/target/dspace-1.5-build.dir/;	
+cd [dspace-source]/dspace/target/dspace-1.5-build.dir/;	
 ant -Dconfig=[dspace]/config/dspace.cfg update
 </pre>
 </li> 	

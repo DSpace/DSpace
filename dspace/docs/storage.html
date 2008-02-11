@@ -24,15 +24,15 @@
 
   <p>All calls to the <code>Database Manager</code> require a <a href="business.html#core">DSpace <code>Context</code> object</a>. Example use of the database manager API is given in the <code>org.dspace.storage.rdbms</code> package Javadoc.</p>
 
-  <p>The database schema used by DSpace (for PostgreSQL) is stored in <code><i>[dspace-source]</i>/etc/database_schema.sql</code> in the source distribution. It is stored in the form of SQL that can be fed straight into the DBMS to construct the database. The schema SQL file also directly creates two e-person groups in the database that are required for the system to function properly.</p>
+  <p>The database schema used by DSpace (for PostgreSQL) is stored in <code><i>[dspace-source]</i>/dspace/etc/database_schema.sql</code> in the source distribution. It is stored in the form of SQL that can be fed straight into the DBMS to construct the database. The schema SQL file also directly creates two e-person groups in the database that are required for the system to function properly.</p>
 
-  <P>Also in <code><i>[dspace-source]</i>/etc</code> are various SQL files called <code>database_schema_1x_1y</code>.  These contain the necessary SQL commands to update a live DSpace database from version 1.<code>x</code> to 1.<code>y</code>.  Note that this might not be the only part of an upgrade process:  see <a href="update.html">Updating a DSpace Installation</a> for details.</P>
+  <P>Also in <code><i>[dspace-source]</i>/dspace/etc</code> are various SQL files called <code>database_schema_1x_1y</code>.  These contain the necessary SQL commands to update a live DSpace database from version 1.<code>x</code> to 1.<code>y</code>.  Note that this might not be the only part of an upgrade process:  see <a href="update.html">Updating a DSpace Installation</a> for details.</P>
 
   <p>The DSpace database code uses an SQL function <code>getnextid</code> to assign primary keys to newly created rows. This SQL function must be safe to use if several JVMs are accessing the database at once; for example, the Web UI might be creating new rows in the database at the same time as the batch item importer. The PostgreSQL-specific implementation of the method uses <code>SEQUENCES</code> for each table in order to create new IDs. If an alternative database backend were to be used, the implementation of <code>getnextid</code> could be updated to operate with that specific DBMS.</p>
 
   <p>The <code>etc</code> directory in the source distribution contains two further SQL files. <code>clean-database.sql</code> contains the SQL necessary to completely clean out the database, so use with caution! The Ant target <code>clean_database</code> can be used to execute this. <code>update-sequences.sql</code> contains SQL to reset the primary key generation sequences to appropriate values. You'd need to do this if, for example, you're restoring a backup database dump which creates rows with specific primary keys already defined. In such a case, the sequences would allocate primary keys that were already used.</p>
 
-  <P>Versions of the <code>*.sql*</code> files for Oracle are stored in <code><i>[dspace-source]</i>/etc/oracle</code>.  These need to be copied over their PostgreSQL counterparts in <code><i>[dspace-source]</i>/etc</code> prior to installation.</P>
+  <P>Versions of the <code>*.sql*</code> files for Oracle are stored in <code><i>[dspace-source]</i>/dspace/etc/oracle</code>.  These need to be copied over their PostgreSQL counterparts in <code><i>[dspace-source]</i>/dspace/etc</code> prior to installation.</P>
 
   <h3>Maintenance and Backup</h3>
 
@@ -55,9 +55,9 @@ DELETE FROM epersongroup;
     </li>
 
     <li>
-      <p>After restoring a backup, you will need to reset the primary key generation sequences so that they do not produce already-used primary keys. Do this by executing the SQL in <code><i>[dspace-source]</i>/etc/update-sequences.sql</code>, for example with:</p>
+      <p>After restoring a backup, you will need to reset the primary key generation sequences so that they do not produce already-used primary keys. Do this by executing the SQL in <code><i>[dspace-source]</i>/dspace/etc/update-sequences.sql</code>, for example with:</p>
       <pre>
-psql -U dspace -f <i>[dspace-source]</i>/etc/update-sequences.sql
+psql -U dspace -f <i>[dspace-source]</i>/dspace/etc/update-sequences.sql
 </pre>
     </li>
   </ul>

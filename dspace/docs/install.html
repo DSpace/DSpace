@@ -134,7 +134,7 @@
 			or user interfaces, using basic pre-built interface "overlays".  However, it will not allow you to customize or change the 
 			underlying DSpace Java API, as <em>all Java code comes pre-compiled.</em></li>
 			<li><strong>This method is highly recommended for those who are new to DSpace, 
-			may not have available technical staff for DSpace at their institutions, 
+			may not have as much technical staff for DSpace at their institutions, 
 			or do not wish to make changes to the underlying DSpace Java API.</strong></li>
 			</ul>
 		  </li>
@@ -201,13 +201,16 @@ of them in order to install DSpace, you do need to know they exist and also know
         <PRE>useradd -m dspace</PRE>
       </li>
       <li>
-        <P>Download the <A HREF="http://sourceforge.net/projects/dspace/">latest DSpace source code</A> and unpack it
-        into a temporary location.  It is not necessary to keep this directory around after you install DSpace.</P>
+        <P>Download the <A HREF="http://sourceforge.net/projects/dspace/">latest DSpace release</A> and unpack it.
+        Although there are two available releases (<code>dspace-1.x.tar.gz</code> and <code>dspace-1.x-src.tar.gz</code>), 
+        you only need to choose one.  If you want a copy of all underlying Java source code, you should download 
+        the <code>dspace-1.x-src.tar.gz</code> release.
+        </P>
        
         <PRE>gunzip -c dspace-1.x.tar.gz | tar -xf -</PRE>
       
       	<P>For ease of reference, we will refer to the location of this unzipped version 
-      	of the DSpace installation package as <code><i>[dspace-source]</i> in the
+      	of the DSpace release as <code><i>[dspace-source]</i> in the
       	remainder of these instructions.</code>
       	
       	</P>
@@ -220,7 +223,7 @@ of them in order to install DSpace, you do need to know they exist and also know
 	<ol type="i">
 	<li>
 	<p><a name="pgdriver"></a>Copy the PostgreSQL JDBC driver (<code>.jar</code> file) into
-<code><i>[dspace-source]</i>/lib</code>.  If you compiled PostgreSQL yourself, it'll be in <code>postgresql-7.x.x/src/interfaces/jdbc/jars/postgresql.jar</code>.  Alternatively you can download it directly from <a href="http://jdbc.postgresql.org/download.html">the PostgreSQL JDBC site</a>.  Make sure you get the recommended driver for the version of PostgreSQL you're running.</p></li>
+<code><i>[dspace-source]</i>/dspace/lib</code>.  If you compiled PostgreSQL yourself, it'll be in <code>postgresql-7.x.x/src/interfaces/jdbc/jars/postgresql.jar</code>.  Alternatively you can download it directly from <a href="http://jdbc.postgresql.org/download.html">the PostgreSQL JDBC site</a>.  Make sure you get the recommended driver for the version of PostgreSQL you're running.</p></li>
         <li>
 	      <p>Create a <code>dspace</code> database, owned by the <code>dspace</code> PostgreSQL user:</p>
 
@@ -233,21 +236,21 @@ createdb -U dspace -E UNICODE dspace</pre>
 	<p><strong>Oracle:</strong>
 	<ol type="i">
 	   <li>
-            <p>Copy the Oracle JDBC driver into <code><i>[dspace-source]</i>/lib</code>.</p>
+            <p>Copy the Oracle JDBC driver into <code><i>[dspace-source]</i>/dspace/lib</code>.</p>
 	   </li>
 	   <li>
             <p>Create a database for DSpace.  Make sure that the character set is one of the Unicode character sets.  DSpace uses UTF-8 natively, and it is suggested that the Oracle database use the same character set.  Create a user account for DSpace (e.g. <code>dspace</code>,) and ensure that it has permissions to add and remove tables in the database.</p>
 	   </li>
 	   <li>
-            <p>Edit the config/dspace.cfg file in your source directory for the  following settings:</p>
+            <p>Edit the <code><i>[dspace-source]</i>/dspace/config/dspace.cfg</code> database settings:</p>
 		<pre>db.name   = oracle
 db.url    = jdbc.oracle.thin:@//host:port/dspace
 db.driver = oracle.jdbc.OracleDriver</pre>
 	   </li>
 	   <li>
-            <p>Go to <code><i>[dspace-source]</i>/etc/oracle</code> and copy the contents to their parent directory, overwriting the versions in the parent:
+            <p>Go to <code><i>[dspace-source]</i>/dspace/etc/oracle</code> and copy the contents to their parent directory, overwriting the versions in the parent:
 
-<pre>cd [dspace-source]/etc/oracle
+<pre>cd [dspace-source]/dspace/etc/oracle
 cp * ..</pre>
             <p>You now have Oracle-specific <code>.sql</code> files in your <code>etc</code> directory, and your dspace.cfg is modified to point to your Oracle database.</p>
 	   </li>
@@ -255,7 +258,7 @@ cp * ..</pre>
       </li>
 
       <li>
-        <P>Edit <code><i>[dspace-source]</i>/config/dspace.cfg</code>, in particular you'll need to set these properties:
+        <P>Edit <code><i>[dspace-source]</i>/dspace/config/dspace.cfg</code>, in particular you'll need to set these properties:
 
 <br><code>dspace.dir</code> -- must be set to the <code>[dspace]</code> (installation) directory.
 
@@ -298,8 +301,8 @@ chown dspace <i>[dspace]</i></PRE>
       </li>
 
 	  <li>
-	  	<P>As the <code>dspace</code> UNIX user, generate the DSpace installation package in the <code><i>[dspace-source]</i>/target/dspace-[version].dir/</code> directory:</P>
-	  	<pre>cd <i>[dspace-source]</i>
+	  	<P>As the <code>dspace</code> UNIX user, generate the DSpace installation package in the <code><i>[dspace-source]</i>/dspace/target/dspace-[version].dir/</code> directory:</P>
+	  	<pre>cd <i>[dspace-source]</i>/dspace/
 mvn package</pre>
 
 		<P>Note: without any extra arguments, the DSpace installation package is initialized for PostgreSQL.  If you want to use Oracle instead,
@@ -310,7 +313,7 @@ mvn package</pre>
       <li>
         <P>As the <code>dspace</code> UNIX user, initialize the DSpace database and install DSpace to <code><i>[dspace]</i></code>:</P>
 
-        <pre>cd <i>[dspace-source]</i>/target/dspace-[version].dir/
+        <pre>cd <i>[dspace-source]</i>/dspace/target/dspace-[version].dir/
 ant fresh_install</pre>
 
 		<P><strong>Note:</strong> to see a complete list of build targets, run</P>
@@ -378,36 +381,36 @@ cp -r <i>[dspace]</i>/webapps/dspace-oai <i>[tomcat]</i>/webapps</PRE>
         <PRE>useradd -m dspace</PRE>
       </li>
       <li>
-        <P>Create the parent directory for the DSpace modules to reside (i.e. <code>[dspace-parent]</code>).  As <em>root</em> (or a user with appropriate permissions), run:</P>
+        <P>Create the source directory for the DSpace modules to reside (i.e. <code>[dspace-source]</code>).  As <em>root</em> (or a user with appropriate permissions), run:</P>
 
-        <PRE>mkdir <i>[dspace-parent]</i>
-chown dspace <i>[dspace-parent]</i></PRE>
+        <PRE>mkdir <i>[dspace-source]</i>
+chown dspace <i>[dspace-source]</i></PRE>
 
         <P>(Assuming the <code>dspace</code> UNIX username.)</P>
       </li>
 	  <li>
-	  	<P>Checkout the DSpace Source code from SourceForge SVN into <code>[dspace-parent]</code>.  For example:</P>
+	  	<P>Checkout the DSpace Source code from SourceForge SVN into <code>[dspace-source]</code>.  For example:</P>
 	  	
-	  	<PRE>svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5 [dspace-parent]</PRE>
+	  	<PRE>svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5 [dspace-source]</PRE>
 	  	
 	  	<P>If you wish, you can choose to <em>only</em> checkout the source code for the specific DSpace "modules"
 	  	which you want to install.  However, you must <em>always</em> checkout the <code>'dspace'</code> module, as
 	  	it is the module which builds DSpace.  For example, if you only want to install the XML-UI and the OAI-PMH interface
 	  	you can perform the following checkouts:</P>
 	  	
-	  	<PRE>svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace [dspace-parent]
-svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace-xmlui [dspace-parent]
-svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace-oai [dspace-parent]	  	
+	  	<PRE>svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace [dspace-source]
+svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace-xmlui [dspace-source]
+svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace-oai [dspace-source]	  	
 	  	</PRE>
 		
 		<P>In order, you are checking out the <code>'dspace'</code> module (builds DSpace), 
 		<code>'dspace-xmlui'</code> module (provides XML-UI), and <code>'dspace-oai'</code> module (provides OAI-PMH).</P>
 	  
-	  	<P>In the end, you should have a folder structure similar to the following in <code><i>[dspace-parent]</i></code>:
+	  	<P>In the end, you should have a folder structure similar to the following in <code><i>[dspace-source]</i></code>:
 	  	<ul>
-	  		<li><code><i>[dspace-parent]</i></code>
+	  		<li><code><i>[dspace-source]</i></code>
 	  		  <ul>
-	  	 		<li><code>dspace/</code> - DSpace 'build' and configuration module (this is what is normally referred to as <code><i>[dspace-source]</i></code>)</li>
+	  	 		<li><code>dspace/</code> - DSpace 'build' and configuration module</li>
 	  	 		<li><code>dspace-api/</code> - DSpace Java API module</li>
 	  	 		<li><code>dspace-jspui/</code> - DSpace JSP-UI module</li>
 	  	 		<li><code>dspace-oai/</code> - DSpace OAI-PMH interface module</li>
@@ -417,33 +420,18 @@ svn co https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace-
 	  	</ul>
 	  </li>
 	  <li>
-	     <P>Build your custom DSpace installation package (from within the <code>'dspace'</code> module)</P>
-	    
-	     <PRE>cd [dspace-parent]/dspace/
-mvn package</PRE>
-	     
-	     <P>Note: without any extra arguments, DSpace is built for PostgreSQL.  If you want to use Oracle instead,
-	     you should build DSpace as follows:</P>
-	     
-	     <PRE>mvn -Ddb.name=oracle package</PRE>
-	  </li>
-	  <li>
-	  	 <P>Building DSpace may take awhile.  But, once it is complete, you should have your
-	  	 custom DSpace installation package ready in your 
-	  	 <code><i>[dspace-parent]</i>/dspace/target/dspace-[version].dir/</code> directory.</P>
-	  	 <P>Note: Although we won't go into this in detail, you can also create your own
-	  	 completely custom Maven-based modules in your <code><i>[dspace-parent]</i></code> directory.
+	     <P>Note: Although we won't go into this in detail, you can also create your own
+	  	 completely custom Maven-based modules in your <code><i>[dspace-source]</i></code> directory.
 	  	 To build your custom modules into DSpace, you would need to modify the <code>'dspace'</code>
 	  	 module's <code>pom.xml</code> (Project Object Model) to look for those custom modules, and
 	  	 then re-build your DSpace installation package.  Look
 	  	 at the <a href="http://maven.apache.org/">Maven Documentation</a> or 
 	  	 <a href="http://wiki.dspace.org/">DSpace Wiki</a> for more hints and tricks.</P>
 	  </li>
-	  <li><P>Once your DSpace installation package has been built, you can follow the steps in the
-	  <A href="#installsteps">Quick Installation Method</A> above to finish installing and configure DSpace.  
-	  Just remember that you can <em>skip</em> downloading the DSpace Source Code from
-	  SourceForge.  In addition, remember that your <code><i>[dspace-parent]</i>/dspace</code> module is
-	  the <i>same</i> as what is referred to as <code><i>[dspace-source]</i></code></P>
+	  <li><P>Once you've downloaded the appropriate DSpace modules into <code><i>[dspace-source]</i></code>, you can follow the steps in the
+	  <A href="#installsteps">Quick Installation Method</A> above to finish installing and configuring DSpace.  
+	  Just remember that you can <em>skip</em> downloading the Latest DSpace Release from
+	  SourceForge, as you've already downloaded it via Maven.</P>
 	  </li>
 	</ol>
     </P>
@@ -726,7 +714,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize 1024 \
     <P>A Handle server runs as a separate process that receives TCP requests from other Handle servers, and issues resolution requests to a global server or servers if a Handle entered locally does not correspond to some local content.  The Handle protocol is based on TCP, so it will need to be installed on a server that can broadcast and receive TCP on port 2641.</P>
 
     <P>The Handle server code is included with the DSpace code in
-<code><i>[dspace-source]</i>/lib/handle.jar</code>. <strong>Note:</strong> The latest version of the <code>handle.jar</code> file is not included in the release due to licensing conditions changing between the provided version and later versions. It is recommended you read the <a href="http://www.handle.net/upgrade_6-2_DSpace.html">new license conditions</a> and decide whether you wish to update your installation's <code>handle.jar</code>. If you decide to update, you should replace the existing <code>handle.jar</code> in <i>[dspace-source]</i>/lib with the new version and rebuild your war files.</p>
+<code><i>[dspace]</i>/lib/handle.jar</code>. <strong>Note:</strong> The latest version of the <code>handle.jar</code> file is not included in the release due to licensing conditions changing between the provided version and later versions. It is recommended you read the <a href="http://www.handle.net/upgrade_6-2_DSpace.html">new license conditions</a> and decide whether you wish to update your installation's <code>handle.jar</code>. If you decide to update, you should replace the existing <code>handle.jar</code> in <i>[dspace]</i>/lib with the new version and rebuild your war files.</p>
     <p>A script exists to create a simple Handle configuration - simply run <code><i>[dspace]</i>/bin/make-handle-config</code> after you've set the appropriate parameters in <code>dspace.cfg</code>.  You can also create a Handle configuration directly by following the <A HREF="http://www.handle.net/hs_manual_18jan02/server_manual_2.html">installation instructions on handle.net</A>, but with these changes:</P>
 
     <UL>
@@ -805,13 +793,13 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize 1024 \
 
 	<p><ol>
 	<li><p>Download the DSpace source from <a href="http://sourceforge.net/projects/dspace">SourceForge</a> and untar it (<a href="http://www.winzip.com/">WinZip</a> will do this)</p></li>
-	<li><p>Copy the PostgreSQL JDBC driver across to the DSpace source tree. The drivers will be in <code>C:\Program Files\PostgreSQL\8.x\jdbc\</code>. The <code>postgresql-8.x-yyy.jdbc2.jar</code> is the jar file you need. Copy it to <code>[dspace-source]/lib</code>.</p></li>
+	<li><p>Copy the PostgreSQL JDBC driver across to the DSpace source tree. The drivers will be in <code>C:\Program Files\PostgreSQL\8.x\jdbc\</code>. The <code>postgresql-8.x-yyy.jdbc2.jar</code> is the jar file you need. Copy it to <code>[dspace]/lib</code>.</p></li>
 	<li><p>Ensure the PostgreSQL service is running, and then run pgAdmin III (Start -> PostgreSQL 8.0 -> pgAdmin III). Connect to the local database as the postgres user and:
 		<ul>
 		<li>Create a 'Login Role' (user) called <code>dspace</code> with the password <code>dspace</code></li>
 		<li>Create a database called <code>dspace</code> owned by the user <code>dspace</code>, with UTF-8 encoding
 		</ul></p></li>
-	<li><p>Update paths in <code>[dspace-source]\config\dspace.cfg</code>. <strong>Note:</strong> Use forward slashes / for path separators, though you can still use drive letters, e.g.:
+	<li><p>Update paths in <code>[dspace-source]\dspace\config\dspace.cfg</code>. <strong>Note:</strong> Use forward slashes / for path separators, though you can still use drive letters, e.g.:
 		<p><code>dspace.dir = C:/DSpace</code><p>
       Make sure you change all of the parameters with file paths to suit, specifically:
 		<p><pre>
@@ -830,7 +818,20 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize 1024 \
 	<li><p>Run:<p><code>ant fresh_install</code></p></p></li>
 	<li><p>Create an administrator account, e.g. assuming <code>C:\dspace</code> is where your DSpace installation is:<p><code>C:\dspace\bin\dsrun org.dspace.administer.CreateAdministrator</code></p>
 	<p>and enter the required information</p></p></li>
-	<li><p>Copy the <code>.war</code> Web application files from <code>[dspace-source]\build</code> to Tomcat's webapps dir, which should be somewhere like <code>C:\Program Files\Apache Software Foundation\Tomcat 5.5\webapps</code></p></li>
+	<li><p>Copy the Web application directories from <code>[dspace]\webapps\</code> to Tomcat's webapps dir, which should be somewhere like <code>C:\Program Files\Apache Software Foundation\Tomcat 5.5\webapps</code></p>
+		<ul>
+		<li><P>Alternatively, Tell your Tomcat installation where to find your DSpace web application(s).  
+        As an example, in the <code>&lt;Host&gt;</code> section of your <code><em>[tomcat]</em>/conf/server.xml</code> you could add lines similar to the following
+        (but replace <code><em>[dspace]</em></code> with your installation location):</P>
+        
+        <PRE>&lt;!-- DEFINE A CONTEXT PATH FOR DSpace JSP User Interface  --&gt;
+&lt;Context path="/dspace-jspui" docBase="[dspace]\webapps\dspace-jspui" debug="0" reloadable="true" cachingAllowed="false" allowLinking="true"/&gt;
+	
+&lt;!-- DEFINE A CONTEXT PATH FOR DSpace OAI User Interface  --&gt;
+&lt;Context path="/dspace-oai" docBase="[dspace]\webapps\dspace-oai" debug="0" reloadable="true" cachingAllowed="false" allowLinking="true"/&gt;</PRE>
+		</li>
+		</ul>
+	</li>
 	<li><p>Start the Tomcat service</p></li>
 	<li><p>Browse <code>http://localhost:8080/dspace</code>. You should see the DSpace home page</p></li>
 	</ol></p>

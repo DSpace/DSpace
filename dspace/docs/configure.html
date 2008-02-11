@@ -1236,7 +1236,13 @@ The following vocabularies are currently available by default:
 
   <p>Thus, if possible, it is recommeded you limit your changes to the 'layout' JSPs and the stylesheet.</P>
 
-  <p>The JSPs are stored in <code><i>[dspace-source]</i>/jsp</code>. Place your edited version of a JSP in the <code><i>[dspace-source]</i>/modules/dspace-jspui/src/main/webapp/</code> directory (<i>this is the replacement for the pre-1.5 <code>/jsp/local</code> directory</i>), with the same path as the original. If they exist, these will be used in preference to the distributed versions in <code><i>[dspace-source]</i>/jsp</code>. For example:</p>
+  <p>The JSPs are available in one of two places:
+     <ul>
+     <li><code><i>[dspace-source]</i>/dspace-jspui/dspace-jspui-webapp/src/main/webapp/</code> - Only exists if you downloaded the full Source Release of DSpace</li>
+     <li><code><i>[dspace-source]</i>/dspace/target/dspace-[version].dir/webapps/dspace-jspui-webapp/</code> - The location where they are copied after first building DSpace.</li>
+     </ul>
+  </p>
+  <p>If you wish to modify a particular JSP, place your edited version in the <code><i>[dspace-source]</i>/dspace/modules/dspace-jspui/src/main/webapp/</code> directory (<i>this is the replacement for the pre-1.5 <code>/jsp/local</code> directory</i>), with the same path as the original.  If they exist, these will be used in preference to the default JSPs. For example:</p>
 
   <table>
     <tbody>
@@ -1247,34 +1253,34 @@ The following vocabularies are currently available by default:
       </tr>
 
       <tr>
-        <td><code><i>[dspace-source]</i>/jsp/community-list.jsp</code></td>
+        <td><code><i>[jsp.dir]</i>/community-list.jsp</code></td>
 
-        <td><code><i>[dspace-source]</i>/modules/dspace-jspui/src/main/webapp/community-list.jsp</code></td>
+        <td><code><i>[dspace-source]</i>/dspace/modules/dspace-jspui/src/main/webapp/community-list.jsp</code></td>
       </tr>
 
       <tr>
-        <td><code><i>[dspace-source]</i>/jsp/mydspace/main.jsp</code></td>
+        <td><code><i>[jsp.dir]</i>/mydspace/main.jsp</code></td>
 
-        <td><code><i>[dspace-source]</i>/modules/dspace-jspui/src/main/webapp/mydspace/main.jsp</code></td>
+        <td><code><i>[dspace-source]</i>/dspace/modules/dspace-jspui/src/main/webapp/mydspace/main.jsp</code></td>
       </tr>
     </tbody>
   </table>
 
-  <p>Heavy use is made of a style sheet, in <code><i>[dspace-source]</i>/jsp/styles.css.jsp</code>. If you make edits, call the local version <code><i>[dspace-source]</i>/modules/dspace-jspui/src/main/webapp/styles.css.jsp</code>, and it will be used automatically in preference to the default, as described above.</p>
+  <p>Heavy use is made of a style sheet, <code>styles.css.jsp</code>. If you make edits, copy the local version to <code><i>[dspace-source]</i>/dspace/modules/dspace-jspui/src/main/webapp/styles.css.jsp</code>, and it will be used automatically in preference to the default, as described above.</p>
 
   <p>Fonts and colors can be easily changed using the stylesheet. The stylesheet is a JSP so that the user's browser version can be detected and the stylesheet tweaked accordingly.</p>
 
-  <p>The 'layout' of each page, that is, the top and bottom banners and the navigation bar, are determined by the JSPs <code><i>[dspace-source]</i>/jsp/layout/header-*.jsp</code> and <code><i>[dspace-source]</i>/jsp/layout/footer-*.jsp</code>. You can provide modified versions of these (in <code><i>[dspace-source]</i>/jsp/local/layout</code>, or define more styles and apply them to pages by using the "style" attribute of the <code>dspace:layout</code> tag.</p>
+  <p>The 'layout' of each page, that is, the top and bottom banners and the navigation bar, are determined by the JSPs <code>/layout/header-*.jsp</code> and <code>/layout/footer-*.jsp</code>. You can provide modified versions of these (in <code><i>[dspace-source]</i>/dspace/modules/dspace-jspui/src/main/webapp/layout</code>), or define more styles and apply them to pages by using the "style" attribute of the <code>dspace:layout</code> tag.</p>
 
   <p>After you've customized your JSPs, <strong>you must rebuild the DSpace Web application</strong>. If you haven't already built and installed it, follow the <a href="install.html">install</a> directions. Otherwise, follow the steps below:</p>
 
   <ol>
     <li>
-      <p>Rebuild the DSpace installation package by running the following command from your <code><i>[dspace-source]</i></code> directory:</p>
+      <p>Rebuild the DSpace installation package by running the following command from your <code><i>[dspace-source]</i>/dspace/</code> directory:</p>
       <pre>mvn package</pre>
     </li>
     <li>
-      <p>Re-install the DSpace WAR(s) to <code><i>[dspace]</i>/webapps</code> by running the following command from your <code><i>[dspace-source]</i>/target/dspace-[version].dir</code> directory:</p>
+      <p>Re-install the DSpace WAR(s) to <code><i>[dspace]</i>/webapps</code> by running the following command from your <code><i>[dspace-source]</i>/dspace/target/dspace-[version].dir</code> directory:</p>
       <pre>
 ant -Dconfig=<i>[dspace]</i>/config/dspace.cfg update
 </pre>
