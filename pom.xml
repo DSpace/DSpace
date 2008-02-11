@@ -64,8 +64,8 @@
                   <artifactId>maven-assembly-plugin</artifactId>
                   <configuration>
                      <descriptorRefs>
-                        <descriptorRef>bootstrap-release</descriptorRef>
-                        <descriptorRef>source-release</descriptorRef>
+                        <descriptorRef>release</descriptorRef>
+                        <descriptorRef>src-release</descriptorRef>
                      </descriptorRefs>
                      <finalName>dspace-${pom.version}</finalName>
                   </configuration>
