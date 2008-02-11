@@ -242,49 +242,63 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
     }
 
     /* (non-Javadoc)
-     * @see org.dspace.browse.BrowseCreateDAO#createDistinctMapping(java.lang.String, int, int)
-     */
-    public void createDistinctMapping(String table, int itemID, int distinctID) throws BrowseException
-    {
-        try
-        {
-            TableRow tr = DatabaseManager.create(context, table);
-            tr.setColumn("item_id",     itemID);
-            tr.setColumn("distinct_id", distinctID);
-            DatabaseManager.update(context, tr);
-        }
-        catch (SQLException e)
-        {
-            log.error("caught exception: ", e);
-            String msg = "problem creating distinct mapping: table=" + table + ",item-id=" + itemID + ",distinct_id=" + distinctID;
-            throw new BrowseException(msg, e);
-        }
-
-    }
-
-    /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#updateDistinctMapping(java.lang.String, int, int)
      */
-    public boolean updateDistinctMapping(String table, int itemID, int distinctID) throws BrowseException
+    public boolean updateDistinctMappings(String table, int itemID, int[] distinctIDs) throws BrowseException
     {
         try
         {
-            TableRow tr = DatabaseManager.findByUnique(context, table, "item_id", itemID);
-            if (tr != null)
+            // Remove (set to -1) any duplicate distinctIDs
+            for (int i = 0; i < distinctIDs.length; i++)
             {
-                if (distinctID != tr.getIntColumn("distinct_id"))
-                {
-                    tr.setColumn("distinct_id", distinctID);
-                    DatabaseManager.update(context, tr);
-                }
+                if (!isFirstOccurrence(distinctIDs, i))
+                    distinctIDs[i] = -1;
+            }
 
-                return true;
+            // Find all existing mappings for this item
+            TableRowIterator tri = DatabaseManager.queryTable(context, table, "SELECT * FROM " + table + " WHERE item_id=?", itemID);
+            if (tri != null)
+            {
+                while (tri.hasNext())
+                {
+                    TableRow tr = tri.next();
+
+                    // Check the item mappings to see if it contains this mapping
+                    boolean itemIsMapped = false;
+                    int trDistinctID = tr.getIntColumn("distinct_id");
+                    for (int i = 0; i < distinctIDs.length; i++)
+                    {
+                        // Found this mapping
+                        if (distinctIDs[i] == trDistinctID)
+                        {
+                            // Flag it, and remove (-1) from the item mappings
+                            itemIsMapped = true;
+                            distinctIDs[i] = -1;
+                        }
+                    }
+
+                    // The item is no longer mapped to this community, so remove the database record
+                    if (!itemIsMapped)
+                        DatabaseManager.delete(context, tr);
+                }
+            }
+
+            // Any remaining mappings need to be added to the database
+            for (int i = 0; i < distinctIDs.length; i++)
+            {
+                if (distinctIDs[i] > -1)
+                {
+                    TableRow row = DatabaseManager.create(context, table);
+                    row.setColumn("item_id", itemID);
+                    row.setColumn("distinct_id", distinctIDs[i]);
+                    DatabaseManager.update(context, row);
+                }
             }
         }
         catch (SQLException e)
         {
             log.error("caught exception: ", e);
-            String msg = "problem updating distinct mapping: table=" + table + ",item-id=" + itemID + ",distinct_id=" + distinctID;
+            String msg = "problem updating distinct mappings: table=" + table + ",item-id=" + itemID;
             throw new BrowseException(msg, e);
         }
 

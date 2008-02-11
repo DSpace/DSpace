@@ -40,8 +40,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.commons.cli.CommandLine;
@@ -415,7 +417,7 @@ public class IndexBrowse
                 
                 if (bis[i].isMetadataIndex())
                 {
-                    boolean itemMapped = false;
+                    Set<Integer> distIDSet = new HashSet<Integer>();
 
                     // now index the new details - but only if it's archived and not withdrawn
                     if (item.isArchived() && !item.isWithdrawn())
@@ -443,22 +445,30 @@ public class IndexBrowse
                                     {
                                         // get the normalised version of the value
                                         String nVal = OrderFormat.makeSortString(values[x].value, values[x].language, bis[i].getDataType());
-                                        int distinctID = dao.getDistinctID(bis[i].getDistinctTableName(), values[x].value, nVal);
-
-                                        // Update the existing mapping, or create a new one if it doesn't exist
-                                        if (!dao.updateDistinctMapping(bis[i].getMapTableName(), item.getID(), distinctID))
-                                            dao.createDistinctMapping(bis[i].getMapTableName(), item.getID(), distinctID);
-
-                                        itemMapped = true;
+                                        distIDSet.add(dao.getDistinctID(bis[i].getDistinctTableName(), values[x].value, nVal));
                                     }
                                 }
                             }
                         }
                     }
 
-                    // remove any old mappings
-                    if (!itemMapped)
+                    // Do we have any mappings?
+                    if (distIDSet.isEmpty())
+                    {
+                        // remove any old mappings
                         removeIndex(item.getID(), bis[i].getMapTableName());
+                    }
+                    else
+                    {
+                        // Update the existing mappings
+                        int[] distIDarr = new int[distIDSet.size()];
+                        int didx = 0;
+                        for (Integer distID : distIDSet)
+                        {
+                            distIDarr[didx++] = distID;
+                        }
+                        dao.updateDistinctMappings(bis[i].getMapTableName(), item.getID(), distIDarr);
+                    }
                 }
             }
         }
