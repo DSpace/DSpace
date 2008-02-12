@@ -490,13 +490,18 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 					}
 				} else if ((current instanceof Element)
 						&& ("list".equals(((Element) current).getName()))) {
-					i++;
+					if (paragraphWrap(parent, i, removed)) {
+						removed.clear();
+						i++; // account for the field added
+					}
 				} else {
 					// If we break paragraphs based upon blank lines then we
 					// need to check if
 					// there are any in this text element.
 					if (this.blankLines && current instanceof Text) {
 						String rawText = ((Text) current).getText();
+						parent.removeContent(current);
+						i--;// account text field removed.
 
 						// Regular expressiot to split based upon blank lines.
 						// FIXME: This may not work for windows people who
@@ -507,22 +512,18 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 								.asList(rawText.split("\n\\s*\n")));
 
 						if (parts.size() > 0) {
-							Collections.reverse(parts);
-							String lastPart = parts.remove(0);
+							String lastPart = parts.remove(parts.size()-1);
 
 							for (String part : parts) {
 								removed.add(new Text(part));
 
-								if (paragraphWrap(parent, i, removed)) {
+								if (paragraphWrap(parent, i+1, removed)) {
 									removed.clear();
 									i++;// account for the field added
 								}
 							}
 
 							removed.add(new Text(lastPart));
-
-							parent.removeContent(current);
-							i--;// account text field removed.
 						}
 					} else {
 						removed.add(current);
