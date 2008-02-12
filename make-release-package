@@ -26,7 +26,8 @@ if [ $? -eq 1 ]; then
 fi
 
 cd tmp
-FILENAME="dspace-$3-source"
+S_FILENAME="dspace-$3-source"
+B_FILENAME="dspace-$3-binary"
 
 echo "Checking out core code..."
 $SVN export -r $2 "$SVN_BASE_URL/$1" release
@@ -51,20 +52,41 @@ else
 	rm -f release/make-release-package
 fi
 
-echo "Creating tarball..."
-mv release $FILENAME
+echo "Creating source distribution..."
+mv release $S_FILENAME
 
-tar czf $FILENAME.tgz $FILENAME
-tar cjf $FILENAME.tbz2 $FILENAME
-zip -r $FILENAME.zip $FILENAME
+tar czf $S_FILENAME.tgz $S_FILENAME
+tar cjf $S_FILENAME.tbz2 $S_FILENAME
+zip -r $S_FILENAME.zip $S_FILENAME
+
+echo "Creating binary distribution..."
+
+cd $S_FILENAME
+mvn package
+cd dspace
+mvn package
+
+cd target
+mv dspace-*-build.dir $B_FILENAME
+
+tar czf ../../../$B_FILENAME.tgz $B_FILENAME
+tar cjf ../../../$B_FILENAME.tbz2 $B_FILENAME
+zip -r  ../../../$B_FILENAME.zip $B_FILENAME
+  
 
 echo "Cleaning up..."
 
-cd ..
-mv tmp/$FILENAME.* .
-rm -r tmp
+cd ../../../..
+mv tmp/$S_FILENAME.* .
+mv tmp/$B_FILENAME.* .
+#rm -r tmp
 
 echo "Packages created:
-  * $FILENAME.tgz
-  * $FILENAME.tbz2
-  * $FILENAME.zip"
+  * $S_FILENAME.tgz
+  * $S_FILENAME.tbz2
+  * $S_FILENAME.zip
+  * $B_FILENAME.tgz
+  * $B_FILENAME.tbz2
+  * $B_FILENAME.zip"
+  
+  
