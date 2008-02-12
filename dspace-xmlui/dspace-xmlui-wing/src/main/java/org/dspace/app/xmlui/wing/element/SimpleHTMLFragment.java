@@ -77,7 +77,9 @@ import org.xml.sax.helpers.NamespaceSupport;
  * p, a, b, i, u, ol, li and img. Each are translated into their DRI equivelents, note
  * the "h" tags are translated into a paragraph of rend=heading.
  * 
- * If the linkbreaks flag is set then line breaks are treated as paragraphs.
+ * If the linkbreaks flag is set then line breaks are treated as paragraphs. This 
+ * allows plain text files to also be included and they will be mapped into DRI as 
+ * well.
  * 
  * @author Scott Phillips
  * @author Jay Paz
@@ -477,7 +479,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 			List<Content> removed = new ArrayList<Content>();
 			for (int i = 0; i < parent.getContentSize(); i++) {
 				Content current = parent.getContent(i);
-
+				
 				if ((current instanceof Element)
 						&& ("p".equals(((Element) current).getName()))) {
 					// A paragraph is being open, combine anything up to this
@@ -486,6 +488,9 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 						removed.clear();
 						i++; // account for the field added
 					}
+				} else if ((current instanceof Element)
+						&& ("list".equals(((Element) current).getName()))) {
+					i++;
 				} else {
 					// If we break paragraphs based upon blank lines then we
 					// need to check if
