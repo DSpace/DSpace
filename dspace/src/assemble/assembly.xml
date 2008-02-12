@@ -67,7 +67,8 @@
 			<binaries>
 				<includeDependencies>false</includeDependencies>
 				<outputDirectory>webapps</outputDirectory>
-				<unpack>true</unpack>
+			    <outputFileNameMapping>${artifactId}-${version}</outputFileNameMapping>
+                <unpack>true</unpack>
 			</binaries>
 		</moduleSet>
 	</moduleSets>
