@@ -676,3 +676,4 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 		}
 	}
 }
+ 
