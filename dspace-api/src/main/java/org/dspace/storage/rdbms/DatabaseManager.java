@@ -632,22 +632,32 @@ public class DatabaseManager
         StringBuffer sql = new StringBuffer().append("update ").append(table)
                 .append(" set ");
 
+        List columns = new ArrayList();
         ColumnInfo pk = getPrimaryKeyColumnInfo(table);
         ColumnInfo[] info = getNonPrimaryKeyColumns(table);
 
+        String seperator = "";
         for (int i = 0; i < info.length; i++)
         {
-            sql.append((i == 0) ? "" : ", ").append(info[i].getName()).append(
-                    " = ?");
+            // Only update this column if it has changed
+            if (row.hasColumnChanged(info[i].getName()))
+            {
+                sql.append(seperator).append(info[i].getName()).append(" = ?");
+                columns.add(info[i]);
+                seperator = ", ";
+            }
         }
 
-        sql.append(" where ").append(pk.getName()).append(" = ?");
+        // Only execute the update if there is anything to update
+        if (columns.size() > 0)
+        {
+            sql.append(" where ").append(pk.getName()).append(" = ?");
+            columns.add(pk);
 
-        List columns = new ArrayList();
-        columns.addAll(Arrays.asList(info));
-        columns.add(pk);
+            return execute(context.getDBConnection(), sql.toString(), columns, row);
+        }
 
-        return execute(context.getDBConnection(), sql.toString(), columns, row);
+        return 1;
     }
 
     /**
@@ -1107,6 +1117,8 @@ public class DatabaseManager
             }
         }
 
+        // Now that we've prepped the TableRow, reset the flags so that we can detect which columns have changed
+        row.resetChanged();
         return row;
     }
 

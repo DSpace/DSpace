@@ -67,6 +67,8 @@ public class TableRow
      */
     private Map data = new HashMap();
 
+    private Map changed = new HashMap();
+
     /**
      * Constructor
      * 
@@ -82,6 +84,7 @@ public class TableRow
     {
         this.table = table;
         nullColumns(columns);
+        resetChanged(columns);
     }
 
     /**
@@ -105,6 +108,18 @@ public class TableRow
     public boolean hasColumn(String column)
     {
         return data.get(canonicalize(column)) != null;
+    }
+
+    /**
+     * Return true if this row contains this column and the value has been updated.
+     *
+     * @param column
+     *            The column name (case-insensitive)
+     * @return True if this row contains a column with this name.
+     */
+    public boolean hasColumnChanged(String column)
+    {
+        return changed.get(canonicalize(column)) == Boolean.TRUE;
     }
 
     /**
@@ -387,15 +402,26 @@ public class TableRow
             throw new IllegalArgumentException("No such column " + column);
         }
 
+        String canonName = canonicalize(column);
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
             // if oracle, use 1 or 0 for true/false
-            data.put(canonicalize(column), b ? new Integer(1) : new Integer(0));
+            Integer value = b ? new Integer(1) : new Integer(0);
+            if (!value.equals(data.get(canonName)))
+            {
+                data.put(canonName, value);
+                changed.put(canonName, Boolean.TRUE);
+            }
         }
         else
         {
             // default to postgres true/false
-            data.put(canonicalize(column), b ? Boolean.TRUE : Boolean.FALSE);
+            Boolean value = b ? Boolean.TRUE : Boolean.FALSE;
+            if (!value.equals(data.get(canonName)))
+            {
+                data.put(canonName, value);
+                changed.put(canonName, Boolean.TRUE);
+            }
         }
     }
 
@@ -416,7 +442,13 @@ public class TableRow
             throw new IllegalArgumentException("No such column " + column);
         }
 
-        data.put(canonicalize(column), (s == null) ? NULL_OBJECT : s);
+        String canonName = canonicalize(column);
+        Object value = (s == null) ? NULL_OBJECT : s;
+        if (!value.equals(data.get(canonName)))
+        {
+            data.put(canonName, value);
+            changed.put(canonName, Boolean.TRUE);
+        }
     }
 
     /**
@@ -436,7 +468,13 @@ public class TableRow
             throw new IllegalArgumentException("No such column " + column);
         }
 
-        data.put(canonicalize(column), new Integer(i));
+        String canonName = canonicalize(column);
+        Integer value = new Integer(i);
+        if (!value.equals(data.get(canonName)))
+        {
+            data.put(canonName, value);
+            changed.put(canonName, Boolean.TRUE);
+        }
     }
 
     /**
@@ -456,7 +494,13 @@ public class TableRow
             throw new IllegalArgumentException("No such column " + column);
         }
 
-        data.put(canonicalize(column), new Long(l));
+        String canonName = canonicalize(column);
+        Long value = new Long(l);
+        if (!value.equals(data.get(canonName)))
+        {
+            data.put(canonName, value);
+            changed.put(canonName, Boolean.TRUE);
+        }
     }
 
     /**
@@ -477,14 +521,13 @@ public class TableRow
             throw new IllegalArgumentException("No such column " + column);
         }
 
-        if (d == null)
+        String canonName = canonicalize(column);
+        Object value = (d == null) ? NULL_OBJECT : d;
+        if (!value.equals(data.get(canonName)))
         {
-            setColumnNull(canonicalize(column));
-
-            return;
+            data.put(canonName, value);
+            changed.put(canonName, Boolean.TRUE);
         }
-
-        data.put(canonicalize(column), d);
     }
 
     ////////////////////////////////////////
@@ -583,6 +626,29 @@ public class TableRow
         }
     }
 
+    private void resetChanged(List columns)
+    {
+        for (Iterator iterator = columns.iterator(); iterator.hasNext();)
+        {
+            changed.put(canonicalize((String) iterator.next()), Boolean.FALSE);
+        }
+    }
+
+    /**
+     * package private method to reset the flags of which columns have been updated
+     * This is used by the database manager after it has finished processing the contents
+     * of a resultset, so that it can update only columns that have been updated.
+     * Note that this method does not reset the values themselves, only the flags,
+     * and should not be considered safe to call from anywhere other than the DatabaseManager.
+     */
+    void resetChanged()
+    {
+        for (Iterator iterator = changed.keySet().iterator(); iterator.hasNext();)
+        {
+            changed.put(canonicalize((String) iterator.next()), Boolean.FALSE);
+        }
+    }
+
     /**
      * Internal method to set column to null. The public method ensures that
      * column actually exists.
@@ -591,6 +657,11 @@ public class TableRow
      */
     private void setColumnNullInternal(String column)
     {
-        data.put(canonicalize(column), NULL_OBJECT);
+        String canonName = canonicalize(column);
+        if (data.get(canonName) != NULL_OBJECT)
+        {
+            data.put(canonName, NULL_OBJECT);
+            changed.put(canonName, Boolean.TRUE);
+        }
     }
 }
