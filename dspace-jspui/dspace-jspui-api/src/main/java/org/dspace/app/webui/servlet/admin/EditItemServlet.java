@@ -596,8 +596,6 @@ public class EditItemServlet extends DSpaceServlet
             }
         }
 
-        item.update();
-
         /*
          * Now respond to button presses, other than "Remove" or "Delete" button
          * presses which were dealt with in the above loop.
@@ -620,8 +618,9 @@ public class EditItemServlet extends DSpaceServlet
                     .getSchemaID());
             item.addMetadata(schema.getName(), field.getElement(), field
                     .getQualifier(), lang, value);
-            item.update();
         }
+
+        item.update();
 
         if (button.equals("submit_addcc"))
         {
