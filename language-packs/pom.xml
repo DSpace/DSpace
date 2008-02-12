@@ -127,9 +127,9 @@
    <reporting>
       <plugins>
          <plugin>
-            <groupId>org.dspace</groupId>
-            <artifactId>maven-i18n-report-plugin</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>org.dspace.maven.plugins</groupId>
+            <artifactId>dspace-i18n-report-plugin</artifactId>
+            <version>1.0</version>
          </plugin>
       </plugins>
    </reporting>
