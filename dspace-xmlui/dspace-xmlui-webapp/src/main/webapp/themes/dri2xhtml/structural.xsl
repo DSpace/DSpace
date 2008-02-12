@@ -541,7 +541,7 @@
             <xsl:attribute name="action"><xsl:value-of select="@action"/></xsl:attribute>
             <xsl:attribute name="method"><xsl:value-of select="@method"/></xsl:attribute>
             <xsl:if test="@method='multipart'">
-            	<xsl:attribute name="method">POST</xsl:attribute>
+            	<xsl:attribute name="method">post</xsl:attribute>
                 <xsl:attribute name="enctype">multipart/form-data</xsl:attribute>
             </xsl:if>
             <xsl:attribute name="onsubmit">javascript:tSubmit(this);</xsl:attribute>
@@ -1059,21 +1059,55 @@
     <xsl:template name="pick-label">
         <xsl:choose>
             <xsl:when test="dri:field/dri:label">
-                <span class="ds-form-label">
+                <label class="ds-form-label">
+                	<xsl:choose>
+                		<xsl:when test="./dri:field/@id">
+                			<xsl:attribute name="for">
+                				<xsl:value-of select="translate(./dri:field/@id,'.','_')"/>
+                			</xsl:attribute>
+                		</xsl:when>
+                		<xsl:otherwise></xsl:otherwise>
+                	</xsl:choose>
                     <xsl:apply-templates select="dri:field/dri:label" mode="formComposite"/>
                     <xsl:text>:</xsl:text>
-                </span>                
+                </label>                
             </xsl:when>
             <xsl:when test="string-length(string(preceding-sibling::*[1][local-name()='label'])) > 0">
-                <span>
-                    <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>
-                    <xsl:text>:</xsl:text>
-                </span>
+                <xsl:choose>
+                	<xsl:when test="./dri:field/@id">
+                		<label>
+		                	<xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>
+		                    <xsl:text>:</xsl:text>
+		                </label>
+                	</xsl:when>
+                	<xsl:otherwise>
+                		<span>
+		                	<xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>
+		                    <xsl:text>:</xsl:text>
+		                </span>
+                	</xsl:otherwise>
+                </xsl:choose>
+                
             </xsl:when>
             <xsl:when test="dri:field">
-                <span class="ds-form-label">
-                    <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>&#160;
-                </span>
+                <xsl:choose>       
+	                <xsl:when test="preceding-sibling::*[1][local-name()='label']">
+		                <label class="ds-form-label">
+		                	<xsl:choose>
+		                		<xsl:when test="./dri:field/@id">
+		                			<xsl:attribute name="for">
+		                				<xsl:value-of select="translate(./dri:field/@id,'.','_')"/>
+		                			</xsl:attribute>
+		                		</xsl:when>
+		                		<xsl:otherwise></xsl:otherwise>
+		                	</xsl:choose>
+		                    <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>&#160;
+		                </label>
+		            </xsl:when>
+		            <xsl:otherwise>
+		            	<xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>&#160;
+		            </xsl:otherwise>
+                </xsl:choose>
             </xsl:when>
             <xsl:otherwise>
                 <!-- If the label is empty and the item contains no field, omit the label. This is to 
@@ -1081,7 +1115,7 @@
                     both columns of the list. -->
             </xsl:otherwise>
         </xsl:choose>
-    </xsl:template>    
+    </xsl:template> 
     
     <xsl:template match="dri:list[@type='form']/dri:label" priority="3">
    		<xsl:attribute name="class">
@@ -1091,8 +1125,19 @@
 	             <xsl:value-of select="@rend"/>
 	         </xsl:if>
         </xsl:attribute>
+        <xsl:choose>
+        	<xsl:when test="following-sibling::dri:item[1]/dri:field/@id">
+        		<xsl:attribute name="for">
+		        	<xsl:value-of select="translate(following-sibling::dri:item[1]/dri:field/@id,'.','_')" />
+		        </xsl:attribute>
+        	</xsl:when>
+        	<xsl:otherwise>
+        	</xsl:otherwise>
+        </xsl:choose>
         <xsl:apply-templates />
-    </xsl:template>
+    </xsl:template>  
+    
+    
     <xsl:template match="dri:field/dri:label" mode="formComposite">
         <xsl:apply-templates />
     </xsl:template>
@@ -1780,7 +1825,15 @@
             <!-- This is changing drammatically -->
             <xsl:when test="@type= 'checkbox' or @type= 'radio'">
                 <fieldset>
-                    <xsl:call-template name="fieldAttributes"/>
+                    <xsl:call-template name="standardAttributes">
+			            <xsl:with-param name="class">
+			                <xsl:text>ds-</xsl:text><xsl:value-of select="@type"/><xsl:text>-field </xsl:text>
+			                <xsl:if test="dri:error">
+			                    <xsl:text>error </xsl:text>
+			                </xsl:if>
+			            </xsl:with-param>
+			        </xsl:call-template> 
+			        <xsl:attribute name="id"><xsl:value-of select="generate-id()"/></xsl:attribute>
                     <xsl:if test="dri:label">
                     	<legend><xsl:apply-templates select="dri:label" mode="compositeComponent" /></legend>
                     </xsl:if>
