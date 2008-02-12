@@ -194,6 +194,7 @@
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.browse_titles">Titles</message>
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.browse_authors">Authors</message>
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.browse_dates">Dates</message>
+	<message key="xmlui.ArtifactBrowser.CollectionViewer.advanced_search_link">Advanced Search</message>
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.head_recent_submissions">Recent Submissions</message>
 	
 	<!-- org.dspace.app.xmlui.artifactbrowser.CommunityBrowser.java -->
@@ -210,6 +211,7 @@
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.browse_titles">Titles</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.browse_authors">Authors</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.browse_dates">Dates</message>
+	<message key="xmlui.ArtifactBrowser.CommunityViewer.advanced_search_link">Advanced Search</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.head_sub_communities">Sub-communities within this community</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.head_sub_collections">Collections in this community</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.head_recent_submissions">Recent Submissions</message>
@@ -1701,7 +1703,7 @@
 	<message key="xmlui.dri2xhtml.structural.contact-link">Contact Us</message>
 	<message key="xmlui.dri2xhtml.structural.feedback-link">Send Feedback</message>
 	
-	<message key="xmlui.dri2xhtml.structural.head-subtitle">Manakin: DSpace XMLUI Project v2</message>
+	<message key="xmlui.dri2xhtml.structural.head-subtitle">DSpace/Manakin Repository</message>
 
 	<message key="xmlui.dri2xhtml.structural.profile">Profile: </message>
 	<message key="xmlui.dri2xhtml.structural.logout">Logout</message>
@@ -1735,6 +1737,8 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-description">Description</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-uri">URI</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-date">Date</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Publisher</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-subject">Subject</message>
 	
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Files in this item</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-file">Files</message>

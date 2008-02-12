@@ -133,6 +133,8 @@
 				<browser name="explorer" useragent="MSIE"/>
 				<browser name="explorer6" useragent="MSIE 6"/>
 				<browser name="explorer7" useragent="MSIE 7"/>
+				<browser name="safari2" useragent="(KHTML, like Gecko) Safari"/>
+				<browser name="safari3" useragent="(KHTML, like Gecko) Version/3"/>
 				<browser name="firefox" useragent="Firefox"/>
 				<browser name="firefox1" useragent="Firefox/1."/>
 				<browser name="firefox2" useragent="Firefox/2."/>

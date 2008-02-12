@@ -105,6 +105,9 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     private static final Message T_browse_dates = 
         message("xmlui.ArtifactBrowser.CollectionViewer.browse_dates");
     
+    private static final Message T_advanced_search_link=
+    	message("xmlui.ArtifactBrowser.CollectionViewer.advanced_search_link");
+    
     private static final Message T_head_recent_submissions =
         message("xmlui.ArtifactBrowser.CollectionViewer.head_recent_submissions");
     
@@ -264,12 +267,15 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
                     "collection-browse");
             browse.setHead(T_head_browse);
             String url = contextPath + "/handle/" + collection.getHandle();
-            browse.addItemXref(url + "/browse-title",T_browse_titles);
-            browse.addItemXref(url + "/browse-author",T_browse_authors);
-            browse.addItemXref(url + "/browse-date",T_browse_dates);
+            browse.addItemXref(url + "/browse?type=title",T_browse_titles);
+            browse.addItemXref(url + "/browse?type=author",T_browse_authors);
+            browse.addItemXref(url + "/browse?type=dateissued",T_browse_dates);
+            
+            Division advancedSearchLink = search.addDivision("collection-advanced-search", "secondary advanced-search");
+            advancedSearchLink.addPara().addXref(contextPath + "/advanced-search", T_advanced_search_link);
         }
 
-        // Add the refrence
+        // Add the reference
         {
         	Division viewer = home.addDivision("collection-view","secondary");
             ReferenceSet mainInclude = viewer.addReferenceSet("collection-view",
@@ -277,7 +283,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             mainInclude.addReference(collection);
         }
 
-        // Reciently submitted items
+        // Recently submitted items
         {
             java.util.List<BrowseItem> items = getRecientlySubmittedIems(collection);
 
@@ -292,6 +298,9 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
                 lastSubmitted.addReference(item);
             }
         }
+        
+        
+        
     }
     
     /**

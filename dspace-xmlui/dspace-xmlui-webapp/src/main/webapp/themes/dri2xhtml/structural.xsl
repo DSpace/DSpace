@@ -230,8 +230,8 @@
                 </xsl:attribute>
                 <span id="ds-header-logo">&#160;</span>
             </a>
-            <h1><xsl:copy-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']/node()"/></h1>
-            <h2><i18n:text>xmlui.dri2xhtml.structural.head-subtitle</i18n:text></h2>
+            <h1 class="pagetitle"><xsl:copy-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']/node()"/></h1>
+            <h2 class="static-pagetitle"><i18n:text>xmlui.dri2xhtml.structural.head-subtitle</i18n:text></h2>
             <ul id="ds-trail">
                 <xsl:apply-templates select="/dri:document/dri:meta/dri:pageMeta/dri:trail"/>
             </ul>
@@ -1221,15 +1221,27 @@
     <!-- The first (and most complex) case of the header tag is the one used for divisions. Since divisions can 
         nest freely, their headers should reflect that. Thus, the type of HTML h tag produced depends on how
         many divisions the header tag is nested inside of. -->
+    <!-- The font-sizing variable is the result of a linear function applied to the character count of the heading text -->
     <xsl:template match="dri:div/dri:head" priority="3">
         <xsl:variable name="head_count" select="count(ancestor::dri:div)"/>
+        <!-- with the help of the font-sizing variable, the font-size of our header text is made continuously variable based on the character count -->
+        <xsl:variable name="font-sizing" select="365 - $head_count * 80 - string-length(current())"></xsl:variable>
         <xsl:element name="h{$head_count}">
+            <!-- in case the chosen size is less than 120%, don't let it go below. Shrinking stops at 120% -->
+            <xsl:choose>
+                <xsl:when test="$font-sizing &lt; 120">
+                    <xsl:attribute name="style">font-size: 120%;</xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:attribute name="style">font-size: <xsl:value-of select="$font-sizing"/>%;</xsl:attribute>
+                </xsl:otherwise>
+            </xsl:choose>
             <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-div-head</xsl:with-param>
-            </xsl:call-template>
+            </xsl:call-template>            
             <xsl:apply-templates />
         </xsl:element>
-    </xsl:template>
+    </xsl:template>   
     
     <!-- The second case is the header on tables, which always creates an HTML h3 element -->
     <xsl:template match="dri:table/dri:head" priority="2">
@@ -1683,6 +1695,9 @@
         	</xsl:when>		
         	<xsl:otherwise>
 		        <label class="ds-composite-component">
+		            <xsl:if test="position()=last()">
+		                <xsl:attribute name="class">ds-composite-component last</xsl:attribute>
+		            </xsl:if>
 		            <xsl:apply-templates select="." mode="normalField"/>
 		            <br/>
 		            <xsl:apply-templates select="dri:label" mode="compositeComponent"/>

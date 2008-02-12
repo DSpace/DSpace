@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+<!--
+	sitemap.xmap
+	
+  Version: $Revision: 1.18 $
+ 
+  Date: $Date: 2006/05/01 21:56:29 $
+ 
+  Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+  Institute of Technology.  All rights reserved.
+ 
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+ 
+  - Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+ 
+  - Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+ 
+  - Neither the name of the Hewlett-Packard Company nor the name of the
+  Massachusetts Institute of Technology nor the names of their
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+ 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+  DAMAGE.
+
+-->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+	<map:pipelines>
+		
+		<!-- 
+			Define global theme variables that are used later in this 
+			sitemap. Two variables are typically defined here, the theme's 
+			path and name. The path is the directory name where this theme 
+			is located, such as "Reference" for the reference theme. The 
+			theme's name is used only for descriptive purposes to describe 
+			the theme.		
+		-->
+		<map:component-configurations>
+			<global-variables>
+				<theme-path>Kubrick</theme-path>
+				<theme-name>Kubrick</theme-name>
+			</global-variables>
+		</map:component-configurations>
+		
+		
+		<!-- 
+			The theme's pipeline is used to process all requests handled 
+			by the theme. It is broken up into two parts, the first part 
+			handles all static theme content while the second part handle 
+			all dynamic aspect generated content. The static content is 
+			such things as stylesheets, images, or static pages. Typically 
+			these are just stored on disk and passed directly to the 
+			browser without any processing. 
+		-->
+		<map:pipeline>
+			
+			<!-- Static content -->
+			<map:match pattern="themes/*/**">
+				<map:read src="{2}"/>
+			</map:match>
+			
+			<!-- Aspect content 
+			
+			There are five steps to processing aspect content:
+				
+			1: Generate the DRI page
+				
+				The first step is to generate a DRI page for the request; 
+				this is handled by the aspect chain. Once it is generated 
+				it is the beginning of a theme's pipeline, the DRI page is 
+				ultimately transformed in the resulting XHTML that is 
+				given to the user's browser.
+				
+			2: Add page metadata
+				
+				The next step is to add theme specific metadata to the 
+				DRI page. This is metadata about where the theme is 
+				located and its name. Typically this metadata is different 
+				depending on the users browser, this allows us to give 
+				different stylesheets to Internet Explorer than for other 
+				browsers.
+				
+			3: Transform to XHTML
+				
+				The third step is the main component of a theme the XSL 
+				transformations will turn the DRI page from the aspects 
+				into an XHTML page useable by browsers. 
+				
+			4: Localize the page
+				
+				The second to last step is to localize the content for the 
+				particular user, if they user is requesting a page in a 
+				particular language then those language strings are inserted 
+				into the resulting XHTML.  
+				
+			5: Serialize to the browser
+				
+				The last step sends the page to the user's browser. 
+				
+			-->
+			<map:match pattern="**">
+				
+				<!-- Step 1: Generate the DRI page -->
+				<map:generate type="file" src="cocoon://DRI/{1}"/>
+				
+				<!-- Step 2 Add page metadata -->
+				<map:select type="browser">
+					<map:when test="explorer6">
+						<map:transform type="IncludePageMeta">
+							<map:parameter name="stylesheet.screen#1" value="lib/css/style.css"/>
+							<map:parameter name="stylesheet.screen#2" value="lib/css/style-ie6.css"/>
+							<map:parameter name="javascript#1" value="lib/jquery-1.2.min.js"/>
+							<map:parameter name="javascript#2" value="lib/kubrick-jquery.js"/>
+							<map:parameter name="theme.path" value="{global:theme-path}"/>
+							<map:parameter name="theme.name" value="{global:theme-name}"/>
+						</map:transform>
+					</map:when>
+					<map:when test="explorer7">
+						<map:transform type="IncludePageMeta">
+							<map:parameter name="stylesheet.screen#1" value="lib/css/style.css"/>
+							<map:parameter name="stylesheet.screen#2" value="lib/css/style-ie7.css"/>
+							<map:parameter name="javascript#1" value="lib/jquery-1.2.min.js"/>
+							<map:parameter name="javascript#2" value="lib/kubrick-jquery.js"/>
+							<map:parameter name="theme.path" value="{global:theme-path}"/>
+							<map:parameter name="theme.name" value="{global:theme-name}"/>
+						</map:transform>
+					</map:when>
+					<map:when test="safari2">
+						<map:transform type="IncludePageMeta">
+							<map:parameter name="stylesheet.screen#1" value="lib/css/style.css"/>
+							<map:parameter name="stylesheet.screen#3" value="lib/css/style-safari2.css"/>
+							<map:parameter name="javascript#1" value="lib/jquery-1.2.min.js"/>
+							<map:parameter name="javascript#2" value="lib/kubrick-jquery.js"/>
+							<map:parameter name="theme.path" value="{global:theme-path}"/>
+							<map:parameter name="theme.name" value="{global:theme-name}"/>
+						</map:transform>
+					</map:when>
+					<map:when test="safari3">
+						<map:transform type="IncludePageMeta">
+							<map:parameter name="stylesheet.screen#1" value="lib/css/style.css"/>
+							<map:parameter name="stylesheet.screen#3" value="lib/css/style-safari3.css"/>
+							<map:parameter name="javascript#1" value="lib/jquery-1.2.min.js"/>
+							<map:parameter name="javascript#2" value="lib/kubrick-jquery.js"/>
+							<map:parameter name="theme.path" value="{global:theme-path}"/>
+							<map:parameter name="theme.name" value="{global:theme-name}"/>
+						</map:transform>
+					</map:when>
+					<map:otherwise>
+						<map:transform type="IncludePageMeta">
+							<map:parameter name="stylesheet.screen" value="lib/css/style.css"/>
+							<map:parameter name="javascript#1" value="lib/jquery-1.2.min.js"/>
+							<map:parameter name="javascript#2" value="lib/kubrick-jquery.js"/>
+							<map:parameter name="theme.path" value="{global:theme-path}"/>
+							<map:parameter name="theme.name" value="{global:theme-name}"/>
+						</map:transform>
+					</map:otherwise>
+				</map:select>
+				
+				<!-- Debuging output -->
+				<map:match type="request" pattern="XML">
+					<map:serialize type="xml"/>
+				</map:match>
+				
+				<!-- Step 3: Transform to XHTML -->
+				<map:transform src="{global:theme-name}.xsl"/>
+			    <!-- <map:transform src="template.xsl"/> -->
+				
+				<!-- Step 4: Localize the page -->
+				<map:act type="locale">
+					<map:transform type="i18n">
+						<map:parameter name="locale" value="{locale}"/>						
+					</map:transform>
+				</map:act>
+				
+				<!-- Step 5: Serialize to the browser -->
+				<map:serialize type="xhtml"/>
+				
+			</map:match>
+		</map:pipeline>
+	</map:pipelines>
+</map:sitemap>

@@ -108,6 +108,9 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
     private static final Message T_browse_dates =
         message("xmlui.ArtifactBrowser.CommunityViewer.browse_dates");
     
+    private static final Message T_advanced_search_link=
+    	message("xmlui.ArtifactBrowser.CommunityViewer.advanced_search_link");
+    
     private static final Message T_head_sub_communities = 
         message("xmlui.ArtifactBrowser.CommunityViewer.head_sub_communities");
     
@@ -284,9 +287,12 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
                     "community-browse");
             browse.setHead(T_head_browse);
             String url = contextPath + "/handle/" + community.getHandle();
-            browse.addItemXref(url + "/browse-title",T_browse_titles);
-            browse.addItemXref(url + "/browse-author",T_browse_authors);
-            browse.addItemXref(url + "/browse-date",T_browse_dates);
+            browse.addItemXref(url + "/browse?type=title",T_browse_titles);
+            browse.addItemXref(url + "/browse?type=author",T_browse_authors);
+            browse.addItemXref(url + "/browse?type=dateissued",T_browse_dates);
+            
+            Division advancedSearchLink = search.addDivision("community-advanced-search", "secondary advanced-search");
+            advancedSearchLink.addPara().addXref(contextPath + "/advanced-search", T_advanced_search_link);
         }
 
         // Add main reference:
