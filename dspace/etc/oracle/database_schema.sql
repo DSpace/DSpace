@@ -97,6 +97,8 @@ CREATE TABLE FileExtension
   extension            VARCHAR2(16)
 );
 
+CREATE INDEX fe_bitstream_fk_idx ON FileExtension(bitstream_format_id);
+
 -------------------------------------------------------
 -- Bitstream table
 -------------------------------------------------------
@@ -116,6 +118,8 @@ CREATE TABLE Bitstream
    store_number            INTEGER,
    sequence_id             INTEGER
 );
+
+CREATE INDEX bit_bitstream_fk_idx ON Bitstream(bitstream_format_id);
 
 -------------------------------------------------------
 -- EPerson table
@@ -137,6 +141,11 @@ CREATE TABLE EPerson
   language            VARCHAR2(64)
 );
 
+-- index by email
+CREATE INDEX eperson_email_idx ON EPerson(email);
+
+-- index by netid
+CREATE INDEX eperson_netid_idx ON EPerson(netid);
 
 -------------------------------------------------------
 -- EPersonGroup table
@@ -157,6 +166,9 @@ CREATE TABLE Group2Group
   child_id  INTEGER REFERENCES EPersonGroup(eperson_group_id)
 );
 
+CREATE INDEX g2g_parent_fk_idx ON Group2Group(parent_id);
+CREATE INDEX g2g_child_fk_idx ON Group2Group(child_id);
+
 ------------------------------------------------------
 -- Group2GroupCache table, is the 'unwound' hierarchy in
 -- Group2Group.  It explicitly names every parent child
@@ -173,6 +185,9 @@ CREATE TABLE Group2GroupCache
   child_id  INTEGER REFERENCES EPersonGroup(eperson_group_id)
 );
 
+CREATE INDEX g2gc_parent_fk_idx ON Group2Group(parent_id);
+CREATE INDEX g2gc_child_fk_idx ON Group2Group(child_id);
+
 -------------------------------------------------------
 -- Item table
 -------------------------------------------------------
@@ -186,6 +201,8 @@ CREATE TABLE Item
   owning_collection INTEGER
 );
 
+CREATE INDEX item_submitter_fk_idx ON Item(submitter_id);
+
 -------------------------------------------------------
 -- Bundle table
 -------------------------------------------------------
@@ -196,6 +213,8 @@ CREATE TABLE Bundle
   name               VARCHAR2(16),  -- ORIGINAL | THUMBNAIL | TEXT 
   primary_bitstream_id	INTEGER REFERENCES Bitstream(bitstream_id)
 );
+
+CREATE INDEX bundle_primary_fk_idx ON Bundle(primary_bitstream_id);
 
 -------------------------------------------------------
 -- Item2Bundle table
@@ -210,6 +229,8 @@ CREATE TABLE Item2Bundle
 -- index by item_id
 CREATE INDEX item2bundle_item_idx on Item2Bundle(item_id);
 
+CREATE INDEX item2bundle_bundle_fk_idx ON Item2Bundle(bundle_id);
+
 -------------------------------------------------------
 -- Bundle2Bitstream table
 -------------------------------------------------------
@@ -222,6 +243,8 @@ CREATE TABLE Bundle2Bitstream
 
 -- index by bundle_id
 CREATE INDEX bundle2bitstream_bundle_idx ON Bundle2Bitstream(bundle_id);
+
+CREATE INDEX bundle2bits_bitstream_fk_idx ON Bundle2Bitstream(bitstream_id);
 
 -------------------------------------------------------
 -- Metadata Tables and Sequences
@@ -269,6 +292,7 @@ CREATE VIEW dcvalue AS
 -- related to that item
 CREATE INDEX metadatavalue_item_idx ON MetadataValue(item_id);
 CREATE INDEX metadatavalue_item_idx2 ON MetadataValue(item_id,metadata_field_id);
+CREATE INDEX metadatavalue_field_fk_idx ON MetadataValue(metadata_field_id);
 CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_id);
 
 -------------------------------------------------------
@@ -284,6 +308,8 @@ CREATE TABLE Community
   copyright_text    CLOB,
   side_bar_text     VARCHAR2(2000)
 );
+
+CREATE INDEX community_logo_fk_idx ON Community(logo_bitstream_id);
 
 -------------------------------------------------------
 -- Collection table
@@ -307,6 +333,14 @@ CREATE TABLE Collection
   admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )
 );
 
+CREATE INDEX collection_logo_fk_idx ON Collection(logo_bitstream_id);
+CREATE INDEX collection_template_fk_idx ON Collection(template_item_id);
+CREATE INDEX collection_workflow1_fk_idx ON Collection(workflow_step_1);
+CREATE INDEX collection_workflow2_fk_idx ON Collection(workflow_step_2);
+CREATE INDEX collection_workflow3_fk_idx ON Collection(workflow_step_3);
+CREATE INDEX collection_submitter_fk_idx ON Collection(submitter);
+CREATE INDEX collection_admin_fk_idx ON Collection(admin);
+
 -------------------------------------------------------
 -- Community2Community table
 -------------------------------------------------------
@@ -316,6 +350,9 @@ CREATE TABLE Community2Community
   parent_comm_id INTEGER REFERENCES Community(community_id),
   child_comm_id  INTEGER REFERENCES Community(community_id)
 );
+
+CREATE INDEX com2com_parent_fk_idx ON Community2Community(parent_comm_id);
+CREATE INDEX com2com_child_fk_idx ON Community2Community(child_comm_id);
 
 -------------------------------------------------------
 -- Community2Collection table
@@ -366,6 +403,9 @@ CREATE TABLE ResourcePolicy
 -- authorization manager are select type=x, id=y, action=z
 CREATE INDEX resourcepolicy_type_id_idx ON ResourcePolicy(resource_type_id,resource_id); 
 
+CREATE INDEX rp_eperson_fk_idx ON ResourcePolicy(eperson_id);
+CREATE INDEX rp_epersongroup_fk_idx ON ResourcePolicy(epersongroup_id);
+
 -------------------------------------------------------
 -- EPersonGroup2EPerson table
 -------------------------------------------------------
@@ -378,6 +418,8 @@ CREATE TABLE EPersonGroup2EPerson
 
 -- Index by group ID (used heavily by AuthorizeManager)
 CREATE INDEX epersongroup2eperson_group_idx on EPersonGroup2EPerson(eperson_group_id);
+
+CREATE INDEX epg2ep_eperson_fk_idx ON EPersonGroup2EPerson(eperson_id);
 
 
 -------------------------------------------------------
@@ -411,6 +453,9 @@ CREATE TABLE WorkspaceItem
   page_reached      INTEGER
 );
 
+CREATE INDEX workspace_item_fk_idx ON WorkspaceItem(item_id);
+CREATE INDEX workspace_coll_fk_idx ON WorkspaceItem(collection_id);
+
 -------------------------------------------------------
 --  WorkflowItem table
 -------------------------------------------------------
@@ -431,6 +476,10 @@ CREATE TABLE WorkflowItem
 
 );
 
+CREATE INDEX workflow_item_fk_idx ON WorkflowItem(item_id);
+CREATE INDEX workflow_coll_fk_idx ON WorkflowItem(collection_id);
+CREATE INDEX workflow_owner_fk_idx ON WorkflowItem(owner);
+
 -------------------------------------------------------
 --  TasklistItem table
 -------------------------------------------------------
@@ -440,6 +489,9 @@ CREATE TABLE TasklistItem
   eperson_id	INTEGER REFERENCES EPerson(eperson_id),
   workflow_id	INTEGER REFERENCES WorkflowItem(workflow_id)
 );
+
+CREATE INDEX tasklist_eperson_fk_idx ON TasklistItem(eperson_id);
+CREATE INDEX tasklist_workflow_fk_idx ON TasklistItem(workflow_id);
 
 
 -------------------------------------------------------
@@ -463,6 +515,9 @@ CREATE TABLE Subscription
   eperson_id        INTEGER REFERENCES EPerson(eperson_id),
   collection_id     INTEGER REFERENCES Collection(collection_id)
 );
+
+CREATE INDEX subs_eperson_fk_idx ON Subscription(eperson_id);
+CREATE INDEX subs_collection_fk_idx ON Subscription(collection_id);
 
 
 -------------------------------------------------------
@@ -497,6 +552,9 @@ CREATE TABLE EPersonGroup2WorkspaceItem
   workspace_item_id INTEGER REFERENCES WorkspaceItem(workspace_item_id)
 );
 
+CREATE INDEX epg2wi_group_fk_idx ON epersongroup2workspaceitem(eperson_group_id);
+CREATE INDEX epg2wi_workspace_fk_idx ON epersongroup2workspaceitem(workspace_item_id);
+
 ------------------------------------------------------------
 -- Browse subsystem tables and views
 ------------------------------------------------------------
@@ -511,6 +569,10 @@ CREATE TABLE Communities2Item
    item_id                 INTEGER REFERENCES Item(item_id)
 );
 
+-- Indexing browse tables update/re-index performance
+CREATE INDEX Communities2Item_item_id_idx ON Communities2Item( item_id );
+CREATE INDEX Comm2Item_community_fk_idx ON Communities2Item( community_id );
+
 -------------------------------------------------------
 -- Community2Item view
 ------------------------------------------------------
@@ -519,9 +581,6 @@ SELECT Community2Collection.community_id, Collection2Item.item_id
 FROM Community2Collection, Collection2Item
 WHERE Collection2Item.collection_id   = Community2Collection.collection_id
 ;
-
--- Indexing browse tables update/re-index performance
-CREATE INDEX Communities2Item_item_id_idx ON Communities2Item( item_id );
 
 -------------------------------------------------------------------------
 -- Tables to manage cache of item counts for communities and collections
@@ -578,6 +637,8 @@ CREATE TABLE most_recent_checksum
     result VARCHAR(64) REFERENCES checksum_results(result_code)
 );
 
+CREATE INDEX mrc_result_fk_idx ON most_recent_checksum( result );
+
 -- A row will be inserted into this table every
 -- time a checksum is re-calculated.
 
@@ -593,6 +654,8 @@ CREATE TABLE checksum_history
     checksum_calculated VARCHAR(64),
     result VARCHAR(64) REFERENCES checksum_results(result_code)
 );
+
+CREATE INDEX ch_result_fk_idx ON checksum_history( result );
 
 
 -- this will insert into the result code
