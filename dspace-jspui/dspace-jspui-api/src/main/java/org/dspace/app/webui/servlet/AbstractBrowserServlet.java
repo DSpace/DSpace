@@ -251,7 +251,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             }
             
             // For second level browses on metadata indexes, we need to adjust the default sorting
-            if (bi.isMetadataIndex() && scope.isSecondLevel() && scope.getSortBy() <= 0)
+            if (bi != null && bi.isMetadataIndex() && scope.isSecondLevel() && scope.getSortBy() <= 0)
             {
                 scope.setSortBy(1);
             }
