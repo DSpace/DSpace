@@ -138,7 +138,7 @@ public class BrowseItemDAOPostgres implements BrowseItemDAO
 
             if (!tri.hasNext())
             {
-                return null;
+                return new DCValue[0];
             }
 
             while (tri.hasNext())
