@@ -17,7 +17,7 @@
  
  <p>The changes in DSpace 1.5 are significant and wide spread involving database schema upgrades, code restructuring, completely new user and programatic interfaces, and new build system.</p>
  
- <p>In the notes below <code>[dspace]</code>code> refers to the install directory for your existing DSpace installation, 
+ <p>In the notes below <code>[dspace]</code> refers to the install directory for your existing DSpace installation, 
  and <code>[dspace-source]</code> to the source directory for DSpace 1.5. Whenever you see these path references,
   be sure to replace them with the actual path names on your local system.</p>  
     
@@ -131,9 +131,17 @@ event.consumer.eperson.filters = EPerson+Create
 
 
 <li><b>Add <code>xmlui.xconf</code> Manakin configuration</b>
-<p>The new Manakin user interface available with DSpace 1.5 requires an extra configuration file that you will need to manually copy over to your configuration directory. </p>
+<p>The new Manakin user interface available with DSpace 1.5 requires an extra configuration file that you will need to manually copy it over to your configuration directory. </p>
 <pre>
 cp [dspace-source]/dspace/config/xmlui.xconf [dspace]/config/xmlui.xconf
+</pre>
+</li>
+
+
+<li><b>Add <code>item-submission.xml</code> configurable submission configuration</b>
+<p>The new configurable submission system that enables an administrator to re-arrange, or add/remove item submission steps requires this configuration file. You need to manually copy it over to your configuration directory. </p>
+<pre>
+cp [dspace-source]/dspace/config/item-submission.xml [dspace]/config/item-submission.xml
 </pre>
 </li>
 
