@@ -98,9 +98,9 @@
             </executions>
          </plugin>
          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>native2ascii-maven-plugin</artifactId>
-            <version>1.0-alpha-3-SNAPSHOT</version>
+            <groupId>org.dspace.maven.plugins</groupId>
+            <artifactId>dspace-native2ascii-plugin</artifactId>
+            <version>1.0</version>
             <configuration>
                <encoding>UTF8</encoding>
                <includes>**/*.properties.UTF-8</includes>

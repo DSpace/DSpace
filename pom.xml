@@ -44,7 +44,7 @@
                <dependency>
                   <groupId>org.dspace.maven.plugins</groupId>
                   <artifactId>dspace-assembly-plugin</artifactId>
-                  <version>SNAPSHOT</version>
+                  <version>1.0</version>
                </dependency>
             </dependencies>
          </plugin>
