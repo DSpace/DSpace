@@ -897,8 +897,7 @@ class BrowseParams
         Map<String, String> paramMap = new HashMap<String, String>();
 
         paramMap.put(BrowseParams.SORT_BY, Integer.toString(this.scope.getSortBy()));
-        paramMap
-                .put(BrowseParams.ORDER, AbstractDSpaceTransformer.URLEncode(this.scope.getOrder()));
+        paramMap.put(BrowseParams.ORDER, AbstractDSpaceTransformer.URLEncode(this.scope.getOrder()));
         paramMap.put(BrowseParams.RESULTS_PER_PAGE, Integer
                 .toString(this.scope.getResultsPerPage()));
         paramMap.put(BrowseParams.ETAL, Integer.toString(this.etAl));

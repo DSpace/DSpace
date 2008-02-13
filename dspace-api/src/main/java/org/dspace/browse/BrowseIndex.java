@@ -88,7 +88,7 @@ public class BrowseIndex
     private String[][] mdBits;
 
     /** default order (asc / desc) for this index */
-    private String defaultOrder;
+    private String defaultOrder = SortOption.ASCENDING;
 
     /** additional 'internal' tables that are always defined */
     private static BrowseIndex itemIndex      = new BrowseIndex("bi_item");
