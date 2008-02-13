@@ -30,6 +30,7 @@
          </releases>
          <snapshots>
             <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
             <checksumPolicy>fail</checksumPolicy>
          </snapshots>
       </repository>
@@ -41,11 +42,12 @@
          <name>DSpace Maven Repository</name>
          <url>http://maven.dspace.org/snapshot</url>
          <releases>
-            <updatePolicy>never</updatePolicy>
+            <enabled>false</enabled>
             <checksumPolicy>fail</checksumPolicy>
          </releases>
          <snapshots>
-            <updatePolicy>always</updatePolicy>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
             <checksumPolicy>fail</checksumPolicy>
          </snapshots>
       </pluginRepository>
