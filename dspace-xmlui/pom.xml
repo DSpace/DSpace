@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace</groupId>
    <artifactId>dspace-xmlui</artifactId>
@@ -15,7 +12,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>1.5-SNAPSHOT</version>
+      <version>1.5.0-beta1</version>
    </parent>
 
    <repositories>
@@ -58,15 +55,9 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection>
-         scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-xmlui
-      </connection>
-      <developerConnection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-xmlui
-      </developerConnection>
-      <url>
-         http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace-xmlui
-      </url>
+      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5-beta1/dspace-xmlui</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5-beta1/dspace-xmlui</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/tags/dspace-1_5-beta1/dspace-xmlui</url>
    </scm>
    
    <modules>
@@ -76,4 +67,3 @@
    </modules>
 
 </project>
-
