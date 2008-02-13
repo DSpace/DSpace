@@ -1020,7 +1020,7 @@ public class BrowseDAOPostgres implements BrowseDAO
         queryBuf.append(table);
         if (containerTable != null && tableMap != null)
         {
-            queryBuf.append(", (SELECT ").append(tableMap).append(".distinct_id ");
+            queryBuf.append(", (SELECT DISTINCT ").append(tableMap).append(".distinct_id ");
             queryBuf.append(" FROM ");
             buildFocusedSelectTables(queryBuf);
             queryBuf.append(" WHERE ");
