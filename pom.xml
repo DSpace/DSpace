@@ -53,6 +53,31 @@
    </build>
 
    <profiles>
+   
+      <!--  
+         adds dspace module into build reactor for 
+         when dspace is being build for installation
+         on the users machine and when mvn release:prepare
+         is used by the release manager to create a new 
+         tag in svn. Just use 'mvn package' for building or 
+         use 'mvn release:prepare' for tagging.
+      -->
+      <profile>
+         <id>package</id>
+         <activation>
+            <activeByDefault>true</activeByDefault>
+         </activation>
+         <modules>
+            <module>dspace</module>
+         </modules>
+      </profile>
+      
+      <!-- 
+         Defines distributions that need to be created
+         for release manager when deploying
+         a new version of dspace to the maven repository
+         use 'mvn package deploy -Prelease'
+       -->
       <profile>
          <id>release</id>
          <activation>
