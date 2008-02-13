@@ -1022,6 +1022,15 @@ public class BrowseDAOPostgres implements BrowseDAO
         // Then append the table
         queryBuf.append(" FROM ");
         queryBuf.append(table);
+        if (containerTable != null && tableMap != null)
+        {
+            queryBuf.append(", (SELECT DISTINCT ").append(tableMap).append(".distinct_id ");
+            queryBuf.append(" FROM ");
+            buildFocusedSelectTables(queryBuf);
+            queryBuf.append(" WHERE ");
+            buildFocusedSelectClauses(queryBuf, params);
+            queryBuf.append(") mappings");
+        }
         queryBuf.append(" ");
     }
     
@@ -1044,12 +1053,7 @@ public class BrowseDAOPostgres implements BrowseDAO
         if (containerIDField != null && containerID != -1 && containerTable != null)
         {
             buildWhereClauseOpInsert(queryBuf);
-            
-            queryBuf.append(" EXISTS (SELECT 1 FROM ");
-            buildFocusedSelectTables(queryBuf);
-            queryBuf.append(" WHERE ");
-            buildFocusedSelectClauses(queryBuf, params);
-            queryBuf.append(" AND distinct_id=" + table + ".id) ");
+            queryBuf.append(" ").append(table).append(".id=mappings.distinct_id ");
         }
     }
     
