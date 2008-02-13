@@ -100,7 +100,7 @@
          <plugin>
             <groupId>org.dspace.maven.plugins</groupId>
             <artifactId>dspace-native2ascii-plugin</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
             <configuration>
                <encoding>UTF8</encoding>
                <includes>**/*.properties.UTF-8</includes>
