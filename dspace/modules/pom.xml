@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.dspace</groupId>
 		<artifactId>dspace-parent</artifactId>
-		<version>1.5.0-beta1</version>
+		<version>1.5-SNAPSHOT</version>
 	</parent>
 
 	<repositories>
