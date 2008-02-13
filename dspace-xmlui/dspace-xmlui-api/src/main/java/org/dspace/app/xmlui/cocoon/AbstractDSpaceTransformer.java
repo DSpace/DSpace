@@ -197,10 +197,12 @@ public abstract class AbstractDSpaceTransformer extends AbstractWingTransformer
      */
     public static String URLEncode(String unencodedString) throws UIException
     {
+    	if (unencodedString == null)
+    		return "";
+    	
         try
         {
-            return URLEncoder.encode(unencodedString,
-                    Constants.DEFAULT_ENCODING);
+            return URLEncoder.encode(unencodedString,Constants.DEFAULT_ENCODING);
         }
         catch (UnsupportedEncodingException uee)
         {
