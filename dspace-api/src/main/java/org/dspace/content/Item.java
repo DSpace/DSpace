@@ -141,10 +141,7 @@ public class Item extends DSpaceObject
         clearDetails();
  
         // Get Dublin Core metadata
-        TableRowIterator tri = DatabaseManager.queryTable(ourContext, "MetadataValue",
-                "SELECT * FROM MetadataValue WHERE item_id= ? " +
-                " ORDER BY metadata_field_id, place",
-                itemRow.getIntColumn("item_id"));
+        TableRowIterator tri = retrieveMetadata();
 
         while (tri.hasNext())
         {
@@ -185,6 +182,13 @@ public class Item extends DSpaceObject
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("item_id"));
+    }
+
+    private TableRowIterator retrieveMetadata() throws SQLException
+    {
+        return DatabaseManager.queryTable(ourContext, "MetadataValue",
+                "SELECT * FROM MetadataValue WHERE item_id= ? ORDER BY metadata_field_id, place",
+                itemRow.getIntColumn("item_id"));
     }
 
     /**
@@ -1463,30 +1467,41 @@ public class Item extends DSpaceObject
         // Redo Dublin Core if it's changed
         if (dublinCoreChanged)
         {
-            // Remove existing DC
-            removeMetadataFromDatabase();
+            // Arrays to store the working information required
+            int[]     placeNum = new int[dublinCore.size()];
+            boolean[] storedDC = new boolean[dublinCore.size()];
+            MetadataField[] dcFields = new MetadataField[dublinCore.size()];
 
-            // Add in-memory DC
-            for (DCValue dcv : dublinCore)
+            // Work out the place numbers for the in memory DC
+            for (int dcIdx = 0; dcIdx < dublinCore.size(); dcIdx++)
             {
-                // Get the DC Type
-                int schemaID;
-                MetadataSchema schema = MetadataSchema.find(ourContext,dcv.schema);
-                if (schema == null) {
-                    schemaID = MetadataSchema.DC_SCHEMA_ID;
-                } else {
-                    schemaID = schema.getSchemaID();
+                DCValue dcv = dublinCore.get(dcIdx);
+
+                // Work out the place number for ordering
+                int current = 0;
+
+                // Key into map is "element" or "element.qualifier"
+                String key = dcv.element + ((dcv.qualifier == null) ? "" : ("." + dcv.qualifier));
+
+                Integer currentInteger = elementCount.get(key);
+                if (currentInteger != null)
+                {
+                    current = currentInteger.intValue();
                 }
 
-                MetadataField field = MetadataField.findByElement(ourContext,
-                        schemaID, dcv.element, dcv.qualifier);
+                current++;
+                elementCount.put(key, Integer.valueOf(current));
 
-                if (field == null)
+                // Store the calculated place number, reset the stored flag, and cache the metadatafield
+                placeNum[dcIdx] = current;
+                storedDC[dcIdx] = false;
+                dcFields[dcIdx] = getMetadataField(dcv);
+                if (dcFields[dcIdx] == null)
                 {
                     // Bad DC field, log and throw exception
                     log.warn(LogManager
                             .getHeader(ourContext, "bad_dc",
-                                    "Bad DC field. SchemaID="+String.valueOf(schemaID)
+                                    "Bad DC field. schema="+String.valueOf(dcv.schema)
                                             + ", element: \""
                                             + ((dcv.element == null) ? "null"
                                                     : dcv.element)
@@ -1498,36 +1513,102 @@ public class Item extends DSpaceObject
                                                     : dcv.value) + "\""));
 
                     throw new SQLException("bad_dublin_core "
-                            + "SchemaID="+String.valueOf(schemaID)+", "
+                            + "schema="+dcv.schema+", "
                             + dcv.element
                             + " " + dcv.qualifier);
                 }
+            }
 
-                // Work out the place number for ordering
-                int current = 0;
-
-                // Key into map is "element" or "element.qualifier"
-                String key = dcv.element
-                        + ((dcv.qualifier == null) ? "" : ("." + dcv.qualifier));
-
-                Integer currentInteger = (Integer) elementCount.get(key);
-
-                if (currentInteger != null)
+            // Now the precalculations are done, iterate through the existing metadata
+            // looking for matches
+            TableRowIterator tri = retrieveMetadata();
+            if (tri != null)
+            {
+                while (tri.hasNext())
                 {
-                    current = currentInteger.intValue();
+                    TableRow tr = tri.next();
+                    // Assume that we will remove this row, unless we get a match
+                    boolean removeRow = true;
+
+                    // Go through the in-memory metadata, unless we've already decided to keep this row
+                    for (int dcIdx = 0; dcIdx < dublinCore.size() && removeRow; dcIdx++)
+                    {
+                        // Only process if this metadata has not already been matched to something in the DB
+                        if (!storedDC[dcIdx])
+                        {
+                            boolean matched = true;
+                            DCValue dcv   = dublinCore.get(dcIdx);
+
+                            // Check the metadata field is the same
+                            if (matched && dcFields[dcIdx].getFieldID() != tr.getIntColumn("metadata_field_id"))
+                                matched = false;
+
+                            // Check the place is the same
+                            if (matched && placeNum[dcIdx] != tr.getIntColumn("place"))
+                                matched = false;
+
+                            // Check the text is the same
+                            if (matched)
+                            {
+                                String text = tr.getStringColumn("text_value");
+                                if (dcv.value == null && text == null)
+                                    matched = true;
+                                else if (dcv.value != null && dcv.value.equals(text))
+                                    matched = true;
+                                else
+                                    matched = false;
+                            }
+
+                            // Check the language is the same
+                            if (matched)
+                            {
+                                String lang = tr.getStringColumn("text_lang");
+                                if (dcv.language == null && lang == null)
+                                    matched = true;
+                                else if (dcv.language != null && dcv.language.equals(lang))
+                                    matched = true;
+                                else
+                                    matched = false;
+                            }
+
+                            // If the db record is identical to the in memory values
+                            if (matched)
+                            {
+                                // Flag that the metadata is already in the DB
+                                storedDC[dcIdx] = true;
+
+                                // Flag that we are not going to remove the row
+                                removeRow = false;
+                            }
+                        }
+                    }
+
+                    // If after processing all the metadata values, we didn't find a match
+                    // delete this row from the DB
+                    if (removeRow)
+                    {
+                        DatabaseManager.delete(ourContext, tr);
+                    }
                 }
+            }
 
-                current++;
-                elementCount.put(key, new Integer(current));
+            // Add missing in-memory DC
+            for (int dcIdx = 0; dcIdx < dublinCore.size(); dcIdx++)
+            {
+                // Only write values that are not already in the db
+                if (!storedDC[dcIdx])
+                {
+                    DCValue dcv = dublinCore.get(dcIdx);
 
-                // Write DCValue
-                MetadataValue metadata = new MetadataValue();
-                metadata.setItemId(getID());
-                metadata.setFieldId(field.getFieldID());
-                metadata.setValue(dcv.value);
-                metadata.setLanguage(dcv.language);
-                metadata.setPlace(current);
-                metadata.create(ourContext);
+                    // Write DCValue
+                    MetadataValue metadata = new MetadataValue();
+                    metadata.setItemId(getID());
+                    metadata.setFieldId(dcFields[dcIdx].getFieldID());
+                    metadata.setValue(dcv.value);
+                    metadata.setLanguage(dcv.language);
+                    metadata.setPlace(placeNum[dcIdx]);
+                    metadata.create(ourContext);
+                }
             }
 
             ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.ITEM, getID(), getDetails()));
@@ -1540,6 +1621,27 @@ public class Item extends DSpaceObject
             ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
             modified = false;
         }
+    }
+
+    private MetadataField getMetadataField(DCValue dcv) throws SQLException, AuthorizeException
+    {
+        return MetadataField.findByElement(ourContext,
+                        getMetadataSchemaID(dcv), dcv.element, dcv.qualifier);
+    }
+
+    private int getMetadataSchemaID(DCValue dcv) throws SQLException
+    {
+        int schemaID;
+        MetadataSchema schema = MetadataSchema.find(ourContext,dcv.schema);
+        if (schema == null)
+        {
+            schemaID = MetadataSchema.DC_SCHEMA_ID;
+        }
+        else
+        {
+            schemaID = schema.getSchemaID();
+        }
+        return schemaID;
     }
 
     /**
