@@ -470,23 +470,15 @@
             </dependency>
          </dependencies>
       </profile>
-      
-      <!-- 
-         Builds Overlay Modules for DSpace
-      -->
-      <profile>
-         <id>modules</id>
-         <activation>
-            <file>
-               <exists>modules/pom.xml</exists>
-            </file>
-         </activation>
-         <modules>
-            <module>modules</module>
-         </modules>
-      </profile>
-      
+
    </profiles>
+   
+   <!-- 
+      Builds Overlay Modules for DSpace
+   -->
+   <modules>
+      <module>modules</module>
+   </modules>
 	
    <build>
       <plugins>
