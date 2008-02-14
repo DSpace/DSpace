@@ -1468,7 +1468,7 @@
 	<!-- org.dspace.app.xmlui.administrative.mapper.SearchItemForm -->
 	<message key="xmlui.administrative.mapper.SearchItemForm.title">Search Items</message>
 	<message key="xmlui.administrative.mapper.SearchItemForm.trail">Search items</message>
-	<message key="xmlui.administrative.mapper.SearchItemForm.head1">Search items matching author: "{0}"</message>
+	<message key="xmlui.administrative.mapper.SearchItemForm.head1">Search items matching: "{0}"</message>
 	<message key="xmlui.administrative.mapper.SearchItemForm.submit_map">Map selected items</message>
 	<message key="xmlui.administrative.mapper.SearchItemForm.column1"></message>
 	<message key="xmlui.administrative.mapper.SearchItemForm.column2">Collection</message>
