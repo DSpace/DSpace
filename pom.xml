@@ -35,18 +35,6 @@
                <target>1.5</target>
             </configuration>
          </plugin>
-
-         <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <dependencies>
-               <dependency>
-                  <groupId>org.dspace.maven.plugins</groupId>
-                  <artifactId>dspace-assembly-plugin</artifactId>
-                  <version>1.1</version>
-               </dependency>
-            </dependencies>
-         </plugin>
-
       </plugins>
    </build>
 
@@ -61,7 +49,7 @@
          use 'mvn release:prepare' for tagging.
       -->
       <profile>
-         <id>package</id>
+         <id>all-projects</id>
          <activation>
             <activeByDefault>true</activeByDefault>
          </activation>
@@ -71,13 +59,24 @@
       </profile>
       
       <!-- 
-         Defines distributions that need to be created
-         for release manager when deploying
-         a new version of dspace to the maven repository
-         use 'mvn package deploy -Prelease'
+         An empty hook to turn off the above profile while
+         doing Continuous Integration and deploying the release. 
+         Use 'mvn deploy -Ponly-modules'
        -->
       <profile>
-         <id>release</id>
+         <id>only-modules</id>
+         <activation>
+            <activeByDefault>false</activeByDefault>
+         </activation>
+      </profile>
+      
+      <!-- 
+         Defines distributions that need to be created
+         for release manager to upload to S.F.
+         use 'mvn package -N -Ponly-releases'
+       -->
+      <profile>
+         <id>only-releases</id>
          <activation>
             <activeByDefault>false</activeByDefault>
          </activation>
@@ -85,22 +84,31 @@
             <plugins>
                <plugin>
                   <artifactId>maven-assembly-plugin</artifactId>
-                  <configuration>
-                     <descriptorRefs>
-                        <descriptorRef>release</descriptorRef>
-                        <descriptorRef>src-release</descriptorRef>
-                     </descriptorRefs>
-                     <finalName>dspace-${pom.version}</finalName>
-                  </configuration>
                   <inherited>false</inherited>
                   <executions>
                      <execution>
+                        <inherited>false</inherited>
+                        <configuration>
+                           <descriptorRefs>
+                              <descriptorRef>release</descriptorRef>
+                              <descriptorRef>src-release</descriptorRef>
+                           </descriptorRefs>
+                           <tarLongFileMode>gnu</tarLongFileMode>
+                           <finalName>dspace-${pom.version}</finalName>
+                        </configuration>
                         <phase>package</phase>
                         <goals>
-                           <goal>attached</goal>
+                           <goal>single</goal>
                         </goals>
                      </execution>
                   </executions>
+                  <dependencies>
+                     <dependency>
+                        <groupId>org.dspace.maven.plugins</groupId>
+                        <artifactId>dspace-assembly-plugin</artifactId>
+                        <version>1.1</version>
+                     </dependency>
+                  </dependencies>
                </plugin>
             </plugins>
          </build>
