@@ -832,17 +832,17 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
             if (bix.isMetadataIndex())
             {
-                titleMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata." + bix.getName())
+                trailMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata." + bix.getName())
                         .parameterize(scopeName);
             }
             else if (info.getSortOption() != null)
             {
-                titleMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item." + info.getSortOption().getName())
+                trailMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item." + info.getSortOption().getName())
                         .parameterize(scopeName);
             }
             else
             {
-                titleMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item." + bix.getSortOption().getName())
+                trailMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item." + bix.getSortOption().getName())
                         .parameterize(scopeName);
             }
         }
