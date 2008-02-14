@@ -1,3 +1,42 @@
+/*
+ * AbstractBrowserServlet.java
+ *
+ * Version: $Revision: 1189 $
+ *
+ * Date: $Date: 2005-04-20 15:23:44 +0100 (Wed, 20 Apr 2005) $
+ *
+ * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+ * Institute of Technology.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ * - Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *
+ * - Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *
+ * - Neither the name of the Hewlett-Packard Company nor the name of the
+ * Massachusetts Institute of Technology nor the names of their
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+ * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+ * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ */
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
@@ -24,10 +63,10 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
 /**
- * Servlet for browsing through indices, as they are defined in 
+ * Servlet for browsing through indices, as they are defined in
  * the configuration.  This class can take a wide variety of inputs from
  * the user interface:
- * 
+ *
  * - type:  the type of browse (index name) being performed
  * - order: (ASC | DESC) the direction for result sorting
  * - value: A specific value to find items around.  For example the author name or subject
@@ -39,7 +78,7 @@ import org.dspace.core.LogManager;
  * - rpp: integer number of results per page to display
  * - sort_by: integer specification of the field to search on
  * - etal: integer number to limit multiple value items specified in config to
- * 
+ *
  * @author Richard Jones
  * @version $Revision:  $
  */
@@ -55,7 +94,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
 
     /**
      * Create a BrowserScope from the current request
-     * 
+     *
      * @param context The database context
      * @param request The servlet request
      * @param response The servlet response
@@ -81,10 +120,11 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             String valueFocus = request.getParameter("vfocus");
             String valueFocusLang = request.getParameter("vfocus_lang");
             int focus = UIUtil.getIntParameter(request, "focus");
+            int offset = UIUtil.getIntParameter(request, "offset");
             int resultsperpage = UIUtil.getIntParameter(request, "rpp");
             int sortBy = UIUtil.getIntParameter(request, "sort_by");
             int etAl = UIUtil.getIntParameter(request, "etal");
-            
+
             // get the community or collection location for the browse request
             // Note that we are only interested in getting the "smallest" container,
             // so if we find a collection, we don't bother looking up the community
@@ -95,7 +135,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             {
                 community = UIUtil.getCommunityLocation(request);
             }
-            
+
             // process the input, performing some inline validation
             BrowseIndex bi = null;
             if (type != null && !"".equals(type))
@@ -110,7 +150,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
                 else
                     bi = BrowseIndex.getBrowseIndex(SortOption.getDefaultSortOption());
             }
-            
+
             // If we don't have a sort column
             if (bi != null && sortBy == -1)
             {
@@ -145,12 +185,18 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
                 order = bi.getDefaultOrder();
             }
 
+            // If the offset is invalid, reset to 0
+            if (offset < 0)
+            {
+                offset = 0;
+            }
+
             // if no resultsperpage set, default to 20
-            if (resultsperpage == -1)
+            if (resultsperpage < 0)
             {
                 resultsperpage = 20;
             }
-        
+
             // if year and perhaps month have been selected, we translate these into "startsWith"
             // if startsWith has already been defined then it is overwritten
             if (year != null && !"".equals(year) && !"-1".equals(year))
@@ -163,31 +209,31 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
                     {
                         month = Integer.toString((Integer.parseInt(month) - 1));
                     }
-                    
+
                     // They've selected a month as well
                     if (month.length() == 1)
                     {
                         // Ensure double-digit month number
                         month = "0" + month;
                     }
-                    
+
                     startsWith = year + "-" + month;
                 }
             }
-            
+
             // determine which level of the browse we are at: 0 for top, 1 for second
             int level = 0;
             if (value != null)
             {
                 level = 1;
             }
-            
+
             // if sortBy is still not set, set it to 0, which is default to use the primary index value
             if (sortBy == -1)
             {
                 sortBy = 0;
             }
-        
+
             // figure out the setting for author list truncation
             if (etAl == -1)     // there is no limit, or the UI says to use the default
             {
@@ -204,7 +250,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
                     etAl = -1;  // but -1 is the application setting for unlimited
                 }
             }
-            
+
             // log the request
             String comHandle = "n/a";
             if (community != null)
@@ -216,15 +262,15 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             {
                 colHandle = collection.getHandle();
             }
-            
-            String arguments = "type=" + type + ",order=" + order + ",value=" + value + 
+
+            String arguments = "type=" + type + ",order=" + order + ",value=" + value +
                 ",month=" + month + ",year=" + year + ",starts_with=" + startsWith +
                 ",vfocus=" + valueFocus + ",focus=" + focus + ",rpp=" + resultsperpage +
                 ",sort_by=" + sortBy + ",community=" + comHandle + ",collection=" + colHandle +
                 ",level=" + level + ",etal=" + etAl;
-        
+
             log.info(LogManager.getHeader(context, "browse", arguments));
-            
+
             // set up a BrowseScope and start loading the values into it
             BrowserScope scope = new BrowserScope(context);
             scope.setBrowseIndex(bi);
@@ -235,11 +281,12 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             scope.setJumpToValue(valueFocus);
             scope.setJumpToValueLang(valueFocusLang);
             scope.setStartsWith(startsWith);
+            scope.setOffset(offset);
             scope.setResultsPerPage(resultsperpage);
             scope.setSortBy(sortBy);
             scope.setBrowseLevel(level);
             scope.setEtAl(etAl);
-            
+
             // assign the scope of either Community or Collection if necessary
             if (community != null)
             {
@@ -249,7 +296,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             {
                 scope.setBrowseContainer(collection);
             }
-            
+
             // For second level browses on metadata indexes, we need to adjust the default sorting
             if (bi != null && bi.isMetadataIndex() && scope.isSecondLevel() && scope.getSortBy() <= 0)
             {
@@ -269,7 +316,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             throw new ServletException(e);
         }
     }
-    
+
     /**
      * Do the usual DSpace GET method.  You will notice that browse does not currently
      * respond to POST requests.
@@ -285,9 +332,9 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             // now start up a browse engine and get it to do the work for us
             BrowseEngine be = new BrowseEngine(context);
             BrowseInfo binfo = be.browse(scope);
-            
+
             request.setAttribute("browse.info", binfo);
-            
+
             if (binfo.hasResults())
             {
                 if (bi.isMetadataIndex() && !scope.isSecondLevel())
@@ -310,10 +357,10 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             throw new ServletException(e);
         }
     }
-    
+
     /**
      * Display the error page
-     * 
+     *
      * @param context
      * @param request
      * @param response
@@ -328,7 +375,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
 
     /**
      * Display the No Results page
-     * 
+     *
      * @param context
      * @param request
      * @param response
@@ -342,10 +389,10 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             AuthorizeException;
 
     /**
-     * Display the single page.  This is the page which lists just the single values of a 
+     * Display the single page.  This is the page which lists just the single values of a
      * metadata browse, not individual items.  Single values are links through to all the items
      * that match that metadata value
-     * 
+     *
      * @param context
      * @param request
      * @param response

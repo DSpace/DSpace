@@ -1,6 +1,6 @@
 /*
  * BrowserScope.java
- * 
+ *
  * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
  *
@@ -47,7 +47,7 @@ import org.apache.log4j.Logger;
  * A class which represents the initial request to the browse system.
  * When passed into the BrowseEngine, this will cause the creation
  * of a BrowseInfo object
- * 
+ *
  * @author Richard Jones
  *
  */
@@ -56,166 +56,170 @@ public class BrowserScope
     /** the logger for this class */
     private static Logger log = Logger.getLogger(BrowserScope.class);
 
-	/** the DSpace context */
-	private Context context;
-	
-	/** the current browse index */
-	private BrowseIndex browseIndex;
-	
-	/** the order in which to display results */
-	private String order;
-	
-	/** the field upon which to sort */
-	private int sortBy;
-	
-	/** the value to restrict the browse to */
-	private String filterValue;
+    /** the DSpace context */
+    private Context context;
+
+    /** the current browse index */
+    private BrowseIndex browseIndex;
+
+    /** the order in which to display results */
+    private String order;
+
+    /** the field upon which to sort */
+    private int sortBy;
+
+    /** the value to restrict the browse to */
+    private String filterValue;
 
     /** exact or partial matching of the value */
     private boolean filterValuePartial = false;
 
     /** the language of the value to restrict the browse to */
     private String filterValueLang;
-    
-	/** the item id focus of the browse */
-	private int jumpItemId = -1;
-	
-	/** the string value to start with */
-	private String startsWith;
-	
-	/** the number of results per page to display */
-	private int resultsPerPage = 20;
-	
-	/** the Collection to which to restrict */
-	private Collection collection;
-	
-	/** the Community to which to restrict */
-	private Community community;
-	
-	/** the sort option being used */
-	private SortOption sortOption;
-	
-	/** the value upon which to focus */
-	private String jumpValue;
+
+    /** the item id focus of the browse */
+    private int jumpItemId = -1;
+
+    /** the string value to start with */
+    private String startsWith;
+
+    /** the number of results per page to display */
+    private int resultsPerPage = 20;
+
+    /** the Collection to which to restrict */
+    private Collection collection;
+
+    /** the Community to which to restrict */
+    private Community community;
+
+    /** the sort option being used */
+    private SortOption sortOption;
+
+    /** the value upon which to focus */
+    private String jumpValue;
 
     /** the language of the value upon which to focus */
     private String jumpValueLang;
-    
-	/** the browse level */
-	private int level = 0;
 
-	/** the number of authors to display in the results */
-	private int etAl = 0;
-	/**
-	 * Construct a new BrowserScope using the given Context 
-	 * 
-	 * @param context	the DSpace Context
-	 */
-	public BrowserScope(Context context)
-	{
-		this.context = context;
-	}
+    /** the browse level */
+    private int level = 0;
 
-	/**
+    /** the number of authors to display in the results */
+    private int etAl = 0;
+
+    /** the number of items to offset into the result ie. 0 = 1st record */
+    private int offset = 0;
+
+    /**
+     * Construct a new BrowserScope using the given Context
+     *
+     * @param context   the DSpace Context
+     */
+    public BrowserScope(Context context)
+    {
+        this.context = context;
+    }
+
+    /**
      * Set the DSpaceObject that is the container for this browse.  If this
      * is not of type Collection or Community, this method will throw an
      * exception
-     * 
-     * @param dso		the container object; a Community or Collection
+     *
+     * @param dso       the container object; a Community or Collection
      * @throws BrowseException
      */
-	public void setBrowseContainer(DSpaceObject dso)
-		throws BrowseException
-	{
-		if (dso instanceof Collection)
-		{
-			this.collection = (Collection) dso;
-		}
-		else if (dso instanceof Community)
-		{
-			this.community = (Community) dso;
-		}
-		else
-		{
-			throw new BrowseException("The container must be a community or a collection");
-		}
-	}
-	
-	/**
+    public void setBrowseContainer(DSpaceObject dso)
+        throws BrowseException
+    {
+        if (dso instanceof Collection)
+        {
+            this.collection = (Collection) dso;
+        }
+        else if (dso instanceof Community)
+        {
+            this.community = (Community) dso;
+        }
+        else
+        {
+            throw new BrowseException("The container must be a community or a collection");
+        }
+    }
+
+    /**
      * Obtain a DSpaceObject that represents the container object.  This will be
      * a Community or a Collection
-     * 
-     * @return	A DSpaceObject representing a Community or a Collection
+     *
+     * @return  A DSpaceObject representing a Community or a Collection
      */
-	public DSpaceObject getBrowseContainer()
-	{
-		if (this.collection != null)
-		{
-			return this.collection;
-		}
-		if (this.community != null)
-		{
-			return this.community;
-		}
-		return null;
-	}
-	
-	/**
-	 * @param level		the browse level
-	 */
-	public void setBrowseLevel(int level)
-	{
-		this.level = level;
-	}
-	
-	/**
-	 * @return	the browse level
-	 */
-	public int getBrowseLevel()
-	{
-		return this.level;
-	}
-	
-	/**
-	 * @return true if top level browse, false if not
-	 */
-	public boolean isTopLevel()
-	{
-		if (this.level == 0)
-		{
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * @return	true if second level browse, false if not
-	 */
-	public boolean isSecondLevel()
-	{
-		if (this.level == 1)
-		{
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * @return Returns the browseIndex.
-	 */
-	public BrowseIndex getBrowseIndex()
-	{
-		return browseIndex;
-	}
+    public DSpaceObject getBrowseContainer()
+    {
+        if (this.collection != null)
+        {
+            return this.collection;
+        }
+        if (this.community != null)
+        {
+            return this.community;
+        }
+        return null;
+    }
 
-	/**
-	 * @param browseIndex The browseIndex to set.
-	 */
-	public void setBrowseIndex(BrowseIndex browseIndex)
-	    throws BrowseException
-	{
+    /**
+     * @param level     the browse level
+     */
+    public void setBrowseLevel(int level)
+    {
+        this.level = level;
+    }
+
+    /**
+     * @return  the browse level
+     */
+    public int getBrowseLevel()
+    {
+        return this.level;
+    }
+
+    /**
+     * @return true if top level browse, false if not
+     */
+    public boolean isTopLevel()
+    {
+        if (this.level == 0)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return  true if second level browse, false if not
+     */
+    public boolean isSecondLevel()
+    {
+        if (this.level == 1)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return Returns the browseIndex.
+     */
+    public BrowseIndex getBrowseIndex()
+    {
+        return browseIndex;
+    }
+
+    /**
+     * @param browseIndex The browseIndex to set.
+     */
+    public void setBrowseIndex(BrowseIndex browseIndex)
+        throws BrowseException
+    {
         this.browseIndex = browseIndex;
-	}
+    }
 
     /**
      * @return Returns the author limit.
@@ -233,94 +237,94 @@ public class BrowserScope
         this.etAl = etAl;
     }
 
-	/**
-	 * @return Returns the collection.
-	 */
-	public Collection getCollection()
-	{
-		return collection;
-	}
+    /**
+     * @return Returns the collection.
+     */
+    public Collection getCollection()
+    {
+        return collection;
+    }
 
-	/**
-	 * @param collection The collection to set.
-	 */
-	public void setCollection(Collection collection)
-	{
-		this.collection = collection;
-	}
+    /**
+     * @param collection The collection to set.
+     */
+    public void setCollection(Collection collection)
+    {
+        this.collection = collection;
+    }
 
-	/**
-	 * @return Returns the community.
-	 */
-	public Community getCommunity()
-	{
-		return community;
-	}
+    /**
+     * @return Returns the community.
+     */
+    public Community getCommunity()
+    {
+        return community;
+    }
 
-	/**
-	 * @param community The community to set.
-	 */
-	public void setCommunity(Community community)
-	{
-		this.community = community;
-	}
+    /**
+     * @param community The community to set.
+     */
+    public void setCommunity(Community community)
+    {
+        this.community = community;
+    }
 
-	/**
-	 * @return Returns the context.
-	 */
-	public Context getContext()
-	{
-		return context;
-	}
+    /**
+     * @return Returns the context.
+     */
+    public Context getContext()
+    {
+        return context;
+    }
 
-	/**
-	 * @param context The context to set.
-	 */
-	public void setContext(Context context)
-	{
-		this.context = context;
-	}
+    /**
+     * @param context The context to set.
+     */
+    public void setContext(Context context)
+    {
+        this.context = context;
+    }
 
-	/**
-	 * @return Returns the focus.
-	 */
-	public int getJumpToItem()
-	{
-		return jumpItemId;
-	}
+    /**
+     * @return Returns the focus.
+     */
+    public int getJumpToItem()
+    {
+        return jumpItemId;
+    }
 
-	/**
-	 * @param itemId The focus to set.
-	 */
-	public void setJumpToItem(int itemId)
-	{
-		this.jumpItemId = itemId;
-	}
+    /**
+     * @param itemId The focus to set.
+     */
+    public void setJumpToItem(int itemId)
+    {
+        this.jumpItemId = itemId;
+    }
 
-	/**
-	 * @return	the value to focus on
-	 */
-	public String getJumpToValue()
-	{
-		return jumpValue;
-	}
-	
-	/**
-	 * @param value		the value to focus on
-	 */
-	public void setJumpToValue(String value)
-	{
-		this.jumpValue = value;
-	}
+    /**
+     * @return  the value to focus on
+     */
+    public String getJumpToValue()
+    {
+        return jumpValue;
+    }
+
+    /**
+     * @param value     the value to focus on
+     */
+    public void setJumpToValue(String value)
+    {
+        this.jumpValue = value;
+    }
 
     /**
      * @return  the language of the value to focus on
      */
-    public String setJumpToValueLang()
+    public String getJumpToValueLang()
     {
         return jumpValueLang;
     }
-    
+
     /**
      * @param valueLang     the language of the value to focus on
      */
@@ -328,12 +332,12 @@ public class BrowserScope
     {
         this.jumpValueLang = valueLang;
     }
-	
-	/**
-	 * @return Returns the order.
-	 */
-	public String getOrder()
-	{
+
+    /**
+     * @return Returns the order.
+     */
+    public String getOrder()
+    {
         if (order != null)
             return order;
 
@@ -344,11 +348,11 @@ public class BrowserScope
         return SortOption.ASCENDING;
     }
 
-	/**
-	 * @param order The order to set.
-	 */
-	public void setOrder(String order)
-	{
+    /**
+     * @param order The order to set.
+     */
+    public void setOrder(String order)
+    {
         if (order == null)
         {
             this.order = null;
@@ -363,49 +367,65 @@ public class BrowserScope
         }
     }
 
-	/**
-	 * @return Returns the resultsPerPage.
-	 */
-	public int getResultsPerPage()
-	{
-		return resultsPerPage;
-	}
+    /**
+     * @return Returns the resultsPerPage.
+     */
+    public int getResultsPerPage()
+    {
+        return resultsPerPage;
+    }
 
-	/**
-	 * @param resultsPerPage The resultsPerPage to set.
-	 */
-	public void setResultsPerPage(int resultsPerPage)
-	{
-		if (resultsPerPage > -1)
-			this.resultsPerPage = resultsPerPage;
-	}
+    /**
+     * @param resultsPerPage The resultsPerPage to set.
+     */
+    public void setResultsPerPage(int resultsPerPage)
+    {
+        if (resultsPerPage > -1)
+            this.resultsPerPage = resultsPerPage;
+    }
 
-	/**
-	 * @return Returns the sortBy.
-	 */
-	public int getSortBy()
-	{
-		return sortBy;
-	}
+    /**
+     * @return Returns the sortBy.
+     */
+    public int getSortBy()
+    {
+        return sortBy;
+    }
 
-	/**
-	 * @param sortBy The sortBy to set.
-	 */
-	public void setSortBy(int sortBy)
-	    throws BrowseException
-	{
+    /**
+     * @param sortBy The sortBy to set.
+     */
+    public void setSortBy(int sortBy)
+        throws BrowseException
+    {
         this.sortBy = sortBy;
-	}
+    }
 
-	/**
-	 * Obtain the sort option
-	 * 
-	 * @return	the sort option
-	 * @throws BrowseException
-	 */
-	public SortOption getSortOption()
-		throws BrowseException
-	{
+    /**
+     * @return returns the offset for the browse
+     */
+    public int getOffset()
+    {
+        return offset;
+    }
+
+    /**
+     * @param offset  the offset to use for this scope
+     */
+    public void setOffset(int offset)
+    {
+        this.offset = offset;
+    }
+
+    /**
+     * Obtain the sort option
+     *
+     * @return  the sort option
+     * @throws BrowseException
+     */
+    public SortOption getSortOption()
+        throws BrowseException
+    {
         try
         {
             // If a sortOption hasn't been set, work out the default
@@ -460,36 +480,36 @@ public class BrowserScope
             throw new BrowseException("Error in SortOptions", se);
         }
     }
-	
-	/**
-	 * @return Returns the startsWith.
-	 */
-	public String getStartsWith()
-	{
-		return startsWith;
-	}
 
-	/**
-	 * @param startsWith The startsWith to set.
-	 */
-	public void setStartsWith(String startsWith)
-	{
-		this.startsWith = startsWith;
-	}
+    /**
+     * @return Returns the startsWith.
+     */
+    public String getStartsWith()
+    {
+        return startsWith;
+    }
 
-	/**
-     * Used for second-level item browses,
-     * to only display items that match the value 
-	 * @return Returns the value.
-	 */
-	public String getFilterValue()
-	{
-		return filterValue;
-	}
+    /**
+     * @param startsWith The startsWith to set.
+     */
+    public void setStartsWith(String startsWith)
+    {
+        this.startsWith = startsWith;
+    }
 
     /**
      * Used for second-level item browses,
-     * to only display items that match the value 
+     * to only display items that match the value
+     * @return Returns the value.
+     */
+    public String getFilterValue()
+    {
+        return filterValue;
+    }
+
+    /**
+     * Used for second-level item browses,
+     * to only display items that match the value
      * @param value The value to set.
      */
     public void setFilterValue(String value)
@@ -530,40 +550,40 @@ public class BrowserScope
     {
         this.filterValueLang = lang;
     }
-    
-	/**
-	 * @return	true if in community, false if not
-	 */
-	public boolean inCommunity()
-	{
-		if (this.community != null)
-		{
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * @return	true if in collection, false if not
-	 */
-	public boolean inCollection()
-	{
-		if (this.collection != null)
-		{
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * @return	true if ascending, false if not - or not set
-	 */
-	public boolean isAscending()
-	{
-		if (SortOption.ASCENDING.equalsIgnoreCase(order))
-		{
-			return true;
-		}
+
+    /**
+     * @return  true if in community, false if not
+     */
+    public boolean inCommunity()
+    {
+        if (this.community != null)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return  true if in collection, false if not
+     */
+    public boolean inCollection()
+    {
+        if (this.collection != null)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return  true if ascending, false if not - or not set
+     */
+    public boolean isAscending()
+    {
+        if (SortOption.ASCENDING.equalsIgnoreCase(order))
+        {
+            return true;
+        }
 
         if (SortOption.DESCENDING.equalsIgnoreCase(order))
         {
@@ -576,53 +596,53 @@ public class BrowserScope
             return false;
 
         return true;
-	}
-	
-	/**
-	 * @return	true if has value, false if not
-	 */
-	public boolean hasFilterValue()
-	{
-		if (filterValue == null || "".equals(filterValue))
-		{
-			return false;
-		}
-		return true;
-	}
-	
-	/**
-	 * @return	true if has item focus, false if not
-	 */
-	public boolean hasJumpToItem()
-	{
-		if (jumpItemId == -1)
-		{
-			return false;
-		}
-		return true;
-	}
-	
-	/**
-	 * @return	true if has value focus, false if not
-	 */
-	public boolean hasJumpToValue()
-	{
-		if (this.jumpValue != null)
-		{
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * @return	true if has starts with value, false if not
-	 */
-	public boolean hasStartsWith()
-	{
-		if (this.startsWith != null)
-		{
-			return true;
-		}
-		return false;
-	}
+    }
+
+    /**
+     * @return  true if has value, false if not
+     */
+    public boolean hasFilterValue()
+    {
+        if (filterValue == null || "".equals(filterValue))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @return  true if has item focus, false if not
+     */
+    public boolean hasJumpToItem()
+    {
+        if (jumpItemId == -1)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @return  true if has value focus, false if not
+     */
+    public boolean hasJumpToValue()
+    {
+        if (this.jumpValue != null)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return  true if has starts with value, false if not
+     */
+    public boolean hasStartsWith()
+    {
+        if (this.startsWith != null)
+        {
+            return true;
+        }
+        return false;
+    }
 }
