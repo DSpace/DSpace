@@ -123,7 +123,7 @@ public class BrowseDAOPostgres implements BrowseDAO
     private int limit = -1;
     
     /** the offset of the start point (avoid using) */
-    private int offset = -1;
+    private int offset = 0;
     
     /** whether to use the equals comparator in value comparisons */
     private boolean equalsComparator = true;
@@ -230,6 +230,108 @@ public class BrowseDAOPostgres implements BrowseDAO
             else
             {
                 return null;
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new BrowseException(e);
+        }
+        finally
+        {
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.browse.BrowseDAO#doOffsetQuery(java.lang.String, java.lang.String, java.lang.String)
+     */
+    public int doOffsetQuery(String column, String value)
+            throws BrowseException
+    {
+        TableRowIterator tri = null;
+
+        try
+        {
+            List paramsList = new ArrayList();
+            StringBuffer queryBuf = new StringBuffer();
+
+            queryBuf.append("COUNT(").append(column).append(") AS offset ");
+
+            buildSelectStatement(queryBuf, paramsList);
+            queryBuf.append(" WHERE ").append(column).append("<?");
+            paramsList.add(value);
+
+            if (containerTable != null || (value != null && valueField != null && tableDis != null && tableMap != null))
+            {
+                queryBuf.append(" AND ").append("mappings.item_id=");
+                queryBuf.append(table).append(".item_id");
+            }
+
+            tri = DatabaseManager.query(context, queryBuf.toString(), paramsList.toArray());
+
+            TableRow row;
+            if (tri.hasNext())
+            {
+                row = tri.next();
+                return (int)row.getLongColumn("offset");
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new BrowseException(e);
+        }
+        finally
+        {
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.browse.BrowseDAO#doDistinctOffsetQuery(java.lang.String, java.lang.String, java.lang.String)
+     */
+    public int doDistinctOffsetQuery(String column, String value)
+            throws BrowseException
+    {
+        TableRowIterator tri = null;
+
+        try
+        {
+            List paramsList = new ArrayList();
+            StringBuffer queryBuf = new StringBuffer();
+
+            queryBuf.append("COUNT(").append(column).append(") AS offset ");
+
+            buildSelectStatementDistinct(queryBuf, paramsList);
+            queryBuf.append(" WHERE ").append(column).append("<?");
+            paramsList.add(value);
+
+            if (containerTable != null && tableMap != null)
+            {
+                queryBuf.append(" AND ").append("mappings.distinct_id=");
+                queryBuf.append(table).append(".id");
+            }
+
+            tri = DatabaseManager.query(context, queryBuf.toString(), paramsList.toArray());
+
+            TableRow row;
+            if (tri.hasNext())
+            {
+                row = tri.next();
+                return (int)row.getLongColumn("offset");
+            }
+            else
+            {
+                return 0;
             }
         }
         catch (SQLException e)
@@ -678,9 +780,9 @@ public class BrowseDAOPostgres implements BrowseDAO
         // assemble the order by field
         buildOrderBy(queryBuf);
         
-        // prepare the LIMIT clause
-        buildRowLimit(queryBuf, params);
-        
+        // prepare the limit and offset clauses
+        buildRowLimitAndOffset(queryBuf, params);
+
         return queryBuf.toString();
     }
     
@@ -722,11 +824,8 @@ public class BrowseDAOPostgres implements BrowseDAO
         // assemble the order by field
         buildOrderBy(queryBuf);
         
-        // prepare the LIMIT clause
-        buildRowLimit(queryBuf, params);
-        
-        // prepare the OFFSET clause
-        buildRowOffset(queryBuf, params);
+        // prepare the limit and offset clauses
+        buildRowLimitAndOffset(queryBuf, params);
         
         return queryBuf.toString();
     }
@@ -768,30 +867,21 @@ public class BrowseDAOPostgres implements BrowseDAO
      * 
      * @return  the limit clause
      */
-    private void buildRowLimit(StringBuffer queryBuf, List params)
+    private void buildRowLimitAndOffset(StringBuffer queryBuf, List params)
     {
         // prepare the LIMIT clause
-        if (limit != -1)
+        if (limit > 0)
         {
             queryBuf.append(" LIMIT ? ");
-            
+
             params.add(new Integer(limit));
         }
-    }
-    
-    /**
-     * Get the offset clause to offset the start point of search results
-     * 
-     * @return
-     * @deprecated
-     */
-    private void buildRowOffset(StringBuffer queryBuf, List params)
-    {
+
         // prepare the OFFSET clause
-        if (offset != -1)
+        if (offset > 0)
         {
-            queryBuf.append(" OFFSET ?");
-            
+            queryBuf.append(" OFFSET ? ");
+
             params.add(new Integer(offset));
         }
     }

@@ -145,31 +145,15 @@
 	String next = sharedLink;
 	String prev = sharedLink;
 	
-	if (bi.hasNextPage())
-	{
-		next = next + "&amp;";
-		if (bi.getNextItem() == -1)
-		{
-			next = next + "vfocus=" + URLEncoder.encode(bi.getNextValue());
-		}
-		else
-		{
-			next = next + "focus=" + URLEncoder.encode(Integer.toString(bi.getNextItem()));
-		}
-	}
-	
-	if (bi.hasPrevPage())
-	{
-		prev = prev + "&amp;";
-		if (bi.getPrevItem() == -1)
-		{
-			prev = prev + "vfocus=" + URLEncoder.encode(bi.getPrevValue());
-		}
-		else
-		{
-			prev = prev + "focus=" + URLEncoder.encode(Integer.toString(bi.getPrevItem()));
-		}
-	}
+    if (bi.hasNextPage())
+    {
+        next = next + "&amp;offset=" + bi.getNextOffset();
+    }
+
+    if (bi.hasPrevPage())
+    {
+        prev = prev + "&amp;offset=" + bi.getPrevOffset();
+    }
 	
 	// prepare a url for use by form actions
 	String formaction = request.getContextPath() + "/";

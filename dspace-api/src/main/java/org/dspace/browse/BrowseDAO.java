@@ -109,6 +109,28 @@ public interface BrowseDAO
 	 */
 	public String doMaxQuery(String column, String table, int itemID) throws BrowseException;
 	
+    /**
+     * This executes a query which returns the offset where the value (or nearest greater
+     * equivalent) can be found in the specified table ordered by the column.
+     *
+     * @param column    the column to interrogate
+     * @param value     the item id
+     * @return          the offset into the table
+     * @throws BrowseException
+     */
+    public int doOffsetQuery(String column, String value) throws BrowseException;
+
+    /**
+     * This executes a query which returns the offset where the value (or nearest greater
+     * equivalent) can be found in the specified table ordered by the column.
+     *
+     * @param column    the column to interrogate
+     * @param value     the item id
+     * @return          the offset into the table
+     * @throws BrowseException
+     */
+    public int doDistinctOffsetQuery(String column, String value) throws BrowseException;
+
 	/**
 	 * Does the query use the equals comparator when doing less than or greater than
 	 * comparisons.  @see setEqualsComparator

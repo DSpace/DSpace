@@ -537,10 +537,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
         if (info.hasPrevPage())
         {
-            if (info.getPrevItem() < 0)
-                parameters.put(BrowseParams.JUMPTO_VALUE, URLEncode(info.getPrevValue()));
-            else
-                parameters.put(BrowseParams.JUMPTO_ITEM, Integer.toString(info.getPrevItem()));
+            parameters.put(BrowseParams.OFFSET, URLEncode(String.valueOf(info.getPrevOffset())));
         }
 
         return super.generateURL(WITHDRAWN_URL_BASE, parameters);
@@ -566,10 +563,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
         if (info.hasNextPage())
         {
-            if (info.getNextItem() < 0)
-                parameters.put(BrowseParams.JUMPTO_VALUE, URLEncode(info.getNextValue()));
-            else
-                parameters.put(BrowseParams.JUMPTO_ITEM, Integer.toString(info.getNextItem()));
+            parameters.put(BrowseParams.OFFSET, URLEncode(String.valueOf(info.getNextOffset())));
         }
 
         return super.generateURL(WITHDRAWN_URL_BASE, parameters);
@@ -627,6 +621,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
             params.scope.setJumpToItem(RequestUtils.getIntParameter(request, BrowseParams.JUMPTO_ITEM));
             params.scope.setOrder(request.getParameter(BrowseParams.ORDER));
+            params.scope.setOffset(RequestUtils.getIntParameter(request, BrowseParams.OFFSET));
             params.scope.setResultsPerPage(RequestUtils.getIntParameter(request,
                     BrowseParams.RESULTS_PER_PAGE));
             params.scope.setStartsWith(request.getParameter(BrowseParams.STARTS_WITH));
@@ -857,6 +852,8 @@ class BrowseParams
 
     final static String ORDER = "order";
 
+    final static String OFFSET = "offset";
+
     final static String RESULTS_PER_PAGE = "rpp";
 
     final static String SORT_BY = "sort_by";
@@ -899,8 +896,7 @@ class BrowseParams
         Map<String, String> paramMap = new HashMap<String, String>();
 
         paramMap.put(BrowseParams.SORT_BY, Integer.toString(this.scope.getSortBy()));
-        paramMap
-                .put(BrowseParams.ORDER, AbstractDSpaceTransformer.URLEncode(this.scope.getOrder()));
+        paramMap.put(BrowseParams.ORDER, AbstractDSpaceTransformer.URLEncode(this.scope.getOrder()));
         paramMap.put(BrowseParams.RESULTS_PER_PAGE, Integer
                 .toString(this.scope.getResultsPerPage()));
         paramMap.put(BrowseParams.ETAL, Integer.toString(this.etAl));
@@ -921,11 +917,12 @@ class BrowseParams
             key += "-" + scope.getSortBy();
             key += "-" + scope.getSortOption().getNumber();
             key += "-" + scope.getOrder();
+            key += "-" + scope.getOffset();
             key += "-" + scope.getJumpToItem();
             key += "-" + scope.getFilterValue();
             key += "-" + scope.getFilterValueLang();
             key += "-" + scope.getJumpToValue();
-            key += "-" + scope.setJumpToValueLang();
+            key += "-" + scope.getJumpToValueLang();
             key += "-" + etAl;
 
             return key;

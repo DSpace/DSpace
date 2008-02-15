@@ -106,6 +106,10 @@ public class BrowserScope
 
 	/** the number of authors to display in the results */
 	private int etAl = 0;
+
+    /** the number of items to offset into the result ie. 0 = 1st record */
+    private int offset = 0;
+
 	/**
 	 * Construct a new BrowserScope using the given Context 
 	 * 
@@ -316,7 +320,7 @@ public class BrowserScope
     /**
      * @return  the language of the value to focus on
      */
-    public String setJumpToValueLang()
+    public String getJumpToValueLang()
     {
         return jumpValueLang;
     }
@@ -396,6 +400,22 @@ public class BrowserScope
 	{
         this.sortBy = sortBy;
 	}
+
+    /**
+     * @return returns the offset for the browse
+     */
+    public int getOffset()
+    {
+        return offset;
+    }
+
+    /**
+     * @param offset  the offset to use for this scope
+     */
+    public void setOffset(int offset)
+    {
+        this.offset = offset;
+    }
 
 	/**
 	 * Obtain the sort option

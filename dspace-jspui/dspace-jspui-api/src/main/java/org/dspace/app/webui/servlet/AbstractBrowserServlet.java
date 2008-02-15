@@ -81,6 +81,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             String valueFocus = request.getParameter("vfocus");
             String valueFocusLang = request.getParameter("vfocus_lang");
             int focus = UIUtil.getIntParameter(request, "focus");
+            int offset = UIUtil.getIntParameter(request, "offset");
             int resultsperpage = UIUtil.getIntParameter(request, "rpp");
             int sortBy = UIUtil.getIntParameter(request, "sort_by");
             int etAl = UIUtil.getIntParameter(request, "etal");
@@ -143,6 +144,12 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             if (order == null && bi != null)
             {
                 order = bi.getDefaultOrder();
+            }
+
+            // If the offset is invalid, reset to 0
+            if (offset < 0)
+            {
+                offset = 0;
             }
 
             // if no resultsperpage set, default to 20
@@ -237,6 +244,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             scope.setJumpToValue(valueFocus);
             scope.setJumpToValueLang(valueFocusLang);
             scope.setStartsWith(startsWith);
+            scope.setOffset(offset);
             scope.setResultsPerPage(resultsperpage);
             scope.setSortBy(sortBy);
             scope.setBrowseLevel(level);

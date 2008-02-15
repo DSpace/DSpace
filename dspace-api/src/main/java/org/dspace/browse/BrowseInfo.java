@@ -111,17 +111,11 @@ public class BrowseInfo
     /** Community we are constrained to */
 	private Community community;
 	
-	/** database id of the item at the top of the next page */
-	private int nextItem = -1;
-	
-	/** string value of the value at the top of the next page */
-	private String nextValue;
-	
-	/** database id of the item at the top of the previous page */
-	private int prevItem = -1;
-	
-	/** string value of the value at the top of the previous page */
-	private String prevValue;
+    /** offset of the item at the top of the next page */
+    private int nextOffset = -1;
+
+    /** offset of the item at the top of the previous page */
+    private int prevOffset = -1;
 	
 	/** the value upon which we are focussing */
 	private String focus;
@@ -328,37 +322,21 @@ public class BrowseInfo
     {
     	return this.level;
     }
-    
+
     /**
      * @param id	the database id of the item at the top of the next page
      */
-    public void setNextItem(int id)
+    public void setNextOffset(int offset)
     {
-    	this.nextItem = id;
+    	this.nextOffset = offset;
     }
-    
+
     /**
      * @return		the database id of the item at the top of the next page
      */
-    public int getNextItem()
+    public int getNextOffset()
     {
-    	return this.nextItem;
-    }
-    
-    /**
-     * @param value		the string value of the value at the top of the next page
-     */
-    public void setNextValue(String value)
-    {
-    	this.nextValue = value;
-    }
-    
-    /**
-     * @return	the string value of the value at the top of the next page
-     */
-    public String getNextValue()
-    {
-    	return this.nextValue;
+    	return this.nextOffset;
     }
     
    /**
@@ -396,34 +374,18 @@ public class BrowseInfo
 	/**
 	 * @return Returns the prevItem.
 	 */
-	public int getPrevItem()
-	{
-		return prevItem;
-	}
+    public int getPrevOffset()
+    {
+        return prevOffset > -1 ? prevOffset : 0;
+    }
 
-	/**
-	 * @param prevItem The prevItem to set.
-	 */
-	public void setPrevItem(int prevItem)
-	{
-		this.prevItem = prevItem;
-	}
-
-	/**
-	 * @return Returns the prevValue.
-	 */
-	public String getPrevValue()
-	{
-		return prevValue;
-	}
-
-	/**
-	 * @param prevValue The prevValue to set.
-	 */
-	public void setPrevValue(String prevValue)
-	{
-		this.prevValue = prevValue;
-	}
+    /**
+     * @param prevItem The prevItem to set.
+     */
+    public void setPrevOffset(int prevOffset)
+    {
+        this.prevOffset = prevOffset;
+    }
 
 	/**
 	 * @return Returns the sortOption.
@@ -663,36 +625,28 @@ public class BrowseInfo
 	 * 
 	 * @return	true if next page, false if not
 	 */
-	public boolean hasNextPage()
-	{
-		if (!"".equals(nextValue) && (nextValue != null))
-		{
-			return true;
-		}
-		if (nextItem != -1)
-		{
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * Are there results prior to these that haven't been returned here?
-	 * 
-	 * @return	true if previous page, false if not
-	 */
-	public boolean hasPrevPage()
-	{
-		if (!"".equals(prevValue) && (prevValue != null))
-		{
-			return true;
-		}
-		if (prevItem != -1)
-		{
-			return true;
-		}
-		return false;
-	}
+    public boolean hasNextPage()
+    {
+        if (nextOffset > -1)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Are there results prior to these that haven't been returned here?
+     *
+     * @return	true if previous page, false if not
+     */
+    public boolean hasPrevPage()
+    {
+        if (offset > 0)
+        {
+            return true;
+        }
+        return false;
+    }
 	
 	/**
 	 * Does this browse have a focus?
@@ -846,35 +800,21 @@ public class BrowseInfo
     		
     		// tell us what the next and previous values are going to be
     		sb.append("Top of next page: ");
-    		if (hasNextPage())
-    		{
-    			if (browseIndex.isMetadataIndex() && !isSecondLevel())
-    			{
-    				sb.append(this.nextValue);
-    			}
-    			else if (browseIndex.isItemIndex() || isSecondLevel())
-    			{
-    				sb.append("Item ID: " + Integer.toString(this.nextItem));
-    			}
-    		}
-    		else
-    		{
-    			sb.append("n/a");
-    		}
-    		sb.append(";");
-    		
-    		sb.append("Top of previous page: ");
-    		if (hasPrevPage())
-    		{
-    			if (browseIndex.isMetadataIndex() && !isSecondLevel())
-    			{
-    				sb.append(this.prevValue);
-    			}
-    			else if (browseIndex.isItemIndex() || isSecondLevel())
-    			{
-    				sb.append("Item ID: " + Integer.toString(this.prevItem));
-    			}
-    		}
+            if (hasNextPage())
+            {
+                sb.append("offset: " + Integer.toString(this.nextOffset));
+            }
+            else
+            {
+                sb.append("n/a");
+            }
+            sb.append(";");
+
+            sb.append("Top of previous page: ");
+            if (hasPrevPage())
+            {
+                sb.append("offset: " + Integer.toString(this.prevOffset));
+            }
     		else
     		{
     			sb.append("n/a");
