@@ -284,6 +284,17 @@ public class BrowseEngine
                 }
             }
 
+            // this is the total number of results in answer to the query
+            int total = getTotalResults();
+
+            // assemble the ORDER BY clause
+            String orderBy = browseIndex.getSortField(scope.isSecondLevel());
+            if (scope.getSortBy() > 0)
+            {
+                orderBy = "sort_" + Integer.toString(scope.getSortBy());
+            }
+            dao.setOrderField(orderBy);
+
             int offset = scope.getOffset();
             String rawFocusValue = null;
             if (offset < 1 && (scope.hasJumpToItem() || scope.hasJumpToValue() || scope.hasStartsWith()))
@@ -294,16 +305,6 @@ public class BrowseEngine
 
                 // make sure the incoming value is normalised
                 String focusValue = normalizeJumpToValue(rawFocusValue);
-
-                // if the value was a "starts with" value, we need to append the
-                // regular expression wildcard
-                if (scope.hasStartsWith())
-                {
-                    if (browseIndex.isDate())
-                    {
-                        focusValue = focusValue + "-32";
-                    }
-                }
 
                 log.debug("browsing using focus: " + focusValue);
 
@@ -320,19 +321,8 @@ public class BrowseEngine
 
             dao.setOffset(offset);
 
-            // assemble the ORDER BY clause
-            String orderBy = browseIndex.getSortField(scope.isSecondLevel());
-            if (scope.getSortBy() > 0)
-            {
-                orderBy = "sort_" + Integer.toString(scope.getSortBy());
-            }
-            dao.setOrderField(orderBy);
-
             // assemble the LIMIT clause
             dao.setLimit(scope.getResultsPerPage());
-
-            // this is the total number of results in answer to the query
-            int total = getTotalResults();
 
             // Holder for the results
             List results = null;
@@ -450,9 +440,6 @@ public class BrowseEngine
             // tell the browse query whether we are ascending or descending on the value
             dao.setAscending(scope.isAscending());
 
-            // set the ordering field (there is only one option)
-            dao.setOrderField("sort_value");
-
             // set our constraints on community or collection
             if (scope.inCollection() || scope.inCommunity())
             {
@@ -476,6 +463,12 @@ public class BrowseEngine
                 }
             }
 
+            // this is the total number of results in answer to the query
+            int total = getTotalResults(true);
+
+            // set the ordering field (there is only one option)
+            dao.setOrderField("sort_value");
+
             // assemble the focus clase if we are to have one
             // it will look like one of the following
             // - sort_value < myvalue
@@ -493,13 +486,6 @@ public class BrowseEngine
                 // make sure the incoming value is normalised
                 focusValue = normalizeJumpToValue(focusValue);
 
-                // if the value was a "starts with" and also a date, we need to
-                // append -32, so that the sorted search works
-                if (scope.hasStartsWith() && browseIndex.isDate())
-                {
-                    focusValue = focusValue + "-32";
-                }
-
                 offset = getOffsetForDistinctValue(focusValue);
             }
 
@@ -507,9 +493,6 @@ public class BrowseEngine
             // assemble the offset and limit
             dao.setOffset(offset);
             dao.setLimit(scope.getResultsPerPage());
-
-            // this is the total number of results in answer to the query
-            int total = getTotalResults(true);
 
             // Holder for the results
             List results = null;
@@ -688,7 +671,7 @@ public class BrowseEngine
         // now get the DAO to do the query for us, returning the highest
         // string value in the given column in the given table for the
         // item (I think)
-        return dao.doOffsetQuery(col, value);
+        return dao.doOffsetQuery(col, value, scope.isAscending());
     }
 
     /**
@@ -711,7 +694,7 @@ public class BrowseEngine
         // now get the DAO to do the query for us, returning the highest
         // string value in the given column in the given table for the
         // item (I think)
-        return dao.doDistinctOffsetQuery("sort_value", value);
+        return dao.doDistinctOffsetQuery("sort_value", value, scope.isAscending());
     }
 
     /**

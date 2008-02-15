@@ -115,10 +115,11 @@ public interface BrowseDAO
      *
      * @param column    the column to interrogate
      * @param value     the item id
+     * @param isAscending browsing in ascending or descending order
      * @return          the offset into the table
      * @throws BrowseException
      */
-    public int doOffsetQuery(String column, String value) throws BrowseException;
+    public int doOffsetQuery(String column, String value, boolean isAscending) throws BrowseException;
 
     /**
      * This executes a query which returns the offset where the value (or nearest greater
@@ -126,10 +127,11 @@ public interface BrowseDAO
      *
      * @param column    the column to interrogate
      * @param value     the item id
+     * @param isAscending browsing in ascending or descending order
      * @return          the offset into the table
      * @throws BrowseException
      */
-    public int doDistinctOffsetQuery(String column, String value) throws BrowseException;
+    public int doDistinctOffsetQuery(String column, String value, boolean isAscending) throws BrowseException;
 
     /**
      * Does the query use the equals comparator when doing less than or greater than

@@ -681,6 +681,11 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                     }
 
                     startsWith = params.year + "-" + params.month;
+
+                    if ("ASC".equals(params.scope.getOrder()))
+                    {
+                        startsWith = startsWith + "-32";
+                    }
                 }
 
                 params.scope.setStartsWith(startsWith);

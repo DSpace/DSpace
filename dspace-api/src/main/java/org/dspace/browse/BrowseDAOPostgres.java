@@ -246,7 +246,7 @@ public class BrowseDAOPostgres implements BrowseDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseDAO#doOffsetQuery(java.lang.String, java.lang.String, java.lang.String)
      */
-    public int doOffsetQuery(String column, String value)
+    public int doOffsetQuery(String column, String value, boolean isAscending)
             throws BrowseException
     {
         TableRowIterator tri = null;
@@ -259,8 +259,16 @@ public class BrowseDAOPostgres implements BrowseDAO
             queryBuf.append("COUNT(").append(column).append(") AS offset ");
 
             buildSelectStatement(queryBuf, paramsList);
-            queryBuf.append(" WHERE ").append(column).append("<?");
-            paramsList.add(value);
+            if (isAscending)
+            {
+                queryBuf.append(" WHERE ").append(column).append("<?");
+                paramsList.add(value);
+            }
+            else
+            {
+                queryBuf.append(" WHERE ").append(column).append(">?");
+                paramsList.add(value + Character.MAX_VALUE);
+            }
 
             if (containerTable != null || (value != null && valueField != null && tableDis != null && tableMap != null))
             {
@@ -297,7 +305,7 @@ public class BrowseDAOPostgres implements BrowseDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseDAO#doDistinctOffsetQuery(java.lang.String, java.lang.String, java.lang.String)
      */
-    public int doDistinctOffsetQuery(String column, String value)
+    public int doDistinctOffsetQuery(String column, String value, boolean isAscending)
             throws BrowseException
     {
         TableRowIterator tri = null;
@@ -310,8 +318,16 @@ public class BrowseDAOPostgres implements BrowseDAO
             queryBuf.append("COUNT(").append(column).append(") AS offset ");
 
             buildSelectStatementDistinct(queryBuf, paramsList);
-            queryBuf.append(" WHERE ").append(column).append("<?");
-            paramsList.add(value);
+            if (isAscending)
+            {
+                queryBuf.append(" WHERE ").append(column).append("<?");
+                paramsList.add(value);
+            }
+            else
+            {
+                queryBuf.append(" WHERE ").append(column).append(">?");
+                paramsList.add(value + Character.MAX_VALUE);
+            }
 
             if (containerTable != null && tableMap != null)
             {

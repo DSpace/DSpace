@@ -218,6 +218,11 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
                     }
 
                     startsWith = year + "-" + month;
+
+                    if ("ASC".equals(order))
+                    {
+                        startsWith = startsWith + "-32";
+                    }
                 }
             }
 
