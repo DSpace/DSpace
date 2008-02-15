@@ -39,11 +39,13 @@
 package org.dspace.app.statistics;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -83,19 +85,45 @@ public class CreateStatReport {
 	
 	/**User context*/
 	private static Context context;
-	
-	
-	/*
+
+    /** the config file from which to configure the analyser */
+    private static String configFile = ConfigurationManager.getProperty("dspace.dir") +
+                            File.separator + "config" + File.separator +
+                            "dstat.cfg";
+
+    /*
 	 * Main method to be run from the command line executes individual statistic methods
 	 * 
 	 * Usage: java CreateStatReport -r <statistic to run> 
 	 */
 	public static void main(String[] argv) throws Exception {
-		
-		calendar = new GregorianCalendar();
-		reportStartDate = new GregorianCalendar(2007, 0, 1); //Date to begin initial reports from
-		
-		// create context as super user
+
+        // Open the statistics config file
+        FileInputStream fis = new java.io.FileInputStream(new File(configFile));
+        Properties config = new Properties();
+        config.load(fis);
+        int startMonth = 0;
+        int startYear = 2005;
+        try
+        {
+            startYear = Integer.parseInt(config.getProperty("start.year", "1").trim());
+        } catch (NumberFormatException nfe)
+        {
+            System.err.println("start.year is incorrectly set in dstat.cfg. Must be a number (e.g. 2005).");
+            System.exit(0);
+        }
+        try
+        {
+            startMonth = Integer.parseInt(config.getProperty("start.month", "2005").trim());
+        } catch (NumberFormatException nfe)
+        {
+            System.err.println("start.month is incorrectly set in dstat.cfg. Must be a number between 1 and 12.");
+            System.exit(0);
+        }
+        reportStartDate = new GregorianCalendar(startYear, startMonth - 1, 1);
+        calendar = new GregorianCalendar();
+        
+        // create context as super user
         context = new Context();
         context.setIgnoreAuthorization(true);
         

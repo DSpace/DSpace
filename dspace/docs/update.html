@@ -30,6 +30,7 @@
 <li>A snapshot of the database</li>
 <li>The asset store (<code>[dspace]/assetstore</code> by default)</li>
 <li>Your configuration files and customizations to DSpace</li>
+<li>Your statistics scripts (<code>[dspace]/bin/stat*</code>) which contain customizable dates</li>
 </ul><br/></li>
 
 
@@ -186,8 +187,27 @@ ant -Dconfig=[dspace]/config/dspace.cfg update
 [dspace]/bin/index-init
 </pre>
 </li>
-   	
-   	
+
+
+<li><b>Update statistics scripts</b>
+<p>The statistics scripts have been rewritten for DSpace 1.5. Prior to 1.5 they were written in Perl, but have been rewritten in Java to avoid having to install Perl. First, make a note of the dates you have specified in your statistics scripts for the statistics to run from. You will find these in <code>[dspace]/bin/stat-initial</code>, as <code>$start_year</code> and <code>$start_month</code>. Note down these values.</p>
+<p>Copy the new stats scripts:</p>
+<pre>
+    cp [dspace-source]/dspace/target/dspace-1.5-build.dir/bin/stat* [dspace]/bin/
+</pre>
+<p>Then edit your statistics configuration file with the start details. Add the follwing to <code>[dspace]/conf/dstat.cfg</code></p>
+<p>
+    <code># the year and month to start creating reports from</code><br />
+    <code>#  - year as four digits (e.g. 2005)</code><br />
+    <code>#  - month as a number (e.g. January is 1, December is 12)</code><br />
+    <code>start.year = 2005</code><br />
+    <code>start.month = 1</code><br />
+    Replace '2005' and '1' as with the values you noted down.
+</p>
+<p><code>dstat.cfg</code> also used to contain the hostname and service name as displayed at the top of the statistics. These values are now taken from <code>dspace.cfg</code> so you can remove <code>host.name</code> and <code>host.url</code> from <code>dstat.cfg</code> if you wish. The values now used are <code>dspace.hostname</code> and <code>dspace.name</code> from <code>dspace.cfg</code></p>
+</li>
+
+
 <li><b>Deploy webapplications</b>
 <p>Copy the webapplications files from your [dspace]/webapps directory to the subdirectory of your servlet container (e.g. Tomcat):</p>
 <pre>

@@ -230,7 +230,7 @@ public class ReportGenerator
                 System.exit(0);
             }
         }
-        
+
         processReport(context, myFormat, myInput, myOutput, myMap);
     }
     
@@ -648,7 +648,7 @@ public class ReportGenerator
         } 
         catch (IOException e) 
         {  
-            System.out.println("Failed to read input file");
+            System.out.println("Failed to read input file: " + input);
             System.exit(0);
         } 
         
@@ -749,7 +749,7 @@ public class ReportGenerator
             {
                 url = value;
             }
-            
+
             if (section.equals("item_lookup"))
             {
                 itemLookup = Integer.parseInt(value);

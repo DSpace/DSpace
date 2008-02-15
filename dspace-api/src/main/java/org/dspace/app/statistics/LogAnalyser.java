@@ -546,15 +546,13 @@ public class LogAnalyser
             archiveStats.put(itemTypes.get(i), getNumItems(context, (String) itemTypes.get(i)));
         }
         
-        // now do the host lookup
-        try 
+        // now do the host name and url lookup
+        hostName = ConfigurationManager.getProperty("dspace.hostname").trim();
+        name = ConfigurationManager.getProperty("dspace.name").trim();
+        url = ConfigurationManager.getProperties("dspace.url").trim();
+        if ((url != null) && (!url.endsWith("/")))
         {
-            InetAddress addr = InetAddress.getLocalHost();
-            hostName = addr.getHostName();
-        } 
-        catch (UnknownHostException e) 
-        {
-            hostName = "unknown host";
+                url = url + "/";
         }
         
         // do the average views analysis
@@ -922,7 +920,7 @@ public class LogAnalyser
         } 
         catch (IOException e) 
         {
-            System.out.println("Failed to read config file");
+            System.out.println("Failed to read config file: " + configFile);
             System.exit(0);
         } 
         
@@ -986,16 +984,6 @@ public class LogAnalyser
                 if (key.equals("user.email"))
                 {
                     userEmail = value;
-                }
-
-                if (key.equals("host.url"))
-                {
-                    url = value;
-                }
-
-                if (key.equals("host.name"))
-                {
-                    name = value;
                 }
             }
         }
