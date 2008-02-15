@@ -509,7 +509,7 @@ public class BrowseEngine
             dao.setLimit(scope.getResultsPerPage());
 
             // this is the total number of results in answer to the query
-            int total = getTotalResults();
+            int total = getTotalResults(true);
 
             // Holder for the results
             List results = null;
@@ -518,7 +518,7 @@ public class BrowseEngine
             if (total > 0)
             {
                 // now run the query
-                results = dao.doQuery();
+                results = dao.doValueQuery();
 
                 // now, if we don't have any results, we are at the end of the browse.  This will
                 // be because a starts_with value has been supplied for which we don't have
@@ -532,7 +532,7 @@ public class BrowseEngine
 
                     // And rerun the query
                     dao.setOffset(offset);
-                    results = dao.doQuery();
+                    results = dao.doValueQuery();
                 }
             }
             else
