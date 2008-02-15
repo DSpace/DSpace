@@ -859,7 +859,7 @@ public class BrowseDAOOracle implements BrowseDAO
         if (limit > 0 || offset > 0)
         {
             queryBuf.insert(0, "SELECT /*+ FIRST_ROWS(n) */ rec.*, ROWNUM rnum  FROM (");
-            queryBuf.append(")");
+            queryBuf.append(") ");
         }
 
         if (limit > 0)

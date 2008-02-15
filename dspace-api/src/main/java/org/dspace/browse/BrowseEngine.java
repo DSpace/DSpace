@@ -43,6 +43,7 @@ package org.dspace.browse;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
@@ -330,26 +331,37 @@ public class BrowseEngine
             // assemble the LIMIT clause
             dao.setLimit(scope.getResultsPerPage());
 
-            // now run the query
-            List results = dao.doQuery();
-
             // this is the total number of results in answer to the query
             int total = getTotalResults();
 
-            // now, if we don't have any results, we are at the end of the browse.  This will
-            // be because a starts_with value has been supplied for which we don't have
-            // any items.
-            if (results.size() == 0)
-            {
-                // In this case, we will calculate a new offset for the last page of results
-                offset = total - scope.getResultsPerPage();
-                if (offset < 0)
-                    offset = 0;
+            // Holder for the results
+            List results = null;
 
-                // And rerun the query
-                dao.setOffset(offset);
+            // Does this browse have any contents?
+            if (total > 0)
+            {
+                // now run the query
                 results = dao.doQuery();
-                total = getTotalResults();
+
+                // now, if we don't have any results, we are at the end of the browse.  This will
+                // be because a starts_with value has been supplied for which we don't have
+                // any items.
+                if (results.size() == 0)
+                {
+                    // In this case, we will calculate a new offset for the last page of results
+                    offset = total - scope.getResultsPerPage();
+                    if (offset < 0)
+                        offset = 0;
+
+                    // And rerun the query
+                    dao.setOffset(offset);
+                    results = dao.doQuery();
+                }
+            }
+            else
+            {
+                // No records, so make an empty list
+                results = new ArrayList();
             }
 
             // construct the BrowseInfo object to pass back
@@ -496,29 +508,37 @@ public class BrowseEngine
             dao.setOffset(offset);
             dao.setLimit(scope.getResultsPerPage());
 
-            // now run the query
-            List results = dao.doValueQuery();
+            // this is the total number of results in answer to the query
+            int total = getTotalResults();
 
-            // second, total
-            // this is the total number of results in answer to the query (in this case
-            // we want to count distinct values, so we pass in true)
-            int total = getTotalResults(true);
+            // Holder for the results
+            List results = null;
 
-            // now, if we don't have any results, we are at the end of the browse.  This will
-            // be because a starts_with value has been supplied for which we don't have
-            // any items.  To do this, we want to use the results acquired in getPreviousPageID
-            // called below to assemble the new result set.
-            if (results.size() == 0)
+            // Does this browse have any contents?
+            if (total > 0)
             {
-                // In this case, we will calculate a new offset for the last page of results
-                offset = total - scope.getResultsPerPage();
-                if (offset < 0)
-                    offset = 0;
-
-                // And rerun the query
-                dao.setOffset(offset);
+                // now run the query
                 results = dao.doQuery();
-                total = getTotalResults();
+
+                // now, if we don't have any results, we are at the end of the browse.  This will
+                // be because a starts_with value has been supplied for which we don't have
+                // any items.
+                if (results.size() == 0)
+                {
+                    // In this case, we will calculate a new offset for the last page of results
+                    offset = total - scope.getResultsPerPage();
+                    if (offset < 0)
+                        offset = 0;
+
+                    // And rerun the query
+                    dao.setOffset(offset);
+                    results = dao.doQuery();
+                }
+            }
+            else
+            {
+                // No records, so make an empty list
+                results = new ArrayList();
             }
 
             // construct the BrowseInfo object to pass back
@@ -782,6 +802,7 @@ public class BrowseEngine
         dao.setOrderField(orderField);
         dao.setLimit(limit);
         dao.setOffset(offset);
+        dao.setCountValues(null);
 
         log.debug(LogManager.getHeader(context, "get_total_results_return", "return=" + count));
 
