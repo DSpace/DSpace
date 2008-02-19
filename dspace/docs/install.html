@@ -115,63 +115,61 @@
 	<p>Its important to note that the strategies are identical in terms of the list of proceedures required to complete the build process, the only difference being that the Source Release includes &quot;more modules&quot; that will be built given their presence in the distribution package.</p>
   <ul>
     <li><A name="defaultRelease">Default Release  ( dspace-&lt;version&gt;-release.zip )<br>
-      <br>
+        <br>
     </A>
       <ul>
         <li><strong>This distribution will be adequate for most cases of running a DSpace instance. </strong><strong>It is intended to be the quickest way to get DSpace installed and running while still allowing for customization of the themes and branding of your DSpace instance.</strong><br>
-        </li>
+  </li>
         <li>This method allows you to customize DSpace configurations (in dspace.cfg) 
-        or user interfaces, using basic pre-built interface "overlays".<br>
-        </li>
+          or user interfaces, using basic pre-built interface "overlays".<br>
+  </li>
         <li>It downloads &quot;precompiled&quot; libraries for the core dspace-api, supporting servlets, taglibraries, aspects and themes for the dspace-jspui, dspace-xmlui and other webservice/applications.<br>
-        </li>
-        <li>This approach exposes the parts of the application that the DSpace commiters would prefer to see customized. All other modules are downloaded from the 'Maven Central Repository'.</li>
+            </li>
+        <li>This approach exposes the parts of the application that the DSpace commiters would prefer to see customized. All other modules are downloaded from the 'Maven Central Repository'</li>
       </ul>
-      <blockquote>
-        <p>The directory structure for this release is the following:</p>
-        <ul>
-          <li><code><i>[dspace-source]</i></code>
-              <ul>
-                <li><code>dspace/</code> - DSpace 'build' and configuration module</li>
-                <li><code>pom.xml</code> - DSpace Parent Project definition<strong><br>
-                <br>
-                </strong></li>
-              </ul>
-          </li>
-        </ul>
-      </blockquote>
     </li>
-    <li><A name="sourceRelease">Source Release ( dspace-&lt;version&gt;-src-release.zip )</A>
-      <br>
-      <br>
+  </ul>
+  <blockquote>
+    <p>The directory structure for this release is the following:</p>
+  </blockquote>
+  <ul>
+    <ul>
+      <li><code><i>[dspace-source]</i></code>
+        <ul>
+          <li><code>dspace/</code> - DSpace 'build' and configuration module</li>
+          <li><code>pom.xml</code> - DSpace Parent Project definition</li>
+          </ul>
+      </li>
+    </ul>
+  </ul>
+
+  <ul>
+    <li><A name="sourceRelease">Source Release ( dspace-&lt;version&gt;-src-release.zip )<br>
+    <br>
+    </A>
       <ul>
         <li><strong>This method is recommended for those who wish to develop DSpace further or alter its underlying capabilities to a greater degree.</strong><br>
-          <br>
         </li>
-  	    <li>It contains &quot;all&quot; dspace code for the core dspace-api, supporting servlets, taglibraries, aspects and themes for the dspace-jspui, dspace-xmlui and other webservice/applications.<br>
-  	      <br>
-  	    </li>
+        <li>It contains &quot;all&quot; dspace code for the core dspace-api, supporting servlets, taglibraries, aspects and themes for the dspace-jspui, dspace-xmlui and other webservice/applications.<br>
+        </li>
         <li>Provides all the same capabilities as the normal release.</li>
       </ul>
-      <blockquote>
-        <p>The directory structure for this release is more detailed:</p>
+      <br>
+  The directory structure for this release is more detailed: </li>
+    <ul>
+      <li><code><i>[dspace-source]</i></code>
         <ul>
-          <li><code><i>[dspace-source]</i></code>
-              <ul>
-                <li><code>dspace/</code> - DSpace 'build' and configuration module</li>
-                <li><code>dspace-api/</code> -  Java API source module</li>
-                <li><code>dspace-jspui/</code> - JSP-UI source module</li>
-                <li><code>dspace-oai/</code> - OAI-PMH source module</li>
-                <li><code>dspace-xmlui/</code> - XML-UI source module</li>
-                <li><code>dspace-lni/</code> - Lightweight Network Interface source  module</li>
-                <li><code>dspace-sword/</code> -  Sword deposit service  source module</li>
-                <li><code>pom.xml</code> - DSpace Parent Project definition</li>
-              </ul>
-          </li>
+          <li><code>dspace/</code> - DSpace 'build' and configuration module</li>
+          <li><code>dspace-api/</code> -  Java API source module</li>
+          <li><code>dspace-jspui/</code> - JSP-UI source module</li>
+          <li><code>dspace-oai/</code> - OAI-PMH source module</li>
+          <li><code>dspace-xmlui/</code> - XML-UI source module</li>
+          <li><code>dspace-lni/</code> - Lightweight Network Interface source  module</li>
+          <li><code>dspace-sword/</code> -  Sword deposit service  source module</li>
+          <li><code>pom.xml</code> - DSpace Parent Project definition</li>
         </ul>
-        <p>&nbsp;</p>
-      </blockquote>
-    </li>
+      </li>
+        </ul>
   </ul>
   <p>Both approaches provide you with the same control over how DSpace
 	    builds itself (especially in terms of adding completely custom/3rd-party DSpace 
