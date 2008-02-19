@@ -73,19 +73,55 @@ public class XMLUIConfiguration
 
     /**
      * Initialize the XMLUI Configuration.
+	 *
+	 * Load and parse the xmlui.xconf configuration file for a list of 
+     * installed aspects and themes. Multiple configuration paths may be 
+     * supplied but only the first valid file (exists and readable) will
+     * be used.
      * 
-     * @param configPath
-     * @throws IOException
-     * @throws JDOMException
+     * @param configPath Multiple paths configuration paths may be specified
      */
-    public static void loadConfig(String configPath) throws IOException,
+    public static void loadConfig(String ... configPaths) throws IOException,
             JDOMException
     {
-        if (configPath == null || configPath.length() == 0)
+        if (configPaths == null || configPaths.length == 0)
             throw new IllegalStateException(
                     "The xmlui configuration path must be defined.");
 
-        File configFile = new File(configPath);
+        File configFile = null;
+        
+        for (String configPath : configPaths )
+        {
+        	if (configPath != null)
+        		configFile = new File(configPath);
+        	
+        	if (configFile != null && configFile.exists() && configFile.canRead())
+        	{
+        		log.info("Loading XMLUI configuration from: "+configPath);
+        		break;
+        	}
+        	else
+        	{
+        		log.debug("Faild to load XMLUI configuration from: "+configPath);
+        	}
+        }
+        
+        if (configFile == null)
+        {
+        	String allPaths = "";
+        	boolean first = true;
+        	for (String configPath : configPaths)
+        	{
+        		if (first)
+        			first = false;
+        		else
+        			allPaths += ", ";
+        		allPaths += configPath;
+        	}
+        	throw new IllegalStateException("None of the xmlui configuration paths were valid: "+ allPaths);
+        }
+        
+        
         SAXBuilder builder = new SAXBuilder();
         Document config = builder.build(configFile);
 

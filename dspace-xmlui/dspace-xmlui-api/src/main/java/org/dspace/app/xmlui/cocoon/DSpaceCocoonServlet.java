@@ -50,7 +50,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cocoon.servlet.CocoonServlet;
-import org.apache.log4j.PropertyConfigurator;
 import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
@@ -110,7 +109,8 @@ public class DSpaceCocoonServlet extends CocoonServlet
     	// Paths to the various config files
     	String dspaceConfig = null;
     	String log4jConfig  = null;
-    	String xmluiConfig  = null;
+    	String webappConfigPath    = null;
+    	String installedConfigPath = null;
     	
     	/**
     	 * Stage 1
@@ -162,15 +162,23 @@ public class DSpaceCocoonServlet extends CocoonServlet
          */
     	try
     	{
-	        xmluiConfig = ConfigurationManager.getProperty("dspace.dir")
+    		// There are two places we could find the XMLUI configuration, 
+    		// 1) inside the webapp's WEB-INF directory, or 2) inside the 
+    		// installed dspace config directory along side the dspace.cfg.
+    		
+    		webappConfigPath = super.getServletContext().getRealPath("/") 
+    				+ File.separator + "WEB-INF" + File.separator + "xmlui.xconf";
+    		
+    		installedConfigPath = ConfigurationManager.getProperty("dspace.dir")
 	                + File.separator + "config" + File.separator + "xmlui.xconf";
-	        XMLUIConfiguration.loadConfig(xmluiConfig);
+    		
+	        XMLUIConfiguration.loadConfig(webappConfigPath,installedConfigPath);
     	}   
     	catch (Throwable t)
     	{
     		throw new ServletException(
     				"\n\nDSpace has failed to initialize, during stage 3. Error while attempting to read \n" +
-    				"the XML UI configuration file (Path: "+xmluiConfig+").\n" + 
+    				"the XML UI configuration file (Path: "+webappConfigPath+" or '"+installedConfigPath+"').\n" + 
     				"This has likely occurred because either the file does not exist, or it's permissions \n" +
     				"are set incorrectly, or the path to the configuration file is incorrect. The XML UI \n" +
     				"configuration file should be named \"xmlui.xconf\" and located inside the standard \n" +
