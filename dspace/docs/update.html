@@ -50,8 +50,7 @@
 
 
 <li><b>Stop Tomcat</b>  
-<p>Take down your servlet container, for Tomcat use the <code>bin/shutdown.sh</code> script. 	  
-</li>
+<p>Take down your servlet container, for Tomcat use the <code>bin/shutdown.sh</code> script.</li>
 
 
 <li><b>Update <code>dspace.cfg</code></b>
@@ -128,9 +127,6 @@ event.consumer.browse.filters = Item+Create|Modify|Modify_Metadata:Collection+Ad
 event.consumer.eperson.class = org.dspace.eperson.EPersonConsumer
 event.consumer.eperson.filters = EPerson+Create
 </pre>
-
-
-
 <li><b>Add <code>xmlui.xconf</code> Manakin configuration</b>
 <p>The new Manakin user interface available with DSpace 1.5 requires an extra configuration file that you will need to manually copy it over to your configuration directory. </p>
 <pre>
@@ -139,32 +135,42 @@ cp [dspace-source]/dspace/config/xmlui.xconf [dspace]/config/xmlui.xconf
 </li>
 
 
-<li><b>Add <code>item-submission.xml</code> configurable submission configuration</b>
-<p>The new configurable submission system that enables an administrator to re-arrange, or add/remove item submission steps requires this configuration file. You need to manually copy it over to your configuration directory. </p>
+<li><b>Add <code>item-submission.xml</code> and <code>item-submission.dtd</code> configurable submission configuration</b>
+  <p>The new configurable submission system that enables an administrator to re-arrange, or add/remove item submission steps requires this configuration file. You need to manually copy it over to your configuration directory. </p>
 <pre>
 cp [dspace-source]/dspace/config/item-submission.xml [dspace]/config/item-submission.xml
-</pre>
+
+
+cp [dspace-source]/dspace/config/item-submission.dtd [dspace]/config/item-submission.dtd</pre>
 </li>
 
 
+
+<li><b>Add <code>new input-forms.xml</code> and <code>input-forms.dtd</code> configurable submission configuration</b>
+  <p>The input-forms.xml now has an included dtd reference to support validation. You'll need to merge in your changes to both file/and or copy them into place.</p>
+  <pre>
+cp [dspace-source]/dspace/config/input-forms.xml [dspace]/configinput-forms.xml
+
+
+cp [dspace-source]/dspace/config/input-forms.dtd [dspace]/config/inputforms.dtd</pre>
+  <b><br>
+  </b></li>  
 
 <li><b>Update the database</b>
-<p>The database schema needs updating. SQL files contain the relevant updates are provided, note if you have made any local customizations to the database schema you should consult these updates and make sure they will work for you.</p>
-<ul>
-<li>For PostgreSQL
-<p><code>psql -U [dspace-user] -f [dspace-source]/dspace/etc/database_schema_14-15.sql [database-name]</code></p>
+    <p>The database schema needs updating. SQL files contain the relevant updates are provided, note if you have made any local customizations to the database schema you should consult these updates and make sure they will work for you.</p>
+  <ul>
+    <li>For PostgreSQL
+      <p><code>psql -U [dspace-user] -f [dspace-source]/dspace/etc/database_schema_14-15.sql [database-name]</code></p>
+    </li>
+    <li>For Oracle
+      <p><code>[dspace-source]/dspace/etc/oracle/database_schema_142-15.sql</code> contains the 
+        commands necessary to upgrade your database schema on oracle.</p>
+    </li>
+  </ul>
 </li>
-<li>For Oracle
-<p><code>[dspace-source]/dspace/etc/oracle/database_schema_142-15.sql</code> contains the 
-commands necessary to upgrade your database schema on oracle.</p>
-</li></ul></li>  
-
-
-
 <li><b>Apply any customizations</b>
 <p>If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. Commonly these modifications are made to "JSP" pages located inside the <code>[dspace 1.4.2]/jsp/local</code> directory. These should be moved 
-<code>[dspace-source]/dspace/modules/dspace-jspui/src/main/webapp/</code> in the new build structure. See <a href="file:///Users/scott/Development/Workspaces/DSpace1.5/dspace-1.5/dspace/docs/configure.html#jspui-jsp">Customizing the JSP Pages</a> for more information.  
-</li>
+<code>[dspace-source]/dspace/modules/dspace-jspui/src/main/webapp/</code> in the new build structure. See <a href="file:///Users/scott/Development/Workspaces/DSpace1.5/dspace-1.5/dspace/docs/configure.html#jspui-jsp">Customizing the JSP Pages</a> for more information.</li>
 	
 	
 	
@@ -202,8 +208,7 @@ ant -Dconfig=[dspace]/config/dspace.cfg update
     <code>#  - month as a number (e.g. January is 1, December is 12)</code><br />
     <code>start.year = 2005</code><br />
     <code>start.month = 1</code><br />
-    Replace '2005' and '1' as with the values you noted down.
-</p>
+    Replace '2005' and '1' as with the values you noted down.</p>
 <p><code>dstat.cfg</code> also used to contain the hostname and service name as displayed at the top of the statistics. These values are now taken from <code>dspace.cfg</code> so you can remove <code>host.name</code> and <code>host.url</code> from <code>dstat.cfg</code> if you wish. The values now used are <code>dspace.hostname</code> and <code>dspace.name</code> from <code>dspace.cfg</code></p>
 </li>
 
@@ -221,13 +226,12 @@ cp [dspace]/webapps/* [tomcat]/webapps/
 <li><b>Restart Tomcat</b>
 <p>Restart your servlet container, for Tomcat use the <code>bin/startup.sh</code> script. </p>
 </li>
-
 </ol>
     
     
     
 
-    <h2><a name="141_142">Updating From 1.4.1 to 1.4.2</a></h2>
+  <h2><a name="141_142">Updating From 1.4.1 to 1.4.2</a></h2>
 See <A HREF="#14_14x">Updating From 1.4 to 1.4.x</A>; the same instructions apply.
 
     <h2><a name="14_14x">Updating From 1.4 to 1.4.x</a></h2>
