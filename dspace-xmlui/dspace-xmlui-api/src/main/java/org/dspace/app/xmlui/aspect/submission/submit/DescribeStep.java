@@ -224,18 +224,9 @@ public class DescribeStep extends AbstractSubmissionStep
 			}
 			else if (inputType.equals("twobox"))
 			{
-				// FIXME: this probably shouldn't be needed
-				if ("ispartofseries".equals(qualifier))
-				{
-					// Ispartofseries should be series and not two-boxes.
-					renderSeriesField(form,fieldName,dcInput,dcValues);
-				}
-				else
-				{
-					// We don't have a twobox field, instead it's just a
-					// one box field that the theme can render in two columns.
-					renderOneboxField(form, fieldName, dcInput, dcValues);
-				}
+				// We don't have a twobox field, instead it's just a
+				// one box field that the theme can render in two columns.
+				renderOneboxField(form, fieldName, dcInput, dcValues);
 			}
 			else if (inputType.equals("qualdrop_value"))
 			{

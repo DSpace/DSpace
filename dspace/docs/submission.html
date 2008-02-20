@@ -465,19 +465,22 @@
       <UL>
         <LI><STRONG>onebox</STRONG> -- A single text-entry box.</LI>
 
-        <LI><STRONG>twobox</STRONG> -- A pair of simple text-entry boxes, used for <EM>repeatable</EM> values such as the DC <CODE>subject</CODE> item.</LI>
+        <LI><STRONG>twobox</STRONG> -- A pair of simple text-entry boxes, used for <EM>repeatable</EM> values such as the DC <CODE>subject</CODE> item.
+        <em>Note:</em> The 'twobox' input type is rendered the same as a 'onebox' in the XML-UI, but both allow for ease of adding multiple values.</LI>
 
         <LI><STRONG>textarea</STRONG> -- Large block of text that can be entered on multiple lines, e.g. for an abstract.</LI>
 
-        <LI><STRONG>name</STRONG> -- Personal name, with separate fields for family name and first name.</LI>
+        <LI><STRONG>name</STRONG> -- Personal name, with separate fields for family name and first name. When saved they are appended in the format 'LastName, FirstName'</LI>
 
-        <LI><STRONG>date</STRONG> -- Calendar date. when required, demands that at least the year be entered.</LI>
+        <LI><STRONG>date</STRONG> -- Calendar date. When required, demands that at least the year be entered.</LI>
 
-        <LI><STRONG>dropdown</STRONG> -- Choose value(s) from a "drop-down" menu list. <STRONG>Note:</STRONG> You must also include a value for the <CODE>value-pairs-name</CODE> attribute to specify a list of menu entries, from which to choose, for this item. Use this to make a choice from a restricted set of options, such as for the <CODE>language</CODE> item.</LI>
+		<LI><STRONG>series</STRONG> -- Series/Report name and number.  Separate fields are provided for series name and series number, but they are appended (with a semicolon between) when saved.</LI>
+
+        <LI><STRONG>dropdown</STRONG> -- Choose value(s) from a "drop-down" menu list. <STRONG>Note:</STRONG> You must also include a value for the <CODE>value-pairs-name</CODE> attribute to specify a list of menu entries from which to choose. Use this to make a choice from a restricted set of options, such as for the <CODE>language</CODE> item.</LI>
 
         <LI><STRONG>qualdrop_value</STRONG> -- Enter a "qualified value", which includes <EM>both</EM> a qualifier from a drop-down menu and a free-text value. Used to enter items like alternate identifers and codes for a submitted item, e.g. the DC <CODE>identifier</CODE> field. <STRONG>Note:</STRONG> As for the <CODE>dropdown</CODE> type, you must include the <CODE>value-pairs-name</CODE> attribute to specify a menu choice list.</LI>
       
-      	<LI><STRONG>list</STRONG> -- Choose value(s) from a checkbox or radio button list. If the <CODE>repeatable</CODE> attribute is set to <CODE>true</CODE>, a list of checkboxes is displayed.  If the <CODE>repeatable</CODE> attribute is set to <CODE>false</CODE>, a list of radio buttons is displayed. <STRONG>Note:</STRONG> You must also include a value for the <CODE>value-pairs-name</CODE> attribute to specify a list of values, from which to choose, for this item.</LI>
+      	<LI><STRONG>list</STRONG> -- Choose value(s) from a checkbox or radio button list. If the <CODE>repeatable</CODE> attribute is set to <CODE>true</CODE>, a list of checkboxes is displayed.  If the <CODE>repeatable</CODE> attribute is set to <CODE>false</CODE>, a list of radio buttons is displayed. <STRONG>Note:</STRONG> You must also include a value for the <CODE>value-pairs-name</CODE> attribute to specify a list of values from which to choose.</LI>
       </UL>
     </DD>
 

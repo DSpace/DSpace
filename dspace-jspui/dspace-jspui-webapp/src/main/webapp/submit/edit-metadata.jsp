@@ -348,7 +348,23 @@
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
       org.dspace.content.DCSeriesNumber sn;
+      StringBuffer headers = new StringBuffer();
 
+      //Width hints used here to affect whole table 
+      headers.append("<tr><td width=\"40%\">&nbsp;</td>")
+          .append("<td class=\"submitFormDateLabel\" width=\"5%\">")
+//          .append("Series Name</td>")
+			 .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.seriesname"))
+          .append("</td>")
+          .append("<td class=\"submitFormDateLabel\" width=\"5%\">")
+//          .append("Report or Paper No.</td>")
+			 .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.paperno"))
+          .append("</td>")
+          .append("<td width=\"40%\">&nbsp;</td>")
+          .append("</tr>");
+      out.write(headers.toString());
+      
+      
       if (fieldCount == 0)
          fieldCount = 1;
 
