@@ -375,7 +375,10 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             for (SortOption so : SortOption.getSortOptions())
             {
                 if (so.getName().equals(source))
+                {
                     scope.setSortBy(so.getNumber());
+                	scope.setOrder(SortOption.DESCENDING);
+                }
             }
 
         	BrowseEngine be = new BrowseEngine(context);

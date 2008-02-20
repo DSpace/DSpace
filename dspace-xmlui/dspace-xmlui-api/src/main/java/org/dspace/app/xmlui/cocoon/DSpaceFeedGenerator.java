@@ -558,7 +558,10 @@ public class DSpaceFeedGenerator extends AbstractGenerator
             for (SortOption so : SortOption.getSortOptions())
             {
                 if (so.getName().equals(source))
+                {
                     scope.setSortBy(so.getNumber());
+                    scope.setOrder(SortOption.DESCENDING);
+                }
             }
 
             BrowseEngine be = new BrowseEngine(context);

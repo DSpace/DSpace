@@ -327,7 +327,10 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             for (SortOption so : SortOption.getSortOptions())
             {
                 if (so.getName().equals(source))
+                {
                     scope.setSortBy(so.getNumber());
+                    scope.setOrder(SortOption.DESCENDING);
+                }
             }
 
         	BrowseEngine be = new BrowseEngine(context);
