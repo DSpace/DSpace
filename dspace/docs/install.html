@@ -178,6 +178,7 @@
       and automatically download the rest of the interface code from the maven central repository whenever
       you build DSpace.  This reduces the amount of out-of-the-box
     DSpace interface code maintained in your local CVS/SVN.</p>
+  
   <H3><A NAME="directories">Overview of DSpace Directories</A></H3>
 
 	<p>Before beginning an installation, it is important to get a general understanding
@@ -372,21 +373,13 @@ cp -r <i>[dspace]</i>/webapps/dspace-oai <i>[tomcat]</i>/webapps</PRE>
         <P>Base URLs of DSpace Web Applications:</P>
         <UL>
         <li><em>JSP User Interface</em> - (e.g.) http://dspace.myu.edu:8080/dspace-jspui</li>
-        <li><em>XML User Interface (aka. Manakin)</em> -  (e.g.) http://dspace.myu.edu:8080/dspace-xmlui-webapp</li>
+        <li><em>XML User Interface (aka. Manakin)</em> -  (e.g.) http://dspace.myu.edu:8080/dspace-xmlui</li>
         <li><em>OAI-PMH Interface</em> -  (e.g.) http://dspace.myu.edu:8080/dspace-oai/request?verb=identify  (Should return an XML-based response)</li>
         </UL>
       </LI>
     </ol>
 
   <p>In order to set up some communities and collections, you'll need to login as your DSpace Administrator (which you created with <code>create-administrator</code> above) and access the administration UI in either the JSP or XML user interface.</P>
-
-  <P><strong>Useful Maven References</strong>
-	<ul>
-		<li><A HREF="http://maven.apache.org/">Maven Homepage</A> - The place to go for all things Maven...it also includes links to the below resources.</li>
-		<li><A HREF="http://maven.apache.org/users/">Maven User Centre</A> - Basic documentation and Tutorials for Maven.  Also has a Project Object Model (POM) reference.</li>
-		<li><A href="http://maven.apache.org/plugins/">Maven Plugins</A> - Various Maven plugins you can take advantage of in your Maven POMs.</li>
-	</ul>
-	</P>
 	
     
     <H2><A NAME="advancedinstall">Advanced Installation</A></H2>
