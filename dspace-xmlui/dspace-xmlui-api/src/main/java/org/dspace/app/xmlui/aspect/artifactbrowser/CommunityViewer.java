@@ -237,7 +237,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 				
 				String feedFormat = parts[0].trim()+"+xml";
 					
-				String feedURL = contextPath+"/feed/"+community.getHandle()+"/"+format.trim();
+				String feedURL = contextPath+"/feed/"+format.trim()+"/"+community.getHandle();
 				pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
 			}
 		}

@@ -221,7 +221,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 				
 				String feedFormat = parts[0].trim()+"+xml";
 					
-				String feedURL = contextPath+"/feed/"+collection.getHandle()+"/"+format.trim();
+				String feedURL = contextPath+"/feed/"+format.trim()+"/"+collection.getHandle();
 				pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
 			}
 		}
