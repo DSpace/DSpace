@@ -146,15 +146,25 @@ cp [dspace-source]/dspace/config/item-submission.dtd [dspace]/config/item-submis
 
 
 
-<li><b>Add <code>new input-forms.xml</code> and <code>input-forms.dtd</code> configurable submission configuration</b>
+<li><b>Add new <code>input-forms.xml</code> and <code>input-forms.dtd</code> configurable submission configuration</b>
   <p>The input-forms.xml now has an included dtd reference to support validation. You'll need to merge in your changes to both file/and or copy them into place.</p>
   <pre>
-cp [dspace-source]/dspace/config/input-forms.xml [dspace]/configinput-forms.xml
+cp [dspace-source]/dspace/config/input-forms.xml [dspace]/config/input-forms.xml
 
 
 cp [dspace-source]/dspace/config/input-forms.dtd [dspace]/config/inputforms.dtd</pre>
   <b><br>
-  </b></li>  
+  </b></li>
+
+<li><b>Add <code>sword-swap-ingest.xsl</code> and <code>xhtml-head-item.properties</code> crosswalk files</b>
+  <p>New crosswalk files are required to support SWORD and the inclusion of metadata into the head of items.</p>
+  <pre>
+cp [dspace-source]/dspace/config/crosswalks/sword-swap-ingest.xsl [dspace]/config/crosswalks/sword-swap-ingest.xsl
+
+
+cp [dspace-source]/dspace/config/crosswalks/xhtml-head-item.properties [dspace]/config/crosswalks/xhtml-head-item.properties</pre>
+  <b><br>
+  </b></li>
 
 <li><b>Update the database</b>
     <p>The database schema needs updating. SQL files contain the relevant updates are provided, note if you have made any local customizations to the database schema you should consult these updates and make sure they will work for you.</p>

@@ -72,6 +72,7 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 - SF Patch #1591871 Docs for google and html sitemaps
 - SF Patch #1799575 New EPersonConsumer event consumer
 - SF Patch #1642563 bin/update-handle-prefix rewritten in Java
+- Updated upgrade instructions to include new crosswalk files for SWORD and metadata in html head
 
 (Chris Yates)
 - SF Patch #1724330 Removes "null" being displayed in community-home.jsp
