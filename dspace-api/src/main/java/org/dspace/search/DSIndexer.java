@@ -48,6 +48,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
@@ -79,6 +80,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.sort.SortOption;
@@ -704,7 +706,7 @@ public class DSIndexer
 					.getProperty("alert.recipient");
 
 			if (recipient != null) {
-				Email email = ConfigurationManager.getEmail("internal_error");
+				Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "internal_error"));
 				email.addRecipient(recipient);
 				email.addArgument(ConfigurationManager
 						.getProperty("dspace.url"));
