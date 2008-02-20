@@ -62,6 +62,8 @@ DROP VIEW Community2Item;
 DROP VIEW DCValue;
 
 -- Then the tables
+DROP TABLE collection_item_count;
+DROP TABLE community_item_count;
 DROP TABLE checksum_history;
 DROP TABLE most_recent_checksum;
 DROP TABLE checksum_results;
