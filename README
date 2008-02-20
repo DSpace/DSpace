@@ -1,8 +1,8 @@
-DSpace Version 1.5-SNAPSHOT, $Date$
+DSpace Version 1.5-SNAPSHOT, $Date: 2007-10-29 21:19:02 -0500 (Mon, 29 Oct 2007) $
 
 Installation instructions are included in this release package under
 
-docs/install.html
+dspace/docs/install.html
 
 Documentation for the most recent stable release may be viewed online at
 dspace.org:
@@ -13,7 +13,7 @@ Installation instructions for other version may be different, so you
 are encouraged to obtain the corresponding documentation package from
 SourceForge, or to download the latest documentation snapshot from SVN
 
-Please also read the KNOWN_BUGS file.
+Please also read the dspace/KNOWN_BUGS file.
 
 Please refer any further problems to the dspace-tech@lists.sourceforge.net 
 mailing list. 
