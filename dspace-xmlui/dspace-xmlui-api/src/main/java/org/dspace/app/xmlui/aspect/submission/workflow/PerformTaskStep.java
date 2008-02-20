@@ -86,7 +86,7 @@ public class PerformTaskStep extends AbstractStep
     protected static final Message T_leave_submit = 
         message("xmlui.Submission.workflow.PerformTaskStep.leave_submit");
     protected static final Message T_approve_help = 
-        message("xmlui.Submission.workflow.PerformTaskStep.approve_help1");
+        message("xmlui.Submission.workflow.PerformTaskStep.approve_help");
     protected static final Message T_approve_submit = 
         message("xmlui.Submission.workflow.PerformTaskStep.approve_submit");
     protected static final Message T_commit_help = 
