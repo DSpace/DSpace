@@ -101,6 +101,11 @@ public class ConfigurationManager
      */
     public static Properties getProperties()
     {
+        if (properties == null)
+        {
+            loadConfig(null);
+        }
+        
         return (Properties)properties.clone();
     }
     
