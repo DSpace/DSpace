@@ -182,13 +182,37 @@
                 </link>
             </xsl:for-each>
             
-            <!-- the following javascript removes the default text of empty text areas when they are focused on or submitted -->
-            <script type="text/javascript">
-                function tFocus(element){if (element.value == '<i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>'){element.value='';}}
-                function tSubmit(form){var defaultedElements = document.getElementsByTagName("textarea");
-                for (var i=0; i != defaultedElements.length; i++){
-                if (defaultedElements[i].value == '<i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>'){
-                defaultedElements[i].value='';}}}
+            <!-- The following javascript removes the default text of empty text areas when they are focused on or submitted -->
+            <!-- There is also javascript to disable submitting a form when the 'enter' key is pressed. -->
+			<script type="text/javascript">
+				//Clear default text of emty text areas on focus
+				function tFocus(element)
+				{
+					if (element.value == '<i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>'){element.value='';}
+				}
+				//Clear default text of emty text areas on submit
+				function tSubmit(form)
+				{
+					var defaultedElements = document.getElementsByTagName("textarea");
+					for (var i=0; i != defaultedElements.length; i++){
+						if (defaultedElements[i].value == '<i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>'){
+							defaultedElements[i].value='';}}
+				}
+				//Disable pressing 'enter' key to submit a form (otherwise pressing 'enter' causes a submission to start over)
+				function disableEnterKey(e)
+				{
+				     var key;
+				
+				     if(window.event)
+				          key = window.event.keyCode;     //Internet Explorer
+				     else
+				          key = e.which;     //Firefox and Netscape
+				
+				     if(key == 13)  //if "Enter" pressed, then disable!
+				          return false;
+				     else
+				          return true;
+				}
             </script>
             
             <!-- Add javascipt  -->
@@ -434,8 +458,9 @@
                                     </xsl:attribute>       
                                 </input> 
                                 <xsl:choose>
-                                    <xsl:when test="/dri:document/dri:body//dri:div/dri:referenceSet[@type='detailView' and @n='collection-view']">This Collection</xsl:when>
-                                    <xsl:when test="/dri:document/dri:body//dri:div/dri:referenceSet[@type='detailView' and @n='community-view']">This Community</xsl:when>                           
+									<xsl:when test="/dri:document/dri:body//dri:div/dri:referenceSet[@type='detailView' and @n='collection-view']">This Collection</xsl:when>
+									<xsl:when test="/dri:document/dri:body//dri:div/dri:referenceSet[@type='detailView' and @n='community-view']">This Community</xsl:when>
+									                      
                                 </xsl:choose>
                             </label>
                         </xsl:if>
@@ -545,7 +570,11 @@
                 <xsl:attribute name="enctype">multipart/form-data</xsl:attribute>
             </xsl:if>
             <xsl:attribute name="onsubmit">javascript:tSubmit(this);</xsl:attribute>
-            	<xsl:apply-templates select="*[not(name()='head')]"/>
+			<!--For Item Submission process, disable ability to submit a form by pressing 'Enter'-->
+			<xsl:if test="starts-with(@n,'submit')">
+				<xsl:attribute name="onkeydown">javascript:return disableEnterKey(event);</xsl:attribute>
+            </xsl:if>
+			<xsl:apply-templates select="*[not(name()='head')]"/>
           
         </form>
         <xsl:apply-templates select="@pagination">
