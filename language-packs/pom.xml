@@ -70,14 +70,11 @@
             <configuration>
                <tasks>
                   <mkdir dir="target/classes" />
-                  <copy todir="target/classes" includeEmptyDirs="false">
-                     <fileset dir="${basedir}">
-                        <include name="**/*.properties" />
-                        <exclude name="**/*.UTF-8" />
-                        <exclude name="*" />
-                     </fileset>
-                     <flattenmapper />
-                  </copy>
+                  <native2ascii 
+                     encoding="UTF8" 
+                     src="${basedir}/src/main/resources" 
+                     dest="${basedir}/target/classes"
+                     includes="**/*.properties.UTF-8" ext=""/>
                </tasks>
             </configuration>
             <executions>
@@ -88,30 +85,18 @@
                   </goals>
                </execution>
             </executions>
-         </plugin>
-         <plugin>
-            <groupId>org.dspace.maven.plugins</groupId>
-            <artifactId>dspace-native2ascii-plugin</artifactId>
-            <version>1.0</version>
-            <configuration>
-               <encoding>UTF8</encoding>
-               <includes>**/*.properties.UTF-8</includes>
-               <excludes>
-                  **/*.properties,src,target,pom.xml,.*
-               </excludes>
-               <mapFrom>*.properties.UTF-8</mapFrom>
-               <mapTo>*.properties</mapTo>
-               <flatten>true</flatten>
-               <src>${basedir}</src>
-            </configuration>
-            <executions>
-               <execution>
-                  <phase>generate-resources</phase>
-                  <goals>
-                     <goal>native2ascii</goal>
-                  </goals>
-               </execution>
-            </executions>
+            <dependencies>
+               <dependency>
+                  <groupId>org.apache.ant</groupId>
+                  <artifactId>ant-nodeps</artifactId>
+                  <version>1.7.0</version>
+               </dependency>
+               <dependency>
+                  <groupId>org.apache.ant</groupId>
+                  <artifactId>ant</artifactId>
+                  <version>1.7.0</version>
+               </dependency>
+            </dependencies>
          </plugin>
       </plugins>
    </build>
@@ -126,11 +111,6 @@
       </plugins>
    </reporting>
 
-   <dependencies>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-api</artifactId>
-      </dependency>
-   </dependencies>
+   
 
 </project>
