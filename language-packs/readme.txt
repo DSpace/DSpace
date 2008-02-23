@@ -5,36 +5,41 @@ DSPACE LANGUAGE PACKS
 Layout of the source tree
 =========================
 
-The Messages.properties files for each language are stored in the
-directories below this.  The top-level directory is the ISO 639-1 language
-code, in lower case.  Sub-directories of that are the ISO 3166-1 codes for
-country, if required.  For example:
+The Messages.properties files for each language are stored in the following
+directory below this. 
 
+src/main/resources
 
-el/
-   language files for Greek
+The file naming conventions are as follows:
 
-fr/
-   FR/
-      language files for French (France)
-   CA/
-      language files for Canadian French
+Messages_<ISO 639-1>_<ISO 3166-1>.properties
 
+ISO 639-1: language code, in lower case.  
+ISO 3166-1: codes for country, if required.  For example:
+
+Language files for Greek
+
+src/main/resources/
+           Messages.properties - file for default (English)
+           Messages_el.properties - file for Greek
+           Messages_fr_FR.properties - file for French (France)
+           Messages_fr_CA.properties - file for French (Canada)
+           
 
 For languages that can be fully represented using the Latin-1 character set,
 the appropriate Messages.properties file is placed in the relevant
 directory:
 
-it/
-   Messages_it.properties
+src/main/resources/Messages_it.properties
 
 For languages that require other encodings, they are stored in this tree in
 their native encoding for ease of editing, patching and so forth.  The
 filename extension representing the encoding, for example:
 
-el/
-   Messages_el.properties.UTF-8
+src/main/resources/Messages_el.properties.UTF-8
 
+The Maven build process supports native2ascii conversion on packaging of 
+the UTF-8 files prior to packaging the jar. 
 
 SVN tags
 ========
@@ -57,21 +62,25 @@ Note that a language file should only be tagged when it is complete for a
 particular *stable* version of DSpace.  This means tagging must be done
 carefully on individual files, and not on the whole language-packs tree.
 
-Maven Based release strategy, language packs need to be compiled into 
-<dspace.home>/lib and any <war>/WEB-INF/lib. This is done when compiling
-packaging DSpace with Maven via the following Mechanism.
+1.5 or Greater release Strategy:
 
+The 1.5 Build process is Maven based and language packs is currently included
+in the distributions by default.  The "dspace-1.5-release" distribution will
+download them from the Maven Central repository while the the 
+"dspace-1.5-src-release" includes them as a addon project that is compiled into 
+<dspace.home>/lib and any <war>/WEB-INF/lib. This is done when compiling
+packaging DSpace with Maven via the mechanism described in the documentation.
 
 Creating a language pack for download
 =====================================
 
-Language Packs are now a DSpace Addon. 
-They can be compiled into your dspace distro via the addition of '-P lang' 
-to the active profiles, they are inactive by default. 
+Language Packs are currently added into the distributions by default.  If
+wish to do development on them it is recommended that you either check them 
+out from svn in the appropriate branch for your distribution; 
 
-The Maven build process supports native2ascii conversion on packaging of 
-the Jar. When the profile is active, the jar will be a dependency compiled into all 
-lib directories where dspace-api is present.
+http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/language-packs
+
+or by editing the existing project in dspace-1.5-src-release.zip.
 
 
 OTHER TOOLS
