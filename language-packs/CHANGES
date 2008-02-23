@@ -1,7 +1,6 @@
 
-
+* Place Messages.properties appropriately in resources and adjust documentation.   
+* Reorganize Language file to support easier editing, processing and management 
 * Language Packs are now a DSpace Addon. 
-* They can be compiled into your dspace distro via the addition of '-P lang' to the active profiles, they are inactive by default. 
-* If a UTF-8 properties file exists, then the non-UTF-* file has been removed to avoid confusion.
 * The Maven build process supports native2ascii conversion on packaging of the Jar.
 * When the profile is active, the jar will be a dependency compiled into all lib directories where dspace-api is present.
