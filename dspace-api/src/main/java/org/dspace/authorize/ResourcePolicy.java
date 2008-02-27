@@ -350,7 +350,7 @@ public class ResourcePolicy
         if (ed != null)
         {
             // end date is set, return false if we're after it
-            if (now.after(sd))
+            if (now.after(ed))
             {
                 return false;
             }
