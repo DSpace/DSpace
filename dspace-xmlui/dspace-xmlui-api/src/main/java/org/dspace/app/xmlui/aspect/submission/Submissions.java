@@ -265,7 +265,12 @@ public class Submissions extends AbstractDSpaceTransformer
 
         		// The item description
         		if (titles != null && titles.length > 0)
-        			row.addCell().addXref(url,titles[0].value);
+        		{
+        			String displayTitle = titles[0].value;
+        			if (displayTitle.length() > 50)
+        				displayTitle = displayTitle.substring(0,50)+ " ...";
+        			row.addCell().addXref(url,displayTitle);
+        		}
         		else
         			row.addCell().addXref(url,T_untitled);
 
@@ -329,7 +334,13 @@ public class Submissions extends AbstractDSpaceTransformer
 
         		// The item description
         		if (titles != null && titles.length > 0)
-        			row.addCell().addXref(url,titles[0].value);
+        		{
+        			String displayTitle = titles[0].value;
+        			if (displayTitle.length() > 50)
+        				displayTitle = displayTitle.substring(0,50)+ " ...";
+        			
+        			row.addCell().addXref(url,displayTitle);
+        		}
         		else
         			row.addCell().addXref(url,T_untitled);
 
@@ -436,7 +447,12 @@ public class Submissions extends AbstractDSpaceTransformer
 	        	remove.addOption(workspaceItemID);
 	        	
 	        	if (titles.length > 0)
-	        		row.addCell().addXref(url,titles[0].value);
+	        	{
+	        		String displayTitle = titles[0].value;
+        			if (displayTitle.length() > 50)
+        				displayTitle = displayTitle.substring(0,50)+ " ...";
+	        		row.addCell().addXref(url,displayTitle);
+	        	}
 	        	else
 	        		row.addCell().addXref(url,T_untitled);
 	        	row.addCell().addXref(url,collectionName);
@@ -529,7 +545,12 @@ public class Submissions extends AbstractDSpaceTransformer
         	
         	// Add the title column
         	if (titles.length > 0)
+        	{
+        		String displayTitle = titles[0].value;
+    			if (displayTitle.length() > 50)
+    				displayTitle = displayTitle.substring(0,50)+ " ...";
         		row.addCellContent(titles[0].value);
+        	}
         	else
         		row.addCellContent(T_untitled);
         	

@@ -253,7 +253,7 @@ public class UploadStep extends AbstractProcessingStep
         // -----------------------------------
         String contentType = request.getContentType();
 
-        if (buttonPressed.equalsIgnoreCase(SUBMIT_UPLOAD_BUTTON))
+        if (buttonPressed.equalsIgnoreCase(SUBMIT_UPLOAD_BUTTON) || buttonPressed.equalsIgnoreCase(NEXT_BUTTON))
         {
             // if multipart form, then we are uploading a file
             if ((contentType != null)
