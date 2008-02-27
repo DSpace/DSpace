@@ -72,6 +72,29 @@
 							</includes>
 						</resource>
 					</webResources>
+					<overlays>
+                  <!--  
+                  the priority of overlays is determined here
+                  1.) default: anything in the current project has highest
+                  2.) anything defined here has precedence in the order defined
+                  3.) any war found transitively in the dependencies will be applied
+                      next. the order is unpredictable.
+                   -->
+					   <overlay>
+					      <groupId>org.dspace</groupId>
+					      <artifactId>dspace-xmlui-lang</artifactId>
+					      <excludes>
+                        <!--  
+                        keep lang web.xml from overiding xmlui
+                        -->
+					         <exclude>WEB-INF/web.xml</exclude>
+					      </excludes>
+					   </overlay>
+                  <overlay>
+                     <groupId>org.dspace</groupId>
+                     <artifactId>dspace-xmlui-webapp</artifactId>
+                  </overlay>
+					</overlays>
 				</configuration>
 				<executions>
 					<execution>
@@ -136,6 +159,18 @@
 	</profiles>
 
 	<dependencies>
+   
+      <!-- DSpace XMLUI Languages -->
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-xmlui-lang</artifactId>
+         <!-- 
+            TODO: change in release to <version>[1.5.0,1.6.0)</version>
+          -->
+         <version>[1.5,1.6)</version>
+         <type>war</type>
+      </dependency>
+      
 		<!-- DSpace XMLUI Webapp -->
 		<dependency>
 			<groupId>org.dspace</groupId>
@@ -144,7 +179,7 @@
 			<classifier>skinny</classifier>
 			<type>war</type>
 		</dependency>
-
+      
 		<!-- DSpace XMLUI API -->
 		<dependency>
 			<groupId>org.dspace</groupId>
