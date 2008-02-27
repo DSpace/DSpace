@@ -116,7 +116,7 @@
          Builds OAI Gateway WAR for DSpace
       -->
       <profile>
-         <id>oai-api</id>
+         <id>dspace-oai-api</id>
          <activation>
             <file>
                <exists>../dspace-oai-api/pom.xml</exists>
@@ -131,7 +131,7 @@
          Builds OAI Gateway WAR for DSpace
       -->
       <profile>
-         <id>oai-webapp</id>
+         <id>dspace-oai-webapp</id>
          <activation>
             <file>
                <exists>../dspace-oai-webapp/pom.xml</exists>
@@ -146,7 +146,7 @@
          Builds OAI Gateway WAR for DSpace
       -->
       <profile>
-         <id>oai</id>
+         <id>dspace-oai</id>
          <activation>
             <file>
                <exists>../dspace-oai/pom.xml</exists>
@@ -162,7 +162,7 @@
       -->
       <profile>
 
-         <id>jspui-api</id>
+         <id>dspace-jspui-api</id>
          <activation>
             <file>
                <exists>../dspace-jspui-api/pom.xml</exists>
@@ -178,7 +178,7 @@
       -->
       <profile>
 
-         <id>jspui-webapp</id>
+         <id>dspace-jspui-webapp</id>
          <activation>
             <file>
                <exists>../dspace-jspui-webapp/pom.xml</exists>
@@ -194,7 +194,7 @@
       -->
       <profile>
 
-         <id>jspui</id>
+         <id>dspace-jspui</id>
          <activation>
             <file>
                <exists>../dspace-jspui/pom.xml</exists>
@@ -210,7 +210,7 @@
       -->
       <profile>
 
-         <id>sword-api</id>
+         <id>dspace-sword-api</id>
          <activation>
             <file>
                <exists>../dspace-sword-api/pom.xml</exists>
@@ -226,7 +226,7 @@
       -->
       <profile>
 
-         <id>sword-webapp</id>
+         <id>dspace-sword-webapp</id>
          <activation>
             <file>
                <exists>../dspace-sword-webapp/pom.xml</exists>
@@ -242,7 +242,7 @@
       -->
       <profile>
 
-         <id>sword</id>
+         <id>dspace-sword</id>
          <activation>
             <file>
                <exists>../dspace-sword/pom.xml</exists>
@@ -257,7 +257,7 @@
          Builds each separate XMLUI module for the XMLUI war (for development/Eclipse)
       -->
       <profile>
-         <id>xmlui-api</id>
+         <id>dspace-xmlui-api</id>
          <activation>
             <file>
                <exists>../dspace-xmlui-api/pom.xml</exists>
@@ -269,7 +269,7 @@
       </profile>
 
       <profile>
-         <id>xmlui-wing</id>
+         <id>dspace-xmlui-wing</id>
          <activation>
             <file>
                <exists>../dspace-xmlui-wing/pom.xml</exists>
@@ -281,7 +281,7 @@
       </profile>
 
       <profile>
-         <id>xmlui-webapp</id>
+         <id>dspace-xmlui-webapp</id>
          <activation>
             <file>
                <exists>../dspace-xmlui-webapp/pom.xml</exists>
@@ -292,11 +292,23 @@
          </modules>
       </profile>
 
+      <profile>
+         <id>dspace-xmlui-lang</id>
+         <activation>
+            <file>
+               <exists>../dspace-xmlui-lang/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-xmlui-lang</module>
+         </modules>
+      </profile>
+      
       <!-- 
          Builds XMLUI WAR for DSpace
       -->
       <profile>
-         <id>xmlui</id>
+         <id>dspace-xmlui</id>
          <activation>
             <file>
                <exists>../dspace-xmlui/pom.xml</exists>
@@ -311,7 +323,7 @@
          Builds each separate LNI module for the LNI war (for development/Eclipse)
       -->
       <profile>
-         <id>lni-core</id>
+         <id>dspace-lni-core</id>
          <activation>
             <file>
                <exists>../dspace-lni-core/pom.xml</exists>
@@ -323,7 +335,7 @@
       </profile>
 
       <profile>
-         <id>lni-webapp</id>
+         <id>dspace-lni-webapp</id>
          <activation>
             <file>
                <exists>../dspace-lni-webapp/pom.xml</exists>
@@ -335,7 +347,7 @@
       </profile>
       
       <profile>
-         <id>lni-client</id>
+         <id>dspace-lni-client</id>
          <activation>
             <file>
                <exists>../dspace-lni-client/pom.xml</exists>
@@ -350,7 +362,7 @@
          Builds LNI WAR for DSpace
       -->
       <profile>
-         <id>lni</id>
+         <id>dspace-lni</id>
          <activation>
             <file>
                <exists>../dspace-lni/pom.xml</exists>
