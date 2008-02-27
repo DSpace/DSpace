@@ -1079,7 +1079,7 @@
 	<message key="xmlui.administrative.authorization.AuthorizationMain.submit_find">Find</message>
 	<message key="xmlui.administrative.authorization.AuthorizationMain.actions_advanced">Advanced authorizations tool</message>
 	<message key="xmlui.administrative.authorization.AuthorizationMain.actions_advanced_link">Click here to go to the item wildcard policy admin tool</message>
-	<message key="xmlui.administrative.authorization.AuthorizationMain.containerList_head">Community/collection authroizations</message>
+	<message key="xmlui.administrative.authorization.AuthorizationMain.containerList_head">Community/collection authorizations</message>
 	<message key="xmlui.administrative.authorization.AuthorizationMain.containerList_para">Click on a community or collection to edit its policies.</message>
 	
 	
