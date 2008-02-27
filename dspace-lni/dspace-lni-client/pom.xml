@@ -92,12 +92,31 @@
       </profile>
    </profiles>
    
+   <build>
+      <plugins>
+        <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <archive>
+            <manifest>
+              <mainClass>LNISmokeTest</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+        <executions>
+         <execution>
+            <goals><goal>attached</goal></goals>
+            <phase>package</phase>
+         </execution>
+        </executions>
+        </plugin>
+      </plugins>
+   </build>
+   
    <dependencies>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-lni-core</artifactId>
-         <scope>compile</scope>
-      </dependency>
       <dependency>
          <groupId>javax.activation</groupId>
          <artifactId>activation</artifactId>
