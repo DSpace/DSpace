@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/bin/sh
 
 ###########################################################################
 #
@@ -44,94 +44,9 @@
 # This script starts from the year and month specified below and works
 # forward until the end of the current month, generating monthly reports
 # from the dstat aggregation files.
-#
-# To customise for your own use change the $in_prefix, $in_suffix, $out_prefix, 
-# $out_suffix, $start_year, $start_month, $dsrun and $out_directory variables 
-# below.
-# 
-# If you wish to futher configure this script, you will need to edit the
-# command being executed, which appears near the bottom of the page, and is 
-# commented with "# The command to generate the report"
-#
-# For more information on using the ReportGenerator, use:
-#
-# [dspace]/bin/dsrun org.dspace.app.statistics.ReportGenerator -help
 ###########################################################################
 
-use POSIX qw(floor);
+# Get the DSPACE/bin directory
+BINDIR=`dirname $0`
 
-my $start;
-my $end;
-my $out;
-my $i;
-my $no_months;
-my $second; 
-my $minute; 
-my $hour;
-my $day;
-my $month;
-my $year; 
-my $week_day; 
-my $day_of_year; 
-my $is_dst;
-my $out_prefix;
-my $out_suffix;
-
-# Details used
-################################################
-
-$in_prefix = "dspace-log-monthly-";
-$in_suffix = ".dat";
-$out_prefix = "report-";
-$out_suffix = ".html";
-$start_year = "2004";
-$start_month = "5";
-$dsrun = "/dspace/bin/dsrun";
-$in_directory = "/dspace/log/";
-$out_directory = "/dspace/reports/";
-
-################################################
-
-# Get the all the values for current time
-($second, $minute, $hour, $day, $month, $year, $week_day, $day_of_year, $is_dst) = localtime(time);
-
-# set up the variables to use in the loop
-
-# number of years after the current year (will mostly be negative)
-# <current year> = (<perl year> + 1900)
-# <start year offset> = <start year> - <current year>
-$year_offset = $start_year - ($year + 1900);
-
-# total number of months between now and the start date (negated to be positive in general)
-# <months in year offset> = |<start year offset>| * 12
-# <difference in current year months> = (<current perl month> + 1) - <start month>
-# <total number of months> = <months in year offset> + <difference in current year months>
-# we use -1 to make <start year offset> positive since it should always be negative
-$no_months = (-1 * ($year_offset * 12)) + (($month + 1) - $start_month);
-
-# start day of every month
-$start_day = "01";
-
-# for every month ...
-for ($i = 0; $i < $no_months; $i++)
-{
-    # the month of the year (horrid modular maths)
-    $this_month = (($start_month + $i - 1) % 12) + 1;
-
-    # number of years gone through since we started the loop
-    $year_count = floor(($i + $start_month - 1) / 12);
-
-    # the year of the current analysis period
-    $this_year = $year + $year_offset + $year_count + 1900;
-
-    # input and output file paths
-    $in = $in_directory . $in_prefix . $this_year . "-" . $this_month . $in_suffix;
-    $out = $out_directory . $out_prefix . $this_year . "-" . $this_month . $out_suffix;
-
-    # The command to generate the report
-    $execute = "$dsrun org.dspace.app.statistics.ReportGenerator -format html -in $in -out $out";
-    
-    system($execute);
-}
-
-exit(1);
+$BINDIR/dsrun org.dspace.app.statistics.CreateStatReport -r stat-report-initial
