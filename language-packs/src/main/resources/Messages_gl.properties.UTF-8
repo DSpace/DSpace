@@ -190,8 +190,8 @@ jsp.dspace-admin.confirm-delete-format.title = Borrar formato de Bitstream
 jsp.dspace-admin.confirm-delete-format.warning = Calquera bistream con este formato sera convertido a <em>unknown</em>
 jsp.dspace-admin.confirm-delete-format.returntoedit = Volver para a p&aacute;xina de Administraci&oacute;n de Usuarios
 #
-jsp.dspace-admin.eperson.general.firstname = Nome
-jsp.dspace-admin.eperson.general.lastname = Apelidos
+jsp.dspace-admin.eperson.general.firstname = Apelidos
+jsp.dspace-admin.eperson.general.lastname = Nome
 #
 jsp.dspace-admin.eperson-browse.email = Direcci&oacute;n de Correo electr&oacute;nico
 jsp.dspace-admin.eperson-browse.canlogin = Pode identificarse?

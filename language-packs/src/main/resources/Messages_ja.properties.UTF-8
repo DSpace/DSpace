@@ -192,7 +192,7 @@ jsp.dspace-admin.confirm-delete-format.title = ãƒ“ãƒƒãƒˆã‚¹ãƒˆãƒªãƒ¼ãƒ ãƒ•ã‚©ãƒ
 jsp.dspace-admin.confirm-delete-format.warning = ã?“ã?®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã?®ãƒ“ãƒƒãƒˆã‚¹ãƒˆãƒ¼ãƒ«ã?Œå­˜åœ¨ã?™ã‚‹å ´å?ˆã?¯ã€?<em>æœªçŸ¥</em>ã?®ãƒ“ãƒƒãƒˆã‚¹ãƒˆãƒªãƒ¼ãƒ ï½¥ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã?«ã?ªã‚Šã?¾ã?™ã€‚
 jsp.dspace-admin.confirm-delete-format.returntoedit = ç®¡ç?†è€…ç”»é?¢ã?«æˆ»ã‚‹
 
-jsp.dspace-admin.eperson.general.firstname = å??
+jsp.dspace-admin.eperson.general.firstname = å
 jsp.dspace-admin.eperson.general.lastname = å§“
 
 jsp.dspace-admin.eperson-browse.email = ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹

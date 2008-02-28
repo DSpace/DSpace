@@ -173,8 +173,8 @@ jsp.dspace-admin.confirm-delete-format.title = åˆªé™¤ä½?å…ƒä¸²æµ?æ ¼å¼?
 jsp.dspace-admin.confirm-delete-format.warning = æ‰€æœ‰æ­¤æ ¼å¼?ä¹‹ä½?å…ƒä¸²æµ?å°‡å›å¾©æˆ?  <em>æœªçŸ¥</em> æ ¼å¼?.
 jsp.dspace-admin.confirm-delete-format.returntoedit = å›åˆ°ç®¡ç?† EPeople é ?é?¢
 
-jsp.dspace-admin.eperson.general.firstname = å??å­—
-jsp.dspace-admin.eperson.general.lastname = å§“æ°?
+jsp.dspace-admin.eperson.general.firstname = åå­—
+jsp.dspace-admin.eperson.general.lastname = å§“æ°
 
 jsp.dspace-admin.eperson-browse.email = E-mail
 jsp.dspace-admin.eperson-browse.canlogin = ç™»å…¥?

@@ -177,8 +177,8 @@ jsp.dspace-admin.confirm-delete-format.title = Remover formato de Bitstream
 jsp.dspace-admin.confirm-delete-format.warning = Quaisquer bitstreams pr&eacute;-existentes com este formato ter&aacute; sua descri&ccedil;&atilde;o revertida para o formato <em>unknown</em>.
 jsp.dspace-admin.confirm-delete-format.returntoedit = Voltar &agrave; p&aacute;gina de Administra&ccedil;&atilde;o de Usu&aacute;rios
 
-jsp.dspace-admin.eperson.general.firstname = Nome
-jsp.dspace-admin.eperson.general.lastname = Sobrenome
+jsp.dspace-admin.eperson.general.firstname = Sobrenome 
+jsp.dspace-admin.eperson.general.lastname = Nome
 
 jsp.dspace-admin.eperson-browse.email = Email
 jsp.dspace-admin.eperson-browse.canlogin = Pode se logar?

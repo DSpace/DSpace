@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -18,7 +17,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>SNAPSHOT</version>
+      <version>1.5-SNAPSHOT</version>
    </parent>
 
    <repositories>
@@ -32,6 +31,7 @@
          </releases>
          <snapshots>
             <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
             <checksumPolicy>fail</checksumPolicy>
          </snapshots>
       </repository>
@@ -43,11 +43,12 @@
          <name>DSpace Maven Repository</name>
          <url>http://maven.dspace.org/snapshot</url>
          <releases>
-            <updatePolicy>never</updatePolicy>
+            <enabled>false</enabled>
             <checksumPolicy>fail</checksumPolicy>
          </releases>
          <snapshots>
-            <updatePolicy>always</updatePolicy>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
             <checksumPolicy>fail</checksumPolicy>
          </snapshots>
       </pluginRepository>
@@ -59,15 +60,9 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection>
-         scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/language-packs
-      </connection>
-      <developerConnection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/language-packs
-      </developerConnection>
-      <url>
-         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/language-packs
-      </url>
+      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/language-packs</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/language-packs</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/language-packs</url>
    </scm>
 
    <build>
@@ -77,15 +72,11 @@
             <configuration>
                <tasks>
                   <mkdir dir="target/classes" />
-                  <copy todir="target/classes"
-                     includeEmptyDirs="false">
-                     <fileset dir="${basedir}">
-                        <include name="**/*.properties" />
-                        <exclude name="**/*.UTF-8" />
-                        <exclude name="*" />
-                     </fileset>
-                     <flattenmapper />
-                  </copy>
+                  <native2ascii 
+                     encoding="UTF8" 
+                     src="${basedir}/src/main/resources" 
+                     dest="${basedir}/target/classes"
+                     includes="**/*.properties.UTF-8" ext=""/>
                </tasks>
             </configuration>
             <executions>
@@ -96,30 +87,18 @@
                   </goals>
                </execution>
             </executions>
-         </plugin>
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>native2ascii-maven-plugin</artifactId>
-            <version>1.0-alpha-3-SNAPSHOT</version>
-            <configuration>
-               <encoding>UTF8</encoding>
-               <includes>**/*.properties.UTF-8</includes>
-               <excludes>
-                  **/*.properties,src,target,pom.xml,.*
-               </excludes>
-               <mapFrom>*.properties.UTF-8</mapFrom>
-               <mapTo>*.properties</mapTo>
-               <flatten>true</flatten>
-               <src>${basedir}</src>
-            </configuration>
-            <executions>
-               <execution>
-                  <phase>generate-resources</phase>
-                  <goals>
-                     <goal>native2ascii</goal>
-                  </goals>
-               </execution>
-            </executions>
+            <dependencies>
+               <dependency>
+                  <groupId>org.apache.ant</groupId>
+                  <artifactId>ant-nodeps</artifactId>
+                  <version>1.7.0</version>
+               </dependency>
+               <dependency>
+                  <groupId>org.apache.ant</groupId>
+                  <artifactId>ant</artifactId>
+                  <version>1.7.0</version>
+               </dependency>
+            </dependencies>
          </plugin>
       </plugins>
    </build>
@@ -127,18 +106,13 @@
    <reporting>
       <plugins>
          <plugin>
-            <groupId>org.dspace</groupId>
-            <artifactId>maven-i18n-report-plugin</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>org.dspace.maven.plugins</groupId>
+            <artifactId>dspace-i18n-report-plugin</artifactId>
+            <version>1.0</version>
          </plugin>
       </plugins>
    </reporting>
 
-   <dependencies>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-api</artifactId>
-      </dependency>
-   </dependencies>
+   
 
 </project>
