@@ -126,6 +126,9 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 
     private final static Message T_rpp = message("xmlui.ArtifactBrowser.AbstractSearch.rpp");
     
+    /** The options for results per page */
+    private static final int[] RESULTS_PER_PAGE_PROGRESSION = {5,10,20,40,60,80,100};
+    
     /** Cached query results */
     private QueryResults queryResults;
     
@@ -580,7 +583,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         Cell rppCell = controlsRow.addCell();
         rppCell.addContent(T_rpp);
         Select rppSelect = rppCell.addSelect("rpp");
-        for (int i = 5; i <= 100; i += 5)
+        for (int i : RESULTS_PER_PAGE_PROGRESSION)
         {
             rppSelect.addOption((i == getParameterRpp()), i, Integer.toString(i));
         }

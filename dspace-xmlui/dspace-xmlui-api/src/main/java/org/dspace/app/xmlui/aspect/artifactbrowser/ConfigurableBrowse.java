@@ -148,6 +148,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     private static final int TEN_YEAR_LIMIT = 100;
 
+    /** The options for results per page */
+    private static final int[] RESULTS_PER_PAGE_PROGRESSION = {5,10,20,40,60,80,100};
+    
     /** Cached validity object */
     private SourceValidity validity;
 
@@ -274,6 +277,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         Division results = div.addDivision("browse-by-" + type + "-results", "primary");
 
         // Add the pagination
+        //results.setSimplePagination(itemsTotal, firstItemIndex, lastItemIndex, previousPage, nextPage)
         results.setSimplePagination(info.getTotal(), browseInfo.getOverallPosition() + 1,
                 browseInfo.getOverallPosition() + browseInfo.getResultCount(), getPreviousPageURL(
                         params, info), getNextPageURL(params, info));
@@ -491,9 +495,11 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         // Create a control for the number of records to display
         controlsForm.addContent(T_rpp);
         Select rppSelect = controlsForm.addSelect(BrowseParams.RESULTS_PER_PAGE);
-        for (int i = 5; i <= 100; i += 5)
+        
+        for (int i : RESULTS_PER_PAGE_PROGRESSION)
         {
             rppSelect.addOption((i == info.getResultsPerPage()), i, Integer.toString(i));
+ 
         }
 
         // Create a control for the number of authors per item to display
@@ -649,7 +655,8 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             
             params.scope.setJumpToItem(RequestUtils.getIntParameter(request, BrowseParams.JUMPTO_ITEM));
             params.scope.setOrder(request.getParameter(BrowseParams.ORDER));
-            params.scope.setOffset(RequestUtils.getIntParameter(request, BrowseParams.OFFSET));
+            int offset = RequestUtils.getIntParameter(request, BrowseParams.OFFSET);
+            params.scope.setOffset(offset > 0 ? offset : 0);
             params.scope.setResultsPerPage(RequestUtils.getIntParameter(request,
                     BrowseParams.RESULTS_PER_PAGE));
             params.scope.setStartsWith(request.getParameter(BrowseParams.STARTS_WITH));
