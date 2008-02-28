@@ -123,7 +123,6 @@
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.rpp">Results/page</message>
 
     <!-- org.dspace.app.xmlui.artifactbrowser.AdvancedSearch.java -->
-
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.title">Advanced Search</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.trail">Advanced Search</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.head">Advanced Search</message>
@@ -285,19 +284,6 @@
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_collection">You do not have the credentials to access the restricted collection <b>{0}</b>.</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_item">You do not have the credentials to access the restricted item <b>{0}</b>.</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_bitstream">You do not have the credentials to access the restricted bitstream <b>{0}</b>.</message>
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_collection">collection</message>
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_community">community</message>
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_bitstream">bitstream</message>
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_item">item</message>
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_resource">resource</message>
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.unknown">unknown</message>
-
-	
-	<!-- org.dspace.app.xmlui.artifactbrowser.RestrictedItem.java -->
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.title">This resource is restricted</message>
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.trail">Restricted</message>
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.head">This {0} is restricted</message>
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.para">The {0} you tried to access, <b>{1}</b>, is a restricted {0} and requires credentials that you do not have.</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_collection">collection</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_community">community</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_bitstream">bitstream</message>
@@ -604,7 +590,6 @@
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.head">Save or cancel your submission?</message>
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.info1">Do you want the submission removed, or do you want to carry on working on it later?  You may return to the submission process if you clicked Exit by accident.</message>
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_back">Oops, continue submission</message>
-
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_save">Save it, I'll work on it later</message>
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_remove">Remove the submission</message>
 
@@ -645,7 +630,6 @@
 	<message key="xmlui.Submission.submit.UploadStep.file_error">The item must contain at least one file.</message>
 	<message key="xmlui.Submission.submit.UploadStep.description">File Description</message>
 	<message key="xmlui.Submission.submit.UploadStep.description_help">Optionally, provide a brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
-
 	<message key="xmlui.Submission.submit.UploadStep.submit_upload">Upload file &amp; add another</message>
 	<message key="xmlui.Submission.submit.UploadStep.head2">Files Uploaded</message>
 	<message key="xmlui.Submission.submit.UploadStep.column1"></message>
@@ -749,7 +733,6 @@
 
 	
 	
-
 	
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		
@@ -1193,11 +1176,11 @@
 	<message key="xmlui.administrative.item.AddBitstreamForm.trail">Upload bitstream</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.head1">Upload a new bitstream</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_label">Bundle</message>
-	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_original">Content Files (default)</message>
-	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_metadata">Metadata Files</message>
-	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_thumbnail">Thumbnails</message>
-	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_license">Licenses</message>
-	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_cc_license">Creative Commons Licenses</message>
+	<message key="xmlui.administrative.item.AddBitstreamForm.bundle.ORIGINAL">Content Files (default)</message>
+	<message key="xmlui.administrative.item.AddBitstreamForm.bundle.METADATA">Metadata Files</message>
+	<message key="xmlui.administrative.item.AddBitstreamForm.bundle.THUMBNAIL">Thumbnails</message>
+	<message key="xmlui.administrative.item.AddBitstreamForm.bundle.LICENSE">Licenses</message>
+	<message key="xmlui.administrative.item.AddBitstreamForm.bundle.CC_LICENSE">Creative Commons Licenses</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.file_label">File</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.file_help">Please enter the name of the file on your computer corresponding to your item. If you click "Browse...", a new window will appear in which you can locate and select the file from your computer.</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.description_label">Description</message>

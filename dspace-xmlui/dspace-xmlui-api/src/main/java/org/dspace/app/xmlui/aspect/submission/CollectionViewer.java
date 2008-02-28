@@ -51,8 +51,10 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
@@ -162,10 +164,14 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
         // Set up the major variables
         Collection collection = (Collection) dso;
         
-        Division home = body.addDivision("collection-home","primary repository collection");
-        Division viewer = home.addDivision("collection-view","secondary");
-        String submitURL = IdentifierService.getURL(collection) + "/submit";
-        viewer.addPara().addXref(submitURL,"Submit a new item to this collection"); 
+        // Only add the submit link if the user has the ability to add items.
+        if (AuthorizeManager.authorizeActionBoolean(context, collection, Constants.ADD))
+        {
+	        Division home = body.addDivision("collection-home","primary repository collection");
+	        Division viewer = home.addDivision("collection-view","secondary");
+                String submitURL = IdentifierService.getURL(collection) + "/submit";
+	        viewer.addPara().addXref(submitURL,"Submit a new item to this collection"); 
+        }
         
     }
     
