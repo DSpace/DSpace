@@ -66,7 +66,6 @@ import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
-import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
@@ -156,7 +155,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     private DSpaceValidity validity = null;
     
     /** The cache of recently submitted items */
-    private java.util.List<BrowseItem> recentSubmissionItems;
+    private java.util.List<Item> recentSubmissionItems;
     
     /**
      * Generate the unique caching key.
@@ -198,7 +197,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     			validity.add(dso);
     			
     			// add reciently submitted items
-    			for(BrowseItem item : getRecientlySubmittedItems(context,dso))
+    			for(Item item : getRecientlySubmittedItems(context,dso))
     			{
     				validity.add(item);
     			}
@@ -424,7 +423,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     	List<com.sun.syndication.feed.rss.Item> items = 
     		new ArrayList<com.sun.syndication.feed.rss.Item>();
     	
-		for(BrowseItem item : getRecientlySubmittedItems(context,dso))
+		for(Item item : getRecientlySubmittedItems(context,dso))
 		{
 			items.add(itemFromDSpaceItem(context, item));
 		}
@@ -444,7 +443,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      * @return an object representing a feed entry
      */
     private com.sun.syndication.feed.rss.Item itemFromDSpaceItem(Context context,
-    		                                                     BrowseItem dspaceItem)
+    		                                                     Item dspaceItem)
     	throws SQLException
     {
         com.sun.syndication.feed.rss.Item rssItem = 
@@ -554,7 +553,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     
     
     @SuppressWarnings("unchecked")
-    private java.util.List<BrowseItem> getRecientlySubmittedItems(Context context, DSpaceObject dso) 
+    private java.util.List<Item> getRecientlySubmittedItems(Context context, DSpaceObject dso) 
             throws SQLException
     {
     	if (recentSubmissionItems != null)
@@ -763,7 +762,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      *            <schema prefix>.<element>[.<qualifier>|.*]
      * @throws SQLException 
      */
-    private static DCValue[] getMetadata(BrowseItem item, String mdString) throws SQLException
+    private static DCValue[] getMetadata(Item item, String mdString)
     {
         StringTokenizer dcf = new StringTokenizer(mdString, ".");
         
