@@ -65,12 +65,13 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
-import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
+import org.dspace.uri.IdentifierService;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
@@ -116,7 +117,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     private static final int RECENT_SUBMISISONS = 5;
 
     /** The cache of recently submitted items */
-    private java.util.List<BrowseItem> recentSubmissionItems;
+    private java.util.List<Item> recentSubmissionItems;
     
     /** Cached validity object */
     private SourceValidity validity;
@@ -173,7 +174,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 	            validity.add(collection);
 	
 	            // add reciently submitted items
-	            for(BrowseItem item : getRecientlySubmittedIems(collection))
+	            for(Item item : getRecientlySubmittedIems(collection))
 	            {
 	                validity.add(item);
 	            }
@@ -286,7 +287,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 
         // Recently submitted items
         {
-            java.util.List<BrowseItem> items = getRecientlySubmittedIems(collection);
+            java.util.List<Item> items = getRecientlySubmittedIems(collection);
 
             Division lastSubmittedDiv = home
                     .addDivision("collection-recent-submission","secondary recent-submission");
@@ -294,7 +295,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             ReferenceSet lastSubmitted = lastSubmittedDiv.addReferenceSet(
                     "collection-last-submitted", ReferenceSet.TYPE_SUMMARY_LIST,
                     null, "recent-submissions");
-            for (BrowseItem item : items)
+            for (Item item : items)
             {
                 lastSubmitted.addReference(item);
             }
@@ -310,7 +311,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
      * @param collection The collection.
      */
     @SuppressWarnings("unchecked") // The cast from getLastSubmitted is correct, it dose infact return a list of Items.
-    private java.util.List<BrowseItem> getRecientlySubmittedIems(Collection collection) 
+    private java.util.List<Item> getRecientlySubmittedIems(Collection collection) 
         throws SQLException
     {
         if (recentSubmissionItems != null)

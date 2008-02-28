@@ -124,7 +124,7 @@ public class DSpaceObjectManager implements ObjectManager
 			else
 			{
 				// No handle then refrence it by an internal ID.
-				if (dso instanceof Item || dso instanceof BrowseItem)
+				if (dso instanceof Item)
 		    	{
 		    		return "/metadata/internal/item/" + dso.getID() + "/mets.xml";
 		    	}
@@ -148,7 +148,7 @@ public class DSpaceObjectManager implements ObjectManager
 	 */
 	public String getObjectType(Object object) throws WingException 
 	{
-		if (object instanceof Item || object instanceof BrowseItem)
+		if (object instanceof Item)
     	{
     		return "DSpace Item";
     	}
