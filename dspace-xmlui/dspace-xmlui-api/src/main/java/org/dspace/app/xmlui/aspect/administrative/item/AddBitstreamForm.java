@@ -41,8 +41,17 @@ package org.dspace.app.xmlui.aspect.administrative.item;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Map;
 
-import org.dspace.app.xmlui.aspect.submission.AbstractStep;
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.components.flow.FlowHelper;
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.SourceResolver;
+import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -58,6 +67,7 @@ import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bundle;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.xml.sax.SAXException;
 
@@ -69,7 +79,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Scott Phillips
  */
-public class AddBitstreamForm extends AbstractStep
+public class AddBitstreamForm extends AbstractDSpaceTransformer
 {
 	
 	/** Language strings */
@@ -81,11 +91,6 @@ public class AddBitstreamForm extends AbstractStep
 	private static final Message T_trail = message("xmlui.administrative.item.AddBitstreamForm.trail");
 	private static final Message T_head1 = message("xmlui.administrative.item.AddBitstreamForm.head1");
 	private static final Message T_bundle_label = message("xmlui.administrative.item.AddBitstreamForm.bundle_label");
-	private static final Message T_bundle_original = message("xmlui.administrative.item.AddBitstreamForm.bundle_original");
-	private static final Message T_bundle_metadata = message("xmlui.administrative.item.AddBitstreamForm.bundle_metadata");
-	private static final Message T_bundle_thumbnail = message("xmlui.administrative.item.AddBitstreamForm.bundle_thumbnail");
-	private static final Message T_bundle_license = message("xmlui.administrative.item.AddBitstreamForm.bundle_license");
-	private static final Message T_bundle_cc_license = message("xmlui.administrative.item.AddBitstreamForm.bundle_cc_license");
 	private static final Message T_file_label = message("xmlui.administrative.item.AddBitstreamForm.file_label");
 	private static final Message T_file_help = message("xmlui.administrative.item.AddBitstreamForm.file_help");
 	private static final Message T_description_label = message("xmlui.administrative.item.AddBitstreamForm.description_label");
@@ -94,7 +99,9 @@ public class AddBitstreamForm extends AbstractStep
 
 	private static final Message T_no_bundles = message("xmlui.administrative.item.AddBitstreamForm.no_bundles");
 
-
+	
+	private static String DEFAULT_BUNDLE_LIST = "ORIGINAL, METADATA, THUMBNAIL, LICENSE, CC_LICENSE";
+		
 	public void addPageMeta(PageMeta pageMeta) throws WingException
 	{
 		pageMeta.addMetadata("title").addContent(T_title);
@@ -120,18 +127,20 @@ public class AddBitstreamForm extends AbstractStep
 		int bundleCount = 0; // record how many bundles we are able to upload too.
 		Select select = upload.addItem().addSelect("bundle");
 		select.setLabel(T_bundle_label);
-		if (addBundleOption(item,select,"ORIGINAL", T_bundle_original))
-			bundleCount++;
-		if (addBundleOption(item,select,"METADATA", T_bundle_metadata))
-			bundleCount++;
-		if (addBundleOption(item,select,"THUMBNAIL", T_bundle_thumbnail))
-			bundleCount++;
-		if (addBundleOption(item,select,"LICENSE", T_bundle_license))
-			bundleCount++;
-		if (addBundleOption(item,select,"CC_LICENSE", T_bundle_cc_license))
-			bundleCount++;
-		select.setOptionSelected("ORIGINAL");
-
+		
+		// Get the list of bundles to allow the user to upload too. Either use the default 
+		// or one supplied from the dspace.cfg.
+		String bundleString = ConfigurationManager.getProperty("xmlui.bundle.upload");
+        if (bundleString == null || bundleString.length() == 0)
+        	bundleString = DEFAULT_BUNDLE_LIST;
+        String[] parts = bundleString.split(",");
+        for (String part : parts)
+        {
+        	if (addBundleOption(item,select,part.trim()))
+        		bundleCount++;
+        }
+        select.setOptionSelected("ORIGINAL");
+		
 		if (bundleCount == 0)
 			select.setDisabled();
 		
@@ -166,7 +175,7 @@ public class AddBitstreamForm extends AbstractStep
 		div.addHidden("administrative-continue").setValue(knot.getId()); 
 	}	
 	
-	public boolean addBundleOption(org.dspace.content.Item item, Select select, String bundleName, Message bundleLabel) throws SQLException, WingException
+	public boolean addBundleOption(org.dspace.content.Item item, Select select, String bundleName) throws SQLException, WingException
 	{
 		
 		// For some crazzy reason multiple bundles can share the same name
@@ -192,7 +201,7 @@ public class AddBitstreamForm extends AbstractStep
 		}
 		
 		// It's okay to upload.
-		select.addOption(bundleName, bundleLabel);
+		select.addOption(bundleName, message("xmlui.administrative.item.AddBitstreamForm.bundle."+bundleName));
 		return true;
 	}
 	

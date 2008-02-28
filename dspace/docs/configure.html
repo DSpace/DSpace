@@ -837,6 +837,13 @@ More information is provide below in <a href="#newfilter">Creating a new Media/F
         <td>If set to true, then allow the user to override which theme is used to display a particular page. When submitting a request add the HTTP parameter "themepath" which corresponds to a particular theme, that specified theme will be used instead of the any other configured theme. Note that this is a potential security hole allowing execution of unintended code on the server, this option is only for development and debugging it should be turned off for any production repository. The default value unless otherwise specified is "false"</td>
       </tr>
    
+   	
+   	  <tr>
+   	  	<td><code>xmlui.bundle.upload</code></td>
+   	  	<td><code>ORIGINAL, METADATA, THUMBNAIL, LICENSE, CC_LICENSE</code>
+   	  	<td>Determine which bundles administrators and collection administrators may upload into an existing item through the administrative interface. If the user does not have the appropriate privileges (add & write) on the bundle then that bundle will not be shown to the user as an option. </td>   	  </tr>
+   
+   
       <tr>
         <td><code>xmlui.community-list.render.full</code></td>
 

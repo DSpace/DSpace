@@ -1176,11 +1176,11 @@
 	<message key="xmlui.administrative.item.AddBitstreamForm.trail">Upload bitstream</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.head1">Upload a new bitstream</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_label">Bundle</message>
-	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_original">Content Files (default)</message>
-	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_metadata">Metadata Files</message>
-	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_thumbnail">Thumbnails</message>
-	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_license">Licenses</message>
-	<message key="xmlui.administrative.item.AddBitstreamForm.bundle_cc_license">Creative Commons Licenses</message>
+	<message key="xmlui.administrative.item.AddBitstreamForm.bundle.ORIGINAL">Content Files (default)</message>
+	<message key="xmlui.administrative.item.AddBitstreamForm.bundle.METADATA">Metadata Files</message>
+	<message key="xmlui.administrative.item.AddBitstreamForm.bundle.THUMBNAIL">Thumbnails</message>
+	<message key="xmlui.administrative.item.AddBitstreamForm.bundle.LICENSE">Licenses</message>
+	<message key="xmlui.administrative.item.AddBitstreamForm.bundle.CC_LICENSE">Creative Commons Licenses</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.file_label">File</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.file_help">Please enter the name of the file on your computer corresponding to your item. If you click "Browse...", a new window will appear in which you can locate and select the file from your computer.</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.description_label">Description</message>
