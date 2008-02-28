@@ -1553,6 +1553,8 @@
 
 	<message key="xmlui.dri2xhtml.structural.search">Search DSpace</message>
 	<message key="xmlui.dri2xhtml.structural.search-advanced">Advanced Search</message>
+	<message key="xmlui.dri2xhtml.structural.search-in-community">This Community</message>
+	<message key="xmlui.dri2xhtml.structural.search-in-collection">This Collection</message>
 	
 	<message key="xmlui.dri2xhtml.structural.pagination-previous">Previous Page</message>
 	<message key="xmlui.dri2xhtml.structural.pagination-info">Now showing items {0}-{1} of {2}</message>
