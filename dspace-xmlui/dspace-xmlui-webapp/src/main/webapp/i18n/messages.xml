@@ -502,6 +502,8 @@
 	<message key="xmlui.Submission.general.workflow.head">Item submission</message>
 	<message key="xmlui.Submission.general.showfull">Show full item record</message>
 	<message key="xmlui.Submission.general.showsimple">Show simple item record</message>
+	<message key="xmlui.Submission.general.default.title">Submission</message>
+	<message key="xmlui.Submission.general.default.trail">Submission</message>
 	
 	<!-- org.dspace.app.xmlui.submission.CollectiovViewer -->
 	<message key="xmlui.Submission.CollectionViewer.link1">Submit a new item to this collection</message>

@@ -254,11 +254,33 @@
                 </xsl:attribute>
                 <span id="ds-header-logo">&#160;</span>
             </a>
-            <h1 class="pagetitle"><xsl:copy-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']/node()"/></h1>
+            <h1 class="pagetitle">
+            	<xsl:choose>
+            		<!-- protectiotion against an empty page title -->
+            		<xsl:when test="not(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title'])">
+            			<xsl:text> </xsl:text>
+            		</xsl:when>
+            		<xsl:otherwise>
+            			<xsl:copy-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']/node()"/>
+            		</xsl:otherwise>
+            	</xsl:choose>
+            		
+            </h1>
             <h2 class="static-pagetitle"><i18n:text>xmlui.dri2xhtml.structural.head-subtitle</i18n:text></h2>
+            
+            
             <ul id="ds-trail">
-                <xsl:apply-templates select="/dri:document/dri:meta/dri:pageMeta/dri:trail"/>
+            	<xsl:choose>
+	            	<xsl:when test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail) = 0">
+	                	<li class="ds-trail-link first-link"> - </li>
+	                </xsl:when>
+	                <xsl:otherwise>
+	                	<xsl:apply-templates select="/dri:document/dri:meta/dri:pageMeta/dri:trail"/>
+	                </xsl:otherwise>
+                </xsl:choose>
             </ul>
+           
+            
             <xsl:choose>
                 <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
                     <div id="ds-user-box">
