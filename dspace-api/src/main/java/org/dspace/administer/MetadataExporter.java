@@ -15,7 +15,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.xml.serialize.EncodingInfo;
-import org.apache.xml.serialize.Encodings;
 import org.apache.xml.serialize.Method;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.Serializer;
