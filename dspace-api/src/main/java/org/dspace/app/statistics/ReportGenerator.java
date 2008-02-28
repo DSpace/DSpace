@@ -89,19 +89,19 @@ public class ReportGenerator
     /////////////////
     
     /** aggregator for all actions performed in the system */
-    private static Map actionAggregator = new HashMap();
+    private static Map actionAggregator;
     
     /** aggregator for all searches performed */
-    private static Map searchAggregator = new HashMap();
+    private static Map searchAggregator;
     
     /** aggregator for user logins */
-    private static Map userAggregator = new HashMap();
+    private static Map userAggregator;
     
     /** aggregator for item views */
-    private static Map itemAggregator = new HashMap();
+    private static Map itemAggregator;
     
     /** aggregator for current archive state statistics */
-    private static Map archiveStats = new HashMap();
+    private static Map archiveStats;
     
     
     //////////////////
@@ -148,7 +148,7 @@ public class ReportGenerator
     private static int warnings;
     
     /** the list of results to be displayed in the general summary */
-    private static List generalSummary = new ArrayList();
+    private static List generalSummary;
     
     //////////////////
     // regular expressions
@@ -165,7 +165,7 @@ public class ReportGenerator
    private static Calendar startTime = null;
    
    /** a map from log file action to human readable action */
-   private static Map actionMap = new HashMap();
+   private static Map actionMap = null;
    
     /////////////////
     // report generator config data
@@ -230,7 +230,7 @@ public class ReportGenerator
                 System.exit(0);
             }
         }
-        
+
         processReport(context, myFormat, myInput, myOutput, myMap);
     }
     
@@ -250,7 +250,18 @@ public class ReportGenerator
         throws Exception
     {
         startTime = new GregorianCalendar();
+             
+        /** instantiate aggregators */
+        actionAggregator = new HashMap();
+        searchAggregator = new HashMap();
+        userAggregator = new HashMap();
+        itemAggregator = new HashMap();
+        archiveStats = new HashMap();
+        actionMap = new HashMap();
         
+        /** instantite lists */
+        generalSummary = new ArrayList();
+                
         // set the parameters for this analysis
         setParameters(myFormat, myInput, myOutput, myMap);
         
@@ -637,7 +648,7 @@ public class ReportGenerator
         } 
         catch (IOException e) 
         {  
-            System.out.println("Failed to read input file");
+            System.out.println("Failed to read input file: " + input);
             System.exit(0);
         } 
         
@@ -738,7 +749,7 @@ public class ReportGenerator
             {
                 url = value;
             }
-            
+
             if (section.equals("item_lookup"))
             {
                 itemLookup = Integer.parseInt(value);

@@ -97,19 +97,19 @@ public class LogAnalyser
     /////////////////
 
     /** aggregator for all actions performed in the system */
-    private static Map actionAggregator = new HashMap();
+    private static Map actionAggregator;
 
     /** aggregator for all searches performed */
-    private static Map searchAggregator = new HashMap();
+    private static Map searchAggregator;
 
     /** aggregator for user logins */
-    private static Map userAggregator = new HashMap();
+    private static Map userAggregator;
 
     /** aggregator for item views */
-    private static Map itemAggregator = new HashMap();
+    private static Map itemAggregator;
 
     /** aggregator for current archive state statistics */
-    private static Map archiveStats = new HashMap();
+    private static Map archiveStats;
 
     /** warning counter */
     private static int warnCount = 0;
@@ -122,19 +122,19 @@ public class LogAnalyser
     //////////////////
 
     /** list of actions to be included in the general summary */
-    private static List generalSummary = new ArrayList();
+    private static List generalSummary;
 
     /** list of words not to be aggregated */
-    private static List excludeWords = new ArrayList();
+    private static List excludeWords;
 
     /** list of search types to be ignored, such as "author:" */
-    private static List excludeTypes = new ArrayList();
+    private static List excludeTypes;
 
     /** list of characters to be excluded */
-    private static List excludeChars = new ArrayList();
+    private static List excludeChars;
 
     /** list of item types to be reported on in the current state */
-    private static List itemTypes = new ArrayList();
+    private static List itemTypes;
 
     /** bottom limit to output for search word analysis */
     private static int searchFloor;
@@ -346,11 +346,22 @@ public class LogAnalyser
         // together in a single aggregating object
 
         // if the timer has not yet been started, then start it
-        if (startTime != null)
-        {
-            startTime = new GregorianCalendar();
-        }
+        startTime = new GregorianCalendar();
+                
+        //instantiate aggregators
+        actionAggregator = new HashMap();
+        searchAggregator = new HashMap();
+        userAggregator = new HashMap();
+        itemAggregator = new HashMap();
+        archiveStats = new HashMap();
 
+        //instantiate lists
+        generalSummary = new ArrayList();
+        excludeWords = new ArrayList();
+        excludeTypes = new ArrayList();
+        excludeChars = new ArrayList();
+        itemTypes = new ArrayList();
+              
         // set the parameters for this analysis
         setParameters(myLogDir, myFileTemplate, myConfigFile, myOutFile, myStartDate, myEndDate, myLookUp);
 
@@ -531,15 +542,13 @@ public class LogAnalyser
             archiveStats.put(itemTypes.get(i), getNumItems(context, (String) itemTypes.get(i)));
         }
 
-        // now do the host lookup
-        try
+        // now do the host name and url lookup
+        hostName = ConfigurationManager.getProperty("dspace.hostname").trim();
+        name = ConfigurationManager.getProperty("dspace.name").trim();
+        url = ConfigurationManager.getProperty("dspace.url").trim();
+        if ((url != null) && (!url.endsWith("/")))
         {
-            InetAddress addr = InetAddress.getLocalHost();
-            hostName = addr.getHostName();
-        }
-        catch (UnknownHostException e)
-        {
-            hostName = "unknown host";
+                url = url + "/";
         }
 
         // do the average views analysis
@@ -763,6 +772,7 @@ public class LogAnalyser
         {
             BufferedWriter out = new BufferedWriter(new FileWriter(outFile));
             out.write(summary.toString());
+            out.flush();
             out.close();
         }
         catch (IOException e)
@@ -906,7 +916,7 @@ public class LogAnalyser
         }
         catch (IOException e)
         {
-            System.out.println("Failed to read config file");
+            System.out.println("Failed to read config file: " + configFile);
             System.exit(0);
         }
 
@@ -970,16 +980,6 @@ public class LogAnalyser
                 if (key.equals("user.email"))
                 {
                     userEmail = value;
-                }
-
-                if (key.equals("host.url"))
-                {
-                    url = value;
-                }
-
-                if (key.equals("host.name"))
-                {
-                    name = value;
                 }
             }
         }
