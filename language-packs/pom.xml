@@ -60,12 +60,26 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/language-packs</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/language-packs</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/language-packs</url>
+      <connection>
+         scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/language-packs
+      </connection>
+      <developerConnection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/language-packs
+      </developerConnection>
+      <url>
+         http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/language-packs
+      </url>
    </scm>
 
    <build>
+      <resources>
+         <resource>
+            <directory>src/main/resources</directory>
+            <excludes>
+               <exclude>**/*.properties.UTF-8</exclude>
+            </excludes>
+         </resource>
+      </resources>
       <plugins>
          <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
