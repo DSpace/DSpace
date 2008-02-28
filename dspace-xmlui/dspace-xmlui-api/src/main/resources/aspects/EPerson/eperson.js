@@ -112,6 +112,7 @@ function doRegister()
             }
             
             email = cocoon.request.getParameter("email");
+            email = email.toLowerCase(); // all emails should be lowercase
             var epersonFound = (EPerson.findByEmail(getDSContext(),email) != null);
             
             if (epersonFound) 
