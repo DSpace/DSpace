@@ -12,16 +12,6 @@
       <url>http://www.dspace.org</url>
    </organization>
 
-   <modules>
-      <module>language-packs</module>
-      <module>dspace-api</module>
-      <module>dspace-jspui</module>
-      <module>dspace-xmlui</module>
-      <module>dspace-lni</module>
-      <module>dspace-oai</module>
-      <module>dspace-sword</module>
-   </modules>
-
    <build>
       <plugins>
          <!-- 
