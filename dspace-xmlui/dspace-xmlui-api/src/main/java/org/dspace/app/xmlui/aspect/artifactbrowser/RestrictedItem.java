@@ -56,6 +56,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -171,14 +172,15 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
         	else
         	{
         		String identifier = "unknown";
-        		String handle = dso.getHandle();
+
+        		String handle = IdentifierService.getCanonicalForm(dso);
             	if (handle == null || "".equals(handle))
             	{
             		identifier =  "internal ID: " + dso.getID();
             	}
             	else
             	{
-            		identifier = "hdl:"+handle;
+            		identifier = handle;
             	}
         		unauthorized.setHead(T_head_item);
                 unauthorized.addPara(T_para_item.parameterize(identifier));

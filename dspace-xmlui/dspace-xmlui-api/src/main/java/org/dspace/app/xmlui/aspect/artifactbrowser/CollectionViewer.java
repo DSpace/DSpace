@@ -52,6 +52,7 @@ import org.dspace.app.xmlui.cocoon.DSpaceFeedGenerator;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -128,12 +129,12 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     {
         try
         {
-            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+            DSpaceObject dso = URIUtil.resolve(objectModel);
 
             if (dso == null)
                 return "0";
                 
-            return HashUtil.hash(dso.getHandle());
+            return HashUtil.hash(IdentifierService.getCanonicalForm(dso));
         }
         catch (SQLException sqle)
         {
@@ -156,7 +157,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     	{
 	        try
 	        {
-	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+	            DSpaceObject dso = URIUtil.resolve(objectModel);
 	
 	            if (dso == null)
 	                return null;
@@ -195,7 +196,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
         if (!(dso instanceof Collection))
             return;
 
@@ -221,7 +222,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 				
 				String feedFormat = parts[0].trim()+"+xml";
 					
-				String feedURL = contextPath+"/feed/"+format.trim()+"/"+collection.getHandle();
+				String feedURL = IdentifierService.getURL(collection).toString() + "/"+format.trim();
 				pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
 			}
 		}
@@ -233,7 +234,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
         if (!(dso instanceof Collection))
             return;
 
@@ -251,7 +252,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 
             // Search query
             Division query = search.addInteractiveDivision("collection-search",
-                    contextPath + "/handle/" + collection.getHandle() + "/search", 
+                    IdentifierService.getURL(collection).toString() + "/search",
                     Division.METHOD_POST, "secondary search");
             
             Para para = query.addPara("search-query", null);
@@ -266,7 +267,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             List browse = browseDiv.addList("collection-browse", List.TYPE_SIMPLE,
                     "collection-browse");
             browse.setHead(T_head_browse);
-            String url = contextPath + "/handle/" + collection.getHandle();
+            String url = IdentifierService.getURL(collection).toString();
             browse.addItemXref(url + "/browse?type=title",T_browse_titles);
             browse.addItemXref(url + "/browse?type=author",T_browse_authors);
             browse.addItemXref(url + "/browse?type=dateissued",T_browse_dates);

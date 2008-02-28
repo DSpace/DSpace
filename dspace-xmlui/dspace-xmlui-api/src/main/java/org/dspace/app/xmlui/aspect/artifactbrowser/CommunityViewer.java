@@ -52,6 +52,7 @@ import org.dspace.app.xmlui.cocoon.DSpaceFeedGenerator;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -135,12 +136,12 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
      */
     public Serializable getKey() {
         try {
-            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+            DSpaceObject dso = URIUtil.resolve(objectModel);
             
             if (dso == null)
                 return "0"; // no item, something is wrong
             
-            return HashUtil.hash(dso.getHandle());
+            return HashUtil.hash(IdentifierService.getCanonicalForm(dso));
         } 
         catch (SQLException sqle)
         {
@@ -161,7 +162,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
     	if (this.validity == null)
     	{
 	        try {
-	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+	            DSpaceObject dso = URIUtil.resolve(objectModel);
 	            
 	            if (dso == null)
 	                return null;
@@ -211,7 +212,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
         if (!(dso instanceof Community))
             return;
 
@@ -237,7 +238,8 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 				
 				String feedFormat = parts[0].trim()+"+xml";
 					
-				String feedURL = contextPath+"/feed/"+format.trim()+"/"+community.getHandle();
+				// theres a problem here, the url for the feed has the format further in.	
+				String feedURL = IdentifierService.getURL(community).toString() +"/"+format.trim();
 				pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
 			}
 		}
@@ -251,7 +253,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             UIException, SQLException, IOException, AuthorizeException
     {
 
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
         if (!(dso instanceof Community))
             return;
 
@@ -271,7 +273,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 
             // Search query
             Division query = search.addInteractiveDivision("community-search",
-                    contextPath + "/handle/" + community.getHandle() + "/search", 
+                    IdentifierService.getURL(community).toString() + "/search",
                     Division.METHOD_POST, "secondary search");
             
             Para para = query.addPara("search-query", null);
@@ -286,7 +288,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             List browse = browseDiv.addList("community-browse", List.TYPE_SIMPLE,
                     "community-browse");
             browse.setHead(T_head_browse);
-            String url = contextPath + "/handle/" + community.getHandle();
+            String url = IdentifierService.getURL(community).toString();
             browse.addItemXref(url + "/browse?type=title",T_browse_titles);
             browse.addItemXref(url + "/browse?type=author",T_browse_authors);
             browse.addItemXref(url + "/browse?type=dateissued",T_browse_dates);
