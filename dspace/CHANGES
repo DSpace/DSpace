@@ -16,6 +16,8 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 - S.F. Patch 1670093 More stable metadata and schema registry import
 - Option to generate community and collection "strength" as a batch job
 - S.F. Patch 1659868 Improved database level debugging
+- Option to generate community and collection "strength" as a batch job
+- S.F. Patch 1659868 Improved database level debugging
 
 (Richard Jones / Graham Triggs)
 - New Browse code that allows customisation of the available indexes via dspace.cfg,
@@ -71,10 +73,13 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 - Removal of message for Netscape users in choose-file.jsp + removal of supporting text and images in the help file
 - SF Patch #1591871 Docs for google and html sitemaps
 - SF Patch #1799575 New EPersonConsumer event consumer
+- SF Patch #1642563 bin/update-handle-prefix rewritten in Java
+- Updated upgrade instructions to include new crosswalk files for SWORD and metadata in html head
 
-(Chris yates)
+(Chris Yates)
 - SF Patch #1724330 Removes "null" being displayed in community-home.jsp
 - SF Patch #1763535 Alert DSpace administrator of new user registration
+- SF Patch #1888652 Statistics Rewritten In Java
 
 (Robert Tansley / Stuart Lewis)
 - SF Patch #1587225 Google and html sitemap generator

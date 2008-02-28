@@ -17,7 +17,7 @@
  <!-- which does not appear in this map will be associated with the mapping-->
  <!-- for handle "default".                                                -->
  <submission-map>
-   <name-map collection-uri="default" submission-name="traditional" />
+   <name-map collection-handle="default" submission-name="traditional" />
  </submission-map>
 
 
@@ -223,3 +223,4 @@
  </submission-definitions>
 
 </item-submission>
+

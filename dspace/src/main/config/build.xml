@@ -175,7 +175,7 @@ Common usage:
  ${dspace.dir}/lib was backed up to
 			
  ${dspace.dir}/lib.bak-${build.date}
-			
+
  ${dspace.dir}/etc was backed up to
 			
  ${dspace.dir}/etc.bak-${build.date}
@@ -226,7 +226,7 @@ Common usage:
    UI web applications from ${dspace.dir}/webapps/, then you
    can jump straight to restarting your Web servlet container
 
- * Otherwise, you will need to copy any web applications from 
+ * Otherwise, you will need to copy any web applications from
    ${dspace.dir}/webapps/ to the appropriate place for your servlet 
    container.  (e.g. '$CATALINA_HOME/webapps' for Tomcat)
 
@@ -364,8 +364,17 @@ Common usage:
             <sysproperty key="dspace.configuration" value="${config}"/>
 		    <arg line="-f ${dspace.dir}/config/registries/dublin-core-types.xml"/>
 		</java>
-		
-	</target>
+
+        <!-- FIXME: this should be more modular -->
+        <!-- import the SWORD required metadata -->
+        <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties"/>
+			<sysproperty key="dspace.log.init.disable" value="true"/>
+            <sysproperty key="dspace.configuration" value="${config}"/>
+		    <arg line="-f ${dspace.dir}/config/registries/sword-metadata.xml"/>
+		</java>
+
+    </target>
 
 
 	<!-- ============================================================= -->

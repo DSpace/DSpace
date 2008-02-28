@@ -112,7 +112,7 @@
          <dc-qualifier>ispartofseries</dc-qualifier>
          <repeatable>true</repeatable>
          <label>Series/Report No.</label>
-         <input-type>twobox</input-type>
+         <input-type>series</input-type>
          <hint>Enter the series and number assigned to this item by your community.</hint>
          <required></required>
        </field>

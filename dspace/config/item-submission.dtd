@@ -11,7 +11,7 @@
  
  <!ELEMENT name-map EMPTY >
  <!ATTLIST name-map 
-           collection-uri CDATA #REQUIRED
+           collection-handle CDATA #REQUIRED
            submission-name NMTOKEN #REQUIRED>
 
  <!-- 'step-definitions' must contain at least one 'step' node -->
@@ -33,3 +33,4 @@
  
  <!ELEMENT submission-process (step+)>
  <!ATTLIST submission-process name NMTOKEN #REQUIRED>
+

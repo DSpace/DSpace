@@ -10,7 +10,7 @@
 
     <P>Authors: Robert Tansley, Mick Bass, Margret Branschofsky, Grace Carpenter, Greg McClellan, David Stuve, and others</P>
 
-    <P>For DSpace Version: <strong>1.4.1</strong> (8-December-2006)</P>
+    <P>For DSpace Version: <strong>1.5</strong> (January-2008)</P>
 
     <P><small>Documentation for other versions of DSpace are included with the source code.</small></P>
 
@@ -56,6 +56,7 @@
       </LI>
       <LI><A HREF="update.html">Updating a DSpace Installation</A>
         <UL>
+          <LI><A HREF="update.html#142_15">Updating from 1.4.2 to 1.5</A></LI>
           <LI><A HREF="update.html#14_141">Updating From 1.4 to 1.4.1</A></LI>
           <LI><A HREF="update.html#132_14">Updating From 1.3.x to 1.4.x</A></LI>
           <LI><A HREF="update.html#131_132">Updating From 1.3.1 to 1.3.2</A></LI>
@@ -67,42 +68,55 @@
           <LI><A HREF="update.html#101_11">Updating From 1.0.1 to 1.1</A></LI>
         </UL>
       </LI>
-      <LI><A HREF="configure.html">Configuration and Customization</A>
+      <LI><A HREF="configure.html">Configuration and Customization</A></LI>
         <UL>
-          <LI><A HREF="configure.html#dspacecfg">The <code>dspace.cfg</code> Configuration Properties File</A></LI>
-          <LI><A HREF="configure.html#email">Wording of E-mail Messages</A></LI>
-          <LI><A HREF="configure.html#registries">The Metadata and Bitstream Format Registries</A></LI>
-          <LI><A HREF="configure.html#license">The Default Submission License</A></LI>
-          <LI><A HREF="configure.html#crosswalks">Activating Additional OAI-PMH Crosswalks</A></LI>
-          <LI><A HREF="configure.html#templates">Configuration Files for Other Applications</A></LI>
-          <LI><A HREF="configure.html#customui">Customizing the Web User Interface</A></LI>
-          <LI><A HREF="configure.html#customsimpleitem">Customizing the Simple Item Display Metadata</A></LI>
-          <LI><A href="configure.html#browse">Browse Configuration</A></LI>
-          <LI><A href="configure.html#browse-index">Browse Index Creation</A></LI>
-          <LI><A HREF="configure.html#multilingualui">Multilingual User Interface</A></LI>
-          <li><a href="configure.html#mydspacegroupmembership">MyDSpace Display of Group Memberships</li>
-          <LI><A HREF="configure.html#authenticate">Custom Authentication Code</A></LI>
-          <li><a href="configure.html#ipauthentication">Configuring IP Authentication</a></li>
-          <LI><A HREF="configure.html#ldap">Configuring LDAP Authentication</A></LI>
-          <LI><A HREF="configure.html#search-index">Configuring Lucene Search Indexes</A></LI>
-          <LI><A HREF="configure.html#statistics">Configuring System Statistical Reports</A></LI>
-          <LI><A HREF="configure.html#mediafilters">Configuring MediaFilters</A></LI>
-          <LI><A HREF="configure.html#preview">Displaying Image Item Preview</A></LI>
-          <LI><A HREF="configure.html#webuithumbs">Displaying Image Thumbnails</A></LI>
-          <LI><A HREF="configure.html#strengths">Displaying Community and Collection Item Counts</A></LI>
-          <LI><A HREF="configure.html#luceneanalyzer">Lucene Analyzer</A></LI>
-	   <li><a href="configure.html#formathelp">On-line Help About File Formats</a></li>
-	   <li><a href="configure.html#viewlicence">View Item Licence</a></li>
-           <li><a href="configure.html#syndication">Configuring RSS Syndication</a></li>
-           <li><a href="configure.html#suggest">Configuring Item Recommendations</a></li>
-	   <li><a href="configure.html#controlledvocabulary">Configuring Controlled Vocabularies</a></li>
-	   <li><a href="configure.html#checker">Configuring the checksum checker</a></li>
-           <li><a href="configure.html#packager">Configuring Packager Plugins</a></li>
-           <li><a href="configure.html#crosswalk">Configuring Crosswalk Plugins</a></li>
-		   <LI><A HREF="submission.html">Customizing Submission Process and Metadata Entry</A></LI>
-
+          <LI><A HREF="configure.html#general">General Configuration</A></LI>
+            <UL>
+              <LI><A HREF="configure.html#general-dspacecfg">dspace.cfg</A></LI>
+              <LI><A HREF="configure.html#general-search">Search Indexes</A></LI>
+              <LI><A HREF="configure.html#general-browse">Browse Configuration<A></li>
+              <LI><A HREF="configure.html#general-mediafilter">Configuring Media Filters</A></LI>
+              <LI><A HREF="configure.html#general-email">Email Messages</A></LI>
+              <LI><A HREF="configure.html#general-registries">Metadata and Bitstream Format Registries</A></LI>
+              <LI><A HREF="configure.html#general-license">Default Submission License</A></LI>
+              <LI><A HREF="submission.html">Submission Configuration</A>
+              	  <UL>
+              	    <li><a href="submission.html#configurationFile">Understanding the Submission Configuration File</a></li>
+      				<li><a href="submission.html#stepOrdering">Reordering/Removing Submission Steps</a></li>
+     				<li><a href="submission.html#collectionSubmission">Assigning a custom Submission Process to a Collection</a></li>
+      				<li><a href="submission.html#metadataEntry">Customizing the Metadata-entry pages</a></li>
+      				<li><a href="submission.html#uploadStep">Configuring the File Upload step</a></li>
+      				<li><a href="submission.html#createStep">Creating new Submission Steps</a></li>
+              	  </UL>
+              </LI>
+            </UL>
+          <LI><A HREF="configure.html#xmlui">XMLUI Interface Customizations (Manakin)</A>
+            <UL>
+          	  <LI><A HREF="configure.html#xmlui-dspacecfg">dspace.cfg</A></LI>
+          	  <LI><A HREF="configure.html#xmlui-configure">Configuring Themes and Aspects</A></LI>
+          	  <LI><A HREF="configure.html#xmlui-multilingual">Multilingual Support</A></LI>
+          	  <LI><A HREF="configure.html#xmlui-newtheme">Creating a New Theme</A></LI>
+          	</UL>
+          <LI><A HREF="configure.html#jspui">JSPUI Interface Customizations</A></LI>
+            <UL>
+          	  <LI><A HREF="configure.html#jspui-dspacecfg">dspace.cfg</A></LI>
+          	  <LI><A HREF="configure.html#jspui-controlledvocabulary">Configuring Controlled Vocabularies</A></LI>
+          	  <LI><A HREF="configure.html#jspui-multilingual">Configuring Multilingual Support</A></LI>
+          	  <LI><A HREF="configure.html#jspui-jsp">Customizing the JSP Pages</A></LI>
+          	</UL>	
+          <LI><A HREF="configure.html#advanced">Advanced DSpace Customizations</A></LI>
+            <UL>
+              <LI><A HREF="configure.html#checksum">Checksum Checker</A></LI>
+          	  <LI><A HREF="configure.html#authentication">Custom Authentication</A></LI>
+          	  <LI><A HREF="configure.html#statistics">Configuring Statistical Reports</A></LI>
+          	  <LI><A HREF="configure.html#oai">Activating Additional OAI-PMH Crosswalks</A></LI>
+          	  <LI><A HREF="configure.html#packager">Configuring Packager Plugins</A></LI>
+          	  <LI><A HREF="configure.html#crosswalk">Configuring Crosswalk Plugins</A></LI>
+          	  <LI><A HREF="configure.html#mediafilters">Creating new Media/Format Filters</A></LI>
+ 			  <LI><A HREF="configure.html#templates">Configuration Files for Other Applications</A></LI>
+			  <LI><A HREF="configure.html#browse-index">Browse Index Creation</A></LI>
+          	</UL>
         </UL>
-      </LI>
       <LI><A HREF="directories.html">Directories and Files</A>
         <UL>
           <LI><A HREF="directories.html#sourcedir">Source Directory Layout</A></LI>
@@ -153,6 +167,7 @@
       </LI>
       <LI><A HREF="history.html">Version History</A>
         <UL>
+          <LI><A HREF="history.html#version1_5">Changes in DSpace 1.5</A><LI>
           <LI><A HREF="history.html#version1_4_1">Changes in DSpace 1.4.1</A></LI>
           <LI><A HREF="history.html#version1_4">Changes in DSpace 1.4</A></LI>
           <LI><A HREF="history.html#version1_3_2">Changes in DSpace 1.3.2</A></LI>
@@ -175,7 +190,7 @@
     <HR>
 
     <ADDRESS>
-      Copyright &copy; 2002-2006 MIT and Hewlett Packard
+      Copyright &copy; 2002-2008 The DSpace Foundation 
     </ADDRESS>
   </BODY>
 </HTML>

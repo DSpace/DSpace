@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace</groupId>
    <artifactId>dspace</artifactId>
@@ -19,7 +16,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>SNAPSHOT</version>
+      <version>1.5-SNAPSHOT</version>
    </parent>
 
    <repositories>
@@ -60,13 +57,9 @@
    	into the snapshot repository below.
    -->
    <scm>
-   	<connection>
-   		scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace
-   	</connection>
-   	<developerConnection>
-   		scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace
-   	</developerConnection>
-   	<url>http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace</url>
+   	<connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace</connection>
+   	<developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace</developerConnection>
+   	<url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace</url>
    </scm>
 
    <profiles>
@@ -123,7 +116,7 @@
          Builds OAI Gateway WAR for DSpace
       -->
       <profile>
-         <id>oai-api</id>
+         <id>dspace-oai-api</id>
          <activation>
             <file>
                <exists>../dspace-oai-api/pom.xml</exists>
@@ -138,7 +131,7 @@
          Builds OAI Gateway WAR for DSpace
       -->
       <profile>
-         <id>oai-webapp</id>
+         <id>dspace-oai-webapp</id>
          <activation>
             <file>
                <exists>../dspace-oai-webapp/pom.xml</exists>
@@ -153,7 +146,7 @@
          Builds OAI Gateway WAR for DSpace
       -->
       <profile>
-         <id>oai</id>
+         <id>dspace-oai</id>
          <activation>
             <file>
                <exists>../dspace-oai/pom.xml</exists>
@@ -169,7 +162,7 @@
       -->
       <profile>
 
-         <id>jspui-api</id>
+         <id>dspace-jspui-api</id>
          <activation>
             <file>
                <exists>../dspace-jspui-api/pom.xml</exists>
@@ -185,7 +178,7 @@
       -->
       <profile>
 
-         <id>jspui-webapp</id>
+         <id>dspace-jspui-webapp</id>
          <activation>
             <file>
                <exists>../dspace-jspui-webapp/pom.xml</exists>
@@ -201,7 +194,7 @@
       -->
       <profile>
 
-         <id>jspui</id>
+         <id>dspace-jspui</id>
          <activation>
             <file>
                <exists>../dspace-jspui/pom.xml</exists>
@@ -212,11 +205,59 @@
          </modules>
       </profile>
 
+       <!--
+         Builds SWORD WAR for DSpace
+      -->
+      <profile>
+
+         <id>dspace-sword-api</id>
+         <activation>
+            <file>
+               <exists>../dspace-sword-api/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-sword-api</module>
+         </modules>
+      </profile>
+
+      <!--
+         Builds SWORD WAR for DSpace
+      -->
+      <profile>
+
+         <id>dspace-sword-webapp</id>
+         <activation>
+            <file>
+               <exists>../dspace-sword-webapp/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-sword-webapp</module>
+         </modules>
+      </profile>
+
+      <!--
+         Builds SWORD WAR for DSpace
+      -->
+      <profile>
+
+         <id>dspace-sword</id>
+         <activation>
+            <file>
+               <exists>../dspace-sword/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-sword</module>
+         </modules>
+      </profile>
+
       <!-- 
          Builds each separate XMLUI module for the XMLUI war (for development/Eclipse)
       -->
       <profile>
-         <id>xmlui-api</id>
+         <id>dspace-xmlui-api</id>
          <activation>
             <file>
                <exists>../dspace-xmlui-api/pom.xml</exists>
@@ -228,7 +269,7 @@
       </profile>
 
       <profile>
-         <id>xmlui-wing</id>
+         <id>dspace-xmlui-wing</id>
          <activation>
             <file>
                <exists>../dspace-xmlui-wing/pom.xml</exists>
@@ -240,7 +281,7 @@
       </profile>
 
       <profile>
-         <id>xmlui-webapp</id>
+         <id>dspace-xmlui-webapp</id>
          <activation>
             <file>
                <exists>../dspace-xmlui-webapp/pom.xml</exists>
@@ -251,11 +292,23 @@
          </modules>
       </profile>
 
+      <profile>
+         <id>dspace-xmlui-lang</id>
+         <activation>
+            <file>
+               <exists>../dspace-xmlui-lang/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-xmlui-lang</module>
+         </modules>
+      </profile>
+      
       <!-- 
          Builds XMLUI WAR for DSpace
       -->
       <profile>
-         <id>xmlui</id>
+         <id>dspace-xmlui</id>
          <activation>
             <file>
                <exists>../dspace-xmlui/pom.xml</exists>
@@ -270,7 +323,7 @@
          Builds each separate LNI module for the LNI war (for development/Eclipse)
       -->
       <profile>
-         <id>lni-core</id>
+         <id>dspace-lni-core</id>
          <activation>
             <file>
                <exists>../dspace-lni-core/pom.xml</exists>
@@ -282,7 +335,7 @@
       </profile>
 
       <profile>
-         <id>lni-webapp</id>
+         <id>dspace-lni-webapp</id>
          <activation>
             <file>
                <exists>../dspace-lni-webapp/pom.xml</exists>
@@ -294,7 +347,7 @@
       </profile>
       
       <profile>
-         <id>lni-client</id>
+         <id>dspace-lni-client</id>
          <activation>
             <file>
                <exists>../dspace-lni-client/pom.xml</exists>
@@ -309,7 +362,7 @@
          Builds LNI WAR for DSpace
       -->
       <profile>
-         <id>lni</id>
+         <id>dspace-lni</id>
          <activation>
             <file>
                <exists>../dspace-lni/pom.xml</exists>
@@ -407,53 +460,4 @@
          </properties>
       </profile>
 
-      <profile>
-         <id>oracle-support</id>
-         <activation>
-            <property>
-               <name>db.name</name>
-               <value>oracle</value>
-            </property>
-         </activation>
-         <dependencies>
-            <dependency>
-               <groupId>com.oracle</groupId>
-               <artifactId>ojdbc14</artifactId>
-            </dependency>
-         </dependencies>
-      </profile>
-   </profiles>
-
-   <build>
-      <plugins>
-         <!--  overall project assembly -->
-         <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <configuration>
-               <descriptors>
-                  <descriptor>src/assemble/assembly.xml</descriptor>
-               </descriptors>
-            </configuration>
-            <executions>
-               <execution>
-                  <phase>package</phase>
-                  <goals>
-                     <goal>directory-single</goal>
-                  </goals>   
-               </execution>
-            </executions>
-         </plugin>
-      </plugins>
-   </build>
-
-   <dependencies>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-api</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>language-packs</artifactId>
-      </dependency>
-   </dependencies>
 </project>

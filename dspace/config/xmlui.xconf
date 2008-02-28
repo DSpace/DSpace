@@ -68,7 +68,7 @@
             This aspect tests the various possible DRI features, 
             it helps a theme developer create themes 
         -->
-        <!-- <aspect name="XML Tests" path="XMLTest/"/> -->
+        <!-- <aspect name="XML Tests" path="resource://aspects/XMLTest/"/> -->
     </aspects>
 
     <!--
