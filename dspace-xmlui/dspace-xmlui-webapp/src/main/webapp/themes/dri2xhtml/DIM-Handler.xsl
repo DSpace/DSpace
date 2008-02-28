@@ -391,8 +391,16 @@
                 <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-title</i18n:text>: </span></td>
                 <td>
                     <xsl:choose>
-                        <xsl:when test="dim:field[@element='title']">
-                            <xsl:value-of select="dim:field[@element='title'][1]/node()"/>
+                        <xsl:when test="count(dim:field[@element='title'][not(@qualifier)]) &gt; 1">
+                            <xsl:for-each select="dim:field[@element='title'][not(@qualifier)]">
+                            	<xsl:value-of select="./node()"/>
+                            	<xsl:if test="count(following-sibling::dim:field[@element='title'][not(@qualifier)]) != 0">
+	                                    <xsl:text>; </xsl:text><br/>
+	                                </xsl:if>
+                            </xsl:for-each>
+                        </xsl:when>
+                         <xsl:when test="count(dim:field[@element='title'][not(@qualifier)]) = 1">
+                            <xsl:value-of select="dim:field[@element='title'][not(@qualifier)][1]/node()"/>
                         </xsl:when>
                         <xsl:otherwise>
                             <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
@@ -439,32 +447,70 @@
             <xsl:if test="dim:field[@element='description' and @qualifier='abstract']">
 	            <tr class="ds-table-row even">
 	                <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-abstract</i18n:text>:</span></td>
-	                <td><xsl:copy-of select="dim:field[@element='description' and @qualifier='abstract']/node()"/></td>
+	                <td>
+	                <xsl:if test="count(dim:field[@element='description' and @qualifier='abstract']) &gt; 1">
+	                	<hr class="metadata-seperator"/>
+	                </xsl:if>
+	                <xsl:for-each select="dim:field[@element='description' and @qualifier='abstract']">
+		                <xsl:copy-of select="./node()"/>
+		                <xsl:if test="count(following-sibling::dim:field[@element='description' and @qualifier='abstract']) != 0">
+	                    	<hr class="metadata-seperator"/>
+	                    </xsl:if>
+	              	</xsl:for-each>
+	              	<xsl:if test="count(dim:field[@element='description' and @qualifier='abstract']) &gt; 1">
+	                	<hr class="metadata-seperator"/>
+	                </xsl:if>
+	                </td>
 	            </tr>
             </xsl:if>
             <xsl:if test="dim:field[@element='description' and not(@qualifier)]">
 	            <tr class="ds-table-row odd">
 	                <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-description</i18n:text>:</span></td>
-	                <td><xsl:copy-of select="dim:field[@element='description' and not(@qualifier)]/node()"/></td>
+	                <td>
+	                <xsl:if test="count(dim:field[@element='description' and not(@qualifier)]) &gt; 1 and not(count(dim:field[@element='description' and @qualifier='abstract']) &gt; 1)">
+	                	<hr class="metadata-seperator"/>
+	                </xsl:if>
+	                <xsl:for-each select="dim:field[@element='description' and not(@qualifier)]">
+		                <xsl:copy-of select="./node()"/>
+		                <xsl:if test="count(following-sibling::dim:field[@element='description' and not(@qualifier)]) != 0">
+	                    	<hr class="metadata-seperator"/>
+	                    </xsl:if>
+	               	</xsl:for-each>
+	               	<xsl:if test="count(dim:field[@element='description' and not(@qualifier)]) &gt; 1">
+	                	<hr class="metadata-seperator"/>
+	                </xsl:if>
+	                </td>
 	            </tr>
             </xsl:if>
             <xsl:if test="dim:field[@element='identifier' and @qualifier='uri']">
 	            <tr class="ds-table-row even">
 	                <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-uri</i18n:text>:</span></td>
 	                <td>
-	                    <a>
-	                        <xsl:attribute name="href">
-	                            <xsl:copy-of select="dim:field[@element='identifier' and @qualifier='uri'][1]/node()"/>
-	                        </xsl:attribute>
-	                        <xsl:copy-of select="dim:field[@element='identifier' and @qualifier='uri'][1]/node()"/>
-	                    </a>
+	                	<xsl:for-each select="dim:field[@element='identifier' and @qualifier='uri']">
+		                    <a>
+		                        <xsl:attribute name="href">
+		                            <xsl:copy-of select="./node()"/>
+		                        </xsl:attribute>
+		                        <xsl:copy-of select="./node()"/>
+		                    </a>
+		                    <xsl:if test="count(following-sibling::dim:field[@element='identifier' and @qualifier='uri']) != 0">
+		                    	<br/>
+		                    </xsl:if>
+	                    </xsl:for-each>
 	                </td>
 	            </tr>
             </xsl:if>
             <xsl:if test="dim:field[@element='date' and @qualifier='issued']">
 	            <tr class="ds-table-row odd">
 	                <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-date</i18n:text>:</span></td>
-	                <td><xsl:copy-of select="substring(dim:field[@element='date' and @qualifier='issued']/node(),1,10)"/></td>
+	                <td>
+		                <xsl:for-each select="dim:field[@element='date' and @qualifier='issued']">
+		                	<xsl:copy-of select="substring(./node(),1,10)"/>
+		                	 <xsl:if test="count(following-sibling::dim:field[@element='date' and @qualifier='issued']) != 0">
+	                    	<br/>
+	                    </xsl:if>
+		                </xsl:for-each>
+	                </td>
 	            </tr>
             </xsl:if>
         </table>
