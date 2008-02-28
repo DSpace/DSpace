@@ -148,7 +148,6 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
         
         TextArea comments = form.addItem().addTextArea("comments");
         comments.setLabel(T_comments);
-        comments.setSize(5,60);
         comments.setValue(parameters.getParameter("comments",""));
         
         form.addItem().addButton("submit").setValue(T_submit);

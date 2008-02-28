@@ -1,0 +1,305 @@
+/* 
+  style-ie6.css
+
+  Version: $Revision: 1.18 $
+ 
+  Date: $Date: 2006/05/01 21:56:29 $
+ 
+  Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+  Institute of Technology.  All rights reserved.
+ 
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+ 
+  - Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+ 
+  - Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+ 
+  - Neither the name of the Hewlett-Packard Company nor the name of the
+  Massachusetts Institute of Technology nor the names of their
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+ 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+  DAMAGE.
+
+Kubrick theme's cascading stylesheet for ie 6 only
+
+*/
+
+#page
+{
+    background-position:center;
+}
+
+
+
+
+
+
+/* Styles for the header */
+#ds-header {
+    height:140px;
+    margin:0pt 0pt 0pt 1px;
+    padding:0px;
+    width:958px;  
+}
+#ds-user-box
+{
+    position: relative;
+    left: 70px;
+    top: -92px;
+}
+#ds-header ul#ds-trail
+{
+    position: relative;
+    top: 41px;
+}
+#ds-header h2
+{
+    margin: 0;
+    padding: 0;
+    position: relative;
+    left: 20px;
+    top: 40px;
+}
+/*
+#header h2
+{
+    margin: 0;
+    padding: 0;
+    position: relative;
+    left: 20px;
+    top: 28px;
+}
+*/
+
+
+
+
+
+/*Style for the main content area*/
+div#content
+{
+    margin-left: 20px;
+     float: left;
+}
+
+
+
+
+
+
+/*Style for the search/navigation box within communities and collections */
+#aspect_artifactbrowser_CommunityViewer_div_community-search-browse
+{
+    overflow: hidden;
+}
+.advanced-search
+{
+    top: -140px;
+}
+#aspect_artifactbrowser_CommunityViewer_div_community-browse,
+#aspect_artifactbrowser_CollectionViewer_div_collection-browse
+{
+    overflow: hidden;
+    width: 145px;
+    top: -99px;
+    left: 416px;
+}
+#aspect_artifactbrowser_CommunityViewer_div_community-search
+{
+    /*height: 106px;*/
+}
+#aspect_artifactbrowser_CommunityViewer_list_community-browse,
+#aspect_artifactbrowser_CollectionViewer_list_collection-browse
+{
+    position: relative;
+    top: -10px;
+}
+
+
+
+
+
+
+
+/* Style for the tabs on the control panel */
+#aspect_administrative_ControlPanel_list_options
+{
+    top: -40px;
+}
+
+
+
+
+
+/* the checkboxes on the Initial Questions of item submission */
+fieldset#aspect_submission_StepTransformer_field_multiple_titles 
+{   
+    position: absolute;
+    left: 177px;
+    top: 21px;
+}
+fieldset#aspect_submission_StepTransformer_field_published_before
+{
+    position: absolute;
+    left: 177px;
+    top: 60px;
+}
+
+
+
+/* getting rid of a superflous border on the first page of submission */
+fieldset#aspect_submission_StepTransformer_list_submit-initial-questions ol li
+{
+    border: none;
+}
+
+
+
+
+
+
+/* Styles for the buttons on item submission */
+ul.ds-progress-list #aspect_submission_StepTransformer_field_submit_jump_1_1
+{
+    width: 100px;
+}
+ul.ds-progress-list #aspect_submission_StepTransformer_field_submit_jump_2_1
+{
+	width: 60px;
+}
+ul.ds-progress-list #aspect_submission_StepTransformer_field_submit_jump_2_2
+{
+	width: 60px;	
+}
+ul.ds-progress-list #aspect_submission_StepTransformer_field_submit_jump_3_1
+{
+	width: 52px;
+}
+ul.ds-progress-list #aspect_submission_StepTransformer_field_submit_jump_4_1
+{
+	width: 52px;
+}
+ul.ds-progress-list #aspect_submission_StepTransformer_field_submit_jump_5_1
+{
+	width: 56px;
+}
+ul.ds-progress-list #aspect_submission_StepTransformer_field_submit_jump_6_1
+{
+	width: 68px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* Styles for the sidebar (navigation) */
+/*Style for the navigation sidebar*/
+div#sidebar
+{   
+    padding: 0px 0px 0px 5px;
+    margin: 0;
+    position: relative;
+    left: 74px;
+   
+    width: 245px;
+}
+#sidebar h3
+{
+    width: 246px;
+}
+#sidebar div,
+#sidebar form,
+#sidebar a,
+#sidebar li
+{
+    width: 230px;
+}
+
+
+
+
+
+
+
+/* Styles the footer */
+#footer
+{
+   margin-left: 41px;
+   line-height: 1;
+}
+
+
+
+
+
+
+
+
+/* Styles for labels in forms */
+span.ds-form-label,
+label.ds-form-label
+{
+    width: 120px;
+}
+
+
+
+
+
+/* Styles for the metadata sliders */
+div.item_metadata_slider span.bold, div.item_metadata_slider a
+{
+    font-size: 0.75em;
+}
+
+
+
+
+/* Styles for borders */
+	#artifactbrowser_CollectionViewer_div_collection-recent-submission ul, 
+	#artifactbrowser_BrowseTitles_div_browse-by-title-results ul, 
+	#artifactbrowser_BrowseAuthorItems_div_browse-by-author-item-results ul, 
+	#artifactbrowser_BrowseDates_div_browse-by-date-results ul, 
+	#artifactbrowser_SimpleSearch_div_search-results ul, 
+	#artifactbrowser_AdvancedSearch_div_search-results ul, 
+	#aspect_artifactbrowser_CollectionViewer_div_collection-recent-submission ul, 
+	#aspect_artifactbrowser_BrowseTitles_div_browse-by-title-results ul, 
+	#aspect_artifactbrowser_BrowseAuthorItems_div_browse-by-author-item-results ul, 
+	#aspect_artifactbrowser_BrowseDates_div_browse-by-date-results ul, 
+	#aspect_artifactbrowser_SimpleSearch_div_search-results ul, 
+	#aspect_artifactbrowser_AdvancedSearch_div_search-results ul, 
+	#org_tdl_dspace_filtersearch_FilterSearch_div_search-results ul {
+		border: none;
+	}
+	
+	.ds-static-div ul {
+		border: none;
+	}
+	
+	.ds-artifact-item, .ds-artifact-item-with-popup {
+		border: none;
+	}

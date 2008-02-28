@@ -70,6 +70,8 @@ import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
+import org.dspace.sort.SortOption;
+import org.dspace.sort.SortException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
@@ -407,6 +409,11 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         {
             // Create a clickable list of the alphabet
             List jumpList = jump.addList("jump-list", List.TYPE_SIMPLE, "alphabet");
+            
+            Map<String, String> zeroQuery = new HashMap<String, String>(queryParams);
+            zeroQuery.put(BrowseParams.STARTS_WITH, "0");
+            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, zeroQuery), "0-9");
+            
             for (char c = 'A'; c <= 'Z'; c++)
             {
                 Map<String, String> cQuery = new HashMap<String, String>(queryParams);
@@ -683,6 +690,11 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                     }
 
                     startsWith = params.year + "-" + params.month;
+
+                    if ("ASC".equals(params.scope.getOrder()))
+                    {
+                        startsWith = startsWith + "-32";
+                    }
                 }
 
                 params.scope.setStartsWith(startsWith);

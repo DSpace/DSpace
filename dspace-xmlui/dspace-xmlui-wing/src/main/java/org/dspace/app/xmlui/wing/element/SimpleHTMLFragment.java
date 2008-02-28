@@ -77,7 +77,9 @@ import org.xml.sax.helpers.NamespaceSupport;
  * p, a, b, i, u, ol, li and img. Each are translated into their DRI equivelents, note
  * the "h" tags are translated into a paragraph of rend=heading.
  * 
- * If the linkbreaks flag is set then line breaks are treated as paragraphs.
+ * If the linkbreaks flag is set then line breaks are treated as paragraphs. This 
+ * allows plain text files to also be included and they will be mapped into DRI as 
+ * well.
  * 
  * @author Scott Phillips
  * @author Jay Paz
@@ -477,11 +479,17 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 			List<Content> removed = new ArrayList<Content>();
 			for (int i = 0; i < parent.getContentSize(); i++) {
 				Content current = parent.getContent(i);
-
+				
 				if ((current instanceof Element)
 						&& ("p".equals(((Element) current).getName()))) {
 					// A paragraph is being open, combine anything up to this
 					// point into a paragraph.
+					if (paragraphWrap(parent, i, removed)) {
+						removed.clear();
+						i++; // account for the field added
+					}
+				} else if ((current instanceof Element)
+						&& ("list".equals(((Element) current).getName()))) {
 					if (paragraphWrap(parent, i, removed)) {
 						removed.clear();
 						i++; // account for the field added
@@ -492,6 +500,8 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 					// there are any in this text element.
 					if (this.blankLines && current instanceof Text) {
 						String rawText = ((Text) current).getText();
+						parent.removeContent(current);
+						i--;// account text field removed.
 
 						// Regular expressiot to split based upon blank lines.
 						// FIXME: This may not work for windows people who
@@ -502,22 +512,18 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 								.asList(rawText.split("\n\\s*\n")));
 
 						if (parts.size() > 0) {
-							Collections.reverse(parts);
-							String lastPart = parts.remove(0);
+							String lastPart = parts.remove(parts.size()-1);
 
 							for (String part : parts) {
 								removed.add(new Text(part));
 
-								if (paragraphWrap(parent, i, removed)) {
+								if (paragraphWrap(parent, i+1, removed)) {
 									removed.clear();
 									i++;// account for the field added
 								}
 							}
 
 							removed.add(new Text(lastPart));
-
-							parent.removeContent(current);
-							i--;// account text field removed.
 						}
 					} else {
 						removed.add(current);
@@ -670,3 +676,4 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 		}
 	}
 }
+ 

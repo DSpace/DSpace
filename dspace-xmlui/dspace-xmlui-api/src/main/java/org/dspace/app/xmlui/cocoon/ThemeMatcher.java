@@ -51,6 +51,7 @@ import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.ConfigurationManager;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -97,6 +98,50 @@ public class ThemeMatcher extends AbstractLogEnabled implements Matcher {
 			String uri = request.getSitemapURI();
 			DSpaceObject dso = URIUtil.resolve(objectModel);
 
+			
+			// Allow the user to override the theme configuration
+			if (ConfigurationManager.getBooleanProperty("xmlui.theme.allowoverrides",false))
+			{
+				String themePathOverride  = request.getParameter("themepath");
+				if (themePathOverride != null && themePathOverride.length() > 0)
+				{
+					// Allowing the user to specify the theme path is a security risk because it 
+					// allows the user to direct which sitemap is executed next. An attacker could 
+					// use this in combination with another attack execute code on the server. 
+					// Ultimately this option should not be turned on in a production system and 
+					// only used in development. However lets do some simple sanity checks to 
+					// protect us a little even when under development.
+					
+					// Allow: allow all letters and numbers plus periods (but not consecutive), 
+					// dashes, underscores, and forward slashes 
+					if (!themePathOverride.matches("^[a-zA-V0-9][a-zA-Z0-9/_\\-]*/?$")) {
+						
+						throw new IllegalArgumentException("The user specified theme path, \""+themePathOverride+"\", may be " +
+								"an exploit attempt. To use this feature please limit your theme paths to only letters " +
+								"(a-Z), numbers(0-9), dashes(-), underscores (_), and trailing forward slashes (/).");
+					}
+					
+					// The user is selecting to override a theme, ignore any set
+					// rules to apply and use the one specified.
+					String themeNameOverride = request.getParameter("themename");
+					String themeIdOverride = request.getParameter("themeid");
+					
+					if (themeNameOverride == null || themeNameOverride.length() == 0)
+						themeNameOverride = "User specified theme";
+					
+					getLogger().debug("User as specified to override theme selection with theme "+
+							"(name=\""+themeNameOverride+"\", path=\""+themePathOverride+"\", id=\""+themeIdOverride+"\")");
+					
+					Map<String, String> result = new HashMap<String, String>();
+					result.put("themeName", themeNameOverride);
+					result.put("theme", themePathOverride);
+					result.put("themeID", themeIdOverride);
+					
+					return result;
+				}
+			}
+			
+			
 			List<Theme> rules = XMLUIConfiguration.getThemeRules();
 			getLogger().debug("Checking if URL=" + uri + " matches any theme rules.");
 			for (Theme rule : rules) {

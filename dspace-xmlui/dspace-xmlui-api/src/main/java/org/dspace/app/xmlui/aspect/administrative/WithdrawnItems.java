@@ -70,6 +70,8 @@ import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
+import org.dspace.sort.SortOption;
+import org.dspace.sort.SortException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
@@ -478,9 +480,9 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                     }
                 }
             }
-            catch (SortException be)
+            catch (SortException se)
             {
-                throw new WingException("Unable to get sort options", be);
+                throw new WingException("Unable to get sort options", se);
             }
         }
 
@@ -658,6 +660,11 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                     }
 
                     startsWith = params.year + "-" + params.month;
+
+                    if ("ASC".equals(params.scope.getOrder()))
+                    {
+                        startsWith = startsWith + "-32";
+                    }
                 }
 
                 params.scope.setStartsWith(startsWith);

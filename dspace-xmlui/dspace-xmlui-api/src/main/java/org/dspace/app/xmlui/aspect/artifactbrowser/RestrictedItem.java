@@ -55,7 +55,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.uri.IdentifierService;
+import org.dspace.content.Item;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -78,11 +78,36 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
     private static final Message T_trail = 
         message("xmlui.ArtifactBrowser.RestrictedItem.trail");
 
-    private static final Message T_head = 
-        message("xmlui.ArtifactBrowser.RestrictedItem.head");
+    private static final Message T_head_resource = 
+        message("xmlui.ArtifactBrowser.RestrictedItem.head_resource");
     
-    private static final Message T_para = 
-        message("xmlui.ArtifactBrowser.RestrictedItem.para");
+    private static final Message T_head_community = 
+        message("xmlui.ArtifactBrowser.RestrictedItem.head_community");
+    
+    private static final Message T_head_collection = 
+        message("xmlui.ArtifactBrowser.RestrictedItem.head_collection");
+    
+    private static final Message T_head_item = 
+        message("xmlui.ArtifactBrowser.RestrictedItem.head_item");
+    
+    private static final Message T_head_bitstream = 
+        message("xmlui.ArtifactBrowser.RestrictedItem.head_bitstream");
+    
+    private static final Message T_para_resource = 
+        message("xmlui.ArtifactBrowser.RestrictedItem.para_resource");
+    
+    private static final Message T_para_community = 
+        message("xmlui.ArtifactBrowser.RestrictedItem.para_community");
+    
+    private static final Message T_para_collection = 
+        message("xmlui.ArtifactBrowser.RestrictedItem.para_collection");
+    
+    private static final Message T_para_item = 
+        message("xmlui.ArtifactBrowser.RestrictedItem.para_item");
+    
+    private static final Message T_para_bitstream = 
+        message("xmlui.ArtifactBrowser.RestrictedItem.para_bitstream");
+    
     
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
             WingException, UIException, SQLException, IOException,
@@ -106,58 +131,65 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
     	Request  request = ObjectModelHelper.getRequest(objectModel);
         DSpaceObject dso = URIUtil.resolve(objectModel);
         
-        String type = null;
-        String identifier = null;
+        Division unauthorized = body.addDivision("unauthorized-resource","primary");
+
         if (dso == null)
         {
-        	type = "resource";
-        	identifier = "unknown";
+            unauthorized.setHead(T_head_resource);
+            unauthorized.addPara(T_para_resource);
         } 
         else if (dso instanceof Community)
         {
         	Community community = (Community) dso;
-        	identifier = community.getMetadata("name");
-        	type = "community";
+        	unauthorized.setHead(T_head_community);
+            unauthorized.addPara(T_para_community.parameterize(community.getMetadata("name")));
         } 
         else if (dso instanceof Collection)
         {
         	Collection collection = (Collection) dso;
-        	identifier = collection.getMetadata("name");
-        	type = "collection";
-        } 
-        else 
+        	unauthorized.setHead(T_head_collection);
+            unauthorized.addPara(T_para_collection.parameterize(collection.getMetadata("name")));
+        }
+        else if (dso instanceof Item)
         {
-        	String handle = IdentifierService.getCanonicalForm(dso);
-        	type = "item";
-        	if (handle == null || "".equals(handle))
+        	 // The dso may be an item but it could still be an item's bitstream. So let's check for the parameter.
+        	if (request.getParameter("bitstreamId") != null)
         	{
-        		identifier =  "internal ID: " + dso.getID();
-        	}
-        	else
-        	{
-        		identifier = handle;
-        	}
-        	
-        	if (request.getParameter("bitstreamId")!=null){
-        		type = "bitstream";
-        		try{
+        		String identifier = "unknown";
+        		try {
         			Bitstream bit = Bitstream.find(context, new Integer(request.getParameter("bitstreamId")));
-	        		if(bit!=null){
+	        		if (bit != null) {
 	        			identifier = bit.getName();
 	        		}
-	        		else{
-	        			identifier = "unknown";
-	        		}
         		}
-        		catch(Exception e){
-        			
+        		catch(Exception e) {
+        			// just forget it - and display the restricted message.
         		}
+        		unauthorized.setHead(T_head_bitstream);
+                unauthorized.addPara(T_para_bitstream.parameterize(identifier));
+        	} 
+        	else
+        	{
+        		String identifier = "unknown";
+        		String handle = dso.getHandle();
+            	if (handle == null || "".equals(handle))
+            	{
+            		identifier =  "internal ID: " + dso.getID();
+            	}
+            	else
+            	{
+            		identifier = "hdl:"+handle;
+            	}
+        		unauthorized.setHead(T_head_item);
+                unauthorized.addPara(T_para_item.parameterize(identifier));
         	}
+        } 
+        else
+        {
+        	// This case should not occure, but if it does just fall back to the resource message.
+        	unauthorized.setHead(T_head_resource);
+            unauthorized.addPara(T_para_resource);
         }
-        	
-        Division unauthorized = body.addDivision("unauthorized-item","primary");
-        unauthorized.setHead(T_head.parameterize(type));
-        
-        unauthorized.addPara(T_para.parameterize(new Object[]{type,identifier}));
+      
     }
 }

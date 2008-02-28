@@ -113,6 +113,11 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
     protected static final Message T_showsimple = 
         message("xmlui.Submission.general.showsimple");
     
+    protected static final Message T_default_title = 
+        message("xmlui.Submission.general.default.title");
+    protected static final Message T_default_trail = 
+        message("xmlui.Submission.general.default.trail");
+    
     
     /** Progress Bar Language Strings */
     protected static final Message T_initial_questions = 
@@ -249,13 +254,22 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
 		}
 		else if (submission instanceof WorkflowItem)
 		{
-			pageMeta.addMetadata("title").addContent("Workflow Task");
+			pageMeta.addMetadata("title").addContent(T_workflow_title);
 			
 			Collection collection = submission.getCollection();
 			
 	        pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
 	        HandleUtil.buildHandleTrail(collection,pageMeta,contextPath);
-	        pageMeta.addTrail().addContent("Workflow Task");
+	        pageMeta.addTrail().addContent(T_workflow_trail);
+		}
+		else
+		{
+			// defaults for pages that don't have a workspace item or workflow 
+			// item such as the submission complete page where the object is in transition.
+			pageMeta.addMetadata("title").addContent(T_default_title);
+			
+			pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
+	        pageMeta.addTrail().addContent(T_default_trail);
 		}
 	}
 
@@ -541,3 +555,4 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
 		super.recycle();
 	}
 }
+

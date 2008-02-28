@@ -58,6 +58,8 @@ import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Table;
+import org.dspace.app.xmlui.wing.element.Row;
+import org.dspace.app.xmlui.wing.element.Cell;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -127,7 +129,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     private final static Message T_order_desc = message("xmlui.ArtifactBrowser.AbstractSearch.order.desc");
 
     private final static Message T_rpp = message("xmlui.ArtifactBrowser.AbstractSearch.rpp");
-
+    
     /** Cached query results */
     private QueryResults queryResults;
     
@@ -151,7 +153,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             key += "-" + getParameterSortBy();
             key += "-" + getParameterOrder();
             key += "-" + getParameterEtAl();
-            
+
             // What scope the search is at
             DSpaceObject scope = getScope();
             if (scope != null)
@@ -198,9 +200,9 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 //	            for (String handle : handles)
 	            for (String uri : uris)
 	            {
-                    ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
-                    DSpaceObject resultDSO = ri.getObject(context);
-                    validity.add(resultDSO);
+                        ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
+                        DSpaceObject resultDSO = ri.getObject(context);
+                        validity.add(resultDSO);
 	            }
 	            
 	            this.validity = validity.complete();
@@ -420,7 +422,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             return;
         
         Context context = ContextUtil.obtainContext(objectModel);
-        Request request = ObjectModelHelper.getRequest(objectModel);
         String query = getQuery();
         DSpaceObject scope = getScope();
         int page = getParameterPage();
@@ -434,9 +435,9 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         catch (SortException se)
         {
         }
-
-        qArgs.setSortOrder(getParameterOrder());
         
+        qArgs.setSortOrder(getParameterOrder());
+
         qArgs.setQuery(query);
         if (page > 1)
             qArgs.setStart((Integer.valueOf(page) - 1) * qArgs.getPageSize());

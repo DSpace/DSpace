@@ -120,7 +120,7 @@ public class FrontPageSearch extends AbstractDSpaceTransformer implements Cachea
 				
 				String feedFormat = parts[0].trim()+"+xml";
 					
-				String feedURL = contextPath+"/feed/"+format.trim();
+				String feedURL = contextPath+"/feed/"+format.trim()+"/site";
 				pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
 			}
 		}

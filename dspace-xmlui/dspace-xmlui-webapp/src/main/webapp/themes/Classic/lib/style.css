@@ -1,4 +1,4 @@
-﻿/*
+/*
   style.css
 
   Version: $Revision: 1.15 $
@@ -115,718 +115,686 @@ p.hidden, span.hidden {
 
 
 /*******************************
- *****  Major components  ******
- *******************************/
+*****  Major components  ******
+*******************************/
 ul#ds-trail {
-    margin: 5px 0 10px 165px;
+		margin: 5px 0 10px 190px;
 }
 
 div#ds-body {
-    margin: 5px 0 10px 165px;
-    min-width:600px;
+		margin: 5px 0 10px 190px;
+		/* min-width:600px; */
 }
 
 div#ds-options {
-    border-right: 1px solid gray;
-    padding: 0 5px 0 5px;
-    position: absolute;
-    top: 100px;
-    left: 0;
-    width: 125px;
-    overflow: hidden;
+		border-right: 1px solid gray;
+		padding: 0 5px 0 5px;
+		position: absolute;
+		top: 100px;
+		left: 0;
+		width: 160px;
+		overflow: hidden;
 }
 
 div#ds-footer {
-	clear: both;
-	margin: 100px 0 10px 165px;
-	border-top: 1px solid gray;
+		clear: both;
+		margin: 100px 0 10px 190px;
+		border-top: 1px solid gray;
 }
-
-
-
-
 
 
 
 
 /*******************************
- **********  Header  ***********
- *******************************/
+**********  Header  ***********
+*******************************/
 div#ds-header a span#ds-header-logo {
-    width: 200px;
-	height: 80px;
-	float: left;
-	background-image: url("../images/dspace-blue.gif");
-	background-repeat: no-repeat;
+		width: 200px;
+		height: 80px;
+		float: left;
+		background-image: url("../images/dspace-blue.gif");
+		background-repeat: no-repeat;
 }
 
 div#ds-header a {
-	text-decoration: none;
+		text-decoration: none;
 }
 
 div#ds-header h1 {
-	display: none;
+		display: none;
 }
 
 div#ds-header h2 {
-    clear: both;
-    height: 15px;
-    background-image: url("../images/stripe.gif");
-    /*visibility: none;*/
-    font-size: 0.001em; /* yeah it's still there but not really visible */
+		clear: both;
+		height: 15px;
+		background-image: url("../images/stripe.gif");
+		/*visibility: none;*/
+		font-size: 0.001em; /* yeah it's still there but not really visible */
 }
 
 /* User box (login / profile) */
 div#ds-user-box {
-	position: absolute;
-	top: 20px;
-	right: 20px;
+		position: absolute;
+		top: 20px;
+		right: 20px;
 }
 
 div#ds-user-box p {
-	color: gray;
-	padding: 0px;
-	margin: 0px;
+		color: gray;
 }
 
 div#ds-user-box a {
-	text-decoration: none;
-	color: gray;
-	padding: 0px;
-	margin: 0px;
+		text-decoration: none;
+		color: gray;
 }
 
 div#ds-user-box a:hover {
-	text-decoration: underline;
+		text-decoration: underline;
 }
 
 /* Trail */
 ul#ds-trail li.ds-trail-link {
-    list-style: none;
-    margin-left:0px;
+		list-style: none;
+		margin-left:0px;
 }
 
 ul#ds-trail li.ds-trail-link a:hover {
-    text-decoration: underline;
+		text-decoration: underline;
 }
 
 ul#ds-trail li.ds-trail-link:after {
-    content: " > ";
+		content: " > ";
 }
 
 
 
 
 /*******************************
- *******  Options list  ********
- *******************************/
+*******  Options list  ********
+*******************************/
 
 div#ds-options h3 {
-	color: black;
-    font-size: 1em;
-	margin-top: 0px;
-	margin-bottom: 0px;
+		color: black;
+		font-size: 1em;
 }
 
 div#ds-options h4 {
-	color: black;
-    font-size: 10pt;
-	margin-top: 10px;
-	margin-bottom: 0px;
-}
-
-div#ds-options ul {
-	margin: 0 0 0 0;
-	padding: 0;
+		color: black;
+		font-size: 10pt;
+		margin-top: 10px;
+		
 }
 
 div#ds-options li {
-	margin-left: 0px;
-	margin-top: 5px;
-	margin-bottom: 5px;
-	padding: 0;
-	font-size: 10pt;
-}
-
-div#ds-options li {
-    
-    margin-left: 25px;
+		margin-top: 5px;
+		margin-bottom: 5px;
+		font-size: 10pt;
+		margin-left: 25px;
 }
 
 div#ds-options div#artifactbrowser_Navigation_list_browse li {
-	list-style: none;
-	margin-left: 0px;
+		list-style: none;
+		margin-left: 0px;
 }
 
 div#ds-options div#artifactbrowser_Navigation_list_browse ul ul li {
-	list-style-image: url(../images/arrow.gif);
-	margin-left: 25px;
+		list-style-image: url(../images/arrow.gif);
+		margin-left: 25px;
 }
 
 div#ds-options div#artifactbrowser_Navigation_list_account ul li {
-	list-style-image: url(../images/arrow.gif);
-	margin-left: 25px;
+		list-style-image: url(../images/arrow.gif);
+		margin-left: 25px;
 }
 
 div#ds-options div#artifactbrowser_Navigation_list_context ul li {
-	list-style-image: url(../images/arrow.gif);
-	margin-left: 25px;
+		list-style-image: url(../images/arrow.gif);
+		margin-left: 25px;
 }
 
 div.ds-option-set {
-	margin-bottom: 30px;
+		margin-bottom: 30px;
 }
 
 /* search box, in the option list */
 #ds-search-option-head {
-	margin: 0 !important; 
-	background-color: #fefecd;
-	padding-left: 2px;
+		background-color: #fefecd;
+		padding-left: 2px;
 }
 
 div#ds-search-option {
-	background-color: #fefecd;
-	padding-top: 2px;
-	padding-bottom: 10px;
-	padding-left: 2px;
+		background-color: #fefecd;
+		padding-top: 2px;
+		padding-bottom: 10px;
+		padding-left: 2px;
 }
 
 form#ds-search-form fieldset {
-	border: none;
-	margin: 0 0 0 0;
-	padding: 0px 0px 0px 0px;
+		border: none;
 }
 
 div#ds-search-option input.ds-text-field {
-    width: 79px;
-    font-size: 1em;
-	margin: 0 0 0 0;
-    padding: 0 0 0 0;
-}
-
-div#ds-search-option input.ds-button-field {
-	margin: 0 0 0 0;
-	padding: 0 0 0 0;
+		width: 79px;
+		font-size: 1em;
 }
 
 div#ds-search-option label {
-	display: none;
+		display: none;
 }
 
 div#ds-search-option a {
-	font-weight: bold;
-	font-size: .9em;
+		font-weight: bold;
+		font-size: .9em;
 }
 
 /*******************************
- **********  Footer  ***********
- *******************************/
- 
+**********  Footer  ***********
+*******************************/
+
 div#ds-footer a span#ds-footer-logo {
-    width: 250px;
-	height: 250px;
-	float: left;
-	background-image: url("../images/manakin_logo.png");
-	background-repeat: no-repeat;
-	margin: 5px;
+		width: 250px;
+		height: 250px;
+		float: left;
+		background-image: url("../images/manakin_logo.png");
+		background-repeat: no-repeat;
+		margin: 5px;
 }
 
 div#ds-footer a {
-	text-decoration: none;
+		text-decoration: none;
 }
 
 div#ds-footer a:hover {
-	text-decoration: underline;
+		text-decoration: underline;
 }
 
 
 /*******************************
- ********  pagination  *********
- *******************************/
+********  pagination  *********
+*******************************/
 
 div.pagination {
-	position: relative;
-	margin: 10px 20px 2px 20px;
+		position: relative;
+		margin: 10px 20px 2px 20px;
 }
 
 div.pagination-masked {
-	position: relative;
-	margin: 10px 20px 10px 20px;
+		position: relative;
+		margin: 10px 20px 10px 20px;
 }
 
 a.previous-page-link {
-	position: absolute;
-	left: 50px;
-	bottom: 5px;
+		position: absolute;
+		left: 50px;
+		bottom: 5px;
 }
 
 a.next-page-link {
-	position: absolute;
-	right: 50px;
-	bottom: 5px;
+		position: absolute;
+		right: 50px;
+		bottom: 5px;
 }
 
 p.pagination-info {
-	position: relative;
-	text-align: center;
-	width: 50%;
-	margin: 0 auto 5px auto;
+		position: relative;
+		text-align: center;
+		width: 50%;
+		margin: 0 auto 5px auto;
 }
 
 ul.pagination-links {
-	position: relative;
-	text-align: center;
-	width: 50%;
-	margin: 0 auto 5px auto;
-	padding: 0 0 0 0;
+		position: relative;
+		text-align: center;
+		width: 50%;
+		margin: 0 auto 5px auto;
+		padding: 0 0 0 0;
 }
 
 *.pagination-links li {
-	list-style: none;
-	display: inline;
-	margin-right: 5px;
-	font-weight: bolder;
-	font-size: 90%;
+		list-style: none;
+		display: inline;
+		margin-right: 5px;
+		font-weight: bolder;
+		font-size: 90%;
 }
 
 
 /*******************************
- ******  Alphabet Lists  *******
- *******************************/
+******  Alphabet Lists  *******
+*******************************/
 
 ul.alphabet {
-	text-align: center;
+		text-align: center;
 }
 
 ul.alphabet li {
-	list-style: none;
-	display: inline;
-	padding: 0;
-	margin: 0 5px 0 5px;
-	font-weight: bolder;
+		list-style: none;
+		display: inline;
+		margin: 0 5px 0 5px;
+		font-weight: bolder;
 }
 
 ul.alphabet a:hover {
-	color: black;
+		color: black;
 }
 
 /*******************************
- ******  Progress Lists  *******
- *******************************/
+******  Progress Lists  *******
+*******************************/
 
 ul.ds-progress-list {
-	margin: 0px;
-	padding-top: 2px;
-	padding-bottom: 2px;
-	text-align: center;
+		margin: 0px;
+		padding-top: 2px;
+		padding-bottom: 2px;
+		text-align: center;
 }
 
 ul.ds-progress-list li {
-	font-family: Arial, Helvetica, sans-serif;
-	font-weight: bold;
-	color: gray;
-	overflow: hidden;
-	display: inline;
-	line-height: 20px;
+		font-family: Arial, Helvetica, sans-serif;
+		font-weight: bold;
+		color: gray;
+		overflow: hidden;
+		display: inline;
+		line-height: 20px;
 }
 
 ul.ds-progress-list li.current {
-	color: black;
+		color: black;
 }
 
 ul.ds-progress-list li.arrow {
-	font-size: 200%;
-	font-weight: bold;
-	position: relative;
-	top: 6px;
+		font-size: 200%;
+		font-weight: bold;
+		position: relative;
+		top: 6px;
 }
 
 
 /*******************************
- *******  Artifact List  *******
- *******************************/
+*******  Artifact List  *******
+*******************************/
 
 ul.ds-artifact-list {
-	border: 1px solid gray;
-	list-style-type: none;
-	width: 95%;
+		border: 1px solid gray;
+		list-style-type: none;
+		width: 95%;
 }
 
 ul.ds-artifact-list li.odd {
-	background-color: rgb(238, 238, 238);
+		background-color: rgb(238, 238, 238);
 }
 
 ul.ds-artifact-list li.even {
-	background-color: rgb(255, 255, 255);
+		background-color: rgb(255, 255, 255);
 }
 
 ul.ds-artifact-list li {
-	position: relative;
-	padding-bottom: 3px;
-	padding-top: 3px;
-	margin: 0 0 0 0;
-	padding: 2px 5px 2px 5px;
+		position: relative;
+		padding-bottom: 3px;
+		padding-top: 3px;
+		margin: 0 0 0 0;
+		padding: 2px 5px 2px 5px;
 	
 }
 
 ul.ds-artifact-list li div.artifact-description {
-	width: 80%;
+		width: 80%;
 }
 
 ul.ds-artifact-list li div.artifact-preview {
-	margin: -30px 0px 0 auto;
-	width: 15%;
+		margin: -30px 0px 0 auto;
+		width: 15%;
 }
 
 ul.ds-artifact-list li div.artifact-info {
-	font-size: 110%;
-	padding-left: 25px;
+		font-size: 110%;
+		padding-left: 25px;
 }
 
 ul.ds-artifact-list li div.artifact-title {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 130%;
-	font-weight: bolder;
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 130%;
+		font-weight: bolder;
 }
 
 span.date {
-	font-style: italic;
+		font-style: italic;
 }
 
 /*******************************
- *********  Tables  ************
- *******************************/
- 
+*********  Tables  ************
+*******************************/
+
 table {
-    clear: both;
-	border-spacing: 0px;
-	border: 1px solid gray;
-	width: 95%;
+		clear: both;
+		border-spacing: 0px;
+		border: 1px solid gray;
+		width: 95%;
 }
 
 tr.ds-table-header-row {
-	color: inherit;
-	background-color: rgb(218, 218, 218);
+		color: inherit;
+		background-color: rgb(218, 218, 218);
 }
 
 tr.ds-table-header-row.subheader {
-    background-color: rgb(250, 250, 214);
+		background-color: rgb(250, 250, 214);
 }
 
 th {
-    padding: 4px 10px;
+		padding: 4px 10px;
 }
+
 .subheader th {
-    padding-left: 5px;
-	font-weight: 100;
+		padding-left: 5px;
+		font-weight: 100;
 }
 
 tr.ds-table-row.odd {
-	color: inherit;
-	background-color: rgb(238, 238, 238);
+		color: inherit;
+		background-color: rgb(238, 238, 238);
 }
 
 tr.ds-table-row.even {
-	color: inherit;
-	background-color: rgb(255, 255, 255);
+		color: inherit;
+		background-color: rgb(255, 255, 255);
 }
 
 td {
-	padding: 3px 10px 5px 10px;
-	border: none;
-	font-size: inherit;
-	background-color: inherit;
-	color: inherit;
+		padding: 3px 10px 5px 10px;
+		border: none;
+		font-size: inherit;
+		background-color: inherit;
+		color: inherit;
 }
 
 *.first-cell {
-	vertical-align: middle;
-	text-align: center;
+		vertical-align: middle;
+		text-align: center;
 }
 
 .indent {
-    padding-left: 35px;
-    padding-right: 0;
+		padding-left: 35px;
+		padding-right: 0;
 }
 .doubleIndent {
-    padding-left: 55px;
-    padding-right: 0;
+		padding-left: 55px;
+		padding-right: 0;
 }
 
 th.indent {
-    padding-left: 30px;
-    padding-right: 0;
+		padding-left: 30px;
+		padding-right: 0;
 }
 th.doubleIndent {
-    padding-left: 50px;
-    padding-right: 0;
+		padding-left: 50px;
+		padding-right: 0;
 }
 
 
 
 
 /*******************************
- ***********  forms  ***********
- *******************************/
+***********  forms  ***********
+*******************************/
 
 form.ds-interactive-div {
-	width: 95%;
+
+		width: 95%;
 }
 
 form.ds-interactive-div li.ds-form-item {
-	/*display: block;*/
-	padding: 2px 0;
-	width: 100%;
+		/*display: block; */
+		padding: 2px 0;
+		width: 100%;
 }
 
 form.ds-interactive-div li {
-	margin: 0;
+		margin: 0;
 }
 
 form.ds-interactive-div li.odd {
-	background-color: rgb(238, 238, 238);
+		background-color: rgb(238, 238, 238);
 }
 
 form.ds-interactive-div li.even {
-	background-color: rgb(255, 255, 255);
+		background-color: rgb(255, 255, 255);
 }
 
 form.ds-interactive-div li.last {
-	border-top: 2px solid gray;
-	background-color: rgb(215, 215, 215);
+		border-top: 2px solid gray;
+		background-color: rgb(215, 215, 215);
 }
 
 li.ds-form-item {
-	float: left;
-	clear: both;
-	width: 100%;
+		float: left;
+		clear: both;
+		width: 100%;
 }
 
 div.ds-form-content {
-	float: left;
-	clear: right;
-	display: block;
-	padding: 7px;
+		float: left;
+		clear: right;
+		display: block;
+		padding: 7px;
 		width: 400px;
 }
 
 span.ds-form-label,label.ds-form-label {
-	display: block;
-	float: left;
-	clear: left;
-	padding: 5px 20px 5px 10px;
-	width: 115px;
-	font-weight: bold;
-	vertical-align: middle;
-	overflow: hidden;
+		display: block;
+		float: left;
+		clear: left;
+		padding: 5px 20px 5px 10px;
+		width: 115px;
+		font-weight: bold;
+		vertical-align: middle;
+		overflow: hidden;
 }
 
 /* Help, error, & in-line labels */
 label.ds-composite-component {
-	display: block;
-	float: left;
-	padding: 0px 5px 0 0px;
-	font-size: 80%;
-	color: black;
-	background-color: inherit;
-	text-align: left;
+		display: block;
+		float: left;
+		padding: 0px 5px 0 0px;
+		font-size: 80%;
+		color: black;
+		background-color: inherit;
+		text-align: left;
 }
 
 span.error {
-	display: block;
-	font-size: 100%;
-	color: red;
-	background-color: inherit;
-	margin: 0;
+		display: block;
+		font-size: 100%;
+		color: red;
+		background-color: inherit;
+		margin: 0;
 }
 
 span.field-help {
-	display: block;
-	margin-left: 5px;
-	font-size: 90%;
-	color: gray;
-	background-color: inherit;
+		display: block;
+		margin-left: 5px;
+		font-size: 90%;
+		color: gray;
+		background-color: inherit;
 }
 
 input.error,textarea.error,select.error {
-	color: inherit;
-	background-color: rgb(255, 245, 245);
-	border-color: red;
+		color: inherit;
+		background-color: rgb(255, 245, 245);
+		border-color: red;
 }
 
 span.composite-help {
-	display: block;
-	font-size: 90%;
-	color: gray;
-	background-color: inherit;
-	text-align: left;
+		display: block;
+		font-size: 90%;
+		color: gray;
+		background-color: inherit;
+		text-align: left;
 }
 
 span.composite-help {
-	display: block;
-	font-size: 80%;
-	color: black;
-	background-color: inherit;
-	text-align: left;
+		display: block;
+		font-size: 80%;
+		color: black;
+		background-color: inherit;
+		text-align: left;
 }
 
 div.spacer {
-	margin: 0;
-	padding: 0;
-	line-height: 0px;
-	clear: both;
+		margin: 0;
+		padding: 0;
+		line-height: 0px;
+		clear: both;
 }
 
 
 /* The composite field  */
 span.ds-composite-field {
-	display: table-row;
-	padding: 2px;
+		display: table-row;
+		padding: 2px;
 }
 
 *.ds-composite-field.ds-composite-component {
-	display: table-cell;
-	text-align: left;
-	width: auto;
-	padding-right: 10px;
+		display: table-cell;
+		text-align: left;
+		width: auto;
+		padding-right: 10px;
 }
 
 *.ds-composite-field input,*.ds-composite-field textarea,*.ds-composite-field select {
-	margin-right: 5px;
-	margin-bottom: -2px;
+		margin-right: 5px;
+		margin-bottom: -2px;
 }
 
 
 /* Checkboxes and Radio buttons */
 fieldset.ds-checkbox-field,fieldset.ds-radio-field {
-	border: none;
-	margin: 0;
-	padding: 0;
+		border: none;
+		margin: 0;
+		padding: 0;
 }
 
 fieldset.ds-checkbox-field legend,fieldset.ds-radio-field legend {
-	display: none;
+		display: none;
 }
 
 fieldset.ds-checkbox-field label,fieldset.ds-radio-field label {
-	display: block;
+		display: block;
 }
 
 
 /* Sub sections within a form */
 
 fieldset.ds-form-list {
-	border: 2px solid gray;
-	padding: 0;
-	margin-left: 0;
-	margin-right: 0;
+		border: 2px solid gray;
+		padding: 0;
+		margin-left: 0;
+		margin-right: 0;
 }
 
 fieldset.ds-form-list ol {
-	padding: 0;
-	margin: 0;
-	width: 100%;
+		padding: 0;
+		margin: 0;
+		width: 100%;
 }
 
 fieldset.ds-form-list legend {
-	color: #336699;
-	background-color: inherit;
-	font-size: 115%;
-	font-weight: bolder;
-	margin-left: 10px;
+		color: #336699;
+		background-color: inherit;
+		font-size: 115%;
+		font-weight: bolder;
+		margin-left: 10px;
 }
 
 fieldset.thick legend {
-	color: #336699;
-	padding-left: 10px;
-	padding-right: 30px;
+		color: #336699;
+		padding-left: 10px;
+		padding-right: 30px;
 }
 
 fieldset.ds-form-sublist {
-	border: 1px solid rgb(238, 238, 238);
-	padding: 0;
-	margin: 5px;
+		border: 1px solid rgb(238, 238, 238);
+		padding: 0;
+		margin: 5px;
 }
 
 fieldset.ds-form-list ol {
-	list-style-type: none;
+		list-style-type: none;
 }
 
 
 
 /*******************************
- *   Rules for specific pages  *
- *******************************/
+*   Rules for specific pages  *
+*******************************/
 
 /** Navigation bar for browse-by pages */
 form.navigation {
-	max-width: 750px;
-	margin: 0 auto 0 auto;
-	border: 1px solid gray;
-	background-color: rgb(238, 238, 238);
+		max-width: 750px;
+		margin: 0 auto 0 auto;
+		border: 1px solid gray;
+		background-color: rgb(238, 238, 238);
 }
 
 form.navigation p {
-	text-align: center;
+		text-align: center;
 }
 
 /* System wide alerts */
 div#ds-system-wide-alert {
-    background-color: rgb(255,240,220);
-    border: 2px solid rgb(213,80,40);
-    padding: 6px;
-	margin: 10px 30px 10px 30px;
-    color: rgb(213, 80, 40);
+		background-color: rgb(255,240,220);
+		border: 2px solid rgb(213,80,40);
+		padding: 6px;
+		margin: 10px 30px 10px 30px;
+		color: rgb(213, 80, 40);
 }
 
 /* License text, used during submission to show a license */
 div.license-text {
-	border: 1px solid #666;
-	background-color: #EEE;
-	padding: 20px;
-	margin: 20px;
-	margin-top: 5px;
-	font-family: monospace;
-	font-size: 125%;
+		border: 1px solid #666;
+		background-color: #EEE;
+		padding: 20px;
+		margin: 20px;
+		margin-top: 5px;
+		font-family: monospace;
+		font-size: 125%;
 }
 
 /** System generated notices, typicaly these follow any action in the administrative section. */
 div.notice {
-	background-color: rgb(238, 238, 238);
-	border: 2px solid gray;
-	padding: 6px;
-	text-align: center;
-	margin: 10px 30px 10px 30px;
+		background-color: rgb(238, 238, 238);
+		border: 2px solid gray;
+		padding: 6px;
+		text-align: center;
+		margin: 10px 30px 10px 30px;
 }
 
 
 /** Community & Collection homepage */
 
 div.search-browse {
-	border: 2px solid gray;
-	background-color: rgb(238,238,238);
-	padding: 0px 5px 0px 10px;
-	width: 350px;
+		border: 2px solid gray;
+		background-color: rgb(238,238,238);
+		padding: 0px 5px 0px 10px;
+		width: 350px;
 }
 
 div.detail-view div.ds-logo-wrapper {
-	text-align: right;
-	
-	margin-right: 30px;
-	margin: -150px 30px 0px auto;
+		text-align: right;
+		margin-right: 30px;
+		margin: -150px 30px 0px auto;
 }
 
 div.detail-view p {
-	clear: both;
+		clear: both;
 }
 
 p.copyright-text {
-	margin-top: 30px;
-	width: 90%;
-	font-style: italic;
-	text-align: center;
-	
-	margin: 30px auto 0px auto;
+		margin-top: 30px;
+		width: 90%;
+		font-style: italic;
+		text-align: center;
+		margin: 30px auto 0px auto;
 }
 
 

@@ -121,8 +121,9 @@
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.order.asc">ascending</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.order.desc">descending</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.rpp">Results/page</message>
-    
+
     <!-- org.dspace.app.xmlui.artifactbrowser.AdvancedSearch.java -->
+
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.title">Advanced Search</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.trail">Advanced Search</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.head">Advanced Search</message>
@@ -194,6 +195,7 @@
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.browse_titles">Titles</message>
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.browse_authors">Authors</message>
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.browse_dates">Dates</message>
+	<message key="xmlui.ArtifactBrowser.CollectionViewer.advanced_search_link">Advanced Search</message>
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.head_recent_submissions">Recent Submissions</message>
 	
 	<!-- org.dspace.app.xmlui.artifactbrowser.CommunityBrowser.java -->
@@ -210,6 +212,7 @@
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.browse_titles">Titles</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.browse_authors">Authors</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.browse_dates">Dates</message>
+	<message key="xmlui.ArtifactBrowser.CommunityViewer.advanced_search_link">Advanced Search</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.head_sub_communities">Sub-communities within this community</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.head_sub_collections">Collections in this community</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.head_recent_submissions">Recent Submissions</message>
@@ -270,10 +273,25 @@
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.full_text_search">Full Text Search</message>
 	
 	<!-- org.dspace.app.xmlui.artifactbrowser.RestrictedItem.java -->
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.title">This item is restricted</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.title">This resource is restricted</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.trail">Restricted</message>
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.head">This item is restricted</message>
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.para">The item you tried to access, <b>{0}</b>, is a restricted item and requires credentials that you do not have.</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.head_resource">This resource is restricted</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.head_community">This community is restricted</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.head_collection">This collection is restricted</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.head_item">This item is restricted</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.head_bitstream">This bitstream is restricted</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_resource">You do not have the credentials to access the restricted resource.</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_community">You do not have the credentials to access the restricted community <b>{0}</b>.</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_collection">You do not have the credentials to access the restricted collection <b>{0}</b>.</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_item">You do not have the credentials to access the restricted item <b>{0}</b>.</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_bitstream">You do not have the credentials to access the restricted bitstream <b>{0}</b>.</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_collection">collection</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_community">community</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_bitstream">bitstream</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_item">item</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_resource">resource</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.unknown">unknown</message>
+
 	
 	<!-- org.dspace.app.xmlui.artifactbrowser.RestrictedItem.java -->
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.title">This resource is restricted</message>
@@ -490,7 +508,7 @@
 	<message key="xmlui.Submission.general.submission.trail">Item submission</message>
 	<message key="xmlui.Submission.general.submission.head">Item submission</message>	
 	<message key="xmlui.Submission.general.submission.previous">&lt; Previous</message>
-	<message key="xmlui.Submission.general.submission.save">Save / Cancel</message>
+	<message key="xmlui.Submission.general.submission.save">Save &amp; Exit</message>
 	<message key="xmlui.Submission.general.submission.next">Next &gt;</message>
 	<message key="xmlui.Submission.general.submission.complete">Complete submission</message>
 	<message key="xmlui.Submission.general.workflow.title">Item submission</message>
@@ -498,6 +516,8 @@
 	<message key="xmlui.Submission.general.workflow.head">Item submission</message>
 	<message key="xmlui.Submission.general.showfull">Show full item record</message>
 	<message key="xmlui.Submission.general.showsimple">Show simple item record</message>
+	<message key="xmlui.Submission.general.default.title">Submission</message>
+	<message key="xmlui.Submission.general.default.trail">Submission</message>
 	
 	<!-- org.dspace.app.xmlui.submission.CollectiovViewer -->
 	<message key="xmlui.Submission.CollectionViewer.link1">Submit a new item to this collection</message>
@@ -582,8 +602,9 @@
 
 	<!-- org.dspace.app.xmlui.Submission.submit.SaveOrRemoveStep -->
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.head">Save or cancel your submission?</message>
-	<message key="xmlui.Submission.submit.SaveOrRemoveStep.info1">Do you want the submission removed, or do you want to carry on working on it later?  You may return to the submission process if you clicked Cancel by accident.</message>
+	<message key="xmlui.Submission.submit.SaveOrRemoveStep.info1">Do you want the submission removed, or do you want to carry on working on it later?  You may return to the submission process if you clicked Exit by accident.</message>
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_back">Oops, continue submission</message>
+
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_save">Save it, I'll work on it later</message>
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_remove">Remove the submission</message>
 
@@ -622,8 +643,9 @@
 	<message key="xmlui.Submission.submit.UploadStep.file">File</message>
 	<message key="xmlui.Submission.submit.UploadStep.file_help">Please enter the full path of the file on your computer corresponding to your item. If you click "Browse...", a new window will allow you to select the file from your computer.</message>
 	<message key="xmlui.Submission.submit.UploadStep.file_error">The item must contain at least one file.</message>
-	<message key="xmlui.Submission.submit.UploadStep.description">Description</message>
+	<message key="xmlui.Submission.submit.UploadStep.description">File Description</message>
 	<message key="xmlui.Submission.submit.UploadStep.description_help">Optionally, provide a brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
+
 	<message key="xmlui.Submission.submit.UploadStep.submit_upload">Upload file &amp; add another</message>
 	<message key="xmlui.Submission.submit.UploadStep.head2">Files Uploaded</message>
 	<message key="xmlui.Submission.submit.UploadStep.column1"></message>
@@ -687,7 +709,7 @@
 	<message key="xmlui.Submission.submit.LicenseStep.info3">If you have questions regarding this license please contact the system administrators.</message>
 	<message key="xmlui.Submission.submit.LicenseStep.decision_label">Distribution license</message>
 	<message key="xmlui.Submission.submit.LicenseStep.decision_checkbox">I Grant the License</message>
-	<message key="xmlui.Submission.submit.LicenseStep.decision_error">You must grant this license to complete your submission. If you are unable to grant this license at this time you may save your work and return later or remove the submission by clicking the 'Save/Cancel' button below.</message>
+	<message key="xmlui.Submission.submit.LicenseStep.decision_error">You must grant this license to complete your submission. If you are unable to grant this license at this time you may save your work and return later or remove the submission by clicking the 'Save &amp; Exit' button below.</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.RemovedStep -->
 	<message key="xmlui.Submission.submit.RemovedStep.head">Submission removed</message>
@@ -725,170 +747,9 @@
 	<message key="xmlui.Submission.workflow.RejectTaskStep.submit_reject">Reject item</message>
 	<message key="xmlui.Submission.workflow.RejectTaskStep.submit_cancel">Cancel</message>
 
-	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	
-		             Common Submission System Aspect
-		
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
-	<message key="xmlui.CSS.saveContinue">Save and Continue >></message>
 	
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.head">Verify Your Information</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.inst1">Enter your name exactly as it appears on your title page. You may use Unicode characters, if your computer supports them.</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.inst2">Enter a current email address that you check regularly. This address will be used only by your school to communicate with you regarding this submission.</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.inst3">If your current address is not temporary, you may omit these fields.</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.p1">Please verify all of your personal information. Required fields are indicated with a bold label.</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.p2">The information contained in the read only fields has been provided by your home institution.  If you would like to change this information please contact your home institution.</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.personalInfo_head">Personal Information</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.label_firstName">First Name</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.error_firstName">Please provide your first name</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.label_middleInitial">Middle Initial</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.label_lastName">Last Name</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.error_lastName">Please provide your last name</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.label_suffix">Suffix</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.label_citizenship">Citizenship</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.error_citizenship">Please provide your citizenship information</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.label_email">E-mail</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.error_email">Please provide your e-mail address</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.affiliation_head">Affiliation</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.label_school">School</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.error_school">Please provide your school</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.label_degree">Degree</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.error_degree">Please provide your degree</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.label_discipline">Discipline</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.error_discipline">Please provide your discipline</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.contactInfo_head">Phone &amp; Address</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.label_phone1">Current Phone</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.error_phone1">Please provide your current phone</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.label_address1">Current Address</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.error_address1">Please provide your current address</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.label_phone2">Permanent Phone</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.error_phone2">Please provide your permanent phone</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.label_address2">Permanent Address</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.error_address2">Please provide your permanent address</message>
-	<message key="xmlui.CSS.VerifyPersonalInformationStep.title">TDL :: Step 1: Verify User Data</message>
-	
-	<message key="xmlui.CSS.LicenseAgreementStep.agreeContinue">Agree and Continue>></message>
-	<message key="xmlui.CSS.LicenseAgreementStep.continue">Continue>></message>
-	<message key="xmlui.CSS.LicenseAgreementStep.head">License Agreement</message>
-	<message key="xmlui.CSS.LicenseAgreementStep.instructions">You must agree to the non-exclusive license agreement below in order to continue:</message>
-	<message key="xmlui.CSS.LicenseAgreementStep.agree">By checking here you agree to the above license agreement in its entirety.</message>
-	<message key="xmlui.CSS.LicenseAgreementStep.agree_error">You must agree to the license agreement before continuing.</message>
-	<message key="xmlui.CSS.LicenseAgreementStep.title">TDL :: Step 2: License Agreement</message>
 
-	<message key="xmlui.CSS.SubmissionStatus.start_xref">Start a new Submission Application</message>
-	<message key="xmlui.CSS.SubmissionStatus.header1">Title</message>
-	<message key="xmlui.CSS.SubmissionStatus.header2">Thesis</message>
-	<message key="xmlui.CSS.SubmissionStatus.header3">Status</message>
-	<message key="xmlui.CSS.SubmissionStatus.header4">Date Submitted</message>
-	<message key="xmlui.CSS.SubmissionStatus.header5">Assigned To</message>
-	<message key="xmlui.CSS.SubmissionStatus.header6">Actions</message>
-	<message key="xmlui.CSS.SubmissionStatus.unassigned">Unassigned</message>
-	<message key="xmlui.CSS.SubmissionStatus.continue">Continue</message>
-	<message key="xmlui.CSS.SubmissionStatus.view">View</message>
-	<message key="xmlui.CSS.SubmissionStatus.no_submissions">You do not have any active applications.</message>
-	<message key="xmlui.CSS.SubmissionStatus.title">TDL :: Submission Status</message>
-	
-	<message key="xmlui.CSS.DocumentMetaDataStep.head1">Document Information</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.inst1">For the degree date, enter the year in which your degree will be conferred. This date will be verified by your institution.</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.inst2">Enter up to six (6) keyword phrases, delimited by semi-colons (';').</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.inst3">Enter the names of each individual on your committee, and use the checkbox to indicate which one is your committee chair (or two, if you have co-chairs).</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.inst4">If you don't know if you need an embargo, then you probably don't. Usually this option is only necessary for situations like patent holds or a request by a publisher if content from the document will be published shortly (within a year).</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.para1">Please describe your work below.</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.head2">Document info</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.label1">Title</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.error1">Please enter the title of your work.</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.label2">Language</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.error2">Please enter the language your work is in.</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.label3">Thesis Date</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.help1">Please provide date in 'Month Year' format (i.e. 'May 2006').</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.error3">Please enter your thesis date in 'Month Year' format.</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.label4">Abstract</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.error4">Please enter your work's abstract.</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.label5">Keywords</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.error5">Please enter keywords which describe your work.</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.head3">Your committee</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.error6">Please provide all the information for this committee member.</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.label6">Member</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.help2">First Name</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.label7">First Name</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.error7">Please provide a first name for this committee memeber.</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.help3">Initial</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.label8">Middle Initial</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.error8">Please provide a middle initial for this committee memeber.</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.help4">Last Name</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.label9">Last Name</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.error9">Please provide a last name for this committee memeber.</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.option1">Chair</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.help5">Check if this committee member is a chair</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.head4">Embargo Period</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.option2">I am not requesting any publication delay. TDL may publish the full text of my paper as soon as it is approved.</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.option3">I am requesting a publication delay (embargo) for my thesis/dissertation. My advisor is aware of the circumstances and has approved the request.</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.label10">Type of Embargo</message>
-	<message key="xmlui.CSS.DocumentMetaDataStep.title">TDL :: Step 3: Document Information</message>
-	
-	<message key="xmlui.CSS.DocumentFilesStep.head1">Upload Your Files</message>
-	<message key="xmlui.CSS.DocumentFilesStep.inst1">You may only upload one file for your thesis, and the only allowable file format is </message>
-	<message key="xmlui.CSS.DocumentFilesStep.inst2">. Please contact your school for help or information related to creating a PDF from your original file.</message>
-	<message key="xmlui.CSS.DocumentFilesStep.inst3">You may upload as many supplementary files for your thesis as you wish; there are no size or filetype restrictions. Be aware, however, that each file individual can be no larger than 256MB.</message>
-	<message key="xmlui.CSS.DocumentFilesStep.p1">Please upload your thesis and supplementary files.</message>
-	<message key="xmlui.CSS.DocumentFilesStep.head2">Upload your thesis</message>
-	<message key="xmlui.CSS.DocumentFilesStep.label1">Thesis PDF</message>
-	<message key="xmlui.CSS.DocumentFilesStep.error1">Please upload a thesis file in PDF format before continuing</message>
-	<message key="xmlui.CSS.DocumentFilesStep.upload">Upload</message>
-	<message key="xmlui.CSS.DocumentFilesStep.head3">Thesis File</message>
-	<message key="xmlui.CSS.DocumentFilesStep.label2">Uploaded Thesis</message>
-	<message key="xmlui.CSS.DocumentFilesStep.remove">Remove Thesis</message>
-	<message key="xmlui.CSS.DocumentFilesStep.head4">Upload supplementary files</message>
-	<message key="xmlui.CSS.DocumentFilesStep.label3">Supplementary Files</message>
-	<message key="xmlui.CSS.DocumentFilesStep.error2">Supplementary files can not be larger than 250MB.</message>
-	<message key="xmlui.CSS.DocumentFilesStep.head5">Uploaded Supplementary Files</message>
-	<message key="xmlui.CSS.DocumentFilesStep.remove_selected">Remove Selected</message>
-	<message key="xmlui.CSS.DocumentFilesStep.error3">Please select the supplementary files to be removed</message>
-	<message key="xmlui.CSS.DocumentFilesStep.title">TDL :: Step 4: Upload Files</message>
-	
-	<message key="xmlui.CSS.ApplicationViewStep.confirm_h1">Comfirm &amp; Submit</message>
-	<message key="xmlui.CSS.ApplicationViewStep.view_h1">View Application</message>
-	<message key="xmlui.CSS.ApplicationViewStep.head1">About You</message>
-	<message key="xmlui.CSS.ApplicationViewStep.head2">Your Academic Affiliation</message>
-	<message key="xmlui.CSS.ApplicationViewStep.head3">About Your Thesis</message>
-	<message key="xmlui.CSS.ApplicationViewStep.head4">Uploaded Files</message>
-	<message key="xmlui.CSS.ApplicationViewStep.head5">Application Activity</message>
-	<message key="xmlui.CSS.ApplicationViewStep.no_activity">No activity found.</message>
-	<message key="xmlui.CSS.ApplicationViewStep.add_message">Add Message</message>
-	<message key="xmlui.CSS.ApplicationViewStep.message_error">Please provide a message.</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label1">Name</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label2">Citizenship</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label3">E-mail</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label4">Phone</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label5">Address</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label6">School</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label7">Degree</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label8">Discipline</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label9">Title</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label10">Thesis Date</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label11">Language</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label12">Keywords</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label13">Abstract</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label14">Committee Chair</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label15">Committee Member</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label16">Embargo</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label17">Thesis</message>
-	<message key="xmlui.CSS.ApplicationViewStep.button1">Remove Thesis</message>
-	<message key="xmlui.CSS.ApplicationViewStep.none">None</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label18">Thesis PDF</message>
-	<message key="xmlui.CSS.ApplicationViewStep.error1">Please upload a thesis file in PDF format before continuing</message>
-	<message key="xmlui.CSS.ApplicationViewStep.upload">Upload</message>
-	<message key="xmlui.CSS.ApplicationViewStep.label19">Supplementary Files</message>
-	<message key="xmlui.CSS.ApplicationViewStep.error2">Supplementary files can not be larger than 250MB.</message>
-	<message key="xmlui.CSS.ApplicationViewStep.column1">File Name</message>
-	<message key="xmlui.CSS.ApplicationViewStep.column2">File Type</message>
-	<message key="xmlui.CSS.ApplicationViewStep.column3">File Size</message>
-	<message key="xmlui.CSS.ApplicationViewStep.remove_selected">Remove Selected</message>
-	<message key="xmlui.CSS.ApplicationViewStep.submit">Send Submission to Thesis Office</message>
-	<message key="xmlui.CSS.ApplicationViewStep.return">Return</message>
-	<message key="xmlui.CSS.ApplicationViewStep.confirm_title">TDL :: Step 1: Verify User Data</message>
-	<message key="xmlui.CSS.ApplicationViewStep.view_title">TDL :: View Application</message>
-	
 	
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		
@@ -1237,7 +1098,7 @@
 	<message key="xmlui.administrative.authorization.AuthorizationMain.submit_find">Find</message>
 	<message key="xmlui.administrative.authorization.AuthorizationMain.actions_advanced">Advanced authorizations tool</message>
 	<message key="xmlui.administrative.authorization.AuthorizationMain.actions_advanced_link">Click here to go to the item wildcard policy admin tool</message>
-	<message key="xmlui.administrative.authorization.AuthorizationMain.containerList_head">Community/collection authroizations</message>
+	<message key="xmlui.administrative.authorization.AuthorizationMain.containerList_head">Community/collection authorizations</message>
 	<message key="xmlui.administrative.authorization.AuthorizationMain.containerList_para">Click on a community or collection to edit its policies.</message>
 	
 	
@@ -1466,7 +1327,7 @@
 	<!-- org.dspace.app.xmlui.administrative.mapper.SearchItemForm -->
 	<message key="xmlui.administrative.mapper.SearchItemForm.title">Search Items</message>
 	<message key="xmlui.administrative.mapper.SearchItemForm.trail">Search items</message>
-	<message key="xmlui.administrative.mapper.SearchItemForm.head1">Search items matching author: "{0}"</message>
+	<message key="xmlui.administrative.mapper.SearchItemForm.head1">Search items matching: "{0}"</message>
 	<message key="xmlui.administrative.mapper.SearchItemForm.submit_map">Map selected items</message>
 	<message key="xmlui.administrative.mapper.SearchItemForm.column1"></message>
 	<message key="xmlui.administrative.mapper.SearchItemForm.column2">Collection</message>
@@ -1701,7 +1562,7 @@
 	<message key="xmlui.dri2xhtml.structural.contact-link">Contact Us</message>
 	<message key="xmlui.dri2xhtml.structural.feedback-link">Send Feedback</message>
 	
-	<message key="xmlui.dri2xhtml.structural.head-subtitle">Manakin: DSpace XMLUI Project v2</message>
+	<message key="xmlui.dri2xhtml.structural.head-subtitle">DSpace/Manakin Repository</message>
 
 	<message key="xmlui.dri2xhtml.structural.profile">Profile: </message>
 	<message key="xmlui.dri2xhtml.structural.logout">Logout</message>
@@ -1709,6 +1570,8 @@
 
 	<message key="xmlui.dri2xhtml.structural.search">Search DSpace</message>
 	<message key="xmlui.dri2xhtml.structural.search-advanced">Advanced Search</message>
+	<message key="xmlui.dri2xhtml.structural.search-in-community">This Community</message>
+	<message key="xmlui.dri2xhtml.structural.search-in-collection">This Collection</message>
 	
 	<message key="xmlui.dri2xhtml.structural.pagination-previous">Previous Page</message>
 	<message key="xmlui.dri2xhtml.structural.pagination-info">Now showing items {0}-{1} of {2}</message>
@@ -1735,6 +1598,8 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-description">Description</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-uri">URI</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-date">Date</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Publisher</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-subject">Subject</message>
 	
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Files in this item</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-file">Files</message>
@@ -1742,6 +1607,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-format">Format</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-view">View</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-viewOpen">View/<wbr/>Open</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-no-files">There are no files associated with this item.</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.size-bytes">bytes</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.size-kilobytes">Kb</message>
@@ -1762,7 +1628,8 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.collection-logo-alt">The collection's logo</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.community-logo-alt">The community's logo</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.no-logo-alt">No logo</message>		
-		
+	<message key="xmlui.dri2xhtml.METS-1.0.news">News</message>	
+	<message key="xmlui.dri2xhtml.METS-1.0.copyright">Copyright and License</message>			
 		
 	<!-- Internationalization elements specific to the Qualified Dublin Core metadata handler.
 		DS-METS-1.0-QDC.xsl -->

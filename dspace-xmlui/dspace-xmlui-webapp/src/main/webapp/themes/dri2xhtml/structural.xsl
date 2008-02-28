@@ -182,13 +182,37 @@
                 </link>
             </xsl:for-each>
             
-            <!-- the following javascript removes the default text of empty text areas when they are focused on or submitted -->
-            <script type="text/javascript">
-                function tFocus(element){if (element.value == '<i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>'){element.value='';}}
-                function tSubmit(form){var defaultedElements = document.getElementsByTagName("textarea");
-                for (var i=0; i != defaultedElements.length; i++){
-                if (defaultedElements[i].value == '<i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>'){
-                defaultedElements[i].value='';}}}
+            <!-- The following javascript removes the default text of empty text areas when they are focused on or submitted -->
+            <!-- There is also javascript to disable submitting a form when the 'enter' key is pressed. -->
+			<script type="text/javascript">
+				//Clear default text of emty text areas on focus
+				function tFocus(element)
+				{
+					if (element.value == '<i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>'){element.value='';}
+				}
+				//Clear default text of emty text areas on submit
+				function tSubmit(form)
+				{
+					var defaultedElements = document.getElementsByTagName("textarea");
+					for (var i=0; i != defaultedElements.length; i++){
+						if (defaultedElements[i].value == '<i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>'){
+							defaultedElements[i].value='';}}
+				}
+				//Disable pressing 'enter' key to submit a form (otherwise pressing 'enter' causes a submission to start over)
+				function disableEnterKey(e)
+				{
+				     var key;
+				
+				     if(window.event)
+				          key = window.event.keyCode;     //Internet Explorer
+				     else
+				          key = e.which;     //Firefox and Netscape
+				
+				     if(key == 13)  //if "Enter" pressed, then disable!
+				          return false;
+				     else
+				          return true;
+				}
             </script>
             
             <!-- Add javascipt  -->
@@ -230,11 +254,33 @@
                 </xsl:attribute>
                 <span id="ds-header-logo">&#160;</span>
             </a>
-            <h1><xsl:copy-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']/node()"/></h1>
-            <h2><i18n:text>xmlui.dri2xhtml.structural.head-subtitle</i18n:text></h2>
+            <h1 class="pagetitle">
+            	<xsl:choose>
+            		<!-- protectiotion against an empty page title -->
+            		<xsl:when test="not(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title'])">
+            			<xsl:text> </xsl:text>
+            		</xsl:when>
+            		<xsl:otherwise>
+            			<xsl:copy-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']/node()"/>
+            		</xsl:otherwise>
+            	</xsl:choose>
+            		
+            </h1>
+            <h2 class="static-pagetitle"><i18n:text>xmlui.dri2xhtml.structural.head-subtitle</i18n:text></h2>
+            
+            
             <ul id="ds-trail">
-                <xsl:apply-templates select="/dri:document/dri:meta/dri:pageMeta/dri:trail"/>
+            	<xsl:choose>
+	            	<xsl:when test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail) = 0">
+	                	<li class="ds-trail-link first-link"> - </li>
+	                </xsl:when>
+	                <xsl:otherwise>
+	                	<xsl:apply-templates select="/dri:document/dri:meta/dri:pageMeta/dri:trail"/>
+	                </xsl:otherwise>
+                </xsl:choose>
             </ul>
+           
+            
             <xsl:choose>
                 <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
                     <div id="ds-user-box">
@@ -434,8 +480,13 @@
                                     </xsl:attribute>       
                                 </input> 
                                 <xsl:choose>
-                                    <xsl:when test="/dri:document/dri:body//dri:div/dri:referenceSet[@type='detailView' and @n='collection-view']">This Collection</xsl:when>
-                                    <xsl:when test="/dri:document/dri:body//dri:div/dri:referenceSet[@type='detailView' and @n='community-view']">This Community</xsl:when>                           
+									<xsl:when test="/dri:document/dri:body//dri:div/dri:referenceSet[@type='detailView' and @n='community-view']">
+										<i18n:text>xmlui.dri2xhtml.structural.search-in-community</i18n:text>
+									</xsl:when>   
+									<xsl:otherwise>
+										<i18n:text>xmlui.dri2xhtml.structural.search-in-collection</i18n:text>
+									</xsl:otherwise>
+									                      
                                 </xsl:choose>
                             </label>
                         </xsl:if>
@@ -541,11 +592,15 @@
             <xsl:attribute name="action"><xsl:value-of select="@action"/></xsl:attribute>
             <xsl:attribute name="method"><xsl:value-of select="@method"/></xsl:attribute>
             <xsl:if test="@method='multipart'">
-            	<xsl:attribute name="method">POST</xsl:attribute>
+            	<xsl:attribute name="method">post</xsl:attribute>
                 <xsl:attribute name="enctype">multipart/form-data</xsl:attribute>
             </xsl:if>
             <xsl:attribute name="onsubmit">javascript:tSubmit(this);</xsl:attribute>
-            	<xsl:apply-templates select="*[not(name()='head')]"/>
+			<!--For Item Submission process, disable ability to submit a form by pressing 'Enter'-->
+			<xsl:if test="starts-with(@n,'submit')">
+				<xsl:attribute name="onkeydown">javascript:return disableEnterKey(event);</xsl:attribute>
+            </xsl:if>
+			<xsl:apply-templates select="*[not(name()='head')]"/>
           
         </form>
         <xsl:apply-templates select="@pagination">
@@ -1059,21 +1114,55 @@
     <xsl:template name="pick-label">
         <xsl:choose>
             <xsl:when test="dri:field/dri:label">
-                <span class="ds-form-label">
+                <label class="ds-form-label">
+                	<xsl:choose>
+                		<xsl:when test="./dri:field/@id">
+                			<xsl:attribute name="for">
+                				<xsl:value-of select="translate(./dri:field/@id,'.','_')"/>
+                			</xsl:attribute>
+                		</xsl:when>
+                		<xsl:otherwise></xsl:otherwise>
+                	</xsl:choose>
                     <xsl:apply-templates select="dri:field/dri:label" mode="formComposite"/>
                     <xsl:text>:</xsl:text>
-                </span>                
+                </label>                
             </xsl:when>
             <xsl:when test="string-length(string(preceding-sibling::*[1][local-name()='label'])) > 0">
-                <span>
-                    <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>
-                    <xsl:text>:</xsl:text>
-                </span>
+                <xsl:choose>
+                	<xsl:when test="./dri:field/@id">
+                		<label>
+		                	<xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>
+		                    <xsl:text>:</xsl:text>
+		                </label>
+                	</xsl:when>
+                	<xsl:otherwise>
+                		<span>
+		                	<xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>
+		                    <xsl:text>:</xsl:text>
+		                </span>
+                	</xsl:otherwise>
+                </xsl:choose>
+                
             </xsl:when>
             <xsl:when test="dri:field">
-                <span class="ds-form-label">
-                    <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>&#160;
-                </span>
+                <xsl:choose>       
+	                <xsl:when test="preceding-sibling::*[1][local-name()='label']">
+		                <label class="ds-form-label">
+		                	<xsl:choose>
+		                		<xsl:when test="./dri:field/@id">
+		                			<xsl:attribute name="for">
+		                				<xsl:value-of select="translate(./dri:field/@id,'.','_')"/>
+		                			</xsl:attribute>
+		                		</xsl:when>
+		                		<xsl:otherwise></xsl:otherwise>
+		                	</xsl:choose>
+		                    <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>&#160;
+		                </label>
+		            </xsl:when>
+		            <xsl:otherwise>
+		            	<xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>&#160;
+		            </xsl:otherwise>
+                </xsl:choose>
             </xsl:when>
             <xsl:otherwise>
                 <!-- If the label is empty and the item contains no field, omit the label. This is to 
@@ -1081,7 +1170,7 @@
                     both columns of the list. -->
             </xsl:otherwise>
         </xsl:choose>
-    </xsl:template>    
+    </xsl:template> 
     
     <xsl:template match="dri:list[@type='form']/dri:label" priority="3">
    		<xsl:attribute name="class">
@@ -1091,8 +1180,19 @@
 	             <xsl:value-of select="@rend"/>
 	         </xsl:if>
         </xsl:attribute>
+        <xsl:choose>
+        	<xsl:when test="following-sibling::dri:item[1]/dri:field/@id">
+        		<xsl:attribute name="for">
+		        	<xsl:value-of select="translate(following-sibling::dri:item[1]/dri:field/@id,'.','_')" />
+		        </xsl:attribute>
+        	</xsl:when>
+        	<xsl:otherwise>
+        	</xsl:otherwise>
+        </xsl:choose>
         <xsl:apply-templates />
-    </xsl:template>
+    </xsl:template>  
+    
+    
     <xsl:template match="dri:field/dri:label" mode="formComposite">
         <xsl:apply-templates />
     </xsl:template>
@@ -1221,15 +1321,27 @@
     <!-- The first (and most complex) case of the header tag is the one used for divisions. Since divisions can 
         nest freely, their headers should reflect that. Thus, the type of HTML h tag produced depends on how
         many divisions the header tag is nested inside of. -->
+    <!-- The font-sizing variable is the result of a linear function applied to the character count of the heading text -->
     <xsl:template match="dri:div/dri:head" priority="3">
         <xsl:variable name="head_count" select="count(ancestor::dri:div)"/>
+        <!-- with the help of the font-sizing variable, the font-size of our header text is made continuously variable based on the character count -->
+        <xsl:variable name="font-sizing" select="365 - $head_count * 80 - string-length(current())"></xsl:variable>
         <xsl:element name="h{$head_count}">
+            <!-- in case the chosen size is less than 120%, don't let it go below. Shrinking stops at 120% -->
+            <xsl:choose>
+                <xsl:when test="$font-sizing &lt; 120">
+                    <xsl:attribute name="style">font-size: 120%;</xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:attribute name="style">font-size: <xsl:value-of select="$font-sizing"/>%;</xsl:attribute>
+                </xsl:otherwise>
+            </xsl:choose>
             <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-div-head</xsl:with-param>
-            </xsl:call-template>
+            </xsl:call-template>            
             <xsl:apply-templates />
         </xsl:element>
-    </xsl:template>
+    </xsl:template>   
     
     <!-- The second case is the header on tables, which always creates an HTML h3 element -->
     <xsl:template match="dri:table/dri:head" priority="2">
@@ -1683,6 +1795,9 @@
         	</xsl:when>		
         	<xsl:otherwise>
 		        <label class="ds-composite-component">
+		            <xsl:if test="position()=last()">
+		                <xsl:attribute name="class">ds-composite-component last</xsl:attribute>
+		            </xsl:if>
 		            <xsl:apply-templates select="." mode="normalField"/>
 		            <br/>
 		            <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
@@ -1765,7 +1880,15 @@
             <!-- This is changing drammatically -->
             <xsl:when test="@type= 'checkbox' or @type= 'radio'">
                 <fieldset>
-                    <xsl:call-template name="fieldAttributes"/>
+                    <xsl:call-template name="standardAttributes">
+			            <xsl:with-param name="class">
+			                <xsl:text>ds-</xsl:text><xsl:value-of select="@type"/><xsl:text>-field </xsl:text>
+			                <xsl:if test="dri:error">
+			                    <xsl:text>error </xsl:text>
+			                </xsl:if>
+			            </xsl:with-param>
+			        </xsl:call-template> 
+			        <xsl:attribute name="id"><xsl:value-of select="generate-id()"/></xsl:attribute>
                     <xsl:if test="dri:label">
                     	<legend><xsl:apply-templates select="dri:label" mode="compositeComponent" /></legend>
                     </xsl:if>

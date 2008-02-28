@@ -124,7 +124,7 @@ public class DSpaceObjectManager implements ObjectManager
 			else
 			{
 				// No handle then refrence it by an internal ID.
-				if (dso instanceof Item)
+				if (dso instanceof Item || dso instanceof BrowseItem)
 		    	{
 		    		return "/metadata/internal/item/" + dso.getID() + "/mets.xml";
 		    	}
@@ -148,7 +148,7 @@ public class DSpaceObjectManager implements ObjectManager
 	 */
 	public String getObjectType(Object object) throws WingException 
 	{
-		if (object instanceof Item)
+		if (object instanceof Item || object instanceof BrowseItem)
     	{
     		return "DSpace Item";
     	}
@@ -183,7 +183,7 @@ public class DSpaceObjectManager implements ObjectManager
 	
 	/**
 	 * For the DSpace implementation we just return a hash of one entry which contains
-	 * a refrence to this repository's metadata.
+	 * a reference to this repository's metadata.
 	 */
 	public HashMap<String,String> getAllManagedRepositories() throws WingException
 	{

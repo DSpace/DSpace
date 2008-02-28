@@ -74,6 +74,9 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.xml.sax.SAXException;
 
+import org.apache.log4j.Logger;
+import org.dspace.core.LogManager;
+
 /**
  * The BitstreamReader will query DSpace for a particular bitstream and transmit
  * it to the user. There are several method of specifing the bitstream to be
@@ -124,6 +127,8 @@ import org.xml.sax.SAXException;
 public class BitstreamReader extends AbstractReader implements Recyclable
 {
 
+	private static Logger log = Logger.getLogger(BitstreamReader.class);
+	
     /**
      * Messages to be sent when the user is not authorized to view
      * a particular bitstream. They will be redirected to the login
@@ -286,6 +291,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             this.bitstreamInputStream = bitstream.retrieve();
             this.bitstreamSize = bitstream.getSize();
             this.bitstreamMimeType = bitstream.getFormat().getMIMEType();
+            
+            // Log that the bitstream has been viewed.
+			log.info(LogManager.getHeader(context, "view_bitstream", "bitstream_id=" + bitstream.getID()));
         }
         catch (SQLException sqle)
         {

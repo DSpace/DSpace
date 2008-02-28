@@ -196,7 +196,8 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         	query.addHidden("field"+i).setValue(field.getField());
         	query.addHidden("query"+i).setValue(field.getQuery());
         }
-        
+
+        buildSearchControls(query);
         buildSearchControls(query);
         query.addPara(null, "button-list").addButton("submit").setValue(T_go);
         

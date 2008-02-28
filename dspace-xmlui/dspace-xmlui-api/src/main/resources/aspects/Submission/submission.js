@@ -45,14 +45,11 @@ importClass(Packages.org.apache.cocoon.components.CocoonComponentManager);
 importClass(Packages.org.apache.cocoon.environment.http.HttpEnvironment);
 importClass(Packages.org.apache.cocoon.servlet.multipart.Part);
 
+importClass(Packages.org.dspace.handle.HandleManager);
 importClass(Packages.org.dspace.core.Constants);
 importClass(Packages.org.dspace.workflow.WorkflowItem);
 importClass(Packages.org.dspace.workflow.WorkflowManager);
 importClass(Packages.org.dspace.content.WorkspaceItem);
-importClass(Packages.org.dspace.uri.ExternalIdentifier);
-importClass(Packages.org.dspace.uri.IdentifierFactory);
-importClass(Packages.org.dspace.uri.dao.ExternalIdentifierDAO);
-importClass(Packages.org.dspace.uri.dao.ExternalIdentifierDAOFactory);
 importClass(Packages.org.dspace.authorize.AuthorizeManager);
 importClass(Packages.org.dspace.license.CreativeCommons);
 
@@ -182,11 +179,8 @@ function doSubmission()
        do {
            if (handle != null)
            {
-               var identifier = IdentifierFactory.resolve(getDSContext(), handle);
-               // var dao = ExternalIdentifierDAOFactory.getInstance(getDSContext());
-               // var identifier = dao.retrieve(handle);
-               var dso = identifier.getObject(getDSContext());
-
+               var dso = HandleManager.resolveToObject(getDSContext(), handle);
+               
                // Check that the dso is a collection
                if (dso != null && dso.getType() == Constants.COLLECTION)
                {
@@ -226,15 +220,14 @@ function doSubmission()
        if (submitterID == currentID)
        {
            // Get the collection handle for this item.
-           // var handle = workspace.getCollection().getExternalIdentifier().getCanonicalForm();
+           var handle = workspace.getCollection().getHandle();
            
            // Record that this is a submission id, not a workflow id.
            //(specify "S" for submission item, for FlowUtils.findSubmission())
            workspaceID = "S"+workspaceID;
            do {
-               // sendPageAndWait("handle/"+handle+"/submit/resumeStep",{"id":workspaceID,"step":"0"});
-               sendPageAndWait(IdentifierFactory.getContextPath(workspace.getCollection())+"/submit/resumeStep",{"id":workspaceID,"step":"0"});
-
+               sendPageAndWait("handle/"+handle+"/submit/resumeStep",{"id":workspaceID,"step":"0"});
+               
                if (cocoon.request.get("submit_resume"))
                {
                    submissionControl(handle,workspaceID, step);
@@ -720,7 +713,7 @@ function doWorkflow()
     }
     
     // Get the collection handle for this item.
-    var handle = WorkflowItem.find(getDSContext(), workflowID).getCollection().getExternalIdentifier().getCanonicalForm();
+    var handle = WorkflowItem.find(getDSContext(), workflowID).getCollection().getHandle();
     
     // Specify that we are working with workflows.
     //(specify "W" for workflow item, for FlowUtils.findSubmission())
@@ -820,5 +813,6 @@ function workflowStepReject(handle,workflowID)
     } while (1 == 1)
     
 }
+
 
 
