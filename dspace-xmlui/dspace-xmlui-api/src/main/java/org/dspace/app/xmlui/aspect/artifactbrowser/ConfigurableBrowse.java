@@ -59,6 +59,7 @@ import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.RequestUtils;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -86,6 +87,7 @@ import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
 /**
@@ -172,9 +174,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             
             if (key != null)
             {
-                DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+                DSpaceObject dso = URIUtil.resolve(objectModel);
                 if (dso != null)
-                    key += "-" + dso.getHandle();            
+                    key += "-" + IdentifierService.getCanonicalForm(dso);            
 
                 return HashUtil.hash(key);
             }
@@ -194,7 +196,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             try
             {
                 DSpaceValidity validity = new DSpaceValidity();
-                DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+                DSpaceObject dso = URIUtil.resolve(objectModel);
 
                 if (dso != null)
                     validity.add(dso);
@@ -242,7 +244,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         
         pageMeta.addMetadata("title").addContent(getTitleMessage(info));
 
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
 
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         if (dso != null)
@@ -597,7 +599,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         params.scope = new BrowserScope(context);
 
         // Are we in a community or collection?
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = URIUtil.resolve(objectModel);
         if (dso instanceof Community)
             params.scope.setCommunity((Community) dso);
         if (dso instanceof Collection)
