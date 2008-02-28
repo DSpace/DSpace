@@ -104,11 +104,11 @@
          <id>dspace-api</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-api/pom.xml</exists>
+               <exists>../dspace-api/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-api</module>
+            <module>../dspace-api</module>
          </modules>
       </profile>
 
@@ -119,11 +119,11 @@
          <id>dspace-oai-api</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-oai-api/pom.xml</exists>
+               <exists>../dspace-oai-api/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-oai-api</module>
+            <module>../dspace-oai-api</module>
          </modules>
       </profile>
 
@@ -134,11 +134,11 @@
          <id>dspace-oai-webapp</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-oai-webapp/pom.xml</exists>
+               <exists>../dspace-oai-webapp/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-oai-webapp</module>
+            <module>../dspace-oai-webapp</module>
          </modules>
       </profile>
       
@@ -149,11 +149,11 @@
          <id>dspace-oai</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-oai/pom.xml</exists>
+               <exists>../dspace-oai/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-oai</module>
+            <module>../dspace-oai</module>
          </modules>
       </profile>
 
@@ -165,11 +165,11 @@
          <id>dspace-jspui-api</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-jspui-api/pom.xml</exists>
+               <exists>../dspace-jspui-api/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-jspui-api</module>
+            <module>../dspace-jspui-api</module>
          </modules>
       </profile>
       
@@ -181,11 +181,11 @@
          <id>dspace-jspui-webapp</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-jspui-webapp/pom.xml</exists>
+               <exists>../dspace-jspui-webapp/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-jspui-webapp</module>
+            <module>../dspace-jspui-webapp</module>
          </modules>
       </profile>
             
@@ -197,11 +197,11 @@
          <id>dspace-jspui</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-jspui/pom.xml</exists>
+               <exists>../dspace-jspui/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-jspui</module>
+            <module>../dspace-jspui</module>
          </modules>
       </profile>
 
@@ -213,11 +213,11 @@
          <id>dspace-sword-api</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-sword-api/pom.xml</exists>
+               <exists>../dspace-sword-api/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-sword-api</module>
+            <module>../dspace-sword-api</module>
          </modules>
       </profile>
 
@@ -229,11 +229,11 @@
          <id>dspace-sword-webapp</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-sword-webapp/pom.xml</exists>
+               <exists>../dspace-sword-webapp/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-sword-webapp</module>
+            <module>../dspace-sword-webapp</module>
          </modules>
       </profile>
 
@@ -245,11 +245,11 @@
          <id>dspace-sword</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-sword/pom.xml</exists>
+               <exists>../dspace-sword/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-sword</module>
+            <module>../dspace-sword</module>
          </modules>
       </profile>
 
@@ -260,11 +260,11 @@
          <id>dspace-xmlui-api</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-xmlui-api/pom.xml</exists>
+               <exists>../dspace-xmlui-api/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-xmlui-api</module>
+            <module>../dspace-xmlui-api</module>
          </modules>
       </profile>
 
@@ -272,11 +272,11 @@
          <id>dspace-xmlui-wing</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-xmlui-wing/pom.xml</exists>
+               <exists>../dspace-xmlui-wing/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-xmlui-wing</module>
+            <module>../dspace-xmlui-wing</module>
          </modules>
       </profile>
 
@@ -284,11 +284,11 @@
          <id>dspace-xmlui-webapp</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-xmlui-webapp/pom.xml</exists>
+               <exists>../dspace-xmlui-webapp/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-xmlui-webapp</module>
+            <module>../dspace-xmlui-webapp</module>
          </modules>
       </profile>
 
@@ -296,11 +296,11 @@
          <id>dspace-xmlui-lang</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-xmlui-lang/pom.xml</exists>
+               <exists>../dspace-xmlui-lang/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-xmlui-lang</module>
+            <module>../dspace-xmlui-lang</module>
          </modules>
       </profile>
       
@@ -311,11 +311,11 @@
          <id>dspace-xmlui</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-xmlui/pom.xml</exists>
+               <exists>../dspace-xmlui/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-xmlui</module>
+            <module>../dspace-xmlui</module>
          </modules>
       </profile>
 
@@ -326,11 +326,11 @@
          <id>dspace-lni-core</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-lni-core/pom.xml</exists>
+               <exists>../dspace-lni-core/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-lni-core</module>
+            <module>../dspace-lni-core</module>
          </modules>
       </profile>
 
@@ -338,11 +338,11 @@
          <id>dspace-lni-webapp</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-lni-webapp/pom.xml</exists>
+               <exists>../dspace-lni-webapp/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-lni-webapp</module>
+            <module>../dspace-lni-webapp</module>
          </modules>
       </profile>
       
@@ -350,11 +350,11 @@
          <id>dspace-lni-client</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-lni-client/pom.xml</exists>
+               <exists>../dspace-lni-client/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-lni-client</module>
+            <module>../dspace-lni-client</module>
          </modules>
       </profile>
 
@@ -365,11 +365,11 @@
          <id>dspace-lni</id>
          <activation>
             <file>
-               <exists>${basedir}/../dspace-lni/pom.xml</exists>
+               <exists>../dspace-lni/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../dspace-lni</module>
+            <module>../dspace-lni</module>
          </modules>
       </profile>
       
@@ -380,11 +380,11 @@
          <id>language-packs</id>
          <activation>
             <file>
-               <exists>${basedir}/../language-packs/pom.xml</exists>
+               <exists>../language-packs/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>${basedir}/../language-packs</module>
+            <module>../language-packs</module>
          </modules>
       </profile>
 

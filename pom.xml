@@ -40,43 +40,58 @@
 
    <profiles>
    
-      <!--  
-         adds dspace module into build reactor for 
-         when dspace is being build for installation
-         on the users machine and when mvn release:prepare
-         is used by the release manager to create a new 
-         tag in svn. Just use 'mvn package' for building or 
-         use 'mvn release:prepare' for tagging.
+      <!-- 
+         ========================================================
+         These are admiistrative profiles used by release manager
+         To complete release tasks.
+         ========================================================
+         
+         Use 'mvn release:prepare -Pall' for tagging the release.
       -->
       <profile>
-         <id>all-projects</id>
+         <id>all</id>
          <activation>
-            <activeByDefault>true</activeByDefault>
+            <activeByDefault>false</activeByDefault>
          </activation>
          <modules>
+            <module>language-packs</module>
+            <module>dspace-api</module>
+            <module>dspace-jspui</module>
+            <module>dspace-xmlui</module>
+            <module>dspace-lni</module>
+            <module>dspace-oai</module>
+            <module>dspace-sword</module>
             <module>dspace</module>
          </modules>
       </profile>
       
+      
       <!-- 
-         An empty hook to turn off the above profile while
-         doing Continuous Integration and deploying the release. 
-         Use 'mvn deploy -Ponly-modules'
+         Use 'mvn deploy -Paddons' while doing Continuous Integration
+         and deploying addons to the Maven repository. 
        -->
       <profile>
-         <id>only-modules</id>
+         <id>addons</id>
          <activation>
             <activeByDefault>false</activeByDefault>
          </activation>
+         <modules>
+            <module>language-packs</module>
+            <module>dspace-api</module>
+            <module>dspace-jspui</module>
+            <module>dspace-xmlui</module>
+            <module>dspace-lni</module>
+            <module>dspace-oai</module>
+            <module>dspace-sword</module>
+         </modules>
       </profile>
       
       <!-- 
-         Defines distributions that need to be created
-         for release manager to upload to S.F.
-         use 'mvn package -N -Ponly-releases'
+         Use 'mvn package -Pdistributions' to create distributions 
+         to upload to S.F.
        -->
       <profile>
-         <id>only-releases</id>
+         <id>distributions</id>
          <activation>
             <activeByDefault>false</activeByDefault>
          </activation>
