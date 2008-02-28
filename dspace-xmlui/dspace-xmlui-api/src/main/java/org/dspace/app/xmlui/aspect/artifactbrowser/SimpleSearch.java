@@ -123,7 +123,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         Division search = body.addDivision("search","primary");
         search.setHead(T_head);
         Division query = search.addInteractiveDivision("general-query",
-                "",Division.METHOD_POST,"secondary search");
+                "search",Division.METHOD_POST,"secondary search");
 
         List queryList = query.addList("search-query",List.TYPE_FORM);
         
@@ -139,7 +139,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         text.setValue(queryString);
         
         buildSearchControls(query);
-        queryList.addItem().addButton("submit").setValue(T_go);
+        query.addPara(null, "button-list").addButton("submit").setValue(T_go);
 
         // Add the result division
         buildSearchResultsDivision(search);
@@ -168,7 +168,22 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         String query = getQuery();
         if (!"".equals(query))
             parameters.put("query", URLEncode(query));
-
+        
+        if (parameters.get("page") == null)
+        	parameters.put("page", String.valueOf(getParameterPage()));
+        
+        if (parameters.get("rpp") == null)
+        	parameters.put("rpp", String.valueOf(getParameterRpp()));
+        
+        if (parameters.get("sort_by") == null)
+        	parameters.put("sort_by", String.valueOf(getParameterSortBy()));
+        
+        if (parameters.get("order") == null)
+        	parameters.put("order",getParameterOrder());
+        
+        if (parameters.get("etal") == null)
+        	parameters.put("etal",String.valueOf(getParameterEtAl()));
+        
         return super.generateURL("search", parameters);
     }
 }

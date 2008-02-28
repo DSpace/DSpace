@@ -341,6 +341,21 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
             parameters.put("query" + index, query);
         }
         
+        if (parameters.get("page") == null)
+        	parameters.put("page", String.valueOf(getParameterPage()));
+        
+        if (parameters.get("rpp") == null)
+        	parameters.put("rpp", String.valueOf(getParameterRpp()));
+        
+        if (parameters.get("sort_by") == null)
+        	parameters.put("sort_by", String.valueOf(getParameterSortBy()));
+        
+        if (parameters.get("order") == null)
+        	parameters.put("order",getParameterOrder());
+        
+        if (parameters.get("etal") == null)
+        	parameters.put("etal",String.valueOf(getParameterEtAl()));
+        
         return super.generateURL("advanced-search", parameters);
     }
 
