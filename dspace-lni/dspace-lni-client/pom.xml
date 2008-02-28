@@ -28,6 +28,7 @@
          </releases>
          <snapshots>
             <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
             <checksumPolicy>fail</checksumPolicy>
          </snapshots>
       </repository>
@@ -39,11 +40,12 @@
          <name>DSpace Maven Repository</name>
          <url>http://maven.dspace.org/snapshot</url>
          <releases>
-            <updatePolicy>never</updatePolicy>
+            <enabled>false</enabled>
             <checksumPolicy>fail</checksumPolicy>
          </releases>
          <snapshots>
-            <updatePolicy>always</updatePolicy>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
             <checksumPolicy>fail</checksumPolicy>
          </snapshots>
       </pluginRepository>
@@ -60,6 +62,53 @@
          http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace-lni/dspace-lni-client
       </url>
    </scm>
+
+   <profiles>
+      <profile>
+         <activation>
+            <property>
+               <name>regenerate-wsdl</name>
+               <value>true</value>
+            </property>
+         </activation>
+         <build>
+            <plugins>
+               <plugin>
+                  <artifactId>maven-antrun-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                           <tasks>
+                              <taskdef resource="axis-tasks.properties"
+                                 classpathref="maven.compile.classpath" />
+                              <mkdir dir="src/main/config" />
+                              <axis-java2wsdl
+                                 classname="org.dspace.app.dav.LNISoapServlet"
+                                 location="http://localhost/dspace/lni/DSpaceLNI"
+                                 methods="lookup,propfind,proppatch,copy"
+                                 namespace="http://dspace.org/xmlns/lni"
+                                 output="src/main/resources/dspace-lni.wsdl" />
+                              <mkdir dir="src/main/java" />
+                              <axis-wsdl2java output="src/main/java"
+                                 verbose="true"
+                                 url="src/main/resources/dspace-lni.wsdl">
+                                 <mapping
+                                    namespace="http://dspace.org/xmlns/lni"
+                                    package="org.dspace.app.dav.client" />
+                              </axis-wsdl2java>
+                           </tasks>
+                        </configuration>
+                        <goals>
+                           <goal>run</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+   </profiles>
 
    <build>
       <plugins>
