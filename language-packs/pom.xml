@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace</groupId>
    <artifactId>language-packs</artifactId>
@@ -70,11 +72,10 @@
             <configuration>
                <tasks>
                   <mkdir dir="target/classes" />
-                  <native2ascii 
-                     encoding="UTF8" 
-                     src="${basedir}/src/main/resources" 
+                  <native2ascii encoding="UTF8"
+                     src="${basedir}/src/main/resources"
                      dest="${basedir}/target/classes"
-                     includes="**/*.properties.UTF-8" ext=""/>
+                     includes="**/*.properties.UTF-8" ext="" />
                </tasks>
             </configuration>
             <executions>
@@ -111,6 +112,25 @@
       </plugins>
    </reporting>
 
-   
+   <profiles>
+      <profile>
+         <id>default-tools.jar</id>
+         <activation>
+            <property>
+               <name>java.vendor</name>
+               <value>Sun Microsystems Inc.</value>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>com.sun</groupId>
+               <artifactId>tools</artifactId>
+               <version>1.4.2</version>
+               <scope>system</scope>
+               <systemPath>${java.home}/../lib/tools.jar</systemPath>
+            </dependency>
+         </dependencies>
+      </profile>
+   </profiles>
 
 </project>
