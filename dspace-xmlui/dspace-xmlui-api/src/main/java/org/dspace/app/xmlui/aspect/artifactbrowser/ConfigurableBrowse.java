@@ -405,6 +405,11 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         {
             // Create a clickable list of the alphabet
             List jumpList = jump.addList("jump-list", List.TYPE_SIMPLE, "alphabet");
+            
+            Map<String, String> zeroQuery = new HashMap<String, String>(queryParams);
+            zeroQuery.put(BrowseParams.STARTS_WITH, "0");
+            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, zeroQuery), "0-9");
+            
             for (char c = 'A'; c <= 'Z'; c++)
             {
                 Map<String, String> cQuery = new HashMap<String, String>(queryParams);
