@@ -351,7 +351,7 @@
         	<xsl:otherwise>
 		        <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT']">
 		            <xsl:with-param name="context" select="."/>
-		            <xsl:with-param name="primaryBitream" select="./mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
+		            <xsl:with-param name="primaryBitstream" select="./mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
 		        </xsl:apply-templates>
         	</xsl:otherwise>
         </xsl:choose>
@@ -584,7 +584,7 @@
         	<xsl:otherwise>
 		        <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT']">
 		            <xsl:with-param name="context" select="."/>
-		            <xsl:with-param name="primaryBitream" select="./mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
+		            <xsl:with-param name="primaryBitstream" select="./mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
 		        </xsl:apply-templates>
         	</xsl:otherwise>
         </xsl:choose>
