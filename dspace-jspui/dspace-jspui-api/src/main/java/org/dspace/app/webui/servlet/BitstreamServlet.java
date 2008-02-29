@@ -205,20 +205,26 @@ public class BitstreamServlet extends DSpaceServlet
                 "bitstream_id=" + bitstream.getID()));
 
         // Modification date
-        // TODO: Currently the date of the item, since we don't have dates
-        // for files
-        response.setDateHeader("Last-Modified", item.getLastModified()
-                .getTime());
-        
-        // Check for if-modified-since header
-        long modSince = request.getDateHeader("If-Modified-Since");
-
-        if (modSince != -1 && item.getLastModified().getTime() < modSince)
+        // Only use last-modified if this is an anonymous access
+        // - caching content that may be generated under authorisation
+        //   is a security problem
+        if (context.getCurrentUser() == null)
         {
-            // Item has not been modified since requested date,
-            // hence bitstream has not; return 304
-            response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-            return;
+            // TODO: Currently the date of the item, since we don't have dates
+            // for files
+            response.setDateHeader("Last-Modified", item.getLastModified()
+                    .getTime());
+
+            // Check for if-modified-since header
+            long modSince = request.getDateHeader("If-Modified-Since");
+
+            if (modSince != -1 && item.getLastModified().getTime() < modSince)
+            {
+                // Item has not been modified since requested date,
+                // hence bitstream has not; return 304
+                response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                return;
+            }
         }
         
         // Pipe the bits

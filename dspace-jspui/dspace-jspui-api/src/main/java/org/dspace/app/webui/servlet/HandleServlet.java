@@ -156,18 +156,29 @@ public class HandleServlet extends DSpaceServlet
         if (dso.getType() == Constants.ITEM)
         {
             Item item = (Item) dso;
-            
-            response.setDateHeader("Last-Modified", item
-                    .getLastModified().getTime());
-            
-            // Check for if-modified-since header
-            long modSince = request.getDateHeader("If-Modified-Since");
 
-            if (modSince != -1 && item.getLastModified().getTime() < modSince)
+            // Only use last-modified if this is an anonymous access
+            // - caching content that may be generated under authorisation
+            //   is a security problem
+            if (context.getCurrentUser() == null)
             {
-                // Item has not been modified since requested date,
-                // hence bitstream has not; return 304
-                response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                response.setDateHeader("Last-Modified", item
+                        .getLastModified().getTime());
+
+                // Check for if-modified-since header
+                long modSince = request.getDateHeader("If-Modified-Since");
+
+                if (modSince != -1 && item.getLastModified().getTime() < modSince)
+                {
+                    // Item has not been modified since requested date,
+                    // hence bitstream has not; return 304
+                    response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                }
+                else
+                {
+                    // Display the item page
+                    displayItem(context, request, response, item, handle);
+                }
             }
             else
             {
