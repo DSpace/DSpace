@@ -498,7 +498,7 @@ function startCreateCollection()
 {
 	var communityID = cocoon.request.get("communityID");
 	
-	assertAdministrator()
+	assertAuthorized(Constants.COMMUNITY,communityID,Constants.ADD);
 	
 	doCreateCollection(communityID);
 	
@@ -556,8 +556,8 @@ function startEditCommunity()
 	
 	doEditCommunity(communityID);
 	
-	// Go back to the collection
-	var community = community.find(getDSContext(),communityID);
+	// Go back to the community
+	var community = Community.find(getDSContext(),communityID);
 	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+community.getHandle(),true);
 	getDSContext().complete();
 	community = null;
@@ -2339,14 +2339,14 @@ function doDeleteCollection(collectionID)
 // Creating a new collection, given the ID of its parent community 
 function doCreateCollection(communityID)
 {
-	assertAdministrator();
+	assertAuthorized(Constants.COMMUNITY,communityID,Constants.ADD);
 	
 	var result;
 	var collectionID;
 	
 	do {
 		sendPageAndWait("admin/collection/createCollection",{"communityID":communityID},result);
-		assertAdministrator();
+		assertAuthorized(Constants.COMMUNITY,communityID,Constants.ADD);
 		result=null;
 		
 		if (cocoon.request.get("submit_save")) {
@@ -2428,6 +2428,10 @@ function doEditCommunity(communityID)
 		assertEditCommunity(communityID);
 		result=null;
 		
+		if (cocoon.request.get("submit_return"))
+		{
+			return null;	
+		}
 		if (cocoon.request.get("submit_save")) 
 		{
 			result = FlowContainerUtils.processEditCommunity(getDSContext(), communityID, false, cocoon.request);
