@@ -166,8 +166,8 @@
          <artifactId>dspace-xmlui-lang</artifactId>
          <!-- 
             TODO: change in release to <version>[1.5.0,1.6.0)</version>
-          -->
-         <version>[1.5,1.6)</version>
+         -->
+         <version>1.5-SNAPSHOT</version>
          <type>war</type>
       </dependency>
       
