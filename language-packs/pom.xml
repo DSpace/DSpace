@@ -80,40 +80,6 @@
             </excludes>
          </resource>
       </resources>
-      <plugins>
-         <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <configuration>
-               <tasks>
-                  <mkdir dir="target/classes" />
-                  <native2ascii encoding="UTF8"
-                     src="${basedir}/src/main/resources"
-                     dest="${basedir}/target/classes"
-                     includes="**/*.properties.UTF-8" ext="" />
-               </tasks>
-            </configuration>
-            <executions>
-               <execution>
-                  <phase>generate-resources</phase>
-                  <goals>
-                     <goal>run</goal>
-                  </goals>
-               </execution>
-            </executions>
-            <dependencies>
-               <dependency>
-                  <groupId>org.apache.ant</groupId>
-                  <artifactId>ant-nodeps</artifactId>
-                  <version>1.7.0</version>
-               </dependency>
-               <dependency>
-                  <groupId>org.apache.ant</groupId>
-                  <artifactId>ant</artifactId>
-                  <version>1.7.0</version>
-               </dependency>
-            </dependencies>
-         </plugin>
-      </plugins>
    </build>
 
    <reporting>
@@ -126,25 +92,5 @@
       </plugins>
    </reporting>
 
-   <profiles>
-      <profile>
-         <id>default-tools.jar</id>
-         <activation>
-            <property>
-               <name>java.vendor</name>
-               <value>Sun Microsystems Inc.</value>
-            </property>
-         </activation>
-         <dependencies>
-            <dependency>
-               <groupId>com.sun</groupId>
-               <artifactId>tools</artifactId>
-               <version>1.4.2</version>
-               <scope>system</scope>
-               <systemPath>${java.home}/../lib/tools.jar</systemPath>
-            </dependency>
-         </dependencies>
-      </profile>
-   </profiles>
 
 </project>
