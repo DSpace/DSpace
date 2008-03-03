@@ -38,13 +38,17 @@
  * DAMAGE.
  */package org.dspace.app.xmlui.aspect.administrative;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -181,9 +185,19 @@ public class FlowGroupUtils {
 	 * @param newGroupIDsArray All group members.
 	 * @return A result
 	 */
-	public static FlowResult processSaveGroup(Context context, int groupID, String newName, String[] newEPeopleIDsArray, String[] newGroupIDsArray) throws SQLException, AuthorizeException
+	public static FlowResult processSaveGroup(Context context, int groupID, String newName, String[] newEPeopleIDsArray, String[] newGroupIDsArray) throws SQLException, AuthorizeException, UIException
 	{
 		FlowResult result = new FlowResult();
+		
+		// Decode the name incase it uses non-ascii characters.
+		try
+        {
+            newName = URLDecoder.decode(newName, Constants.DEFAULT_ENCODING);
+        }
+        catch (UnsupportedEncodingException uee)
+        {
+            throw new UIException(uee);
+        }
 		
 		// If the new name is empty we can return in error right away.
 		if (newName == null || newName.length() == 0)

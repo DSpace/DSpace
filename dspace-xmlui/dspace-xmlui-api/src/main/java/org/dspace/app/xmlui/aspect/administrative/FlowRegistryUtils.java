@@ -39,18 +39,23 @@
  */package org.dspace.app.xmlui.aspect.administrative;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.utils.RequestUtils;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
 /**
@@ -90,10 +95,21 @@ public class FlowRegistryUtils
 	 * @param name The new schema's name.
 	 * @return A flow result
 	 */
-	public static FlowResult processAddMetadataSchema(Context context, String namespace, String name) throws SQLException, AuthorizeException, NonUniqueMetadataException
+	public static FlowResult processAddMetadataSchema(Context context, String namespace, String name) throws SQLException, AuthorizeException, NonUniqueMetadataException, UIException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
+		
+		// Decode the namespace and name
+		try
+        {
+            namespace = URLDecoder.decode(namespace, Constants.DEFAULT_ENCODING);
+            name = URLDecoder.decode(name,Constants.DEFAULT_ENCODING);
+        }
+        catch (UnsupportedEncodingException uee)
+        {
+            throw new UIException(uee);
+        }
 		
 		if (namespace == null || 
 			namespace.length() <= 0)
@@ -174,11 +190,23 @@ public class FlowRegistryUtils
 	 * @param note A scope not about the field.
 	 * @return A results object
 	 */
-	public static FlowResult processAddMetadataField(Context context, int schemaID, String element, String qualifier, String note) throws IOException, AuthorizeException, SQLException
+	public static FlowResult processAddMetadataField(Context context, int schemaID, String element, String qualifier, String note) throws IOException, AuthorizeException, SQLException, UIException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
 
+		// Decode the element, qualifier, and note.
+		try
+        {
+            element = URLDecoder.decode(element, Constants.DEFAULT_ENCODING);
+            qualifier = URLDecoder.decode(qualifier,Constants.DEFAULT_ENCODING);
+            note = URLDecoder.decode(note,Constants.DEFAULT_ENCODING);
+        }
+        catch (UnsupportedEncodingException uee)
+        {
+            throw new UIException(uee);
+        }
+		
 		// Check if the field name is good.
 		result.setErrors(checkMetadataFieldName(element, qualifier));
 		
@@ -226,11 +254,23 @@ public class FlowRegistryUtils
 	 * @param note A new note value.
 	 * @return A results object.
 	 */
-	public static FlowResult processEditMetadataField(Context context, int schemaID, int fieldID, String element, String qualifier, String note) throws IOException, AuthorizeException, SQLException
+	public static FlowResult processEditMetadataField(Context context, int schemaID, int fieldID, String element, String qualifier, String note) throws IOException, AuthorizeException, SQLException, UIException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
 
+		// Decode the element, qualifier, and note.
+		try
+        {
+            element = URLDecoder.decode(element, Constants.DEFAULT_ENCODING);
+            qualifier = URLDecoder.decode(qualifier,Constants.DEFAULT_ENCODING);
+            note = URLDecoder.decode(note,Constants.DEFAULT_ENCODING);
+        }
+        catch (UnsupportedEncodingException uee)
+        {
+            throw new UIException(uee);
+        }
+		
 		// Check if the field name is good.
 		result.setErrors(checkMetadataFieldName(element, qualifier));
 		

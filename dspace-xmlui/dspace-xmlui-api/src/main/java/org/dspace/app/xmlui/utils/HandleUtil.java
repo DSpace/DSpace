@@ -45,6 +45,7 @@ import java.util.Stack;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.content.Bitstream;
@@ -220,14 +221,28 @@ public class HandleUtil
         while (!stack.empty())
         {
             DSpaceObject pop = stack.pop();
+            
             if (pop instanceof Collection)
-                pageMeta.addTrailLink(contextPath + "/handle/"
-                        + pop.getHandle(), ((Collection) pop)
-                        .getMetadata("name"));
+            {
+            	Collection collection = (Collection) pop;
+            	String name = collection.getMetadata("name");
+            	if (name == null || name.length() == 0)
+            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), new Message("default","xmlui.general.untitled") );
+            	else
+            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), name);
+            }
             else if (pop instanceof Community)
-                pageMeta.addTrailLink(contextPath + "/handle/"
-                        + pop.getHandle(), ((Community) pop)
-                        .getMetadata("name"));
+            {
+            	Community community = (Community) pop;
+            	String name = community.getMetadata("name");
+            	if (name == null || name.length() == 0)
+            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), new Message("default","xmlui.general.untitled") );
+            	else
+            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), name);
+            	
+            	
+                pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), ((Community) pop).getMetadata("name"));
+            }
 
         }
     }

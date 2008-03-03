@@ -148,12 +148,12 @@ public class ManageGroupsMain extends AbstractDSpaceTransformer
 	public void addBody(Body body) throws WingException, SQLException 
 	{
 		// Get all our parameters
-		String baseURL = contextPath +"/admin/groups?administrative-continue="+knot.getId();
-		String query = parameters.getParameter("query","");
-		int page = parameters.getParameterAsInteger("page",0);
+		String baseURL  = contextPath +"/admin/groups?administrative-continue="+knot.getId();
+		String query    = URLDecode(parameters.getParameter("query",""));
+		int page        = parameters.getParameterAsInteger("page",0);
 		int highlightID = parameters.getParameterAsInteger("highlightID",-1);
         int resultCount = Group.searchResultCount(context, query);
-        Group[] groups = Group.search(context, query, page*PAGE_SIZE, PAGE_SIZE);
+        Group[] groups  = Group.search(context, query, page*PAGE_SIZE, PAGE_SIZE);
 		
 		
 		

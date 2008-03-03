@@ -92,6 +92,9 @@ public class AuthorizationMain extends AbstractDSpaceTransformer
 	private static final Message T_dspace_home =
 		message("xmlui.general.dspace_home");
 	
+	private static final Message T_untitled =
+		message("xmlui.general.untitled");
+	
 	
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -104,7 +107,7 @@ public class AuthorizationMain extends AbstractDSpaceTransformer
 	public void addBody(Body body) throws WingException, SQLException 
 	{
 		/* Get and setup our parameters */
-        String query = parameters.getParameter("query",null);
+        String query = URLDecode(parameters.getParameter("query",null));
         String baseURL = contextPath+"/admin/epeople?administrative-continue="+knot.getId();
         
         String errorString = parameters.getParameter("errors",null);
@@ -165,7 +168,11 @@ public class AuthorizationMain extends AbstractDSpaceTransformer
 			{
 				if (containerSubList == null)
 					containerSubList = parentList.addList("subList" + currentCommunity.getID());
-        		containerSubList.addItemXref(baseURL+"&submit_edit&collection_id="+subCols.getID(), subCols.getMetadata("name"));
+				String name = subCols.getMetadata("name");
+				if (name == null || name.length() == 0)
+					containerSubList.addItemXref(baseURL+"&submit_edit&collection_id="+subCols.getID(), T_untitled);
+				else
+					containerSubList.addItemXref(baseURL+"&submit_edit&collection_id="+subCols.getID(), name);
         	}
 			for (Community subComs : currentCommunity.getSubcommunities()) 
 			{
