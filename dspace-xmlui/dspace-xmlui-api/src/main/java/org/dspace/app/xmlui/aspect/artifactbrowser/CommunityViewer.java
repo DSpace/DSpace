@@ -95,6 +95,9 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
     
     private static final Message T_go =
         message("xmlui.general.go");
+    
+    public static final Message T_untitled = 
+    	message("xmlui.general.untitled");
 
     private static final Message T_head_browse =
         message("xmlui.ArtifactBrowser.CommunityViewer.head_browse");
@@ -218,7 +221,11 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         // Set up the major variables
         Community community = (Community) dso;
         // Set the page title
-        pageMeta.addMetadata("title").addContent(community.getMetadata("name"));
+        String name = community.getMetadata("name");
+        if (name == null || name.length() == 0)
+        	pageMeta.addMetadata("title").addContent(T_untitled);
+        else
+        	pageMeta.addMetadata("title").addContent(name);
 
         // Add the trail back to the repository root.
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
@@ -262,7 +269,11 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 
         // Build the community viewer division.
         Division home = body.addDivision("community-home", "primary repository community");
-        home.setHead(community.getMetadata("name"));
+        String name = community.getMetadata("name");
+        if (name == null || name.length() == 0)
+        	home.setHead(T_untitled);
+        else
+        	home.setHead(name);
 
         // The search / browse box.
         {

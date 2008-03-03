@@ -93,6 +93,9 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     private static final Message T_go = 
         message("xmlui.general.go");
     
+    public static final Message T_untitled = 
+    	message("xmlui.general.untitled");
+    
     private static final Message T_head_browse =
         message("xmlui.ArtifactBrowser.CollectionViewer.head_browse");
     
@@ -202,8 +205,11 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
         Collection collection = (Collection) dso;
 
         // Set the page title
-        pageMeta.addMetadata("title")
-                .addContent(collection.getMetadata("name"));
+        String name = collection.getMetadata("name");
+        if (name == null || name.length() == 0)
+        	pageMeta.addMetadata("title").addContent(T_untitled);
+        else
+        	pageMeta.addMetadata("title").addContent(name);
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         HandleUtil.buildHandleTrail(collection,pageMeta,contextPath);
@@ -242,7 +248,11 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 
         // Build the collection viewer division.
         Division home = body.addDivision("collection-home", "primary repository collection");
-        home.setHead(collection.getMetadata("name"));
+        String name = collection.getMetadata("name");
+        if (name == null || name.length() == 0)
+        	home.setHead(T_untitled);
+        else
+        	home.setHead(name);
 
         // The search / browse box.
         {
