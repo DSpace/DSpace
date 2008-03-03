@@ -48,13 +48,21 @@
 			</global-variables>
 		</map:component-configurations>
 		
-		
+
 		<map:pipeline>
+			<!-- Allow the browser to cache static content for an hour -->
+			<map:parameter name="expires" value="access plus 1 hours"/>
 			
 			<!-- Static content -->
 			<map:match pattern="themes/*/**">
 				<map:read src="{2}"/>
 			</map:match>
+		</map:pipeline>
+
+		
+		<map:pipeline>
+			<!-- Never allow the browser to cache dynamic content -->
+			<map:parameter name="expires" value="now"/>
 			
 			<!-- Aspect content -->
 			<map:match pattern="**">

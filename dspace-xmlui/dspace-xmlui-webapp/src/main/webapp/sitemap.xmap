@@ -197,6 +197,7 @@
 		<!-- Bitstream pipeline -->
 		<map:pipeline type="noncaching">
 			<map:parameter name="outputBufferSize" value="8192"/>
+			<map:parameter name="expires" value="now"/>
 
 
 			<!--
@@ -271,6 +272,8 @@
 		
 		<!-- non-bitstream pipeline -->
 		<map:pipeline>
+			<!--<map:parameter name="expires" value="now"/>-->
+		
 			<!-- Theme pipeline -->
 			<map:match pattern="DRI/**">
 				<map:mount check-reload="no" src="aspects/aspects.xmap" uri-prefix="DRI/"/>
