@@ -155,15 +155,7 @@
 			<map:reader name="BitstreamReader" src="org.dspace.app.xmlui.cocoon.BitstreamReader"/>
 		</map:readers>
 		<map:actions>
-			<map:action name="locale" src="org.apache.cocoon.acting.LocaleAction">
-				<locale-attribute>locale</locale-attribute>
-				<use-locale>true</use-locale>
-				<default-locale language="en" country="US"/>
-				<store-in-request>false</store-in-request>
-				<create-session>false</create-session>
-				<store-in-session>false</store-in-session>
-				<store-in-cookie>false</store-in-cookie>
-			</map:action>
+			<map:action name="locale" src="org.dspace.app.xmlui.cocoon.DSpaceLocaleAction"/>
 			<map:action name="StartAuthentication" src="org.dspace.app.xmlui.aspect.eperson.StartAuthenticationAction"/>
 			<map:action name="DSpacePropertyFileReader" src="org.dspace.app.xmlui.cocoon.DSpacePropertyFileReader" />
 			<map:action name="PropertyFileReader" src="org.dspace.app.xmlui.cocoon.PropertyFileReader" />
