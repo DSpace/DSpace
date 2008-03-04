@@ -866,15 +866,7 @@ Also, make sure that the <code>db.username</code> and <code>db.password</code> p
       <PRE>dspace 16325  1997  0  Feb 14  ?         0:00 postgres: dspace dspace 127.0.0.1 SELECT</PRE>
 
       <P>This means the connection is in the middle of a <CODE>SELECT</CODE> operation, and if you're not using DSpace right that instant, it's probably a 'zombie' connection.  If this is the case, try <code>kill</code>ing the process, and stopping and restarting Tomcat.</P></DD>
-
-      <dt>You've made changes to the code or to the JSP's and rebuilt DSpace successfully, but when you run Tomcat
-      you don't see any of your changes in DSpace.</dt>
-
-      <dd><p>After you've rebuilt DSpace and copied <code>dspace.war</code> from your <code><i>[dspace-source]</i>/build</code> directory
-    into your <code><i>[tomcat]</i>/webapps</code> directory, you must
-      also <strong>delete</strong> the existing <code><i>[tomcat]</i>/webapps/dspace</code> directory <strong>before</strong> re-starting Tomcat. Otherwise
-      Tomcat will continue to use the old code.<p></dd>
-
+      
     </DL>
 
     <HR>
