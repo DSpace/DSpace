@@ -42,9 +42,14 @@ package org.dspace.app.xmlui.cocoon;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.regex.Matcher;
 
+import javax.mail.internet.MimeUtility;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.avalon.excalibur.pool.Recyclable;
@@ -166,6 +171,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     /** The bitstream's mime-type */
     protected String bitstreamMimeType;
     
+    /** The bitstream's name */
+    protected String bitstreamName;
+    
     /**
      * Set up the bitstream reader.
      * 
@@ -282,6 +290,15 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             this.bitstreamInputStream = bitstream.retrieve();
             this.bitstreamSize = bitstream.getSize();
             this.bitstreamMimeType = bitstream.getFormat().getMIMEType();
+            this.bitstreamName = bitstream.getName();
+            
+            // Trim any path information from the bitstream
+    		int finalSlashIndex = bitstreamName.lastIndexOf("/");
+    		if (finalSlashIndex > 0)
+    		{
+    			bitstreamName = bitstreamName.substring(finalSlashIndex+1);
+    		}
+    		
             
             // Log that the bitstream has been viewed.
 			log.info(LogManager.getHeader(context, "view_bitstream", "bitstream_id=" + bitstream.getID()));
@@ -423,6 +440,27 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
         response.setDateHeader("Expires", System.currentTimeMillis()
                 + expires);
+    	
+        // If this is a large bitstream then tell the browser it should treat it as a download.
+        int threshold = ConfigurationManager.getIntProperty("webui.content_disposition_threshold");
+        if (bitstreamSize > threshold && threshold > 0)
+        {
+	    	String name  = bitstreamName;
+	    	
+	    	// Try and make the download file name formated for each browser.
+	    	try {
+		    	String agent = request.getHeader("USER-AGENT");
+		    	if (agent != null && agent.contains("MSIE"))
+		    		name = URLEncoder.encode(name,"UTF8");
+		    	else if (agent != null && agent.contains("Mozilla"))
+		    		name = MimeUtility.encodeText(name, "UTF8", "B");
+	    	}
+	    	catch (UnsupportedEncodingException see)
+	    	{
+	    		// do nothing
+	    	}
+	        response.setHeader("Content-Disposition", "attachment;filename=" + name);
+        }
 
         // Turn off partial downloads, they cause problems
         // and are only rarely used. Specifically some windows pdf
