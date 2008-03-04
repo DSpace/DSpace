@@ -442,8 +442,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 + expires);
     	
         // If this is a large bitstream then tell the browser it should treat it as a download.
-        int threshold = ConfigurationManager.getIntProperty("webui.content_disposition_threshold");
-        if (bitstreamSize > threshold && threshold > 0)
+        int threshold = ConfigurationManager.getIntProperty("xmlui.content_disposition_threshold");
+        if (bitstreamSize > threshold && threshold != 0)
         {
 	    	String name  = bitstreamName;
 	    	
