@@ -104,9 +104,9 @@ public class EditFileStep extends AbstractStep
     protected static final Message T_format_user_help = 
         message("xmlui.Submission.submit.EditFileStep.format_user_help");
     protected static final Message T_submit_save = 
-        message("xmlui.Submission.submit.EditFileStep.submit_save");
+        message("xmlui.general.save");
     protected static final Message T_submit_cancel = 
-        message("xmlui.Submission.submit.EditFileStep.submit_cancel");
+        message("xmlui.general.cancel");
 
     /** The bitstream we are editing */
 	private Bitstream bitstream;

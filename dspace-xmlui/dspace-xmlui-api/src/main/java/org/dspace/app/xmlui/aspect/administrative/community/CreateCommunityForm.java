@@ -79,7 +79,7 @@ public class CreateCommunityForm extends AbstractDSpaceTransformer
 	private static final Message T_label_logo = message("xmlui.administrative.community.EditCommunityMetadataForm.label_logo");
 
 	private static final Message T_submit_save = message("xmlui.administrative.community.CreateCommunityForm.submit_save");
-	private static final Message T_submit_cancel = message("xmlui.administrative.community.CreateCommunityForm.submit_cancel");
+	private static final Message T_submit_cancel = message("xmlui.general.cancel");
 	
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException

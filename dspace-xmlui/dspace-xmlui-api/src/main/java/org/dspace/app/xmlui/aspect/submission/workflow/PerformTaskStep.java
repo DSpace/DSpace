@@ -106,7 +106,7 @@ public class PerformTaskStep extends AbstractStep
     protected static final Message T_return_submit = 
         message("xmlui.Submission.workflow.PerformTaskStep.return_submit");
     protected static final Message T_cancel_submit = 
-        message("xmlui.Submission.workflow.PerformTaskStep.cancel_submit");
+        message("xmlui.general.cancel");
 	
 	
 	/** Copy the workflow manager's state values so that we can refrence them easier. */

@@ -83,7 +83,7 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	private static final Message T_no_role = message("xmlui.administrative.collection.AssignCollectionRoles.no_role");
 	
 	private static final Message T_create = message("xmlui.administrative.collection.AssignCollectionRoles.create");
-	private static final Message T_delete = message("xmlui.administrative.collection.AssignCollectionRoles.delete");
+	private static final Message T_delete = message("xmlui.general.delete");
 	private static final Message T_restrict = message("xmlui.administrative.collection.AssignCollectionRoles.restrict");
 
 	private static final Message T_help_admins = message("xmlui.administrative.collection.AssignCollectionRoles.help_admins");

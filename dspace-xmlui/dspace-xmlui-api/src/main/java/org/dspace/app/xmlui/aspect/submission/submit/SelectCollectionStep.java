@@ -82,8 +82,8 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         message("xmlui.Submission.submit.SelectCollection.collection_help");
     protected static final Message T_collection_default = 
         message("xmlui.Submission.submit.SelectCollection.collection_default");
-    protected static final Message T_submit = 
-        message("xmlui.Submission.submit.SelectCollection.submit");
+    protected static final Message T_submit_next = 
+        message("xmlui.general.next");
 	
     public SelectCollectionStep() 
     {
@@ -135,7 +135,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         }
         
         Button submit = list.addItem().addButton("submit");
-        submit.setValue(T_submit);
+        submit.setValue(T_submit_next);
         
         div.addHidden("submission-continue").setValue(knot.getId()); 
         
