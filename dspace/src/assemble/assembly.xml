@@ -59,6 +59,7 @@
 			</includes>
 			<excludes>
 				<exclude>org.dspace:dspace-xmlui-webapp</exclude>
+            <exclude>org.dspace:dspace-xmlui-lang</exclude>
 				<exclude>org.dspace:dspace-lni-webapp</exclude>
 				<exclude>org.dspace:dspace-sword-webapp</exclude>
 				<exclude>org.dspace:dspace-jspui-webapp</exclude>
@@ -67,9 +68,10 @@
 			<binaries>
 				<includeDependencies>false</includeDependencies>
 				<outputDirectory>webapps</outputDirectory>
-			    <outputFileNameMapping>${artifactId}-${version}</outputFileNameMapping>
-                <unpack>true</unpack>
-			</binaries>
+			   <outputFileNameMapping>${artifactId}</outputFileNameMapping>
+            <unpack>true</unpack>
+         </binaries>
+         
 		</moduleSet>
 	</moduleSets>
 
