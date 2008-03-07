@@ -113,12 +113,30 @@
   </bitstream-type>
 
   <bitstream-type>
+    <mimetype>application/vnd.openxmlformats-officedocument.wordprocessingml.document</mimetype>
+    <short_description>Microsoft Word XML</short_description>
+    <description>Microsoft Word XML</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>docx</extension>
+  </bitstream-type>
+
+  <bitstream-type>
     <mimetype>application/vnd.ms-powerpoint</mimetype>
     <short_description>Microsoft Powerpoint</short_description>
     <description>Microsoft Powerpoint</description>
     <support_level>1</support_level>
     <internal>false</internal>
     <extension>ppt</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/vnd.openxmlformats-officedocument.presentationml.presentation</mimetype>
+    <short_description>Microsoft Powerpoint XML</short_description>
+    <description>Microsoft Powerpoint XML</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>pptx</extension>
   </bitstream-type>
 
   <bitstream-type>
@@ -129,6 +147,17 @@
     <internal>false</internal>
     <extension>xls</extension>
   </bitstream-type>
+
+
+  <bitstream-type>
+    <mimetype>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</mimetype>
+    <short_description>Microsoft Excel XML</short_description>
+    <description>Microsoft Excel XML</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>xlsx</extension>
+  </bitstream-type>
+
 
   <bitstream-type>
     <mimetype>application/marc</mimetype>

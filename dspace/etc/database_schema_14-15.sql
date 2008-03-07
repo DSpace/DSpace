@@ -62,6 +62,14 @@ alter table bundle drop column mets_bitstream_id; -- totally unused column
 -------------------------------------------------------------------------------
 ALTER TABLE workspaceitem ADD page_reached INTEGER;
 
+
+-------------------------------------------------------------------------
+-- Increase the mimetype field size to support larger types, such as the 
+-- new Word 2007 mimetypes.
+-------------------------------------------------------------------------
+ALTER TABLE BitstreamFormatRegistry ALTER COLUMN mimetype TYPE VARCHAR(256);
+
+
 -------------------------------------------------------------------------
 -- Tables to manage cache of item counts for communities and collections
 -------------------------------------------------------------------------
