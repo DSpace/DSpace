@@ -3,9 +3,9 @@
 	<groupId>org.dspace.modules</groupId>
 	<artifactId>dspace-jspui</artifactId>
 	<packaging>war</packaging>
-	<name>DSpace JSPUI :: Web Application</name>
+	<name>DSpace JSP-UI :: Web Application</name>
 	<url>http://www.dspace.org</url>
-	<description>DSpace JSPUI :: Overlay</description>
+	<description>DSpace JSP-UI :: Web Application</description>
 
 	<parent>
 		<groupId>org.dspace</groupId>
@@ -127,38 +127,11 @@
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-jspui-webapp</artifactId>
-			<version>${pom.version}</version>
 			<type>war</type>
-			<classifier>skinny</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-jspui-api</artifactId>
-			<version>${pom.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>language-packs</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.3</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>jstl</artifactId>
-			<version>1.1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>taglibs</groupId>
-			<artifactId>standard</artifactId>
-			<version>1.1.2</version>
 		</dependency>
 	</dependencies>
 

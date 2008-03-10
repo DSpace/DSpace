@@ -3,7 +3,7 @@
 	<groupId>org.dspace.modules</groupId>
 	<artifactId>dspace-lni</artifactId>
 	<packaging>war</packaging>
-	<name>DSpace LNI :: Web Application Overlay</name>
+	<name>DSpace LNI :: Web Application</name>
 	<description>
 		DSpace Lightweight Network Interface Webapplication
 	</description>
@@ -138,20 +138,13 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.dspace</groupId>
-			<artifactId>dspace-lni-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
 			<artifactId>dspace-lni-webapp</artifactId>
-			<version>${pom.version}</version>
-			<classifier>skinny</classifier>
 			<type>war</type>
 		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-lni-core</artifactId>
+      </dependency>
 	</dependencies>
 
 </project>

@@ -515,7 +515,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.dspace</groupId>
-			<artifactId>language-packs</artifactId>
+			<artifactId>dspace-api-lang</artifactId>
 		</dependency>
 	</dependencies>
 	

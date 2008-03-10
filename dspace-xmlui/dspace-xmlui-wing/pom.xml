@@ -3,7 +3,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-xmlui-wing</artifactId>
    <packaging>jar</packaging>
-   <name>DSpace XMLUI (Manakin) :: Wing-Framework</name>
+   <name>DSpace XML-UI (Manakin) :: Wing-Framework</name>
    <url>http://projects.dspace.org/dspace-xmlui/dspace-xmlui-wing</url>
    <description>The Cocoon-based Wing framework</description>
 

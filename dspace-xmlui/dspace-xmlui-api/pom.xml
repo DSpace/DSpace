@@ -3,7 +3,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-xmlui-api</artifactId>
    <packaging>jar</packaging>
-   <name>DSpace XMLUI (Manakin) :: API and Core Aspects</name>
+   <name>DSpace XML-UI (Manakin) :: API and Core Aspects</name>
    <url>http://projects.dspace.org/dspace-xmlui/dspace-xmlui-api</url>
    <description>
       DSpace/Manakin XML UI Based APIs and components using the Cocoon
@@ -72,7 +72,7 @@
       
       <dependency>
          <groupId>org.dspace</groupId>
-         <artifactId>language-packs</artifactId>
+         <artifactId>dspace-api-lang</artifactId>
       </dependency>
       
    </dependencies>

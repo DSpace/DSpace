@@ -3,10 +3,10 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-xmlui-webapp</artifactId>
    <packaging>war</packaging>
-   <name>DSpace XMLUI (Manakin) :: Web Application</name>
+   <name>DSpace XML-UI (Manakin) :: Web Application Resources</name>
    <url>http://projects.dspace.org/dspace-xmlui/dspace-xmlui-webapp</url>
    <description>
-      DSpace/Manakin XML UI Based Webapplication using the Cocoon and
+      DSpace/Manakin XML-UI Based Web Application using the Cocoon and
       Wing frameworks
    </description>
 
@@ -63,6 +63,7 @@
             <artifactId>maven-war-plugin</artifactId>
             <configuration>
                <archiveClasses>false</archiveClasses>
+               <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
                <webResources>
                   <resource>
                      <filtering>true</filtering>
@@ -79,32 +80,6 @@
                </execution>
             </executions>
          </plugin>
-            
-         <!-- Secondary Artifact: Skinny war. -->
-         <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <configuration>
-               <descriptorRefs>
-                  <descriptorRef>skinny</descriptorRef>
-               </descriptorRefs>
-            </configuration>
-            <executions>
-               <execution>
-                  <phase>package</phase>
-                  <goals>
-                     <goal>attached</goal>
-                  </goals>
-               </execution>
-            </executions>
-            <dependencies>
-               <dependency>
-                  <groupId>org.dspace.maven.plugins</groupId>
-                  <artifactId>dspace-assembly-plugin</artifactId>
-                  <version>1.1</version>
-               </dependency>
-            </dependencies>
-         </plugin>
-         
       </plugins>
    </build>
 
@@ -166,7 +141,6 @@
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-xmlui-api</artifactId>
-         <version>${project.version}</version>
       </dependency>
 
    </dependencies>

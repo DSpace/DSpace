@@ -3,8 +3,8 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-oai-webapp</artifactId>
    <packaging>war</packaging>
-   <name>DSpace OAI :: Web Application</name>
-   <description>DSpace OAI Service Provider Webapplication</description>
+   <name>DSpace OAI :: Web Application Resources</name>
+   <description>DSpace OAI Service Provider Webapplication Resources</description>
    <url>http://projects.dspace.org/dspace-oai/dspace-oai-webapp</url>
 
    <!-- 
@@ -69,6 +69,7 @@
             <artifactId>maven-war-plugin</artifactId>
             <configuration>
                <archiveClasses>false</archiveClasses>
+               <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
                <webResources>
                   <resource>
                      <filtering>true</filtering>
@@ -85,32 +86,6 @@
                </execution>
             </executions>
          </plugin>
-             
-         <!-- Secondary Artifact: Skinny war. -->
-         <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <configuration>
-               <descriptorRefs>
-                  <descriptorRef>skinny</descriptorRef>
-               </descriptorRefs>
-            </configuration>
-            <executions>
-               <execution>
-                  <phase>package</phase>
-                  <goals>
-                     <goal>attached</goal>
-                  </goals>
-               </execution>
-            </executions>
-            <dependencies>
-               <dependency>
-                  <groupId>org.dspace.maven.plugins</groupId>
-                  <artifactId>dspace-assembly-plugin</artifactId>
-                  <version>1.1</version>
-               </dependency>
-            </dependencies>
-         </plugin>
-
       </plugins>
    </build>
 
@@ -173,22 +148,7 @@
       </dependency>
       <dependency>
          <groupId>org.dspace</groupId>
-         <artifactId>language-packs</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace</groupId>
          <artifactId>dspace-oai-api</artifactId>
-         <version>${pom.version}</version>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>oaicat</artifactId>
-         <version>1.5.48</version>
-      </dependency>
-      <dependency>
-         <groupId>javax.servlet</groupId>
-         <artifactId>servlet-api</artifactId>
-         <scope>provided</scope>
       </dependency>
    </dependencies>
 

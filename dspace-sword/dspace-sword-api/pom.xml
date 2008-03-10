@@ -80,6 +80,11 @@
       </dependency>
 
       <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-api-lang</artifactId>
+      </dependency>
+      
+      <dependency>
          <groupId>xom</groupId>
          <artifactId>xom</artifactId>
          <version>1.1</version>

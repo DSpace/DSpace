@@ -3,7 +3,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-oai-api</artifactId>
    <packaging>jar</packaging>
-   <name>DSpace OAI :: Libraries to support Web Application</name>
+   <name>DSpace OAI :: API and Implementation</name>
    <description>Libraries to support DSpace OAI Service Provider Webapplication</description>
    <url>http://projects.dspace.org/dspace-oai/dspace-oai-api</url>
 
@@ -69,12 +69,11 @@
       </dependency>
       <dependency>
          <groupId>org.dspace</groupId>
-         <artifactId>language-packs</artifactId>
+         <artifactId>dspace-api-lang</artifactId>
       </dependency>
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>oaicat</artifactId>
-         <version>1.5.48</version>
       </dependency>
       <dependency>
          <groupId>javax.servlet</groupId>

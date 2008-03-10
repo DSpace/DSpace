@@ -2,7 +2,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace</groupId>
    <artifactId>dspace-jspui</artifactId>
-   <name>DSpace JSPUI</name>
+   <name>DSpace JSP-UI</name>
    <packaging>pom</packaging>
    <url>http://projects.dspace.org/dspace-jspui</url>
    <description>DSpace JSP Based Webapplication</description>

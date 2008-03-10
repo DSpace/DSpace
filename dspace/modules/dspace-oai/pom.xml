@@ -3,8 +3,8 @@
 	<groupId>org.dspace.modules</groupId>
 	<artifactId>dspace-oai</artifactId>
 	<packaging>war</packaging>
-	<name>DSpace OAI :: Web Application Overlay</name>
-	<description>DSpace OAI Service Provider</description>
+	<name>DSpace OAI :: Web Application</name>
+	<description>DSpace OAI Service Provider Web Application</description>
 	<url>http://projects.dspace.org/dspace-oai</url>
 
 	<!-- 
@@ -143,34 +143,13 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.dspace</groupId>
-			<artifactId>dspace-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>language-packs</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-oai-api</artifactId>
-			<version>${pom.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
 			<artifactId>dspace-oai-webapp</artifactId>
-			<version>${pom.version}</version>
 			<type>war</type>
-			<classifier>skinny</classifier>
 		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>oaicat</artifactId>
-			<version>1.5.48</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-oai-api</artifactId>
+      </dependency>
 	</dependencies>
 
 </project>

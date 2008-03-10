@@ -3,7 +3,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-xmlui</artifactId>
    <packaging>pom</packaging>
-   <name>DSpace XMLUI (Manakin)</name>
+   <name>DSpace XML-UI (Manakin)</name>
    <url>http://projects.dspace.org/dspace-xmlui</url>
    <description>
       DSpace web-based user interface based upon Apache Cocoon.

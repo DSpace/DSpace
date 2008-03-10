@@ -76,7 +76,6 @@
             <activeByDefault>true</activeByDefault>
          </activation>
          <modules>
-            <module>language-packs</module>
             <module>dspace-api</module>
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
@@ -98,7 +97,6 @@
             <activeByDefault>false</activeByDefault>
          </activation>
          <modules>
-            <module>language-packs</module>
             <module>dspace-api</module>
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
@@ -196,14 +194,10 @@
    -->
    <dependencyManagement>
       <dependencies>
+         <!-- DSpace core and endorsed Addons -->
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
-            <version>${project.version}</version>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>language-packs</artifactId>
             <version>${project.version}</version>
          </dependency>
           <dependency>
@@ -215,6 +209,7 @@
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-webapp</artifactId>
               <version>${project.version}</version>
+              <type>war</type>
           </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
@@ -225,6 +220,7 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-webapp</artifactId>
             <version>${project.version}</version>
+            <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
@@ -235,6 +231,7 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai-webapp</artifactId>
             <version>${project.version}</version>
+            <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
@@ -250,6 +247,7 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-webapp</artifactId>
             <version>${project.version}</version>
+            <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
@@ -260,12 +258,26 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-webapp</artifactId>
             <version>${project.version}</version>
+            <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-wing</artifactId>
             <version>${project.version}</version>
          </dependency>
+         <!-- DSpace Localization Packages -->
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api-lang</artifactId>
+            <version>1.5-SNAPSHOT</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-xmlui-lang</artifactId>
+            <version>1.5-SNAPSHOT</version>
+            <type>war</type>
+         </dependency>
+         <!-- DSpace third Party Dependencies -->
          <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
@@ -290,6 +302,11 @@
             <groupId>org.dspace</groupId>
             <artifactId>mets</artifactId>
             <version>1.5.2</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>oaicat</artifactId>
+            <version>1.5.48</version>
          </dependency>
          <dependency>
             <groupId>org.textmining</groupId>

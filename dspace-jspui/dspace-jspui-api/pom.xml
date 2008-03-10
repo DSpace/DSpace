@@ -2,7 +2,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace</groupId>
    <artifactId>dspace-jspui-api</artifactId>
-   <name>DSpace JSPUI :: API and Implementation</name>
+   <name>DSpace JSP-UI :: API and Implementation</name>
    <packaging>jar</packaging>
    <url>http://projects.dspace.org/dspace-jspui/dspace-jspui-api</url>
    <description>Libraries for DSpace JSP Based Webapplication</description>
@@ -70,7 +70,7 @@
       </dependency>
       <dependency>
          <groupId>org.dspace</groupId>
-         <artifactId>language-packs</artifactId>
+         <artifactId>dspace-api-lang</artifactId>
       </dependency>
       <dependency>
           <groupId>commons-validator</groupId>
@@ -79,7 +79,6 @@
       <dependency>
          <groupId>javax.servlet</groupId>
          <artifactId>servlet-api</artifactId>
-         <version>2.3</version>
          <scope>provided</scope>
       </dependency>
       <dependency>

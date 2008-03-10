@@ -5,7 +5,7 @@
 	<packaging>war</packaging>
 	<name>DSpace SWORD :: Web Application</name>
 	<description>
-		DSpace SWORD Deposit Service Provider Web Application Overlay
+		DSpace SWORD Deposit Service Provider Web Application
 	</description>
 	<url>http://www.ukoln.ac.uk/repositories/digirep/index/SWORD</url>
 
@@ -149,22 +149,15 @@
 	</profiles>
 
 	<dependencies>
-
-		<!-- DSpace SWORD Webapp -->
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-sword-webapp</artifactId>
-			<version>${project.version}</version>
-			<classifier>skinny</classifier>
 			<type>war</type>
 		</dependency>
-
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-sword-api</artifactId>
-			<version>1.5-SNAPSHOT</version>
 		</dependency>
-
 	</dependencies>
 
 </project>

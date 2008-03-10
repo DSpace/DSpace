@@ -5,10 +5,10 @@
    <groupId>org.dspace.modules</groupId>
    <artifactId>dspace-xmlui</artifactId>
    <packaging>war</packaging>
-   <name>DSpace XMLUI (Manakin) :: Web Application Overlay</name>
+   <name>DSpace XML-UI (Manakin) :: Web Application</name>
    <url>http://projects.dspace.org/dspace-xmlui</url>
    <description>
-      DSpace/Manakin XML UI Based Webapplication using the Cocoon and
+      DSpace/Manakin XML-UI Based Webapplication using the Cocoon and
       Wing frameworks
    </description>
 
@@ -170,10 +170,6 @@
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-xmlui-lang</artifactId>
-         <!-- 
-            TODO: change in release to <version>[1.5.0,1.6.0)</version>
-         -->
-         <version>${project.version}</version>
          <type>war</type>
       </dependency>
 
@@ -181,8 +177,6 @@
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-xmlui-webapp</artifactId>
-         <version>${project.version}</version>
-         <classifier>skinny</classifier>
          <type>war</type>
       </dependency>
 
@@ -190,7 +184,6 @@
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-xmlui-api</artifactId>
-         <version>${project.version}</version>
       </dependency>
 
    </dependencies>

@@ -2,10 +2,10 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace</groupId>
    <artifactId>dspace-jspui-webapp</artifactId>
-   <name>DSpace JSPUI :: Web Application Resources</name>
+   <name>DSpace JSP-UI :: Web Application Resources</name>
    <packaging>war</packaging>
    <url>http://projects.dspace.org/dspace-jspui/dspace-jspui-webapp</url>
-   <description>DSpace JSP Based Webapplication</description>
+   <description>DSpace JSP Based Webapplication Resources</description>
 
    <!-- 
       A Parent POM that Maven inherits DSpace Default 
@@ -65,7 +65,6 @@
 
    <build>
       <plugins>
-
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
@@ -88,32 +87,6 @@
                </execution>
             </executions>
          </plugin>
-
-         <!-- Secondary Artifact: Skinny war. -->
-         <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <configuration>
-               <descriptorRefs>
-                  <descriptorRef>skinny</descriptorRef>
-               </descriptorRefs>
-            </configuration>
-            <executions>
-               <execution>
-                  <phase>package</phase>
-                  <goals>
-                     <goal>attached</goal>
-                  </goals>
-               </execution>
-            </executions>
-            <dependencies>
-               <dependency>
-                  <groupId>org.dspace.maven.plugins</groupId>
-                  <artifactId>dspace-assembly-plugin</artifactId>
-                  <version>1.1</version>
-               </dependency>
-            </dependencies>
-         </plugin>
-
       </plugins>
    </build>
 
@@ -176,27 +149,7 @@
       </dependency>
       <dependency>
          <groupId>org.dspace</groupId>
-         <artifactId>language-packs</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace</groupId>
          <artifactId>dspace-jspui-api</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>javax.servlet</groupId>
-         <artifactId>servlet-api</artifactId>
-         <version>2.3</version>
-         <scope>provided</scope>
-      </dependency>
-      <dependency>
-         <groupId>javax.servlet</groupId>
-         <artifactId>jstl</artifactId>
-         <version>1.1.2</version>
-      </dependency>
-      <dependency>
-         <groupId>taglibs</groupId>
-         <artifactId>standard</artifactId>
-         <version>1.1.2</version>
       </dependency>
    </dependencies>
 
