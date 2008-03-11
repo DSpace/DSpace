@@ -3,7 +3,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-oai</artifactId>
    <packaging>pom</packaging>
-   <name>DSpace OAI :: Parent</name>
+   <name>DSpace OAI</name>
    <description>Parent for DSpace OAI Service Provider Webapplication</description>
    <url>http://projects.dspace.org/dspace-oai</url>
 
