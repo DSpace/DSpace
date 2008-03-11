@@ -67,8 +67,8 @@
 			</excludes>
 			<binaries>
 				<includeDependencies>false</includeDependencies>
-				<outputDirectory>webapps</outputDirectory>
-			   <outputFileNameMapping>${artifactId}</outputFileNameMapping>
+				<outputDirectory>webapps/</outputDirectory>
+			   <outputFileNameMapping>${artifactId}/</outputFileNameMapping>
             <unpack>true</unpack>
          </binaries>
          
