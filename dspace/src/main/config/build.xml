@@ -362,7 +362,7 @@ Common usage:
             <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties"/>
 			<sysproperty key="dspace.log.init.disable" value="true"/>
             <sysproperty key="dspace.configuration" value="${config}"/>
-		    <arg line="-f ${dspace.dir}/config/registries/dublin-core-types.xml"/>
+		    <arg line="-f '${dspace.dir}/config/registries/dublin-core-types.xml'"/>
 		</java>
 
         <!-- FIXME: this should be more modular -->
@@ -371,7 +371,7 @@ Common usage:
             <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties"/>
 			<sysproperty key="dspace.log.init.disable" value="true"/>
             <sysproperty key="dspace.configuration" value="${config}"/>
-		    <arg line="-f ${dspace.dir}/config/registries/sword-metadata.xml"/>
+		    <arg line="-f '${dspace.dir}/config/registries/sword-metadata.xml'"/>
 		</java>
 
     </target>
