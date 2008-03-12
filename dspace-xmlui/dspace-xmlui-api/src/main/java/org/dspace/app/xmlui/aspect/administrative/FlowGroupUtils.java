@@ -199,21 +199,21 @@ public class FlowGroupUtils {
             throw new UIException(uee);
         }
 		
-		// If the new name is empty we can return in error right away.
-		if (newName == null || newName.length() == 0)
-		{
-			// Group's can not have blank names.
-			result.setContinue(false);
-			result.addError("group_name");
-			result.setOutcome(false);
-			result.setMessage(new Message("default","The group name may not be blank."));
-			
-			return result;
-		}
-		
 		Group group = null;
 		if (groupID == -1)
 		{
+			// First check if the name is blank.
+			if (newName == null || newName.length() == 0)
+			{
+				// Group's can not have blank names.
+				result.setContinue(false);
+				result.addError("group_name");
+				result.setOutcome(false);
+				result.setMessage(new Message("default","The group name may not be blank."));
+				
+				return result;
+			}
+			
 			// Create a new group, check if the newName is allready in use.
 			Group potentialDuplicate = Group.findByName(context,newName);
 			
@@ -238,11 +238,10 @@ public class FlowGroupUtils {
 		else
 		{
 			group = Group.find(context,groupID);
-			
-			// First, check if the name is being updated.
-			
 			String name = group.getName();
-			if (name == null || !name.equals(newName))
+			
+			// Only update the name if there has been a change.
+			if (newName != null && newName.length() > 0 && !name.equals(newName))
 			{
 				// The group name is to be updated, check if the newName is allready in use.
 				Group potentialDuplicate = Group.findByName(context,newName);
