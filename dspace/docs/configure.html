@@ -831,13 +831,29 @@ More information is provide below in <a href="#newfilter">Creating a new Media/F
    
 
       <tr>
+        <td><code>xmlui.user.registration</code></td>
+
+        <td><code>true</code></td>
+
+        <td>Determine if new users should be allowed to register.This parameter is usefull in congunction with shibboleth where you want to disallow registration because shibboleth will automatically register the user. Default value is true.</td>
+      </tr>
+
+      <tr>
+        <td><code>xmlui.user.editmetadata</code></td>
+
+        <td><code>true</code></td>
+
+        <td>Determine if users should be allowed to edit their own metadata. This parameter is usefull in congunction with shibboleth where you want to disable the user's ability to edit their metadata because it came from Shibboleth. Default value is true.</td>
+      </tr>
+
+      <tr>
         <td><code>xmlui.force.ssl</code></td>
 
         <td><code>true</code></td>
 
-        <td>Force all authenticated connections to use SSL, only non-authenticated connections are allowed over plain http. If set to true, then you need to ensure that the 'dspace.hostname' parameter is set to the correctly.</td>
+        <td>Force all authenticated connections to use SSL, only non-authenticated connections are allowed over plain http. If set to true, then you need to ensure that the 'dspace.hostname' parameter is set to the correctly. Default value is false.</td>
       </tr>
-   
+      
       <tr>
         <td><code>xmlui.theme.allowoverrides</code></td>
 

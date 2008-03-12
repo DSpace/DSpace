@@ -60,6 +60,7 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Password;
 import org.dspace.app.xmlui.wing.element.Text;
+import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -232,9 +233,12 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements Cacheabl
         Item submit = list.addItem("login-in", null);
         submit.addButton("submit").setValue(T_submit);
         
-        Division register = login.addDivision("register");
-        register.setHead(T_head2);
-        register.addPara(T_para1);
-        register.addPara().addXref(contextPath + "/register",T_register_link);
+        if (ConfigurationManager.getBooleanProperty("xmlui.user.registration", true))
+        {
+	        Division register = login.addDivision("register");
+	        register.setHead(T_head2);
+	        register.addPara(T_para1);
+	        register.addPara().addXref(contextPath + "/register",T_register_link);
+        }
     }
 }
