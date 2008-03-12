@@ -185,8 +185,8 @@ CREATE TABLE Group2GroupCache
   child_id  INTEGER REFERENCES EPersonGroup(eperson_group_id)
 );
 
-CREATE INDEX g2gc_parent_fk_idx ON Group2Group(parent_id);
-CREATE INDEX g2gc_child_fk_idx ON Group2Group(child_id);
+CREATE INDEX g2gc_parent_fk_idx ON Group2GroupCache(parent_id);
+CREATE INDEX g2gc_child_fk_idx ON Group2GroupCache(child_id);
 
 -------------------------------------------------------
 -- Item table
@@ -214,6 +214,7 @@ CREATE TABLE Bundle
   primary_bitstream_id	INTEGER REFERENCES Bitstream(bitstream_id)
 );
 
+CREATE INDEX bundle_mets_fk_idx ON Bundle(mets_bitstream_id);
 CREATE INDEX bundle_primary_fk_idx ON Bundle(primary_bitstream_id);
 
 -------------------------------------------------------
@@ -476,7 +477,6 @@ CREATE TABLE WorkflowItem
 
 );
 
-CREATE INDEX workflow_item_fk_idx ON WorkflowItem(item_id);
 CREATE INDEX workflow_coll_fk_idx ON WorkflowItem(collection_id);
 CREATE INDEX workflow_owner_fk_idx ON WorkflowItem(owner);
 
