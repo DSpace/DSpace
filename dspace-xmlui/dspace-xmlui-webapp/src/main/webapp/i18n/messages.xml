@@ -64,6 +64,7 @@
 	<message key="xmlui.general.update">Update</message>
 	<message key="xmlui.general.delete">Delete</message>
 	<message key="xmlui.general.next">Next</message>
+	<message key="xmlui.general.untitled">Untitled</message>
 	
 	
 	<!-- 
