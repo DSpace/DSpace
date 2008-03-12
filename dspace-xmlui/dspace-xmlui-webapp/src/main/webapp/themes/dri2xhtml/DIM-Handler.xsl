@@ -198,7 +198,14 @@
     <xsl:template name="collectionSummaryList-DIM">
         <xsl:variable name="data" select="./mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim"/>
         <a href="{@OBJID}">
-            <xsl:value-of select="$data/dim:field[@element='title'][1]"/>
+            <xsl:choose>
+	            <xsl:when test="string-length($data/dim:field[@element='title'][1]) &gt; 0">
+	                <xsl:value-of select="$data/dim:field[@element='title'][1]"/>
+	            </xsl:when>
+	            <xsl:otherwise>
+	                <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+	            </xsl:otherwise>
+            </xsl:choose>
         </a>
     </xsl:template>
 
@@ -208,7 +215,14 @@
         <xsl:variable name="data" select="./mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim"/>
         <span class="bold">
             <a href="{@OBJID}">
-                <xsl:value-of select="$data/dim:field[@element='title'][1]"/>
+	            <xsl:choose>
+		            <xsl:when test="string-length($data/dim:field[@element='title'][1]) &gt; 0">
+		                <xsl:value-of select="$data/dim:field[@element='title'][1]"/>
+		            </xsl:when>
+		            <xsl:otherwise>
+		                <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+		            </xsl:otherwise>
+	            </xsl:choose>
             </a>
         </span>
     </xsl:template>
@@ -261,7 +275,14 @@
     <xsl:template name="collectionDetailList-DIM">
         <xsl:variable name="data" select="./mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim"/>
         <a href="{@OBJID}">
-            <xsl:value-of select="$data/dim:field[@element='title'][1]"/>
+            <xsl:choose>
+	            <xsl:when test="string-length($data/dim:field[@element='title'][1]) &gt; 0">
+	                <xsl:value-of select="$data/dim:field[@element='title'][1]"/>
+	            </xsl:when>
+	            <xsl:otherwise>
+	                <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+	            </xsl:otherwise>
+            </xsl:choose>
         </a>
         <br/>
         <xsl:choose>
@@ -279,7 +300,14 @@
         <xsl:variable name="data" select="./mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim"/>
         <span class="bold">
             <a href="{@OBJID}">
-                <xsl:value-of select="$data/dim:field[@element='title'][1]"/>
+                <xsl:choose>
+		            <xsl:when test="string-length($data/dim:field[@element='title'][1]) &gt; 0">
+		                <xsl:value-of select="$data/dim:field[@element='title'][1]"/>
+		            </xsl:when>
+		            <xsl:otherwise>
+		                <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+		            </xsl:otherwise>
+           		</xsl:choose>
             </a>
             <br/>
             <xsl:choose>
