@@ -2198,10 +2198,9 @@ function doAssignCollectionRoles(collectionID)
 			var groupID = FlowContainerUtils.getCollectionRole(getDSContext(),collectionID, "ADMIN");
 			result = doEditGroup(groupID);
 		}
-		/* Cannot be done due to DSpace API limitations
 		else if (cocoon.request.get("submit_delete_admin")) {
 			result = doDeleteCollectionRole(collectionID, "ADMIN");
-		}*/
+		}
 		
 		// WORKFLOW STEPS 1-3
 		else if (cocoon.request.get("submit_edit_wf_step1") || cocoon.request.get("submit_create_wf_step1")) 
@@ -2246,12 +2245,12 @@ function doAssignCollectionRoles(collectionID)
 			assertEditCollection(collectionID);
 			var groupID = FlowContainerUtils.getCollectionRole(getDSContext(),collectionID, "SUBMIT");
 			result = doEditGroup(groupID);
-		}/* Cannot be done due to DSpace API limitations
+		}
 		else if (cocoon.request.get("submit_delete_submit")) 
 		{
 		    assertAdministrator();
 			result = doDeleteCollectionRole(collectionID, "SUBMIT");
-		}*/
+		}
 		
 		// DEFAULT_READ
 		else if (cocoon.request.get("submit_create_default_read"))

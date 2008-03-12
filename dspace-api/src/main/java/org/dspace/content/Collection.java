@@ -609,6 +609,29 @@ public class Collection extends DSpaceObject
     }
 
     /**
+     * Remove the submitters group, if no group has already been created 
+     * then return without error. This will merely dereference the current 
+     * submitters group from the collection so that it may be deleted 
+     * without violating database constraints.
+     */
+    public void removeSubmitters() throws SQLException, AuthorizeException
+    {
+    	// Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+
+        // just return if there is no administrative group.
+        if (submitters == null)
+        	return; 
+
+        // Remove the link to the collection table.
+        collectionRow.setColumnNull("submitter");
+        submitters = null;
+       
+        modified = true;
+    }
+
+    
+    /**
      * Get the default group of submitters, if there is one. Note that the
      * authorization system may allow others to submit to the collection, so
      * this is not necessarily a definitive list of potential submitters.
@@ -660,6 +683,28 @@ public class Collection extends DSpaceObject
 
         modified = true;
         return admins;
+    }
+    
+    /**
+     * Remove the administrators group, if no group has already been created 
+     * then return without error. This will merely dereference the current 
+     * administrators group from the collection so that it may be deleted 
+     * without violating database constraints.
+     */
+    public void removeAdministrators() throws SQLException, AuthorizeException
+    {
+    	// Check authorisation
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+
+        // just return if there is no administrative group.
+        if (admins == null)
+        	return; 
+
+        // Remove the link to the collection table.
+        collectionRow.setColumnNull("admin");
+        admins = null;
+       
+        modified = true;
     }
 
     /**

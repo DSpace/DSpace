@@ -567,6 +567,17 @@ public class EditCommunitiesServlet extends DSpaceServlet
                     .getContextPath()
                     + "/tools/group-edit?group_id=" + newGroup.getID()));
         }
+        else if (button.equals("submit_admins_delete"))
+        {
+        	// Remove the administrators group.
+        	Group g = collection.getAdministrators();
+        	collection.removeAdministrators();
+            collection.update();
+            g.delete();
+
+            // Show edit page again - attributes set in doDSPost()
+            JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
+        }
         else if (button.equals("submit_submitters_create"))
         {
             // Create new group
@@ -576,6 +587,17 @@ public class EditCommunitiesServlet extends DSpaceServlet
             response.sendRedirect(response.encodeRedirectURL(request
                     .getContextPath()
                     + "/tools/group-edit?group_id=" + newGroup.getID()));
+        }
+        else if (button.equals("submit_submitters_delete"))
+        {
+        	// Remove the administrators group.
+        	Group g = collection.getSubmitters();
+        	collection.removeSubmitters();
+            collection.update();
+            g.delete();
+
+            // Show edit page again - attributes set in doDSPost()
+            JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
         }
         else if (button.equals("submit_authorization_edit"))
         {

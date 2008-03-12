@@ -38,6 +38,7 @@
  * DAMAGE.
  */package org.dspace.app.xmlui.aspect.administrative;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.SQLException;
@@ -48,6 +49,8 @@ import java.util.List;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.Collection;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -341,7 +344,7 @@ public class FlowGroupUtils {
 	 * @param groupIDs A list of groups to be removed.
 	 * @return A results object.
 	 */
-	public static FlowResult processDeleteGroups(Context context, String[] groupIDs) throws SQLException
+	public static FlowResult processDeleteGroups(Context context, String[] groupIDs) throws SQLException, AuthorizeException, IOException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(true);
@@ -349,6 +352,48 @@ public class FlowGroupUtils {
     	for (String id : groupIDs) 
     	{
     		Group groupDeleted = Group.find(context, Integer.valueOf(id));
+    		
+    		// If this group is related to a collection, then un-link it.
+    		int collectionId = getCollectionId(groupDeleted.getName());
+    		Role role = getCollectionRole(groupDeleted.getName());
+    		if (collectionId != -1 && role != Role.none)
+    		{
+	    		Collection collection = Collection.find(context, collectionId);
+	    		
+	    		if (collection != null)
+	    		{
+		    		if (role == Role.Administrators)
+		    		{
+		    			collection.removeAdministrators();
+		    			collection.update();
+		    		} 
+		    		else if (role == Role.Submitters)
+		    		{
+		    			collection.removeSubmitters();
+		    			collection.update();
+		    		}
+		    		else if (role == Role.WorkflowStep1)
+		    		{
+		    			collection.setWorkflowGroup(1, null);
+		    			collection.update();
+		    		}
+		    		else if (role == Role.WorkflowStep2)
+		    		{
+		    			collection.setWorkflowGroup(2, null);
+		    			collection.update();
+		    		}
+		    		else if (role == Role.WorkflowStep3)
+		    		{
+		    			collection.setWorkflowGroup(3, null);
+		    			collection.update();
+		    		}
+		    		else if (role == Role.DefaultRead)
+		    		{
+		    			// Nothing special needs to happen.
+		    		}
+	    		}
+    		}
+
 			groupDeleted.delete();
 	    }
     	
@@ -368,6 +413,8 @@ public class FlowGroupUtils {
 	 * These are the possible collection suffixes, all groups which are
 	 * specific to a collection will end with one of these. The collection
 	 * id should be inbetween the prefix and the suffix.
+	 * 
+	 * Note: the order of these suffixes are important, see getCollectionRole()
 	 */
 	private static final String[] COLLECTION_SUFFIXES = {"_SUBMIT","_ADMIN","_WFSTEP_1","_WORKFLOW_STEP_1","_WFSTEP_2","_WORKFLOW_STEP_2","_WFSTEP_3","_WORKFLOW_STEP_3","_DEFAULT_ITEM_READ"};
 	
@@ -407,5 +454,43 @@ public class FlowGroupUtils {
 		
 		return -1;
     }
+	
+	public enum Role {Administrators, Submitters, WorkflowStep1, WorkflowStep2, WorkflowStep3, DefaultRead, none};
+	
+	public static Role getCollectionRole(String groupName)
+	{
+		if (groupName != null && groupName.startsWith(COLLECTION_PREFIX))
+		{
+			for (String suffix : COLLECTION_SUFFIXES)
+			{
+				if (groupName.endsWith(suffix))
+				{
+					if (COLLECTION_SUFFIXES[0].equals(suffix))
+						return Role.Submitters;
+					else if (COLLECTION_SUFFIXES[1].equals(suffix))
+						return Role.Administrators;
+					else if (COLLECTION_SUFFIXES[2].equals(suffix))
+						return Role.WorkflowStep1;
+					else if (COLLECTION_SUFFIXES[3].equals(suffix))
+						return Role.WorkflowStep1;
+					else if (COLLECTION_SUFFIXES[4].equals(suffix))
+						return Role.WorkflowStep2;
+					else if (COLLECTION_SUFFIXES[5].equals(suffix))
+						return Role.WorkflowStep2;
+					else if (COLLECTION_SUFFIXES[6].equals(suffix))
+						return Role.WorkflowStep3;
+					else if (COLLECTION_SUFFIXES[7].equals(suffix))
+						return Role.WorkflowStep3;
+					else if (COLLECTION_SUFFIXES[8].equals(suffix))
+						return Role.DefaultRead;
+					
+				} // if it ends with a proper suffix.
+			} // for each possible suffix
+		} // if it starts with COLLECTION_
+		
+		return Role.none;
+	}
+	
+	
 	
 }

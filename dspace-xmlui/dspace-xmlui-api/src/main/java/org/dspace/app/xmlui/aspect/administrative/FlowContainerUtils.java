@@ -273,21 +273,11 @@ public class FlowContainerUtils
 		// First, Unregister the role
 		if (ROLE_ADMIN.equals(roleName))
 		{
-			// FIXME: This should unregister this role from the collection 
-			// object however there is no method available to do this. Once 
-			// Manakin is integrated into dspace this situatiotion should be 
-			// resolved.
-			
-			throw new UIException("This operation can not be preformed untill the DSpace API is modified to enable the removal of collection administrators.");
+			collection.removeAdministrators();
 		} 
 		else if (ROLE_SUBMIT.equals(roleName))
 		{
-			// FIXME: This should unregister this role from the collection 
-			// object however there is no method available to do this. Once 
-			// Manakin is integrated into dspace this situatiotion should be 
-			// resolved.
-			
-			throw new UIException("This operation can not be preformed untill the DSpace API is modified to enable the removal of collection submitters.");
+			collection.removeSubmitters();
 		}
 		else if (ROLE_WF_STEP1.equals(roleName))
 		{	
@@ -314,7 +304,7 @@ public class FlowContainerUtils
 				policy.delete();
 		}
 		
-		// Finaly, Delete the role's actual group.
+		// Finally, Delete the role's actual group.
 		collection.update();
 		role.delete();
 		context.commit();

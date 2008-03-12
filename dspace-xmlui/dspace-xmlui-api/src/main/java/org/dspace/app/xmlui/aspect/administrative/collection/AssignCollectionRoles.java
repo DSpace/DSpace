@@ -167,7 +167,7 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	    if (admins != null) 
 	    {
 		    tableRow.addCell().addXref(baseURL + "&submit_edit_admin", admins.getName());
-		    tableRow.addCell();
+		    addAdministratorOnlyButton(tableRow.addCell(),"submit_delete_admin",T_delete);
 	    }
 	    else 
 	    {
@@ -247,7 +247,7 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	    if (submitters != null) 
 	    {
 	    	tableRow.addCell().addXref(baseURL + "&submit_edit_submit", submitters.getName());
-	    	tableRow.addCell();
+	    	addAdministratorOnlyButton(tableRow.addCell(),"submit_delete_submit",T_delete);
 	    }
 	    else 
 	    {
