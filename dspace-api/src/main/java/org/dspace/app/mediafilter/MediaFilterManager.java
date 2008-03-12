@@ -560,8 +560,24 @@ public class MediaFilterManager
             	}
                 catch (Exception e)
                 {
-                    System.out.println("ERROR filtering, skipping bitstream #"
-                            + myBitstream.getID() + " " + e);
+                	String handle = myItem.getHandle();
+                	Bundle[] bundles = myBitstream.getBundles();
+                	String name = myBitstream.getName();
+                	long size = myBitstream.getSize();
+                	String checksum = myBitstream.getChecksum() + " ("+myBitstream.getChecksumAlgorithm()+")";
+                	int assetstore = myBitstream.getStoreNumber();
+   
+                	// Printout helpfull information to find the errored bistream.
+                	System.out.println("ERROR filtering, skipping bitstream:\n");
+                	System.out.println("\tItem Handle: "+ handle);
+                	for (Bundle bundle : bundles)
+                	{
+                		System.out.println("\tBundle Name: " + bundle.getName());
+                	}
+                	System.out.println("\tFile Size: " + size);
+                	System.out.println("\tChecksum: " + checksum);
+                	System.out.println("\tAsset Store: " + assetstore);
+                	System.out.println(e);
                     e.printStackTrace();
                 }
     		}
