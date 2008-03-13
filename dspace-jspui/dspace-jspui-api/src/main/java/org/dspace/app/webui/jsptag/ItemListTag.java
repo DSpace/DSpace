@@ -207,7 +207,7 @@ public class ItemListTag extends TagSupport
 
                 StringBuilder newLLine = new StringBuilder();
                 StringBuilder newWLine = new StringBuilder();
-                while (llt.hasMoreTokens() && wlt.hasMoreTokens())
+                while (llt.hasMoreTokens() || wlt.hasMoreTokens())
                 {
                     String listTok  = llt.hasMoreTokens() ? llt.nextToken() : null;
                     String widthTok = wlt.hasMoreTokens() ? wlt.nextToken() : null;

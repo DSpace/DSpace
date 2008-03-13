@@ -235,7 +235,7 @@ public class BrowseListTag extends TagSupport
 
                 StringBuilder newBLLine = new StringBuilder();
                 StringBuilder newBWLine = new StringBuilder();
-                while (bllt.hasMoreTokens() && bwlt.hasMoreTokens())
+                while (bllt.hasMoreTokens() || bwlt.hasMoreTokens())
                 {
                     String browseListTok  = bllt.hasMoreTokens() ? bllt.nextToken() : null;
                     String browseWidthTok = bwlt.hasMoreTokens() ? bwlt.nextToken() : null;
