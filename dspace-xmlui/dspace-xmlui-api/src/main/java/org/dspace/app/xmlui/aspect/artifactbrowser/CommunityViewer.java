@@ -291,6 +291,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             para.addText("query");
             para.addContent(" ");
             para.addButton("submit").setValue(T_go);
+            query.addPara().addXref(contextPath + "/handle/" + community.getHandle() + "/advanced-search", T_advanced_search_link);
 
             // Browse by list
             Division browseDiv = search.addDivision("community-browse","secondary browse");
@@ -301,9 +302,6 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             browse.addItemXref(url + "/browse?type=title",T_browse_titles);
             browse.addItemXref(url + "/browse?type=author",T_browse_authors);
             browse.addItemXref(url + "/browse?type=dateissued",T_browse_dates);
-            
-            Division advancedSearchLink = search.addDivision("community-advanced-search", "secondary advanced-search");
-            advancedSearchLink.addPara().addXref(contextPath + "/advanced-search", T_advanced_search_link);
         }
 
         // Add main reference:

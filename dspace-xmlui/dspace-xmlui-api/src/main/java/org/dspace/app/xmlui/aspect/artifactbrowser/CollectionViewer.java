@@ -270,7 +270,8 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             para.addText("query");
             para.addContent(" ");
             para.addButton("submit").setValue(T_go);
-
+            query.addPara().addXref(contextPath + "/handle/" + collection.getHandle()+ "/advanced-search", T_advanced_search_link);
+            
             // Browse by list
             Division browseDiv = search.addDivision("collection-browse","secondary browse");
             List browse = browseDiv.addList("collection-browse", List.TYPE_SIMPLE,
@@ -280,9 +281,6 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             browse.addItemXref(url + "/browse?type=title",T_browse_titles);
             browse.addItemXref(url + "/browse?type=author",T_browse_authors);
             browse.addItemXref(url + "/browse?type=dateissued",T_browse_dates);
-            
-            Division advancedSearchLink = search.addDivision("collection-advanced-search", "secondary advanced-search");
-            advancedSearchLink.addPara().addXref(contextPath + "/advanced-search", T_advanced_search_link);
         }
 
         // Add the reference
