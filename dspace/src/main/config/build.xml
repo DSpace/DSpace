@@ -334,8 +334,6 @@ Common usage:
 
 		<mkdir dir="${handle.dir}" />
 
-		<mkdir dir="${history.dir}" />
-
 		<mkdir dir="${search.dir}" />
 
 		<mkdir dir="${log.dir}" />
