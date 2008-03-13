@@ -107,7 +107,10 @@ public class BrowseListTag extends TagSupport
     private boolean disableCrossLinks = false;
 
     /** The default fields to be displayed when listing items */
-    private static String listFields = "dc.date.issued(date), dc.title, dc.contributor.*";
+    private static String listFields;
+
+    /** The default widths for the columns */
+    private static String listWidths;
 
     /** The default field which is bound to the browse by date */
     private static String dateField = "dc.date.issued";
@@ -125,6 +128,17 @@ public class BrowseListTag extends TagSupport
     {
         super();
         getThumbSettings();
+
+        if (showThumbs)
+        {
+            listFields = "thumbnail, dc.date.issued(date), dc.title, dc.contributor.*";
+            listWidths = "*, 130, 60%, 40%";
+        }
+        else
+        {
+            listFields = "dc.date.issued(date), dc.title, dc.contributor.*";
+            listWidths = "130, 60%, 40%";
+        }
     }
 
     public int doStartTag() throws JspException
@@ -144,7 +158,8 @@ public class BrowseListTag extends TagSupport
         */
 
         // get the elements to display
-        String browseListLine = null;
+        String browseListLine  = null;
+        String browseWidthLine = null;
 
         // As different indexes / sort options may require different columns to be displayed
         // try to obtain a custom configuration based for the browse that has been performed
@@ -158,7 +173,10 @@ public class BrowseListTag extends TagSupport
             {
                 // First, try to get a configuration for this browse and sort option combined
                 if (so != null && browseListLine == null)
-                    browseListLine = ConfigurationManager.getProperty("webui.itemlist.browse." + bix.getName() + ".sort." + so.getName() + ".columns");
+                {
+                    browseListLine  = ConfigurationManager.getProperty("webui.itemlist.browse." + bix.getName() + ".sort." + so.getName() + ".columns");
+                    browseWidthLine = ConfigurationManager.getProperty("webui.itemlist.browse." + bix.getName() + ".sort." + so.getName() + ".widths");
+                }
 
                 // We haven't got a sort option defined, so get one for the index
                 // - it may be required later
@@ -168,29 +186,88 @@ public class BrowseListTag extends TagSupport
 
             // If no config found, attempt to get one for this sort option
             if (so != null && browseListLine == null)
-                browseListLine = ConfigurationManager.getProperty("webui.itemlist.sort." + so.getName() + ".columns");
+            {
+                browseListLine  = ConfigurationManager.getProperty("webui.itemlist.sort." + so.getName() + ".columns");
+                browseWidthLine = ConfigurationManager.getProperty("webui.itemlist.sort." + so.getName() + ".widths");
+            }
 
             // If no config found, attempt to get one for this browse index
             if (bix != null && browseListLine == null)
-                browseListLine = ConfigurationManager.getProperty("webui.itemlist.browse." + bix.getName() + ".columns");
+            {
+                browseListLine  = ConfigurationManager.getProperty("webui.itemlist.browse." + bix.getName() + ".columns");
+                browseWidthLine = ConfigurationManager.getProperty("webui.itemlist.browse." + bix.getName() + ".widths");
+            }
 
             // If no config found, attempt to get a general one, using the sort name
             if (so != null && browseListLine == null)
-                browseListLine = ConfigurationManager.getProperty("webui.itemlist." + so.getName() + ".columns");
+            {
+                browseListLine  = ConfigurationManager.getProperty("webui.itemlist." + so.getName() + ".columns");
+                browseWidthLine = ConfigurationManager.getProperty("webui.itemlist." + so.getName() + ".widths");
+            }
 
             // If no config found, attempt to get a general one, using the index name
             if (bix != null && browseListLine == null)
-                browseListLine = ConfigurationManager.getProperty("webui.itemlist." + bix.getName() + ".columns");
+            {
+                browseListLine  = ConfigurationManager.getProperty("webui.itemlist." + bix.getName() + ".columns");
+                browseWidthLine = ConfigurationManager.getProperty("webui.itemlist." + bix.getName() + ".widths");
+            }
         }
 
         if (browseListLine == null)
         {
-            browseListLine = ConfigurationManager.getProperty("webui.itemlist.columns");
+            browseListLine  = ConfigurationManager.getProperty("webui.itemlist.columns");
+            browseWidthLine = ConfigurationManager.getProperty("webui.itemlist.widths");
         }
 
+        // Have we read a field configration from dspace.cfg?
         if (browseListLine != null)
         {
+            // If thumbnails are disabled, strip out any thumbnail column from the configuration
+            if (!showThumbs && browseListLine.contains("thumbnail"))
+            {
+                // Ensure we haven't got any nulls
+                browseListLine  = browseListLine  == null ? "" : browseListLine;
+                browseWidthLine = browseWidthLine == null ? "" : browseWidthLine;
+
+                // Tokenize the field and width lines
+                StringTokenizer bllt = new StringTokenizer(browseListLine,  ",");
+                StringTokenizer bwlt = new StringTokenizer(browseWidthLine, ",");
+
+                StringBuilder newBLLine = new StringBuilder();
+                StringBuilder newBWLine = new StringBuilder();
+                while (bllt.hasMoreTokens() && bwlt.hasMoreTokens())
+                {
+                    String browseListTok  = bllt.hasMoreTokens() ? bllt.nextToken() : null;
+                    String browseWidthTok = bwlt.hasMoreTokens() ? bwlt.nextToken() : null;
+
+                    // Only use the Field and Width tokens, if the field isn't 'thumbnail'
+                    if (browseListTok == null || !browseListTok.trim().equals("thumbnail"))
+                    {
+                        if (browseListTok != null)
+                        {
+                            if (newBLLine.length() > 0)
+                                newBLLine.append(",");
+
+                            newBLLine.append(browseListTok);
+                        }
+
+                        if (browseWidthTok != null)
+                        {
+                            if (newBWLine.length() > 0)
+                                newBWLine.append(",");
+
+                            newBWLine.append(browseWidthTok);
+                        }
+                    }
+                }
+
+                // Use the newly built configuration file
+                browseListLine  = newBLLine.toString();
+                browseWidthLine = newBWLine.toString();
+            }
+
             listFields = browseListLine;
+            listWidths = browseWidthLine;
         }
 
         // get the date and title fields
@@ -213,7 +290,9 @@ public class BrowseListTag extends TagSupport
         	authorField = authorLine;
         }
 
-        String[] fieldArr  = listFields.split("\\s*,\\s*");
+        // Arrays used to hold the information we will require when outputting each row
+        String[] fieldArr  = listFields == null ? new String[0] : listFields.split("\\s*,\\s*");
+        String[] widthArr  = listWidths == null ? new String[0] : listWidths.split("\\s*,\\s*");
         boolean isDate[]   = new boolean[fieldArr.length];
         boolean emph[]     = new boolean[fieldArr.length];
         boolean isAuthor[] = new boolean[fieldArr.length];
@@ -223,10 +302,59 @@ public class BrowseListTag extends TagSupport
 
         try
         {
-        	// get the interlinking configuration too
+        	// Get the interlinking configuration too
             CrossLinks cl = new CrossLinks();
 
-            out.println("<table align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+            // Get a width for the table
+            String tablewidth = ConfigurationManager.getProperty("webui.itemlist.tablewidth");
+
+            // If we have column widths, try to use a fixed layout table - faster for browsers to render
+            // but not if we have to add an 'edit item' button - we can't know how big it will be
+            if (widthArr.length > 0 && widthArr.length == fieldArr.length && !linkToEdit)
+            {
+                // If the table width has been specified, we can make this a fixed layout
+                if (!StringUtils.isEmpty(tablewidth))
+                {
+                    out.println("<table style=\"width: " + tablewidth + "; table-layout: fixed;\" align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+                }
+                else
+                {
+                    // Otherwise, don't constrain the width
+                    out.println("<table align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+                }
+
+                // Output the known column widths
+                out.print("<colgroup>");
+
+                for (int w = 0; w < widthArr.length; w++)
+                {
+                    out.print("<col width=\"");
+
+                    // For a thumbnail column of width '*', use the configured max width for thumbnails
+                    if (fieldArr[w].equals("thumbnail") && widthArr[w].equals("*"))
+                    {
+                        out.print(thumbItemListMaxWidth);
+                    }
+                    else
+                    {
+                        out.print(StringUtils.isEmpty(widthArr[w]) ? "*" : widthArr[w]);
+                    }
+
+                    out.print("\" />");
+                }
+
+                out.println("</colgroup>");
+            }
+            else if (!StringUtils.isEmpty(tablewidth))
+            {
+                out.println("<table width=\"" + tablewidth + "\" align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+            }
+            else
+            {
+                out.println("<table align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+            }
+
+            // Output the table headers
             out.println("<tr>");
 
             for (int colIdx = 0; colIdx < fieldArr.length; colIdx++)
@@ -296,7 +424,7 @@ public class BrowseListTag extends TagSupport
 
             out.print("</tr>");
 
-            // now prepare the frags for each of the table elements
+            // now output each item row
             for (int i = 0; i < items.length; i++)
             {
                 // now prepare the XHTML frag for this division
@@ -356,20 +484,17 @@ public class BrowseListTag extends TagSupport
 
                     // now prepare the content of the table division
                     String metadata = "-";
-                    if (metadataArray.length > 0)
+                    if (field.equals("thumbnail"))
+                    {
+                        metadata = getThumbMarkup(hrq, items[i]);
+                    }
+                    else if (metadataArray.length > 0)
                     {
                         // format the date field correctly
                         if (isDate[colIdx])
                         {
-                            // FIXME: why on _earth_ is this here.  Thumbnail config should
-                        	// be part of the display columns configuration
-                            String thumbs = "";
-                            if (showThumbs)
-                            {
-                                thumbs = getThumbMarkup(hrq, items[i]);
-                            }
                             DCDate dd = new DCDate(metadataArray[0].value);
-                            metadata = UIUtil.displayDate(dd, false, false, hrq) + thumbs;
+                            metadata = UIUtil.displayDate(dd, false, false, hrq);
                         }
                         // format the title field correctly for withdrawn items (ie. don't link)
                         else if (field.equals(titleField) && items[i].isWithdrawn())
@@ -750,7 +875,7 @@ public class BrowseListTag extends TagSupport
                      .append("\" alt=\"")
                      .append(alt + "\" ")
                      .append(scAttr)
-                     .append("/></a>");
+                     .append("/ border=\"0\"></a>");
 
         	return thumbFrag.toString();
         }
