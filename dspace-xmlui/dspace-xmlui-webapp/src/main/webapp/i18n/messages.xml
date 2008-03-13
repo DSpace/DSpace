@@ -742,6 +742,7 @@
 	<message key="xmlui.administrative.FlowEPersonUtils.edit_eperson_success_notice">The user was edited successfully.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.reset_password_success_notice">An email message has been sent to the user containing a token that may be used to choose a new password.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.delete_eperson_success_notice">The user(s) were deleted successfully.</message>
+	<message key="xmlui.administrative.FlowEPersonUtils.delete_eperson_failed_notice">The user(s) listed were not deleted because there are constraints preventing them from being deleted, see the eperson detail page for more information.</message>
 	<message key="xmlui.administrative.FlowGroupUtils.edit_group_success_notice">The group was edited successfully.</message>
 	<message key="xmlui.administrative.FlowGroupUtils.delete_group_success_notice">The selected groups were deleted successfully.</message>
 	<message key="xmlui.administrative.FlowRegistryUtils.add_metadata_schema_success_notice">New schema has been successfully created.</message>
@@ -840,6 +841,14 @@
 	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_reset_password">Reset Password</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.special_help">You may also permanently remove this E-Person from the system or reset his/her password. When resetting a password the user will be sent an email containing a special link they can follow to choose a new password.</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_delete">Delete this E-Person</message>
+	
+	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint">This eperson is unable to be deleted because of the following constraint(s):</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint.last_conjunction">and</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint.item">eperson has submitted one or more items</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint.workflowitem">eperson has an active submission workflow</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint.tasklistitem">eperson has a workflow task awaiting their attention</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint.unknown">eperson has an unidentified constraint within the system</message>
+	
 	<message key="xmlui.administrative.eperson.EditEPersonForm.member_head">Groups this E-Person is a member of:</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.indirect_member">(via group: {0})</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.member_none">none</message>

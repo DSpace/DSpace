@@ -856,7 +856,7 @@ public class EPerson extends DSpaceObject
      * 
      * @return Vector of tables that contain a reference to the eperson.
      */
-    public Vector getDeleteConstraints() throws SQLException
+    public Vector<String> getDeleteConstraints() throws SQLException
     {
         Vector<String> tableList = new Vector<String>();
 
