@@ -54,6 +54,7 @@ import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.sitemap.PatternException;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
@@ -112,6 +113,12 @@ public class AuthenticateAction extends AbstractAction
                 		// Resume the request and set the redirect target URL to
                 		// that of the originaly interrupted request.
                 		redirectURL += AuthenticationUtil.resumeInterruptedRequest(objectModel);
+                	}
+                	else
+                	{
+                		// Otherwise direct the user to the login page
+                		String loginRedirect = ConfigurationManager.getProperty("xmlui.user.loginredirect");
+                		redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "";	
                 	}
                 	
                     // Authentication successfull send a redirect.
