@@ -759,7 +759,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize 1024 \
 	from your <code><i>[dspace-source]</i>/dspace/</code> directory:
 	<pre>mvn package</pre>
 	  <P>Note #1: This will generate the DSpace installation package in your
-	  <code><i>[dspace-source]</i>/dspace/target/dspace-[version].dir/</code> directory.
+	  <code><i>[dspace-source]</i>/dspace/target/dspace-[version]-build.dir/</code> directory.
       <P>Note #2: Without any extra arguments, the DSpace installation package is initialized for PostgreSQL. <br>
           <br>
         If you want to use Oracle instead,
@@ -768,7 +768,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize 1024 \
 </PRE>
     <li>
       <P>Initialize the DSpace database and install DSpace to <code><i>[dspace]</i></code> (e.g. <code>C:\DSpace</code>) by
-      running the following from commandline from your <code><i>[dspace-source]</i>/dspace/target/dspace-[version].dir/</code> directory:</P>
+      running the following from commandline from your <code><i>[dspace-source]</i>/dspace/target/dspace-[version]-build.dir/</code> directory:</P>
       <pre>ant fresh_install</pre>
       <P><strong>Note:</strong> to see a complete list of build targets, run</P>
       <pre>ant help</pre>
