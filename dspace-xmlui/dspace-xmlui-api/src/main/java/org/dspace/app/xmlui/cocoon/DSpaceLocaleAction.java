@@ -148,7 +148,7 @@ public class DSpaceLocaleAction extends ServiceableAction implements Configurabl
     public static class DSpaceLocaleValidator implements LocaleValidator {
 
     	/** the list of supported locales that may be used. */
-    	private List<Locale> supportedLocales = new ArrayList<Locale>();
+    	private List<Locale> supportedLocales;
     	
     	/**
     	 * Build a list supported locales to validate against upon object construction.
@@ -157,12 +157,14 @@ public class DSpaceLocaleAction extends ServiceableAction implements Configurabl
     	{
             if (ConfigurationManager.getProperty("xmlui.supported.locales") != null)
             {
-
+            	supportedLocales = new ArrayList<Locale>();
+            	
                 String supportedLocalesConfig = ConfigurationManager.getProperty("xmlui.supported.locales");
+                
                 String[] parts = supportedLocalesConfig.split(",");
                 
                 for (String part : parts)
-                {
+                {	
                 	Locale supportedLocale = I18nUtils.parseLocale(part.trim(), null);
                 	if (supportedLocale != null)
                 	{
@@ -170,9 +172,6 @@ public class DSpaceLocaleAction extends ServiceableAction implements Configurabl
                 	}
                 }
             }
-
-            // The default locale is always supported
-            supportedLocales.add(I18nUtil.getDefaultLocale());
     	}
     	
     	
@@ -181,10 +180,18 @@ public class DSpaceLocaleAction extends ServiceableAction implements Configurabl
          * @param locale to test
          * @return true if locale satisfies validator's criteria
          */
-		public boolean test(String name, Locale test) {
+		public boolean test(String name, Locale test) 
+		{
+			// If there are no configured locales the accept them all.
+			if (supportedLocales == null)
+				return true;
+			
+			// Otherwise check if they are listed
 			for (Locale locale : supportedLocales)
 				if (locale.equals(test))
 					return true;
+			
+			// Fail if not found
 			return false;
 			
 		}
