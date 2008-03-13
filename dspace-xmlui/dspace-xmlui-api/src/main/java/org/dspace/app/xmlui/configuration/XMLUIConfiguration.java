@@ -121,7 +121,8 @@ public class XMLUIConfiguration
         	throw new IllegalStateException("None of the xmlui configuration paths were valid: "+ allPaths);
         }
         
-        
+        // FIXME: Sometime in the future require that the xmlui.xconf be valid. 
+        // SAXBuilder builder = new SAXBuilder(true);
         SAXBuilder builder = new SAXBuilder();
         Document config = builder.build(configFile);
 
