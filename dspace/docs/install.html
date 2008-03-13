@@ -721,16 +721,18 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize 1024 \
 
 	<ul>
 	<li><p><a href="http://java.sun.com/">Java SDK 1.5</a> or later (standard SDK is fine, you don't need J2EE)</p></li>
-	<li><p><a href="http://www.postgresql.org/ftp/">PostgreSQL 8.x for Windows</a>. This comes with an installer application now, so Cygwin is no longer required. Make sure the ODBC + JDBC options are selected, as well as the pgAdmin III tool<p></li>
-	<li><p><a href="http://ant.apache.org/">Apache Ant 1.6.x</a>. Unzip the package in <code>C:\</code> and add <code>C:\apache-ant-1.6.2\bin</code> to the <code>PATH</code> environment variable. For Ant to work properly, you should ensure that <code>JAVA_HOME</code> is set.</p></li>
-	<li><p><a href="http://tomcat.apache.org/">Jakarta Tomcat 5.x+<p>
-</a></ul></p>
+	<li><p><a href="http://www.postgresql.org/ftp/">PostgreSQL 8.x for Windows</a> OR <a href="http://www.oracle.com/database/">Oracle 9 or later</a>.</p> 
+	  <ul><li><p>If you install PostgreSQL, it's recommended to select to install the pgAdmin III tool<p></li></ul>
+	</li>
+	<li><p><a href="http://ant.apache.org/">Apache Ant 1.6.2 or later</a>. Unzip the package in <code>C:\</code> and add <code>C:\apache-ant-1.6.2\bin</code> to the <code>PATH</code> environment variable. For Ant to work properly, you should ensure that <code>JAVA_HOME</code> is set.</p></li>
+	<li><p><a href="http://tomcat.apache.org/">Jakarta Tomcat 5.x or later</a></p></li>
+	<li><p><a href="http://maven.apache.org/">Apache Maven 2.0.8 or later</a></p></li>
+	</ul></p>
 
 	<h3>Installation Steps</h3>
 
 	<p><ol>
 	<li><p>Download the DSpace source from <a href="http://sourceforge.net/projects/dspace">SourceForge</a> and untar it (<a href="http://www.winzip.com/">WinZip</a> will do this)</p></li>
-	<li><p>Copy the PostgreSQL JDBC driver across to the DSpace source tree. The drivers will be in <code>C:\Program Files\PostgreSQL\8.x\jdbc\</code>. The <code>postgresql-8.x-yyy.jdbc2.jar</code> is the jar file you need. Copy it to <code>[dspace]/lib</code>.</p></li>
 	<li><p>Ensure the PostgreSQL service is running, and then run pgAdmin III (Start -> PostgreSQL 8.0 -> pgAdmin III). Connect to the local database as the postgres user and:
 		<ul>
 		<li>Create a 'Login Role' (user) called <code>dspace</code> with the password <code>dspace</code></li>
@@ -754,25 +756,26 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize 1024 \
 	handle.dir</pre></p></p>
 	</li>
 	<li><p>Create the directory for the DSpace installation (e.g. <code>C:\DSpace</code>)</p></li>
-	<li>Generate the DSpace installation package in the <code><i>[dspace-source]</i>/dspace/target/dspace-[version].dir/</code> directory:
-	  <pre>cd <i>[dspace-source]</i>/dspace/
-
-
-mvn package</pre>
-      <P>Note: without any extra arguments, the DSpace installation package is initialized for PostgreSQL. <br>
+	<li>Generate the DSpace installation package by running the following from commandline (cmd)
+	from your <code><i>[dspace-source]</i>/dspace/</code> directory:
+	<pre>mvn package</pre>
+	  <P>Note #1: This will generate the DSpace installation package in your
+	  <code><i>[dspace-source]</i>/dspace/target/dspace-[version].dir/</code> directory.
+      <P>Note #2: Without any extra arguments, the DSpace installation package is initialized for PostgreSQL. <br>
           <br>
         If you want to use Oracle instead,
         you should build the DSpace installation package as follows:</P>
 	  <PRE>mvn -Ddb.name=oracle package
 </PRE>
     <li>
-      <P>As the <code>dspace</code> UNIX user, initialize the DSpace database and install DSpace to <code><i>[dspace]</i></code>:</P>
-      <pre>cd <i>[dspace-source]</i>/dspace/target/dspace-[version].dir/
-ant fresh_install</pre>
+      <P>Initialize the DSpace database and install DSpace to <code><i>[dspace]</i></code> (e.g. <code>C:\DSpace</code>) by
+      running the following from commandline from your <code><i>[dspace-source]</i>/dspace/target/dspace-[version].dir/</code> directory:</P>
+      <pre>ant fresh_install</pre>
       <P><strong>Note:</strong> to see a complete list of build targets, run</P>
       <pre>ant help</pre>
     </li>
-    <li><p>Create an administrator account, e.g. assuming <code>C:\dspace</code> is where your DSpace installation is:
+    <li><p>Create an administrator account, by running the following from your <code><i>[dspace]</i></code> (e.g. <code>C:\DSpace</code>)
+      directory</p>
       <p><code><em>[dspace]</em>\bin\dsrun org.dspace.administer.CreateAdministrator</code></p>
 	<p>and enter the required information</p></p></li>
 	<li><p>Copy the Web application directories from <code>[dspace]\webapps\</code> to Tomcat's webapps dir, which should be somewhere like <code>C:\Program Files\Apache Software Foundation\Tomcat 5.5\webapps</code></p>
@@ -790,7 +793,8 @@ ant fresh_install</pre>
 		</ul>
 	</li>
 	<li><p>Start the Tomcat service</p></li>
-	<li><p>Browse <code>http://localhost:8080/dspace</code>. You should see the DSpace home page</p></li>
+	<li><p>Browse to either <code>http://localhost:8080/dspace-jspui</code> or <code>http://localhost:8080/dspace-xmlui</code>. You should see the DSpace home page for
+	either the JSPUI or XMLUI, respectively.</p></li>
 </ol>
 </p>
 
