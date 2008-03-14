@@ -272,6 +272,10 @@ public class MediaFilterManager
     {
         boolean bUpdate = false;
 
+	if (isVerbose) {
+	  System.out.println("Filtering item: " + myItem.getID());
+	}
+
         // get 'original' bundles
         Bundle[] myBundles = myItem.getBundles();
 
@@ -291,6 +295,10 @@ public class MediaFilterManager
                 }
             }
         }
+
+	if (isVerbose) {
+	  System.out.println("Item " + myItem.getID() + " was updated: " + bUpdate);
+	}
 
         return bUpdate;
     }
