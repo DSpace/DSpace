@@ -15,7 +15,7 @@
 
 	<repositories>
 		<repository>
-			<id>maven.dspace.org-snapshot</id>
+			<id>maven.dspace.org/snapshot</id>
 			<name>DSpace Maven Snapshot Repository</name>
 			<url>http://maven.dspace.org/snapshot</url>
 			<releases>
