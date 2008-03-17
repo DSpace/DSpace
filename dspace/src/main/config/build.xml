@@ -293,24 +293,24 @@ Common usage:
 
 	<target name="build_webapps_wars" description="Compress Web Applications into .war files" if="wars">
 
-		<war destfile="${dspace.dir}/webapps/dspace-xmlui.war">
-			<fileset dir="${dspace.dir}/webapps/dspace-xmlui/"/>
+		<war destfile="${dspace.dir}/webapps/xmlui.war">
+			<fileset dir="${dspace.dir}/webapps/xmlui/"/>
 		</war>
 		
-		<war destfile="${dspace.dir}/webapps/dspace-oai.war">
-			<fileset dir="${dspace.dir}/webapps/dspace-oai/"/>
+		<war destfile="${dspace.dir}/webapps/oai.war">
+			<fileset dir="${dspace.dir}/webapps/oai/"/>
 		</war>
 		
-		<war destfile="${dspace.dir}/webapps/dspace-lni.war">
-			<fileset dir="${dspace.dir}/webapps/dspace-lni/"/>
+		<war destfile="${dspace.dir}/webapps/lni.war">
+			<fileset dir="${dspace.dir}/webapps/lni/"/>
 		</war>
 		
-		<war destfile="${dspace.dir}/webapps/dspace-jspui.war">
-			<fileset dir="${dspace.dir}/webapps/dspace-jspui/"/>
+		<war destfile="${dspace.dir}/webapps/jspui.war">
+			<fileset dir="${dspace.dir}/webapps/jspui/"/>
 		</war>
 		
-		<war destfile="${dspace.dir}/webapps/dspace-sword.war">
-			<fileset dir="${dspace.dir}/webapps/dspace-sword/"/>
+		<war destfile="${dspace.dir}/webapps/sword.war">
+			<fileset dir="${dspace.dir}/webapps/sword/"/>
 		</war>
 
 	</target>
