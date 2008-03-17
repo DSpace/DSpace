@@ -342,6 +342,7 @@ public class Harvest
             TableRow r = colRows.next();
             itemInfo.collectionHandles.add(r.getStringColumn("handle"));
         }
+        colRows.close();
     }
 
     
