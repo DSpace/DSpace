@@ -38,6 +38,8 @@
 
 package org.dspace.sword;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
@@ -148,7 +150,18 @@ public class CollectionLocation
 			{
 				throw new DSpaceSWORDException("Unable to construct deposit urls, due to missing/invalid config in sword.deposit.url and/or dspace.url");
 			}
-			depositUrl = dspaceUrl + "/dspace-sword/deposit";
+
+            try
+            {
+                URL url = new URL(dspaceUrl);
+                depositUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(), "/sword/deposit").toString();
+            }
+            catch (MalformedURLException e)
+            {
+                throw new DSpaceSWORDException("Unable to construct deposit urls, due to invalid dspace.url " + e.getMessage(),e);
+            }
+			
+			
 		}
 		return depositUrl;
 	}
