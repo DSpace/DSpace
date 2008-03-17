@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.dspace.modules</groupId>
-	<artifactId>dspace-sword</artifactId>
+	<artifactId>sword</artifactId>
 	<packaging>war</packaging>
 	<name>DSpace SWORD :: Web Application</name>
 	<description>
@@ -58,9 +58,9 @@
 		into the snapshot repository below.
 	-->
 	<scm>
-		<connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/modules/dspace-sword</connection>
-		<developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/dspace-sword</developerConnection>
-		<url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace/modules/dspace-sword</url>
+		<connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/sword</connection>
+		<developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/sword</developerConnection>
+		<url>http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/sword</url>
 	</scm>
 
 	<build>

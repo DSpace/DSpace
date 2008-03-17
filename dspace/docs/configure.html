@@ -993,7 +993,7 @@ messages.xml<br/>
 
 <p>The interface will automatically determine which file to select based upon the user's browser and system configuration. For example, if the user's browser is set to Australian English then first the system will check if <code>messages_en_au.xml</code> is available. If this translation is not available it will fall back to <code>messages_en.xml</code>, and finally if that is not available, <code>messages.xml</code>. </p>
 
-<p>Manakin supplies an English only translation of the interface.  In order to add other translations to the system, locate the <code>[dspace-source]/dspace/modules/dspace-xmlui/src/main/webapp/i18n/</code> directory. By default this directory will be empty; to add additional translations add alternative versions of the <code>messages.xml</code> file in specific language and country variants as needed for your installation. </p>
+<p>Manakin supplies an English only translation of the interface.  In order to add other translations to the system, locate the <code>[dspace-source]/dspace/modules/xmlui/src/main/webapp/i18n/</code> directory. By default this directory will be empty; to add additional translations add alternative versions of the <code>messages.xml</code> file in specific language and country variants as needed for your installation. </p>
 
 To set a language other than English as the default language for the repository's interface, simply name the translation catalogue for the new default language "<code>messages.xml</code>"</p>
 
@@ -1002,7 +1002,7 @@ To set a language other than English as the default language for the repository'
 <p>Manakin themes stylize the look-and-feel of the repository, community, or collection and are distributed as self-contained packages. A Manakin/DSpace installation may have multiple themes installed and available to be used in different parts of the repository. The central component of a theme is the sitemap.xmap, which defines what resources are available to the theme such as XSL stylesheets, CSS stylesheets, images, or multimedia files.</p>
 
 <b>1) Create theme skeleton</b>
-<p>Most theme developers do not create a new theme from scratch; instead they start from the standard theme template, which defines a skeleton structure for a theme. The template is located at: <code>[dspace-source]/dspace-xmlui/dspace-xmlui-webbapp/src/main/webbapp/themes/template</code>. To start your new theme simply copy the theme template into your locally defined modules directory, <code>[dspace-source]/dspace/modules/dspace-xmlui/src/main/webbapp/themes/[your theme's directory]/</code>.</p>
+<p>Most theme developers do not create a new theme from scratch; instead they start from the standard theme template, which defines a skeleton structure for a theme. The template is located at: <code>[dspace-source]/dspace-xmlui/dspace-xmlui-webbapp/src/main/webbapp/themes/template</code>. To start your new theme simply copy the theme template into your locally defined modules directory, <code>[dspace-source]/dspace/modules/xmlui/src/main/webbapp/themes/[your theme's directory]/</code>.</p>
 
 <b>2) Modify theme variables</b>
 <p>The next step is to modify the theme's parameters so that the theme knows where it is located. Open the <code>[your theme's directory]/sitemap.xmap</code> and look for <code>&lt;global-variables&gt;</code></p>
@@ -1249,14 +1249,14 @@ The following vocabularies are currently available by default:
         If you set webui.supported.locales make sure that all the related additional files for each language are available. <code>LOCALE</code> should correspond to the locale set in <code>webui.supported.locales</code>, 
         e. g.: for webui.supported.locales = en, de, fr, there should be:
     <ul>
-      <li><code><i>[dspace]</i>/modules/dspace-jspui/src/main/resources/Messages.properties</code></li>
-      <li><code><i>[dspace]</i>/modules/dspace-jspui/src/main/resources/Messages_en.properties</code></li>
-      <li><code><i>[dspace]</i>/modules/dspace-jspui/src/main/resources/Messages_de.properties</code></li>
-      <li><code><i>[dspace]</i>/modules/dspace-jspui/src/main/resources/Messages_fr.properties</code></li>
+      <li><code><i>[dspace]</i>/modules/jspui/src/main/resources/Messages.properties</code></li>
+      <li><code><i>[dspace]</i>/modules/jspui/src/main/resources/Messages_en.properties</code></li>
+      <li><code><i>[dspace]</i>/modules/jspui/src/main/resources/Messages_de.properties</code></li>
+      <li><code><i>[dspace]</i>/modules/jspui/src/main/resources/Messages_fr.properties</code></li>
     </ul>
     Files to be localized:
     <ul>
-    <li><code><i>[dspace]</i>/modules/dspace-jspui/src/main/resources/Messages_LOCALE.properties</code></li>
+    <li><code><i>[dspace]</i>/modules/jspui/src/main/resources/Messages_LOCALE.properties</code></li>
       <li><code><i>[dspace]</i>/config/input-forms_LOCALE.xml</code></li>
       <li><code><i>[dspace]</i>/config/default_LOCALE.license</code> <i>should be pure ascii</i></li>
       <li><code><i>[dspace]</i>/config/news-top_LOCALE.html</code></li>
@@ -1294,7 +1294,7 @@ The following vocabularies are currently available by default:
      <li><code><i>[dspace-source]</i>/dspace/target/dspace-[version].dir/webapps/dspace-jspui-webapp/</code> - The location where they are copied after first building DSpace.</li>
      </ul>
   </p>
-  <p>If you wish to modify a particular JSP, place your edited version in the <code><i>[dspace-source]</i>/dspace/modules/dspace-jspui/src/main/webapp/</code> directory (<i>this is the replacement for the pre-1.5 <code>/jsp/local</code> directory</i>), with the same path as the original.  If they exist, these will be used in preference to the default JSPs. For example:</p>
+  <p>If you wish to modify a particular JSP, place your edited version in the <code><i>[dspace-source]</i>/dspace/modules/jspui/src/main/webapp/</code> directory (<i>this is the replacement for the pre-1.5 <code>/jsp/local</code> directory</i>), with the same path as the original.  If they exist, these will be used in preference to the default JSPs. For example:</p>
 
   <table>
     <tbody>
@@ -1307,22 +1307,22 @@ The following vocabularies are currently available by default:
       <tr>
         <td><code><i>[jsp.dir]</i>/community-list.jsp</code></td>
 
-        <td><code><i>[dspace-source]</i>/dspace/modules/dspace-jspui/src/main/webapp/community-list.jsp</code></td>
+        <td><code><i>[dspace-source]</i>/dspace/modules/jspui/src/main/webapp/community-list.jsp</code></td>
       </tr>
 
       <tr>
         <td><code><i>[jsp.dir]</i>/mydspace/main.jsp</code></td>
 
-        <td><code><i>[dspace-source]</i>/dspace/modules/dspace-jspui/src/main/webapp/mydspace/main.jsp</code></td>
+        <td><code><i>[dspace-source]</i>/dspace/modules/jspui/src/main/webapp/mydspace/main.jsp</code></td>
       </tr>
     </tbody>
   </table>
 
-  <p>Heavy use is made of a style sheet, <code>styles.css.jsp</code>. If you make edits, copy the local version to <code><i>[dspace-source]</i>/dspace/modules/dspace-jspui/src/main/webapp/styles.css.jsp</code>, and it will be used automatically in preference to the default, as described above.</p>
+  <p>Heavy use is made of a style sheet, <code>styles.css.jsp</code>. If you make edits, copy the local version to <code><i>[dspace-source]</i>/dspace/modules/jspui/src/main/webapp/styles.css.jsp</code>, and it will be used automatically in preference to the default, as described above.</p>
 
   <p>Fonts and colors can be easily changed using the stylesheet. The stylesheet is a JSP so that the user's browser version can be detected and the stylesheet tweaked accordingly.</p>
 
-  <p>The 'layout' of each page, that is, the top and bottom banners and the navigation bar, are determined by the JSPs <code>/layout/header-*.jsp</code> and <code>/layout/footer-*.jsp</code>. You can provide modified versions of these (in <code><i>[dspace-source]</i>/dspace/modules/dspace-jspui/src/main/webapp/layout</code>), or define more styles and apply them to pages by using the "style" attribute of the <code>dspace:layout</code> tag.</p>
+  <p>The 'layout' of each page, that is, the top and bottom banners and the navigation bar, are determined by the JSPs <code>/layout/header-*.jsp</code> and <code>/layout/footer-*.jsp</code>. You can provide modified versions of these (in <code><i>[dspace-source]</i>/dspace/modules/jspui/src/main/webapp/layout</code>), or define more styles and apply them to pages by using the "style" attribute of the <code>dspace:layout</code> tag.</p>
 
   <p>After you've customized your JSPs, <strong>you must rebuild the DSpace Web application</strong>. If you haven't already built and installed it, follow the <a href="install.html">install</a> directions. Otherwise, follow the steps below:</p>
 
@@ -1840,7 +1840,7 @@ the form:<br>
 		<li>Uncomment the DIDL Crosswalk entry from the <code>config/templates/oaicat.properties</code> file</li>
 		<li>Run	the <code>bin/install-configs</code> script</li>
 		<li>Restart Tomcat</li>
-		<li>Verify the Crosswalk is activated by accessing a URL such as <code>http://mydspace/dspace-oai/request?verb=ListRecords&amp;metadataPrefix=didl</code></li>
+		<li>Verify the Crosswalk is activated by accessing a URL such as <code>http://mydspace/oai/request?verb=ListRecords&amp;metadataPrefix=didl</code></li>
 	</ul>
   
    <h3><a name="packager">Configuring Packager Plugins</a></h3>

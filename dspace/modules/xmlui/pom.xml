@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace.modules</groupId>
-   <artifactId>dspace-xmlui</artifactId>
+   <artifactId>xmlui</artifactId>
    <packaging>war</packaging>
    <name>DSpace XML-UI (Manakin) :: Web Application</name>
    <url>http://projects.dspace.org/dspace-xmlui</url>
@@ -49,9 +49,9 @@
    </pluginRepositories>
 
    <scm>
-      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-xmlui</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-xmlui</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace-xmlui</url>
+      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/xmlui</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/xmlui</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/xmlui</url>
    </scm>
 
    <build>

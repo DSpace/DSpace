@@ -29,12 +29,18 @@
 		</repository>
 	</repositories>
 
+   <scm>
+      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules</url>
+   </scm>
+   
 	<modules>
-		<module>dspace-xmlui</module>
-		<module>dspace-lni</module>
-		<module>dspace-oai</module>
-		<module>dspace-jspui</module>
-		<module>dspace-sword</module>
+		<module>xmlui</module>
+		<module>lni</module>
+		<module>oai</module>
+		<module>jspui</module>
+		<module>sword</module>
 	</modules>
 	
 </project>

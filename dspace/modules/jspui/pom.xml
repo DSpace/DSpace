@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.dspace.modules</groupId>
-	<artifactId>dspace-jspui</artifactId>
+	<artifactId>jspui</artifactId>
 	<packaging>war</packaging>
 	<name>DSpace JSP-UI :: Web Application</name>
 	<url>http://www.dspace.org</url>
@@ -89,9 +89,9 @@
 	</repositories>
 
 	<scm>
-		<connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/dspace-jspui</connection>
-		<developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/dspace-jspui</developerConnection>
-		<url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace/modules/dspace-jspui</url>
+		<connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/jspui</connection>
+		<developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/jspui</developerConnection>
+		<url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace/modules/jspui</url>
 	</scm>
 
 	<build>
