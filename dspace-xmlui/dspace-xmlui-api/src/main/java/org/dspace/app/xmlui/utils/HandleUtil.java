@@ -239,9 +239,6 @@ public class HandleUtil
             		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), new Message("default","xmlui.general.untitled") );
             	else
             		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), name);
-            	
-            	
-                pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), ((Community) pop).getMetadata("name"));
             }
 
         }
