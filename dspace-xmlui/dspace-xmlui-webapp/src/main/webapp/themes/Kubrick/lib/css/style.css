@@ -354,6 +354,10 @@ table.ds-includeSet-metadata-table
 	color: #555588;
 }
 
+ul.alphabet 
+{
+	padding-left: 20px;
+}
 
 /* next few entries deal with the A-Z browsing list above the pagination links */
 /* excessively many names are used because they keep changing and we want backwards and forwards compatibility */
