@@ -92,9 +92,12 @@ public class LDAPAuthenticateAction extends AbstractAction {
 		String password = request.getParameter("ldap_password");
 		String realm = request.getParameter("login_realm");
 
+		// Skip out of no name or password given.
+		if (username == null || password == null)
+			return null;
+		
 		try {
-			Context context = AuthenticationUtil.Authenticate(objectModel,
-					username, password, realm);
+			Context context = AuthenticationUtil.Authenticate(objectModel,username, password, realm);
 
 			EPerson eperson = context.getCurrentUser();
 

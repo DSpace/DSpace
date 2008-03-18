@@ -145,11 +145,15 @@ public class LDAPAuthentication
     {
         log.info(LogManager.getHeader(context, "auth", "attempting trivial auth of user="+netid));
 
+        // Skip out when no netid or password is given.
+        if (netid == null || password == null)
+        	return BAD_ARGS;
+        
         // Locate the eperson
         EPerson eperson = null;
         try
         {
-            eperson = EPerson.findByNetid(context, netid.toLowerCase());
+        		eperson = EPerson.findByNetid(context, netid.toLowerCase());
         }
         catch (SQLException e)
         {
