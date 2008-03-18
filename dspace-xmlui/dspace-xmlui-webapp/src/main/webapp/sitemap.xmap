@@ -84,9 +84,14 @@
 				<xslt-processor-role>xalan</xslt-processor-role>
 				<check-includes>true</check-includes>
 			</map:transformer>
-			<map:transformer name="i18n" src="org.apache.cocoon.transformation.I18nTransformer">
+			<map:transformer name="i18n" src="org.dspace.app.xmlui.cocoon.DSpaceI18NTransformer">
 				<catalogues default="default">
-					<catalogue id="default" name="messages" location="context:/i18n"/>
+					<catalogue id="default" name="messages" aspects="true">
+						<location>context://i18n/</location>
+						<!-- Two locations for each installed aspect will be installed, one inside
+							 the aspect's directory and another inside the base location listed
+							 above -->
+					</catalogue>
 				</catalogues>
 				<untranslated-text>untranslated</untranslated-text>
 				<cache-at-startup>true</cache-at-startup>

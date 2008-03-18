@@ -396,7 +396,7 @@ public abstract class AbstractWingTransformer extends AbstractTransformer
      * Return the default i18n message catalogue that should be used 
      * when no others are specified.
      */
-    protected static String getDefaultMessageCatalogue()
+    public static String getDefaultMessageCatalogue()
     {
         return "default";
     }
