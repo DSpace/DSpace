@@ -404,7 +404,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
      * 
      * @return The associated query results.
      */
-    protected void performSearch() throws SQLException, IOException
+    protected void performSearch() throws SQLException, IOException, UIException
     {
         if (queryResults != null)
             return;
@@ -550,7 +550,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
      * 
      * @return The query string.
      */
-    abstract protected String getQuery();
+    abstract protected String getQuery() throws UIException;
 
     /**
      * Generate a url to the given search implementation with the associated

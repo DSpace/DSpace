@@ -310,7 +310,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
     private void buildQueryField(int row, Cell cell) throws WingException
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
-        String current = request.getParameter("query" + row);
+        String current = URLDecode(request.getParameter("query" + row));
 
         Text text = cell.addText("query" + row);
         if (current != null)
@@ -375,7 +375,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
      * 
      * @return the query.
      */
-    protected String getQuery()
+    protected String getQuery() throws UIException
     {
         Request request = ObjectModelHelper.getRequest(objectModel);   
         return buildQuery(getSearchFields(request));
@@ -446,8 +446,9 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
      * 
      * @param request The http request object
      * @return Array of search fields
+     * @throws UIException 
      */
-    public ArrayList<SearchField> getSearchFields(Request request)
+    public ArrayList<SearchField> getSearchFields(Request request) throws UIException
 	{
     	if (this.fields != null)
     		return this.fields;
@@ -468,7 +469,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
 		for (int i = 1; i <= numSearchField; i++)
 		{
 			String field = request.getParameter("field"+i);
-			String query = request.getParameter("query"+i);
+			String query = URLDecode(request.getParameter("query"+i));
 			String conjunction = request.getParameter("conjunction"+i);
 			
 			if (field != null)

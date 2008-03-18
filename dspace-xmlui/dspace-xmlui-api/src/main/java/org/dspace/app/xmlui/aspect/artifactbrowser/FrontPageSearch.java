@@ -131,7 +131,7 @@ public class FrontPageSearch extends AbstractDSpaceTransformer implements Cachea
             UIException, SQLException, IOException, AuthorizeException
     {
         Division search = 
-        	body.addInteractiveDivision("front-page-search",contextPath+"/search",Division.METHOD_POST,"primary");
+        	body.addInteractiveDivision("front-page-search",contextPath+"/search",Division.METHOD_GET,"primary");
         
         search.setHead(T_head);
         
