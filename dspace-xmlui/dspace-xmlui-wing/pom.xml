@@ -10,7 +10,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-xmlui</artifactId>
-      <version>1.5-SNAPSHOT</version>
+      <version>1.5.0-rc1</version>
    </parent>
 
    <repositories>
@@ -48,9 +48,9 @@
    </pluginRepositories>
 
    <scm>
-      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-xmlui/dspace-xmlui-wing</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-xmlui/dspace-xmlui-wing</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace-xmlui/dspace-xmlui-wing</url>
+      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5-rc1</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5-rc1/dspace-xmlui/dspace-xmlui-wing</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/tags/dspace-1_5-rc1/dspace-xmlui/dspace-xmlui-wing</url>
    </scm>
 
    <dependencies>
