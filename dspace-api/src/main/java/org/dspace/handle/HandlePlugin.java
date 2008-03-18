@@ -348,16 +348,31 @@ public class HandlePlugin implements HandleStorage
          * FIXME: For more complex Handle situations, this will need enhancing.
          */
 
-        // First, construct a string representating the naming authority Handle
-        // we'd expect.
-        String expected = "0.NA/"
-                + ConfigurationManager.getProperty("handle.prefix");
-
-        // Which authority does the request pertain to?
-        String received = Util.decodeString(theHandle);
-
-        // Return true if they match
-        return expected.equals(received);
+        // This parameter allows the dspace handle server to be capable of having multiple 
+        // name authorities assigned to it. So long as the handle table the alternative prefixes 
+        // defined the dspace will answer for those handles prefixes. This is not ideal and only 
+        // works if the dspace instances assumes control over all the items in a prefix, but it 
+        // does allow the admin to merge together two previously separate dspace instances each 
+        // with their own prefixes and have the one instance handle both prefixes. In this case
+        // all new handle would be given a unified prefix but all old handles would still be 
+        // resolvable.
+        if (ConfigurationManager.getBooleanProperty("handle.plugin.checknameauthority",true))
+        {
+	        // First, construct a string representating the naming authority Handle
+	        // we'd expect.
+	        String expected = "0.NA/"
+	                + ConfigurationManager.getProperty("handle.prefix");
+	
+	        // Which authority does the request pertain to?
+	        String received = Util.decodeString(theHandle);
+	
+	        // Return true if they match
+	        return expected.equals(received);
+        }
+        else 
+        {
+        	return true;
+        }
     }
 
     /**

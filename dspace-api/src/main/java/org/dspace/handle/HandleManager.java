@@ -124,8 +124,17 @@ public class HandleManager
      */
     public static String getCanonicalForm(String handle)
     {
-        //        return "hdl:" + handle;
-        return "http://hdl.handle.net/" + handle;
+    	
+    	// Let the admin define a new prefix, if not then we'll use the 
+    	// CNRI default. This allows the admin to use "hdl:" if they want too or
+    	// use a locally branded prefix handle.myuni.edu.
+    	String handlePrefix = ConfigurationManager.getProperty("handle.canonical.prefix");
+    	if (handlePrefix == null || handlePrefix.length() == 0)
+    	{
+    		handlePrefix = "http://hdl.handle.net/";
+    	}
+    	
+    	return handlePrefix + handle;
     }
 
     /**
