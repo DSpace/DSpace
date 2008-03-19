@@ -46,6 +46,7 @@ import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.configuration.DefaultConfiguration;
 import org.apache.avalon.framework.configuration.MutableConfiguration;
 import org.apache.cocoon.transformation.I18nTransformer;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.configuration.Aspect;
 import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 
@@ -95,6 +96,9 @@ import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 
 public class DSpaceI18NTransformer extends I18nTransformer {
 	
+    /** log4j category */
+    private static Logger log = Logger.getLogger(DSpaceI18NTransformer.class);
+	
 	// If we can't find a base location, use this one by default.
 	public static final String DEFAULT_BASE_LOCATION ="context://i18n/";
 	
@@ -122,6 +126,8 @@ public class DSpaceI18NTransformer extends I18nTransformer {
         		if (!baseCatalogueLocationPath.endsWith("/"))
         			baseCatalogueLocationPath += "/"; // Add a trailing slash if one dosn't exist
         			
+        		String catalogueId = catalogueConf.getAttribute("id","unknown");
+        		
         		// For each aspect add two new locations one inside the aspect's directory
         		// and another inside the base location for i18n files.
             	for (Aspect aspect : XMLUIConfiguration.getAspectChain())
@@ -155,9 +161,8 @@ public class DSpaceI18NTransformer extends I18nTransformer {
             		aspectLocation.setValue(aspectLocationPath);
             		catalogueConf.addChild(aspectLocation);
             		
-            		
-            		System.out.println("Adden location: '"+baseLocationPath+"'");
-            		System.out.println("Adden location: '"+aspectLocationPath+"'");
+            		log.info("Adding i18n location path for '"+catalogueId+"' catalogue: "+baseLocationPath);
+            		log.info("Adding i18n location path for '"+catalogueId+"' catalogue: "+aspectLocationPath);
             	} // for each aspect
 			} // if catalogue has the aspect parameter
         } // for each catalogue
