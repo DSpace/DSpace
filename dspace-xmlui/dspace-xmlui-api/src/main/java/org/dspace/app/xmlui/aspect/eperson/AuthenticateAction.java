@@ -97,9 +97,12 @@ public class AuthenticateAction extends AbstractAction
         String password = request.getParameter("login_password");
         String realm = request.getParameter("login_realm");
 
-        // Skip out if no email or password is given.
-        if (email == null || password == null)
-        	return null;
+        // Protect against NPE errors inside the authentication
+        // class.
+        if (email == null)
+        	email = "";
+        if (password == null)
+        	password = "";
         
         try
         {
