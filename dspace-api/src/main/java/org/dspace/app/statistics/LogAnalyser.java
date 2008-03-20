@@ -1203,7 +1203,16 @@ public class LogAnalyser
         
         // start the date constraint query buffer
         StringBuffer dateQuery = new StringBuffer();
-        dateQuery.append("SELECT item_id " +
+        if (oracle)
+        {
+            dateQuery.append("SELECT /*+ ORDERED_PREDICATES */ item_id ");
+        }
+        else
+        {
+            dateQuery.append("SELECT item_id ");
+        }
+
+        dateQuery.append("FROM metadatavalue " +
                           "FROM metadatavalue " +
                           "WHERE metadata_field_id = (" +
                           " SELECT metadata_field_id " +
