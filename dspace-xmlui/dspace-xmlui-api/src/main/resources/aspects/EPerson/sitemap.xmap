@@ -181,6 +181,17 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 				<map:serialize type="xml"/>
 			</map:match>
 			
+         <map:match pattern="certificate-login">
+            <map:act type="AuthenticateAction">
+               <!-- Loggin succeeded, request will be forwarded. -->
+               <map:serialize type="xml"/>
+            </map:act>
+            
+            <!-- Login failed, try again. Show them static content from xml file --> 
+            <map:transform type="FailedAuthentication" />  
+            <map:serialize type="xml"/>
+         </map:match>
+         
 			<map:match pattern="shibboleth-login">
 				<map:act type="AuthenticateAction">
 					<!-- Loggin succeeded, request will be forwarded. -->
