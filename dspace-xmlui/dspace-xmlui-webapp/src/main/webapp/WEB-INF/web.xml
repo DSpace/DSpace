@@ -368,7 +368,7 @@
         -->
         <init-param>
             <param-name>container-encoding</param-name>
-            <param-value>ISO-8859-1</param-value>
+            <param-value>UTF-8</param-value>
         </init-param>
 
         <!--
