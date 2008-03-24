@@ -1,0 +1,11 @@
+
+Licensing Notice
+
+The DSpace Foundation, Inc. is a 501(c)3 corporation established in July 2007 
+with a mission to promote and advance the dspace platform enabling management, 
+access and preservation of digital works. The Foundation was able to transfer 
+the legal copyright from Hewlett-Packard Company (HP) and Massachusetts 
+Institute of Technology (MIT) to the  DSpace Foundation in October 2007. Many 
+of the files in the source code may contain a copyright statement stating HP 
+and MIT posses the copyright, in these instances please note that the copy 
+right has transfered to the DSpace foundation.
