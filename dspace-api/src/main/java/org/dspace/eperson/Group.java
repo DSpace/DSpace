@@ -794,13 +794,47 @@ public class Group extends DSpaceObject
     		throws SQLException
 	{
 		String params = "%"+query.toLowerCase()+"%";
-		String dbquery = "SELECT * FROM epersongroup WHERE name ILIKE ? OR eperson_group_id = ? ORDER BY name ASC ";
+        StringBuffer queryBuf = new StringBuffer();
+		queryBuf.append("SELECT * FROM epersongroup WHERE LOWER(name) LIKE LOWER(?) OR eperson_group_id = ? ORDER BY name ASC ");
 		
-		if (offset >= 0 && limit > 0) {
-			dbquery += "LIMIT " + limit + " OFFSET " + offset;
-		}
-		
-		// When checking against the eperson-id, make sure the query can be made into a number
+        // Add offset and limit restrictions - Oracle requires special code
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        {
+            // First prepare the query to generate row numbers
+            if (limit > 0 || offset > 0)
+            {
+                queryBuf.insert(0, "SELECT /*+ FIRST_ROWS(n) */ rec.*, ROWNUM rnum  FROM (");
+                queryBuf.append(") ");
+            }
+
+            // Restrict the number of rows returned based on the limit
+            if (limit > 0)
+            {
+                queryBuf.append("rec WHERE rownum<=? ");
+                // If we also have an offset, then convert the limit into the maximum row number
+                if (offset > 0)
+                    limit += offset;
+            }
+
+            // Return only the records after the specified offset (row number)
+            if (offset > 0)
+            {
+                queryBuf.insert(0, "SELECT * FROM (");
+                queryBuf.append(") WHERE rnum>?");
+            }
+        }
+        else
+        {
+            if (limit > 0)
+                queryBuf.append(" LIMIT ? ");
+
+            if (offset > 0)
+                queryBuf.append(" OFFSET ? ");
+        }
+
+        String dbquery = queryBuf.toString();
+
+        // When checking against the eperson-id, make sure the query can be made into a number
 		Integer int_param;
 		try {
 			int_param = Integer.valueOf(query);
@@ -808,9 +842,18 @@ public class Group extends DSpaceObject
 		catch (NumberFormatException e) {
 			int_param = new Integer(-1);
 		}
-		
-		TableRowIterator rows = 
-			DatabaseManager.query(context, dbquery, new Object[]{params, int_param});
+
+        // Create the parameter array, including limit and offset if part of the query
+        Object[] paramArr = new Object[]{params, int_param};
+        if (limit > 0 && offset > 0)
+            paramArr = new Object[] {params, int_param,limit,offset};
+        else if (limit > 0)
+            paramArr = new Object[] {params, int_param,limit};
+        else if (offset > 0)
+            paramArr = new Object[] {params, int_param,offset};
+
+        TableRowIterator rows =
+			DatabaseManager.query(context, dbquery, paramArr);
 		
 		List groupRows = rows.toList();
 		Group[] groups = new Group[groupRows.size()];
@@ -850,7 +893,7 @@ public class Group extends DSpaceObject
     	throws SQLException
 	{
 		String params = "%"+query.toLowerCase()+"%";
-		String dbquery = "SELECT count(*) as count FROM epersongroup WHERE name ILIKE ? OR eperson_group_id = ? ";
+		String dbquery = "SELECT count(*) as gcount FROM epersongroup WHERE LOWER(name) LIKE LOWER(?) OR eperson_group_id = ? ";
 		
 		// When checking against the eperson-id, make sure the query can be made into a number
 		Integer int_param;
@@ -868,11 +911,11 @@ public class Group extends DSpaceObject
 		Long count;
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
-            count = new Long(row.getIntColumn("count"));              
+            count = new Long(row.getIntColumn("gcount"));
         }
         else  //getLongColumn works for postgres
         {
-            count = new Long(row.getLongColumn("count"));
+            count = new Long(row.getLongColumn("gcount"));
         }
 
 		return count.intValue();

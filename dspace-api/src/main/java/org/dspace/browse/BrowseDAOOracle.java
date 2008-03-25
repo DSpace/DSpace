@@ -887,7 +887,7 @@ public class BrowseDAOOracle implements BrowseDAO
                 params.add(new Integer(limit));
         }
 
-        if (offset > -1)
+        if (offset > 0)
         {
             queryBuf.insert(0, "SELECT * FROM (");
             queryBuf.append(") WHERE rnum>?");
