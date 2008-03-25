@@ -10,7 +10,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-lni</artifactId>
-      <version>1.5.0</version>
+      <version>1.5.1-SNAPSHOT</version>
    </parent>
 
    <repositories>
@@ -48,9 +48,9 @@
    </pluginRepositories>
 
    <scm>
-      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace-lni/dspace-lni-core</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/tags/dspace-1_5/dspace-lni/dspace-lni-core</url>
+      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-lni/dspace-lni-core</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-lni/dspace-lni-core</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace-lni/dspace-lni-core</url>
    </scm>
 
    <dependencies>

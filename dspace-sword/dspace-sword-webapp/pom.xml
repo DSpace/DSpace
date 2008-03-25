@@ -14,7 +14,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-sword</artifactId>
-      <version>1.5.0</version>
+      <version>1.5.1-SNAPSHOT</version>
    </parent>
 
    <repositories>
@@ -58,9 +58,9 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace-sword/dspace-sword-webapp</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1_5/dspace-sword/dspace-sword-webapp</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/tags/dspace-1_5/dspace-sword/dspace-sword-webapp</url>
+      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-sword/dspace-sword-webapp</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-sword/dspace-sword-webapp</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace-sword/dspace-sword-webapp</url>
    </scm>
 
    <build>
@@ -146,7 +146,7 @@
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-sword-api</artifactId>
-         <version>1.5.0</version>
+         <version>1.5.1-SNAPSHOT</version>
       </dependency>
    </dependencies>
 
