@@ -241,7 +241,7 @@ public class Body extends AbstractWingElement implements WingMergeableElement
             division.toSAX(contentHandler, lexicalHandler, namespaces);
 
         if (!merged)
-            startElement(contentHandler, namespaces, E_BODY, null);
+            endElement(contentHandler, namespaces, E_BODY);
     }
 
     /**
