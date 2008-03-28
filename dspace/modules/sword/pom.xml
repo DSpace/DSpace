@@ -71,9 +71,6 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<archiveClasses>false</archiveClasses>
-					<warSourceExcludes>
-						WEB-INF/lib/*.jar
-					</warSourceExcludes>
 					<webResources>
 						<resource>
 							<filtering>true</filtering>
