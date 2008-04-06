@@ -1213,7 +1213,6 @@ public class LogAnalyser
         }
 
         dateQuery.append("FROM metadatavalue " +
-                          "FROM metadatavalue " +
                           "WHERE metadata_field_id = (" +
                           " SELECT metadata_field_id " +
                           " FROM metadatafieldregistry " +
