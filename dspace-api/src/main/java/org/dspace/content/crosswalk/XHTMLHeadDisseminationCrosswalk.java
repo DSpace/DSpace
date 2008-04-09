@@ -50,6 +50,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.SelfNamedPlugin;
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.jdom.Verifier;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -233,9 +234,31 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
             {
                 Element e = new Element("meta", XHTML_NAMESPACE);
                 e.setAttribute("name", name);
-                // TODO: Check valid encoding?  We assume UTF-8
-                // TODO: Check escaping "<>&
-                e.setAttribute("content", v.value == null ? "" : v.value);
+                if (v.value == null)
+                {
+                    e.setAttribute("content", "");
+                }
+                else
+                {
+                    // Check that we can output the content
+                    String reason = Verifier.checkCharacterData(v.value);
+                    if (reason == null)
+                    {
+                        // TODO: Check valid encoding?  We assume UTF-8
+                        // TODO: Check escaping "<>&
+                        e.setAttribute("content", v.value == null ? "" : v.value);
+                    }
+                    else
+                    {
+                        // Warn that we found invalid characters
+                        log.warn("Invalid attribute characters in Metadata: " + reason);
+
+                        // Strip any characters that we can, and if the result is valid, output it
+                        String simpleText = v.value.replaceAll("\\p{Cntrl}", "");
+                        if (Verifier.checkCharacterData(simpleText) == null)
+                            e.setAttribute("content", simpleText);
+                    }
+                }
                 if (v.language != null && !v.language.equals(""))
                 {
                     e.setAttribute("lang", v.language, Namespace.XML_NAMESPACE);
