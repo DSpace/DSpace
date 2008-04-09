@@ -245,6 +245,9 @@ public class BrowseDAOOracle implements BrowseDAO
     {
         TableRowIterator tri = null;
 
+        if (column == null || value == null)
+            return 0;
+
         try
         {
             List paramsList = new ArrayList();
