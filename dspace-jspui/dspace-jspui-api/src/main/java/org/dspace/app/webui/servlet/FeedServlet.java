@@ -383,7 +383,7 @@ public class FeedServlet extends DSpaceServlet
                         }
 
     			// put in container-level data
-    			channel.setDescription(description);
+    			channel.setDescription(description.replaceAll("\\p{Cntrl}", ""));
     			channel.setLink(objectUrl);
     			//build channel title by passing in type and title
     			String channelTitle = MessageFormat.format(labels.getString(clazz + ".feed.title"),
@@ -575,7 +575,7 @@ public class FeedServlet extends DSpaceServlet
             
         }//end while   
         Description descrip = new Description();
-        descrip.setValue(descBuf.toString());
+        descrip.setValue(descBuf.toString().replaceAll("\\p{Cntrl}", ""));
         rssItem.setDescription(descrip);
             
         
