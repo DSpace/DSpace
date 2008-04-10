@@ -16,7 +16,7 @@
 	<parent>
 		<groupId>org.dspace</groupId>
 		<artifactId>modules</artifactId>
-		<version>1.5-SNAPSHOT</version>
+		<version>SNAPSHOT</version>
 	</parent>
 
 	<repositories>
@@ -162,7 +162,7 @@
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-sword-api</artifactId>
-			<version>1.5-SNAPSHOT</version>
+			<version>SNAPSHOT</version>
 		</dependency>
 
 	</dependencies>
