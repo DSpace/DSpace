@@ -51,7 +51,9 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 /**
  * Class representing an e-mail message, also used to send e-mails.
@@ -139,6 +141,9 @@ public class Email
     /** Reply to field, if any */
     private String replyTo;
 
+    /** Attachments */
+    private List attachments;
+
     /**
      * Create a new email message.
      */
@@ -149,6 +154,7 @@ public class Email
         subject = "";
         content = "";
         replyTo = null;
+        attachments = new ArrayList();
     }
 
     /**
@@ -160,6 +166,16 @@ public class Email
     public void addRecipient(String email)
     {
         recipients.add(email);
+    }
+
+    /**
+     * Add attachment.
+     * 
+     * @param attachment single attachment
+     */
+    public void addAttachment(MimeBodyPart attachment)
+    {
+        attachments.add(attachment);
     }
 
     /**
@@ -232,13 +248,13 @@ public class Email
         String server = ConfigurationManager.getProperty("mail.server");
         String from = ConfigurationManager.getProperty("mail.from.address");
         String localhost = ConfigurationManager.getProperty("mail.localhost");
-	
+        
         // Set up properties for mail session
         Properties props = System.getProperties();
         props.put("mail.smtp.host", server);
-	if (localhost != null) {
-	  props.put("mail.smtp.localhost", localhost);
-	}
+        if (localhost != null) {
+          props.put("mail.smtp.localhost", localhost);
+        }
 
         // Get session
         Session session = Session.getDefaultInstance(props, null);
@@ -261,7 +277,21 @@ public class Email
 
         message.setFrom(new InternetAddress(from));
         message.setSubject(subject);
-        message.setText(fullMessage);
+
+        MimeMultipart mp = new MimeMultipart();
+
+        // Add the first part, which is text
+        MimeBodyPart text = new MimeBodyPart();
+        text.setContent(fullMessage,"text/plain");
+	mp.addBodyPart(text);
+
+	// Add the rest of the parts
+	for (i=attachments.iterator(); i.hasNext(); ) {
+	  mp.addBodyPart((MimeBodyPart)i.next());
+	}
+
+        message.setContent(mp);
+        message.saveChanges();
 
         if (replyTo != null)
         {
