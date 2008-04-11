@@ -96,6 +96,11 @@ Common usage:
 	<!-- Load the configuration -->
 	<property file="${config}" />
 
+    <!-- Timestamp date used when creating backup directories -->
+	<tstamp>
+		<format property="build.date" pattern="yyyyMMdd-HHmmss" />
+	</tstamp>
+	
 
 	<!-- ============================================================= -->
 	<!-- The DSpace class path for executing installation targets      -->
@@ -121,16 +126,30 @@ Common usage:
 		<echo message="" />
 		<echo message="Available targets are:" />
 		<echo message="" />
-		<echo message="update          --> Update installed code without touching your config or data" />
+		<echo message="update          --> Update installed code and web applications without "/>
+	    <echo message="                    touching your config or data" />
+		<echo message="update_code     --> Update compiled code (bin, lib, and etc directories)"  />
+		<echo message="update_webapps  --> Update web applications" />
 		<echo message="" />
 		<echo message="init_configs    --> Write the configuration files to ${dspace.dir}/config" />
 		<echo message="install_code    --> Install compiled code into ${dspace.dir}" />
 		<echo message="" />
-		<echo message="fresh_install   --> Perform a fresh installation of the software, including the databases &amp; config" />
+		<echo message="fresh_install   --> Perform a fresh installation of the software, "/>
+		<echo message="                    including the databases &amp; config" />
 		<echo message="setup_database  --> Create database tables" />
-		<echo message="load_registries --> Load metadata &amp; file format registries into the database" />
+		<echo message="load_registries --> Load metadata &amp; file format registries into the "/>
+	    <echo message="                    database" />
 		<echo message="" />
 		<echo message="clean_database  --> Remove DSpace database tables, destroying data" />
+		<echo message=""/>
+		<echo message=""/>
+		<echo message="Available parameters are:" />
+		<echo message=""/>
+		<echo message="-Dconfig=&lt;path/to/dspace.cfg&gt;  -- Where your dspace.cfg configuration"/> 
+		<echo message="                                  is located"/>
+		<echo message="-Dwars=true                    -- Build .war files when updating web"/>
+		<echo message="                                  applications"/>
+		<echo message=""/>
 
 	</target>
 
@@ -138,12 +157,22 @@ Common usage:
 	<!-- Update an installation (except database)                      -->
 	<!-- ============================================================= -->
 
-	<target name="update" description="Update installed code (without clobbering data/config)">
+	<target name="update" depends="update_code,update_webapps" description="Update installed code and web applications (without clobbering data/config)">
+	</target>
 
-		<tstamp>
-			<format property="build.date" pattern="yyyyMMdd-HHmmss" />
-		</tstamp>
+	
+	<!-- ============================================================= -->
+	<!-- Update an installation (except database)                      -->
+	<!-- ============================================================= -->
 
+	<target name="update_code" description="Update installed code (without clobbering data/config)">
+
+		<move todir="${dspace.dir}/bin.bak-${build.date}" failonerror="no">
+			<fileset dir="${dspace.dir}/bin">
+				<include name="**/*" />
+			</fileset>
+		</move>
+		
 		<copy todir="${dspace.dir}/bin" preservelastmodified="true">
 			<fileset dir="bin" />
 		</copy>
@@ -172,6 +201,10 @@ Common usage:
 
 		<echo>
 ====================================================================
+ ${dspace.dir}/bin was backed up to
+						
+ ${dspace.dir}/bin.bak-${build.date}
+			
  ${dspace.dir}/lib was backed up to
 			
  ${dspace.dir}/lib.bak-${build.date}
@@ -183,10 +216,19 @@ Common usage:
  Please review these directories and delete if no longer needed.
 ====================================================================
 		</echo>
+		
+	</target>
+	
+
+	<!-- ============================================================= -->
+	<!-- Update Web Applications only                                  -->
+	<!-- ============================================================= -->
+
+	<target name="update_webapps" description="Update Web Applications (without clobbering data/config)">
 
 		<move todir="${dspace.dir}/webapps.bak-${build.date}" failonerror="no">
 			<fileset dir="${dspace.dir}/webapps">
-				<include name="**/*.war"/>
+				<include name="**/*"/>
 			</fileset>
 		</move>
 
@@ -215,6 +257,8 @@ Common usage:
 ====================================================================
 		</echo>
 
+		<antcall target="build_webapps_wars"/>
+		
 		<echo>
 ====================================================================
  Updated DSpace Web application directories are in the 
@@ -240,8 +284,38 @@ Common usage:
     	</echo>
 
 	</target>
+	
+	
+	<!-- ============================================================= -->
+	<!-- Compress Web Applications                                     -->
+	<!-- (Only executes if the "wars" property is defined)             -->
+	<!-- ============================================================= -->
 
+	<target name="build_webapps_wars" description="Compress Web Applications into .war files" if="wars">
 
+		<war destfile="${dspace.dir}/webapps/xmlui.war">
+			<fileset dir="${dspace.dir}/webapps/xmlui/"/>
+		</war>
+		
+		<war destfile="${dspace.dir}/webapps/oai.war">
+			<fileset dir="${dspace.dir}/webapps/oai/"/>
+		</war>
+		
+		<war destfile="${dspace.dir}/webapps/lni.war">
+			<fileset dir="${dspace.dir}/webapps/lni/"/>
+		</war>
+		
+		<war destfile="${dspace.dir}/webapps/jspui.war">
+			<fileset dir="${dspace.dir}/webapps/jspui/"/>
+		</war>
+		
+		<war destfile="${dspace.dir}/webapps/sword.war">
+			<fileset dir="${dspace.dir}/webapps/sword/"/>
+		</war>
+
+	</target>
+	
+	
 	<!-- ============================================================= -->
 	<!-- Install DSpace and Dependencies                               -->
 	<!-- ============================================================= -->
@@ -259,8 +333,6 @@ Common usage:
 		<mkdir dir="${assetstore.dir}" />
 
 		<mkdir dir="${handle.dir}" />
-
-		<mkdir dir="${history.dir}" />
 
 		<mkdir dir="${search.dir}" />
 
@@ -362,7 +434,7 @@ Common usage:
             <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties"/>
 			<sysproperty key="dspace.log.init.disable" value="true"/>
             <sysproperty key="dspace.configuration" value="${config}"/>
-		    <arg line="-f ${dspace.dir}/config/registries/dublin-core-types.xml"/>
+		    <arg line="-f '${dspace.dir}/config/registries/dublin-core-types.xml'"/>
 		</java>
 
         <!-- FIXME: this should be more modular -->
@@ -371,7 +443,7 @@ Common usage:
             <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties"/>
 			<sysproperty key="dspace.log.init.disable" value="true"/>
             <sysproperty key="dspace.configuration" value="${config}"/>
-		    <arg line="-f ${dspace.dir}/config/registries/sword-metadata.xml"/>
+		    <arg line="-f '${dspace.dir}/config/registries/sword-metadata.xml'"/>
 		</java>
 
     </target>
@@ -428,6 +500,8 @@ Common usage:
 			</filterchain>
 		</copy>
 
+		<antcall target="build_webapps_wars"/>
+		
 		<java classname="org.dspace.browse.IndexBrowse" classpathref="class.path" fork="yes" failonerror="yes">
 			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
 			<sysproperty key="dspace.log.init.disable" value="true"/>
