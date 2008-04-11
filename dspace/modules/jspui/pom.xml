@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.dspace.modules</groupId>
-	<artifactId>dspace-jspui</artifactId>
+	<artifactId>jspui</artifactId>
 	<packaging>war</packaging>
-	<name>DSpace JSPUI :: Web Application</name>
+	<name>DSpace JSP-UI :: Web Application</name>
 	<url>http://www.dspace.org</url>
-	<description>DSpace JSPUI :: Overlay</description>
+	<description>DSpace JSP-UI :: Web Application</description>
 
 	<parent>
 		<groupId>org.dspace</groupId>
@@ -74,7 +74,7 @@
 
 	<repositories>
 		<repository>
-			<id>maven.dspace.org-snapshot</id>
+			<id>maven.dspace.org/snapshot</id>
 			<name>DSpace Maven Snapshot Repository</name>
 			<url>http://maven.dspace.org/snapshot</url>
 			<releases>
@@ -89,9 +89,9 @@
 	</repositories>
 
 	<scm>
-		<connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/dspace-jspui</connection>
-		<developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/dspace-jspui</developerConnection>
-		<url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace/modules/dspace-jspui</url>
+		<connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/jspui</connection>
+		<developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/jspui</developerConnection>
+		<url>http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace/modules/jspui</url>
 	</scm>
 
 	<build>
@@ -99,7 +99,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>2.0</version>
 				<configuration>
 					<archiveClasses>false</archiveClasses>
 					<webResources>
@@ -127,38 +126,11 @@
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-jspui-webapp</artifactId>
-			<version>${pom.version}</version>
 			<type>war</type>
-			<classifier>skinny</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-jspui-api</artifactId>
-			<version>${pom.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>language-packs</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.3</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>jstl</artifactId>
-			<version>1.1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>taglibs</groupId>
-			<artifactId>standard</artifactId>
-			<version>1.1.2</version>
 		</dependency>
 	</dependencies>
 

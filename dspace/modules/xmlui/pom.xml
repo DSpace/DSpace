@@ -1,192 +1,183 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.dspace.modules</groupId>
-	<artifactId>dspace-xmlui</artifactId>
-	<packaging>war</packaging>
-	<name>DSpace XMLUI (Manakin) :: Web Application Overlay</name>
-	<url>http://projects.dspace.org/dspace-xmlui</url>
-	<description>
-		DSpace/Manakin XML UI Based Webapplication using the Cocoon and
-		Wing frameworks
-	</description>
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace.modules</groupId>
+   <artifactId>xmlui</artifactId>
+   <packaging>war</packaging>
+   <name>DSpace XML-UI (Manakin) :: Web Application</name>
+   <url>http://projects.dspace.org/dspace-xmlui</url>
+   <description>
+      DSpace/Manakin XML-UI Based Webapplication using the Cocoon and
+      Wing frameworks
+   </description>
 
-	<parent>
-		<groupId>org.dspace</groupId>
-		<artifactId>modules</artifactId>
-		<version>SNAPSHOT</version>
-	</parent>
+   <parent>
+      <groupId>org.dspace</groupId>
+      <artifactId>modules</artifactId>
+      <version>SNAPSHOT</version>
+   </parent>
 
-	<repositories>
-		<repository>
-			<id>maven.dspace.org/snapshot</id>
-			<name>DSpace Maven Snapshot Repository</name>
-			<url>http://maven.dspace.org/snapshot</url>
-			<releases>
-				<enabled>false</enabled>
-				<checksumPolicy>fail</checksumPolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		</repository>
-	</repositories>
+   <repositories>
+      <repository>
+         <id>maven.dspace.org/snapshot</id>
+         <name>DSpace Maven Snapshot Repository</name>
+         <url>http://maven.dspace.org/snapshot</url>
+         <releases>
+            <enabled>false</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <enabled>true</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </repository>
+   </repositories>
 
-	<pluginRepositories>
-		<pluginRepository>
-			<id>maven.dspace.org/snapshot</id>
-			<name>DSpace Maven Repository</name>
-			<url>http://maven.dspace.org/snapshot</url>
-			<releases>
-				<updatePolicy>never</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</releases>
-			<snapshots>
-				<updatePolicy>always</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
+   <pluginRepositories>
+      <pluginRepository>
+         <id>maven.dspace.org/snapshot</id>
+         <name>DSpace Maven Repository</name>
+         <url>http://maven.dspace.org/snapshot</url>
+         <releases>
+            <updatePolicy>never</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </pluginRepository>
+   </pluginRepositories>
 
-	<scm>
-		<connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-xmlui</connection>
-		<developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-xmlui</developerConnection>
-		<url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace-xmlui</url>
-	</scm>
+   <scm>
+      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/xmlui</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/xmlui</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/xmlui</url>
+   </scm>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<archiveClasses>false</archiveClasses>
-					<webResources>
-						<resource>
-							<filtering>true</filtering>
-							<directory>
-								${basedir}/src/main/webapp
-							</directory>
-							<includes>
-								<include>WEB-INF/web.xml</include>
-							</includes>
-						</resource>
-					</webResources>
-					<overlays>
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+               <archiveClasses>false</archiveClasses>
+               <webResources>
+                  <resource>
+                     <filtering>true</filtering>
+                     <directory>${basedir}/src/main/webapp</directory>
+                     <includes>
+                        <include>WEB-INF/web.xml</include>
+                     </includes>
+                  </resource>
+               </webResources>
+               <overlays>
                   <!--  
-                  the priority of overlays is determined here
-                  1.) default: anything in the current project has highest
-                  2.) anything defined here has precedence in the order defined
-                  3.) any war found transitively in the dependencies will be applied
-                      next. the order is unpredictable.
-                   -->
-					   <overlay>
-					      <groupId>org.dspace</groupId>
-					      <artifactId>dspace-xmlui-lang</artifactId>
-					      <excludes>
+                     the priority of overlays is determined here
+                     1.) default: anything in the current project has highest
+                     2.) anything defined here has precedence in the order defined
+                     3.) any war found transitively in the dependencies will be applied
+                     next. the order is unpredictable.
+                  -->
+                  <overlay>
+                     <groupId>org.dspace</groupId>
+                     <artifactId>dspace-xmlui-lang</artifactId>
+                     <excludes>
                         <!--  
-                        keep lang web.xml from overiding xmlui
+                           keep lang web.xml from overiding xmlui
                         -->
-					         <exclude>WEB-INF/web.xml</exclude>
-					      </excludes>
-					   </overlay>
+                        <exclude>WEB-INF/web.xml</exclude>
+                     </excludes>
+                  </overlay>
                   <overlay>
                      <groupId>org.dspace</groupId>
                      <artifactId>dspace-xmlui-webapp</artifactId>
                   </overlay>
-					</overlays>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>prepare-package</phase>
-					</execution>
-				</executions>
-			</plugin>
+               </overlays>
+            </configuration>
+            <executions>
+               <execution>
+                  <phase>prepare-package</phase>
+               </execution>
+            </executions>
+         </plugin>
 
-		</plugins>
-	</build>
+      </plugins>
+   </build>
 
-	<profiles>
-		<!-- 
-			when activated a dspace.config configuration
-			file location passed on the commandline 
-			(-Ddspace.config=...) can be passed through 
-			to be used as a filter source by projects for 
-			tasks such as updating the ${dspace.dir} in
-			web.xml etc.
-		-->
-		<profile>
-			<activation>
-				<property>
-					<name>dspace.config</name>
-				</property>
-			</activation>
-			<build>
-				<filters>
-					<filter>${dspace.config}</filter>
-				</filters>
-			</build>
-		</profile>
-		<profile>
-			<id>postgres-support</id>
-			<activation>
-				<property>
-					<name>!db.name</name>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>postgresql</groupId>
-					<artifactId>postgresql</artifactId>
-				</dependency>
-			</dependencies>
-		</profile>
-		<profile>
-			<id>oracle-support</id>
-			<activation>
-				<property>
-					<name>db.name</name>
-					<value>oracle</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>com.oracle</groupId>
-					<artifactId>ojdbc14</artifactId>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
+   <profiles>
+      <!-- 
+         when activated a dspace.config configuration
+         file location passed on the commandline 
+         (-Ddspace.config=...) can be passed through 
+         to be used as a filter source by projects for 
+         tasks such as updating the ${dspace.dir} in
+         web.xml etc.
+      -->
+      <profile>
+         <activation>
+            <property>
+               <name>dspace.config</name>
+            </property>
+         </activation>
+         <build>
+            <filters>
+               <filter>${dspace.config}</filter>
+            </filters>
+         </build>
+      </profile>
+      <profile>
+         <id>postgres-support</id>
+         <activation>
+            <property>
+               <name>!db.name</name>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>postgresql</groupId>
+               <artifactId>postgresql</artifactId>
+            </dependency>
+         </dependencies>
+      </profile>
+      <profile>
+         <id>oracle-support</id>
+         <activation>
+            <property>
+               <name>db.name</name>
+               <value>oracle</value>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>com.oracle</groupId>
+               <artifactId>ojdbc14</artifactId>
+            </dependency>
+         </dependencies>
+      </profile>
+   </profiles>
 
-	<dependencies>
-   
+   <dependencies>
+
       <!-- DSpace XMLUI Languages -->
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-xmlui-lang</artifactId>
-         <!-- 
-            TODO: change in release to <version>[1.5.0,1.6.0)</version>
-         -->
-         <version>SNAPSHOT</version>
          <type>war</type>
       </dependency>
-      
-		<!-- DSpace XMLUI Webapp -->
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-xmlui-webapp</artifactId>
-			<version>${project.version}</version>
-			<classifier>skinny</classifier>
-			<type>war</type>
-		</dependency>
-      
-		<!-- DSpace XMLUI API -->
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-xmlui-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
-	</dependencies>
+      <!-- DSpace XMLUI Webapp -->
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-xmlui-webapp</artifactId>
+         <type>war</type>
+      </dependency>
+
+      <!-- DSpace XMLUI API -->
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-xmlui-api</artifactId>
+      </dependency>
+
+   </dependencies>
 
 </project>

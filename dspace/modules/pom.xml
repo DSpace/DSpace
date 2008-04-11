@@ -15,7 +15,7 @@
 
 	<repositories>
 		<repository>
-			<id>maven.dspace.org-snapshot</id>
+			<id>maven.dspace.org/snapshot</id>
 			<name>DSpace Maven Snapshot Repository</name>
 			<url>http://maven.dspace.org/snapshot</url>
 			<releases>
@@ -29,12 +29,18 @@
 		</repository>
 	</repositories>
 
+   <scm>
+      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules</url>
+   </scm>
+   
 	<modules>
-		<module>dspace-xmlui</module>
-		<module>dspace-lni</module>
-		<module>dspace-oai</module>
-		<module>dspace-jspui</module>
-		<module>dspace-sword</module>
+		<module>xmlui</module>
+		<module>lni</module>
+		<module>oai</module>
+		<module>jspui</module>
+		<module>sword</module>
 	</modules>
 	
 </project>

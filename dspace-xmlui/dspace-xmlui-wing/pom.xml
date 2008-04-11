@@ -3,7 +3,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-xmlui-wing</artifactId>
    <packaging>jar</packaging>
-   <name>DSpace XMLUI (Manakin) :: Wing-Framework</name>
+   <name>DSpace XML-UI (Manakin) :: Wing-Framework</name>
    <url>http://projects.dspace.org/dspace-xmlui/dspace-xmlui-wing</url>
    <description>The Cocoon-based Wing framework</description>
 
@@ -48,15 +48,9 @@
    </pluginRepositories>
 
    <scm>
-      <connection>
-         scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui/dspace-xmlui-wing
-      </connection>
-      <developerConnection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui/dspace-xmlui-wing
-      </developerConnection>
-      <url>
-         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-xmlui/dspace-xmlui-wing
-      </url>
+      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui/dspace-xmlui-wing</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui/dspace-xmlui-wing</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-xmlui/dspace-xmlui-wing</url>
    </scm>
 
    <dependencies>
@@ -155,10 +149,11 @@
 
       <!-- ehcache -->
       <dependency>
-         <groupId>org.dspace.xmlui.ehcache</groupId>
-         <artifactId>ehcache</artifactId>
-         <version>1.1</version>
-      </dependency>
+    	  <groupId>net.sf.ehcache</groupId>
+    	  <artifactId>ehcache</artifactId>
+    	  <version>1.4.1</version>
+	  </dependency>
+      
 
       <!-- excalibur -->
       <dependency>

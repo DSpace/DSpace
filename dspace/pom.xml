@@ -381,14 +381,14 @@
          Builds Language Packs for DSpace
       -->
       <profile>
-         <id>language-packs</id>
+         <id>dspace-api-lang</id>
          <activation>
             <file>
-               <exists>../language-packs/pom.xml</exists>
+               <exists>../dspace-api-lang/pom.xml</exists>
             </file>
          </activation>
          <modules>
-            <module>../language-packs</module>
+            <module>../dspace-api-lang</module>
          </modules>
       </profile>
 
@@ -494,6 +494,7 @@
          <!--  overall project assembly -->
          <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.2-beta-1</version>
             <configuration>
                <descriptors>
                   <descriptor>src/assemble/assembly.xml</descriptor>
@@ -518,7 +519,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.dspace</groupId>
-			<artifactId>language-packs</artifactId>
+			<artifactId>dspace-api-lang</artifactId>
 		</dependency>
 	</dependencies>
 	

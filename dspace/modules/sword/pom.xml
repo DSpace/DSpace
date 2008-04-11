@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.dspace.modules</groupId>
-	<artifactId>dspace-sword</artifactId>
+	<artifactId>sword</artifactId>
 	<packaging>war</packaging>
 	<name>DSpace SWORD :: Web Application</name>
 	<description>
-		DSpace SWORD Deposit Service Provider Web Application Overlay
+		DSpace SWORD Deposit Service Provider Web Application
 	</description>
 	<url>http://www.ukoln.ac.uk/repositories/digirep/index/SWORD</url>
 
@@ -58,9 +58,9 @@
 		into the snapshot repository below.
 	-->
 	<scm>
-		<connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/modules/dspace-sword</connection>
-		<developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/dspace-sword</developerConnection>
-		<url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace/modules/dspace-sword</url>
+		<connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/sword</connection>
+		<developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/sword</developerConnection>
+		<url>http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/sword</url>
 	</scm>
 
 	<build>
@@ -71,9 +71,6 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<archiveClasses>false</archiveClasses>
-					<warSourceExcludes>
-						WEB-INF/lib/*.jar
-					</warSourceExcludes>
 					<webResources>
 						<resource>
 							<filtering>true</filtering>
@@ -149,22 +146,15 @@
 	</profiles>
 
 	<dependencies>
-
-		<!-- DSpace SWORD Webapp -->
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-sword-webapp</artifactId>
-			<version>${project.version}</version>
-			<classifier>skinny</classifier>
 			<type>war</type>
 		</dependency>
-
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-sword-api</artifactId>
-			<version>SNAPSHOT</version>
 		</dependency>
-
 	</dependencies>
 
 </project>

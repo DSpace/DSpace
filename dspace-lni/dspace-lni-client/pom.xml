@@ -1,6 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace</groupId>
    <artifactId>dspace-lni-client</artifactId>
@@ -52,15 +50,9 @@
    </pluginRepositories>
 
    <scm>
-      <connection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-lni/dspace-lni-client
-      </connection>
-      <developerConnection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-lni/dspace-lni-client
-      </developerConnection>
-      <url>
-         http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace-lni/dspace-lni-client
-      </url>
+      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-lni/dspace-lni-client</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-lni/dspace-lni-client</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-lni/dspace-lni-client</url>
    </scm>
 
    <profiles>
@@ -80,22 +72,12 @@
                         <phase>generate-sources</phase>
                         <configuration>
                            <tasks>
-                              <taskdef resource="axis-tasks.properties"
-                                 classpathref="maven.compile.classpath" />
+                              <taskdef resource="axis-tasks.properties" classpathref="maven.compile.classpath" />
                               <mkdir dir="src/main/config" />
-                              <axis-java2wsdl
-                                 classname="org.dspace.app.dav.LNISoapServlet"
-                                 location="http://localhost/dspace/lni/DSpaceLNI"
-                                 methods="lookup,propfind,proppatch,copy"
-                                 namespace="http://dspace.org/xmlns/lni"
-                                 output="src/main/resources/dspace-lni.wsdl" />
+                              <axis-java2wsdl classname="org.dspace.app.dav.LNISoapServlet" location="http://localhost/dspace/lni/DSpaceLNI" methods="lookup,propfind,proppatch,copy" namespace="http://dspace.org/xmlns/lni" output="src/main/resources/dspace-lni.wsdl" />
                               <mkdir dir="src/main/java" />
-                              <axis-wsdl2java output="src/main/java"
-                                 verbose="true"
-                                 url="src/main/resources/dspace-lni.wsdl">
-                                 <mapping
-                                    namespace="http://dspace.org/xmlns/lni"
-                                    package="org.dspace.app.dav.client" />
+                              <axis-wsdl2java output="src/main/java" verbose="true" url="src/main/resources/dspace-lni.wsdl">
+                                 <mapping namespace="http://dspace.org/xmlns/lni" package="org.dspace.app.dav.client" />
                               </axis-wsdl2java>
                            </tasks>
                         </configuration>
@@ -114,6 +96,7 @@
       <plugins>
          <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
+			<version>2.2-beta-1</version>
             <configuration>
                <descriptorRefs>
                   <descriptorRef>jar-with-dependencies</descriptorRef>
