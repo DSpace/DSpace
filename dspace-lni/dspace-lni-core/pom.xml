@@ -30,23 +30,6 @@
       </repository>
    </repositories>
 
-   <pluginRepositories>
-      <pluginRepository>
-         <id>maven.dspace.org/snapshot</id>
-         <name>DSpace Maven Repository</name>
-         <url>http://maven.dspace.org/snapshot</url>
-         <releases>
-            <enabled>false</enabled>
-            <checksumPolicy>fail</checksumPolicy>
-         </releases>
-         <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-            <checksumPolicy>fail</checksumPolicy>
-         </snapshots>
-      </pluginRepository>
-   </pluginRepositories>
-
    <scm>
       <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-lni/dspace-lni-core</connection>
       <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-lni/dspace-lni-core</developerConnection>
