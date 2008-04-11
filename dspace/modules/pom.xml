@@ -40,7 +40,7 @@
 		<module>lni</module>
 		<module>oai</module>
 		<module>jspui</module>
-		<module>sword</module>
+		<!-- <module>sword</module> -->
 	</modules>
 	
 </project>

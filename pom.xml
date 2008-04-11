@@ -81,7 +81,7 @@
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
             <module>dspace-oai</module>
-            <module>dspace-sword</module>
+            <!-- <module>dspace-sword</module> -->
             <module>dspace</module>
          </modules>
       </profile>
@@ -102,7 +102,7 @@
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
             <module>dspace-oai</module>
-            <module>dspace-sword</module>
+            <!-- <module>dspace-sword</module> -->
          </modules>
       </profile>
       
