@@ -66,6 +66,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -213,6 +214,13 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         pageMeta.addMetadata("request","serverPort").addContent(request.getServerPort());
         pageMeta.addMetadata("request","serverName").addContent(request.getServerName());
         pageMeta.addMetadata("request","URI").addContent(request.getSitemapURI());
+        
+        String analyticsKey = ConfigurationManager.getProperty("xmlui.google.analytics.key");
+        if (analyticsKey != null && analyticsKey.length() > 0)
+        {
+        	analyticsKey = analyticsKey.trim();
+        	pageMeta.addMetadata("google","analytics").addContent(analyticsKey);
+        }
         
         // Add metadata for quick searches:
         pageMeta.addMetadata("search", "simpleURL").addContent(

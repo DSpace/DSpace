@@ -228,6 +228,18 @@
                     &#160;
                 </script>
             </xsl:for-each>
+            
+            
+            <!-- Add a google analytics script if the key is present -->
+            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">
+            	<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"><xsl:text>&#160;</xsl:text></script>
+				<script type="text/javascript">
+					<xsl:text>_uacct = "</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>";</xsl:text>
+					<xsl:text>urchinTracker();</xsl:text>
+				</script>
+            </xsl:if>
+            
+            
             <!-- Add the title in -->
             <xsl:variable name="page_title" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']" />
             <title>
