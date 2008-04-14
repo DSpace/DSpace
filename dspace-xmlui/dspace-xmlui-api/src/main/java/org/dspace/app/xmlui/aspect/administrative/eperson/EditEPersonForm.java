@@ -61,6 +61,7 @@ import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -127,6 +128,9 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	
 	private static final Message T_submit_delete =
 		message("xmlui.administrative.eperson.EditEPersonForm.submit_delete");
+	
+	private static final Message T_submit_login_as =
+		message("xmlui.administrative.eperson.EditEPersonForm.submit_login_as");
 	
 	private static final Message T_delete_constraint =
 		message("xmlui.administrative.eperson.EditEPersonForm.delete_constraint");
@@ -309,13 +313,19 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	        certificateField.addOption(certificatValue,"true");
 	        
 	        
-        	// Buttons to reset or delete
+        	// Buttons to reset, delete or login as
 	        identity.addItem().addHighlight("italic").addContent(T_special_help);
 	        Item special = identity.addItem();
 	        special.addButton("submit_reset_password").setValue(T_submit_reset_password);
 	        
 	        Button submitDelete = special.addButton("submit_delete");
 	        submitDelete.setValue(T_submit_delete);
+	       
+	        Button submitLoginAs = special.addButton("submit_login_as");
+	        submitLoginAs.setValue(T_submit_login_as);
+	        if (!ConfigurationManager.getBooleanProperty("xmlui.user.assumelogin", false))
+	        	submitLoginAs.setDisabled();
+	       
 	        if (deleteConstraints != null && deleteConstraints.size() > 0)
 	        {
 	        	submitDelete.setDisabled();

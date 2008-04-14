@@ -681,7 +681,6 @@ function doAddEPerson()
  */
 function doEditEPerson(epersonID)
 {
-	// FIXME:
 	// We can't assert any privleges at this point, the user could be a collection 
 	// admin or a supper admin. Instead we protect each operation.
     var result;
@@ -730,6 +729,22 @@ function doEditEPerson(epersonID)
             
             if (result != null)
                 result.setContinue(false);
+        }
+        else if (cocoon.request.get("submit_login_as"))
+        {
+        	// Login as this user.
+        	assertAdministrator();
+        	result = FlowEPersonUtils.processLoginAs(getDSContext(),getObjectModel(),epersonID);
+        	
+        	if (result != null && result.getOutcome().equals("success"))
+        	{
+        		// the user is loged in as another user, we can't let them continue on
+        		// using this flow because they might not have permissions. So forward
+        		// them to the homepage.
+        		cocoon.redirectTo(cocoon.request.getContextPath(),true);
+				getDSContext().complete();
+				cocoon.exit(); 
+        	}
         }
         
     } while (result == null || !result.getContinue())  

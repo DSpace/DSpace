@@ -845,6 +845,14 @@ More information is provide below in <a href="#newfilter">Creating a new Media/F
 
         <td>Determine if users should be allowed to edit their own metadata. This parameter is usefull in congunction with shibboleth where you want to disable the user's ability to edit their metadata because it came from Shibboleth. Default value is true.</td>
       </tr>
+      
+      <tr>
+        <td><code>xmlui.user.assumelogin</code></td>
+
+        <td><code>true</code></td>
+
+        <td>Determine if super administrators (those whom are in the Administrators group) can login as another user from the "edit eperson" page. This is usefull for debugging problems in a running dspace instance, especially in the workflow process so that you can see exactly what the user is seeing. The default value is false, i.e. no one may assume the login of another user.</td>
+      </tr>
 
       <tr>
         <td><code>xmlui.user.loginredirect</code></td>

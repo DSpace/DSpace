@@ -98,7 +98,7 @@ public class UnAuthenticateAction extends AbstractAction
         EPerson eperson = context.getCurrentUser();
         
         // Actualy log the user out.
-        AuthenticationUtil.loggedOut(context,httpRequest);
+        AuthenticationUtil.logOut(context,httpRequest);
         
         // Set the user as logged in for the rest of this request so that the cache does not get spoiled.
         context.setCurrentUser(eperson);
