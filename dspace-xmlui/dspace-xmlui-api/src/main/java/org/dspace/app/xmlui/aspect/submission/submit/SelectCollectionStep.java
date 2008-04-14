@@ -109,7 +109,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         DSpaceObject dso = null;
         if (eid != null)
         {
-            dso = eid.getObject(context);
+            dso = (DSpaceObject) IdentifierService.getResource(context, eid);
         }
 
         if (dso != null && dso instanceof Community)

@@ -38,11 +38,25 @@ package org.dspace.uri;
 import org.dspace.content.DSpaceObject;
 
 /**
- * @author Richard Jones
+ * Generic Interface for external identifier mechanisms which wish to be able to resolve
+ * identifiers to DSpaceObjects.  The ExternalIdentifierService can load classes
+ * which conform to this interface and ask them to resolve identifiers through this
+ * generic mechanism
+ *
+ * @author Richard JOnes
  */
 public interface IdentifierResolver<T extends ExternalIdentifier>
 {
-    DSpaceObject resolve(String identifier);
-
+    /**
+     * Given the URL path as an argument, extract the portion of the path which
+     * is the object identifier and return an instance of the implementation's
+     * extension of the ExternalIdentifier.
+     * 
+     * @param path
+     * @return
+     */
     T extractURLIdentifier(String path);
+
+    // FIXME: there is no interface for, and so far no use for a general canonical
+    // form resolver.  This may need to be introduced for generality and completeness
 }

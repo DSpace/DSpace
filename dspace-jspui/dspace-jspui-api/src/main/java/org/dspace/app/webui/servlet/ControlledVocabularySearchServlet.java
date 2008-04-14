@@ -281,7 +281,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
             String uri = (String) itemIdentifiers.get(i);
 
             ResolvableIdentifier di = IdentifierService.resolve(context, uri);
-            Item item = (Item) di.getObject(context);
+            Item item = (Item) IdentifierService.getResource(context, di);
 
             resultsItems[i] = item;
 
@@ -297,7 +297,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
             String uri = (String) collectionIdentifiers.get(i);
 
             ResolvableIdentifier di = IdentifierService.resolve(context, uri);
-            Collection c = (Collection) di.getObject(context);
+            Collection c = (Collection) IdentifierService.getResource(context, di);
 
             resultsCollections[i] = collection;
 
@@ -313,7 +313,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
             String uri = (String) communityIdentifiers.get(i);
 
             ResolvableIdentifier di = IdentifierService.resolve(context, uri);
-            Community c = (Community) di.getObject(context);
+            Community c = (Community) IdentifierService.getResource(context, di);
 
             resultsCommunities[i] = c;
 

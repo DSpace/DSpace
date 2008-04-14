@@ -48,6 +48,7 @@ import org.dspace.core.LogManager;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.IdentifierService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -151,7 +152,7 @@ public class OpenURLServlet extends URIServlet
 
         oi = identifier.getObjectIdentifier();
 
-        dso = oi.getObject(context);
+        dso = (DSpaceObject) IdentifierService.getResource(context, oi);
 
         if (dso == null)
         {

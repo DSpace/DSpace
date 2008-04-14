@@ -114,15 +114,7 @@ public class URIDispatcher implements BitstreamDispatcher
             context = new Context();
 
             ResolvableIdentifier di = IdentifierService.resolve(context, uri);
-            DSpaceObject dso = di.getObject(context);
-            /*
-            ExternalIdentifierDAO identifierDAO =
-                ExternalIdentifierDAOFactory.getInstance(context);
-
-            ExternalIdentifier identifier = identifierDAO.retrieve(uri);
-            ObjectIdentifier oi = identifier.getObjectIdentifier();
-            DSpaceObject dso = oi.getObject(context);
-            */
+            DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, di);
             
             id = dso.getID();
             dsoType = dso.getType();

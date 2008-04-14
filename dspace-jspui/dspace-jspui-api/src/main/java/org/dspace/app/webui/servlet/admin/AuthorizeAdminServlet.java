@@ -193,7 +193,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             {
                 // otherwise, attempt to resolve uri
                 ResolvableIdentifier di = IdentifierService.resolve(c, uri);
-                DSpaceObject dso = di.getObject(c);
+                DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(c, di);
 
                 // make sure it's an item
                 if ((dso != null) && (dso.getType() == Constants.ITEM))

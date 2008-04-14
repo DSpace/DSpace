@@ -221,7 +221,7 @@ public class HTMLServlet extends DSpaceServlet
                     ResolvableIdentifier di = IdentifierService.resolveCanonical(context, uri);
                     //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
                     //ObjectIdentifier oi = identifier.getObjectIdentifier();
-                    item = (Item) di.getObject(context);
+                    item = (Item) IdentifierService.getResource(context, di);
                 }
             }
             catch (NumberFormatException nfe)

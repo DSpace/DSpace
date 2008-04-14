@@ -75,6 +75,7 @@ import org.dspace.license.CreativeCommons;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.IdentifierService;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
@@ -163,7 +164,7 @@ public class EditItemServlet extends DSpaceServlet
             ExternalIdentifier identifier = ExternalIdentifierService.parseCanonicalForm(context, uri);
             // ExternalIdentifier identifier = identifierDAO.retrieve(uri);
             ObjectIdentifier oi = identifier.getObjectIdentifier();
-            DSpaceObject dso = oi.getObject(context);
+            DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, oi);
 
             // make sure it's an ITEM
             if ((dso != null) && (dso.getType() == Constants.ITEM))

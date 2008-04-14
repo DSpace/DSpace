@@ -197,7 +197,7 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
             DSpaceObject resultDSO =
                 identifier.getObjectIdentifier().getObject(context);*/
             ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
-            DSpaceObject resultDSO = ri.getObject(context);
+            DSpaceObject resultDSO = (DSpaceObject) IdentifierService.getResource(context, ri);
 
             if (resultDSO instanceof Item)
             {

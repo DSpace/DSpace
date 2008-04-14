@@ -77,6 +77,7 @@ import org.dspace.content.Item;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.IdentifierService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -632,7 +633,7 @@ public class DSIndexer
         		String uri = doc.get("uri");
 
                 oi = ObjectIdentifier.parseCanonicalForm(uri);
-        		DSpaceObject o = oi.getObject(context);
+        		DSpaceObject o = (DSpaceObject) IdentifierService.getResource(context, oi);
 
                 if (o == null)
                 {

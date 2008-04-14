@@ -67,6 +67,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Entity class to represent the native DSpace identification mechanism for full
+ * scale DSpaceObjects.  This extends the SimpleIdentifier class, which simply supports
+ * the use of UUIDs, and implements the ResolvableIdentifier interface so that it
+ * can be used to construct URLs and to have objects behind those URLs resolved
+ *
  * @author Richard Jones
  * @author James Rutherford
  */
@@ -236,6 +241,7 @@ public class ObjectIdentifier extends SimpleIdentifier implements ResolvableIden
      * @param context
      * @return
      */
+    /* NOTE: this has been totally removed, and exists here for reference for a few cycles
     public DSpaceObject getObject(Context context)
     {
         // do we know what the resource type and id is?
@@ -259,6 +265,18 @@ public class ObjectIdentifier extends SimpleIdentifier implements ResolvableIden
 
         // now we can select the object based on its resource type and id
         return this.getObjectByResourceID(context);
+    }
+*/
+
+    /**
+     * Return the ObjectIdentifier to which this ResolvableIdentifier refers.  This
+     * is the degenerate case, as this method simply returns the current object "this"
+     *
+     * @return this
+     */
+    public ObjectIdentifier getObjectIdentifier()
+    {
+        return this;
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -318,6 +336,7 @@ public class ObjectIdentifier extends SimpleIdentifier implements ResolvableIden
      * @param context
      * @return
      */
+    /*
     private DSpaceObject getObjectByResourceID(Context context)
     {
         switch(resourceTypeID)
@@ -346,7 +365,7 @@ public class ObjectIdentifier extends SimpleIdentifier implements ResolvableIden
             default:
                 throw new RuntimeException("Not a valid DSpaceObject type");
         }
-    }
+    }*/
 
     ////////////////////////////////////////////////////////////////////
     // Utility methods

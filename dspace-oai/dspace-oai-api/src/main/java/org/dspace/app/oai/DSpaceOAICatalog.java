@@ -60,6 +60,7 @@ import org.dspace.content.dao.CollectionDAOFactory;
 import org.dspace.content.dao.CommunityDAO;
 import org.dspace.content.dao.CommunityDAOFactory;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.IdentifierService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -808,7 +809,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
         String uri = set.replaceFirst("_", ":").replace('_', '/');
 
         ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(uri);
-        o = oi.getObject(context);
+        o = (DSpaceObject) IdentifierService.getResource(context, oi);
 
         // If it corresponds to a collection or a community, that's the set we
         // want

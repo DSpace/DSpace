@@ -204,7 +204,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 	            for (String uri : uris)
 	            {
                         ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
-                        DSpaceObject resultDSO = ri.getObject(context);
+                        DSpaceObject resultDSO = (DSpaceObject) IdentifierService.getResource(context, ri);
                         validity.add(resultDSO);
 	            }
 	            
@@ -301,7 +301,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
                 for (String uri : containerURIs)
                 {
                     ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
-                    DSpaceObject resultDSO = ri.getObject(context);
+                    DSpaceObject resultDSO = (DSpaceObject) IdentifierService.getResource(context, ri);
 
                     if (resultDSO instanceof Community
                             || resultDSO instanceof Collection)
@@ -328,7 +328,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
                 for (String uri : itemURIs)
                 {
                     ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
-                    DSpaceObject resultDSO = ri.getObject(context);
+                    DSpaceObject resultDSO = (DSpaceObject) IdentifierService.getResource(context, ri);
                     if (resultDSO instanceof Item)
                     {
                         if (referenceSet == null) {

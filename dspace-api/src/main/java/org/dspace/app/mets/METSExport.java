@@ -86,10 +86,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.core.Utils;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierService;
-import org.dspace.uri.ExternalIdentifierType;
-import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.*;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
@@ -197,7 +194,8 @@ public class METSExport
             }
             if (oi != null)
             {
-                o = oi.getObject(context);
+                // o = oi.getObject(context);
+                o = (DSpaceObject) IdentifierService.getResource(context, oi);
             }
 
             if ((o != null) && o instanceof Item)
@@ -242,7 +240,8 @@ public class METSExport
             }
             if (oi != null)
             {
-                o = oi.getObject(context);
+                // o = oi.getObject(context);
+                o = (DSpaceObject) IdentifierService.getResource(context, oi);
             }
             
             if ((o != null) && o instanceof Collection)

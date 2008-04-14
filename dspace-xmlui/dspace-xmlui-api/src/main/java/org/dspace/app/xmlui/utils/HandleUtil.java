@@ -105,7 +105,7 @@ public class HandleUtil
             Context context = ContextUtil.obtainContext(objectModel);
 
             ResolvableIdentifier ri = IdentifierService.resolve(context, handle);
-            dso = ri.getObject(context);
+            dso = (DSpaceObject) IdentifierService.getResource(context, ri);
 
             request.setAttribute(DSPACE_OBJECT, dso);
         }

@@ -47,6 +47,7 @@ import org.dspace.core.Context;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.IdentifierService;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -831,10 +832,7 @@ public class ReportGenerator
         try 
         {
             ExternalIdentifier identifier = ExternalIdentifierService.parseCanonicalForm(context, uri);
-            //ExternalIdentifierDAO identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
-            //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
-            ObjectIdentifier oi = identifier.getObjectIdentifier();
-            item = (Item) oi.getObject(context);
+            item = (Item) IdentifierService.getResource(context, identifier);
         } 
         catch (Exception e)
         {

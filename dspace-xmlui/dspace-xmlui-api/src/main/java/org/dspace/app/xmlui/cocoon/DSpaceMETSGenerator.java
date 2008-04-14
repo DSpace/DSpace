@@ -168,16 +168,8 @@ public class DSpaceMETSGenerator extends AbstractGenerator
         AbstractAdapter adapter = null;
 		 if (uri != null)
          {
-			// Specified using a regular handle. 
-//         	DSpaceObject dso = HandleManager.resolveToObject(context, handle);
-         	// FIXME: This could be totally broken, I have no idea
-             /*
-            ExternalIdentifierDAO identifierDAO =
-                ExternalIdentifierDAOFactory.getInstance(context);
-            ExternalIdentifier eid = identifierDAO.retrieve(uri);
-            DSpaceObject dso = eid.getObjectIdentifier().getObject(context);*/
             ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
-            DSpaceObject dso = ri.getObject(context);
+            DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, ri);
 
              // Handles can be either items or containers.
          	if (dso instanceof Item)

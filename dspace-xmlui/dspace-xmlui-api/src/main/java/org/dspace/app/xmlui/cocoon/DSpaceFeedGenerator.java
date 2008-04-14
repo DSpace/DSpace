@@ -191,7 +191,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     			if (uri != null && !uri.contains("site"))
                         {
                             ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
-                            dso = ri.getObject(context);
+                            dso = (DSpaceObject) IdentifierService.getResource(context, ri);
                         }
     			
     			validity.add(dso);
@@ -256,7 +256,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 			if (uri != null && !uri.contains("site"))
 			{
                 ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
-                dso = ri.getObject(context);
+                dso = (DSpaceObject) IdentifierService.getResource(context, ri);
 				
                 if (dso == null)
 				{

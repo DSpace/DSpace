@@ -99,7 +99,7 @@ public class SuggestServlet extends DSpaceServlet
         String collName = null;
         if (identifier != null)
         {
-            item = (Item) oi.getObject(context);
+            item = (Item) IdentifierService.getResource(context, oi);
             link = IdentifierService.getURL(item).toString();
             request.setAttribute("link", link);
 

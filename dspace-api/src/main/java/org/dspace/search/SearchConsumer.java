@@ -50,6 +50,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.IdentifierService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
@@ -201,7 +202,7 @@ public class SearchConsumer implements Consumer
                         {
                             // If an update to an Item removes it from the
                             // archive we must remove it from the search indices
-                            DSIndexer.unIndexContent(ctx, oid.getObject(ctx));
+                            DSIndexer.unIndexContent(ctx, (DSpaceObject) IdentifierService.getResource(ctx, oid));
                         }
                         catch (Exception e)
                         {
@@ -218,7 +219,7 @@ public class SearchConsumer implements Consumer
             {
                 try
                 {
-                    DSIndexer.unIndexContent(ctx, oid.getObject(ctx));
+                    DSIndexer.unIndexContent(ctx, (DSpaceObject) IdentifierService.getResource(ctx, oid));
                     if (log.isDebugEnabled())
                         log.debug("un-indexed Item, oid="
                                 + oid.getCanonicalForm());

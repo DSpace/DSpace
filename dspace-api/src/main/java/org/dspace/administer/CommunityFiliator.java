@@ -54,6 +54,7 @@ import org.dspace.core.Context;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.IdentifierService;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
@@ -245,8 +246,11 @@ public class CommunityFiliator
 
             ExternalIdentifier identifier = ExternalIdentifierService.parseCanonicalForm(c, communityID);
 
+            /*
+            community (Community) oi.getObject(c);
             ObjectIdentifier oi = identifier.getObjectIdentifier();
-            community = (Community) oi.getObject(c);
+            community = (Community) oi.getObject(c);*/
+            community = (Community) IdentifierService.getResource(c, identifier);
 
             // ensure it's a community
             if ((community == null)

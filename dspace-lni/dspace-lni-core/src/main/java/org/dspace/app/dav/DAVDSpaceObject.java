@@ -174,7 +174,7 @@ abstract class DAVDSpaceObject extends DAVResource
             // it's too big a job at the moment to modify all the semantics, so I have just done so where necessary
 //            DSpaceObject dso = HandleManager.resolveToObject(context, handle);
             ResolvableIdentifier dsi = IdentifierService.resolve(context, handle);
-            DSpaceObject dso = dsi.getObject(context);
+            DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, dsi);
 
             if (dso == null)
             {

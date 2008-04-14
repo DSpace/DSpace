@@ -79,6 +79,7 @@ import org.dspace.eperson.dao.GroupDAOFactory;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.IdentifierService;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.workflow.WorkflowManager;
@@ -399,7 +400,9 @@ public class ItemImport
             for (int i = 0; i < collections.length; i++)
             {
                 ObjectIdentifier oid = ObjectIdentifier.parseCanonicalForm(collections[i]);
-                DSpaceObject dso = oid.getObject(c);
+                // DSpaceObject dso = oid.getObject(c);
+                DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(c, oid);
+
                 if (!(dso instanceof Collection))
                 {
                     throw new IllegalArgumentException(collections[i] + " does not resolve to a Collection");

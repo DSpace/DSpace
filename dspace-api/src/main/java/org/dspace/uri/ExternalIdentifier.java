@@ -152,20 +152,6 @@ public abstract class ExternalIdentifier implements ResolvableIdentifier
     }
 
     /**
-     * Get the native object identifier for the object we are representing
-     *
-     * @return
-     */
-    public ObjectIdentifier getObjectIdentifier()
-    {
-        if (oid == null)
-        {
-            throw new IllegalStateException("An external identifier with no ObjectIdentifier exists");
-        }
-        return oid;
-    }
-
-    /**
      * get the type definition object for the implementation of the external identifier
      *
      * @return
@@ -230,22 +216,6 @@ public abstract class ExternalIdentifier implements ResolvableIdentifier
     /////////////////////////////////////////////////////////////////////
 
     /**
-     * obtain the actual DSpaceObject the external identifier represents.  This is effectively
-     * the same as calling
-     *
-     * <code>getObjectIdentifier().getObject(context)</code>
-     *
-     * as the external identifiers have no inherent comprehension of the objects they represent
-     *
-     * @param context
-     * @return
-     */
-    public DSpaceObject getObject(Context context)
-    {
-        return this.getObjectIdentifier().getObject(context);
-    }
-
-    /**
      * Get the context path segment of the URL which the implementation of the external identifier
      * will expose and will be able to subsequently resolve
      *
@@ -283,6 +253,20 @@ public abstract class ExternalIdentifier implements ResolvableIdentifier
     public String getIdentifierType()
     {
         return type.getNamespace();
+    }
+
+    /**
+     * Get the native object identifier for the object we are representing
+     *
+     * @return
+     */
+    public ObjectIdentifier getObjectIdentifier()
+    {
+        if (oid == null)
+        {
+            throw new IllegalStateException("An external identifier with no ObjectIdentifier exists");
+        }
+        return oid;
     }
 
     /////////////////////////////////////////////////////////////////////

@@ -211,7 +211,7 @@ class DAVLookup extends DAVResource
 
         // did handle lookup fail?
         ResolvableIdentifier dsi = IdentifierService.resolve(context, handle);
-        dso = dsi.getObject(context);
+        dso = (DSpaceObject) IdentifierService.getResource(context, dsi);
 
         if (dso == null)
         {
@@ -258,7 +258,7 @@ class DAVLookup extends DAVResource
             SQLException
     {
         ResolvableIdentifier dsi = IdentifierService.resolve(context, handle);
-        DSpaceObject dso = dsi.getObject(context);
+        DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, dsi);
 
         if (dso == null)
         {

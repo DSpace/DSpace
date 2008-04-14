@@ -87,7 +87,7 @@ public class URIServlet extends DSpaceServlet
         // get the object if there is one
         if (di != null)
         {
-            dso = di.getObject(context);
+            dso = (DSpaceObject) IdentifierService.getResource(context, di);
         }
 
         // if there is no object, display the invalid id error

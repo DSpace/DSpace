@@ -114,7 +114,7 @@ public class FlowItemUtils
             ExternalIdentifier eid = identifierDAO.retrieve(identifier);
             DSpaceObject dso = eid.getObjectIdentifier().getObject(context);*/
             ResolvableIdentifier ri = IdentifierService.resolve(context, identifier);
-            DSpaceObject dso = ri.getObject(context);
+            DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, ri);
 	
             if (dso != null && dso.getType() == Constants.ITEM)
 			{ 

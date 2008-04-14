@@ -115,11 +115,6 @@ public class Handle extends ExternalIdentifier implements IdentifierAssigner<Han
     }
 
     // IdentifierResolver implementation
-    public DSpaceObject resolve(String identifier)
-    {
-        // FIXME: do we even need this any more?
-        return null;
-    }
 
     public Handle extractURLIdentifier(String path)
     {

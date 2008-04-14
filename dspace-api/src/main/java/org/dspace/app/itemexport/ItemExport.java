@@ -61,6 +61,7 @@ import org.dspace.core.Utils;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.IdentifierService;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
@@ -240,7 +241,8 @@ public class ItemExport
         if (myType == Constants.ITEM)
         {
             // first, do we have a persistent identifier for the item?
-            myItem = (Item) oi.getObject(c);
+            // myItem = (Item) oi.getObject(c);
+            myItem = (Item) IdentifierService.getResource(c, oi);
 
             if ((myItem == null) || (myItem.getType() != Constants.ITEM))
             {
@@ -255,7 +257,8 @@ public class ItemExport
         }
         else
         {
-            mycollection = (Collection) oi.getObject(c);
+            // mycollection = (Collection) oi.getObject(c);
+            mycollection = (Collection) IdentifierService.getResource(c, oi);
 
             // ensure it's a collection
             if ((mycollection == null)

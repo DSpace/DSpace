@@ -76,6 +76,7 @@ import org.dspace.search.DSIndexer;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.IdentifierService;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
@@ -381,11 +382,11 @@ public class MediaFilterManager
             {
                 ExternalIdentifier pid = ExternalIdentifierService.parseCanonicalForm(c, identifier);
                 // ExternalIdentifier pid = identifierDAO.retrieve(identifier);
-                ObjectIdentifier oi = pid.getObjectIdentifier();
+                // ObjectIdentifier oi = pid.getObjectIdentifier();
+                // DSpaceObject dso = oi.getObject(c);
+                DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(c, pid);
 
-                DSpaceObject dso = oi.getObject(c);
-
-            	if (dso == null)
+                if (dso == null)
             	{
             		throw new IllegalArgumentException("Cannot resolve "
                                 + identifier + " to a DSpace object");

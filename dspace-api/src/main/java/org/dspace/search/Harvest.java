@@ -51,6 +51,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ObjectIdentifierMint;
+import org.dspace.uri.IdentifierService;
 
 import java.text.ParseException;
 import java.util.LinkedList;
@@ -180,7 +181,7 @@ public class Harvest
             ObjectIdentifier identifier, boolean collections)
     {
         // FIXME: Assume identifier is item
-        Item i = (Item) identifier.getObject(context);
+        Item i = (Item) IdentifierService.getResource(context, identifier);
 
         if (i == null)
         {
@@ -221,7 +222,7 @@ public class Harvest
 
         ObjectIdentifier oi = ObjectIdentifierMint.get(context, itemInfo.itemID, Constants.ITEM);
         // ObjectIdentifier oi = new ObjectIdentifier(itemInfo.itemID, Constants.ITEM);
-        Item item = (Item) oi.getObject(context);
+        Item item = (Item) IdentifierService.getResource(context, oi);
 
         List<Collection> parents = collectionDAO.getParentCollections(item);
 

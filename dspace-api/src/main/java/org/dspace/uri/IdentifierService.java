@@ -42,12 +42,25 @@ package org.dspace.uri;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.Constants;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.dao.*;
+import org.dspace.eperson.dao.EPersonDAO;
+import org.dspace.eperson.dao.EPersonDAOFactory;
+import org.dspace.eperson.dao.GroupDAO;
+import org.dspace.eperson.dao.GroupDAOFactory;
+import org.dspace.uri.dao.ObjectIdentifierDAO;
+import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
 /**
+ * High level static library for performing generic identifier tasks such as resolution
+ * in a variety of context, and translation between forms (e.g. url and canonical).  It also
+ * offers encapsulation of all configuration associated with Identifier management.
+ *
  * @author Richard Jones
  */
 public class IdentifierService
@@ -66,6 +79,7 @@ public class IdentifierService
      * - assuming the string is a url path segment which may contain additional characters
      *
      * If it succeeds in resolving to a valid identifier this is returned.  If not, it returns null
+     * 
      * @param context
      * @param str
      * @return
@@ -298,5 +312,66 @@ public class IdentifierService
 
         ObjectIdentifier oid = dso.getIdentifier();
         return oid;
+    }
+
+    public static Identifiable getResource(Context context, ResolvableIdentifier ri)
+    {
+        ObjectIdentifier oid = ri.getObjectIdentifier();
+
+        // do we know what the resource type and id is?
+        if (oid.getResourceTypeID() == -1 || oid.getResourceID() == -1)
+        {
+            // we don't have resource type or resource id for this item
+            // check the UUID cache and see if we can find them
+            ObjectIdentifierDAO dao = ObjectIdentifierDAOFactory.getInstance(context);
+            ObjectIdentifier noid = dao.retrieve(oid.getUUID());
+
+            // if there is no object identifier, just return null
+            if (noid == null)
+            {
+                return null;
+            }
+        }
+
+        // now we can select the object based on its resource type and id
+        return IdentifierService.getObjectByResourceID(context, oid);
+    }
+
+    /**
+     * Use the member variable resource type id to determine the type of object
+     * we are attempting to get hold of, and then use the resource id through
+     * the DAO layer to obtain an instance of the object
+     *
+     * @param context
+     * @return
+     */
+    private static Identifiable getObjectByResourceID(Context context, ObjectIdentifier oid)
+    {
+        switch(oid.getResourceTypeID())
+        {
+            case (Constants.BITSTREAM):
+                BitstreamDAO bitstreamDAO = BitstreamDAOFactory.getInstance(context);
+                return bitstreamDAO.retrieve(oid.getResourceID());
+            case (Constants.BUNDLE):
+                BundleDAO bundleDAO = BundleDAOFactory.getInstance(context);
+                return bundleDAO.retrieve(oid.getResourceID());
+            case (Constants.ITEM):
+                ItemDAO itemDAO = ItemDAOFactory.getInstance(context);
+                return itemDAO.retrieve(oid.getResourceID());
+            case (Constants.COLLECTION):
+                CollectionDAO collectionDAO = CollectionDAOFactory.getInstance(context);
+                return collectionDAO.retrieve(oid.getResourceID());
+            case (Constants.COMMUNITY):
+                CommunityDAO communityDAO = CommunityDAOFactory.getInstance(context);
+                return communityDAO.retrieve(oid.getResourceID());
+            case (Constants.EPERSON):
+                EPersonDAO epDAO = EPersonDAOFactory.getInstance(context);
+                return epDAO.retrieve(oid.getResourceID());
+            case (Constants.GROUP):
+                GroupDAO gDAO = GroupDAOFactory.getInstance(context);
+                return gDAO.retrieve(oid.getResourceID());
+            default:
+                throw new RuntimeException("Not a valid DSpaceObject/Identifiable type");
+        }
     }
 }

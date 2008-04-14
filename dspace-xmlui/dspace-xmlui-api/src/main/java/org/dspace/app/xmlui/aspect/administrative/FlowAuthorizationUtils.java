@@ -92,7 +92,7 @@ public class FlowAuthorizationUtils {
 		//Check whether it's a handle or internal id (by check ing if it has a slash in the string)
 		if (identifier.contains("/")) {
             ResolvableIdentifier ri = IdentifierService.resolve(context, identifier);
-            DSpaceObject dso = ri.getObject(context);
+            DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, ri);
 			
             if (dso != null && dso.getType() == Constants.ITEM) {
 				result.setParameter("itemID", dso.getID());

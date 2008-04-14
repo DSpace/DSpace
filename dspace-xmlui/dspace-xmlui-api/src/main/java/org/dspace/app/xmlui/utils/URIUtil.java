@@ -43,7 +43,7 @@ public class URIUtil
                 dso = HandleUtil.obtainHandle(objectModel);
                 return dso;
             }
-            dso = ri.getObject(context);
+            dso = (DSpaceObject) IdentifierService.getResource(context, ri);
 
             request.setAttribute(DSPACE_OBJECT, dso);
         }

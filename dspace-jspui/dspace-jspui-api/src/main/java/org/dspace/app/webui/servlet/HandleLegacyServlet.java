@@ -70,7 +70,7 @@ public class HandleLegacyServlet extends DSpaceServlet
         // NOTE: my god how good is the API?  It's great, that's how good it is
         handle = "hdl:" + handle;
         ResolvableIdentifier ri = IdentifierService.resolve(context, handle);
-        dso = ri.getObject(context);
+        dso = (DSpaceObject) IdentifierService.getResource(context, ri);
 
         // if there is no object, display the invalid id error
         if (dso == null)

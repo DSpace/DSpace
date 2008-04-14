@@ -226,7 +226,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             {
             	// Reference by an item's handle.
                 ResolvableIdentifier ri = IdentifierService.resolve(context, handle);
-                dso = ri.getObject(context);
+                dso = (DSpaceObject) IdentifierService.getResource(context, ri);
 
                 if (dso instanceof Item && sequence > -1)
             	{

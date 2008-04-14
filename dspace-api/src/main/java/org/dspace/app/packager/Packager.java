@@ -60,6 +60,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.IdentifierService;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.workflow.WorkflowItem;
@@ -270,7 +271,8 @@ public class Packager
                 ObjectIdentifier oi = identifier.getObjectIdentifier();
 
                 // sanity check: did uri resolve, and to a collection?
-                DSpaceObject dso = oi.getObject(context);
+                // DSpaceObject dso = oi.getObject(context);
+                DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, oi);
 
                 if (dso == null)
                     throw new IllegalArgumentException(
@@ -353,10 +355,10 @@ public class Packager
 
             ExternalIdentifier identifier = ExternalIdentifierService.parseCanonicalForm(context, itemUri);
             // ExternalIdentifier identifier = identifierDAO.retrieve(itemUri);
-            ObjectIdentifier oi = identifier.getObjectIdentifier();
+            // ObjectIdentifier oi = identifier.getObjectIdentifier();
 
             // sanity check: did uri resolve, and to a collection?
-            DSpaceObject dso = oi.getObject(context);
+            DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, identifier);
 
             if (dso == null)
             {

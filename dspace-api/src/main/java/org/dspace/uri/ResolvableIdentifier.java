@@ -43,11 +43,11 @@ import org.dspace.core.Context;
  */
 public interface ResolvableIdentifier
 {
-    DSpaceObject getObject(Context context);
-
     String getURLForm();
 
     String getIdentifierType();
 
     String getCanonicalForm();
+
+    ObjectIdentifier getObjectIdentifier();
 }

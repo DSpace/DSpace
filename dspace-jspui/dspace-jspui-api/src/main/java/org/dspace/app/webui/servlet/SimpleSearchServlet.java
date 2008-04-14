@@ -59,6 +59,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.uri.ObjectIdentifier;
+import org.dspace.uri.IdentifierService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -286,7 +287,7 @@ public class SimpleSearchServlet extends DSpaceServlet
                 else
                 {
                     ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(myURI);
-                    resultsItems[itemCount] = (Item)oi.getObject(context);
+                    resultsItems[itemCount] = (Item) IdentifierService.getResource(context, oi);
                 }
 
                 if (resultsItems[itemCount] == null)
@@ -305,7 +306,7 @@ public class SimpleSearchServlet extends DSpaceServlet
                 else
                 {
                     ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(myURI);
-                    resultsCollections[collCount] = (Collection)oi.getObject(context);
+                    resultsCollections[collCount] = (Collection) IdentifierService.getResource(context, oi);
                 }
 
                 if (resultsCollections[collCount] == null)
@@ -325,7 +326,7 @@ public class SimpleSearchServlet extends DSpaceServlet
                 else
                 {
                     ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(myURI);
-                    resultsCommunities[commCount] = (Community)oi.getObject(context);
+                    resultsCommunities[commCount] = (Community) IdentifierService.getResource(context, oi);
                 }
 
                 if (resultsCommunities[commCount] == null)

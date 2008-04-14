@@ -193,10 +193,7 @@ public class FeedServlet extends DSpaceServlet
         { 	
         	// Determine if the URI is a valid reference
             ResolvableIdentifier di = IdentifierService.resolve(context, uri);
-            //ExternalIdentifierDAO dao = ExternalIdentifierDAOFactory.getInstance(context);
-            //ExternalIdentifier identifier = dao.retrieve(uri);
-            //ObjectIdentifier oi = identifier.getObjectIdentifier();
-            dso = di.getObject(context);
+            dso = (DSpaceObject) IdentifierService.getResource(context, di);
         }
         
         if (! enabled || (dso != null && 
