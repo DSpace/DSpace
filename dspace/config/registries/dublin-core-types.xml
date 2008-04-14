@@ -237,6 +237,13 @@
     <scope_note>A government document number</scope_note>
   </dc-type>
 
+  <dc-type>
+	<schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>hdl</qualifier>
+    <scope_note>CNRI Handle canonical form</scope_note>
+  </dc-type>
+
   <!-- Used by system: do not remove -->
   <dc-type>
 	<schema>dc</schema>
@@ -282,6 +289,22 @@
     <element>identifier</element>
     <qualifier>uri</qualifier>
     <scope_note>Uniform Resource Identifier</scope_note>
+  </dc-type>
+
+  <!-- Used by system: do not remove -->
+  <dc-type>
+	<schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>url</qualifier>
+    <scope_note>Uniform Resource Locator; used to store any URLs associated with DSpace internal and external identifiers</scope_note>
+  </dc-type>
+
+  <!-- Used by system: do not remove -->
+  <dc-type>
+	<schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>uuid</qualifier>
+    <scope_note>Universally Unique Identifier; used to store DSpace internal identifiers</scope_note>
   </dc-type>
 
   <!-- Used by system: do not remove -->
