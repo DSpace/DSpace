@@ -50,7 +50,7 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPerson.EPersonMetadataField;
 import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ObjectIdentifierMint;
+import org.dspace.uri.ObjectIdentifierService;
 
 /**
  * @author James Rutherford
@@ -72,7 +72,7 @@ public class EPersonDAOCore extends EPersonDAO
 
         EPerson eperson = childDAO.create();
 
-        ObjectIdentifier oid = ObjectIdentifierMint.mint(context, eperson);
+        ObjectIdentifier oid = ObjectIdentifierService.mint(context, eperson);
 
         update(eperson);
 
@@ -125,7 +125,7 @@ public class EPersonDAOCore extends EPersonDAO
         ObjectIdentifier oid = eperson.getIdentifier();
         if (oid == null)
         {
-            oid = ObjectIdentifierMint.mint(context, eperson);
+            oid = ObjectIdentifierService.mint(context, eperson);
         }
         oidDAO.update(eperson.getIdentifier());
 

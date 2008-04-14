@@ -45,7 +45,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ObjectIdentifierMint;
+import org.dspace.uri.ObjectIdentifierService;
 import org.dspace.uri.IdentifierService;
 
 import java.io.Serializable;
@@ -329,7 +329,7 @@ public class Event implements Serializable
         }
         else
         {
-            ObjectIdentifier oid = ObjectIdentifierMint.get(context, type, id);
+            ObjectIdentifier oid = ObjectIdentifierService.get(context, type, id);
             // ObjectIdentifier oid = new ObjectIdentifier(id, type);
             return (DSpaceObject) IdentifierService.getResource(context, oid);
         }
@@ -343,7 +343,7 @@ public class Event implements Serializable
      */
     public DSpaceObject getSubject(Context context)
     {
-        ObjectIdentifier oid = ObjectIdentifierMint.get(context, getSubjectType(), getSubjectID());
+        ObjectIdentifier oid = ObjectIdentifierService.get(context, getSubjectType(), getSubjectID());
         // ObjectIdentifier oid = new ObjectIdentifier(getSubjectID(), getSubjectType());
         return (DSpaceObject) IdentifierService.getResource(context, oid);
     }

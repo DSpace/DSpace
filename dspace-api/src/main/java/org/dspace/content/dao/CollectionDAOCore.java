@@ -52,11 +52,8 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierService;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ObjectIdentifierMint;
-import org.dspace.uri.UnsupportedIdentifierException;
+import org.dspace.uri.ObjectIdentifierService;
+import org.dspace.uri.*;
 import org.dspace.workflow.WorkflowItem;
 
 import java.io.IOException;
@@ -83,7 +80,7 @@ public class CollectionDAOCore extends CollectionDAO
             Collection collection = childDAO.create();
 
             // now assign an object identifier
-            ObjectIdentifier oid = ObjectIdentifierMint.mint(context, collection);
+            ObjectIdentifier oid = ObjectIdentifierService.mint(context, collection);
 
             // now assign any required external identifiers
             List<ExternalIdentifier> eids = ExternalIdentifierService.mintAll(context, collection);
@@ -168,7 +165,7 @@ public class CollectionDAOCore extends CollectionDAO
             /*
             oid = new ObjectIdentifier(true);
             collection.setIdentifier(oid);*/
-            oid = ObjectIdentifierMint.mint(context, collection);
+            oid = ObjectIdentifierService.mint(context, collection);
         }
         oidDAO.update(collection.getIdentifier());
 

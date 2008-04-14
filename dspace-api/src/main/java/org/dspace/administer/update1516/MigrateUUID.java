@@ -1,7 +1,6 @@
 package org.dspace.administer.update1516;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.dao.ResourcePolicyDAO;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -19,7 +18,7 @@ import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.Context;
 import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ObjectIdentifierMint;
+import org.dspace.uri.ObjectIdentifierService;
 import org.dspace.uri.dao.ObjectIdentifierDAO;
 import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
 
@@ -64,7 +63,7 @@ public class MigrateUUID
             ObjectIdentifier oid = new ObjectIdentifier(true);
             item.setIdentifier(oid);
             oidDAO.update(item.getIdentifier());*/
-            ObjectIdentifier oid = ObjectIdentifierMint.mint(context, item);
+            ObjectIdentifier oid = ObjectIdentifierService.mint(context, item);
             oidDAO.update(oid);
 
             // do the bundles while we're at it
@@ -75,7 +74,7 @@ public class MigrateUUID
                 ObjectIdentifier oidb = new ObjectIdentifier(true);
                 bundles[i].setIdentifier(oidb);
                 oidDAO.update(bundles[i].getIdentifier());*/
-                ObjectIdentifier oidb = ObjectIdentifierMint.mint(context, bundles[i]);
+                ObjectIdentifier oidb = ObjectIdentifierService.mint(context, bundles[i]);
                 oidDAO.update(oidb);
 
                 // do the bitstreams while we're at it
@@ -86,7 +85,7 @@ public class MigrateUUID
                     ObjectIdentifier oidc = new ObjectIdentifier(true);
                     bss[j].setIdentifier(oidc);
                     oidDAO.update(bss[j].getIdentifier());*/
-                    ObjectIdentifier oidc = ObjectIdentifierMint.mint(context, bss[j]);
+                    ObjectIdentifier oidc = ObjectIdentifierService.mint(context, bss[j]);
                     oidDAO.update(oidc);
                     bitstreamDAO.update(bss[j]);
                 }
@@ -105,7 +104,7 @@ public class MigrateUUID
             ObjectIdentifier oid = new ObjectIdentifier(true);
             col.setIdentifier(oid);
             oidDAO.update(oid);*/
-            ObjectIdentifier oid = ObjectIdentifierMint.mint(context, col);
+            ObjectIdentifier oid = ObjectIdentifierService.mint(context, col);
             oidDAO.update(oid);
             collectionDAO.update(col);
         }
@@ -117,7 +116,7 @@ public class MigrateUUID
             ObjectIdentifier oid = new ObjectIdentifier(true);
             com.setIdentifier(oid);
             oidDAO.update(oid);*/
-            ObjectIdentifier oid = ObjectIdentifierMint.mint(context, com);
+            ObjectIdentifier oid = ObjectIdentifierService.mint(context, com);
             oidDAO.update(oid);
             communityDAO.update(com);
         }

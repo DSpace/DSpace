@@ -47,7 +47,7 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ObjectIdentifierMint;
+import org.dspace.uri.ObjectIdentifierService;
 
 import java.util.List;
 import java.util.Set;
@@ -75,7 +75,7 @@ public class GroupDAOCore extends GroupDAO
 
         Group group = childDAO.create();
 
-        ObjectIdentifier oid = ObjectIdentifierMint.mint(context, group);
+        ObjectIdentifier oid = ObjectIdentifierService.mint(context, group);
         update(group);
 
         log.info(LogManager.getHeader(context, "create_group", "group_id="
@@ -167,7 +167,7 @@ public class GroupDAOCore extends GroupDAO
         ObjectIdentifier oid = group.getIdentifier();
         if (oid == null)
         {
-            oid = ObjectIdentifierMint.mint(context, group);
+            oid = ObjectIdentifierService.mint(context, group);
         }
         oidDAO.update(group.getIdentifier());
 

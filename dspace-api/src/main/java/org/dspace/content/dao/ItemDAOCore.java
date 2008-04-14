@@ -55,7 +55,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ObjectIdentifierMint;
+import org.dspace.uri.ObjectIdentifierService;
 import org.dspace.uri.UnsupportedIdentifierException;
 
 import java.util.Date;
@@ -83,7 +83,7 @@ public class ItemDAOCore extends ItemDAO
             Item item = childDAO.create();
 
             // now assign an object identifier
-            ObjectIdentifier oid = ObjectIdentifierMint.mint(context, item);
+            ObjectIdentifier oid = ObjectIdentifierService.mint(context, item);
 
             // now assign any required external identifiers
             List<ExternalIdentifier> eids = ExternalIdentifierService.mintAll(context, item);
@@ -321,7 +321,7 @@ public class ItemDAOCore extends ItemDAO
             /*
             oid = new ObjectIdentifier(true);
             item.setIdentifier(oid);*/
-            oid = ObjectIdentifierMint.mint(context, item);
+            oid = ObjectIdentifierService.mint(context, item);
         }
         oidDAO.update(item.getIdentifier());
 

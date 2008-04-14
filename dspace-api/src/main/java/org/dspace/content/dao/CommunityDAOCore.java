@@ -51,11 +51,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierService;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ObjectIdentifierMint;
-import org.dspace.uri.UnsupportedIdentifierException;
+import org.dspace.uri.ObjectIdentifierService;
+import org.dspace.uri.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -87,7 +84,7 @@ public class CommunityDAOCore extends CommunityDAO
             Community community = childDAO.create();
 
             // now assign an object identifier
-            ObjectIdentifier oid = ObjectIdentifierMint.mint(context, community);
+            ObjectIdentifier oid = ObjectIdentifierService.mint(context, community);
 
             // now assign any required external identifiers
             List<ExternalIdentifier> eids = ExternalIdentifierService.mintAll(context, community);
@@ -152,7 +149,7 @@ public class CommunityDAOCore extends CommunityDAO
             /*
             oid = new ObjectIdentifier(true);
             community.setIdentifier(oid);*/
-            oid = ObjectIdentifierMint.mint(context, community);
+            oid = ObjectIdentifierService.mint(context, community);
         }
         oidDAO.update(community.getIdentifier());
 

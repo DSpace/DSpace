@@ -1,5 +1,9 @@
 /*
- * ResolvableIdentifier.java
+ * ObjectIdentifierService.java
+ *
+ * Version: $Revision: 1727 $
+ *
+ * Date: $Date: 2007-01-19 10:52:10 +0000 (Fri, 19 Jan 2007) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -37,49 +41,74 @@ package org.dspace.uri;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.uri.dao.ObjectIdentifierDAO;
+import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
+
+import java.util.UUID;
 
 /**
- * Interface to be implemented by any Identifier class which wants to be able
- * to offer resolution services.
+ * General static library of methods which offer services to the native identifier mechanism.  It
+ * encapsulates access to configuration and to the data access layer, and therefore insulates
+ * all calling code dealing with identifiers from having to deal with either of these issues
  *
  * @author Richard Jones
  */
-public interface ResolvableIdentifier
+public class ObjectIdentifierService
 {
     /**
-     * Get the context path of the URL which should be used in constructing
-     * the URL space, and for which the IdentifierResolver will be able to
-     * re-obtain the ResolvableIdentifier for.  This means the [context path]
-     * part of the URL as follows:
+     * Mint the appropriate ObjectIdentifier for the given DSpaceObject
      *
-     * <code>[base URL]/[context path][extra path info]</code>
+     * @param context
+     * @param dso
+     * @return
+     */
+    public static ObjectIdentifier mint(Context context, DSpaceObject dso)
+    {
+        UUID uuid = UUID.randomUUID();
+        ObjectIdentifier oid = new ObjectIdentifier(uuid, dso.getType(), dso.getID());
+        dso.setIdentifier(oid);
+        return oid;
+    }
+
+    /**
+     * Mint a SimpleIdentifier.
      *
      * @return
      */
-    String getURLForm();
+    public static SimpleIdentifier mintSimple()
+    {
+        UUID uuid = UUID.randomUUID();
+        SimpleIdentifier sid = new SimpleIdentifier(uuid);
+        return sid;
+    }
 
     /**
-     * Return the string representation of the identifier type, such as "uuid"
-     * or "hdl" etc.
+     * Get the ObjectIdentifier (if it exists) associated with the given resource
+     * type and storage layer id
      *
+     * @param context
+     * @param type
+     * @param id
      * @return
      */
-    String getIdentifierType();
+    public static ObjectIdentifier get(Context context, int type, int id)
+    {
+        ObjectIdentifierDAO dao = ObjectIdentifierDAOFactory.getInstance(context);
+        ObjectIdentifier oid = dao.retrieve(type, id);
+        return oid;
+    }
 
     /**
-     * Return the canonical form of the specific identifier
-     *
-     * @return
-     */
-    String getCanonicalForm();
-
-    /**
-     * Get the ObjectIdentifier which backs this particular ResolvableIdentifier.
-     *
-     * In the special case that the ObjectIdentifier is the ResolvableIdentifier, then
-     * this method should return a reference to itself (i.e. "this")
+     * Get the ObjectIdentifier (if it exitsts) associated with the given UUID
      * 
+     * @param context
+     * @param uuid
      * @return
      */
-    ObjectIdentifier getObjectIdentifier();
+    public static ObjectIdentifier get(Context context, UUID uuid)
+    {
+        ObjectIdentifierDAO dao = ObjectIdentifierDAOFactory.getInstance(context);
+        ObjectIdentifier oid = dao.retrieve(uuid);
+        return oid;
+    }
 }

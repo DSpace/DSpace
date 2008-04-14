@@ -50,7 +50,7 @@ import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ObjectIdentifierMint;
+import org.dspace.uri.ObjectIdentifierService;
 import org.dspace.uri.IdentifierService;
 
 import java.text.ParseException;
@@ -220,7 +220,7 @@ public class Harvest
     {
         CollectionDAO collectionDAO = CollectionDAOFactory.getInstance(context);
 
-        ObjectIdentifier oi = ObjectIdentifierMint.get(context, itemInfo.itemID, Constants.ITEM);
+        ObjectIdentifier oi = ObjectIdentifierService.get(context, itemInfo.itemID, Constants.ITEM);
         // ObjectIdentifier oi = new ObjectIdentifier(itemInfo.itemID, Constants.ITEM);
         Item item = (Item) IdentifierService.getResource(context, oi);
 

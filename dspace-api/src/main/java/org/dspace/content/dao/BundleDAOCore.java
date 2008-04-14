@@ -47,11 +47,8 @@ import org.dspace.content.Bundle;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ObjectIdentifierMint;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierService;
-import org.dspace.uri.UnsupportedIdentifierException;
+import org.dspace.uri.ObjectIdentifierService;
+import org.dspace.uri.*;
 
 import java.util.List;
 
@@ -79,7 +76,7 @@ public class BundleDAOCore extends BundleDAO
             Bundle bundle =  childDAO.create();
 
             // now assign an object identifier
-            ObjectIdentifier oid = ObjectIdentifierMint.mint(context, bundle);
+            ObjectIdentifier oid = ObjectIdentifierService.mint(context, bundle);
 
             // now assign any required external identifiers
             List<ExternalIdentifier> eids = ExternalIdentifierService.mintAll(context, bundle);
@@ -151,7 +148,7 @@ public class BundleDAOCore extends BundleDAO
             /*
             oid = new ObjectIdentifier(true);
             bundle.setIdentifier(oid);*/
-            oid = ObjectIdentifierMint.mint(context, bundle);
+            oid = ObjectIdentifierService.mint(context, bundle);
         }
         oidDAO.update(bundle.getIdentifier());
 

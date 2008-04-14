@@ -47,10 +47,8 @@ import org.dspace.eperson.Group;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ObjectIdentifierMint;
+import org.dspace.uri.ObjectIdentifierService;
 import org.dspace.uri.SimpleIdentifier;
-import org.dspace.uri.UnsupportedIdentifierException;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -73,7 +71,7 @@ public class ResourcePolicyDAOPostgres extends ResourcePolicyDAO
     {
         try
         {
-            SimpleIdentifier sid = ObjectIdentifierMint.mintSimple();
+            SimpleIdentifier sid = ObjectIdentifierService.mintSimple();
             TableRow row = DatabaseManager.create(context, "resourcepolicy");
             row.setColumn("uuid", sid.getUUID().toString());
             DatabaseManager.update(context, row);

@@ -46,11 +46,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ObjectIdentifierMint;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierService;
-import org.dspace.uri.UnsupportedIdentifierException;
+import org.dspace.uri.ObjectIdentifierService;
+import org.dspace.uri.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,7 +90,7 @@ public class BitstreamDAOCore extends BitstreamDAO
             Bitstream bitstream = childDAO.create();
 
             // now assign an object identifier
-            ObjectIdentifier oid = ObjectIdentifierMint.mint(context, bitstream);
+            ObjectIdentifier oid = ObjectIdentifierService.mint(context, bitstream);
 
             // now assign any required external identifiers
             List<ExternalIdentifier> eids = ExternalIdentifierService.mintAll(context, bitstream);
@@ -143,7 +140,7 @@ public class BitstreamDAOCore extends BitstreamDAO
             /*
             oid = new ObjectIdentifier(true);
             bitstream.setIdentifier(oid);*/
-            oid = ObjectIdentifierMint.mint(context, bitstream);
+            oid = ObjectIdentifierService.mint(context, bitstream);
         }
         oidDAO.update(bitstream.getIdentifier());
 
