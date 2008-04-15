@@ -46,10 +46,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 import javax.mail.internet.MimeUtility;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.avalon.excalibur.pool.Recyclable;
@@ -189,8 +187,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         {
             this.request = ObjectModelHelper.getRequest(objectModel);
             this.response = ObjectModelHelper.getResponse(objectModel);
-            Context context = ContextUtil.obtainContext(objectModel);
-
+            Context context = ContextUtil.obtainContext(objectModel);            
+            
             // Get our parameters that identify the bitstream
             int itemID = par.getParameterAsInteger("itemID", -1);
             int bitstreamID = par.getParameterAsInteger("bitstreamID", -1);

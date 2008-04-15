@@ -1446,6 +1446,9 @@
 	<message key="xmlui.administrative.ControlPanel.option_dspace">DSpace Configuration</message>
 	<message key="xmlui.administrative.ControlPanel.option_knots">Web Continuations</message>
 	<message key="xmlui.administrative.ControlPanel.option_alerts">System-wide Alerts</message>
+	<message key="xmlui.administrative.ControlPanel.hours">{0} h</message>
+	<message key="xmlui.administrative.ControlPanel.minutes">{0} m</message>
+	<message key="xmlui.administrative.ControlPanel.seconds">{0} s</message>
 	<message key="xmlui.administrative.ControlPanel.java_head">Java and Operating System</message>
 	<message key="xmlui.administrative.ControlPanel.java_version">Java Runtime Environment Version</message>
 	<message key="xmlui.administrative.ControlPanel.java_vendor">Java Runtime Environment Vendor</message>
@@ -1477,8 +1480,6 @@
 	<message key="xmlui.administrative.ControlPanel.knots_column1">Interpreter</message>
 	<message key="xmlui.administrative.ControlPanel.knots_column2">Last Access</message>
 	<message key="xmlui.administrative.ControlPanel.knots_column3">State</message>
-	<message key="xmlui.administrative.ControlPanel.knots_hours">{0} hours</message>
-	<message key="xmlui.administrative.ControlPanel.knots_minutes">{0} minutes</message>
 	<message key="xmlui.administrative.ControlPanel.knots_expired">Expired</message>
 	<message key="xmlui.administrative.ControlPanel.knots_active">Active</message>
 	<message key="xmlui.administrative.ControlPanel.knots_none">There are no active continuations.</message>
@@ -1495,6 +1496,17 @@
 	<message key="xmlui.administrative.ControlPanel.alerts_countdown_keep">Keep the current count down timer</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_submit_activate">Activate</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_submit_deactivate">Deactivate</message>
+	<message key="xmlui.administrative.ControlPanel.activity_head">Current Activity ({0} pages maximum)</message>
+	<message key="xmlui.administrative.ControlPanel.activity_sort_time">Time Stamp</message>
+	<message key="xmlui.administrative.ControlPanel.activity_sort_user">User</message>
+	<message key="xmlui.administrative.ControlPanel.activity_sort_ip">IP Address</message>
+	<message key="xmlui.administrative.ControlPanel.activity_sort_url">URL Page</message>
+	<message key="xmlui.administrative.ControlPanel.activity_sort_Agent">User-Agent</message>
+	<message key="xmlui.administrative.ControlPanel.activity_anonymous">Anonymous {0}</message>	
+	<message key="xmlui.administrative.ControlPanel.activity_hideself">Hide my page views</message>
+	<message key="xmlui.administrative.ControlPanel.activity_showself">Show my page views</message>
+	<message key="xmlui.administrative.ControlPanel.activity_none">Other than yourself, there have been no page views in the past {0} pages.</message>
+	
 	<message key="xmlui.administrative.ControlPanel.select_panel">Use the tabs above to select the information to display</message>
 	
 	<!-- org.dspace.app.xmlui.administrative.SystemwideAlerts -->
