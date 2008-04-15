@@ -33,7 +33,7 @@ public class IdentifierMatcher extends WildcardMatcher
 
             // store the results
             Map<String, String> result = new HashMap<String, String>();
-            result.put("identifierType", ri.getIdentifierType());
+            result.put("identifierType", ri.getIdentifierTypeRepresentation());
 
             // find out if the parent matcher implementation has anything to say
             String extra = s.substring(s.indexOf(ri.getURLForm()) + ri.getURLForm().length());

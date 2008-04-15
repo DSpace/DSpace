@@ -64,7 +64,7 @@ public interface ResolvableIdentifier
      *
      * @return
      */
-    String getIdentifierType();
+    String getIdentifierTypeRepresentation();
 
     /**
      * Return the canonical form of the specific identifier

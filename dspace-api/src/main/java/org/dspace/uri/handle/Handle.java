@@ -39,7 +39,6 @@
  */
 package org.dspace.uri.handle;
 
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.uri.ExternalIdentifier;
@@ -57,7 +56,8 @@ import java.util.regex.Pattern;
  * @author Richard Jones
  * @author James Rutherford
  */
-public class Handle extends ExternalIdentifier implements IdentifierAssigner<Handle>, IdentifierResolver<Handle>
+public class Handle extends ExternalIdentifier
+        implements IdentifierAssigner<Handle>, IdentifierResolver<Handle>
 {
     // REQUIRED for the plugin manager
     public Handle()

@@ -250,7 +250,7 @@ public abstract class ExternalIdentifier implements ResolvableIdentifier
      *
      * @return
      */
-    public String getIdentifierType()
+    public String getIdentifierTypeRepresentation()
     {
         return type.getNamespace();
     }
