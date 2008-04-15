@@ -58,6 +58,18 @@
 		</map:component-configurations>
 		
 		
+			
+		<map:pipeline>
+			<!-- Allow the browser to cache static content for an hour -->
+			<map:parameter name="expires" value="access plus 1 hours"/>
+			
+			<!-- Static content -->
+			<map:match pattern="themes/*/**">
+				<map:read src="{2}"/>
+			</map:match>
+		</map:pipeline>
+		
+		
 		<!-- 
 			The theme's pipeline is used to process all requests handled 
 			by the theme. It is broken up into two parts, the first part 
@@ -68,11 +80,8 @@
 			browser without any processing. 
 		-->
 		<map:pipeline>
-			
-			<!-- Static content -->
-			<map:match pattern="themes/*/**">
-				<map:read src="{2}"/>
-			</map:match>
+			<!-- Never allow the browser to cache dynamic content -->
+			<map:parameter name="expires" value="now"/>
 			
 			<!-- Aspect content 
 			

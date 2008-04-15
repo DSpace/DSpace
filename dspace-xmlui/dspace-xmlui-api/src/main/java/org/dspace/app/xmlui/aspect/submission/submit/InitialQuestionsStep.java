@@ -251,15 +251,14 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
 	        }
         }
         
-        //Since we already warn users about the metadata pruning to happen
-        //if they uncheck an already checked box, then
-        //we can let the prune process occur immediately!
-        form.addItem().addHidden("prune").setValue("true");
-        
         //add standard control/paging buttons
         addControlButtons(form);
         
         div.addHidden("submission-continue").setValue(knot.getId()); 
+        //Since we already warn users about the metadata pruning to happen
+        //if they uncheck an already checked box, then
+        //we can let the prune process occur immediately!
+        div.addHidden("prune").setValue("true");
         
     }
     

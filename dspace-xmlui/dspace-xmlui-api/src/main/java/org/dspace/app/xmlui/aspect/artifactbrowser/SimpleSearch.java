@@ -124,7 +124,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         Division search = body.addDivision("search","primary");
         search.setHead(T_head);
         Division query = search.addInteractiveDivision("general-query",
-                "search",Division.METHOD_POST,"secondary search");
+                "search",Division.METHOD_GET,"secondary search");
 
         List queryList = query.addList("search-query",List.TYPE_FORM);
         
@@ -151,10 +151,10 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
      * Get the search query from the URL parameter, if none is found the empty
      * string is returned.
      */
-    protected String getQuery()
+    protected String getQuery() throws UIException
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
-        String query = request.getParameter("query");
+        String query = URLDecode(request.getParameter("query"));
         if (query == null)
             return "";
         return query;

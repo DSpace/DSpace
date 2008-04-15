@@ -85,7 +85,8 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 
 	private static final Message T_submit_delete_logo = message("xmlui.administrative.community.EditCommunityMetadataForm.submit_delete_logo");
 	private static final Message T_submit_delete = message("xmlui.administrative.community.EditCommunityMetadataForm.submit_delete");
-	private static final Message T_submit_save = message("xmlui.administrative.community.EditCommunityMetadataForm.submit_save");
+	private static final Message T_submit_update = message("xmlui.general.update");
+	private static final Message T_submit_return = message("xmlui.general.return");
 	
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -170,8 +171,9 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 	    }
 	    
 	    Para buttonList = main.addPara();
-	    buttonList.addButton("submit_save").setValue(T_submit_save);
+	    buttonList.addButton("submit_save").setValue(T_submit_update);
 	    buttonList.addButton("submit_delete").setValue(T_submit_delete);
+	    buttonList.addButton("submit_return").setValue(T_submit_return);
 	    
     	main.addHidden("administrative-continue").setValue(knot.getId());
 	    

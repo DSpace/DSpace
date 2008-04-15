@@ -86,7 +86,7 @@ public class ConfirmItemForm extends AbstractDSpaceTransformer {
 	private static final Message T_column1 = message("xmlui.administrative.item.ConfirmItemForm.column1");
 	private static final Message T_column2 = message("xmlui.administrative.item.ConfirmItemForm.column2");
 	private static final Message T_column3 = message("xmlui.administrative.item.ConfirmItemForm.column3");
-	private static final Message T_submit_delete = message("xmlui.administrative.item.ConfirmItemForm.submit_delete");
+	private static final Message T_submit_delete = message("xmlui.general.delete");
 	private static final Message T_submit_withdraw = message("xmlui.administrative.item.ConfirmItemForm.submit_withdraw");
 	private static final Message T_submit_reinstate = message("xmlui.administrative.item.ConfirmItemForm.submit_reinstate");
 

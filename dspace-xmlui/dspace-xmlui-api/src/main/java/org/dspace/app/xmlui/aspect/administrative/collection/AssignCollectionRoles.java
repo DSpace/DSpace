@@ -83,7 +83,7 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	private static final Message T_no_role = message("xmlui.administrative.collection.AssignCollectionRoles.no_role");
 	
 	private static final Message T_create = message("xmlui.administrative.collection.AssignCollectionRoles.create");
-	private static final Message T_delete = message("xmlui.administrative.collection.AssignCollectionRoles.delete");
+	private static final Message T_delete = message("xmlui.general.delete");
 	private static final Message T_restrict = message("xmlui.administrative.collection.AssignCollectionRoles.restrict");
 
 	private static final Message T_help_admins = message("xmlui.administrative.collection.AssignCollectionRoles.help_admins");
@@ -167,7 +167,7 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	    if (admins != null) 
 	    {
 		    tableRow.addCell().addXref(baseURL + "&submit_edit_admin", admins.getName());
-		    tableRow.addCell();
+		    addAdministratorOnlyButton(tableRow.addCell(),"submit_delete_admin",T_delete);
 	    }
 	    else 
 	    {
@@ -247,7 +247,7 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	    if (submitters != null) 
 	    {
 	    	tableRow.addCell().addXref(baseURL + "&submit_edit_submit", submitters.getName());
-	    	tableRow.addCell();
+	    	addAdministratorOnlyButton(tableRow.addCell(),"submit_delete_submit",T_delete);
 	    }
 	    else 
 	    {

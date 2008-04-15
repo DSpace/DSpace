@@ -113,7 +113,7 @@ and searching the repository.
 			    -->
 				<map:act type="DSpacePropertyFileReader">
 					<map:parameter name="dspace.dir" value="dspace.dir" />
-					<map:transform type="Include" src="{dspace.dir}/config/news.xml" /> 
+					<map:transform type="Include" src="file://{dspace.dir}/config/news-xmlui.xml" /> 
 				</map:act>				
 				
 				<map:transform type="FrontPageSearch"/>

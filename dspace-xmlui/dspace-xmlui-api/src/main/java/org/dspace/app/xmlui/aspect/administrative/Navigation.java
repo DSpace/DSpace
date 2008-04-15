@@ -226,8 +226,14 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             if (AuthorizeManager.authorizeActionBoolean(this.context, community,Constants.ADD))
             {
             	context.setHead(T_context_head);
-            	context.addItemXref(contextPath+"/admin/collection?createNew&communityID=" + community.getID(), T_context_create_collection);
-            	context.addItemXref(contextPath+"/admin/community?createNew&communityID=" + community.getID(), T_context_create_subcommunity);            	
+            	context.addItemXref(contextPath+"/admin/collection?createNew&communityID=" + community.getID(), T_context_create_collection);         	
+            }
+            
+            // Only administrators can create communities
+            if (AuthorizeManager.isAdmin(this.context))
+            {
+            	context.setHead(T_context_head);
+            	context.addItemXref(contextPath+"/admin/community?createNew&communityID=" + community.getID(), T_context_create_subcommunity);  	
             }
     	}
     	

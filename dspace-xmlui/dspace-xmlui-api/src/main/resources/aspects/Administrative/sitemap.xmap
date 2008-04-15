@@ -115,6 +115,7 @@ to administer DSpace.
 		
     	<map:actions>
     		<map:action name="ControlPanelAction" src="org.dspace.app.xmlui.aspect.administrative.ControlPanelAction" />
+    		<map:action name="CurrentActivityAction" src="org.dspace.app.xmlui.aspect.administrative.CurrentActivityAction" />
     	</map:actions>		
 		
 		<map:selectors>
@@ -262,6 +263,7 @@ to administer DSpace.
 			</map:select>
 						
 			<map:generate/>
+			<map:act type="CurrentActivityAction"/>
 			<map:transform type="SystemwideAlerts"/>
 			<map:transform type="Navigation"/>
 		    

@@ -96,7 +96,7 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 
 	private static final Message T_submit_create_template = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_create_template");
 	private static final Message T_submit_edit_template = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_edit_template");
-	private static final Message T_submit_delete_template = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete_template");
+	private static final Message T_submit_delete_template = message("xmlui.general.delete");
 
 	private static final Message T_submit_delete_logo = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete_logo");
 	private static final Message T_submit_delete = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete");

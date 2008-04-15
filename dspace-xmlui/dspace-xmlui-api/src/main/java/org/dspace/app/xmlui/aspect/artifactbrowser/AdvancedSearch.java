@@ -50,6 +50,7 @@ import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.oro.text.perl.Perl5Util;
+import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -63,6 +64,9 @@ import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.xml.sax.SAXException;
 
 /**
@@ -133,10 +137,17 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
     /**
      * Add Page metadata.
      */
-    public void addPageMeta(PageMeta pageMeta) throws WingException
+    public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
+        
+		DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        if ((dso instanceof Collection) || (dso instanceof Community))
+        {
+	        HandleUtil.buildHandleTrail(dso,pageMeta,contextPath);
+		} 
+		
         pageMeta.addTrail().addContent(T_trail);
     }
     
@@ -155,7 +166,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         Division search = body.addDivision("advanced-search","primary");
         search.setHead(T_head);
         Division query = search.addInteractiveDivision("search-query",
-                contextPath+"/advanced-search",Division.METHOD_POST,"secondary search");
+                "advanced-search",Division.METHOD_POST,"secondary search");
         
         // Use these fields to change the number of search fields, or change the results per page.
         query.addHidden("num_search_field").setValue(numSearchField);
@@ -300,7 +311,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
     private void buildQueryField(int row, Cell cell) throws WingException
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
-        String current = request.getParameter("query" + row);
+        String current = URLDecode(request.getParameter("query" + row));
 
         Text text = cell.addText("query" + row);
         if (current != null)
@@ -365,7 +376,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
      * 
      * @return the query.
      */
-    protected String getQuery()
+    protected String getQuery() throws UIException
     {
         Request request = ObjectModelHelper.getRequest(objectModel);   
         return buildQuery(getSearchFields(request));
@@ -436,8 +447,9 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
      * 
      * @param request The http request object
      * @return Array of search fields
+     * @throws UIException 
      */
-    public ArrayList<SearchField> getSearchFields(Request request)
+    public ArrayList<SearchField> getSearchFields(Request request) throws UIException
 	{
     	if (this.fields != null)
     		return this.fields;
@@ -458,7 +470,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
 		for (int i = 1; i <= numSearchField; i++)
 		{
 			String field = request.getParameter("field"+i);
-			String query = request.getParameter("query"+i);
+			String query = URLDecode(request.getParameter("query"+i));
 			String conjunction = request.getParameter("conjunction"+i);
 			
 			if (field != null)

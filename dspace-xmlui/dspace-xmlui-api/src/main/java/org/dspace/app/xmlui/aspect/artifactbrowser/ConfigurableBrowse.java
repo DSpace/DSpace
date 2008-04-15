@@ -661,11 +661,11 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             params.scope.setOffset(offset > 0 ? offset : 0);
             params.scope.setResultsPerPage(RequestUtils.getIntParameter(request,
                     BrowseParams.RESULTS_PER_PAGE));
-            params.scope.setStartsWith(request.getParameter(BrowseParams.STARTS_WITH));
-            params.scope.setFilterValue(request.getParameter(BrowseParams.FILTER_VALUE));
-            params.scope.setJumpToValue(request.getParameter(BrowseParams.JUMPTO_VALUE));
-            params.scope.setJumpToValueLang(request.getParameter(BrowseParams.JUMPTO_VALUE_LANG));
-            params.scope.setFilterValueLang(request.getParameter(BrowseParams.FILTER_VALUE_LANG));
+            params.scope.setStartsWith(URLDecode(request.getParameter(BrowseParams.STARTS_WITH)));
+            params.scope.setFilterValue(URLDecode(request.getParameter(BrowseParams.FILTER_VALUE)));
+            params.scope.setJumpToValue(URLDecode(request.getParameter(BrowseParams.JUMPTO_VALUE)));
+            params.scope.setJumpToValueLang(URLDecode(request.getParameter(BrowseParams.JUMPTO_VALUE_LANG)));
+            params.scope.setFilterValueLang(URLDecode(request.getParameter(BrowseParams.FILTER_VALUE_LANG)));
 
             // Filtering to a value implies this is a second level browse
             if (params.scope.getFilterValue() != null)

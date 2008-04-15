@@ -50,9 +50,12 @@ import org.apache.log4j.Logger;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 /**
  * Methods for authenticating the user. This is DSpace platform code, as opposed
@@ -83,14 +86,18 @@ public class AuthenticationUtil
 
     
     /**
-     * Session attribute names to store the current user & id.
+     * The IP address this user first logged in from, do not allow this session for
+     * other IP addresses.
      */
-    private static final String CURRENT_USER = "dspace.current.user";
-
-    private static final String CURRENT_USER_ID = "dspace.current.user.id";
+    private static final String CURRENT_IP_ADDRESS = "dspace.user.ip";
     
-    private static final String CURRENT_USER_ADDRESS = "dspace.current.user.address";
-
+    /**
+     * The effective user id, typically this will never change. However if an administrator 
+     * has assumed login as this user then they will differ.
+     */
+    private static final String EFFECTIVE_USER_ID = "dspace.user.effective";
+    private static final String AUTHENTICATED_USER_ID = "dspace.user.authenticated";
+    
     /**
      * Authenticate the current DSpace content based upon given authentication
      * credentials. The AuthenticationManager will consult the configured
@@ -122,7 +129,7 @@ public class AuthenticationUtil
         if (implicitStatus == AuthenticationMethod.SUCCESS)
         {
             log.info(LogManager.getHeader(context, "login", "type=implicit"));
-            AuthenticationUtil.loggedIn(context, request, context.getCurrentUser());
+            AuthenticationUtil.logIn(context, request, context.getCurrentUser());
         }
         else
         {
@@ -136,7 +143,7 @@ public class AuthenticationUtil
                 // Logged in OK.
                 log.info(LogManager
                         .getHeader(context, "login", "type=explicit"));
-                AuthenticationUtil.loggedIn(context, request, context
+                AuthenticationUtil.logIn(context, request, context
                         .getCurrentUser());
             }
             else
@@ -175,14 +182,15 @@ public class AuthenticationUtil
         if (implicitStatus == AuthenticationMethod.SUCCESS)
         {
             log.info(LogManager.getHeader(context, "login", "type=implicit"));
-            AuthenticationUtil.loggedIn(context, request, context.getCurrentUser());
+            AuthenticationUtil.logIn(context, request, context.getCurrentUser());
         }
 
         return context;
     }
 
     /**
-     * Store information about the current user in the request and context
+     * Log the given user in as a real authenticated user. This should only be used after 
+     * a user has presented their credintals and they have been validated. 
      * 
      * @param context
      *            DSpace context
@@ -191,7 +199,7 @@ public class AuthenticationUtil
      * @param eperson
      *            the eperson logged in
      */
-    public static void loggedIn(Context context, HttpServletRequest request,
+    private static void logIn(Context context, HttpServletRequest request,
             EPerson eperson) throws SQLException
     {
         if (eperson == null)
@@ -204,32 +212,22 @@ public class AuthenticationUtil
         // Set any special groups - invoke the authentication mgr.
         int[] groupIDs = AuthenticationManager.getSpecialGroups(context,
                 request);
-
         for (int groupID : groupIDs)
             context.setSpecialGroup(groupID);
 
-        // We store the current user in the request as an EPerson object...
-        request.setAttribute(CURRENT_USER, eperson);
-
-        // and in the session as an ID
-        session.setAttribute(CURRENT_USER_ID, eperson.getID());
-        
         // and the remote IP address to compare against later requests
         // so we can detect session hijacking.
-        session.setAttribute(CURRENT_USER_ADDRESS,
-                             request.getRemoteAddr());
-    }
-    
-    public static void loggedIn(Map objectModel, EPerson eperson) throws SQLException
-    {
-        final HttpServletRequest request = (HttpServletRequest) objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
-        Context context = ContextUtil.obtainContext(objectModel);
+        session.setAttribute(CURRENT_IP_ADDRESS, request.getRemoteAddr());
         
-        loggedIn(context,request,eperson);
+        // Set both the effective and authenticated user to the same.
+        session.setAttribute(EFFECTIVE_USER_ID, eperson.getID());
+        session.setAttribute(AUTHENTICATED_USER_ID,eperson.getID());
+        
     }
 
     /**
-     * Resume any previous login.
+     * Check to see if there are any session attributes indicating a currently authenticated 
+     * user. If there is then log this user in.
      * 
      * @param context
      *            DSpace context
@@ -243,15 +241,20 @@ public class AuthenticationUtil
 
         if (session != null)
         {
-            Integer id = (Integer) session.getAttribute(CURRENT_USER_ID);
+            Integer id = (Integer) session.getAttribute(EFFECTIVE_USER_ID);
 
             if (id != null)
             {
-                String address = (String)session.getAttribute(CURRENT_USER_ADDRESS);
+                String address = (String)session.getAttribute(CURRENT_IP_ADDRESS);
                 if (address != null && address.equals(request.getRemoteAddr()))
                 {
                     EPerson eperson = EPerson.find(context, id);
-                    loggedIn(context, request, eperson);
+                    context.setCurrentUser(eperson);
+
+                    // Set any special groups - invoke the authentication mgr.
+                    int[] groupIDs = AuthenticationManager.getSpecialGroups(context, request);
+                    for (int groupID : groupIDs)
+                        context.setSpecialGroup(groupID);
                 }
                 else
                 {
@@ -262,6 +265,54 @@ public class AuthenticationUtil
     }
 
     /**
+     * Assume the login as another user. Only site administrators may preform the action.
+     * 
+     * @param context
+     * 		The current DSpace context loged in as a site administrator
+     * @param request
+     * 		The reall HTTP request.
+     * @param loginAs
+     * 		Whom to login as.
+     */
+    public static void loginAs(Context context, HttpServletRequest request, EPerson loginAs ) 
+    throws SQLException, AuthorizeException
+    {
+    	// Only allow loginAs if the administrator has allowed it.
+    	if (!ConfigurationManager.getBooleanProperty("xmlui.user.assumelogin", false))
+    		return;
+    	
+    	// Only super administrators can login as someone else.
+    	if (!AuthorizeManager.isAdmin(context))
+    		throw new AuthorizeException("Only site administrators may assume login as another user.");
+    		
+    	// Just to be double be sure, make sure the administrator
+    	// is the one who actualy authenticated themself.
+	    HttpSession session = request.getSession(false);
+	    Integer authenticatedID = (Integer) session.getAttribute(AUTHENTICATED_USER_ID); 
+	    if (context.getCurrentUser().getID() != authenticatedID)
+	    	throw new AuthorizeException("Only authenticated users whom are administrators may assume the login as another user.");
+	    
+	    // You may not assume the login of another super administrator
+	    if (loginAs == null)
+	    	return;
+	    Group administrators = Group.find(context,1);
+	    if (administrators.isMember(loginAs))
+	    	throw new AuthorizeException("You may not assume the login as another super administrator.");
+	    
+	    // Success, allow the user to login as another user.
+	    context.setCurrentUser(loginAs);
+	
+        // Set any special groups - invoke the authentication mgr.
+        int[] groupIDs = AuthenticationManager.getSpecialGroups(context,request);
+        for (int groupID : groupIDs)
+            context.setSpecialGroup(groupID);
+	    	        
+        // Set both the effective and authenticated user to the same.
+        session.setAttribute(EFFECTIVE_USER_ID, loginAs.getID());
+    }
+    
+    
+    /**
      * Log the user out.
      * 
      * @param context
@@ -269,14 +320,33 @@ public class AuthenticationUtil
      * @param request
      *            HTTP request
      */
-    public static void loggedOut(Context context, HttpServletRequest request)
+    public static void logOut(Context context, HttpServletRequest request) throws SQLException
     {
         HttpSession session = request.getSession();
 
+        if (session.getAttribute(EFFECTIVE_USER_ID) != null &&
+        	session.getAttribute(AUTHENTICATED_USER_ID) != null)
+        {
+    	    Integer effectiveID = (Integer) session.getAttribute(EFFECTIVE_USER_ID); 
+    	    Integer authenticatedID = (Integer) session.getAttribute(AUTHENTICATED_USER_ID); 
+    	    
+    	    if (effectiveID != authenticatedID)
+    	    {
+    	    	// The user has login in as another user, instead of logging them out, 
+    	    	// revert back to their previous login name.
+    	    	
+    	    	EPerson authenticatedUser = EPerson.find(context, authenticatedID);
+    	    	context.setCurrentUser(authenticatedUser);
+    	    	session.setAttribute(EFFECTIVE_USER_ID, authenticatedID);
+    	    	return;
+    	    }
+        }
+        
+        // Otherwise, just log the person out as normal.
         context.setCurrentUser(null);
-        request.removeAttribute(CURRENT_USER);
-        session.removeAttribute(CURRENT_USER_ID);
-        session.removeAttribute(CURRENT_USER_ADDRESS);
+        session.removeAttribute(EFFECTIVE_USER_ID);
+        session.removeAttribute(AUTHENTICATED_USER_ID);
+        session.removeAttribute(CURRENT_IP_ADDRESS);
     }
 
     /**

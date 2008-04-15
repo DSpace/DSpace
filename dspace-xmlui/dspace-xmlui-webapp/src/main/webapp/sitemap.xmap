@@ -84,9 +84,14 @@
 				<xslt-processor-role>xalan</xslt-processor-role>
 				<check-includes>true</check-includes>
 			</map:transformer>
-			<map:transformer name="i18n" src="org.apache.cocoon.transformation.I18nTransformer">
+			<map:transformer name="i18n" src="org.dspace.app.xmlui.cocoon.DSpaceI18NTransformer">
 				<catalogues default="default">
-					<catalogue id="default" name="messages" location="context:/i18n"/>
+					<catalogue id="default" name="messages" aspects="true">
+						<location>context://i18n/</location>
+						<!-- Two locations for each installed aspect will be installed, one inside
+							 the aspect's directory and another inside the base location listed
+							 above -->
+					</catalogue>
 				</catalogues>
 				<untranslated-text>untranslated</untranslated-text>
 				<cache-at-startup>true</cache-at-startup>
@@ -155,15 +160,7 @@
 			<map:reader name="BitstreamReader" src="org.dspace.app.xmlui.cocoon.BitstreamReader"/>
 		</map:readers>
 		<map:actions>
-			<map:action name="locale" src="org.apache.cocoon.acting.LocaleAction">
-				<locale-attribute>locale</locale-attribute>
-				<use-locale>true</use-locale>
-				<default-locale language="en" country="US"/>
-				<store-in-request>false</store-in-request>
-				<create-session>false</create-session>
-				<store-in-session>false</store-in-session>
-				<store-in-cookie>false</store-in-cookie>
-			</map:action>
+			<map:action name="locale" src="org.dspace.app.xmlui.cocoon.DSpaceLocaleAction"/>
 			<map:action name="StartAuthentication" src="org.dspace.app.xmlui.aspect.eperson.StartAuthenticationAction"/>
 			<map:action name="DSpacePropertyFileReader" src="org.dspace.app.xmlui.cocoon.DSpacePropertyFileReader" />
 			<map:action name="PropertyFileReader" src="org.dspace.app.xmlui.cocoon.PropertyFileReader" />
@@ -197,6 +194,7 @@
 		<!-- Bitstream pipeline -->
 		<map:pipeline type="noncaching">
 			<map:parameter name="outputBufferSize" value="8192"/>
+			<map:parameter name="expires" value="now"/>
 
 
 			<!--
@@ -273,6 +271,8 @@
 		
 		<!-- non-bitstream pipeline -->
 		<map:pipeline>
+			<!--<map:parameter name="expires" value="now"/>-->
+		
 			<!-- Theme pipeline -->
 			<map:match pattern="DRI/**">
 				<map:mount check-reload="no" src="aspects/aspects.xmap" uri-prefix="DRI/"/>

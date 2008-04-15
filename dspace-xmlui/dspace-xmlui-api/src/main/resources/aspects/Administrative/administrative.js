@@ -498,7 +498,7 @@ function startCreateCollection()
 {
 	var communityID = cocoon.request.get("communityID");
 	
-	assertAdministrator()
+	assertAuthorized(Constants.COMMUNITY,communityID,Constants.ADD);
 	
 	doCreateCollection(communityID);
 	
@@ -556,8 +556,8 @@ function startEditCommunity()
 	
 	doEditCommunity(communityID);
 	
-	// Go back to the collection
-	var community = community.find(getDSContext(),communityID);
+	// Go back to the community
+	var community = Community.find(getDSContext(),communityID);
 	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+community.getExternalIdentifier().getCanonicalForm(),true);
 	getDSContext().complete();
 	community = null;
@@ -591,7 +591,7 @@ function doManageEPeople()
     var result;
     do {
         
-        sendPageAndWait("admin/epeople/main",{"page":page,"query":query,"highlightID":highlightID},result);
+        sendPageAndWait("admin/epeople/main",{"page":page,"query":escape(query),"highlightID":highlightID},result);
         result = null;
         
         // Update the page parameter if supplied.
@@ -681,7 +681,6 @@ function doAddEPerson()
  */
 function doEditEPerson(epersonID)
 {
-	// FIXME:
 	// We can't assert any privleges at this point, the user could be a collection 
 	// admin or a supper admin. Instead we protect each operation.
     var result;
@@ -731,6 +730,22 @@ function doEditEPerson(epersonID)
             if (result != null)
                 result.setContinue(false);
         }
+        else if (cocoon.request.get("submit_login_as"))
+        {
+        	// Login as this user.
+        	assertAdministrator();
+        	result = FlowEPersonUtils.processLoginAs(getDSContext(),getObjectModel(),epersonID);
+        	
+        	if (result != null && result.getOutcome().equals("success"))
+        	{
+        		// the user is loged in as another user, we can't let them continue on
+        		// using this flow because they might not have permissions. So forward
+        		// them to the homepage.
+        		cocoon.redirectTo(cocoon.request.getContextPath(),true);
+				getDSContext().complete();
+				cocoon.exit(); 
+        	}
+        }
         
     } while (result == null || !result.getContinue())  
     
@@ -779,7 +794,8 @@ function doManageGroups()
     var result;
     do {
         
-        sendPageAndWait("admin/group/main",{"query":query,"page":page,"highlightID":highlightID},result);
+
+        sendPageAndWait("admin/group/main",{"query":escape(query),"page":page,"highlightID":highlightID},result);
         assertAdministrator();
 		result = null;
         
@@ -835,7 +851,7 @@ function doManageGroups()
 function doEditGroup(groupID)
 {
 	
-	var groupName = FlowGroupUtils.getName(getDSContext(),groupID);
+	var groupName = ""; // This is only filled in if the user changes the group's name.
 	var memberEPeopleIDs = FlowGroupUtils.getEPeopleMembers(getDSContext(),groupID);
 	var memberGroupIDs = FlowGroupUtils.getGroupMembers(getDSContext(),groupID);
 	
@@ -848,7 +864,7 @@ function doEditGroup(groupID)
     var page = 0;
     var result = null;
     do {
-        sendPageAndWait("admin/group/edit",{"groupID":groupID,"groupName":groupName,"memberGroupIDs":memberGroupIDs.join(','),"memberEPeopleIDs":memberEPeopleIDs.join(','),"highlightEPersonID":highlightEPersonID,"highlightGroupID":highlightGroupID,"query":query,"page":page,"type":type},result);
+        sendPageAndWait("admin/group/edit",{"groupID":groupID,"groupName":escape(groupName),"memberGroupIDs":memberGroupIDs.join(','),"memberEPeopleIDs":memberEPeopleIDs.join(','),"highlightEPersonID":highlightEPersonID,"highlightGroupID":highlightGroupID,"query":escape(query),"page":page,"type":type},result);
         assertEditGroup(groupName);
 
 		result = null;
@@ -869,7 +885,7 @@ function doEditGroup(groupID)
         }
        	else if (cocoon.request.get("submit_save"))
        	{
-       		result = FlowGroupUtils.processSaveGroup(getDSContext(),groupID,groupName,memberEPeopleIDs,memberGroupIDs);
+       		result = FlowGroupUtils.processSaveGroup(getDSContext(),groupID,escape(groupName),memberEPeopleIDs,memberGroupIDs);
        		
        		// Incase a group was created, update our id.
        		if (result != null && result.getParameter("groupID"))
@@ -1013,7 +1029,7 @@ function doManageMetadataRegistry()
             // Add a new schema 
             var namespace = cocoon.request.get("namespace");
             var name = cocoon.request.get("name");
-            result = FlowRegistryUtils.processAddMetadataSchema(getDSContext(), namespace, name);
+            result = FlowRegistryUtils.processAddMetadataSchema(getDSContext(), escape(namespace), escape(name));
         } 
         else if (cocoon.request.get("submit_delete") && cocoon.request.get("select_schema"))
         {
@@ -1063,7 +1079,7 @@ function doEditMetadataSchema(schemaID)
             var qualifier = cocoon.request.get("newQualifier");
             var note = cocoon.request.get("newNote");
             // processes adding field
-            result = FlowRegistryUtils.processAddMetadataField(getDSContext(),schemaID,element,qualifier,note);
+            result = FlowRegistryUtils.processAddMetadataField(getDSContext(),schemaID,escape(element),escape(qualifier),escape(note));
             highlightID = result.getParameter("fieldID");
         }
         else if (cocoon.request.get("submit_update") && updateID >= 0)
@@ -1073,7 +1089,7 @@ function doEditMetadataSchema(schemaID)
             var qualifier = cocoon.request.get("updateQualifier");
             var note = cocoon.request.get("updateNote");
             
-            result = FlowRegistryUtils.processEditMetadataField(getDSContext(),schemaID,updateID,element,qualifier,note);
+            result = FlowRegistryUtils.processEditMetadataField(getDSContext(),schemaID,updateID,escape(element),escape(qualifier),escape(note));
         
             if (result != null && result.getContinue())
             {
@@ -1678,7 +1694,8 @@ function doMapItemSearch(collectionID)
     var result;
     var query = cocoon.request.get("query");
 
-    sendPageAndWait("admin/mapper/search",{"collectionID":collectionID,"query":query},result);
+
+    sendPageAndWait("admin/mapper/search",{"collectionID":collectionID,"query":escape(query)},result);
 	assertAuthorized(Constants.COLLECTION,collectionID,Constants.ADD);    
 
     if (cocoon.request.get("submit_cancel"))
@@ -1739,7 +1756,7 @@ function doManageAuthorizations()
     var query = "";
     
     do {
-        sendPageAndWait("admin/authorize/main",{"query":query},result);
+        sendPageAndWait("admin/authorize/main",{"query":escape(query)},result);
         
         assertAdministrator();
         
@@ -1977,7 +1994,7 @@ function doEditPolicy(objectType,objectID,policyID)
     	/* The page recieves parameters for the type and ID of the DSpace object that the policy is assciated with, the
     	 * policy ID, the group search query (if a search was performed), the ID of the currenly associated group, the
     	 * current action and the currently viewed page (if a search returned more than one page of results) */ 
-        sendPageAndWait("admin/authorize/edit",{"objectType":objectType,"objectID":objectID,"policyID":policyID,"query":query,"groupID":groupID,"actionID":actionID,"page":page},result);
+        sendPageAndWait("admin/authorize/edit",{"objectType":objectType,"objectID":objectID,"policyID":policyID,"query":escape(query),"groupID":groupID,"actionID":actionID,"page":page},result);
         assertAdministrator();
         result = null;
         
@@ -2196,10 +2213,9 @@ function doAssignCollectionRoles(collectionID)
 			var groupID = FlowContainerUtils.getCollectionRole(getDSContext(),collectionID, "ADMIN");
 			result = doEditGroup(groupID);
 		}
-		/* Cannot be done due to DSpace API limitations
 		else if (cocoon.request.get("submit_delete_admin")) {
 			result = doDeleteCollectionRole(collectionID, "ADMIN");
-		}*/
+		}
 		
 		// WORKFLOW STEPS 1-3
 		else if (cocoon.request.get("submit_edit_wf_step1") || cocoon.request.get("submit_create_wf_step1")) 
@@ -2244,12 +2260,12 @@ function doAssignCollectionRoles(collectionID)
 			assertEditCollection(collectionID);
 			var groupID = FlowContainerUtils.getCollectionRole(getDSContext(),collectionID, "SUBMIT");
 			result = doEditGroup(groupID);
-		}/* Cannot be done due to DSpace API limitations
+		}
 		else if (cocoon.request.get("submit_delete_submit")) 
 		{
 		    assertAdministrator();
 			result = doDeleteCollectionRole(collectionID, "SUBMIT");
-		}*/
+		}
 		
 		// DEFAULT_READ
 		else if (cocoon.request.get("submit_create_default_read"))
@@ -2337,14 +2353,14 @@ function doDeleteCollection(collectionID)
 // Creating a new collection, given the ID of its parent community 
 function doCreateCollection(communityID)
 {
-	assertAdministrator();
+	assertAuthorized(Constants.COMMUNITY,communityID,Constants.ADD);
 	
 	var result;
 	var collectionID;
 	
 	do {
 		sendPageAndWait("admin/collection/createCollection",{"communityID":communityID},result);
-		assertAdministrator();
+		assertAuthorized(Constants.COMMUNITY,communityID,Constants.ADD);
 		result=null;
 		
 		if (cocoon.request.get("submit_save")) {
@@ -2426,6 +2442,10 @@ function doEditCommunity(communityID)
 		assertEditCommunity(communityID);
 		result=null;
 		
+		if (cocoon.request.get("submit_return"))
+		{
+			return null;	
+		}
 		if (cocoon.request.get("submit_save")) 
 		{
 			result = FlowContainerUtils.processEditCommunity(getDSContext(), communityID, false, cocoon.request);

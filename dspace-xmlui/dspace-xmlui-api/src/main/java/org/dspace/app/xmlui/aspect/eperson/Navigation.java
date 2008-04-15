@@ -60,6 +60,7 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.UserMeta;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.xml.sax.SAXException;
@@ -214,7 +215,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         else 
         {
             account.addItemXref(contextPath+"/login",T_login);
-            account.addItemXref(contextPath+"/register",T_register);
+            if (ConfigurationManager.getBooleanProperty("xmlui.user.registration", true))
+            	account.addItemXref(contextPath+"/register",T_register);
         }
     }
 

@@ -42,12 +42,17 @@ package org.dspace.app.xmlui.aspect.administrative;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
+import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -75,6 +80,9 @@ public class FlowEPersonUtils {
 	
 	private static final Message t_delete_eperson_success_notice =
 		new Message("default","xmlui.administrative.FlowEPersonUtils.delete_eperson_success_notice");
+	
+	private static final Message t_delete_eperson_failed_notice =
+		new Message("default","xmlui.administrative.FlowEPersonUtils.delete_eperson_failed_notice");
 	
 	/**
 	 * Add a new eperson. This method will check that the email address, 
@@ -249,6 +257,39 @@ public class FlowEPersonUtils {
 	
 	
 	/**
+	 * Log this user in as another user. If the operation failed then the flow result
+	 * will be set to failure with it's mesage set correctly. Note that after logging out
+	 * the user may not have sufficent priveleges to continue.
+	 * 
+	 * @param context The current DSpace context.
+	 * @param objectModel Object model to obtain the HTTP request from.
+	 * @param epersonID The epersonID of the person to login as.
+	 * @return The flow result.
+	 */
+	public static FlowResult processLoginAs(Context context, Map objectModel, int epersonID) throws SQLException
+	{
+		FlowResult result = new FlowResult();
+		result.setContinue(true);
+		result.setOutcome(true);
+		
+		final HttpServletRequest request = (HttpServletRequest) objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
+        
+		EPerson eperson = EPerson.find(context,epersonID);
+
+		try {
+			AuthenticationUtil.loginAs(context, request, eperson);
+		} 
+		catch (AuthorizeException ae)
+		{
+			// give the exception error as a notice.
+			result.setOutcome(false);
+			result.setCharacters(ae.getMessage());
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * Delete the epeople specified by the epeopleIDs parameter. This assumes that the
 	 * detetion has been confirmed.
 	 * 
@@ -260,14 +301,43 @@ public class FlowEPersonUtils {
 	{
 		FlowResult result = new FlowResult();
 		
+		List<String> unableList = new ArrayList<String>();
     	for (String id : epeopleIDs) 
     	{
     		EPerson personDeleted = EPerson.find(context, Integer.valueOf(id));
-			personDeleted.delete();
+    		try {
+				personDeleted.delete();
+    		} 
+    		catch (EPersonDeletionException epde)
+    		{
+    			String firstName = personDeleted.getFirstName();
+    			String lastName = personDeleted.getLastName();
+    			String email = personDeleted.getEmail();
+    			unableList.add(firstName + " " + lastName + " ("+email+")");
+    		}
 	    }
     	
-    	result.setOutcome(true);
-		result.setMessage(t_delete_eperson_success_notice);
+    	if (unableList.size() > 0)
+    	{
+    		result.setOutcome(false);
+    		result.setMessage(t_delete_eperson_failed_notice);
+    			
+    		String characters = null;
+    		for(String unable : unableList )
+    		{
+    			if (characters == null)
+    				characters = unable;
+    			else
+    				characters += ", "+unable;
+    		}
+    		
+    		result.setCharacters(characters);
+    	}
+    	else
+    	{
+    		result.setOutcome(true);
+    		result.setMessage(t_delete_eperson_success_notice);
+    	}
  
     	
     	return result;

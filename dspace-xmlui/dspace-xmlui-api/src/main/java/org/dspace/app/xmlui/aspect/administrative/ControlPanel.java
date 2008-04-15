@@ -44,6 +44,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 
 import org.apache.avalon.framework.service.ServiceException;
 import org.apache.avalon.framework.service.ServiceManager;
@@ -69,6 +70,7 @@ import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.eperson.EPerson;
 import org.xml.sax.SAXException;
 
 /**
@@ -90,6 +92,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 	private static final Message T_option_dspace  		= message("xmlui.administrative.ControlPanel.option_dspace");
 	private static final Message T_option_knots  		= message("xmlui.administrative.ControlPanel.option_knots");
 	private static final Message T_option_alerts  		= message("xmlui.administrative.ControlPanel.option_alerts");
+	private static final Message T_seconds 				= message("xmlui.administrative.ControlPanel.seconds");
+	private static final Message T_hours 				= message("xmlui.administrative.ControlPanel.hours");
+	private static final Message T_minutes 				= message("xmlui.administrative.ControlPanel.minutes");
 	private static final Message T_JAVA_HEAD 			= message("xmlui.administrative.ControlPanel.java_head");
 	private static final Message T_JAVA_VERSION 		= message("xmlui.administrative.ControlPanel.java_version");
 	private static final Message T_JAVA_VENDOR 			= message("xmlui.administrative.ControlPanel.java_vendor");
@@ -121,8 +126,6 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 	private static final Message T_knots_column1 		= message("xmlui.administrative.ControlPanel.knots_column1");
 	private static final Message T_knots_column2 		= message("xmlui.administrative.ControlPanel.knots_column2");
 	private static final Message T_knots_column3 		= message("xmlui.administrative.ControlPanel.knots_column3");
-	private static final Message T_knots_hours 			= message("xmlui.administrative.ControlPanel.knots_hours");
-	private static final Message T_knots_minutes 		= message("xmlui.administrative.ControlPanel.knots_minutes");
 	private static final Message T_knots_expired 		= message("xmlui.administrative.ControlPanel.knots_expired");
 	private static final Message T_knots_active 		= message("xmlui.administrative.ControlPanel.knots_active");
 	private static final Message T_knots_none			= message("xmlui.administrative.ControlPanel.knots_none");
@@ -139,6 +142,16 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 	private static final Message T_alerts_countdown_keep	= message("xmlui.administrative.ControlPanel.alerts_countdown_keep");
 	private static final Message T_alerts_submit_activate	= message("xmlui.administrative.ControlPanel.alerts_submit_activate");
 	private static final Message T_alerts_submit_deactivate	= message("xmlui.administrative.ControlPanel.alerts_submit_deactivate");
+	private static final Message T_activity_head 			= message("xmlui.administrative.ControlPanel.activity_head");
+	private static final Message T_activity_sort_time 		= message("xmlui.administrative.ControlPanel.activity_sort_time");
+	private static final Message T_activity_sort_user 		= message("xmlui.administrative.ControlPanel.activity_sort_user");
+	private static final Message T_activity_sort_ip  		= message("xmlui.administrative.ControlPanel.activity_sort_ip");
+	private static final Message T_activity_sort_url 		= message("xmlui.administrative.ControlPanel.activity_sort_url");
+	private static final Message T_activity_sort_agent 		= message("xmlui.administrative.ControlPanel.activity_sort_Agent");
+	private static final Message T_activity_anonymous 		= message("xmlui.administrative.ControlPanel.activity_anonymous");	
+	private static final Message T_activity_none			= message("xmlui.administrative.ControlPanel.activity_none");
+	private static final Message T_activity_hideself        = message("xmlui.administrative.ControlPanel.activity_hideself");
+	private static final Message T_activity_showself        = message("xmlui.administrative.ControlPanel.activity_showself");
 	private static final Message T_select_panel             = message("xmlui.administrative.ControlPanel.select_panel");
     /** 
      * The service manager allows us to access the continuation's 
@@ -149,7 +162,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
     /**
      * The four states that this page can be in.
      */
-    private enum OPTIONS {java, dspace,knots,alerts};
+    private enum OPTIONS {java, dspace, knots, alerts, activity};
     
     /**
      * From the servicable api, give us a service manager.
@@ -184,6 +197,8 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 			option = OPTIONS.knots;
 		if (request.getParameter("alerts") != null)
 			option = OPTIONS.alerts;
+		if (request.getParameter("activity") != null)
+			option = OPTIONS.activity;
 		
 		Division div = body.addInteractiveDivision("control-panel", contextPath+"/admin/panel", Division.METHOD_POST, "primary administrative");
 		div.setHead(T_head);
@@ -212,6 +227,16 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		else
 			options.addItemXref("?alerts",T_option_alerts);
 		
+		String userSortTarget = "?activity";
+		if (request.getParameter("sortBy") != null)
+			userSortTarget += "&sortBy="+request.getParameter("sortBy");
+		if (request.getParameter("showSelf") != null)
+			userSortTarget += "&showSelf="+request.getParameter("showSelf");
+		if (option == OPTIONS.activity)
+			options.addItem().addHighlight("bold").addXref(userSortTarget,"Current Activity");
+		else
+			options.addItemXref(userSortTarget,"Current Activity");
+		
 		
 		// The main content:
 		if (option == OPTIONS.java)
@@ -222,7 +247,10 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 			addWebContinuations(div);
 		else if (option == OPTIONS.alerts)
 			addAlerts(div);
-		else{
+		else if (option == OPTIONS.activity)
+			addActivity(div);
+		else
+		{
 			div.addPara(T_select_panel);
 		}
 		
@@ -380,9 +408,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         	Message lastAccessMessage = null;
         	long lastAccess = System.currentTimeMillis() - knot.getLastAccessTime();
         	if (lastAccess > 2*60*60*1000)
-        		lastAccessMessage = T_knots_hours.parameterize((lastAccess / (60*60*1000))); 
+        		lastAccessMessage = T_hours.parameterize((lastAccess / (60*60*1000))); 
         	else
-        		lastAccessMessage = T_knots_minutes.parameterize((lastAccess / (60*1000)));
+        		lastAccessMessage = T_minutes.parameterize((lastAccess / (60*1000)));
         	
         	row = activeFlows.addRow();
         	row.addCellContent(interpreter);
@@ -453,5 +481,192 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		
 	}
 	
+	/** The possible sorting parameters */
+	private static enum EventSort { TIME, URL, SESSION, AGENT, IP };
+	
+	/**
+	 * Create a list of all activity.
+	 */
+	private void addActivity(Division div) throws WingException, SQLException 
+	{
+		
+		// 0) Show my requests
+		Request request = ObjectModelHelper.getRequest(objectModel);
+		String showSelf = request.getParameter("showSelf");
+		if (showSelf == null || !showSelf.equals("false"))
+			showSelf = "true";
+		
+		// 1) Determine how to sort
+		EventSort sortBy = EventSort.TIME;
+		String sortByString = request.getParameter("sortBy");
+		if (EventSort.TIME.toString().equals(sortByString))
+			sortBy = EventSort.TIME;
+		if (EventSort.URL.toString().equals(sortByString))
+			sortBy = EventSort.URL;
+		if (EventSort.SESSION.toString().equals(sortByString))
+			sortBy = EventSort.SESSION;
+		if (EventSort.AGENT.toString().equals(sortByString))
+			sortBy = EventSort.AGENT;
+		if (EventSort.IP.toString().equals(sortByString))
+			sortBy = EventSort.IP;
+		
+		// 2) Sort the events by the requested sorting parameter
+		java.util.List<CurrentActivityAction.Event> events = CurrentActivityAction.getEvents();
+        Collections.sort(events, new ActivitySort<CurrentActivityAction.Event>(sortBy));
+        Collections.reverse(events);
+        
+        // 3) self toggle
+        if (showSelf.equals("true"))
+        	div.addPara().addXref("?activity&sortBy="+sortBy+"&showSelf=false").addContent(T_activity_hideself);
+        else
+        	div.addPara().addXref("?activity&sortBy="+sortBy+"&showSelf=true").addContent(T_activity_showself);
+       	
+        
+		// 4) Display the results Table
+        // TABLE: activeUsers
+        Table activeUsers = div.addTable("users",1,1);
+        activeUsers.setHead(T_activity_head);
+        Row row = activeUsers.addRow(Row.ROLE_HEADER);
+        if (sortBy == EventSort.TIME)
+        	row.addCell().addHighlight("bold").addXref("?activity&sortBy="+EventSort.TIME+"&showSelf="+showSelf).addContent(T_activity_sort_time);
+        else
+        	row.addCell().addXref("?activity&sortBy="+EventSort.TIME+"&showSelf="+showSelf).addContent(T_activity_sort_time);
+        
+        if (sortBy == EventSort.SESSION)
+        	row.addCell().addHighlight("bold").addXref("?activity&sortBy="+EventSort.SESSION+"&showSelf="+showSelf).addContent(T_activity_sort_user);
+        else
+        	row.addCell().addXref("?activity&sortBy="+EventSort.SESSION+"&showSelf="+showSelf).addContent(T_activity_sort_user);
+        
+        if (sortBy == EventSort.IP)
+        	row.addCell().addHighlight("bold").addXref("?activity&sortBy="+EventSort.IP+"&showSelf="+showSelf).addContent(T_activity_sort_ip);
+        else
+        	row.addCell().addXref("?activity&sortBy="+EventSort.IP+"&showSelf="+showSelf).addContent(T_activity_sort_ip);
+        
+        if (sortBy == EventSort.URL)
+        	row.addCell().addHighlight("bold").addXref("?activity&sortBy="+EventSort.URL+"&showSelf="+showSelf).addContent(T_activity_sort_url);
+        else
+        	row.addCell().addXref("?activity&sortBy="+EventSort.URL+"&showSelf="+showSelf).addContent(T_activity_sort_url);
+        
+        if (sortBy == EventSort.AGENT)
+        	row.addCell().addHighlight("bold").addXref("?activity&sortBy="+EventSort.AGENT+"&showSelf="+showSelf).addContent(T_activity_sort_agent);
+        else
+        	row.addCell().addXref("?activity&sortBy="+EventSort.AGENT+"&showSelf="+showSelf).addContent(T_activity_sort_agent);
+   
+        // Keep track of how many individual anonymous users there are, each unique anonymous
+        // user is assigned an index based upon the servlet session id.
+        HashMap<String,Integer> anonymousHash = new HashMap<String,Integer>();
+        int anonymousCount = 1;
+		
+        int shown = 0;
+		for (CurrentActivityAction.Event event : events)
+		{	
+			// Skip out if the user does not want to see their requests.
+			if (showSelf.equals("false") && event.getEPersonID() == context.getCurrentUser().getID())
+				continue;
+			
+			shown++;
+			
+			Message timeStampMessage = null;
+        	long ago = System.currentTimeMillis() - event.getTimeStamp();
+        	
+        	if (ago > 2*60*60*1000)
+        		timeStampMessage = T_hours.parameterize((ago / (60*60*1000))); 
+        	else if (ago > 60*1000)
+        		timeStampMessage = T_minutes.parameterize((ago / (60*1000))); 
+        	else
+        		timeStampMessage = T_seconds.parameterize((ago / (1000)));
+        	
+        	
+			Row eventRow = activeUsers.addRow();
+			
+			eventRow.addCellContent(timeStampMessage);
+			int eid = event.getEPersonID();
+			EPerson eperson = EPerson.find(context, eid);
+			if (eperson != null)
+			{
+				String name = eperson.getFullName();
+				eventRow.addCellContent(name);
+			}
+			else
+			{
+				// Is this a new anonymous user?
+				if (!anonymousHash.containsKey(event.getSessionID()))
+					anonymousHash.put(event.getSessionID(), anonymousCount++);
+				
+				eventRow.addCellContent(T_activity_anonymous.parameterize(anonymousHash.get(event.getSessionID())));
+			}
+			eventRow.addCellContent(event.getIP());
+			eventRow.addCell().addXref(contextPath+"/"+event.getURL()).addContent("/"+event.getURL());
+			eventRow.addCellContent(event.getDectectedBrowser());
+		}
+		
+		if (shown == 0)
+        {
+			activeUsers.addRow().addCell(1, 5).addContent(T_activity_none.parameterize(CurrentActivityAction.MAX_EVENTS));
+        }
+	}
+	
+	/**
+	 * Comparator to sort activity events by their access times.
+	 */
+	public static class ActivitySort<E extends CurrentActivityAction.Event> implements Comparator<E>
+	{
+		// Sort parameter
+		private EventSort sortBy;
+		
+		public ActivitySort(EventSort sortBy)
+		{
+			this.sortBy = sortBy;
+		}
+		
+		/**
+		 * Compare these two activity events based upon the given sort parameter. In the case of a tie,
+		 * allways fallback to sorting based upon the timestamp.
+		 */
+		public int compare(E a, E b) 
+		{
+			// Sort by the given ordering matrix
+			if (EventSort.URL == sortBy)
+			{
+				String aURL = a.getURL();
+				String bURL = b.getURL();
+				int cmp = aURL.compareTo(bURL);
+				if (cmp != 0)
+					return cmp;
+			}
+			else if (EventSort.AGENT == sortBy)
+			{
+				String aAgent = a.getDectectedBrowser();
+				String bAgent = b.getDectectedBrowser();
+				int cmp = aAgent.compareTo(bAgent);
+				if (cmp != 0)
+					return cmp;
+			}
+			else if (EventSort.IP == sortBy)
+			{
+				String aIP = a.getIP();
+				String bIP = b.getIP();
+				int cmp = aIP.compareTo(bIP);
+				if (cmp != 0)
+					return cmp;
+				
+			}
+			else if (EventSort.SESSION == sortBy)
+			{
+				String aSession = a.getSessionID();
+				String bSession = b.getSessionID();
+				int cmp = aSession.compareTo(bSession);
+				if (cmp != 0)
+					return cmp;
+			}
+			
+			// All ways fall back to sorting by time, when events are equal.
+			if (a.getTimeStamp() > b.getTimeStamp())
+				return 1;  // A > B
+			else if (a.getTimeStamp() > b.getTimeStamp())
+				return -1; // B < A
+			return 0; // A == B
+		}
+	}
 	
 }

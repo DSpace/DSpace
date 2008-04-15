@@ -95,6 +95,9 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     private static final Message T_go = 
         message("xmlui.general.go");
     
+    public static final Message T_untitled = 
+    	message("xmlui.general.untitled");
+    
     private static final Message T_head_browse =
         message("xmlui.ArtifactBrowser.CollectionViewer.head_browse");
     
@@ -204,8 +207,11 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
         Collection collection = (Collection) dso;
 
         // Set the page title
-        pageMeta.addMetadata("title")
-                .addContent(collection.getMetadata("name"));
+        String name = collection.getMetadata("name");
+        if (name == null || name.length() == 0)
+        	pageMeta.addMetadata("title").addContent(T_untitled);
+        else
+        	pageMeta.addMetadata("title").addContent(name);
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         HandleUtil.buildHandleTrail(collection,pageMeta,contextPath);
@@ -244,7 +250,11 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 
         // Build the collection viewer division.
         Division home = body.addDivision("collection-home", "primary repository collection");
-        home.setHead(collection.getMetadata("name"));
+        String name = collection.getMetadata("name");
+        if (name == null || name.length() == 0)
+        	home.setHead(T_untitled);
+        else
+        	home.setHead(name);
 
         // The search / browse box.
         {
@@ -262,7 +272,8 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             para.addText("query");
             para.addContent(" ");
             para.addButton("submit").setValue(T_go);
-
+            query.addPara().addXref(contextPath + "/handle/" + collection.getHandle()+ "/advanced-search", T_advanced_search_link);
+            
             // Browse by list
             Division browseDiv = search.addDivision("collection-browse","secondary browse");
             List browse = browseDiv.addList("collection-browse", List.TYPE_SIMPLE,
@@ -272,9 +283,6 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             browse.addItemXref(url + "/browse?type=title",T_browse_titles);
             browse.addItemXref(url + "/browse?type=author",T_browse_authors);
             browse.addItemXref(url + "/browse?type=dateissued",T_browse_dates);
-            
-            Division advancedSearchLink = search.addDivision("collection-advanced-search", "secondary advanced-search");
-            advancedSearchLink.addPara().addXref(contextPath + "/advanced-search", T_advanced_search_link);
         }
 
         // Add the reference

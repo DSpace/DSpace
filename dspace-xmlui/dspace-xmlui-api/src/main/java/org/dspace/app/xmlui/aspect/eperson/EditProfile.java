@@ -63,6 +63,7 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Collection;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.Group;
 //import org.dspace.eperson.Subscribe;
 import org.dspace.eperson.SubscriptionManager;
@@ -278,6 +279,8 @@ public class EditProfile extends AbstractDSpaceTransformer
        {
            firstName.addError(T_error_required);
        }
+       if (!registering && !ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
+    	   firstName.setDisabled();
        
        // Last name
        Text lastName = identity.addItem().addText("last_name");
@@ -288,6 +291,8 @@ public class EditProfile extends AbstractDSpaceTransformer
        {
            lastName.addError(T_error_required);
        }
+       if (!registering &&!ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
+    	   lastName.setDisabled();
        
        // Phone
        Text phone = identity.addItem().addText("phone");
@@ -297,6 +302,8 @@ public class EditProfile extends AbstractDSpaceTransformer
        {
            phone.addError(T_error_required);
        }
+       if (!registering && !ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
+    	   phone.setDisabled();
         
        // Subscriptions
        if (!registering)

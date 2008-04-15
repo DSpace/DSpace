@@ -89,7 +89,7 @@ public class MoveMetadataFields extends AbstractDSpaceTransformer
 	private static final Message T_submit_move =
 		message("xmlui.administrative.registries.MoveMetadataField.submit_move");
 	private static final Message T_submit_cancel =
-		message("xmlui.administrative.registries.MoveMetadataField.submit_cancel");
+		message("xmlui.general.cancel");
 	
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException

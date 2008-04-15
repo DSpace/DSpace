@@ -78,7 +78,7 @@ public class ResumeStep extends AbstractStep
     protected static final Message T_submit_resume = 
         message("xmlui.Submission.submit.ResumeStep.submit_resume");
     protected static final Message T_submit_cancel = 
-        message("xmlui.Submission.submit.ResumeStep.submit_cancel");
+        message("xmlui.general.cancel");
   
 	/**
 	 * Establish our required parameters, abstractStep will enforce these.

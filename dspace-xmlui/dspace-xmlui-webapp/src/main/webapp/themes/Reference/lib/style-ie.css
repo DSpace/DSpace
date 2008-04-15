@@ -175,3 +175,7 @@ background-color: white;
 }
 
 ul.horizontal li span.bold a { color: black; }
+
+form.ds-interactive-div  li.ds-form-item.last {
+	width: 558px;
+}

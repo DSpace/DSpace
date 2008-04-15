@@ -54,6 +54,7 @@ importClass(Packages.org.dspace.authorize.AuthorizeManager);
 importClass(Packages.org.dspace.license.CreativeCommons);
 
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
+importClass(Packages.org.dspace.app.xmlui.cocoon.HttpServletRequestCocoonWrapper);
 importClass(Packages.org.dspace.app.xmlui.aspect.submission.FlowUtils);
 
 importClass(Packages.org.dspace.app.util.SubmissionConfig);
@@ -91,7 +92,17 @@ function getDSContext()
  */
 function getHttpRequest()
 {
-	return getObjectModel().get(HttpEnvironment.HTTP_REQUEST_OBJECT)
+	//return getObjectModel().get(HttpEnvironment.HTTP_REQUEST_OBJECT)
+	
+	// Cocoon's request object handles form encoding, thus if the users enters 
+	// non-ascii characters such as those found in foriegn languages they will 
+	// come through corruped if they are not obtained through the cocoon request
+	// object. However, since the dspace-api is built to accept only HttpServletRequest
+	// a wrapper class HttpServletRequestCocoonWrapper has bee built to translate
+	// the cocoon request back into a servlet request. This is not a fully complete 
+	// translation as some methods are unimplemeted. But it is enough for our 
+	// purposes here.
+	return new HttpServletRequestCocoonWrapper(getObjectModel());
 }
 
 /**
@@ -100,7 +111,7 @@ function getHttpRequest()
  */
 function getHttpResponse()
 {
-	return getObjectModel().get(HttpEnvironment.HTTP_RESPONSE_OBJECT)
+	return getObjectModel().get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 }
 
 /**

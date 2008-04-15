@@ -63,6 +63,8 @@
 	<message key="xmlui.general.return">Return</message>
 	<message key="xmlui.general.update">Update</message>
 	<message key="xmlui.general.delete">Delete</message>
+	<message key="xmlui.general.next">Next</message>
+	<message key="xmlui.general.untitled">Untitled</message>
 	
 	
 	<!-- 
@@ -577,14 +579,12 @@
 	
 	<!-- org.dspace.app.xmlui.Submission.submit.ResumeStep -->
 	<message key="xmlui.Submission.submit.ResumeStep.submit_resume">Resume</message>
-	<message key="xmlui.Submission.submit.ResumeStep.submit_cancel">Cancel</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.SelectCollection -->
 	<message key="xmlui.Submission.submit.SelectCollection.head">Select a collection</message>
 	<message key="xmlui.Submission.submit.SelectCollection.collection">Collection</message>
 	<message key="xmlui.Submission.submit.SelectCollection.collection_help">Select the collection you wish to submit an item to.</message>
 	<message key="xmlui.Submission.submit.SelectCollection.collection_default">Select a collection...</message>
-	<message key="xmlui.Submission.submit.SelectCollection.submit">Next</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.SaveOrRemoveStep -->
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.head">Save or cancel your submission?</message>
@@ -659,8 +659,6 @@
 	<message key="xmlui.Submission.submit.EditFileStep.info2">If the format is not in the above list, <strong>select "format not in list" above</strong> and describe the file's format in the box below.</message>
 	<message key="xmlui.Submission.submit.EditFileStep.format_user">Other Format</message>
 	<message key="xmlui.Submission.submit.EditFileStep.format_user_help">The application's name you used to create the file, and the version number (for example, "<i>ACMESoft SuperApp version 1.5</i>").</message>
-	<message key="xmlui.Submission.submit.EditFileStep.submit_save">Save</message>
-	<message key="xmlui.Submission.submit.EditFileStep.submit_cancel">Cancel</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.ReviewStep -->
 	<message key="xmlui.Submission.submit.ReviewStep.head">Review Submission</message>
@@ -722,14 +720,12 @@
 	<message key="xmlui.Submission.workflow.PerformTaskStep.edit_submit">Edit metadata</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.return_help">Return the task to the pool so that another user may perform the task.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.return_submit">Return task to pool</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.cancel_submit">Cancel</message>
 
 	<!-- org.dspace.app.xmlui.Submission.workflow.RejectTaskStep -->
 	<message key="xmlui.Submission.workflow.RejectTaskStep.info1">Please enter your reason for rejecting the submission into the box below, indicating whether the submitter may fix a problem and resubmit.</message>
 	<message key="xmlui.Submission.workflow.RejectTaskStep.reason">Reason</message>
 	<message key="xmlui.Submission.workflow.RejectTaskStep.reason_required">The reason field is required</message>
 	<message key="xmlui.Submission.workflow.RejectTaskStep.submit_reject">Reject item</message>
-	<message key="xmlui.Submission.workflow.RejectTaskStep.submit_cancel">Cancel</message>
 
 	
 	
@@ -746,6 +742,7 @@
 	<message key="xmlui.administrative.FlowEPersonUtils.edit_eperson_success_notice">The user was edited successfully.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.reset_password_success_notice">An email message has been sent to the user containing a token that may be used to choose a new password.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.delete_eperson_success_notice">The user(s) were deleted successfully.</message>
+	<message key="xmlui.administrative.FlowEPersonUtils.delete_eperson_failed_notice">The user(s) listed were not deleted because there are constraints preventing them from being deleted, see the eperson detail page for more information.</message>
 	<message key="xmlui.administrative.FlowGroupUtils.edit_group_success_notice">The group was edited successfully.</message>
 	<message key="xmlui.administrative.FlowGroupUtils.delete_group_success_notice">The selected groups were deleted successfully.</message>
 	<message key="xmlui.administrative.FlowRegistryUtils.add_metadata_schema_success_notice">New schema has been successfully created.</message>
@@ -843,7 +840,16 @@
 	<message key="xmlui.administrative.eperson.EditEPersonForm.can_log_in">Can Log In</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_reset_password">Reset Password</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.special_help">You may also permanently remove this E-Person from the system or reset his/her password. When resetting a password the user will be sent an email containing a special link they can follow to choose a new password.</message>
-	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_delete">Delete this E-Person</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_delete">Delete E-Person</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_login_as">Login as E-Person</message>
+	
+	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint">This eperson is unable to be deleted because of the following constraint(s):</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint.last_conjunction">and</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint.item">eperson has submitted one or more items</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint.workflowitem">eperson has an active submission workflow</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint.tasklistitem">eperson has a workflow task awaiting their attention</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint.unknown">eperson has an unidentified constraint within the system</message>
+	
 	<message key="xmlui.administrative.eperson.EditEPersonForm.member_head">Groups this E-Person is a member of:</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.indirect_member">(via group: {0})</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.member_none">none</message>
@@ -999,7 +1005,6 @@
 	<message key="xmlui.administrative.registries.EditMetadataSchema.column3">Field</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.column4">Scope Note</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.empty">No metadata fields</message>
-	<message key="xmlui.administrative.registries.EditMetadataSchema.submit_return">Return</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.submit_delete">Delete fields</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.submit_move">Move fields to another schema</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.head3">Add new metadata field</message>
@@ -1009,7 +1014,6 @@
 	<message key="xmlui.administrative.registries.EditMetadataSchema.submit_add">Add new metadata field</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.head4">Update Field: {0}</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.submit_update">Update field</message>
-	<message key="xmlui.administrative.registries.EditMetadataSchema.submit_cancel">Cancel</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.error">Error</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.error_duplicate_field">The field name is already in use, all element and qualifiers must be unique.</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.error_element_empty">The field's element is required.</message>
@@ -1062,7 +1066,6 @@
 	<message key="xmlui.administrative.registries.MoveMetadataField.column3">Scope Note</message>
 	<message key="xmlui.administrative.registries.MoveMetadataField.para2">Move to schema: </message>
 	<message key="xmlui.administrative.registries.MoveMetadataField.submit_move">Move fields</message>
-	<message key="xmlui.administrative.registries.MoveMetadataField.submit_cancel">Cancel</message>
 
 	
 	
@@ -1207,7 +1210,6 @@
 	<message key="xmlui.administrative.item.ConfirmItemForm.column1">Field</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.column2">Value</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.column3">Language</message>
-	<message key="xmlui.administrative.item.ConfirmItemForm.submit_delete">Delete</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.submit_withdraw">Withdraw</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.submit_reinstate">Reinstate</message>
 
@@ -1277,7 +1279,6 @@
 	<message key="xmlui.administrative.item.EditItemStatusForm.submit_withdraw">Withdraw...</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.submit_reinstate">Reinstate...</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.submit_delete">Permanently delete</message>
-	<message key="xmlui.administrative.item.EditItemStatusForm.submit_return">Return</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.na">n/a</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.sysadmins_only">(system administrators only)</message>
 	
@@ -1340,7 +1341,6 @@
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.main_head">Edit Collection: {0}</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.no_role">none</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.create">Create...</message>
-	<message key="xmlui.administrative.collection.AssignCollectionRoles.delete">Delete</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.restrict">Restrict...</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.help_admins">Collection administrators decide who can submit items to the collection, withdraw items, edit item metadata (after submission), and add (map) existing items from other collections to this collection (subject to authorization for that collection).</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.help_wf_step1">The people responsible for this step are able to accept or reject incoming submissions. However, they are not able to edit the submission's metadata.</message>
@@ -1394,7 +1394,6 @@
 	<message key="xmlui.administrative.collection.EditCollectionMetadataForm.label_item_template">Item template</message>
 	<message key="xmlui.administrative.collection.EditCollectionMetadataForm.submit_create_template">Create...</message>
 	<message key="xmlui.administrative.collection.EditCollectionMetadataForm.submit_edit_template">Edit...</message>
-	<message key="xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete_template">Delete</message>
 	<message key="xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete_logo">Remove logo</message>
 	<message key="xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete">Delete collection</message>
 	<message key="xmlui.administrative.collection.EditCollectionMetadataForm.submit_save">Save updates</message>
@@ -1405,7 +1404,6 @@
 	<message key="xmlui.administrative.collection.CreateCollectionForm.trail">Create Collection</message>
 	<message key="xmlui.administrative.collection.CreateCollectionForm.main_head">Enter Metadata for a New Collection of {0}</message>
 	<message key="xmlui.administrative.collection.CreateCollectionForm.submit_save">Create</message>
-	<message key="xmlui.administrative.collection.CreateCollectionForm.submit_cancel">Cancel</message>
 
 	<!-- org.dspace.app.xmlui.administrative.community.DeleteCommunityConfirm.java -->
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.title">Confirm Deletion</message>
@@ -1431,7 +1429,6 @@
 	<message key="xmlui.administrative.community.EditCommunityMetadataForm.label_existing_logo">Current logo</message>
 	<message key="xmlui.administrative.community.EditCommunityMetadataForm.submit_delete_logo">Remove logo</message>
 	<message key="xmlui.administrative.community.EditCommunityMetadataForm.submit_delete">Delete community</message>
-	<message key="xmlui.administrative.community.EditCommunityMetadataForm.submit_save">Update</message>
 	
 	<!-- org.dspace.app.xmlui.administrative.community.CreateCommunityForm.java -->
 	<message key="xmlui.administrative.community.CreateCommunityForm.title">Create Community</message>
@@ -1439,7 +1436,6 @@
 	<message key="xmlui.administrative.community.CreateCommunityForm.main_head_sub">Enter Metadata for a New Sub-Community of {0}</message>
 	<message key="xmlui.administrative.community.CreateCommunityForm.main_head_top">Edit Metadata for a New Top-Level Community</message>
 	<message key="xmlui.administrative.community.CreateCommunityForm.submit_save">Create</message>
-	<message key="xmlui.administrative.community.CreateCommunityForm.submit_cancel">Cancel</message>
 
 
 	<!-- org.dspace.app.xmlui.administrative.ControlPanel.java -->
@@ -1450,6 +1446,9 @@
 	<message key="xmlui.administrative.ControlPanel.option_dspace">DSpace Configuration</message>
 	<message key="xmlui.administrative.ControlPanel.option_knots">Web Continuations</message>
 	<message key="xmlui.administrative.ControlPanel.option_alerts">System-wide Alerts</message>
+	<message key="xmlui.administrative.ControlPanel.hours">{0} h</message>
+	<message key="xmlui.administrative.ControlPanel.minutes">{0} m</message>
+	<message key="xmlui.administrative.ControlPanel.seconds">{0} s</message>
 	<message key="xmlui.administrative.ControlPanel.java_head">Java and Operating System</message>
 	<message key="xmlui.administrative.ControlPanel.java_version">Java Runtime Environment Version</message>
 	<message key="xmlui.administrative.ControlPanel.java_vendor">Java Runtime Environment Vendor</message>
@@ -1481,8 +1480,6 @@
 	<message key="xmlui.administrative.ControlPanel.knots_column1">Interpreter</message>
 	<message key="xmlui.administrative.ControlPanel.knots_column2">Last Access</message>
 	<message key="xmlui.administrative.ControlPanel.knots_column3">State</message>
-	<message key="xmlui.administrative.ControlPanel.knots_hours">{0} hours</message>
-	<message key="xmlui.administrative.ControlPanel.knots_minutes">{0} minutes</message>
 	<message key="xmlui.administrative.ControlPanel.knots_expired">Expired</message>
 	<message key="xmlui.administrative.ControlPanel.knots_active">Active</message>
 	<message key="xmlui.administrative.ControlPanel.knots_none">There are no active continuations.</message>
@@ -1499,6 +1496,17 @@
 	<message key="xmlui.administrative.ControlPanel.alerts_countdown_keep">Keep the current count down timer</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_submit_activate">Activate</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_submit_deactivate">Deactivate</message>
+	<message key="xmlui.administrative.ControlPanel.activity_head">Current Activity ({0} pages maximum)</message>
+	<message key="xmlui.administrative.ControlPanel.activity_sort_time">Time Stamp</message>
+	<message key="xmlui.administrative.ControlPanel.activity_sort_user">User</message>
+	<message key="xmlui.administrative.ControlPanel.activity_sort_ip">IP Address</message>
+	<message key="xmlui.administrative.ControlPanel.activity_sort_url">URL Page</message>
+	<message key="xmlui.administrative.ControlPanel.activity_sort_Agent">User-Agent</message>
+	<message key="xmlui.administrative.ControlPanel.activity_anonymous">Anonymous {0}</message>	
+	<message key="xmlui.administrative.ControlPanel.activity_hideself">Hide my page views</message>
+	<message key="xmlui.administrative.ControlPanel.activity_showself">Show my page views</message>
+	<message key="xmlui.administrative.ControlPanel.activity_none">Other than yourself, there have been no page views in the past {0} pages.</message>
+	
 	<message key="xmlui.administrative.ControlPanel.select_panel">Use the tabs above to select the information to display</message>
 	
 	<!-- org.dspace.app.xmlui.administrative.SystemwideAlerts -->

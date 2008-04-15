@@ -79,7 +79,7 @@ public class RejectTaskStep extends AbstractStep
     protected static final Message T_submit_reject = 
         message("xmlui.Submission.workflow.RejectTaskStep.submit_reject");
     protected static final Message T_submit_cancel = 
-        message("xmlui.Submission.workflow.RejectTaskStep.submit_cancel");
+        message("xmlui.general.cancel");
 	
 	
 	

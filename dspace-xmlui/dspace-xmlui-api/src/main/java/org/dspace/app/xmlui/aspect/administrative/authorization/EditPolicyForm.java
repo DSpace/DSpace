@@ -149,7 +149,7 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         int groupID = parameters.getParameterAsInteger("groupID",-1);
         int actionID = parameters.getParameterAsInteger("actionID",-1);
         int page = parameters.getParameterAsInteger("page",0);
-        String query = parameters.getParameter("query","-1");
+        String query = URLDecode(parameters.getParameter("query","-1"));
         
         // The current policy, if it exists (i.e. we are not creating a new one)
         ResourcePolicy policy = ResourcePolicy.find(context, policyID);

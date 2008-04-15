@@ -97,6 +97,9 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
     
     private static final Message T_go =
         message("xmlui.general.go");
+    
+    public static final Message T_untitled = 
+    	message("xmlui.general.untitled");
 
     private static final Message T_head_browse =
         message("xmlui.ArtifactBrowser.CommunityViewer.head_browse");
@@ -220,7 +223,11 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         // Set up the major variables
         Community community = (Community) dso;
         // Set the page title
-        pageMeta.addMetadata("title").addContent(community.getMetadata("name"));
+        String name = community.getMetadata("name");
+        if (name == null || name.length() == 0)
+        	pageMeta.addMetadata("title").addContent(T_untitled);
+        else
+        	pageMeta.addMetadata("title").addContent(name);
 
         // Add the trail back to the repository root.
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
@@ -265,7 +272,11 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 
         // Build the community viewer division.
         Division home = body.addDivision("community-home", "primary repository community");
-        home.setHead(community.getMetadata("name"));
+        String name = community.getMetadata("name");
+        if (name == null || name.length() == 0)
+        	home.setHead(T_untitled);
+        else
+        	home.setHead(name);
 
         // The search / browse box.
         {
@@ -283,6 +294,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             para.addText("query");
             para.addContent(" ");
             para.addButton("submit").setValue(T_go);
+            query.addPara().addXref(contextPath + "/handle/" + community.getHandle() + "/advanced-search", T_advanced_search_link);
 
             // Browse by list
             Division browseDiv = search.addDivision("community-browse","secondary browse");
@@ -293,9 +305,6 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             browse.addItemXref(url + "/browse?type=title",T_browse_titles);
             browse.addItemXref(url + "/browse?type=author",T_browse_authors);
             browse.addItemXref(url + "/browse?type=dateissued",T_browse_dates);
-            
-            Division advancedSearchLink = search.addDivision("community-advanced-search", "secondary advanced-search");
-            advancedSearchLink.addPara().addXref(contextPath + "/advanced-search", T_advanced_search_link);
         }
 
         // Add main reference:

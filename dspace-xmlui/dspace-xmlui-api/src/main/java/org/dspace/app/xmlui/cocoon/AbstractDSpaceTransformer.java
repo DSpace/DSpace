@@ -220,6 +220,9 @@ public abstract class AbstractDSpaceTransformer extends AbstractWingTransformer
      */
     public static String URLDecode(String encodedString) throws UIException
     {
+    	if (encodedString == null)
+    		return null;
+    	
         try
         {
             return URLDecoder.decode(encodedString, Constants.DEFAULT_ENCODING);

@@ -117,7 +117,15 @@ public class DescribeStep extends AbstractSubmissionStep
 	 * The scope of the input sets, this restricts hidden metadata fields from 
 	 * view by the end user during submission. 
 	 */
-	private static String SCOPE = "submit";
+	private static String SUBMISSION_SCOPE = "submit";
+	
+	/** 
+     * The scope of the input sets, this restricts hidden metadata fields from 
+     * view during workflow processing. 
+     */
+    private static String WORKFLOW_SCOPE = "workflow";
+    
+  
     
     /**
      * A shared resource of the inputs reader. The 'inputs' are the 
@@ -194,8 +202,8 @@ public class DescribeStep extends AbstractSubmissionStep
 		// Iterate over all inputs and add it to the form.
 		for(DCInput dcInput : inputs)
 		{
-			// If the input is invisible skip it.
-			if (!dcInput.isVisible(SCOPE))
+			// If the input is invisible in this scope, then skip it.
+			if (!dcInput.isVisible(submissionInfo.isInWorkflow() ? WORKFLOW_SCOPE : SUBMISSION_SCOPE))
 				continue;
 
 			String schema = dcInput.getSchema();
@@ -316,7 +324,8 @@ public class DescribeStep extends AbstractSubmissionStep
 
         for (DCInput input : inputs)
         {
-            if (!input.isVisible(SCOPE))
+            // If the input is invisible in this scope, then skip it.
+            if (!input.isVisible(submissionInfo.isInWorkflow() ? WORKFLOW_SCOPE : SUBMISSION_SCOPE))
                 continue;
 
             String inputType = input.getInputType();

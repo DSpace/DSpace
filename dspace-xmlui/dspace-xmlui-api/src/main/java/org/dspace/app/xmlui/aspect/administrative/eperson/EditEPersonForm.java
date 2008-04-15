@@ -41,6 +41,7 @@ package org.dspace.app.xmlui.aspect.administrative.eperson;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -49,8 +50,10 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
+import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.Highlight;
 import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
@@ -58,6 +61,7 @@ import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -125,6 +129,27 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	private static final Message T_submit_delete =
 		message("xmlui.administrative.eperson.EditEPersonForm.submit_delete");
 	
+	private static final Message T_submit_login_as =
+		message("xmlui.administrative.eperson.EditEPersonForm.submit_login_as");
+	
+	private static final Message T_delete_constraint =
+		message("xmlui.administrative.eperson.EditEPersonForm.delete_constraint");
+
+	private static final Message T_constraint_last_conjunction =
+		message("xmlui.administrative.eperson.EditEPersonForm.delete_constraint.last_conjunction");
+	
+	private static final Message T_constraint_item =
+		message("xmlui.administrative.eperson.EditEPersonForm.delete_constraint.item");
+	
+	private static final Message T_constraint_workflowitem =
+		message("xmlui.administrative.eperson.EditEPersonForm.delete_constraint.workflowitem");
+	
+	private static final Message T_constraint_tasklistitem =
+		message("xmlui.administrative.eperson.EditEPersonForm.delete_constraint.tasklistitem");
+
+	private static final Message T_constraint_unknown = 
+		message("xmlui.administrative.eperson.EditEPersonForm.delete_constraint.unknown");
+	
 	private static final Message T_member_head =
 		message("xmlui.administrative.eperson.EditEPersonForm.member_head");
 	
@@ -190,6 +215,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 		String phoneValue = eperson.getMetadata("phone");
 		boolean canLogInValue = eperson.canLogIn();
 		boolean certificatValue = eperson.getRequireCertificate();
+		Vector<String> deleteConstraints = eperson.getDeleteConstraints();
 		
 		if (request.getParameter("email_address") != null)
 			emailValue = request.getParameter("email_address");
@@ -276,9 +302,8 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
         }
         
         if (admin)
-        {
+        {	
         	// Administrative options:
-        	
 	        CheckBox canLogInField = identity.addItem().addCheckBox("can_log_in");
 	        canLogInField.setLabel(T_can_log_in);
 	        canLogInField.addOption(canLogInValue, "true");
@@ -287,10 +312,52 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	        certificateField.setLabel(T_req_certs);
 	        certificateField.addOption(certificatValue,"true");
 	        
+	        
+        	// Buttons to reset, delete or login as
 	        identity.addItem().addHighlight("italic").addContent(T_special_help);
 	        Item special = identity.addItem();
 	        special.addButton("submit_reset_password").setValue(T_submit_reset_password);
-	        special.addButton("submit_delete").setValue(T_submit_delete);
+	        
+	        Button submitDelete = special.addButton("submit_delete");
+	        submitDelete.setValue(T_submit_delete);
+	       
+	        Button submitLoginAs = special.addButton("submit_login_as");
+	        submitLoginAs.setValue(T_submit_login_as);
+	        if (!ConfigurationManager.getBooleanProperty("xmlui.user.assumelogin", false))
+	        	submitLoginAs.setDisabled();
+	       
+	        if (deleteConstraints != null && deleteConstraints.size() > 0)
+	        {
+	        	submitDelete.setDisabled();
+	        	
+	        	Highlight hi = identity.addItem("eperson-delete-constraint","eperson-delete-constraint").addHighlight("error");
+	        	hi.addContent(T_delete_constraint);
+	        	hi.addContent(" ");
+	        	
+	        	for (String constraint : deleteConstraints)
+        		{
+	        		int idx = deleteConstraints.indexOf(constraint);
+	        		if (idx > 0 && idx == deleteConstraints.size() -1 )
+	        		{
+	        			hi.addContent(", ");
+	        			hi.addContent(T_constraint_last_conjunction);
+	        			hi.addContent(" ");
+	        		}
+	        		else if (idx > 0)
+	        			hi.addContent(", ");
+	        		
+	        		if ("item".equals(constraint))
+	        			hi.addContent(T_constraint_item);
+	        		else if ("workflowitem".equals(constraint))
+	        			hi.addContent(T_constraint_workflowitem);
+	        		else if ("tasklistitem".equals(constraint))
+	        			hi.addContent(T_constraint_tasklistitem);
+	        		else
+	        			hi.addContent(T_constraint_unknown);
+        			
+        		}
+	        	hi.addContent(".");
+	        }
         }
         
         
