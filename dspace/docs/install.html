@@ -123,7 +123,7 @@
         <li>This method allows you to customize DSpace configurations (in dspace.cfg) 
           or user interfaces, using basic pre-built interface "overlays".<br>
   </li>
-        <li>It downloads &quot;precompiled&quot; libraries for the core dspace-api, supporting servlets, taglibraries, aspects and themes for the dspace-jspui, dspace-xmlui and other webservice/applications.<br>
+        <li>It downloads &quot;precompiled&quot; libraries for the core dspace-api, supporting servlets, taglibraries, aspects and themes for the dspace-xmlui, dspace-xmlui and other webservice/applications.<br>
             </li>
         <li>This approach exposes the parts of the application that the DSpace commiters would prefer to see customized. All other modules are downloaded from the 'Maven Central Repository'</li>
       </ul>
@@ -150,7 +150,7 @@
       <ul>
         <li><strong>This method is recommended for those who wish to develop DSpace further or alter its underlying capabilities to a greater degree.</strong><br>
         </li>
-        <li>It contains &quot;all&quot; dspace code for the core dspace-api, supporting servlets, taglibraries, aspects and themes for the dspace-jspui, dspace-xmlui and other webservice/applications.<br>
+        <li>It contains &quot;all&quot; dspace code for the core dspace-api, supporting servlets, taglibraries, aspects and themes for the dspace-xmlui, dspace-xmlui and other webservice/applications.<br>
         </li>
         <li>Provides all the same capabilities as the normal release.</li>
       </ul>
@@ -165,7 +165,7 @@
           <li><code>dspace-oai/</code> - OAI-PMH source module</li>
           <li><code>dspace-xmlui/</code> - XML-UI source module</li>
           <li><code>dspace-lni/</code> - Lightweight Network Interface source  module</li>
-          <li><code>dspace-sword/</code> -  Sword deposit service  source module</li>
+          <li><code>dspace-sword/</code> -  SWORD (Simple Web-service Offering Repository Deposit) deposit service source module</li>
           <li><code>pom.xml</code> - DSpace Parent Project definition</li>
         </ul>
       </li>
@@ -354,15 +354,15 @@ ant fresh_install</pre>
         (but replace <code><em>[dspace]</em></code> with your installation location):</P>
         
         <PRE>&lt;!-- DEFINE A CONTEXT PATH FOR DSpace JSP User Interface  --&gt;
-&lt;Context path="/dspace-jspui" docBase="[dspace]\webapps\dspace-jspui" debug="0" reloadable="true" cachingAllowed="false" allowLinking="true"/&gt;
+&lt;Context path="/jspui" docBase="[dspace]\webapps\jspui" debug="0" reloadable="true" cachingAllowed="false" allowLinking="true"/&gt;
 	
 &lt;!-- DEFINE A CONTEXT PATH FOR DSpace OAI User Interface  --&gt;
-&lt;Context path="/dspace-oai" docBase="[dspace]\webapps\dspace-oai" debug="0" reloadable="true" cachingAllowed="false" allowLinking="true"/&gt;</PRE>
+&lt;Context path="/oai" docBase="[dspace]\webapps\oai" debug="0" reloadable="true" cachingAllowed="false" allowLinking="true"/&gt;</PRE>
         
         <P>Alternatively, you could copy only the DSpace Web application(s) you wish to use from <code><em>[dspace]</em>/webapps</code> to the appropriate directory in your Tomcat/Jetty/Resin installation.  For example:</P>
 
-        <PRE>cp -r <i>[dspace]</i>/webapps/dspace-jspui <i>[tomcat]</i>/webapps
-cp -r <i>[dspace]</i>/webapps/dspace-oai <i>[tomcat]</i>/webapps</PRE>
+        <PRE>cp -r <i>[dspace]</i>/webapps/jspui <i>[tomcat]</i>/webapps
+cp -r <i>[dspace]</i>/webapps/oai <i>[tomcat]</i>/webapps</PRE>
       </li>
 
       <LI>Create an initial administrator account:
@@ -372,9 +372,9 @@ cp -r <i>[dspace]</i>/webapps/dspace-oai <i>[tomcat]</i>/webapps</PRE>
       <LI>Now the moment of truth!  Start up (or restart) Tomcat/Jetty/Resin.  Visit the base URL(s) of your server, depending on which DSpace web applications you want to use.  You should see the DSpace home page.  Congratulations!
         <P>Base URLs of DSpace Web Applications:</P>
         <UL>
-        <li><em>JSP User Interface</em> - (e.g.) http://dspace.myu.edu:8080/dspace-jspui</li>
-        <li><em>XML User Interface (aka. Manakin)</em> -  (e.g.) http://dspace.myu.edu:8080/dspace-xmlui</li>
-        <li><em>OAI-PMH Interface</em> -  (e.g.) http://dspace.myu.edu:8080/dspace-oai/request?verb=identify  (Should return an XML-based response)</li>
+        <li><em>JSP User Interface</em> - (e.g.) http://dspace.myu.edu:8080/jspui</li>
+        <li><em>XML User Interface (aka. Manakin)</em> -  (e.g.) http://dspace.myu.edu:8080/xmlui</li>
+        <li><em>OAI-PMH Interface</em> -  (e.g.) http://dspace.myu.edu:8080/oai/request?verb=identify  (Should return an XML-based response)</li>
         </UL>
       </LI>
     </ol>
@@ -721,16 +721,18 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize 1024 \
 
 	<ul>
 	<li><p><a href="http://java.sun.com/">Java SDK 1.5</a> or later (standard SDK is fine, you don't need J2EE)</p></li>
-	<li><p><a href="http://www.postgresql.org/ftp/">PostgreSQL 8.x for Windows</a>. This comes with an installer application now, so Cygwin is no longer required. Make sure the ODBC + JDBC options are selected, as well as the pgAdmin III tool<p></li>
-	<li><p><a href="http://ant.apache.org/">Apache Ant 1.6.x</a>. Unzip the package in <code>C:\</code> and add <code>C:\apache-ant-1.6.2\bin</code> to the <code>PATH</code> environment variable. For Ant to work properly, you should ensure that <code>JAVA_HOME</code> is set.</p></li>
-	<li><p><a href="http://tomcat.apache.org/">Jakarta Tomcat 5.x+<p>
-</a></ul></p>
+	<li><p><a href="http://www.postgresql.org/ftp/">PostgreSQL 8.x for Windows</a> OR <a href="http://www.oracle.com/database/">Oracle 9 or later</a>.</p> 
+	  <ul><li><p>If you install PostgreSQL, it's recommended to select to install the pgAdmin III tool<p></li></ul>
+	</li>
+	<li><p><a href="http://ant.apache.org/">Apache Ant 1.6.2 or later</a>. Unzip the package in <code>C:\</code> and add <code>C:\apache-ant-1.6.2\bin</code> to the <code>PATH</code> environment variable. For Ant to work properly, you should ensure that <code>JAVA_HOME</code> is set.</p></li>
+	<li><p><a href="http://tomcat.apache.org/">Jakarta Tomcat 5.x or later</a></p></li>
+	<li><p><a href="http://maven.apache.org/">Apache Maven 2.0.8 or later</a></p></li>
+	</ul></p>
 
 	<h3>Installation Steps</h3>
 
 	<p><ol>
 	<li><p>Download the DSpace source from <a href="http://sourceforge.net/projects/dspace">SourceForge</a> and untar it (<a href="http://www.winzip.com/">WinZip</a> will do this)</p></li>
-	<li><p>Copy the PostgreSQL JDBC driver across to the DSpace source tree. The drivers will be in <code>C:\Program Files\PostgreSQL\8.x\jdbc\</code>. The <code>postgresql-8.x-yyy.jdbc2.jar</code> is the jar file you need. Copy it to <code>[dspace]/lib</code>.</p></li>
 	<li><p>Ensure the PostgreSQL service is running, and then run pgAdmin III (Start -> PostgreSQL 8.0 -> pgAdmin III). Connect to the local database as the postgres user and:
 		<ul>
 		<li>Create a 'Login Role' (user) called <code>dspace</code> with the password <code>dspace</code></li>
@@ -747,32 +749,32 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize 1024 \
 	config.template.log4j-handle-plugin.properties
 	config.template.oaicat.properties
 	assetstore.dir
-	history.dir
 	log.dir
 	upload.temp.dir
 	report.dir
 	handle.dir</pre></p></p>
 	</li>
 	<li><p>Create the directory for the DSpace installation (e.g. <code>C:\DSpace</code>)</p></li>
-	<li>Generate the DSpace installation package in the <code><i>[dspace-source]</i>/dspace/target/dspace-[version].dir/</code> directory:
-	  <pre>cd <i>[dspace-source]</i>/dspace/
-
-
-mvn package</pre>
-      <P>Note: without any extra arguments, the DSpace installation package is initialized for PostgreSQL. <br>
+	<li>Generate the DSpace installation package by running the following from commandline (cmd)
+	from your <code><i>[dspace-source]</i>/dspace/</code> directory:
+	<pre>mvn package</pre>
+	  <P>Note #1: This will generate the DSpace installation package in your
+	  <code><i>[dspace-source]</i>/dspace/target/dspace-[version]-build.dir/</code> directory.
+      <P>Note #2: Without any extra arguments, the DSpace installation package is initialized for PostgreSQL. <br>
           <br>
         If you want to use Oracle instead,
         you should build the DSpace installation package as follows:</P>
 	  <PRE>mvn -Ddb.name=oracle package
 </PRE>
     <li>
-      <P>As the <code>dspace</code> UNIX user, initialize the DSpace database and install DSpace to <code><i>[dspace]</i></code>:</P>
-      <pre>cd <i>[dspace-source]</i>/dspace/target/dspace-[version].dir/
-ant fresh_install</pre>
+      <P>Initialize the DSpace database and install DSpace to <code><i>[dspace]</i></code> (e.g. <code>C:\DSpace</code>) by
+      running the following from commandline from your <code><i>[dspace-source]</i>/dspace/target/dspace-[version]-build.dir/</code> directory:</P>
+      <pre>ant fresh_install</pre>
       <P><strong>Note:</strong> to see a complete list of build targets, run</P>
       <pre>ant help</pre>
     </li>
-    <li><p>Create an administrator account, e.g. assuming <code>C:\dspace</code> is where your DSpace installation is:
+    <li><p>Create an administrator account, by running the following from your <code><i>[dspace]</i></code> (e.g. <code>C:\DSpace</code>)
+      directory</p>
       <p><code><em>[dspace]</em>\bin\dsrun org.dspace.administer.CreateAdministrator</code></p>
 	<p>and enter the required information</p></p></li>
 	<li><p>Copy the Web application directories from <code>[dspace]\webapps\</code> to Tomcat's webapps dir, which should be somewhere like <code>C:\Program Files\Apache Software Foundation\Tomcat 5.5\webapps</code></p>
@@ -782,15 +784,16 @@ ant fresh_install</pre>
         (but replace <code><em>[dspace]</em></code> with your installation location):</P>
         
         <PRE>&lt;!-- DEFINE A CONTEXT PATH FOR DSpace JSP User Interface  --&gt;
-&lt;Context path="/dspace-jspui" docBase="[dspace]\webapps\dspace-jspui" debug="0" reloadable="true" cachingAllowed="false" allowLinking="true"/&gt;
+&lt;Context path="/jspui" docBase="[dspace]\webapps\jspui" debug="0" reloadable="true" cachingAllowed="false" allowLinking="true"/&gt;
 	
 &lt;!-- DEFINE A CONTEXT PATH FOR DSpace OAI User Interface  --&gt;
-&lt;Context path="/dspace-oai" docBase="[dspace]\webapps\dspace-oai" debug="0" reloadable="true" cachingAllowed="false" allowLinking="true"/&gt;</PRE>
+&lt;Context path="/oai" docBase="[dspace]\webapps\oai" debug="0" reloadable="true" cachingAllowed="false" allowLinking="true"/&gt;</PRE>
 		</li>
 		</ul>
 	</li>
 	<li><p>Start the Tomcat service</p></li>
-	<li><p>Browse <code>http://localhost:8080/dspace</code>. You should see the DSpace home page</p></li>
+	<li><p>Browse to either <code>http://localhost:8080/jspui</code> or <code>http://localhost:8080/xmlui</code>. You should see the DSpace home page for
+	either the JSPUI or XMLUI, respectively.</p></li>
 </ol>
 </p>
 
@@ -866,15 +869,7 @@ Also, make sure that the <code>db.username</code> and <code>db.password</code> p
       <PRE>dspace 16325  1997  0  Feb 14  ?         0:00 postgres: dspace dspace 127.0.0.1 SELECT</PRE>
 
       <P>This means the connection is in the middle of a <CODE>SELECT</CODE> operation, and if you're not using DSpace right that instant, it's probably a 'zombie' connection.  If this is the case, try <code>kill</code>ing the process, and stopping and restarting Tomcat.</P></DD>
-
-      <dt>You've made changes to the code or to the JSP's and rebuilt DSpace successfully, but when you run Tomcat
-      you don't see any of your changes in DSpace.</dt>
-
-      <dd><p>After you've rebuilt DSpace and copied <code>dspace.war</code> from your <code><i>[dspace-source]</i>/build</code> directory
-    into your <code><i>[tomcat]</i>/webapps</code> directory, you must
-      also <strong>delete</strong> the existing <code><i>[tomcat]</i>/webapps/dspace</code> directory <strong>before</strong> re-starting Tomcat. Otherwise
-      Tomcat will continue to use the old code.<p></dd>
-
+      
     </DL>
 
     <HR>

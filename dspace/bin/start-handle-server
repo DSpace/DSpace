@@ -58,4 +58,4 @@ rm -f $handledir/txns/lock
 # Start the Handle server, with a special log4j properties file.
 # We cannot simply write to the same logs, since log4j
 # does not support more than one JVM writing to the same rolling log.
-nohup $BINDIR/dsrun -Dlog4j.configuration=log4j-handle-plugin.properties net.handle.server.Main $handledir </dev/null >> $logdir/handle-server.log 2>&1 &
+nohup $BINDIR/dsrun -Ddspace.log.init.disable=true -Dlog4j.configuration=log4j-handle-plugin.properties net.handle.server.Main $handledir </dev/null >> $logdir/handle-server.log 2>&1 &

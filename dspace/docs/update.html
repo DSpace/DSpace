@@ -180,7 +180,7 @@ cp [dspace-source]/dspace/config/crosswalks/xhtml-head-item.properties [dspace]/
 </li>
 <li><b>Apply any customizations</b>
 <p>If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. Commonly these modifications are made to "JSP" pages located inside the <code>[dspace 1.4.2]/jsp/local</code> directory. These should be moved 
-<code>[dspace-source]/dspace/modules/dspace-jspui/src/main/webapp/</code> in the new build structure. See <a href="file:///Users/scott/Development/Workspaces/DSpace1.5/dspace-1.5/dspace/docs/configure.html#jspui-jsp">Customizing the JSP Pages</a> for more information.</li>
+<code>[dspace-source]/dspace/modules/jspui/src/main/webapp/</code> in the new build structure. See <a href="file:///Users/scott/Development/Workspaces/DSpace1.5/dspace-1.5/dspace/docs/configure.html#jspui-jsp">Customizing the JSP Pages</a> for more information.</li>
 	
 	
 	
@@ -771,7 +771,7 @@ thumbnail.maxheight 80</PRE>
         <UL>
           <LI><P>Change the value of <code>OAI_ID_PREFIX</code> at the top of the <code>org.dspace.app.oai.DSpaceOAICatalog</code> class to <code>hdl:</code></P></LI>
           <LI><P>Change the servlet mapping for the <code>OAIHandler</code> servlet back to <code>/</code> (from <code>/request</code>)</P></LI>
-          <LI><P>Rebuild and deploy <code>dspace-oai.war</code></LI>
+          <LI><P>Rebuild and deploy <code>oai.war</code></LI>
         </UL>
 
         <P>However, note that in this case, all the records will be re-harvested by harvesters anyway, so you still need to brace for the associated DB activity; also note that the set spec changes may not be picked up by some harvesters.  It's recommended you read the above-linked mailing list posts to understand why the change was made.</P>

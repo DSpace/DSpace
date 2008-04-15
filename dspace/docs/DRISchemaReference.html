@@ -1,0 +1,3820 @@
+<html>
+  <style type="text/css" media="screen">
+    
+    /* Generic definitions */
+    span.term {font-weight: bolder; }
+    dt {font-weight: bolder; }
+    span.def {display: block; margin-left: 40px;}
+    div.element div {margin-top: 10px;}
+    
+    /* Element Name */
+    h3.element-name { font-family: sans-serif; font-size: 1.8em; border-bottom: 1px solid gray; width: 100%; }
+    
+    /* Types */
+    div.element-type span.term { display: none; }
+    div.element-type span.def { text-align: right; }
+    div.element-type { float: right; border: 1px dashed gray; padding: 5px; position: relative; top: -10px; margin-left: 10px;}
+    
+    /* Description  */
+    div.element-description span.term { display: none;}
+    
+    /* Parents and Children */
+    div.element-children span.term { display: block; float: left; width: 75px; }
+    div.element-children span.def { display: inline; margin-left: 10px;}
+    div.element-parents span.def { display: inline; margin-left: 10px;}
+    div.element-parents span.term { display: block; float: left; width: 75px; }
+    
+    /* Attribute styles */
+    div.element-attributes dl {margin-top: 0px; margin-left: 20px;}
+    div.element-attributes dt {float: left; padding-top: 10px;}
+    dd.element-attribute-selection {font-style: italic; padding-left: 100px; clear both; padding-top: 10px;}
+    
+    /* Attribute controlled vocabulary */
+    dl.element-controlled-vocabulary dt {float: none; font-family: monospace; font-weight: normal; }
+    dl.element-controlled-vocabulary dd {margin-left: 20px;}
+    
+  
+    /* Code style */
+    div.element-example pre { border: 1px dashed black; overflow-x: hidden; background: rgb(240,240,240); margin: 0px; padding: 10px;}
+  </style>
+  <body>
+    
+    <h1>DRI Schema Reference </h1>
+    
+    <p><a HREF="index.html">Back to contents</a></p>
+
+	<P><strong>DRI Schema Reference Table of Contents</strong>
+    
+    <ul>
+      <li><a href="DRISchemaReference.html#Introduction">Introduction</a></li>
+      <li><a href="DRISchemaReference.html#DRI_in_Manakin">DRI in Manakin</a></li>
+      <li><a href="DRISchemaReference.html#Common_Design_Patterns">Common Design Patterns</a></li>
+      <li><a href="DRISchemaReference.html#Schema_Overview">Schema Overview</a></li>
+      <li><a href="DRISchemaReference.html#Merging_of_DRI_Documents">Merging of DRI Documents</a></li>
+      <li><a href="DRISchemaReference.html#Version_Changes">Version Changes</a></li>
+      <li><a href="DRISchemaReference.html#Element_Reference">Element Reference</a></li>
+    </ul>
+    
+    <p><b>D</b>igital <b>R</b>epository <b>I</b>nterface (<b>DRI</b>) is a schema that governs the structure of a Manakin DSpace page when encoded as an XML Document. It determines what elements can be present in the Document and the relationship of those elements to each other. This reference document explains the purpose of DRI, provides a broad architectural overview, and explains common design patterns. The appendix includes a complete reference for elements used in the DRI Schema, a graphical representation of the element hierarchy, and a quick reference table of elements and attributes. </p>
+    
+    <h2><a name="Introduction">Introduction</a></h2>
+    
+    <p>This manual describes the Digital Repository Interface (DRI) as it applies to the DSpace digital repository and XMLUI Manakin based interface. DSpace XML UI is a comprehensive user interface system. It is centralized and generic, allowing it to be applied to all DSpace pages, effectively replacing the JSP-based interface system. Its ability to apply specific styles to arbitrarily large sets of DSpace pages significantly eases the task of adapting the DSpace look and feel to that of the adopting institution. This also allows for several levels of branding, lending institutional credibility to the repository and collections.</p>
+    
+    <p>Manakin, the second version of DSpace XML UI, consists of several components, written using Java, XML, and XSL, and is implemented in <a href="http://cocoon.apache.org/">Cocoon</a>. Central to the interface is the XML Document, which is a semantic representation of a DSpace page. In Manakin, the XML Document adheres to a schema called the Digital Repository Interface (DRI) Schema, which was developed in conjunction with Manakin and is the subject of this guide. For the remainder of this guide, the terms XML Document, DRI Document, and Document will be used interchangeably.</p>
+    
+    <p>This reference document explains the purpose of DRI, provides a broad architectural overview, and explains common design patterns. The appendix includes a complete reference for elements used in the DRI Schema, a graphical representation of the element hierarchy, and a quick reference table of elements and attributes. </p>
+    
+    <h3>The Purpose of DRI</h3>
+    
+    <p>DRI is a schema that governs the structure of the XML Document. It determines the elements that can be present in the Document and the relationship of those elements to each other. Since all Manakin components produce XML Documents that adhere to the DRI schema, The XML Document serves as the abstraction layer. Two such components, Themes and Aspects, are essential to the workings of Manakin and are described briefly in this manual.</p>
+    
+    <h3>The Development of DRI</h3>
+    
+    <p>The DRI schema was developed for use in Manakin. The choice to develop our own schema rather than adapt an existing one came after a careful analysis of the schema's purpose as well as the lessons learned from earlier attempts at customizing the DSpace interface. Since every DSpace page in Manakin exists as an XML Document at some point in the process, the schema describing that Document had to be able to structurally represent all content, metadata and relationships between different parts of a DSpace page. It had to be precise enough to avoid losing any structural information, and yet generic enough to allow Themes a certain degree of freedom in expressing that information in a readable format. </p>
+    
+    <p>Popular schemas such as XHTML suffer from the problem of not relating elements together explicitly. For example, if a heading precedes a paragraph, the heading is related to the paragraph not because it is encoded as such but because it happens to precede it. When these structures are attempted to be translated into formats where these types of relationships are explicit, the translation becomes tedious, and potentially problematic. More structured schemas, like TEI or Docbook, are domain specific (much like DRI itself) and therefore not suitable for our purposes.</p>
+    
+    <p>We also decided that the schema should natively support a metadata standard for encoding artifacts. Rather than encoding artifact metadata in structural elements, like tables or lists, the schema would include artifacts as objects encoded in a particular standard. The inclusion of metadata in native format would enable the Theme to choose the best method to render the artifact for display without being tied to a particular structure. </p>
+    
+    <p>Ultimately, we chose to develop our own schema. We have constructed the DRI schema by incorporating other standards when appropriate, such as <a href="http://cocoon.apache.org/2.1/userdocs/i18nTransformer.html">Cocoon's i18n schema</a> for internationalization, <a href="http://dublincore.org/">DCMI's Dublin Core</a>, and the <a href="http://www.loc.gov/standards/mets/">Library of Congress's METS schema</a>. The design of structural elements was derived primarily from <a href="http://www.tei-c.org/index.xml">TEI</a>, with some of the design patterns borrowed from other existing standards such as DocBook and XHTML. While the structural elements were designed to be easily translated into XHTML, they preserve the semantic relationships for use in more expressive languages. </p>
+        
+        
+    <h2><a name="DRI_in_Manakin">DRI in Manakin</a></h2>
+    
+    <p>The general process for handling a request in DSpace XML UI  consists of two parts. The first part builds the XML Document, and the second part stylizes that Document for output. In Manakin, the two parts are not discrete and instead wrapped within two processes: Content Generation, which builds an XML representation of the page, and Style Application, which stylizes the resulting Document. Content Generation is performed by Aspect chaining, while Style Application is performed by a Theme.</p>
+    
+    <h3>Themes</h3>
+    
+    <p>A Theme is a collection of XSL stylesheets and supporting files like images, CSS styles, translations, and help documents. The XSL stylesheets are applied to the DRI Document to covert it into a readable format and give it structure and basic visual formatting in that format. The supporting files are used to provide the page with a specific look and feel, insert images and other media, translate the content, and perform other tasks. The currently used output format is XHTML and the supporting files are generally limited to CSS, images, and JavaScript. More output formats, like PDF or SVG, may be added in the future.</p>
+    
+    <p>A DSpace installation running Manakin may have several Themes associated with it. When applied to a page, a Theme determines most of the pageís look and feel. Different themes can be applied to different sets of DSpace pages allowing for both variety of styles between sets of pages and consistency within those sets. The xmlui.xconf configuration file determines which Themes are applied to which DSpace pages (see the <a href="configure.html#xmlui-configure">Configuration and Customization chapter</a> for more information on installing and configuring themes). Themes may be configured to apply to all pages of specific type, like browse-by-title, to all pages of a one particular community or collection or sets of communities and collections, and to any mix of the two. They can also be configured to apply to a singe arbitrary page or handle.</p>
+    
+    <h3>Aspect Chains</h3>
+    
+    <p>Manakin Aspects are arrangements of Cocoon components (transformers, actions, matchers, etc) that implement a new set of coupled features for the system. These Aspects are chained together to form all the features of Manakin. Five Aspects exist in the default installation of Manakin, each handling a particular set of features of DSpace, and more can be added to implement extra features. All Aspects take a DRI Document as input and generate one as output. This allows Aspects to be linked together to form an Aspect chain. Each Aspect in the chain takes a DRI Document as input, adds its own functionality, and passes the modified Document to the next Aspect in the chain. </p>
+    
+        
+    <h2><a name="Common_Design_Patterns">Common Design Patterns</a></h2>
+    
+    <p>There are several design patterns used consistently within the DRI schema. This section identifies the need for and describes the implementation of these patterns. Three patterns are discussed: language and internationalization issues, standard attribute triplet (<em>id</em>, <em>n</em>, and <em>rend</em>), and the use of structure-oriented markup. </p>
+    
+    <h3>Localization and Internationalization</h3>
+    
+    <p>Internationalization is a very important component of the DRI system. It allows content to be offered in other languages based on user's locale and conditioned upon availability of translations, as well as present dates and currency in a localized manner. There are two types of translated content: content stored and displayed by DSpace itself, and content introduced by the DRI styling process in the XSL transformations. Both types are handled by Cocoon's i18n transformer without regard to their origin.</p>
+    
+    <p>When the Content Generation process produces a DRI Document, some of the textual content may be marked up with <code>i18n</code> elements to signify that translations are available for that content. During the Style Application process, the Theme can also introduce new textual content, marking it up with <code>i18n</code> tags. As a result, after the Theme's XSL templates are applied to the DRI Document, the final output consists of a DSpace page marked up in the chosen display format (like XHTML) with <code>i18n</code> elements from both DSpace and XSL content. This final document is sent through Cocoon's i18n transformer that translates the marked up text.</p>
+    
+    <h3>Standard attribute triplet</h3>
+    
+    <p>Many elements in the DRI system (all top-level containers, character classes, and many others) contain one or several of the three standard attributes: <em>id</em>, <em>n</em>, and <em>rend</em>. The <em>id</em> and <em>n</em> attributes can be required or optional based on the elementís purpose, while the <em>rend</em> attribute is always optional. The first two are used for identification purposes, while the third is used as a display hint issued to the styling step.</p>
+    
+    <p>Identification is important because it allows elements to be separated from their peers for sorting, special case rendering, and other tasks. The first attribute, <em>id</em>, is the global identifier and it is unique to the entire document. Any element that contains an <em>id</em> attribute can thus be uniquely referenced by it. The <em>id</em> attribute of an element can be either assigned explicitly, or generated from the Java Class Path of the originating object if no name is given. While all elements that can be uniquely identified can carry the <em>id</em> attribute, only those that are independent on their context are required to do so. For example, tables are required to have an id since they retain meaning regardless of their location in the document, while table rows and cells can omit the attribute since their meaning depends on the parent element. </p>
+    
+    <p>The name attribute <em>n</em> is simply the name assigned to the element, and it is used to distinguish an element from its immediate peers. In the example of a particular list, all items in that list will have different names to distinguish them from each other. Other lists in the document, however, can also contain items whose names will be different from each other, but identical to those in the first list. The <em>n</em> attribute of an element is therefore unique only in the scope of that elementís parent and is used mostly for sorting purposes and special rendering of a certain class of elements, like, for example,  all first items in lists, or all items named "browse". The <em>n</em> attribute follows the same rules as id when determining whether or not it is required for a given element.</p>
+    
+    <p>The last attribute in the standard triplet is <em>rend</em>. Unlike <em>id</em> and <em>n</em>, the <em>rend</em> attribute can consist of several space delimited values and is optional for all elements that can contain it. Its purpose is to provide a rendering hint from the middle layer component to the styling theme. How that hint is interpreted and whether it is used at all when provided, is completely up the theme. There are several cases, however, where the content of the <em>rend</em> attribute is outlined in detail and its use is encouraged. Those cases are the emphasis element <code>hi</code>, the division element <code>div</code>, and the <code>list</code> element. Please refer to the Element Reference for more detail on these elements.</p>
+    
+    <h3>Structure-oriented markup</h3>
+    
+    <p>The final design pattern is the use of structure-oriented markup for content carried by the XML Document. Once generated by Cocoon, the Document contains two major types of information: metadata about the repository and its contents, and the actual content of the page to be displayed. A complete overview of metadata and content markup and their relationship to each other is given in the next section. An important thing to note here, however, is that the markup of the content is oriented towards explicitly stating structural relationships between the elements rather than focusing on the presentational aspects. This makes the markup used by the Document more similar to TEI or Docbook rather than HTML. For this reason, XSL templates are used by the themes to convert structural DRI markup to XHTML. Even then, an attempt is made to create XHTML as structural as possible, leaving presentation entirely to CSS. This allows the XML Document to be generic enough to represent any DSpace page without dictating how it should be rendered.</p>
+        
+    <h2><a name="Schema_Overview">Schema Overview</a></h2>
+    
+    <p>The DRI XML Document consists of the root element document and three top-level elements that contain two major types of elements. The three top-level containers are <code>meta</code>, <code>body</code>, and <code>options</code>. The two types of elements they contain are metadata and content, carrying metadata about the page and the contents of the page, respectively. Figure 1 depicts the relationship between these six components.</p>
+    
+    <div class="figure">
+    <img src="image/DRISchemaOverview.png" alt="DRI Schema Overview"/>
+    <div class="caption" style="font-weight: bold">Figure 1: The two content types across three major divisions of a DRI  page.</div>
+    </div>
+    
+    <p>The <code>document</code> element is the root for all DRI pages and contains all other elements. It bears only one attribute, <em>version</em>, that contains the version number of the DRI system and the schema used to validate the produced document. At the time of writing the working version number is "1.1". </p>
+    
+    <p>The <code>meta</code> element is a the top-level element under document and contains all metadata information about the page, the user that requested it, and the repository it is used with. It contains no structural elements, instead being the only container of metadata elements in a DRI Document. The metadata stored by the meta element is broken up into three major groups: <code>userMeta</code>, <code>pageMeta</code>, and <code>objectMeta</code>, each storing metadata information about their respective component. Please refer to the reference entries for more information about these elements.</p>
+    
+    <p>The <code>options</code> element is another top-level element that contains all navigation and action options available to the user. The options are stored as items in list elements, broken up by the type of action they perform. The five types of actions are: browsing, search, language selection, actions that are always available, and actions that are context dependent. The two action types also contain sub-lists that contain actions available to users of varying degrees of access to the system. The <code>options</code> element contains no metadata elements and can only make use of a small set of structural elements, namely the <code>list</code> element and its children.</p>
+    
+    <p>The last major top-level element is the <code>body</code> element. It contains all structural elements in a DRI Document, including the lists used by the <code>options</code> element. Structural elements are used to build a generic representation of a DSpace page. Any DSpace page can be represented with a combination of the structural elements, which will in turn be transformed by the XSL templates into another format. This is the core mechanism that allows DSpace XML UI to apply uniform templates and styling rules to all DSpace pages and is the fundamental difference from the JSP approach currently used by DSpace.</p>
+    
+    <p>The <code>body</code> element directly contains only one type of element: <code>div</code>. The <code>div</code> element serves as a major division of content and any number of them can be contained by the <code>body</code>. Additionally, divisions are recursive, allowing <code>divs</code> to contain other <code>divs</code>. It is within these elements that all other structural elements are contained. Those elements include tables, paragraph elements <code>p</code>, and lists, as well as their various children elements. At the lower levels of this hierarchy lie the character container elements. These elements, namely paragraphs <code>p</code>, table <code>cells</code>, lists <code>items</code>, and the emphasis element <code>hi</code>, contain the textual content of a DSpace page, optionally modified with links, figures, and emphasis. If the division within which the character class is contained is tagged as interactive (via the <em>interactive</em> attribute), those elements can also contain interactive form fields. Divisions tagged as interactive must also provide <em>method</em> and <em>action</em> attributes for its fields to use.</p>
+    
+    <div class="figure">
+      <img src="image/DRISchema.png" alt="DRI XML Document Schema" />
+      <div class="caption" style="font-weight: bold">Figure 2: All the elements in the DRI schema.</div>
+      <p>Note: This image is out-of-date, it does not reflect the changes between 1.0 and 1.1 such as reference and referenceSet.</p>
+    </div>
+    
+    <br />
+    
+    <h2><a name="Merging_of_DRI_Documents">Merging of DRI Documents</a></h2>
+    
+    <p>Having described the structure of the DRI Document, as well as its function in Manakin's Aspect chains, we now turn our attention to the one last detail of their use: merging two Documents into one. There are several situations where the need to merge two documents arises. In Manakin, for example, every Aspect is responsible for adding different functionality to a DSpace page. Since every instance of a page has to be a complete DRI Document, each Aspect is faced with the task of merging the Document it generated with the ones generated (and merged into one Document) by previously executed Aspects. For this reason rules exist that describe which elements can be merged together and what happens to their data and child elements in the process.</p>
+    
+    <p>When merging two DRI Documents, one is considered to be the main document, and the other a feeder document that is added in. The three top level containers (<code>meta</code>, <code>body</code> and <code>options</code>) of both documents are then individually analyzed and merged. In the case of the <code>options</code> and <code>meta</code> elements, the children tags are taken individually as well and treated differently from their siblings.</p>
+    
+    <p>The <code>body</code> elements are the easiest to merge: their respective <code>div</code> children are preserved along with their ordering and are grouped together under one element. Thus, the new <code>body</code> tag will contain all the <code>divs</code> of the main document followed by all the <code>divs</code> of the feeder. However, if two <code>divs</code> have the same <em>n</em> and <em>rend</em> attributes (and in case of an interactive <code>div</code> the same <em>action</em> and <em>method</em> attributes as well), those <code>divs</code> will be merged into one. The resulting div will bear the <em>id</em>, <em>n</em>, and <em>rend</em> attributes of the main document's div and contain all the <code>divs</code> of the main document followed by all the <code>divs</code> of the feeder. This process continues recursively until all the <code>divs</code> have been merged. It should be noted that two divisions with separate pagination rules cannot be merged together.</p>
+    
+    <p>Merging the <code>options</code> elements is somewhat different. First, <code>list</code> elements under <code>options</code> of both documents are compared with each other. Those unique to either document are simply added under the new options element, just like <code>divs</code> under <code>body</code>. In case of duplicates, that is <code>list</code> elements that belong to both documents and have the same <em>n</em> attribute, the two <code>lists</code> will be merged into one. The new <code>list</code> element will consist of the main documentís head element, followed <code>label-item</code> pairs from the main document, and then finally the <code>label-item</code> pairs of the feeder, provided they are different from those of the main.</p>
+    
+    <p>Finally, the <code>meta</code> elements are merged much like the elements under body. The three children of <code>meta</code> - <code>userMeta</code>, <code>pageMeta</code>, and <code>objectMeta</code> -  are individually merged, adding the contents of the feeder after the contents of the main.</p>
+    
+    <h2><a name="version_changes">Version Changes</a></h2>
+    
+    <p> The DRI schema will continue to evolve overtime as the needs of interface design require. The version attribute on the document will indicate which version of the schema the document conforms to. At the time Manakin was incorporated into the standard distribution of DSpac the current version was "1.1", however earlier versions of the Manakin interface may use "1.0". 
+    
+    <h3> Changes from 1.0 to 1.1 </h3>
+    
+    <p>There were major structural changes between these two version numbers. Several elements were removed from the schema:<code>includeSet</code>, <code>include</code>, <code>objectMeta</code>, and <code>object</code>. Originaly all metadata for objects were included in-line with the DRI document, this proved to have several problems and has been removed in version 1.1 of the DRI schema. Instead of including metadata in-line, external references to the metadata is included. Thus, a <code>reference</code> element has been added along with <code>referenceSet</code>. These new elements operate like their counterparts in the previous version except refrencing metadata contained on the <code>objectMeta</code> element they reference metadata in external files. The <code>repository</code> and <code>repositoryMeta</code> elements were alse modified in a similar mannor removing in-line metadata and refrencing external metadata documents.</p>
+    
+    
+    <h2><a name="Element_Reference">Element Refenence</a></h2>
+    
+    <div class="tables">
+    	<table border="1">
+
+				<tr>
+
+					<th>
+
+						Element 
+
+					</th>
+
+					<th>
+
+						Attributes 
+
+					</th>
+
+					<th>
+
+						Required 
+
+					</th>
+
+				</tr>
+
+				
+
+				<tr>
+
+					<td>
+
+						<a href="#element:body">BODY</a> 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				
+
+				<tr>
+
+					<td rowspan="6">
+
+						<a href="#element:cell">cell</a> 
+
+					</td>
+
+					<td>
+
+						cols 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				
+
+				<tr>
+
+					<td>
+
+						id 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						n 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						rend 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						role 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						rows 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td rowspan="17">
+
+						<a href="#element:div">div</a>
+
+					</td>
+
+					<td>
+
+						action 
+
+					</td>
+
+					<td>
+
+						required for interactive 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						behavior 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						behaviorSensitivFields 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						currentPage 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						firstItemIndex 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						id 
+
+					</td>
+
+					<td>
+
+						required 
+
+					</td>
+
+				</tr>
+				<tr>
+
+					<td>
+
+						interactive 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+				<tr>
+
+					<td>
+
+						itemsTotal 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+				<tr>
+
+					<td>
+
+						lastItemIndex 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+				<tr>
+
+					<td>
+
+						method 
+
+					</td>
+
+					<td>
+
+						required for interactive 
+
+					</td>
+
+				</tr>
+				<tr>
+
+					<td>
+
+						n 
+
+					</td>
+
+					<td>
+
+						required
+
+					</td>
+
+				
+
+				</tr>
+				<tr>
+
+					<td>
+
+						nextPage 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+					
+
+				</tr>
+				<tr>
+
+					<td>
+
+						pagesTotal
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+
+				</tr>
+				<tr>
+
+					<td>
+
+						pageURLMask 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				
+				</tr>
+				<tr>
+
+					<td>
+
+						pagination 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+					
+				</tr>
+				<tr>
+
+					<td>
+
+						previousPage 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+				<tr>
+
+					<td>
+
+						rend 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				
+				</tr>
+
+				<tr>
+
+					<td>
+
+						<a href="#element:document">DOCUMENT</a>
+
+					</td>
+
+					<td>
+
+						version 
+
+					</td>
+
+					<td>
+
+						required 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td rowspan="6">
+
+						<a href="#element:field">field</a>
+
+					</td>
+
+					<td>
+
+						disabled 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						id 
+
+					</td>
+
+					<td>
+
+						required 
+
+					</td>
+
+				
+				</tr>
+
+				<tr>
+
+					<td>
+
+						n 
+
+					</td>
+
+					<td>
+
+						required 
+
+					</td>
+
+				
+				</tr>
+
+				<tr>
+
+					<td>
+
+						rend 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						required 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				
+				</tr>
+
+				<tr>
+
+					<td>
+
+						type 
+
+					</td>
+
+					<td>
+
+						required 
+
+					</td>
+
+				
+				</tr>
+
+				<tr>
+
+					<td rowspan="3">
+
+						<a href="#element:figure">figure</a>
+
+					</td>
+
+					<td>
+
+						rend 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						source 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						target 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td rowspan="3">
+
+						<a href="#element:head">head</a>
+
+					</td>
+
+					<td>
+
+						id 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						n 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+					
+				</tr>
+
+				<tr>
+
+					<td>
+
+						rend 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						<a href="#element:help">help</a>
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						<a href="#element:hi">hi</a>
+
+					</td>
+
+					<td>
+
+						rend 
+
+					</td>
+
+					<td>
+
+						required 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						<a href="#element:instance">instance</a> 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td rowspan="3">
+
+						<a href="#element:item">item</a>
+
+					</td>
+
+					<td>
+
+						id 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						n 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				
+				</tr>
+
+				<tr>
+
+					<td>
+
+						rend 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+			
+
+				</tr>
+
+				<tr>
+
+					<td rowspan="3">
+
+						<a href="#element:label">label</a>
+
+					</td>
+
+					<td>
+
+						id 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						n 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						rend 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td rowspan="4">
+
+						<a href="#element:list">list</a>
+
+					</td>
+
+					<td>
+
+						id 
+
+					</td>
+
+					<td>
+
+						required 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						n 
+
+					</td>
+
+					<td>
+
+						required 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						rend 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						type 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						<a href="#element:meta">META</a>
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td rowspan="3">
+
+						<a href="#element:metadata">metadata</a> 
+
+					</td>
+
+					<td>
+
+						element 
+
+					</td>
+
+					<td>
+
+						required 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						language 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						qualifier 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						<a href="#element:options">OPTIONS</a>
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td rowspan="3">
+
+						<a href="#element:p">p</a>
+
+					</td>
+
+					<td>
+
+						id 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						n 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						rend 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						<a href="#element:pageMeta">pageMeta</a> 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td rowspan="6">
+
+						<a href="#element:params">params</a> 
+
+					</td>
+
+					<td>
+
+						cols 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>				
+
+				<tr>
+
+					<td>
+
+						maxlength 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						multiple 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						operations 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						rows 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>	
+				<tr>
+
+					<td>
+
+						size 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>	
+				
+				
+    	  <tr>
+    	    
+    	    <td rowspan="3">
+    	      
+    	      <a href="#element:refrence">refrence</a> 
+    	      
+    	    </td>
+    	    
+    	    <td>
+    	      
+    	      url 
+    	      
+    	    </td>
+    	    
+    	    <td>
+    	      
+    	      required 
+    	      
+    	    </td>
+    	    
+    	  </tr>
+    	  
+    	  <tr>
+    	    
+    	    <td>
+    	      
+    	      repositoryID 
+    	      
+    	    </td>
+    	    
+    	    <td>
+    	      
+    	      required 
+    	      
+    	    </td>
+    	    
+    	  </tr>
+    	  
+    	  <tr>
+    	    
+    	    <td>
+    	      
+    	      type 
+    	      
+    	    </td>
+    	    
+    	    <td>
+    	      
+    	      &nbsp; 
+    	      
+    	    </td>
+    	    
+    	  </tr>
+    	  
+    	  <tr>
+    	    
+    	    <td rowspan="5">
+    	      
+    	      <a href="#element:referenceSet">referenceSet</a>
+    	      
+    	    </td>
+    	    
+    	    <td>
+    	      
+    	      id 
+    	      
+    	    </td>
+    	    
+    	    <td>
+    	      
+    	      required 
+    	      
+    	    </td>
+    	    
+    	  </tr>
+    	  
+    	  <tr>
+    	    
+    	    <td>
+    	      
+    	      n 
+    	      
+    	    </td>
+    	    
+    	    <td>
+    	      
+    	      required 
+    	      
+    	    </td>
+    	    
+    	  </tr>
+    	  
+    	  <tr>
+    	    
+    	    <td>
+    	      
+    	      orderBy 
+    	      
+    	    </td>
+    	    
+    	    <td>
+    	      
+    	      &nbsp; 
+    	      
+    	    </td>
+    	    
+    	    
+    	  </tr>
+    	  
+    	  <tr>
+    	    
+    	    <td>
+    	      
+    	      rend 
+    	      
+    	    </td>
+    	    
+    	    <td>
+    	      
+    	      &nbsp; 
+    	      
+    	    </td>
+    	    
+    	    
+    	  </tr>
+    	  
+    	  <tr>
+    	    
+    	    <td>
+    	      
+    	      type 
+    	      
+    	    </td>
+    	    
+    	    <td>
+    	      
+    	      required 
+    	      
+    	    </td>
+    	    
+    	    
+    	  </tr>
+				
+						
+				<tr>
+
+					<td rowspan="2">
+
+						<a href="#element:repository">repository</a> 
+
+					</td>
+
+					<td>
+
+						repositoryID
+
+					</td>
+
+					<td>
+
+						required 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						url 
+
+					</td>
+
+					<td>
+
+						required 
+
+					</td>
+
+				</tr>
+				<tr>
+
+					<td>
+
+						<a href="#element:repositoryMeta">repositoryMeta</a> 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td rowspan="4">
+
+						<a href="#element:row">row</a> 
+
+					</td>
+
+					<td>
+
+						id 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						n 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						rend 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						role 
+
+					</td>
+
+					<td>
+
+						required 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td rowspan="5">
+
+						<a href="#element:table">table</a>
+
+					</td>
+
+					<td>
+
+						cols 
+
+					</td>
+
+					<td>
+
+						required 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						id 
+
+					</td>
+
+					<td>
+
+						required 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						n 
+
+					</td>
+
+					<td>
+
+						required 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						rend 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						rows 
+
+					</td>
+
+					<td>
+
+						required 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td rowspan="2">
+
+						<a href="#element:trail">trail</a> 
+
+					</td>
+
+					<td>
+
+						rend 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						target 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						<a href="#element:userMeta">userMeta</a> 
+
+					</td>
+
+					<td>
+
+						authenticated 
+
+					</td>
+
+					<td>
+
+						required 
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td rowspan="3">
+
+						<a href="#element:value">value</a> 
+
+					</td>
+
+					<td>
+
+						optionSelected 
+
+					</td>
+
+					<td>
+
+						&nbsp; 
+
+					</td>
+
+				</tr>
+				<tr>
+
+					<td>
+
+						optionValue 
+
+					</td>
+
+					<td>
+
+						&nbsp;
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						type 
+
+					</td>
+
+					<td>
+
+						required
+
+					</td>
+
+				</tr>
+
+				<tr>
+
+					<td>
+
+						<a href="#element:xref">xref</a> 
+
+					</td>
+
+					<td>
+
+						target 
+
+					</td>
+
+					<td>
+
+						required 
+
+					</td>
+
+				</tr>
+
+			</table>
+  	</div>
+    
+<!--start of elements-->    
+    
+    <div class="element">
+    
+    	<h3 class="element-name">
+    		<a name="element:body">BODY</a>
+    	</h3>
+    	
+    	<div class="element-type">
+    		<span class="def"><a href="#type:Top-Level Container">Top-Level Container</a></span>
+    	</div>
+    	
+    	<div class="element-descsription">
+    		<p>The <code>body</code> element is the main container for all content displayed to the user. It contains any number of <code>div</code> elements that group content into interactive and display blocks.</p>
+    	</div>
+    
+    	<div class="element-parents">
+    		<span class="term">Parent</span>
+    		<span class="def"><a href="#element:document">document</a></span>
+    	</div>
+    	
+    	<div class="element-children">
+        <span class="term">Children</span>
+        <span class="def"><a href="#element:div">div</a> (any)</span>
+      </div>
+    	
+    	<div class="element-attributes">
+        <span class="term">Attributes</span>
+        <span class="def">None</span>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;document version=1.0&gt;
+  &lt;meta&gt; ... &lt;/meta&gt;
+  <b>&lt;body&gt;</b>
+    &lt;div n="division-example1" id="XMLExample.div.division-example1"&gt;
+     ... 
+    &lt;/div&gt;
+    &lt;div n="division-example2" id="XMLExample.div.division-example2" interactive="yes" action="www.DRItest.com" method="post"&gt;
+     ...
+    &lt;/div&gt;
+     ...
+  <b>&lt;/body&gt;</b>
+  &lt;options&gt; ... &lt;/options&gt;
+&lt;/document&gt;
+</pre>
+      </div>    	
+  	</div>
+<!--end of body element-->    
+    
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:cell">cell</a>
+      </h3>
+      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Rich Text Container">Rich Text Container</a></span>
+        <span class="def"><a href="#type:Structural Element">Structural Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The <code>cell</code> element contained in a <code>row</code> of a <code>table</code> carries content for that table. It is a character container, just like <code>p</code>, <code>item</code>, and <code>hi</code>, and its primary purpose is to display textual data, possibly enhanced with hyperlinks, emphasized blocks of text, images and form fields.  Every <code>cell</code> can be annotated with a <em>role</em> (the most common being ìheaderî and ìdataî) and can stretch across any number of rows and columns. Since cells cannot exist outside their container, <code>row</code>, their <em>id</em> attribute is optional.</p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:row">row</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def"><a href="#element:hi">hi</a> (any)</span>
+        <span class="def"><a href="#element:xref">xref</a> (any)</span>
+        <span class="def"><a href="#element:figure">figure</a> (any)</span>
+        <span class="def"><a href="#element:field">field</a> (any)</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>
+        	<dt>cols</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">The number of columns the cell spans.</dd>
+        	<dt>id</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A unique identifier of the element.</dd>
+          <dt>n</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A local identifier used to differentiate the element from its siblings.</dd>       
+					<dt>rend</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A rendering hint used to override the default display of the element.</dd>
+          <dt>role</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">An optional attribute to override the containing rowís role settings.</dd>
+          <dt>rows</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">The number of rows the cell spans.</dd>          
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;table n="table-example" id="XMLExample.table.table-example" rows="2" cols="3"&gt;
+    &lt;row role="head"&gt;
+      <b>&lt;cell cols="2"&gt;Data Label One and Two&lt;/cell&gt;
+      &lt;cell&gt;Data Label Three&lt;/cell&gt;</b>
+      ...
+    &lt;/row&gt;
+    &lt;row&gt;
+      <b>&lt;cell&gt; Value One &lt;/cell&gt;
+      &lt;cell&gt; Value Two &lt;/cell&gt;
+      &lt;cell&gt; Value Three &lt;/cell&gt;</b>
+      ...
+    &lt;/row&gt;
+    ...
+&lt;/table&gt;</pre>
+      </div>
+    </div>
+<!--end of cell element-->    
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:div">div</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Structural Element">Structural Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The <code>div</code> element represents a major section of content and can contain a wide variety of structural elements to present that content to the user. It can contain paragraphs, tables, and lists, as well as references to artifact information stored in <code>artifactMeta</code>, <code>repositoryMeta</code>, <code>collections</code>, and <code>communities</code>. The <code>div</code> element is also recursive, allowing it to be further divided into other divs. Divs can be of two types: interactive and static. The two types are set by the use of the <em>interactive</em> attribute and differ in their ability to contain interactive content. Children elements of divs tagged as interactive can contain form fields, with the <em>action</em> and <em>method</em> attributes of the <code>div</code> serving to resolve those fields.</p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:body">body</a></span>
+        <span class="def"><a href="#element:div">div</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def"><a href="#element:head">head</a> (zero or one)</span>
+        <span class="def"><a href="#element:pagination">pagination</a> (zero or one)</span>
+        <span class="def"><a href="#element:table">table</a> (any)</span>
+        <span class="def"><a href="#element:p">p</a> (any)</span>
+        <span class="def"><a href="#element:referenceSet">referenceSet</a> (any)</span>
+        <span class="def"><a href="#element:list">list</a> (any)</span>
+        <span class="def"><a href="#element:div">div</a> (any)</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>
+        	<dt>action</dt>
+          <dd class="element-attribute-selection">required for interactive</dd>
+          <dd class="element-attribute-description">The form action attribute determines where the form information should be sent for processing.</dd>
+          <dt>behavior</dt>
+          <dd class="element-attribute-selection">optional for interactive</dd>
+          <dd class="element-attribute-description">The acceptable behavior options that may be used on this form.  The only possible value defined at this time is ìajaxî which means that the form may be submitted multiple times for each individual field in this form. Note that if the form is submitted multiple times it is best for the behaviorSensitiveFields to be updated as well.</dd>
+          <dt>behaviorSensitiveFields</dt>
+          <dd class="element-attribute-selection">optional for interactive</dd>
+          <dd class="element-attribute-description">A space separated list of field names that are sensitive to behavior. These fields must be updated each time a form is submitted with out a complete refresh of the page (i.e. ajax).</dd>               
+					<dt>currentPage</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">For paginated divs, the currentPage attribute indicates the index of the page currently displayed for this div.</dd>
+					<dt>firstItemIndex</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">For paginated divs, the firstItemIndex attribute indicates the index of the first item included in this div.</dd>
+					<dt>id</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">A unique identifier of the element.</dd>
+          <dt>interactive</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">Accepted values are ìyesî, ìnoî. This attribute determines whether the div is interactive or static. Interactive divs must provide action and method and can contain field elements.</dd>          
+          <dt>itemsTotal</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">For paginated divs, the itemsTotal attribute indicates how many items exit across all paginated divs.</dd>
+          <dt>lastItemIndex</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">For paginated divs, the lastItemIndex attribute indicates the index of the last item included in this div.</dd>
+          <dt>method</dt>
+          <dd class="element-attribute-selection">required for interactive</dd>
+          <dd class="element-attribute-description">Accepted values are ìgetî, ìpostî, and ìmultipartî. Determines the method used to pass gathered field values to the handler specified by the action attribute. The multipart method should be used for uploading files.</dd>
+          <dt>n</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">A local identifier used to differentiate the element from its siblings.</dd>
+          <dt>nextPage</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">For paginated divs the nextPage attribute points to the URL of the next page of the div, if it exists.</dd>
+          <dt>pagesTotal</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">For paginated divs, the pagesTotal attribute indicates how many pages the paginated divs spans.</dd>
+          <dt>pageURLMask</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">For paginated divs, the pageURLMask attribute contains the mask of a url to a particular page within the paginated set. The destination pageís number should replace the {pageNum} string in the URL mask to generate a full URL to that page. </dd>
+          <dt>pagination</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">Accepted values are ìsimpleî, ìmaskedî. This attribute determines whether the div is spread over several pages. Simple paginated divs must provide previousPage, nextPage, itemsTotal, firstItemIndex, lastItemIndex attributes. Masked paginated divs must provide currentPage, pagesTotal, pageURLMask, itemsTotal, firstItemIndex, lastItemIndex attributes.</dd>
+          <dt>previousPage</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">For paginated divs the previousPage attribute points to the URL of the previous page of the div, if it exists.</dd>
+          <dt>rend</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A rendering hint used to override the default display of the element. In the case of the div tag, it is also encouraged to label it as either ìprimaryî or ìsecondaryî. Divs marked as primary contain content, while secondary divs contain auxiliary information or supporting fields.</dd>
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;body&gt;
+    <b>&lt;div n="division-example" id="XMLExample.div.division-example"&gt;</b>
+      &lt;head&gt; Example Division &lt;/head&gt;
+      &lt;p&gt; This example shows the use of divisions. &lt;/p&gt;
+      &lt;table ...&gt;
+        ...
+      &lt;/table&gt;
+      &lt;referenceSet ...&gt;
+        ...
+      &lt;/referenceSet&gt;
+      &lt;list ...&gt;
+        ...
+      &lt;/list&gt;
+      <b>&lt;div n="sub-division-example" id="XMLExample.div.sub-division-example"&gt;</b>
+        &lt;p&gt; Divisions may be nested &lt;/p&gt;
+        ...
+      <b>&lt;/div&gt;</b>
+      ...
+    <b>&lt;/div&gt;</b>
+    ...
+&lt;/body&gt;</pre>
+      </div>
+    </div>
+<!--end of div element-->
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:document">DOCUMENT</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Document Root">Document Root</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The document element is the root container of an XML UI document. All other elements are contained within it either directly or indirectly. The only attribute it carries is the version of the Schema to which it conforms.</p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def">none</span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def"><a href="#element:meta">meta</a> (one)</span>
+        <span class="def"><a href="#element:body">body</a> (one)</span>
+        <span class="def"><a href="#element:options">options</a> (one)</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>
+          <dt>version</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">Version number of the schema this document adheres to. At the time of writing the only valid version number is ì1.0î. Future iterations of this schema may increment the version number.</dd>       
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+<b>&lt;document version="1.0"&gt;</b>
+    &lt;meta&gt;
+      ...
+    &lt;/meta&gt;
+    &lt;body&gt;
+      ...
+    &lt;/body&gt;
+    &lt;options&gt;
+      ...
+    &lt;/options&gt;
+<b>&lt;/document&gt;</b></pre>
+      </div>
+    </div>
+<!--end of document element-->
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:field">field</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Text Container">Text Container</a></span>
+        <span class="def"><a href="#type:Structural Element">Structural Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The <code>field</code> element is a container for all information necessary to create a form field. The required <em>type</em> attribute determines the type of the field, while the children tags carry the information on how to build it. Fields can only occur in divisions tagged as "interactive".</p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:cell">cell</a></span>
+        <span class="def"><a href="#element:p">p</a></span>
+        <span class="def"><a href="#element:hi">hi</a></span>
+        <span class="def"><a href="#element:item">item</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def"><a href="#element:params">params</a> (one)</span>
+        <span class="def"><a href="#element:help">help</a> (zero or one)</span>
+        <span class="def"><a href="#element:error">error</a> (any)</span>
+        <span class="def"><a href="#element:option">option</a> (any - only with the select type)</span>
+        <span class="def"><a href="#element:value">value</a> (any - only available on fields of type: select, checkbox, or radio)</span>
+        <span class="def"><a href="#element:field">field</a> (one or more - only with the composite type)</span>
+        <span class="def"><a href="#element:valueSet">valueSet</a> (any)</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>
+          <dt>disabled</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">Accepted values are ìyesî, ìnoî. Determines whether the field allows user input. Rendering of disabled fields may vary with implementation and display media.</dd>
+          <dt>id</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">A unique identifier for a field element. </dd>
+          <dt>n</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">A non-unique local identifier used to differentiate the element from its siblings within an interactive division.  This is the name of the field use when data is submitted back to the server.</dd>
+          <dt>rend</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A rendering hint used to override the default display of the element.</dd>
+          <dt>required</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">Accepted values are ìyesî, ìnoî. Determines whether the field is a required component of the form and thus cannot be left blank.</dd>
+   
+          <dt>type</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">A required attribute to specify the type of value. Accepted types are: 
+            
+            <dl class="element-controlled-vocabulary">
+              <dt>button</dt>
+              <dd>A button input control that when activated by the user will submit the form, including all the fields, back to the server for processing.</dd>
+              <dt>checkbox</dt>
+              <dd>A boolean input control which may be toggled by the user. A checkbox may have several fields which share the same name and each of those fields may be toggled independently. This is distinct from a radio button where only one field may be toggled.</dd>
+              <dt>file</dt>
+              <dd>An input control that allows the user to select files to be submitted with the form. Note that a form which uses a file field must use the multipart method.</dd>
+              <dt>hidden</dt>
+              <dd>An input control that is not rendered on the screen and hidden from the user.</dd>
+              <dt>password</dt>
+              <dd>A single-line text input control where the input text is rendered in such a way as to hide the characters from the user.</dd>
+              <dt>radio</dt>
+              <dd>A boolean input control which may be toggled by the user. Multiple radio button fields may share the same name. When this occurs only one field may be selected to be true. This is distinct from a checkbox where multiple fields may be toggled.</dd>
+              <dt>select</dt>
+              <dd>A menu input control which allows the user to select from a list of available options.</dd>
+              <dt>text</dt>
+              <dd>A single-line text input control.</dd>
+              <dt>textarea</dt>
+              <dd>A multi-line text input control.</dd>
+              <dt>composite</dt>
+              <dd>A composite input control combines several input controls into a single field. The only fields that may be combined together are: checkbox, password, select, text, and textarea. When fields are combined together they can posses multiple combined values.</dd>
+            </dl>            
+          </dd>
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;p&gt;
+  &lt;hi&gt; ... &lt;/hi&gt;
+  &lt;xref&gt; ... &lt;/xref&gt;
+  &lt;figure&gt; ... &lt;/figure&gt;
+  ...
+  <b>&lt;field id="XMLExample.field.name" n="name" type="text" required="yes"&gt;</b>
+    &lt;params size="16" maxlength="32"/&gt;
+    &lt;help&gt;Some help text with &lt;i18n&gt;localized content&lt;/i18n&gt;.&lt;/help&gt;
+    &lt;value type="raw"&gt;Default value goes here&lt;/value&gt;
+  <b>&lt;/field&gt;</b>
+&lt;/p&gt;
+        </pre>
+      </div>
+    </div>
+<!--end of field element-->
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:figure">figure</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Text Container">Text Container</a></span>
+        <span class="def"><a href="#type:Structural Element">Structural Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The <code>figure</code> element is used to embed a reference to an image or a graphic element. It can be mixed freely with text, and any text within the tag itself will be used as an alternative descriptor or a caption.</p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:cell">cell</a></span>
+        <span class="def"><a href="#element:p">p</a></span>
+        <span class="def"><a href="#element:hi">hi</a></span>
+        <span class="def"><a href="#element:item">item</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def">none</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>
+          <dt>rend</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A rendering hint used to override the default display of the element.</dd>
+          <dt>source</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">The source for the image, using either a URL or a pre-defined XML entity.</dd>
+          <dt>target</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A target for an image used as a link, using either a URL or an id of an existing element as a destination.</dd> 
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;p&gt;
+    &lt;hi&gt; ... &lt;/hi&gt;
+    ...
+    &lt;xref&gt; ... &lt;/xref&gt;
+    ...
+    &lt;field&gt; ... &lt;/field&gt;
+    ...
+    <b>&lt;figure source="www.example.com/fig1"&gt; This is a static image. &lt;/figure&gt;</b>
+    <b>&lt;figure source="www.example.com/fig1" target="www.example.net"&gt;</b>
+      This image is also a link.
+    <b>&lt;/figure&gt;</b>
+    ...
+&lt;/p&gt;</pre>
+      </div>
+    </div>
+<!--end of figure element-->
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:head">head</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Text Container">Text Container</a></span>
+        <span class="def"><a href="#type:Structural Element">Structural Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The <code>head</code> element is primarily used as a label associated with its parent element. The rendering is determined by its parent tag, but can be overridden by the <em>rend</em> attribute. Since there can only be one <code>head</code> element associated with a particular tag, the <em>n</em> attribute is not needed, and the <em>id</em> attribute is optional.</p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:div">div</a></span>
+        <span class="def"><a href="#element:table">table</a></span>
+        <span class="def"><a href="#element:list">list</a></span>
+        <span class="def"><a href="#element:referenceSet">referenceSet</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def">none</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>
+          <dt>id</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A unique identifier of the element </dd>
+          <dt>n</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A local identifier used to differentiate the element from its siblings</dd>
+          <dt>rend</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A rendering hint used to override the default display of the element.</dd>        
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;div ...&gt;
+    <b>&lt;head&gt; This is a simple header associated with its div element. &lt;/head&gt;</b>
+    &lt;div ...&gt;
+      <b>&lt;head rend="green"&gt; This header will be green. &lt;/head&gt;</b>
+      &lt;p&gt;
+        <b>&lt;head&gt; A header with &lt;i18n&gt;localized content&lt;/i18n&gt;. &lt;/head&gt;</b>
+        ...
+      &lt;/p&gt;
+    &lt;/div&gt;
+    &lt;table ...&gt;
+      <b>&lt;head&gt; ... &lt;/head&gt;</b>
+      ...
+    &lt;/table&gt;
+    &lt;list ...&gt;
+      <b>&lt;head&gt; ... &lt;/head&gt;</b>
+      ...
+    &lt;/list&gt;
+    ...
+&lt;/body&gt;</pre>
+      </div>
+    </div>
+<!--end of head element-->
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:help">help</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Text Container">Text Container</a></span>
+        <span class="def"><a href="#type:Structural Element">Structural Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The optional <code>help</code> element is used to supply help instructions in plain text and is normally contained by the <code>field</code> element. The method used to render the help text in the target markup is up to the theme.</p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:field">field</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def">none</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <span class="def">None</span>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;p&gt;
+    &lt;hi&gt; ... &lt;/hi&gt;
+    ...
+    &lt;xref&gt; ... &lt;/xref&gt;
+    ...
+    &lt;figure&gt; ... &lt;/figure&gt;
+    ...
+    &lt;field id="XMLExample.field.name" n="name" type="text" required="yes"&gt;
+      &lt;params size="16" maxlength="32" /&gt;
+      <b>&lt;help&gt;Some help text with &lt;i18n&gt;localized content&lt;/i18n&gt;.&lt;/help&gt;</b>
+    &lt;/field&gt;
+    ...
+&lt;/p&gt;</pre>
+      </div>
+    </div>
+<!--end of help element-->
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:hi">hi</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Rich Text Container">Rich Text Container</a></span>
+        <span class="def"><a href="#type:Structural Element">Structural Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The <code>hi</code> element is used for emphasis of text and occurs inside character containers like <code>p</code> and <code>list</code> item. It can be mixed freely with text, and any text within the tag itself will be emphasized in a manner specified by the required <em>rend</em> attribute. Additionally, <code>hi</code> element is the only text container component that is a rich text container itself, meaning it can contain other tags in addition to plain text. This allows it to contain other text containers, including other <code>hi</code> tags.</p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:cell">cell</a></span>
+        <span class="def"><a href="#element:p">p</a></span>
+        <span class="def"><a href="#element:item">item</a></span>
+        <span class="def"><a href="#element:hi">hi</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def"><a href="#element:hi">hi</a> (any)</span>
+        <span class="def"><a href="#element:xref">xref</a> (any)</span>
+        <span class="def"><a href="#element:figure">figure</a> (any)</span>
+        <span class="def"><a href="#element:field">field</a> (any)</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>
+          <dt>rend</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">A required attribute used to specify the exact type of emphasis to apply to the contained text. Common values include but are not limited to "bold", "italic", "underline", and "emph".</dd>        
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;p&gt;
+    This text is normal, while <b>&lt;hi rend="bold"&gt;this text is bold and this text is &lt;hi rend="italic"&gt;bold and italic.&lt;/hi&gt;&lt;/hi&gt;</b>
+&lt;/p&gt;</pre>
+      </div>
+    </div>
+<!--end of hi element-->
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:instance">instance</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Structural Element">Structural Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The <code>instance</code> element contains the value associated with a form fieldís multiple instances. Fields encoded as an instance should also include the values of each instance as a hidden field. The hidden field should be appended with the index number for the instance. Thus if the field is "firstName" each instance would be named "firstName_1", "firstName_2", "firstName_3", etc...</p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:field">field</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def"><a href="#element:value">value</a></span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <span class="def">None listed yet.</span>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+Example needed.</pre>
+      </div>
+    </div>
+<!--end of instance element-->
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:item">item</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Rich Text Container">Rich Text Container</a></span>
+        <span class="def"><a href="#type:Structural Element">Structural Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The <code>item</code> element is a rich text container used to display textual data in a list. As a rich text container it can contain hyperlinks, emphasized blocks of text, images and form fields in addition to plain text.</p>
+        <p>The <code>item</code> element can be associated with a label that directly precedes it. The Schema requires that if one <code>item</code> in a <code>list</code> has an associated <code>label</code>, then all other items must have one as well. This mitigates the problem of loose connections between elements that is commonly encountered in XHTML, since every item in particular list has the same structure.</p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:list">list</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def"><a href="#element:hi">hi</a> (any)</span>
+        <span class="def"><a href="#element:xref">xref</a> (any)</span>
+        <span class="def"><a href="#element:figure">figure</a> (any)</span>
+        <span class="def"><a href="#element:field">field</a> (any)</span>
+        <span class="def"><a href="#element:list">list</a> (any)</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>
+        	<dt>id</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A unique identifier of the element</dd>
+        	<dt>n</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A non-unique local identifier used to differentiate the element from its siblings</dd>  
+          <dt>rend</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A rendering hint used to override the default display of the element.</dd>      
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;list n="list-example" id="XMLExample.list.list-example"&gt;
+  &lt;head&gt; Example List &lt;/head&gt;
+  <b>&lt;item&gt; This is the first item  &lt;/item&gt;</b>
+  <b>&lt;item&gt; This is the second item with &lt;hi ...&gt;highlighted text&lt;/hi&gt;, &lt;xref ...&gt; a link&lt;/xref&gt; and an &lt;figure ...&gt;image&lt;/figure&gt;.&lt;/item&gt;</b>
+  ...
+  &lt;list n="list-example2" id="XMLExample.list.list-example2"&gt;
+    &lt;head&gt; Example List &lt;/head&gt;
+    &lt;label&gt;ITEM ONE:&lt;/label&gt;
+    <b>&lt;item&gt; This is the first item  &lt;/item&gt;</b>
+    &lt;label&gt;ITEM TWO:&lt;/label&gt;
+    <b>&lt;item&gt; This is the second item with &lt;hi ...&gt;highlighted text&lt;/hi&gt;, &lt;xref ...&gt; a link&lt;/xref&gt; and an &lt;figure ...&gt;image&lt;/figure&gt;.&lt;/item&gt;</b>
+    &lt;label&gt;ITEM THREE:&lt;/label&gt;
+    <b>&lt;item&gt; This is the third item with a &lt;field ...&gt; ... &lt;/field&gt; &lt;/item&gt;</b>
+    ...
+  &lt;/list&gt;
+  <b>&lt;item&gt; This is the third item in the list &lt;/item&gt;</b>
+  ...
+&lt;/list&gt;</pre>
+      </div>
+    </div>
+<!--end of item element-->
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:label">label</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Text Container">Text Container</a></span>
+        <span class="def"><a href="#type:Structural Element">Structural Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The <code>label</code> element is associated with an item and annotates that item with a number, a textual description of some sort, or a simple bullet.</p>        
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:item">item</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def">none</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>
+        	<dt>id</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A unique identifier of the element</dd>
+        	<dt>n</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A local identifier used to differentiate the element from its siblings</dd>  
+          <dt>rend</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">An optional rend attribute provides a hint on how the label should be rendered, independent of its type.</dd>      
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;list n="list-example" id="XMLExample.list.list-example"&gt;
+  &lt;head&gt;Example List&lt;/head&gt;
+  <b>&lt;label&gt;1&lt;/label&gt;</b>
+  &lt;item&gt; This is the first item  &lt;/item&gt;
+  <b>&lt;label&gt;2&lt;/label&gt;</b>
+  &lt;item&gt; This is the second item with &lt;hi ...&gt;highlighted text&lt;/hi&gt;, &lt;xref ...&gt; a link&lt;/xref&gt; and an &lt;figure ...&gt;image&lt;/figure&gt;.&lt;/item&gt;
+  ...
+  &lt;list n="list-example2" id="XMLExample.list.list-example2"&gt;
+    &lt;head&gt;Example Sublist&lt;/head&gt;
+    <b>&lt;label&gt;ITEM ONE:&lt;/label&gt;</b>
+    &lt;item&gt; This is the first item  &lt;/item&gt;
+    <b>&lt;label&gt;ITEM TWO:&lt;/label&gt;</b>
+    &lt;item&gt; This is the second item with &lt;hi ...&gt;highlighted text&lt;/hi&gt;, &lt;xref ...&gt; a link&lt;/xref&gt; and an &lt;figure ...&gt;image&lt;/figure&gt;.&lt;/item&gt;
+    <b>&lt;label&gt;ITEM THREE:&lt;/label&gt;</b>
+    &lt;item&gt; This is the third item with a &lt;field ...&gt; ... &lt;/field&gt; &lt;/item&gt;
+    ...
+  &lt;/list&gt;
+  &lt;item&gt; This is the third item in the list &lt;/item&gt;
+  ...
+&lt;/list&gt;</pre>
+      </div>
+    </div>
+<!--end of label element-->
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:list">list</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Structural Element">Structural Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The <code>list</code> element is used to display sets of sequential data. It contains an optional <code>head</code> element, as well as any number of <code>item</code> and <code>list</code> elements. <code>Items</code> contain textual information, while sublists contain other <code>item</code> or <code>list</code> elements. An <code>item</code> can also be associated with a <code>label</code> element that annotates an item with a number, a textual description of some sort, or a simple bullet. The list type (ordered, bulleted, gloss, etc.) is then determined either by the content of <code>labels</code> on <code>items</code> or by an explicit value of the <em>type</em> attribute. Note that if <code>labels</code> are used in conjunction with any <code>items</code> in a list, all of the <code>items</code> in that list must have a <code>label</code>. It is also recommended to avoid mixing <code>label</code> styles unless an explicit type is specified.</p>        
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:div">div</a></span>
+        <span class="def"><a href="#element:list">list</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def"><a href="#element:head">head</a> (zero or one)</span>
+        <span class="def"><a href="#element:label">label</a> (any)</span>
+        <span class="def"><a href="#element:item">item</a> (any)</span>
+        <span class="def"><a href="#element:list">list</a> (any)</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>
+        	<dt>id</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">A unique identifier of the element</dd>
+        	<dt>n</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">A local identifier used to differentiate the element from its siblings</dd>  
+          <dt>rend</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">An optional rend attribute provides a hint on how the list should be rendered, independent of its type. Common values are but not limited to:
+          	
+          	<dl class="element-controlled-vocabulary">
+              <dt>alphabet</dt>
+              <dd>The list should be rendered as an alphabetical index</dd>
+              <dt>columns</dt>
+              <dd>The list should be rendered in equal length columns as determined by the theme.</dd>
+              <dt>columns2</dt>
+              <dd>The list should be rendered in two equal columns.</dd>
+            	<dt>columns3</dt>
+              <dd>The list should be rendered in three equal columns.</dd>
+              <dt>horizontal</dt>
+              <dd>The list should be rendered horizontally.</dd>
+              <dt>numeric</dt>
+              <dd>The list should be rendered as a numeric index.</dd>
+              <dt>vertical</dt>
+              <dd>The list should be rendered vertically.</dd>
+            </dl>
+          
+          </dd>
+          <dt>type</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">An optional attribute to explicitly specify the type of list. In the absence of this attribute, the type of a list will be inferred from the presence and content of labels on its items. Accepted values are: 
+            
+            <dl class="element-controlled-vocabulary">
+              <dt>form</dt>
+              <dd>Used for form lists that consist of a series of fields.</dd>
+              <dt>bulleted</dt>
+              <dd>Used for lists with bullet-marked items.</dd>
+              <dt>gloss</dt>
+              <dd>Used for lists consisting of a set of technical terms, each marked with a <code>label</code> element and accompanied by the definition marked as an <code>item</code> element.</dd>
+            	<dt>ordered</dt>
+              <dd>Used for lists with numbered or lettered items.</dd>
+              <dt>progress</dt>
+              <dd>Used for lists consisting of a set of steps currently being performed to accomplish a task. For this type to apply, each <code>item</code> in the list should represent a step and be accompanied by a <code>label</code> that contains the displayable name for the step. The <code>item</code> contains an <code>xref</code> that references the step. Also the <em>rend</em> attribute on the <code>item</code> element should be: ìavailableî (meaning the user may jump to the step using the provided <code>xref</code>), ìunavailableî (the user has not meet the requirements to jump to the step), or ìcurrentî (the user is currently on the step)</dd>
+              <dt>simple</dt>
+              <dd>Used for lists with items not marked with numbers or bullets.</dd>
+            </dl>   
+                     
+          </dd>
+
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;div ...&gt;
+  ...
+  <b>&lt;list n="list-example" id="XMLExample.list.list-example"&gt;</b>
+    &lt;head&gt;Example List&lt;/head&gt;
+    &lt;item&gt; ... &lt;/item&gt;
+    &lt;item&gt; ... &lt;/item&gt;
+    ...
+    <b>&lt;list n="list-example2" id="XMLExample.list.list-example2"&gt;</b>
+      &lt;head&gt;Example Sublist&lt;/head&gt;
+      &lt;label&gt; ... &lt;/label&gt;
+      &lt;item&gt; ... &lt;/item&gt;
+      &lt;label&gt; ... &lt;/label&gt;
+      &lt;item&gt; ... &lt;/item&gt;
+      &lt;label&gt; ... &lt;/label&gt;
+      &lt;item&gt; ... &lt;/item&gt;
+      ...
+    <b>&lt;/list&gt;</b>
+    &lt;label&gt; ... &lt;/label&gt;
+    &lt;item&gt; ... &lt;/item&gt;
+    ...
+  <b>&lt;/list&gt;</b>
+&lt;/div&gt;</pre>
+      </div>
+    </div>
+<!--end of list element-->
+
+    <div class="element">
+    
+    	<h3 class="element-name">
+    		<a name="element:meta">META</a>
+    	</h3>
+    	
+    	<div class="element-type">
+    		<span class="def"><a href="#type:Top-Level Container">Top-Level Container</a></span>
+    	</div>
+    	
+    	<div class="element-descsription">
+    		<p>The <code>meta</code> element is a top level element and exists directly inside the <code>document</code> element. It serves as a container element for all metadata associated with a document broken up into categories according to the type of metadata they carry.</p>
+    	</div>
+    
+    	<div class="element-parents">
+    		<span class="term">Parent</span>
+    		<span class="def"><a href="#element:document">document</a></span>
+    	</div>
+    	
+    	<div class="element-children">
+        <span class="term">Children</span>
+        <span class="def"><a href="#element:userMeta">userMeta</a> (one)</span>
+        <span class="def"><a href="#element:pageMeta">pageMeta</a> (one)</span>
+        <span class="def"><a href="#element:repositoryMeta">repositoryMeta</a> (one)</span>
+      </div>
+    	
+    	<div class="element-attributes">
+        <span class="term">Attributes</span>
+        <span class="def">None</span>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;document version=1.0&gt;
+  <b>&lt;meta&gt;</b>
+    &lt;userMeta&gt; ... &lt;/userMeta&gt;
+    &lt;pageMeta&gt; ... &lt;/pageMeta&gt;
+    &lt;repositoryMeta&gt; ... &lt;/repositoryMeta&gt;
+  <b>&lt;/meta&gt;</b>
+  &lt;body&gt; ... &lt;/body&gt;
+  &lt;options&gt; ... &lt;/options&gt;
+&lt;/document&gt;
+</pre>
+      </div>    	
+  	</div>
+<!--end of META element-->
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:metadata">metadata</a>
+      </h3>      
+      
+      <div class="element-type">
+      	<span class="def"><a href="#type:Text Container">Text Container</a></span>
+        <span class="def"><a href="#type:Structural Element">Structural Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The <code>metadata</code> element carries generic metadata information in the form on an attribute-value pair. The type of information it contains is determined by two attributes: <em>element</em>, which specifies the general type of metadata stored, and an optional <em>qualifier</em> attribute that narrows the type down. The standard representation for this pairing is element.qualifier. The actual metadata is contained in the text of the tag itself. Additionally, a <em>language</em> attribute can be used to specify the language used for the metadata entry. </p>        
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:userMeta">userMeta</a></span>
+        <span class="def"><a href="#element:pageMeta">pageMeta</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def">none</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>
+        	<dt>element</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">The name of a metadata field.</dd>  
+          <dt>language</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">An optional attribute to specify the language used in the metadata tag.</dd>
+          <dt>qualifier</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">An optional postfix to the field name used to further differentiate the names.</dd>  
+        
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;meta&gt;
+  &lt;userMeta&gt;
+    <b>&lt;metadata element="identifier" qualifier="firstName"&gt; Bob &lt;/metadata&gt;</b>
+    <b>&lt;metadata element="identifier" qualifier="lastName"&gt; Jones &lt;/metadata&gt;</b>
+    <b>&lt;metadata ...&gt; ... &lt;/metadata&gt;</b>
+    ...
+  &lt;/userMeta&gt;
+  &lt;pageMeta&gt;
+    <b>&lt;metadata element="rights" qualifier="accessRights"&gt;user&lt;/metadata&gt;</b>
+    <b>&lt;metadata ...&gt; ... &lt;/metadata&gt;</b>
+    ...
+  &lt;/pageMeta&gt;
+&lt;/meta&gt;</pre>
+      </div>
+    </div>
+<!--end of metadata element-->
+
+    <div class="element">
+    
+    	<h3 class="element-name">
+    		<a name="element:options">OPTIONS</a>
+    	</h3>
+    	
+    	<div class="element-type">
+    		<span class="def"><a href="#type:Top-Level Container">Top-Level Container</a></span>
+    	</div>
+    	
+    	<div class="element-descsription">
+    		<p>The <code>options</code> element is the main container for all actions and navigation options available to the user. It consists of any number of <code>list</code> elements whose items contain navigation information and actions. While any list of navigational options may be contained in this element, it is suggested that at least the following 5 lists be included.</p>   		
+    	</div>
+    
+    	<div class="element-parents">
+    		<span class="term">Parent</span>
+    		<span class="def"><a href="#element:document">document</a></span>
+    	</div>
+    	
+    	<div class="element-children">
+        <span class="term">Children</span>
+        <span class="def"><a href="#element:list">list</a> (any)</span>
+      </div>
+    	
+    	<div class="element-attributes">
+        <span class="term">Attributes</span>
+        <span class="def">None</span>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;document version=1.0&gt;
+
+    &lt;meta&gt; Ö &lt;/meta&gt;
+
+    &lt;body&gt; Ö &lt;/body&gt;
+
+    <b>&lt;options&gt;</b>
+
+        &lt;list n="navigation-example1" id="XMLExample.list.navigation-example1"&gt;
+
+            &lt;head&gt;Example Navigation List 1&lt;/head&gt;
+
+            &lt;item&gt;&lt;xref target="/link/to/option"&gt;Option One&lt;/xref&gt;&lt;/item&gt;
+
+            &lt;item&gt;&lt;xref target="/link/to/option"&gt;Option two&lt;/xref&gt;&lt;/item&gt;
+
+           	...
+
+        &lt;/list&gt;
+
+        &lt;list n="navigation-example2" id="XMLExample.list.navigation-example2"&gt;
+
+            &lt;head&gt;Example Navigation List 2&lt;/head&gt;
+
+            &lt;item&gt;&lt;xref target="/link/to/option"&gt;Option One&lt;/xref&gt;&lt;/item&gt;
+
+            &lt;item&gt;&lt;xref target="/link/to/option"&gt;Option two&lt;/xref&gt;&lt;/item&gt;
+
+            ...
+
+        &lt;/list&gt;
+
+        ...
+
+    <b>&lt;/options&gt;</b>
+
+&lt;/document&gt;</pre>
+      </div>    	
+  	</div>
+<!--end of OPTIONS element-->
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:p">p</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Rich Text Container">Rich Text Container</a></span>
+        <span class="def"><a href="#type:Structural Element">Structural Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The <code>p</code> element is a rich text container used by <code>divs</code> to display textual data in a paragraph format. As a rich text container it can contain hyperlinks, emphasized blocks of text, images and form fields in addition to plain text.  </p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:div">div</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def"><a href="#element:hi">hi</a> (any)</span>
+        <span class="def"><a href="#element:xref">xref</a> (any)</span>
+        <span class="def"><a href="#element:figure">figure</a> (any)</span>
+        <span class="def"><a href="#element:field">field</a> (any)</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>        
+          <dt>id</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A unique identifier of the element.</dd>
+          <dt>n</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A local identifier used to differentiate the element from its siblings.</dd>          
+          <dt>rend</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A rendering hint used to override the default display of the element.</dd> 
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;div n="division-example" id="XMLExample.div.division-example"&gt;
+
+    <b>&lt;p&gt; This is a regular paragraph. &lt;/p&gt;</b>
+
+    <b>&lt;p&gt; This text is normal, while &lt;hi rend="bold"&gt;this text is bold and this  
+
+      text is &lt;hi rend="italic"&gt;bold and italic.&lt;/hi&gt;&lt;/hi&gt; 
+
+    &lt;/p&gt;</b>
+
+    <b>&lt;p&gt; This paragraph contains a &lt;xref target="/link/target"&gt;link&lt;/xref&gt;, a  
+
+      static &lt;figure source="/image.jpg"&gt;image&lt;/figure>, and a &lt;figure target=
+
+      "/link/target" source="/image.jpg"&gt;image link.&lt;/figure&gt;
+
+    &lt;/p&gt;</b>
+
+&lt;/div&gt;</pre>
+      </div>
+    </div>
+<!--end of p element-->
+
+    <div class="element">
+    
+    	<h3 class="element-name">
+    		<a name="element:pageMeta">pageMeta</a>
+    	</h3>
+    	
+    	<div class="element-type">
+    		<span class="def"><a href="#type:Metadata Element">Metadata Element</a></span>
+    	</div>
+    	
+    	<div class="element-descsription">
+    		<p>The <code>pageMeta</code> element contains metadata associated with the document itself. It contains generic <code>metadata</code> elements to carry the content, and any number of <code>trail</code> elements to provide information on the userís current location in the system. Required and suggested values for <code>metadata</code> elements contained in <code>pageMeta</code> include but are not limited to: 
+    			<ul>
+    				<li>browser (suggested): The userís browsing agent as reported to server in the HTTP request.</li>
+
+						<li>browser.type (suggested): The general browser family as derived form the browser metadata field. Possible values may include "MSIE" (for Microsoft Internet Explorer), "Opera" (for the Opera browser), "Apple" (for Apple web kit based browsers), "Gecko" (for Netscape, Mozilla, and Firefox based browsers), or "Lynx" (for text based browsers).</li>
+
+						<li>browser.version (suggested): The browser version as reported by HTTP Request.</li>
+
+						<li>contextPath (required): The base URL of the Digital Repository system.</li>
+
+						<li>redirect.time (suggested): The time that must elapse before the page is redirected to an address specified by the redirect.url <code>metadata</code> element. </li>
+
+						<li>redirect.url (suggested): The URL destination of a redirect page</li>
+
+						<li>title (required): The title of the document/page that the user currently browsing. </li>
+    		  </ul>
+    			See the <code>metadata</code> and <code>trail</code> tag entries for more information on their structure.
+    		</p>   		
+    	</div>
+    
+    	<div class="element-parents">
+    		<span class="term">Parent</span>
+    		<span class="def"><a href="#element:meta">meta</a></span>
+    	</div>
+    	
+    	<div class="element-children">
+        <span class="term">Children</span>
+        <span class="def"><a href="#element:metadata">metadata</a> (any)</span>
+        <span class="def"><a href="#element:trail">trail</a> (any)</span>
+      </div>
+    	
+    	<div class="element-attributes">
+        <span class="term">Attributes</span>
+        <span class="def">None</span>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;meta&gt;
+
+    &lt;userMeta&gt; ... &lt;/userMeta&gt;
+
+    <b>&lt;pageMeta&gt;</b>
+
+        &lt;metadata element="title"&gt;Examlpe DRI page&lt;/metadata&gt;
+
+        &lt;metadata element="contextPath"&gt;/xmlui/&lt;/metadata&gt;
+
+        &lt;metadata ...&gt; ... &lt;/metadata&gt;
+
+        ...
+
+        &lt;trail source="123456789/6"&gt; A bread crumb item &lt;/trail&gt;
+
+        &lt;trail ...&gt; ... &lt;/trail&gt;
+
+        ...
+
+    <b>&lt;/pageMeta&gt;</b>
+
+&lt;/meta&gt;</pre>
+      </div>    	
+  	</div>
+<!--end of pageMeta element-->    
+    
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:params">params</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Structural Component">Structural Component</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The <code>params</code> element identifies extra parameters used to build a form field. There are several attributes that may be available for this element depending on the field type.</p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:field">field</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def">none</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>
+        	<dt>cols</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">The default number of columns that the text area should span. This applies only to textarea field types.</dd>
+          <dt>maxlength</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">The maximum length that the theme should accept for form input. This applies to text and password field types.</dd>
+          <dt>multiple</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">yes/no value. Determine if the field can accept multiple values for the field. This applies only to select lists.</dd>          
+          <dt>operations</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">
+          <p>The possible operations that may be preformed on this field. The possible values are "add" and/or "delete". If both operations are possible then they should be provided as a space separated list.</p>
+          <p>The "add" operations indicates that there may be multiple values for this field and the user may add to the set one at a time. The front-end should render a button that enables the user to add more fields to the set. The button must be named the field name appended with the string "_add", thus if the fieldís name is "firstName" the button must be called "firstName_add".</p>
+        	<p>The "delete" operation indicates that there may be multiple values for this field each of which may be removed from the set. The front-end should render a checkbox by each field value, except for the first, The checkbox must be named the field name appended with the string "_selected", thus if the fieldís name is "firstName" the checkbox must be called "firstName_selected" and the value of each successive checkbox should be the field name. The front-end must also render a delete button. The delete button name must be the fieldís name appended with the string "_delete".</p>
+          </dd>
+          <dt>rows</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">The default number of rows that the text area should span. This applies only to textarea field types.</dd> 
+          <dt>size</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">The default size for a field. This applies to text, password, and select field types.</dd>          
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;p&gt;
+
+    &lt;field id="XMLExample.field.name" n="name" type="text" required="yes"&gt;
+
+        <b>&lt;params size="16" maxlength="32"/&gt;</b>
+
+        &lt;help&gt;Some help text with &lt;i18n&gt;localized content&lt;/i18n&gt;.&lt;/help&gt;
+
+        &lt;default&gt;Default value goes here&lt;/default&gt;
+
+    &lt;/field&gt;
+
+&lt;/p&gt;</pre>
+      </div>
+    </div>
+<!--end of params element-->
+
+      <div class="element">
+        
+        <h3 class="element-name">
+          <a name="element:refrence">refrence</a>
+        </h3>
+        
+        <div class="element-type">
+          <span class="def"><a href="#type:Metadata Reference Element">Metadata Reference Element</a></span>
+        </div>
+        
+        <div class="element-descsription">
+          <p><code>refrence</code> is a reference element used to access information stored in an extarnal metadata file. The <em>url</em> attribute is used to locate the external metadata file. The <em>type</em> attribute provides a short limited description of the referenced object's type. </p>
+          <p><code>refrence</code> elements can be both contained by <code>includeSet</code> elements and contain <code>includeSets</code> themselves, making the structure recursive.</p>
+        </div>
+        
+        <div class="element-parents">
+          <span class="term">Parent</span>
+          <span class="def"><a href="#element:referenceSet">referenceSet</a></span>
+        </div>
+        
+        <div class="element-children">
+          <span class="term">Children</span>
+          <span class="def"><a href="#element:referenceSet">referenceSet</a> (zero or more)</span>
+        </div>
+        
+        <div class="element-attributes">
+          <span class="term">Attributes</span>
+          <dl>        
+            <dt>url</dt>
+            <dd class="element-attribute-selection">required</dd>
+            <dd class="element-attribute-description">A url to the external metadata file.</dd>        
+            <dt>repositoryIdentifier</dt>
+            <dd class="element-attribute-selection">required</dd>
+            <dd class="element-attribute-description">A reference to the repositoryIdentifier of the repository.</dd>   
+            <dt>type</dt>
+            <dd class="element-attribute-selection">optional</dd>
+            <dd class="element-attribute-description">Description of the refrence object's type.</dd>    
+          </dl>
+        </div>
+        
+        <div class="element-example">
+          <pre>
+            &lt;includeSet n="browse-list" id="XMLTest.includeSet.browse-list"&gt;
+            <b>&lt;refrence url="/metadata/handle/123/4/mets.xml" repositoryID="123" type="DSpace Item"/&gt;</b>
+            <b>&lt;refrence url="/metadata/handle/123/5/mets.xml" repositoryID="123" /&gt;</b>
+            ...
+            &lt;/includeSet&gt;
+          </pre>
+        </div>    	
+      </div>
+      <!--end of objectInlcude element-->
+      
+      <div class="element">
+        
+        <h3 class="element-name">
+          <a name="element:referenceSet">referenceSet</a>
+        </h3>      
+        
+        <div class="element-type">
+          <span class="def"><a href="#type:Metadata Reference Element">Metadata Reference Element</a></span>
+        </div>
+        
+        <div class="element-description">
+          <p>The <code>referenceSet</code> element is a container of artifact or repository references.</p>
+        </div>
+        
+        <div class="element-parents">
+          <span class="term">Parent</span>
+          <span class="def"><a href="#element:div">div</a></span>
+          <span class="def"><a href="#element:refrence">refrence</a></span>
+        </div>
+        
+        <div class="element-children">
+          <span class="term">Children</span>
+          <span class="def"><a href="#element:head">head</a> (zero or one)</span>
+          <span class="def"><a href="#element:refrence">refrence</a> (any)</span>
+        </div>
+        
+        <div class="element-attributes">
+          <span class="term">Attributes</span>
+          <dl>
+            <dt>id</dt>
+            <dd class="element-attribute-selection">required</dd>
+            <dd class="element-attribute-description">A unique identifier of the element</dd> 
+            <dt>n</dt>
+            <dd class="element-attribute-selection">required</dd>
+            <dd class="element-attribute-description">Local identifier used to differentiate the element from its siblings</dd>  
+            <dt>orderBy</dt>
+            <dd class="element-attribute-selection">optional</dd>
+            <dd class="element-attribute-description">A reference to the metadata field that determines the ordering of artifacts or repository objects within the set. When the Dublin Core metadata scheme is used  this attribute should be the element.qualifier value that the set is sorted by. As an example, for a browse by title list, the value should be sortedBy=title, while for browse by date list it should be sortedBy=date.created</dd>
+            <dt>rend</dt>
+            <dd class="element-attribute-selection">optional</dd>
+            <dd class="element-attribute-description">A rendering hint used to override the default display of the element.</dd>
+            <dt>type</dt>
+            <dd class="element-attribute-selection">required</dd>
+            <dd class="element-attribute-description">Determines the level of detail for the given metadata. Accepted values are: 
+              
+              <dl class="element-controlled-vocabulary">
+                <dt>summaryList</dt>
+                <dd>Indicates that the metadata from referenced artifacts or repository objects should be used to build a list representation that is suitable for quick scanning.</dd>
+                <dt>summaryView</dt>
+                <dd>Indicates that the metadata from referenced artifacts or repository objects should be used to build a partial view of the referenced object or objects.</dd>
+                <dt>detailList</dt>
+                <dd>Indicates that the metadata from referenced artifacts or repository objects should be used to build a list representation that provides a complete, or near complete, view of the referenced objects. Whether such a view is possible or different from summaryView depends largely on the repository at hand and the implementing theme.</dd>
+                <dt>detailView</dt>
+                <dd>Indicates that the metadata from referenced artifacts or repository objects should be used to display complete information about the referenced object. Rendering of several references included under this type is up to the theme.</dd>
+              </dl>            
+            </dd>           
+          </dl>
+        </div>
+        
+        <div class="element-example">
+          <pre>
+            &lt;div ...&gt;
+            &lt;head&gt; Example Division &lt;/head&gt;
+            &lt;p&gt; ... &lt;/p&gt;
+            &lt;table&gt; ... &lt;/table&gt;
+            &lt;list&gt;
+            ...
+            &lt;/list&gt;
+            <b>&lt;referenceSet n="browse-list" id="XMLTest.referenceSet.browse-list" type="summaryView" informationModel="DSpace"&gt;</b>
+            &lt;head&gt;A header for the includeset&lt;/head&gt;
+            &lt;refrence url="/metadata/handle/123/34/mets.xml"/&gt;
+            &lt;refrence url=""metadata/handle/123/34/mets.xml/&gt;
+            <b>&lt;/referenceSet&gt;</b>
+            ...
+            &lt;/p&gt;</pre>
+        </div>
+      </div>
+      <!--end of referenceSet element-->
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:repository">repository</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Metadata Element">Metadata Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The <code>repository</code> element is used to describe the repository. Its principal component is a set of structural metadata that carrier information on how the repositoryís objects under <code>objectMeta</code> are related to each other. The principal method of encoding these relationships at the time of this writing is a METS document, although other formats, like RDF, may be employed in the future.</p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:repositoryMeta">repositoryMeta</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def">none</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>        
+          <dt>repositoryID</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">A unique identifier assigned to a repository. It is referenced by the <code>object</code> element to signify the repository that assigned its identifier. </dd>          
+          <dt>url</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">A url to the external METS metadata file for the repository.</dd>
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;repositoryMeta&gt;
+
+    <b>&lt;repository repositoryID="123456789" url="/metadata/handle/1234/4/mets.xml" /&gt;</b>
+
+&lt;/repositoryMeta&gt;</pre>
+      </div>
+    </div>
+<!--end of repository-->
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:repositoryMeta">repositoryMeta</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Metadata Element">Metadata Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The <code>repositoryMeta</code> element contains metadata refernces about the repositories used in the used or refrenced in the documnet. It can contain any number of <code>repository</code> elements.</p>
+        <p>See the <code>repository</code> tag entry for more information on the structure of <code>repository</code> elements.</p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:Meta">Meta</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def"><a href="#element:repository">repository</a> (any)</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <span class="def">None</span>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;meta&gt;
+
+  &lt;userMeta&gt; ... &lt;/usermeta&gt;
+
+  &lt;pageMeta&gt; ... &lt;/pageMeta&gt;
+
+    <b>&lt;repositoryMeta&gt;</b>
+
+        &lt;repository repositoryIID="..." url="..." /&gt;
+
+    <b>&lt;/repositoryMeta&gt;</b>
+
+&lt;/meta&gt;</pre>
+      </div>
+    </div>
+<!--end of repositoryMeta element-->
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:row">row</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Structural Element">Structural Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The row element is contained inside a <code>table</code> and serves as a container of <code>cell</code> elements. A required <em>role</em> attribute determines how the row and its cells are rendered.</p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:table">table</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def"><a href="#element:cell">cell</a> (any)</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>        
+          <dt>id</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A unique identifier of the element </dd>
+          <dt>n</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A local identifier used to differentiate the element from its siblings</dd>          
+					<dt>rend</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A rendering hint used to override the default display of the element.</dd>
+          <dt>role</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">Indicates what kind of information the row carries. Possible values include "header" and "data".</dd>          
+          
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;table n="table-example" id="XMLExample.table.table-example" rows="2" cols="3"&gt;
+
+    <b>&lt;row role="head"&gt;</b>
+
+      &lt;cell cols="2"&gt;Data Label One and Two&lt;/cell&gt;
+
+        &lt;cell&gt;Data Label Three&lt;/cell&gt;
+
+        ...
+
+    <b>&lt;/row&gt;
+
+    &lt;row&gt;</b>
+
+      &lt;cell&gt; Value One &lt;/cell&gt;
+
+      &lt;cell&gt; Value Two &lt;/cell&gt;
+
+      &lt;cell&gt; Value Three &lt;/cell&gt;
+
+      ...
+
+    <b>&lt;/row&gt;</b>
+
+    ...
+
+&lt;/table&gt;</pre>
+      </div>
+    </div>
+<!--end of row element-->
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:table">table</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Structural Element">Structural Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The <code>table<code> element is a container for information presented in tabular format. It consists of a set of <code>row</code> elements and an optional <code>header</code>.</p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:div">div</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def"><a href="#element:head">head</a> (zero or one)</span>
+        <span class="def"><a href="#element:row">row</a> (any)</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>        
+          <dt>cols</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">The number of columns in the table.</dd>
+          <dt>id</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">A unique identifier of the element </dd>
+          <dt>n</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">A local identifier used to differentiate the element from its siblings</dd>          
+          <dt>rend</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A rendering hint used to override the default display of the element.</dd>
+          <dt>rows</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">The number of rows in the table.</dd>
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;div n="division-example" id="XMLExample.div.division-example"&gt;
+
+    <b>&lt;table n="table1" id="XMLExample.table.table1" rows="2" cols="3"&gt;</b>
+
+        &lt;row role="head"&gt;
+
+          &lt;cell cols="2"&gt;Data Label One and Two&lt;/cell&gt;
+
+            &lt;cell&gt;Data Label Three&lt;/cell&gt;
+
+            ...
+
+        &lt;/row&gt;
+
+        &lt;row&gt;
+
+          &lt;cell&gt; Value One &lt;/cell&gt;
+
+          &lt;cell&gt; Value Two &lt;/cell&gt;
+
+          &lt;cell&gt; Value Three &lt;/cell&gt;
+
+          ...
+
+        &lt;/row&gt;
+
+        ...
+
+    <b>&lt;/table&gt;</b>
+    ...
+&lt;/div&gt;</pre>
+      </div>
+    </div>
+<!--end of table element-->
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:trail">trail</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Text Container">Text Container</a></span>
+        <span class="def"><a href="#type:Metadata Element">Metadata Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The <code>trail</code> element carries information about the userís current location in the system relative of the repositoryís root page. Each instance of the element serves as one link in the path from the root to the current page.</p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:pageMeta">pageMeta</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def">none</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>        
+          <dt>rend</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">A rendering hint used to override the default display of the element.</dd>
+          <dt>target</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description"> An optional attribute to specify a target URL for a trail element serving as a hyperlink. The text inside the element will be used as the text of the link.</dd>           
+          
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;pageMeta&gt;
+
+    &lt;metadata element="title">Examlpe DRI page&lt;/metadata&gt;
+
+    &lt;metadata element="contextPath">/xmlui/&lt;/metadata&gt;
+
+    &lt;metadata ...&gt; ... &lt;/metadata&gt;
+
+    ...
+
+    <b>&lt;trail target="/myDSpace"> A bread crumb item pointing to a page. &lt;/trail&gt;
+
+    &lt;trail ...&gt; ... &lt;/trail&gt;</b>
+
+    ...
+
+&lt;/pageMeta&gt;</pre>
+      </div>
+    </div>
+<!--end of trail element-->
+
+    <div class="element">
+    
+    	<h3 class="element-name">
+    		<a name="element:userMeta">userMeta</a>
+    	</h3>
+    	
+    	<div class="element-type">
+    		<span class="def"><a href="#type:Metadata Element">Metadata Element</a></span>
+    	</div>
+    	
+    	<div class="element-descsription">
+    		<p>The <code>userMeta</code> element contains metadata associated with the user that requested the document. It contains generic <code>metadata</code> elements, which in turn carry the information. Required and suggested values for <code>metadata<code> elements contained in <code>userMeta</code> include but not limited to:  
+    			<ul>
+    				<li>identifier (suggested): A unique identifier associated with the user. </li>
+
+						<li>identifier.email (suggested): The requesting userís email address.</li>
+
+						<li>identifier.firstName (suggested): The requesting userís first name.</li>
+
+						<li>identifier.lastName (suggested): The requesting userís last name.</li>
+
+						<li>identifier.logoutURL (suggested): The URL that a user will be taken to when logging out.</li>
+
+						<li>identifier.url (suggested): A url reference to the userís page within the repository.</li>
+
+						<li>language.RFC3066 (suggested): The requesting userís preferred language selection code as describe by RFC3066</li>
+						<li>rights.accessRights (required): Determines the scope of actions that a user can perform in the system. Accepted values are:
+							<ul>
+								<li>none: The user is either not authenticated or does not have a valid account on the system</li>
+
+								<li>user: The user is authenticated and has a valid account on the system</li>
+
+								<li>admin: The user is authenticated and belongs to the systemís administrative group</li>
+							</ul>
+						</li>
+    		  </ul>
+    			See the <code>metadata</code> tag entry for more information on the structure of <code>metadata</code> elements.
+    		</p>   		
+    	</div>
+    
+    	<div class="element-parents">
+    		<span class="term">Parent</span>
+    		<span class="def"><a href="#element:meta">meta</a></span>
+    	</div>
+    	
+    	<div class="element-children">
+        <span class="term">Children</span>
+        <span class="def"><a href="#element:metadata">metadata</a> (any)</span>
+      </div>
+    	
+    	<div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>        
+          <dt>authenticated</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">Accepted values are "yes", "no". Determines whether the user has been authenticated by the system.</dd>           
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;meta&gt;
+
+    <b>&lt;userMeta&gt;</b>
+
+        &lt;metadata element="identifier" qualifier="email"&gt; 
+
+           bobJones@tamu.edu
+
+        &lt;/metadata&gt;
+
+        &lt;metadata element="identifier" qualifier="firstName"&gt; Bob &lt;/metadata&gt;
+
+        &lt;metadata element="identifier" qualifier="lastName"&gt; Jones &lt;/metadata&gt;
+
+        &lt;metadata element="rights" qualifier="accessRights"&gt;user&lt;/metadata&gt;
+
+        &lt;metadata ...&gt; ... &lt;/metadata&gt;
+
+        ...
+
+        &lt;trail source="123456789/6"&gt; A bread crumb item &lt;/trail&gt;
+
+        &lt;trail ...&gt; ... &lt;/trail&gt;
+
+        ...
+
+    <b>&lt;/userMeta&gt;</b>
+
+    &lt;pageMeta&gt; ... &lt;/pageMeta&gt;
+
+&lt;/meta&gt;</pre>
+      </div>    	
+  	</div>
+<!--end of userMeta element-->
+    
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:value">value</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Rich Text Container">Rich Text Container</a></span>
+        <span class="def"><a href="#type:Structural Element">Structural Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The value element contains the value associated with a form field and can serve a different purpose for various field types. The value element is comprised of two subelements: the raw element which stores the unprocessed value directly from the user of other source, and the interpreted element which stores the value in a format appropriate for display to the user, possibly including rich text markup.</p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:field">field</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def"><a href="#element:hi">hi</a> (any)</span>
+        <span class="def"><a href="#element:xref">xref</a> (any)</span>
+        <span class="def"><a href="#element:figure">figure</a> (any)</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>          
+          <dt>optionSelected</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">An optional attribute for select, checkbox, and radio fields to determine if the value is to be selected or not.</dd>
+          
+          <dt>optionValue</dt>
+          <dd class="element-attribute-selection">optional</dd>
+          <dd class="element-attribute-description">An optional attribute for select, checkbox, and radio fields to determine the value that should be returned when this value is selected.</dd>      
+        	<dt>type</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">A required attribute to specify the type of value. Accepted types are: 
+            
+            <dl class="element-controlled-vocabulary">
+              <dt>raw</dt>
+              <dd>The raw type stores the unprocessed value directly from the user of other source.</dd>
+              <dt>interpreted</dt>
+              <dd>The interpreted type stores the value in a format appropriate for display to the user, possibly including rich text markup.</dd>
+              <dt>default</dt>
+              <dd>The default type stores a value supplied by the system, used when no other values are provided.</dd>
+            </dl>
+            
+          </dd>
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;p&gt;
+  &lt;hi&gt; ... &lt;/hi&gt;
+  &lt;xref&gt; ... &lt;/xref&gt;
+  &lt;figure&gt; ... &lt;/figure&gt;
+  &lt;field id="XMLExample.field.name" n="name" type="text" required="yes"&gt;
+    &lt;params size="16" maxlength="32"/&gt;
+    &lt;help&gt;Some help text with &lt;i18n&gt;localized content&lt;/i18n&gt;.&lt;/help&gt;
+    <b>&lt;value type="default"&gt;Author, John&lt;/value&gt;</b>
+  &lt;/field&gt; 
+&lt;/p&gt;
+        </pre>
+      </div>
+    </div>
+<!--end of value element-->
+
+    <div class="element">
+      
+      <h3 class="element-name">
+        <a name="element:xref">xref</a>
+      </h3>      
+      
+      <div class="element-type">
+        <span class="def"><a href="#type:Text Container">Text Container</a></span>
+        <span class="def"><a href="#type:Structural Element">Structural Element</a></span>
+      </div>
+      
+      <div class="element-description">
+        <p>The <code>xref</code> element is a reference to an external document. It can be mixed freely with text, and any text within the tag itself will be used as part of the linkís visual body.</p>
+      </div>
+      
+      <div class="element-parents">
+        <span class="term">Parent</span>
+        <span class="def"><a href="#element:cell">cell</a></span>
+        <span class="def"><a href="#element:p">p</a></span>
+        <span class="def"><a href="#element:item">item</a></span>
+        <span class="def"><a href="#element:hi">hi</a></span>
+      </div>
+      
+      <div class="element-children">
+        <span class="term">Children</span>
+        <span class="def">none</span>
+      </div>
+      
+      <div class="element-attributes">
+        <span class="term">Attributes</span>
+        <dl>
+          <dt>target</dt>
+          <dd class="element-attribute-selection">required</dd>
+          <dd class="element-attribute-description">A target for the reference, using either a URL or an id of an existing element as a destination for the <code>xref</code>.</dd>      
+        </dl>
+      </div>
+      
+      <div class="element-example">
+        <pre>
+&lt;p&gt;
+
+    <b>&lt;xref target="/url/link/target"&gt;This text is shown as a link.&lt;/xref&gt;</b>
+
+&lt;/p&gt;</pre>
+      </div>
+    </div>
+<!--end of xref element-->
+
+  </body>
+</html>

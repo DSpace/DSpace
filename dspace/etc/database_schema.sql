@@ -118,7 +118,7 @@ CREATE SEQUENCE group2groupcache_seq;
 CREATE TABLE BitstreamFormatRegistry
 (
   bitstream_format_id INTEGER PRIMARY KEY,
-  mimetype            VARCHAR(48),
+  mimetype            VARCHAR(256),
   short_description   VARCHAR(128) UNIQUE,
   description         TEXT,
   support_level       INTEGER,

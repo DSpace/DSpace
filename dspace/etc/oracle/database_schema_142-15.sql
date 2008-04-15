@@ -53,10 +53,11 @@ ALTER TABLE most_recent_checksum MODIFY current_checksum null;
 -- New Column language language in EPerson
 ------------------------------------------------------
 
-alter table eperson add column language VARCHAR2(64);
+alter table eperson ADD language VARCHAR2(64);
 update eperson set language = 'en';
 
-alter table bundle drop column mets_bitstream_id; -- totally unused column
+-- totally unused column
+alter table bundle drop column mets_bitstream_id;
 
 -------------------------------------------------------------------------------
 -- Necessary for Configurable Submission functionality:
@@ -64,6 +65,14 @@ alter table bundle drop column mets_bitstream_id; -- totally unused column
 -- of the last page reached within a step in the Configurable Submission Process
 -------------------------------------------------------------------------------
 ALTER TABLE workspaceitem ADD page_reached INTEGER;
+
+
+-------------------------------------------------------------------------
+-- Increase the mimetype field size to support larger types, such as the 
+-- new Word 2007 mimetypes.
+-------------------------------------------------------------------------
+ALTER TABLE BitstreamFormatRegistry MODIFY (mimetype VARCHAR(256));
+
 
 -------------------------------------------------------------------------
 -- Tables to manage cache of item counts for communities and collections
@@ -89,11 +98,14 @@ DROP SEQUENCE itemsbydate_seq;
 DROP SEQUENCE itemsbydateaccessioned_seq;
 DROP SEQUENCE itemsbysubject_seq;
 
-DROP TABLE ItemsByAuthor CASCADE;
-DROP TABLE ItemsByTitle CASCADE;
-DROP TABLE ItemsByDate CASCADE;
-DROP TABLE ItemsByDateAccessioned CASCADE;
-DROP TABLE ItemsBySubject CASCADE;
+DROP TABLE ItemsByAuthor CASCADE CONSTRAINTS;
+DROP TABLE ItemsByTitle CASCADE CONSTRAINTS;
+DROP TABLE ItemsByDate CASCADE CONSTRAINTS;
+DROP TABLE ItemsByDateAccessioned CASCADE CONSTRAINTS;
+DROP TABLE ItemsBySubject CASCADE CONSTRAINTS;
+
+DROP TABLE History CASCADE CONSTRAINTS;
+DROP TABLE HistoryState CASCADE CONSTRAINTS;
 
 ----------------------------------------------------------------
 -- Add indexes for foreign key columns
@@ -106,8 +118,8 @@ CREATE INDEX bit_bitstream_fk_idx ON Bitstream(bitstream_format_id);
 CREATE INDEX g2g_parent_fk_idx ON Group2Group(parent_id);
 CREATE INDEX g2g_child_fk_idx ON Group2Group(child_id);
 
-CREATE INDEX g2gc_parent_fk_idx ON Group2Group(parent_id);
-CREATE INDEX g2gc_child_fk_idx ON Group2Group(child_id);
+-- CREATE INDEX g2gc_parent_fk_idx ON Group2Group(parent_id);
+-- CREATE INDEX g2gc_child_fk_idx ON Group2Group(child_id);
 
 CREATE INDEX item_submitter_fk_idx ON Item(submitter_id);
 
@@ -140,7 +152,7 @@ CREATE INDEX epg2ep_eperson_fk_idx ON EPersonGroup2EPerson(eperson_id);
 CREATE INDEX workspace_item_fk_idx ON WorkspaceItem(item_id);
 CREATE INDEX workspace_coll_fk_idx ON WorkspaceItem(collection_id);
 
-CREATE INDEX workflow_item_fk_idx ON WorkflowItem(item_id);
+-- CREATE INDEX workflow_item_fk_idx ON WorkflowItem(item_id);
 CREATE INDEX workflow_coll_fk_idx ON WorkflowItem(collection_id);
 CREATE INDEX workflow_owner_fk_idx ON WorkflowItem(owner);
 

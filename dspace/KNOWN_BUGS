@@ -3,8 +3,53 @@ bug tracker:
 
 http://sourceforge.net/tracker/?group_id=19984&atid=119984
 
-Oracle compatibility: this release does not support Oracle. Check for patches or updates
-to this release to restore Oracle compatibility.
+1904122 Help text in submission process doesn't parse html tags
+1899801 SWORD ingest fails with METSExport tool
+1899709 Creative Commons XMLUI Firefox displayed as text
+1899705 Links in CC license broken, IE
+1898560 Errors not logged in dspace.log in xmlui
+1897993 HTML not stripped in user profile data information in JSPUI
+1897642 Move item works on both mapped items and owned items moved
+1897262 Bitstream listing description is missing
+1897236 An item can be mapped multiple times to the same collection
+1896980 SWORD code does not make use of proxy
+1896960 SWORD authentication doesn't work with LDAP
+1896259 No check for unique netid in LDAP authN
+1896225 HTML tags not stripped in statistics display
+1896119 Bitstream format display
+1896055 bitstream format registry, setting bitstream internal
+1896013 Missing online help
+1879848 Anchor for add button in submission process
+1879838 Creative Commons - Licence Dependancy
+1856364 Wrong label for First/Last name in admin tool
+1832509 RSS feeds dont work on large collection / communities
+1827597 Registration Notification for eperson reg. via admin ui
+1810898 NullPointer upon submission
+1779601 filtermedia: OutOfMemory
+1775059 Repeated execution of chooser.jsp exhausts db conn pool
+1774958 Nested folders do not export correctly
+1756384 Authorization denied resulting in ServletException
+1753027 Double format string in supervise-list.jsp
+1745573 Itemmap-browse.jsp throws Exception on items without date
+1730606 Restricted Items metadata exposed via OAI
+1725817 Error in authorization to submit when you add collection.
+1725675 Incorrect count for mapped items in same community
+1715242 SequenceID gets reused if highest-SID bitstream is deleted
+1714851 Subscription Notification on Modified Items
+1707821 JPEGFilter throws IllegalArgumentException
+1695186 No sanity checking of self-register emails
+1689143 ControlledVocabulary don't works with onebox
+1688445 Anonymous group don't works as subgroup
+1686277 Cached Bitstream and Bundles have wrong Context stored
+1678703 OAI-PMH requests with from/until datestamps on Oracle
+1644932 Creative Commons iFrame disappears in Firefox 2.0
+1631575 Collection Templates language of metadata partially ignored
+1627199 DSRUN.BAT does not run a new class?
+1619473 Wrong dfg entry in webui.itemdisplay.* -> err. display
+1617889 Years < 1000 do not display in simple item view
+
+Plus these following bugs from previous releases which may 
+have or may not have been fixed:
 
 1609427 OAI server doesn't generate resumption token
 1606789 When collection is deleted, mapped item remains in community

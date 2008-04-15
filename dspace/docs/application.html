@@ -428,17 +428,17 @@ https://dspace.mit.edu/html/1721.1/12345/chapter2_images/figure.gif
 
   <p>The DSpace platform supports the <a href="http://www.openarchives.org/">Open Archives Initiative Protocol for Metadata Harvesting</a> (OAI-PMH) version 2.0 as a data provider. This is accomplished using the <a href="http://www.oclc.org/research/software/oai/cat.shtm">OAICat framework from OCLC</a>.</p>
 
-  <p>The DSpace build process builds a Web application archive, <code><em>[dspace-source]</em>/build/dspace-oai.war</code>), in much the same way as <a href="#webui_build">the Web UI build process</a> described above. The only differences are that the JSPs are not included, and <code><em>[dspace-source]</em>/etc/oai-web.xml</code> is used as the deployment descriptor. This 'webapp' is deployed to receive and respond to OAI-PMH requests via HTTP. Note that typically it should <em>not</em> be deployed on SSL (<code>https:</code> protocol). In a typical configuration, this is deployed at <code>dspace-oai</code>, for example:</p>
+  <p>The DSpace build process builds a Web application archive, <code><em>[dspace-source]</em>/build/oai.war</code>), in much the same way as <a href="#webui_build">the Web UI build process</a> described above. The only differences are that the JSPs are not included, and <code><em>[dspace-source]</em>/etc/oai-web.xml</code> is used as the deployment descriptor. This 'webapp' is deployed to receive and respond to OAI-PMH requests via HTTP. Note that typically it should <em>not</em> be deployed on SSL (<code>https:</code> protocol). In a typical configuration, this is deployed at <code>oai</code>, for example:</p>
   <pre>
-http://dspace.myu.edu/dspace-oai/request?verb=Identify
+http://dspace.myu.edu/oai/request?verb=Identify
 </pre>
 
   <p>The 'base URL' of this DSpace deployment would be:</p>
   <pre>
-http://dspace.myu.edu/dspace-oai/request
+http://dspace.myu.edu/oai/request
 </pre>
 
-  <p>It is this URL that should be registered with <a href="http://www.openarchives.org/">www.openarchives.org</a>. Note that you can easily change the '<code>request</code>' portion of the URL by editing <code><em>[dspace-source]</em>/etc/oai-web.xml</code> and rebuilding and deploying <code>dspace-oai.war</code>.</p>
+  <p>It is this URL that should be registered with <a href="http://www.openarchives.org/">www.openarchives.org</a>. Note that you can easily change the '<code>request</code>' portion of the URL by editing <code><em>[dspace-source]</em>/etc/oai-web.xml</code> and rebuilding and deploying <code>oai.war</code>.</p>
 
   <p>DSpace provides implementations of the OAICat interfaces <code>AbstractCatalog</code>, <code>RecordFactory</code> and <code>Crosswalk</code> that interface with the DSpace content management API and harvesting API (in the search subsystem).</p>
 

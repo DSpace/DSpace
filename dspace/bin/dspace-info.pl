@@ -67,7 +67,6 @@ my $database_dir = "/dspace/database";
 
 my $assetstore_dir = GetConfigParameter( "assetstore.dir" );
 my $search_dir     = GetConfigParameter( "search.dir"     );
-my $history_dir    = GetConfigParameter( "history.dir"    );
 my $logs_dir       = GetConfigParameter( "log.dir"        );
 
 # directories in this array are to be checked for ownership by
@@ -105,7 +104,6 @@ my $workspaceitem_count = CountRows( "workspaceitem" );
 
 my $assetstore_size = DirectorySize( $assetstore_dir );
 my $search_size     = DirectorySize( $search_dir     );
-my $history_size    = DirectorySize( $history_dir    );
 my $logs_size       = DirectorySize( $logs_dir       );
 my $database_size   = DirectorySize( $database_dir   );
 
