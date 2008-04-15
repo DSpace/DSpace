@@ -48,10 +48,7 @@ import org.dspace.dao.CRUD;
 import org.dspace.dao.Link;
 import org.dspace.eperson.dao.GroupDAO;
 import org.dspace.eperson.dao.GroupDAOFactory;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
-import org.dspace.uri.dao.ObjectIdentifierDAO;
-import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
+import org.dspace.uri.dao.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -107,13 +104,24 @@ public abstract class CommunityDAO extends ContentDAO<CommunityDAO>
 
     public CommunityDAO(Context context)
     {
-        this.context = context;
+        try
+        {
+            this.context = context;
 
-        bitstreamDAO = BitstreamDAOFactory.getInstance(context);
-        collectionDAO = CollectionDAOFactory.getInstance(context);
-        groupDAO = GroupDAOFactory.getInstance(context);
-        identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
-        oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
+            bitstreamDAO = BitstreamDAOFactory.getInstance(context);
+            collectionDAO = CollectionDAOFactory.getInstance(context);
+            groupDAO = GroupDAOFactory.getInstance(context);
+            identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
+            oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
+        }
+        catch (ExternalIdentifierStorageException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (ObjectIdentifierStorageException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public CommunityDAO getChild()

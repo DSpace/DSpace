@@ -63,6 +63,7 @@ import org.dspace.uri.IdentifierService;
 import org.dspace.uri.IdentifierException;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
@@ -148,6 +149,10 @@ DSpaceObject dso = eid.getObjectIdentifier().getObject(context);*/
 
             result.addError("identifier");
             return result;
+        }
+        catch (ExternalIdentifierStorageException e)
+        {
+            throw new RuntimeException(e);
         }
         catch (IdentifierException e)
         {

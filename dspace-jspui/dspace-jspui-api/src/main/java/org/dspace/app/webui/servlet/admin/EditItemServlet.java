@@ -75,6 +75,7 @@ import org.dspace.license.CreativeCommons;
 import org.dspace.uri.*;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -132,7 +133,8 @@ public class EditItemServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        try {
+        try
+        {
             ExternalIdentifierDAO identifierDAO =
                 ExternalIdentifierDAOFactory.getInstance(context);
 
@@ -192,6 +194,11 @@ public class EditItemServlet extends DSpaceServlet
 
                 JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
             }
+        }
+        catch (ExternalIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
         }
         catch (IdentifierException e)
         {

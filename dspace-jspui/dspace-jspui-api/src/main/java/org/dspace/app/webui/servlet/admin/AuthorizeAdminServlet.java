@@ -71,6 +71,7 @@ import org.dspace.uri.IdentifierService;
 import org.dspace.uri.IdentifierException;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -731,6 +732,10 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             }
 
             c.complete();
+        }
+        catch (ExternalIdentifierStorageException e)
+        {
+            throw new RuntimeException(e);
         }
         catch (IdentifierException e)
         {

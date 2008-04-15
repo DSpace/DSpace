@@ -51,10 +51,7 @@ import org.dspace.core.Context;
 import org.dspace.dao.CRUD;
 import org.dspace.dao.Link;
 import org.dspace.eperson.EPerson;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
-import org.dspace.uri.dao.ObjectIdentifierDAO;
-import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
+import org.dspace.uri.dao.*;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -80,12 +77,23 @@ public abstract class ItemDAO extends ContentDAO<ItemDAO>
 
     public ItemDAO(Context context)
     {
-        this.context = context;
+        try
+        {
+            this.context = context;
 
-        bundleDAO = BundleDAOFactory.getInstance(context);
-        bitstreamDAO = BitstreamDAOFactory.getInstance(context);
-        identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
-        oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
+            bundleDAO = BundleDAOFactory.getInstance(context);
+            bitstreamDAO = BitstreamDAOFactory.getInstance(context);
+            identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
+            oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
+        }
+        catch (ExternalIdentifierStorageException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (ObjectIdentifierStorageException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public ItemDAO getChild()

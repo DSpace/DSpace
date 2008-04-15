@@ -51,6 +51,7 @@ import org.dspace.uri.IdentifierService;
 import org.dspace.uri.IdentifierException;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -158,214 +159,221 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
     private void doSearch(Context context, HttpServletRequest request,
             String query) throws IOException, SQLException, IdentifierException
     {
-        ExternalIdentifierDAO identifierDAO =
-            ExternalIdentifierDAOFactory.getInstance(context);
-
-        // Get the query
-        // String query = request.getParameter("query");
-        int start = UIUtil.getIntParameter(request, "start");
-        String advanced = request.getParameter("advanced");
-        String fromAdvanced = request.getParameter("from_advanced");
-        String advancedQuery = "";
-        HashMap queryHash = new HashMap();
-
-        // can't start earlier than 0 in the results!
-        if (start < 0)
+        try
         {
-            start = 0;
-        }
+            ExternalIdentifierDAO identifierDAO =
+                ExternalIdentifierDAOFactory.getInstance(context);
 
-        List itemIdentifiers = new ArrayList();
-        List collectionIdentifiers = new ArrayList();
-        List communityIdentifiers = new ArrayList();
+            // Get the query
+            // String query = request.getParameter("query");
+            int start = UIUtil.getIntParameter(request, "start");
+            String advanced = request.getParameter("advanced");
+            String fromAdvanced = request.getParameter("from_advanced");
+            String advancedQuery = "";
+            HashMap queryHash = new HashMap();
 
-        Item[] resultsItems;
-        Collection[] resultsCollections;
-        Community[] resultsCommunities;
-
-        QueryResults qResults = null;
-        QueryArgs qArgs = new QueryArgs();
-
-        // if the "advanced" flag is set, build the query string from the
-        // multiple query fields
-        if (advanced != null)
-        {
-            query = qArgs.buildQuery(request);
-            advancedQuery = qArgs.buildHTTPQuery(request);
-        }
-
-        // Ensure the query is non-null
-        if (query == null)
-        {
-            query = "";
-        }
-
-        // Get the location parameter, if any
-        String location = request.getParameter("location");
-        String newURL;
-
-        // Build log information
-        String logInfo = "";
-
-        // Get our location
-        Community community = UIUtil.getCommunityLocation(request);
-        Collection collection = UIUtil.getCollectionLocation(request);
-
-        // get the start of the query results page
-        // List resultObjects = null;
-        qArgs.setQuery(query);
-        qArgs.setStart(start);
-
-        // Perform the search
-        if (collection != null)
-        {
-            logInfo = "collection_id=" + collection.getID() + ",";
-
-            // Values for drop-down box
-            request.setAttribute("community", community);
-            request.setAttribute("collection", collection);
-
-            qResults = DSQuery.doQuery(context, qArgs, collection);
-        }
-        else if (community != null)
-        {
-            logInfo = "community_id=" + community.getID() + ",";
-
-            request.setAttribute("community", community);
-
-            // Get the collections within the community for the dropdown box
-            request
-                    .setAttribute("collection.array", community
-                            .getCollections());
-
-            qResults = DSQuery.doQuery(context, qArgs, community);
-        }
-        else
-        {
-            // Get all communities for dropdown box
-            Community[] communities = Community.findAll(context);
-            request.setAttribute("community.array", communities);
-
-            qResults = DSQuery.doQuery(context, qArgs);
-        }
-
-        // now instantiate the results and put them in their buckets
-        for (int i = 0; i < qResults.getHitURIs().size(); i++)
-        {
-            String myURI = (String) qResults.getHitURIs().get(i);
-            Integer myType = (Integer) qResults.getHitTypes().get(i);
-
-            // add the URI to the appropriate lists
-            switch (myType.intValue())
+            // can't start earlier than 0 in the results!
+            if (start < 0)
             {
-            case Constants.ITEM:
-                itemIdentifiers.add(myURI);
-
-                break;
-
-            case Constants.COLLECTION:
-                collectionIdentifiers.add(myURI);
-
-                break;
-
-            case Constants.COMMUNITY:
-                communityIdentifiers.add(myURI);
-
-                break;
+                start = 0;
             }
-        }
 
-        int numCommunities = communityIdentifiers.size();
-        int numCollections = collectionIdentifiers.size();
-        int numItems = itemIdentifiers.size();
+            List itemIdentifiers = new ArrayList();
+            List collectionIdentifiers = new ArrayList();
+            List communityIdentifiers = new ArrayList();
 
-        // Make objects from the URIs - make arrays, fill them out
-        resultsCommunities = new Community[numCommunities];
-        resultsCollections = new Collection[numCollections];
-        resultsItems = new Item[numItems];
+            Item[] resultsItems;
+            Collection[] resultsCollections;
+            Community[] resultsCommunities;
 
-        for (int i = 0; i < numItems; i++)
-        {
-            String uri = (String) itemIdentifiers.get(i);
+            QueryResults qResults = null;
+            QueryArgs qArgs = new QueryArgs();
 
-            ResolvableIdentifier di = IdentifierService.resolve(context, uri);
-            Item item = (Item) IdentifierService.getResource(context, di);
-
-            resultsItems[i] = item;
-
-            if (resultsItems[i] == null)
+            // if the "advanced" flag is set, build the query string from the
+            // multiple query fields
+            if (advanced != null)
             {
-                throw new SQLException("Query \"" + query
-                        + "\" returned unresolvable uri: " + uri);
+                query = qArgs.buildQuery(request);
+                advancedQuery = qArgs.buildHTTPQuery(request);
             }
-        }
 
-        for (int i = 0; i < collectionIdentifiers.size(); i++)
-        {
-            String uri = (String) collectionIdentifiers.get(i);
-
-            ResolvableIdentifier di = IdentifierService.resolve(context, uri);
-            Collection c = (Collection) IdentifierService.getResource(context, di);
-
-            resultsCollections[i] = collection;
-
-            if (resultsCollections[i] == null)
+            // Ensure the query is non-null
+            if (query == null)
             {
-                throw new SQLException("Query \"" + query
-                        + "\" returned unresolvable uri: " + uri);
+                query = "";
             }
-        }
 
-        for (int i = 0; i < communityIdentifiers.size(); i++)
-        {
-            String uri = (String) communityIdentifiers.get(i);
+            // Get the location parameter, if any
+            String location = request.getParameter("location");
+            String newURL;
 
-            ResolvableIdentifier di = IdentifierService.resolve(context, uri);
-            Community c = (Community) IdentifierService.getResource(context, di);
+            // Build log information
+            String logInfo = "";
 
-            resultsCommunities[i] = c;
+            // Get our location
+            Community community = UIUtil.getCommunityLocation(request);
+            Collection collection = UIUtil.getCollectionLocation(request);
 
-            if (resultsCommunities[i] == null)
+            // get the start of the query results page
+            // List resultObjects = null;
+            qArgs.setQuery(query);
+            qArgs.setStart(start);
+
+            // Perform the search
+            if (collection != null)
             {
-                throw new SQLException("Query \"" + query
-                        + "\" returned unresolvable uri: " + uri);
+                logInfo = "collection_id=" + collection.getID() + ",";
+
+                // Values for drop-down box
+                request.setAttribute("community", community);
+                request.setAttribute("collection", collection);
+
+                qResults = DSQuery.doQuery(context, qArgs, collection);
             }
+            else if (community != null)
+            {
+                logInfo = "community_id=" + community.getID() + ",";
+
+                request.setAttribute("community", community);
+
+                // Get the collections within the community for the dropdown box
+                request
+                        .setAttribute("collection.array", community
+                                .getCollections());
+
+                qResults = DSQuery.doQuery(context, qArgs, community);
+            }
+            else
+            {
+                // Get all communities for dropdown box
+                Community[] communities = Community.findAll(context);
+                request.setAttribute("community.array", communities);
+
+                qResults = DSQuery.doQuery(context, qArgs);
+            }
+
+            // now instantiate the results and put them in their buckets
+            for (int i = 0; i < qResults.getHitURIs().size(); i++)
+            {
+                String myURI = (String) qResults.getHitURIs().get(i);
+                Integer myType = (Integer) qResults.getHitTypes().get(i);
+
+                // add the URI to the appropriate lists
+                switch (myType.intValue())
+                {
+                case Constants.ITEM:
+                    itemIdentifiers.add(myURI);
+
+                    break;
+
+                case Constants.COLLECTION:
+                    collectionIdentifiers.add(myURI);
+
+                    break;
+
+                case Constants.COMMUNITY:
+                    communityIdentifiers.add(myURI);
+
+                    break;
+                }
+            }
+
+            int numCommunities = communityIdentifiers.size();
+            int numCollections = collectionIdentifiers.size();
+            int numItems = itemIdentifiers.size();
+
+            // Make objects from the URIs - make arrays, fill them out
+            resultsCommunities = new Community[numCommunities];
+            resultsCollections = new Collection[numCollections];
+            resultsItems = new Item[numItems];
+
+            for (int i = 0; i < numItems; i++)
+            {
+                String uri = (String) itemIdentifiers.get(i);
+
+                ResolvableIdentifier di = IdentifierService.resolve(context, uri);
+                Item item = (Item) IdentifierService.getResource(context, di);
+
+                resultsItems[i] = item;
+
+                if (resultsItems[i] == null)
+                {
+                    throw new SQLException("Query \"" + query
+                            + "\" returned unresolvable uri: " + uri);
+                }
+            }
+
+            for (int i = 0; i < collectionIdentifiers.size(); i++)
+            {
+                String uri = (String) collectionIdentifiers.get(i);
+
+                ResolvableIdentifier di = IdentifierService.resolve(context, uri);
+                Collection c = (Collection) IdentifierService.getResource(context, di);
+
+                resultsCollections[i] = collection;
+
+                if (resultsCollections[i] == null)
+                {
+                    throw new SQLException("Query \"" + query
+                            + "\" returned unresolvable uri: " + uri);
+                }
+            }
+
+            for (int i = 0; i < communityIdentifiers.size(); i++)
+            {
+                String uri = (String) communityIdentifiers.get(i);
+
+                ResolvableIdentifier di = IdentifierService.resolve(context, uri);
+                Community c = (Community) IdentifierService.getResource(context, di);
+
+                resultsCommunities[i] = c;
+
+                if (resultsCommunities[i] == null)
+                {
+                    throw new SQLException("Query \"" + query
+                            + "\" returned unresolvable uri: " + uri);
+                }
+            }
+
+            // Log
+            log.info(LogManager.getHeader(context, "search", logInfo + "query=\""
+                    + query + "\",results=(" + resultsCommunities.length + ","
+                    + resultsCollections.length + "," + resultsItems.length + ")"));
+
+            // Pass in some page qualities
+            // total number of pages
+            int pageTotal = 1 + ((qResults.getHitCount() - 1) / qResults
+                    .getPageSize());
+
+            // current page being displayed
+            int pageCurrent = 1 + (qResults.getStart() / qResults.getPageSize());
+
+            // pageLast = min(pageCurrent+9,pageTotal)
+            int pageLast = ((pageCurrent + 9) > pageTotal) ? pageTotal
+                    : (pageCurrent + 9);
+
+            // pageFirst = max(1,pageCurrent-9)
+            int pageFirst = ((pageCurrent - 9) > 1) ? (pageCurrent - 9) : 1;
+
+            // Pass the results to the display JSP
+            request.setAttribute("items", resultsItems);
+            request.setAttribute("communities", resultsCommunities);
+            request.setAttribute("collections", resultsCollections);
+
+            request.setAttribute("pagetotal", new Integer(pageTotal));
+            request.setAttribute("pagecurrent", new Integer(pageCurrent));
+            request.setAttribute("pagelast", new Integer(pageLast));
+            request.setAttribute("pagefirst", new Integer(pageFirst));
+
+            request.setAttribute("queryresults", qResults);
+
+            // And the original query string
+            request.setAttribute("query", query);
         }
-
-        // Log
-        log.info(LogManager.getHeader(context, "search", logInfo + "query=\""
-                + query + "\",results=(" + resultsCommunities.length + ","
-                + resultsCollections.length + "," + resultsItems.length + ")"));
-
-        // Pass in some page qualities
-        // total number of pages
-        int pageTotal = 1 + ((qResults.getHitCount() - 1) / qResults
-                .getPageSize());
-
-        // current page being displayed
-        int pageCurrent = 1 + (qResults.getStart() / qResults.getPageSize());
-
-        // pageLast = min(pageCurrent+9,pageTotal)
-        int pageLast = ((pageCurrent + 9) > pageTotal) ? pageTotal
-                : (pageCurrent + 9);
-
-        // pageFirst = max(1,pageCurrent-9)
-        int pageFirst = ((pageCurrent - 9) > 1) ? (pageCurrent - 9) : 1;
-
-        // Pass the results to the display JSP
-        request.setAttribute("items", resultsItems);
-        request.setAttribute("communities", resultsCommunities);
-        request.setAttribute("collections", resultsCollections);
-
-        request.setAttribute("pagetotal", new Integer(pageTotal));
-        request.setAttribute("pagecurrent", new Integer(pageCurrent));
-        request.setAttribute("pagelast", new Integer(pageLast));
-        request.setAttribute("pagefirst", new Integer(pageFirst));
-
-        request.setAttribute("queryresults", qResults);
-
-        // And the original query string
-        request.setAttribute("query", query);
+        catch (ExternalIdentifierStorageException e)
+        {
+            throw new IdentifierException(e);
+        }
 
     }
 

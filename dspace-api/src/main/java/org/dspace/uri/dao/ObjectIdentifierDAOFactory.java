@@ -36,7 +36,9 @@
 package org.dspace.uri.dao;
 
 import org.dspace.core.Context;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.uri.dao.postgres.ObjectIdentifierDAOPostgres;
+import org.dspace.uri.dao.oracle.ObjectIdentifierDAOOracle;
 
 /**
  * Factory class to generate the relevant storage layer DAO for storing ObjectIdentifier objects
@@ -52,7 +54,20 @@ public class ObjectIdentifierDAOFactory
      * @return
      */
     public static ObjectIdentifierDAO getInstance(Context context)
+            throws ObjectIdentifierStorageException
     {
-        return new ObjectIdentifierDAOPostgres(context);
+        String db = ConfigurationManager.getProperty("db.name");
+        if (db != null)
+        {
+            if ("postgres".equals(db))
+            {
+                return new ObjectIdentifierDAOPostgres(context);
+            }
+            else if ("oracle".equals(db))
+            {
+                return new ObjectIdentifierDAOOracle(context);
+            }
+        }
+        throw new ObjectIdentifierStorageException("Invalid or no configuration for db.name");
     }
 }

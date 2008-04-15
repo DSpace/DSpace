@@ -62,6 +62,7 @@ import org.dspace.uri.IdentifierService;
 import org.dspace.uri.IdentifierException;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
@@ -212,6 +213,10 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
             }
 
             return items;
+        }
+        catch (ExternalIdentifierStorageException e)
+        {
+            throw new RuntimeException(e);
         }
         catch (IdentifierException e)
         {

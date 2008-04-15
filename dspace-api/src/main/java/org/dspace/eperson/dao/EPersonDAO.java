@@ -49,6 +49,7 @@ import org.dspace.eperson.EPerson.EPersonMetadataField;
 import org.dspace.eperson.Group;
 import org.dspace.uri.dao.ObjectIdentifierDAO;
 import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
+import org.dspace.uri.dao.ObjectIdentifierStorageException;
 
 import java.util.List;
 import java.util.UUID;
@@ -73,8 +74,15 @@ public abstract class EPersonDAO extends StackableDAO<EPersonDAO>
 
     public EPersonDAO(Context context)
     {
-        this.context = context;
-        oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
+        try
+        {
+            this.context = context;
+            oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
+        }
+        catch (ObjectIdentifierStorageException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public EPersonDAO getChild()

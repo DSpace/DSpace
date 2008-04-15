@@ -45,8 +45,10 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.uri.ExternalIdentifier;
+import org.dspace.uri.IdentifierException;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 import org.dspace.core.Context;
 
 /**
@@ -92,80 +94,86 @@ public class InstallItem
     public static Item installItem(Context c, InProgressSubmission is,
             String value) throws IOException, AuthorizeException
     {
-        ItemDAO itemDAO = ItemDAOFactory.getInstance(c);
-        ExternalIdentifierDAO identifierDAO =
-            ExternalIdentifierDAOFactory.getInstance(c);
+        try {
+            ItemDAO itemDAO = ItemDAOFactory.getInstance(c);
+            ExternalIdentifierDAO identifierDAO =
+                ExternalIdentifierDAOFactory.getInstance(c);
 
-        Item item = is.getItem();
-        ExternalIdentifier identifier;
+            Item item = is.getItem();
+            ExternalIdentifier identifier;
 
-        // create accession date
-        DCDate now = DCDate.getCurrent();
-        item.addDC("date", "accessioned", null, now.toString());
-        item.addDC("date", "available", null, now.toString());
+            // create accession date
+            DCDate now = DCDate.getCurrent();
+            item.addDC("date", "accessioned", null, now.toString());
+            item.addDC("date", "available", null, now.toString());
 
-        // create issue date if not present
-        DCValue[] currentDateIssued = item.getDC("date", "issued", Item.ANY);
+            // create issue date if not present
+            DCValue[] currentDateIssued = item.getDC("date", "issued", Item.ANY);
 
-        if (currentDateIssued.length == 0)
-        {
-            item.addDC("date", "issued", null, now.toString());
+            if (currentDateIssued.length == 0)
+            {
+                item.addDC("date", "issued", null, now.toString());
+            }
+
+            /*  FIXME: items should get persistent identifiers anyway, so this should no longer be necessary
+
+                        BUT: what do we do about adding identifiers to metadata!
+                        // if no previous identifier supplied, create one
+                        if (value == null)
+                        {
+                            // Create persistent identifier. Note that this will create an
+                            // identifier of the default type (as specified in the
+                            // configuration).
+                            identifier = identifierDAO.create(item);
+                        }
+                        else
+                        {
+                            identifier = identifierDAO.create(item, value);
+                        }
+
+                        String uri = identifier.getURI().toString();
+
+                        // Add uri as identifier.uri DC value
+                        item.addDC("identifier", "uri", null, uri);
+                */
+            String provDescription = "Made available in DSpace on " + now
+                    + " (GMT). " + getBitstreamProvenanceMessage(item);
+
+            if (currentDateIssued.length != 0)
+            {
+                DCDate d = new DCDate(currentDateIssued[0].value);
+                provDescription = provDescription + "  Previous issue date: "
+                        + d.toString();
+            }
+
+            // Add provenance description
+            item.addDC("description", "provenance", "en", provDescription);
+
+            // create collection2item mapping
+            is.getCollection().addItem(item);
+
+            // set owning collection
+            item.setOwningCollection(is.getCollection());
+
+            // set in_archive=true
+            item.setArchived(true);
+
+            // save changes ;-)
+            itemDAO.update(item);
+
+            // remove in-progress submission
+            is.deleteWrapper();
+
+            // remove the item's policies and replace them with
+            // the defaults from the collection
+            item.inheritCollectionDefaultPolicies(is.getCollection());
+
+            return item;
         }
-
-        /*  FIXME: items should get persistent identifiers anyway, so this should no longer be necessary
-
-        BUT: what do we do about adding identifiers to metadata!
-        // if no previous identifier supplied, create one
-        if (value == null)
+        catch (ExternalIdentifierStorageException e)
         {
-            // Create persistent identifier. Note that this will create an
-            // identifier of the default type (as specified in the
-            // configuration).
-            identifier = identifierDAO.create(item);
+            throw new RuntimeException(e);
         }
-        else
-        {
-            identifier = identifierDAO.create(item, value);
-        }
-
-        String uri = identifier.getURI().toString();
-
-        // Add uri as identifier.uri DC value
-        item.addDC("identifier", "uri", null, uri);
-*/
-        String provDescription = "Made available in DSpace on " + now
-                + " (GMT). " + getBitstreamProvenanceMessage(item);
-
-        if (currentDateIssued.length != 0)
-        {
-            DCDate d = new DCDate(currentDateIssued[0].value);
-            provDescription = provDescription + "  Previous issue date: "
-                    + d.toString();
-        }
-
-        // Add provenance description
-        item.addDC("description", "provenance", "en", provDescription);
-
-        // create collection2item mapping
-        is.getCollection().addItem(item);
-
-        // set owning collection
-        item.setOwningCollection(is.getCollection());
-
-        // set in_archive=true
-        item.setArchived(true);
-
-        // save changes ;-)
-        itemDAO.update(item);
-
-        // remove in-progress submission
-        is.deleteWrapper();
-
-        // remove the item's policies and replace them with
-        // the defaults from the collection
-        item.inheritCollectionDefaultPolicies(is.getCollection());
-
-        return item;
     }
 
 

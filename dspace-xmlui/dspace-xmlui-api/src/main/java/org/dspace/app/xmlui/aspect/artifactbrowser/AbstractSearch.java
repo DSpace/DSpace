@@ -76,6 +76,7 @@ import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierException;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -352,6 +353,10 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
                 }
             }// Empty query
         }
+        catch (ExternalIdentifierStorageException e)
+        {
+            throw new RuntimeException(e);
+        }
         catch (IdentifierException e)
         {
             throw new RuntimeException(e);
@@ -484,29 +489,36 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
      */
     protected DSpaceObject getScope() throws SQLException
     {
-        Request request = ObjectModelHelper.getRequest(objectModel);
-        String scopeString = request.getParameter("scope");
-
-        ExternalIdentifierDAO dao =
-            ExternalIdentifierDAOFactory.getInstance(context);
-
-        // Are we in a community or collection?
-        /*
-        DSpaceObject dso;
-        if (scopeString == null || "".equals(scopeString) || "/".equals(scopeString))
+        try
         {
-            // get the search scope from the url handle
-            dso = URIUtil.resolve(objectModel);
+            Request request = ObjectModelHelper.getRequest(objectModel);
+            String scopeString = request.getParameter("scope");
+
+            ExternalIdentifierDAO dao =
+                ExternalIdentifierDAOFactory.getInstance(context);
+
+            // Are we in a community or collection?
+            /*
+            DSpaceObject dso;
+                if (scopeString == null || "".equals(scopeString) || "/".equals(scopeString))
+                {
+                    // get the search scope from the url handle
+                    dso = URIUtil.resolve(objectModel);
+                }
+                else
+                {
+                    // Get the search scope from the location parameter
+                    ResolvableIdentifier ri = IdentifierService.resolve(context, scopeString);
+                    dso = ri.getObject(context);
+                }*/
+            DSpaceObject dso = URIUtil.resolve(objectModel);
+
+            return dso;
         }
-        else
+        catch (ExternalIdentifierStorageException e)
         {
-            // Get the search scope from the location parameter
-            ResolvableIdentifier ri = IdentifierService.resolve(context, scopeString);
-            dso = ri.getObject(context);
-        }*/
-        DSpaceObject dso = URIUtil.resolve(objectModel);
-
-        return dso;
+            throw new RuntimeException(e);
+        }
     }
 
     protected int getParameterPage()

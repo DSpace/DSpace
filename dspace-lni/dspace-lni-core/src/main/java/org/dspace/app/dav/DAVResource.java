@@ -62,6 +62,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DSpaceObject;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -196,13 +197,21 @@ abstract class DAVResource
     protected DAVResource(Context context, HttpServletRequest request,
             HttpServletResponse response, String pathElt[])
     {
-        this.pathElt = pathElt;
-        this.request = request;
-        this.response = response;
-        this.context = context;
+        try
+        {
+            this.pathElt = pathElt;
+            this.request = request;
+            this.response = response;
+            this.context = context;
 
-        // This is used in a lot of subclasses, so setting it here makes sense
-        externalIdentifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
+            // This is used in a lot of subclasses, so setting it here makes sense
+            externalIdentifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
+        }
+        catch (ExternalIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
     }
 
     /*----------------- Abstracts -----------------------*/

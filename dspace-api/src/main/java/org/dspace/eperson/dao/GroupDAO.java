@@ -50,6 +50,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.uri.dao.ObjectIdentifierDAO;
 import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
+import org.dspace.uri.dao.ObjectIdentifierStorageException;
 
 import java.util.List;
 import java.util.Set;
@@ -78,10 +79,17 @@ public abstract class GroupDAO extends StackableDAO<GroupDAO>
 
     public GroupDAO(Context context)
     {
-        this.context = context;
+        try
+        {
+            this.context = context;
 
-        epersonDAO = EPersonDAOFactory.getInstance(context);
-        oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
+            epersonDAO = EPersonDAOFactory.getInstance(context);
+            oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
+        }
+        catch (ObjectIdentifierStorageException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public GroupDAO getChild()

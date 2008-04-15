@@ -54,6 +54,7 @@ import org.dspace.core.Context;
 import org.dspace.uri.*;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -228,7 +229,8 @@ public class CommunityFiliator
 
     private Community resolveCommunity(Context c, String communityID)
     {
-        try {
+        try
+        {
             ExternalIdentifierDAO identifierDAO =
                 ExternalIdentifierDAOFactory.getInstance(c);
             Community community = null;
@@ -260,6 +262,10 @@ public class CommunityFiliator
             return community;
         }
         catch (IdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (ExternalIdentifierStorageException e)
         {
             throw new RuntimeException(e);
         }

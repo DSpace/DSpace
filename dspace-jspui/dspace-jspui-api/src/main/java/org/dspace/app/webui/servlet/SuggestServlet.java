@@ -55,6 +55,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.uri.*;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
@@ -248,6 +249,11 @@ public class SuggestServlet extends DSpaceServlet
                 request.setAttribute("eperson.name", userName);
                 JSPManager.showJSP(request, response, "/suggest/suggest.jsp"); //asd
             }
+        }
+        catch (ExternalIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new ServletException(e);
         }
         catch (IdentifierException e)
         {

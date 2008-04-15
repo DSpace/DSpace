@@ -56,6 +56,7 @@ import org.dspace.uri.IdentifierService;
 import org.dspace.uri.IdentifierException;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -275,6 +276,11 @@ public class HTMLServlet extends DSpaceServlet
                 JSPManager.showInvalidIDError(request, response, idString,
                         Constants.BITSTREAM);
             }
+        }
+        catch (ExternalIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
         }
         catch (IdentifierException e)
         {

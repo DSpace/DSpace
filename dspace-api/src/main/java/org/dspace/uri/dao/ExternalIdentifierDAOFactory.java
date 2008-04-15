@@ -40,7 +40,9 @@
 package org.dspace.uri.dao;
 
 import org.dspace.uri.dao.postgres.ExternalIdentifierDAOPostgres;
+import org.dspace.uri.dao.oracle.ExternalIdentifierDAOOracle;
 import org.dspace.core.Context;
+import org.dspace.core.ConfigurationManager;
 
 /**
  * Factory class for returning DAOs for storing ExternalIdentifier objects
@@ -57,7 +59,20 @@ public class ExternalIdentifierDAOFactory
      * @return
      */
     public static ExternalIdentifierDAO getInstance(Context context)
+            throws ExternalIdentifierStorageException
     {
-        return new ExternalIdentifierDAOPostgres(context);
+        String db = ConfigurationManager.getProperty("db.name");
+        if (db != null)
+        {
+            if ("postgres".equals(db))
+            {
+                return new ExternalIdentifierDAOPostgres(context);
+            }
+            else if ("oracle".equals(db))
+            {
+                return new ExternalIdentifierDAOOracle(context);
+            }
+        }
+        throw new ExternalIdentifierStorageException("Invalid or no configuration for db.name");
     }
 }

@@ -52,10 +52,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.dao.CRUD;
 import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
-import org.dspace.uri.dao.ObjectIdentifierDAO;
-import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
+import org.dspace.uri.dao.*;
 
 /**
  * @author James Rutherford
@@ -73,10 +70,21 @@ public abstract class BitstreamDAO extends ContentDAO<BitstreamDAO>
 
     public BitstreamDAO(Context context)
     {
-        this.context = context;
+        try
+        {
+            this.context = context;
 
-        identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
-        oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
+            identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
+            oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
+        }
+        catch (ExternalIdentifierStorageException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (ObjectIdentifierStorageException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public BitstreamDAO getChild()
