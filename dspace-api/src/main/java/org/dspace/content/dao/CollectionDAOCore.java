@@ -120,6 +120,10 @@ public class CollectionDAOCore extends CollectionDAO
         {
             throw new RuntimeException(e);
         }
+        catch (IdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

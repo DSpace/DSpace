@@ -99,6 +99,10 @@ public class ItemDAOCore extends ItemDAO
         {
             throw new RuntimeException(e);
         }
+        catch (IdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public Item retrieve(int id)

@@ -36,15 +36,40 @@
 package org.dspace.uri.handle.dao;
 
 import org.dspace.core.Context;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.uri.handle.dao.postgres.HandleDAOPostgres;
+import org.dspace.uri.handle.dao.oracle.HandleDAOOracle;
 
 /**
+ * Factory class for constructing the appropriate implementation of the
+ * HandleDAO
+ *
  * @author Richard Jones
  */
 public class HandleDAOFactory
 {
+    /**
+     * Get an instance of the appropriate implementation of HandleDAO given the
+     * DSpace context
+     * 
+     * @param context
+     * @return
+     */
     public static HandleDAO getInstance(Context context)
+            throws HandleStorageException
     {
-        return new HandleDAOPostgres(context);
+        String db = ConfigurationManager.getProperty("db.name");
+        if (db != null)
+        {
+            if ("postgres".equals(db))
+            {
+                return new HandleDAOPostgres(context);
+            }
+            else if ("oracle".equals(db))
+            {
+                return new HandleDAOOracle(context);
+            }
+        }
+        throw new HandleStorageException("Invalid or no configuration for db.name");
     }
 }

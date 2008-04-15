@@ -39,26 +39,59 @@
  */
 package org.dspace.uri.handle;
 
-import org.dspace.core.ConfigurationManager;
 import org.dspace.uri.ExternalIdentifierType;
 import org.dspace.uri.ObjectIdentifier;
 
 /**
+ * Entity class for representing the identifier of type Handle.  This class
+ * encapsulates all the general information about this identifier type, and
+ * extends the ExternalIdentifierType class to make that available to the
+ * rest of the identifier mechanisms.
+ *
  * @author James Rutherford
  * @author Richard Jones
  */
 public class HandleType extends ExternalIdentifierType
 {
+    /**
+     * Construct a new instance of the HandleType class.  This contains
+     * all the essential information which defines the Handle
+     */
     public HandleType()
     {
         super("hdl", "http", "hdl.handle.net", "://", "/");
     }
 
+    /**
+     * Get an instance of the Handle associated with this type using the given value
+     * and ObjectIdentifier.
+     *
+     * @param value
+     * @param oid
+     * @return
+     */
     public Handle getInstance(String value, ObjectIdentifier oid)
     {
         return new Handle(value, oid);
     }
 
+    /**
+     * Is the given identifier type the same as the current instance.  This should not compare their
+     * in-memory equalness, but their value equalness.  For example, in:
+     *
+     * <code>
+     * HandleType ht1 = new HandleType();
+     * HandleType ht2 = new HandleType();
+     * boolean equal = ht1.equals(ht2);
+     * </code>
+     *
+     * the value of "equal" should be "true".  This is equivalent to asking
+     *
+     * <code>type instanceof HandleType</code>
+     *
+     * @param type
+     * @return
+     */
     public boolean equals(ExternalIdentifierType type)
     {
         if (type instanceof HandleType)

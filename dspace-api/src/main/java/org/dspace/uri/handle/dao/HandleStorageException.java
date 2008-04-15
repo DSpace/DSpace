@@ -1,5 +1,5 @@
 /*
- * IdentifierResolver.java
+ * HandleStorageException.java
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -33,30 +33,35 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.uri;
+package org.dspace.uri.handle.dao;
 
-import org.dspace.content.DSpaceObject;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 
 /**
- * Generic Interface for external identifier mechanisms which wish to be able to resolve
- * identifiers to DSpaceObjects.  The ExternalIdentifierService can load classes
- * which conform to this interface and ask them to resolve identifiers through this
- * generic mechanism
+ * Exception class to indicate that there was a problem with some
+ * part of the storage layer access for Handles.
  *
- * @author Richard JOnes
+ * @author Richard Jones
  */
-public interface IdentifierResolver<T extends ExternalIdentifier>
+public class HandleStorageException extends ExternalIdentifierStorageException
 {
-    /**
-     * Given the URL path as an argument, extract the portion of the path which
-     * is the object identifier and return an instance of the implementation's
-     * extension of the ExternalIdentifier.
-     * 
-     * @param path
-     * @return
-     */
-    T extractURLIdentifier(String path) throws IdentifierException;
+    public HandleStorageException()
+    {
+        super();
+    }
 
-    // FIXME: there is no interface for, and so far no use for a general canonical
-    // form resolver.  This may need to be introduced for generality and completeness
+    public HandleStorageException(String message)
+    {
+        super(message);
+    }
+
+    public HandleStorageException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
+
+    public HandleStorageException(Throwable cause)
+    {
+        super(cause);
+    }
 }

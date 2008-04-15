@@ -67,7 +67,7 @@ import net.handle.util.StreamTable;
  * Extension to the CNRI Handle Server that translates requests to resolve
  * handles into DSpace API calls. The implementation simply stubs out most of
  * the methods, and delegates the rest to the
- * {@link org.dspace.uri.ExternalIdentifierDAO}. This only provides
+ * {@link org.dspace.uri.dao.ExternalIdentifierDAO}. This only provides
  * some of the functionality (namely, the resolving of handles to URLs) of the
  * CNRI HandleStorage interface.
  * 

@@ -116,6 +116,10 @@ public class CommunityDAOCore extends CommunityDAO
         {
             throw new RuntimeException(e);
         }
+        catch (IdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

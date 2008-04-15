@@ -93,6 +93,10 @@ public class BundleDAOCore extends BundleDAO
         {
             throw new RuntimeException(e);
         }
+        catch (IdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

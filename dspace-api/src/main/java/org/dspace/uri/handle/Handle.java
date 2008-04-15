@@ -39,42 +39,64 @@
  */
 package org.dspace.uri.handle;
 
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
 import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.Identifiable;
-import org.dspace.uri.IdentifierAssigner;
-import org.dspace.uri.IdentifierResolver;
 import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.handle.dao.HandleDAO;
-import org.dspace.uri.handle.dao.HandleDAOFactory;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
+ * Primary class representing the Persistent Identifier scheme for Handles
+ *
+ * This class extends the ExternalIdentifier class, so that instances of this
+ * class can be passed around the identifier code.  It inherits all features
+ * from this super class, but provides its own implementation of the
+ * <code>parseCanonicalForm</code> method.
+ *
  * @author Richard Jones
  * @author James Rutherford
  */
 public class Handle extends ExternalIdentifier
-        implements IdentifierAssigner<Handle>, IdentifierResolver<Handle>
 {
-    // REQUIRED for the plugin manager
+    /**
+     * DO NOT USE
+     *
+     * Required for PluginManager to function, but should not be used
+     * to construct new Handle instances in main code
+     */
     public Handle()
     {
         super();
     }
 
+    /**
+     * Construct a new Handle object with the given handle value backed
+     * by the given ObjectIdentifier
+     *
+     * @param value
+     * @param oid
+     */
     public Handle(String value, ObjectIdentifier oid)
     {
         super(new HandleType(), value, oid);
     }
 
+    /**
+     * Construct a new Handle object with the given handle value.  This
+     * should be used with care, as any attempt to resolve an Identifiable
+     * from this object may fail if an ObjectIdentifier is not available
+     * which can back this identifier.
+     *
+     * @param value
+     */
     public Handle(String value)
     {
         super(new HandleType(), value);
     }
 
+    /**
+     * Parse the provided string as the canonical form of a handle, and construct
+     * an un-backed instance of the Handle object.
+     * @param canonical
+     * @return
+     */
     public Handle parseCanonicalForm(String canonical)
     {
         // canonical form: hdl:xxxxx/yyyy
@@ -92,47 +114,7 @@ public class Handle extends ExternalIdentifier
             return null;
         }
 
-        // ExternalIdentifierService.get();
-
         Handle handle = new Handle(bits[1]);
-        return handle;
-    }
-
-    // IdentifierAssigner implementation
-    public Handle mint(Context context, Identifiable dso)
-    {
-        HandleDAO dao = HandleDAOFactory.getInstance(context);
-        int next = dao.getNextHandle();
-        String prefix = ConfigurationManager.getProperty("handle.prefix");
-        if (prefix == null || "".equals(prefix))
-        {
-            throw new RuntimeException("no configuration or configuration invalid for handle.prefix");
-        }
-        String fullHandle = prefix + "/" + Integer.toString(next);
-
-        Handle handle = new Handle(fullHandle, dso.getIdentifier());
-        return handle;
-    }
-
-    // IdentifierResolver implementation
-
-    public Handle extractURLIdentifier(String path)
-    {
-        String prefix = ConfigurationManager.getProperty("handle.prefix");
-        if (prefix == null || "".equals(prefix))
-        {
-            throw new RuntimeException("no configuration, or configuration invalid for handle.prefix");
-        }
-
-        String hdlRX = ".*hdl/(" + prefix + "/[0-9]+).*";
-        Pattern p = Pattern.compile(hdlRX);
-        Matcher m = p.matcher(path);
-        if (!m.matches())
-        {
-            return null;
-        }
-        String value = m.group(1);
-        Handle handle = new Handle(value);
         return handle;
     }
 }

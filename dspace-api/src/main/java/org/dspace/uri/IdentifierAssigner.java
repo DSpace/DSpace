@@ -52,12 +52,12 @@ import org.dspace.core.Context;
 public interface IdentifierAssigner<T extends ExternalIdentifier>
 {
     /**
-     * Mint a new identifier for the passed DSpaceObject.  The implementation should not
-     * attempt to assign the identifier to the DSpaceObject.
+     * Mint a new identifier for the passed Identifiable.  The implementation should not
+     * attempt to assign the identifier to the Identifiable.
      * 
      * @param context
      * @param dso
      * @return
      */
-    T mint(Context context, Identifiable dso);
+    T mint(Context context, Identifiable dso) throws IdentifierException;
 }

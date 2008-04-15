@@ -228,45 +228,10 @@ public class ObjectIdentifier extends SimpleIdentifier implements ResolvableIden
      *
      * @return
      */
-    public String getIdentifierType()
+    public String getIdentifierTypeRepresentation()
     {
         return ObjectIdentifier.PREFIX;
     }
-
-    /**
-     * obtain the actual DSpaceObject the object identifier represents.
-     *
-     * FIXME: it is debatable as to whether this legitimately belongs here
-     *
-     * @param context
-     * @return
-     */
-    /* NOTE: this has been totally removed, and exists here for reference for a few cycles
-    public DSpaceObject getObject(Context context)
-    {
-        // do we know what the resource type and id is?
-        if (this.resourceTypeID == -1 || this.resourceID == -1)
-        {
-            // we don't have resource type or resource id for this item
-            // check the UUID cache and see if we can find them
-            ObjectIdentifierDAO dao = ObjectIdentifierDAOFactory.getInstance(context);
-            ObjectIdentifier noid = dao.retrieve(uuid);
-
-            // if there is no object identifier, just return null
-            if (noid == null)
-            {
-                return null;
-            }
-
-            // move the values up to this object for convenience
-            this.resourceTypeID = noid.getResourceTypeID();
-            this.resourceID = noid.getResourceID();
-        }
-
-        // now we can select the object based on its resource type and id
-        return this.getObjectByResourceID(context);
-    }
-*/
 
     /**
      * Return the ObjectIdentifier to which this ResolvableIdentifier refers.  This

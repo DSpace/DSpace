@@ -38,16 +38,30 @@ package org.dspace.uri.handle.dao;
 import org.dspace.core.Context;
 
 /**
+ * Abstract class for providing an interface and basic functionality for
+ * the minimal storage requirements of the default handle implementation
+ *
  * @author Richard Jones
  */
 public abstract class HandleDAO
 {
+    /** the DSpace context */
     protected Context context;
 
+    /**
+     * Construct a new HandleDAO with the given DSpace context
+     *
+     * @param context
+     */
     public HandleDAO(Context context)
     {
         this.context = context;
     }
-    
-    public abstract int getNextHandle();
+
+    /**
+     * Generate the next handle value to be assigned
+     *
+     * @return
+     */
+    public abstract int getNextHandle() throws HandleStorageException;
 }

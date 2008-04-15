@@ -73,6 +73,7 @@ public class ExternalIdentifierService
      * @return
      */
     public static List<ExternalIdentifier> mintAll(Context context, Identifiable dso)
+            throws IdentifierException
     {
         List<ExternalIdentifier> eids = new ArrayList<ExternalIdentifier>();
         IdentifierAssigner[] assigners = (IdentifierAssigner[]) PluginManager.getPluginSequence(IdentifierAssigner.class);
