@@ -52,11 +52,9 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierService;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ObjectIdentifierService;
-import org.dspace.uri.UnsupportedIdentifierException;
+import org.dspace.uri.*;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
+import org.dspace.uri.dao.ObjectIdentifierStorageException;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -122,255 +120,292 @@ public class ItemDAOCore extends ItemDAO
         }
         catch (UnsupportedIdentifierException e)
         {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+        catch (ExternalIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+        catch (IdentifierException e)
+        {
+            log.error("caught exception: ", e);
             throw new RuntimeException(e);
         }
     }
 
     public void update(Item item) throws AuthorizeException
     {
-        // Check authorisation. We only do write authorization if user is
-        // not an editor
-        if (!item.canEdit())
+        try
         {
-            AuthorizeManager.authorizeAction(context, item, Constants.WRITE);
-        }
+            // Check authorisation. We only do write authorization if user is
+            // not an editor
+            if (!item.canEdit())
+            {
+                AuthorizeManager.authorizeAction(context, item, Constants.WRITE);
+            }
 
-        MetadataValueDAO mvDAO = MetadataValueDAOFactory.getInstance(context);
-        MetadataFieldDAO mfDAO = MetadataFieldDAOFactory.getInstance(context);
-        MetadataSchemaDAO msDAO = MetadataSchemaDAOFactory.getInstance(context);
+            MetadataValueDAO mvDAO = MetadataValueDAOFactory.getInstance(context);
+            MetadataFieldDAO mfDAO = MetadataFieldDAOFactory.getInstance(context);
+            MetadataSchemaDAO msDAO = MetadataSchemaDAOFactory.getInstance(context);
 
-        log.info(LogManager.getHeader(context, "update_item", "item_id="
-                + item.getID()));
+            log.info(LogManager.getHeader(context, "update_item", "item_id="
+                    + item.getID()));
 
-        // Update the associated Bundles & Bitstreams
-        Bundle[] bundles = item.getBundles();
+            // Update the associated Bundles & Bitstreams
+            Bundle[] bundles = item.getBundles();
 
-        // Delete any Bundles that were removed from the in-memory list
-        for (Bundle dbBundle : bundleDAO.getBundles(item))
-        {
-            boolean deleted = true;
+            // Delete any Bundles that were removed from the in-memory list
+            for (Bundle dbBundle : bundleDAO.getBundles(item))
+            {
+                boolean deleted = true;
+                for (Bundle bundle : bundles)
+                {
+                    if (bundle.equals(dbBundle))
+                    {
+                        // If the bundle still exists in memory, don't delete
+                        deleted = false;
+                        break;
+                    }
+                }
+
+                if (deleted)
+                {
+                    unlink(item, dbBundle);
+                }
+            }
+
+            // Now that we've cleared up the db, we make the Item <-> Bundle
+            // link concrete.
             for (Bundle bundle : bundles)
             {
-                if (bundle.equals(dbBundle))
+                link(item, bundle);
+            }
+
+            // Set sequence IDs for bitstreams in item
+            int sequence = 0;
+
+            // find the highest current sequence number
+            for (Bundle bundle : bundles)
+            {
+                for (Bitstream bitstream : bundle.getBitstreams())
                 {
-                    // If the bundle still exists in memory, don't delete
-                    deleted = false;
-                    break;
+                    if (bitstream.getSequenceID() > sequence)
+                    {
+                        sequence = bitstream.getSequenceID();
+                    }
                 }
             }
 
-            if (deleted)
+            // start sequencing bitstreams without sequence IDs
+            sequence++;
+
+            for (Bundle bundle : bundles)
             {
-                unlink(item, dbBundle);
-            }
-        }
-
-        // Now that we've cleared up the db, we make the Item <-> Bundle
-        // link concrete.
-        for (Bundle bundle : bundles)
-        {
-            link(item, bundle);
-        }
-
-        // Set sequence IDs for bitstreams in item
-        int sequence = 0;
-
-        // find the highest current sequence number
-        for (Bundle bundle : bundles)
-        {
-            for (Bitstream bitstream : bundle.getBitstreams())
-            {
-                if (bitstream.getSequenceID() > sequence)
+                for (Bitstream bitstream : bundle.getBitstreams())
                 {
-                    sequence = bitstream.getSequenceID();
+                    if (bitstream.getSequenceID() < 0)
+                    {
+                        bitstream.setSequenceID(sequence);
+                        sequence++;
+                        bitstreamDAO.update(bitstream);
+                    }
                 }
-            }
-        }
 
-        // start sequencing bitstreams without sequence IDs
-        sequence++;
-
-        for (Bundle bundle : bundles)
-        {
-            for (Bitstream bitstream : bundle.getBitstreams())
-            {
-                if (bitstream.getSequenceID() < 0)
-                {
-                    bitstream.setSequenceID(sequence);
-                    sequence++;
-                    bitstreamDAO.update(bitstream);
-                }
+                bundleDAO.update(bundle);
             }
 
-            bundleDAO.update(bundle);
-        }
+            // Next we take care of the metadata
 
-        // Next we take care of the metadata
+            // First, we figure out what's in memory, and what's in the database
+            List<MetadataValue> dbMetadata = mvDAO.getMetadataValues(item);
+            List<DCValue> memMetadata = item.getMetadata();
 
-        // First, we figure out what's in memory, and what's in the database
-        List<MetadataValue> dbMetadata = mvDAO.getMetadataValues(item);
-        List<DCValue> memMetadata = item.getMetadata();
+            // Now we have Lists of metadata values stored in-memory and in the
+            // database, we can go about saving changes.
 
-        // Now we have Lists of metadata values stored in-memory and in the
-        // database, we can go about saving changes.
-
-        // Step 1: remove any metadata that is no longer in memory (this
-        // includes values that may have changed, but since we allow
-        // multiple values for a given field for an object, we can't tell
-        // what's changed and what's just gone.
-
-        for (MetadataValue dbValue : dbMetadata)
-        {
-            boolean deleted = true;
-
-            for (DCValue memValue : memMetadata)
-            {
-                if (dbValue.equals(memValue))
-                {
-                    deleted = false;
-                }
-            }
-
-            if (deleted)
-            {
-                mvDAO.delete(dbValue.getID());
-            }
-        }
-
-        // Step 2: go through the list of in-memory metadata and save it to
-        // the database if it's not already there.
-
-        // Map counting number of values for each MetadataField
-        // Values are Integers indicating number of values written for a
-        // given MetadataField. Keys are MetadataField IDs.
-        Map<Integer, Integer> elementCount =
-                new HashMap<Integer, Integer>();
-
-        MetadataSchema schema;
-        MetadataField field;
-
-        for (DCValue memValue : memMetadata)
-        {
-            boolean exists = false;
-            MetadataValue storedValue = null;
-
-            schema = msDAO.retrieveByName(memValue.schema);
-
-            if (schema == null)
-            {
-                schema = msDAO.retrieve(MetadataSchema.DC_SCHEMA_ID);
-            }
-
-            field = mfDAO.retrieve(schema.getID(), memValue.element, memValue.qualifier);
-
-            if (field == null)
-            {
-                throw new RuntimeException("Bad Metadata Field: " + schema.getName()
-                                           + "." + memValue.element + "." + memValue.qualifier);
-            }
-
-            // Work out the place number for ordering
-            int current = 0;
-
-            Integer key = field.getID();
-            Integer currentInteger = elementCount.get(key);
-
-            if (currentInteger != null)
-            {
-                current = currentInteger;
-            }
-
-            current++;
-            elementCount.put(key, current);
+            // Step 1: remove any metadata that is no longer in memory (this
+            // includes values that may have changed, but since we allow
+            // multiple values for a given field for an object, we can't tell
+            // what's changed and what's just gone.
 
             for (MetadataValue dbValue : dbMetadata)
             {
-                if (dbValue.equals(memValue))
+                boolean deleted = true;
+
+                for (DCValue memValue : memMetadata)
                 {
-                    // If it already exists, we make a note of the fact and
-                    // hold on to a copy of the object so we can update it
-                    // later.
-                    exists = true;
-                    storedValue = dbValue;
-                    break;
+                    if (dbValue.equals(memValue))
+                    {
+                        deleted = false;
+                    }
+                }
+
+                if (deleted)
+                {
+                    mvDAO.delete(dbValue.getID());
                 }
             }
 
-            if (!exists)
+            // Step 2: go through the list of in-memory metadata and save it to
+            // the database if it's not already there.
+
+            // Map counting number of values for each MetadataField
+            // Values are Integers indicating number of values written for a
+            // given MetadataField. Keys are MetadataField IDs.
+            Map<Integer, Integer> elementCount =
+                    new HashMap<Integer, Integer>();
+
+            MetadataSchema schema;
+            MetadataField field;
+
+            for (DCValue memValue : memMetadata)
             {
-                MetadataValue value = mvDAO.create();
-                value.setFieldID(field.getID());
-                value.setItemID(item.getID());
-                value.setValue(memValue.value);
-                value.setLanguage(memValue.language);
-                value.setPlace(current);
-                mvDAO.update(value);
+                boolean exists = false;
+                MetadataValue storedValue = null;
+
+                schema = msDAO.retrieveByName(memValue.schema);
+
+                if (schema == null)
+                {
+                    schema = msDAO.retrieve(MetadataSchema.DC_SCHEMA_ID);
+                }
+
+                field = mfDAO.retrieve(schema.getID(), memValue.element, memValue.qualifier);
+
+                if (field == null)
+                {
+                    throw new RuntimeException("Bad Metadata Field: " + schema.getName()
+                                               + "." + memValue.element + "." + memValue.qualifier);
+                }
+
+                // Work out the place number for ordering
+                int current = 0;
+
+                Integer key = field.getID();
+                Integer currentInteger = elementCount.get(key);
+
+                if (currentInteger != null)
+                {
+                    current = currentInteger;
+                }
+
+                current++;
+                elementCount.put(key, current);
+
+                for (MetadataValue dbValue : dbMetadata)
+                {
+                    if (dbValue.equals(memValue))
+                    {
+                        // If it already exists, we make a note of the fact and
+                        // hold on to a copy of the object so we can update it
+                        // later.
+                        exists = true;
+                        storedValue = dbValue;
+                        break;
+                    }
+                }
+
+                if (!exists)
+                {
+                    MetadataValue value = mvDAO.create();
+                    value.setFieldID(field.getID());
+                    value.setItemID(item.getID());
+                    value.setValue(memValue.value);
+                    value.setLanguage(memValue.language);
+                    value.setPlace(current);
+                    mvDAO.update(value);
+                }
+                else
+                {
+                    // Even if it already exists, the place may have changed.
+                    storedValue.setPlace(current);
+                    mvDAO.update(storedValue);
+                }
             }
-            else
+
+            // deal with the item identifier/uuid
+            ObjectIdentifier oid = item.getIdentifier();
+            if (oid == null)
             {
-                // Even if it already exists, the place may have changed.
-                storedValue.setPlace(current);
-                mvDAO.update(storedValue);
+                /*
+                oid = new ObjectIdentifier(true);
+                item.setIdentifier(oid);*/
+                oid = ObjectIdentifierService.mint(context, item);
             }
-        }
+            oidDAO.update(item.getIdentifier());
 
-        // deal with the item identifier/uuid
-        ObjectIdentifier oid = item.getIdentifier();
-        if (oid == null)
+            // deal with the external identifiers
+            List<ExternalIdentifier> eids = item.getExternalIdentifiers();
+            for (ExternalIdentifier eid : eids)
+            {
+                identifierDAO.update(eid);
+            }
+
+            childDAO.update(item);
+        }
+        catch (ObjectIdentifierStorageException e)
         {
-            /*
-            oid = new ObjectIdentifier(true);
-            item.setIdentifier(oid);*/
-            oid = ObjectIdentifierService.mint(context, item);
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
         }
-        oidDAO.update(item.getIdentifier());
-
-        // deal with the external identifiers
-        List<ExternalIdentifier> eids = item.getExternalIdentifiers();
-        for (ExternalIdentifier eid : eids)
+        catch (ExternalIdentifierStorageException e)
         {
-            identifierDAO.update(eid);
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
         }
-
-        childDAO.update(item);
     }
 
     public void delete(int id) throws AuthorizeException
     {
-        Item item = retrieve(id);
-
-        context.removeCached(item, id);
-
-        log.info(LogManager.getHeader(context, "delete_item", "item_id=" + id));
-
-        // Remove bundles
-        for (Bundle bundle : item.getBundles())
+        try
         {
-            item.removeBundle(bundle);
-            unlink(item, bundle);
+            Item item = retrieve(id);
+
+            context.removeCached(item, id);
+
+            log.info(LogManager.getHeader(context, "delete_item", "item_id=" + id));
+
+            // Remove bundles
+            for (Bundle bundle : item.getBundles())
+            {
+                item.removeBundle(bundle);
+                unlink(item, bundle);
+            }
+
+            // remove all of our authorization policies
+            AuthorizeManager.removeAllPolicies(context, item);
+
+            // remove/tombstone the external identifiers
+            List<ExternalIdentifier> eids = item.getExternalIdentifiers();
+            for (ExternalIdentifier eid : eids)
+            {
+                if (eid.leaveTombstone())
+                {
+                    identifierDAO.tombstone(eid);
+                }
+                else
+                {
+                    identifierDAO.delete(eid);
+                }
+            }
+
+            // remove the object identifier
+            oidDAO.delete(item.getIdentifier());
+
+            childDAO.delete(id);
         }
-
-        // remove all of our authorization policies
-        AuthorizeManager.removeAllPolicies(context, item);
-
-        // remove/tombstone the external identifiers
-        List<ExternalIdentifier> eids = item.getExternalIdentifiers();
-        for (ExternalIdentifier eid : eids)
+        catch (ObjectIdentifierStorageException e)
         {
-            if (eid.leaveTombstone())
-            {
-                identifierDAO.tombstone(eid);
-            }
-            else
-            {
-                identifierDAO.delete(eid);
-            }
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
         }
-
-        // remove the object identifier
-        oidDAO.delete(item);
-
-        childDAO.delete(id);
+        catch (ExternalIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
     }
 
     public void decache(Item item)

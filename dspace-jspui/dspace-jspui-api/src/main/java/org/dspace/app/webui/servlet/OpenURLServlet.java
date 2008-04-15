@@ -45,10 +45,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierService;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.IdentifierService;
+import org.dspace.uri.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -132,40 +129,48 @@ public class OpenURLServlet extends URIServlet
             HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
-        String id = request.getParameter("id");
-
-        if (id.startsWith("info:dspace/"))
+        try
         {
-            id = id.substring(new String("info:dspace/").length());
-            id = id.replaceFirst("/", ":");
+            String id = request.getParameter("id");
+
+            if (id.startsWith("info:dspace/"))
+            {
+                id = id.substring(new String("info:dspace/").length());
+                id = id.replaceFirst("/", ":");
+            }
+
+            ExternalIdentifier identifier = null;
+            ObjectIdentifier oi = null;
+            DSpaceObject dso = null;
+
+            // The value of URI will be the persistent identifier in canonical
+            // form, eg: xyz:1234/56
+            identifier = ExternalIdentifierService.parseCanonicalForm(context, id);
+            //ExternalIdentifierDAO identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
+            //identifier = identifierDAO.retrieve(id);
+
+            oi = identifier.getObjectIdentifier();
+
+            dso = (DSpaceObject) IdentifierService.getResource(context, oi);
+
+            if (dso == null)
+            {
+                log.info(LogManager.getHeader(
+                            context, "invalid_id", "id=" + id));
+                JSPManager.showInvalidIDError(request, response, id, -1);
+
+                return;
+            }
+            else
+            {
+                DSpaceObjectServlet dos = new DSpaceObjectServlet();
+                dos.processDSpaceObject(context, request, response, dso, null);
+            }
         }
-
-        ExternalIdentifier identifier = null;
-        ObjectIdentifier oi = null;
-        DSpaceObject dso = null;
-
-        // The value of URI will be the persistent identifier in canonical
-        // form, eg: xyz:1234/56
-        identifier = ExternalIdentifierService.parseCanonicalForm(context, id);
-        //ExternalIdentifierDAO identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
-        //identifier = identifierDAO.retrieve(id);
-
-        oi = identifier.getObjectIdentifier();
-
-        dso = (DSpaceObject) IdentifierService.getResource(context, oi);
-
-        if (dso == null)
+        catch (IdentifierException e)
         {
-            log.info(LogManager.getHeader(
-                        context, "invalid_id", "id=" + id));
-            JSPManager.showInvalidIDError(request, response, id, -1);
-
-            return;
-        }
-        else
-        {
-            DSpaceObjectServlet dos = new DSpaceObjectServlet();
-            dos.processDSpaceObject(context, request, response, dso, null);
+            log.error("caught exception: ", e);
+            throw new ServletException(e);
         }
     }
 }

@@ -56,6 +56,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.uri.IdentifierService;
 import org.dspace.uri.ResolvableIdentifier;
+import org.dspace.uri.IdentifierException;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -87,52 +88,59 @@ public class FlowAuthorizationUtils {
 	 */
 	public static FlowResult resolveItemIdentifier(Context context, String identifier) throws SQLException 
 	{
-		FlowResult result = new FlowResult();
-		result.setContinue(false);
-		//Check whether it's a handle or internal id (by check ing if it has a slash in the string)
-		if (identifier.contains("/")) {
-            ResolvableIdentifier ri = IdentifierService.resolve(context, identifier);
-            DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, ri);
-			
-            if (dso != null && dso.getType() == Constants.ITEM) {
-				result.setParameter("itemID", dso.getID());
-				result.setParameter("type", Constants.ITEM);
-				result.setContinue(true);
-				return result;
-			}
-			else if (dso != null && dso.getType() == Constants.COLLECTION) { 
-				result.setParameter("collectionID", dso.getID());
-				result.setParameter("type", Constants.COLLECTION);
-				result.setContinue(true);
-				return result;
-			}
-			else if (dso != null && dso.getType() == Constants.COMMUNITY) { 
-				result.setParameter("communityID", dso.getID());
-				result.setParameter("type", Constants.COMMUNITY);
-				result.setContinue(true);
-				return result;
-			}
-		}
-		// Otherwise, it's assumed to be a DSpace Item
-		else {
-			Item item = null;
-			try {
-				item = Item.find(context, Integer.valueOf(identifier));
-			} catch (NumberFormatException e) {
-				// ignoring the exception in case of a malformed input string
-			}
-			
-			if (item != null) {
-				result.setParameter("itemID", item.getID());
-				result.setParameter("type", Constants.ITEM);
-				result.setContinue(true);
-				return result;
-			}
-		}
-		
-		result.addError("identifier");
-		return result;	
-	}
+        try
+        {
+            FlowResult result = new FlowResult();
+            result.setContinue(false);
+            //Check whether it's a handle or internal id (by check ing if it has a slash in the string)
+            if (identifier.contains("/")) {
+                ResolvableIdentifier ri = IdentifierService.resolve(context, identifier);
+                DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, ri);
+
+                if (dso != null && dso.getType() == Constants.ITEM) {
+                    result.setParameter("itemID", dso.getID());
+                    result.setParameter("type", Constants.ITEM);
+                    result.setContinue(true);
+                    return result;
+                }
+                else if (dso != null && dso.getType() == Constants.COLLECTION) {
+                    result.setParameter("collectionID", dso.getID());
+                    result.setParameter("type", Constants.COLLECTION);
+                    result.setContinue(true);
+                    return result;
+                }
+                else if (dso != null && dso.getType() == Constants.COMMUNITY) {
+                    result.setParameter("communityID", dso.getID());
+                    result.setParameter("type", Constants.COMMUNITY);
+                    result.setContinue(true);
+                    return result;
+                }
+            }
+            // Otherwise, it's assumed to be a DSpace Item
+            else {
+                Item item = null;
+                try {
+                    item = Item.find(context, Integer.valueOf(identifier));
+                } catch (NumberFormatException e) {
+                    // ignoring the exception in case of a malformed input string
+                }
+
+                if (item != null) {
+                    result.setParameter("itemID", item.getID());
+                    result.setParameter("type", Constants.ITEM);
+                    result.setContinue(true);
+                    return result;
+                }
+            }
+
+            result.addError("identifier");
+            return result;
+        }
+        catch (IdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 	
 	
 	/**

@@ -52,6 +52,7 @@ import org.dspace.core.Context;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ObjectIdentifierService;
 import org.dspace.uri.IdentifierService;
+import org.dspace.uri.IdentifierException;
 
 import java.text.ParseException;
 import java.util.LinkedList;
@@ -180,31 +181,39 @@ public class Harvest
     public static HarvestedItemInfo getSingle(Context context,
             ObjectIdentifier identifier, boolean collections)
     {
-        // FIXME: Assume identifier is item
-        Item i = (Item) IdentifierService.getResource(context, identifier);
-
-        if (i == null)
+        try
         {
-            return null;
+// FIXME: Assume identifier is item
+            Item i = (Item) IdentifierService.getResource(context, identifier);
+
+            if (i == null)
+            {
+                return null;
+            }
+
+            // Fill out OAI info item object
+            HarvestedItemInfo itemInfo = new HarvestedItemInfo();
+
+            itemInfo.context = context;
+            itemInfo.item = i;
+            itemInfo.identifier = identifier;
+            itemInfo.withdrawn = i.isWithdrawn();
+            itemInfo.datestamp = i.getLastModified();
+            itemInfo.itemID = i.getID();
+
+            // Get the sets
+            if (collections)
+            {
+                fillCollections(context, itemInfo);
+            }
+
+            return itemInfo;
         }
-
-        // Fill out OAI info item object
-        HarvestedItemInfo itemInfo = new HarvestedItemInfo();
-
-        itemInfo.context = context;
-        itemInfo.item = i;
-        itemInfo.identifier = identifier;
-        itemInfo.withdrawn = i.isWithdrawn();
-        itemInfo.datestamp = i.getLastModified();
-        itemInfo.itemID = i.getID();
-
-        // Get the sets
-        if (collections)
+        catch (IdentifierException e)
         {
-            fillCollections(context, itemInfo);
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
         }
-
-        return itemInfo;
     }
 
     /**
@@ -218,22 +227,30 @@ public class Harvest
     private static void fillCollections(Context context,
             HarvestedItemInfo itemInfo)
     {
-        CollectionDAO collectionDAO = CollectionDAOFactory.getInstance(context);
-
-        ObjectIdentifier oi = ObjectIdentifierService.get(context, itemInfo.itemID, Constants.ITEM);
-        // ObjectIdentifier oi = new ObjectIdentifier(itemInfo.itemID, Constants.ITEM);
-        Item item = (Item) IdentifierService.getResource(context, oi);
-
-        List<Collection> parents = collectionDAO.getParentCollections(item);
-
-        List<ObjectIdentifier> identifiers =
-            new LinkedList<ObjectIdentifier>();
-
-        for (Collection parent : parents)
+        try
         {
-            identifiers.add(parent.getIdentifier());
-        }
+            CollectionDAO collectionDAO = CollectionDAOFactory.getInstance(context);
 
-        itemInfo.collectionIdentifiers = identifiers;
+            ObjectIdentifier oi = ObjectIdentifierService.get(context, itemInfo.itemID, Constants.ITEM);
+            // ObjectIdentifier oi = new ObjectIdentifier(itemInfo.itemID, Constants.ITEM);
+            Item item = (Item) IdentifierService.getResource(context, oi);
+
+            List<Collection> parents = collectionDAO.getParentCollections(item);
+
+            List<ObjectIdentifier> identifiers =
+                new LinkedList<ObjectIdentifier>();
+
+            for (Collection parent : parents)
+            {
+                identifiers.add(parent.getIdentifier());
+            }
+
+            itemInfo.collectionIdentifiers = identifiers;
+        }
+        catch (IdentifierException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
     }
 }

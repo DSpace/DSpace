@@ -7,6 +7,7 @@ import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.Context;
 import org.dspace.uri.IdentifierService;
 import org.dspace.uri.ResolvableIdentifier;
+import org.dspace.uri.IdentifierException;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -52,6 +53,10 @@ public class IdentifierMatcher extends WildcardMatcher
         {
             // FIXME:???
             return null;
+        }
+        catch (IdentifierException e)
+        {
+            throw new RuntimeException(e);
         }
     }
 }

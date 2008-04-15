@@ -51,6 +51,8 @@ import org.dspace.eperson.dao.GroupDAO;
 import org.dspace.eperson.dao.GroupDAOFactory;
 import org.dspace.uri.dao.ObjectIdentifierDAO;
 import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
+import org.dspace.uri.dao.ObjectIdentifierStorageException;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -85,6 +87,7 @@ public class IdentifierService
      * @return
      */
     public static ResolvableIdentifier resolve(Context context, String str)
+            throws IdentifierException
     {
         ResolvableIdentifier dsi = null;
 
@@ -117,6 +120,7 @@ public class IdentifierService
      * @return
      */
     public static ResolvableIdentifier resolveAsURLSubstring(Context context, String path)
+            throws IdentifierException
     {
         ObjectIdentifier oi = ObjectIdentifier.extractURLIdentifier(path);
         ExternalIdentifier ei = null;
@@ -157,6 +161,7 @@ public class IdentifierService
      * @return
      */
     public static ResolvableIdentifier resolveCanonical(Context context, String canonicalForm)
+            throws IdentifierException
     {
         ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(canonicalForm);
         ExternalIdentifier ei = null;
@@ -315,26 +320,35 @@ public class IdentifierService
     }
 
     public static Identifiable getResource(Context context, ResolvableIdentifier ri)
+            throws IdentifierException
     {
-        ObjectIdentifier oid = ri.getObjectIdentifier();
-
-        // do we know what the resource type and id is?
-        if (oid.getResourceTypeID() == -1 || oid.getResourceID() == -1)
+        try
         {
-            // we don't have resource type or resource id for this item
-            // check the UUID cache and see if we can find them
-            ObjectIdentifierDAO dao = ObjectIdentifierDAOFactory.getInstance(context);
-            ObjectIdentifier noid = dao.retrieve(oid.getUUID());
+            ObjectIdentifier oid = ri.getObjectIdentifier();
 
-            // if there is no object identifier, just return null
-            if (noid == null)
+            // do we know what the resource type and id is?
+            if (oid.getResourceTypeID() == -1 || oid.getResourceID() == -1)
             {
-                return null;
-            }
-        }
+                // we don't have resource type or resource id for this item
+                // check the UUID cache and see if we can find them
+                ObjectIdentifierDAO dao = ObjectIdentifierDAOFactory.getInstance(context);
+                ObjectIdentifier noid = dao.retrieve(oid.getUUID());
 
-        // now we can select the object based on its resource type and id
-        return IdentifierService.getObjectByResourceID(context, oid);
+                // if there is no object identifier, just return null
+                if (noid == null)
+                {
+                    return null;
+                }
+            }
+
+            // now we can select the object based on its resource type and id
+            return IdentifierService.getObjectByResourceID(context, oid);
+        }
+        catch (ObjectIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new IdentifierException(e);
+        }
     }
 
     /**

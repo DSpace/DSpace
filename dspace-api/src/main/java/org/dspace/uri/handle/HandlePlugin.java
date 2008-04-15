@@ -54,6 +54,7 @@ import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierType;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 import net.handle.hdllib.Encoder;
 import net.handle.hdllib.HandleException;
 import net.handle.hdllib.HandleStorage;
@@ -414,6 +415,11 @@ public class HandlePlugin implements HandleStorage
             }
 
             return Collections.enumeration(results);
+        }
+        catch (ExternalIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new HandleException(HandleException.INTERNAL_ERROR);
         }
         catch (SQLException sqle)
         {

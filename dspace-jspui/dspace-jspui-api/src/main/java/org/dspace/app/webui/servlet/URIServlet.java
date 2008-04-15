@@ -47,6 +47,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierService;
+import org.dspace.uri.IdentifierException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -73,46 +74,51 @@ public class URIServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        String extraPathInfo = null;
-        DSpaceObject dso = null;
+        try {
+            String extraPathInfo = null;
+            DSpaceObject dso = null;
 
-        // Original path info of the form:
-        //
-        // /<identifier namespace>/<identifier>[/<optional path info>]
-        String path = request.getPathInfo();
+            // Original path info of the form:
+            //
+            // /<identifier namespace>/<identifier>[/<optional path info>]
+            String path = request.getPathInfo();
 
-        // get the identifier if there is one
-        ResolvableIdentifier di = IdentifierService.resolve(context, path);
+            // get the identifier if there is one
+            ResolvableIdentifier di = IdentifierService.resolve(context, path);
 
-        // get the object if there is one
-        if (di != null)
-        {
-            dso = (DSpaceObject) IdentifierService.getResource(context, di);
-        }
-
-        // if there is no object, display the invalid id error
-        if (dso == null)
-        {
-            log.info(LogManager.getHeader(context, "invalid_id", "path=" + path));
-            JSPManager.showInvalidIDError(request, response, path, -1);
-        }
-        else
-        {
-            String urlForm = di.getURLForm();
-            int index = path.indexOf(urlForm);
-            int startFrom = index + urlForm.length();
-            if (startFrom < path.length())
+            // get the object if there is one
+            if (di != null)
             {
-                extraPathInfo = path.substring(startFrom);
+                dso = (DSpaceObject) IdentifierService.getResource(context, di);
             }
 
-            // we've got a standard content delivery servlet to deal with this, to allow for alternative URI
-            // handling mechanisms.  Not the best decoupling, but it'll do for the moment to allow the handle
-            // system to offer a legacy url interpretation
-            DSpaceObjectServlet dos = new DSpaceObjectServlet();
-            dos.processDSpaceObject(context, request, response, dso, extraPathInfo);
+            // if there is no object, display the invalid id error
+            if (dso == null)
+            {
+                log.info(LogManager.getHeader(context, "invalid_id", "path=" + path));
+                JSPManager.showInvalidIDError(request, response, path, -1);
+            }
+            else
+            {
+                String urlForm = di.getURLForm();
+                int index = path.indexOf(urlForm);
+                int startFrom = index + urlForm.length();
+                if (startFrom < path.length())
+                {
+                    extraPathInfo = path.substring(startFrom);
+                }
+
+                // we've got a standard content delivery servlet to deal with this, to allow for alternative URI
+                // handling mechanisms.  Not the best decoupling, but it'll do for the moment to allow the handle
+                // system to offer a legacy url interpretation
+                DSpaceObjectServlet dos = new DSpaceObjectServlet();
+                dos.processDSpaceObject(context, request, response, dso, extraPathInfo);
+            }
+        }
+        catch (IdentifierException e)
+        {
+            log.error("caught exception: ", e);
+            throw new ServletException(e);
         }
     }
-
-    
 }

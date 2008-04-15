@@ -6,6 +6,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.uri.IdentifierService;
 import org.dspace.uri.ResolvableIdentifier;
+import org.dspace.uri.IdentifierException;
 import org.dspace.app.webui.util.JSPManager;
 import org.apache.log4j.Logger;
 
@@ -29,70 +30,78 @@ public class HandleLegacyServlet extends DSpaceServlet
     protected void doDSPost(Context context, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException, AuthorizeException
     {
-        String handle = null;
-        String extraPathInfo = null;
-        DSpaceObject dso = null;
-
-        // Original path info, of the form "1721.x/1234"
-        // or "1721.x/1234/extra/stuff"
-        String path = request.getPathInfo();
-
-        if (path != null)
+        try
         {
-            // substring(1) is to remove initial '/'
-            path = path.substring(1);
+            String handle = null;
+            String extraPathInfo = null;
+            DSpaceObject dso = null;
 
-            try
+            // Original path info, of the form "1721.x/1234"
+            // or "1721.x/1234/extra/stuff"
+            String path = request.getPathInfo();
+
+            if (path != null)
             {
-                // Extract the Handle
-                int firstSlash = path.indexOf('/');
-                int secondSlash = path.indexOf('/', firstSlash + 1);
+                // substring(1) is to remove initial '/'
+                path = path.substring(1);
 
-                if (secondSlash != -1)
+                try
                 {
-                    // We have extra path info
-                    handle = path.substring(0, secondSlash);
-                    extraPathInfo = path.substring(secondSlash);
+                    // Extract the Handle
+                    int firstSlash = path.indexOf('/');
+                    int secondSlash = path.indexOf('/', firstSlash + 1);
+
+                    if (secondSlash != -1)
+                    {
+                        // We have extra path info
+                        handle = path.substring(0, secondSlash);
+                        extraPathInfo = path.substring(secondSlash);
+                    }
+                    else
+                    {
+                        // The path is just the Handle
+                        handle = path;
+                    }
                 }
-                else
+                catch (NumberFormatException nfe)
                 {
-                    // The path is just the Handle
-                    handle = path;
+                    // Leave handle as null
                 }
             }
-            catch (NumberFormatException nfe)
+
+            // now parse the handle in its canonical form to locate the item
+            // NOTE: my god how good is the API?  It's great, that's how good it is
+            handle = "hdl:" + handle;
+            ResolvableIdentifier ri = IdentifierService.resolve(context, handle);
+            dso = (DSpaceObject) IdentifierService.getResource(context, ri);
+
+            // if there is no object, display the invalid id error
+            if (dso == null)
             {
-                // Leave handle as null
+                log.info(LogManager.getHeader(context, "invalid_id", "path=" + path));
+                JSPManager.showInvalidIDError(request, response, path, -1);
+            }
+            else
+            {
+                String urlForm = ri.getURLForm();
+                int index = path.indexOf(urlForm);
+                int startFrom = index + urlForm.length();
+                if (startFrom < path.length())
+                {
+                    extraPathInfo = path.substring(startFrom);
+                }
+
+                // we've got a standard content delivery servlet to deal with this, to allow for alternative URI
+                // handling mechanisms.  Not the best decoupling, but it'll do for the moment to allow the handle
+                // system to offer a legacy url interpretation
+                DSpaceObjectServlet dos = new DSpaceObjectServlet();
+                dos.processDSpaceObject(context, request, response, dso, extraPathInfo);
             }
         }
-
-        // now parse the handle in its canonical form to locate the item
-        // NOTE: my god how good is the API?  It's great, that's how good it is
-        handle = "hdl:" + handle;
-        ResolvableIdentifier ri = IdentifierService.resolve(context, handle);
-        dso = (DSpaceObject) IdentifierService.getResource(context, ri);
-
-        // if there is no object, display the invalid id error
-        if (dso == null)
+        catch (IdentifierException e)
         {
-            log.info(LogManager.getHeader(context, "invalid_id", "path=" + path));
-            JSPManager.showInvalidIDError(request, response, path, -1);
-        }
-        else
-        {
-            String urlForm = ri.getURLForm();
-            int index = path.indexOf(urlForm);
-            int startFrom = index + urlForm.length();
-            if (startFrom < path.length())
-            {
-                extraPathInfo = path.substring(startFrom);
-            }
-
-            // we've got a standard content delivery servlet to deal with this, to allow for alternative URI
-            // handling mechanisms.  Not the best decoupling, but it'll do for the moment to allow the handle
-            // system to offer a legacy url interpretation
-            DSpaceObjectServlet dos = new DSpaceObjectServlet();
-            dos.processDSpaceObject(context, request, response, dso, extraPathInfo);
+            log.error("caught exception: ", e);
+            throw new ServletException(e);
         }
     }
 }

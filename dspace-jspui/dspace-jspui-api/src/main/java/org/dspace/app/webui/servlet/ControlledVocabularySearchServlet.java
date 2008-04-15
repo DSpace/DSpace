@@ -48,6 +48,7 @@ import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
 import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierService;
+import org.dspace.uri.IdentifierException;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
@@ -89,26 +90,33 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
+        try
+        {
+            String action = request.getParameter("action") == null ? "" : request
+                    .getParameter("action");
 
-        String action = request.getParameter("action") == null ? "" : request
-                .getParameter("action");
-
-        if (action.equals("search"))
-        {
-            List keywords = extractKeywords(request);
-            String query = join(keywords, " or ");
-            doSearch(context, request, query);
-            JSPManager.showJSP(request, response, RESULTS_JSP);
+            if (action.equals("search"))
+            {
+                List keywords = extractKeywords(request);
+                String query = join(keywords, " or ");
+                doSearch(context, request, query);
+                JSPManager.showJSP(request, response, RESULTS_JSP);
+            }
+            else if (action.equals("filter"))
+            {
+                String filter = request.getParameter("filter");
+                request.getSession().setAttribute("conceptsearch.filter", filter);
+                JSPManager.showJSP(request, response, SEARCH_JSP);
+            }
+            else
+            {
+                JSPManager.showJSP(request, response, SEARCH_JSP);
+            }
         }
-        else if (action.equals("filter"))
+        catch (IdentifierException e)
         {
-            String filter = request.getParameter("filter");
-            request.getSession().setAttribute("conceptsearch.filter", filter);
-            JSPManager.showJSP(request, response, SEARCH_JSP);
-        }
-        else
-        {
-            JSPManager.showJSP(request, response, SEARCH_JSP);
+            log.error("caught exception: ", e);
+            throw new ServletException(e);
         }
     }
 
@@ -148,7 +156,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
      * @throws SQLException
      */
     private void doSearch(Context context, HttpServletRequest request,
-            String query) throws IOException, SQLException
+            String query) throws IOException, SQLException, IdentifierException
     {
         ExternalIdentifierDAO identifierDAO =
             ExternalIdentifierDAOFactory.getInstance(context);

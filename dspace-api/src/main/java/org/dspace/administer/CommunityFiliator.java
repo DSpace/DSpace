@@ -51,10 +51,7 @@ import org.dspace.content.dao.CommunityDAOFactory;
 import org.dspace.core.ArchiveManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierService;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.IdentifierService;
+import org.dspace.uri.*;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
@@ -231,39 +228,40 @@ public class CommunityFiliator
 
     private Community resolveCommunity(Context c, String communityID)
     {
-        ExternalIdentifierDAO identifierDAO =
-            ExternalIdentifierDAOFactory.getInstance(c);
-        Community community = null;
+        try {
+            ExternalIdentifierDAO identifierDAO =
+                ExternalIdentifierDAOFactory.getInstance(c);
+            Community community = null;
 
-        if (communityID.indexOf('/') != -1)
-        {
-            if (communityID.indexOf(':') == -1)
+            if (communityID.indexOf('/') != -1)
             {
-                // has no : must be a handle
-                communityID = "hdl:" + communityID;
-                System.out.println("no namespace provided. assuming handles.");
+                if (communityID.indexOf(':') == -1)
+                {
+                    // has no : must be a handle
+                    communityID = "hdl:" + communityID;
+                    System.out.println("no namespace provided. assuming handles.");
+                }
+
+                ExternalIdentifier identifier = ExternalIdentifierService.parseCanonicalForm(c, communityID);
+                community = (Community) IdentifierService.getResource(c, identifier);
+
+                // ensure it's a community
+                if ((community == null)
+                        || (community.getType() != Constants.COMMUNITY))
+                {
+                    community = null;
+                }
+            }
+            else
+            {
+                community = communityDAO.retrieve(Integer.parseInt(communityID));
             }
 
-            ExternalIdentifier identifier = ExternalIdentifierService.parseCanonicalForm(c, communityID);
-
-            /*
-            community (Community) oi.getObject(c);
-            ObjectIdentifier oi = identifier.getObjectIdentifier();
-            community = (Community) oi.getObject(c);*/
-            community = (Community) IdentifierService.getResource(c, identifier);
-
-            // ensure it's a community
-            if ((community == null)
-                    || (community.getType() != Constants.COMMUNITY))
-            {
-                community = null;
-            }
+            return community;
         }
-        else
+        catch (IdentifierException e)
         {
-            community = communityDAO.retrieve(Integer.parseInt(communityID));
+            throw new RuntimeException(e);
         }
-
-        return community;
     }
 }

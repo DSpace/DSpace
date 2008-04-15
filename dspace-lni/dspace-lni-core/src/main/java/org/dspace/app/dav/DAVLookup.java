@@ -47,6 +47,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierService;
+import org.dspace.uri.IdentifierException;
 import org.jdom.Element;
 
 import javax.servlet.ServletException;
@@ -157,89 +158,97 @@ class DAVLookup extends DAVResource
     private void doRedirect() throws IOException, SQLException,
             DAVStatusException
     {
-        DSpaceObject dso = null;
-        String bsPid = null;
+        try
+        {
+            DSpaceObject dso = null;
+            String bsPid = null;
 
-        /*
-         * FIXME: (maybe?) NOTE: This is currently hard-wired to accomodate the
-         * syntax of Handles, with "prefix/suffix" separated by the slash --
-         * that means the Handle probably takes up multiple path elements,
-         * unless the client escaped the '/'. This code *might* need adjusting
-         * if we allow other kinds of persistent identifiers for DSpace objects.
-         */
-        int hdlStart = -1;
-        if (this.pathElt.length > 2 && this.pathElt[1].equals("handle"))
-        {
-            hdlStart = 2;
-        }
-        else if (this.pathElt.length > 3 && this.pathElt[1].equals("bitstream-handle"))
-        {
-            bsPid = this.pathElt[2];
-            hdlStart = 3;
-        }
-        else
-        {
-            throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
-                    "Unrecognized 'lookup' request format.");
-        }
-        String prefix = decodeHandle(this.pathElt[hdlStart]);
-        String handle = null;
-
-        // if "prefix" contains a slash, then it's the whole handle:
-        if (prefix.indexOf("/") >= 0)
-        {
-            handle = prefix;
-            log.debug("Lookup: resolving escaped handle \"" + handle + "\"");
-        }
-        else if (this.pathElt.length >= hdlStart + 2)
-        {
-            StringBuffer hdl = new StringBuffer(prefix);
-            for (int i = hdlStart + 1; i < this.pathElt.length; ++i)
+            /*
+            * FIXME: (maybe?) NOTE: This is currently hard-wired to accomodate the
+                * syntax of Handles, with "prefix/suffix" separated by the slash --
+                * that means the Handle probably takes up multiple path elements,
+                * unless the client escaped the '/'. This code *might* need adjusting
+                * if we allow other kinds of persistent identifiers for DSpace objects.
+                */
+            int hdlStart = -1;
+            if (this.pathElt.length > 2 && this.pathElt[1].equals("handle"))
             {
-                hdl.append("/");
-                hdl.append(this.pathElt[i]);
+                hdlStart = 2;
             }
-            handle = hdl.toString();
-            log.debug("Lookup: resolving multielement handle \"" + handle
-                    + "\"");
-        }
-        else
-        {
-            throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
-                    "Incomplete handle in lookup request.");
-        }
+            else if (this.pathElt.length > 3 && this.pathElt[1].equals("bitstream-handle"))
+            {
+                bsPid = this.pathElt[2];
+                hdlStart = 3;
+            }
+            else
+            {
+                throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
+                        "Unrecognized 'lookup' request format.");
+            }
+            String prefix = decodeHandle(this.pathElt[hdlStart]);
+            String handle = null;
 
-        // did handle lookup fail?
-        ResolvableIdentifier dsi = IdentifierService.resolve(context, handle);
-        dso = (DSpaceObject) IdentifierService.getResource(context, dsi);
+            // if "prefix" contains a slash, then it's the whole handle:
+            if (prefix.indexOf("/") >= 0)
+            {
+                handle = prefix;
+                log.debug("Lookup: resolving escaped handle \"" + handle + "\"");
+            }
+            else if (this.pathElt.length >= hdlStart + 2)
+            {
+                StringBuffer hdl = new StringBuffer(prefix);
+                for (int i = hdlStart + 1; i < this.pathElt.length; ++i)
+                {
+                    hdl.append("/");
+                    hdl.append(this.pathElt[i]);
+                }
+                handle = hdl.toString();
+                log.debug("Lookup: resolving multielement handle \"" + handle
+                        + "\"");
+            }
+            else
+            {
+                throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
+                        "Incomplete handle in lookup request.");
+            }
 
-        if (dso == null)
-        {
-            throw new DAVStatusException(HttpServletResponse.SC_NOT_FOUND,
-                    "Cannot resolve handle \"" + handle + "\"");
-        }
+            // did handle lookup fail?
+            ResolvableIdentifier dsi = IdentifierService.resolve(context, handle);
+            dso = (DSpaceObject) IdentifierService.getResource(context, dsi);
 
-        // bitstream must exist too
-        String location = makeLocation(dso, bsPid);
-        if (location == null)
-        {
-            throw new DAVStatusException(HttpServletResponse.SC_NOT_FOUND,
-                    "Bitstream \"" + bsPid + "\" does not exist in \"" + handle
-                            + "\"");
-        }
+            if (dso == null)
+            {
+                throw new DAVStatusException(HttpServletResponse.SC_NOT_FOUND,
+                        "Cannot resolve handle \"" + handle + "\"");
+            }
 
-        // add query string -- unnecessary, but it helps naive clients that
-        // use GET with "package" query arg to download an Item.
-        String qs = this.request.getQueryString();
-        if (qs != null)
-        {
-            location += "?" + qs;
-        }
+            // bitstream must exist too
+            String location = makeLocation(dso, bsPid);
+            if (location == null)
+            {
+                throw new DAVStatusException(HttpServletResponse.SC_NOT_FOUND,
+                        "Bitstream \"" + bsPid + "\" does not exist in \"" + handle
+                                + "\"");
+            }
 
-        log.debug("Lookup returning redirect to: " + location);
-        this.response.setHeader("Location", location);
-        this.response.sendError(HttpServletResponse.SC_MOVED_TEMPORARILY,
+            // add query string -- unnecessary, but it helps naive clients that
+            // use GET with "package" query arg to download an Item.
+            String qs = this.request.getQueryString();
+            if (qs != null)
+            {
+                location += "?" + qs;
+            }
+
+            log.debug("Lookup returning redirect to: " + location);
+            this.response.setHeader("Location", location);
+            this.response.sendError(HttpServletResponse.SC_MOVED_TEMPORARILY,
                 "These are not the droids you are looking for.");
+        }
+        catch (IdentifierException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -257,14 +266,22 @@ class DAVLookup extends DAVResource
     protected String makeURI(String handle, String bsPid) throws IOException,
             SQLException
     {
-        ResolvableIdentifier dsi = IdentifierService.resolve(context, handle);
-        DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, dsi);
-
-        if (dso == null)
+        try
         {
-            return null;
+            ResolvableIdentifier dsi = IdentifierService.resolve(context, handle);
+            DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, dsi);
+
+            if (dso == null)
+            {
+                return null;
+            }
+            return makeURI(dso, bsPid);
         }
-        return makeURI(dso, bsPid);
+        catch (IdentifierException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
     }
 
     /**

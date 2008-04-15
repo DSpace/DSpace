@@ -60,6 +60,7 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierService;
+import org.dspace.uri.IdentifierException;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.core.Constants;
@@ -100,52 +101,59 @@ public class FlowItemUtils
 	 */
 	public static FlowResult resolveItemIdentifier(Context context, String identifier) throws SQLException
 	{
-		FlowResult result = new FlowResult();
-		result.setContinue(false);
+        try
+        {
+            FlowResult result = new FlowResult();
+            result.setContinue(false);
 
-        ExternalIdentifierDAO identifierDAO =
-            ExternalIdentifierDAOFactory.getInstance(context);
-		
-		//		Check whether it's a handle or internal id (by check ing if it has a slash inthe string)
-		if (identifier.contains("/")) 
-		{
+            ExternalIdentifierDAO identifierDAO =
+                ExternalIdentifierDAOFactory.getInstance(context);
+
+            //		Check whether it's a handle or internal id (by check ing if it has a slash inthe string)
+            if (identifier.contains("/"))
+            {
 //			DSpaceObject dso = HandleManager.resolveToObject(context, identifier);
-            /*
-            ExternalIdentifier eid = identifierDAO.retrieve(identifier);
-            DSpaceObject dso = eid.getObjectIdentifier().getObject(context);*/
-            ResolvableIdentifier ri = IdentifierService.resolve(context, identifier);
-            DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, ri);
-	
-            if (dso != null && dso.getType() == Constants.ITEM)
-			{ 
-				result.setParameter("itemID", dso.getID());
-				result.setParameter("type", Constants.ITEM);
-				result.setContinue(true);
-				return result;
-			}
-		}
-		else
-		{
-		
-			Item item = null;
-			try {
-				item = Item.find(context, Integer.valueOf(identifier));
-			} catch (NumberFormatException e) {
-				// ignoring the exception
-			}
+/*
+ExternalIdentifier eid = identifierDAO.retrieve(identifier);
+DSpaceObject dso = eid.getObjectIdentifier().getObject(context);*/
+                ResolvableIdentifier ri = IdentifierService.resolve(context, identifier);
+                DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, ri);
 
-			if (item != null) 
-			{
-				result.setParameter("itemID", item.getID());
-				result.setParameter("type", Constants.ITEM);
-				result.setContinue(true);
-				return result;
-			}
-		}
+                if (dso != null && dso.getType() == Constants.ITEM)
+                {
+                    result.setParameter("itemID", dso.getID());
+                    result.setParameter("type", Constants.ITEM);
+                    result.setContinue(true);
+                    return result;
+                }
+            }
+            else
+            {
 
-		result.addError("identifier");
-		return result;
-	}
+                Item item = null;
+                try {
+                    item = Item.find(context, Integer.valueOf(identifier));
+                } catch (NumberFormatException e) {
+                    // ignoring the exception
+                }
+
+                if (item != null)
+                {
+                    result.setParameter("itemID", item.getID());
+                    result.setParameter("type", Constants.ITEM);
+                    result.setContinue(true);
+                    return result;
+                }
+            }
+
+            result.addError("identifier");
+            return result;
+        }
+        catch (IdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 	
 	/**
 	 * Process the request parameters to update the item's metadata and remove any selected bitstreams.

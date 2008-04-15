@@ -70,6 +70,7 @@ import org.dspace.core.LogManager;
 import org.dspace.search.Harvest;
 import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierService;
+import org.dspace.uri.IdentifierException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -162,105 +163,113 @@ public class FeedServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
 	{
-        String path = request.getPathInfo();
-        String feedType = null;
-        String uri = null;
-
-        if(labels==null)
-        {    
-            // Get access to the localized resource bundle
-            Locale locale = request.getLocale();
-            labels = ResourceBundle.getBundle("Messages", locale);
-        }
-        
-        if (path != null)
-        {
-            // substring(1) is to remove initial '/'
-            path = path.substring(1);
-            int split = path.indexOf("/");
-            if (split != -1)
-            {
-            	feedType = path.substring(0,split);
-            	uri = path.substring(split+1);
-            }
-        }
-
-        DSpaceObject dso = null;
-        
-        //as long as this is not a site wide feed, 
-        //attempt to retrieve the Collection or Community object
-        if(!uri.equals(SITE_FEED_KEY))
-        { 	
-        	// Determine if the URI is a valid reference
-            ResolvableIdentifier di = IdentifierService.resolve(context, uri);
-            dso = (DSpaceObject) IdentifierService.getResource(context, di);
-        }
-        
-        if (! enabled || (dso != null && 
-        	(dso.getType() != Constants.COLLECTION && dso.getType() != Constants.COMMUNITY)) )
-        {
-            log.info(LogManager.getHeader(context, "invalid_id", "path=" + path));
-            JSPManager.showInvalidIDError(request, response, path, -1);
-            return;
-        }
-        
-        // Determine if requested format is supported
-        if( feedType == null || ! formats.contains( feedType ) )
-        {
-            log.info(LogManager.getHeader(context, "invalid_syndformat", "path=" + path));
-            JSPManager.showInvalidIDError(request, response, path, -1);
-            return;
-        }
-        
-        // Lookup or generate the feed
-        Channel channel = null;
-        if (feedCache != null)
-        {
-            // Cache key is URI
-        	CacheFeed cFeed = (CacheFeed)feedCache.get(uri);
-        	if (cFeed != null)  // cache hit, but...
-        	{
-        		// Is the feed current?
-        		boolean cacheFeedCurrent = false;
-        		if (cFeed.timeStamp + (cacheAge * HOUR_MSECS) < System.currentTimeMillis())
-        		{
-        			cacheFeedCurrent = true;
-        		}
-        		// Not current, but have any items changed since feed was created/last checked?
-        		else if ( ! itemsChanged(context, dso, cFeed.timeStamp))
-        		{
-        			// no items have changed, re-stamp feed and use it
-          			cFeed.timeStamp = System.currentTimeMillis();
-          			cacheFeedCurrent = true;
-        		}
-        		if (cacheFeedCurrent)
-        		{
-        			channel = cFeed.access();		
-        		}
-        	}
-        }
-        
-        // either not caching, not found in cache, or feed in cache not current
-        if (channel == null)
-        {
-        	channel = generateFeed(context, dso);
-        	if (feedCache != null)
-        	{
-        		cache(uri, new CacheFeed(channel));
-        	}
-        }
-        
-        // set the feed to the requested type & return it
-        channel.setFeedType(feedType);
-        WireFeedOutput feedWriter = new WireFeedOutput();
         try
         {
+            String path = request.getPathInfo();
+            String feedType = null;
+            String uri = null;
+
+            if(labels==null)
+            {
+                // Get access to the localized resource bundle
+                Locale locale = request.getLocale();
+                labels = ResourceBundle.getBundle("Messages", locale);
+            }
+
+            if (path != null)
+            {
+                // substring(1) is to remove initial '/'
+                path = path.substring(1);
+                int split = path.indexOf("/");
+                if (split != -1)
+                {
+                    feedType = path.substring(0,split);
+                    uri = path.substring(split+1);
+                }
+            }
+
+            DSpaceObject dso = null;
+
+            //as long as this is not a site wide feed,
+            //attempt to retrieve the Collection or Community object
+            if(!uri.equals(SITE_FEED_KEY))
+            { 	
+                // Determine if the URI is a valid reference
+                ResolvableIdentifier di = IdentifierService.resolve(context, uri);
+                dso = (DSpaceObject) IdentifierService.getResource(context, di);
+            }
+
+            if (! enabled || (dso != null &&
+                (dso.getType() != Constants.COLLECTION && dso.getType() != Constants.COMMUNITY)) )
+            {
+                log.info(LogManager.getHeader(context, "invalid_id", "path=" + path));
+                JSPManager.showInvalidIDError(request, response, path, -1);
+                return;
+            }
+
+            // Determine if requested format is supported
+            if( feedType == null || ! formats.contains( feedType ) )
+            {
+                log.info(LogManager.getHeader(context, "invalid_syndformat", "path=" + path));
+                JSPManager.showInvalidIDError(request, response, path, -1);
+                return;
+            }
+
+            // Lookup or generate the feed
+            Channel channel = null;
+            if (feedCache != null)
+            {
+                // Cache key is URI
+                CacheFeed cFeed = (CacheFeed)feedCache.get(uri);
+                if (cFeed != null)  // cache hit, but...
+                {
+                    // Is the feed current?
+                    boolean cacheFeedCurrent = false;
+                    if (cFeed.timeStamp + (cacheAge * HOUR_MSECS) < System.currentTimeMillis())
+                    {
+                        cacheFeedCurrent = true;
+                    }
+                    // Not current, but have any items changed since feed was created/last checked?
+                    else if ( ! itemsChanged(context, dso, cFeed.timeStamp))
+                    {
+                        // no items have changed, re-stamp feed and use it
+                          cFeed.timeStamp = System.currentTimeMillis();
+                          cacheFeedCurrent = true;
+                    }
+                    if (cacheFeedCurrent)
+                    {
+                        channel = cFeed.access();
+                    }
+                }
+            }
+
+            // either not caching, not found in cache, or feed in cache not current
+            if (channel == null)
+            {
+                channel = generateFeed(context, dso);
+                if (feedCache != null)
+                {
+                    cache(uri, new CacheFeed(channel));
+                }
+            }
+
+            // set the feed to the requested type & return it
+            channel.setFeedType(feedType);
+            WireFeedOutput feedWriter = new WireFeedOutput();
+            try
+            {
         	response.setContentType("text/xml; charset=UTF-8");
-        	feedWriter.output(channel, response.getWriter());
+                feedWriter.output(channel, response.getWriter());
+            }
+            catch( FeedException fex )
+            {
+                throw new IOException(fex.getMessage());
+            }
         }
-        catch( FeedException fex )
+        catch (IdentifierException e)
         {
-        	throw new IOException(fex.getMessage());
+            log.error("caught exception: ", e);
+            throw new ServletException(e);
         }
     }
        

@@ -1,5 +1,5 @@
 /*
- * ExternalIdentifierDAOFactory.java
+ * IdentifierException.java
  *
  * Version: $Revision: 1727 $
  *
@@ -37,27 +37,34 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-package org.dspace.uri.dao;
-
-import org.dspace.uri.dao.postgres.ExternalIdentifierDAOPostgres;
-import org.dspace.core.Context;
+package org.dspace.uri;
 
 /**
- * Factory class for returning DAOs for storing ExternalIdentifier objects
+ * Exception class to indicate that there was a problem with some general
+ * part of the Identifier mechanism.  This may further wrap deeper
+ * exceptions from this module.
  *
- * @author James Rutherford
  * @author Richard Jones
  */
-public class ExternalIdentifierDAOFactory
+public class IdentifierException extends Exception
 {
-    /**
-     * Get an ExternalIdentifierDAO for the given DSpace Context
-     *
-     * @param context
-     * @return
-     */
-    public static ExternalIdentifierDAO getInstance(Context context)
+    public IdentifierException()
     {
-        return new ExternalIdentifierDAOPostgres(context);
+        super();
+    }
+
+    public IdentifierException(String s)
+    {
+        super(s);
+    }
+
+    public IdentifierException(String s, Throwable throwable)
+    {
+        super(s, throwable);
+    }
+
+    public IdentifierException(Throwable throwable)
+    {
+        super(throwable);
     }
 }

@@ -47,6 +47,7 @@ import org.dspace.core.Context;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ObjectIdentifierService;
 import org.dspace.uri.IdentifierService;
+import org.dspace.uri.IdentifierException;
 
 import java.io.Serializable;
 import java.util.BitSet;
@@ -321,17 +322,25 @@ public class Event implements Serializable
      */
     public DSpaceObject getObject(Context context)
     {
-        int type = getObjectType();
-        int id = getObjectID();
-        if (type < 0 || id < 0)
+        try
         {
-            return null;
+            int type = getObjectType();
+            int id = getObjectID();
+            if (type < 0 || id < 0)
+            {
+                return null;
+            }
+            else
+            {
+                ObjectIdentifier oid = ObjectIdentifierService.get(context, type, id);
+                // ObjectIdentifier oid = new ObjectIdentifier(id, type);
+                return (DSpaceObject) IdentifierService.getResource(context, oid);
+            }
         }
-        else
+        catch (IdentifierException e)
         {
-            ObjectIdentifier oid = ObjectIdentifierService.get(context, type, id);
-            // ObjectIdentifier oid = new ObjectIdentifier(id, type);
-            return (DSpaceObject) IdentifierService.getResource(context, oid);
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -343,9 +352,17 @@ public class Event implements Serializable
      */
     public DSpaceObject getSubject(Context context)
     {
-        ObjectIdentifier oid = ObjectIdentifierService.get(context, getSubjectType(), getSubjectID());
-        // ObjectIdentifier oid = new ObjectIdentifier(getSubjectID(), getSubjectType());
-        return (DSpaceObject) IdentifierService.getResource(context, oid);
+        try
+        {
+            ObjectIdentifier oid = ObjectIdentifierService.get(context, getSubjectType(), getSubjectID());
+            // ObjectIdentifier oid = new ObjectIdentifier(getSubjectID(), getSubjectType());
+            return (DSpaceObject) IdentifierService.getResource(context, oid);
+        }
+        catch (IdentifierException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
     }
 
     /**

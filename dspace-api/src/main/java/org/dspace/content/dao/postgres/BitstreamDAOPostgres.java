@@ -54,6 +54,8 @@ import org.dspace.content.dao.BitstreamDAO;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.UnsupportedIdentifierException;
+import org.dspace.uri.IdentifierException;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -268,6 +270,17 @@ public class BitstreamDAOPostgres extends BitstreamDAO
         }
         catch (UnsupportedIdentifierException e)
         {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+        catch (ExternalIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+        catch (IdentifierException e)
+        {
+            log.error("caught exception: ", e);
             throw new RuntimeException(e);
         }
     }

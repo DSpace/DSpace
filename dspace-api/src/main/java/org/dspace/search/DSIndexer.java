@@ -78,6 +78,7 @@ import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.IdentifierService;
+import org.dspace.uri.IdentifierException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -621,38 +622,46 @@ public class DSIndexer
      */
     public static void cleanIndex(Context context) throws IOException
     {
-        ObjectIdentifier oi = null;
+        try
+        {
+            ObjectIdentifier oi = null;
 
-    	IndexReader reader = DSQuery.getIndexReader();
+            IndexReader reader = DSQuery.getIndexReader();
 
-    	for(int i = 0 ; i < reader.numDocs(); i++)
-    	{
-    		if(!reader.isDeleted(i))
-    		{
-    			Document doc = reader.document(i);
-        		String uri = doc.get("uri");
-
-                oi = ObjectIdentifier.parseCanonicalForm(uri);
-        		DSpaceObject o = (DSpaceObject) IdentifierService.getResource(context, oi);
-
-                if (o == null)
+            for(int i = 0 ; i < reader.numDocs(); i++)
+            {
+                if(!reader.isDeleted(i))
                 {
-                	log.info("Deleting: " + uri);
-                	/* Use IndexWriter to delete, its easier to manage write.lock */
-                	DSIndexer.unIndexContent(context, uri);
+                    Document doc = reader.document(i);
+                    String uri = doc.get("uri");
+
+                    oi = ObjectIdentifier.parseCanonicalForm(uri);
+                    DSpaceObject o = (DSpaceObject) IdentifierService.getResource(context, oi);
+
+                    if (o == null)
+                    {
+                        log.info("Deleting: " + uri);
+                        /* Use IndexWriter to delete, its easier to manage write.lock */
+                        DSIndexer.unIndexContent(context, uri);
+                    }
+                    else
+                    {
+                        context.removeCached(o, o.getID());
+                        log.debug("Keeping: " + uri);
+                    }
                 }
                 else
                 {
-                	context.removeCached(o, o.getID());
-                	log.debug("Keeping: " + uri);
+                    log.debug("Encountered deleted doc: " + i);
                 }
-    		}
-    		else
-    		{
-    			log.debug("Encountered deleted doc: " + i);
-    		}
-    	}
-	}
+            }
+        }
+        catch (IdentifierException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+    }
 
 	/**
      * Get the Lucene analyzer to use according to current configuration (or

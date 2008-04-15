@@ -38,8 +38,19 @@ package org.dspace.uri.dao;
 import org.dspace.core.Context;
 import org.dspace.uri.dao.postgres.ObjectIdentifierDAOPostgres;
 
+/**
+ * Factory class to generate the relevant storage layer DAO for storing ObjectIdentifier objects
+ *
+ * @author Richard Jones
+ */
 public class ObjectIdentifierDAOFactory
 {
+    /**
+     * Get an instance of the relevant DAO for the given DSpace context
+     * 
+     * @param context
+     * @return
+     */
     public static ObjectIdentifierDAO getInstance(Context context)
     {
         return new ObjectIdentifierDAOPostgres(context);

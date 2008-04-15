@@ -73,6 +73,7 @@ import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 import org.dspace.uri.IdentifierService;
 import org.dspace.uri.ResolvableIdentifier;
+import org.dspace.uri.IdentifierException;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.xml.sax.SAXException;
@@ -236,118 +237,125 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     protected void buildSearchResultsDivision(Division search)
             throws IOException, SQLException, WingException
     {
-        if (getQuery().length() > 0)
+        try
         {
-            ExternalIdentifierDAO dao =
-                ExternalIdentifierDAOFactory.getInstance(context);
-
-            // Preform the actual search
-            performSearch();
-            DSpaceObject searchScope = getScope();
-            
-            Para para = search.addPara("result-query","result-query");
-
-            String query = getQuery();
-            int hitCount = queryResults.getHitCount();
-            para.addContent(T_result_query.parameterize(query,hitCount));
-            
-            Division results = search.addDivision("search-results","primary");
-            
-            if (searchScope instanceof Community)
+            if (getQuery().length() > 0)
             {
-                Community community = (Community) searchScope;
-                String communityName = community.getMetadata("name");
-                results.setHead(T_head1_community.parameterize(communityName));
-            }
-            else if (searchScope instanceof Collection)
-            {
-                Collection collection = (Collection) searchScope;
-                String collectionName = collection.getMetadata("name");
-                results.setHead(T_head1_collection.parameterize(collectionName));
-            }
-            else
-            {
-                results.setHead(T_head1_none);
-            }
+                ExternalIdentifierDAO dao =
+                    ExternalIdentifierDAOFactory.getInstance(context);
 
-            if (queryResults.getHitCount() > 0)
-            {
-                // Pagination variables.
-                int itemsTotal = queryResults.getHitCount();
-                int firstItemIndex = queryResults.getStart() + 1;
-                int lastItemIndex = queryResults.getStart()
-                        + queryResults.getPageSize();
-                if (itemsTotal < lastItemIndex)
-                    lastItemIndex = itemsTotal;
-                int currentPage = (queryResults.getStart() / queryResults
-                        .getPageSize()) + 1;
-                int pagesTotal = ((queryResults.getHitCount() - 1) / queryResults
-                        .getPageSize()) + 1;
-                Map<String, String> parameters = new HashMap<String, String>();
-                parameters.put("page", "{pageNum}");
-                String pageURLMask = generateURL(parameters);
+                // Preform the actual search
+                performSearch();
+                DSpaceObject searchScope = getScope();
 
-                results.setMaskedPagination(itemsTotal, firstItemIndex,
-                        lastItemIndex, currentPage, pagesTotal, pageURLMask);
+                Para para = search.addPara("result-query","result-query");
 
-                // Look for any communities or collections in the mix
-                ReferenceSet referenceSet = null;
-                boolean resultsContainsBothContainersAndItems = false;
-                
-                @SuppressWarnings("unchecked") // This cast is correct
-                java.util.List<String> containerURIs = queryResults.getHitURIs();
-//                java.util.List<String> containerHandles = queryResults.getHitHandles();
-//                for (String handle : containerHandles)
-                for (String uri : containerURIs)
+                String query = getQuery();
+                int hitCount = queryResults.getHitCount();
+                para.addContent(T_result_query.parameterize(query,hitCount));
+
+                Division results = search.addDivision("search-results","primary");
+
+                if (searchScope instanceof Community)
                 {
-                    ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
-                    DSpaceObject resultDSO = (DSpaceObject) IdentifierService.getResource(context, ri);
-
-                    if (resultDSO instanceof Community
-                            || resultDSO instanceof Collection)
-                    {
-                        if (referenceSet == null) {
-                            referenceSet = results.addReferenceSet("search-results-repository",
-                                    ReferenceSet.TYPE_SUMMARY_LIST,null,"repository-search-results");
-                            // Set a heading showing that we will be listing containers that matched:
-                            referenceSet.setHead(T_head2);
-                            resultsContainsBothContainersAndItems = true;
-                        }
-                        referenceSet.addReference(resultDSO);
-                    }
+                    Community community = (Community) searchScope;
+                    String communityName = community.getMetadata("name");
+                    results.setHead(T_head1_community.parameterize(communityName));
                 }
-                
-                
-                // Look for any items in the result set.
-                referenceSet = null;
-                
-                @SuppressWarnings("unchecked") // This cast is correct
-                java.util.List<String> itemURIs = queryResults.getHitURIs();
-//                java.util.List<String> itemHandles = queryResults.getHitHandles();
-//                for (String handle : itemHandles)
-                for (String uri : itemURIs)
+                else if (searchScope instanceof Collection)
                 {
-                    ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
-                    DSpaceObject resultDSO = (DSpaceObject) IdentifierService.getResource(context, ri);
-                    if (resultDSO instanceof Item)
-                    {
-                        if (referenceSet == null) {
-                            referenceSet = results.addReferenceSet("search-results-repository",
-                                    ReferenceSet.TYPE_SUMMARY_LIST,null,"repository-search-results");
-                            // Only set a heading if there are both containers and items.
-                            if (resultsContainsBothContainersAndItems)
-                            	referenceSet.setHead(T_head3);  
-                        }
-                        referenceSet.addReference(resultDSO);
-                    }
+                    Collection collection = (Collection) searchScope;
+                    String collectionName = collection.getMetadata("name");
+                    results.setHead(T_head1_collection.parameterize(collectionName));
                 }
-                
-            }
-            else
-            {
-                results.addPara(T_no_results);
-            }
-        }// Empty query
+                else
+                {
+                    results.setHead(T_head1_none);
+                }
+
+                if (queryResults.getHitCount() > 0)
+                {
+                    // Pagination variables.
+                    int itemsTotal = queryResults.getHitCount();
+                    int firstItemIndex = queryResults.getStart() + 1;
+                    int lastItemIndex = queryResults.getStart()
+                            + queryResults.getPageSize();
+                    if (itemsTotal < lastItemIndex)
+                        lastItemIndex = itemsTotal;
+                    int currentPage = (queryResults.getStart() / queryResults
+                            .getPageSize()) + 1;
+                    int pagesTotal = ((queryResults.getHitCount() - 1) / queryResults
+                            .getPageSize()) + 1;
+                    Map<String, String> parameters = new HashMap<String, String>();
+                    parameters.put("page", "{pageNum}");
+                    String pageURLMask = generateURL(parameters);
+
+                    results.setMaskedPagination(itemsTotal, firstItemIndex,
+                            lastItemIndex, currentPage, pagesTotal, pageURLMask);
+
+                    // Look for any communities or collections in the mix
+                    ReferenceSet referenceSet = null;
+                    boolean resultsContainsBothContainersAndItems = false;
+
+                    @SuppressWarnings("unchecked") // This cast is correct
+                    java.util.List<String> containerURIs = queryResults.getHitURIs();
+    //                java.util.List<String> containerHandles = queryResults.getHitHandles();
+    //                for (String handle : containerHandles)
+                    for (String uri : containerURIs)
+                    {
+                        ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
+                        DSpaceObject resultDSO = (DSpaceObject) IdentifierService.getResource(context, ri);
+
+                        if (resultDSO instanceof Community
+                                || resultDSO instanceof Collection)
+                        {
+                            if (referenceSet == null) {
+                                referenceSet = results.addReferenceSet("search-results-repository",
+                                        ReferenceSet.TYPE_SUMMARY_LIST,null,"repository-search-results");
+                                // Set a heading showing that we will be listing containers that matched:
+                                referenceSet.setHead(T_head2);
+                                resultsContainsBothContainersAndItems = true;
+                            }
+                            referenceSet.addReference(resultDSO);
+                        }
+                    }
+
+
+                    // Look for any items in the result set.
+                    referenceSet = null;
+
+                    @SuppressWarnings("unchecked") // This cast is correct
+                    java.util.List<String> itemURIs = queryResults.getHitURIs();
+    //                java.util.List<String> itemHandles = queryResults.getHitHandles();
+    //                for (String handle : itemHandles)
+                    for (String uri : itemURIs)
+                    {
+                        ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
+                        DSpaceObject resultDSO = (DSpaceObject) IdentifierService.getResource(context, ri);
+                        if (resultDSO instanceof Item)
+                        {
+                            if (referenceSet == null) {
+                                referenceSet = results.addReferenceSet("search-results-repository",
+                                        ReferenceSet.TYPE_SUMMARY_LIST,null,"repository-search-results");
+                                // Only set a heading if there are both containers and items.
+                                if (resultsContainsBothContainersAndItems)
+                                    referenceSet.setHead(T_head3);
+                            }
+                            referenceSet.addReference(resultDSO);
+                        }
+                    }
+
+                }
+                else
+                {
+                    results.addPara(T_no_results);
+                }
+            }// Empty query
+        }
+        catch (IdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
     
     /**

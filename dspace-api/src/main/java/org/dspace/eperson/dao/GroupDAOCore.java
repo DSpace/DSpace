@@ -48,6 +48,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ObjectIdentifierService;
+import org.dspace.uri.dao.ObjectIdentifierStorageException;
 
 import java.util.List;
 import java.util.Set;
@@ -103,99 +104,115 @@ public class GroupDAOCore extends GroupDAO
      */
     public void update(Group group) throws AuthorizeException
     {
-        // Check authorisation - if you're not the eperson
-        // see if the authorization system says you can
-        if (!context.ignoreAuthorization())
+        try
         {
-            AuthorizeManager.authorizeAction(context, group, Constants.WRITE);
-        }
+            // Check authorisation - if you're not the eperson
+            // see if the authorization system says you can
+            if (!context.ignoreAuthorization())
+            {
+                AuthorizeManager.authorizeAction(context, group, Constants.WRITE);
+            }
 
-        log.info(LogManager.getHeader(context, "update_group", "group_id="
-                + group.getID()));
+            log.info(LogManager.getHeader(context, "update_group", "group_id="
+                    + group.getID()));
 
-        EPerson[] epeople = group.getMembers();
+            EPerson[] epeople = group.getMembers();
 
-        for (EPerson storedEPerson : epersonDAO.getEPeople(group))
-        {
-            boolean deleted = true;
+            for (EPerson storedEPerson : epersonDAO.getEPeople(group))
+            {
+                boolean deleted = true;
+                for (EPerson eperson : epeople)
+                {
+                    if (eperson.equals(storedEPerson))
+                    {
+                        deleted = false;
+                        break;
+                    }
+                }
+
+                if (deleted)
+                {
+                    unlink(group, storedEPerson);
+                }
+            }
+
             for (EPerson eperson : epeople)
             {
-                if (eperson.equals(storedEPerson))
+                link(group, eperson);
+            }
+
+            Group[] groups = group.getMemberGroups();
+
+            for (Group storedGroup : getMemberGroups(group))
+            {
+                boolean deleted = true;
+                for (Group g : groups)
                 {
-                    deleted = false;
-                    break;
+                    if (g.equals(storedGroup))
+                    {
+                        deleted = false;
+                        break;
+                    }
+                }
+
+                if (deleted)
+                {
+                    unlink(group, storedGroup);
                 }
             }
 
-            if (deleted)
+            for (EPerson eperson : epeople)
             {
-                unlink(group, storedEPerson);
-            }
-        }
-
-        for (EPerson eperson : epeople)
-        {
-            link(group, eperson);
-        }
-        
-        Group[] groups = group.getMemberGroups();
-
-        for (Group storedGroup : getMemberGroups(group))
-        {
-            boolean deleted = true;
-            for (Group g : groups)
-            {
-                if (g.equals(storedGroup))
-                {
-                    deleted = false;
-                    break;
-                }
+                link(group, eperson);
             }
 
-            if (deleted)
+            // deal with the item identifier/uuid
+            ObjectIdentifier oid = group.getIdentifier();
+            if (oid == null)
             {
-                unlink(group, storedGroup);
+                oid = ObjectIdentifierService.mint(context, group);
             }
-        }
+            oidDAO.update(group.getIdentifier());
 
-        for (EPerson eperson : epeople)
+            childDAO.update(group);
+        }
+        catch (ObjectIdentifierStorageException e)
         {
-            link(group, eperson);
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
         }
-
-        // deal with the item identifier/uuid
-        ObjectIdentifier oid = group.getIdentifier();
-        if (oid == null)
-        {
-            oid = ObjectIdentifierService.mint(context, group);
-        }
-        oidDAO.update(group.getIdentifier());
-
-        childDAO.update(group);
     }
 
     public void delete(int id) throws AuthorizeException
     {
-        if (!AuthorizeManager.isAdmin(context))
+        try
         {
-            throw new AuthorizeException(
-                    "You must be an admin to delete a Group");
+            if (!AuthorizeManager.isAdmin(context))
+            {
+                throw new AuthorizeException(
+                        "You must be an admin to delete a Group");
+            }
+
+            Group group = retrieve(id);
+
+            context.removeCached(group, id);
+
+            // Remove any ResourcePolicies that reference this group
+            AuthorizeManager.removeGroupPolicies(context, id);
+
+            // delete the identifier cache
+            oidDAO.delete(group.getIdentifier());
+
+            log.info(LogManager.getHeader(context, "delete_group", "group_id=" +
+                        id));
+
+            childDAO.delete(id);
         }
-
-        Group group = retrieve(id);
-
-        context.removeCached(group, id);
-
-        // Remove any ResourcePolicies that reference this group
-        AuthorizeManager.removeGroupPolicies(context, id);
-
-        // delete the identifier cache
-        oidDAO.delete(group);
-
-        log.info(LogManager.getHeader(context, "delete_group", "group_id=" +
-                    id));
-
-        childDAO.delete(id);
+        catch (ObjectIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
     }
 
     public List<Group> getGroups()

@@ -48,6 +48,8 @@ import org.dspace.core.LogManager;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.uri.ObjectIdentifierService;
 import org.dspace.uri.*;
+import org.dspace.uri.dao.ObjectIdentifierStorageException;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -128,60 +130,89 @@ public class BitstreamDAOCore extends BitstreamDAO
     @Override
     public void update(Bitstream bitstream) throws AuthorizeException
     {
-        AuthorizeManager.authorizeAction(context, bitstream, Constants.WRITE);
-
-        log.info(LogManager.getHeader(context, "update_bitstream",
-                "bitstream_id=" + bitstream.getID()));
-
-        // finally, deal with the bitstream identifier/uuid
-        ObjectIdentifier oid = bitstream.getIdentifier();
-        if (oid == null)
+        try
         {
-            /*
-            oid = new ObjectIdentifier(true);
-            bitstream.setIdentifier(oid);*/
-            oid = ObjectIdentifierService.mint(context, bitstream);
-        }
-        oidDAO.update(bitstream.getIdentifier());
+            AuthorizeManager.authorizeAction(context, bitstream, Constants.WRITE);
 
-        // deal with the external identifiers
-        List<ExternalIdentifier> eids = bitstream.getExternalIdentifiers();
-        for (ExternalIdentifier eid : eids)
+            log.info(LogManager.getHeader(context, "update_bitstream",
+                    "bitstream_id=" + bitstream.getID()));
+
+            // finally, deal with the bitstream identifier/uuid
+            ObjectIdentifier oid = bitstream.getIdentifier();
+            if (oid == null)
+            {
+                /*
+                oid = new ObjectIdentifier(true);
+                bitstream.setIdentifier(oid);*/
+                oid = ObjectIdentifierService.mint(context, bitstream);
+            }
+            oidDAO.update(bitstream.getIdentifier());
+
+            // deal with the external identifiers
+            List<ExternalIdentifier> eids = bitstream.getExternalIdentifiers();
+            for (ExternalIdentifier eid : eids)
+            {
+                identifierDAO.update(eid);
+            }
+
+            childDAO.update(bitstream);
+        }
+        catch (ObjectIdentifierStorageException e)
         {
-            identifierDAO.update(eid);
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
         }
-
-        childDAO.update(bitstream);
+        catch (ExternalIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void delete(int id) throws AuthorizeException
     {
-        Bitstream bitstream = retrieve(id);
-        bitstream.setDeleted(true);
+        try
+        {
+            Bitstream bitstream = retrieve(id);
+            bitstream.setDeleted(true);
 
-        log.info(LogManager.getHeader(context, "delete_bitstream",
-                "bitstream_id=" + id));
+            log.info(LogManager.getHeader(context, "delete_bitstream",
+                    "bitstream_id=" + id));
 
-        context.removeCached(bitstream, id);
+            context.removeCached(bitstream, id);
 
-        AuthorizeManager.removeAllPolicies(context, bitstream);
+            AuthorizeManager.removeAllPolicies(context, bitstream);
 
-        // remove the object identifier
-        oidDAO.delete(bitstream);
+            // remove the object identifier
+            oidDAO.delete(bitstream.getIdentifier());
 
-        childDAO.delete(id);
+            childDAO.delete(id);
+        }
+        catch (ObjectIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
     }
     
     @Override
     public void remove(int id) throws AuthorizeException
     {
-        Bitstream bitstream = retrieve(id);
+        try
+        {
+            Bitstream bitstream = retrieve(id);
 
-        AuthorizeManager.authorizeAction(context, bitstream, Constants.REMOVE);
-        // remove the object identifier
-        oidDAO.delete(bitstream);
+            AuthorizeManager.authorizeAction(context, bitstream, Constants.REMOVE);
+            // remove the object identifier
+            oidDAO.delete(bitstream.getIdentifier());
 
-        childDAO.remove(id);
+            childDAO.remove(id);
+        }
+        catch (ObjectIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
     }
 }

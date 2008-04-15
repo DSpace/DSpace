@@ -76,10 +76,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.dao.GroupDAO;
 import org.dspace.eperson.dao.GroupDAOFactory;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierService;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.IdentifierService;
+import org.dspace.uri.*;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.workflow.WorkflowManager;
@@ -1639,7 +1636,7 @@ public class ItemImport
     }
 
     private List<ExternalIdentifier> getExternalIdentifiers(String directory)
-            throws IOException
+            throws IOException, IdentifierException
     {
         File uriFile = new File(directory + "uri");
         FileReader reader = new FileReader(uriFile);
@@ -1654,15 +1651,6 @@ public class ItemImport
             {
                 eids.add(eid);
             }
-            /*
-            for (int i = 0; i < eidPlugins.length; i++)
-            {
-                ExternalIdentifier eid = eidPlugins[i].parseCanonicalForm(line);
-                if (eid != null)
-                {
-                    eids.add(eid);
-                }
-            }*/
         }
         
         return eids;

@@ -59,6 +59,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierService;
+import org.dspace.uri.IdentifierException;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 import org.dspace.search.DSQuery;
@@ -173,43 +174,50 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 	 */
 	private ArrayList<Item> preformSearch(Collection collection, String query) throws SQLException, IOException
 	{
-		
-		// Search the repository
-        QueryArgs queryArgs = new QueryArgs();
-        queryArgs.setQuery(query);
-        queryArgs.setPageSize(Integer.MAX_VALUE);
-        QueryResults results = DSQuery.doQuery(context, queryArgs);
-        
-        ExternalIdentifierDAO identifierDAO =
-            ExternalIdentifierDAOFactory.getInstance(context);
 
-        // Get a list of found items
-        ArrayList<Item> items = new ArrayList<Item>();
-        @SuppressWarnings("unchecked")
-        java.util.List<String> uris = results.getHitURIs();
+        try
+        {
+// Search the repository
+            QueryArgs queryArgs = new QueryArgs();
+            queryArgs.setQuery(query);
+            queryArgs.setPageSize(Integer.MAX_VALUE);
+            QueryResults results = DSQuery.doQuery(context, queryArgs);
+
+            ExternalIdentifierDAO identifierDAO =
+                ExternalIdentifierDAOFactory.getInstance(context);
+
+            // Get a list of found items
+            ArrayList<Item> items = new ArrayList<Item>();
+            @SuppressWarnings("unchecked")
+            java.util.List<String> uris = results.getHitURIs();
 //        java.util.List<String> handles = results.getHithandles();
 //        for (String handle : handles)
-        for (String uri : uris)
-        {
-//            DSpaceObject resultDSO = HandleManager.resolveToObject(context, handle);
-            /*
-            ExternalIdentifier identifier = identifierDAO.retrieve(uri);
-            DSpaceObject resultDSO =
-                identifier.getObjectIdentifier().getObject(context);*/
-            ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
-            DSpaceObject resultDSO = (DSpaceObject) IdentifierService.getResource(context, ri);
-
-            if (resultDSO instanceof Item)
+            for (String uri : uris)
             {
-            	Item item = (Item) resultDSO;
-            	
-            	if (!item.isOwningCollection(collection))
-            		items.add(item);
+    //            DSpaceObject resultDSO = HandleManager.resolveToObject(context, handle);
+                /*
+                ExternalIdentifier identifier = identifierDAO.retrieve(uri);
+                DSpaceObject resultDSO =
+                    identifier.getObjectIdentifier().getObject(context);*/
+                ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
+                DSpaceObject resultDSO = (DSpaceObject) IdentifierService.getResource(context, ri);
+
+                if (resultDSO instanceof Item)
+                {
+                    Item item = (Item) resultDSO;
+
+                    if (!item.isOwningCollection(collection))
+                        items.add(item);
+                }
             }
+
+            return items;
         }
-        
-        return items;
-	}
+        catch (IdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 	
 	
 	

@@ -53,6 +53,7 @@ import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
 import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierService;
+import org.dspace.uri.IdentifierException;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
@@ -149,128 +150,136 @@ public class HTMLServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        ExternalIdentifierDAO identifierDAO =
-            ExternalIdentifierDAOFactory.getInstance(context);
-
-        Item item = null;
-        Bitstream bitstream = null;
-
-        String idString = request.getPathInfo();
-        String filenameNoPath = null;
-        String fullpath = null;
-        String uri = null;
-
-        // Parse URL
-        if (idString != null)
+        try
         {
-            // Remove leading slash
-            if (idString.startsWith("/"))
-            {
-                idString = idString.substring(1);
-            }
+            ExternalIdentifierDAO identifierDAO =
+                ExternalIdentifierDAOFactory.getInstance(context);
 
-            // Get uri and full file path
-            int slashIndex = idString.indexOf('/');
-            if (slashIndex != -1)
+            Item item = null;
+            Bitstream bitstream = null;
+
+            String idString = request.getPathInfo();
+            String filenameNoPath = null;
+            String fullpath = null;
+            String uri = null;
+
+            // Parse URL
+            if (idString != null)
             {
-                slashIndex = idString.indexOf('/', slashIndex + 1);
+                // Remove leading slash
+                if (idString.startsWith("/"))
+                {
+                    idString = idString.substring(1);
+                }
+
+                // Get uri and full file path
+                int slashIndex = idString.indexOf('/');
                 if (slashIndex != -1)
                 {
-                    uri = idString.substring(0, slashIndex);
-                    fullpath = URLDecoder.decode(idString
-                            .substring(slashIndex + 1),
-                            Constants.DEFAULT_ENCODING);
-
-                    // Get filename with no path
-                    slashIndex = fullpath.indexOf('/');
+                    slashIndex = idString.indexOf('/', slashIndex + 1);
                     if (slashIndex != -1)
                     {
-                        String[] pathComponents = fullpath.split("/");
-                        if (pathComponents.length <= maxDepthGuess + 1)
+                        uri = idString.substring(0, slashIndex);
+                        fullpath = URLDecoder.decode(idString
+                                .substring(slashIndex + 1),
+                                Constants.DEFAULT_ENCODING);
+
+                        // Get filename with no path
+                        slashIndex = fullpath.indexOf('/');
+                        if (slashIndex != -1)
                         {
-                            filenameNoPath = pathComponents[pathComponents.length - 1];
+                            String[] pathComponents = fullpath.split("/");
+                            if (pathComponents.length <= maxDepthGuess + 1)
+                            {
+                                filenameNoPath = pathComponents[pathComponents.length - 1];
+                            }
                         }
                     }
                 }
             }
-        }
 
-        if (uri != null && fullpath != null)
-        {
-            // Find the item
-            try
+            if (uri != null && fullpath != null)
             {
-                /*
-                 * If the original item doesn't have a persistent identifier
-                 * yet (because it's in the workflow) what we actually have is
-                 * a URL of the form: db-id/1234 where 1234 is the database ID
-                 * of the item.
-                 *
-                 * FIXME: This first part could be totally omitted now that we
-                 * have the dsi:x/y format of identification.
-                */
-                if (uri.startsWith("db-id"))
+                // Find the item
+                try
                 {
-                    String dbIDString = uri
-                            .substring(uri.indexOf('/') + 1);
-                    int dbID = Integer.parseInt(dbIDString);
-                    item = ItemDAOFactory.getInstance(context).retrieve(dbID);
+                    /*
+                     * If the original item doesn't have a persistent identifier
+                     * yet (because it's in the workflow) what we actually have is
+                     * a URL of the form: db-id/1234 where 1234 is the database ID
+                     * of the item.
+                     *
+                     * FIXME: This first part could be totally omitted now that we
+                     * have the dsi:x/y format of identification.
+                    */
+                    if (uri.startsWith("db-id"))
+                    {
+                        String dbIDString = uri
+                                .substring(uri.indexOf('/') + 1);
+                        int dbID = Integer.parseInt(dbIDString);
+                        item = ItemDAOFactory.getInstance(context).retrieve(dbID);
+                    }
+                    else
+                    {
+                        ResolvableIdentifier di = IdentifierService.resolveCanonical(context, uri);
+                        //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
+                        //ObjectIdentifier oi = identifier.getObjectIdentifier();
+                        item = (Item) IdentifierService.getResource(context, di);
+                    }
                 }
-                else
+                catch (NumberFormatException nfe)
                 {
-                    ResolvableIdentifier di = IdentifierService.resolveCanonical(context, uri);
-                    //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
-                    //ObjectIdentifier oi = identifier.getObjectIdentifier();
-                    item = (Item) IdentifierService.getResource(context, di);
+                    // Invalid ID - this will be dealt with below
                 }
             }
-            catch (NumberFormatException nfe)
+
+            if (item != null)
             {
-                // Invalid ID - this will be dealt with below
+                // Try to find bitstream with exactly matching name + path
+                bitstream = getItemBitstreamByName(item, fullpath);
+
+                if (bitstream == null && filenameNoPath != null)
+                {
+                    // No match with the full path, but we can try again with
+                    // only the filename
+                    bitstream = getItemBitstreamByName(item, filenameNoPath);
+                }
+            }
+
+            // Did we get a bitstream?
+            if (bitstream != null)
+            {
+                log.info(LogManager.getHeader(context, "view_html", "uri="
+                        + uri + ",bitstream_id=" + bitstream.getID()));
+
+                // Set the response MIME type
+                response.setContentType(bitstream.getFormat().getMIMEType());
+
+                // Response length
+                response.setHeader("Content-Length", String.valueOf(bitstream
+                        .getSize()));
+
+                // Pipe the bits
+                InputStream is = bitstream.retrieve();
+
+                Utils.bufferedCopy(is, response.getOutputStream());
+                is.close();
+                response.getOutputStream().flush();
+            }
+            else
+            {
+                // No bitstream - we got an invalid ID
+                log.info(LogManager.getHeader(context, "view_html",
+                        "invalid_bitstream_id=" + idString));
+
+                JSPManager.showInvalidIDError(request, response, idString,
+                        Constants.BITSTREAM);
             }
         }
-
-        if (item != null)
+        catch (IdentifierException e)
         {
-            // Try to find bitstream with exactly matching name + path
-            bitstream = getItemBitstreamByName(item, fullpath);
-            
-            if (bitstream == null && filenameNoPath != null)
-            {
-                // No match with the full path, but we can try again with
-                // only the filename
-                bitstream = getItemBitstreamByName(item, filenameNoPath);
-            }
-        }
-
-        // Did we get a bitstream?
-        if (bitstream != null)
-        {
-            log.info(LogManager.getHeader(context, "view_html", "uri="
-                    + uri + ",bitstream_id=" + bitstream.getID()));
-
-            // Set the response MIME type
-            response.setContentType(bitstream.getFormat().getMIMEType());
-
-            // Response length
-            response.setHeader("Content-Length", String.valueOf(bitstream
-                    .getSize()));
-
-            // Pipe the bits
-            InputStream is = bitstream.retrieve();
-
-            Utils.bufferedCopy(is, response.getOutputStream());
-            is.close();
-            response.getOutputStream().flush();
-        }
-        else
-        {
-            // No bitstream - we got an invalid ID
-            log.info(LogManager.getHeader(context, "view_html",
-                    "invalid_bitstream_id=" + idString));
-
-            JSPManager.showInvalidIDError(request, response, idString,
-                    Constants.BITSTREAM);
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
         }
     }
 }

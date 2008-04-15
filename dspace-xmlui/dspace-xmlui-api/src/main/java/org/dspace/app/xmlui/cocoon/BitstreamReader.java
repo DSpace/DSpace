@@ -69,6 +69,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierService;
+import org.dspace.uri.IdentifierException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -298,6 +299,11 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         catch (SQLException sqle)
         {
             throw new ProcessingException("Unable to read bitstream.",sqle);
+        }
+        catch (IdentifierException e)
+        {
+            log.error("caught exception: ", e);
+            throw new ProcessingException("Unable to read bitstream.", e);
         }
         catch (AuthorizeException ae)
         {

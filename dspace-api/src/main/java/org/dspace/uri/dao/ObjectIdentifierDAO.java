@@ -35,29 +35,66 @@
  */
 package org.dspace.uri.dao;
 
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.uri.ObjectIdentifier;
 
 import java.util.UUID;
 
+/**
+ * Abstract parent class to be extended by any DAO wishing to store ObjectIdentifier objects
+ *
+ * @author Richard Jones
+ */
 public abstract class ObjectIdentifierDAO
 {
+    /** the DSpace context */
     protected Context context;
-    
+
+    /**
+     * Construct a new ObjectIdentifierDAO with the given DSpace context
+     * @param context
+     */
     public ObjectIdentifierDAO(Context context)
     {
         this.context = context;
     }
 
-    public abstract void create(UUID uuid, DSpaceObject dso);
+    /**
+     * Create a persistent record of the given ObjectIdentifier
+     *
+     * @param oid
+     */
+    public abstract void create(ObjectIdentifier oid) throws ObjectIdentifierStorageException;
 
-    public abstract ObjectIdentifier retrieve(UUID uuid);
+    /**
+     * Retrieve the ObjectIdentifier associated with the given DSpaceObject
+     *
+     * @param uuid
+     * @return
+     */
+    public abstract ObjectIdentifier retrieve(UUID uuid) throws ObjectIdentifierStorageException;
 
-    public abstract ObjectIdentifier retrieve(int type, int id);
+    /**
+     * Retrieve the ObjectIdentifier associated with the given DSpace object type and
+     * storage layer id
+     *
+     * @param type
+     * @param id
+     * @return
+     */
+    public abstract ObjectIdentifier retrieve(int type, int id) throws ObjectIdentifierStorageException;
 
-    public abstract void update(ObjectIdentifier oid);
+    /**
+     * Update the record of the given ObjectIdentifier
+     *
+     * @param oid
+     */
+    public abstract void update(ObjectIdentifier oid) throws ObjectIdentifierStorageException;
 
-    public abstract void delete(DSpaceObject dso);
+    /**
+     * Delete all record of the given ObjectIdentifier
+     *
+     * @param oid
+     */
+    public abstract void delete(ObjectIdentifier oid) throws ObjectIdentifierStorageException;
 }

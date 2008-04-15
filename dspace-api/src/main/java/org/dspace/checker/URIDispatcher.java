@@ -39,6 +39,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierService;
+import org.dspace.uri.IdentifierException;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -120,6 +121,11 @@ public class URIDispatcher implements BitstreamDispatcher
             dsoType = dso.getType();
             context.abort();
 
+        }
+        catch (IdentifierException e)
+        {
+            LOG.error("caught exception: ", e);
+            throw new RuntimeException(e);
         }
         catch (SQLException e)
         {

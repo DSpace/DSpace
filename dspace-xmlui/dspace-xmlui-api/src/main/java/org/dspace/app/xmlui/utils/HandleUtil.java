@@ -55,6 +55,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierService;
+import org.dspace.uri.IdentifierException;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
@@ -85,32 +86,39 @@ public class HandleUtil
     public static DSpaceObject obtainHandle(Map objectModel)
             throws SQLException
     {
-        Request request = ObjectModelHelper.getRequest(objectModel);
-
-        DSpaceObject dso = (DSpaceObject) request.getAttribute(DSPACE_OBJECT);
-
-        if (dso == null)
+        try
         {
-            String uri = request.getSitemapURI();
+            Request request = ObjectModelHelper.getRequest(objectModel);
 
-            if (!uri.startsWith(HANDLE_PREFIX))
-                // Dosn't start with the prefix then no match
-                return null;
+            DSpaceObject dso = (DSpaceObject) request.getAttribute(DSPACE_OBJECT);
 
-            String handle = uri.substring(HANDLE_PREFIX.length());
+            if (dso == null)
+            {
+                String uri = request.getSitemapURI();
 
-            // now fudge the legacy version of the handle
-            handle = "hdl:" + handle;
+                if (!uri.startsWith(HANDLE_PREFIX))
+                    // Dosn't start with the prefix then no match
+                    return null;
 
-            Context context = ContextUtil.obtainContext(objectModel);
+                String handle = uri.substring(HANDLE_PREFIX.length());
 
-            ResolvableIdentifier ri = IdentifierService.resolve(context, handle);
-            dso = (DSpaceObject) IdentifierService.getResource(context, ri);
+                // now fudge the legacy version of the handle
+                handle = "hdl:" + handle;
 
-            request.setAttribute(DSPACE_OBJECT, dso);
+                Context context = ContextUtil.obtainContext(objectModel);
+
+                ResolvableIdentifier ri = IdentifierService.resolve(context, handle);
+                dso = (DSpaceObject) IdentifierService.getResource(context, ri);
+
+                request.setAttribute(DSPACE_OBJECT, dso);
+            }
+
+            return dso;
         }
-
-        return dso;
+        catch (IdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

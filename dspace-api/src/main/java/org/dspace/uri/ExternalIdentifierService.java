@@ -41,6 +41,8 @@ import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +56,9 @@ import java.util.List;
  */
 public class ExternalIdentifierService
 {
+    /** log4j logger */
+    private static Logger log = Logger.getLogger(ExternalIdentifierService.class);
+
     /**
      * Mint all of the necessary external identifiers for the given DSpaceObject.  This will use the
      * PluginManager to load all the IdentifierAssigner implementations specified in dspace.cfg
@@ -116,15 +121,24 @@ public class ExternalIdentifierService
      * @return
      */
     public static ExternalIdentifier get(Context context, String namespace, String value)
+            throws IdentifierException
     {
-        ExternalIdentifierType eit = ExternalIdentifierService.getType(namespace);
-        if (eit == null)
+        try
         {
-            return null;
+            ExternalIdentifierType eit = ExternalIdentifierService.getType(namespace);
+            if (eit == null)
+            {
+                return null;
+            }
+            ExternalIdentifierDAO dao = ExternalIdentifierDAOFactory.getInstance(context);
+            ExternalIdentifier eid = dao.retrieve(eit, value);
+            return eid;
         }
-        ExternalIdentifierDAO dao = ExternalIdentifierDAOFactory.getInstance(context);
-        ExternalIdentifier eid = dao.retrieve(eit, value);
-        return eid;
+        catch (ExternalIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new IdentifierException(e);
+        }
     }
 
     /**
@@ -164,18 +178,27 @@ public class ExternalIdentifierService
      * @return
      */
     public static ExternalIdentifier parseCanonicalForm(Context context, String canonicalForm)
+            throws IdentifierException
     {
-        ExternalIdentifier[] eids = (ExternalIdentifier[]) PluginManager.getPluginSequence(ExternalIdentifier.class);
-        for (int i = 0; i < eids.length; i++)
+        try
         {
-            ExternalIdentifier eid = eids[i].parseCanonicalForm(canonicalForm);
-            if (eid != null)
+            ExternalIdentifier[] eids = (ExternalIdentifier[]) PluginManager.getPluginSequence(ExternalIdentifier.class);
+            for (int i = 0; i < eids.length; i++)
             {
-                ExternalIdentifierDAO dao = ExternalIdentifierDAOFactory.getInstance(context);
-                return dao.retrieve(eid.getType(), eid.getValue());
+                ExternalIdentifier eid = eids[i].parseCanonicalForm(canonicalForm);
+                if (eid != null)
+                {
+                    ExternalIdentifierDAO dao = ExternalIdentifierDAOFactory.getInstance(context);
+                    return dao.retrieve(eid.getType(), eid.getValue());
+                }
             }
+            return null;
         }
-        return null;
+        catch (ExternalIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new IdentifierException(e);
+        }
     }
 
     /**
@@ -194,18 +217,27 @@ public class ExternalIdentifierService
      * @return
      */
     public static ExternalIdentifier extractURLIdentifier(Context context, String path)
+            throws IdentifierException
     {
-        IdentifierResolver[] eids = (IdentifierResolver[]) PluginManager.getPluginSequence(IdentifierResolver.class);
-        for (int i = 0; i < eids.length; i++)
+        try
         {
-            ExternalIdentifier eid = eids[i].extractURLIdentifier(path);
-            if (eid != null)
+            IdentifierResolver[] eids = (IdentifierResolver[]) PluginManager.getPluginSequence(IdentifierResolver.class);
+            for (int i = 0; i < eids.length; i++)
             {
-                ExternalIdentifierDAO dao = ExternalIdentifierDAOFactory.getInstance(context);
-                return dao.retrieve(eid.getType(), eid.getValue());
+                ExternalIdentifier eid = eids[i].extractURLIdentifier(path);
+                if (eid != null)
+                {
+                    ExternalIdentifierDAO dao = ExternalIdentifierDAOFactory.getInstance(context);
+                    return dao.retrieve(eid.getType(), eid.getValue());
+                }
             }
+            return null;
         }
-        return null;
+        catch (ExternalIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new IdentifierException(e);
+        }
     }
 
     /**

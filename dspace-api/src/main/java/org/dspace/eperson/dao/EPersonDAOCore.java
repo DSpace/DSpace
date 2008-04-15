@@ -51,6 +51,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPerson.EPersonMetadataField;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ObjectIdentifierService;
+import org.dspace.uri.IdentifierException;
+import org.dspace.uri.dao.ObjectIdentifierStorageException;
 
 /**
  * @author James Rutherford
@@ -112,49 +114,65 @@ public class EPersonDAOCore extends EPersonDAO
 
     public void update(EPerson eperson) throws AuthorizeException
     {
-        // Check authorisation - if you're not the eperson
-        // see if the authorization system says you can
-        if (!context.ignoreAuthorization() && (
-                    (context.getCurrentUser() == null) ||
-                    !eperson.equals(context.getCurrentUser())))
+        try
         {
-            AuthorizeManager.authorizeAction(context, eperson, Constants.WRITE);
-        }
+            // Check authorisation - if you're not the eperson
+            // see if the authorization system says you can
+            if (!context.ignoreAuthorization() && (
+                        (context.getCurrentUser() == null) ||
+                        !eperson.equals(context.getCurrentUser())))
+            {
+                AuthorizeManager.authorizeAction(context, eperson, Constants.WRITE);
+            }
 
-        // deal with the item identifier/uuid
-        ObjectIdentifier oid = eperson.getIdentifier();
-        if (oid == null)
+            // deal with the item identifier/uuid
+            ObjectIdentifier oid = eperson.getIdentifier();
+            if (oid == null)
+            {
+                oid = ObjectIdentifierService.mint(context, eperson);
+            }
+            oidDAO.update(eperson.getIdentifier());
+
+            log.info(LogManager.getHeader(context, "update_eperson",
+                    "eperson_id=" + eperson.getID()));
+
+            childDAO.update(eperson);
+        }
+        catch (ObjectIdentifierStorageException e)
         {
-            oid = ObjectIdentifierService.mint(context, eperson);
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
         }
-        oidDAO.update(eperson.getIdentifier());
-
-        log.info(LogManager.getHeader(context, "update_eperson",
-                "eperson_id=" + eperson.getID()));
-
-        childDAO.update(eperson);
     }
 
     public void delete(int id) throws AuthorizeException
     {
-        // authorized?
-        if (!AuthorizeManager.isAdmin(context))
+        try
         {
-            throw new AuthorizeException(
-                    "You must be an admin to delete an EPerson");
+            // authorized?
+            if (!AuthorizeManager.isAdmin(context))
+            {
+                throw new AuthorizeException(
+                        "You must be an admin to delete an EPerson");
+            }
+
+            EPerson eperson = retrieve(id);
+
+            context.removeCached(eperson, id);
+
+            // remove the object identifier
+            oidDAO.delete(eperson.getIdentifier());
+
+            log.info(LogManager.getHeader(context, "delete_eperson",
+                    "eperson_id=" + id));
+
+            childDAO.delete(id);
         }
-
-        EPerson eperson = retrieve(id);
-
-        context.removeCached(eperson, id);
-
-        // remove the object identifier
-        oidDAO.delete(eperson);
-
-        log.info(LogManager.getHeader(context, "delete_eperson",
-                "eperson_id=" + id));
-
-        childDAO.delete(id);
+        catch (ObjectIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
     }
 
     public List<EPerson> search(String query)

@@ -46,8 +46,10 @@ import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ObjectIdentifierService;
+import org.dspace.uri.IdentifierException;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 import org.dspace.uri.handle.Handle;
 
 import java.sql.SQLException;
@@ -58,7 +60,7 @@ import java.sql.SQLException;
 public class MigrateHandle
 {
     public void migrate()
-            throws SQLException
+            throws SQLException, ExternalIdentifierStorageException, IdentifierException
     {
         Context context = new Context();
         context.setIgnoreAuthorization(true);
@@ -71,8 +73,6 @@ public class MigrateHandle
         {
             TableRow row = tri.next();
             ObjectIdentifier oid = ObjectIdentifierService.get(context, row.getIntColumn("resource_type_id"), row.getIntColumn("resource_id"));
-            // ObjectIdentifier oid = oidDAO.retrieve(row.getIntColumn("resource_type_id"), row.getIntColumn("resource_id"));
-            // ObjectIdentifier oid = new ObjectIdentifier(row.getIntColumn("resource_id"), row.getIntColumn("resource_type_id"));
             ExternalIdentifier eid = new Handle(row.getStringColumn("handle"), oid);
             dao.update(eid);
         }

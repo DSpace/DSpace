@@ -72,10 +72,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.license.CreativeCommons;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierService;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.IdentifierService;
+import org.dspace.uri.*;
 import org.dspace.uri.dao.ExternalIdentifierDAO;
 import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
@@ -135,64 +132,71 @@ public class EditItemServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        ExternalIdentifierDAO identifierDAO =
-            ExternalIdentifierDAOFactory.getInstance(context);
+        try {
+            ExternalIdentifierDAO identifierDAO =
+                ExternalIdentifierDAOFactory.getInstance(context);
 
-        /*
-         * GET with no parameters displays "find by URI/id" form parameter
-         * item_id -> find and edit item with internal ID item_id parameter
-         * URI -> find and edit corresponding item if internal ID or URI
-         * are invalid, "find by URI/id" form is displayed again with error
-         * message
-         */
-        int itemID = UIUtil.getIntParameter(request, "item_id");
-        String uri = request.getParameter("uri");
-        boolean showError = false;
+            /*
+            * GET with no parameters displays "find by URI/id" form parameter
+                * item_id -> find and edit item with internal ID item_id parameter
+                * URI -> find and edit corresponding item if internal ID or URI
+                * are invalid, "find by URI/id" form is displayed again with error
+                * message
+                */
+            int itemID = UIUtil.getIntParameter(request, "item_id");
+            String uri = request.getParameter("uri");
+            boolean showError = false;
 
-        // See if an item ID or URI was passed in
-        Item item = null;
-        if (itemID > 0)
-        {
-            ItemDAO itemDAO = ItemDAOFactory.getInstance(context);
-            item = itemDAO.retrieve(itemID);
-
-            showError = (item == null);
-        }
-        else if ((uri != null) && !uri.equals(""))
-        {
-            // resolve uri
-            ExternalIdentifier identifier = ExternalIdentifierService.parseCanonicalForm(context, uri);
-            // ExternalIdentifier identifier = identifierDAO.retrieve(uri);
-            ObjectIdentifier oi = identifier.getObjectIdentifier();
-            DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, oi);
-
-            // make sure it's an ITEM
-            if ((dso != null) && (dso.getType() == Constants.ITEM))
+            // See if an item ID or URI was passed in
+            Item item = null;
+            if (itemID > 0)
             {
-                item = (Item) dso;
-                showError = false;
+                ItemDAO itemDAO = ItemDAOFactory.getInstance(context);
+                item = itemDAO.retrieve(itemID);
+
+                showError = (item == null);
+            }
+            else if ((uri != null) && !uri.equals(""))
+            {
+                // resolve uri
+                ExternalIdentifier identifier = ExternalIdentifierService.parseCanonicalForm(context, uri);
+                // ExternalIdentifier identifier = identifierDAO.retrieve(uri);
+                ObjectIdentifier oi = identifier.getObjectIdentifier();
+                DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, oi);
+
+                // make sure it's an ITEM
+                if ((dso != null) && (dso.getType() == Constants.ITEM))
+                {
+                    item = (Item) dso;
+                    showError = false;
+                }
+                else
+                {
+                    showError = true;
+                }
+            }
+
+            // Show edit form if appropriate
+            if (item != null)
+            {
+                // now check to see if person can edit item
+                checkEditAuthorization(context, item);
+                showEditForm(context, request, response, item);
             }
             else
             {
-                showError = true;
+                if (showError)
+                {
+                    request.setAttribute("invalid.id", new Boolean(true));
+                }
+
+                JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
             }
         }
-
-        // Show edit form if appropriate
-        if (item != null)
+        catch (IdentifierException e)
         {
-            // now check to see if person can edit item
-            checkEditAuthorization(context, item);
-            showEditForm(context, request, response, item);
-        }
-        else
-        {
-            if (showError)
-            {
-                request.setAttribute("invalid.id", new Boolean(true));
-            }
-
-            JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
+            log.error("caught exception: ", e);
+            throw new ServletException(e);
         }
     }
 

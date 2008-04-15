@@ -54,6 +54,8 @@ import org.dspace.eperson.Group;
 import org.dspace.event.Event;
 import org.dspace.uri.ObjectIdentifierService;
 import org.dspace.uri.*;
+import org.dspace.uri.dao.ObjectIdentifierStorageException;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 import org.dspace.workflow.WorkflowItem;
 
 import java.io.IOException;
@@ -137,46 +139,58 @@ public class CollectionDAOCore extends CollectionDAO
     @Override
     public void update(Collection collection) throws AuthorizeException
     {
-        // Check authorisation
-        collection.canEdit();
-
-        log.info(LogManager.getHeader(context, "update_collection",
-                "collection_id=" + collection.getID()));
-
-        ItemIterator iterator = collection.getItems();
         try
         {
+            // Check authorisation
+            collection.canEdit();
+
+            log.info(LogManager.getHeader(context, "update_collection",
+                    "collection_id=" + collection.getID()));
+
+            ItemIterator iterator = collection.getItems();
+
             while (iterator.hasNext())
             {
                 Item item = iterator.next();
                 link(collection, item); // create mapping row in the db
                 itemDAO.update(item);   // save changes to item
             }
-        }
-        catch (SQLException sqle)
-        {
-            throw new RuntimeException(sqle);
-        }
 
-        // finally, deal with the item identifier/uuid
-        ObjectIdentifier oid = collection.getIdentifier();
-        if (oid == null)
-        {
-            /*
-            oid = new ObjectIdentifier(true);
-            collection.setIdentifier(oid);*/
-            oid = ObjectIdentifierService.mint(context, collection);
-        }
-        oidDAO.update(collection.getIdentifier());
+            // finally, deal with the item identifier/uuid
+            ObjectIdentifier oid = collection.getIdentifier();
+            if (oid == null)
+            {
+                /*
+                oid = new ObjectIdentifier(true);
+                collection.setIdentifier(oid);*/
+                oid = ObjectIdentifierService.mint(context, collection);
+            }
+            oidDAO.update(collection.getIdentifier());
 
-        // deal with the external identifiers
-        List<ExternalIdentifier> eids = collection.getExternalIdentifiers();
-        for (ExternalIdentifier eid : eids)
-        {
-            identifierDAO.update(eid);
-        }
+            // deal with the external identifiers
+            List<ExternalIdentifier> eids = collection.getExternalIdentifiers();
+            for (ExternalIdentifier eid : eids)
+            {
+                identifierDAO.update(eid);
+            }
 
-        childDAO.update(collection);
+            childDAO.update(collection);
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+        catch (ObjectIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+        catch (ExternalIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -258,7 +272,12 @@ public class CollectionDAOCore extends CollectionDAO
             }
 
             // remove the object identifier
-            oidDAO.delete(collection);
+            oidDAO.delete(collection.getIdentifier());
+        }
+        catch (ObjectIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
         }
         catch (IOException ioe)
         {

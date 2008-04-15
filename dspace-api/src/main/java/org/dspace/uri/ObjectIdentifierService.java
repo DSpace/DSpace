@@ -43,6 +43,9 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.uri.dao.ObjectIdentifierDAO;
 import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
+import org.dspace.uri.dao.ObjectIdentifierStorageException;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
+import org.apache.log4j.Logger;
 
 import java.util.UUID;
 
@@ -55,6 +58,9 @@ import java.util.UUID;
  */
 public class ObjectIdentifierService
 {
+    /** log4j logger */
+    private static final Logger log = Logger.getLogger(ObjectIdentifierService.class);
+
     /**
      * Mint the appropriate ObjectIdentifier for the given DSpaceObject
      *
@@ -92,10 +98,19 @@ public class ObjectIdentifierService
      * @return
      */
     public static ObjectIdentifier get(Context context, int type, int id)
+            throws IdentifierException
     {
-        ObjectIdentifierDAO dao = ObjectIdentifierDAOFactory.getInstance(context);
-        ObjectIdentifier oid = dao.retrieve(type, id);
-        return oid;
+        try
+        {
+            ObjectIdentifierDAO dao = ObjectIdentifierDAOFactory.getInstance(context);
+            ObjectIdentifier oid = dao.retrieve(type, id);
+            return oid;
+        }
+        catch (ObjectIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new IdentifierException(e);
+        }
     }
 
     /**
@@ -106,9 +121,18 @@ public class ObjectIdentifierService
      * @return
      */
     public static ObjectIdentifier get(Context context, UUID uuid)
+            throws IdentifierException
     {
-        ObjectIdentifierDAO dao = ObjectIdentifierDAOFactory.getInstance(context);
-        ObjectIdentifier oid = dao.retrieve(uuid);
-        return oid;
+        try
+        {
+            ObjectIdentifierDAO dao = ObjectIdentifierDAOFactory.getInstance(context);
+            ObjectIdentifier oid = dao.retrieve(uuid);
+            return oid;
+        }
+        catch (ObjectIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new IdentifierException(e);
+        }
     }
 }

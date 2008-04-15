@@ -50,6 +50,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierService;
+import org.dspace.uri.IdentifierException;
 import org.jdom.Element;
 
 import javax.servlet.http.HttpServletRequest;
@@ -149,91 +150,97 @@ abstract class DAVDSpaceObject extends DAVResource
             String pathElt[]) throws DAVStatusException, SQLException,
             AuthorizeException
     {
-        // Match /dso_<handle>{...} .. look for last "dso_" element
-        if (pathElt[0].startsWith("dso_"))
-        {
-            int i = 1;
-            for (; i < pathElt.length && pathElt[i].startsWith("dso_"); ++i)
+        try {
+// Match /dso_<handle>{...} .. look for last "dso_" element
+            if (pathElt[0].startsWith("dso_"))
             {
-                // empty
-            }
-            --i;
-            String handle = decodeHandle(pathElt[i].substring(4));
-
-            // Replace substituted handle separator char with '/' to
-            // get back a normal handle: (inverse of getPathElt() above)
-            int sepIndex = handle.indexOf(handleSeparator);
-            if (sepIndex >= 0)
-            {
-                char hc[] = handle.toCharArray();
-                hc[sepIndex] = '/';
-                handle = String.copyValueOf(hc);
-            }
-
-            // FIXME: in reality, these aren't handles any more, they are UUIDs from the ObjectIdentifiers, but
-            // it's too big a job at the moment to modify all the semantics, so I have just done so where necessary
-//            DSpaceObject dso = HandleManager.resolveToObject(context, handle);
-            ResolvableIdentifier dsi = IdentifierService.resolve(context, handle);
-            DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, dsi);
-
-            if (dso == null)
-            {
-                throw new DAVStatusException(HttpServletResponse.SC_NOT_FOUND,
-                        "Cannot resolve handle \"" + handle + "\"");
-            }
-            else if (dso.getType() == Constants.ITEM)
-            {
-                if (i + 1 < pathElt.length)
+                int i = 1;
+                for (; i < pathElt.length && pathElt[i].startsWith("dso_"); ++i)
                 {
-                    if (pathElt[i + 1].startsWith("bitstream_"))
+                    // empty
+                }
+                --i;
+                String handle = decodeHandle(pathElt[i].substring(4));
+
+                // Replace substituted handle separator char with '/' to
+                // get back a normal handle: (inverse of getPathElt() above)
+                int sepIndex = handle.indexOf(handleSeparator);
+                if (sepIndex >= 0)
+                {
+                    char hc[] = handle.toCharArray();
+                    hc[sepIndex] = '/';
+                    handle = String.copyValueOf(hc);
+                }
+
+                // FIXME: in reality, these aren't handles any more, they are UUIDs from the ObjectIdentifiers, but
+                // it's too big a job at the moment to modify all the semantics, so I have just done so where necessary
+    //            DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+                ResolvableIdentifier dsi = IdentifierService.resolve(context, handle);
+                DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, dsi);
+
+                if (dso == null)
+                {
+                    throw new DAVStatusException(HttpServletResponse.SC_NOT_FOUND,
+                            "Cannot resolve handle \"" + handle + "\"");
+                }
+                else if (dso.getType() == Constants.ITEM)
+                {
+                    if (i + 1 < pathElt.length)
                     {
-                        Bitstream bs = DAVBitstream.findBitstream(context,
-                                (Item) dso, pathElt[i + 1]);
-                        if (bs == null)
+                        if (pathElt[i + 1].startsWith("bitstream_"))
+                        {
+                            Bitstream bs = DAVBitstream.findBitstream(context,
+                                    (Item) dso, pathElt[i + 1]);
+                            if (bs == null)
+                            {
+                                throw new DAVStatusException(
+                                        HttpServletResponse.SC_NOT_FOUND,
+                                        "Bitstream \"" + pathElt[i + 1]
+                                                + "\" not found in item: "
+                                                + pathElt[i]);
+                            }
+                            return new DAVBitstream(context, request, response,
+                                    pathElt, (Item) dso, bs);
+                        }
+                        else
                         {
                             throw new DAVStatusException(
                                     HttpServletResponse.SC_NOT_FOUND,
-                                    "Bitstream \"" + pathElt[i + 1]
-                                            + "\" not found in item: "
+                                    "Illegal resource path, \""
+                                            + pathElt[i + 1]
+                                            + "\" is not a Bitstream identifier for item: "
                                             + pathElt[i]);
                         }
-                        return new DAVBitstream(context, request, response,
-                                pathElt, (Item) dso, bs);
                     }
                     else
                     {
-                        throw new DAVStatusException(
-                                HttpServletResponse.SC_NOT_FOUND,
-                                "Illegal resource path, \""
-                                        + pathElt[i + 1]
-                                        + "\" is not a Bitstream identifier for item: "
-                                        + pathElt[i]);
+                        return new DAVItem(context, request, response, pathElt,
+                                (Item) dso);
                     }
+                }
+                else if (dso.getType() == Constants.COLLECTION)
+                {
+                    return new DAVCollection(context, request, response, pathElt,
+                            (Collection) dso);
+                }
+                else if (dso.getType() == Constants.COMMUNITY)
+                {
+                    return new DAVCommunity(context, request, response, pathElt,
+                            (Community) dso);
                 }
                 else
                 {
-                    return new DAVItem(context, request, response, pathElt,
-                            (Item) dso);
+                    throw new DAVStatusException(
+                            HttpServletResponse.SC_BAD_REQUEST,
+                            "Unrecognized DSpace object type for handle=" + handle);
                 }
             }
-            else if (dso.getType() == Constants.COLLECTION)
-            {
-                return new DAVCollection(context, request, response, pathElt,
-                        (Collection) dso);
-            }
-            else if (dso.getType() == Constants.COMMUNITY)
-            {
-                return new DAVCommunity(context, request, response, pathElt,
-                        (Community) dso);
-            }
-            else
-            {
-                throw new DAVStatusException(
-                        HttpServletResponse.SC_BAD_REQUEST,
-                        "Unrecognized DSpace object type for handle=" + handle);
-            }
+            return null;
         }
-        return null;
+        catch (IdentifierException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

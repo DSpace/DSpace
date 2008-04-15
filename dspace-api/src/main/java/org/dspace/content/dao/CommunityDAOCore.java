@@ -53,6 +53,8 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.uri.ObjectIdentifierService;
 import org.dspace.uri.*;
+import org.dspace.uri.dao.ObjectIdentifierStorageException;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -133,34 +135,47 @@ public class CommunityDAOCore extends CommunityDAO
     @Override
     public void update(Community community) throws AuthorizeException
     {
-        // Check authorization
-        community.canEdit();
-
-        log.info(LogManager.getHeader(context, "update_community",
-                "community_id=" + community.getID()));
-
-        // FIXME: Do we need to iterate through child Communities /
-        // Collecitons to update / re-index? Probably not.
-
-        // finally, deal with the item identifier/uuid
-        ObjectIdentifier oid = community.getIdentifier();
-        if (oid == null)
+        try
         {
-            /*
-            oid = new ObjectIdentifier(true);
-            community.setIdentifier(oid);*/
-            oid = ObjectIdentifierService.mint(context, community);
-        }
-        oidDAO.update(community.getIdentifier());
+            // Check authorization
+            community.canEdit();
 
-        // deal with the external identifiers
-        List<ExternalIdentifier> eids = community.getExternalIdentifiers();
-        for (ExternalIdentifier eid : eids)
+            log.info(LogManager.getHeader(context, "update_community",
+                    "community_id=" + community.getID()));
+
+            // FIXME: Do we need to iterate through child Communities /
+            // Collecitons to update / re-index? Probably not.
+
+            // finally, deal with the item identifier/uuid
+            ObjectIdentifier oid = community.getIdentifier();
+            if (oid == null)
+            {
+                /*
+                oid = new ObjectIdentifier(true);
+                community.setIdentifier(oid);*/
+                oid = ObjectIdentifierService.mint(context, community);
+            }
+            oidDAO.update(community.getIdentifier());
+
+            // deal with the external identifiers
+            List<ExternalIdentifier> eids = community.getExternalIdentifiers();
+            for (ExternalIdentifier eid : eids)
+            {
+                identifierDAO.update(eid);
+            }
+
+            childDAO.update(community);
+        }
+        catch (ObjectIdentifierStorageException e)
         {
-            identifierDAO.update(eid);
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
         }
-
-        childDAO.update(community);
+        catch (ExternalIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -222,7 +237,12 @@ public class CommunityDAOCore extends CommunityDAO
             AuthorizeManager.removeAllPolicies(context, community);
 
             // remove the object identifier
-            oidDAO.delete(community);
+            oidDAO.delete(community.getIdentifier());
+        }
+        catch (ObjectIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
         }
         catch (IOException ioe)
         {

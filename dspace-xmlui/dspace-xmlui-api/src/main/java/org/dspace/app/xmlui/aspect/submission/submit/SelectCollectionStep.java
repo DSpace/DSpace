@@ -58,6 +58,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.uri.ResolvableIdentifier;
 import org.dspace.uri.IdentifierService;
+import org.dspace.uri.IdentifierException;
 import org.dspace.core.Constants;
 import org.xml.sax.SAXException;
 
@@ -102,50 +103,57 @@ public class SelectCollectionStep extends AbstractSubmissionStep
   
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
-    {     
-		Collection[] collections; // List of possible collections.
-        ResolvableIdentifier eid = IdentifierService.resolve(context, handle);
-
-        DSpaceObject dso = null;
-        if (eid != null)
+    {
+        try
         {
-            dso = (DSpaceObject) IdentifierService.getResource(context, eid);
+            Collection[] collections; // List of possible collections.
+            ResolvableIdentifier eid = IdentifierService.resolve(context, handle);
+
+            DSpaceObject dso = null;
+            if (eid != null)
+            {
+                dso = (DSpaceObject) IdentifierService.getResource(context, eid);
+            }
+
+            if (dso != null && dso instanceof Community)
+            {
+                collections = Collection.findAuthorized(context, ((Community) dso), Constants.ADD);
+            }
+            else
+            {
+                collections = Collection.findAuthorized(context, null, Constants.ADD);
+            }
+
+            // Basic form with a drop down list of all the collections
+            // you can submit too.
+            Division div = body.addInteractiveDivision("select-collection",contextPath+"/submit",Division.METHOD_POST,"primary submission");
+            div.setHead(T_submission_head);
+
+            List list = div.addList("select-collection", List.TYPE_FORM);
+            list.setHead(T_head);
+            Select select = list.addItem().addSelect("handle");
+            select.setLabel(T_collection);
+            select.setHelp(T_collection_help);
+
+            select.addOption("",T_collection_default);
+            for (Collection collection : collections)
+            {
+                String name = collection.getMetadata("name");
+                      if (name.length() > 50)
+                          name = name.substring(0, 47) + "...";
+                select.addOption(IdentifierService.getCanonicalForm(collection),name);
+            }
+
+            Button submit = list.addItem().addButton("submit");
+            submit.setValue(T_submit);
+
+            div.addHidden("submission-continue").setValue(knot.getId());
+        }
+        catch (IdentifierException e)
+        {
+            throw new RuntimeException(e);
         }
 
-        if (dso != null && dso instanceof Community)
-		{
-			collections = Collection.findAuthorized(context, ((Community) dso), Constants.ADD);   
-		} 
-		else
-		{
-			collections = Collection.findAuthorized(context, null, Constants.ADD);
-		}
-        
-		// Basic form with a drop down list of all the collections
-		// you can submit too.
-        Division div = body.addInteractiveDivision("select-collection",contextPath+"/submit",Division.METHOD_POST,"primary submission");
-		div.setHead(T_submission_head);
-        
-        List list = div.addList("select-collection", List.TYPE_FORM);
-        list.setHead(T_head);       
-        Select select = list.addItem().addSelect("handle");
-        select.setLabel(T_collection);
-        select.setHelp(T_collection_help);
-        
-        select.addOption("",T_collection_default);
-        for (Collection collection : collections) 
-        {
-        	String name = collection.getMetadata("name");
-   		   	if (name.length() > 50)
-   		   		name = name.substring(0, 47) + "...";
-        	select.addOption(IdentifierService.getCanonicalForm(collection),name);
-        }
-        
-        Button submit = list.addItem().addButton("submit");
-        submit.setValue(T_submit);
-        
-        div.addHidden("submission-continue").setValue(knot.getId()); 
-        
     }
     
     /** 

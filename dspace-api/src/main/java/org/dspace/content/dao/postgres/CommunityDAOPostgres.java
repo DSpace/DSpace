@@ -54,6 +54,8 @@ import org.dspace.content.dao.CommunityDAO;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.UnsupportedIdentifierException;
+import org.dspace.uri.IdentifierException;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -415,6 +417,17 @@ public class CommunityDAOPostgres extends CommunityDAO
         }
         catch (UnsupportedIdentifierException e)
         {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+        catch (ExternalIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
+        catch (IdentifierException e)
+        {
+            log.error("caught exception: ", e);
             throw new RuntimeException(e);
         }
     }

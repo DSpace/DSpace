@@ -21,17 +21,11 @@ import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.ObjectIdentifierService;
 import org.dspace.uri.dao.ObjectIdentifierDAO;
 import org.dspace.uri.dao.ObjectIdentifierDAOFactory;
+import org.dspace.uri.dao.ObjectIdentifierStorageException;
 
 import java.sql.SQLException;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: richard
- * Date: Dec 13, 2007
- * Time: 4:05:06 PM
- * To change this template use File | Settings | File Templates.
- */
 public class MigrateUUID
 {
     public static void main(String[] args)
@@ -43,7 +37,7 @@ public class MigrateUUID
 
 
     public void migrate()
-            throws SQLException, AuthorizeException
+            throws SQLException, AuthorizeException, ObjectIdentifierStorageException
     {
         Context context = new Context();
         context.setIgnoreAuthorization(true);
@@ -122,7 +116,7 @@ public class MigrateUUID
         }
 
         // FIXME: we still need to do uuid generation for the following
-        
+
         // ResourcePolicy
 
         // EPerson

@@ -61,6 +61,7 @@ import org.dspace.content.dao.CommunityDAO;
 import org.dspace.content.dao.CommunityDAOFactory;
 import org.dspace.uri.ObjectIdentifier;
 import org.dspace.uri.IdentifierService;
+import org.dspace.uri.IdentifierException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -793,35 +794,42 @@ public class DSpaceOAICatalog extends AbstractCatalog
     private DSpaceObject resolveSet(Context context, String set)
             throws BadArgumentException
     {
-        if (set == null)
+        try
         {
-            return null;
+            if (set == null)
+            {
+                return null;
+            }
+
+            DSpaceObject o = null;
+
+            /*
+            * set specs are in form xyz_123.456_789 corresponding to
+                * xyz:123.456/789
+                */
+            // Bit of a hax. Basically, turns the first underscore into a
+            // colon, and all subsequent underscores into forward slashes.
+            String uri = set.replaceFirst("_", ":").replace('_', '/');
+
+            ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(uri);
+            o = (DSpaceObject) IdentifierService.getResource(context, oi);
+
+            // If it corresponds to a collection or a community, that's the set we
+            // want
+            if ((o != null) &&
+                    ((o instanceof Collection) || (o instanceof Community)))
+            {
+                return o;
+            }
+
+            // URI is either non-existent, or corresponds to a non-collection
+            // Either way, a bad set spec, ergo a bad argument
+            throw new BadArgumentException();
         }
-
-        DSpaceObject o = null;
-
-        /*
-         * set specs are in form xyz_123.456_789 corresponding to
-         * xyz:123.456/789
-         */
-        // Bit of a hax. Basically, turns the first underscore into a
-        // colon, and all subsequent underscores into forward slashes.
-        String uri = set.replaceFirst("_", ":").replace('_', '/');
-
-        ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(uri);
-        o = (DSpaceObject) IdentifierService.getResource(context, oi);
-
-        // If it corresponds to a collection or a community, that's the set we
-        // want
-        if ((o != null) &&
-                ((o instanceof Collection) || (o instanceof Community))) 
+        catch (IdentifierException e)
         {
-            return o;
+            throw new BadArgumentException();
         }
-
-        // URI is either non-existent, or corresponds to a non-collection
-        // Either way, a bad set spec, ergo a bad argument
-        throw new BadArgumentException();
     }
 
     /**

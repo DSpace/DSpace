@@ -83,6 +83,7 @@ import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 import org.dspace.uri.IdentifierService;
 import org.dspace.uri.ResolvableIdentifier;
+import org.dspace.uri.IdentifierException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -249,7 +250,8 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      */
     public void generate() throws IOException, SAXException, ProcessingException
     {
-		try {
+		try
+        {
 			Context context = ContextUtil.obtainContext(objectModel);
 			DSpaceObject dso = null;
 			
@@ -300,6 +302,11 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 		{
 			throw new SAXException(sqle);
 		}
+        catch (IdentifierException e)
+        {
+            log.error("caught exception: ", e);
+            throw new ProcessingException(e);
+        }
     	
     }
     

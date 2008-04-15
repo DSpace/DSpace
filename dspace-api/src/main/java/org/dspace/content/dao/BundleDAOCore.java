@@ -49,6 +49,8 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.uri.ObjectIdentifierService;
 import org.dspace.uri.*;
+import org.dspace.uri.dao.ObjectIdentifierStorageException;
+import org.dspace.uri.dao.ExternalIdentifierStorageException;
 
 import java.util.List;
 
@@ -109,81 +111,102 @@ public class BundleDAOCore extends BundleDAO
     @Override
     public void update(Bundle bundle) throws AuthorizeException
     {
-        // FIXME: Check authorization? Or do we count on this only ever
-        // happening via an Item?
-        Bitstream[] bitstreams = bundle.getBitstreams();
-
-        // Delete any Bitstreams that were removed from the in-memory list
-        for (Bitstream dbBitstream : bitstreamDAO.getBitstreamsByBundle(bundle))
+        try
         {
-            boolean deleted = true;
+            // FIXME: Check authorization? Or do we count on this only ever
+            // happening via an Item?
+            Bitstream[] bitstreams = bundle.getBitstreams();
 
-            for (Bitstream bitstream : bitstreams)
+            // Delete any Bitstreams that were removed from the in-memory list
+            for (Bitstream dbBitstream : bitstreamDAO.getBitstreamsByBundle(bundle))
             {
-                if (bitstream.getID() == dbBitstream.getID())
+                boolean deleted = true;
+
+                for (Bitstream bitstream : bitstreams)
                 {
-                    // If the bitstream still exists in memory, don't delete
-                    deleted = false;
-                    break;
+                    if (bitstream.getID() == dbBitstream.getID())
+                    {
+                        // If the bitstream still exists in memory, don't delete
+                        deleted = false;
+                        break;
+                    }
+                }
+
+                if (deleted)
+                {
+                    unlink(bundle, dbBitstream);
                 }
             }
 
-            if (deleted)
+            // Now that we've cleared up the db, we make the Bundle <->
+            // Bitstream link concrete.
+            for (Bitstream bitstream : bitstreams)
             {
-                unlink(bundle, dbBitstream);
+                link(bundle, bitstream);
             }
-        }
 
-        // Now that we've cleared up the db, we make the Bundle <->
-        // Bitstream link concrete.
-        for (Bitstream bitstream : bitstreams)
+            // finally, deal with the item identifier/uuid
+            ObjectIdentifier oid = bundle.getIdentifier();
+            if (oid == null)
+            {
+                /*
+                oid = new ObjectIdentifier(true);
+                bundle.setIdentifier(oid);*/
+                oid = ObjectIdentifierService.mint(context, bundle);
+            }
+            oidDAO.update(bundle.getIdentifier());
+
+            // deal with the external identifiers
+            List<ExternalIdentifier> eids = bundle.getExternalIdentifiers();
+            for (ExternalIdentifier eid : eids)
+            {
+                identifierDAO.update(eid);
+            }
+
+            childDAO.update(bundle);
+        }
+        catch (ObjectIdentifierStorageException e)
         {
-            link(bundle, bitstream);
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
         }
-
-        // finally, deal with the item identifier/uuid
-        ObjectIdentifier oid = bundle.getIdentifier();
-        if (oid == null)
+        catch (ExternalIdentifierStorageException e)
         {
-            /*
-            oid = new ObjectIdentifier(true);
-            bundle.setIdentifier(oid);*/
-            oid = ObjectIdentifierService.mint(context, bundle);
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
         }
-        oidDAO.update(bundle.getIdentifier());
-
-        // deal with the external identifiers
-        List<ExternalIdentifier> eids = bundle.getExternalIdentifiers();
-        for (ExternalIdentifier eid : eids)
-        {
-            identifierDAO.update(eid);
-        }
-
-        childDAO.update(bundle);
     }
 
     @Override
     public void delete(int id) throws AuthorizeException
     {
-        Bundle bundle = retrieve(id);
-
-        context.removeCached(bundle, id);
-
-        log.info(LogManager.getHeader(context, "delete_bundle", "bundle_id="
-                    + id));
-
-        for (Bitstream bitstream : bundle.getBitstreams())
+        try
         {
-            unlink(bundle, bitstream);
+            Bundle bundle = retrieve(id);
+
+            context.removeCached(bundle, id);
+
+            log.info(LogManager.getHeader(context, "delete_bundle", "bundle_id="
+                        + id));
+
+            for (Bitstream bitstream : bundle.getBitstreams())
+            {
+                unlink(bundle, bitstream);
+            }
+
+            // remove our authorization policies
+            AuthorizeManager.removeAllPolicies(context, bundle);
+
+            // remove the object identifier
+            oidDAO.delete(bundle.getIdentifier());
+
+            childDAO.delete(id);
         }
-
-        // remove our authorization policies
-        AuthorizeManager.removeAllPolicies(context, bundle);
-
-        // remove the object identifier
-        oidDAO.delete(bundle);
-
-        childDAO.delete(id);
+        catch (ObjectIdentifierStorageException e)
+        {
+            log.error("caught exception: ", e);
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
