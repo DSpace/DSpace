@@ -339,6 +339,9 @@ public class IdentifierService
                 {
                     return null;
                 }
+
+                // substitue the newly found for the original
+                oid = noid;
             }
 
             // now we can select the object based on its resource type and id
