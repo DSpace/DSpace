@@ -99,6 +99,7 @@ public class ExternalIdentifiersTag extends TagSupport
             {
                 writeIdentifier(eid, out);
             }
+            out.println("</table>");
 
             return SKIP_BODY;
         }
@@ -113,7 +114,7 @@ public class ExternalIdentifiersTag extends TagSupport
     {
         URI link = eid.getURI();
         String msg = "<a href=\"" + link + "\">" + link  + "</a>";
-        out.println("<tr><td>" + msg + "</td></tr></table>");
+        out.println("<tr><td>" + msg + "</td></tr>");
     }
 
     private String getHeaderText()
