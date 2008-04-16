@@ -262,6 +262,19 @@ public class IdentifierService
     }
 
     /**
+     * Get the URL for the identifiable with the given base url instead of the
+     * default. The default is obtained from the dspace.url config parameter
+     *
+     * @param base
+     * @param dso
+     * @return
+     */
+    public static String getURL(String base, Identifiable dso)
+    {
+        return base + "/" + IdentifierService.getContextPath(dso);
+    }
+
+    /**
      * Get the preferred url form for the given DSpaceObject.  The actual URL generated will
      * depend on which of the identifiers (both external and native) are most desireable,
      * as well as any other features of the underlying selection mechanism.  The form of
