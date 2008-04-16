@@ -41,7 +41,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.dspace.core.I18N;
+import org.dspace.core.I18nUtil;
 
 /**
  * 
@@ -71,7 +71,7 @@ public class SimpleReporterImpl implements SimpleReporter
 
     private String msg(String key)
     {
-        return I18N.message(key, SimpleReporterImpl.class);
+        return I18nUtil.getMessage("org.dspace.checker.SimpleReporterImpl." + key);
     }
 
     /**
