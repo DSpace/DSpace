@@ -256,73 +256,61 @@ public class DSpaceSWORDServer implements SWORDServer
 		}
 		
 		log.info(LogManager.getHeader(context, "sword_authenticate", "username=" + un + ",on_behalf_of=" + obo));
-		try
-		{
-			// attempt to authenticate the primary user
-			SWORDContext sc = new SWORDContext();
-			SWORDAuthentication auth = new SWORDAuthentication();
-			EPerson ep = null;
-			boolean authenticated = false;
-			if (auth.authenticates(this.context, un, pw))
-			{
-				// if authenticated, obtain the eperson object
-				ep = EPerson.findByEmail(context, un);
-				
-				if (ep != null)
-				{
-					authenticated = true;
-					sc.setAuthenticated(ep);
-				}
-				
-				// if there is an onBehalfOfuser, then find their eperson 
-				// record, and if it exists set it.  If not, then the
-				// authentication process fails
-				if (obo != null)
-				{
-					EPerson epObo= EPerson.findByEmail(this.context, obo);
-					if (epObo != null)
-					{
-						sc.setOnBehalfOf(epObo);
-					}
-					else
-					{
-						authenticated = false;
-					}
-				}
-			}
-			
-			// deal with the context or throw an authentication exception
-			if (ep != null && authenticated)
-			{
-				this.context.setCurrentUser(ep);
-				log.info(LogManager.getHeader(context, "sword_set_authenticated_user", "user_id=" + ep.getID()));
-			}
-			else
-			{
-				// decide what kind of error to throw
-				if (ep != null)
-				{
-					log.info(LogManager.getHeader(context, "sword_unable_to_set_user", "username=" + un));
-					throw new SWORDAuthenticationException("Unable to authenticate the supplied used");
-				}
-				else
-				{
-					log.info(LogManager.getHeader(context, "sword_unable_to_set_on_behalf_of", "username=" + un + ",on_behalf_of=" + obo));
-					throw new SWORDAuthenticationException("Unable to authenticate the onBehalfOf account");
-				}
-			}
-			
-			return sc;
-		}
-		catch (SQLException e)
-		{
-			log.error("caught exception: ", e);
-			throw new SWORDException("There was a problem accessing the repository user database", e);
-		}
-		catch (AuthorizeException e)
-		{
-			log.error("caught exception: ", e);
-			throw new SWORDAuthenticationException("There was a problem authenticating or authorising the user", e);
-		}
+
+        // attempt to authenticate the primary user
+        SWORDContext sc = new SWORDContext();
+        SWORDAuthentication auth = new SWORDAuthentication();
+        EPerson ep = null;
+        boolean authenticated = false;
+        if (auth.authenticates(this.context, un, pw))
+        {
+            // if authenticated, obtain the eperson object
+            ep = EPerson.findByEmail(context, un);
+
+            if (ep != null)
+            {
+                authenticated = true;
+                sc.setAuthenticated(ep);
+            }
+
+            // if there is an onBehalfOfuser, then find their eperson
+            // record, and if it exists set it.  If not, then the
+            // authentication process fails
+            if (obo != null)
+            {
+                EPerson epObo= EPerson.findByEmail(this.context, obo);
+                if (epObo != null)
+                {
+                    sc.setOnBehalfOf(epObo);
+                }
+                else
+                {
+                    authenticated = false;
+                }
+            }
+        }
+
+        // deal with the context or throw an authentication exception
+        if (ep != null && authenticated)
+        {
+            this.context.setCurrentUser(ep);
+            log.info(LogManager.getHeader(context, "sword_set_authenticated_user", "user_id=" + ep.getID()));
+        }
+        else
+        {
+            // decide what kind of error to throw
+            if (ep != null)
+            {
+                log.info(LogManager.getHeader(context, "sword_unable_to_set_user", "username=" + un));
+                throw new SWORDAuthenticationException("Unable to authenticate the supplied used");
+            }
+            else
+            {
+                log.info(LogManager.getHeader(context, "sword_unable_to_set_on_behalf_of", "username=" + un + ",on_behalf_of=" + obo));
+                throw new SWORDAuthenticationException("Unable to authenticate the onBehalfOf account");
+            }
+        }
+
+        return sc;
 	}
 }

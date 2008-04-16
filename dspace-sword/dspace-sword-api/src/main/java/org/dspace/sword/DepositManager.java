@@ -39,7 +39,6 @@
 package org.dspace.sword;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
@@ -264,11 +263,6 @@ public class DepositManager
 		catch (AuthorizeException e)
 		{
 			log.error("authentication problem; caught exception: ", e);
-			throw new DSpaceSWORDException(e);
-		}
-		catch (SQLException e)
-		{
-			log.error("caught exception: ", e);
 			throw new DSpaceSWORDException(e);
 		}
 	}

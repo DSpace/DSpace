@@ -54,9 +54,9 @@ import org.dspace.content.packager.PackageParameters;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
-import org.dspace.handle.HandleManager;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
+import org.dspace.uri.IdentifierService;
 
 import org.purl.sword.base.Deposit;
 
@@ -90,7 +90,7 @@ public class SWORDMETSIngester implements SWORDIngester
 			CollectionLocation cl = new CollectionLocation();
 			Collection collection = cl.getCollection(context, loc);
 			message("Performing deposit using location: " + loc + "; ");
-			message("Location resolves to collection with handle: " + collection.getHandle() + 
+			message("Location resolves to collection with identifier: " + IdentifierService.getCanonicalForm(collection) +
 					" and name: " + collection.getMetadata("name") + "; ");
 			
 			// load the plugin manager for the required configuration
@@ -143,9 +143,10 @@ public class SWORDMETSIngester implements SWORDIngester
 			
 			// for some reason, DSpace will not give you the handle automatically,
 			// so we have to look it up
-			String handle = HandleManager.findHandle(context, installedItem);
-			
-			message("Ingest successful; ");
+			// String handle = HandleManager.findHandle(context, installedItem);
+			String handle = IdentifierService.getCanonicalForm(installedItem);
+
+            message("Ingest successful; ");
 			message("Item created with internal identifier: " + installedItem.getID() + "; ");
 			if (handle != null)
 			{

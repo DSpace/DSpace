@@ -47,7 +47,7 @@ import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.handle.HandleManager;
+import org.dspace.uri.IdentifierService;
 
 import org.purl.sword.base.SWORDEntry;
 
@@ -192,17 +192,14 @@ public class DSpaceATOMEntry
 		{
 			if (!noOp)
 			{
-				if (item.getHandle() != null)
-				{
-					handle = item.getHandle();
-				}
+                handle = IdentifierService.getCanonicalForm(item);
 
 				if (handle != null && !"".equals(handle))
 				{
 					Content content = new Content();
 					// content.setType("application/zip");
 					content.setType("text/html");
-					content.setSource(HandleManager.getCanonicalForm(handle));
+					content.setSource(handle);
 					entry.setContent(content);
 				}
 			}
@@ -247,14 +244,11 @@ public class DSpaceATOMEntry
 		// it's possible that the item hasn't been assigned a handle yet
 		if (!noOp)
 		{
-			if (item.getHandle() != null)
-			{
-				handle = item.getHandle();
-			}
+            handle = IdentifierService.getCanonicalForm(item);
 
 			if (handle != null && !"".equals(handle))
 			{
-				entry.setId(HandleManager.getCanonicalForm(handle));
+				entry.setId(handle);
 				return;
 			}
 		}
@@ -277,35 +271,26 @@ public class DSpaceATOMEntry
 	protected void addLinks(String handle)
 		throws DSpaceSWORDException
 	{
-		try
-		{
-			// if there is no handle, we can't generate links
-			if (handle == null)
-			{
-				return;
-			}
-			
-			String base = ConfigurationManager.getProperty("dspace.url");
-			
-			// in the default set up we just pass urls to all of the 
-			// inidivual files in the item
-			Bundle[] bundles = item.getBundles("ORIGINAL");
-			for (int i = 0; i < bundles.length ; i++)
-			{
-				Bitstream[] bss = bundles[i].getBitstreams();
-				for (int j = 0; j < bss.length; j++)
-				{
-					Link link = new Link();
-					String url = base + "/bitstream/" + handle + "/" + bss[j].getSequenceID() + "/" + bss[j].getName();
-					link.setHref(url);
-					entry.addLink(link);
-				}
-			}
-		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSWORDException(e);
-		}
+        // if there is no handle, we can't generate links
+        if (handle == null)
+        {
+            return;
+        }
+
+        // in the default set up we just pass urls to all of the
+        // inidivual files in the item
+        Bundle[] bundles = item.getBundles("ORIGINAL");
+        for (int i = 0; i < bundles.length ; i++)
+        {
+            Bitstream[] bss = bundles[i].getBitstreams();
+            for (int j = 0; j < bss.length; j++)
+            {
+                Link link = new Link();
+                String url = IdentifierService.getURL(bss[j]).toString(); // base + "/bitstream/" + handle + "/" + bss[j].getSequenceID() + "/" + bss[j].getName();
+                link.setHref(url);
+                entry.addLink(link);
+            }
+        }
 	}
 	
 	/**
@@ -338,43 +323,28 @@ public class DSpaceATOMEntry
 	 */
 	protected void addRights(String handle)
 	{
-		try
-		{
-			// if there's no handle, we can't give a link
-			if (handle == null)
-			{
-				return;
-			}
-			
-			String base = ConfigurationManager.getProperty("dspace.url");
-			
-			// if there's no base URL, we are stuck
-			if (base == null)
-			{
-				return;
-			}
-			
-			StringBuilder rightsString = new StringBuilder();
-			Bundle[] bundles = item.getBundles("LICENSE");
-			for (int i = 0; i < bundles.length; i++)
-			{
-				Bitstream[] bss = bundles[i].getBitstreams();
-				for (int j = 0; j < bss.length; j++)
-				{
-					String url = base + "/bitstream/" + handle + "/" + bss[j].getSequenceID() + "/" + bss[j].getName();
-					rightsString.append(url + " ");
-				}
-			}
-			
-			Rights rights = new Rights();
-			rights.setContent(rightsString.toString());
-			rights.setType(ContentType.TEXT);
-			entry.setRights(rights);
-		}
-		catch (SQLException e)
-		{
-			// do nothing
-		}
+        // if there's no handle, we can't give a link
+        if (handle == null)
+        {
+            return;
+        }
+
+        StringBuilder rightsString = new StringBuilder();
+        Bundle[] bundles = item.getBundles("LICENSE");
+        for (int i = 0; i < bundles.length; i++)
+        {
+            Bitstream[] bss = bundles[i].getBitstreams();
+            for (int j = 0; j < bss.length; j++)
+            {
+                String url = IdentifierService.getURL(bss[j]).toString(); //base + "/bitstream/" + handle + "/" + bss[j].getSequenceID() + "/" + bss[j].getName();
+                rightsString.append(url + " ");
+            }
+        }
+
+        Rights rights = new Rights();
+        rights.setContent(rightsString.toString());
+        rights.setType(ContentType.TEXT);
+        entry.setRights(rights);
 	}
 	
 	/**

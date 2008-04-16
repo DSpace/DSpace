@@ -104,27 +104,19 @@ public class SWORDContext
 	 * Is the authenticated user a DSpace administrator?  This translates
 	 * as asking the question of whether the given eperson is a member
 	 * of the special DSpace group Administrator, with id 1
-	 * 
-	 * @param eperson
+	 *
 	 * @return	true if administrator, false if not
 	 * @throws SQLException
 	 */
 	public boolean isUserAdmin(Context context)
 		throws DSpaceSWORDException
 	{
-		try
-		{
-			if (this.authenticated != null)
-			{
-				Group admin = Group.find(context, 1);
-				return admin.isMember(this.authenticated);
-			}
-			return false;
-		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSWORDException(e);
-		}
+        if (this.authenticated != null)
+        {
+            Group admin = Group.find(context, 1);
+            return admin.isMember(this.authenticated);
+        }
+        return false;
 	}
 	
 	/**
@@ -132,26 +124,18 @@ public class SWORDContext
 	 * as asking the question of whether the given eperson is a member
 	 * of the special DSpace group Administrator, with id 1
 	 * 
-	 * @param eperson
 	 * @return	true if administrator, false if not
 	 * @throws SQLException
 	 */
 	public boolean isOnBehalfOfAdmin(Context context)
 		throws DSpaceSWORDException
 	{
-		try
-		{
-			if (this.onBehalfOf != null)
-			{
-				Group admin = Group.find(context, 1);
-				return admin.isMember(this.onBehalfOf);
-			}
-			return false;
-		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSWORDException(e);
-		}
+        if (this.onBehalfOf != null)
+        {
+            Group admin = Group.find(context, 1);
+            return admin.isMember(this.onBehalfOf);
+        }
+        return false;
 	}
 	
 	/**
@@ -237,49 +221,42 @@ public class SWORDContext
 	public Collection[] getAllowedCollections(Context context)
 		throws DSpaceSWORDException
 	{
-		try
-		{
-			// locate the collections to which the authenticated user has ADD rights
-			Collection[] cols = Collection.findAuthorized(context, null, Constants.ADD);
+        // locate the collections to which the authenticated user has ADD rights
+        Collection[] cols = Collection.findAuthorized(context, null, Constants.ADD);
 
-			// if there is no onBehalfOf user, just return the list
-			if (this.getOnBehalfOf() == null)
-			{
-				return cols;
-			}
-			
-			// if the onBehalfOf user is an administrator, return the list
-			if (this.isOnBehalfOfAdmin(context))
-			{
-				return cols;
-			}
-			
-			// if we are here, then we have to filter the list of collections
-			List<Collection> colList = new ArrayList<Collection>();
-			
-			for (int i = 0; i < cols.length; i++)
-			{
-				// we check each collection to see if the onBehalfOf user
-				// is permitted to deposit
-				
-				// urgh, this is so inefficient, but the authorisation API is
-				// a total hellish nightmare
-				Group subs = cols[i].getSubmitters();
-				if (isOnBehalfOfInGroup(subs))
-				{
-					colList.add(cols[i]);
-				}
-			}
-			
-			// now create the new array and return that
-			Collection[] newCols = new Collection[colList.size()];
-			newCols = colList.toArray((Collection[]) newCols);
-			return newCols;
-		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSWORDException(e);
-		}
+        // if there is no onBehalfOf user, just return the list
+        if (this.getOnBehalfOf() == null)
+        {
+            return cols;
+        }
+
+        // if the onBehalfOf user is an administrator, return the list
+        if (this.isOnBehalfOfAdmin(context))
+        {
+            return cols;
+        }
+
+        // if we are here, then we have to filter the list of collections
+        List<Collection> colList = new ArrayList<Collection>();
+
+        for (int i = 0; i < cols.length; i++)
+        {
+            // we check each collection to see if the onBehalfOf user
+            // is permitted to deposit
+
+            // urgh, this is so inefficient, but the authorisation API is
+            // a total hellish nightmare
+            Group subs = cols[i].getSubmitters();
+            if (isOnBehalfOfInGroup(subs))
+            {
+                colList.add(cols[i]);
+            }
+        }
+
+        // now create the new array and return that
+        Collection[] newCols = new Collection[colList.size()];
+        newCols = colList.toArray((Collection[]) newCols);
+        return newCols;
 	}
 	
 	/**
