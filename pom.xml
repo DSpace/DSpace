@@ -78,10 +78,10 @@
          <modules>
             <module>dspace-api</module>
             <module>dspace-jspui</module>
-            <module>dspace-xmlui</module>
+            <!-- <module>dspace-xmlui</module> -->
             <module>dspace-lni</module>
             <module>dspace-oai</module>
-            <!-- <module>dspace-sword</module> -->
+            <module>dspace-sword</module>
             <module>dspace</module>
          </modules>
       </profile>
@@ -99,10 +99,10 @@
          <modules>
             <module>dspace-api</module>
             <module>dspace-jspui</module>
-            <module>dspace-xmlui</module>
+            <!--<module>dspace-xmlui</module>-->
             <module>dspace-lni</module>
             <module>dspace-oai</module>
-            <!-- <module>dspace-sword</module> -->
+            <module>dspace-sword</module>
          </modules>
       </profile>
       
