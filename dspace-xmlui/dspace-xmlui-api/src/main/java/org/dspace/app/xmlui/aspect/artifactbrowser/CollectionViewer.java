@@ -272,8 +272,9 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             para.addText("query");
             para.addContent(" ");
             para.addButton("submit").setValue(T_go);
-            query.addPara().addXref(contextPath + "/handle/" + collection.getHandle()+ "/advanced-search", T_advanced_search_link);
             
+            para.addXref(IdentifierService.getURL(collection).toString() + "/advanced-search", T_advanced_search_link);
+
             // Browse by list
             Division browseDiv = search.addDivision("collection-browse","secondary browse");
             List browse = browseDiv.addList("collection-browse", List.TYPE_SIMPLE,

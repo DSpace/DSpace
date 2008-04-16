@@ -145,7 +145,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
             }
 
             Button submit = list.addItem().addButton("submit");
-            submit.setValue(T_submit);
+            submit.setValue(T_submit_next);
 
             div.addHidden("submission-continue").setValue(knot.getId());
         }
@@ -153,12 +153,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         {
             throw new RuntimeException(e);
         }
-        
-        Button submit = list.addItem().addButton("submit");
-        submit.setValue(T_submit_next);
-        
-        div.addHidden("submission-continue").setValue(knot.getId()); 
-        
+
     }
     
     /** 

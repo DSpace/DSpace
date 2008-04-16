@@ -294,7 +294,8 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             para.addText("query");
             para.addContent(" ");
             para.addButton("submit").setValue(T_go);
-            query.addPara().addXref(contextPath + "/handle/" + community.getHandle() + "/advanced-search", T_advanced_search_link);
+            
+            query.addPara().addXref(IdentifierService.getURL(community).toString() + "/advanced-search", T_advanced_search_link);
 
             // Browse by list
             Division browseDiv = search.addDivision("community-browse","secondary browse");
