@@ -283,6 +283,13 @@
     <scope_note>A known identifier type common to a local collection.</scope_note>
   </dc-type>
 
+  <dc-type>
+	<schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>purl</qualifier>
+    <scope_note>PURL canonical form</scope_note>
+  </dc-type>
+
   <!-- Used by system: do not remove -->
   <dc-type>
 	<schema>dc</schema>
