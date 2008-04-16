@@ -78,7 +78,7 @@ public class I18nUtil
      * @return defaultLocale
      *         the default Locale for this DSpace instance
      */
-    private static Locale getDefaultLocale()
+    public static Locale getDefaultLocale()
     {
         Locale defaultLocale = null;
         if ((ConfigurationManager.getProperty("default.locale") != null)
