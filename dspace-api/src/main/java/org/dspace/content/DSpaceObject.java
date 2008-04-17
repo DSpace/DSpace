@@ -236,6 +236,18 @@ public abstract class DSpaceObject implements Identifiable
         return false;
     }
 
+    public boolean contains(List<? extends DSpaceObject> dsos, DSpaceObject dso)
+    {
+        for (DSpaceObject obj : dsos)
+        {
+            if (obj.equals(dso))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public int hashCode()
     {
         return HashCodeBuilder.reflectionHashCode(this);

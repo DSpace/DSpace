@@ -155,7 +155,7 @@ public class GroupProxy extends Group
             loadEPeople();
         }
 
-        return epeople.contains(e);
+        return this.contains(epeople, e);
     }
 
     @Override
@@ -166,7 +166,7 @@ public class GroupProxy extends Group
             loadGroups();
         }
 
-        return groups.contains(g);
+        return this.contains(groups, g);
     }
 
     @Override

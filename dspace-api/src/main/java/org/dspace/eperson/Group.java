@@ -169,12 +169,12 @@ public class Group extends DSpaceObject
             return true;
         }
 
-        return epeople.contains(e);
+        return this.contains(epeople, e);
     }
 
     public boolean isMember(Group g)
     {
-        return groups.contains(g);
+        return this.contains(groups, g);
     }
 
     public Group[] getMemberGroups()
