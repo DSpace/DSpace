@@ -19,7 +19,59 @@
 		<version>SNAPSHOT</version>
 	</parent>
 
-	<repositories>
+    	<profiles>
+		<!--
+			when activated a dspace.config configuration
+			file location passed on the commandline
+			(-Ddspace.config=...) can be passed through
+			to be used as a filter source by projects for
+			tasks such as updating the ${dspace.dir} in
+			web.xml etc.
+		-->
+		<profile>
+			<activation>
+				<property>
+					<name>dspace.config</name>
+				</property>
+			</activation>
+			<build>
+				<filters>
+					<filter>${dspace.config}</filter>
+				</filters>
+			</build>
+		</profile>
+		<profile>
+			<id>postgres-support</id>
+			<activation>
+				<property>
+					<name>!db.name</name>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>postgresql</groupId>
+					<artifactId>postgresql</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>oracle-support</id>
+			<activation>
+				<property>
+					<name>db.name</name>
+					<value>oracle</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.oracle</groupId>
+					<artifactId>ojdbc14</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+
+    <repositories>
 		<repository>
 			<id>maven.dspace.org/snapshot</id>
 			<name>DSpace Maven Snapshot Repository</name>
@@ -76,57 +128,7 @@
 		</plugins>
 	</build>
 
-	<profiles>
-		<!--
-			when activated a dspace.config configuration
-			file location passed on the commandline
-			(-Ddspace.config=...) can be passed through
-			to be used as a filter source by projects for
-			tasks such as updating the ${dspace.dir} in
-			web.xml etc.
-		-->
-		<profile>
-			<activation>
-				<property>
-					<name>dspace.config</name>
-				</property>
-			</activation>
-			<build>
-				<filters>
-					<filter>${dspace.config}</filter>
-				</filters>
-			</build>
-		</profile>
-		<profile>
-			<id>oracle-support</id>
-			<activation>
-				<property>
-					<name>db.name</name>
-					<value>oracle</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>com.oracle</groupId>
-					<artifactId>ojdbc14</artifactId>
-				</dependency>
-			</dependencies>
-		</profile>
-		<profile>
-			<id>postgres-support</id>
-			<activation>
-				<property>
-					<name>!db.name</name>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>postgresql</groupId>
-					<artifactId>postgresql</artifactId>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
+
 
 	<dependencies>
 		<dependency>
