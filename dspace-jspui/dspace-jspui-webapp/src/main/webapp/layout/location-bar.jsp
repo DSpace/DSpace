@@ -67,6 +67,12 @@
         String s = (String) parentTitles.get(i);
         String u = (String) parentLinks.get(i);
 
+        // New line for each breadcrumb (no <br> needed for first)
+        if (i > 0)
+        {
+%><br/><%
+        }
+
         if (u.equals(""))
         {
 %>
@@ -76,7 +82,7 @@
         else
         {
 %>
-<a href="<%= u %>"><%= s %></a>&nbsp;&gt;
+<a href="<%= request.getContextPath() %><%= u %>"><%= s %></a>&nbsp;&gt;
 <%
         }
 }
