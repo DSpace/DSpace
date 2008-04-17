@@ -344,7 +344,7 @@ public class FlowGroupUtils {
 	 * @param groupIDs A list of groups to be removed.
 	 * @return A results object.
 	 */
-	public static FlowResult processDeleteGroups(Context context, String[] groupIDs) throws AuthorizeException, IOException
+	public static FlowResult processDeleteGroups(Context context, String[] groupIDs) throws AuthorizeException, UIException, IOException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(true);
@@ -364,13 +364,21 @@ public class FlowGroupUtils {
 	    		{
 		    		if (role == Role.Administrators)
 		    		{
-		    			collection.removeAdministrators();
-		    			collection.update();
-		    		} 
+		    		    // FIXME: This should unregister this role from the collection 
+		                // object however there is no method available to do this. Once 
+		                // Manakin is integrated into dspace this situatiotion should be 
+		                // resolved.
+		                
+		                throw new UIException("This operation can not be preformed untill the DSpace API is modified to enable the removal of collection administrators.");
+		            } 
 		    		else if (role == Role.Submitters)
 		    		{
-		    			collection.removeSubmitters();
-		    			collection.update();
+		                // FIXME: This should unregister this role from the collection 
+		                // object however there is no method available to do this. Once 
+		                // Manakin is integrated into dspace this situatiotion should be 
+		                // resolved.
+		                
+		                throw new UIException("This operation can not be preformed untill the DSpace API is modified to enable the removal of collection submitters.");
 		    		}
 		    		else if (role == Role.WorkflowStep1)
 		    		{
