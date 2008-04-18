@@ -188,6 +188,7 @@ public class EtdLoader
   static SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
 
   static MarcStreamWriter marcwriter = null;
+  static PrintWriter csvwriter = null;
 
   static Map mAllCollections = null;
 
@@ -207,6 +208,7 @@ public class EtdLoader
       String strZipFile    = props.getProperty("etdloader.zipfile", null);
       String strSingleItem = props.getProperty("etdloader.singleitem", null);
       String strMarcFile   = props.getProperty("etdloader.marcfile", null);
+		String strCsvFile    = props.getProperty("etdloader.csvfile", null);
 
       // dspace dir
       String strDspace     = ConfigurationManager.getProperty("dspace.dir");
@@ -227,6 +229,13 @@ public class EtdLoader
       if (strMarcFile != null) {
 	FileOutputStream fos = new FileOutputStream(new File(strMarcFile), true);
 	marcwriter = new MarcStreamWriter(fos, "UTF-8");
+      }
+
+      // open the csv output file
+      if (strCsvFile != null) {
+	FileOutputStream fos = new FileOutputStream(strCsvFile, true);
+	OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+	csvwriter = new PrintWriter(osw);
       }
 
       // Get DSpace values
@@ -290,6 +299,10 @@ public class EtdLoader
     finally {
       if (marcwriter != null) {
 	try { marcwriter.close(); } catch (Exception e) {}
+      }
+
+      if (csvwriter != null) {
+	try { csvwriter.close(); } catch (Exception e) {}
       }
 
       log.info("=====================================\n" +
@@ -545,6 +558,58 @@ public class EtdLoader
   }
 
 
+  /************************************************************ createCsv */
+  /**
+   * Add an entry in the CSV files for this item: title, author, handle
+   */
+
+  public static void createCsv(Item item, String strHandle) throws Exception {
+
+    if (csvwriter != null) {
+      log.debug("Creating CSV");
+
+      // Build the line
+      StringBuffer sb = new StringBuffer();
+
+      sb.append('"');
+
+      // Get the title(s)
+      DCValue title[] = item.getDC("title", null, Item.ANY);
+
+      for (int i=0; i < title.length; i++) {
+	if (i > 0) {
+	  sb.append("; ");
+	}
+
+	sb.append(title[i].value.replaceAll("\"","\"\""));
+      }
+
+      sb.append("\",\"");
+
+      // Get the author(s)
+      DCValue author[] = item.getDC("contributor", "author", Item.ANY);
+
+      for (int i=0; i < author.length; i++) {
+	if (i > 0) {
+	  sb.append("; ");
+	}
+
+	sb.append(author[i].value.replaceAll("\"","\"\""));
+      }
+
+      sb.append("\",\"");
+
+      // Add the handle
+      sb.append(strHandle);
+
+      sb.append('"');
+
+      // Write out the csv line
+      csvwriter.println(sb.toString());
+    }
+  }
+
+
   /******************************************************* getCollections */
   /**
    * Get additional mapped collections.
@@ -732,6 +797,9 @@ public class EtdLoader
 
       // Create marc record for upload to TSD
       createMarc(meta, strHandle, files);
+
+      // Create csv entry for this item
+      createCsv(item, strHandle);
     }
 
     catch (Exception e) {
