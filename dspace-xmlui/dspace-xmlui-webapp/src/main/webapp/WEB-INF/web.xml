@@ -49,6 +49,12 @@
         </description>
     </context-param>
 
+    <!-- Listener to initialise / clean up the application -->
+    <listener>
+        <listener-class>org.dspace.app.util.DSpaceContextListener</listener-class>
+    </listener>
+
+
     <!-- Servlet Configuration ========================================== -->
 
     <servlet>
