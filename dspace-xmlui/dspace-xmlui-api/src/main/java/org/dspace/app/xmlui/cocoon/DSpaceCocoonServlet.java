@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cocoon.servlet.CocoonServlet;
+import org.apache.log.ContextMap;
 import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
@@ -197,25 +198,33 @@ public class DSpaceCocoonServlet extends CocoonServlet
     public void service(HttpServletRequest realRequest, HttpServletResponse realResponse)
     throws ServletException, IOException 
     {
-    	// Check if there is a request to be resumed.
-    	realRequest = AuthenticationUtil.resumeRequest(realRequest);
-        
-        // Send the real request or the resumed request off to
-        // cocoon....
-    	
-    	// if force ssl is on and the user has authenticated and the request is not secure redirect to https
-    	if ((ConfigurationManager.getBooleanProperty("xmlui.force.ssl")) && (realRequest.getSession().getAttribute("dspace.current.user.id")!=null) && (!realRequest.isSecure())) {
-				StringBuffer location = new StringBuffer("https://");
-				location.append(ConfigurationManager.getProperty("dspace.hostname")).append(realRequest.getContextPath()).append(realRequest.getServletPath()).append(
-						realRequest.getQueryString() == null ? ""
-								: ("?" + realRequest.getQueryString()));
-				realResponse.sendRedirect(location.toString());
-		}
-    	
-    	super.service(realRequest, realResponse);
-    	
-    	// Close out the DSpace context no matter what.
-    	ContextUtil.closeContext(realRequest);
+        try
+        {
+            // Check if there is a request to be resumed.
+            realRequest = AuthenticationUtil.resumeRequest(realRequest);
+
+            // Send the real request or the resumed request off to
+            // cocoon....
+
+            // if force ssl is on and the user has authenticated and the request is not secure redirect to https
+            if ((ConfigurationManager.getBooleanProperty("xmlui.force.ssl")) && (realRequest.getSession().getAttribute("dspace.current.user.id")!=null) && (!realRequest.isSecure())) {
+                    StringBuffer location = new StringBuffer("https://");
+                    location.append(ConfigurationManager.getProperty("dspace.hostname")).append(realRequest.getContextPath()).append(realRequest.getServletPath()).append(
+                            realRequest.getQueryString() == null ? ""
+                                    : ("?" + realRequest.getQueryString()));
+                    realResponse.sendRedirect(location.toString());
+            }
+
+            super.service(realRequest, realResponse);
+
+            // Close out the DSpace context no matter what.
+            ContextUtil.closeContext(realRequest);
+        }
+        finally
+        {
+            // Ensure that the current context is removed from ThreadLocal
+            ContextMap.removeCurrentContext();
+        }
     }
     
     

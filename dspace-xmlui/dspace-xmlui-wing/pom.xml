@@ -86,9 +86,9 @@
          <version>4.3.1</version>
       </dependency>
       <dependency>
-         <groupId>avalon-logkit</groupId>
+         <groupId>org.apache.avalon.logkit</groupId>
          <artifactId>avalon-logkit</artifactId>
-         <version>2.1</version>
+         <version>2.2.1</version>
          <exclusions>
             <exclusion>
                <groupId>geronimo-spec</groupId>
