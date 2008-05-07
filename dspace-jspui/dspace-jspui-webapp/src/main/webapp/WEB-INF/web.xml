@@ -124,6 +124,12 @@
     <url-pattern>/view-workspaceitem</url-pattern>
   </filter-mapping>
 
+    <!-- Listener to initialise / clean up the application -->
+    <listener>
+        <listener-class>org.dspace.app.util.DSpaceContextListener</listener-class>
+    </listener>
+
+
   <!-- Servlets -->
 
   <!-- DSpace configuration initialisation.  This needs to be loaded before

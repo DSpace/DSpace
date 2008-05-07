@@ -1429,10 +1429,8 @@ public class DatabaseManager
         try
         {
             // Register basic JDBC driver
-            Class driverClass = Class.forName(ConfigurationManager
-                    .getProperty("db.driver"));
-            Driver basicDriver = (Driver) driverClass.newInstance();
-            DriverManager.registerDriver(basicDriver);
+            Class.forName(ConfigurationManager.getProperty("db.driver"));
+            Class.forName("org.apache.commons.dbcp.PoolingDriver");
 
             // Read pool configuration parameter or use defaults
             // Note we check to see if property is null; getIntProperty returns
@@ -1529,14 +1527,15 @@ public class DatabaseManager
             }
 
             //
-            // Finally, we create the PoolingDriver itself...
+            // Finally, we get the PoolingDriver itself...
             //
-            PoolingDriver driver = new PoolingDriver();
+            PoolingDriver driver = (PoolingDriver)DriverManager.getDriver("jdbc:apache:commons:dbcp:");
 
             //
             // ...and register our pool with it.
             //
-            driver.registerPool(poolName, connectionPool);
+            if (driver != null)
+                driver.registerPool(poolName, connectionPool);
 
             // Old SimplePool init
             //DriverManager.registerDriver(new SimplePool());
