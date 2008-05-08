@@ -1410,7 +1410,10 @@ public class DatabaseManager
         if (initialized)
         {
             initialized = false;
-            PoolingDriver driver = (PoolingDriver)DriverManager.getDriver("jdbc:apache:commons:dbcp:" + poolName);
+            // Get the registered DBCP pooling driver
+            PoolingDriver driver = (PoolingDriver)DriverManager.getDriver("jdbc:apache:commons:dbcp:");
+
+            // Close the named pool
             if (driver != null)
                 driver.closePool(poolName);
         }
@@ -1430,6 +1433,8 @@ public class DatabaseManager
         {
             // Register basic JDBC driver
             Class.forName(ConfigurationManager.getProperty("db.driver"));
+
+            // Register the DBCP driver
             Class.forName("org.apache.commons.dbcp.PoolingDriver");
 
             // Read pool configuration parameter or use defaults
