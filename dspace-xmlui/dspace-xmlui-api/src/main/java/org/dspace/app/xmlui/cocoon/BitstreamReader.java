@@ -301,11 +301,14 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             this.bitstreamName = bitstream.getName();
             
             // Trim any path information from the bitstream
-    		int finalSlashIndex = bitstreamName.lastIndexOf("/");
-    		if (finalSlashIndex > 0)
-    		{
-    			bitstreamName = bitstreamName.substring(finalSlashIndex+1);
-    		}
+            if (bitstreamName != null)
+            {  
+                int finalSlashIndex = bitstreamName.lastIndexOf("/");
+                if (finalSlashIndex > 0)
+                {
+                    bitstreamName = bitstreamName.substring(finalSlashIndex+1);
+                }
+            }
     		
             
             // Log that the bitstream has been viewed.
