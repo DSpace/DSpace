@@ -61,6 +61,8 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
+import javax.servlet.jsp.JspWriter;
+
 /**
  * Class representing a community
  * <P>
@@ -73,23 +75,6 @@ import org.dspace.storage.rdbms.TableRowIterator;
  */
 public class Community extends DSpaceObject
 {
-    /**
-     * <pre>
-     * Revision History
-     *
-     *   2005/08/10:Ben
-     *     - when a Collection is added or removed update the browse
-     *       indexes for all Items in the Collection
-     *
-     *   2004/10/21: Ben
-     *     - move group functionality to CommunityGroup;
-     *       leave behind new int metadata functions
-     *     
-     *   2004/10/20: Ben
-     *     - add group function
-     * </pre>
-     */
-
     /** log4j category */
     private static Logger log = Logger.getLogger(Community.class);
 
@@ -571,11 +556,11 @@ public class Community extends DSpaceObject
                         ourContext,
                         "collection",
                         "SELECT collection.* FROM collection WHERE "
-			+ "collection_id NOT IN "
+                        + "collection_id NOT IN "
                         + "  (SELECT collection.collection_id FROM collection, community2collection WHERE "
-			+ "   community2collection.collection_id=collection.collection_id "
-			+ "   AND community2collection.community_id="
-			+ getID() + ") ORDER BY collection.name");
+                        + "   community2collection.collection_id=collection.collection_id "
+                        + "   AND community2collection.community_id="
+                        + getID() + ") ORDER BY collection.name");
 
         // Make Collection objects
         while (tri.hasNext())
@@ -749,6 +734,18 @@ public class Community extends DSpaceObject
     public void addCollection(Collection c) throws SQLException,
             AuthorizeException
     {
+      addCollection(c, null);
+    }
+
+    /**
+     * Add an exisiting collection to the community
+     * 
+     * @param c
+     *            collection to add
+      @param request request object to send reindex updates
+     */
+  public void addCollection(Collection c, JspWriter out) throws SQLException, AuthorizeException
+    {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
@@ -775,11 +772,27 @@ public class Community extends DSpaceObject
         // close the TableRowIterator to free up resources
         tri.close();
 
-	// Update browse indexes for all items in the collection
-	for (ItemIterator ii = c.getItems(); ii.hasNext(); ) {
-	  Item i = ii.next();
-	  Browse.itemChanged(ourContext, i);
-	}
+        // Update browse indexes for all items in the collection
+        for (ItemIterator ii = c.getItems(); ii.hasNext(); ) {
+          Item i = ii.next();
+
+          Browse.itemChanged(ourContext, i);
+
+	  if (out != null) {
+	    try {
+	      String strHandle = HandleManager.findHandle(ourContext, i);
+	      out.write("Reindexing Item: " + strHandle + "<br/>");
+	      for (int x=0; x < 1024; x++) {
+		out.write(" ");
+	      }
+	      out.write("\n");
+	      out.flush();
+	    } 
+	    catch (IOException e) {
+	    }
+	  }
+
+        }
     }
 
     /**
@@ -844,6 +857,18 @@ public class Community extends DSpaceObject
     public void removeCollection(Collection c) throws SQLException,
             AuthorizeException, IOException
     {
+      removeCollection(c, null); 
+    }
+
+    /**
+     * Remove a collection. Any items then orphaned are deleted.
+     * 
+     * @param c
+     *            collection to remove
+     */
+    public void removeCollection(Collection c, JspWriter out) throws SQLException,
+            AuthorizeException, IOException
+    {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
@@ -880,11 +905,26 @@ public class Community extends DSpaceObject
         // close the TableRowIterator to free up resources
         tri.close();
 
-	// Update browse indexes for all items in the collection
-	for (ItemIterator ii = c.getItems(); ii.hasNext(); ) {
-	  Item i = ii.next();
-	  Browse.itemChanged(ourContext, i);
-	}
+        // Update browse indexes for all items in the collection
+        for (ItemIterator ii = c.getItems(); ii.hasNext(); ) {
+          Item i = ii.next();
+          Browse.itemChanged(ourContext, i);
+
+	  if (out != null) {
+	    try {
+	      String strHandle = HandleManager.findHandle(ourContext, i);
+	      out.write("Reindexing Item: " + strHandle + "<br/>");
+	      for (int x=0; x < 1024; x++) {
+		out.write(" ");
+	      }
+	      out.write("\n");
+	      out.flush();
+	    } 
+	    catch (IOException e) {
+	    }
+	  }
+
+        }
     }
 
     /**
@@ -1071,7 +1111,7 @@ public class Community extends DSpaceObject
         AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
     }
 
-	/**
+        /**
      * counts items in this community
      *
      * @return  total items

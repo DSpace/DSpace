@@ -95,12 +95,14 @@ public class CollectionMappingServlet extends DSpaceServlet {
 	JSPManager.showJSP(request, response, "/tools/confirm-unmapcollection.jsp");
       }	
       else if (action.equals("confirm_map") && cancel == null) {
-	comm.addCollection(coll);
-	c.commit();
+	//comm.addCollection(coll);
+	//c.commit();
+	JSPManager.showJSP(request, response, "/tools/mapcollections_display.jsp");
       }	
       else if (action.equals("confirm_unmap") && cancel == null) {
-	comm.removeCollection(coll);
-	c.commit();
+	//comm.removeCollection(coll);
+	//c.commit();
+	JSPManager.showJSP(request, response, "/tools/mapcollections_display.jsp");
       }	
 
       showMainPage(c, request, response, comm);
