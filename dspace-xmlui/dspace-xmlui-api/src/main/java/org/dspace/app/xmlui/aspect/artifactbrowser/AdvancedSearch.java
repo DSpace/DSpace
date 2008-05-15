@@ -42,6 +42,7 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,6 +68,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -258,32 +260,26 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         
         Select select = cell.addSelect("field" + row);
 
-        // FIXME: this needs to come from a configurable source.
         Map<String, Message> searchTypes = new HashMap<String, Message>();
-        searchTypes.put("author", 
-                message("xmlui.ArtifactBrowser.AdvancedSearch.type_author"));
-        searchTypes.put("title", 
-                message("xmlui.ArtifactBrowser.AdvancedSearch.type_title"));
-        searchTypes.put("keyword", 
-                message("xmlui.ArtifactBrowser.AdvancedSearch.type_subject"));
-        searchTypes.put("abstract", 
-                message("xmlui.ArtifactBrowser.AdvancedSearch.type_abstract"));
-        searchTypes.put("series", 
-                message("xmlui.ArtifactBrowser.AdvancedSearch.type_series"));
-        searchTypes.put("sponsor", 
-                message("xmlui.ArtifactBrowser.AdvancedSearch.type_sponsor"));
-        searchTypes.put("identifier", 
-                message("xmlui.ArtifactBrowser.AdvancedSearch.type_identifier"));
-        searchTypes.put("language", 
-                message("xmlui.ArtifactBrowser.AdvancedSearch.type_language"));
-
+        
+        int i = 1;
+        String sindex = ConfigurationManager.getProperty("search.index." + i);
+        while(sindex != null)
+        {
+            String field = sindex.split(":")[0];               
+            searchTypes.put(field, message("xmlui.ArtifactBrowser.AdvancedSearch.type_" + field));
+            
+            sindex = ConfigurationManager.getProperty("search.index." + ++i);
+        }
+            
+        
+        
         // Special case ANY
         select.addOption((current == null), "ANY").addContent(
-                message("xmlui.ArtifactBrowser.AdvancedSearch.type_keyword"));
+                message("xmlui.ArtifactBrowser.AdvancedSearch.type_ANY"));
 
         for (String key : searchTypes.keySet())
         {
-
             select.addOption(key.equals(current), key).addContent(
                     searchTypes.get(key));
         }
