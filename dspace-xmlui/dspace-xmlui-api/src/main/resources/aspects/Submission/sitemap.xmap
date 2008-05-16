@@ -92,6 +92,15 @@
   <map:pipelines>
     <map:pipeline>
       
+     <!-- 
+         catch mydspace uri's and immediately redirect 
+         to "submissions" this is a fix to catch approval 
+         emails "mydspace" linking from Workflow system.
+     -->
+     <map:match pattern="mydspace">
+         <map:redirect-to uri="{request:contextPath}/submissions"/>
+     </map:match>
+         
       <!-- Make sure the user is atleast logged in -->
       <map:select type="AuthenticatedSelector">
         <map:when test="eperson">
