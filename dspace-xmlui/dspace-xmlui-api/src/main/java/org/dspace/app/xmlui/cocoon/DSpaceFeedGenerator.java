@@ -501,6 +501,9 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         //loop through all the metadata fields to put in the description
         StringTokenizer st = new StringTokenizer(descriptionFields, ",");
 
+        Description descrip = new Description();
+        descrip.setValue("");
+
         while (st.hasMoreTokens())
         {
             String field = st.nextToken().trim();
@@ -513,29 +516,24 @@ public class DSpaceFeedGenerator extends AbstractGenerator
                 isDate = true;
             }
 
-            
             //print out this field, along with its value(s)
-            //FIXME: replace with this line once dspace 1.4.1 is released:
-            //DCValue[] values = dspaceItem.getMetadata(field);
             DCValue[] values = getMetadata(dspaceItem,field);
-           
-            if(values != null && values.length>0)
-            {  
-            	// We've found one, only take the first one if there
-            	// are more than one.
-                String fieldValue = values[0].value;
+            
+            for(DCValue value : values)
+            {
+                // We've found one, only take the first one if there
+                // are more than one.
+                String fieldValue = value.value;
                 if(isDate)
                     fieldValue = (new DCDate(fieldValue)).toString();
-               
-                Description descrip = new Description();
-                descrip.setValue(fieldValue);
-                rssItem.setDescription(descrip);
-                
-                // Once we've found one we can stop looking for more.
-                break;
+
+                descrip.setValue(descrip.getValue() + fieldValue + "\n\n");
             }
             
-        }//end while   
+        }//end while 
+
+        rssItem.setDescription(descrip);
+        
         // set date field
         String dcDate = null;
         try
