@@ -41,6 +41,7 @@
 package org.dspace.app.util;
 
 import java.util.Map;
+import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 
@@ -49,14 +50,17 @@ import org.apache.log4j.Logger;
  * Process. In other words, this is a single step in the SubmissionConfig class.
  * This class represents the structure of a single 'step' node in the
  * item-submission.xml configuration file.
- * 
+ *
+ * Note: Implements Serializable as it will be saved to the current session during submission.
+ * Please ensure that nothing is added to this class that isn't also serializable
+ *
  * @see org.dspace.app.util.SubmissionConfigReader
  * @see org.dspace.app.util.SubmissionConfig
  * 
  * @author Tim Donohue
  * @version $Revision$
  */
-public class SubmissionStepConfig
+public class SubmissionStepConfig implements Serializable
 {
     /*
      * The identifier for the Select Collection step
