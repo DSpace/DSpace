@@ -42,6 +42,7 @@ package org.dspace.app.util;
 
 import java.util.Vector;
 import java.util.Map;
+import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 
@@ -49,6 +50,9 @@ import org.apache.log4j.Logger;
  * Class representing a single Item Submission config definition, organized into
  * steps. This class represents the structure of a single 'submission-process'
  * node in the item-submission.xml configuration file.
+ *
+ * Note: Implements Serializable as it will be saved to the current session during submission.
+ * Please ensure that nothing is added to this class that isn't also serializable
  * 
  * @see org.dspace.app.util.SubmissionConfigReader
  * @see org.dspace.app.util.SubmissionStepConfig
@@ -57,7 +61,7 @@ import org.apache.log4j.Logger;
  * @version $Revision$
  */
 
-public class SubmissionConfig
+public class SubmissionConfig implements Serializable
 {
     /** name of the item submission process */
     private String submissionName = null;
