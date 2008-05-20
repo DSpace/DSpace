@@ -43,6 +43,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.io.Serializable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -51,11 +52,14 @@ import javax.servlet.http.HttpServletRequestWrapper;
  * Stores information about an HTTP request. This is used so that the request
  * can be replicated during a later request, once authentication has
  * successfully occurred.
- * 
+ *
+ * Note: Implements Serializable as it will be saved to the current session during submission.
+ * Please ensure that nothing is added to this class that isn't also serializable
+ *
  * @author Robert Tansley
  * @version $Revision$
  */
-public class RequestInfo
+public class RequestInfo implements Serializable
 {
     /** The original parameters */
     private Map originalParameterMap;
