@@ -35,23 +35,6 @@
 		</repository>
 	</repositories>
 
-	<pluginRepositories>
-		<pluginRepository>
-			<id>maven.dspace.org/snapshot</id>
-			<name>DSpace Maven Repository</name>
-			<url>http://maven.dspace.org/snapshot</url>
-			<releases>
-				<updatePolicy>never</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</releases>
-			<snapshots>
-				<updatePolicy>always</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
-
-
 	<!--
 		The Subversion repository location is used by Continuum to update against
 		when changes have occured, this spawns a new build cycle and releases snapshots

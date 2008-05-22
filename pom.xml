@@ -168,23 +168,6 @@
       </repository>
    </repositories>
 
-   <pluginRepositories>
-      <pluginRepository>
-         <id>maven.dspace.org/snapshot</id>
-         <name>DSpace Maven Repository</name>
-         <url>http://maven.dspace.org/snapshot</url>
-         <releases>
-            <enabled>false</enabled>
-            <checksumPolicy>fail</checksumPolicy>
-         </releases>
-         <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-            <checksumPolicy>fail</checksumPolicy>
-         </snapshots>
-      </pluginRepository>
-   </pluginRepositories>
-
    <!-- 
       Distribution management provides a means to control which
       versions of dependency jars are used for compilation
