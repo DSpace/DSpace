@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace.modules</groupId>
    <artifactId>xmlui</artifactId>
@@ -33,9 +35,15 @@
    </repositories>
 
    <scm>
-      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/xmlui</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/xmlui</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/xmlui</url>
+      <connection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/xmlui
+      </connection>
+      <developerConnection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/xmlui
+      </developerConnection>
+      <url>
+         http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/xmlui
+      </url>
    </scm>
 
    <build>
@@ -160,6 +168,13 @@
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-xmlui-api</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>servlet-api</artifactId>
+         <version>2.3</version>
+         <scope>provided</scope>
       </dependency>
 
    </dependencies>

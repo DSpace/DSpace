@@ -1,143 +1,155 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.dspace.modules</groupId>
-	<artifactId>sword</artifactId>
-	<packaging>war</packaging>
-	<name>DSpace SWORD :: Web Application</name>
-	<description>
-		DSpace SWORD Deposit Service Provider Web Application
-	</description>
-	<url>http://www.ukoln.ac.uk/repositories/digirep/index/SWORD</url>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace.modules</groupId>
+   <artifactId>sword</artifactId>
+   <packaging>war</packaging>
+   <name>DSpace SWORD :: Web Application</name>
+   <description>
+      DSpace SWORD Deposit Service Provider Web Application
+   </description>
+   <url>http://www.ukoln.ac.uk/repositories/digirep/index/SWORD</url>
 
-	<!--
-		A Parent POM that Maven inherits DSpace Default
-		POM atrributes from.
-	-->
-	<parent>
-		<groupId>org.dspace</groupId>
-		<artifactId>modules</artifactId>
-		<version>1.5.1-SNAPSHOT</version>
-	</parent>
+   <!--
+      A Parent POM that Maven inherits DSpace Default
+      POM atrributes from.
+   -->
+   <parent>
+      <groupId>org.dspace</groupId>
+      <artifactId>modules</artifactId>
+      <version>1.5.1-SNAPSHOT</version>
+   </parent>
 
-	<repositories>
-		<repository>
-			<id>maven.dspace.org/snapshot</id>
-			<name>DSpace Maven Snapshot Repository</name>
-			<url>http://maven.dspace.org/snapshot</url>
-			<releases>
-				<enabled>false</enabled>
-				<checksumPolicy>fail</checksumPolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		</repository>
-	</repositories>
+   <repositories>
+      <repository>
+         <id>maven.dspace.org/snapshot</id>
+         <name>DSpace Maven Snapshot Repository</name>
+         <url>http://maven.dspace.org/snapshot</url>
+         <releases>
+            <enabled>false</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <enabled>true</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </repository>
+   </repositories>
 
-	<!--
-		The Subversion repository location is used by Continuum to update against
-		when changes have occured, this spawns a new build cycle and releases snapshots
-		into the snapshot repository below.
-	-->
-	<scm>
-		<connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/sword</connection>
-		<developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/sword</developerConnection>
-		<url>http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/sword</url>
-	</scm>
+   <!--
+      The Subversion repository location is used by Continuum to update against
+      when changes have occured, this spawns a new build cycle and releases snapshots
+      into the snapshot repository below.
+   -->
+   <scm>
+      <connection>
+         scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/sword
+      </connection>
+      <developerConnection>
+         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/sword
+      </developerConnection>
+      <url>
+         http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/sword
+      </url>
+   </scm>
 
-	<build>
-		<plugins>
+   <build>
+      <plugins>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<archiveClasses>false</archiveClasses>
-					<webResources>
-						<resource>
-							<filtering>true</filtering>
-							<directory>
-								${basedir}/src/main/webapp
-							</directory>
-							<includes>
-								<include>WEB-INF/web.xml</include>
-							</includes>
-						</resource>
-					</webResources>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>prepare-package</phase>
-					</execution>
-				</executions>
-			</plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+               <archiveClasses>false</archiveClasses>
+               <webResources>
+                  <resource>
+                     <filtering>true</filtering>
+                     <directory>${basedir}/src/main/webapp</directory>
+                     <includes>
+                        <include>WEB-INF/web.xml</include>
+                     </includes>
+                  </resource>
+               </webResources>
+            </configuration>
+            <executions>
+               <execution>
+                  <phase>prepare-package</phase>
+               </execution>
+            </executions>
+         </plugin>
 
-		</plugins>
-	</build>
+      </plugins>
+   </build>
 
-	<profiles>
-		<!--
-			when activated a dspace.config configuration
-			file location passed on the commandline
-			(-Ddspace.config=...) can be passed through
-			to be used as a filter source by projects for
-			tasks such as updating the ${dspace.dir} in
-			web.xml etc.
-		-->
-		<profile>
-			<activation>
-				<property>
-					<name>dspace.config</name>
-				</property>
-			</activation>
-			<build>
-				<filters>
-					<filter>${dspace.config}</filter>
-				</filters>
-			</build>
-		</profile>
-		<profile>
-			<id>oracle-support</id>
-			<activation>
-				<property>
-					<name>db.name</name>
-					<value>oracle</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>com.oracle</groupId>
-					<artifactId>ojdbc14</artifactId>
-				</dependency>
-			</dependencies>
-		</profile>
-		<profile>
-			<id>postgres-support</id>
-			<activation>
-				<property>
-					<name>!db.name</name>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>postgresql</groupId>
-					<artifactId>postgresql</artifactId>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
+   <profiles>
+      <!--
+         when activated a dspace.config configuration
+         file location passed on the commandline
+         (-Ddspace.config=...) can be passed through
+         to be used as a filter source by projects for
+         tasks such as updating the ${dspace.dir} in
+         web.xml etc.
+      -->
+      <profile>
+         <activation>
+            <property>
+               <name>dspace.config</name>
+            </property>
+         </activation>
+         <build>
+            <filters>
+               <filter>${dspace.config}</filter>
+            </filters>
+         </build>
+      </profile>
+      <profile>
+         <id>oracle-support</id>
+         <activation>
+            <property>
+               <name>db.name</name>
+               <value>oracle</value>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>com.oracle</groupId>
+               <artifactId>ojdbc14</artifactId>
+            </dependency>
+         </dependencies>
+      </profile>
+      <profile>
+         <id>postgres-support</id>
+         <activation>
+            <property>
+               <name>!db.name</name>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>postgresql</groupId>
+               <artifactId>postgresql</artifactId>
+            </dependency>
+         </dependencies>
+      </profile>
+   </profiles>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-sword-webapp</artifactId>
-			<type>war</type>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-sword-api</artifactId>
-		</dependency>
-	</dependencies>
+   <dependencies>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-sword-webapp</artifactId>
+         <type>war</type>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-sword-api</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>servlet-api</artifactId>
+         <version>2.3</version>
+         <scope>provided</scope>
+      </dependency>
+   </dependencies>
 
 </project>
