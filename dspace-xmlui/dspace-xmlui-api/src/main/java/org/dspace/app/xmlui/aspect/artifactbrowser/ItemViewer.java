@@ -49,6 +49,7 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -65,6 +66,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.LogManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -74,6 +76,8 @@ import org.xml.sax.SAXException;
  */
 public class ItemViewer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
+    private static final Logger log = Logger.getLogger(ItemViewer.class);
+    
     /** Language strings */
     private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
@@ -129,7 +133,11 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 	            DSpaceValidity validity = new DSpaceValidity();
 	            validity.add(dso);
 	            this.validity =  validity.complete();
-	        } 
+
+                // add log message that we are viewing the item
+                // done here, as the serialization may not occur if the cache is valid
+                log.info(LogManager.getHeader(context, "view_item", "handle=" + dso.getHandle()));
+	        }
 	        catch (Exception e)
 	        {
 	            // Ignore all errors and just invalidate the cache.

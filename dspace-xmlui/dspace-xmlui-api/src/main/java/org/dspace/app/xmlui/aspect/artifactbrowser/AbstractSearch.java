@@ -50,6 +50,7 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
@@ -71,6 +72,8 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
+import org.dspace.core.Constants;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
@@ -90,6 +93,8 @@ import org.xml.sax.SAXException;
  */
 public abstract class AbstractSearch extends AbstractDSpaceTransformer
 {
+    private static final Logger log = Logger.getLogger(AbstractSearch.class);
+
 	/** Language strings */
     private static final Message T_result_query = 
         message("xmlui.ArtifactBrowser.AbstractSearch.result_query");
@@ -128,7 +133,10 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     
     /** The options for results per page */
     private static final int[] RESULTS_PER_PAGE_PROGRESSION = {5,10,20,40,60,80,100};
-    
+
+    /** Cached query arguments */
+    private QueryArgs queryArgs;
+
     /** Cached query results */
     private QueryResults queryResults;
     
@@ -199,7 +207,11 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 	            }
 	            
 	            this.validity = validity.complete();
-	        }
+
+                // add log message that we are viewing the item
+                // done here, as the serialization may not occur if the cache is valid
+                logSearch();
+            }
 	        catch (Exception e)
 	        {
 	            // Just ignore all errors and return an invalid cache.
@@ -414,36 +426,36 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         DSpaceObject scope = getScope();
         int page = getParameterPage();
 
-        QueryArgs qArgs = new QueryArgs();
-        qArgs.setPageSize(getParameterRpp());
+        queryArgs = new QueryArgs();
+        queryArgs.setPageSize(getParameterRpp());
         try
         {
-            qArgs.setSortOption(SortOption.getSortOption(getParameterSortBy()));
+            queryArgs.setSortOption(SortOption.getSortOption(getParameterSortBy()));
         }
         catch (SortException se)
         {
         }
         
-        qArgs.setSortOrder(getParameterOrder());
+        queryArgs.setSortOrder(getParameterOrder());
 
-        qArgs.setQuery(query);
+        queryArgs.setQuery(query);
         if (page > 1)
-            qArgs.setStart((Integer.valueOf(page) - 1) * qArgs.getPageSize());
+            queryArgs.setStart((Integer.valueOf(page) - 1) * queryArgs.getPageSize());
         else
-            qArgs.setStart(0);
+            queryArgs.setStart(0);
 
         QueryResults qResults = null;
         if (scope instanceof Community)
         {
-            qResults = DSQuery.doQuery(context, qArgs, (Community) scope);
+            qResults = DSQuery.doQuery(context, queryArgs, (Community) scope);
         }
         else if (scope instanceof Collection)
         {
-            qResults = DSQuery.doQuery(context, qArgs, (Collection) scope);
+            qResults = DSQuery.doQuery(context, queryArgs, (Collection) scope);
         }
         else
         {
-            qResults = DSQuery.doQuery(context, qArgs);
+            qResults = DSQuery.doQuery(context, queryArgs);
         }
 
         this.queryResults = qResults;
@@ -632,5 +644,49 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         //        etalSelect.addOption(i == info.getEtAl(), i, Integer.toString(i));
         //    }
         //}
+    }
+
+    protected void logSearch()
+    {
+        int countCommunities = 0;
+        int countCollections = 0;
+        int countItems       = 0;
+
+        for (Object type : queryResults.getHitTypes())
+        {
+            if (type instanceof Integer)
+            {
+                switch (((Integer)type).intValue())
+                {
+                case Constants.ITEM:       countItems++;        break;
+                case Constants.COLLECTION: countCollections++;  break;
+                case Constants.COMMUNITY:  countCommunities++;  break;
+                }
+            }
+        }
+
+        String logInfo = "";
+
+        try
+        {
+            DSpaceObject dsoScope = getScope();
+
+            if (dsoScope instanceof Collection)
+            {
+                logInfo = "collection_id=" + dsoScope.getID() + ",";
+            }
+            else if (dsoScope instanceof Community)
+            {
+                logInfo = "community_id=" + dsoScope.getID() + ",";
+            }
+        }
+        catch (SQLException sqle)
+        {
+            // Ignore, as we are only trying to get the scope to add detail to the log message
+        }
+        
+        log.info(LogManager.getHeader(context, "search", logInfo + "query=\""
+                + queryArgs.getQuery() + "\",results=(" + countCommunities + ","
+                + countCollections + "," + countItems + ")"));
     }
 }
