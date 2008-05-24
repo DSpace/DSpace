@@ -374,7 +374,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             // No scope, display all root level communities
             scope.addOption("/",T_all_of_dspace);
             scope.setOptionSelected("/");
-            for (Community community : Community.findAll(context))
+            for (Community community : Community.findAllTop(context))
             {
                 scope.addOption(community.getHandle(),community.getMetadata("name"));
             }
