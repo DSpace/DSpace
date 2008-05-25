@@ -44,6 +44,7 @@ import java.sql.SQLException;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.wing.Message;
@@ -56,6 +57,7 @@ import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.LogManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -67,8 +69,9 @@ import org.xml.sax.SAXException;
  */
 public class RejectTaskStep extends AbstractStep
 {
-  
-	/** Language Strings **/
+    private static final Logger log = Logger.getLogger(RejectTaskStep.class);
+
+    /** Language Strings **/
     protected static final Message T_info1 = 
         message("xmlui.Submission.workflow.RejectTaskStep.info1");
     protected static final Message T_reason = 
@@ -143,8 +146,9 @@ public class RejectTaskStep extends AbstractStep
         actions.addButton("submit_cancel").setValue(T_submit_cancel);
         
         div.addHidden("submission-continue").setValue(knot.getId()); 
+
+        log.info(LogManager.getHeader(context, "get_reject_reason",
+                "workflow_id=" + submission.getID() + ",item_id="
+                        + item.getID()));
     }
-    
-    
-   
 }

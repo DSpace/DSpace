@@ -52,6 +52,7 @@ import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.UIException;
@@ -69,6 +70,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.core.LogManager;
 
 import org.xml.sax.SAXException;
 
@@ -84,6 +86,8 @@ import org.xml.sax.SAXException;
  */
 public class CommunityBrowser extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
+    private static Logger log = Logger.getLogger(CommunityBrowser.class);
+
     /** Language Strings */
     public static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
@@ -183,6 +187,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 	        {
 	            // ignore all errors and return an invalid cache.
 	        }
+            log.info(LogManager.getHeader(context, "view_community_list", ""));
     	}
     	return this.validity;
     }

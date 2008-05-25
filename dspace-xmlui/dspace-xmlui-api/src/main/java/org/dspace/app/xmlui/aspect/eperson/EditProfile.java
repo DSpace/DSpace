@@ -51,6 +51,7 @@ import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -64,6 +65,7 @@ import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Subscribe;
 import org.xml.sax.SAXException;
@@ -90,6 +92,8 @@ import org.xml.sax.SAXException;
  */
 public class EditProfile extends AbstractDSpaceTransformer
 {
+    private static Logger log = Logger.getLogger(EditProfile.class);
+
     /** Language string used: */
     private static final Message T_title_create =
         message("xmlui.EPerson.EditProfile.title_create");
@@ -219,6 +223,9 @@ public class EditProfile extends AbstractDSpaceTransformer
     
    public void addBody(Body body) throws WingException, SQLException 
    {
+       // Log that we are viewing a profile
+       log.info(LogManager.getHeader(context, "view_profile", ""));
+
        Request request = ObjectModelHelper.getRequest(objectModel);
        
        String defaultFirstName="",defaultLastName="",defaultPhone="";
@@ -227,7 +234,7 @@ public class EditProfile extends AbstractDSpaceTransformer
            defaultFirstName = request.getParameter("first_name");
            defaultLastName = request.getParameter("last_name");
            defaultPhone = request.getParameter("phone");
-       } 
+       }
        else if (eperson != null)
        {
             defaultFirstName = eperson.getFirstName();

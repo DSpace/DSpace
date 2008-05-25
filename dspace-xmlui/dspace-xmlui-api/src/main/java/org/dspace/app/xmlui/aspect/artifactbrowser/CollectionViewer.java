@@ -71,6 +71,7 @@ import org.dspace.sort.SortException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.LogManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -81,7 +82,7 @@ import org.xml.sax.SAXException;
  */
 public class CollectionViewer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
-    private static final Logger log = Logger.getLogger(DSpaceFeedGenerator.class);
+    private static final Logger log = Logger.getLogger(CollectionViewer.class);
 
     /** Language Strings */
     private static final Message T_dspace_home =
@@ -157,6 +158,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     {
     	if (this.validity == null)
     	{
+            Collection collection = null;
 	        try
 	        {
 	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
@@ -167,7 +169,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 	            if (!(dso instanceof Collection))
 	                return null;
 	
-	            Collection collection = (Collection) dso;
+	            collection = (Collection) dso;
 	
 	            DSpaceValidity validity = new DSpaceValidity();
 	            
@@ -186,6 +188,8 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 	        {
 	            // Just ignore all errors and return an invalid cache.
 	        }
+
+            log.info(LogManager.getHeader(context, "view_collection", "collection_id=" + (collection == null ? "" : collection.getID())));
     	}
     	return this.validity;
     }

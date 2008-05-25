@@ -125,23 +125,25 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
      */
     public SourceValidity getValidity() 
     {
-    	if (this.validity == null)
+        DSpaceObject dso = null;
+
+        if (this.validity == null)
     	{
 	        try {
-	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+	            dso = HandleUtil.obtainHandle(objectModel);
 	            
 	            DSpaceValidity validity = new DSpaceValidity();
 	            validity.add(dso);
 	            this.validity =  validity.complete();
-
-                // add log message that we are viewing the item
-                // done here, as the serialization may not occur if the cache is valid
-                log.info(LogManager.getHeader(context, "view_item", "handle=" + dso.getHandle()));
 	        }
 	        catch (Exception e)
 	        {
 	            // Ignore all errors and just invalidate the cache.
 	        }
+
+            // add log message that we are viewing the item
+            // done here, as the serialization may not occur if the cache is valid
+            log.info(LogManager.getHeader(context, "view_item", "handle=" + (dso == null ? "" : dso.getHandle())));
     	}
     	return this.validity;
     }

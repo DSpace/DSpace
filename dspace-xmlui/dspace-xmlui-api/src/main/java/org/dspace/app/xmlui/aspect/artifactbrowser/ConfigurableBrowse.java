@@ -53,6 +53,7 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
@@ -86,6 +87,7 @@ import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -98,6 +100,8 @@ import org.xml.sax.SAXException;
 public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         CacheableProcessingComponent
 {
+    private final static Logger log = Logger.getLogger(ConfigurableBrowse.class);
+
     /**
      * Static Messages for common text
      */
@@ -218,12 +222,15 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                         validity.add(singleEntry);
                     }
                 }
+
+                this.validity =  validity.complete();
             }
             catch (Exception e)
             {
                 // Just ignore all errors and return an invalid cache.
             }
             
+            log.info(LogManager.getHeader(context, "browse", this.validity.toString()));
         }
         
         return this.validity;

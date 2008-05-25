@@ -46,6 +46,7 @@ import java.util.Map;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.SourceResolver;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.wing.Message;
@@ -57,6 +58,7 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.license.CreativeCommons;
+import org.dspace.core.LogManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -74,8 +76,9 @@ import org.xml.sax.SAXException;
  */
 public class LicenseStep extends AbstractSubmissionStep
 {
-
-	/** Language Strings **/
+    private static final Logger log = Logger.getLogger(LicenseStep.class);
+    
+    /** Language Strings **/
     protected static final Message T_head = 
         message("xmlui.Submission.submit.LicenseStep.head");
     protected static final Message T_info1 = 
@@ -174,6 +177,8 @@ public class LicenseStep extends AbstractSubmissionStep
 		// If user did not check "I accept" checkbox 
 		if(this.errorFlag==org.dspace.submit.step.LicenseStep.STATUS_LICENSE_REJECTED)
 		{
+            log.info(LogManager.getHeader(context, "reject_license", submissionInfo.getSubmissionLogInfo()));
+
 			decision.addError(T_decision_error);
 		}
 		

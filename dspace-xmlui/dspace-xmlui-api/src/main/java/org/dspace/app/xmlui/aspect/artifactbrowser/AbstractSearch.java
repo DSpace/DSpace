@@ -207,15 +207,15 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 	            }
 	            
 	            this.validity = validity.complete();
-
-                // add log message that we are viewing the item
-                // done here, as the serialization may not occur if the cache is valid
-                logSearch();
             }
 	        catch (Exception e)
 	        {
 	            // Just ignore all errors and return an invalid cache.
 	        }
+
+            // add log message that we are viewing the item
+            // done here, as the serialization may not occur if the cache is valid
+            logSearch();
     	}
     	return this.validity;
     }

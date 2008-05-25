@@ -48,8 +48,10 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 
@@ -62,10 +64,12 @@ import org.dspace.workflow.WorkflowManager;
  */
 public class UnclaimTasksAction extends AbstractAction
 {
+    private static final Logger log = Logger.getLogger(UnclaimTasksAction.class);
 
     /**
-     * @param pattern
+     * @param redirector
      *            un-used.
+     * @param resolver
      * @param objectModel
      *            Cocoon's object model
      */
@@ -90,6 +94,7 @@ public class UnclaimTasksAction extends AbstractAction
     				 state == WorkflowManager.WFSTATE_STEP2 || 
     				 state == WorkflowManager.WFSTATE_STEP3 )
     			{
+                    log.info(LogManager.getHeader(context, "unclaim_workflow", "workflow_id=" + workflowItem.getID()));
     				WorkflowManager.unclaim(context, workflowItem, context.getCurrentUser());
     			}
     		}

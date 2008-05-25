@@ -226,26 +226,37 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             {
             	// Reference by an item's handle.
             	dso = HandleManager.resolveToObject(context,handle);
-            	
-            	if (dso instanceof Item && sequence > -1)
-            	{
-            		bitstream = findBitstreamBySequence((Item) dso,sequence);
-            	}
-            	else if (dso instanceof Item && name != null)
-            	{
-            		bitstream = findBitstreamByName((Item) dso,name);
-            	}
+
+                if (dso instanceof Item)
+                {
+                    item = (Item)dso;
+
+                    if (sequence > -1)
+                    {
+                        bitstream = findBitstreamBySequence(item,sequence);
+                    }
+                    else if (name != null)
+                    {
+                        bitstream = findBitstreamByName(item,name);
+                    }
+                }
             }
-          
 
             // Was a bitstream found?
             if (bitstream == null)
             {
             	throw new ResourceNotFoundException("Unable to locate bitstream");
             }
-                
+
             // Is there a User logged in and does the user have access to read it?
-            if (!AuthorizeManager.authorizeActionBoolean(context, bitstream, Constants.READ))
+            boolean isAuthorized = AuthorizeManager.authorizeActionBoolean(context, bitstream, Constants.READ); 
+            if (item != null && item.isWithdrawn() && !AuthorizeManager.isAdmin(context))
+            {
+                isAuthorized = false;
+                log.info(LogManager.getHeader(context, "view_bitstream", "handle=" + item.getHandle() + ",withdrawn=true"));
+            }
+
+            if (!isAuthorized)
             {
             	if(this.request.getSession().getAttribute("dspace.current.user.id")!=null){
             		// A user is logged in, but they are not authorized to read this bitstream, 
@@ -282,17 +293,16 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             	}
             }
                 
-                
             // Success, bitstream found and the user has access to read it.
             // Store these for later retreval:
             this.bitstreamInputStream = bitstream.retrieve();
             this.bitstreamSize = bitstream.getSize();
             this.bitstreamMimeType = bitstream.getFormat().getMIMEType();
             this.bitstreamName = bitstream.getName();
-            
+
             // Trim any path information from the bitstream
             if (bitstreamName != null)
-            {  
+            {
                 int finalSlashIndex = bitstreamName.lastIndexOf("/");
                 if (finalSlashIndex > 0)
                 {
@@ -301,7 +311,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             }
 
             // Log that the bitstream has been viewed.
-			log.info(LogManager.getHeader(context, "view_bitstream", "bitstream_id=" + bitstream.getID()));
+            log.info(LogManager.getHeader(context, "view_bitstream", "bitstream_id=" + bitstream.getID()));
         }
         catch (SQLException sqle)
         {
