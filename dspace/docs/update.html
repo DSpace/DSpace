@@ -178,9 +178,10 @@ cp [dspace-source]/dspace/config/crosswalks/xhtml-head-item.properties [dspace]/
     </li>
   </ul>
 </li>
+
 <li><b>Apply any customizations</b>
 <p>If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. Commonly these modifications are made to "JSP" pages located inside the <code>[dspace 1.4.2]/jsp/local</code> directory. These should be moved 
-<code>[dspace-source]/dspace/modules/jspui/src/main/webapp/</code> in the new build structure. See <a href="file:///Users/scott/Development/Workspaces/DSpace1.5/dspace-1.5/dspace/docs/configure.html#jspui-jsp">Customizing the JSP Pages</a> for more information.</li>
+<code>[dspace-source]/dspace/modules/jspui/src/main/webapp/</code> in the new build structure. See <a href="file:///Users/scott/Development/Workspaces/DSpace1.5/dspace-1.5/dspace/docs/configure.html#jspui-jsp">Customizing the JSP Pages</a> for more information.</p></li>
 	
 	
 	
@@ -194,6 +195,15 @@ ant -Dconfig=[dspace]/config/dspace.cfg update
 </pre>
 </li> 	
 
+
+<li><b>Update the Metadata Registry</b>
+  <p>New Metadata Registry updates are required to support SWORD.</p>
+<pre>
+cp [dspace-source]/dspace/config/registries/sword-metadata.xml [dspace]/config/registries/sword-metadata.xml; 
+
+[dspace]/bin/dsrun org.dspace.administer.MetadataImporter -f [dspace]/config/registries/sword-metadata.xml
+</pre>  
+</li>
 
 
 
