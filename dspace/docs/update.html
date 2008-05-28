@@ -40,7 +40,7 @@
 
 
 <li><b>Build DSpace</b>
-<p>The build process has radically changed for DSpace 1.5. With this new release the build system has moved to a maven-based system enabling the various projects (JSPUI, XMLUI, OAI, and Core API) into separate projects. See the <a href="file:///Users/scott/Development/Workspaces/DSpace1.5/dspace-1.5/dspace/docs/install.html">Installation section</a> for more information on building DSpace using the new maven-based build system. Run the following commands to compile DSpace.</p>
+<p>The build process has radically changed for DSpace 1.5. With this new release the build system has moved to a maven-based system enabling the various projects (JSPUI, XMLUI, OAI, and Core API) into separate projects. See the <a href="install.html">Installation section</a> for more information on building DSpace using the new maven-based build system. Run the following commands to compile DSpace.</p>
 <pre>  
   cd [dspace-source]/dspace/;
   mvn package
@@ -181,7 +181,7 @@ cp [dspace-source]/dspace/config/crosswalks/xhtml-head-item.properties [dspace]/
 
 <li><b>Apply any customizations</b>
 <p>If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. Commonly these modifications are made to "JSP" pages located inside the <code>[dspace 1.4.2]/jsp/local</code> directory. These should be moved 
-<code>[dspace-source]/dspace/modules/jspui/src/main/webapp/</code> in the new build structure. See <a href="file:///Users/scott/Development/Workspaces/DSpace1.5/dspace-1.5/dspace/docs/configure.html#jspui-jsp">Customizing the JSP Pages</a> for more information.</p></li>
+<code>[dspace-source]/dspace/modules/jspui/src/main/webapp/</code> in the new build structure. See <a href="configure.html#jspui-jsp">Customizing the JSP Pages</a> for more information.</p></li>
 	
 	
 	
