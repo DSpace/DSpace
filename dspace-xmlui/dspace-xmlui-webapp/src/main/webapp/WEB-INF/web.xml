@@ -49,6 +49,10 @@
         </description>
     </context-param>
 
+    <!-- Listener to clean up Commons-FileUpload -->
+    <listener>
+      <listener-class>org.apache.commons.fileupload.servlet.FileCleanerCleanup</listener-class>
+    </listener>
     <!-- Listener to initialise / clean up the application -->
     <listener>
         <listener-class>org.dspace.app.util.DSpaceContextListener</listener-class>

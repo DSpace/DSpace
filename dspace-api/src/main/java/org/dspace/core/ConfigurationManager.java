@@ -507,7 +507,17 @@ public class ConfigurationManager
         
         try
         {
-            String configProperty = System.getProperty("dspace.configuration");
+            String configProperty = null;
+            try
+            {
+                configProperty = System.getProperty("dspace.configuration");
+            }
+            catch (SecurityException se)
+            {
+                // A security manager may stop us from accessing the system properties.
+                // This isn't really a fatal error though, so catch and ignore
+                log.warn("Unable to access system properties, ignoring.", se);
+            }
 
             if (configFile != null)
             {

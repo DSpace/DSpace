@@ -70,6 +70,11 @@
     </description>
   </context-param>
 
+    <!-- Listener to initialise / clean up the application -->
+    <listener>
+        <listener-class>org.dspace.app.util.DSpaceContextListener</listener-class>
+    </listener>
+    
   <!-- DSpace configuration initialisation.  This needs to be loaded before
        other servlets. -->
   <servlet>
