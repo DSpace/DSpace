@@ -97,7 +97,7 @@
          emails "mydspace" linking from Workflow system.
      -->
      <map:match pattern="mydspace">
-         <map:redirect-to uri="{request:contextPath}/submissions"/>
+         <map:redirect-to uri="submissions" permanent="yes"/>
      </map:match>
      
       <!-- Make sure the user is atleast logged in -->
