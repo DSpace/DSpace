@@ -270,7 +270,16 @@
 		<!-- non-bitstream pipeline -->
 		<map:pipeline>
 			<!--<map:parameter name="expires" value="now"/>-->
-		
+
+         <!-- 
+            catch mydspace uri's and immediately redirect 
+            to "submissions" this is a fix to catch approval 
+            emails "mydspace" linking from Workflow system.
+         -->
+         <map:match pattern="mydspace">
+            <map:redirect-to uri="submissions" permanent="yes" />
+         </map:match>
+
 			<!-- Theme pipeline -->
 			<map:match pattern="DRI/**">
 				<map:mount check-reload="no" src="aspects/aspects.xmap" uri-prefix="DRI/"/>
