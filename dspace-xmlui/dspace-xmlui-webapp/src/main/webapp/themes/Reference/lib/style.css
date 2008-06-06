@@ -490,6 +490,10 @@ td {
 	color: inherit;
 }
 
+td.ds-table-cell.right {
+    text-align: right;
+}
+
 *.first-cell {
 	vertical-align: middle;
 	text-align: center;

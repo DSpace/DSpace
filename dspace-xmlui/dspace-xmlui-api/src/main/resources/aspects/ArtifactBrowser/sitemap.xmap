@@ -64,7 +64,9 @@ and searching the repository.
 			<map:transformer name="Contact" src="org.dspace.app.xmlui.aspect.artifactbrowser.Contact"/>
 			<map:transformer name="RestrictedItem" src="org.dspace.app.xmlui.aspect.artifactbrowser.RestrictedItem"/>
 			<map:transformer name="FrontPageSearch" src="org.dspace.app.xmlui.aspect.artifactbrowser.FrontPageSearch"/>
-		</map:transformers>
+
+            <map:transformer name="Statistics" src="org.dspace.app.xmlui.aspect.artifactbrowser.StatisticsViewer"/>
+        </map:transformers>
 
 
 		<map:matchers default="wildcard">
@@ -153,8 +155,14 @@ and searching the repository.
 				<map:transform type="ConfigurableBrowse"/>
 				<map:serialize type="xml"/>
 			</map:match>
-			
-			<!-- Handle specific features -->
+
+            <!-- Display statistics -->
+            <map:match pattern="statistics">
+                <map:transform type="Statistics"/>
+                <map:serialize type="xml"/>
+            </map:match>
+
+            <!-- Handle specific features -->
 			<map:match pattern="handle/*/**">
 
 				<!-- Inform the user that the item they are viewing is a restricted resource -->

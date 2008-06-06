@@ -170,16 +170,9 @@ public class ReportGenerator
     // report generator config data
     ////////////////
     
-    /** the format of the report to be output */
-    private static String format = null;
-    
     /** the input file to build the report from */
     private static String input = null;
     
-    /** the output file to which to write aggregation data */
-   private static String output = ConfigurationManager.getProperty("dspace.dir") + 
-                            File.separator + "log" + File.separator + "report";
-   
    /** the log file action to human readable action map */
    private static String map = ConfigurationManager.getProperty("dspace.dir") +
                             File.separator + "config" + File.separator + "dstat.map";
@@ -239,6 +232,9 @@ public class ReportGenerator
      * aggregation data and output a file containing the report in the
      * requested format
      *
+     * this method is retained for backwards compatibility, but delegates the actual
+     * wprk to a new method
+     *
      * @param   context     the DSpace context in which this action is performed
      * @param   myFormat    the desired output format (currently on HTML supported)
      * @param   myInput     the aggregation file to be turned into a report
@@ -247,6 +243,32 @@ public class ReportGenerator
     public static void processReport(Context context, String myFormat, 
                                      String myInput, String myOutput,
                                      String myMap)
+        throws Exception, SQLException
+    {
+        // create the relevant report type
+        // FIXME: at the moment we only support HTML report generation
+        Report report = null;
+        if (myFormat.equals("html"))
+        {
+            report = new HTMLReport();
+            ((HTMLReport)report).setOutput(myOutput);
+        }
+
+        if (myMap != null)
+        {
+            map = myMap;
+        }
+
+        ReportGenerator.processReport(context, report, myInput);
+    }
+
+    /**
+     * using the pre-configuration information passed here, read in the
+     * aggregation data and output a file containing the report in the
+     * requested format
+     */
+    public static void processReport(Context context, Report report,
+                                     String myInput)
         throws Exception, SQLException
     {
         startTime = new GregorianCalendar();
@@ -263,7 +285,7 @@ public class ReportGenerator
         generalSummary = new ArrayList();
                 
         // set the parameters for this analysis
-        setParameters(myFormat, myInput, myOutput, myMap);
+        setParameters(myInput);
         
         // pre prepare our standard file readers and buffered readers
         FileReader fr = null;
@@ -274,14 +296,6 @@ public class ReportGenerator
         
         // load the log file action to human readable action map
         readMap(map);
-        
-        // create the relevant report type
-        // FIXME: at the moment we only support HTML report generation
-        Report report = null;
-        if (format.equals("html"))
-        {
-            report = new HTMLReport();
-        }
         
         report.setStartDate(startDate);
         report.setEndDate(endDate);
@@ -351,7 +365,8 @@ public class ReportGenerator
         String info = null;
         for (i = 0; i < items.length; i++)
         {
-            if (i < itemLookup)
+            // Allow negative value to say that all items should be looked up
+            if (itemLookup < 0 || i < itemLookup)
             {
                 info = getItemInfo(context, items[i].getKey());
             }
@@ -458,21 +473,8 @@ public class ReportGenerator
         process.add(proc);
         
         report.addBlock(process);
-        
-        // finally write the string into the output file
-        try 
-        {
-        	FileOutputStream fos = new FileOutputStream(output);
-            OutputStreamWriter osr = new OutputStreamWriter(fos, "UTF-8");
-            PrintWriter out = new PrintWriter(osr);
-            out.write(report.render());
-            out.close();
-        } 
-        catch (IOException e) 
-        {
-            System.out.println("Unable to write to output file " + output);
-            System.exit(0);
-        }
+
+        report.render();
         
         return;
     }
@@ -594,32 +596,13 @@ public class ReportGenerator
      * the command line with args or calling the processReport method statically
      * from elsewhere
      *
-     * @param   myFormat    the log file directory to be analysed
      * @param   myInput     regex for log file names
-     * @param   myOutput    config file to use for dstat
-     * @param   myMap       the action map file to use for translations
      */
-    public static void setParameters(String myFormat, String myInput, 
-                                    String myOutput, String myMap)
+    public static void setParameters(String myInput)
     {
-        if (myFormat != null)
-        {
-            format = myFormat;
-        }
-        
         if (myInput != null)
         {
             input = myInput;
-        }
-        
-        if (myOutput != null)
-        {
-            output = myOutput;
-        }
-        
-        if (myMap != null)
-        {
-            map = myMap;
         }
         
         return;
@@ -649,9 +632,13 @@ public class ReportGenerator
         catch (IOException e) 
         {  
             System.out.println("Failed to read input file: " + input);
-            System.exit(0);
+            return;
         } 
         
+        // first initialise a date format object to do our date processing
+        // if necessary
+        SimpleDateFormat sdf = new SimpleDateFormat("dd'/'MM'/'yyyy");
+
         // FIXME: although this works, it is not very elegant
         // loop through the aggregator file and read in the values
         while ((record = br.readLine()) != null) 
@@ -698,64 +685,48 @@ public class ReportGenerator
             }
             
             // if the line is real, then we carry on
-            
-            // first initialise a date format object to do our date processing
-            // if necessary
-            SimpleDateFormat sdf = new SimpleDateFormat("dd'/'MM'/'yyyy");
-            
             // read the analysis contents in
             if (section.equals("archive"))
             {
                 archiveStats.put(key, value);
             }
-            
-            if (section.equals("action"))
+            else if (section.equals("action"))
             {
                 actionAggregator.put(key, value);
             }
-            
-            if (section.equals("user"))
+            else if (section.equals("user"))
             {
                 userAggregator.put(key, value);
             }
-            
-            if (section.equals("search"))
+            else if (section.equals("search"))
             {
                 searchAggregator.put(key, value);
             }
-            
-            if (section.equals("item"))
+            else if (section.equals("item"))
             {
                 itemAggregator.put(key, value);
             }
-            
-            // read the config details used to make this report in
-            if (section.equals("user_email"))
+            else if (section.equals("user_email"))
             {
                 userEmail = value;
             }
-            
-            if (section.equals("item_floor"))
+            else if (section.equals("item_floor"))
             {
                 itemFloor = Integer.parseInt(value);
             }
-            
-            if (section.equals("search_floor"))
+            else if (section.equals("search_floor"))
             {
                 searchFloor = Integer.parseInt(value);
             }
-            
-            if (section.equals("host_url"))
+            else if (section.equals("host_url"))
             {
                 url = value;
             }
-
-            if (section.equals("item_lookup"))
+            else if (section.equals("item_lookup"))
             {
                 itemLookup = Integer.parseInt(value);
             }
-            
-            if (section.equals("avg_item_views"))
+            else if (section.equals("avg_item_views"))
             {
                 try 
                 {
@@ -766,43 +737,35 @@ public class ReportGenerator
                     avgItemViews = 0;
                 }
             }
-            
-            if (section.equals("server_name"))
+            else if (section.equals("server_name"))
             {
                 serverName = value;
             }
-            
-            if (section.equals("service_name"))
+            else if (section.equals("service_name"))
             {
                 name = value;
             }
-             
-            if (section.equals("start_date"))
+            else if (section.equals("start_date"))
             {
                 startDate = sdf.parse(value);
             }
-            
-            if (section.equals("end_date"))
+            else if (section.equals("end_date"))
             {
                 endDate = sdf.parse(value);
             }
-            
-            if (section.equals("analysis_process_time"))
+            else if (section.equals("analysis_process_time"))
             {
                 processTime = Integer.parseInt(value);
             }
-            
-            if (section.equals("general_summary"))
+            else if (section.equals("general_summary"))
             {
                 generalSummary.add(value);
             }
-            
-            if (section.equals("log_lines"))
+            else if (section.equals("log_lines"))
             {
                 logLines = Integer.parseInt(value);
             }
-            
-            if (section.equals("warnings"))
+            else if (section.equals("warnings"))
             {
                 warnings = Integer.parseInt(value);
             }

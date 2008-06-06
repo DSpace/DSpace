@@ -87,18 +87,6 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_communities_and_collections =
         message("xmlui.ArtifactBrowser.Navigation.communities_and_collections");
     
-    private static final Message T_browse_titles =
-        message("xmlui.ArtifactBrowser.Navigation.browse_titles");
-    
-    private static final Message T_browse_authors = 
-        message("xmlui.ArtifactBrowser.Navigation.browse_authors");
-    
-    private static final Message T_browse_subjects = 
-        message("xmlui.ArtifactBrowser.Navigation.browse_subjects");
-    
-    private static final Message T_browse_dates = 
-        message("xmlui.ArtifactBrowser.Navigation.browse_dates");
-    
     private static final Message T_head_this_collection =
         message("xmlui.ArtifactBrowser.Navigation.head_this_collection");
     

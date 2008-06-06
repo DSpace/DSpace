@@ -48,30 +48,18 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Abstract class to define an interface to a generic report generating
+ * Sn interface to a generic report generating
  * class, and to provide the polymorphism necessary to allow the report
  * generator to generate any number of different formats of report
  *
+ * Note: This used to be an abstract class, but has been made an interface as there wasn't
+ * any logic contained within it. It's also been made public, so that you can create a Report
+ * type without monkeying about in the statistics package.
+ *
  * @author  Richard Jones
  */
-abstract class Report 
+public interface Report
 {
-    
-    /** a list of the statistics blocks being managed by this class */
-    private List blocks = new ArrayList();
-    
-    /** the title for the page */
-    private String pageTitle = null;
-    
-    /** the main title for the page */
-    private String mainTitle = null;
-    
-    /** start date for report */
-    private Date start = null;
-    
-    /** end date for report */
-    private Date end = null;
-    
     /**
      * output any top headers that this page needs
      *

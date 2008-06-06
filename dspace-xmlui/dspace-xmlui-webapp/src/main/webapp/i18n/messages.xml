@@ -310,7 +310,13 @@
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.auth_header">The item is restricted</message>	
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.auth_message">The item you are attempting to access is a restricted item and requires credentials to view. Please login below to access the item.</message>
 
-	<!-- Authentication messages used for bitstream authentication -->	
+    <message key="xmlui.ArtifactBrowser.StatisticsViewer.choose_month">Monthly Reports</message>
+    <message key="xmlui.ArtifactBrowser.StatisticsViewer.report.title">Statistical Summary</message>
+
+    <message key="xmlui.ArtifactBrowser.StatisticsViewer.no_report.title">No reports currently available</message>
+    <message key="xmlui.ArtifactBrowser.StatisticsViewer.no_report.text">There are currently no reports available for this service.  Please check back later.</message>
+
+    <!-- Authentication messages used for bitstream authentication -->
 	<message key="xmlui.BitstreamReader.auth_header">The file is restricted</message>	
 	<message key="xmlui.BitstreamReader.auth_message">The file you are attempting to access is a restricted file and requires credentials to view. Please login below to access the file.</message>
 	
@@ -803,9 +809,10 @@
 	<message key="xmlui.administrative.Navigation.administrative_items">Items</message>
     <message key="xmlui.administrative.Navigation.administrative_withdrawn">Withdrawn Items</message>
 	<message key="xmlui.administrative.Navigation.administrative_control_panel">Control Panel</message>
-		
-		
-	<!-- org.dspace.app.xmlui.administrative.eperson.ManageEPeopleMain -->
+    <message key="xmlui.administrative.Navigation.statistics">Statistics</message>
+
+
+    <!-- org.dspace.app.xmlui.administrative.eperson.ManageEPeopleMain -->
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.title">Manage E-people</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.main_head">E-person management</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.actions_head">Actions</message>
