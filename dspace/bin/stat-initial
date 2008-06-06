@@ -41,9 +41,9 @@
 ###########################################################################
 
 ###########################################################################
-# This script starts from the year and month specified below and works
-# forward until the end of the current month, generating monthly aggregation
-# files for the DStat system.
+# This script starts from the year and month specified in dstat.cfg and
+# works forward until the end of the current month, generating monthly
+# aggregation files for the DStat system.
 ###########################################################################
 
 # Get the DSPACE/bin directory
