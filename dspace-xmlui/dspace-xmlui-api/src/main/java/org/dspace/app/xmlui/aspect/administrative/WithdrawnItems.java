@@ -405,7 +405,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             // Create a free text entry box for the year
             jumpForm = jump.addPara();
             jumpForm.addContent(T_jump_year);
-            jumpForm.addText("start_with").setHelp(T_jump_year_help);
+            jumpForm.addText(BrowseParams.STARTS_WITH).setHelp(T_jump_year_help);
 
             jumpForm.addButton("submit").setValue(T_go);
         }
