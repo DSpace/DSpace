@@ -58,7 +58,8 @@ public class BrowseItemDAOOracle implements BrowseItemDAO
                                     " AND metadatafieldregistry.element = ? " +
                                     " AND metadatafieldregistry.qualifier IS NULL " +
                                     " AND metadatafieldregistry.metadata_schema_id=metadataschemaregistry.metadata_schema_id " +
-                                    " AND metadataschemaregistry.short_id = ?";
+                                    " AND metadataschemaregistry.short_id = ? " +
+                                    " ORDER BY metadata_field_id, place";
 
     /** query to get the text value of a metadata element and qualifier */
     private String getByMetadata = "SELECT text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
@@ -67,7 +68,8 @@ public class BrowseItemDAOOracle implements BrowseItemDAO
                                     " AND metadatafieldregistry.element = ? " +
                                     " AND metadatafieldregistry.qualifier = ? " +
                                     " AND metadatafieldregistry.metadata_schema_id=metadataschemaregistry.metadata_schema_id " +
-                                    " AND metadataschemaregistry.short_id = ?";
+                                    " AND metadataschemaregistry.short_id = ? " +
+                                    " ORDER BY metadata_field_id, place";
 
     /** query to get the text value of a metadata element with the wildcard qualifier (*) */
     private String getByMetadataAnyQualifier = "SELECT text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
@@ -75,7 +77,8 @@ public class BrowseItemDAOOracle implements BrowseItemDAO
                                     " AND metadatavalue.metadata_field_id = metadatafieldregistry.metadata_field_id " +
                                     " AND metadatafieldregistry.element = ? " +
                                     " AND metadatafieldregistry.metadata_schema_id=metadataschemaregistry.metadata_schema_id " +
-                                    " AND metadataschemaregistry.short_id = ?";
+                                    " AND metadataschemaregistry.short_id = ? " +
+                                    " ORDER BY metadata_field_id, place";
 
     /** DSpace context */
 	private Context context;
