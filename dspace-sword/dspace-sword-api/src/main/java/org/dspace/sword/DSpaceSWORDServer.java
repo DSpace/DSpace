@@ -266,7 +266,7 @@ public class DSpaceSWORDServer implements SWORDServer
 			if (auth.authenticates(this.context, un, pw))
 			{
 				// if authenticated, obtain the eperson object
-				ep = EPerson.findByEmail(context, un);
+				ep = context.getCurrentUser();
 				
 				if (ep != null)
 				{
