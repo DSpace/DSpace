@@ -1,3 +1,13 @@
+(Stuart Lewis)
+- [1947036] Patch for SF Bug1896960 SWORD authentication and LDAP + [1989874] LDAPAuthentication
+  pluggable method broken for current users
+
+(Zuki Ebetsu / Stuart Lewis)
+- [1990660] SWORD Service Document are malformed / Corrected Atom publishing MIME types
+
+1.5 final
+=========
+
 (Mark Diggory)
 - New options for ItemImporter to support bitstream permissions and descriptions.
 

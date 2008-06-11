@@ -185,8 +185,7 @@ public class DepositServlet extends HttpServlet {
 				
 				// Print out the Deposit Response
 				response.setStatus(dr.getHttpResponse());
-				// response.setContentType("application/atomserv+xml");
-				response.setContentType("application/xml");
+				response.setContentType("application/atom+xml; charset=UTF-8");
 				PrintWriter out = response.getWriter();
 		        out.write(dr.marshall());
 		        out.flush();

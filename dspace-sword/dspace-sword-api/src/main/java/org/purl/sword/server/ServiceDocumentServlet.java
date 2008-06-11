@@ -80,8 +80,7 @@ public class ServiceDocumentServlet extends HttpServlet {
 			ServiceDocument sd = myRepository.doServiceDocument(sdr);
 			
 			// Print out the Service Document
-			// response.setContentType("application/atomserv+xml");
-			response.setContentType("application/xml");
+			response.setContentType("application/atomsvc+xml; charset=UTF-8");
 			PrintWriter out = response.getWriter();
 	        out.write(sd.marshall());
 	        out.flush();
