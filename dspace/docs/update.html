@@ -219,7 +219,7 @@ cp [dspace-source]/dspace/config/registries/sword-metadata.xml [dspace]/config/r
 <p>The statistics scripts have been rewritten for DSpace 1.5. Prior to 1.5 they were written in Perl, but have been rewritten in Java to avoid having to install Perl. First, make a note of the dates you have specified in your statistics scripts for the statistics to run from. You will find these in <code>[dspace]/bin/stat-initial</code>, as <code>$start_year</code> and <code>$start_month</code>. Note down these values.</p>
 <p>Copy the new stats scripts:</p>
 <pre>
-    cp [dspace-source]/dspace/target/dspace-1.5-build.dir/bin/stat* [dspace]/bin/
+    cp [dspace-source]/dspace/bin/stat* [dspace]/bin/
 </pre>
 <p>Then edit your statistics configuration file with the start details. Add the follwing to <code>[dspace]/conf/dstat.cfg</code></p>
 <p>
