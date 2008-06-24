@@ -166,6 +166,11 @@
 	</servlet>
 
   <servlet>
+    <servlet-name>exportdownload</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.ItemExportArchiveServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>collection-wizard</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.CollectionWizardServlet</servlet-class>
   </servlet>
@@ -402,6 +407,11 @@
   <servlet-mapping>
     <servlet-name>advanced-search</servlet-name>
     <url-pattern>/advanced-search</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>exportdownload</servlet-name>
+    <url-pattern>/exportdownload/*</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

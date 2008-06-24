@@ -60,6 +60,7 @@
 <%@ page import="org.dspace.app.webui.components.RecentSubmissions" %>
 
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
+<%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.browse.ItemCounter"%>
@@ -75,6 +76,7 @@
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.dspace.uri.IdentifierService" %>
+
 
 
 <%
@@ -305,6 +307,17 @@
 		      </form>
 	         </td>
            </tr>
+<% } %>
+<% if( editor_button || admin_button) { %>
+            <tr>
+              <td headers="t1" class="standard" align="center">
+                <form method="post" action="<%=request.getContextPath()%>/mydspace">
+                  <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
+                  <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_EXPORT_ARCHIVE %>" />
+                  <input type="submit" value="<fmt:message key="jsp.mydspace.request.export.collection"/>" />
+                </form>
+              </td>
+            </tr>
 <% } %>
             <tr>
               <td headers="t1" class="standard" align="center">

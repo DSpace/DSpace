@@ -314,6 +314,10 @@
 	<message key="xmlui.BitstreamReader.auth_header">The file is restricted</message>	
 	<message key="xmlui.BitstreamReader.auth_message">The file you are attempting to access is a restricted file and requires credentials to view. Please login below to access the file.</message>
 	
+	<!-- Export Archive download messages -->
+	<message key="xmlui.ItemExportDownloadReader.auth_header">This export archive is restricted.</message>
+	<message key="xmlui.ItemExportDownloadReader.auth_message">The export archive you are attempting to access is a restricted resource and requires credentials to view. Please login below to access the export archive.</message>
+ 
 	
 
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -790,6 +794,27 @@
 	<message key="xmlui.administrative.Navigation.context_create_collection">Create Collection</message>
 	<message key="xmlui.administrative.Navigation.context_create_subcommunity">Create Sub-community</message>
 	<message key="xmlui.administrative.Navigation.context_create_community">Create Community</message>
+	<message key="xmlui.administrative.Navigation.context_export_item">Export Item</message>
+    <message key="xmlui.administrative.Navigation.context_export_collection">Export Collection</message>
+    <message key="xmlui.administrative.Navigation.context_export_community">Export Community</message>
+	
+	<!-- my account items -->
+	<message key="xmlui.administrative.Navigation.account_export">My Exports</message>
+	
+	
+	<!-- export item -->
+	<message key="xmlui.administrative.ItemExport.head">Export Archive</message>
+	<message key="xmlui.administrative.ItemExport.item.id.error">The item id provided is invalid.</message>
+	<message key="xmlui.administrative.ItemExport.collection.id.error">The collection id provided is invalid.</message>
+	<message key="xmlui.administrative.ItemExport.community.id.error">The community id provided is invalid</message>
+	<message key="xmlui.administrative.ItemExport.item.not.found">The item requested was not found.</message>
+	<message key="xmlui.administrative.ItemExport.collection.not.found">The collection requested was not found.</message>
+	<message key="xmlui.administrative.ItemExport.community.not.found">The community requested was not found.</message>
+	<message key="xmlui.administrative.ItemExport.export.success">The item was exported successfully.  You should receive an e-mail when the archive is ready for download.  You can also use the 'My Exports' link to view a list of your available archives.</message>
+	<message key="xmlui.administrative.ItemExport.collection.success">The collection was exported successfully.  You should receive an e-mail when the archive is ready for download.  You can also use the 'My Exports' link to view a list of your available archives.</message>
+	<message key="xmlui.administrative.ItemExport.community.success">The community was exported successfully.  You should receive an e-mail when the archive is ready for download.  You can also use the 'My Exports' link to view a list of your available archives.</message>
+	<message key="xmlui.administrative.ItemExport.available.head">Available export archives for download:</message>
+	
 	
 	<!-- Site administrator options -->
 	<message key="xmlui.administrative.Navigation.administrative_head">Administrative</message>

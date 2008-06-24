@@ -61,6 +61,7 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
@@ -252,6 +253,15 @@
                     <input type="submit" name="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
                 </form>
             </td>
+            <td class="evenRowEvenCol" align="center">
+                <form method="post" action="<%= request.getContextPath() %>/mydspace">
+                    <input type="hidden" name="item_id" value="<%= item.getID() %>" />
+                    <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_EXPORT_ARCHIVE %>" />
+                    <%--<input type="submit" name="submit" value="Edit...">--%>
+                    <input type="submit" name="submit" value="<fmt:message key="jsp.mydspace.request.export.item"/>" />
+                </form>
+            </td>
+ <%      } %>
         </tr>
         </table>
         </td></tr></table>

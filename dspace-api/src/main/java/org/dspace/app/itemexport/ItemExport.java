@@ -47,10 +47,13 @@ import org.apache.commons.cli.PosixParser;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DCValue;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.MetadataSchema;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.content.dao.CollectionDAO;
 import org.dspace.content.dao.CollectionDAOFactory;
 import org.dspace.content.dao.ItemDAO;
@@ -58,6 +61,7 @@ import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.eperson.EPerson;
 import org.dspace.uri.ExternalIdentifier;
 import org.dspace.uri.ExternalIdentifierService;
 import org.dspace.uri.ObjectIdentifier;
@@ -67,14 +71,34 @@ import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import javax.mail.BodyPart;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 /**
  * Item exporter to create simple AIPs for DSpace content. Currently exports
@@ -104,6 +128,11 @@ public class ItemExport
 
     private static ExternalIdentifierDAO identifierDAO;
 
+    /**
+     * used for export download
+     */
+    public static final String COMPRESSED_EXPORT_MIME_TYPE = "application/zip";
+    
     /*
      *  
      */
@@ -578,5 +607,666 @@ public class ItemExport
         {
             throw new Exception("Cannot create contents in " + destDir);
         }
+    }
+
+    /**
+     * Convenience methot to create export a single Community, Collection, or
+     * Item
+     * 
+     * @param dso -
+     *            the dspace object to export
+     * @param context -
+     *            the dspace context
+     * @throws Exception
+     */
+    public static void createDownloadableExport(DSpaceObject dso,
+    		Context context) throws Exception {
+    	EPerson eperson = context.getCurrentUser();
+    	ArrayList<DSpaceObject> list = new ArrayList<DSpaceObject>(1);
+    	list.add(dso);
+    	processDownloadableExport(list, context, eperson == null ? null
+    			: eperson.getEmail());
+    }
+
+    /**
+     * Convenience method to export a List of dspace objects (Community,
+     * Collection or Item)
+     * 
+     * @param dsObjects -
+     *            List containing dspace objects
+     * @param context -
+     *            the dspace context
+     * @throws Exception
+     */
+    public static void createDownloadableExport(List<DSpaceObject> dsObjects,
+    		Context context) throws Exception {
+    	EPerson eperson = context.getCurrentUser();
+    	processDownloadableExport(dsObjects, context, eperson == null ? null
+    			: eperson.getEmail());
+    }
+
+    /**
+     * Convenience methot to create export a single Community, Collection, or
+     * Item
+     * 
+     * @param dso -
+     *            the dspace object to export
+     * @param context -
+     *            the dspace context
+     * @param additionalEmail -
+     *            cc email to use
+     * @throws Exception
+     */
+    public static void createDownloadableExport(DSpaceObject dso,
+    		Context context, String additionalEmail) throws Exception {
+    	ArrayList<DSpaceObject> list = new ArrayList<DSpaceObject>(1);
+    	list.add(dso);
+    	processDownloadableExport(list, context, additionalEmail);
+    }
+
+    /**
+     * Convenience method to export a List of dspace objects (Community,
+     * Collection or Item)
+     * 
+     * @param dsObjects -
+     *            List containing dspace objects
+     * @param context -
+     *            the dspace context
+     * @param additionalEmail -
+     *            cc email to use
+     * @throws Exception
+     */
+    public static void createDownloadableExport(List<DSpaceObject> dsObjects,
+    		Context context, String additionalEmail) throws Exception {
+    	processDownloadableExport(dsObjects, context, additionalEmail);
+    }
+
+    /**
+     * Does the work creating a List with all the Items in the Community or
+     * Collection It then kicks off a new Thread to export the items, zip the
+     * export directory and send confirmation email
+     * 
+     * @param dsObjects -
+     *            List of dspace objects to process
+     * @param context -
+     *            the dspace context
+     * @param additionalEmail -
+     *            email address to cc in addition the the current user email
+     * @throws Exception
+     */
+    private static void processDownloadableExport(List<DSpaceObject> dsObjects,
+    		Context context, final String additionalEmail) throws Exception {
+    	final EPerson eperson = context.getCurrentUser();
+
+    	// before we create a new export archive lets delete the 'expired'
+    	// archives
+    	deleteOldExportArchives(eperson.getID());
+
+    	// keep track of the commulative size of all bitstreams in each of the
+    	// items
+    	// it will be checked against the config file entry
+    	float size = 0;
+    	final ArrayList<Integer> items = new ArrayList<Integer>();
+    	for (DSpaceObject dso : dsObjects) {
+    		if (dso.getType() == Constants.COMMUNITY) {
+    			Community community = (Community) dso;
+    			// get all the collections in the community
+    			Collection[] collections = community.getCollections();
+    			for (Collection collection : collections) {
+    				// get all the items in each collection
+    				ItemIterator iitems = collection.getItems();
+    				while (iitems.hasNext()) {
+    					Item item = iitems.next();
+    					// get all the bundles in the item
+    					Bundle[] bundles = item.getBundles();
+    					for (Bundle bundle : bundles) {
+    						// get all the bitstreams in each bundle
+    						Bitstream[] bitstreams = bundle.getBitstreams();
+    						for (Bitstream bit : bitstreams) {
+    							// add up the size
+    							size += bit.getSize();
+    						}
+    					}
+    					items.add(item.getID());
+    				}
+    			}
+    		} else if (dso.getType() == Constants.COLLECTION) {
+    			Collection collection = (Collection) dso;
+    			// get all the items in the collection
+    			ItemIterator iitems = collection.getItems();
+    			while (iitems.hasNext()) {
+    				Item item = iitems.next();
+    				// get all thebundles in the item
+    				Bundle[] bundles = item.getBundles();
+    				for (Bundle bundle : bundles) {
+    					// get all the bitstreams in the bundle
+    					Bitstream[] bitstreams = bundle.getBitstreams();
+    					for (Bitstream bit : bitstreams) {
+    						// add up the size
+    						size += bit.getSize();
+    					}
+    				}
+    				items.add(item.getID());
+    			}
+    		} else if (dso.getType() == Constants.ITEM) {
+    			Item item = (Item) dso;
+    			// get all the bundles in the item
+    			Bundle[] bundles = item.getBundles();
+    			for (Bundle bundle : bundles) {
+    				// get all the bitstreams in the bundle
+    				Bitstream[] bitstreams = bundle.getBitstreams();
+    				for (Bitstream bit : bitstreams) {
+    					// add up the size
+    					size += bit.getSize();
+    				}
+    			}
+    			items.add(item.getID());
+    		} else {
+    			// nothing to do just ignore this type of DSPaceObject
+    		}
+    	}
+
+    	// check the size of all the bitstreams against the configuration file
+    	// entry if it exists
+    	String megaBytes = ConfigurationManager
+    	.getProperty("org.dspace.app.itemexport.max.size");
+    	if (megaBytes != null) {
+    		float maxSize = 0;
+    		try {
+    			maxSize = Float.parseFloat(megaBytes);
+    		} catch (Exception e) {
+    			// ignore...configuration entry may not be present
+    		}
+
+    		if (maxSize > 0) {
+    			if (maxSize < (size / 1048576.00)) { // a megabyte
+    				throw new Exception(
+    				"The overall size of this export is too large.  Please contact your administrator for more information.");
+    			}
+    		}
+    	}
+
+    	// if we have any items to process then kick off annonymous thread
+    	if (items.size() > 0) {
+    		Thread go = new Thread() {
+    			public void run() {
+    				Context context;
+    				try {
+    					// create a new dspace context
+    					context = new Context();
+    					// ignore auths
+    					context.setIgnoreAuthorization(true);
+    					ItemIterator iitems = new ItemIterator(context, items);
+    					String fileName = assembleFileName(eperson, new Date());
+    					String workDir = getExportWorkDirectory()
+    					+ System.getProperty("file.separator")
+    					+ fileName;
+    					String downloadDir = getExportDownloadDirectory(eperson
+    							.getID());
+
+    					File wkDir = new File(workDir);
+    					if (!wkDir.exists()) {
+    						wkDir.mkdirs();
+    					}
+
+    					File dnDir = new File(downloadDir);
+    					if (!dnDir.exists()) {
+    						dnDir.mkdirs();
+    					}
+
+    					// export the items using normal export method
+    					exportItem(context, iitems, workDir, 1);
+    					// now zip up the export directory created above
+    					zip(workDir, downloadDir
+    							+ System.getProperty("file.separator")
+    							+ fileName + ".zip");
+    					// email message letting user know the file is ready for
+    					// download
+    					emailSuccessMessage(eperson.getEmail(),
+    							ConfigurationManager
+    							.getProperty("mail.from.address"),
+    							additionalEmail, fileName + ".zip");
+    					// return to enforcing auths
+    					context.setIgnoreAuthorization(false);
+    				} catch (Exception e1) {
+    					try {
+    						emailErrorMessage(eperson.getEmail(),
+    								ConfigurationManager
+    								.getProperty("mail.from.address"),
+    								additionalEmail, e1.getMessage());
+    					} catch (Exception e) {
+    						// wont throw here
+    					}
+    					throw new RuntimeException(e1);
+    				}
+    			}
+
+    		};
+
+    		go.isDaemon();
+    		go.start();
+    	}
+    }
+
+    /**
+     * Create a file name based on the date and eperson
+     * 
+     * @param eperson -
+     *            eperson who requested export and will be able to download it
+     * @param date -
+     *            the date the export process was created
+     * @return String representing the file name in the form of
+     *         'export_yyy_MMM_dd_count_epersonID'
+     * @throws Exception
+     */
+    private static String assembleFileName(EPerson eperson, Date date)
+    throws Exception {
+    	// to format the date
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MMM_dd");
+    	String downloadDir = getExportDownloadDirectory(eperson.getID());
+    	// used to avoid name collision
+    	int count = 1;
+    	boolean exists = true;
+    	String fileName = null;
+    	while (exists) {
+    		fileName = "export_" + sdf.format(date) + "_" + count + "_"
+    		+ eperson.getID();
+    		exists = new File(downloadDir
+    				+ System.getProperty("file.separator") + fileName + ".zip")
+    		.exists();
+    		count++;
+    	}
+    	return fileName;
+    }
+
+    /**
+     * Use config file entry for org.dspace.app.itemexport.download.dir and id
+     * of the eperson to create a download directory name
+     * 
+     * @param ePersonID -
+     *            id of the eperson who requested export archive
+     * @return String representing a directory in the form of
+     *         org.dspace.app.itemexport.download.dir/epersonID
+     * @throws Exception
+     */
+    private static String getExportDownloadDirectory(int ePersonID)
+    throws Exception {
+    	String downloadDir = ConfigurationManager
+    	.getProperty("org.dspace.app.itemexport.download.dir");
+    	if (downloadDir == null) {
+    		throw new Exception(
+    				"A dspace.cfg entry for 'org.dspace.app.itemexport.download.dir' does not exist.");
+    	}
+
+    	return downloadDir + System.getProperty("file.separator") + ePersonID;
+
+    }
+
+    /**
+     * Returns config file entry for org.dspace.app.itemexport.work.dir
+     * 
+     * @return String representing config file entry for
+     *         org.dspace.app.itemexport.work.dir
+     * @throws Exception
+     */
+    private static String getExportWorkDirectory() throws Exception {
+    	String exportDir = ConfigurationManager
+    	.getProperty("org.dspace.app.itemexport.work.dir");
+    	if (exportDir == null) {
+    		throw new Exception(
+    				"A dspace.cfg entry for 'org.dspace.app.itemexport.work.dir' does not exist.");
+    	}
+    	return exportDir;
+    }
+
+    /**
+     * Used to read the export archived. Inteded for download.
+     * 
+     * @param fileName
+     *            the name of the file to download
+     * @param eperson
+     *            the eperson requesting the download
+     * @return an input stream of the file to be downloaded
+     * @throws Exception
+     */
+    public static InputStream getExportDownloadInputStream(String fileName,
+    		EPerson eperson) throws Exception {
+    	File file = new File(getExportDownloadDirectory(eperson.getID())
+    			+ System.getProperty("file.separator") + fileName);
+    	if (file.exists()) {
+    		return new FileInputStream(file);
+    	} else
+    		return null;
+    }
+
+    /**
+     * Get the file size of the export archive represented by the file name
+     * 
+     * @param fileName
+     *            name of the file to get the size
+     * @param eperson
+     *            the eperson requesting file
+     * @return
+     * @throws Exception
+     */
+    public static long getExportFileSize(String fileName) throws Exception {
+    	String strID = fileName.substring(fileName.lastIndexOf('_') + 1,
+    			fileName.lastIndexOf('.'));
+    	File file = new File(
+    			getExportDownloadDirectory(Integer.parseInt(strID))
+    			+ System.getProperty("file.separator") + fileName);
+    	if (!file.exists() || !file.isFile()) {
+    		throw new FileNotFoundException("The file " + getExportDownloadDirectory(Integer.parseInt(strID))
+    				+ System.getProperty("file.separator") + fileName
+    				+ " does not exist.");
+    	}
+
+    	return file.length();
+    }
+
+    public static long getExportFileLastModified(String fileName) throws Exception {
+    	String strID = fileName.substring(fileName.lastIndexOf('_') + 1,
+    			fileName.lastIndexOf('.'));
+    	File file = new File(
+    			getExportDownloadDirectory(Integer.parseInt(strID))
+    			+ System.getProperty("file.separator") + fileName);
+    	if (!file.exists() || !file.isFile()) {
+    		throw new FileNotFoundException("The file " + getExportDownloadDirectory(Integer.parseInt(strID))
+    				+ System.getProperty("file.separator") + fileName
+    				+ " does not exist.");
+    	}
+
+    	return file.lastModified();
+    }
+
+    /**
+     * The file name of the export archive contains the eperson id of the person
+     * who created it When requested for download this method can check if the
+     * person requesting it is the same one that created it
+     * 
+     * @param context
+     *            dspace context
+     * @param fileName
+     *            the file name to check auths for
+     * @return true if it is the same person false otherwise
+     */
+    public static boolean canDownload(Context context, String fileName) {
+    	EPerson eperson = context.getCurrentUser();
+    	if (eperson == null) {
+    		return false;
+    	}
+    	String strID = fileName.substring(fileName.lastIndexOf('_') + 1,
+    			fileName.lastIndexOf('.'));
+    	try {
+    		if (Integer.parseInt(strID) == eperson.getID()) {
+    			return true;
+    		}
+    	} catch (Exception e) {
+    		return false;
+    	}
+    	return false;
+    }
+
+    /**
+     * Reads the download directory for the eperson to see if any export
+     * archives are available
+     * 
+     * @param eperson
+     * @return a list of file names representing export archives that have been
+     *         processed
+     * @throws Exception
+     */
+    public static List<String> getExportsAvailable(EPerson eperson)
+    throws Exception {
+    	File downloadDir = new File(getExportDownloadDirectory(eperson.getID()));
+    	if (!downloadDir.exists() || !downloadDir.isDirectory()) {
+    		return null;
+    	}
+
+    	List<String> fileNames = new ArrayList<String>();
+
+    	for (String fileName : downloadDir.list()) {
+    		if (fileName.contains("export") && fileName.endsWith(".zip")) {
+    			fileNames.add(fileName);
+    		}
+    	}
+
+    	if (fileNames.size() > 0) {
+    		return fileNames;
+    	}
+
+    	return null;
+    }
+
+    /**
+     * A clean up method that is ran before a new export archive is created. It
+     * uses the config file entry 'org.dspace.app.itemexport.life.span.hours' to
+     * determine if the current exports are too old and need pruging
+     * 
+     * @param epersonID -
+     *            the id of the eperson to clean up
+     * @throws Exception
+     */
+    private static void deleteOldExportArchives(int epersonID) throws Exception {
+    	int hours = ConfigurationManager
+    	.getIntProperty("org.dspace.app.itemexport.life.span.hours");
+    	Calendar now = Calendar.getInstance();
+    	now.setTime(new Date());
+    	now.add(Calendar.HOUR, (-hours));
+    	File downloadDir = new File(getExportDownloadDirectory(epersonID));
+    	if (downloadDir.exists()) {
+    		File[] files = downloadDir.listFiles();
+    		for (File file : files) {
+    			if (file.lastModified() < now.getTimeInMillis()) {
+    				file.delete();
+    			}
+    		}
+    	}
+
+    }
+
+    /**
+     * Since the archive is created in a new thread we are unable to communicate
+     * with calling method about success or failure. We accomplis this
+     * communication with email instead. Send a success email once the export
+     * archive is complete and ready for download
+     * 
+     * @param toMail -
+     *            email to send message to
+     * @param fromMail -
+     *            email for the from field
+     * @param ccMail -
+     *            carbon copy email
+     * @param fileName -
+     *            the file name to be downloaded. It is added to the url in the
+     *            email
+     * @throws MessagingException
+     */
+    private static void emailSuccessMessage(String toMail, String fromMail,
+    		String ccMail, String fileName) throws MessagingException {
+    	StringBuffer content = new StringBuffer();
+    	content
+    	.append("The item export you requested from the repositry is now ready for download.");
+    	content.append(System.getProperty("line.separator"));
+    	content.append(System.getProperty("line.separator"));
+    	content
+    	.append("You may download the compressed file using the following web address:");
+    	content.append(System.getProperty("line.separator"));
+    	content.append(ConfigurationManager.getProperty("dspace.url"));
+    	content.append("/exportdownload/");
+    	content.append(fileName);
+    	content.append(System.getProperty("line.separator"));
+    	content.append(System.getProperty("line.separator"));
+    	content.append("Tis file will remain available for at least ");
+    	content.append(ConfigurationManager
+    			.getProperty("org.dspace.app.itemexport.life.span.hours"));
+    	content.append(" hours.");
+    	content.append(System.getProperty("line.separator"));
+    	content.append(System.getProperty("line.separator"));
+    	content.append("Thank you");
+
+    	sendMessage(toMail, fromMail, ccMail,
+    			"Item export requested is ready for download", content);
+    }
+
+    /**
+     * Since the archive is created in a new thread we are unable to communicate
+     * with calling method about success or failure. We accomplis this
+     * communication with email instead. Send an error email if the export
+     * archive fails
+     * 
+     * @param toMail -
+     *            email to send message to
+     * @param fromMail -
+     *            email for the from field
+     * @param ccMail -
+     *            carbon copy email
+     * @param fileName -
+     *            the file name to be downloaded. It is added to the url in the
+     *            email
+     * @throws MessagingException
+     */
+    private static void emailErrorMessage(String toMail, String fromMail,
+    		String ccMail, String error) throws MessagingException {
+    	StringBuffer content = new StringBuffer();
+    	content.append("The item export you requested was not completed.");
+    	content.append(System.getProperty("line.separator"));
+    	content.append(System.getProperty("line.separator"));
+    	content
+    	.append("For more infrmation you may contact your system administrator.");
+    	content.append(System.getProperty("line.separator"));
+    	content.append(System.getProperty("line.separator"));
+    	content.append("Error message received: ");
+    	content.append(error);
+    	content.append(System.getProperty("line.separator"));
+    	content.append(System.getProperty("line.separator"));
+    	content.append("Thank you");
+
+    	sendMessage(toMail, fromMail, ccMail,
+    			"Item export requested was not completed", content);
+    }
+
+    private static void sendMessage(String toMail, String fromMail,
+    		String ccMail, String subject, StringBuffer content)
+    throws MessagingException {
+    	try {
+    		if (toMail == null || !toMail.contains("@")) {
+    			return;
+    		}
+
+    		// Get the mail configuration properties
+    		String server = ConfigurationManager.getProperty("mail.server");
+
+    		// Set up properties for mail session
+    		Properties props = System.getProperties();
+    		props.put("mail.smtp.host", server);
+
+    		// Get session
+    		Session session = Session.getDefaultInstance(props, null);
+
+    		MimeMessage msg = new MimeMessage(session);
+    		Multipart multipart = new MimeMultipart();
+
+    		// create the first part of the email
+    		BodyPart messageBodyPart = new MimeBodyPart();
+    		messageBodyPart.setText(content.toString());
+
+    		multipart.addBodyPart(messageBodyPart);
+    		msg.setContent(multipart);
+    		msg.setFrom(new InternetAddress(fromMail));
+    		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
+    				toMail));
+    		if (ccMail != null && ccMail.contains("@")) {
+    			msg.addRecipient(Message.RecipientType.CC, new InternetAddress(
+    					ccMail));
+    		}
+    		msg.setSentDate(new Date());
+    		msg.setSubject(subject);
+    		Transport.send(msg);
+    	} catch (MessagingException e) {
+    		e.printStackTrace();
+    		throw e;
+    	}
+    }
+
+    private static void zip(String strSource, String target) throws Exception {
+    	ZipOutputStream cpZipOutputStream = null;
+    	String tempFileName = target + "_tmp";
+    	try {
+    		File cpFile = new File(strSource);
+    		if (!cpFile.isFile() && !cpFile.isDirectory()) {
+    			return;
+    		}
+    		File targetFile = new File(tempFileName);
+    		if (!targetFile.exists()) {
+    			targetFile.createNewFile();
+    		}
+    		FileOutputStream fos = new FileOutputStream(tempFileName);
+    		cpZipOutputStream = new ZipOutputStream(fos);
+    		cpZipOutputStream.setLevel(9);
+    		zipFiles(cpFile, strSource, tempFileName, cpZipOutputStream);
+    		cpZipOutputStream.finish();
+    		cpZipOutputStream.close();
+    		deleteDirectory(cpFile);
+    		targetFile.renameTo(new File(target));
+    	} catch (Exception e) {
+    		throw e;
+    	}
+    }
+
+    private static void zipFiles(File cpFile, String strSource,
+    		String strTarget, ZipOutputStream cpZipOutputStream)
+    throws Exception {
+    	int byteCount;
+    	final int DATA_BLOCK_SIZE = 2048;
+    	FileInputStream cpFileInputStream;
+    	if (cpFile.isDirectory()) {
+    		File[] fList = cpFile.listFiles();
+    		for (int i = 0; i < fList.length; i++) {
+    			zipFiles(fList[i], strSource, strTarget, cpZipOutputStream);
+    		}
+    	} else {
+    		try {
+    			if (cpFile.getAbsolutePath().equalsIgnoreCase(strTarget)) {
+    				return;
+    			}
+    			String strAbsPath = cpFile.getPath();
+    			String strZipEntryName = strAbsPath.substring(strSource
+    					.length() + 1, strAbsPath.length());
+
+    			// byte[] b = new byte[ (int)(cpFile.length()) ];
+
+    			cpFileInputStream = new FileInputStream(cpFile);
+    			ZipEntry cpZipEntry = new ZipEntry(strZipEntryName);
+    			cpZipOutputStream.putNextEntry(cpZipEntry);
+
+    			byte[] b = new byte[DATA_BLOCK_SIZE];
+    			while ((byteCount = cpFileInputStream.read(b, 0,
+    					DATA_BLOCK_SIZE)) != -1) {
+    				cpZipOutputStream.write(b, 0, byteCount);
+    			}
+
+    			// cpZipOutputStream.write(b, 0, (int)cpFile.length());
+    			cpZipOutputStream.closeEntry();
+    		} catch (Exception e) {
+    			throw e;
+    		}
+    	}
+    }
+
+    private static boolean deleteDirectory(File path) {
+    	if (path.exists()) {
+    		File[] files = path.listFiles();
+    		for (int i = 0; i < files.length; i++) {
+    			if (files[i].isDirectory()) {
+    				deleteDirectory(files[i]);
+    			} else {
+    				files[i].delete();
+    			}
+    		}
+    	}
+
+    	boolean pathDeleted = path.delete();
+    	return (pathDeleted);
     }
 }

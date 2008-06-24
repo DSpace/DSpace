@@ -153,6 +153,12 @@ and searching the repository.
 				<map:transform type="ConfigurableBrowse"/>
 				<map:serialize type="xml"/>
 			</map:match>
+			
+			  <!-- restricted resource -->
+			<map:match pattern="restricted-resource">
+				<map:transform type="RestrictedItem"/>
+				<map:serialize type="xml"/>	
+			</map:match>
 
             <!-- general identifier features -->
 			<map:match pattern="resource/**">

@@ -54,8 +54,10 @@ import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
+import org.dspace.app.itemexport.ItemExport;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.SupervisedItem;
@@ -78,6 +80,7 @@ import org.dspace.uri.IdentifierService;
  * Servlet for constructing the components of the "My DSpace" page
  * 
  * @author Robert Tansley
+ * @author Jay Paz
  * @version $Id$
  */
 public class MyDSpaceServlet extends DSpaceServlet
@@ -99,6 +102,9 @@ public class MyDSpaceServlet extends DSpaceServlet
 
     /** The "reason for rejection" page */
     public static final int REJECT_REASON_PAGE = 4;
+    
+    /** The "request export archive for download" page */
+    public static final int REQUEST_EXPORT_ARCHIVE = 5;
 
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -138,14 +144,17 @@ public class MyDSpaceServlet extends DSpaceServlet
             break;
 
         case REJECT_REASON_PAGE:
-            processRejectReason(context, request, response);
+        	processRejectReason(context, request, response);
 
-            break;
+        	break;
+        case REQUEST_EXPORT_ARCHIVE:
+        	processExportArchive(context, request, response);
 
+        	break;
         default:
-            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-                    .getRequestLogInfo(request)));
-            JSPManager.showIntegrityError(request, response);
+        	log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+        			.getRequestLogInfo(request)));
+        JSPManager.showIntegrityError(request, response);
         }
     }
 
@@ -680,5 +689,99 @@ public class MyDSpaceServlet extends DSpaceServlet
         request.setAttribute("items", items);
 
         JSPManager.showJSP(request, response, "/mydspace/own-submissions.jsp");
+    }
+
+    private void processExportArchive(Context context,
+    		HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+
+    	if (request.getParameter("item_id") != null) {
+    		Item item = null;
+    		try {
+    			item = Item.find(context, Integer.parseInt(request
+    					.getParameter("item_id")));
+    		} catch (Exception e) {
+    			log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+    					.getRequestLogInfo(request)));
+    			JSPManager.showIntegrityError(request, response);
+    			return;
+    		}
+
+    		if (item == null) {
+    			log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+    					.getRequestLogInfo(request)));
+    			JSPManager.showIntegrityError(request, response);
+    			return;
+    		} else {
+    			try {
+    				ItemExport.createDownloadableExport(item, context);
+    			} catch (Exception e) {
+    				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+    						.getRequestLogInfo(request)));
+    				JSPManager.showIntegrityError(request, response);
+    				return;
+    			}
+    		}
+
+    		// success
+    		JSPManager.showJSP(request, response, "/mydspace/task-complete.jsp");
+    	} else if (request.getParameter("collection_id") != null) {
+    		Collection col = null;
+    		try {
+    			col = Collection.find(context, Integer.parseInt(request
+    					.getParameter("collection_id")));
+    		} catch (Exception e) {
+    			log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+    					.getRequestLogInfo(request)));
+    			JSPManager.showIntegrityError(request, response);
+    			return;
+    		}
+
+    		if (col == null) {
+    			log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+    					.getRequestLogInfo(request)));
+    			JSPManager.showIntegrityError(request, response);
+    			return;
+    		} else {
+    			try {
+    				ItemExport.createDownloadableExport(col, context);
+    			} catch (Exception e) {
+    				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+    						.getRequestLogInfo(request)));
+    				JSPManager.showIntegrityError(request, response);
+    				return;
+    			}
+    		}
+    		JSPManager.showJSP(request, response, "/mydspace/task-complete.jsp");
+    	} else if (request.getParameter("community_id") != null) {
+    		Community com = null;
+    		try {
+    			com = Community.find(context, Integer.parseInt(request
+    					.getParameter("community_id")));
+    		} catch (Exception e) {
+    			log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+    					.getRequestLogInfo(request)));
+    			JSPManager.showIntegrityError(request, response);
+    			return;
+    		}
+
+    		if (com == null) {
+    			log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+    					.getRequestLogInfo(request)));
+    			JSPManager.showIntegrityError(request, response);
+    			return;
+    		} else {
+    			try {
+    				org.dspace.app.itemexport.ItemExport.createDownloadableExport(com, context);
+    			} catch (Exception e) {
+    				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+    						.getRequestLogInfo(request)));
+    				JSPManager.showIntegrityError(request, response);
+    				return;
+    			}
+    		}
+    		JSPManager.showJSP(request, response, "/mydspace/task-complete.jsp");
+    	}
+
+
     }
 }
