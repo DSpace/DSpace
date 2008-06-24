@@ -50,11 +50,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
+import org.dspace.app.itemexport.ItemExport;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.SupervisedItem;
@@ -73,6 +75,7 @@ import org.dspace.workflow.WorkflowManager;
  * Servlet for constructing the components of the "My DSpace" page
  * 
  * @author Robert Tansley
+ * @author Jay Paz
  * @version $Id$
  */
 public class MyDSpaceServlet extends DSpaceServlet
@@ -94,6 +97,9 @@ public class MyDSpaceServlet extends DSpaceServlet
 
     /** The "reason for rejection" page */
     public static final int REJECT_REASON_PAGE = 4;
+    
+    /** The "request export archive for download" page */
+    public static final int REQUEST_EXPORT_ARCHIVE = 5;
 
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -134,6 +140,10 @@ public class MyDSpaceServlet extends DSpaceServlet
 
         case REJECT_REASON_PAGE:
             processRejectReason(context, request, response);
+
+            break;
+        case REQUEST_EXPORT_ARCHIVE:
+            processExportArchive(context, request, response);
 
             break;
 
@@ -576,6 +586,99 @@ public class MyDSpaceServlet extends DSpaceServlet
         }
     }
 
+    private void processExportArchive(Context context,
+            HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+    	
+    	if (request.getParameter("item_id") != null) {
+			Item item = null;
+			try {
+				item = Item.find(context, Integer.parseInt(request
+						.getParameter("item_id")));
+			} catch (Exception e) {
+				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+	                    .getRequestLogInfo(request)));
+	            JSPManager.showIntegrityError(request, response);
+	            return;
+			}
+
+			if (item == null) {
+				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+	                    .getRequestLogInfo(request)));
+	            JSPManager.showIntegrityError(request, response);
+	            return;
+			} else {
+				try {
+					ItemExport.createDownloadableExport(item, context);
+				} catch (Exception e) {
+					log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+		                    .getRequestLogInfo(request)));
+		            JSPManager.showIntegrityError(request, response);
+		            return;
+				}
+			}
+			
+			// success
+			JSPManager.showJSP(request, response, "/mydspace/task-complete.jsp");
+		} else if (request.getParameter("collection_id") != null) {
+			Collection col = null;
+			try {
+				col = Collection.find(context, Integer.parseInt(request
+						.getParameter("collection_id")));
+			} catch (Exception e) {
+				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+	                    .getRequestLogInfo(request)));
+	            JSPManager.showIntegrityError(request, response);
+	            return;
+			}
+
+			if (col == null) {
+				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+	                    .getRequestLogInfo(request)));
+	            JSPManager.showIntegrityError(request, response);
+	            return;
+			} else {
+				try {
+					ItemExport.createDownloadableExport(col, context);
+				} catch (Exception e) {
+					log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+		                    .getRequestLogInfo(request)));
+		            JSPManager.showIntegrityError(request, response);
+		            return;
+				}
+			}
+			JSPManager.showJSP(request, response, "/mydspace/task-complete.jsp");
+		} else if (request.getParameter("community_id") != null) {
+			Community com = null;
+			try {
+				com = Community.find(context, Integer.parseInt(request
+						.getParameter("community_id")));
+			} catch (Exception e) {
+				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+	                    .getRequestLogInfo(request)));
+	            JSPManager.showIntegrityError(request, response);
+	            return;
+			}
+
+			if (com == null) {
+				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+	                    .getRequestLogInfo(request)));
+	            JSPManager.showIntegrityError(request, response);
+	            return;
+			} else {
+				try {
+					org.dspace.app.itemexport.ItemExport.createDownloadableExport(com, context);
+				} catch (Exception e) {
+					log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+		                    .getRequestLogInfo(request)));
+		            JSPManager.showIntegrityError(request, response);
+		            return;
+				}
+			}
+			JSPManager.showJSP(request, response, "/mydspace/task-complete.jsp");
+		}
+    	
+    	
+    }
     // ****************************************************************
     // ****************************************************************
     // METHODS FOR SHOWING FORMS
@@ -623,7 +726,16 @@ public class MyDSpaceServlet extends DSpaceServlet
 
         SupervisedItem[] supervisedItems = SupervisedItem.findbyEPerson(
                 context, currentUser);
-
+        // export archives available for download
+        List<String> exportArchives = null;
+        try{
+        	exportArchives = ItemExport.getExportsAvailable(currentUser);
+        }
+        catch (Exception e) {
+			// nothing to do they just have no export archives available for download
+		}
+        
+        
         // Set attributes
         request.setAttribute("mydspace.user", currentUser);
         request.setAttribute("workspace.items", workspaceItems);
@@ -633,6 +745,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         request.setAttribute("group.memberships", memberships);
         request.setAttribute("display.groupmemberships", new Boolean(displayMemberships));
         request.setAttribute("supervised.items", supervisedItems);
+        request.setAttribute("export.archives", exportArchives);
 
         // Forward to main mydspace page
         JSPManager.showJSP(request, response, "/mydspace/main.jsp");

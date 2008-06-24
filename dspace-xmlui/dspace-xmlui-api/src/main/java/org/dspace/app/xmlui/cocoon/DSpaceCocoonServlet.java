@@ -223,7 +223,13 @@ public class DSpaceCocoonServlet extends CocoonServlet
         finally
         {
             // Ensure that the current context is removed from ThreadLocal
-            ContextMap.removeCurrentContext();
+        	try {
+        		ContextMap.removeCurrentContext();
+        	} 
+        	catch (NoSuchMethodError nsme)
+        	{
+        		// just ignore this, it means we're using an out of date logging library.
+        	}
         }
     }
     

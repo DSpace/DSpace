@@ -103,6 +103,7 @@
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
 %>
 
+<%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 <dspace:layout locbar="commLink" title="<%= name %>" feedData="<%= feedData %>">
 
   <table border="0" cellpadding="5" width="100%">
@@ -333,6 +334,17 @@
              <% } %>
               </td>
             </tr>
+            <% if( editor_button ) { %>
+            <tr>
+              <td headers="t1" class="standard" align="center">
+                <form method="post" action="<%=request.getContextPath()%>/mydspace">
+                  <input type="hidden" name="community_id" value="<%= community.getID() %>" />
+                  <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_EXPORT_ARCHIVE %>" />
+                  <input type="submit" value="<fmt:message key="jsp.mydspace.request.export.community"/>" />
+                </form>
+              </td>
+            </tr>
+			<% } %>
             <tr>
               <td headers="t1" class="standard" align="center">
                  <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\")%>"><fmt:message key="jsp.adminhelp"/></dspace:popup>

@@ -161,6 +161,14 @@ and searching the repository.
                 <map:transform type="Statistics"/>
                 <map:serialize type="xml"/>
             </map:match>
+            
+            
+            <!-- restricted resource -->
+			<map:match pattern="restricted-resource">
+				<map:transform type="RestrictedItem"/>
+				<map:serialize type="xml"/>	
+			</map:match>
+	
 
             <!-- Handle specific features -->
 			<map:match pattern="handle/*/**">

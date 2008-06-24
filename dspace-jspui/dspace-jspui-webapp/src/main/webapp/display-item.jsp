@@ -111,6 +111,7 @@
 	}
 %>
 
+<%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 <dspace:layout title="<%= title %>">
 
 <%
@@ -134,6 +135,14 @@
                     <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                     <%--<input type="submit" name="submit" value="Edit...">--%>
                     <input type="submit" name="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
+                </form>
+            </td>
+            <td class="evenRowEvenCol" align="center">
+                <form method="post" action="<%= request.getContextPath() %>/mydspace">
+                    <input type="hidden" name="item_id" value="<%= item.getID() %>" />
+                    <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_EXPORT_ARCHIVE %>" />
+                    <%--<input type="submit" name="submit" value="Edit...">--%>
+                    <input type="submit" name="submit" value="<fmt:message key="jsp.mydspace.request.export.item"/>" />
                 </form>
             </td>
 <%      } %>

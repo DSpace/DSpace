@@ -42,13 +42,18 @@ package org.dspace.app.xmlui.aspect.administrative;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Map;
 
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
+import org.dspace.app.itemexport.ItemExport;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -75,6 +80,7 @@ import org.xml.sax.SAXException;
  * @author Scott Phillips
  * @author Afonso Araujo Neto (internationalization)
  * @author Alexey Maslov
+ * @author Jay Paz
  */
 public class Navigation extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
@@ -101,11 +107,17 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
     private static final Message T_statistics            	= message("xmlui.administrative.Navigation.statistics");
 
-   
+    private static final Message T_context_export_item 				= message("xmlui.administrative.Navigation.context_export_item");
+    private static final Message T_context_export_collection 		= message("xmlui.administrative.Navigation.context_export_collection");
+    private static final Message T_context_export_community 		= message("xmlui.administrative.Navigation.context_export_community");
+    private static final Message T_account_export			 		= message("xmlui.administrative.Navigation.account_export");
 	
 
     /** Cached validity object */
 	private SourceValidity validity;
+	
+	/** exports available for download */
+	java.util.List<String> availableExports = null;
 	
 	 /**
      * Generate the unique cache key.
@@ -128,9 +140,16 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             return "0";
         }
                 
-    	String key;
+        String key;
         if (context.getCurrentUser() != null)
-            key = context.getCurrentUser().getEmail();
+        {
+        	key = context.getCurrentUser().getEmail();
+        	if(availableExports!=null && availableExports.size()>0){
+        		for(String fileName:availableExports){
+        			key+= ":"+fileName;
+        		}
+        	}
+        }
         else
         	key = "anonymous";
         
@@ -176,6 +195,20 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     	return this.validity;
     }
 	
+    
+    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
+    	super.setup(resolver, objectModel, src, parameters);
+    	try{
+    		availableExports = ItemExport.getExportsAvailable(context.getCurrentUser());
+    	}
+    	catch (Exception e) {
+    		// nothing to do
+    	}
+    }
+    
+    
+    
+    
     public void addOptions(Options options) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
@@ -183,9 +216,15 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     	 * even if they are never used 
     	 */
         options.addList("browse");
-        options.addList("account");
+        List account = options.addList("account");
         List context = options.addList("context");
         List admin = options.addList("administrative");
+        
+        // My Account options
+        if(availableExports!=null && availableExports.size()>0){
+        	account.addItem().addXref(contextPath+"/admin/export", T_account_export);
+        }
+        
         
         // Context Administrative options
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
@@ -197,6 +236,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     		{
             	context.setHead(T_context_head);
             	context.addItem().addXref(contextPath+"/admin/item?itemID="+item.getID(), T_context_edit_item);
+            	context.addItem().addXref(contextPath+"/admin/export?itemID="+item.getID(), T_context_export_item );
     		}
     	}
     	else if (dso instanceof Collection)
@@ -209,7 +249,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             {
             	context.setHead(T_context_head);
             	context.addItemXref(contextPath+"/admin/collection?collectionID=" + collection.getID(), T_context_edit_collection);            	
-            	context.addItemXref(contextPath+"/admin/mapper?collectionID="+collection.getID(), T_context_item_mapper);            	
+            	context.addItemXref(contextPath+"/admin/mapper?collectionID="+collection.getID(), T_context_item_mapper); 
+            	context.addItem().addXref(contextPath+"/admin/export?collectionID="+collection.getID(), T_context_export_collection );
             }
     	}
     	else if (dso instanceof Community)
@@ -220,7 +261,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             if (community.canEditBoolean())
             {
             	context.setHead(T_context_head);
-            	context.addItemXref(contextPath+"/admin/community?communityID=" + community.getID(), T_context_edit_community);            	
+            	context.addItemXref(contextPath+"/admin/community?communityID=" + community.getID(), T_context_edit_community); 
+            	context.addItem().addXref(contextPath+"/admin/export?communityID="+community.getID(), T_context_export_community );
             }
             
             // can they add to this community?

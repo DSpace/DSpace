@@ -164,6 +164,11 @@
     <servlet-class>org.dspace.app.webui.servlet.BitstreamServlet</servlet-class>
   </servlet>
 
+ <servlet>
+    <servlet-name>exportdownload</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.ItemExportArchiveServlet</servlet-class>
+  </servlet>
+
 	<servlet>
 		<servlet-name>browse</servlet-name>
 		<servlet-class>org.dspace.app.webui.servlet.BrowserServlet</servlet-class>
@@ -411,6 +416,11 @@
   <servlet-mapping>
     <servlet-name>bitstream</servlet-name>
     <url-pattern>/bitstream/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>exportdownload</servlet-name>
+    <url-pattern>/exportdownload/*</url-pattern>
   </servlet-mapping>
 
 	<servlet-mapping>

@@ -126,6 +126,7 @@
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
 %>
 
+<%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 <dspace:layout locbar="commLink" title="<%= name %>" feedData="<%= feedData %>">
 
   <table border="0" cellpadding="5" width="100%">
@@ -288,6 +289,17 @@
 		      </form>
 	         </td>
            </tr>
+<% } %>
+<% if( editor_button || admin_button) { %>
+            <tr>
+              <td headers="t1" class="standard" align="center">
+                <form method="post" action="<%=request.getContextPath()%>/mydspace">
+                  <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
+                  <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_EXPORT_ARCHIVE %>" />
+                  <input type="submit" value="<fmt:message key="jsp.mydspace.request.export.collection"/>" />
+                </form>
+              </td>
+            </tr>
 <% } %>
             <tr>
               <td headers="t1" class="standard" align="center">

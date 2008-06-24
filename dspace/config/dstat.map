@@ -100,3 +100,4 @@ show_feedback_form=Feedback Form Displayed
 create_dc_type=New Dublin Core Type Created
 remove_template_item=Item Template Removed
 withdraw_item=Item Withdrawn
+download_export_archive = Download Export Archive

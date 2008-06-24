@@ -105,6 +105,7 @@ to administer DSpace.
 			<map:transformer name="SystemwideAlerts" src="org.dspace.app.xmlui.aspect.administrative.SystemwideAlerts"/>
 			<map:transformer name="ControlPanel" src="org.dspace.app.xmlui.aspect.administrative.ControlPanel" />
             <map:transformer name="WithdrawnItems" src="org.dspace.app.xmlui.aspect.administrative.WithdrawnItems" />
+            <map:transformer name="ItemExport" src="org.dspace.app.xmlui.aspect.administrative.ItemExport"/>
 		</map:transformers>
 		
 		<map:matchers default="wildcard">
@@ -777,6 +778,10 @@ to administer DSpace.
 		    		<map:match pattern="admin/authorize">
 		    			<map:act type="StartAuthentication"/>
 		    		</map:match>
+		    		<map:match pattern="admin/export">
+		    			<map:act type="StartAuthentication"/>
+		    		</map:match>
+		    		
                 </map:otherwise>
             </map:select>
             
@@ -795,6 +800,10 @@ to administer DSpace.
 					</map:otherwise>
 				</map:select>
 			</map:match>
+		    
+		    <map:match pattern="admin/export">
+                <map:transform type="ItemExport"/>
+            </map:match>
 		    
             <map:match pattern="admin/withdrawn">
                 <map:select type="AuthenticatedSelector">
