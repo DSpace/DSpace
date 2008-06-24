@@ -215,7 +215,8 @@ public class PerformTaskStep extends AbstractStep
 	        row.addCell().addButton("submit_reject").setValue(T_reject_submit);
         }
         
-        if (state == WFSTATE_STEP2)
+        if (state == WFSTATE_STEP2 ||
+            state == WFSTATE_STEP3 )
         {
 	        // Edit metadata
 	        row = table.addRow();
