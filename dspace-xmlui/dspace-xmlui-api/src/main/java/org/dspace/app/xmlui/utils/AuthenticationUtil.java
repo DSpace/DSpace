@@ -47,6 +47,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.log4j.Logger;
+import org.dspace.app.xmlui.aspect.administrative.SystemwideAlerts;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authorize.AuthorizeException;
@@ -209,6 +210,14 @@ public class AuthenticationUtil
 
         context.setCurrentUser(eperson);
 
+        // Check to see if systemwide alerts is restricting sessions
+        if (!AuthorizeManager.isAdmin(context) && !SystemwideAlerts.canUserStartSession())
+        {
+        	// Do not allow this user to login because sessions are being restricted by a systemwide alert.
+        	context.setCurrentUser(null);
+        	return;
+        }
+        
         // Set any special groups - invoke the authentication mgr.
         int[] groupIDs = AuthenticationManager.getSpecialGroups(context,
                 request);
@@ -242,7 +251,8 @@ public class AuthenticationUtil
         if (session != null)
         {
             Integer id = (Integer) session.getAttribute(EFFECTIVE_USER_ID);
-
+            Integer realid = (Integer) session.getAttribute(AUTHENTICATED_USER_ID);
+            
             if (id != null)
             {
                 String address = (String)session.getAttribute(CURRENT_IP_ADDRESS);
@@ -250,6 +260,23 @@ public class AuthenticationUtil
                 {
                     EPerson eperson = EPerson.find(context, id);
                     context.setCurrentUser(eperson);
+                    
+                    // Check to see if systemwide alerts is restricting sessions
+                    if (!AuthorizeManager.isAdmin(context) && !SystemwideAlerts.canUserMaintainSession())
+                    {
+                    	// Normal users can not maintain their sessions, check to see if this is really an
+                    	// administrator loging in as someone else.
+                    	
+                    	EPerson realEPerson = EPerson.find(context, realid);
+                    	Group administrators = Group.find(context,1);
+                 	    if (!administrators.isMember(realEPerson))
+                 	    {
+                 	    	// Log this user out because sessions are being restricted by a systemwide alert.
+                 	    	context.setCurrentUser(null);
+                 	    	return;
+                 	    }
+                    }
+                    
 
                     // Set any special groups - invoke the authentication mgr.
                     int[] groupIDs = AuthenticationManager.getSpecialGroups(context, request);
@@ -364,7 +391,11 @@ public class AuthenticationUtil
         final HttpServletRequest request = (HttpServletRequest) objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
         Context context = ContextUtil.obtainContext(objectModel);
         
-        return AuthenticationManager.canSelfRegister(context,request,email);
+        if (SystemwideAlerts.canUserStartSession())
+        	return AuthenticationManager.canSelfRegister(context,request,email);
+        else
+        	// System wide alerts is preventing new sessions.
+        	return false;
     }
     
     /**

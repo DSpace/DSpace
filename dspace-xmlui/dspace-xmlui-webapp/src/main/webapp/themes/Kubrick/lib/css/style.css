@@ -527,6 +527,10 @@ ul.alphabet
     width: 200px;
 }
 
+#aspect_administrative_ControlPanel_field_restrictsessions
+{
+    width: 350px;
+}
 
 #aspect_artifactbrowser_FeedbackForm_field_email
 {
@@ -615,6 +619,7 @@ ul.alphabet
     position: relative;
     left: -34px;
     top: -34px;
+    width: 100%;
 }
 #aspect_administrative_collection_EditCollectionMetadataForm_list_options li,
 #aspect_administrative_collection_AssignCollectionRoles_list_options li,

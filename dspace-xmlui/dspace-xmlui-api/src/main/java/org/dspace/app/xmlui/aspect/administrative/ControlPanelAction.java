@@ -69,6 +69,8 @@ public class ControlPanelAction extends AbstractAction
         // In any case update the system-wide alert system
         String message = request.getParameter("message");
         String countdownString = request.getParameter("countdown");
+        String restrictsessions = request.getParameter("restrictsessions");
+        
         int countdown = -1;
         if (countdownString != null)
         {
@@ -96,6 +98,18 @@ public class ControlPanelAction extends AbstractAction
         	
         	// set it.
         	SystemwideAlerts.setCountDownToo(countDownTo);
+        }
+        
+        if (restrictsessions != null && restrictsessions.length() > 0)
+        {
+        	try {
+        		int newState = Integer.valueOf(restrictsessions);
+        		SystemwideAlerts.setRestrictSessions(newState);
+        	} 
+        	catch (NumberFormatException nfe)
+        	{
+        		// ignore it
+        	}
         }
         
         

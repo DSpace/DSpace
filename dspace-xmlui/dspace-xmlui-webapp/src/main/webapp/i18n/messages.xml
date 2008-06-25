@@ -1532,6 +1532,11 @@
 	<message key="xmlui.administrative.ControlPanel.alerts_countdown_30">30 minutes</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_countdown_60">1 hour</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_countdown_keep">Keep the current count down timer</message>
+	<message key="xmlui.administrative.ControlPanel.alerts_session_label">Manage session</message>	
+	<message key="xmlui.administrative.ControlPanel.alerts_session_all_sessions">Continue to allow authenticated sessions</message>	
+	<message key="xmlui.administrative.ControlPanel.alerts_session_current_sessions">Restrict authentication but maintain current sessions</message>	
+	<message key="xmlui.administrative.ControlPanel.alerts_session_only_administrative_sessions">Restrict authentication and kill current sessions</message>	
+	<message key="xmlui.administrative.ControlPanel.alerts_session_note"><strong>Note:</strong> Site administrators are exempt from session management.</message>	
 	<message key="xmlui.administrative.ControlPanel.alerts_submit_activate">Activate</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_submit_deactivate">Deactivate</message>
 	<message key="xmlui.administrative.ControlPanel.activity_head">Current Activity ({0} pages maximum)</message>
