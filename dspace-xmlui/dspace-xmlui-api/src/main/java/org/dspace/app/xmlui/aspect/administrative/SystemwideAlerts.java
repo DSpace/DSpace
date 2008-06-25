@@ -63,6 +63,12 @@ public class SystemwideAlerts extends AbstractDSpaceTransformer implements Cache
 	/** Language Strings */
 	private static final Message T_COUNTDOWN = message("xmlui.administrative.SystemwideAlerts.countdown");
 
+	/** Possible user restricted states */
+	public static int STATE_ALL_SESSIONS = 1;
+	public static int STATE_CURRENT_SESSIONS = 2;
+	public static int STATE_ONLY_ADMINISTRATIVE_SESSIONS = 3;
+	
+	
 	// Is an alert activated?
 	private static boolean active;
 	
@@ -71,6 +77,9 @@ public class SystemwideAlerts extends AbstractDSpaceTransformer implements Cache
 	
 	// If a count down time is present, what time are we counting down too?
 	private static long countDownToo;
+	
+	// Can users use the website?
+	private static int restrictsessions = STATE_ALL_SESSIONS;
 	
 	/**
      * Generate the unique caching key.
@@ -179,5 +188,50 @@ public class SystemwideAlerts extends AbstractDSpaceTransformer implements Cache
 	}
 	
 	
+	// Can users login or continue to use the system?
+	public static int getRestrictSessions()
+	{
+		return SystemwideAlerts.restrictsessions;
+	}
 	
+	// Set the ability to restrict use of the system
+	public static void setRestrictSessions(int restrictsessions)
+	{
+		if (restrictsessions == STATE_ALL_SESSIONS ||
+			restrictsessions == STATE_CURRENT_SESSIONS ||
+			restrictsessions == STATE_ONLY_ADMINISTRATIVE_SESSIONS)
+			SystemwideAlerts.restrictsessions = restrictsessions;
+	}
+	
+	
+	/**
+	 * Are users able to start a new session, will return false if there is 
+	 * a current alert activated and sessions are restricted.
+	 * 
+	 * @return if false do not allow user to start a new session, otherwise no restriction.
+	 */
+	public static boolean canUserStartSession()
+	{
+		if (SystemwideAlerts.active &&
+		    (restrictsessions == STATE_ONLY_ADMINISTRATIVE_SESSIONS ||
+		     restrictsessions == STATE_CURRENT_SESSIONS))
+		    	return false;
+		else
+			return true;
+	}
+	
+	/**
+	 * Are users able to maintain a session, will return false if there is 
+	 * a current alert activated and sessions are restricted.
+	 * 
+	 * @return if false do not allow user to maintain their current session 
+	 * or start a new session, otherwise no restriction.
+	 */
+	public static boolean canUserMaintainSession()
+	{
+		if (SystemwideAlerts.active && restrictsessions == STATE_ONLY_ADMINISTRATIVE_SESSIONS)
+			return false;
+		else
+			return true;
+	}
 }

@@ -140,6 +140,11 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 	private static final Message T_alerts_countdown_30		= message("xmlui.administrative.ControlPanel.alerts_countdown_30");
 	private static final Message T_alerts_countdown_60		= message("xmlui.administrative.ControlPanel.alerts_countdown_60");
 	private static final Message T_alerts_countdown_keep	= message("xmlui.administrative.ControlPanel.alerts_countdown_keep");
+	private static final Message T_alerts_session_label 	          = message("xmlui.administrative.ControlPanel.alerts_session_label");
+	private static final Message T_alerts_session_all_sessions        = message("xmlui.administrative.ControlPanel.alerts_session_all_sessions");
+	private static final Message T_alerts_session_current_sessions    = message("xmlui.administrative.ControlPanel.alerts_session_current_sessions");
+	private static final Message T_alerts_session_only_administrative = message("xmlui.administrative.ControlPanel.alerts_session_only_administrative_sessions");
+	private static final Message T_alerts_session_note                = message("xmlui.administrative.ControlPanel.alerts_session_note");	
 	private static final Message T_alerts_submit_activate	= message("xmlui.administrative.ControlPanel.alerts_submit_activate");
 	private static final Message T_alerts_submit_deactivate	= message("xmlui.administrative.ControlPanel.alerts_submit_deactivate");
 	private static final Message T_activity_head 			= message("xmlui.administrative.ControlPanel.activity_head");
@@ -444,7 +449,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 	 */
 	private void addAlerts(Division div) throws WingException 
 	{
-		// Remember we're in teh alerts section
+		// Remember we're in the alerts section
 		div.addHidden("alerts").setValue("true");
 		
 		List form = div.addList("system-wide-alerts",List.TYPE_FORM);
@@ -474,6 +479,16 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 			countdown.addOption(true,-1,T_alerts_countdown_keep);
 		else
 			countdown.setOptionSelected(0);
+		
+		Select restrictsessions = form.addItem().addSelect("restrictsessions");
+		restrictsessions.setLabel(T_alerts_session_label);
+		restrictsessions.addOption(SystemwideAlerts.STATE_ALL_SESSIONS,T_alerts_session_all_sessions);
+		restrictsessions.addOption(SystemwideAlerts.STATE_CURRENT_SESSIONS,T_alerts_session_current_sessions);
+		restrictsessions.addOption(SystemwideAlerts.STATE_ONLY_ADMINISTRATIVE_SESSIONS,T_alerts_session_only_administrative);
+		restrictsessions.setOptionSelected(SystemwideAlerts.getRestrictSessions());
+		
+		form.addItem(T_alerts_session_note);
+		
 		
 		Item actions = form.addItem();
 		actions.addButton("submit_activate").setValue(T_alerts_submit_activate);
