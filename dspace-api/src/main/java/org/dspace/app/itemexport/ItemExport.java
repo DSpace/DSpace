@@ -706,7 +706,7 @@ public class ItemExport {
 						context.setIgnoreAuthorization(true);
 						ItemIterator iitems = new ItemIterator(context, items);
 
-						String fileName = assembleFileName(eperson, new Date());
+						String fileName = assembleFileName("item", eperson, new Date());
 						String workDir = getExportWorkDirectory()
 								+ System.getProperty("file.separator")
 								+ fileName;
@@ -768,7 +768,7 @@ public class ItemExport {
 	 *         'export_yyy_MMM_dd_count_epersonID'
 	 * @throws Exception
 	 */
-	private static String assembleFileName(EPerson eperson, Date date)
+	public static String assembleFileName(String type, EPerson eperson, Date date)
 			throws Exception {
 		// to format the date
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MMM_dd");
@@ -778,7 +778,7 @@ public class ItemExport {
 		boolean exists = true;
 		String fileName = null;
 		while (exists) {
-			fileName = "export_" + sdf.format(date) + "_" + count + "_"
+			fileName = type + "_export_" + sdf.format(date) + "_" + count + "_"
 					+ eperson.getID();
 			exists = new File(downloadDir
 					+ System.getProperty("file.separator") + fileName + ".zip")
@@ -798,7 +798,7 @@ public class ItemExport {
 	 *         org.dspace.app.itemexport.download.dir/epersonID
 	 * @throws Exception
 	 */
-	private static String getExportDownloadDirectory(int ePersonID)
+	public static String getExportDownloadDirectory(int ePersonID)
 			throws Exception {
 		String downloadDir = ConfigurationManager
 				.getProperty("org.dspace.app.itemexport.download.dir");
@@ -818,7 +818,7 @@ public class ItemExport {
 	 *         org.dspace.app.itemexport.work.dir
 	 * @throws Exception
 	 */
-	private static String getExportWorkDirectory() throws Exception {
+	public static String getExportWorkDirectory() throws Exception {
 		String exportDir = ConfigurationManager
 				.getProperty("org.dspace.app.itemexport.work.dir");
 		if (exportDir == null) {
@@ -956,7 +956,7 @@ public class ItemExport {
 	 *            the id of the eperson to clean up
 	 * @throws Exception
 	 */
-	private static void deleteOldExportArchives(int epersonID) throws Exception {
+	public static void deleteOldExportArchives(int epersonID) throws Exception {
 		int hours = ConfigurationManager
 				.getIntProperty("org.dspace.app.itemexport.life.span.hours");
 		Calendar now = Calendar.getInstance();
@@ -991,7 +991,7 @@ public class ItemExport {
 	 *            email
 	 * @throws MessagingException
 	 */
-	private static void emailSuccessMessage(String toMail, String fromMail,
+	public static void emailSuccessMessage(String toMail, String fromMail,
 			String ccMail, String fileName) throws MessagingException {
 		StringBuffer content = new StringBuffer();
 		content
@@ -1035,7 +1035,7 @@ public class ItemExport {
 	 *            email
 	 * @throws MessagingException
 	 */
-	private static void emailErrorMessage(String toMail, String fromMail,
+	public static void emailErrorMessage(String toMail, String fromMail,
 			String ccMail, String error) throws MessagingException {
 		StringBuffer content = new StringBuffer();
 		content.append("The item export you requested was not completed.");
@@ -1098,7 +1098,7 @@ public class ItemExport {
 		}
 	}
 
-	private static void zip(String strSource, String target) throws Exception {
+	public static void zip(String strSource, String target) throws Exception {
 		ZipOutputStream cpZipOutputStream = null;
 		String tempFileName = target + "_tmp";
 		try {
