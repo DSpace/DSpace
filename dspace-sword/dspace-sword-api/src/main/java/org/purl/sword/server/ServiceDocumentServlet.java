@@ -28,7 +28,7 @@ public class ServiceDocumentServlet extends HttpServlet {
 	
 	public void init() {
 		// Instantiate the correct SWORD Server class
-		String className = getServletContext().getInitParameter("server-class");
+		String className = getServletContext().getInitParameter("sword-server-class");
 		if (className == null) {
 			log.fatal("Unable to read value of 'sword-server-class' from Servlet context");
 		} else {

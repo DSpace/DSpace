@@ -22,7 +22,7 @@
   </context-param>
 
   <context-param>
-    <param-name>server-class</param-name>
+    <param-name>sword-server-class</param-name>
     <param-value>org.dspace.sword.DSpaceSWORDServer</param-value>
     <description>
       The SWORDServer class name
