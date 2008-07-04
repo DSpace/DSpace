@@ -251,6 +251,22 @@ public class ResourcePolicyDAOPostgres extends ResourcePolicyDAO
         }
     }
 
+    @Override
+    public List<ResourcePolicy> getPolicies()
+    {
+        try
+        {
+            TableRowIterator tri = DatabaseManager.queryTable(context,
+                    "resourcepolicy",
+                    "SELECT policy_id FROM resourcepolicy "
+                    );
+            return returnAsList(tri);
+        }
+        catch (SQLException sqle)
+        {
+            throw new RuntimeException(":(");
+        }
+    }
     ////////////////////////////////////////////////////////////////////
     // Utility methods
     ////////////////////////////////////////////////////////////////////
@@ -374,4 +390,5 @@ public class ResourcePolicyDAOPostgres extends ResourcePolicyDAO
             row.setColumnNull("end_date");
         }
     }
+
 }

@@ -88,4 +88,5 @@ public abstract class ResourcePolicyDAO
             Group group);
     public abstract List<ResourcePolicy> getPolicies(DSpaceObject dso,
             int actionID);
+    public abstract List<ResourcePolicy> getPolicies();
 }
