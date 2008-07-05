@@ -174,7 +174,7 @@ public class MediaFilterManager
                 "SKIP the bitstreams belonging to identifier\n" +
                 "Separate multiple identifiers with a comma (,)\n" +
                 "(e.g. MediaFilterManager -s \n" +
-                "uuid:6432e1d5-b089-44dd-91cc-504104cf80b0,uuid:65263253-c4ce-416a-83c8-fbb2404156b8)");
+                "urn:uuid:6432e1d5-b089-44dd-91cc-504104cf80b0,urn:uuid:65263253-c4ce-416a-83c8-fbb2404156b8)");
         Option skipOption = OptionBuilder.create('s');
         skipOption.setArgs(Option.UNLIMITED_VALUES); //unlimited number of args
         options.addOption(skipOption);    

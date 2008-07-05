@@ -91,7 +91,7 @@ public class SimpleIdentifier
     /**
      * Get the canonical form of a UUID backed identifier.  This will be of the form:
      *
-     * <code>uuid:[the uuid]</code>
+     * <code>urn:uuid:[the uuid]</code>
      *
      * @return
      */
@@ -101,7 +101,7 @@ public class SimpleIdentifier
         {
             return null;
         }
-        return "uuid:" + uuid.toString();
+        return "urn:uuid:" + uuid.toString();
     }
 
     /**
@@ -115,7 +115,7 @@ public class SimpleIdentifier
      */
     public static SimpleIdentifier parseCanonicalForm(String canonicalForm)
     {
-        if (!canonicalForm.startsWith("uuid:"))
+        if (!canonicalForm.startsWith("urn:uuid:"))
         {
             return null;
         }
