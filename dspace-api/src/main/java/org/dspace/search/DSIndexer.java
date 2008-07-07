@@ -48,7 +48,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.TimeZone;
+import java.util.Vector;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 
@@ -233,7 +235,7 @@ public class DSIndexer
     	{
     		try {
     			new File(index_directory).mkdirs();
-				openIndex(null,true).close();
+				openIndex(true).close();
 			} catch (IOException e) {
                 throw new RuntimeException(
                         "Could not create search index: " + e.getMessage(),e);
@@ -274,17 +276,6 @@ public class DSIndexer
 
         Term t = new Term("uri", uri);
 
-//    	String handle = dso.getHandle();
-//
-//    	if(handle == null)
-//    	{
-//    		handle = HandleManager.findHandle(context, dso);
-//    	}
-//
-//		Term t = new Term("handle", handle);
-
-        IndexWriter writer = null;
-
         try
         {
             switch (dso.getType())
@@ -293,31 +284,21 @@ public class DSIndexer
                 Item item = (Item)dso;
                 if (item.isArchived() && !item.isWithdrawn())
                 {
-                    if (requiresIndexing(uri, ((Item)dso).getLastModified()) || force)
+                    if (requiresIndexing(t, ((Item)dso).getLastModified()) || force)
                     {
-                        Document doc = buildDocument(context, (Item) dso);
-
-                        /* open inside stale block, after building doc
-                         * to limit the total time spent in a lock.
-                         */
-                        writer = openIndex(context, false);
-                        writer.updateDocument(t, doc);
-
-                        log.info("Wrote Item: " + uri + " to Index");
+                        buildDocument(context, (Item) dso, t);                       
                     }
                 }
 
                 break;
 
             case Constants.COLLECTION :
-            	writer = openIndex(context, false);
-            	writer.updateDocument(t, buildDocument(context, (Collection) dso));
+            	buildDocument(context, (Collection) dso, t);
             	log.info("Wrote Collection: " + uri + " to Index");
             	break;
 
             case Constants.COMMUNITY :
-            	writer = openIndex(context, false);
-            	writer.updateDocument(t, buildDocument(context, (Community) dso));
+            	buildDocument(context, (Community) dso, t);
                 log.info("Wrote Community: " + uri + " to Index");
                 break;
 
@@ -328,12 +309,6 @@ public class DSIndexer
         } catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
-        finally
-        {
-        	/* drop the lock */
-            if(writer != null)
-            	writer.close();
-        }
     }
 
     /**
@@ -371,7 +346,7 @@ public class DSIndexer
             throws IOException
     {
 
-        IndexWriter writer = openIndex(context, false);
+        IndexWriter writer = openIndex(false);
 
         try
         {
@@ -424,7 +399,7 @@ public class DSIndexer
         itemDAO = ItemDAOFactory.getInstance(c);
 
     	/* Create a new index, blowing away the old. */
-        openIndex(c, true).close();
+        openIndex(true).close();
 
         /* Reindex all content preemptively. */
         DSIndexer.updateIndex(c, true);
@@ -440,7 +415,7 @@ public class DSIndexer
      */
     public static void optimizeIndex(Context c) throws IOException
     {
-        IndexWriter writer = openIndex(c, false);
+        IndexWriter writer = openIndex(false);
 
         try
         {
@@ -467,7 +442,7 @@ public class DSIndexer
         Context context = new Context();
         context.setIgnoreAuthorization(true);
 
-        String usage = "org.dspace.search.DSIndexer [-cbhouf[d <item uri>]] or nothing to update/clean an existing index.";
+        String usage = "org.dspace.search.DSIndexer [-cbhof[r <item uri>]] or nothing to update/clean an existing index.";
         Options options = new Options();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine line = null;
@@ -476,8 +451,8 @@ public class DSIndexer
                         .withArgName("item uri")
                         .hasArg(true)
                         .withDescription(
-                                "delete an Item, Collection or Community from index based on its uri")
-                        .create("d"));
+                                "remove an Item, Collection or Community from index based on its uri")
+                        .create("r"));
 
         options.addOption(OptionBuilder.isRequired(false).withDescription(
                 "optimize existing index").create("o"));
@@ -533,11 +508,6 @@ public class DSIndexer
         {
             log.info("Cleaning Index");
             cleanIndex(context);
-        }
-        else if (line.hasOption("u"))
-        {
-            log.info("Updating Index");
-            updateIndex(context, line.hasOption("f"));
         }
         else if (line.hasOption("b"))
         {
@@ -748,19 +718,19 @@ public class DSIndexer
 	 *
 	 * @param uri
 	 * @param lastModified
-	 * @return
+
+	 * @throws SQLException
 	 * @throws IOException
 	 */
-    private static boolean requiresIndexing(String uri, Date lastModified)
-        throws IOException
+    private static boolean requiresIndexing(Term t, Date lastModified)
+    throws SQLException, IOException
     {
 
 		boolean reindexItem = false;
 		boolean inIndex = false;
 
 		IndexReader ir = DSQuery.getIndexReader();
-
-		Term t = new Term("uri", uri);
+		
 		TermDocs docs = ir.termDocs(t);
 
 		while(docs.next())
@@ -783,7 +753,7 @@ public class DSIndexer
     /**
      * prepare index, opening writer, and wiping out existing index if necessary
      */
-    private static IndexWriter openIndex(Context c, boolean wipe_existing)
+    private static IndexWriter openIndex(boolean wipe_existing)
             throws IOException
     {
 
@@ -846,15 +816,42 @@ public class DSIndexer
     }
 
     /**
+     * Write the document to the index under the appropriate term (t).
+     * @param t
+     * @param doc
+     * @throws IOException
+     */
+    private static void writeDocument(Term t, Document doc) throws IOException
+    {
+        IndexWriter writer = null;
+        
+        try
+        {
+            writer = openIndex(false);
+            writer.updateDocument(t, doc);
+        }
+        catch(Exception e)
+        {
+            log.error(e.getMessage(),e);
+        }
+        finally
+        {
+            if(writer != null)
+            {
+                writer.close();
+            }
+        }
+    }
+    /**
      * Build a Lucene document for a DSpace Community.
      *
      * @param context Users Context
      * @param community Community to be indexed
-     * @return
+     * @throws SQLException
      * @throws IOException
      */
-    private static Document buildDocument(Context context, Community community)
-        throws IOException
+    private static void buildDocument(Context context, Community community, Term t)  
+    throws SQLException, IOException
     {
         // Create Lucene Document
         String uri = community.getIdentifier().getCanonicalForm();
@@ -869,7 +866,7 @@ public class DSIndexer
         	doc.add(new Field("default", name, Field.Store.NO, Field.Index.TOKENIZED));
         }
 
-        return doc;
+        writeDocument(t, doc);
     }
 
     /**
@@ -877,11 +874,11 @@ public class DSIndexer
      *
      * @param context Users Context
      * @param collection Collection to be indexed
-     * @return
+     * @throws SQLException
      * @throws IOException
      */
-    private static Document buildDocument(Context context, Collection collection)
-        throws IOException
+    private static void buildDocument(Context context, Collection collection, Term t)  
+    throws SQLException, IOException
     {
         String location_text = buildCollectionLocationString(context, collection);
 
@@ -897,21 +894,21 @@ public class DSIndexer
         	doc.add(new Field("name", name, Field.Store.NO, Field.Index.TOKENIZED));
         	doc.add(new Field("default", name, Field.Store.NO, Field.Index.TOKENIZED));
         }
-
-        return doc;
-
+        
+        writeDocument(t, doc);
     }
 
     /**
-     * Build a Lucene document for a DSpace Item.
-     *
+     * Build a Lucene document for a DSpace Item and write the index
+     * 
      * @param context Users Context
      * @param item The DSpace Item to be indexed
-     * @return
+     * @param t The Item handle term
+     * @throws SQLException
      * @throws IOException
      */
-    private static Document buildDocument(Context context, Item item)
-        throws IOException
+    private static void buildDocument(Context context, Item item, Term t) 
+    throws SQLException, IOException
     {
     	// get the location string (for searching by collection & community)
         String location = buildItemLocationString(context, item);
@@ -929,8 +926,6 @@ public class DSIndexer
 
         if (indexConfigArr.length > 0)
         {
-            ArrayList fields = new ArrayList();
-            ArrayList content = new ArrayList();
             DCValue[] mydc;
 
             for (int i = 0; i < indexConfigArr.length; i++)
@@ -1019,6 +1014,8 @@ public class DSIndexer
         }
 
         log.debug("  Added Sorting");
+        
+        Vector<InputStreamReader> readers = new Vector<InputStreamReader>();
 
         try
         {
@@ -1040,6 +1037,7 @@ public class DSIndexer
                         {
                             InputStreamReader is = new InputStreamReader(
                                     myBitstreams[j].retrieve()); // get input
+                            readers.add(is);
 
                             // Add each InputStream to the Indexed Document (Acts like an Append)
                             doc.add(new Field("default", is));
@@ -1060,9 +1058,29 @@ public class DSIndexer
         {
         	log.error(e.getMessage(),e);
         }
-
-
-        return doc;
+        
+        //write the index and close the inputstreamreaders
+        try {
+            writeDocument(t, doc);
+            log.info("Wrote Item: " + uri + " to Index");
+        }
+        catch(Exception e)
+        {
+        	log.error(e.getMessage(),e);
+        }
+        finally
+        {
+        	Iterator<InputStreamReader> itr = readers.iterator();
+        	while (itr.hasNext())
+        	{
+        		InputStreamReader reader = itr.next();
+        		if (reader != null)
+        		{
+        			reader.close();
+        		}
+        	}
+    		log.debug("closed " + readers.size() + " readers");
+        }
     }
 
     /**
