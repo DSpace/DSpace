@@ -194,7 +194,7 @@ public class EPersonDAOPostgres extends EPersonDAO
         }
         catch (SQLException sqle)
         {
-            throw new RuntimeException(":(", sqle);
+            throw new RuntimeException(sqle);
         }
     }
 
@@ -231,7 +231,7 @@ public class EPersonDAOPostgres extends EPersonDAO
         }
         catch (SQLException sqle)
         {
-            throw new RuntimeException(":(", sqle);
+            throw new RuntimeException(sqle);
         }
     }
 
@@ -253,7 +253,7 @@ public class EPersonDAOPostgres extends EPersonDAO
         }
         catch (SQLException sqle)
         {
-            throw new RuntimeException(":(", sqle);
+            throw new RuntimeException(sqle);
         }
     }
 
@@ -488,7 +488,7 @@ public class EPersonDAOPostgres extends EPersonDAO
         }
         catch (SQLException sqle)
         {
-            throw new RuntimeException(":(", sqle);
+            throw new RuntimeException(sqle);
         }
         
         // the list of tables can be used to construct an error message

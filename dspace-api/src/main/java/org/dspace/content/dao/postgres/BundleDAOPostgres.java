@@ -172,7 +172,7 @@ public class BundleDAOPostgres extends BundleDAO
         }
         catch (SQLException sqle)
         {
-            throw new RuntimeException(":(");
+            throw new RuntimeException(sqle);
         }
     }
 
