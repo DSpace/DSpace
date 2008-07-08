@@ -5,6 +5,9 @@
 (Zuki Ebetsu / Stuart Lewis)
 - [1990660] SWORD Service Document are malformed / Corrected Atom publishing MIME types
 
+(Stuart Lewis / Claudia Juergen)
+- Updated installation and configuration documents for new statistics script, and removed references to Perl
+
 1.5 final
 =========
 

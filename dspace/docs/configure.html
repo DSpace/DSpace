@@ -1740,93 +1740,29 @@ bin/checker -L	    # Loops continuously through the repository</pre>
    
 <h3><a name="statistics" id="statistics">Configuring System Statistical Reports</a></h3>
 
-  <p><i>Currently the statistic's engine is only available for the JSP-based user interface</i></p>
-
   <p>Statistics for the system can be made available at <code>http://www.mydspaceinstance.edu/statistics</code>. To use the system statistics you will have to initialise them as per the installation documentation, but before you do so you need to perform the customisations discussed here in order to ensure that the reports are generated correctly.</p>
 
   <h4>Configuration File</h4>
 
-  <p>Configuration for the statistics system are in <code>[dspace]/config/dstat.cfg</code> and the file should guide you to correctly filling in the details required. For the most part you will not need to change this file.</p>
+  <p>Configuration for the statistics system are in <code>[dspace]/config/dstat.cfg</code> and the file should guide you to correctly filling in the details required. For the most part you will not need to change this file. You may wish to edit <code>start.year</code> and <code>start.month</code> to customize the start date of the statistics.</p>
 
-  <h4>Customising Shell Scripts</h4>
+  <h4>Generating the statistics</h4>
 
-  <p>To customise the supplied perl scripts to do monthly and general report generation it is necessary to modify the scripts themselves sightly. This is because these scripts were developed to speed up the process of using DStat at Edinburgh University Library and were not particularly intended for external use. They appear here for the convenience of others and in order to bridge the gap between the report generation and the inclusion of those reports into the DSpace UI, which is currently a clunky process.</p>
-
-  <p>In order to get these scripts to work for you, open each of the following in turn:</p>
+  <p>The following scripts must be run (in this order) generate the statistcis:</p>
   <pre>
-stat-general
 stat-initial
+stat-general
 stat-monthly
-stat-report-general
 stat-report-initial
+stat-report-general
 stat-report-monthly
 </pre>
 
-  <p>scripts eding with <code>-general</code> do the work for building reports spanning the entire history of the archive; scripts ending <code>-initial</code> are to initialise the reports by doing monthly reports from some start date up to the present; scripts ending <code>-monthly</code> generate a single monthly report <em>for the current month</em>. These scripts are just designed to make life easier, and are not particularly clever or elegant.</p>
+  <p>Scripts eding with <code>-general</code> do the work for building reports spanning the entire history of the archive; scripts ending <code>-initial</code> are to initialise the reports by doing monthly reports from some start date up to the present; scripts ending <code>-monthly</code> generate a single monthly report <em>for the current month</em>.</p>
 
-  <p>In each file you will find a section:</p>
-  <pre>
-# Details used
-################################################
+  <p><code>stat-inital</code> and <code>stat-report-inital</code> must be run to generate the first set of statistics. Following that, <code>stat-monthly</code>, <code>stat-general</code>, <code>stat-report-monthly</code> and <code>stat-report-general</code> should be run daily to update the statistics reports.</p>
 
-... some perl ...
-
-################################################
-</pre>
-
-  <p>the perl between the lines of hashes defines the variables which will be used to do all of the processing in the report. The following explains what the variables mean and what they should be set to for each of the scripts</p>
-
-  <p><strong>stat-initial:</strong><br>
-  <code>$out_prefix</code>: prefix to place in front of each output file.<br>
-  <code>$out_suffix</code>: suffix for output file. A date will be inserted between the prefix and suffix<br>
-  <code>$start_year</code>: year to start back-analysing monthly logs from<br>
-  <code>$start_month</code>: month to start back-analysing monthly logs from<br>
-  <code>$dsrun</code>: path to your dsrun script, usually <code>[dspace]/bin/dsrun</code><br>
-  <code>$out_directory</code>: directory into which to place analysis files, for example <code>[dspace]/bin/log/</code><br></p>
-
-  <p><strong>stat-monthly:</strong><br>
-  <code>$out_prefix</code>: prefix to place in front of each output file.<br>
-  <code>$out_suffix</code>: suffix for output file. A date will be inserted between the prefix and suffix<br>
-  <code>$dsrun</code>: path to your dsrun script, usually <code>[dspace]/bin/dsrun</code><br>
-  <code>$out_directory</code>: directory into which to place analysis files, for example <code>[dspace]/bin/log/</code><br></p>
-
-  <p><strong>stat-general:</strong><br>
-  <code>$out_prefix</code>: prefix to place in front of each output file.<br>
-  <code>$out_suffix</code>: suffix for output file. Today's date will be inserted between the prefix and suffix<br>
-  <code>$dsrun</code>: path to your dsrun script, usually <code>[dspace]/bin/dsrun</code><br>
-  <code>$out_directory</code>: directory into which to place analysis files, for example <code>[dspace]/bin/log/</code><br></p>
-
-  <p><strong>stat-report-initial:</strong><br>
-  <code>$in_prefix</code>: the prefix of the files generated by stat-initial<br>
-  <code>$in_suffix</code>: the suffix of the files generated by stat-initial<br>
-  <code>$out_prefix</code>: the report file prefix. Should be "<code>report-</code>" in order to work with DSpace UI<br>
-  <code>$out_suffix</code>: the report file suffix. Should be "<code>.html</code>" in order to work with DSpace UI<br>
-  <code>$start_year</code>: the start year used in stat-initial<br>
-  <code>$start_month</code>: the start month used in stat-initial<br>
-  <code>$dsrun</code>: path to your dsrun script, usually <code>[dspace]/bin/dsrun</code><br>
-  <code>$in_directory</code>: directory where analysis files were placed in stat-initial<br>
-  <code>$out_directory</code>: the live reports directory: <code>[dspace]/reports/</code><br></p>
-
-  <p><strong>stat-report-monthly:</strong><br>
-  <code>$in_prefix</code>: the prefix of the files generated by stat-monthly<br>
-  <code>$in_suffix</code>: the suffix of the files generated by stat-monthly<br>
-  <code>$out_prefix</code>: the report file prefix. Should be "<code>report-</code>" in order to work with DSpace UI<br>
-  <code>$out_suffix</code>: the report file suffix. Should be "<code>.html</code>" in order to work with DSpace UI<br>
-  <code>$dsrun</code>: path to your dsrun script, usually <code>[dspace]/bin/dsrun</code><br>
-  <code>$in_directory</code>: directory where analysis files were placed in stat-monthly<br>
-  <code>$out_directory</code>: the live reports directory: <code>[dspace]/reports/</code><br></p>
-
-  <p><strong>stat-report-general:</strong><br>
-  <code>$in_prefix</code>: the prefix of the files generated by stat-general<br>
-  <code>$in_suffix</code>: the suffix of the files generated by stat-general<br>
-  <code>$out_prefix</code>: the report file prefix. Should be "<code>report-general-</code>" in order to work with DSpace UI<br>
-  <code>$out_suffix</code>: the report file suffix. Should be "<code>.html</code>" in order to work with DSpace UI<br>
-  <code>$dsrun</code>: path to your dsrun script, usually <code>[dspace]/bin/dsrun</code><br>
-  <code>$in_directory</code>: directory where analysis files were placed in stat-general<br>
-  <code>$out_directory</code>: the live reports directory: <code>[dspace]/reports/</code><br></p>
-
-  <p>If you want additional customisations, you will need to modify the lines which build the command to be executed and change the parameters passed to the java processes which actually carry out the analysis. For more information on these processes either build the javadocs or run:</p>
-
+  <p>If you want additional customisations, you can find additional information about the scripts by running:</p>
   <pre>[dspace]/bin/dsrun org.dspace.app.statistics.LogAnalyser -help
 [dspace]/bin/dsrun org.dspace.app.statistics.ReportGenerator -help</pre>
 
