@@ -233,7 +233,27 @@ public class AuthenticationUtil
         session.setAttribute(AUTHENTICATED_USER_ID,eperson.getID());
         
     }
-
+    
+    /**
+     * Log the given user in as a real authenticated user. This should only be used after 
+     * a user has presented their credintals and they have been validated. This method 
+     * signature is provided to be easier to call from flow scripts.
+     * 
+     * @param objectModel 
+     * 			  The cocoon object model.
+     * @param eperson
+     *            the eperson logged in
+     * 
+     */
+    public static void logIn(Map objectModel, EPerson eperson) throws SQLException
+    {
+        final HttpServletRequest request = (HttpServletRequest) objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
+        Context context = ContextUtil.obtainContext(objectModel);
+        
+        logIn(context,request,eperson);
+    }
+    
+    
     /**
      * Check to see if there are any session attributes indicating a currently authenticated 
      * user. If there is then log this user in.
@@ -375,7 +395,8 @@ public class AuthenticationUtil
         session.removeAttribute(AUTHENTICATED_USER_ID);
         session.removeAttribute(CURRENT_IP_ADDRESS);
     }
-
+    
+    
     /**
      * Determine if the email can register them selfs or need to be
      * created by a site administrator first.
