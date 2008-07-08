@@ -188,7 +188,7 @@ function doRegister()
         } while (errors.length > 0) 
         
         // Log the newly created user in.
-        AuthenticationUtil.loggedIn(getObjectModel(),eperson);
+        AuthenticationUtil.logIn(getObjectModel(),eperson);
         AccountManager.deleteToken(getDSContext(), token);
         
         cocoon.sendPage("register/finished");
@@ -272,7 +272,7 @@ function doForgotPassword()
         } while (errors.length > 0)
 
         // Log the user in and remove the token.
-        AuthenticationUtil.loggedIn(getObjectModel(),eperson);
+        AuthenticationUtil.logIn(getObjectModel(),eperson);
         AccountManager.deleteToken(getDSContext(), token);
 
         cocoon.sendPage("forgot/finished");
