@@ -2090,14 +2090,27 @@ public class Item extends DSpaceObject
      */
     public void move (Collection from, Collection to) throws SQLException, AuthorizeException, IOException 
     {
-    	if (isOwningCollection(from))
+        // Move the Item from one Collection to the other
+        to.addItem(this);
+        from.removeItem(this);
+
+        // If we are moving from the owning collection, update that too
+        if (isOwningCollection(from))
     	{
     		setOwningCollection(to);
     		update();
     	}
-    	
-    	to.addItem(this);
-    	from.removeItem(this);
+        else
+        {
+            // Although we haven't actually updated anything within the item
+            // we'll tell the event system that it has, so that any consumers that
+            // care about the structure of the repository can take account of the move
+
+            // Note that updating the owning collection above will have the same effect,
+            // so we only do this here if the owning collection hasn't changed.
+            
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
+        }
     }
     
     /**
