@@ -354,7 +354,6 @@ public class DAVServlet extends HttpServlet
                     log
                             .info(LogManager.getHeader(context, "auth",
                                     "Got username=\"" + username
-                                            + "\", password=\"" + password
                                             + "\" out of \"" + crud + "\"."));
                 }
             }
