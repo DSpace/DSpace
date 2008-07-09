@@ -117,6 +117,14 @@
 	<logger name="org.apache.sample.package">
 		<level value="DEBUG" />
 	</logger>
+   
+   <!-- 
+      Block passwords from being exposed in Axis logs. (DEBUG exposes passwords in Basic Auth)
+    -->
+   <logger name="log4j.logger.org.apache.axis.handlers.http.HTTPAuthHandler">
+      <level value="info"/> 
+   </logger>
+   
 	<!-- Add appenders you want live here -->
 	<root>
 		<level value="all" />
