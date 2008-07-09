@@ -47,7 +47,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Vector;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -455,7 +454,7 @@ class DAVBitstream extends DAVDSpaceObject
      */
     @Override
     protected void get() throws SQLException, AuthorizeException,
-            ServletException, IOException, DAVStatusException
+            IOException, DAVStatusException
     {
         if (this.bitstream == null)
         {
@@ -491,7 +490,7 @@ class DAVBitstream extends DAVDSpaceObject
      */
     @Override
     protected void put() throws SQLException, AuthorizeException,
-            ServletException, IOException, DAVStatusException
+            IOException, DAVStatusException
     {
         throw new DAVStatusException(HttpServletResponse.SC_NOT_IMPLEMENTED,
                 "PUT is not implemented for Bitstream (yet?).");

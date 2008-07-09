@@ -44,7 +44,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Vector;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -366,14 +365,13 @@ class DAVLookup extends DAVResource
     /**
      * Override propfind() to make sure it always returns a redirect.
      * 
-     * @throws ServletException the servlet exception
      * @throws SQLException the SQL exception
      * @throws AuthorizeException the authorize exception
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
     @Override
-    protected void propfind() throws ServletException, SQLException,
+    protected void propfind() throws SQLException,
             AuthorizeException, IOException, DAVStatusException
     {
         this.doRedirect();
@@ -395,7 +393,7 @@ class DAVLookup extends DAVResource
      */
     @Override
     protected void get() throws SQLException, AuthorizeException,
-            ServletException, IOException, DAVStatusException
+            IOException, DAVStatusException
     {
         this.doRedirect();
     }
@@ -405,7 +403,7 @@ class DAVLookup extends DAVResource
      */
     @Override
     protected void put() throws SQLException, AuthorizeException,
-            ServletException, IOException, DAVStatusException
+            IOException, DAVStatusException
     {
         this.doRedirect();
     }

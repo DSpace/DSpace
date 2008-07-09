@@ -498,13 +498,11 @@ public class DAVServlet extends HttpServlet
      * @param response the response
      * 
      * @return true, if service internal
-     * 
-     * @throws ServletException the servlet exception
      * @throws IOException Signals that an I/O exception has occurred.
      */
     protected static boolean serviceInternal(String method,
             HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException
+            throws IOException
     {
         // Fake new DAV methods not understood by the Apache Servlet base class
         // (returns HTTP/500 when it sees unrecognised method)
@@ -589,7 +587,7 @@ public class DAVServlet extends HttpServlet
         }
         catch (SQLException e)
         {
-            log.info(e.toString());
+            log.error(e.toString(),e);
             response
                     .sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                             truncateForStatus("Database access error: "
@@ -597,14 +595,38 @@ public class DAVServlet extends HttpServlet
         }
         catch (AuthorizeException e)
         {
-            log.info(e.toString());
+            if(log.isDebugEnabled())
+            {
+                log.debug(e.toString(),e);
+            }
+            else
+            {
+                log.info(e.toString());
+            }
             response.sendError(HttpServletResponse.SC_FORBIDDEN,
                     truncateForStatus("Access denied: " + e.toString()));
         }
-        catch (DAVStatusException se)
+        catch (DAVStatusException e)
         {
-            response.sendError(se.getStatus(), truncateForStatus(se
+            log.error(e.toString(),e);
+            response.sendError(e.getStatus(), truncateForStatus(e
                     .getMessage()));
+        }
+        catch (IOException e)
+        {
+            log.error(e.toString(),e);
+            response
+                    .sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                            truncateForStatus("IO Error: "
+                                    + e.toString()));
+        }
+        catch (Exception e)
+        {
+            log.error(e.toString(),e);
+            response
+                    .sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                            truncateForStatus("IO Error: "
+                                    + e.toString()));
         }
         finally
         {

@@ -52,7 +52,6 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -264,11 +263,10 @@ abstract class DAVResource
      * @throws SQLException the SQL exception
      * @throws AuthorizeException the authorize exception
      * @throws IOException Signals that an I/O exception has occurred.
-     * @throws ServletException the servlet exception
      * @throws DAVStatusException the DAV status exception
      */
     abstract protected void get() throws SQLException, AuthorizeException,
-            ServletException, IOException, DAVStatusException;
+            IOException, DAVStatusException;
 
     /**
      * Create a new resource out of the contents of this request. For example,
@@ -278,11 +276,10 @@ abstract class DAVResource
      * @throws SQLException the SQL exception
      * @throws AuthorizeException the authorize exception
      * @throws IOException Signals that an I/O exception has occurred.
-     * @throws ServletException the servlet exception
      * @throws DAVStatusException the DAV status exception
      */
     abstract protected void put() throws SQLException, AuthorizeException,
-            ServletException, IOException, DAVStatusException;
+            IOException, DAVStatusException;
 
     /**
      * Create a copy of a DAV resource under a different DAV "collection"
@@ -533,13 +530,12 @@ abstract class DAVResource
      * PROPFIND method service: Collect parameters and launch the recursive
      * generic propfind driver which in turn calls resource methods.
      * 
-     * @throws ServletException the servlet exception
      * @throws SQLException the SQL exception
      * @throws AuthorizeException the authorize exception
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
-    protected void propfind() throws ServletException, SQLException,
+    protected void propfind() throws SQLException,
             AuthorizeException, IOException, DAVStatusException
     {
         // set all incoming encoding to UTF-8
@@ -830,13 +826,12 @@ abstract class DAVResource
      * PROPERTYUPDATE request document, call resource's proppatchInternal() for
      * each property, and accumulate the response document.
      * 
-     * @throws ServletException the servlet exception
      * @throws SQLException the SQL exception
      * @throws AuthorizeException the authorize exception
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
-    protected void proppatch() throws ServletException, SQLException,
+    protected void proppatch() throws SQLException,
             AuthorizeException, IOException, DAVStatusException
     {
         // set all incoming encoding to UTF-8
@@ -1651,13 +1646,12 @@ abstract class DAVResource
     /**
      * Service routine for DELETE method on a resource:.
      * 
-     * @throws ServletException the servlet exception
      * @throws SQLException the SQL exception
      * @throws AuthorizeException the authorize exception
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
-    protected void delete() throws ServletException, SQLException,
+    protected void delete() throws SQLException,
             AuthorizeException, IOException, DAVStatusException
     {
         // set all incoming encoding to UTF-8
@@ -1744,13 +1738,12 @@ abstract class DAVResource
     /**
      * Service routine for MKCOL method on a resource:.
      * 
-     * @throws ServletException the servlet exception
      * @throws SQLException the SQL exception
      * @throws AuthorizeException the authorize exception
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
-    protected void mkcol() throws ServletException, SQLException,
+    protected void mkcol() throws SQLException,
             AuthorizeException, IOException, DAVStatusException
     {
         // set all incoming encoding to UTF-8
