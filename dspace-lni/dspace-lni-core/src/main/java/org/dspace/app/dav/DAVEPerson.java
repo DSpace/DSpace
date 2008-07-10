@@ -44,7 +44,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Vector;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -245,7 +244,7 @@ class DAVEPerson extends DAVResource
      */
     @Override
     protected void get() throws SQLException, AuthorizeException,
-            ServletException, IOException, DAVStatusException
+            IOException, DAVStatusException
     {
         throw new DAVStatusException(HttpServletResponse.SC_NOT_IMPLEMENTED,
                 "GET method not implemented for eperson.");
@@ -256,7 +255,7 @@ class DAVEPerson extends DAVResource
      */
     @Override
     protected void put() throws SQLException, AuthorizeException,
-            ServletException, IOException, DAVStatusException
+            IOException, DAVStatusException
     {
         throw new DAVStatusException(HttpServletResponse.SC_NOT_IMPLEMENTED,
                 "PUT method not implemented for eperson.");
