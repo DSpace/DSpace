@@ -14,14 +14,14 @@
 
 
     <h2><a name="142_15">Updating From 1.4.2 to 1.5</a></h2>
- 
+
  <p>The changes in DSpace 1.5 are significant and wide spread involving database schema upgrades, code restructuring, completely new user and programatic interfaces, and new build system.</p>
- 
- <p>In the notes below <code>[dspace]</code> refers to the install directory for your existing DSpace installation, 
+
+ <p>In the notes below <code>[dspace]</code> refers to the install directory for your existing DSpace installation,
  and <code>[dspace-source]</code> to the source directory for DSpace 1.5. Whenever you see these path references,
-  be sure to replace them with the actual path names on your local system.</p>  
-    
-    
+  be sure to replace them with the actual path names on your local system.</p>
+
+
 <ol>
 
 <li><b>Backup your DSpace</b>
@@ -35,13 +35,13 @@
 
 
 <li><b>Download DSpace 1.5</b>
-<p>Get the new DSpace 1.5 source code either as a download from <a href="http://sourceforge.net/project/showfiles.php?group_id=19984">SourceForge</a> or check it out directly from the <a href="http://sourceforge.net/svn/?group_id=19984">SVN code repository</a>.  If you downloaded DSpace do not unpack it on top of your existing installation.</p> 
-</li>    
+<p>Get the new DSpace 1.5 source code either as a download from <a href="http://sourceforge.net/project/showfiles.php?group_id=19984">SourceForge</a> or check it out directly from the <a href="http://sourceforge.net/svn/?group_id=19984">SVN code repository</a>.  If you downloaded DSpace do not unpack it on top of your existing installation.</p>
+</li>
 
 
 <li><b>Build DSpace</b>
 <p>The build process has radically changed for DSpace 1.5. With this new release the build system has moved to a maven-based system enabling the various projects (JSPUI, XMLUI, OAI, and Core API) into separate projects. See the <a href="install.html">Installation section</a> for more information on building DSpace using the new maven-based build system. Run the following commands to compile DSpace.</p>
-<pre>  
+<pre>
   cd [dspace-source]/dspace/;
   mvn package
 </pre>
@@ -49,7 +49,7 @@
 </li>
 
 
-<li><b>Stop Tomcat</b>  
+<li><b>Stop Tomcat</b>
 <p>Take down your servlet container, for Tomcat use the <code>bin/shutdown.sh</code> script.</li>
 
 
@@ -61,7 +61,7 @@
 #
 # Stack of authentication methods
 #  (See org.dspace.authenticate.AuthenticationManager)
-# Note when upgrading you should remove the parameter: 
+# Note when upgrading you should remove the parameter:
 #  plugin.sequence.org.dspace.eperson.AuthenticationMethod
 plugin.sequence.org.dspace.authenticate.AuthenticationMethod = \
         org.dspace.authenticate.PasswordAuthentication
@@ -71,11 +71,11 @@ plugin.sequence.org.dspace.authenticate.AuthenticationMethod = \
 # Specify which strategy use for select the style for an item
 plugin.single.org.dspace.app.webui.util.StyleSelection = \
                        org.dspace.app.webui.util.CollectionStyleSelection
-   	
-   	
+
+
 ###### Browse Configuration ######
 #
-# The following configuration will mimic the previous 
+# The following configuration will mimic the previous
 # behavior exhibited  by DSpace 1.4.2. For alternative
 # configurations see the manual.
 
@@ -89,7 +89,7 @@ webui.browse.index.4 = subject:metadata:dc.subject.*:text
 webui.itemlist.sort-option.1 = title:dc.title:title
 webui.itemlist.sort-option.2 = dateissued:dc.date.issued:date
 webui.itemlist.sort-option.3 = dateaccessioned:dc.date.accessioned:date
-   	
+
 # Recent submissions
 recent.submissions.count = 5
 
@@ -127,6 +127,9 @@ event.consumer.browse.filters = Item+Create|Modify|Modify_Metadata:Collection+Ad
 event.consumer.eperson.class = org.dspace.eperson.EPersonConsumer
 event.consumer.eperson.filters = EPerson+Create
 </pre>
+</li>
+
+
 <li><b>Add <code>xmlui.xconf</code> Manakin configuration</b>
 <p>The new Manakin user interface available with DSpace 1.5 requires an extra configuration file that you will need to manually copy it over to your configuration directory. </p>
 <pre>
@@ -140,10 +143,8 @@ cp [dspace-source]/dspace/config/xmlui.xconf [dspace]/config/xmlui.xconf
 <pre>
 cp [dspace-source]/dspace/config/item-submission.xml [dspace]/config/item-submission.xml
 
-
 cp [dspace-source]/dspace/config/item-submission.dtd [dspace]/config/item-submission.dtd</pre>
 </li>
-
 
 
 <li><b>Add new <code>input-forms.xml</code> and <code>input-forms.dtd</code> configurable submission configuration</b>
@@ -151,10 +152,9 @@ cp [dspace-source]/dspace/config/item-submission.dtd [dspace]/config/item-submis
   <pre>
 cp [dspace-source]/dspace/config/input-forms.xml [dspace]/config/input-forms.xml
 
-
 cp [dspace-source]/dspace/config/input-forms.dtd [dspace]/config/inputforms.dtd</pre>
-  <b><br>
-  </b></li>
+</li>
+
 
 <li><b>Add <code>sword-swap-ingest.xsl</code> and <code>xhtml-head-item.properties</code> crosswalk files</b>
   <p>New crosswalk files are required to support SWORD and the inclusion of metadata into the head of items.</p>
@@ -163,8 +163,16 @@ cp [dspace-source]/dspace/config/crosswalks/sword-swap-ingest.xsl [dspace]/confi
 
 
 cp [dspace-source]/dspace/config/crosswalks/xhtml-head-item.properties [dspace]/config/crosswalks/xhtml-head-item.properties</pre>
-  <b><br>
-  </b></li>
+</li>
+
+
+<li><b>Add <code>registration_notify</code> email files</b>
+  <p>A new configuration option (<code>registration.notify = you@your-email.com</code>) can be set to send a notification email whenever a new user registers to use your DSpace. The email template for this email needs to be copied.</p>
+  <pre>
+cp [dspace-source]/dspace/config/emails/registration_notify [dspace]/config/emails/registration_notify
+  </pre>
+</li>
+
 
 <li><b>Update the database</b>
     <p>The database schema needs updating. SQL files contain the relevant updates are provided, note if you have made any local customizations to the database schema you should consult these updates and make sure they will work for you.</p>
@@ -173,38 +181,34 @@ cp [dspace-source]/dspace/config/crosswalks/xhtml-head-item.properties [dspace]/
       <p><code>psql -U [dspace-user] -f [dspace-source]/dspace/etc/database_schema_14-15.sql [database-name]</code></p>
     </li>
     <li>For Oracle
-      <p><code>[dspace-source]/dspace/etc/oracle/database_schema_142-15.sql</code> contains the 
+      <p><code>[dspace-source]/dspace/etc/oracle/database_schema_142-15.sql</code> contains the
         commands necessary to upgrade your database schema on oracle.</p>
     </li>
   </ul>
 </li>
 
 <li><b>Apply any customizations</b>
-<p>If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. Commonly these modifications are made to "JSP" pages located inside the <code>[dspace 1.4.2]/jsp/local</code> directory. These should be moved 
+<p>If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. Commonly these modifications are made to "JSP" pages located inside the <code>[dspace 1.4.2]/jsp/local</code> directory. These should be moved
 <code>[dspace-source]/dspace/modules/jspui/src/main/webapp/</code> in the new build structure. See <a href="configure.html#jspui-jsp">Customizing the JSP Pages</a> for more information.</p></li>
-	
-	
-	
-	
-	
+
+
 <li><b>Update DSpace</b>
 <p> Update the DSpace installed directory with new code and libraries. Inside the <code>[dspace-source]/dspace/target/dspace-1.5-build.dir/</code> directory run:</p>
 <pre>
-cd [dspace-source]/dspace/target/dspace-1.5-build.dir/;	
+cd [dspace-source]/dspace/target/dspace-1.5-build.dir/;
 ant -Dconfig=[dspace]/config/dspace.cfg update
 </pre>
-</li> 	
+</li>
 
 
 <li><b>Update the Metadata Registry</b>
   <p>New Metadata Registry updates are required to support SWORD.</p>
 <pre>
-cp [dspace-source]/dspace/config/registries/sword-metadata.xml [dspace]/config/registries/sword-metadata.xml; 
+cp [dspace-source]/dspace/config/registries/sword-metadata.xml [dspace]/config/registries/sword-metadata.xml;
 
 [dspace]/bin/dsrun org.dspace.administer.MetadataImporter -f [dspace]/config/registries/sword-metadata.xml
-</pre>  
+</pre>
 </li>
-
 
 
 <li><b>Rebuild browse and search indexes</b>
@@ -239,19 +243,16 @@ cp [dspace-source]/dspace/config/registries/sword-metadata.xml [dspace]/config/r
 cp [dspace]/webapps/* [tomcat]/webapps/
 </pre>
 </li>
-   	
-   	
-   	
-   	
+
+
 <li><b>Restart Tomcat</b>
 <p>Restart your servlet container, for Tomcat use the <code>bin/startup.sh</code> script. </p>
 </li>
 </ol>
-    
-    
-    
 
-  <h2><a name="141_142">Updating From 1.4.1 to 1.4.2</a></h2>
+
+
+<h2><a name="141_142">Updating From 1.4.1 to 1.4.2</a></h2>
 See <A HREF="#14_14x">Updating From 1.4 to 1.4.x</A>; the same instructions apply.
 
     <h2><a name="14_14x">Updating From 1.4 to 1.4.x</a></h2>

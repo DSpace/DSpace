@@ -1,6 +1,7 @@
 (Stuart Lewis)
 - [1947036] Patch for SF Bug1896960 SWORD authentication and LDAP + [1989874] LDAPAuthentication
   pluggable method broken for current users
+- Added copying of registration email template to 1.4 to 1.5 upgrade instructions
 
 (Zuki Ebetsu / Stuart Lewis)
 - [1990660] SWORD Service Document are malformed / Corrected Atom publishing MIME types
