@@ -305,15 +305,15 @@ public class LNISmokeTest
         catch (ParseException pe)
         {
             Usage(options, 1, "Error in arguments: " + pe.toString());
+            
         }
         catch (java.rmi.RemoteException de)
         {
             System.out.println("ERROR, got RemoteException, message="
                     + de.getMessage());
-            if (de.getCause() != null)
-            {
-                System.out.println("  Cause=" + de.getCause().toString());
-            }
+            
+            de.printStackTrace();
+            
             die(1, "  Exception class=" + de.getClass().getName());
         }
     }
@@ -452,10 +452,14 @@ public class LNISmokeTest
         }
         catch (JDOMParseException je)
         {
+            je.printStackTrace();
+            
             die(3, "ERROR: " + je.toString());
         }
         catch (JDOMException je)
         {
+            je.printStackTrace();
+            
             die(4, "ERROR: " + je.toString());
         }
 
