@@ -42,8 +42,10 @@ package org.dspace.eperson;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -362,6 +364,11 @@ public class Subscribe
                         false, // But not containers
                         false); // Or withdrawals
     
+                if (ConfigurationManager.getBooleanProperty("eperson.subscription.onlynew", false))
+                {
+                    itemInfos = filterOutModified(itemInfos);
+                }
+
                 // Only add to buffer if there are new items
                 if (itemInfos.size() > 0)
                 {
@@ -465,5 +472,33 @@ public class Subscribe
                 context.abort();
             }
         }
+    }
+
+    private static List filterOutModified(List completeList)
+    {
+        log.info("Filtering out all modified to leave new items list size="+completeList.size());
+        List filteredList = new ArrayList();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        for (Iterator iter = completeList.iterator(); iter.hasNext();)
+        {
+            HarvestedItemInfo infoObject = (HarvestedItemInfo) iter.next();
+            DCValue[] dateAccArr = infoObject.item.getDC("date", "accessioned", null);
+            if (dateAccArr != null && dateAccArr.length > 0 && dateAccArr[0].value != null)
+            {
+                String lastModded = sdf.format(infoObject.datestamp);
+
+                // if it's never been changed
+                if (dateAccArr[0].value.startsWith(lastModded))
+                    filteredList.add(infoObject);
+            }
+            else
+            {
+                filteredList.add(infoObject);
+            }
+        }
+
+        return filteredList;
     }
 }
