@@ -42,7 +42,6 @@
 
 package org.dspace.search;
 
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -104,17 +103,22 @@ public class SearchConsumer implements Consumer
                             + event.toString());
             return;
         }
-        DSpaceObject dso = null;
-        // EVENT FIXME This call to getSubjectOfEvent is catching a SQLException
-        // but other Consumers don't
-        try
-        {
-            dso = event.getSubject(ctx);
-        }
-        catch (SQLException se)
-        {
-        }
+        
+        DSpaceObject subject = event.getSubject(ctx);
 
+        int obj = event.getSubjectType();
+        if (!(obj == Constants.ITEM || obj == Constants.BUNDLE
+                || obj == Constants.COLLECTION || obj == Constants.COMMUNITY))
+        {
+            log
+                    .warn("SearchConsumer should not have been given this kind of Object in an event, skipping: "
+                            + event.toString());
+            return;
+        }
+        
+        DSpaceObject object = event.getObject(ctx);
+        
+        
         // If event subject is a Bundle and event was Add or Remove,
         // transform the event to be a Modify on the owning Item.
         // It could be a new bitstream in the TEXT bundle which
@@ -122,15 +126,15 @@ public class SearchConsumer implements Consumer
         int et = event.getEventType();
         if (st == Constants.BUNDLE)
         {
-            if ((et == Event.ADD || et == Event.REMOVE) && dso != null
-                    && ((Bundle) dso).getName().equals("TEXT"))
+            if ((et == Event.ADD || et == Event.REMOVE) && subject != null
+                    && ((Bundle) subject).getName().equals("TEXT"))
             {
                 st = Constants.ITEM;
                 et = Event.MODIFY;
-                dso = ((Bundle) dso).getItems()[0];
+                subject = ((Bundle) subject).getItems()[0];
                 if (log.isDebugEnabled())
                     log.debug("Transforming Bundle event into MODIFY of Item "
-                            + dso.getHandle());
+                            + subject.getHandle());
             }
             else
                 return;
@@ -141,14 +145,26 @@ public class SearchConsumer implements Consumer
         case Event.CREATE:
         case Event.MODIFY:
         case Event.MODIFY_METADATA:
-            if (dso == null)
+            if (subject == null)
                 log.warn(event.getEventTypeAsString() + " event, could not get object for "
                         + event.getSubjectTypeAsString() + " id="
                         + String.valueOf(event.getSubjectID())
                         + ", perhaps it has been deleted.");
             else
-                objectsToUpdate.add(dso);
+                objectsToUpdate.add(subject);
             break;
+            
+        case Event.REMOVE:
+        case Event.ADD:
+            if (object == null)
+                log.warn(event.getEventTypeAsString() + " event, could not get object for "
+                        + event.getObjectTypeAsString() + " id="
+                        + String.valueOf(event.getObjectID())
+                        + ", perhaps it has been deleted.");
+            else
+                objectsToUpdate.add(object);
+            break;
+            
         case Event.DELETE:
             String detail = event.getDetail();
             if (detail == null)
@@ -188,7 +204,7 @@ public class SearchConsumer implements Consumer
                     {
                         try
                         {
-                            DSIndexer.indexContent(ctx, iu);
+                            DSIndexer.indexContent(ctx, iu, true);
                             if (log.isDebugEnabled())
                                 log.debug("Indexed "
                                         + Constants.typeText[iu.getType()]
