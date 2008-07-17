@@ -205,7 +205,7 @@ public class SearchConsumer implements Consumer
                     {
                         try
                         {
-                            DSIndexer.reIndexContent(ctx, iu);
+                            DSIndexer.indexContent(ctx, iu,true);
                             if (log.isDebugEnabled())
                                 log.debug("re-indexed "
                                         + Constants.typeText[iu.getType()]
