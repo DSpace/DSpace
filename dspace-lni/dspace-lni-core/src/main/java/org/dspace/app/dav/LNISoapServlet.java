@@ -194,6 +194,7 @@ public class LNISoapServlet extends AxisServlet
                 .getProperty("transport.http.servletRequest");
         this.response = (HttpServletResponse) mc
                 .getProperty("transport.http.servletResponse");
+        
         Context context = new Context();
 
         // try cookie shortcut
@@ -218,20 +219,24 @@ public class LNISoapServlet extends AxisServlet
         }
         else if (status == AuthenticationMethod.BAD_CREDENTIALS)
         {
+            context.abort();
             throw new LNIRemoteException(
                     "Authentication failed: Bad Credentials.");
         }
         else if (status == AuthenticationMethod.CERT_REQUIRED)
         {
+            context.abort();
             throw new LNIRemoteException(
                     "Authentication failed: This user may only login with X.509 certificate.");
         }
         else if (status == AuthenticationMethod.NO_SUCH_USER)
         {
+            context.abort();
             throw new LNIRemoteException("Authentication failed: No such user.");
         }
         else
         {
+            context.abort();
             /** AuthenticationMethod.BAD_ARGS and etc * */
             throw new LNIRemoteException(
                     "Authentication failed: Cannot authenticate.");
@@ -279,21 +284,19 @@ public class LNISoapServlet extends AxisServlet
             {
                 Document outdoc = resource.propfindDriver(depth,
                         new ByteArrayInputStream(doc.getBytes()), typeMask);
-                if (outdoc != null)
-                {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    outputPretty.output(outdoc, baos);
-                    context.complete();
-                    context = null;
-                    return baos.toString();
-                }
-                else
+
+                if (outdoc == null)
                 {
                     // this should never happen, it should throw an error
                     // before returning null
                     throw new LNIRemoteException(
                             "propfind failed, no document returned.");
                 }
+                
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                outputPretty.output(outdoc, baos);
+                context.complete();
+                return baos.toString();
             }
         }
         catch (IOException ie)
@@ -316,7 +319,7 @@ public class LNISoapServlet extends AxisServlet
         }
         finally
         {
-            if (context != null)
+            if (context != null && context.isValid())
             {
                 context.abort();
             }
@@ -357,21 +360,19 @@ public class LNISoapServlet extends AxisServlet
                 Document outdoc = resource
                         .proppatchDriver(new ByteArrayInputStream(doc
                                 .getBytes()));
-                if (outdoc != null)
-                {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    outputPretty.output(outdoc, baos);
-                    context.complete();
-                    context = null;
-                    return baos.toString();
-                }
-                else
+
+                if (outdoc == null)
                 {
                     // this should never happen, it should throw an error
                     // before returning null
                     throw new LNIRemoteException(
                             "proppatch failed, no document returned.");
                 }
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                outputPretty.output(outdoc, baos);
+                context.complete();
+                return baos.toString();
             }
         }
         catch (IOException ie)
@@ -394,7 +395,7 @@ public class LNISoapServlet extends AxisServlet
         }
         finally
         {
-            if (context != null)
+            if (context != null && context.isValid())
             {
                 context.abort();
             }
@@ -437,8 +438,9 @@ public class LNISoapServlet extends AxisServlet
             {
                 throw new LNIRemoteException("Resource not found.");
             }
+            
             context.complete();
-            context = null;
+
             return result;
         }
         catch (IOException ie)
@@ -451,7 +453,7 @@ public class LNISoapServlet extends AxisServlet
         }
         finally
         {
-            if (context != null)
+            if (context != null && context.isValid())
             {
                 context.abort();
             }
@@ -483,19 +485,25 @@ public class LNISoapServlet extends AxisServlet
         String pathElt[] = source.split("/");
 
         Context context = null;
+        
         try
         {
             context = prologue();
+            
             DAVResource resource = DAVResource.findResource(context, null,
                     null, pathElt);
+            
             if (resource == null)
             {
                 throw new LNIRemoteException("Resource not found.");
             }
-            context.complete();
-            context = null;
-            return resource.copyDriver(destination, depth, overwrite,
+            
+            int status = resource.copyDriver(destination, depth, overwrite,
                     keepProperties);
+            
+            context.complete();
+
+            return status;
         }
         catch (IOException ie)
         {
@@ -517,7 +525,7 @@ public class LNISoapServlet extends AxisServlet
         }
         finally
         {
-            if (context != null)
+            if (context != null && context.isValid())
             {
                 context.abort();
             }
