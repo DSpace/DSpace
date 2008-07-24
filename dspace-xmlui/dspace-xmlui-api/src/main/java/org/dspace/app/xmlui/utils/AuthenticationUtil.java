@@ -377,7 +377,7 @@ public class AuthenticationUtil
     	    Integer effectiveID = (Integer) session.getAttribute(EFFECTIVE_USER_ID); 
     	    Integer authenticatedID = (Integer) session.getAttribute(AUTHENTICATED_USER_ID); 
     	    
-    	    if (effectiveID != authenticatedID)
+    	    if (effectiveID.intValue() != authenticatedID.intValue())
     	    {
     	    	// The user has login in as another user, instead of logging them out, 
     	    	// revert back to their previous login name.
