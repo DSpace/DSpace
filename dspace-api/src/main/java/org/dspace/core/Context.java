@@ -120,6 +120,9 @@ public class Context
      */
     public Context() throws SQLException
     {
+        objectCache = new HashMap<String, Object>();
+        specialGroups = new ArrayList<Integer>();
+        
         dao = GlobalDAOFactory.getInstance();
         groupDAO = GroupDAOFactory.getInstance(this);
 
@@ -127,9 +130,6 @@ public class Context
         currentLocale = I18nUtil.DEFAULTLOCALE;
         extraLogInfo = "";
         ignoreAuth = false;
-
-        objectCache = new HashMap<String, Object>();
-        specialGroups = new ArrayList<Integer>();
     }
 
     /**
@@ -407,11 +407,11 @@ public class Context
      * @return the object from the cache, or <code>null</code> if it's not
      *         cached.
      */
-    public Object fromCache(Class objectClass, int id)
+    public <T> T fromCache(Class<T> objectClass, int id)
     {
         String key = objectClass.getName() + id;
 
-        return objectCache.get(key);
+        return (T) objectCache.get(key);
     }
 
     /**
