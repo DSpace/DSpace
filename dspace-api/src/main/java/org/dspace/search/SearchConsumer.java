@@ -141,7 +141,10 @@ public class SearchConsumer implements Consumer
                         + String.valueOf(event.getSubjectID())
                         + ", perhaps it has been deleted.");
             else
+            {
+                log.debug("consume() adding event to update queue: " + event.toString());
                 objectsToUpdate.add(subject);
+            }
             break;
             
         case Event.REMOVE:
@@ -152,7 +155,10 @@ public class SearchConsumer implements Consumer
                         + String.valueOf(event.getObjectID())
                         + ", perhaps it has been deleted.");
             else
+            {
+                log.debug("consume() adding event to update queue: " + event.toString());
                 objectsToUpdate.add(object);
+            }
             break;
             
         case Event.DELETE:
@@ -160,7 +166,10 @@ public class SearchConsumer implements Consumer
             if (detail == null)
                 log.warn("got null detail on DELETE event, skipping it.");
             else
+            {
+                log.debug("consume() adding event to delete queue: " + event.toString());
                 handlesToDelete.add(detail);
+            }
             break;
         default:
             log
@@ -186,25 +195,24 @@ public class SearchConsumer implements Consumer
             // update the changed Items not deleted because they were on create list
             for (DSpaceObject iu : objectsToUpdate)
             {
-                if (iu.getType() != Constants.ITEM || ((Item) iu).isArchived())
+                /* we let all types through here and 
+                 * allow the search DSIndexer to make 
+                 * decisions on indexing and/or removal
+                 */
+                String hdl = iu.getHandle();
+                if (hdl != null && !handlesToDelete.contains(hdl))
                 {
-                    // if handle is NOT in list of deleted objects, index it:
-                    String hdl = iu.getHandle();
-                    if (hdl != null && !handlesToDelete.contains(hdl))
+                    try
                     {
-                        try
-                        {
-                            DSIndexer.indexContent(ctx, iu, true);
-                            if (log.isDebugEnabled())
-                                log.debug("Indexed "
-                                        + Constants.typeText[iu.getType()]
-                                        + ", id=" + String.valueOf(iu.getID())
-                                        + ", handle=" + hdl);
-                        }
-                        catch (Exception e)
-                        {
-                            log.error("Failed while indexing object: ", e);
-                        }
+                        DSIndexer.indexContent(ctx, iu, true);
+                        log.debug("Indexed "
+                             + Constants.typeText[iu.getType()]
+                             + ", id=" + String.valueOf(iu.getID())
+                             + ", handle=" + hdl);
+                    }
+                    catch (Exception e)
+                    {
+                        log.error("Failed while indexing object: ", e);
                     }
                 }
             }
