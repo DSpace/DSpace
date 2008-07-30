@@ -284,10 +284,22 @@ public class DSIndexer
                 Item item = (Item)dso;
                 if (item.isArchived() && !item.isWithdrawn())
                 {
+                    /** If the item is in the repository now, add it to the index*/
                     if (requiresIndexing(t, ((Item)dso).getLastModified()) || force)
                     {
                         buildDocument(context, (Item) dso, t);                       
                     }
+                }       
+                else
+                {
+                    /** 
+                     * Make sure the item is not in the index if it is not in archive.
+                     * TODO: Someday DSIndexer should block withdrawn
+                     * content on search/retrieval and allow admins the ablitity to
+                     * still search for withdrawn Items.
+                     */
+                    DSIndexer.unIndexContent(context, uri);
+                    log.info("Removed Item: " + uri + " from Index");
                 }
 
                 break;

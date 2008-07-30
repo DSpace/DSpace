@@ -145,7 +145,10 @@ public class SearchConsumer implements Consumer
                         + String.valueOf(event.getSubjectID())
                         + ", perhaps it has been deleted.");
             else
+            {
+                log.debug("consume() adding event to update queue: " + event.toString());
                 objectsToUpdate.add(subject);
+            }
             break;
             
         case Event.REMOVE:
@@ -156,14 +159,20 @@ public class SearchConsumer implements Consumer
                         + String.valueOf(event.getObjectID())
                         + ", perhaps it has been deleted.");
             else
+            {
+                log.debug("consume() adding event to update queue: " + event.toString());
                 objectsToUpdate.add(object);
+            }
             break;
         case Event.DELETE:
             String detail = event.getDetail();
             if (detail == null)
                 log.warn("got null detail on DELETE event, skipping it.");
             else
+            {
+                log.debug("consume() adding event to delete queue: " + event.toString());
                 objectsToDelete.add(ObjectIdentifier.parseCanonicalForm(detail));
+            }
             break;
         default:
             log.warn("SearchConsumer should not have been "
@@ -188,44 +197,29 @@ public class SearchConsumer implements Consumer
             // list
             for (DSpaceObject iu : objectsToUpdate)
             {
-                if (iu.getType() != Constants.ITEM || ((Item) iu).isArchived())
+                /* we let all types through here and 
+                 * allow the search DSIndexer to make 
+                 * decisions on indexing and/or removal
+                 */
+                
+                // if handle is NOT in list of deleted objects, index it:
+                ObjectIdentifier oid = iu.getIdentifier();
+                if (oid != null && !objectsToDelete.contains(oid))
                 {
-                    // if handle is NOT in list of deleted objects, index it:
-                    ObjectIdentifier oid = iu.getIdentifier();
-                    if (oid != null && !objectsToDelete.contains(oid))
+                    try
                     {
-                        try
-                        {
-                            DSIndexer.indexContent(ctx, iu,true);
-                            if (log.isDebugEnabled())
-                                log.debug("re-indexed "
-                                        + Constants.typeText[iu.getType()]
-                                        + ", id=" + String.valueOf(iu.getID())
-                                        + ", oid=" + oid.getCanonicalForm());
-                        }
-                        catch (Exception e)
-                        {
-                            log.error("Failed while re-indexing object: ", e);
-                            objectsToUpdate = null;
-                            objectsToDelete = null;
-                        }
+                        DSIndexer.indexContent(ctx, iu,true);
+                        if (log.isDebugEnabled())
+                            log.debug("re-indexed "
+                                    + Constants.typeText[iu.getType()]
+                                    + ", id=" + String.valueOf(iu.getID())
+                                    + ", oid=" + oid.getCanonicalForm());
                     }
-                    else if (iu.getType() == Constants.ITEM && (
-                        !((Item) iu).isArchived() || ((Item) iu).isWithdrawn()))
+                    catch (Exception e)
                     {
-                        try
-                        {
-                            // If an update to an Item removes it from the
-                            // archive we must remove it from the search indices
-                            DSIndexer.unIndexContent(ctx, (DSpaceObject) IdentifierService.getResource(ctx, oid));
-                        }
-                        catch (Exception e)
-                        {
-                            log.error("Failed while un-indexing object: "
-                                    + oid.getCanonicalForm(), e);
-                            objectsToUpdate = new HashSet<DSpaceObject>();
-                            objectsToDelete = new HashSet<ObjectIdentifier>();
-                        }
+                        log.error("Failed while re-indexing object: ", e);
+                        objectsToUpdate = null;
+                        objectsToDelete = null;
                     }
                 }
             }
