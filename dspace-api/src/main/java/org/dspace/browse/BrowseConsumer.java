@@ -93,7 +93,8 @@ public class BrowseConsumer implements Consumer
             toUpdate = new HashSet<Item>();
         }
         
-        DSpaceObject subj = event.getSubject(ctx);
+        log.debug("consume() evaluating event: " + event.toString());
+        
         
         int st = event.getSubjectType();
         int et = event.getEventType();
@@ -101,9 +102,17 @@ public class BrowseConsumer implements Consumer
         switch (st)
         {
 
-        // If an Item is created or modified..
+        // If an Item is created or its metadata is modified..
         case Constants.ITEM:
-            toUpdate.add((Item)subj);
+            if(et == Event.MODIFY_METADATA || et == Event.CREATE)
+            {
+                DSpaceObject subj = event.getSubject(ctx);
+                if (subj != null)
+                {
+                    log.debug("consume() adding event to update queue: " + event.toString());
+                    toUpdate.add((Item)subj);
+                }
+            }
             break;
         // track ADD and REMOVE from collections, that changes browse index.
         case Constants.COLLECTION:
@@ -112,12 +121,14 @@ public class BrowseConsumer implements Consumer
             {
                 Item obj = (Item)event.getObject(ctx);
                 if (obj != null)
+                {
+                    log.debug("consume() adding event to update queue: " + event.toString());
                     toUpdate.add(obj);
+                }
             }
             break;
         default:
-            log.warn("consume() got unrecognized event: " + event.toString());
-
+            log.debug("consume() ingnoring event: " + event.toString());
         }
         
     }

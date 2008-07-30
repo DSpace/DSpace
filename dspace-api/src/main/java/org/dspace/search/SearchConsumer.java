@@ -105,17 +105,7 @@ public class SearchConsumer implements Consumer
         }
         
         DSpaceObject subject = event.getSubject(ctx);
-
-        int obj = event.getSubjectType();
-        if (!(obj == Constants.ITEM || obj == Constants.BUNDLE
-                || obj == Constants.COLLECTION || obj == Constants.COMMUNITY))
-        {
-            log
-                    .warn("SearchConsumer should not have been given this kind of Object in an event, skipping: "
-                            + event.toString());
-            return;
-        }
-        
+ 
         DSpaceObject object = event.getObject(ctx);
         
         
