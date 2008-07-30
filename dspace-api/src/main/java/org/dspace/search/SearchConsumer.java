@@ -101,7 +101,7 @@ public class SearchConsumer implements Consumer
                 || st == Constants.COLLECTION || st == Constants.COMMUNITY))
         {
             log
-                    .warn("SearchConsumer should not have been given this kind of Object in an event, skipping: "
+                    .warn("SearchConsumer should not have been given this kind of Subject in an event, skipping: "
                             + event.toString());
             return;
         }
