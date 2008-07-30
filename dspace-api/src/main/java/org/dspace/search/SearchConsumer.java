@@ -100,23 +100,14 @@ public class SearchConsumer implements Consumer
         if (!(st == Constants.ITEM || st == Constants.BUNDLE
                 || st == Constants.COLLECTION || st == Constants.COMMUNITY))
         {
-            log.warn("SearchConsumer should not have been given this "
-                    + "kind of Subject in an event, skipping: "
-                    + event.toString());
-            return;
-        }
-        DSpaceObject subject = event.getSubject(ctx);
-
-        int obj = event.getSubjectType();
-        if (!(obj == Constants.ITEM || obj == Constants.BUNDLE
-                || obj == Constants.COLLECTION || obj == Constants.COMMUNITY))
-        {
             log
                     .warn("SearchConsumer should not have been given this kind of Object in an event, skipping: "
                             + event.toString());
             return;
         }
         
+        DSpaceObject subject = event.getSubject(ctx);
+ 
         DSpaceObject object = event.getObject(ctx);
         
         
