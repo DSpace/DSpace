@@ -296,7 +296,9 @@ public class ContainerAdapter extends AbstractAdapter
 	                } 
 	                catch(ItemCountException e)
 	                {
-	                	throw new IOException("Could not obtain Collection item-count: ", e);
+	                    IOException ioe = new IOException("Could not obtain Collection item-count");
+	                    ioe.initCause(e);
+	                	throw ioe;
 	                }
         		}
             } 
@@ -331,7 +333,9 @@ public class ContainerAdapter extends AbstractAdapter
 	                }
 	                catch(ItemCountException e)
 	                {
-	                	throw new IOException("Could not obtain Community item-count: ", e);
+	                	IOException ioe = new IOException("Could not obtain Collection item-count");
+		                ioe.initCause(e);
+		                throw ioe;
 	                }
         		}
             }
