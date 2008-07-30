@@ -177,7 +177,7 @@ public class DSpaceMETSGenerator extends AbstractGenerator
                 if (dso instanceof Item)
                     adapter = new ItemAdapter((Item) dso, contextPath);
                 else if (dso instanceof Collection || dso instanceof Community)
-                    adapter = new ContainerAdapter(dso, contextPath);
+                	adapter = new ContainerAdapter(context, dso, contextPath);
             }
             else if (internal != null)
             {
@@ -199,13 +199,13 @@ public class DSpaceMETSGenerator extends AbstractGenerator
                     {
                         Collection collection = Collection.find(context,id);
                         if (collection != null)
-                            adapter = new ContainerAdapter(collection,contextPath);
+                        	adapter = new ContainerAdapter(context, collection,contextPath);
                     }
                     else if ("community".equals(type))
                     {
                         Community community = Community.find(context,id);
                         if (community != null)
-                            adapter = new ContainerAdapter(community,contextPath);
+                        	adapter = new ContainerAdapter(context, community,contextPath);
                     }
                     else if ("repository".equals(type))
                     {

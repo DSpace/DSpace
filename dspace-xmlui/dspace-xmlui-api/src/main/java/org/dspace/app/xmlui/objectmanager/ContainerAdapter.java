@@ -43,13 +43,17 @@ package org.dspace.app.xmlui.objectmanager;
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.browse.ItemCounter;
+import org.dspace.browse.ItemCountException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.uri.IdentifierService;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -89,6 +93,9 @@ public class ContainerAdapter extends AbstractAdapter
     /** A space seperated list of descriptive metadata sections */
     private StringBuffer dmdSecIDS;
 
+    /** Current DSpace context **/
+    private Context dspaceContext;
+
     /**
      * Construct a new CommunityCollectionMETSAdapter.
      * 
@@ -97,10 +104,11 @@ public class ContainerAdapter extends AbstractAdapter
      * @param contextPath
      *            The contextPath of this webapplication.
      */
-    public ContainerAdapter(DSpaceObject dso,String contextPath)
+    public ContainerAdapter(Context context, DSpaceObject dso,String contextPath)
     {
         super(contextPath);
         this.dso = dso;
+        this.dspaceContext = context;
     }
 
     /** Return the container, community or collection, object */
@@ -275,6 +283,22 @@ public class ContainerAdapter extends AbstractAdapter
                 createField("dc","rights",null,null,rights);
                 createField("dc","rights","license",null,rights_license);
                 createField("dc","title",null,null,title);
+                
+                boolean useCache = ConfigurationManager.getBooleanProperty("webui.strengths.cache");
+        		
+                //To improve scalability, XMLUI only adds item counts if they are cached
+                if (useCache)
+        		{
+	                try
+	                {	//try to determine Collection size (i.e. # of items)
+	                	int size = new ItemCounter(this.dspaceContext).getCount(collection);
+	                	createField("dc","format","extent",null, String.valueOf(size)); 
+	                } 
+	                catch(ItemCountException e)
+	                {
+	                	throw new IOException("Could not obtain Collection item-count: ", e);
+	                }
+        		}
             } 
             else if (dso.getType() == Constants.COMMUNITY) 
             {
@@ -294,6 +318,22 @@ public class ContainerAdapter extends AbstractAdapter
                 createField("dc","identifier","uri",null,identifier_uri);
                 createField("dc","rights",null,null,rights);
                 createField("dc","title",null,null,title);
+                
+                boolean useCache = ConfigurationManager.getBooleanProperty("webui.strengths.cache");
+        		
+                //To improve scalability, XMLUI only adds item counts if they are cached
+        		if (useCache)
+        		{
+        			try
+	                {	//try to determine Community size (i.e. # of items)
+	                	int size = new ItemCounter(this.dspaceContext).getCount(community);
+	                	createField("dc","format","extent",null, String.valueOf(size)); 
+	                }
+	                catch(ItemCountException e)
+	                {
+	                	throw new IOException("Could not obtain Community item-count: ", e);
+	                }
+        		}
             }
             
             // ///////////////////////////////
