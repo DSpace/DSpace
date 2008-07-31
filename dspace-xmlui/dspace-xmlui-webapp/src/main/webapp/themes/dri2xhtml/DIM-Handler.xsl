@@ -207,6 +207,12 @@
 	            </xsl:otherwise>
             </xsl:choose>
         </a>
+		<!--Display collection strengths (item counts) if they exist-->
+		<xsl:if test="string-length($data/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
+            <xsl:text> [</xsl:text>
+            <xsl:value-of select="$data/dim:field[@element='format'][@qualifier='extent'][1]"/>
+            <xsl:text>]</xsl:text>
+        </xsl:if>
     </xsl:template>
 
     <!-- A community rendered in the summaryList pattern. Encountered on the community-list and on 
@@ -224,6 +230,12 @@
 		            </xsl:otherwise>
 	            </xsl:choose>
             </a>
+			<!--Display community strengths (item counts) if they exist-->
+			<xsl:if test="string-length($data/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
+                <xsl:text> [</xsl:text>
+                <xsl:value-of select="$data/dim:field[@element='format'][@qualifier='extent'][1]"/>
+                <xsl:text>]</xsl:text>
+            </xsl:if>
         </span>
     </xsl:template>
     
@@ -284,6 +296,12 @@
 	            </xsl:otherwise>
             </xsl:choose>
         </a>
+		<!--Display collection strengths (item counts) if they exist-->
+		<xsl:if test="string-length($data/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
+            <xsl:text> [</xsl:text>
+            <xsl:value-of select="$data/dim:field[@element='format'][@qualifier='extent'][1]"/>
+            <xsl:text>]</xsl:text>
+        </xsl:if>
         <br/>
         <xsl:choose>
             <xsl:when test="$data/dim:field[@element='description' and @qualifier='abstract']">
@@ -309,6 +327,12 @@
 		            </xsl:otherwise>
            		</xsl:choose>
             </a>
+			<!--Display community strengths (item counts) if they exist-->
+			<xsl:if test="string-length($data/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
+                <xsl:text> [</xsl:text>
+                <xsl:value-of select="$data/dim:field[@element='format'][@qualifier='extent'][1]"/>
+                <xsl:text>]</xsl:text>
+            </xsl:if>
             <br/>
             <xsl:choose>
                 <xsl:when test="$data/dim:field[@element='description' and @qualifier='abstract']">
