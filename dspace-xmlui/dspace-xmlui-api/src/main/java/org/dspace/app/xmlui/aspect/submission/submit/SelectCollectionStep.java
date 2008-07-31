@@ -103,6 +103,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
             UIException, SQLException, IOException, AuthorizeException
     {     
 		Collection[] collections; // List of possible collections.
+		String actionURL = contextPath + "/submit/" + knot.getId() + ".continue";
 		DSpaceObject dso = HandleManager.resolveToObject(context, handle);
 
 		if (dso != null && dso instanceof Community)
@@ -116,7 +117,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         
 		// Basic form with a drop down list of all the collections
 		// you can submit too.
-        Division div = body.addInteractiveDivision("select-collection",contextPath+"/submit",Division.METHOD_POST,"primary submission");
+        Division div = body.addInteractiveDivision("select-collection",actionURL,Division.METHOD_POST,"primary submission");
 		div.setHead(T_submission_head);
         
         List list = div.addList("select-collection", List.TYPE_FORM);
@@ -136,9 +137,6 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         
         Button submit = list.addItem().addButton("submit");
         submit.setValue(T_submit_next);
-        
-        div.addHidden("submission-continue").setValue(knot.getId()); 
-        
     }
     
     /** 

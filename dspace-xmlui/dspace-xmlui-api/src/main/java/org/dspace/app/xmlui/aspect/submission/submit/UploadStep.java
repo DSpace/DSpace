@@ -185,7 +185,7 @@ public class UploadStep extends AbstractSubmissionStep
         // Get a list of all files in the original bundle
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit";
+		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 		boolean workflow = submission instanceof WorkflowItem;
 		Bundle[] bundles = item.getBundles("ORIGINAL");
 		Bitstream[] bitstreams = new Bitstream[0];
@@ -323,9 +323,6 @@ public class UploadStep extends AbstractSubmissionStep
         // Part C:
         // add standard control/paging buttons
         addControlButtons(upload);
-		
-        div.addHidden("submission-continue").setValue(knot.getId()); 
-        
     }
     
     /** 

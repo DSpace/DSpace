@@ -179,7 +179,7 @@ public class DescribeStep extends AbstractSubmissionStep
 		// Obtain the inputs (i.e. metadata fields we are going to display)
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit";
+		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 
 		DCInputSet inputSet = null;
 		DCInput[] inputs = {};
@@ -277,9 +277,6 @@ public class DescribeStep extends AbstractSubmissionStep
 			}
 		}
 
-		div.addHidden("submission-continue").setValue(knot.getId()); 
-
-		
 		// add standard control/paging buttons
         addControlButtons(form);
 	}

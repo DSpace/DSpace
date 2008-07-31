@@ -94,7 +94,7 @@ public class ResumeStep extends AbstractStep
 		// Get any metadata that may be removed by unselecting one of these options.
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit";
+		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 
 		Request request = ObjectModelHelper.getRequest(objectModel);
 		String showfull = request.getParameter("showfull");
@@ -128,7 +128,5 @@ public class ResumeStep extends AbstractStep
 		org.dspace.app.xmlui.wing.element.Item actions = form.addItem();
 		actions.addButton("submit_resume").setValue(T_submit_resume);
 		actions.addButton("submit_cancel").setValue(T_submit_cancel);
-
-		div.addHidden("submission-continue").setValue(knot.getId()); 
 	}
 }

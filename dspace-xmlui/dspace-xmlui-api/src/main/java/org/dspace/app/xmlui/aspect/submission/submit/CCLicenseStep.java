@@ -112,8 +112,8 @@ public class CCLicenseStep extends AbstractSubmissionStep
 		// Build the url to and from creative commons
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit";
-		
+		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
+
 		Request request = ObjectModelHelper.getRequest(objectModel);
 		boolean https = request.isSecure();
 		String server = request.getServerName();
@@ -176,7 +176,6 @@ public class CCLicenseStep extends AbstractSubmissionStep
 		// add standard control/paging buttons
         addControlButtons(form);
         
-		onsiteDiv.addHidden("submission-continue").setValue(knot.getId()); 
 	}
 
     /** 

@@ -123,8 +123,8 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
     	// Get any metadata that may be removed by unselecting one of these options.
     	Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit";
-		
+		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
+
 		DCValue[] titles = item.getDC("title", "alternative", Item.ANY);
 		
 		DCValue[] dateIssued = item.getDC("date", "issued", Item.ANY);
@@ -253,7 +253,6 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
         //add standard control/paging buttons
         addControlButtons(form);
         
-        div.addHidden("submission-continue").setValue(knot.getId()); 
         //Since we already warn users about the metadata pruning to happen
         //if they uncheck an already checked box, then
         //we can let the prune process occur immediately!

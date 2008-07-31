@@ -149,7 +149,7 @@ public class LicenseStep extends AbstractSubmissionStep
         
         // Get the full text for the actuial licese
 		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit";
+		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 		String licenseText = collection.getLicense();
 		
 		Division div = body.addInteractiveDivision("submit-license",actionURL, Division.METHOD_POST,"primary submission");
@@ -184,8 +184,6 @@ public class LicenseStep extends AbstractSubmissionStep
 		
 		//add standard control/paging buttons
         addControlButtons(controls);
-        
-		div.addHidden("submission-continue").setValue(knot.getId()); 
 	}
     
     /** 
