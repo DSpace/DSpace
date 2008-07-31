@@ -126,10 +126,11 @@ public class SubmissionController extends DSpaceServlet
     /** Selection collection step */
     public static final int SELECT_COLLECTION = 0;
 
-    public static final int BEFORE_FIRST_STEP = 0;
-
     /** First step after "select collection" */
-    public static int FIRST_STEP = 1;
+    public static final int FIRST_STEP = 1;
+    
+    /** For workflows, first step is step #0 (since Select Collection is already filtered out) */
+    public static final int WORKFLOW_FIRST_STEP = 0;
     
     /** path to the JSP shown once the submission is completed */
     private static String COMPLETE_JSP = "/submit/complete.jsp";
@@ -220,13 +221,9 @@ public class SubmissionController extends DSpaceServlet
                 //load submission information
                 SubmissionInfo si = SubmissionInfo.load(request, wi);
                 
-                //For workflows, first step is step #0 
-                //(since Select Collection is already filtered out)
-                FIRST_STEP = 0;
-                
-                // start over at beginning of first step
+                // start over at beginning of first workflow step
                 setBeginningOfStep(request, true);
-                doStep(context, request, response, si, FIRST_STEP);
+                doStep(context, request, response, si, WORKFLOW_FIRST_STEP);
             }
             catch (NumberFormatException nfe)
             {
