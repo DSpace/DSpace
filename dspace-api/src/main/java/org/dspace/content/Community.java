@@ -349,7 +349,7 @@ public class Community extends DSpaceObject
     public String getMetadata(String field)
     {
     	String metadata = communityRow.getStringColumn(field);
-    	return (metadata == null) ? "" : metadata;
+    	return (metadata == null) ? "" : metadata.trim();
     }
 
     /**
@@ -366,7 +366,8 @@ public class Community extends DSpaceObject
      */
     public void setMetadata(String field, String value)throws MissingResourceException
     {
-        if ((field.trim()).equals("name") && (value.trim()).equals(""))
+        if ((field.trim()).equals("name") 
+                && (value == null || value.trim().equals("")))
         {
             try
             {
@@ -377,7 +378,21 @@ public class Community extends DSpaceObject
                 value = "Untitled";
             }
         }
-        communityRow.setColumn(field, value);
+        
+        /* 
+         * Set metadata field to null if null 
+         * and trim strings to eliminate excess
+         * whitespace.
+         */
+        if(value == null)
+        {
+            communityRow.setColumnNull(field);
+        }
+        else
+        {
+            communityRow.setColumn(field, value.trim());
+        }
+        
         modifiedMetadata = true;
         addDetails(field);
     }

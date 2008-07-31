@@ -409,7 +409,8 @@ public class Collection extends DSpaceObject
      */
     public void setMetadata(String field, String value) throws MissingResourceException
     {
-        if ((field.trim()).equals("name") && (value.trim()).equals(""))
+        if ((field.trim()).equals("name") 
+                && (value == null || value.trim().equals("")))
         {
             try
             {
@@ -420,7 +421,21 @@ public class Collection extends DSpaceObject
                 value = "Untitled";
             }
         }
-        collectionRow.setColumn(field, value);
+        
+        /* 
+         * Set metadata field to null if null 
+         * and trim strings to eliminate excess
+         * whitespace.
+         */
+		if(value == null)
+        {
+            collectionRow.setColumnNull(field);
+        }
+        else
+        {
+            collectionRow.setColumn(field, value.trim());
+        }
+        
         modifiedMetadata = true;
         addDetails(field);
     }
@@ -732,9 +747,9 @@ public class Collection extends DSpaceObject
      */
     public String getLicense()
     {
-        String license = collectionRow.getStringColumn("license");
+        String license = getMetadata("license");
 
-        if ((license == null) || license.equals(""))
+        if (license == null || license.trim().equals(""))
         {
             // Fallback to site-wide default
             license = ConfigurationManager.getDefaultSubmissionLicense();
@@ -751,8 +766,7 @@ public class Collection extends DSpaceObject
      */
     public String getLicenseCollection()
     {
-        String license = collectionRow.getStringColumn("license");
-        return license;
+        return getMetadata("license");
     }
 
     /**
@@ -762,9 +776,9 @@ public class Collection extends DSpaceObject
      */
     public boolean hasCustomLicense()
     {
-        String license = collectionRow.getStringColumn("license");
+        String license = getMetadata("license");
 
-        return ((license != null) && !license.equals(""));
+        return !( license == null || license.trim().equals("") );
     }
 
     /**
@@ -776,15 +790,7 @@ public class Collection extends DSpaceObject
      */
     public void setLicense(String license)
     {
-        if (license == null)
-        {
-            collectionRow.setColumnNull("license");
-        }
-        else
-        {
-            collectionRow.setColumn("license", license);
-        }
-        modified = true;
+        setMetadata("license",license);
     }
 
     /**
