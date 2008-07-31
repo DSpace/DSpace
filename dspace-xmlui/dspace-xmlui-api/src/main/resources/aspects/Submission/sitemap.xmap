@@ -109,20 +109,24 @@
           
           <!-- Start a new submission, unscoped -->
           <map:match pattern="submit">
-              <map:match type="request" pattern="submission-continue">
-                <map:call continuation="{1}"/>
-              </map:match>
               <map:call function="doSubmission"/>
           </map:match>
           
-          <!-- New Submission's flow -->
+          <!-- Continue creating a new submission, unscoped -->
+          <map:match pattern="submit/*.continue">
+             <map:call continuation="{1}"/>
+          </map:match>
+          
+          <!-- Start a new submission to specific collection -->
           <map:match pattern="resource/$/submit" type="IdentifierMatcher">
-            <map:match type="request" pattern="submission-continue">
-              <map:call continuation="{1}"/>
-            </map:match>
             <map:call function="doSubmission">
               <map:parameter name="handle" value="{1}"/>
             </map:call>
+          </map:match>
+          
+          <!-- Continue an existing submission-->
+          <map:match pattern="resource/$/submit/*.continue" type="IdentifierMatcher">
+             <map:call continuation="{2}"/>
           </map:match>
           
           <!-- Workflow task "flow" -->

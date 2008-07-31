@@ -138,7 +138,7 @@ public class ReviewStep extends AbstractSubmissionStep
 	{
 		// Get actionable URL
 		Collection collection = submission.getCollection();
-		String actionURL = IdentifierService.getURL(collection).toString() + "/submit";
+		String actionURL = IdentifierService.getURL(collection).toString() + "/submit/" + knot.getId() + ".continue";
 		
         SubmissionConfig subConfig = submissionInfo.getSubmissionConfig();
         
@@ -217,8 +217,6 @@ public class ReviewStep extends AbstractSubmissionStep
 		// Part C:
         // add standard control/paging buttons
         addControlButtons(review);
-		
-		div.addHidden("submission-continue").setValue(knot.getId()); 
 	}
 
     /** 

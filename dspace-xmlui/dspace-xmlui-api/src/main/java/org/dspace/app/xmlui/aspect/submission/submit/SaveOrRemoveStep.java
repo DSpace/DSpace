@@ -96,7 +96,7 @@ public class SaveOrRemoveStep extends AbstractStep
 	UIException, SQLException, IOException, AuthorizeException
 	{	
 		Collection collection = submission.getCollection();
-		String actionURL = IdentifierService.getURL(collection).toString() + "/submit";
+		String actionURL = IdentifierService.getURL(collection).toString() + "/submit/" + knot.getId() + ".continue";
 		
 		Division div = body.addInteractiveDivision("submit-save-or-cancel",actionURL, Division.METHOD_POST,"primary submission");
 		div.setHead(T_submission_head);
@@ -112,8 +112,5 @@ public class SaveOrRemoveStep extends AbstractStep
         org.dspace.app.xmlui.wing.element.Item actions = saveOrCancel.addItem();
         actions.addButton("submit_save").setValue(T_submit_save);
 		actions.addButton("submit_remove").setValue(T_submit_remove);
-
-		div.addHidden("submission-continue").setValue(knot.getId()); 
-
 	}
 }

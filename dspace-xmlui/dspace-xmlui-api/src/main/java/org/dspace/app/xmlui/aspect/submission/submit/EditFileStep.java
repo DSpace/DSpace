@@ -140,7 +140,7 @@ public class EditFileStep extends AbstractStep
             UIException, SQLException, IOException, AuthorizeException
     {
 		Collection collection = submission.getCollection();
-		String actionURL = IdentifierService.getURL(collection).toString() + "/submit";
+		String actionURL = IdentifierService.getURL(collection).toString() + "/submit/" + knot.getId() + ".continue";
 		
     	// Get the bitstream and all the various formats
 		BitstreamFormat currentFormat = bitstream.getFormat();
@@ -219,8 +219,6 @@ public class EditFileStep extends AbstractStep
         org.dspace.app.xmlui.wing.element.Item actions = edit.addItem();
         actions.addButton("submit_save").setValue(T_submit_save);
 		actions.addButton("submit_edit_cancel").setValue(T_submit_cancel);
-        
-        div.addHidden("submission-continue").setValue(knot.getId()); 
         
     }
     

@@ -273,20 +273,26 @@ function doSubmission()
  *     workspaceID - the in progress submission's Workspace ID
  *     stepAndPage - the Step and Page number to start on (e.g. "1.1")
  */
-function submissionControl(collectionHandle, workspaceID, stepAndPage) 
+function submissionControl(collectionHandle, workspaceID, initStepAndPage) 
 {
 	//load initial submission information
 	var submissionInfo = getSubmissionInfo(workspaceID);
 	 
-    var progressIterator = 0;
+	//Initialize a Cocoon Local Page to save current state information
+	//(This lets us handle when users click the browser "back button"
+	// by caching the state of that previous page, etc.)
+	var state = cocoon.createPageLocal(); 
+    state.progressIterator = 0;  //initialize our progress indicator
     
     //this is array of all the steps/pages in current submission process
     //it's used to step back and forth between pages!
     var stepsInSubmission = getSubmissionSteps(submissionInfo);
     
     //if we didn't have a page passed in, go to first page in process
-    if(stepAndPage==null)
-    	stepAndPage = stepsInSubmission[0];
+    if(initStepAndPage==null)
+    	state.stepAndPage = stepsInSubmission[0];
+    else
+	    state.stepAndPage = initStepAndPage;
     	
     var response_flag = 0;
     
@@ -294,14 +300,14 @@ function submissionControl(collectionHandle, workspaceID, stepAndPage)
      	// Loop forever, exit cases such as save, remove, or completed
         // will call cocoon.exit() stopping execution.
         
-  		cocoon.log.debug("Current step & page=" + stepAndPage, null);
+  		cocoon.log.debug("Current step & page=" + state.stepAndPage, null);
   		cocoon.log.debug("Current ERROR Fields=" + getErrorFields(), null);
     	
     	//----------------------------------------------------------
     	// #1: Actually load the next page in the process
     	//-----------------------------------------------------------
     	//split out step and page (e.g. 1.2 is page 2 of step 1)
-	 	var fields = String(stepAndPage).split(".");
+	 	var fields = String(state.stepAndPage).split(".");
 		var step = fields[0];
 		var page = fields[1];
 		
@@ -313,7 +319,7 @@ function submissionControl(collectionHandle, workspaceID, stepAndPage)
 	  	 	
     	//Pass it all the info it needs, including any response/error flags
     	//in case an error occurred
-    	response_flag = doNextPage(collectionHandle, workspaceID, stepConfig, stepAndPage, response_flag); 
+    	response_flag = doNextPage(collectionHandle, workspaceID, stepConfig, state.stepAndPage, response_flag); 
     	
     	//----------------------------------------------------------
     	// #2: Determine which page/step the user should be sent to next
@@ -322,13 +328,13 @@ function submissionControl(collectionHandle, workspaceID, stepAndPage)
         // Only step forward to next page if no errors on this page
         if ((cocoon.request.get(AbstractProcessingStep.NEXT_BUTTON) || !stepHasUI(stepConfig))  && (response_flag==AbstractProcessingStep.STATUS_COMPLETE))
         {
-           	progressIterator++;
+           	state.progressIterator++;
            	
            	var totalSteps = stepsInSubmission.length;
            	var inWorkflow = submissionInfo.isInWorkflow();
   	
            	//check if we've completed the submission
-           	if(progressIterator >= totalSteps)
+           	if(state.progressIterator >= totalSteps)
            	{
            		if(inWorkflow==false)
            		{
@@ -344,8 +350,8 @@ function submissionControl(collectionHandle, workspaceID, stepAndPage)
            	}
            	else
            	{
-           		stepAndPage = stepsInSubmission[progressIterator];
-           		cocoon.log.debug("Next Step & Page=" + stepAndPage);
+           		state.stepAndPage = stepsInSubmission[state.progressIterator];
+           		cocoon.log.debug("Next Step & Page=" + state.stepAndPage);
         	}
         }//User clicked "<- Previous" button
         else if (cocoon.request.get(AbstractProcessingStep.PREVIOUS_BUTTON))
@@ -355,13 +361,13 @@ function submissionControl(collectionHandle, workspaceID, stepAndPage)
             //Need to find the previous step which HAS a user interface.
             while(stepBack)
             {
-            	progressIterator--;
-            	if(progressIterator<0)
+            	state.progressIterator--;
+            	if(state.progressIterator<0)
             	    stepBack = false;
             	   
-            	stepAndPage = stepsInSubmission[progressIterator];
+            	state.stepAndPage = stepsInSubmission[state.progressIterator];
             
-            	var prevStep = String(stepAndPage).split(".")[0];
+            	var prevStep = String(state.stepAndPage).split(".")[0];
             	var prevStepConfig = submissionInfo.getSubmissionConfig().getStep(prevStep);
             
             	if(!stepHasUI(prevStepConfig))
@@ -370,7 +376,7 @@ function submissionControl(collectionHandle, workspaceID, stepAndPage)
             		stepBack = false;
      		}
             
-            cocoon.log.debug("Previous Step & Page=" + stepAndPage);
+            cocoon.log.debug("Previous Step & Page=" + state.stepAndPage);
         }
         // User clicked "Save/Cancel" Button
         else if (cocoon.request.get(AbstractProcessingStep.CANCEL_BUTTON))
@@ -399,16 +405,16 @@ function submissionControl(collectionHandle, workspaceID, stepAndPage)
 	                //only allow a jump to a page user has already been to
 	                if (newStepAndPage >= 0 && newStepAndPage <= maxStepAndPage)
 	                {
-	                   stepAndPage = newStepAndPage;
+	                   state.stepAndPage = newStepAndPage;
 	                   
-					   cocoon.log.debug("Jump To Step & Page=" + stepAndPage);
+					   cocoon.log.debug("Jump To Step & Page=" + state.stepAndPage);
 	                   
 	                   //reset progress iterator
 	                   for(var i=0; i<stepsInSubmission.length; i++)
 	                   {
-	                   		if(stepAndPage==stepsInSubmission[i])
+	                   		if(state.stepAndPage==stepsInSubmission[i])
 	                   		{
-	                   			progressIterator = i;
+	                   			state.progressIterator = i;
 	                   			break;
 	                   		}
 	                   }
