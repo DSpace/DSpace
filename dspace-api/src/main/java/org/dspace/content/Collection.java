@@ -100,7 +100,6 @@ public class Collection extends DSpaceObject
     private CommunityDAO communityDAO;
     private GroupDAO groupDAO;
 
-    private String license;
     private Bitstream logo;
     private Item templateItem;
 
@@ -223,26 +222,13 @@ public class Collection extends DSpaceObject
 
     public String getMetadata(String field)
     {
-        // FIXME: This is a little naughty, but in technically, the license is
-        // actually metadata.
-        if ("license".equals(field))
-        {
-            return getLicense();
-        }
         return metadata.get(field);
     }
 
     public void setMetadata(String field, String value)
     {
-        // FIXME: This is a little naughty, but in technically, the license is
-        // actually metadata.
-        if ("license".equals(field))
-        {
-            setLicense(value);
-            return;
-        }
-
-        if ((field.trim()).equals("name") && (value.trim()).equals(""))
+        if ((field.trim()).equals("name") 
+                && (value == null || value.trim().equals("")))
         {
             try
             {
@@ -253,7 +239,7 @@ public class Collection extends DSpaceObject
                 value = "Untitled";
             }
         }
-        metadata.put(field, value);
+        metadata.put(field, (value == null ? value : value.trim()));
         modifiedMetadata = true;
         addDetails(field);
     }
@@ -462,6 +448,8 @@ public class Collection extends DSpaceObject
      */
     public String getLicense()
     {
+        String license = getMetadata("license");
+        
         if ((license == null) || license.equals(""))
         {
             // Fallback to site-wide default
@@ -479,7 +467,7 @@ public class Collection extends DSpaceObject
      */
     public void setLicense(String license)
     {
-        this.license = license;
+        this.setMetadata("license", license);
     }
 
     /**
@@ -489,7 +477,8 @@ public class Collection extends DSpaceObject
      */
     public boolean hasCustomLicense()
     {
-        return ((license != null) && !license.equals(""));
+        String license = getMetadata("license");
+        return !(license == null || license.trim().equals(""));
     }
 
     public Item getTemplateItem()

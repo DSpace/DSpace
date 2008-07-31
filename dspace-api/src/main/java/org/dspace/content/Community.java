@@ -125,7 +125,8 @@ public class Community extends DSpaceObject
 
     public void setMetadata(String field, String value)
     {
-        if ((field.trim()).equals("name") && (value.trim()).equals(""))
+        if ((field.trim()).equals("name") 
+                && (value == null || value.trim().equals("")))
         {
             try
             {
@@ -137,9 +138,7 @@ public class Community extends DSpaceObject
                 value = "Untitled";
             }
         }
-        metadata.put(field, value);
-        modifiedMetadata = true;
-        addDetails(field);
+        metadata.put(field, ( value == null ? value : value.trim() ) );
         modifiedMetadata = true;
         addDetails(field);
     }
