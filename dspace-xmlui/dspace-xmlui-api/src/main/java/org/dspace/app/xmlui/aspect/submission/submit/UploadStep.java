@@ -50,6 +50,7 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Cell;
+import org.dspace.app.xmlui.wing.element.Radio;
 import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.File;
@@ -107,6 +108,8 @@ public class UploadStep extends AbstractSubmissionStep
         message("xmlui.Submission.submit.UploadStep.submit_upload");
     protected static final Message T_head2 = 
         message("xmlui.Submission.submit.UploadStep.head2");
+    protected static final Message T_column0 = 
+        message("xmlui.Submission.submit.UploadStep.column0");
     protected static final Message T_column1 = 
         message("xmlui.Submission.submit.UploadStep.column1");
     protected static final Message T_column2 = 
@@ -234,6 +237,7 @@ public class UploadStep extends AbstractSubmissionStep
 	        summary.setHead(T_head2);
 	        
 	        Row header = summary.addRow(Row.ROLE_HEADER);
+	        header.addCellContent(T_column0); // primary bitstream
 	        header.addCellContent(T_column1); // select checkbox
 	        header.addCellContent(T_column2); // file name
 	        header.addCellContent(T_column3); // size
@@ -255,6 +259,16 @@ public class UploadStep extends AbstractSubmissionStep
 	        	
 	        	
 	        	Row row = summary.addRow();
+
+	            // Add radio-button to select this as the primary bitstream
+                Radio primary = row.addCell().addRadio("primary_bitstream_id");
+                primary.addOption(String.valueOf(id));
+                
+                // If this bitstream is already marked as the primary bitstream
+                // mark it as such.
+                if(bundles[0].getPrimaryBitstreamID() == id) {
+                    primary.setOptionSelected(String.valueOf(id));
+                }
 	        	
 	        	if (!workflow)
 	        	{

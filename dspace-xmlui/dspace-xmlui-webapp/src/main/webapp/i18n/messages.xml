@@ -125,23 +125,23 @@
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.rpp">Results/page</message>
 
     <!-- org.dspace.app.xmlui.artifactbrowser.AdvancedSearch.java -->
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.title">Advanced Search</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.trail">Advanced Search</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.head">Advanced Search</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.search_scope">Search scope</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.search_scope_help">Limit your search to a community or collection.</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.conjunction">Conjunction</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.search_type">Search type</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.search_for">Search for</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_author">Author</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_title">Title</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject">Subject</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_abstract">Abstract</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_series">Series</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_sponsor">Sponsor</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_identifier">Identifier</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_language">Language (ISO)</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_keyword">Keyword</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.title">Advanced Search</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.trail">Advanced Search</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.head">Advanced Search</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.search_scope">Search scope</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.search_scope_help">Limit your search to a community or collection.</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.conjunction">Conjunction</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.search_type">Search type</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.search_for">Search for</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_author">Author</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_title">Title</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject">Subject</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_abstract">Abstract</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_series">Series</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_sponsor">Sponsor</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_identifier">Identifier</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_language">Language (ISO)</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_keyword">Keyword</message>
    
    <!--  some common other possibilities for Advanced Search Fields -->
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_contributor">Contributor</message>
@@ -204,7 +204,7 @@
 	<!-- org.dspace.app.xmlui.artifactbrowser.CollectionViewer.java -->
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.search_scope">Search Scope</message>
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.all_of_dspace">All of DSpace</message>
-	<message key="xmlui.ArtifactBrowser.CollectionViewer.full_text_search">Full Text Search:</message>
+	<message key="xmlui.ArtifactBrowser.CollectionViewer.full_text_search">Search within this collection:</message>
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.head_browse">Browse by</message>
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.browse_titles">Titles</message>
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.browse_authors">Authors</message>
@@ -221,7 +221,7 @@
 	<!-- org.dspace.app.xmlui.artifactbrowser.CommunityViewer.java -->
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.search_scope">Search Scope</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.all_of_dspace">All of DSpace</message>
-	<message key="xmlui.ArtifactBrowser.CommunityViewer.full_text_search">Full Text Search:</message>
+	<message key="xmlui.ArtifactBrowser.CommunityViewer.full_text_search">Search within this community and it's collections:</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.head_browse">Browse by</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.browse_titles">Titles</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.browse_authors">Authors</message>
@@ -310,15 +310,19 @@
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.auth_header">The item is restricted</message>	
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.auth_message">The item you are attempting to access is a restricted item and requires credentials to view. Please login below to access the item.</message>
 
-	<!-- Authentication messages used for bitstream authentication -->	
+    <message key="xmlui.ArtifactBrowser.StatisticsViewer.choose_month">Monthly Reports</message>
+    <message key="xmlui.ArtifactBrowser.StatisticsViewer.report.title">Statistical Summary</message>
+
+    <message key="xmlui.ArtifactBrowser.StatisticsViewer.no_report.title">No reports currently available</message>
+    <message key="xmlui.ArtifactBrowser.StatisticsViewer.no_report.text">There are currently no reports available for this service.  Please check back later.</message>
+
+    <!-- Authentication messages used for bitstream authentication -->
 	<message key="xmlui.BitstreamReader.auth_header">The file is restricted</message>	
 	<message key="xmlui.BitstreamReader.auth_message">The file you are attempting to access is a restricted file and requires credentials to view. Please login below to access the file.</message>
 	
 	<!-- Export Archive download messages -->
 	<message key="xmlui.ItemExportDownloadReader.auth_header">This export archive is restricted.</message>
 	<message key="xmlui.ItemExportDownloadReader.auth_message">The export archive you are attempting to access is a restricted resource and requires credentials to view. Please login below to access the export archive.</message>
- 
-	
 
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		
@@ -423,6 +427,7 @@
 	<message key="xmlui.EPerson.LoginChooser.head1">Choose a Login Method</message>
 	<message key="xmlui.EPerson.LoginChooser.para1">Log in via:</message>
 	<message key="au.edu.mq.melcoe.mams.dspace.eperson.ShibAuthentication.title">Shibboleth Authentication</message>
+	<message key="org.dspace.eperson.LDAPAuthentication.title">LDAP Authentication</message>
 	<message key="org.dspace.eperson.PasswordAuthentication.title">Password Authentication</message>
 	<message key="org.dspace.eperson.X509Authentication.title">Web Certificate Authentication</message>
 
@@ -649,7 +654,8 @@
 	<message key="xmlui.Submission.submit.UploadStep.description_help">Optionally, provide a brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
 	<message key="xmlui.Submission.submit.UploadStep.submit_upload">Upload file &amp; add another</message>
 	<message key="xmlui.Submission.submit.UploadStep.head2">Files Uploaded</message>
-	<message key="xmlui.Submission.submit.UploadStep.column1"></message>
+	<message key="xmlui.Submission.submit.UploadStep.column0">Primary</message>
+	<message key="xmlui.Submission.submit.UploadStep.column1">  </message>
 	<message key="xmlui.Submission.submit.UploadStep.column2">File</message>
 	<message key="xmlui.Submission.submit.UploadStep.column3">Size</message>
 	<message key="xmlui.Submission.submit.UploadStep.column4">Description</message>
@@ -798,7 +804,21 @@
     <message key="xmlui.administrative.Navigation.context_export_collection">Export Collection</message>
     <message key="xmlui.administrative.Navigation.context_export_community">Export Community</message>
 	
-	<!-- my account items -->
+	<!-- Site administrator options -->
+	<message key="xmlui.administrative.Navigation.administrative_head">Administrative</message>
+	<message key="xmlui.administrative.Navigation.administrative_access_control">Access Control</message>
+	<message key="xmlui.administrative.Navigation.administrative_people">People</message>
+	<message key="xmlui.administrative.Navigation.administrative_groups">Groups</message>
+	<message key="xmlui.administrative.Navigation.administrative_authorizations">Authorizations</message>
+	<message key="xmlui.administrative.Navigation.administrative_registries">Registries</message>
+	<message key="xmlui.administrative.Navigation.administrative_metadata">Metadata</message>
+	<message key="xmlui.administrative.Navigation.administrative_format">Format</message>
+	<message key="xmlui.administrative.Navigation.administrative_items">Items</message>
+    <message key="xmlui.administrative.Navigation.administrative_withdrawn">Withdrawn Items</message>
+	<message key="xmlui.administrative.Navigation.administrative_control_panel">Control Panel</message>
+    <message key="xmlui.administrative.Navigation.statistics">Statistics</message>
+
+    <!-- my account items -->
 	<message key="xmlui.administrative.Navigation.account_export">My Exports</message>
 	
 	
@@ -815,22 +835,9 @@
 	<message key="xmlui.administrative.ItemExport.community.success">The community was exported successfully.  You should receive an e-mail when the archive is ready for download.  You can also use the 'My Exports' link to view a list of your available archives.</message>
 	<message key="xmlui.administrative.ItemExport.available.head">Available export archives for download:</message>
 	
-	
-	<!-- Site administrator options -->
-	<message key="xmlui.administrative.Navigation.administrative_head">Administrative</message>
-	<message key="xmlui.administrative.Navigation.administrative_access_control">Access Control</message>
-	<message key="xmlui.administrative.Navigation.administrative_people">People</message>
-	<message key="xmlui.administrative.Navigation.administrative_groups">Groups</message>
-	<message key="xmlui.administrative.Navigation.administrative_authorizations">Authorizations</message>
-	<message key="xmlui.administrative.Navigation.administrative_registries">Registries</message>
-	<message key="xmlui.administrative.Navigation.administrative_metadata">Metadata</message>
-	<message key="xmlui.administrative.Navigation.administrative_format">Format</message>
-	<message key="xmlui.administrative.Navigation.administrative_items">Items</message>
-    <message key="xmlui.administrative.Navigation.administrative_withdrawn">Withdrawn Items</message>
-	<message key="xmlui.administrative.Navigation.administrative_control_panel">Control Panel</message>
-		
-		
-	<!-- org.dspace.app.xmlui.administrative.eperson.ManageEPeopleMain -->
+
+
+    <!-- org.dspace.app.xmlui.administrative.eperson.ManageEPeopleMain -->
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.title">Manage E-people</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.main_head">E-person management</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.actions_head">Actions</message>
@@ -1238,7 +1245,7 @@
 	<message key="xmlui.administrative.item.DeleteBitstreamConfirm.column2">Description</message>
 	<message key="xmlui.administrative.item.DeleteBitstreamConfirm.column3">Format</message>
 	
-	<!-- org.dspace.app.xmlui.administrative.item.ConfrimItemForm -->
+	<!-- org.dspace.app.xmlui.administrative.item.ConfirmItemForm -->
 	<message key="xmlui.administrative.item.ConfirmItemForm.title">Confirm</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.trail">Confirm</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.head1">Modify item: {0}</message>
@@ -1446,7 +1453,7 @@
 	<!-- org.dspace.app.xmlui.administrative.community.DeleteCommunityConfirm.java -->
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.title">Confirm Deletion</message>
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.trail">Confirm</message>
-	<message key="xmlui.administrative.community.DeleteCommunityConfirm.main_head">Confrim deletion for community {0}</message>
+	<message key="xmlui.administrative.community.DeleteCommunityConfirm.main_head">Confirm deletion for community {0}</message>
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.main_para">Are you sure community {0} should be deleted? This will delete:</message>
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.confirm_item1">Any collections in the community that are not contained in other communities</message>
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.confirm_item2">Any items and incomplete submissions in this community that aren't contained in other communities</message>
