@@ -217,7 +217,7 @@ else
    <form method="get" action="<%= request.getContextPath() + searchScope + "/simple-search" %>">
    <table border="0">
        <tr><td>
-           <input type="hidden" name="query" value="<%= query %>" />
+           <input type="hidden" name="query" value="<%= URLEncoder.encode(query,"UTF-8") %>" />
            <fmt:message key="search.results.perpage"/>
            <select name="rpp">
 <%
