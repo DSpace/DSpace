@@ -427,6 +427,7 @@
 	<message key="xmlui.EPerson.LoginChooser.head1">Choose a Login Method</message>
 	<message key="xmlui.EPerson.LoginChooser.para1">Log in via:</message>
 	<message key="au.edu.mq.melcoe.mams.dspace.eperson.ShibAuthentication.title">Shibboleth Authentication</message>
+	<message key="org.dspace.eperson.LDAPAuthentication.title">LDAP Authentication</message>
 	<message key="org.dspace.eperson.PasswordAuthentication.title">Password Authentication</message>
 	<message key="org.dspace.eperson.X509Authentication.title">Web Certificate Authentication</message>
 
