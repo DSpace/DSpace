@@ -155,9 +155,9 @@
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_department">Department</message>
 
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_ANY">Full Text</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.and">AND</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.or">OR</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.not">NOT</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.and">AND</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.or">OR</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.not">NOT</message>
 	
 	
 	<!-- org.dspace.app.xmlui.artifactbrowser.ConfigureableBrowse.java -->
@@ -654,7 +654,8 @@
 	<message key="xmlui.Submission.submit.UploadStep.description_help">Optionally, provide a brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
 	<message key="xmlui.Submission.submit.UploadStep.submit_upload">Upload file &amp; add another</message>
 	<message key="xmlui.Submission.submit.UploadStep.head2">Files Uploaded</message>
-	<message key="xmlui.Submission.submit.UploadStep.column1"></message>
+	<message key="xmlui.Submission.submit.UploadStep.column0">Primary</message>
+	<message key="xmlui.Submission.submit.UploadStep.column1">  </message>
 	<message key="xmlui.Submission.submit.UploadStep.column2">File</message>
 	<message key="xmlui.Submission.submit.UploadStep.column3">Size</message>
 	<message key="xmlui.Submission.submit.UploadStep.column4">Description</message>
@@ -1244,7 +1245,7 @@
 	<message key="xmlui.administrative.item.DeleteBitstreamConfirm.column2">Description</message>
 	<message key="xmlui.administrative.item.DeleteBitstreamConfirm.column3">Format</message>
 	
-	<!-- org.dspace.app.xmlui.administrative.item.ConfrimItemForm -->
+	<!-- org.dspace.app.xmlui.administrative.item.ConfirmItemForm -->
 	<message key="xmlui.administrative.item.ConfirmItemForm.title">Confirm</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.trail">Confirm</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.head1">Modify item: {0}</message>
@@ -1452,7 +1453,7 @@
 	<!-- org.dspace.app.xmlui.administrative.community.DeleteCommunityConfirm.java -->
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.title">Confirm Deletion</message>
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.trail">Confirm</message>
-	<message key="xmlui.administrative.community.DeleteCommunityConfirm.main_head">Confrim deletion for community {0}</message>
+	<message key="xmlui.administrative.community.DeleteCommunityConfirm.main_head">Confirm deletion for community {0}</message>
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.main_para">Are you sure community {0} should be deleted? This will delete:</message>
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.confirm_item1">Any collections in the community that are not contained in other communities</message>
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.confirm_item2">Any items and incomplete submissions in this community that aren't contained in other communities</message>
