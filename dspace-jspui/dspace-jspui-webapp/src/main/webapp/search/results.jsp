@@ -217,7 +217,7 @@ else
    <form method="get" action="<%= request.getContextPath() + searchScope + "/simple-search" %>">
    <table border="0">
        <tr><td>
-           <input type="hidden" name="query" value="<%= URLEncoder.encode(query,"UTF-8") %>" />
+           <input type="hidden" name="query" value="<%= StringEscapeUtils.escapeHtml(query) %>" />
            <fmt:message key="search.results.perpage"/>
            <select name="rpp">
 <%
@@ -335,7 +335,7 @@ else
     String prevURL =  request.getContextPath()
                     + searchScope
                     + "/simple-search?query="
-                    + URLEncoder.encode(query)
+                    + URLEncoder.encode(query,"UTF-8")
                     + "&amp;sort_by=" + (so != null ? so.getNumber() : 0)
                     + "&amp;order=" + order
                     + "&amp;rpp=" + rpp
@@ -363,7 +363,7 @@ for( int q = pageFirst; q <= pageLast; q++ )
                     + request.getContextPath()
                     + searchScope
                     + "/simple-search?query="
-                    + URLEncoder.encode(query)
+                    + URLEncoder.encode(query,"UTF-8")
                     + "&amp;sort_by=" + (so != null ? so.getNumber() : 0)
                     + "&amp;order=" + order
                     + "&amp;rpp=" + rpp
