@@ -52,6 +52,11 @@ import java.util.ResourceBundle;
 
 import javax.mail.MessagingException;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -248,8 +253,9 @@ public class Subscribe
      * 
      * @param context
      *            DSpace context object
+     * @param test 
      */
-    public static void processDaily(Context context) throws SQLException,
+    public static void processDaily(Context context, boolean test) throws SQLException,
             IOException
     {
         // Grab the subscriptions
@@ -275,7 +281,7 @@ public class Subscribe
 
                     try
                     {
-                        sendEmail(context, currentEPerson, collections);
+                        sendEmail(context, currentEPerson, collections, test);
                     }
                     catch (MessagingException me)
                     {
@@ -301,7 +307,7 @@ public class Subscribe
         {
             try
             {
-                sendEmail(context, currentEPerson, collections);
+                sendEmail(context, currentEPerson, collections, test);
             }
             catch (MessagingException me)
             {
@@ -323,9 +329,10 @@ public class Subscribe
      *            eperson to send to
      * @param collections
      *            List of collection IDs (Integers)
+     * @param test 
      */
     public static void sendEmail(Context context, EPerson eperson,
-            List collections) throws IOException, MessagingException,
+            List collections, boolean test) throws IOException, MessagingException,
             SQLException
     {
         // Get a resource bundle according to the eperson language preferences
@@ -433,14 +440,24 @@ public class Subscribe
         // Send an e-mail if there were any new items
         if (emailText.length() > 0)
         {
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "subscription"));
+            
+            if(test)
+            {
+                log.info(LogManager.getHeader(context, "subscription:", "eperson=" + eperson.getEmail() ));
+                log.info(LogManager.getHeader(context, "subscription:", "text=" + emailText.toString() ));
 
-            email.addRecipient(eperson.getEmail());
-            email.addArgument(emailText.toString());
-            email.send();
+            } else {
+                
+                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "subscription"));
+                email.addRecipient(eperson.getEmail());
+                email.addArgument(emailText.toString());
+                email.send();
+                
+                log.info(LogManager.getHeader(context, "sent_subscription", "eperson_id=" + eperson.getID() ));
+                
+            }
 
-            log.info(LogManager.getHeader(context, "sent_subscription",
-                    "eperson_id=" + eperson.getID()));
+            
         }
     }
 
@@ -452,12 +469,25 @@ public class Subscribe
      */
     public static void main(String[] argv) 
     {
+        Options options = new Options();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine line = null;
+
+        options.addOption(
+                OptionBuilder.isRequired(false).withDescription(
+                "Run test session").withLongOpt("test").create("t"));
+        
+        boolean test = options.hasOption("t");
+
+        if(test)
+            log.setLevel(Level.DEBUG);
+        
         Context context = null;
 
         try
         {
             context = new Context();
-            processDaily(context);
+            processDaily(context, test);
             context.complete();
         }
         catch( Exception e )
@@ -476,7 +506,7 @@ public class Subscribe
 
     private static List filterOutModified(List completeList)
     {
-        log.info("Filtering out all modified to leave new items list size="+completeList.size());
+        log.debug("Filtering out all modified to leave new items list size="+completeList.size());
         List filteredList = new ArrayList();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -484,17 +514,33 @@ public class Subscribe
         for (Iterator iter = completeList.iterator(); iter.hasNext();)
         {
             HarvestedItemInfo infoObject = (HarvestedItemInfo) iter.next();
-            DCValue[] dateAccArr = infoObject.item.getDC("date", "accessioned", null);
-            if (dateAccArr != null && dateAccArr.length > 0 && dateAccArr[0].value != null)
+            DCValue[] dateAccArr = infoObject.item.getMetadata("dc", "date", "accessioned", Item.ANY);
+            String lastModded = sdf.format(infoObject.datestamp);
+            if (dateAccArr != null && dateAccArr.length > 0)
             {
-                String lastModded = sdf.format(infoObject.datestamp);
+                for(DCValue date : dateAccArr)
+                {
+                    if(date != null && date.value != null)
+                    {
+                        // if it's never been changed
+                        if (date.value.startsWith(lastModded))
+                        {
+                            filteredList.add(infoObject);
+                            log.debug("adding : " + dateAccArr[0].value +" : " + lastModded + " : " + infoObject.handle);
+                        }
+                        else
+                        {
+                            log.debug("ignoring : " + dateAccArr[0].value +" : " + lastModded + " : " + infoObject.handle);
+                        }
+                    }
+                }
+                
 
-                // if it's never been changed
-                if (dateAccArr[0].value.startsWith(lastModded))
-                    filteredList.add(infoObject);
+                
             }
             else
             {
+                log.debug("no date accessioned, adding  : " + infoObject.handle);
                 filteredList.add(infoObject);
             }
         }
