@@ -39,6 +39,11 @@
  */
 package org.dspace.eperson;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -65,8 +70,10 @@ import org.dspace.uri.ObjectIdentifier;
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -238,7 +245,7 @@ public class SubscriptionManager
      * @param context
      *            DSpace context object
      */
-    public static void processDaily(Context context) throws IOException
+    public static void processDaily(Context context, boolean test) throws IOException
     {
         // Grab the subscriptions
         SubscriptionDAO dao = SubscriptionDAOFactory.getInstance(context);
@@ -262,7 +269,7 @@ public class SubscriptionManager
                 {
                     try
                     {
-                        sendEmail(context, currentEPerson, collections);
+                        sendEmail(context, currentEPerson, collections, test);
                     }
                     catch (MessagingException me)
                     {
@@ -284,7 +291,7 @@ public class SubscriptionManager
         {
             try
             {
-                sendEmail(context, currentEPerson, collections);
+                sendEmail(context, currentEPerson, collections, test);
             }
             catch (MessagingException me)
             {
@@ -308,7 +315,7 @@ public class SubscriptionManager
      *            List of collection IDs (Integers)
      */
     public static void sendEmail(Context context, EPerson eperson,
-            List<Collection> collections)
+            List<Collection> collections, boolean test)
         throws IOException, MessagingException
     {
         ObjectIdentifier identifier = null;
@@ -416,15 +423,24 @@ public class SubscriptionManager
         // Send an e-mail if there were any new items
         if (emailText.length() > 0)
         {
-            Email email = ConfigurationManager.getEmail(
-                    I18nUtil.getEmailFilename(supportedLocale, "subscription"));
+            
+            if(test)
+            {
+                log.info(LogManager.getHeader(context, "subscription:", "eperson=" + eperson.getEmail() ));
+                log.info(LogManager.getHeader(context, "subscription:", "text=" + emailText.toString() ));
 
-            email.addRecipient(eperson.getEmail());
-            email.addArgument(emailText.toString());
-            email.send();
+            } else {
+                
+                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "subscription"));
+                email.addRecipient(eperson.getEmail());
+                email.addArgument(emailText.toString());
+                email.send();
+                
+                log.info(LogManager.getHeader(context, "sent_subscription", "eperson_id=" + eperson.getID() ));
+                
+            }
 
-            log.info(LogManager.getHeader(context, "sent_subscription",
-                    "eperson_id=" + eperson.getID()));
+            
         }
     }
 
@@ -436,12 +452,25 @@ public class SubscriptionManager
      */
     public static void main(String[] argv) 
     {
+        Options options = new Options();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine line = null;
+
+        options.addOption(
+                OptionBuilder.isRequired(false).withDescription(
+                "Run test session").withLongOpt("test").create("t"));
+        
+        boolean test = options.hasOption("t");
+
+        if(test)
+            log.setLevel(Level.DEBUG);
+        
         Context context = null;
 
         try
         {
             context = new Context();
-            processDaily(context);
+            processDaily(context, test);
             context.complete();
         }
         catch( Exception e )
@@ -456,5 +485,49 @@ public class SubscriptionManager
                 context.abort();
             }
         }
+    }
+
+    private static List filterOutModified(List completeList)
+    {
+        log.debug("Filtering out all modified to leave new items list size="+completeList.size());
+        List filteredList = new ArrayList();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        for (Iterator iter = completeList.iterator(); iter.hasNext();)
+        {
+            HarvestedItemInfo infoObject = (HarvestedItemInfo) iter.next();
+            DCValue[] dateAccArr = infoObject.item.getMetadata("dc", "date", "accessioned", Item.ANY);
+            String lastModded = sdf.format(infoObject.datestamp);
+            if (dateAccArr != null && dateAccArr.length > 0)
+            {
+                for(DCValue date : dateAccArr)
+                {
+                    if(date != null && date.value != null)
+                    {
+                        // if it's never been changed
+                        if (date.value.startsWith(lastModded))
+                        {
+                            filteredList.add(infoObject);
+                            log.debug("adding : " + dateAccArr[0].value +" : " + lastModded + " : " + infoObject.identifier.getCanonicalForm());
+                        }
+                        else
+                        {
+                            log.debug("ignoring : " + dateAccArr[0].value +" : " + lastModded + " : " + infoObject.identifier.getCanonicalForm());
+                        }
+                    }
+                }
+                
+
+                
+            }
+            else
+            {
+                log.debug("no date accessioned, adding  : " + infoObject.identifier.getCanonicalForm());
+                filteredList.add(infoObject);
+            }
+        }
+
+        return filteredList;
     }
 }
