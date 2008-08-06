@@ -289,25 +289,32 @@ public class Collection extends DSpaceObject
 
         List<Collection> collections = new ArrayList<Collection>();
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // First check the cache
-            Collection fromCache = (Collection) context.fromCache(
-                    Collection.class, row.getIntColumn("collection_id"));
-
-            if (fromCache != null)
+            while (tri.hasNext())
             {
-                collections.add(fromCache);
-            }
-            else
-            {
-                collections.add(new Collection(context, row));
+                TableRow row = tri.next();
+
+                // First check the cache
+                Collection fromCache = (Collection) context.fromCache(
+                        Collection.class, row.getIntColumn("collection_id"));
+
+                if (fromCache != null)
+                {
+                    collections.add(fromCache);
+                }
+                else
+                {
+                    collections.add(new Collection(context, row));
+                }
             }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         Collection[] collectionArray = new Collection[collections.size()];
         collectionArray = (Collection[]) collections.toArray(collectionArray);
@@ -924,24 +931,31 @@ public class Collection extends DSpaceObject
                 "SELECT * FROM collection2item WHERE item_id= ? ",
                 item.getID());
 
-        if (!tri.hasNext())
+        try
         {
-            //make the right to remove the item explicit because the implicit
-            // relation
-            //has been removed. This only has to concern the currentUser
-            // because
-            //he started the removal process and he will end it too.
-            //also add right to remove from the item to remove it's bundles.
-            AuthorizeManager.addPolicy(ourContext, item, Constants.DELETE,
-                    ourContext.getCurrentUser());
-            AuthorizeManager.addPolicy(ourContext, item, Constants.REMOVE,
-                    ourContext.getCurrentUser());
+            if (!tri.hasNext())
+            {
+                //make the right to remove the item explicit because the implicit
+                // relation
+                //has been removed. This only has to concern the currentUser
+                // because
+                //he started the removal process and he will end it too.
+                //also add right to remove from the item to remove it's bundles.
+                AuthorizeManager.addPolicy(ourContext, item, Constants.DELETE,
+                        ourContext.getCurrentUser());
+                AuthorizeManager.addPolicy(ourContext, item, Constants.REMOVE,
+                        ourContext.getCurrentUser());
 
-            // Orphan; delete it
-            item.delete();
+                // Orphan; delete it
+                item.delete();
+            }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
     }
 
     /**
@@ -1181,31 +1195,38 @@ public class Collection extends DSpaceObject
         // Build a list of Community objects
         List<Community> communities = new ArrayList<Community>();
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // First check the cache
-            Community owner = (Community) ourContext.fromCache(Community.class,
-                    row.getIntColumn("community_id"));
-
-            if (owner == null)
+            while (tri.hasNext())
             {
-                owner = new Community(ourContext, row);
-            }
+                TableRow row = tri.next();
 
-            communities.add(owner);
+                // First check the cache
+                Community owner = (Community) ourContext.fromCache(Community.class,
+                        row.getIntColumn("community_id"));
 
-            // now add any parent communities
-            Community[] parents = owner.getAllParents();
+                if (owner == null)
+                {
+                    owner = new Community(ourContext, row);
+                }
 
-            for (int i = 0; i < parents.length; i++)
-            {
-                communities.add(parents[i]);
+                communities.add(owner);
+
+                // now add any parent communities
+                Community[] parents = owner.getAllParents();
+
+                for (int i = 0; i < parents.length; i++)
+                {
+                    communities.add(parents[i]);
+                }
             }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         Community[] communityArray = new Community[communities.size()];
         communityArray = (Community[]) communities.toArray(communityArray);
@@ -1316,20 +1337,39 @@ public class Collection extends DSpaceObject
      public int countItems()
         throws SQLException
      {
-        String query = "SELECT count(*) FROM collection2item, item WHERE "
-            + "collection2item.collection_id =  ? "
-            + "AND collection2item.item_id = item.item_id "
-            + "AND in_archive ='1' AND item.withdrawn='0' ";
+         int itemcount = 0;
+         PreparedStatement statement = null;
+         ResultSet rs = null;
 
-        PreparedStatement statement = ourContext.getDBConnection().prepareStatement(query);
-        statement.setInt(1,getID());
-        
-        ResultSet rs = statement.executeQuery();
-        
-        rs.next();
-        int itemcount = rs.getInt(1);
+         try
+         {
+             String query = "SELECT count(*) FROM collection2item, item WHERE "
+                    + "collection2item.collection_id =  ? "
+                    + "AND collection2item.item_id = item.item_id "
+                    + "AND in_archive ='1' AND item.withdrawn='0' ";
 
-        statement.close();
+            statement = ourContext.getDBConnection().prepareStatement(query);
+            statement.setInt(1,getID());
+
+            rs = statement.executeQuery();
+            if (rs != null)
+            {
+                rs.next();
+                itemcount = rs.getInt(1);
+            }
+         }
+         finally
+         {
+             if (rs != null)
+             {
+                 try { rs.close(); } catch (SQLException sqle) { }
+             }
+
+             if (statement != null)
+             {
+                 try { statement.close(); } catch (SQLException sqle) { }
+             }
+         }
 
         return itemcount;
      }

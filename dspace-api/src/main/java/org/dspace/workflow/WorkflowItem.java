@@ -171,15 +171,21 @@ public class WorkflowItem implements InProgressSubmission
         TableRowIterator tri = DatabaseManager.queryTable(c, "workflowitem",
                 "SELECT * FROM workflowitem");
 
-        // make a list of workflow items
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-            WorkflowItem wi = new WorkflowItem(c, row);
-            wfItems.add(wi);
+            // make a list of workflow items
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+                WorkflowItem wi = new WorkflowItem(c, row);
+                wfItems.add(wi);
+            }
         }
-        
-        tri.close();
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
 
         WorkflowItem[] wfArray = new WorkflowItem[wfItems.size()];
         wfArray = (WorkflowItem[]) wfItems.toArray(wfArray);
@@ -211,23 +217,29 @@ public class WorkflowItem implements InProgressSubmission
                 "ORDER BY workflowitem.workflow_id",
                 ep.getID());
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // Check the cache
-            WorkflowItem wi = (WorkflowItem) context.fromCache(
-                    WorkflowItem.class, row.getIntColumn("workflow_id"));
-
-            if (wi == null)
+            while (tri.hasNext())
             {
-                wi = new WorkflowItem(context, row);
-            }
+                TableRow row = tri.next();
 
-            wfItems.add(wi);
+                // Check the cache
+                WorkflowItem wi = (WorkflowItem) context.fromCache(
+                        WorkflowItem.class, row.getIntColumn("workflow_id"));
+
+                if (wi == null)
+                {
+                    wi = new WorkflowItem(context, row);
+                }
+
+                wfItems.add(wi);
+            }
         }
-        
-        tri.close();
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
 
         WorkflowItem[] wfArray = new WorkflowItem[wfItems.size()];
         wfArray = (WorkflowItem[]) wfItems.toArray(wfArray);
@@ -255,24 +267,30 @@ public class WorkflowItem implements InProgressSubmission
                 "workflowitem.collection_id= ? ",
                 c.getID());
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // Check the cache
-            WorkflowItem wi = (WorkflowItem) context.fromCache(
-                    WorkflowItem.class, row.getIntColumn("workflow_id"));
-
-            // not in cache? turn row into workflowitem
-            if (wi == null)
+            while (tri.hasNext())
             {
-                wi = new WorkflowItem(context, row);
-            }
+                TableRow row = tri.next();
 
-            wsItems.add(wi);
+                // Check the cache
+                WorkflowItem wi = (WorkflowItem) context.fromCache(
+                        WorkflowItem.class, row.getIntColumn("workflow_id"));
+
+                // not in cache? turn row into workflowitem
+                if (wi == null)
+                {
+                    wi = new WorkflowItem(context, row);
+                }
+
+                wsItems.add(wi);
+            }
         }
-        
-        tri.close();
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
 
         WorkflowItem[] wsArray = new WorkflowItem[wsItems.size()];
         wsArray = (WorkflowItem[]) wsItems.toArray(wsArray);

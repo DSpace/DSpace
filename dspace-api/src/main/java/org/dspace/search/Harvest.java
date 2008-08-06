@@ -228,43 +228,51 @@ public class Harvest
         List infoObjects = new LinkedList();
         int index = 0;
 
-        // Process results of query into HarvestedItemInfo objects
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            /*
-             * This conditional ensures that we only process items within any
-             * constraints specified by 'offset' and 'limit' parameters.
-             */
-            if ((index >= offset)
-                    && ((limit == 0) || (index < (offset + limit))))
+            // Process results of query into HarvestedItemInfo objects
+            while (tri.hasNext())
             {
-                HarvestedItemInfo itemInfo = new HarvestedItemInfo();
-                
-                itemInfo.context = context;
-                itemInfo.handle = row.getStringColumn("handle");
-                itemInfo.itemID = row.getIntColumn("resource_id");
-                itemInfo.datestamp = row.getDateColumn("last_modified");
-                itemInfo.withdrawn = row.getBooleanColumn("withdrawn");
+                TableRow row = tri.next();
 
-                if (collections)
+                /*
+                 * This conditional ensures that we only process items within any
+                 * constraints specified by 'offset' and 'limit' parameters.
+                 */
+                if ((index >= offset)
+                        && ((limit == 0) || (index < (offset + limit))))
                 {
-                    fillCollections(context, itemInfo);
+                    HarvestedItemInfo itemInfo = new HarvestedItemInfo();
+
+                    itemInfo.context = context;
+                    itemInfo.handle = row.getStringColumn("handle");
+                    itemInfo.itemID = row.getIntColumn("resource_id");
+                    itemInfo.datestamp = row.getDateColumn("last_modified");
+                    itemInfo.withdrawn = row.getBooleanColumn("withdrawn");
+
+                    if (collections)
+                    {
+                        fillCollections(context, itemInfo);
+                    }
+
+                    if (items)
+                    {
+                        // Get the item
+                        itemInfo.item = Item.find(context, itemInfo.itemID);
+                    }
+
+                    infoObjects.add(itemInfo);
                 }
 
-                if (items)
-                {
-                    // Get the item
-                    itemInfo.item = Item.find(context, itemInfo.itemID);
-                }
-
-                infoObjects.add(itemInfo);
+                index++;
             }
-
-            index++;
         }
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         return infoObjects;
     }

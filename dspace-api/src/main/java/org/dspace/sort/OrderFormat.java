@@ -107,24 +107,24 @@ public class OrderFormat
         	{
         		return delegate.makeSortString(value, language);
         	}
-    	}
-    	
-      	// No delegates found, so apply defaults
-    	if (type.equalsIgnoreCase(OrderFormat.AUTHOR) && authorDelegate != null)
-    	{
-    		return authorDelegate.makeSortString(value, language);
+
+            // No delegates found, so apply defaults
+            if (type.equalsIgnoreCase(OrderFormat.AUTHOR) && authorDelegate != null)
+            {
+              return authorDelegate.makeSortString(value, language);
+            }
+
+            if (type.equalsIgnoreCase(OrderFormat.TITLE) && titleDelegate != null)
+            {
+              return titleDelegate.makeSortString(value, language);
+            }
+
+            if (type.equalsIgnoreCase(OrderFormat.TEXT) && textDelegate != null)
+            {
+              return textDelegate.makeSortString(value, language);
+            }
     	}
 
-    	if (type.equalsIgnoreCase(OrderFormat.TITLE) && titleDelegate != null)
-    	{
-    		return titleDelegate.makeSortString(value, language);
-    	}
-
-    	if (type.equalsIgnoreCase(OrderFormat.TEXT) && textDelegate != null)
-    	{
-    		return textDelegate.makeSortString(value, language);
-    	}
-    	
     	return value;
     }
 

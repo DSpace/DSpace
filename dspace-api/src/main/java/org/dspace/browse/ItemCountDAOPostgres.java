@@ -96,11 +96,12 @@ public class ItemCountDAOPostgres implements ItemCountDAO
 	public void collectionCount(Collection collection, int count) 
 		throws ItemCountException
 	{
-		try
+        TableRowIterator tri = null;
+        try
 		{
 			// first find out if we have a record
 			Object[] sparams = { new Integer(collection.getID()) };
-			TableRowIterator tri = DatabaseManager.query(context, collectionSelect, sparams);
+			tri = DatabaseManager.query(context, collectionSelect, sparams);
 			
 			if (tri.hasNext())
 			{
@@ -112,15 +113,18 @@ public class ItemCountDAOPostgres implements ItemCountDAO
 				Object[] params = { new Integer(collection.getID()), new Integer(count) };
 				DatabaseManager.updateQuery(context, collectionInsert, params);
 			}
-			
-			tri.close();
 		}
 		catch (SQLException e)
 		{
 			log.error("caught exception: ", e);
 			throw new ItemCountException(e);
 		}
-	}
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
+    }
 
 	/**
 	 * Store the count of the given community
@@ -132,11 +136,12 @@ public class ItemCountDAOPostgres implements ItemCountDAO
 	public void communityCount(Community community, int count) 
 		throws ItemCountException
 	{
-		try
+        TableRowIterator tri = null;
+        try
 		{
 			// first find out if we have a record
 			Object[] sparams = { new Integer(community.getID()) };
-			TableRowIterator tri = DatabaseManager.query(context, communitySelect, sparams);
+			tri = DatabaseManager.query(context, communitySelect, sparams);
 			
 			if (tri.hasNext())
 			{
@@ -148,15 +153,18 @@ public class ItemCountDAOPostgres implements ItemCountDAO
 				Object[] params = { new Integer(community.getID()), new Integer(count) };
 				DatabaseManager.updateQuery(context, communityInsert, params);
 			}
-			
-			tri.close();
 		}
 		catch (SQLException e)
 		{
 			log.error("caught exception: ", e);
 			throw new ItemCountException(e);
 		}
-	}
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
+    }
 
 	/**
 	 * Set the dspace context to use
@@ -268,10 +276,11 @@ public class ItemCountDAOPostgres implements ItemCountDAO
 	private int getCollectionCount(Collection collection)
 		throws ItemCountException
 	{
-		try
+        TableRowIterator tri = null;
+        try
 		{
 			Object[] params = { new Integer(collection.getID()) };
-			TableRowIterator tri = DatabaseManager.query(context, collectionSelect, params);
+			tri = DatabaseManager.query(context, collectionSelect, params);
 			
 			if (!tri.hasNext())
 			{
@@ -284,9 +293,7 @@ public class ItemCountDAOPostgres implements ItemCountDAO
 			{
 				throw new ItemCountException("More than one count row in the database");
 			}
-			
-			tri.close();
-			
+
 			return tr.getIntColumn("count");
 		}
 		catch (SQLException e)
@@ -294,7 +301,12 @@ public class ItemCountDAOPostgres implements ItemCountDAO
 			log.error("caught exception: ", e);
 			throw new ItemCountException(e);
 		}
-	}
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
+    }
 	
 	/**
 	 * get the count for the given community
@@ -306,10 +318,11 @@ public class ItemCountDAOPostgres implements ItemCountDAO
 	private int getCommunityCount(Community community)
 		throws ItemCountException
 	{
-		try
+        TableRowIterator tri = null;
+        try
 		{
 			Object[] params = { new Integer(community.getID()) };
-			TableRowIterator tri = DatabaseManager.query(context, communitySelect, params);
+			tri = DatabaseManager.query(context, communitySelect, params);
 			
 			if (!tri.hasNext())
 			{
@@ -322,9 +335,7 @@ public class ItemCountDAOPostgres implements ItemCountDAO
 			{
 				throw new ItemCountException("More than one count row in the database");
 			}
-			
-			tri.close();
-			
+
 			return tr.getIntColumn("count");
 		}
 		catch (SQLException e)
@@ -332,5 +343,10 @@ public class ItemCountDAOPostgres implements ItemCountDAO
 			log.error("caught exception: ", e);
 			throw new ItemCountException(e);
 		}
-	}
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
+    }
 }

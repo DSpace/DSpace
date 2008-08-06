@@ -237,12 +237,18 @@ public class WorkflowManager
         TableRowIterator tri = DatabaseManager.queryTable(c, 
         		"workflowitem", myquery,e.getID());
 
-        while (tri.hasNext())
+        try
         {
-            mylist.add(new WorkflowItem(c, tri.next()));
+            while (tri.hasNext())
+            {
+                mylist.add(new WorkflowItem(c, tri.next()));
+            }
         }
-        
-        tri.close();
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
 
         return mylist;
     }
@@ -265,12 +271,18 @@ public class WorkflowManager
         TableRowIterator tri = DatabaseManager
                 .queryTable(c, "workflowitem", myquery, e.getID());
 
-        while (tri.hasNext())
+        try
         {
-            mylist.add(new WorkflowItem(c, tri.next()));
+            while (tri.hasNext())
+            {
+                mylist.add(new WorkflowItem(c, tri.next()));
+            }
         }
-
-        tri.close();
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
         
         return mylist;
     }

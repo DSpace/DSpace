@@ -112,20 +112,27 @@ public class Subscribe
                     " AND collection_id= ? ", 
                     eperson.getID(),collection.getID());
 
-            if (!r.hasNext())
+            try
             {
-                // Not subscribed, so add them
-                TableRow row = DatabaseManager.create(context, "subscription");
-                row.setColumn("eperson_id", eperson.getID());
-                row.setColumn("collection_id", collection.getID());
-                DatabaseManager.update(context, row);
+                if (!r.hasNext())
+                {
+                    // Not subscribed, so add them
+                    TableRow row = DatabaseManager.create(context, "subscription");
+                    row.setColumn("eperson_id", eperson.getID());
+                    row.setColumn("collection_id", collection.getID());
+                    DatabaseManager.update(context, row);
 
-                log.info(LogManager.getHeader(context, "subscribe",
-                        "eperson_id=" + eperson.getID() + ",collection_id="
-                                + collection.getID()));
+                    log.info(LogManager.getHeader(context, "subscribe",
+                            "eperson_id=" + eperson.getID() + ",collection_id="
+                                    + collection.getID()));
+                }
             }
-            
-            r.close();
+            finally
+            {
+                // close the TableRowIterator to free up resources
+                if (r != null)
+                    r.close();
+            }
         }
         else
         {
@@ -198,15 +205,22 @@ public class Subscribe
 
         List collections = new ArrayList();
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
 
-            collections.add(Collection.find(context, row
-                    .getIntColumn("collection_id")));
+                collections.add(Collection.find(context, row
+                        .getIntColumn("collection_id")));
+            }
         }
-
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
         
         Collection[] collArray = new Collection[collections.size()];
 
@@ -231,11 +245,17 @@ public class Subscribe
                 "SELECT * FROM subscription WHERE eperson_id= ? " +
                 "AND collection_id= ? ", 
                 eperson.getID(),collection.getID());
-    	
-    	boolean result = tri.hasNext();
-    	tri.close();
-    	
-    	return result;
+
+        try
+        {
+            return tri.hasNext();
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
     }
 
     /**
@@ -265,42 +285,49 @@ public class Subscribe
         EPerson currentEPerson = null;
         List collections = null; // List of Collections
 
-        // Go through the list collating subscriptions for each e-person
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // Does this row relate to the same e-person as the last?
-            if ((currentEPerson == null)
-                    || (row.getIntColumn("eperson_id") != currentEPerson
-                            .getID()))
+            // Go through the list collating subscriptions for each e-person
+            while (tri.hasNext())
             {
-                // New e-person. Send mail for previous e-person
-                if (currentEPerson != null)
-                {
+                TableRow row = tri.next();
 
-                    try
+                // Does this row relate to the same e-person as the last?
+                if ((currentEPerson == null)
+                        || (row.getIntColumn("eperson_id") != currentEPerson
+                                .getID()))
+                {
+                    // New e-person. Send mail for previous e-person
+                    if (currentEPerson != null)
                     {
-                        sendEmail(context, currentEPerson, collections, test);
+
+                        try
+                        {
+                            sendEmail(context, currentEPerson, collections, test);
+                        }
+                        catch (MessagingException me)
+                        {
+                            log.error("Failed to send subscription to eperson_id="
+                                    + currentEPerson.getID());
+                            log.error(me);
+                        }
                     }
-                    catch (MessagingException me)
-                    {
-                        log.error("Failed to send subscription to eperson_id="
-                                + currentEPerson.getID());
-                        log.error(me);
-                    }
+
+                    currentEPerson = EPerson.find(context, row
+                            .getIntColumn("eperson_id"));
+                    collections = new ArrayList();
                 }
 
-                currentEPerson = EPerson.find(context, row
-                        .getIntColumn("eperson_id"));
-                collections = new ArrayList();
+                collections.add(Collection.find(context, row
+                        .getIntColumn("collection_id")));
             }
-
-            collections.add(Collection.find(context, row
-                    .getIntColumn("collection_id")));
         }
-        
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
         
         // Process the last person
         if (currentEPerson != null)

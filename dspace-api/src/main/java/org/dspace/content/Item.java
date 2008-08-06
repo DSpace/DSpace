@@ -143,39 +143,46 @@ public class Item extends DSpaceObject
         // Get Dublin Core metadata
         TableRowIterator tri = retrieveMetadata();
 
-        while (tri.hasNext())
+        try
         {
-            TableRow resultRow = tri.next();
-
-            // Get the associated metadata field and schema information
-            int fieldID = resultRow.getIntColumn("metadata_field_id");
-            MetadataField field = MetadataField.find(context, fieldID);
-
-            if (field == null)
+            while (tri.hasNext())
             {
-                log.error("Loading item - cannot found metadata field "
-                        + fieldID);
+                TableRow resultRow = tri.next();
+
+                // Get the associated metadata field and schema information
+                int fieldID = resultRow.getIntColumn("metadata_field_id");
+                MetadataField field = MetadataField.find(context, fieldID);
+
+                if (field == null)
+                {
+                    log.error("Loading item - cannot found metadata field "
+                            + fieldID);
+                }
+                else
+                {
+                    MetadataSchema schema = MetadataSchema.find(
+                            context, field.getSchemaID());
+
+                    // Make a DCValue object
+                    DCValue dcv = new DCValue();
+                        dcv.element = field.getElement();
+                        dcv.qualifier = field.getQualifier();
+                    dcv.value = resultRow.getStringColumn("text_value");
+                    dcv.language = resultRow.getStringColumn("text_lang");
+                        //dcv.namespace = schema.getNamespace();
+                        dcv.schema = schema.getName();
+
+                    // Add it to the list
+                    dublinCore.add(dcv);
+                }
             }
-            else
-            {
-                MetadataSchema schema = MetadataSchema.find(
-                        context, field.getSchemaID());
-
-            // Make a DCValue object
-            DCValue dcv = new DCValue();
-                dcv.element = field.getElement();
-                dcv.qualifier = field.getQualifier();
-            dcv.value = resultRow.getStringColumn("text_value");
-            dcv.language = resultRow.getStringColumn("text_lang");
-                //dcv.namespace = schema.getNamespace();
-                dcv.schema = schema.getName();
-
-            // Add it to the list
-            dublinCore.add(dcv);
         }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
 
         // Get our Handle if any
         handle = HandleManager.findHandle(context, this);
@@ -918,25 +925,32 @@ public class Item extends DSpaceObject
                         "collection2item.item_id= ? ",
                         itemRow.getIntColumn("item_id"));
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // First check the cache
-            Collection fromCache = (Collection) ourContext.fromCache(
-                    Collection.class, row.getIntColumn("collection_id"));
-
-            if (fromCache != null)
+            while (tri.hasNext())
             {
-                collections.add(fromCache);
-            }
-            else
-            {
-                collections.add(new Collection(ourContext, row));
+                TableRow row = tri.next();
+
+                // First check the cache
+                Collection fromCache = (Collection) ourContext.fromCache(
+                        Collection.class, row.getIntColumn("collection_id"));
+
+                if (fromCache != null)
+                {
+                    collections.add(fromCache);
+                }
+                else
+                {
+                    collections.add(new Collection(ourContext, row));
+                }
             }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         Collection[] collectionArray = new Collection[collections.size()];
         collectionArray = (Collection[]) collections.toArray(collectionArray);
@@ -963,31 +977,38 @@ public class Item extends DSpaceObject
                         "AND community2item.item_id= ? ",
                         itemRow.getIntColumn("item_id"));
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // First check the cache
-            Community owner = (Community) ourContext.fromCache(Community.class,
-                    row.getIntColumn("community_id"));
-
-            if (owner == null)
+            while (tri.hasNext())
             {
-                owner = new Community(ourContext, row);
-            }
+                TableRow row = tri.next();
 
-            communities.add(owner);
+                // First check the cache
+                Community owner = (Community) ourContext.fromCache(Community.class,
+                        row.getIntColumn("community_id"));
 
-            // now add any parent communities
-            Community[] parents = owner.getAllParents();
+                if (owner == null)
+                {
+                    owner = new Community(ourContext, row);
+                }
 
-            for (int i = 0; i < parents.length; i++)
-            {
-                communities.add(parents[i]);
+                communities.add(owner);
+
+                // now add any parent communities
+                Community[] parents = owner.getAllParents();
+
+                for (int i = 0; i < parents.length; i++)
+                {
+                    communities.add(parents[i]);
+                }
             }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         Community[] communityArray = new Community[communities.size()];
         communityArray = (Community[]) communities.toArray(communityArray);
@@ -1012,25 +1033,32 @@ public class Item extends DSpaceObject
     					"item2bundle.item_id= ? ",
                         itemRow.getIntColumn("item_id"));
 
-    		while (tri.hasNext())
-    		{
-    			TableRow r = tri.next();
+            try
+            {
+                while (tri.hasNext())
+                {
+                    TableRow r = tri.next();
 
-    			// First check the cache
-    			Bundle fromCache = (Bundle) ourContext.fromCache(Bundle.class,
-    										r.getIntColumn("bundle_id"));
+                    // First check the cache
+                    Bundle fromCache = (Bundle) ourContext.fromCache(Bundle.class,
+                                                r.getIntColumn("bundle_id"));
 
-    			if (fromCache != null)
-    			{
-    				bundles.add(fromCache);
-    			}
-    			else
-    			{
-    				bundles.add(new Bundle(ourContext, r));
-    			}
-    		}
-    		// close the TableRowIterator to free up resources
-    		tri.close();
+                    if (fromCache != null)
+                    {
+                        bundles.add(fromCache);
+                    }
+                    else
+                    {
+                        bundles.add(new Bundle(ourContext, r));
+                    }
+                }
+            }
+            finally
+            {
+                // close the TableRowIterator to free up resources
+                if (tri != null)
+                    tri.close();
+            }
     	}
         
         Bundle[] bundleArray = new Bundle[bundles.size()];
@@ -1184,25 +1212,32 @@ public class Item extends DSpaceObject
                 "SELECT * FROM item2bundle WHERE bundle_id= ? ",
                 b.getID());
 
-        if (!tri.hasNext())
+        try
         {
-            //make the right to remove the bundle explicit because the implicit
-            // relation
-            //has been removed. This only has to concern the currentUser
-            // because
-            //he started the removal process and he will end it too.
-            //also add right to remove from the bundle to remove it's
-            // bitstreams.
-            AuthorizeManager.addPolicy(ourContext, b, Constants.DELETE,
-                    ourContext.getCurrentUser());
-            AuthorizeManager.addPolicy(ourContext, b, Constants.REMOVE,
-                    ourContext.getCurrentUser());
+            if (!tri.hasNext())
+            {
+                //make the right to remove the bundle explicit because the implicit
+                // relation
+                //has been removed. This only has to concern the currentUser
+                // because
+                //he started the removal process and he will end it too.
+                //also add right to remove from the bundle to remove it's
+                // bitstreams.
+                AuthorizeManager.addPolicy(ourContext, b, Constants.DELETE,
+                        ourContext.getCurrentUser());
+                AuthorizeManager.addPolicy(ourContext, b, Constants.REMOVE,
+                        ourContext.getCurrentUser());
 
-            // The bundle is an orphan, delete it
-            b.delete();
+                // The bundle is an orphan, delete it
+                b.delete();
+            }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
     }
 
     /**

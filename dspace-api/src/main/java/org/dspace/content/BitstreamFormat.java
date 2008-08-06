@@ -114,12 +114,19 @@ public class BitstreamFormat
                 "SELECT * FROM fileextension WHERE bitstream_format_id= ? ",
                  getID());
 
-        while (tri.hasNext())
+        try
         {
-            extensions.add(tri.next().getStringColumn("extension"));
+            while (tri.hasNext())
+            {
+                extensions.add(tri.next().getStringColumn("extension"));
+            }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("bitstream_format_id"));
@@ -298,26 +305,33 @@ public class BitstreamFormat
         TableRowIterator tri = DatabaseManager.queryTable(context, "bitstreamformatregistry",
                         "SELECT * FROM bitstreamformatregistry ORDER BY bitstream_format_id");
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // From cache?
-            BitstreamFormat fromCache = (BitstreamFormat) context.fromCache(
-                    BitstreamFormat.class, row
-                            .getIntColumn("bitstream_format_id"));
-
-            if (fromCache != null)
+            while (tri.hasNext())
             {
-                formats.add(fromCache);
-            }
-            else
-            {
-                formats.add(new BitstreamFormat(context, row));
+                TableRow row = tri.next();
+
+                // From cache?
+                BitstreamFormat fromCache = (BitstreamFormat) context.fromCache(
+                        BitstreamFormat.class, row
+                                .getIntColumn("bitstream_format_id"));
+
+                if (fromCache != null)
+                {
+                    formats.add(fromCache);
+                }
+                else
+                {
+                    formats.add(new BitstreamFormat(context, row));
+                }
             }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         // Return the formats as an array
         BitstreamFormat[] formatArray = new BitstreamFormat[formats.size()];
@@ -349,26 +363,33 @@ public class BitstreamFormat
         TableRowIterator tri = DatabaseManager.queryTable(context,
                 "bitstreamformatregistry", myQuery);
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // From cache?
-            BitstreamFormat fromCache = (BitstreamFormat) context.fromCache(
-                    BitstreamFormat.class, row
-                            .getIntColumn("bitstream_format_id"));
-
-            if (fromCache != null)
+            while (tri.hasNext())
             {
-                formats.add(fromCache);
-            }
-            else
-            {
-                formats.add(new BitstreamFormat(context, row));
+                TableRow row = tri.next();
+
+                // From cache?
+                BitstreamFormat fromCache = (BitstreamFormat) context.fromCache(
+                        BitstreamFormat.class, row
+                                .getIntColumn("bitstream_format_id"));
+
+                if (fromCache != null)
+                {
+                    formats.add(fromCache);
+                }
+                else
+                {
+                    formats.add(new BitstreamFormat(context, row));
+                }
             }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         // Return the formats as an array
         BitstreamFormat[] formatArray = new BitstreamFormat[formats.size()];

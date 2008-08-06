@@ -108,10 +108,17 @@ public class Supervisor {
         TableRowIterator tri = DatabaseManager.queryTable(context, 
                                     "epersongroup2workspaceitem", 
                                     query,groupID,wsItemID);
-        
-        boolean result = tri.hasNext();
-        tri.close();
-        return result;
+
+        try
+        {
+            return tri.hasNext();
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
     }
     
     /**

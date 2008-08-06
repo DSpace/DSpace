@@ -320,15 +320,20 @@ public class MetadataField
                     schemaID, element, qualifier);
         }
         
-
         TableRow row = null;
-        if (tri.hasNext())
+        try
         {
-            row = tri.next();
+            if (tri.hasNext())
+            {
+                row = tri.next();
+            }
         }
-
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         if (row == null)
         {
@@ -354,14 +359,21 @@ public class MetadataField
         // Get all the metadatafieldregistry rows
         TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataFieldRegistry",
                                "SELECT mfr.* FROM MetadataFieldRegistry mfr, MetadataSchemaRegistry msr where mfr.metadata_schema_id= msr.metadata_schema_id ORDER BY msr.short_id,  mfr.element, mfr.qualifier");
- 
-        // Make into DC Type objects
-        while (tri.hasNext())
+
+        try
         {
-            fields.add(new MetadataField(tri.next()));
+            // Make into DC Type objects
+            while (tri.hasNext())
+            {
+                fields.add(new MetadataField(tri.next()));
+            }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         // Convert list into an array
         MetadataField[] typeArray = new MetadataField[fields.size()];
@@ -386,13 +398,20 @@ public class MetadataField
                 "SELECT * FROM MetadataFieldRegistry WHERE metadata_schema_id= ? " +
                 " ORDER BY element, qualifier", schemaID);
 
-        // Make into DC Type objects
-        while (tri.hasNext())
+        try
         {
-            fields.add(new MetadataField(tri.next()));
+            // Make into DC Type objects
+            while (tri.hasNext())
+            {
+                fields.add(new MetadataField(tri.next()));
+            }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         // Convert list into an array
         MetadataField[] typeArray = new MetadataField[fields.size()];
@@ -509,41 +528,60 @@ public class MetadataField
             String qualifier) throws IOException, SQLException,
             AuthorizeException
     {
-        Connection con = context.getDBConnection();
-        TableRow reg = DatabaseManager.row("MetadataFieldRegistry");
-        
-        String qualifierClause = "";
-
-        if (qualifier == null)
-        {
-            qualifierClause = "and qualifier is null";
-        }
-        else
-        {
-            qualifierClause = "and qualifier = ?";
-        }
-
-        String query = "SELECT COUNT(*) FROM " + reg.getTable()
-        	+ " WHERE metadata_schema_id= ? "
-        	+ " and metadata_field_id != ? "
-        	+ " and element= ? " + qualifierClause;
-
-        PreparedStatement statement = con.prepareStatement(query);
-        statement.setInt(1,schemaID);
-        statement.setInt(2,fieldID);
-        statement.setString(3,element);
-        
-        if (qualifier != null)
-        {
-            statement.setString(4,qualifier);
-        }
-        
-        ResultSet rs = statement.executeQuery();
-
         int count = 0;
-        if (rs.next())
+        Connection con = null;
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        try
         {
-            count = rs.getInt(1);
+            con = context.getDBConnection();
+            TableRow reg = DatabaseManager.row("MetadataFieldRegistry");
+
+            String qualifierClause = "";
+
+            if (qualifier == null)
+            {
+                qualifierClause = "and qualifier is null";
+            }
+            else
+            {
+                qualifierClause = "and qualifier = ?";
+            }
+
+            String query = "SELECT COUNT(*) FROM " + reg.getTable()
+                + " WHERE metadata_schema_id= ? "
+                + " and metadata_field_id != ? "
+                + " and element= ? " + qualifierClause;
+
+            statement = con.prepareStatement(query);
+            statement.setInt(1,schemaID);
+            statement.setInt(2,fieldID);
+            statement.setString(3,element);
+
+            if (qualifier != null)
+            {
+                statement.setString(4,qualifier);
+            }
+
+            rs = statement.executeQuery();
+
+            if (rs.next())
+            {
+                count = rs.getInt(1);
+            }
+        }
+        finally
+        {
+            if (rs != null)
+            {
+                try { rs.close(); } catch (SQLException sqle) { }
+            }
+
+            if (statement != null)
+            {
+                try { statement.close(); } catch (SQLException sqle) { }
+            }
         }
 
         return (count == 0);
@@ -604,21 +642,36 @@ public class MetadataField
     {
         if (id2field != null)
             return;
-        id2field = new HashMap();
-        log.info("Loading MetadataField elements into cache.");
 
-        // Grab rows from DB
-        TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataFieldRegistry",
-                "SELECT * from MetadataFieldRegistry");
-
-        while (tri.hasNext())
+        synchronized (MetadataField.class)
         {
-            TableRow row = tri.next();
-            int fieldID = row.getIntColumn("metadata_field_id");
-            id2field.put(new Integer(fieldID), new MetadataField(row));
-        }
+            if (id2field == null)
+            {
+                HashMap new_id2field = new HashMap();
+                log.info("Loading MetadataField elements into cache.");
 
-        // close the TableRowIterator to free up resources
-        tri.close();
+                // Grab rows from DB
+                TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataFieldRegistry",
+                        "SELECT * from MetadataFieldRegistry");
+
+                try
+                {
+                    while (tri.hasNext())
+                    {
+                        TableRow row = tri.next();
+                        int fieldID = row.getIntColumn("metadata_field_id");
+                        new_id2field.put(new Integer(fieldID), new MetadataField(row));
+                    }
+                }
+                finally
+                {
+                    // close the TableRowIterator to free up resources
+                    if (tri != null)
+                        tri.close();
+                }
+
+                id2field = new_id2field;
+            }
+        }
     }
 }

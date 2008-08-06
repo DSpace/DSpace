@@ -262,13 +262,19 @@ public class MetadataSchema
                 namespace);
 
         TableRow row = null;
-        if (tri.hasNext())
+        try
         {
-            row = tri.next();
+            if (tri.hasNext())
+            {
+                row = tri.next();
+            }
         }
-
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         if (row == null)
         {
@@ -360,13 +366,20 @@ public class MetadataSchema
         TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataSchemaRegistry",
                         "SELECT * FROM MetadataSchemaRegistry ORDER BY metadata_schema_id");
 
-        // Make into DC Type objects
-        while (tri.hasNext())
+        try
         {
-            schemas.add(new MetadataSchema(tri.next()));
+            // Make into DC Type objects
+            while (tri.hasNext())
+            {
+                schemas.add(new MetadataSchema(tri.next()));
+            }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         // Convert list into an array
         MetadataSchema[] typeArray = new MetadataSchema[schemas.size()];
@@ -385,22 +398,41 @@ public class MetadataSchema
     private boolean uniqueNamespace(Context context, String namespace)
             throws SQLException
     {
-        Connection con = context.getDBConnection();
-        TableRow reg = DatabaseManager.row("MetadataSchemaRegistry");
-        
-        String query = "SELECT COUNT(*) FROM " + reg.getTable() + " " +
-        		"WHERE metadata_schema_id != ? " + 
-        		"AND namespace= ? ";
-        PreparedStatement statement = con.prepareStatement(query);
-        statement.setInt(1,schemaID);
-        statement.setString(2,namespace);
-        
-        ResultSet rs = statement.executeQuery();
-
         int count = 0;
-        if (rs.next())
+        Connection con = context.getDBConnection();
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        try
         {
-            count = rs.getInt(1);
+            TableRow reg = DatabaseManager.row("MetadataSchemaRegistry");
+
+            String query = "SELECT COUNT(*) FROM " + reg.getTable() + " " +
+                    "WHERE metadata_schema_id != ? " +
+                    "AND namespace= ? ";
+
+            statement = con.prepareStatement(query);
+            statement.setInt(1,schemaID);
+            statement.setString(2,namespace);
+
+            rs = statement.executeQuery();
+
+            if (rs.next())
+            {
+                count = rs.getInt(1);
+            }
+        }
+        finally
+        {
+            if (rs != null)
+            {
+                try { rs.close(); } catch (SQLException sqle) { }
+            }
+
+            if (statement != null)
+            {
+                try { statement.close(); } catch (SQLException sqle) { }
+            }
         }
 
         return (count == 0);
@@ -417,23 +449,41 @@ public class MetadataSchema
     private boolean uniqueShortName(Context context, String name)
             throws SQLException
     {
-        Connection con = context.getDBConnection();
-        TableRow reg = DatabaseManager.row("MetadataSchemaRegistry");
-        
-        String query = "SELECT COUNT(*) FROM " + reg.getTable() + " " +
-        		"WHERE metadata_schema_id != ? " +
-                "AND short_id = ? ";
-        
-        PreparedStatement statement = con.prepareStatement(query);
-        statement.setInt(1,schemaID);
-        statement.setString(2,name);
-        
-        ResultSet rs = statement.executeQuery();
-
         int count = 0;
-        if (rs.next())
+        Connection con = context.getDBConnection();
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        try
         {
-            count = rs.getInt(1);
+            TableRow reg = DatabaseManager.row("MetadataSchemaRegistry");
+
+            String query = "SELECT COUNT(*) FROM " + reg.getTable() + " " +
+                    "WHERE metadata_schema_id != ? " +
+                    "AND short_id = ? ";
+
+            statement = con.prepareStatement(query);
+            statement.setInt(1,schemaID);
+            statement.setString(2,name);
+
+            rs = statement.executeQuery();
+
+            if (rs.next())
+            {
+                count = rs.getInt(1);
+            }
+        }
+        finally
+        {
+            if (rs != null)
+            {
+                try { rs.close(); } catch (SQLException sqle) { }
+            }
+
+            if (statement != null)
+            {
+                try { statement.close(); } catch (SQLException sqle) { }
+            }
         }
 
         return (count == 0);
@@ -501,21 +551,38 @@ public class MetadataSchema
         if (id2schema != null && name2schema != null)
             return;
 
-        log.info("Loading schema cache for fast finds");
-        id2schema = new HashMap();
-        name2schema = new HashMap();
-
-        TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataSchemaRegistry",
-                "SELECT * from MetadataSchemaRegistry");
-        while (tri.hasNext())
+        synchronized (MetadataSchema.class)
         {
-            TableRow row = tri.next();
+            if (id2schema == null && name2schema == null)
+            {
+                log.info("Loading schema cache for fast finds");
+                HashMap new_id2schema = new HashMap();
+                HashMap new_name2schema = new HashMap();
 
-            MetadataSchema s = new MetadataSchema(row);
-            id2schema.put(new Integer(s.schemaID), s);
-            name2schema.put(s.name, s);
+                TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataSchemaRegistry",
+                        "SELECT * from MetadataSchemaRegistry");
+
+                try
+                {
+                    while (tri.hasNext())
+                    {
+                        TableRow row = tri.next();
+
+                        MetadataSchema s = new MetadataSchema(row);
+                        new_id2schema.put(new Integer(s.schemaID), s);
+                        new_name2schema.put(s.name, s);
+                    }
+                }
+                finally
+                {
+                    // close the TableRowIterator to free up resources
+                    if (tri != null)
+                        tri.close();
+                }
+
+                id2schema = new_id2schema;
+                name2schema = new_name2schema;
+            }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
     }
 }

@@ -908,36 +908,57 @@ public class EPerson extends DSpaceObject
                 "SELECT * from item where submitter_id= ? ",
                 getID());
 
-        if (tri.hasNext())
+        try
         {
-            tableList.add("item");
+            if (tri.hasNext())
+            {
+                tableList.add("item");
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
         }
 
-        tri.close();
-        
         // check for eperson in workflowitem table
         tri = DatabaseManager.query(myContext,
                 "SELECT * from workflowitem where owner= ? ",
                 getID());
 
-        if (tri.hasNext())
+        try
         {
-            tableList.add("workflowitem");
+            if (tri.hasNext())
+            {
+                tableList.add("workflowitem");
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
         }
 
-        tri.close();
-        
         // check for eperson in tasklistitem table
         tri = DatabaseManager.query(myContext,
                 "SELECT * from tasklistitem where eperson_id= ? ",
                 getID());
 
-        if (tri.hasNext())
+        try
         {
-            tableList.add("tasklistitem");
+            if (tri.hasNext())
+            {
+                tableList.add("tasklistitem");
+            }
         }
-
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
         
         // the list of tables can be used to construct an error message
         // explaining to the user why the eperson cannot be deleted.

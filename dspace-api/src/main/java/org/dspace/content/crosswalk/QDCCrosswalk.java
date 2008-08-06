@@ -280,7 +280,17 @@ public class QDCCrosswalk extends SelfNamedPlugin
             File.separator + "config" + File.separator;
         File propsFile = new File(parent, propsFilename);
         Properties qdcProps = new Properties();
-        qdcProps.load(new FileInputStream(propsFile));
+        FileInputStream pfs = null;
+        try
+        {
+            pfs = new FileInputStream(propsFile);
+            qdcProps.load(pfs);
+        }
+        finally
+        {
+            if (pfs != null)
+                try { pfs.close(); } catch (IOException ioe) { }
+        }
 
         // grovel properties to initialize qdc->element and element->qdc maps.
         // evaluate the XML fragment with a wrapper including namespaces.

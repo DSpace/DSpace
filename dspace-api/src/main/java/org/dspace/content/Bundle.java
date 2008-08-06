@@ -110,26 +110,33 @@ public class Bundle extends DSpaceObject
                         + "bundle2bitstream.bitstream_id=bitstream.bitstream_id AND "
                         + "bundle2bitstream.bundle_id= ? ",
                 bundleRow.getIntColumn("bundle_id"));
-        
-        while (tri.hasNext())
+
+        try
         {
-            TableRow r = (TableRow) tri.next();
-
-            // First check the cache
-            Bitstream fromCache = (Bitstream) context.fromCache(
-                    Bitstream.class, r.getIntColumn("bitstream_id"));
-
-            if (fromCache != null)
+            while (tri.hasNext())
             {
-                bitstreams.add(fromCache);
-            }
-            else
-            {
-                bitstreams.add(new Bitstream(ourContext, r));
+                TableRow r = (TableRow) tri.next();
+
+                // First check the cache
+                Bitstream fromCache = (Bitstream) context.fromCache(
+                        Bitstream.class, r.getIntColumn("bitstream_id"));
+
+                if (fromCache != null)
+                {
+                    bitstreams.add(fromCache);
+                }
+                else
+                {
+                    bitstreams.add(new Bitstream(ourContext, r));
+                }
             }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("bundle_id"));
@@ -331,26 +338,33 @@ public class Bundle extends DSpaceObject
                 "item2bundle.item_id=item.item_id AND " +
                 "item2bundle.bundle_id= ? ",
                 bundleRow.getIntColumn("bundle_id"));
-        
-        while (tri.hasNext())
+
+        try
         {
-            TableRow r = (TableRow) tri.next();
-
-            // Used cached copy if there is one
-            Item fromCache = (Item) ourContext.fromCache(Item.class, r
-                    .getIntColumn("item_id"));
-
-            if (fromCache != null)
+            while (tri.hasNext())
             {
-                items.add(fromCache);
-            }
-            else
-            {
-                items.add(new Item(ourContext, r));
+                TableRow r = (TableRow) tri.next();
+
+                // Used cached copy if there is one
+                Item fromCache = (Item) ourContext.fromCache(Item.class, r
+                        .getIntColumn("item_id"));
+
+                if (fromCache != null)
+                {
+                    items.add(fromCache);
+                }
+                else
+                {
+                    items.add(new Item(ourContext, r));
+                }
             }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         Item[] itemArray = new Item[items.size()];
         itemArray = (Item[]) items.toArray(itemArray);
@@ -503,13 +517,20 @@ public class Bundle extends DSpaceObject
                 "SELECT * FROM bundle2bitstream WHERE bitstream_id= ? ",
                 b.getID());
 
-        if (!tri.hasNext())
+        try
         {
-            // The bitstream is an orphan, delete it
-            b.delete();
+            if (!tri.hasNext())
+            {
+                // The bitstream is an orphan, delete it
+                b.delete();
+            }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
     }
 
     /**

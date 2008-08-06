@@ -98,59 +98,62 @@ public class HandleDispatcher implements BitstreamDispatcher
      * @throws SQLException
      *             if database access fails.
      */
-    private void init()
+    private synchronized void init()
     {
-        Context context = null;
-        int dsoType = -1;
-
-        int id = -1;
-        try
+        if (init == Boolean.FALSE)
         {
-            context = new Context();
-            DSpaceObject dso = HandleManager.resolveToObject(context, handle);
-            id = dso.getID();
-            dsoType = dso.getType();
-            context.abort();
+            Context context = null;
+            int dsoType = -1;
 
-        }
-        catch (SQLException e)
-        {
-            LOG.error("init error " + e.getMessage(), e);
-            throw new RuntimeException("init error" + e.getMessage(), e);
-
-        }
-        finally
-        {
-            // Abort the context if it's still valid
-            if ((context != null) && context.isValid())
+            int id = -1;
+            try
             {
+                context = new Context();
+                DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+                id = dso.getID();
+                dsoType = dso.getType();
                 context.abort();
+
             }
+            catch (SQLException e)
+            {
+                LOG.error("init error " + e.getMessage(), e);
+                throw new RuntimeException("init error" + e.getMessage(), e);
+
+            }
+            finally
+            {
+                // Abort the context if it's still valid
+                if ((context != null) && context.isValid())
+                {
+                    context.abort();
+                }
+            }
+
+            List ids = new ArrayList();
+
+            switch (dsoType)
+            {
+            case Constants.BITSTREAM:
+                ids.add(new Integer(id));
+                break;
+
+            case Constants.ITEM:
+                ids = bitstreamInfoDAO.getItemBitstreams(id);
+                break;
+
+            case Constants.COLLECTION:
+                ids = bitstreamInfoDAO.getCollectionBitstreams(id);
+                break;
+
+            case Constants.COMMUNITY:
+                ids = bitstreamInfoDAO.getCommunityBitstreams(id);
+                break;
+            }
+
+            delegate = new ListDispatcher(ids);
+            init = Boolean.TRUE;
         }
-
-        List ids = new ArrayList();
-
-        switch (dsoType)
-        {
-        case Constants.BITSTREAM:
-            ids.add(new Integer(id));
-            break;
-
-        case Constants.ITEM:
-            ids = bitstreamInfoDAO.getItemBitstreams(id);
-            break;
-
-        case Constants.COLLECTION:
-            ids = bitstreamInfoDAO.getCollectionBitstreams(id);
-            break;
-
-        case Constants.COMMUNITY:
-            ids = bitstreamInfoDAO.getCommunityBitstreams(id);
-            break;
-        }
-
-        delegate = new ListDispatcher(ids);
-        init = Boolean.TRUE;
     }
 
     /**
@@ -160,12 +163,9 @@ public class HandleDispatcher implements BitstreamDispatcher
      */
     public int next()
     {
-        synchronized (init)
+        if (init == Boolean.FALSE)
         {
-            if (init == Boolean.FALSE)
-            {
-                init();
-            }
+            init();
         }
 
         return delegate.next();

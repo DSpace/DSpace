@@ -105,17 +105,24 @@ public class FormatIdentifier
                 extension);
 
         BitstreamFormat retFormat = null;
-        if (tri.hasNext())
+        try
         {
-            // Return first match
-            retFormat = new BitstreamFormat(context, tri.next());
+            if (tri.hasNext())
+            {
+                // Return first match
+                retFormat = new BitstreamFormat(context, tri.next());
+            }
+            else
+            {
+                retFormat = null;
+            }
         }
-        else
+        finally
         {
-            retFormat = null;
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
         return retFormat;
     }
 }

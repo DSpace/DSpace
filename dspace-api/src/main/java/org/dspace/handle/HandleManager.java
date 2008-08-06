@@ -327,13 +327,20 @@ public class HandleManager
         TableRowIterator iterator = DatabaseManager.queryTable(context, null, sql, prefix+"%");
         List results = new ArrayList();
 
-        while (iterator.hasNext())
+        try
         {
-            TableRow row = (TableRow) iterator.next();
-            results.add(row.getStringColumn("handle"));
+            while (iterator.hasNext())
+            {
+                TableRow row = (TableRow) iterator.next();
+                results.add(row.getStringColumn("handle"));
+            }
         }
-        
-        iterator.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (iterator != null)
+                iterator.close();
+        }
 
         return results;
     }

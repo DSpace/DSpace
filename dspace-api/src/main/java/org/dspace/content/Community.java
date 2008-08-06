@@ -237,25 +237,32 @@ public class Community extends DSpaceObject
 
         List<Community> communities = new ArrayList<Community>();
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // First check the cache
-            Community fromCache = (Community) context.fromCache(
-                    Community.class, row.getIntColumn("community_id"));
-
-            if (fromCache != null)
+            while (tri.hasNext())
             {
-                communities.add(fromCache);
-            }
-            else
-            {
-                communities.add(new Community(context, row));
+                TableRow row = tri.next();
+
+                // First check the cache
+                Community fromCache = (Community) context.fromCache(
+                        Community.class, row.getIntColumn("community_id"));
+
+                if (fromCache != null)
+                {
+                    communities.add(fromCache);
+                }
+                else
+                {
+                    communities.add(new Community(context, row));
+                }
             }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         Community[] communityArray = new Community[communities.size()];
         communityArray = (Community[]) communities.toArray(communityArray);
@@ -283,25 +290,32 @@ public class Community extends DSpaceObject
 
         List<Community> topCommunities = new ArrayList<Community>();
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // First check the cache
-            Community fromCache = (Community) context.fromCache(
-                    Community.class, row.getIntColumn("community_id"));
-
-            if (fromCache != null)
+            while (tri.hasNext())
             {
-                topCommunities.add(fromCache);
-            }
-            else
-            {
-                topCommunities.add(new Community(context, row));
+                TableRow row = tri.next();
+
+                // First check the cache
+                Community fromCache = (Community) context.fromCache(
+                        Community.class, row.getIntColumn("community_id"));
+
+                if (fromCache != null)
+                {
+                    topCommunities.add(fromCache);
+                }
+                else
+                {
+                    topCommunities.add(new Community(context, row));
+                }
             }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         Community[] communityArray = new Community[topCommunities.size()];
         communityArray = (Community[]) topCommunities.toArray(communityArray);
@@ -514,25 +528,32 @@ public class Community extends DSpaceObject
             getID());
 
         // Make Collection objects
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // First check the cache
-            Collection fromCache = (Collection) ourContext.fromCache(
-                    Collection.class, row.getIntColumn("collection_id"));
-
-            if (fromCache != null)
+            while (tri.hasNext())
             {
-                collections.add(fromCache);
-            }
-            else
-            {
-                collections.add(new Collection(ourContext, row));
+                TableRow row = tri.next();
+
+                // First check the cache
+                Collection fromCache = (Collection) ourContext.fromCache(
+                        Collection.class, row.getIntColumn("collection_id"));
+
+                if (fromCache != null)
+                {
+                    collections.add(fromCache);
+                }
+                else
+                {
+                    collections.add(new Collection(ourContext, row));
+                }
             }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         // Put them in an array
         Collection[] collectionArray = new Collection[collections.size()];
@@ -562,25 +583,32 @@ public class Community extends DSpaceObject
         
 
         // Make Community objects
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // First check the cache
-            Community fromCache = (Community) ourContext.fromCache(
-                    Community.class, row.getIntColumn("community_id"));
-
-            if (fromCache != null)
+            while (tri.hasNext())
             {
-                subcommunities.add(fromCache);
-            }
-            else
-            {
-                subcommunities.add(new Community(ourContext, row));
+                TableRow row = tri.next();
+
+                // First check the cache
+                Community fromCache = (Community) ourContext.fromCache(
+                        Community.class, row.getIntColumn("community_id"));
+
+                if (fromCache != null)
+                {
+                    subcommunities.add(fromCache);
+                }
+                else
+                {
+                    subcommunities.add(new Community(ourContext, row));
+                }
             }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         // Put them in an array
         Community[] communityArray = new Community[subcommunities.size()];
@@ -608,25 +636,32 @@ public class Community extends DSpaceObject
                 getID());
         
         // Make Community object
-        if (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // First check the cache
-            Community fromCache = (Community) ourContext.fromCache(
-                    Community.class, row.getIntColumn("community_id"));
-
-            if (fromCache != null)
+            if (tri.hasNext())
             {
-                parentCommunity = fromCache;
-            }
-            else
-            {
-                parentCommunity = new Community(ourContext, row);
+                TableRow row = tri.next();
+
+                // First check the cache
+                Community fromCache = (Community) ourContext.fromCache(
+                        Community.class, row.getIntColumn("community_id"));
+
+                if (fromCache != null)
+                {
+                    parentCommunity = fromCache;
+                }
+                else
+                {
+                    parentCommunity = new Community(ourContext, row);
+                }
             }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         return parentCommunity;
     }
@@ -693,22 +728,29 @@ public class Community extends DSpaceObject
                 "community2collection",
                 "SELECT * FROM community2collection WHERE " +
                 "community_id= ? AND collection_id= ? ",getID(),c.getID());
-        
-        if (!tri.hasNext())
+
+        try
         {
-            // No existing mapping, so add one
-            TableRow mappingRow = DatabaseManager.create(ourContext,
-                    "community2collection");
+            if (!tri.hasNext())
+            {
+                // No existing mapping, so add one
+                TableRow mappingRow = DatabaseManager.create(ourContext,
+                        "community2collection");
 
-            mappingRow.setColumn("community_id", getID());
-            mappingRow.setColumn("collection_id", c.getID());
+                mappingRow.setColumn("community_id", getID());
+                mappingRow.setColumn("collection_id", c.getID());
 
-            ourContext.addEvent(new Event(Event.ADD, Constants.COMMUNITY, getID(), Constants.COLLECTION, c.getID(), c.getHandle()));
+                ourContext.addEvent(new Event(Event.ADD, Constants.COMMUNITY, getID(), Constants.COLLECTION, c.getID(), c.getHandle()));
 
-            DatabaseManager.update(ourContext, mappingRow);
+                DatabaseManager.update(ourContext, mappingRow);
+            }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
     }
 
     /**
@@ -748,22 +790,29 @@ public class Community extends DSpaceObject
                 "community2community",
                 "SELECT * FROM community2community WHERE parent_comm_id= ? "+
                 "AND child_comm_id= ? ",getID(), c.getID());
-        
-        if (!tri.hasNext())
+
+        try
         {
-            // No existing mapping, so add one
-            TableRow mappingRow = DatabaseManager.create(ourContext,
-                    "community2community");
+            if (!tri.hasNext())
+            {
+                // No existing mapping, so add one
+                TableRow mappingRow = DatabaseManager.create(ourContext,
+                        "community2community");
 
-            mappingRow.setColumn("parent_comm_id", getID());
-            mappingRow.setColumn("child_comm_id", c.getID());
+                mappingRow.setColumn("parent_comm_id", getID());
+                mappingRow.setColumn("child_comm_id", c.getID());
 
-            ourContext.addEvent(new Event(Event.ADD, Constants.COMMUNITY, getID(), Constants.COMMUNITY, c.getID(), c.getHandle()));
+                ourContext.addEvent(new Event(Event.ADD, Constants.COMMUNITY, getID(), Constants.COMMUNITY, c.getID(), c.getHandle()));
 
-            DatabaseManager.update(ourContext, mappingRow);
+                DatabaseManager.update(ourContext, mappingRow);
+            }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
     }
 
     /**
@@ -793,25 +842,32 @@ public class Community extends DSpaceObject
                 "SELECT * FROM community2collection WHERE collection_id= ? ",
                 c.getID());
 
-        if (!tri.hasNext())
+        try
         {
-            //make the right to remove the collection explicit because the
-            // implicit relation
-            //has been removed. This only has to concern the currentUser
-            // because
-            //he started the removal process and he will end it too.
-            //also add right to remove from the collection to remove it's
-            // items.
-            AuthorizeManager.addPolicy(ourContext, c, Constants.DELETE,
-                    ourContext.getCurrentUser());
-            AuthorizeManager.addPolicy(ourContext, c, Constants.REMOVE,
-                    ourContext.getCurrentUser());
+            if (!tri.hasNext())
+            {
+                //make the right to remove the collection explicit because the
+                // implicit relation
+                //has been removed. This only has to concern the currentUser
+                // because
+                //he started the removal process and he will end it too.
+                //also add right to remove from the collection to remove it's
+                // items.
+                AuthorizeManager.addPolicy(ourContext, c, Constants.DELETE,
+                        ourContext.getCurrentUser());
+                AuthorizeManager.addPolicy(ourContext, c, Constants.REMOVE,
+                        ourContext.getCurrentUser());
 
-            // Orphan; delete it
-            c.delete();
+                // Orphan; delete it
+                c.delete();
+            }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
     }
 
     /**
@@ -841,25 +897,32 @@ public class Community extends DSpaceObject
                 "SELECT * FROM community2community WHERE child_comm_id= ? ",
                 c.getID());
 
-        if (!tri.hasNext())
+        try
         {
-            //make the right to remove the sub explicit because the implicit
-            // relation
-            //has been removed. This only has to concern the currentUser
-            // because
-            //he started the removal process and he will end it too.
-            //also add right to remove from the subcommunity to remove it's
-            // children.
-            AuthorizeManager.addPolicy(ourContext, c, Constants.DELETE,
-                    ourContext.getCurrentUser());
-            AuthorizeManager.addPolicy(ourContext, c, Constants.REMOVE,
-                    ourContext.getCurrentUser());
+            if (!tri.hasNext())
+            {
+                //make the right to remove the sub explicit because the implicit
+                // relation
+                //has been removed. This only has to concern the currentUser
+                // because
+                //he started the removal process and he will end it too.
+                //also add right to remove from the subcommunity to remove it's
+                // children.
+                AuthorizeManager.addPolicy(ourContext, c, Constants.DELETE,
+                        ourContext.getCurrentUser());
+                AuthorizeManager.addPolicy(ourContext, c, Constants.REMOVE,
+                        ourContext.getCurrentUser());
 
-            // Orphan; delete it
-            c.delete();
+                // Orphan; delete it
+                c.delete();
+            }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
     }
 
     /**

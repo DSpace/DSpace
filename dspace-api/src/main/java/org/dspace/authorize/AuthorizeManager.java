@@ -424,24 +424,31 @@ public class AuthorizeManager
 
         List<ResourcePolicy> policies = new ArrayList();
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // first check the cache (FIXME: is this right?)
-            ResourcePolicy cachepolicy = (ResourcePolicy) c.fromCache(
-                    ResourcePolicy.class, row.getIntColumn("policy_id"));
-
-            if (cachepolicy != null)
+            while (tri.hasNext())
             {
-                policies.add(cachepolicy);
-            }
-            else
-            {
-                policies.add(new ResourcePolicy(c, row));
+                TableRow row = tri.next();
+
+                // first check the cache (FIXME: is this right?)
+                ResourcePolicy cachepolicy = (ResourcePolicy) c.fromCache(
+                        ResourcePolicy.class, row.getIntColumn("policy_id"));
+
+                if (cachepolicy != null)
+                {
+                    policies.add(cachepolicy);
+                }
+                else
+                {
+                    policies.add(new ResourcePolicy(c, row));
+                }
             }
         }
-        tri.close();
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
 
         return policies;
     }
@@ -463,24 +470,31 @@ public class AuthorizeManager
 
         List<ResourcePolicy> policies = new ArrayList<ResourcePolicy>();
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // first check the cache (FIXME: is this right?)
-            ResourcePolicy cachepolicy = (ResourcePolicy) c.fromCache(
-                    ResourcePolicy.class, row.getIntColumn("policy_id"));
-
-            if (cachepolicy != null)
+            while (tri.hasNext())
             {
-                policies.add(cachepolicy);
-            }
-            else
-            {
-                policies.add(new ResourcePolicy(c, row));
+                TableRow row = tri.next();
+
+                // first check the cache (FIXME: is this right?)
+                ResourcePolicy cachepolicy = (ResourcePolicy) c.fromCache(
+                        ResourcePolicy.class, row.getIntColumn("policy_id"));
+
+                if (cachepolicy != null)
+                {
+                    policies.add(cachepolicy);
+                }
+                else
+                {
+                    policies.add(new ResourcePolicy(c, row));
+                }
             }
         }
-        tri.close();
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
 
         return policies;
     }
@@ -507,24 +521,31 @@ public class AuthorizeManager
 
         List<ResourcePolicy> policies = new ArrayList<ResourcePolicy>();
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // first check the cache (FIXME: is this right?)
-            ResourcePolicy cachepolicy = (ResourcePolicy) c.fromCache(
-                    ResourcePolicy.class, row.getIntColumn("policy_id"));
-
-            if (cachepolicy != null)
+            while (tri.hasNext())
             {
-                policies.add(cachepolicy);
-            }
-            else
-            {
-                policies.add(new ResourcePolicy(c, row));
+                TableRow row = tri.next();
+
+                // first check the cache (FIXME: is this right?)
+                ResourcePolicy cachepolicy = (ResourcePolicy) c.fromCache(
+                        ResourcePolicy.class, row.getIntColumn("policy_id"));
+
+                if (cachepolicy != null)
+                {
+                    policies.add(cachepolicy);
+                }
+                else
+                {
+                    policies.add(new ResourcePolicy(c, row));
+                }
             }
         }
-        tri.close();
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
 
         return policies;
     }
@@ -697,37 +718,44 @@ public class AuthorizeManager
         TableRowIterator tri = DatabaseManager.queryTable(c, "resourcepolicy",
                 "SELECT * FROM resourcepolicy WHERE resource_type_id= ? "+
                 "AND resource_id= ? AND action_id= ? ",o.getType(),o.getID(),actionID);
-    	
+
         List<Group> groups = new ArrayList<Group>();
-
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
 
-            // first check the cache (FIXME: is this right?)
-            ResourcePolicy cachepolicy = (ResourcePolicy) c.fromCache(
-                    ResourcePolicy.class, row.getIntColumn("policy_id"));
-
-            ResourcePolicy myPolicy = null;
-
-            if (cachepolicy != null)
+            while (tri.hasNext())
             {
-                myPolicy = cachepolicy;
-            }
-            else
-            {
-                myPolicy = new ResourcePolicy(c, row);
-            }
+                TableRow row = tri.next();
 
-            // now do we have a group?
-            Group myGroup = myPolicy.getGroup();
+                // first check the cache (FIXME: is this right?)
+                ResourcePolicy cachepolicy = (ResourcePolicy) c.fromCache(
+                        ResourcePolicy.class, row.getIntColumn("policy_id"));
 
-            if (myGroup != null)
-            {
-                groups.add(myGroup);
+                ResourcePolicy myPolicy = null;
+
+                if (cachepolicy != null)
+                {
+                    myPolicy = cachepolicy;
+                }
+                else
+                {
+                    myPolicy = new ResourcePolicy(c, row);
+                }
+
+                // now do we have a group?
+                Group myGroup = myPolicy.getGroup();
+
+                if (myGroup != null)
+                {
+                    groups.add(myGroup);
+                }
             }
         }
-        tri.close();
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
 
         Group[] groupArray = new Group[groups.size()];
         groupArray = groups.toArray(groupArray);

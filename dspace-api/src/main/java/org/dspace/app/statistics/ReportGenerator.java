@@ -562,30 +562,41 @@ public class ReportGenerator
     {
         FileReader fr = null;
         BufferedReader br = null;
-        
-        // read in the map file, printing a warning if none is found
-        String record = null;
-        try 
-        {  
-            fr = new FileReader(map);
-            br = new BufferedReader(fr);
-        } 
-        catch (IOException e) 
-        {  
-            System.err.println("Failed to read map file: log file actions will be displayed without translation");
-            return;
-        } 
-        
-        // loop through the map file and read in the values
-        while ((record = br.readLine()) != null) 
+
+        try
         {
-            Matcher matchReal = real.matcher(record);
-            
-            // if the line is real then read it in
-            if (matchReal.matches())
+            // read in the map file, printing a warning if none is found
+            String record = null;
+            try
             {
-                actionMap.put(matchReal.group(1).trim(), matchReal.group(2).trim());
+                fr = new FileReader(map);
+                br = new BufferedReader(fr);
             }
+            catch (IOException e)
+            {
+                System.err.println("Failed to read map file: log file actions will be displayed without translation");
+                return;
+            }
+
+            // loop through the map file and read in the values
+            while ((record = br.readLine()) != null)
+            {
+                Matcher matchReal = real.matcher(record);
+
+                // if the line is real then read it in
+                if (matchReal.matches())
+                {
+                    actionMap.put(matchReal.group(1).trim(), matchReal.group(2).trim());
+                }
+            }
+        }
+        finally
+        {
+            if (br != null)
+                try { br.close(); } catch (IOException ioe) { }
+
+            if (fr != null)
+                try { fr.close(); } catch (IOException ioe) { }
         }
     }
     

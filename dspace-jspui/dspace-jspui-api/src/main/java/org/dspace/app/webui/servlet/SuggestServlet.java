@@ -93,7 +93,7 @@ public class SuggestServlet extends DSpaceServlet
             if (item != null)
             {   
                 DCValue[] titleDC = item.getDC("title", null, Item.ANY);
-                if (titleDC != null || titleDC.length > 0)
+                if (titleDC != null && titleDC.length > 0)
                 {
                     title = titleDC[0].value;
                 }

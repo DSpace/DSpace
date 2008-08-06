@@ -190,7 +190,7 @@ public class FeedServlet extends DSpaceServlet
         
         //as long as this is not a site wide feed, 
         //attempt to retrieve the Collection or Community object
-        if(!handle.equals(SITE_FEED_KEY))
+        if(handle != null && !handle.equals(SITE_FEED_KEY))
         { 	
         	// Determine if handle is a valid reference
         	dso = HandleManager.resolveToObject(context, handle);
@@ -371,7 +371,7 @@ public class FeedServlet extends DSpaceServlet
     					: HandleManager.getCanonicalForm(dso.getHandle()); 
     			
     			// put in container-level data
-    			channel.setDescription(description.replaceAll("\\p{Cntrl}", ""));
+    			channel.setDescription(description == null ? "" : description.replaceAll("\\p{Cntrl}", ""));
     			channel.setLink(objectUrl);
     			//build channel title by passing in type and title
     			String channelTitle = MessageFormat.format(labels.getString(clazz + ".feed.title"),

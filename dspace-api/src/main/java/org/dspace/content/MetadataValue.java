@@ -278,13 +278,19 @@ public class MetadataValue
                 valueId);
 
         TableRow row = null;
-        if (tri.hasNext())
+        try
         {
-            row = tri.next();
+            if (tri.hasNext())
+            {
+                row = tri.next();
+            }
         }
-
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         if (row == null)
         {
@@ -316,14 +322,20 @@ public class MetadataValue
 
         TableRow row = null;
         java.util.Collection ret = new ArrayList();
-        while (tri.hasNext())
+        try
         {
-            row = tri.next();
-            ret.add(new MetadataValue(row));
+            while (tri.hasNext())
+            {
+                row = tri.next();
+                ret.add(new MetadataValue(row));
+            }
         }
-
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         return ret;
     }

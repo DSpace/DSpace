@@ -581,27 +581,32 @@ public class Bitstream extends DSpaceObject
 
         // Build a list of Bundle objects
         List<Bundle> bundles = new ArrayList<Bundle>();
-
-        while (tri.hasNext())
+        try
         {
-            TableRow r = tri.next();
-
-            // First check the cache
-            Bundle fromCache = (Bundle) bContext.fromCache(Bundle.class, r
-                    .getIntColumn("bundle_id"));
-
-            if (fromCache != null)
+            while (tri.hasNext())
             {
-                bundles.add(fromCache);
-            }
-            else
-            {
-                bundles.add(new Bundle(bContext, r));
+                TableRow r = tri.next();
+
+                // First check the cache
+                Bundle fromCache = (Bundle) bContext.fromCache(Bundle.class, r
+                        .getIntColumn("bundle_id"));
+
+                if (fromCache != null)
+                {
+                    bundles.add(fromCache);
+                }
+                else
+                {
+                    bundles.add(new Bundle(bContext, r));
+                }
             }
         }
-
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         Bundle[] bundleArray = new Bundle[bundles.size()];
         bundleArray = (Bundle[]) bundles.toArray(bundleArray);

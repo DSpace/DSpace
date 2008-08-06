@@ -242,9 +242,18 @@ public class METSExport
                 + File.separator + "config" + File.separator + "dc2mods.cfg";
 
         // Read it in
-        InputStream is = new FileInputStream(configFile);
-        dcToMODS = new Properties();
-        dcToMODS.load(is);
+        InputStream is = null;
+        try
+        {
+            is = new FileInputStream(configFile);
+            dcToMODS = new Properties();
+            dcToMODS.load(is);
+        }
+        finally
+        {
+            if (is != null)
+                try { is.close(); } catch (IOException ioe) { }
+        }
     }
 
     /**

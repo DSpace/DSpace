@@ -231,8 +231,21 @@ public class DIDLCrosswalk extends Crosswalk
                                     byte[] buffer = new byte[intSize];
                                     
                                     Context contextl= new Context();
-                                    BufferedInputStream bis=new BufferedInputStream(BitstreamStorageManager.retrieve(contextl,bitstreams[k].getID()));
-                                    int size=bis.read(buffer);
+                                    InputStream is = BitstreamStorageManager.retrieve(contextl,bitstreams[k].getID());
+                                    BufferedInputStream bis = new BufferedInputStream(is);
+                                    try
+                                    {
+                                        int size=bis.read(buffer);
+                                    }
+                                    finally
+                                    {
+                                        if (bis != null)
+                                            try { bis.close(); } catch (IOException ioe) { }
+
+                                        if (is != null)
+                                            try { is.close(); } catch (IOException ioe) { }
+                                    }
+
                                     contextl.complete();
                                     
                                     String encoding = new String(Base64.encodeBase64(buffer), "ASCII");

@@ -141,26 +141,33 @@ public class Group extends DSpaceObject
                                 "epersongroup2eperson.eperson_group_id= ?",
                                 myRow.getIntColumn("eperson_group_id"));
 
-                while (tri.hasNext())
+                try
                 {
-                    TableRow r = (TableRow) tri.next();
-
-                    // First check the cache
-                    EPerson fromCache = (EPerson) myContext.fromCache(
-                            EPerson.class, r.getIntColumn("eperson_id"));
-
-                    if (fromCache != null)
+                    while (tri.hasNext())
                     {
-                        epeople.add(fromCache);
-                    }
-                    else
-                    {
-                        epeople.add(new EPerson(myContext, r));
+                        TableRow r = (TableRow) tri.next();
+
+                        // First check the cache
+                        EPerson fromCache = (EPerson) myContext.fromCache(
+                                EPerson.class, r.getIntColumn("eperson_id"));
+
+                        if (fromCache != null)
+                        {
+                            epeople.add(fromCache);
+                        }
+                        else
+                        {
+                            epeople.add(new EPerson(myContext, r));
+                        }
                     }
                 }
+                finally
+                {
+                    // close the TableRowIterator to free up resources
+                    if (tri != null)
+                        tri.close();
+                }
 
-                tri.close();
-                
                 // now get Group objects
                 tri = DatabaseManager.queryTable(myContext,"epersongroup",
                                 "SELECT epersongroup.* FROM epersongroup, group2group WHERE " +
@@ -168,25 +175,32 @@ public class Group extends DSpaceObject
                                 "group2group.parent_id= ? ",
                                 myRow.getIntColumn("eperson_group_id"));
 
-                while (tri.hasNext())
+                try
                 {
-                    TableRow r = (TableRow) tri.next();
-
-                    // First check the cache
-                    Group fromCache = (Group) myContext.fromCache(Group.class,
-                            r.getIntColumn("eperson_group_id"));
-
-                    if (fromCache != null)
+                    while (tri.hasNext())
                     {
-                        groups.add(fromCache);
-                    }
-                    else
-                    {
-                        groups.add(new Group(myContext, r));
+                        TableRow r = (TableRow) tri.next();
+
+                        // First check the cache
+                        Group fromCache = (Group) myContext.fromCache(Group.class,
+                                r.getIntColumn("eperson_group_id"));
+
+                        if (fromCache != null)
+                        {
+                            groups.add(fromCache);
+                        }
+                        else
+                        {
+                            groups.add(new Group(myContext, r));
+                        }
                     }
                 }
-                
-                tri.close();
+                finally
+                {
+                    // close the TableRowIterator to free up resources
+                    if (tri != null)
+                        tri.close();
+                }
 
             }
             catch (Exception e)
@@ -449,16 +463,23 @@ public class Group extends DSpaceObject
 
         Set<Integer> groupIDs = new HashSet<Integer>();
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
 
-            int childID = row.getIntColumn("eperson_group_id");
+                int childID = row.getIntColumn("eperson_group_id");
 
-            groupIDs.add(new Integer(childID));
+                groupIDs.add(new Integer(childID));
+            }
         }
-        
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         // Also need to get all "Special Groups" user is a member of!
         // Otherwise, you're ignoring the user's membership to these groups!
@@ -501,16 +522,23 @@ public class Group extends DSpaceObject
                 "SELECT * FROM group2groupcache WHERE " + groupQuery,
                 parameters);
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
 
-            int parentID = row.getIntColumn("parent_id");
+                int parentID = row.getIntColumn("parent_id");
 
-            groupIDs.add(new Integer(parentID));
+                groupIDs.add(new Integer(parentID));
+            }
         }
-        
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         return groupIDs;
     }
@@ -570,16 +598,23 @@ public class Group extends DSpaceObject
         
         Set<Integer> groupIDs = new HashSet<Integer>();
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
 
-            int childID = row.getIntColumn("child_id");
+                int childID = row.getIntColumn("child_id");
 
-            groupIDs.add(new Integer(childID));
+                groupIDs.add(new Integer(childID));
+            }
         }
-        
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         // now we have all the groups (including this one)
         // it is time to find all the EPeople who belong to those groups
@@ -612,16 +647,23 @@ public class Group extends DSpaceObject
                 "SELECT * FROM epersongroup2eperson WHERE " + epersonQuery,
                 parameters);
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
 
-            int epersonID = row.getIntColumn("eperson_id");
-   
-            epeopleIDs.add(new Integer(epersonID));
+                int epersonID = row.getIntColumn("eperson_id");
+
+                epeopleIDs.add(new Integer(epersonID));
+            }
         }
-        
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         return epeopleIDs;
     }
@@ -1135,32 +1177,39 @@ public class Group extends DSpaceObject
 
         Map<Integer,Set<Integer>> parents = new HashMap<Integer,Set<Integer>>();
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = (TableRow) tri.next();
-
-            Integer parentID = new Integer(row.getIntColumn("parent_id"));
-            Integer childID = new Integer(row.getIntColumn("child_id"));
-
-            // if parent doesn't have an entry, create one
-            if (!parents.containsKey(parentID))
+            while (tri.hasNext())
             {
-                Set<Integer> children = new HashSet<Integer>();
+                TableRow row = (TableRow) tri.next();
 
-                // add child id to the list
-                children.add(childID);
-                parents.put(parentID, children);
-            }
-            else
-            {
-                // parent has an entry, now add the child to the parent's record
-                // of children
-                Set<Integer> children =  parents.get(parentID);
-                children.add(childID);
+                Integer parentID = new Integer(row.getIntColumn("parent_id"));
+                Integer childID = new Integer(row.getIntColumn("child_id"));
+
+                // if parent doesn't have an entry, create one
+                if (!parents.containsKey(parentID))
+                {
+                    Set<Integer> children = new HashSet<Integer>();
+
+                    // add child id to the list
+                    children.add(childID);
+                    parents.put(parentID, children);
+                }
+                else
+                {
+                    // parent has an entry, now add the child to the parent's record
+                    // of children
+                    Set<Integer> children =  parents.get(parentID);
+                    children.add(childID);
+                }
             }
         }
-        
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         // now parents is a hash of all of the IDs of groups that are parents
         // and each hash entry is a hash of all of the IDs of children of those

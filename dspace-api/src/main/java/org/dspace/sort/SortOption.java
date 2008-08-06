@@ -304,16 +304,21 @@ public class SortOption
     {
         if (SortOption.sortOptionsMap != null)
             return SortOption.sortOptionsMap;
-        
-        SortOption.sortOptionsMap = new HashMap<Integer, SortOption>();
-        synchronized (SortOption.sortOptionsMap)
+
+        synchronized (SortOption.class)
         {
-            for (SortOption so : SortOption.getSortOptions())
+            if (SortOption.sortOptionsMap == null)
             {
-                SortOption.sortOptionsMap.put(new Integer(so.getNumber()), so);
+                Map<Integer, SortOption> newSortOptionsMap = new HashMap<Integer, SortOption>();
+                for (SortOption so : SortOption.getSortOptions())
+                {
+                    newSortOptionsMap.put(new Integer(so.getNumber()), so);
+                }
+
+                SortOption.sortOptionsMap = newSortOptionsMap;
             }
         }
-        
+
     	return SortOption.sortOptionsMap;
     }
 
@@ -327,17 +332,22 @@ public class SortOption
         if (SortOption.sortOptionsSet != null)
             return SortOption.sortOptionsSet;
         
-        SortOption.sortOptionsSet = new HashSet<SortOption>();
-        synchronized (SortOption.sortOptionsSet)
+        synchronized (SortOption.class)
         {
-            int idx = 1;
-            String option;
-
-            while ( ((option = ConfigurationManager.getProperty("webui.itemlist.sort-option." + idx))) != null)
+            if (SortOption.sortOptionsSet == null)
             {
-                SortOption so = new SortOption(idx, option);
-                SortOption.sortOptionsSet.add(so);
-                idx++;
+                Set<SortOption> newSortOptionsSet = new HashSet<SortOption>();
+                int idx = 1;
+                String option;
+
+                while ( ((option = ConfigurationManager.getProperty("webui.itemlist.sort-option." + idx))) != null)
+                {
+                    SortOption so = new SortOption(idx, option);
+                    newSortOptionsSet.add(so);
+                    idx++;
+                }
+
+                SortOption.sortOptionsSet = newSortOptionsSet;
             }
         }
 

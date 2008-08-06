@@ -312,23 +312,30 @@ public class WorkspaceItem implements InProgressSubmission
                 "ORDER BY workspaceitem.workspace_item_id", 
                 ep.getID());
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // Check the cache
-            WorkspaceItem wi = (WorkspaceItem) context.fromCache(
-                    WorkspaceItem.class, row.getIntColumn("workspace_item_id"));
-
-            if (wi == null)
+            while (tri.hasNext())
             {
-                wi = new WorkspaceItem(context, row);
-            }
+                TableRow row = tri.next();
 
-            wsItems.add(wi);
+                // Check the cache
+                WorkspaceItem wi = (WorkspaceItem) context.fromCache(
+                        WorkspaceItem.class, row.getIntColumn("workspace_item_id"));
+
+                if (wi == null)
+                {
+                    wi = new WorkspaceItem(context, row);
+                }
+
+                wsItems.add(wi);
+            }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
         wsArray = (WorkspaceItem[]) wsItems.toArray(wsArray);
@@ -356,24 +363,31 @@ public class WorkspaceItem implements InProgressSubmission
                 "workspaceitem.collection_id= ? ",
                 c.getID());
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-
-            // Check the cache
-            WorkspaceItem wi = (WorkspaceItem) context.fromCache(
-                    WorkspaceItem.class, row.getIntColumn("workspace_item_id"));
-
-            // not in cache? turn row into workspaceitem
-            if (wi == null)
+            while (tri.hasNext())
             {
-                wi = new WorkspaceItem(context, row);
-            }
+                TableRow row = tri.next();
 
-            wsItems.add(wi);
+                // Check the cache
+                WorkspaceItem wi = (WorkspaceItem) context.fromCache(
+                        WorkspaceItem.class, row.getIntColumn("workspace_item_id"));
+
+                // not in cache? turn row into workspaceitem
+                if (wi == null)
+                {
+                    wi = new WorkspaceItem(context, row);
+                }
+
+                wsItems.add(wi);
+            }
         }
-        // close the TableRowIterator to free up resources
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
         wsArray = (WorkspaceItem[]) wsItems.toArray(wsArray);
@@ -397,24 +411,31 @@ public class WorkspaceItem implements InProgressSubmission
                                     "workspaceitem",
                                     query);
 
-        while (tri.hasNext())
+        try
         {
-            TableRow row = tri.next();
-            
-            // Check the cache
-            WorkspaceItem wi = (WorkspaceItem) context.fromCache(
-                    WorkspaceItem.class, row.getIntColumn("workspace_item_id"));
-
-            // not in cache? turn row into workspaceitem
-            if (wi == null)
+            while (tri.hasNext())
             {
-                wi = new WorkspaceItem(context, row);
+                TableRow row = tri.next();
+
+                // Check the cache
+                WorkspaceItem wi = (WorkspaceItem) context.fromCache(
+                        WorkspaceItem.class, row.getIntColumn("workspace_item_id"));
+
+                // not in cache? turn row into workspaceitem
+                if (wi == null)
+                {
+                    wi = new WorkspaceItem(context, row);
+                }
+
+                wsItems.add(wi);
             }
-            
-            wsItems.add(wi);
         }
-        
-        tri.close();
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
         
         WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
         wsArray = (WorkspaceItem[]) wsItems.toArray(wsArray);

@@ -352,9 +352,13 @@ public class BitstreamStorageManager
 
         bitstream.setColumn("size_bytes", file.length());
 
-        bitstream.setColumn("checksum", Utils.toHex(dis.getMessageDigest()
-                .digest()));
-        bitstream.setColumn("checksum_algorithm", "MD5");
+        if (dis != null)
+        {
+            bitstream.setColumn("checksum", Utils.toHex(dis.getMessageDigest()
+                    .digest()));
+            bitstream.setColumn("checksum_algorithm", "MD5");
+        }
+        
         bitstream.setColumn("deleted", false);
         DatabaseManager.update(context, bitstream);
 
