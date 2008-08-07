@@ -570,18 +570,25 @@ public class DSIndexer
      * @param force 
      */
     public static void updateIndex(Context context, boolean force) {
-
     		try
     		{
-    			
-    			for(ItemIterator i = Item.findAll(context);i.hasNext();)
-    	        {
-    	            Item item = (Item) i.next();
-    	            indexContent(context,item,force);
-    	            item.decache();
-    	        }
-    			
-    			Collection[] collections = Collection.findAll(context);
+                ItemIterator items = null;
+                try
+                {
+                    for(items = Item.findAll(context);items.hasNext();)
+                    {
+                        Item item = (Item) items.next();
+                        indexContent(context,item,force);
+                        item.decache();
+                    }
+                }
+                finally
+                {
+                    if (items != null)
+                        items.close();
+                }
+
+                Collection[] collections = Collection.findAll(context);
     	        for (int i = 0; i < collections.length; i++)
     	        {
     	            indexContent(context,collections[i],force);
@@ -603,8 +610,7 @@ public class DSIndexer
     		{
     			log.error(e.getMessage(), e);
     		}
-
-	}
+    }
     
     /**
      * Iterates over all documents in the Lucene index and verifies they 

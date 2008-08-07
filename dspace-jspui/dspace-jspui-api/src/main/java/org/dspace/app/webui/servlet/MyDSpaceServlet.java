@@ -766,15 +766,22 @@ public class MyDSpaceServlet extends DSpaceServlet
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
+        // Turn the iterator into a list
+        List subList = new LinkedList();
         ItemIterator subs = Item.findBySubmitter(context, context
                 .getCurrentUser());
 
-        // Turn the iterator into a list
-        List subList = new LinkedList();
-
-        while (subs.hasNext())
+        try
         {
-            subList.add(subs.next());
+            while (subs.hasNext())
+            {
+                subList.add(subs.next());
+            }
+        }
+        finally
+        {
+            if (subs != null)
+                subs.close();
         }
 
         Item[] items = new Item[subList.size()];

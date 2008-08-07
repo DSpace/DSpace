@@ -342,15 +342,22 @@ public class Harvest
                         "AND collection2item.collection_id=handle.resource_id AND collection2item.item_id = ? ",
                         Constants.COLLECTION, itemInfo.itemID);
 
-        // Chuck 'em in the itemInfo object
-        itemInfo.collectionHandles = new LinkedList();
-
-        while (colRows.hasNext())
+        try
         {
-            TableRow r = colRows.next();
-            itemInfo.collectionHandles.add(r.getStringColumn("handle"));
+            // Chuck 'em in the itemInfo object
+            itemInfo.collectionHandles = new LinkedList();
+
+            while (colRows.hasNext())
+            {
+                TableRow r = colRows.next();
+                itemInfo.collectionHandles.add(r.getStringColumn("handle"));
+            }
         }
-        colRows.close();
+        finally
+        {
+            if (colRows != null)
+                colRows.close();
+        }
     }
 
     

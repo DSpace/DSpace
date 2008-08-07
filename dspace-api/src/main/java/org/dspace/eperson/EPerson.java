@@ -314,30 +314,37 @@ public class EPerson extends DSpaceObject
 
         // Get all the epeople that match the query
 		TableRowIterator rows = DatabaseManager.query(context, dbquery, paramArr);
-		
-		List epeopleRows = rows.toList();
-		EPerson[] epeople = new EPerson[epeopleRows.size()];
-		
-		for (int i = 0; i < epeopleRows.size(); i++)
-		{
-		    TableRow row = (TableRow) epeopleRows.get(i);
-		
-		    // First check the cache
-		    EPerson fromCache = (EPerson) context.fromCache(EPerson.class, row
-		            .getIntColumn("eperson_id"));
-		
-		    if (fromCache != null)
-		    {
-		        epeople[i] = fromCache;
-		    }
-		    else
-		    {
-		        epeople[i] = new EPerson(context, row);
-		    }
-		}
-		
-		return epeople;
-	}
+		try
+        {
+            List epeopleRows = rows.toList();
+            EPerson[] epeople = new EPerson[epeopleRows.size()];
+
+            for (int i = 0; i < epeopleRows.size(); i++)
+            {
+                TableRow row = (TableRow) epeopleRows.get(i);
+
+                // First check the cache
+                EPerson fromCache = (EPerson) context.fromCache(EPerson.class, row
+                        .getIntColumn("eperson_id"));
+
+                if (fromCache != null)
+                {
+                    epeople[i] = fromCache;
+                }
+                else
+                {
+                    epeople[i] = new EPerson(context, row);
+                }
+            }
+
+            return epeople;
+        }
+        finally
+        {
+            if (rows != null)
+                rows.close();
+        }
+    }
 
     /**
      * Returns the total number of epeople returned by a specific query, without the overhead 
@@ -428,29 +435,37 @@ public class EPerson extends DSpaceObject
         TableRowIterator rows = DatabaseManager.query(context,
                 "SELECT * FROM eperson ORDER BY "+s);
 
-        List epeopleRows = rows.toList();
-
-        EPerson[] epeople = new EPerson[epeopleRows.size()];
-
-        for (int i = 0; i < epeopleRows.size(); i++)
+        try
         {
-            TableRow row = (TableRow) epeopleRows.get(i);
+            List epeopleRows = rows.toList();
 
-            // First check the cache
-            EPerson fromCache = (EPerson) context.fromCache(EPerson.class, row
-                    .getIntColumn("eperson_id"));
+            EPerson[] epeople = new EPerson[epeopleRows.size()];
 
-            if (fromCache != null)
+            for (int i = 0; i < epeopleRows.size(); i++)
             {
-                epeople[i] = fromCache;
+                TableRow row = (TableRow) epeopleRows.get(i);
+
+                // First check the cache
+                EPerson fromCache = (EPerson) context.fromCache(EPerson.class, row
+                        .getIntColumn("eperson_id"));
+
+                if (fromCache != null)
+                {
+                    epeople[i] = fromCache;
+                }
+                else
+                {
+                    epeople[i] = new EPerson(context, row);
+                }
             }
-            else
-            {
-                epeople[i] = new EPerson(context, row);
-            }
+
+            return epeople;
         }
-
-        return epeople;
+        finally
+        {
+            if (rows != null)
+                rows.close();
+        }
     }
 
     /**

@@ -186,51 +186,19 @@ public class PolicySet
             Group group = Group.find(c, groupID);
 
             ItemIterator i = collection.getItems();
-
-            if (contentType == Constants.ITEM)
+            try
             {
-                // build list of all items in a collection
-                while (i.hasNext())
+                if (contentType == Constants.ITEM)
                 {
-                    Item myitem = i.next();
-
-                    // is this a replace? delete policies first
-                    if (isReplace || clearOnly)
+                    // build list of all items in a collection
+                    while (i.hasNext())
                     {
-                        AuthorizeManager.removeAllPolicies(c, myitem);
-                    }
-
-                    if (!clearOnly)
-                    {
-                        // now add the policy
-                        ResourcePolicy rp = ResourcePolicy.create(c);
-
-                        rp.setResource(myitem);
-                        rp.setAction(actionID);
-                        rp.setGroup(group);
-
-                        rp.update();
-                    }
-                }
-            }
-            else if (contentType == Constants.BUNDLE)
-            {
-                // build list of all items in a collection
-                // build list of all bundles in those items
-                while (i.hasNext())
-                {
-                    Item myitem = i.next();
-
-                    Bundle[] bundles = myitem.getBundles();
-
-                    for (int j = 0; j < bundles.length; j++)
-                    {
-                        Bundle t = bundles[j]; // t for target
+                        Item myitem = i.next();
 
                         // is this a replace? delete policies first
                         if (isReplace || clearOnly)
                         {
-                            AuthorizeManager.removeAllPolicies(c, t);
+                            AuthorizeManager.removeAllPolicies(c, myitem);
                         }
 
                         if (!clearOnly)
@@ -238,7 +206,7 @@ public class PolicySet
                             // now add the policy
                             ResourcePolicy rp = ResourcePolicy.create(c);
 
-                            rp.setResource(t);
+                            rp.setResource(myitem);
                             rp.setAction(actionID);
                             rp.setGroup(group);
 
@@ -246,52 +214,91 @@ public class PolicySet
                         }
                     }
                 }
-            }
-            else if (contentType == Constants.BITSTREAM)
-            {
-                // build list of all bitstreams in a collection
-                // iterate over items, bundles, get bitstreams
-                while (i.hasNext())
+                else if (contentType == Constants.BUNDLE)
                 {
-                    Item myitem = i.next();
-                    System.out.println("Item " + myitem.getID());
-
-                    Bundle[] bundles = myitem.getBundles();
-
-                    for (int j = 0; j < bundles.length; j++)
+                    // build list of all items in a collection
+                    // build list of all bundles in those items
+                    while (i.hasNext())
                     {
-                        System.out.println("Bundle " + bundles[j].getID());
+                        Item myitem = i.next();
 
-                        Bitstream[] bitstreams = bundles[j].getBitstreams();
+                        Bundle[] bundles = myitem.getBundles();
 
-                        for (int k = 0; k < bitstreams.length; k++)
+                        for (int j = 0; j < bundles.length; j++)
                         {
-                            Bitstream t = bitstreams[k]; // t for target
+                            Bundle t = bundles[j]; // t for target
 
-                            if ( filter == null ||
-                                 t.getName().indexOf( filter ) != -1 )
+                            // is this a replace? delete policies first
+                            if (isReplace || clearOnly)
                             {
-                                // is this a replace? delete policies first
-                                if (isReplace || clearOnly)
+                                AuthorizeManager.removeAllPolicies(c, t);
+                            }
+
+                            if (!clearOnly)
+                            {
+                                // now add the policy
+                                ResourcePolicy rp = ResourcePolicy.create(c);
+
+                                rp.setResource(t);
+                                rp.setAction(actionID);
+                                rp.setGroup(group);
+
+                                rp.update();
+                            }
+                        }
+                    }
+                }
+                else if (contentType == Constants.BITSTREAM)
+                {
+                    // build list of all bitstreams in a collection
+                    // iterate over items, bundles, get bitstreams
+                    while (i.hasNext())
+                    {
+                        Item myitem = i.next();
+                        System.out.println("Item " + myitem.getID());
+
+                        Bundle[] bundles = myitem.getBundles();
+
+                        for (int j = 0; j < bundles.length; j++)
+                        {
+                            System.out.println("Bundle " + bundles[j].getID());
+
+                            Bitstream[] bitstreams = bundles[j].getBitstreams();
+
+                            for (int k = 0; k < bitstreams.length; k++)
+                            {
+                                Bitstream t = bitstreams[k]; // t for target
+
+                                if ( filter == null ||
+                                     t.getName().indexOf( filter ) != -1 )
                                 {
-                                        AuthorizeManager.removeAllPolicies(c, t);
-                                }
+                                    // is this a replace? delete policies first
+                                    if (isReplace || clearOnly)
+                                    {
+                                            AuthorizeManager.removeAllPolicies(c, t);
+                                    }
 
-                                if (!clearOnly)
-                                {
-                                        // now add the policy
-                                        ResourcePolicy rp = ResourcePolicy.create(c);
+                                    if (!clearOnly)
+                                    {
+                                            // now add the policy
+                                            ResourcePolicy rp = ResourcePolicy.create(c);
 
-                                        rp.setResource(t);
-                                        rp.setAction(actionID);
-                                        rp.setGroup(group);
+                                            rp.setResource(t);
+                                            rp.setAction(actionID);
+                                            rp.setGroup(group);
 
-                                        rp.update();
+                                            rp.update();
+                                    }
                                 }
                             }
                         }
                     }
                 }
+            }
+            finally
+            {
+                if (i != null)
+                    i.close();
             }
         }
     }

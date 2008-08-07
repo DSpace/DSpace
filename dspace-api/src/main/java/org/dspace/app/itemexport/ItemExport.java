@@ -259,9 +259,16 @@ public class ItemExport {
 
 			// it's a collection, so do a bunch of items
 			ItemIterator i = mycollection.getItems();
-
-			exportItem(c, i, destDirName, seqStart);
-		}
+            try
+            {
+                exportItem(c, i, destDirName, seqStart);
+            }
+            finally
+            {
+                if (i != null)
+                    i.close();
+            }
+        }
 
 		c.complete();
 	}
@@ -623,40 +630,50 @@ public class ItemExport {
 				for (Collection collection : collections) {
 					// get all the items in each collection
 					ItemIterator iitems = collection.getItems();
-					while (iitems.hasNext()) {
-						Item item = iitems.next();
-						// get all the bundles in the item
-						Bundle[] bundles = item.getBundles();
-						for (Bundle bundle : bundles) {
-							// get all the bitstreams in each bundle
-							Bitstream[] bitstreams = bundle.getBitstreams();
-							for (Bitstream bit : bitstreams) {
-								// add up the size
-								size += bit.getSize();
-							}
-						}
-						items.add(item.getID());
-					}
-				}
+                    try {
+                        while (iitems.hasNext()) {
+                            Item item = iitems.next();
+                            // get all the bundles in the item
+                            Bundle[] bundles = item.getBundles();
+                            for (Bundle bundle : bundles) {
+                                // get all the bitstreams in each bundle
+                                Bitstream[] bitstreams = bundle.getBitstreams();
+                                for (Bitstream bit : bitstreams) {
+                                    // add up the size
+                                    size += bit.getSize();
+                                }
+                            }
+                            items.add(item.getID());
+                        }
+                    } finally {
+                        if (iitems != null)
+                            iitems.close();
+                    }
+                }
 			} else if (dso.getType() == Constants.COLLECTION) {
 				Collection collection = (Collection) dso;
 				// get all the items in the collection
 				ItemIterator iitems = collection.getItems();
-				while (iitems.hasNext()) {
-					Item item = iitems.next();
-					// get all thebundles in the item
-					Bundle[] bundles = item.getBundles();
-					for (Bundle bundle : bundles) {
-						// get all the bitstreams in the bundle
-						Bitstream[] bitstreams = bundle.getBitstreams();
-						for (Bitstream bit : bitstreams) {
-							// add up the size
-							size += bit.getSize();
-						}
-					}
-					items.add(item.getID());
-				}
-			} else if (dso.getType() == Constants.ITEM) {
+                try {
+                    while (iitems.hasNext()) {
+                        Item item = iitems.next();
+                        // get all thebundles in the item
+                        Bundle[] bundles = item.getBundles();
+                        for (Bundle bundle : bundles) {
+                            // get all the bitstreams in the bundle
+                            Bitstream[] bitstreams = bundle.getBitstreams();
+                            for (Bitstream bit : bitstreams) {
+                                // add up the size
+                                size += bit.getSize();
+                            }
+                        }
+                        items.add(item.getID());
+                    }
+                } finally {
+                    if (iitems != null)
+                        iitems.close();
+                }
+            } else if (dso.getType() == Constants.ITEM) {
 				Item item = (Item) dso;
 				// get all the bundles in the item
 				Bundle[] bundles = item.getBundles();
@@ -699,12 +716,13 @@ public class ItemExport {
 			Thread go = new Thread() {
 				public void run() {
 					Context context;
-					try {
+                    ItemIterator iitems = null;
+                    try {
 						// create a new dspace context
 						context = new Context();
 						// ignore auths
 						context.setIgnoreAuthorization(true);
-						ItemIterator iitems = new ItemIterator(context, items);
+						iitems = new ItemIterator(context, items);
 
 						String fileName = assembleFileName("item", eperson, new Date());
 						String workDir = getExportWorkDirectory()
@@ -747,7 +765,10 @@ public class ItemExport {
 							// wont throw here
 						}
 						throw new RuntimeException(e1);
-					}
+					} finally {
+                        if (iitems != null)
+                            iitems.close();
+                    }
 				}
 
 			};

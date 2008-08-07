@@ -776,29 +776,37 @@ public class Group extends DSpaceObject
         		context, "epersongroup",
                 "SELECT * FROM epersongroup ORDER BY "+s);
 
-        List gRows = rows.toList();
-
-        Group[] groups = new Group[gRows.size()];
-
-        for (int i = 0; i < gRows.size(); i++)
+        try
         {
-            TableRow row = (TableRow) gRows.get(i);
+            List gRows = rows.toList();
 
-            // First check the cache
-            Group fromCache = (Group) context.fromCache(Group.class, row
-                    .getIntColumn("eperson_group_id"));
+            Group[] groups = new Group[gRows.size()];
 
-            if (fromCache != null)
+            for (int i = 0; i < gRows.size(); i++)
             {
-                groups[i] = fromCache;
+                TableRow row = (TableRow) gRows.get(i);
+
+                // First check the cache
+                Group fromCache = (Group) context.fromCache(Group.class, row
+                        .getIntColumn("eperson_group_id"));
+
+                if (fromCache != null)
+                {
+                    groups[i] = fromCache;
+                }
+                else
+                {
+                    groups[i] = new Group(context, row);
+                }
             }
-            else
-            {
-                groups[i] = new Group(context, row);
-            }
+
+            return groups;
         }
-
-        return groups;
+        finally
+        {
+            if (rows != null)
+                rows.close();
+        }
     }
     
     
@@ -896,28 +904,36 @@ public class Group extends DSpaceObject
 
         TableRowIterator rows =
 			DatabaseManager.query(context, dbquery, paramArr);
-		
-		List groupRows = rows.toList();
-		Group[] groups = new Group[groupRows.size()];
-		
-		for (int i = 0; i < groupRows.size(); i++)
-	    {
-	        TableRow row = (TableRow) groupRows.get(i);
-	
-	        // First check the cache
-	        Group fromCache = (Group) context.fromCache(Group.class, row
-	                .getIntColumn("eperson_group_id"));
-	
-	        if (fromCache != null)
-	        {
-	            groups[i] = fromCache;
-	        }
-	        else
-	        {
-	            groups[i] = new Group(context, row);
-	        }
-	    }
-	    return groups;
+
+        try
+        {
+            List groupRows = rows.toList();
+            Group[] groups = new Group[groupRows.size()];
+
+            for (int i = 0; i < groupRows.size(); i++)
+            {
+                TableRow row = (TableRow) groupRows.get(i);
+
+                // First check the cache
+                Group fromCache = (Group) context.fromCache(Group.class, row
+                        .getIntColumn("eperson_group_id"));
+
+                if (fromCache != null)
+                {
+                    groups[i] = fromCache;
+                }
+                else
+                {
+                    groups[i] = new Group(context, row);
+                }
+            }
+            return groups;
+        }
+        finally
+        {
+            if (rows != null)
+                rows.close();
+        }
 	}
 
     /**

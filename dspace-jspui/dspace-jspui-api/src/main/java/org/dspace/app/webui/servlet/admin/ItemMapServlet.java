@@ -126,50 +126,57 @@ public class ItemMapServlet extends DSpaceServlet
     		
     		// get all items from that collection, add them to a hash
     		ItemIterator i = myCollection.getItems();
-    		
-    		// iterate through the items in this collection, and count how many
-    		// are native, and how many are imports, and which collections they
-    		// came from
-    		while (i.hasNext())
-    		{
-    			Item myItem = i.next();
-    			
-    			// get key for hash
-    			Integer myKey = new Integer(myItem.getID());
-    			
-    			if (myItem.isOwningCollection(myCollection))
-    			{
-    				count_native++;
-    			}
-    			else
-    			{
-    				count_import++;
-    			}
-    			
-    			// is the collection in the hash?
-    			Collection owningCollection = myItem.getOwningCollection();
-    			Integer cKey = new Integer(owningCollection.getID());
-    			
-    			if (myCollections.containsKey(cKey))
-    			{
-    				Integer x = (Integer) myCounts.get(cKey);
-    				int myCount = x.intValue() + 1;
-    				
-    				// increment count for that collection
-    				myCounts.put(cKey, new Integer(myCount));
-    			}
-    			else
-    			{
-    				// store and initialize count
-    				myCollections.put(cKey, owningCollection);
-    				myCounts.put(cKey, new Integer(1));
-    			}
-    			
-    			// store the item
-    			myItems.put(myKey, myItem);
-    		}
-    		
-    		// remove this collection's entry because we already have a native
+    		try
+            {
+                // iterate through the items in this collection, and count how many
+                // are native, and how many are imports, and which collections they
+                // came from
+                while (i.hasNext())
+                {
+                    Item myItem = i.next();
+
+                    // get key for hash
+                    Integer myKey = new Integer(myItem.getID());
+
+                    if (myItem.isOwningCollection(myCollection))
+                    {
+                        count_native++;
+                    }
+                    else
+                    {
+                        count_import++;
+                    }
+
+                    // is the collection in the hash?
+                    Collection owningCollection = myItem.getOwningCollection();
+                    Integer cKey = new Integer(owningCollection.getID());
+
+                    if (myCollections.containsKey(cKey))
+                    {
+                        Integer x = (Integer) myCounts.get(cKey);
+                        int myCount = x.intValue() + 1;
+
+                        // increment count for that collection
+                        myCounts.put(cKey, new Integer(myCount));
+                    }
+                    else
+                    {
+                        // store and initialize count
+                        myCollections.put(cKey, owningCollection);
+                        myCounts.put(cKey, new Integer(1));
+                    }
+
+                    // store the item
+                    myItems.put(myKey, myItem);
+                }
+            }
+            finally
+            {
+                if (i != null)
+                    i.close();
+            }
+            
+            // remove this collection's entry because we already have a native
     		// count
     		myCollections.remove(new Integer(myCollection.getID()));
     		
@@ -381,26 +388,33 @@ public class ItemMapServlet extends DSpaceServlet
     			// FIXME: oh god this is so annoying - what an API /Richard
     			// we need to deduplicate against existing items in this collection
     			ItemIterator itr = myCollection.getItems();
-    			ArrayList idslist = new ArrayList();
-    			while (itr.hasNext())
-    			{
-    				idslist.add(new Integer(itr.nextID()));
-    			}
-    			
-    			for (int i = 0; i < browseItems.length; i++)
-    			{
-    				// only if it isn't already in this collection
-    				if (!idslist.contains(new Integer(browseItems[i].getID())))
-    				{
-    					// only put on list if you can read item
-    					if (AuthorizeManager.authorizeActionBoolean(context, browseItems[i], Constants.READ))
-    					{
-    						items.put(new Integer(browseItems[i].getID()), browseItems[i]);
-    					}
-    				}
-    			}
-    			
-    		}
+                try
+                {
+                    ArrayList idslist = new ArrayList();
+                    while (itr.hasNext())
+                    {
+                        idslist.add(new Integer(itr.nextID()));
+                    }
+
+                    for (int i = 0; i < browseItems.length; i++)
+                    {
+                        // only if it isn't already in this collection
+                        if (!idslist.contains(new Integer(browseItems[i].getID())))
+                        {
+                            // only put on list if you can read item
+                            if (AuthorizeManager.authorizeActionBoolean(context, browseItems[i], Constants.READ))
+                            {
+                                items.put(new Integer(browseItems[i].getID()), browseItems[i]);
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    if (itr != null)
+                        itr.close();
+                }
+            }
     		catch (BrowseException e)
     		{
     			log.error("caught exception: ", e);
@@ -424,21 +438,28 @@ public class ItemMapServlet extends DSpaceServlet
     		
     		// now find all imported items from that collection
     		// seemingly inefficient, but database should have this query cached
+            Map items = new HashMap();
     		ItemIterator i = myCollection.getItems();
-    		Map items = new HashMap();
+            try
+            {
+                while (i.hasNext())
+                {
+                    Item myItem = i.next();
+
+                    if (myItem.isOwningCollection(targetCollection))
+                    {
+                        Integer myKey = new Integer(myItem.getID());
+                        items.put(myKey, myItem);
+                    }
+                }
+            }
+            finally
+            {
+                if (i != null)
+                    i.close();
+            }
     		
-    		while (i.hasNext())
-    		{
-    			Item myItem = i.next();
-    			
-    			if (myItem.isOwningCollection(targetCollection))
-    			{
-    				Integer myKey = new Integer(myItem.getID());
-    				items.put(myKey, myItem);
-    			}
-    		}
-    		
-    		request.setAttribute("collection", myCollection);
+            request.setAttribute("collection", myCollection);
     		request.setAttribute("browsetext", targetCollection
     				.getMetadata("name"));
     		request.setAttribute("items", items);

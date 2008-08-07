@@ -1092,6 +1092,11 @@ public class Collection extends DSpaceObject
         	log.error("caught exception: ", e);
         	throw new IOException(e.getMessage());
         }
+        finally
+        {
+            if (items != null)
+                items.close();
+        }
 
         // Delete bitstream logo
         setLogo(null);

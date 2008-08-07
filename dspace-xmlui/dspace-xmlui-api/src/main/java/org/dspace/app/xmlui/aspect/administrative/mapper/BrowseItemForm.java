@@ -195,13 +195,20 @@ public class BrowseItemForm extends AbstractDSpaceTransformer {
 		
 		// get all items from that collection
         ItemIterator iterator = collection.getItems();
-        
-        while (iterator.hasNext())
+        try
         {
-            Item item = iterator.next();
+            while (iterator.hasNext())
+            {
+                Item item = iterator.next();
 
-            if (! item.isOwningCollection(collection))
-                items.add(item);
+                if (! item.isOwningCollection(collection))
+                    items.add(item);
+            }
+        }
+        finally
+        {
+            if (iterator != null)
+                iterator.close();
         }
         
         return items;

@@ -420,9 +420,17 @@ public class MediaFilterManager
         {
             //otherwise, just find every item and process
             ItemIterator i = Item.findAll(c);
-            while (i.hasNext() && processed < max2Process)
+            try
             {
-            	applyFiltersItem(c, i.next());
+                while (i.hasNext() && processed < max2Process)
+                {
+                    applyFiltersItem(c, i.next());
+                }
+            }
+            finally
+            {
+                if (i != null)
+                    i.close();
             }
         }
     }
@@ -453,9 +461,17 @@ public class MediaFilterManager
         if(!inSkipList(collection.getHandle()))
         {
             ItemIterator i = collection.getItems();
-            while (i.hasNext() && processed < max2Process)
+            try
             {
-            	applyFiltersItem(c, i.next());
+                while (i.hasNext() && processed < max2Process)
+                {
+                    applyFiltersItem(c, i.next());
+                }
+            }
+            finally
+            {
+                if (i != null)
+                    i.close();
             }
         }
     }

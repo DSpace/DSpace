@@ -270,4 +270,13 @@ public class ItemIterator
             return null;
         }
     }
+
+    /**
+     * Dispose of this Iterator, and it's underlying resources
+     */
+    public void close()
+    {
+        if (itemRows != null)
+            itemRows.close();
+    }
 }

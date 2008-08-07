@@ -178,42 +178,49 @@ public class METSExport
         }
 
         ItemIterator items = null;
-
-        if (line.hasOption('c'))
+        try
         {
-            String handle = getHandleArg(line.getOptionValue('c'));
-
-            // Exporting a collection's worth of items
-            DSpaceObject o = HandleManager.resolveToObject(context, handle);
-
-            if ((o != null) && o instanceof Collection)
+            if (line.hasOption('c'))
             {
-                items = ((Collection) o).getItems();
+                String handle = getHandleArg(line.getOptionValue('c'));
+
+                // Exporting a collection's worth of items
+                DSpaceObject o = HandleManager.resolveToObject(context, handle);
+
+                if ((o != null) && o instanceof Collection)
+                {
+                    items = ((Collection) o).getItems();
+                }
+                else
+                {
+                    System.err.println(line.getOptionValue('c')
+                            + " is not a valid collection Handle");
+                    System.exit(1);
+                }
             }
-            else
+
+            if (line.hasOption('a'))
             {
-                System.err.println(line.getOptionValue('c')
-                        + " is not a valid collection Handle");
+                items = Item.findAll(context);
+            }
+
+            if (items == null)
+            {
+                System.err.println("Nothing to export specified!");
                 System.exit(1);
             }
-        }
 
-        if (line.hasOption('a'))
+            while (items.hasNext())
+            {
+                writeAIP(context, items.next(), dest);
+            }
+        }
+        finally
         {
-            items = Item.findAll(context);
+            if (items != null)
+                items.close();
         }
-
-        if (items == null)
-        {
-            System.err.println("Nothing to export specified!");
-            System.exit(1);
-        }
-
-        while (items.hasNext())
-        {
-            writeAIP(context, items.next(), dest);
-        }
-
+        
         context.abort();
         System.exit(0);
     }

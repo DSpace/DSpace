@@ -1559,71 +1559,78 @@ public class Item extends DSpaceObject
             TableRowIterator tri = retrieveMetadata();
             if (tri != null)
             {
-                while (tri.hasNext())
+                try
                 {
-                    TableRow tr = tri.next();
-                    // Assume that we will remove this row, unless we get a match
-                    boolean removeRow = true;
-
-                    // Go through the in-memory metadata, unless we've already decided to keep this row
-                    for (int dcIdx = 0; dcIdx < dublinCore.size() && removeRow; dcIdx++)
+                    while (tri.hasNext())
                     {
-                        // Only process if this metadata has not already been matched to something in the DB
-                        if (!storedDC[dcIdx])
+                        TableRow tr = tri.next();
+                        // Assume that we will remove this row, unless we get a match
+                        boolean removeRow = true;
+
+                        // Go through the in-memory metadata, unless we've already decided to keep this row
+                        for (int dcIdx = 0; dcIdx < dublinCore.size() && removeRow; dcIdx++)
                         {
-                            boolean matched = true;
-                            DCValue dcv   = dublinCore.get(dcIdx);
-
-                            // Check the metadata field is the same
-                            if (matched && dcFields[dcIdx].getFieldID() != tr.getIntColumn("metadata_field_id"))
-                                matched = false;
-
-                            // Check the place is the same
-                            if (matched && placeNum[dcIdx] != tr.getIntColumn("place"))
-                                matched = false;
-
-                            // Check the text is the same
-                            if (matched)
+                            // Only process if this metadata has not already been matched to something in the DB
+                            if (!storedDC[dcIdx])
                             {
-                                String text = tr.getStringColumn("text_value");
-                                if (dcv.value == null && text == null)
-                                    matched = true;
-                                else if (dcv.value != null && dcv.value.equals(text))
-                                    matched = true;
-                                else
+                                boolean matched = true;
+                                DCValue dcv   = dublinCore.get(dcIdx);
+
+                                // Check the metadata field is the same
+                                if (matched && dcFields[dcIdx].getFieldID() != tr.getIntColumn("metadata_field_id"))
                                     matched = false;
-                            }
 
-                            // Check the language is the same
-                            if (matched)
-                            {
-                                String lang = tr.getStringColumn("text_lang");
-                                if (dcv.language == null && lang == null)
-                                    matched = true;
-                                else if (dcv.language != null && dcv.language.equals(lang))
-                                    matched = true;
-                                else
+                                // Check the place is the same
+                                if (matched && placeNum[dcIdx] != tr.getIntColumn("place"))
                                     matched = false;
-                            }
 
-                            // If the db record is identical to the in memory values
-                            if (matched)
-                            {
-                                // Flag that the metadata is already in the DB
-                                storedDC[dcIdx] = true;
+                                // Check the text is the same
+                                if (matched)
+                                {
+                                    String text = tr.getStringColumn("text_value");
+                                    if (dcv.value == null && text == null)
+                                        matched = true;
+                                    else if (dcv.value != null && dcv.value.equals(text))
+                                        matched = true;
+                                    else
+                                        matched = false;
+                                }
 
-                                // Flag that we are not going to remove the row
-                                removeRow = false;
+                                // Check the language is the same
+                                if (matched)
+                                {
+                                    String lang = tr.getStringColumn("text_lang");
+                                    if (dcv.language == null && lang == null)
+                                        matched = true;
+                                    else if (dcv.language != null && dcv.language.equals(lang))
+                                        matched = true;
+                                    else
+                                        matched = false;
+                                }
+
+                                // If the db record is identical to the in memory values
+                                if (matched)
+                                {
+                                    // Flag that the metadata is already in the DB
+                                    storedDC[dcIdx] = true;
+
+                                    // Flag that we are not going to remove the row
+                                    removeRow = false;
+                                }
                             }
                         }
-                    }
 
-                    // If after processing all the metadata values, we didn't find a match
-                    // delete this row from the DB
-                    if (removeRow)
-                    {
-                        DatabaseManager.delete(ourContext, tr);
+                        // If after processing all the metadata values, we didn't find a match
+                        // delete this row from the DB
+                        if (removeRow)
+                        {
+                            DatabaseManager.delete(ourContext, tr);
+                        }
                     }
+                }
+                finally
+                {
+                    tri.close();
                 }
             }
 
