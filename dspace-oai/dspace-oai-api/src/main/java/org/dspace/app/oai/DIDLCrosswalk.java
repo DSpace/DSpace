@@ -35,6 +35,8 @@
 package org.dspace.app.oai;
 
 import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Properties;
