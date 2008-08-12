@@ -1,0 +1,741 @@
+<?xml version='1.0' encoding='UTF-8'?>
+  <chapter remap="h1">
+    <title>DSpace System Documentation: Contents</title>
+    <para>Authors: Robert Tansley, Mick Bass, Margret Branschofsky, Grace Carpenter, Greg McClellan, David Stuve, and others</para>
+    <para>For DSpace Version: <emphasis role="bold">1.5</emphasis> (January-2008)</para>
+    <para>Documentation for other versions of DSpace are included with the source code.</para>
+    <itemizedlist>
+      <listitem>
+        <para>
+          <ulink url="introduction.html">Introduction</ulink>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <ulink url="functional.html">Functional Overview</ulink>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <ulink url="functional.html#data_model">Data Model</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#plugin">Plugin Manager</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#metadata">Metadata</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#packager">Packager Plugins</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#crosswalk">Crosswalk Plugins</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#epeople">E-people and Groups</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#authentication">Authentication</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#auth">Authorization</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#ingest">Ingest Process and Workflow</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#supervision">Supervision and Collaboration</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#handles">Handles</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#bitstream_ids">Bitstream &apos;Persistent&apos; Identifiers</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#srb">Storage Resource Broker (SRB) Support</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#search_browse">Search and Browse</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#html">HTML Support</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#oai">OAI Support</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#openurl">OpenURL Support</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#creativecommons">Creative Commons Support</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#subscriptions">Subscriptions</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#history">History</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#history">Import and Export</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#registration">Registration</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#statistics">Statistical Reports</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="functional.html#checker">Checksum Checker</ulink>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <ulink url="install.html">Installation</ulink>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <ulink url="install.html#prerequisite">Prerequisite Software</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="install.html#installsteps">Quick Installation Steps</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="install.html#advancedinstall">Advanced Installation</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="install.html#windows">Windows Installation</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="install.html#knownbugs">Known Bugs</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="install.html#problems">Common Problems</ulink>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <ulink url="update.html">Updating a DSpace Installation</ulink>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <ulink url="update.html#142_15">Updating from 1.4.2 to 1.5</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="update.html#14_141">Updating From 1.4 to 1.4.1</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="update.html#132_14">Updating From 1.3.x to 1.4.x</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="update.html#131_132">Updating From 1.3.1 to 1.3.2</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="update.html#12_13">Updating From 1.2.x to 1.3.x</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="update.html#121_122">Updating From 1.2.1 to 1.2.2</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="update.html#12_121">Updating From 1.2 to 1.2.1</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="update.html#11_12">Updating From 1.1 (or 1.1.1) to 1.2</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="update.html#11_111">Updating From 1.1 to 1.1.1</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="update.html#101_11">Updating From 1.0.1 to 1.1</ulink>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <ulink url="configure.html">Configuration and Customization</ulink>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <ulink url="configure.html#general">General Configuration</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <itemizedlist>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#general-dspacecfg">dspace.cfg</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#general-search">Search Indexes</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#general-browse">Browse Configuration</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#general-mediafilter">Configuring Media Filters</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#general-email">Email Messages</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#general-registries">Metadata and Bitstream Format Registries</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#general-license">Default Submission License</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="submission.html">Submission Configuration</ulink>
+                      <itemizedlist>
+                        <listitem>
+                          <para>
+                            <ulink url="submission.html#configurationFile">Understanding the Submission Configuration File</ulink>
+                          </para>
+                        </listitem>
+                        <listitem>
+                          <para>
+                            <ulink url="submission.html#stepOrdering">Reordering/Removing Submission Steps</ulink>
+                          </para>
+                        </listitem>
+                        <listitem>
+                          <para>
+                            <ulink url="submission.html#collectionSubmission">Assigning a custom Submission Process to a Collection</ulink>
+                          </para>
+                        </listitem>
+                        <listitem>
+                          <para>
+                            <ulink url="submission.html#metadataEntry">Customizing the Metadata-entry pages</ulink>
+                          </para>
+                        </listitem>
+                        <listitem>
+                          <para>
+                            <ulink url="submission.html#uploadStep">Configuring the File Upload step</ulink>
+                          </para>
+                        </listitem>
+                        <listitem>
+                          <para>
+                            <ulink url="submission.html#createStep">Creating new Submission Steps</ulink>
+                          </para>
+                        </listitem>
+                      </itemizedlist>
+                    </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="configure.html#xmlui">XMLUI Interface Customizations (Manakin)</ulink>
+                <itemizedlist>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#xmlui-dspacecfg">dspace.cfg</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#xmlui-configure">Configuring Themes and Aspects</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#xmlui-multilingual">Multilingual Support</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#xmlui-newtheme">Creating a New Theme</ulink>
+                    </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="configure.html#jspui">JSPUI Interface Customizations</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <itemizedlist>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#jspui-dspacecfg">dspace.cfg</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#jspui-controlledvocabulary">Configuring Controlled Vocabularies</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#jspui-multilingual">Configuring Multilingual Support</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#jspui-jsp">Customizing the JSP Pages</ulink>
+                    </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="configure.html#advanced">Advanced DSpace Customizations</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <itemizedlist>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#checksum">Checksum Checker</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#authentication">Custom Authentication</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#statistics">Configuring Statistical Reports</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#oai">Activating Additional OAI-PMH Crosswalks</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#packager">Configuring Packager Plugins</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#crosswalk">Configuring Crosswalk Plugins</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#mediafilters">Creating new Media/Format Filters</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#templates">Configuration Files for Other Applications</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="configure.html#browse-index">Browse Index Creation</ulink>
+                    </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <ulink url="directories.html">Directories and Files</ulink>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <ulink url="directories.html#sourcedir">Source Directory Layout</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="directories.html#installdir">Installed Directory Layout</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="directories.html#webapp">Contents of Web Application</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="directories.html#logfiles">Log Files</ulink>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <ulink url="architecture.html">Architecture</ulink>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <ulink url="architecture.html#overview">Overview</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="storage.html">Storage Layer</ulink>
+                <itemizedlist>
+                  <listitem>
+                    <para>
+                      <ulink url="storage.html#rdbms">RDBMS</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="storage.html#bitstreams">Bitstream Store</ulink>
+                    </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="business.html">Business Logic Layer</ulink>
+                <itemizedlist>
+                  <listitem>
+                    <para>
+                      <ulink url="business.html#core">Core Classes</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="business.html#content">Content Management API</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="business.html#plugin">Plugin Manager</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="business.html#workflow">Workflow System</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="business.html#administer">Administration Toolkit</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="business.html#eperson">E-person/Group Manager</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="business.html#authorize">Authorization</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="business.html#handle">Handle Manager/Handle Plugin</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="business.html#search">Search</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="business.html#browse">Browse API</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="business.html#history">History Recorder</ulink>
+                    </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="application.html">Application Layer</ulink>
+                <itemizedlist>
+                  <listitem>
+                    <para>
+                      <ulink url="application.html#webui">Web User Interface</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="application.html#oai">OAI-PMH Data Provider</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="application.html#structbuilder">Community and Collection Structure Importer</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="application.html#packager">Package Importer and Exporter</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="application.html#itemimporter">Item Importer and Exporter</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="application.html#transferitem">Transferring Items Between DSpace Instances</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="application.html#registration">Registering (Not Importing) Bitstreams</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="application.html#mets">METS Tools</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="application.html#mediafilters">Media Filters</ulink>
+                    </para>
+                  </listitem>
+                  <listitem>
+                    <para>
+                      <ulink url="application.html#filiator">Sub-Community Management</ulink>
+                    </para>
+                  </listitem>
+                </itemizedlist>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <ulink url="DRISchemaReference.html">DRI Schema Reference</ulink>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <ulink url="DRISchemaReference.html#Introduction">Introduction</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="DRISchemaReference.html#DRI_in_Manakin">DRI in Manakin</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="DRISchemaReference.html#Common_Design_Patterns">Common Design Patterns</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="DRISchemaReference.html#Schema_Overview">Schema Overview</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="DRISchemaReference.html#Merging_of_DRI_Documents">Merging of DRI Documents</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="DRISchemaReference.html#Version_Changes">Version Changes</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="DRISchemaReference.html#Element_Reference">Element Reference</ulink>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <ulink url="history.html">Version History</ulink>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <ulink url="history.html#version1_5">Changes in DSpace 1.5</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="history.html#version1_4_1">Changes in DSpace 1.4.1</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="history.html#version1_4">Changes in DSpace 1.4</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="history.html#version1_3_2">Changes in DSpace 1.3.2</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="history.html#version1_3_1">Changes in DSpace 1.3.1</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="history.html#version1_3">Changes in DSpace 1.3</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="history.html#version1_2_2">Changes in DSpace 1.2.2</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="history.html#version1_2_1">Changes in DSpace 1.2.1</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="history.html#version1_2">Changes in DSpace 1.2</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="history.html#version1_1_1">Changes in DSpace 1.1.1</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="history.html#version1_1">Changes in DSpace 1.1</ulink>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <ulink url="appendix.html">Appendices</ulink>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <ulink url="appendix.html#dublincoreregistry">Default Dublin Core Metadata Registry</ulink>
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                <ulink url="appendix.html#bitstreamformatregistry">Default Bitstream Format Registry</ulink>
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </listitem>
+    </itemizedlist>
+  </chapter>
+
+

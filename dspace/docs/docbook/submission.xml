@@ -1,0 +1,716 @@
+<?xml version='1.0' encoding='UTF-8'?>
+  <chapter remap="h1">
+    <title>Customizing and Configuring Submission User Interface</title>
+    <para>This page explains various customization and configuration options that are available within DSpace for the Item Submission user interface.</para>
+    <para>
+      <anchor id="docbook-submission.html-configurationFile"/>
+    </para>
+    <section remap="h2">
+      <title>Understanding the Submission Configuration File</title>
+      <para>The <literal>[dspace]/config/item-submission.xml</literal> contains the submission configurations for <emphasis>both</emphasis> the DSpace JSP user interface (JSPUI) or the DSpace XML user interface (XMLUI or Manakin). This configuration file contains detailed documentation within the file itself, which should help you better understand how to best utilize it.</para>
+      <section remap="h3">
+        <title>The Structure of <literal>item-submission.xml</literal></title>
+        <screen>
+
+          <literal> &lt;item-submission&gt; &lt;!-- Where submission processes are
+	mapped to specific Collections --&gt; &lt;submission-map&gt; &lt;name-map
+	collection-handle=&quot;default&quot; submission-name=&quot;traditional&quot; /&gt; ...
+	&lt;/submission-map&gt; &lt;!-- Where &quot;steps&quot; which are used across many
+	submission processes can be defined in a single place. They can then
+	be referred to by ID later. --&gt; &lt;step-definitions&gt; &lt;step
+	id=&quot;collection&quot;&gt;
+	&lt;processing-class&gt;org.dspace.submit.step.SelectCollectionStep&lt;/process
+;/processing-class&gt; &lt;workflow-editable&gt;false&lt;/workflow-editable&gt;
+	&lt;/step&gt; ... &lt;/step-definitions&gt; &lt;!-- Where actual submission
+	processes are defined and given names. Each &lt;submission-process&gt; has
+	many &lt;step&gt; nodes which are in the order that the steps should be
+	in.--&gt; &lt;submission-definitions&gt; &lt;submission-process name=&quot;traditional&quot;&gt;
+	... &lt;!-- Step definitions appear here! --&gt; &lt;/submission-process&gt; ...
+	&lt;/submission-definitions&gt; &lt;/item-submission&gt;</literal>
+
+        </screen>
+          <para> Because this file is in XML format, you should be familiar with XML before editing this file. By default, this file contains the &quot;traditional&quot; Item Submission Process for DSpace, which consists of the following Steps (in this order):</para>
+        <para>
+           <literal>Select Collection -&gt; Initial Questions -&gt; Describe -&gt; Upload -&gt; Verify -&gt; License -&gt; Complete</literal>
+        </para>
+        <para>If you would like to customize the steps used or the ordering of the steps, you can do so within the <literal>&lt;submission-definition&gt;</literal> section of the <literal>item-submission.xml</literal> .</para>
+        <para>In addition, you may also specify different Submission Processes for different DSpace Collections. This can be done in the <literal>&lt;submission-map&gt;</literal> section. The <literal>item-submission.xml</literal> file itself documents the syntax required to perform these configuration changes.</para>
+        <para>
+          <anchor id="docbook-submission.html--stepDefinitions"/>
+        </para>
+      </section>
+      <section remap="h3">
+        <title>Defining Steps (<literal>&lt;step&gt;</literal>) within the <literal>item-submission.xml</literal></title>
+        <para>This section describes how Steps of the Submission Process are defined within the <literal>item-submission.xml</literal>.</para>
+        <section remap="h4">
+          <title>Where to place your <literal>&lt;step&gt;</literal> definitions</title>
+          <para><literal>&lt;step&gt;</literal> definitions can appear in one of two places within the <literal>item-submission.xml</literal> configuration file.</para>
+          <orderedlist>
+            <listitem>
+              <para> Within the <literal>&lt;step-definitions&gt;</literal> section </para>
+              <itemizedlist>
+                <listitem>
+                  <para> This is for globally defined <literal>&lt;step&gt;</literal> definitions (i.e. steps which are used in multiple <literal>&lt;submission-process&gt;</literal> definitions). Steps defined in this section <emphasis role="bold">must</emphasis> define a unique <literal>id</literal> which can be used to reference this step.</para>
+                </listitem>
+                <listitem>
+                  <para> For example: </para>
+                  <screen>
+
+                    <literal> &lt;step-definitions&gt; &lt;step id=&quot;custom-step&quot;&gt; ...
+	&lt;/step&gt; ... &lt;/step-definitions&gt; </literal>
+
+                  </screen>
+                </listitem>
+                <listitem>
+                  <para> The above step definition could then be referenced from within a <literal>&lt;submission-process&gt;</literal> as simply <literal>&lt;step id=&quot;custom-step&quot;/&gt;</literal></para>
+                </listitem>
+              </itemizedlist>
+            </listitem>
+            <listitem>
+              <para> Within a specific <literal>&lt;submission-process&gt;</literal> definition </para>
+              <itemizedlist>
+                <listitem>
+                  <para> This is for steps which are specific to a single <literal>&lt;submission-process&gt;</literal> definition.</para>
+                </listitem>
+                <listitem>
+                  <para> For example: </para>
+                  <screen>
+
+                    <literal> &lt;submission-process&gt; &lt;step&gt; ... &lt;/step&gt;
+	&lt;/submission-process&gt;</literal>
+
+                  </screen>
+                </listitem>
+              </itemizedlist>
+            </listitem>
+          </orderedlist>
+          </section>
+        <section remap="h4">
+          <title>The ordering of <literal>&lt;step&gt;</literal> definitions <emphasis role="bold">matters</emphasis>!</title>
+          <para>The ordering of the <literal>&lt;step&gt;</literal> tags within a <literal>&lt;submission-process&gt;</literal> definition directly corresponds to the order in which those steps will appear!</para>
+          <para>For example, the following defines a Submission Process where the <emphasis>License</emphasis> step directly precedes the <emphasis>Initial Questions</emphasis> step (more information about the structure of the information under each &lt;step&gt; tag can be found in the section on <link linkend="docbook-submission.html-stepStructure">Structure of the &lt;step&gt; Definition</link> below):</para>
+          <screen>
+
+            <literal> &lt;submission-process&gt; &lt;!--Step 1 will be to Sign off on
+	the License--&gt; &lt;step&gt; &lt;heading&gt;submit.progressbar.license&lt;/heading&gt;
+	&lt;processing-class&gt;org.dspace.submit.step.LicenseStep&lt;/processing-class
+ing-class&gt;
+	&lt;jspui-binding&gt;org.dspace.app.webui.submit.step.JSPLicenseStep&lt;/jspui-
+t;/jspui-binding&gt;
+	&lt;xmlui-binding&gt;org.dspace.app.xmlui.aspect.submission.submit.LicenseSt
+enseStep&lt;/xmlui-binding&gt; &lt;workflow-editable&gt;false&lt;/workflow-editable&gt;
+	&lt;/step&gt; &lt;!--Step 2 will be to Ask Initial Questions--&gt; &lt;step&gt;
+	&lt;heading&gt;submit.progressbar.initial-questions&lt;/heading&gt;
+	&lt;processing-class&gt;org.dspace.submit.step.InitialQuestionsStep&lt;/process
+;/processing-class&gt;
+	&lt;jspui-binding&gt;org.dspace.app.webui.submit.step.JSPInitialQuestionsSte
+onsStep&lt;/jspui-binding&gt;
+	&lt;xmlui-binding&gt;org.dspace.app.xmlui.aspect.submission.submit.InitialQu
+tialQuestionsStep&lt;/xmlui-binding&gt;
+	&lt;workflow-editable&gt;true&lt;/workflow-editable&gt; &lt;/step&gt; ...[other
+	steps]... &lt;/submission-process&gt; </literal>
+
+          </screen>
+            <para>
+            <anchor id="docbook-submission.html-stepStructure"/>
+          </para>
+        </section>
+        <section remap="h4">
+          <title>Structure of the &lt;step&gt; Definition</title>
+          <para>The same &lt;step&gt; definition is used by both the DSpace JSP user interface (JSPUI) an the DSpace XML user interface (XMLUI or Manakin). Therefore, you will notice each &lt;step&gt; definition contains information specific to each of these two interfaces.</para>
+          <para>The structure of the &lt;step&gt; Definition is as follows:</para>
+          <screen>
+
+            <literal> &lt;step&gt; &lt;heading&gt;submit.progressbar.describe&lt;/heading&gt;
+	&lt;processing-class&gt;org.dspace.submit.step.DescribeStep&lt;/processing-clas
+sing-class&gt;
+	&lt;jspui-binding&gt;org.dspace.app.webui.submit.step.JSPDescribeStep&lt;/jspui
+lt;/jspui-binding&gt;
+	&lt;xmlui-binding&gt;org.dspace.app.xmlui.aspect.submission.submit.DescribeS
+cribeStep&lt;/xmlui-binding&gt; &lt;workflow-editable&gt;true&lt;/workflow-editable&gt;
+	&lt;/step&gt; </literal>
+
+          </screen>
+            <para>Each <literal>step</literal> contains the following elements. The required elements are so marked:</para>
+          <variablelist>
+            <varlistentry>
+              <term>
+                <emphasis role="bold">heading</emphasis>
+              </term>
+              <listitem>
+                <para>Partial I18N key (defined in <literal>Messages.properties</literal> for JSPUI or <literal>messages.xml</literal> for XMLUI) which corresponds to the text that should be displayed in the submission Progress Bar for this step. This partial I18N key is prefixed within either the Messages.properties or messages.xml file, depending on the interface you are using. Therefore, to find the actual key, you will need to search for the partial key with the following prefix: <itemizedlist>
+                    <listitem>
+                      <para> XMLUI: prefix is <literal>xmlui.Submission.</literal> (e.g. &quot;xmlui.Submission.submit.progressbar.describe&quot; for &apos;Describe&apos; step)</para>
+                    </listitem>
+                    <listitem>
+                      <para> JSPUI: prefix is <literal>jsp.</literal> (e.g. &quot;jsp.submit.progressbar.describe&quot; for &apos;Describe&apos; step)</para>
+                    </listitem>
+                  </itemizedlist>
+<emphasis>The &apos;heading&apos; need not be defined if the step should not appear in the progress bar (e.g. steps which perform automated processing, i.e. non-interactive, should not appear in the progress bar).</emphasis></para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>
+                <emphasis role="bold">processing-class</emphasis>
+                <emphasis>(Required)</emphasis>
+              </term>
+              <listitem>
+                <para>Full Java path to the Processing Class for this Step. This Processing Class <emphasis>must</emphasis> perform the primary processing of any information gathered in this step, <emphasis>for both the XMLUI and JSPUI</emphasis>. All valid step processing classes must extend the abstract `<literal>org.dspace.submit.AbstractProcessingStep</literal>` class (or alternatively, extend one of the pre-existing step processing classes in <literal>org.dspace.submit.step.*</literal>)</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>
+                <emphasis role="bold">jspui-binding</emphasis>
+              </term>
+              <listitem>
+                <para>Full Java path of the JSPUI &quot;binding&quot; class for this Step. This &quot;binding&quot; class should initialize and call the appropriate JSPs to display the step&apos;s user interface. A valid JSPUI &quot;binding&quot; class <emphasis>must</emphasis> extend the abstract `<literal>org.dspace.app.webui.submit.JSPStep</literal>` class. <emphasis>This property need not be defined if you are using the XMLUI interface, or for steps which only perform automated processing, i.e. non-interactive steps.</emphasis></para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>
+                <emphasis role="bold">xmlui-binding</emphasis>
+              </term>
+              <listitem>
+                <para>Full Java path of the XMLUI &quot;binding&quot; class for this Step. This &quot;binding&quot; class should generate the Manakin XML (DRI document) necessary to generate the step&apos;s user interface. A valid XMLUI &quot;binding&quot; class <emphasis>must</emphasis> extend the abstract `<literal>org.dspace.app.xmlui.submission.AbstractSubmissionStep</literal>` class. <emphasis>This property need not be defined if you are using the JSPUI interface, or for steps which only perform automated processing, i.e. non-interactive steps.</emphasis></para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>
+                <emphasis role="bold">workflow-editable</emphasis>
+              </term>
+              <listitem>
+                <para>Defines whether or not this step can be edited during the <emphasis>Edit Metadata</emphasis> process with the DSpace approval/rejection workflow process. Possible values include <literal>true</literal> and <literal>false</literal>. If undefined, defaults to <literal>true</literal> (which means that workflow reviewers would be allowed to edit information gathered during that step).</para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+          <para>
+            <anchor id="docbook-submission.html-stepOrdering"/>
+          </para>
+        </section>
+      </section>
+    </section>
+    <section remap="h2">
+      <title>Reordering/Removing Submission Steps</title>
+      <para>The removal of existing steps and reordering of existing steps is a relatively easy process!</para>
+      <para>
+        <emphasis role="bold">Reordering steps</emphasis>
+      </para>
+      <orderedlist>
+        <listitem>
+          <para> Locate the <literal>&lt;submission-process&gt;</literal> tag which defines the Submission Process that you are using. If you are unsure which Submission Process you are using, it&apos;s likely the one with <literal>name=&quot;traditional&quot;</literal>, since this is the traditional DSpace submission process.</para>
+        </listitem>
+        <listitem>
+          <para> Reorder the <literal>&lt;step&gt;</literal> tags within that <literal>&lt;submission-process&gt;</literal> tag. Be sure to move the <emphasis>entire</emphasis><literal>&lt;step&gt;</literal> tag (i.e. everything between and including the opening <literal>&lt;step&gt;</literal> and closing <literal>&lt;/step&gt;</literal> tags). </para>
+          <itemizedlist>
+            <listitem>
+              <para><emphasis>Hint #1:</emphasis> The <literal>&lt;step&gt;</literal> defining the <emphasis>Review/Verify</emphasis> step only allows the user to review information from steps which appear <emphasis role="bold">before</emphasis> it. So, it&apos;s likely you&apos;d want this to appear as one of your last few steps</para>
+            </listitem>
+            <listitem>
+              <para><emphasis>Hint #2:</emphasis> If you are using it, the <literal>&lt;step&gt;</literal> defining the <emphasis>Initial Questions</emphasis> step should always appear <emphasis role="bold">before</emphasis> the <emphasis>Upload</emphasis> or <emphasis>Describe</emphasis> steps since it asks questions which help to set up those later steps.</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </orderedlist>
+      <para>
+        <emphasis role="bold">Removing one or more steps</emphasis>
+      </para>
+      <orderedlist>
+        <listitem>
+          <para> Locate the <literal>&lt;submission-process&gt;</literal> tag which defines the Submission Process that you are using. If you are unsure which Submission Process you are using, it&apos;s likely the one with <literal>name=&quot;traditional&quot;</literal>, since this is the traditional DSpace submission process.</para>
+        </listitem>
+        <listitem>
+          <para> Comment out (i.e. surround with &lt;!-- and --&gt;) the <literal>&lt;step&gt;</literal> tags which you want to remove from that <literal>&lt;submission-process&gt;</literal> tag. Be sure to comment out the <emphasis>entire</emphasis><literal>&lt;step&gt;</literal> tag (i.e. everything between and including the opening <literal>&lt;step&gt;</literal> and closing <literal>&lt;/step&gt;</literal> tags). </para>
+          <itemizedlist>
+            <listitem>
+              <para><emphasis>Hint #1:</emphasis> You cannot remove the <emphasis>Select a Collection</emphasis> step, as an DSpace Item cannot exist without belonging to a Collection.</para>
+            </listitem>
+            <listitem>
+              <para><emphasis>Hint #2:</emphasis> If you decide to remove the <literal>&lt;step&gt;</literal> defining the <emphasis>Initial Questions</emphasis> step, you should be aware that this may affect your <emphasis>Describe</emphasis> and <emphasis>Upload</emphasis> steps! The <emphasis>Initial Questions</emphasis> step asks questions which help to initialize these later steps. If you decide to remove the <emphasis>Initial Questions</emphasis> step you may wish to create a custom, automated step which will provide default answers for the questions asked!</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </orderedlist>
+      <para>
+        <anchor id="docbook-submission.html-collectionSubmission"/>
+      </para>
+    </section>
+    <section remap="h2">
+      <title>Assigning a custom Submission Process to a Collection</title>
+      <para>Assigning a custom submission process to a Collection in DSpace involves working with the <literal>submission-map</literal> section of the <literal>item-submission.xml</literal>. For a review of the structure of the <literal>item-submission.xml</literal> see the section above on <link linkend="docbook-submission.html-configurationFile">Understanding the Submission Configuration File</link>.</para>
+      <para>Each <literal>name-map</literal> element within <literal>submission-map</literal> associates a collection with the name of a submission definition. Its <literal>collection-handle</literal> attribute is the Handle of the collection. Its <literal>submission-name</literal> attribute is the submission definition name, which must match the <literal>name</literal> attribute of a <literal>submission-process</literal> element (in the <literal>submission-definitions</literal> section of <literal>item-submission.xml</literal>.</para>
+      <para>For example, the following fragment shows how the collection with handle &quot;12345.6789/42&quot; is assigned the &quot;custom&quot; submission process:</para>
+      <screen>
+  &lt;submission-map&gt;
+    &lt;name-map collection-handle=&quot;<emphasis role="bold"> 12345.6789/42</emphasis>&quot; submission-name=&quot;<emphasis role="bold">
+	custom</emphasis>&quot; /&gt;
+    ...
+  &lt;/submission-map&gt;
+
+  &lt;submission-definitions&gt;
+    &lt;submission-process name=&quot;<emphasis role="bold">
+	custom</emphasis>&quot;&gt;
+    ...
+  &lt;/submission-definitions&gt;
+</screen>
+      <para>It&apos;s a good idea to keep the definition of the <literal>default</literal> name-map from the example <literal>input-forms.xml</literal> so there is always a default for collections which do not have a custom form set.</para>
+      <section remap="h3">
+        <title>Getting A Collection&apos;s Handle</title>
+        <para>You will need the <emphasis>handle</emphasis> of a collection in order to assign it a custom form set. To discover the handle, go to the &quot;Communities &amp; Collections&quot; page under &quot;<emphasis role="bold">Browse</emphasis>&quot; in the left-hand menu on your DSpace home page. Then, find the link to your collection. It should look something like:</para>
+        <screen>
+    http://myhost.my.edu/dspace/handle/<emphasis role="underline">
+	12345.6789/42</emphasis>
+</screen>
+        <para>The underlined part of the URL is the handle. It should look familiar to any DSpace administrator. That is what goes in the <literal>collection-handle</literal> attribute of your <literal>name-map</literal> element.</para>
+        <para>
+          <anchor id="docbook-submission.html-metadataEntry"/>
+        </para>
+      </section>
+    </section>
+    <section remap="h2">
+      <title>Custom Metadata-entry Pages for Submission</title>
+      <section remap="h3">
+        <title>Introduction</title>
+        <para>This section explains how to customize the Web forms used by submitters and editors to enter and modify the metadata for a new item. These metadata web forms are controlled by the <emphasis>Describe</emphasis> step within the Submission Process. However, they are also configurable via their own XML configuration file (<literal>input-forms.xml</literal>).</para>
+        <para>You can customize the &quot;default&quot; metadata forms used by all collections, and also create alternate sets of metadata forms and assign them to specific collections. In creating custom metadata forms, you can choose:</para>
+        <itemizedlist>
+          <listitem>
+            <para> The number of metadata-entry pages.</para>
+          </listitem>
+          <listitem>
+            <para> Which fields appear on each page, and their sequence.</para>
+          </listitem>
+          <listitem>
+            <para> Labels, prompts, and other text associated with each field.</para>
+          </listitem>
+          <listitem>
+            <para> List of available choices for each menu-driven field.</para>
+          </listitem>
+        </itemizedlist>
+        <para><emphasis role="bold">N.B.</emphasis>The cosmetic and ergonomic details of metadata entry fields remain the same as the fixed metadata pages in previous DSpace releases, and can only be altered by modifying the appropriate stylesheet and JSP pages.</para>
+        <para>All of the custom metadata-entry forms for a DSpace instance are controlled by a single XML file, <literal>input-forms.xml</literal>, in the <literal>config</literal> subdirectory under the DSpace home. DSpace comes with a sample configuration that implements the traditional metadata-entry forms, which also serves as a well-documented example. The rest of this section explains how to create your own sets of custom forms.</para>
+      </section>
+      <section remap="h3">
+        <title>Describing Custom Metadata Forms</title>
+        <para>The description of a set of pages through which submitters enter their metadata is called a <emphasis>form</emphasis> (although it is actually a set of forms, in the HTML sense of the term). A form is identified by a unique symbolic <emphasis>name</emphasis>. In the XML structure, the <emphasis>form</emphasis> is broken down into a series of <emphasis>pages</emphasis>: each of these represents a separate Web page for collecting metadata elements.</para>
+        <para>To set up one of your DSpace collections with customized submission forms, first you make an entry in the <emphasis>form-map</emphasis>. This is effectively a table that relates a collection to a form set, by connecting the collection&apos;s <emphasis>Handle</emphasis> to the form name. Collections are identified by handle because their names are mutable and not necessarily unique, while handles are unique and persistent.</para>
+        <para>A special map entry, for the collection handle &quot;default&quot;, defines the <emphasis>default</emphasis> form set. It applies to all collections which are not explicitly mentioned in the map. In the example XML this form set is named <literal>traditional</literal> (for the &quot;traditional&quot; DSpace user interface) but it could be named anything.</para>
+      </section>
+      <section remap="h3">
+        <title>The Structure of <literal>input-forms.xml</literal></title>
+        <para>The XML configuration file has a single top-level element, <literal>input-forms</literal>, which contains three elements in a specific order. The outline is as follows:</para>
+        <screen>
+&lt;input-forms&gt;
+
+  &lt;-- <emphasis> Map of Collections to Form Sets</emphasis> --&gt;
+  &lt;form-map&gt;
+    &lt;name-map collection-handle=&quot;default&quot; form-name=&quot;traditional&quot;
+	/&gt;
+    ...
+  &lt;/form-map&gt;
+
+  &lt;-- <emphasis> Form Set Definitions</emphasis> --&gt;
+  &lt;form-definitions&gt;
+    &lt;form name=&quot;traditional&quot;&gt;
+    ...
+  &lt;/form-definitions&gt;
+
+  &lt;-- <emphasis> Name/Value Pairs used within Multiple Choice Widgets</emphasis>
+	--&gt;
+  &lt;form-value-pairs&gt;
+    &lt;value-pairs value-pairs-name=&quot;common_iso_languages&quot;
+	dc-term=&quot;language_iso&quot;&gt;
+    ...
+  &lt;/form-value-pairs&gt;
+&lt;/input-forms&gt;
+</screen>
+        <section remap="h4">
+          <title>Adding a Collection Map</title>
+          <para>Each <literal>name-map</literal> element within <literal>form-map</literal> associates a collection with the name of a form set. Its <literal>collection-handle</literal> attribute is the Handle of the collection, and its <literal>form-name</literal> attribute is the form set name, which must match the <literal>name</literal> attribute of a <literal>form</literal> element.</para>
+          <para>For example, the following fragment shows how the collection with handle &quot;12345.6789/42&quot; is attached to the &quot;TechRpt&quot; form set:</para>
+          <screen>
+  &lt;form-map&gt;
+    &lt;name-map collection-handle=&quot;<emphasis role="bold"> 12345.6789/42</emphasis>&quot; form-name=&quot;<emphasis role="bold"> TechRpt</emphasis>&quot;
+	/&gt;
+    ...
+  &lt;/form-map&gt;
+
+  &lt;form-definitions&gt;
+    &lt;form name=&quot;<emphasis role="bold">
+	TechRept</emphasis>&quot;&gt;
+    ...
+  &lt;/form-definitions&gt;
+</screen>
+          <para>It&apos;s a good idea to keep the definition of the <literal>default</literal> name-map from the example <literal>input-forms.xml</literal> so there is always a default for collections which do not have a custom form set.</para>
+          <section remap="h5">
+            <title>Getting A Collection&apos;s Handle</title>
+            <para>You will need the <emphasis>handle</emphasis> of a collection in order to assign it a custom form set. To discover the handle, go to the &quot;Communities &amp; Collections&quot; page under &quot;<emphasis role="bold">Browse</emphasis>&quot; in the left-hand menu on your DSpace home page. Then, find the link to your collection. It should look something like:</para>
+            <screen>
+    http://myhost.my.edu/dspace/handle/<emphasis role="underline">
+	12345.6789/42</emphasis>
+</screen>
+            <para>The underlined part of the URL is the handle. It should look familiar to any DSpace administrator. That is what goes in the <literal>collection-handle</literal> attribute of your <literal>name-map</literal> element.</para>
+          </section>
+        </section>
+        <section remap="h4">
+          <title>Adding a Form Set</title>
+          <para>You can add a new form set by creating a new <literal>form</literal> element within the <literal>form-definitions</literal> element. It has one attribute, <literal>name</literal>, which as seen above must match the value of the <literal>name-map</literal> for the collections it is to be used for.</para>
+          <section remap="h5">
+            <title>Forms and Pages</title>
+            <para>The content of the <literal>form</literal> is a sequence of <literal>page</literal> elements. Each of these corresponds to a Web page of forms for entering metadata elements, presented in sequence between the initial &quot;Describe&quot; page and the final &quot;Verify&quot; page (which presents a summary of all the metadata collected).</para>
+            <para>A <literal>form</literal> must contain at least one and at most six pages. They are presented in the order they appear in the XML. Each <literal>page</literal> element must include a <literal>number</literal> attribute, that should be its sequence number, e.g.</para>
+            <screen>
+&lt;page number=&quot;1&quot;&gt;
+</screen>
+            <para>The <literal>page</literal> element, in turn, contains a sequence of <literal>field</literal> elements. Each field defines an interactive dialog where the submitter enters one of the Dublin Core metadata items.</para>
+          </section>
+          <section remap="h5">
+            <title>Composition of a Field</title>
+            <para>Each <literal>field</literal> contains the following elements, in the order indicated. The required sub-elements are so marked:</para>
+            <variablelist>
+              <varlistentry>
+                <term>
+                  <emphasis role="bold">dc-schema</emphasis>
+                  <emphasis>(Required)</emphasis>
+                </term>
+                <listitem>
+                  <para>Name of metadata schema employed, e.g. <literal>dc</literal> for Dublin Core. This value must match the value of the <literal>schema</literal> element defined in <literal>dublin-core-types.xml</literal></para>
+                </listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>
+                  <emphasis role="bold">dc-element</emphasis>
+                  <emphasis>(Required)</emphasis>
+                </term>
+                <listitem>
+                  <para>Name of the Dublin Core element entered in this field, e.g. <literal>contributor</literal>.</para>
+                </listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>
+                  <emphasis role="bold">dc-qualifier</emphasis>
+                </term>
+                <listitem>
+                  <para>Qualifier of the Dublin Core element entered in this field, e.g. when the field is <literal>contributor.advisor</literal> the value of this element would be <literal>advisor</literal>. Leaving this out means the input is for an unqualified DC element.</para>
+                </listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>
+                  <emphasis role="bold">repeatable</emphasis>
+                </term>
+                <listitem>
+                  <para>Value is <literal>true</literal> when multiple values of this field are allowed, <literal>false</literal> otherwise. When you mark a field repeatable, the UI servlet will add a control to let the user ask for more fields to enter additional values. Intended to be used for arbitrarily-repeating fields such as subject keywords, when it is impossible to know in advance how many input boxes to provide.</para>
+                </listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>
+                  <emphasis role="bold">label</emphasis>
+                  <emphasis>(Required)</emphasis>
+                </term>
+                <listitem>
+                  <para>Text to display as the label of this field, describing what to enter, e.g. &quot;<literal>Your Advisor&apos;s Name</literal>&quot;.</para>
+                </listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>
+                  <emphasis role="bold">input-type</emphasis>
+                  <emphasis>(Required)</emphasis>
+                </term>
+                <listitem>
+                  <para>Defines the kind of interactive widget to put in the form to collect the Dublin Core value. Content must be one of the following keywords: <itemizedlist>
+                      <listitem>
+                        <para><emphasis role="bold">onebox</emphasis>  -- A single text-entry box.</para>
+                      </listitem>
+                      <listitem>
+                        <para><emphasis role="bold">twobox</emphasis>  -- A pair of simple text-entry boxes, used for <emphasis>repeatable</emphasis> values such as the DC <literal>subject</literal> item. <emphasis>Note:</emphasis> The &apos;twobox&apos; input type is rendered the same as a &apos;onebox&apos; in the XML-UI, but both allow for ease of adding multiple values.</para>
+                      </listitem>
+                      <listitem>
+                        <para><emphasis role="bold">textarea</emphasis>  -- Large block of text that can be entered on multiple lines, e.g. for an abstract.</para>
+                      </listitem>
+                      <listitem>
+                        <para><emphasis role="bold">name</emphasis>  -- Personal name, with separate fields for family name and first name. When saved they are appended in the format &apos;LastName, FirstName&apos;</para>
+                      </listitem>
+                      <listitem>
+                        <para><emphasis role="bold">date</emphasis>  -- Calendar date. When required, demands that at least the year be entered.</para>
+                      </listitem>
+                      <listitem>
+                        <para><emphasis role="bold">series</emphasis>  -- Series/Report name and number. Separate fields are provided for series name and series number, but they are appended (with a semicolon between) when saved.</para>
+                      </listitem>
+                      <listitem>
+                        <para><emphasis role="bold">dropdown</emphasis>  -- Choose value(s) from a &quot;drop-down&quot; menu list. <emphasis role="bold">Note:</emphasis> You must also include a value for the <literal>value-pairs-name</literal> attribute to specify a list of menu entries from which to choose. Use this to make a choice from a restricted set of options, such as for the <literal>language</literal> item.</para>
+                      </listitem>
+                      <listitem>
+                        <para><emphasis role="bold">qualdrop_value</emphasis>  -- Enter a &quot;qualified value&quot;, which includes <emphasis>both</emphasis> a qualifier from a drop-down menu and a free-text value. Used to enter items like alternate identifers and codes for a submitted item, e.g. the DC <literal>identifier</literal> field. <emphasis role="bold">Note:</emphasis> As for the <literal>dropdown</literal> type, you must include the <literal>value-pairs-name</literal> attribute to specify a menu choice list.</para>
+                      </listitem>
+                      <listitem>
+                        <para><emphasis role="bold">list</emphasis>  -- Choose value(s) from a checkbox or radio button list. If the <literal>repeatable</literal> attribute is set to <literal>true</literal>, a list of checkboxes is displayed. If the <literal>repeatable</literal> attribute is set to <literal>false</literal>, a list of radio buttons is displayed. <emphasis role="bold">Note:</emphasis> You must also include a value for the <literal>value-pairs-name</literal> attribute to specify a list of values from which to choose.</para>
+                      </listitem>
+                    </itemizedlist>
+</para>
+                </listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>
+                  <emphasis role="bold">hint</emphasis>
+                  <emphasis>(Required)</emphasis>
+                </term>
+                <listitem>
+                  <para>Content is the text that will appear as a &quot;hint&quot;, or instructions, next to the input fields. Can be left empty, but it must be present.</para>
+                </listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>
+                  <emphasis role="bold">required</emphasis>
+                </term>
+                <listitem>
+                  <para>When this element is included with any content, it marks the field as a required input. If the user tries to leave the page without entering a value for this field, that text is displayed as a warning message. For example,</para>
+                  <para><literal>&lt;required&gt;You must enter a title.&lt;/required&gt; Note that leaving the</literal> required element empty will <emphasis>not</emphasis> mark a field as required, e.g.:</para>
+                  <para>
+                    <literal>&lt;required&gt;&lt;/required&gt;</literal>
+                  </para>
+                </listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>
+                  <emphasis role="bold">visibility</emphasis>
+                </term>
+                <listitem>
+                  <para>When this optional element is included with a value, it restricts the visibility of the field to the scope defined by that value. If the element is missing or empty, the field is visible in all scopes. Currently supported scopes are: <itemizedlist>
+                      <listitem>
+                        <para><emphasis role="bold">workflow</emphasis> : the field will only be visible in the workflow stages of submission. This is good for hiding difficult fields for users, such as subject classifications, thereby easing the use of the submission system.</para>
+                      </listitem>
+                      <listitem>
+                        <para><emphasis role="bold">submit</emphasis> : the field will only be visible in the initial submission, and not in the workflow stages.</para>
+                      </listitem>
+                    </itemizedlist>
+ For example:</para>
+                  <para>
+                    <literal>&lt;visibility&gt;workflow&lt;/visibility&gt;</literal>
+                  </para>
+                  <para> Note that it is considered a configuration error to limit a field&apos;s scope while also requiring it - an exception will be generated when this combination is detected.</para>
+                </listitem>
+              </varlistentry>
+            </variablelist>
+            <para>Look at the example <literal>input-forms.xml</literal> and experiment with a a trial custom form to learn this specification language thoroughly. It is a very simple way to express the layout of data-entry forms, but the only way to learn all its subtleties is to use it.</para>
+            <para>For the use of controlled vocabularies see the <ulink url="configure.html#controlledvocabulary">Configuring Controlled Vocabularies</ulink> section.</para>
+          </section>
+          <section remap="h5">
+            <title>Automatically Elided Fields</title>
+            <para>You may notice that some fields are automatically skipped when a custom form page is displayed, depending on the kind of item being submitted. This is because the DSpace user-interface engine skips Dublin Core fields which are not needed, according to the initial description of the item. For example, if the user indicates there are no alternate titles on the first &quot;Describe&quot; page (the one with a few checkboxes), the input for the <literal>title.alternative</literal> DC element is automatically elided, <emphasis>even on custom submission pages.</emphasis></para>
+            <para> When a user initiates a submission, DSpace first displays what we&apos;ll call the &quot;initial-questions page&quot;. By default, it contains three questions with check-boxes: <orderedlist>
+                <listitem>
+                  <para>
+                    <emphasis role="bold">The item has more than one title, e.g. a translated title</emphasis>
+                  </para>
+                  <para>  Controls <literal>title.alternative</literal> field.</para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <emphasis role="bold">The item has been published or publicly distributed before</emphasis>
+                  </para>
+                  <para>  Controls DC fields: </para>
+                  <itemizedlist>
+                    <listitem>
+                      <para>
+                        <literal>date.issued</literal>
+                      </para>
+                    </listitem>
+                    <listitem>
+                      <para>
+                        <literal>publisher</literal>
+                      </para>
+                    </listitem>
+                    <listitem>
+                      <para>
+                        <literal>identifier.citation</literal>
+                      </para>
+                    </listitem>
+                  </itemizedlist>
+                </listitem>
+                <listitem>
+                  <para>
+                    <emphasis role="bold">The item consists of more than one file</emphasis>
+                  </para>
+                  <para>
+                    <emphasis>Does not affect any metadata input fields.</emphasis>
+                  </para>
+                </listitem>
+              </orderedlist>
+ The answers to the first two questions control whether inputs for certain of the DC metadata fields will displayed, even if they are defined as fields in a custom page.  Conversely, if the metadata fields controlled by a checkbox are not mentioned in the custom form, the checkbox is elided from the initial page to avoid confusing or misleading the user.</para>
+            <para>The two relevant checkbox entries are &quot;The item has more than one title, e.g. a translated title&quot;, and &quot;The item has been published or publicly distributed before&quot;. The checkbox for multiple titles trigger the display of the field with dc-element equal to &apos;title&apos; and dc-qualifier equal to &apos;alternative&apos;. If the controlling collection&apos;s form set does not contain this field, then the multiple titles question will not appear on the initial questions page.</para>
+          </section>
+        </section>
+        <section remap="h4">
+          <title>Adding <literal>Value-Pairs</literal></title>
+          <para> Finally, your custom form description needs to define the &quot;value pairs&quot; for any fields with input types that refer to them. Do this by adding a <literal>value-pairs</literal> element to the contents of <literal>form-value-pairs</literal>. It has the following required attributes: <itemizedlist>
+              <listitem>
+                <para><emphasis role="bold">value-pairs-name</emphasis>  -- Name by which an <literal>input-type</literal> refers to this list.</para>
+              </listitem>
+              <listitem>
+                <para><emphasis role="bold">dc-term</emphasis>  -- Qualified Dublin Core field for which this choice list is selecting a value.</para>
+              </listitem>
+            </itemizedlist>
+ Each <literal>value-pairs</literal> element contains a sequence of <literal>pair</literal> sub-elements, each of which in turn contains two elements: <itemizedlist>
+              <listitem>
+                <para><emphasis role="bold">displayed-value</emphasis>  -- Name shown (on the web page) for the menu entry.</para>
+              </listitem>
+              <listitem>
+                <para><emphasis role="bold">stored-value</emphasis>  -- Value stored in the DC element when this entry is chosen.</para>
+              </listitem>
+            </itemizedlist>
+ Unlike the HTML <literal>select</literal> tag, there is no way to indicate one of the entries should be the default, so the first entry is always the default choice.</para>
+          <section remap="h5">
+            <title>Example</title>
+            <para>Here is a menu of types of common identifiers:</para>
+            <screen>
+   &lt;value-pairs value-pairs-name=&quot;common_identifiers&quot;
+	dc-term=&quot;identifier&quot;&gt;
+     &lt;pair&gt;
+       &lt;displayed-value&gt;Gov&apos;t Doc
+	#&lt;/displayed-value&gt;
+       &lt;stored-value&gt;govdoc&lt;/stored-value&gt;
+     &lt;/pair&gt;
+     &lt;pair&gt;
+       &lt;displayed-value&gt;URI&lt;/displayed-value&gt;
+       &lt;stored-value&gt;uri&lt;/stored-value&gt;
+     &lt;/pair&gt;
+     &lt;pair&gt;
+       &lt;displayed-value&gt;ISBN&lt;/displayed-value&gt;
+       &lt;stored-value&gt;isbn&lt;/stored-value&gt;
+     &lt;/pair&gt;
+   &lt;/value-pairs&gt;
+</screen>
+            <para> It generates the following HTML, which results in the
+	menu widget below. (Note that there is no way to indicate a default
+	choice in the custom input XML, so it cannot generate the HTML
+	<literal>SELECTED</literal> attribute to mark one of the options as a pre-selected
+	default.) <screen>
+&lt;select name=&quot;identifier_qualifier_0&quot;&gt;
+&lt;option VALUE=&quot;govdoc&quot;&gt;Gov&apos;t Doc
+	#&lt;/option&gt;
+&lt;option VALUE=&quot;uri&quot;&gt;URI&lt;/option&gt;
+&lt;option VALUE=&quot;isbn&quot;&gt;ISBN&lt;/option&gt;
+&lt;/select&gt;
+</screen><emphasis role="bold">Identifiers:</emphasis>Gov&apos;t Doc #URIISBN</para>
+          </section>
+        </section>
+      </section>
+      <section remap="h3">
+        <title>Deploying Your Custom Forms</title>
+        <para> The DSpace web application only reads your custom form definitions when it starts up, so it is important to remember: <blockquote>
+            <para>
+              <emphasis><emphasis role="bold">You must always restart Tomcat</emphasis> (or whatever servlet container you are using) for changes made to the <literal>input-forms.xml</literal> file take effect.</emphasis>
+            </para>
+          </blockquote>
+ Any mistake in the syntax or semantics of the form definitions, such as poorly formed XML or a reference to a nonexistent field name, will cause a fatal error in the DSpace UI. The exception message (at the top of the stack trace in the <literal>dspace.log</literal> file) usually has a concise and helpful explanation of what went wrong. Don&apos;t forget to stop and restart the servlet container before testing your fix to a bug.</para>
+        <para>
+          <anchor id="docbook-submission.html-uploadStep"/>
+        </para>
+      </section>
+    </section>
+    <section remap="h2">
+      <title>Configuring the File Upload step</title>
+      <para>The <emphasis>Upload</emphasis> step in the DSpace submission process has two configuration options which can be set with your <literal>[dspace]/config/dspace.cfg</literal> configuration file. They are as follows:</para>
+      <itemizedlist>
+        <listitem>
+          <para><literal>upload.max</literal>  - The maximum size of a file (in bytes) that can be uploaded from the JSPUI (not applicable for the XMLUI). It defaults to 536870912 bytes (512MB). You may set this to -1 to disable any file size limitation. </para>
+          <itemizedlist>
+            <listitem>
+              <para><emphasis>Note:</emphasis>  Increasing this value or setting to -1 does <emphasis role="bold">not</emphasis> guarantee that DSpace will be able to successfully upload larger files via the web, as large uploads depend on many other factors including bandwidth, web server settings, internet connection speed, etc.</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para><literal>webui.submit.upload.required</literal>  - Whether or not all users are <emphasis>required</emphasis> to upload a file when they submit an item to DSpace. It defaults to &apos;true&apos;. When set to &apos;false&apos; users will see an option to skip the upload step when they submit a new item.</para>
+        </listitem>
+      </itemizedlist>
+      <para>
+        <anchor id="docbook-submission.html-createStep"/>
+      </para>
+    </section>
+    <section remap="h2">
+      <title>Creating new Submission Steps</title>
+      <para>First, a brief warning: <emphasis>Creating a new Submission Step requires some Java knowledge, and is therefore recommended to be undertaken by a Java programmer whenever possible</emphasis></para>
+      <para>That being said, at a higher level, creating a new Submission Step requires the following (in this relative order):</para>
+      <orderedlist>
+        <listitem>
+          <para> (<emphasis role="bold">Required</emphasis>) Create a new Step Processing class </para>
+          <itemizedlist>
+            <listitem>
+              <para> This class <emphasis role="bold">must</emphasis> extend the abstract <literal>org.dspace.submit.AbstractProcessingStep</literal> class and implement all methods defined by that abstract class.</para>
+            </listitem>
+            <listitem>
+              <para> This class should be built in such a way that it can process the input gathered from <emphasis>either</emphasis> the XMLUI or JSPUI interface.</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para> (<emphasis>For steps using JSPUI</emphasis>) Create the JSPs to display the user interface. Create a new JSPUI &quot;binding&quot; class to initialize and call these JSPs.</para>
+        </listitem>
+        <listitem>
+          <para>
+            <itemizedlist>
+              <listitem>
+                <para> Your JSPUI &quot;binding&quot; class must extend the abstract class <literal>org.dspace.app.webui.submit.JSPStep</literal> and implement all methods defined there. It&apos;s recommended to use one of the classes in <literal>org.dspace.app.webui.submit.step.*</literal> as a reference.</para>
+              </listitem>
+              <listitem>
+                <para> Any JSPs created should be loaded by calling the showJSP() method of the <literal>org.dspace.app.webui.submit.JSPStepManager</literal> class</para>
+              </listitem>
+              <listitem>
+                <para> If this step gathers information to be reviewed, you must also create a Review JSP which will display a read-only view of all data gathered during this step. The path to this JSP must be returned by your getReviewJSP() method. You will find examples of Review JSPs (named similar to <literal>review-[step].jsp</literal>) in the JSP <literal>submit/</literal> directory.</para>
+              </listitem>
+            </itemizedlist>
+          </para>
+        </listitem>
+        <listitem>
+          <para> (<emphasis>For steps using XMLUI</emphasis>) Create an XMLUI &quot;binding&quot; Step Transformer which will generate the DRI XML which Manakin requires. </para>
+          <itemizedlist>
+            <listitem>
+              <para> The Step Transformer must extend and implement all necessary methods within the abstract class <literal>org.dspace.app.xmlui.submission.AbstractSubmissionStep</literal></para>
+            </listitem>
+            <listitem>
+              <para> It is useful to use the existing classes in <literal>org.dspace.app.xmlui.submission.submit.*</literal> as references</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para> (<emphasis role="bold">Required</emphasis>) Add a valid Step Definition to the <literal>item-submission.xml</literal> configuration file. </para>
+          <itemizedlist>
+            <listitem>
+              <para> This may also require that you add an I18N (Internationalization) key for this step&apos;s <literal>heading</literal>. See the sections on <ulink url="configure.html#jspui-multilingual">Configuring Multilingual Support for JSPUI</ulink> or <ulink url="configure.html#xmlui-multilingual">Configuring Multilingual Support for XMLUI</ulink> for more details.</para>
+            </listitem>
+            <listitem>
+              <para> For more information on <literal>&lt;step&gt;</literal> definitions within the <literal>item-submission.xml</literal>, see the section above on <anchor id="docbook-submission.html--stepDefinitions.1" xreflabel="Defining Steps
+(&lt;step&gt;) within the item-submission.xml"/>Defining Steps (<literal>&lt;step&gt;</literal>) within the <literal>item-submission.xml</literal>.</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </orderedlist>
+      <para>
+        <anchor id="docbook-submission.html-createStep.1"/>
+      </para>
+      <section remap="h3">
+        <title>Creating a Non-Interactive Step</title>
+        <para>Non-interactive steps are ones that have no user interface and only perform backend processing. You may find a need to create non-interactive steps which perform further processing of previously entered information.</para>
+        <para>To create a non-interactive step, do the following:</para>
+        <orderedlist>
+          <listitem>
+            <para> Create the required Step Processing class, which extends the abstract <literal>org.dspace.submit.AbstractProcessingStep</literal> class. In this class add any processing which this step will perform.</para>
+          </listitem>
+          <listitem>
+            <para> Add your non-interactive step to your <literal>item-submission.xml</literal> at the place where you wish this step to be called during the submission process. For example, if you want it to be called <emphasis>immediately after</emphasis> the existing &apos;Upload File&apos; step, then place its configuration immediately after the configuration for that &apos;Upload File&apos; step. The configuration should look similar to the following: </para>
+            <screen>
+
+              <literal> &lt;step&gt;
+	&lt;processing-class&gt;org.dspace.submit.step.MyNonInteractveStep&lt;/processi
+/processing-class&gt; &lt;workflow-editable&gt;false&lt;/workflow-editable&gt;
+	&lt;/step&gt;</literal>
+
+            </screen>
+          </listitem>
+        </orderedlist>
+          <para>Note: Non-interactive steps will not appear in the Progress Bar! Therefore, your submitters will not even know they are there. However, because they are not visible to your users, you should make sure that your non-interactive step does not take a large amount of time to finish its processing and return control to the next step (otherwise there will be a visible time delay in the user interface).</para>
+      </section>
+    </section>
+  </chapter>
+
+

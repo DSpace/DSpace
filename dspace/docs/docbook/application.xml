@@ -1,0 +1,1125 @@
+<?xml version='1.0' encoding='UTF-8'?>
+  <chapter remap="h1">
+    <title>DSpace System Documentation: Application Layer</title>
+    <para>
+      <ulink url="architecture.html">Back to architecture overview</ulink>
+    </para>
+    <section remap="h2">
+      <title><anchor id="docbook-application.html-webui" xreflabel="Web User Interface"/>Web User Interface</title>
+      <para>The DSpace Web UI is the largest and most-used component in the application layer. Built on Java Servlet and JavaServer Page technology, it allows end-users to access DSpace over the Web via their Web browsers. As of Dspace 1.3.2 the UI meets both XHTML 1.0 standards and Web Accessibility Initiative (WAI) level-2 standard.</para>
+      <para>It also features an administration section, consisting of pages intended for use by central administrators. Presently, this part of the Web UI is not particularly sophisticated; users of the administration section need to know what they are doing! Selected parts of this may also be used by collection administrators.</para>
+      <section remap="h3">
+        <title>Web UI Files</title>
+        <para>The Web UI-related files are located in a variety of directories in the DSpace source tree. Note that as of DSpace version 1.2, the deployment mechanism has changed; the build process creates easy-to-deploy Web application archives (<literal>.war</literal> files).</para>
+        <table frame="none">
+          <title>Locations of Web UI Source Files</title>
+          <tgroup cols="2">
+            <colspec colname="c1" colwidth="50*"/>
+            <colspec colname="c2" colwidth="50*"/>
+            <tbody>
+              <row>
+                <entry>
+                  <para>
+                    <emphasis role="bold">Location</emphasis>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <emphasis role="bold">Description</emphasis>
+                  </para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>org.dspace.app.webui</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Web UI source files</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>org.dspace.app.webui.filter</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Servlet Filters (Servlet 2.3 spec)</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>org.dspace.app.webui.jsptag</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Custom JSP tag class files</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>org.dspace.app.webui.servlet</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Servlets for main Web UI (controllers)</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>org.dspace.app.webui.servlet.admin</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Servlets that comprise the administration part of the Web UI</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>org.dspace.app.webui.util</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Miscellaneous classes used by the servlets and filters</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>[dspace-source]/jsp</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>The JSP files</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>[dspace-source]/jsp/local</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>This is where you can place customized versions of JSPs -- see <ulink url="configure.html#customui">the configuration section</ulink></para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>[dspace-source]/jsp/WEB-INF/dspace-tags.tld</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Custom DSpace JSP tag descriptor</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>[dspace-source]/etc/dspace-web.xml</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>The Web application deployment descriptor. Before including in the <literal>.war</literal> file, the text <literal>@@dspace.dir@@</literal> will be replaced with the DSpace installation directory (referred to as <emphasis>[dspace]</emphasis> elsewhere in this system documentation). This allows the Web application to pick up the DSpace configuration and environment.</para>
+                </entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-application.html-webui_build" xreflabel="The Build
+Process"/>The Build Process</title>
+        <para>The DSpace build process constructs a Web application archive, which is placed in <literal>[dspace-source]/build/dspace.war</literal>. The <literal>build_wars</literal> Ant target does the work. The process works as follows:</para>
+        <itemizedlist>
+          <listitem>
+            <para> All the DSpace source code is compiled.</para>
+          </listitem>
+          <listitem>
+            <para><literal>[dspace-source]/etc/dspace-web.xml</literal>  is copied to <literal>[dspace-source]/build</literal> and the <literal>@@dspace.dir@@</literal> token inside it replaced with the DSpace installation directory (<literal>dspace.dir</literal> property from <literal>dspace.cfg</literal></para>
+          </listitem>
+          <listitem>
+            <para> The JSPs are all copied to <literal>[dspace-source]/build/jsp</literal></para>
+          </listitem>
+          <listitem>
+            <para> Customized JSPs from <literal>[dspace-source]/jsp/local</literal> are copied on top of these, thus &apos;overriding&apos; the default versions</para>
+          </listitem>
+          <listitem>
+            <para><literal>[dspace-source]/build/dspace.war</literal>  is built</para>
+          </listitem>
+        </itemizedlist>
+        <para>The contents of <literal>dspace.war</literal> are:</para>
+        <itemizedlist>
+          <listitem>
+            <para> (Top level) -- the JSPs (customized versions from <literal>[dspace-source]/jsp/local</literal> will have overwritten the defaults from the DSpace source distribution)</para>
+          </listitem>
+          <listitem>
+            <para><literal>WEB-INF/classes</literal>  -- the compiled DSpace classes</para>
+          </listitem>
+          <listitem>
+            <para><literal>WEB-INF/lib</literal>  -- the third party library JAR files from <literal>[dspace-source]/lib</literal>, minus <literal>servlet.jar</literal> which will be available as part of Tomcat (or other servlet engine)</para>
+          </listitem>
+          <listitem>
+            <para><literal>WEB-INF/web.xml</literal>  -- web deployment descriptor, copied from <literal>[dspace-source]/build/dspace-web.xml</literal></para>
+          </listitem>
+          <listitem>
+            <para><literal>WEB-INF/dspace-tags.tld</literal>  -- tag descriptor</para>
+          </listitem>
+        </itemizedlist>
+        <para>Note that this does mean there are multiple copies of the compiled DSpace code and third-party libraries in the system, so care must be taken to ensure that they are all in sync. (The storage overhead is a few megabytes, totally insignificant these days.) In general, when you change any DSpace code or JSP, it&apos;s best to do a complete update of both the installation (<literal>[dspace]</literal>), and to rebuild and redeploy the Web UI and OAI <literal>.war</literal> files, by running this in <literal>[dspace-source]</literal>:</para>
+        <screen>
+ant -D<emphasis> [dspace]</emphasis>/config/dspace.cfg update
+</screen>
+        <para>and then following the instructions that command writes to the console.</para>
+      </section>
+      <section remap="h3">
+        <title>Servlets and JSPs</title>
+        <para>The Web UI is loosely based around the MVC (model, view, controller) model. The content management API corresponds to the model, the Java Servlets are the controllers, and the JSPs are the views. Interactions take the following basic form:</para>
+        <orderedlist>
+          <listitem>
+            <para> An HTTP request is received from a browser</para>
+          </listitem>
+          <listitem>
+            <para> The appropriate servlet is invoked, and processes the request by invoking the DSpace business logic layer public API</para>
+          </listitem>
+          <listitem>
+            <para> Depending on the outcome of the processing, the servlet invokes the appropriate JSP</para>
+          </listitem>
+          <listitem>
+            <para> The JSP is processed and sent to the browser</para>
+          </listitem>
+        </orderedlist>
+        <para>The reasons for this approach are:</para>
+        <itemizedlist>
+          <listitem>
+            <para> All of the processing is done before the JSP is invoked, so any error or problem that occurs does not occur halfway through HTML rendering</para>
+          </listitem>
+          <listitem>
+            <para> The JSPs contain as little code as possible, so they can be customized without having to delve into Java code too much</para>
+          </listitem>
+        </itemizedlist>
+        <para>The <literal>org.dspace.app.webui.servlet.LoadDSpaceConfig</literal> servlet is always loaded first. This is a very simple servlet that checks the <literal>dspace-config</literal> context parameter from the DSpace deployment descriptor, and uses it to locate <literal>dspace.cfg</literal>. It also loads up the Log4j configuration. It&apos;s important that this servlet is loaded first, since if another servlet is loaded up, it will cause the system to try and load DSpace and Log4j configurations, neither of which would be found.</para>
+        <para>All DSpace servlets are subclasses of the <literal>DSpaceServlet</literal> class. The <literal>DSpaceServlet</literal> class handles some basic operations such as creating a DSpace <literal>Context</literal> object (opening a database connection etc.), authentication and error handling. Instead of overriding the <literal>doGet</literal> and <literal>doPost</literal> methods as one normally would for a servlet, DSpace servlets implement <literal>doDSGet</literal> or <literal>doDSPost</literal> which have an extra context parameter, and allow the servlet to throw various exceptions that can be handled in a standard way.</para>
+        <para>The DSpace servlet processes the contents of the HTTP request. This might involve retrieving the results of a search with a query term, accessing the current user&apos;s eperson record, or updating a submission in progress. According to the results of this processing, the servlet must decide which JSP should be displayed. The servlet then fills out the appropriate attributes in the <literal>HttpRequest</literal> object that represents the HTTP request being processed. This is done by invoking the <literal>setAttribute</literal> method of the <literal>javax.servlet.http.HttpServletRequest</literal> object that is passed into the servlet from Tomcat. The servlet then forwards control of the request to the appropriate JSP using the <literal>JSPManager.showJSP</literal> method.</para>
+        <para>The <literal>JSPManager.showJSP</literal> method uses the standard Java servlet forwarding mechanism is then used to forward the HTTP request to the JSP. The JSP is processed by Tomcat and the results sent back to the user&apos;s browser.</para>
+        <para>There is an exception to this servlet/JSP style: <literal>index.jsp</literal>, the &apos;home page&apos;, receives the HTTP request directly from Tomcat without a servlet being invoked first. This is because in the servlet 2.3 specification, there is no way to map a servlet to handle only requests made to &apos;<literal>/</literal>&apos;; such a mapping results in every request being directed to that servlet. By default, Tomcat forwards requests to &apos;<literal>/</literal>&apos; to <literal>index.jsp</literal>. To try and make things as clean as possible, <literal>index.jsp</literal> contains some simple code that would normally go in a servlet, and then forwards to <literal>home.jsp</literal> using the <literal>JSPManager.showJSP</literal> method. This means localized versions of the &apos;home page&apos; can be created by placing a customized <literal>home.jsp</literal> in <literal>[dspace-source]/jsp/local</literal>, in the same manner as other JSPs.</para>
+        <para><literal>[dspace-source]/jsp/dspace-admin/index.jsp</literal>, the administration UI index page, is invoked directly by Tomcat and not through a servlet for similar reasons.</para>
+        <para>At the top of each JSP file, right after the license and copyright header, is documented the appropriate attributes that a servlet must fill out prior to forwarding to that JSP. No validation is performed; if the servlet does not fill out the necessary attributes, it is likely that an internal server error will occur.</para>
+        <para>Many JSPs containing forms will include hidden parameters that tell the servlets which form has been filled out. The submission UI servlet (<literal>SubmissionController</literal> is a prime example of a servlet that deals with the input from many different JSPs. The <literal>step</literal> and <literal>page</literal> hidden parameters (written out by the <literal>SubmissionController.getSubmissionParameters()</literal> method) are used to inform the servlet which page of which step has just been filled out (i.e. which page of the submission the user has just completed).</para>
+        <para>Below is a detailed, scary diagram depicting the flow of control during the whole process of processing and responding to an HTTP request. More information about the authentication mechanism is mostly <ulink url="configure.html#authenticate">described in the configuration section</ulink>.</para>
+        <para>
+          <inlinemediaobject>
+            <imageobject>
+              <imagedata fileref="image/web-ui-flow.gif" format="GIF" width="6.5in" scalefit="1"/>
+            </imageobject>
+          </inlinemediaobject>
+        </para>
+        <para>Flow of Control During HTTP Request Processing</para>
+      </section>
+      <section remap="h3">
+        <title>Custom JSP Tags</title>
+        <para>The DSpace JSPs all use some custom tags defined in <literal>/dspace/jsp/WEB-INF/dspace-tags.tld</literal>, and the corresponding Java classes reside in <literal>org.dspace.app.webui.jsptag</literal>. The tags are listed below. The <literal>dspace-tags.tld</literal> file contains detailed comments about how to use the tags, so that information is not repeated here.</para>
+        <variablelist>
+          <varlistentry>
+            <term>
+              <literal>layout</literal>
+            </term>
+            <listitem>
+              <para> Just about every JSP uses this tag. It produces the standard HTML header and <literal>&lt;BODY&gt;</literal>tag. Thus the content of each JSP is nested inside a <literal>&lt;dspace:layout&gt;</literal> tag. The (XML-style)attributes of this tag are slightly complicated--see <literal>dspace-tags.tld</literal>. The JSPs in the source code bundle also provide plenty of examples.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>
+              <literal>sidebar</literal>
+            </term>
+            <listitem>
+              <para> Can only be used inside a <literal>layout</literal> tag, and can only be used once per JSP. The content between the start and end <literal>sidebar</literal> tags is rendered in a column on the right-hand side of the HTML page. The contents can contain further JSP tags and Java &apos;scriptlets&apos;.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>
+              <literal>date</literal>
+            </term>
+            <listitem>
+              <para> Displays the date represented by an <literal>org.dspace.content.DCDate</literal> object. Just the one representation of date is rendered currently, but this could use the user&apos;s browser preferences to display a localized date in the future.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>
+              <literal>include</literal>
+            </term>
+            <listitem>
+              <para> Obsolete, simple tag, similar to <literal>jsp:include</literal>. In versions prior to DSpace 1.2, this tag would use the locally modified version of a JSP if one was installed in jsp/local. As of 1.2, the build process now performs this function, however this tag is left in for backwards compatibility.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>
+              <literal>item</literal>
+            </term>
+            <listitem>
+              <para> Displays an item record, including Dublin Core metadata and links to the bitstreams within it. Note that the displaying of the bitstream links is simplistic, and does not take into account any of the bundling structure. This is because DSpace does not have a fully-fledged dissemination architectural piece yet.</para>
+              <para>Displaying an item record is done by a tag rather than a JSP for two reasons: Firstly, it happens in several places (when verifying an item record during submission or workflow review, as well as during standard item accesses), and secondly, displaying the item turns out to be mostly code-work rather than HTML anyway. Of course, the disadvantage of doing it this way is that it is slightly harder to customize exactly what is displayed from an item record; it is necessary to edit the tag code (<literal>org.dspace.app.webui.jsptag.ItemTag</literal>). Hopefully a better solution can be found in the future.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><literal>itemlist</literal>, <literal>collectionlist</literal>, <literal>communitylist</literal></term>
+            <listitem>
+              <para> These tags display ordered sequences of items, collections and communities, showing minimal information but including a link to the page containing full details. These need to be used in HTML tables.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>
+              <literal>popup</literal>
+            </term>
+            <listitem>
+              <para> This tag is used to render a link to a pop-up page (typically a help page.) If Javascript is available, the link will either open or pop to the front any existing DSpace pop-up window. If Javascript is not available, a standard HTML link is displayed that renders the link destination in a window named &apos;<literal>dspace.popup</literal>&apos;. In graphical browsers, this usually opens a new window or re-uses an existing window of that name, but if a window is re-used it is not &apos;raised&apos; which might confuse the user. In text browsers, following this link will simply replace the current page with the destination of the link. This obviously means that Javascript offers the best functionality, but other browsers are still supported.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>
+              <literal>selecteperson</literal>
+            </term>
+            <listitem>
+              <para> A tag which produces a widget analogous to HTML <literal>&lt;SELECT&gt;</literal>, that allows a user to select one or multiple e-people from a pop-up list.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>
+              <literal>sfxlink</literal>
+            </term>
+            <listitem>
+              <para> Using an item&apos;s Dublin Core metadata DSpace can display an SFX link, if an SFX server is available. This tag does so for a particular item if the <literal>sfx.server.url</literal> property is defined in <literal>dspace.cfg</literal>.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-application.html-i18n" xreflabel="Internationalisation"/>Internationalisation</title>
+        <para>The <ulink url="http://jakarta.apache.org/taglibs/doc/standard-1.0-doc/intro.html">Java Standard Tag Library v1.0</ulink> is used to specify messages in the JSPs like this:</para>
+        <para>OLD:</para>
+        <screen>
+&lt;H1&gt;Search Results&lt;/H1&gt;
+</screen>
+        <para>NEW:</para>
+        <screen>
+&lt;H1&gt;&lt;fmt:message key=&quot;jsp.search.results.title&quot;
+	/&gt;&lt;/H1&gt;
+</screen>
+        <para>This message can now be changed using the <literal>config/language-packs/Messages.properties</literal> file. (This must be done at build-time: <literal>Messages.properties</literal> is placed in the <literal>dspace.war</literal> Web application file.)</para>
+        <screen>
+jsp.search.results.title = Search Results
+</screen>
+        <para>Phrases may have parameters to be passed in, to make the job of translating easier, reduce the number of &apos;keys&apos; and to allow translators to make the translated text flow more appropriately for the target language.</para>
+        <para>OLD:</para>
+        <screen>
+&lt;P&gt;Results &lt;%= r.getFirst() %&gt; to &lt;%= r.getLast() %&gt; of &lt;%=
+	r.getTotal() %&gt;&lt;/P&gt;
+</screen>
+        <para>NEW:</para>
+        <screen>
+&lt;fmt:message key=&quot;jsp.search.results.text&quot;&gt;
+  &lt;fmt:param&gt;&lt;%= r.getFirst() %&gt;&lt;/fmt:param&gt;
+  &lt;fmt:param&gt;&lt;%= r.getLast() %&gt;&lt;/fmt:param&gt;
+  &lt;fmt:param&gt;&lt;%= r.getTotal() %&gt;&lt;/fmt:param&gt;
+&lt;/fmt:message&gt;
+</screen>
+        <para>(Note: JSTL 1.0 does not seem to allow JSP &lt;%= %&gt; expressions to be passed in as values of attribute in &lt;fmt:param value=&quot;&quot;/&gt;)</para>
+        <para>The above would appear in the <literal>Messages_xx.properties</literal> file as:</para>
+        <screen>
+jsp.search.results.text = Results {0}-{1} of {2}
+</screen>
+        <para>Introducing number parameters that should be formatted according to the locale used makes no difference in the message key compared to atring parameters:</para>
+        <screen>
+jsp.submit.show-uploaded-file.size-in-bytes = {0} bytes
+</screen>
+        <para>In the JSP using this key can be used in the way belov:</para>
+        <screen>
+&lt;fmt:message
+	key=&quot;jsp.submit.show-uploaded-file.size-in-bytes&quot;&gt;
+  &lt;fmt:param&gt;&lt;fmt:formatNumber&gt;&lt;%= bitstream.getSize()
+	%&gt;&lt;/fmt:formatNumber&gt;&lt;/fmt:param&gt;
+&lt;/fmt:message&gt;
+</screen>
+        <para>(Note: JSTL offers a way to include numbers in the message keys as <literal>jsp.foo.key = {0,number} bytes</literal>. Setting the parameter as <literal>&lt;fmt:param value=&quot;${variable}&quot; /&gt;</literal> workes when <literal>variable</literal> is a single variable name and doesn&apos;t work when trying to use a method&apos;s return value instead: <literal>bitstream.getSize()</literal>. Passing the number as string (or using the &lt;%= %&gt; expression) also does not work.)</para>
+        <para>Multiple <literal>Messages.properties</literal> can be created for different languages. See <ulink url="http://java.sun.com/j2se/1.4.2/docs/api/java/util/ResourceBundle.html#getBundle(java.lang.String,%20java.util.Locale,%20java.lang.ClassLoader)">ResourceBundle.getBundle</ulink>. e.g. you can add German and Canadian French translations:</para>
+        <screen>
+Messages_de.properties
+Messages_fr_CA.properties
+</screen>
+        <para>The end user&apos;s browser settings determine which language is used. The English language file <literal>Messages.properties</literal> (or the default server locale) will be used as a default if there&apos;s no language bundle for the end user&apos;s preferred language. (Note that the English file is not called <literal>Messages_en.properties</literal> -- this is so it is always available as a default, regardless of server configuration.)</para>
+        <para>The <literal>dspace:layout</literal> tag has been updated to allow dictionary keys to be passed in for the titles. It now has two new parameters: <literal>titlekey</literal> and <literal>parenttitlekey</literal>. So where before you&apos;d do:</para>
+        <screen>
+&lt;dspace:layout title=&quot;Here&quot;
+               parentlink=&quot;/mydspace&quot;
+               parenttitle=&quot;My DSpace&quot;&gt;
+</screen>
+        <para>You now do:</para>
+        <screen>
+&lt;dspace:layout titlekey=&quot;jsp.page.title&quot;
+               parentlink=&quot;/mydspace&quot;
+               parenttitlekey=&quot;jsp.mydspace&quot;&gt;
+
+</screen>
+        <para>And so the layout tag itself gets the relevant stuff out of the dictionary. <literal>title</literal> and <literal>parenttitle</literal> still work as before for backwards compatibility, and the odd spot where that&apos;s preferable.</para>
+        <section remap="h4">
+          <title>Message Key Convention</title>
+          <para>When translating further pages, please follow the convention for naming message keys to avoid clashes.</para>
+          <para><emphasis role="bold">For text in JSPs</emphasis> use the complete path + filename of the JSP, then a one-word name for the message. e.g. for the title of <literal>jsp/mydspace/main.jsp</literal> use:</para>
+          <screen>
+jsp.mydspace.main.title
+</screen>
+          <para>Some common words (e.g. &quot;Help&quot;) can be brought out into keys starting <literal>jsp.</literal> for ease of translation, e.g.:</para>
+          <screen>
+jsp.admin = Administer
+</screen>
+          <para>Other common words/phrases are brought out into &apos;general&apos; parameters if they relate to a set (directory) of JSPs, e.g.</para>
+          <screen>
+jsp.tools.general.delete = Delete
+</screen>
+          <para>Phrases that relate <emphasis role="bold">strongly</emphasis> to a topic (eg. MyDSpace) but used in many JSPs outside the particular directory are more convenient to be cross-referenced. For example one could use the key below in <literal>jsp/submit/saved.jsp</literal> to provide a link back to the user&apos;s <emphasis>MyDSpace</emphasis>:</para>
+          <para>
+            <emphasis>(Cross-referencing of keys <emphasis role="bold">in general</emphasis> is not a good idea as it may make maintenance more difficult. But in some cases it has more advantages as the meaning is obvious.)</emphasis>
+          </para>
+          <screen>
+jsp.mydspace.general.goto-mydspace = Go to My DSpace
+</screen>
+          <para><emphasis role="bold">For text in servlet code</emphasis>, in custom JSP tags or wherever applicable use the fully qualified classname + a one-word name for the message. e.g.</para>
+          <screen>
+org.dspace.app.webui.jsptag.ItemListTag.title = Title
+</screen>
+        </section>
+        <section remap="h4">
+          <title>Which Languages are currently supported?</title>
+          <para>To view translations currently being developed, please refer to the <ulink url="http://wiki.dspace.org/I18nSupport">i18n page</ulink> of the DSpace Wiki.</para>
+        </section>
+      </section>
+      <section remap="h3">
+        <title>HTML Content in Items</title>
+        <para>For the most part, the DSpace item display just gives a link that allows an end-user to download a bitstream. However, if a bundle has a primary bitstream whose format is of MIME type <literal>text/html</literal>, instead a link to the HTML servlet is given.</para>
+        <para>So if we had an HTML document like this:</para>
+        <screen>
+contents.html
+chapter1.html
+chapter2.html
+chapter3.html
+figure1.gif
+figure2.jpg
+figure3.gif
+figure4.jpg
+figure5.gif
+figure6.gif
+</screen>
+        <para>The Bundle&apos;s primary bitstream field would point to the contents.html Bitstream, which we know is HTML (check the format MIME type) and so we know which to serve up first.</para>
+        <para>The HTML servlet employs a trick to serve up HTML documents without actually modifying the HTML or other files themselves. Say someone is looking at <literal>contents.html</literal> from the above example, the URL in their browser will look like this:</para>
+        <screen>
+https://dspace.mit.edu/html/1721.1/12345/contents.html
+</screen>
+        <para>If there&apos;s an image called <literal>figure1.gif</literal> in that HTML page, the browser will do HTTP GET on this URL:</para>
+        <screen>
+https://dspace.mit.edu/html/1721.1/12345/figure1.gif
+</screen>
+        <para>The HTML document servlet can work out which item the user is looking at, and then which Bitstream in it is called <literal>figure1.gif</literal>, and serve up that bitstream. Similar for following links to other HTML pages. Of course all the links and image references have to be relative and not absolute.</para>
+        <para>HTML documents must be &quot;self-contained&quot;, as <ulink url="functional.html#html">explained here</ulink>. Provided that full path information is known by DSpace, any depth or complexity of HTML document can be served subject to those contraints. This is usually possible with some kind of batch import. If, however, the document has been uploaded one file at a time using the Web UI, the path information has been stripped. The system can cope with relative links that refer to a deeper path, e.g.</para>
+        <screen>
+&lt;IMG SRC=&quot;images/figure1.gif&quot;&gt;
+</screen>
+        <para>If the item has been uploaded via the Web submit UI, in the Bitstream table in the database we have the &apos;name&apos; field, which will contain the filename with no path (<literal>figure1.gif</literal>). We can still work out what <literal>images/figure1.gif</literal> is by making the HTML document servlet strip any path that comes in from the URL, e.g.</para>
+        <screen>
+https://dspace.mit.edu/html/1721.1/12345/images/figure1.gif
+                                         ^^^^^^^
+                                        Strip this
+</screen>
+        <para>BUT all the filenames (regardless of directory names) must be unique. For example, this wouldn&apos;t work:</para>
+        <screen>
+contents.html
+chapter1.html
+chapter2.html
+chapter1_images/figure.gif
+chapter2_images/figure.gif
+</screen>
+        <para>since the HTML document servlet wouldn&apos;t know which bitstream to serve up for:</para>
+        <screen>
+https://dspace.mit.edu/html/1721.1/12345/chapter1_images/figure.gif
+https://dspace.mit.edu/html/1721.1/12345/chapter2_images/figure.gif
+</screen>
+        <para>since it would just have <literal>figure.gif</literal></para>
+        <para>To prevent &quot;infinite URL spaces&quot; appearing (e.g. if a file <literal>foo.html</literal> linked to <literal>bar/foo.html</literal>, which would link to <literal>bar/bar/foo.html</literal>...) this behavior can be configured by setting the configuration property <literal>webui.html.max-depth-guess</literal>.</para>
+        <para>For example, if we receive a request for <literal>foo/bar/index.html</literal>, and we have a bitstream called just <literal>index.html</literal>, we will serve up that bitstream for the request if <literal>webui.html.max-depth-guess</literal> is 2 or greater. If <literal>webui.html.max-depth-guess</literal> is 1 or less, we would not serve that bitstream, as the depth of the file is greater. If <literal>webui.html.max-depth-guess</literal> is zero, the request filename and path must always exactly match the bitstream name. The default value (if that property is not present in <literal>dspace.cfg</literal>) is 3.</para>
+      </section>
+      <section remap="h3">
+        <title>Thesis Blocking</title>
+        <para>The submission UI has an optional feature that came about as a result of MIT Libraries policy. If the <literal>block.theses</literal> parameter in <literal>dspace.cfg</literal> is <literal>true</literal>, an extra checkbox is included in the first page of the submission UI. This asks the user if the submission is a thesis. If the user checks this box, the submission is halted (deleted) and an error message displayed, explaining that DSpace should not be used to submit theses. This feature can be turned off and on, and the message displayed (<literal>/dspace/jsp/submit/no-theses.jsp</literal> can be localized as necessary.</para>
+      </section>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-application.html-oai" xreflabel="OAI-PMH Data Provider"/>OAI-PMH Data Provider</title>
+      <para>The DSpace platform supports the <ulink url="http://www.openarchives.org/">Open Archives Initiative Protocol for Metadata Harvesting</ulink> (OAI-PMH) version 2.0 as a data provider. This is accomplished using the <ulink url="http://www.oclc.org/research/software/oai/cat.shtm">OAICat framework from OCLC</ulink>.</para>
+      <para>The DSpace build process builds a Web application archive, <literal>[dspace-source]/build/oai.war</literal>), in much the same way as <link linkend="docbook-application.html-webui_build">the Web UI build process</link> described above. The only differences are that the JSPs are not included, and <literal>[dspace-source]/etc/oai-web.xml</literal> is used as the deployment descriptor. This &apos;webapp&apos; is deployed to receive and respond to OAI-PMH requests via HTTP. Note that typically it should <emphasis>not</emphasis> be deployed on SSL (<literal>https:</literal> protocol). In a typical configuration, this is deployed at <literal>oai</literal>, for example:</para>
+      <screen>
+http://dspace.myu.edu/oai/request?verb=Identify
+</screen>
+      <para>The &apos;base URL&apos; of this DSpace deployment would be:</para>
+      <screen>
+http://dspace.myu.edu/oai/request
+</screen>
+      <para>It is this URL that should be registered with <ulink url="http://www.openarchives.org/">www.openarchives.org</ulink>. Note that you can easily change the &apos;<literal>request</literal>&apos; portion of the URL by editing <literal>[dspace-source]/etc/oai-web.xml</literal> and rebuilding and deploying <literal>oai.war</literal>.</para>
+      <para>DSpace provides implementations of the OAICat interfaces <literal>AbstractCatalog</literal>, <literal>RecordFactory</literal> and <literal>Crosswalk</literal> that interface with the DSpace content management API and harvesting API (in the search subsystem).</para>
+      <para>Only the basic <literal>oai_dc</literal> unqualified Dublin Core metadata set export is enabled by default; this is particularly easy since all items have qualified Dublin Core metadata. When this metadata is harvested, the qualifiers are simply stripped; for example, <literal>description.abstract</literal> is exposed as unqualified <literal>description</literal>. The <literal>description.provenance</literal> field is hidden, as this contains private information about the submitter and workflow reviewers of the item, including their e-mail addresses. Additionally, to keep in line with OAI community practices, values of <literal>contributor.author</literal> are exposed as <literal>creator</literal> values.</para>
+      <para>Other metadata formats are supported as well, using other <literal>Crosswalk</literal> implementations; consult the <literal>oaicat.properties</literal> file described below. To enable a format, simply uncomment the lines beginning with <literal>Crosswalks.*</literal>. Multiple formats are allowed, and the current list includes, in addition to unqualified DC: MPEG DIDL, METS, MODS. There is also an incomplete, experimental qualified DC.</para>
+      <para>Note that the current simple DC implementation (<literal>org.dspace.app.oai.OAIDCCrosswalk</literal>) does not currently strip out any invalid XML characters that may be lying around in the data. If your database contains a DC value with, for example, some ASCII control codes (form feed etc.) this may cause OAI harvesters problems. This should rarely occur, however. XML entities (such as <literal>&gt;</literal>) are encoded (e.g. to <literal>&amp;gt;</literal>)</para>
+      <para>In addition to the implementations of the OAICat interfaces, there are two configuration files relevant to OAI support:</para>
+      <variablelist>
+        <varlistentry>
+          <term>
+            <literal>oaicat.properties</literal>
+          </term>
+          <listitem>
+            <para> This resides as a template in <literal>[dspace]/config/templates</literal>, and the live version is written to <literal>[dspace]/config</literal>. You probably won&apos;t need to edit this; the <literal>install-configs</literal> script fills out the relevant deployment-specific parameters. You might want to change the <literal>earliestDatestamp</literal> field to accurately reflect the oldest datestamp in the system. (Note that this is the value of the <literal>last_modified</literal> column in the <literal>Item</literal> database table.)</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <literal>oai-web.xml</literal>
+          </term>
+          <listitem>
+            <para> This standard Java Servlet &apos;deployment descriptor&apos; is stored in the source as <literal>[dspace-source]/etc/oai-web.xml</literal>, and is written to <literal>/dspace/oai/WEB-INF/web.xml</literal>.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+      <section remap="h3">
+        <title>Sets</title>
+        <para>OAI-PMH allows repositories to expose an hierarchy of sets in which records may be placed. A record can be in zero or more sets.</para>
+        <para>DSpace exposes collections as sets. The organization of communities is likely to change over time, and is therefore a less stable basis for selective harvesting.</para>
+        <para>Each collection has a corresponding OAI set, discoverable by harvesters via the ListSets verb. The setSpec is the Handle of the collection, with the &apos;:&apos; and &apos;/&apos; converted to underscores so that the Handle is a legal setSpec, for example:</para>
+        <screen>
+hdl_1721.1_1234
+</screen>
+        <para>Naturally enough, the collection name is also the name of the corresponding set.</para>
+      </section>
+      <section remap="h3">
+        <title>Unique Identifier</title>
+        <para>Every item in OAI-PMH data repository must have an unique identifier, which must conform to the URI syntax. As of DSpace 1.2, Handles are not used; this is because in OAI-PMH, the OAI identifier identifies the <emphasis>metadata record</emphasis> associated with the <emphasis>resource</emphasis>. The <emphasis>resource</emphasis> is the DSpace item, whose <emphasis>resource identifier</emphasis> is the Handle. In practical terms, using the Handle for the OAI identifier may cause problems in the future if DSpace instances share items with the same Handles; the OAI metadata record identifiers should be different as the different DSpace instances would need to be harvested separately and may have different metadata for the item.</para>
+        <para>The OAI identifiers that DSpace uses are of the form:</para>
+        <para>
+          <literal>oai:host name:handle</literal>
+        </para>
+        <para>For example:</para>
+        <para>
+          <literal>oai:dspace.myu.edu:123456789/345</literal>
+        </para>
+        <para>If you wish to use a different scheme, this can easily be changed by editing the value of <literal>OAI_ID_PREFIX</literal> at the top of the <literal>org.dspace.app.oai.DSpaceOAICatalog</literal> class. (You do not need to change the code if the above scheme works for you; the code picks up the host name and Handles automatically from the DSpace configuration.)</para>
+      </section>
+      <section remap="h3">
+        <title>Access control</title>
+        <para>OAI provides no authentication/authorisation details, although these could be implemented using standard HTTP methods. It is assumed that all access will be anonymous for the time being.</para>
+        <para>A question is, &quot;is all metadata public?&quot; Presently the answer to this is yes; all metadata is exposed via OAI-PMH, even if the item has restricted access policies. The reasoning behind this is that people who do actually have permission to read a restricted item should still be able to use OAI-based services to discover the content.</para>
+        <para>If in the future, this &apos;expose all metadata&apos; approach proves unsatisfactory for any reason, it should be possible to expose only publicly readable metadata. The authorisation system has separate permissions for READing and item and READing the content (bitstreams) within it. This means the system can differentiate between an item with public metadata and hidden content, and an item with hidden metadata as well as hidden content. In this case the OAI data repository should only expose items those with anonymous READ access, so it can hide the existence of records to the outside world completely. In this scenario, one should be wary of protected items that are made public after a time. When this happens, the items are &quot;new&quot; from the OAI-PMH perspective.</para>
+      </section>
+      <section remap="h3">
+        <title>Modification Date (OAI Date Stamp)</title>
+        <para>OAI-PMH harvesters need to know when a record has been created, changed or deleted. DSpace keeps track of a &apos;last modified&apos; date for each item in the system, and this date is used for the OAI-PMH date stamp. This means that any changes to the metadata (e.g. admins correcting a field, or a withdrawal) will be exposed to harvesters.</para>
+      </section>
+      <section remap="h3">
+        <title>&apos;About&apos; Information</title>
+        <para>As part of each record given out to a harvester, there is an optional, repeatable &quot;about&quot; section which can be filled out in any (XML-schema conformant) way. Common uses are for provenance and rights information, and there are schemas in use by OAI communities for this. Presently DSpace does not provide any of this information.</para>
+      </section>
+      <section remap="h3">
+        <title>Deletions</title>
+        <para>DSpace keeps track of deletions (withdrawals). These are exposed via OAI, which has a specific mechansim for dealing with this. Since DSpace keeps a permanent record of withdrawn items, in the OAI-PMH sense DSpace supports deletions &apos;persistently&apos;. This is as opposed to &apos;transient&apos; deletion support, which would mean that deleted records are forgotten after a time.</para>
+        <para>Once an item has been withdrawn, OAI-PMH harvests of the date range in which the withdrawal occurred will find the &apos;deleted&apos; record header. Harvests of a date range prior to the withdrawal will <emphasis>not</emphasis> find the record, despite the fact that the record did exist at that time.</para>
+        <para>As an example of this, consider an item that was created on 2002-05-02 and withdrawn on 2002-10-06. A request to harvest the month 2002-10 will yield the &apos;record deleted&apos; header. However, a harvest of the month 2002-05 will not yield the original record.</para>
+        <para>Note that presently, the deletion of &apos;expunged&apos; items is not exposed through OAI.</para>
+      </section>
+      <section remap="h3">
+        <title>Flow Control (Resumption Tokens)</title>
+        <para>An OAI data provider can prevent any performance impact caused by harvesting by forcing a harvester to receive data in time-separated chunks. If the data provider receives a request for a lot of data, it can send part of the data with a resumption token. The harvester can then return later with the resumption token and continue.</para>
+        <para>DSpace supports resumption tokens for &apos;ListRecords&apos; OAI-PMH requests. ListIdentifiers and ListSets requests do not produce a particularly high load on the system, so resumption tokens are not used for those requests.</para>
+        <para>Each OAI-PMH ListRecords request will return at most 100 records. This limit is set at the top of <literal>org.dspace.app.oai.DSpaceOAICatalog.java</literal> (<literal>MAX_RECORDS</literal>). A potential issue here is that if a harvest yields an exact multiple of <literal>MAX_RECORDS</literal>, the last operation will result in a harvest with no records in it. It is unclear from the OAI-PMH specification if this is acceptable.</para>
+        <para>When a resumption token is issued, the optional <literal>completeListSize</literal> and <literal>cursor</literal> attributes are not included. OAICat sets the <literal>expirationDate</literal> of the resumption token to one hour after it was issued, though in fact since DSpace resumption tokens contain all the information required to continue a request they do not actually expire.</para>
+        <para>Resumption tokens contain all the state information required to continue a request. The format is:</para>
+        <screen>
+from/until/setSpec/offset
+</screen>
+        <para><literal>from</literal> and <literal>until</literal> are the ISO 8601 dates passed in as part of the original request, and <literal>setSpec</literal> is also taken from the original request. <literal>offset</literal> is the number of records that have already been sent to the harvester. For example:</para>
+        <screen>
+2003-01-01//hdl_1721_1_1234/300
+</screen>
+        <para>This means the harvest is &apos;from&apos; <literal>2003-01-01</literal>, has no &apos;until&apos; date, is for collection hdl:1721.1/1234, and 300 records have already been sent to the harvester. (Actually, if the original OAI-PMH request doesn&apos;t specify a &apos;from&apos; or &apos;until, OAICat fills them out automatically to &apos;0000-00-00T00:00:00Z&apos; and &apos;9999-12-31T23:59:59Z&apos; respectively. This means DSpace resumption tokens will always have from and until dates in them.)</para>
+        <!-- Struct Builder -->
+      </section>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-application.html-structbuilder" xreflabel="Community and
+Collection Structure Importer"/>Community and Collection Structure Importer</title>
+      <para>This command-line tool gives you the ability to import a community and collection structure directly from a source XML file. It is executed as follows:</para>
+      <para>
+        <literal>[dspace]/bin/structure-builder -f [source xml] -o [output xml file] -e [administrator email]</literal>
+      </para>
+      <para>This will examine the contents of <literal>[source xml]</literal>, import the structure into DSpace while logged in as the supplied administrator, and then output the same structure to the output file, but including the handle for each imported community and collection as an attribute.</para>
+      <para>The source xml document needs to be in the following format:</para>
+      <screen>
+&lt;import_structure&gt;
+        &lt;community&gt;
+                &lt;name&gt;Community Name&lt;/name&gt;
+                &lt;description&gt;Descriptive
+	text&lt;/description&gt;
+                &lt;intro&gt;Introductory text&lt;/intro&gt;
+                &lt;copyright&gt;Special copyright
+	notice&lt;/copyright&gt;
+                &lt;sidebar&gt;Sidebar text&lt;/sidebar&gt;
+                &lt;community&gt;
+                        &lt;name&gt;Sub Community Name&lt;/name&gt;
+                        &lt;community&gt; ...[ad infinitum]...
+	&lt;/community&gt;
+                &lt;/community&gt;
+                &lt;collection&gt;
+                        &lt;name&gt;Collection Name&lt;/name&gt;
+                        &lt;description&gt;Descriptive
+	text&lt;/description&gt;
+                        &lt;intro&gt;Introductory text&lt;/intro&gt;
+                        &lt;copyright&gt;Special copyright
+	notice&lt;/copyright&gt;
+                        &lt;sidebar&gt;Sidebar text&lt;/sidebar&gt;
+                        &lt;license&gt;Special
+	licence&lt;/license&gt;
+                        &lt;provenance&gt;Provenance
+	information&lt;/provenance&gt;
+                &lt;/collection&gt;
+        &lt;/community&gt;
+&lt;/import_structure&gt;
+</screen>
+      <para>The resulting output document will be as follows:</para>
+      <screen>
+&lt;import_structure&gt;
+        &lt;community identifier=&quot;123456789/1&quot;&gt;
+                &lt;name&gt;Community Name&lt;/name&gt;
+                &lt;description&gt;Descriptive
+	text&lt;/description&gt;
+                &lt;intro&gt;Introductory text&lt;/intro&gt;
+                &lt;copyright&gt;Special copyright
+	notice&lt;/copyright&gt;
+                &lt;sidebar&gt;Sidebar text&lt;/sidebar&gt;
+                &lt;community identifier=&quot;123456789/2&quot;&gt;
+                        &lt;name&gt;Sub Community Name&lt;/name&gt;
+                        &lt;community identifier=&quot;123456789/3&quot;&gt; ...[ad
+	infinitum]... &lt;/community&gt;
+                &lt;/community&gt;
+                &lt;collection identifier=&quot;123456789/4&quot;&gt;
+                        &lt;name&gt;Collection Name&lt;/name&gt;
+                        &lt;description&gt;Descriptive
+	text&lt;/description&gt;
+                        &lt;intro&gt;Introductory text&lt;/intro&gt;
+                        &lt;copyright&gt;Special copyright
+	notice&lt;/copyright&gt;
+                        &lt;sidebar&gt;Sidebar text&lt;/sidebar&gt;
+                        &lt;license&gt;Special
+	licence&lt;/license&gt;
+                        &lt;provenance&gt;Provenance
+	information&lt;/provenance&gt;
+                &lt;/collection&gt;
+        &lt;/community&gt;
+&lt;/import_structure&gt;
+</screen>
+      <section remap="h3">
+        <title>Limitation</title>
+        <itemizedlist>
+          <listitem>
+            <para> Currently this does not export community and collection structures, although it should only be a small modification to make it do so</para>
+          </listitem>
+        </itemizedlist>
+        <!-- end Struct Builder -->
+      </section>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-application.html-packager" xreflabel="Package Importer and
+Exporter"/>Package Importer and Exporter</title>
+      <para>This command-line tool gives you access to the Packager plugins. It can <emphasis>ingest</emphasis> a package to create a new DSpace Item, or <emphasis>disseminate</emphasis> an Item as a package.</para>
+      <para>To see all the options, invoke it as:</para>
+      <screen>
+<emphasis> [dspace]</emphasis>/bin/packager --help
+</screen>
+      <para> This mode also displays a list of the names of package ingesters and disseminators that are available.</para>
+      <section remap="h3">
+        <title>Ingesting</title>
+        <para>To ingest a package from a file, give the command:</para>
+        <screen>
+<emphasis> [dspace]</emphasis>/bin/packager -e <emphasis> user</emphasis> -c <emphasis> handle</emphasis> -t <emphasis> packager</emphasis> <emphasis>
+	path</emphasis>
+</screen>
+        <para> Where <emphasis>user</emphasis> is the e-mail address of the E-Person under whose authority this runs; <emphasis>handle</emphasis> is the Handle of the collection into which the Item is added, <emphasis>packager</emphasis> is the plugin name of the package ingester to use, and <emphasis>path</emphasis> is the path to the file to ingest (or <literal>&quot;-&quot;</literal> to read from the standard input).</para>
+        <para> Here is an example that loads a PDF file with internal metadata as a package:</para>
+        <screen>
+/dspace/bin/packager -e florey@mit.edu -c 1721.2/13  -t pdf
+	thesis.pdf
+</screen>
+          <para>This example takes the result of retrieving a URL and ingests it:</para>
+        <screen>
+wget -O - http://alum.mit.edu/jarandom/my-thesis.pdf | \
+/dspace/bin/packager -e florey@mit.edu -c 1721.2/13  -t pdf -
+</screen>
+        </section>
+      <section remap="h3">
+        <title>Disseminating</title>
+        <para>To disseminate an Item as a package, give the command:</para>
+        <screen>
+<emphasis> [dspace]</emphasis>/bin/packager -e <emphasis> user</emphasis> -d -i <emphasis> handle</emphasis> -t   <emphasis> packager</emphasis> <emphasis>
+	path</emphasis>
+</screen>
+        <para> Where <emphasis>user</emphasis> is the e-mail address of the E-Person under whose
+	authority this runs; <emphasis>handle</emphasis> is the Handle of the Item to disseminate;
+	<emphasis>packager</emphasis> is the plugin name of the package disseminator to use; and
+	<emphasis>path</emphasis> is the path to the file to create (or <literal>&quot;-&quot;</literal> to write to the
+	standard output). This example writes an Item out as a METS package
+	in the file &quot;454.zip&quot;: <screen>
+/dspace/bin/packager -e florey@mit.edu -d -i 1721.2/454 -t METS
+	454.zip
+</screen></para>
+      </section>
+      <section remap="h3">
+        <title>METS packages</title>
+        <para>DSpace 1.4 includes a package disseminator and matching ingester for the DSpace METS SIP (Submission Information Package) format. They were created to help end users prepare sets of digital resources and metadata for submission to the archive using well-defined standards such as <ulink url="http://www.loc.gov/standards/mets/">METS</ulink>, <ulink url="http://www.loc.gov/standards/mods/">MODS</ulink>, <ulink url="http://www.loc.gov/standards/premis/">and PREMIS</ulink>. The plugin name is <literal>METS</literal> by default, and it uses MODS for descriptive metadata.</para>
+        <para>The DSpace METS SIP profile is available at: <ulink url="http://www.dspace.org/standards/METS/SIP/profilev1p0/metsipv1p0.pdf">
+            <literal>http://www.dspace.org/standards/METS/SIP/profilev1p0/metsipv1p0.pdf</literal>
+          </ulink>
+.</para>
+      </section>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-application.html-itemimporter" xreflabel="Item Importer and
+Exporter"/>Item Importer and Exporter</title>
+      <para>DSpace has a set of command line tools for importing and exporting items in batches, using the DSpace simple archive format. The tools are not terribly robust, but are useful and are easily modified. They also give a good demonstration of how to implement your own item importer if desired.</para>
+      <section remap="h3">
+        <title>DSpace simple archive format</title>
+        <para>The basic concept behind the DSpace&apos;s simple archive format is to create an archive, which is directory full of items, with a subdirectory per item. Each item directory contains a file for the item&apos;s descriptive metadata, and the files that make up the item.</para>
+        <screen>
+archive_directory/
+    item_000/
+        dublin_core.xml -- qualified Dublin Core metadata
+        contents        -- text file containing one line per filename
+        file_1.doc      -- files to be added as bitstreams to the
+	item
+        file_2.pdf
+    item_001/
+        dublin_core.xml
+        contents
+        file_1.png
+        ...
+</screen>
+        <para>The <literal>dublin_core.xml</literal> file has the following format, where each Dublin Core element has it&apos;s own entry within a <literal>&lt;dcvalue&gt;</literal> tagset. There are currently three tag elements available in the <literal>&lt;dcvalue&gt;</literal> tagset:</para>
+        <itemizedlist>
+          <listitem>
+            <para><literal>&lt;element&gt;</literal>  - the Dublin Core element</para>
+          </listitem>
+          <listitem>
+            <para><literal>&lt;qualifier&gt;</literal>  - the element&apos;s qualifier</para>
+          </listitem>
+          <listitem>
+            <para><literal>&lt;language&gt;</literal>  - (optional)ISO language code for element</para>
+          </listitem>
+        </itemizedlist>
+        <screen>
+&lt;dublin_core&gt;
+    &lt;dcvalue element=&quot;title&quot; qualifier=&quot;none&quot;&gt;A Tale of Two
+	Cities&lt;/dcvalue&gt;
+    &lt;dcvalue element=&quot;date&quot;
+	qualifier=&quot;issued&quot;&gt;1990&lt;/dcvalue&gt;&lt;/dublin_core&gt;
+
+t;
+    &lt;dcvalue element=&quot;title&quot; qualifier=&quot;alternate&quot; language=&quot;fr&quot;
+	&quot;&gt;J&apos;aime les Printemps&lt;/dcvalue&gt;
+&lt;/dublin_core&gt;
+
+</screen>
+        <para>(Note the optional language tag which notifies the system that the optional title is in French.)</para>
+        <para>The <literal>contents</literal> file simply enumerates, one file per line, the bitstream file names. The bitstream name may optionally be followed by the sequence:</para>
+        <para>
+          <literal>\tbundle:bundlename</literal>
+        </para>
+        <para> where &apos;\t&apos; is the tab character and &apos;bundlename&apos; is replaced by the name of the bundle to which the bitstream should be added. If no bundle is specified, the bitstream will be added to the &apos;ORIGINAL&apos; bundle.</para>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-application.html-importingitems" xreflabel="Importing
+Items"/>Importing Items</title>
+        <para><emphasis role="bold">Note:</emphasis> Before running the item importer over items previously exported from a DSpace instance, please first refer to <ulink url="application.html#transferitem">Transferring Items Between DSpace Instances</ulink>.</para>
+        <para>The item importer is in <literal>org.dspace.app.itemimport.ItemImport</literal>, and is run with the <literal>import</literal> utility in the <literal>dspace/bin</literal> directory. Running it with -h gets the current command-line arguments. Another very important flag is the --test flag, which you can use with any command to simulate all of the actions it will perform without actually making any changes to your DSpace instance - very useful for validating your item directories before doing an import. In the importer&apos;s arguments you can use either the user&apos;s database ID or email address and the eperson ID, and the collection&apos;s database ID or handle as arguments. Currently with the importer you can add, remove, and replace items in a collection. If you specify more than one collection argument then the items will be imported to multiple collections, and the first collection specified becomes the &quot;owning&quot; collection. If there is an error and the import is aborted, there is a --resume flag that you can try to resume the import where you left off after you fix the error.</para>
+        <para>To add items to a collection with an EPerson as the submitter, type:</para>
+        <screen>
+[dspace]/bin/import --add --eperson=joe@user.com 
+	--collection=collectionID --source=items_dir --mapfile=mapfile
+</screen>
+        <para>(or by using the short form)</para>
+        <screen>
+[dspace]/bin/import -a -e joe@user.com  -c collectionID -s items_dir
+	-m mapfile
+</screen>
+        <para>which would then cycle through the archive directory&apos;s items, import them, and then generate a map file which stores the mapping of item directories to item handles. Save this map file! Using the map file you can then &apos;unimport&apos; with the command:</para>
+        <screen>
+[dspace]/bin/import --delete --mapfile=mapfile
+</screen>
+        <para>The imported items listed in the map file would then be deleted. If you wish to replace previously imported items, you can give the command:</para>
+        <screen>
+[dspace]/bin/import --replace --eperson=joe@user.com
+	--collection=collectID --source=items_dir --mapfile=mapfile
+</screen>
+        <para>Replacing items uses the map file to replace the old items and still retain their handles.</para>
+        <para>The importer usually bypasses any workflow assigned to a collection, but adding the --workflow option will route the imported items through the workflow system.</para>
+        <para>The importer also has a --test flag that will simulate the entire import process without actually doing the import. This is extremely useful for verifying your import files before doing the import step.</para>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-application.html-exportingitems"/>Exporting Items</title>
+        <para>The item exporter can export a single item or a collection of items, and creates a DSpace simple archive for each item to be exported. To export a collection&apos;s items you type:</para>
+        <screen>
+[dspace]/bin/export --type=COLLECTION --id=collID --dest=dest_dir
+	--number=seq_num
+</screen>
+        <para>The keyword <literal>COLLECTION</literal> means that you intend to export an entire collection. The ID can either be the database ID or the handle. The exporter will begin numbering the simple archives with the sequence number that you supply. To export a single item use the keyword <literal>ITEM</literal> and give the item ID as an argument:</para>
+        <screen>
+[dspace]/bin/export --type=ITEM --id=itemID --dest=dest_dir
+	--number=seq_num
+</screen>
+        <para>Each exported item will have an additional file in its directory, named &apos;handle&apos;. This will contain the handle that was assigned to the item, and this file will be read by the importer so that items exported and then imported to another machine will retain the item&apos;s original handle.</para>
+      </section>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-application.html-transferitem" xreflabel="Transferring Items
+Between DSpace Instances"/>Transferring Items Between DSpace Instances</title>
+      <para>Where items are to be moved between DSpace instances (for example from a test DSpace into a production DSpace) the item exporter and item importer can be used in conjunction with a script to assist in this process.</para>
+      <para>After running the item exporter each <literal>dublin_core.xml</literal> file will contain metadata that was automatically added by DSpace. These fields are as follows:</para>
+      <itemizedlist>
+        <listitem>
+          <para> date.accessioned</para>
+        </listitem>
+        <listitem>
+          <para> date.available</para>
+        </listitem>
+        <listitem>
+          <para> date.issued</para>
+        </listitem>
+        <listitem>
+          <para> description.provenance</para>
+        </listitem>
+        <listitem>
+          <para> format.extent</para>
+        </listitem>
+        <listitem>
+          <para> format.mimetype</para>
+        </listitem>
+        <listitem>
+          <para> identifier.uri</para>
+        </listitem>
+      </itemizedlist>
+      <para>In order to avoid duplication of this metadata, run</para>
+      <para>
+        <literal>dspace_migrate &lt;exported item directory&gt;</literal>
+      </para>
+      <para>prior to running the item importer. This will remove the above metadata items, except for date.issued - if the item has been published or publicly distributed before and identifier.uri - if it is not the handle, from the <literal>dublin_core.xml</literal> file and remove all <literal>handle</literal> files. It will then be safe to run the item exporter. Use</para>
+      <para>
+        <literal>dspace_migrate --help</literal>
+      </para>
+      <para>for instructions on use of the script.</para>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-application.html-registration" xreflabel="Registering (Not
+Importing) Bitstreams"/>Registering (Not Importing) Bitstreams</title>
+      <para>Registration is an alternate means of incorporating items, their metadata, and their bitstreams into DSpace by taking advantage of the bitstreams already being in storage accessible to DSpace. An example might be that there is a repository for existing digital assets. Rather than using the normal <ulink url="functional.html#ingest">interactive ingest process</ulink> or the <ulink url="functional.html#importexport">batch import</ulink> to furnish DSpace the metadata and to upload bitstreams, registration provides DSpace the metadata and the location of the bitstreams. DSpace uses a variation of the import tool to accomplish registration.</para>
+      <section remap="h3">
+        <title>Accessible Storage</title>
+        <para>To register an item its bitstreams must reside on storage accessible to DSpace and therefore referenced by an asset store number in <literal>dspace.cfg</literal>. The configuration file <literal>dspace.cfg</literal> establishes one or more asset stores through the use of an integer asset store number. This number relates to a directory in the DSpace host&apos;s file system or a set of SRB account parameters. This asset store number is described in <ulink url="configure.html#dspacecfg">The <literal>dspace.cfg</literal> Configuration Properties File</ulink> section and in the <literal>dspace.cfg</literal> file itself. The asset store number(s) used for registered items should generally not be the value of the <literal>assetstore.incoming</literal> property since it is unlikely that that you will want to mix the bitstreams of normally ingested and imported items and registered items.</para>
+      </section>
+      <section remap="h3">
+        <title>Registering Items Using the Item Importer</title>
+        <para>DSpace uses the same import tool that is used for batch import except that several variations are employed to support registration. The discussion that follows assumes familiarity with the import tool.</para>
+        <para>The archive format for registration does not include the actual content files (bitstreams) being registered. The format is however a directory full of items to be registered, with a subdirectory per item. Each item directory contains a file for the item&apos;s descriptive metadata (<literal>dublin_core.xml</literal>) and a file listing the item&apos;s content files (<literal>contents</literal>), but not the actual content files themselves.</para>
+        <para>The <literal>dublin_core.xml</literal> file for item registration is exactly the same as for regular item import.</para>
+        <para>The <literal>contents</literal> file, like that for regular item import, lists the item&apos;s content files, one content file per line, but each line has the one of the following formats:</para>
+        <screen>
+-r -s n -f filepath
+-r -s n -f filepath\tbundle:bundlename
+-r -s n -f filepath\tbundle:bundlename\tpermissions: -[r|w] &apos;group
+	name&apos;
+-r -s n -f filepath\tbundle:bundlename\tpermissions: -[r|w] &apos;group
+	name&apos;\tdescription: some text
+</screen>
+        <para>where</para>
+        <itemizedlist>
+          <listitem>
+            <para><literal>-r</literal>  indicates this is a file to be registered</para>
+          </listitem>
+          <listitem>
+            <para><literal>-s n</literal>  indicates the asset store number (<literal>n</literal>)</para>
+          </listitem>
+          <listitem>
+            <para><literal>-f filepath</literal>  indicates the path and name of the content file to be registered (filepath)</para>
+          </listitem>
+          <listitem>
+            <para><literal>\t</literal>  is a tab character</para>
+          </listitem>
+          <listitem>
+            <para><literal>bundle:bundlename</literal>  is an optional bundle name</para>
+          </listitem>
+          <listitem>
+            <para><literal>permissions: -[r|w] &apos;group name&apos;</literal>  is an optional read or write permission that can be attached to the bitstream</para>
+          </listitem>
+          <listitem>
+            <para><literal>description: some text</literal>  is an optional description field to add to the file</para>
+          </listitem>
+        </itemizedlist>
+        <para>The bundle, that is everything after the filepath, is optional and is normally not used.</para>
+        <para>The command line for registration is just like the one for regular import:</para>
+        <screen>
+dsrun org.dspace.app.itemimport.ItemImport --add
+	--eperson=joe@user.com  --collection=collectionID --source=items_dir
+	--mapfile=mapfile
+</screen>
+        <para>(or by using the short form)</para>
+        <screen>
+dsrun org.dspace.app.itemimport.ItemImport -a -e joe@user.com  -c
+	collectionID -s items_dir -m mapfile
+</screen>
+        <para>The <literal>--workflow</literal> and <literal>--test</literal> flags will function as described in <ulink url="application.html#importingitems">Importing Items</ulink>.</para>
+        <para>The <literal>--delete</literal> flag will function as described in <ulink url="application.html#importingitems">Importing Items</ulink> but the registered content files will not be removed from storage. See <link linkend="docbook-application.html-deletingregistereditems">Deleting Registered Items</link>.</para>
+        <para>The <literal>--replace</literal> flag will function as described in <ulink url="application.html#importingitems">Importing Items</ulink> but care should be taken to consider different cases and implications. With old items and new items being registered or ingested normally, there are four combinations or cases to consider. Foremost, an old registered item deleted from DSpace using <literal>--replace</literal> will not be removed from the storage. See <ulink url="application.html#deletingregistereditems">Deleting Registered Items</ulink>. where is resides. A new item added to DSpace using <literal>--replace</literal> will be ingested normally or will be registered depending on whether or not it is marked in the <literal>contents</literal> files with the -r.</para>
+      </section>
+      <section remap="h3">
+        <title>Internal Identification and Retrieval of Registered Items</title>
+        <para>Once an item has been registered, superficially it is indistinguishable from items ingested interactively or by batch import. But internally there are some differences:</para>
+        <para>First, the randomly generated internal ID is not used because DSpace does not control the file path and name of the bitstream. Instead, the file path and name are that specified in the <literal>contents</literal> file.</para>
+        <para>Second, the <literal>store_number</literal> column of the bitstream database row contains the asset store number specified in the <literal>contents</literal> file.</para>
+        <para>Third, the <literal>internal_id</literal> column of the bitstream database row contains a leading flag (<literal>-R</literal>) followed by the registered file path and name. For example, <literal>-Rfilepath</literal> where <literal>filepath</literal> is the file path and name relative to the asset store corresponding to the asset store number. The asset store could be traditional storage in the DSpace server&apos;s file system or an SRB account.</para>
+        <para>Fourth, an MD5 checksum is calculated by reading the registered file if it is in local storage. If the registerd file is in remote storage (say, SRB) a checksup is calulated on just the file name! This is an efficiency choice since registering a large number of large files that are in SRB would consume substantial network resources and time. A future option could be to have an SRB proxy process calculate MD5s and store them in SRB&apos;s metadata catalog (MCAT) for rapid retrieval. SRB offers such an option but it&apos;s not yet in production release.</para>
+        <para>Registered items and their bitstreams can be retrieved transparently just like normally ingested items.</para>
+      </section>
+      <section remap="h3">
+        <title>Exporting Registered Items</title>
+        <para>Registered items may be exported as described in <link linkend="docbook-application.html-exportingitems">Exporting Items</link>. If so, the export directory will contain actual copies of the files being exported but the lines in the contents file will flag the files as registered. This means that if DSpace items are &quot;round tripped&quot; (see Transferring Items Between DSpace Instances) using the exporter and importer, the registered files in the export directory will again registered in DSpace instead of being uploaded and ingested normally.</para>
+      </section>
+      <section remap="h3">
+        <title>METS Export of Registered Items</title>
+        <para>The <link linkend="docbook-application.html-mets">METS Export Tool</link> can also be used but note the cautions described in that section and note that MD5 values for items in remote storage are actually MD5 values on just the file name.</para>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-application.html-deletingregistereditems"/>Deleting Registered Items</title>
+        <para>If a registered item is deleted from DSpace, either interactively or by using the <literal>--delete</literal> or <literal>--replace</literal> flags described in <ulink url="application.html#importingitems">Importing Items</ulink>, the item will disappear from DSpace but it&apos;s registered content files will remain in place just as they were prior to registration. Bitstreams not registered but added by DSpace as part of registration, such as <literal>license.txt</literal> files, will be deleted.</para>
+      </section>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-application.html-mets" xreflabel="METS Tools"/>METS Tools</title>
+      <para>The experimental (incomplete) METS export tool writes DSpace items to a filesystem with the metadata held in a more standard format based on METS.</para>
+      <section remap="h3">
+        <title>The Export Tool</title>
+        <para>The METS export tool is invoked via the command line like this:</para>
+        <screen>
+<emphasis> [dspace]</emphasis>/bin/dsrun org.dspace.app.mets.METSExport
+	--help
+</screen>
+        <para>The tool can export an individual item, the items within a given collection, or everything in the DSpace instance. To export an individual item, use:</para>
+        <screen>
+<emphasis> [dspace]</emphasis>/bin/dsrun org.dspace.app.mets.METSExport --item <emphasis>
+	[handle]</emphasis>
+</screen>
+        <para>To export the items in collection <literal>hdl:123.456/789</literal>, use:</para>
+        <screen>
+<emphasis> [dspace]</emphasis>/bin/dsrun org.dspace.app.mets.METSExport --collection
+	hdl:123.456/789
+</screen>
+        <para>To export all the items DSpace, use:</para>
+        <screen>
+<emphasis> [dspace]</emphasis>/bin/dsrun org.dspace.app.mets.METSExport
+	--all
+</screen>
+        <para>With any of the above forms, you can specify the base directory into which the items will be exported, using <literal>--destination [directory]</literal>. If this parameter is omitted, the current directory is used.</para>
+      </section>
+      <section remap="h3">
+        <title>The AIP Format</title>
+        <para>Each exported item is written to a separate directory, created under the base directory specified in the command-line arguments, or in the current directory if <literal>--destination</literal> is omitted. The name of each directory is the Handle, URL-encoded so that the directory name is &apos;legal&apos;.</para>
+        <para>Within each item directory is a <literal>mets.xml</literal> file which contains the METS-encoded metadata for the item. Bitstreams in the item are also stored in the directory. Their filenames are their MD5 checksums, firstly for easy integrity checking, and also to avoid any problems with &apos;special characters&apos; in the filenames that were legal on the original filing system they came from but are illegal in the server filing system. The <literal>mets.xml</literal> file includes XLink pointers to these bitstream files.</para>
+        <para>An example AIP might look like this:</para>
+        <itemizedlist>
+          <listitem>
+            <para>
+              <literal>hdl%3A123456789%2F8/</literal>
+              <itemizedlist>
+                <listitem>
+                  <para><literal>mets.xml</literal>  -- METS metadata</para>
+                </listitem>
+                <listitem>
+                  <para><literal>184BE84F293342</literal>  -- bitstream</para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>3F9AD0389CB821</literal>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>135FB82113C32D</literal>
+                  </para>
+                </listitem>
+              </itemizedlist>
+            </para>
+          </listitem>
+        </itemizedlist>
+        <para>The contents of the METS in the <literal>mets.xml</literal> file are as follows:</para>
+        <itemizedlist>
+          <listitem>
+            <para> A <literal>dmdSec</literal> (descriptive metadata section) containing the item&apos;s metadata in <ulink url="http://www.loc.gov/standards/mods/">Metadata Object Description Schema (MODS)</ulink> XML. The Dublin Core descriptive metadata is mapped to MODS since there is no official qualified Dublin Core XML schema in existence as of yet, and the Library Application Profile of DC that DSpace uses includes some qualifiers that are not part of the <ulink url="http://dublincore.org/documents/dcmi-terms/">DCMI Metadata Terms</ulink>.</para>
+          </listitem>
+          <listitem>
+            <para> An <literal>amdSec</literal> (administrative metadata section), which contains the a rights metadata element, which in turn contains the base64-encoded deposit license (the license the submitter granted as part of the submission process).</para>
+          </listitem>
+          <listitem>
+            <para> A <literal>fileSec</literal> containing a list of the bitstreams in the item. Each bundle constitutes a <literal>fileGrp</literal>. Each bitstream is represented by a <literal>file</literal> element, which contains an <literal>FLocat</literal> element with a simple XLink to the bitstream in the same directory as the <literal>mets.xml</literal> file. The <literal>file</literal> attributes consist of most of the basic technical metadata for the bitstream. Additionally, for those bitstreams that are thumbnails or text extracted from another bitstream in the item, those &apos;derived&apos; bitstreams have the same <literal>GROUPID</literal> as the bitstream they were derived from, in order that clients understand that there is a relationship.</para>
+            <para>The <literal>OWNERID</literal> of each <literal>file</literal> is the <ulink url="functional.html#bitstream_ids">&apos;persistent&apos; bitstream identifier</ulink> assigned by the DSpace instance. The <literal>ID</literal> and <literal>GROUPID</literal> attributes consist of the item&apos;s Handle, together with the bitstream&apos;s sequence ID, which underscores used in place of dots and slashes. For example, a bitstream with sequence ID 24, in the item <literal>hdl:123.456/789</literal> will have the <literal>ID</literal><literal>123_456_789_24</literal>. This is because <literal>ID</literal> and <literal>GROUPID</literal> attributes must be of type <literal>xsd:id</literal>.</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+      <section remap="h3">
+        <title>Limitations</title>
+        <itemizedlist>
+          <listitem>
+            <para> No corresponding import tool yet</para>
+          </listitem>
+          <listitem>
+            <para> No <literal>structmap</literal> section</para>
+          </listitem>
+          <listitem>
+            <para> Some technical metadata not written, e.g. the primary bitstream in a bundle, original filenames or descriptions.</para>
+          </listitem>
+          <listitem>
+            <para> Only the MIME type is stored, not the (finer grained) bitstream format.</para>
+          </listitem>
+          <listitem>
+            <para> Dublin Core to MODS mapping is very simple, probably needs verification</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-application.html-mediafilters" xreflabel="MediaFilters:
+Transforming DSpace Content"/>MediaFilters: Transforming DSpace Content</title>
+      <para>DSpace can apply filters to content/bitstreams, creating new content. Filters are included that extract text for <emphasis role="bold">full-text searching</emphasis>, and create <emphasis role="bold">thumbnails</emphasis> for items that contain images. The media filters are controlled by the <literal>MediaFilterManager</literal> which traverses the asset store, invoking the <literal>MediaFilter</literal> or <literal>FormatFilter</literal> classes on bitstreams. The media filter plugin configuration <literal>filter.plugins</literal> in <literal>dspace.cfg</literal> contains a list of all enabled media/format filter plugins (see <ulink url="configure.html#mediafilters">Configuring Media Filters</ulink> for more information). The media filter system is intended to be run from the command line (or regularly as a cron task):</para>
+      <screen>
+[dspace]/bin/filter-media
+</screen>
+      <para>With no options, this traverses the asset store, applying media filters to bitstreams, and skipping bitstreams that have already been filtered.</para>
+      <para>
+        <emphasis role="bold">Available Command-Line Options:</emphasis>
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para><emphasis role="bold">Help</emphasis> : <literal>[dspace]/bin/filter-media -h</literal></para>
+          <itemizedlist>
+            <listitem>
+              <para> Display help message describing all command-line options.</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Force mode</emphasis> : <literal>[dspace]/bin/filter-media -f</literal></para>
+          <itemizedlist>
+            <listitem>
+              <para> Apply filters to ALL bitstreams, even if they&apos;ve already been filtered. If they&apos;ve already been filtered, the previously filtered content is overwritten.</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Identifier mode</emphasis> : <literal>[dspace]/bin/filter-media -i 123456789/2</literal></para>
+          <itemizedlist>
+            <listitem>
+              <para> Restrict processing to the community, collection, or item named by the identifier - by default, all bitstreams of all items in the repository are processed. The identifier must be a Handle, not a DB key. This option may be combined with any other option.</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Maximum mode</emphasis> : <literal>[dspace]/bin/filter-media -m 1000</literal></para>
+          <itemizedlist>
+            <listitem>
+              <para> Suspend operation after the specified maximum number of items have been processed - by default, no limit exists. This option may be combined with any other option.</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">No-Index mode</emphasis> : <literal>[dspace]/bin/filter-media -n</literal></para>
+          <itemizedlist>
+            <listitem>
+              <para> Suppress index creation - by default, a new search index is created for full-text searching. This option suppresses index creation if you intend to run <literal>index-all</literal> elsewhere.</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Plugin mode</emphasis> : <literal>[dspace]/bin/filter-media -p &quot;PDF Text Extractor&quot;,&quot;Word Text Extractor&quot;</literal></para>
+          <itemizedlist>
+            <listitem>
+              <para> Apply ONLY the filter plugin(s) listed (separated by commas). By default all named filters listed in the <literal>filter.plugins</literal> field of <literal>dspace.cfg</literal> are applied. This option may be combined with any other option. <emphasis>WARNING:</emphasis> multiple plugin names must be separated by a comma (i.e. &apos;,&apos;) and NOT a comma followed by a space (i.e. &apos;, &apos;).</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Skip mode</emphasis> : <literal>[dspace]/bin/filter-media -s 123456789/9,123456789/100</literal></para>
+          <itemizedlist>
+            <listitem>
+              <para> SKIP the listed identifiers (separated by commas) during processing. The identifiers must be Handles (not DB Keys). They may refer to items, collections or communities which should be skipped. This option may be combined with any other option. <emphasis>WARNING:</emphasis> multiple identifiers must be separated by a comma (i.e. &apos;,&apos;) and NOT a comma followed by a space (i.e. &apos;, &apos;).</para>
+            </listitem>
+            <listitem>
+              <para> NOTE: If you have a large number of identifiers to skip, you may maintain this comma-separated list within a separate file (e.g. <literal>filter-skiplist.txt</literal>), and call it similar to the following: </para>
+              <itemizedlist>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/bin/filter-media -s `less filter-skiplist.txt`</literal>
+                  </para>
+                </listitem>
+              </itemizedlist>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Verbose mode</emphasis> : <literal>[dspace]/bin/filter-media -v</literal></para>
+          <itemizedlist>
+            <listitem>
+              <para> Verbose mode - print all extracted text and other filter details to STDOUT.</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </itemizedlist>
+      <para>Adding your own filters is done by creating a class which <literal>implements</literal> the <literal>org.dspace.app.mediafilter.FormatFilter</literal> interface. See the <ulink url="configure.html#newfilter">Creating a new Media Filter</ulink> topic and comments in the source file FormatFilter.java for more information. In theory filters could be implemented in any programming language (C, Perl, etc.) However, they need to be invoked by the Java code in the Media Filter class that you create.</para>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-application.html-filiator" xreflabel="Sub-Community
+Management"/>Sub-Community Management</title>
+      <para>DSpace provides an administrative tool - &apos;CommunityFiliator&apos; - for managing community sub-structure. Normally this structure seldom changes, but prior to the 1.2 release sub-communities were not supported, so this tool could be used to place existing pre-1.2 communities into a hierarchy. It has two operations, either establishing a community to sub-community relationship, or dis-establishing an existing relationship.</para>
+      <para>The familiar parent/child metaphor can be used to explain how it works. Every community in DSpace can be either a &apos;parent&apos; community - meaning it has at least one sub-community, or a &apos;child&apos; community - meaning it is a sub-community of another community, or both or neither. In these terms, an &apos;orphan&apos; is a community that lacks a parent (although it can be a parent); &apos;orphans&apos; are referred to as &apos;top-level&apos; communities in the DSpace user-interface, since there is no parent community &apos;above&apos; them. The first operation - establishing a parent/child relationship - can take place between any community and an orphan. The second operation - removing a parent/child relationship - will make the child an orphan.</para>
+      <para>Using the dsrun utility in the dspace/bin directory, the establish operation looks like this:</para>
+      <screen>
+dsrun org.dspace.administer.CommunityFiliator --set --parent=parentID
+	--child=childID
+</screen>
+      <para>(or using the short form)</para>
+      <screen>
+dsrun org.dspace.administer.CommunityFiliator -s -p parentID -c
+	childID
+</screen>
+      <para>where &apos;-s&apos; or &apos;--set&apos; means establish a relationship whereby the community identified by the &apos;-p&apos; parameter becomes the parent of the community identified by the &apos;-c&apos; parameter. Both the &apos;parentID&apos; and &apos;childID&apos; values may be handles or database IDs.</para>
+      <para>The reverse operation looks like this:</para>
+      <screen>
+dsrun org.dspace.administer.CommunityFiliator --remove
+	--parent=parentID --child=childID
+</screen>
+      <para>(or using the short form)</para>
+      <screen>
+dsrun org.dspace.administer.CommunityFiliator -r -p parentID -c
+	childID
+</screen>
+      <para>where &apos;-r&apos; or &apos;--remove&apos; means dis-establish the current relationship in which the community identified by &apos;parentID&apos; is the parent of the community identified by &apos;childID&apos;. The outcome will be that the &apos;childID&apos; community will become an orphan, i.e. a top-level community.</para>
+      <para>If the required constraints of operation are violated, an error message will appear explaining the problem, and no change will be made. An example in a removal operation, where the stated child community does not have the stated parent community as its parent: &quot;Error, child community not a child of parent community&quot;.</para>
+      <para>It is possible to effect arbitrary changes to the community hierarchy by chaining the basic operations together. For example, to move a child community from one parent to another, simply perform a &apos;remove&apos; from its current parent (which will leave it an orphan), followed by a &apos;set&apos; to its new parent.</para>
+      <para>It is important to understand that when any operation is performed, all the sub-structure of the child community follows it. Thus, if a child has itself children (sub-communities), or collections, they will all move with it to its new &apos;location&apos; in the community tree.</para>
+    </section>
+  </chapter>
+
+

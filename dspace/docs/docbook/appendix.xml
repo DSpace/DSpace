@@ -1,0 +1,1686 @@
+<?xml version='1.0' encoding='UTF-8'?>
+  <chapter remap="h1">
+    <title>DSpace System Documentation: Appendices</title>
+    <section remap="h2">
+      <title><anchor id="docbook-appendix.html-dublincoreregistry" xreflabel="Default
+Dublin Core Metadata Registry"/>Default Dublin Core Metadata Registry</title>
+      <informaltable frame="all">
+        <tgroup cols="4">
+          <colspec colname="c1" colwidth="25*"/>
+          <colspec colname="c2" colwidth="25*"/>
+          <colspec colname="c3" colwidth="25*"/>
+          <colspec colname="c4" colwidth="25*"/>
+          <tbody>
+            <row>
+              <entry>
+                <para>
+                  <emphasis role="bold">Element</emphasis>
+                </para>
+              </entry>
+              <entry>
+                <para>
+                  <emphasis role="bold">Qualifier</emphasis>
+                </para>
+              </entry>
+              <entry>
+                <para>
+                  <emphasis role="bold">Scope Note</emphasis>
+                </para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>contributor</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para>A person, organization, or service responsible for the content of the resource. Catch-all for unspecified contributors.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>contributor</para>
+              </entry>
+              <entry>
+                <para>advisor</para>
+              </entry>
+              <entry>
+                <para>Use primarily for thesis advisor.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>contributor<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>author</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>contributor</para>
+              </entry>
+              <entry>
+                <para>editor</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>contributor</para>
+              </entry>
+              <entry>
+                <para>illustrator</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>contributor</para>
+              </entry>
+              <entry>
+                <para>other</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>coverage</para>
+              </entry>
+              <entry>
+                <para>spatial</para>
+              </entry>
+              <entry>
+                <para>Spatial characteristics of content.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>coverage</para>
+              </entry>
+              <entry>
+                <para>temporal</para>
+              </entry>
+              <entry>
+                <para>Temporal characteristics of content.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>creator</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para>Do not use; only for harvested metadata.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>date</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para>Use qualified form if possible.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>date<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>accessioned</para>
+              </entry>
+              <entry>
+                <para>Date DSpace takes possession of item.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>date<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>available</para>
+              </entry>
+              <entry>
+                <para>Date or date range item became available to the public.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>date</para>
+              </entry>
+              <entry>
+                <para>copyright</para>
+              </entry>
+              <entry>
+                <para>Date of copyright.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>date</para>
+              </entry>
+              <entry>
+                <para>created</para>
+              </entry>
+              <entry>
+                <para>Date of creation or manufacture of intellectual content if different from date.issued.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>date<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>issued</para>
+              </entry>
+              <entry>
+                <para>Date of publication or distribution.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>date</para>
+              </entry>
+              <entry>
+                <para>submitted</para>
+              </entry>
+              <entry>
+                <para>Recommend for theses/dissertations.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>identifier</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para>Catch-all for unambiguous identifiers not defined by qualified form; use identifier.other for a known identifier common to a local collection instead of unqualified form.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>identifier<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>citation</para>
+              </entry>
+              <entry>
+                <para>Human-readable, standard bibliographic citation of non-DSpace format of this item</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>identifier<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>govdoc</para>
+              </entry>
+              <entry>
+                <para>A government document number</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>identifier<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>isbn</para>
+              </entry>
+              <entry>
+                <para>International Standard Book Number</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>identifier<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>issn</para>
+              </entry>
+              <entry>
+                <para>International Standard Serial Number</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>identifier</para>
+              </entry>
+              <entry>
+                <para>sici</para>
+              </entry>
+              <entry>
+                <para>Serial Item and Contribution Identifier</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>identifier<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>ismn</para>
+              </entry>
+              <entry>
+                <para>International Standard Music Number</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>identifier<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>other</para>
+              </entry>
+              <entry>
+                <para>A known identifier type common to a local collection.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>identifier<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>uri</para>
+              </entry>
+              <entry>
+                <para>Uniform Resource Identifier</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>description<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para>Catch-all for any description not defined by qualifiers.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>description<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>abstract</para>
+              </entry>
+              <entry>
+                <para>Abstract or summary.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>description<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>provenance</para>
+              </entry>
+              <entry>
+                <para>The history of custody of the item since its creation, including any changes successive custodians made to it.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>description<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>sponsorship</para>
+              </entry>
+              <entry>
+                <para>Information about sponsoring agencies, individuals, or contractual arrangements for the item.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>description</para>
+              </entry>
+              <entry>
+                <para>statementofresponsibility</para>
+              </entry>
+              <entry>
+                <para>To preserve statement of responsibility from MARC records.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>description</para>
+              </entry>
+              <entry>
+                <para>tableofcontents</para>
+              </entry>
+              <entry>
+                <para>A table of contents for a given item.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>description</para>
+              </entry>
+              <entry>
+                <para>uri</para>
+              </entry>
+              <entry>
+                <para>Uniform Resource Identifier pointing to description of this item.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>format<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para>Catch-all for any format information not defined by qualifiers.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>format<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>extent</para>
+              </entry>
+              <entry>
+                <para>Size or duration.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>format</para>
+              </entry>
+              <entry>
+                <para>medium</para>
+              </entry>
+              <entry>
+                <para>Physical medium.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>format<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>mimetype</para>
+              </entry>
+              <entry>
+                <para>Registered MIME type identifiers.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>language</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para>Catch-all for non-ISO forms of the language of the item, accommodating harvested values.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>language<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>iso</para>
+              </entry>
+              <entry>
+                <para>Current ISO standard for language of intellectual content, including country codes (e.g. &quot;en_US&quot;).</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>publisher<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para>Entity responsible for publication, distribution, or imprint.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>relation</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para>Catch-all for references to other related items.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>relation</para>
+              </entry>
+              <entry>
+                <para>isformatof</para>
+              </entry>
+              <entry>
+                <para>References additional physical form.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>relation</para>
+              </entry>
+              <entry>
+                <para>ispartof</para>
+              </entry>
+              <entry>
+                <para>References physically or logically containing item.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>relation<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>ispartofseries</para>
+              </entry>
+              <entry>
+                <para>Series name and number within that series, if available.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>relation</para>
+              </entry>
+              <entry>
+                <para>haspart</para>
+              </entry>
+              <entry>
+                <para>References physically or logically contained item.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>relation</para>
+              </entry>
+              <entry>
+                <para>isversionof</para>
+              </entry>
+              <entry>
+                <para>References earlier version.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>relation</para>
+              </entry>
+              <entry>
+                <para>hasversion</para>
+              </entry>
+              <entry>
+                <para>References later version.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>relation</para>
+              </entry>
+              <entry>
+                <para>isbasedon</para>
+              </entry>
+              <entry>
+                <para>References source.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>relation</para>
+              </entry>
+              <entry>
+                <para>isreferencedby</para>
+              </entry>
+              <entry>
+                <para>Pointed to by referenced resource.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>relation</para>
+              </entry>
+              <entry>
+                <para>requires</para>
+              </entry>
+              <entry>
+                <para>Referenced resource is required to support function, delivery, or coherence of item.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>relation</para>
+              </entry>
+              <entry>
+                <para>replaces</para>
+              </entry>
+              <entry>
+                <para>References preceeding item.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>relation</para>
+              </entry>
+              <entry>
+                <para>isreplacedby</para>
+              </entry>
+              <entry>
+                <para>References succeeding item.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>relation</para>
+              </entry>
+              <entry>
+                <para>uri</para>
+              </entry>
+              <entry>
+                <para>References Uniform Resource Identifier for related item.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>rights</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para>Terms governing use and reproduction.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>rights</para>
+              </entry>
+              <entry>
+                <para>uri</para>
+              </entry>
+              <entry>
+                <para>References terms governing use and reproduction.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>source</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para>Do not use; only for harvested metadata.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>source</para>
+              </entry>
+              <entry>
+                <para>uri</para>
+              </entry>
+              <entry>
+                <para>Do not use; only for harvested metadata.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>subject<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para>Uncontrolled index term.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>subject</para>
+              </entry>
+              <entry>
+                <para>classification</para>
+              </entry>
+              <entry>
+                <para>Catch-all for value from local classification system. Global classification systems will receive specific qualifier</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>subject</para>
+              </entry>
+              <entry>
+                <para>ddc</para>
+              </entry>
+              <entry>
+                <para>Dewey Decimal Classification Number</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>subject</para>
+              </entry>
+              <entry>
+                <para>lcc</para>
+              </entry>
+              <entry>
+                <para>Library of Congress Classification Number</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>subject</para>
+              </entry>
+              <entry>
+                <para>lcsh</para>
+              </entry>
+              <entry>
+                <para>Library of Congress Subject Headings</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>subject</para>
+              </entry>
+              <entry>
+                <para>mesh</para>
+              </entry>
+              <entry>
+                <para>MEdical Subject Headings</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>subject</para>
+              </entry>
+              <entry>
+                <para>other</para>
+              </entry>
+              <entry>
+                <para>Local controlled vocabulary; global vocabularies will receive specific qualifier.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>title<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para>Title statement/title proper.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>title<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para>alternative</para>
+              </entry>
+              <entry>
+                <para>Varying (or substitute) form of title proper appearing in item, e.g. abbreviation or translation</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>type<link linkend="docbook-appendix.html-note1">¹</link></para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para>Nature or genre of content.</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <para>
+        <anchor id="docbook-appendix.html-note1" xreflabel="¹Used by system: do not remove"/>
+      </para>
+      <para>¹Used by system: do not remove</para>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-appendix.html-bitstreamformatregistry" xreflabel="Default Bitstream Format
+Registry"/>Default Bitstream Format Registry</title>
+      <informaltable frame="all">
+        <tgroup cols="6">
+          <colspec colname="c1" colwidth="16*"/>
+          <colspec colname="c2" colwidth="16*"/>
+          <colspec colname="c3" colwidth="16*"/>
+          <colspec colname="c4" colwidth="16*"/>
+          <colspec colname="c5" colwidth="16*"/>
+          <colspec colname="c6" colwidth="16*"/>
+          <tbody>
+            <row>
+              <entry>
+                <para>
+                  <emphasis role="bold">Mimetype</emphasis>
+                </para>
+              </entry>
+              <entry>
+                <para>
+                  <emphasis role="bold">Short Description</emphasis>
+                </para>
+              </entry>
+              <entry>
+                <para>
+                  <emphasis role="bold">Description</emphasis>
+                </para>
+              </entry>
+              <entry>
+                <para>
+                  <emphasis role="bold">Support Level</emphasis>
+                </para>
+              </entry>
+              <entry>
+                <para>
+                  <emphasis role="bold">Internal</emphasis>
+                </para>
+              </entry>
+              <entry>
+                <para>
+                  <emphasis role="bold">Extensions</emphasis>
+                </para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>application/octet-stream<link linkend="docbook-appendix.html-note2">¹</link></para>
+              </entry>
+              <entry>
+                <para>Unknown</para>
+              </entry>
+              <entry>
+                <para>Unknown data format</para>
+              </entry>
+              <entry>
+                <para>Unknown</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>text/plain<link linkend="docbook-appendix.html-note2">¹</link></para>
+              </entry>
+              <entry>
+                <para>License</para>
+              </entry>
+              <entry>
+                <para>Item-specific license agreed upon to submission</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>true</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>application/marc</para>
+              </entry>
+              <entry>
+                <para>MARC</para>
+              </entry>
+              <entry>
+                <para>Machine-Readable Cataloging records</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>application/mathematica</para>
+              </entry>
+              <entry>
+                <para>Mathematica</para>
+              </entry>
+              <entry>
+                <para>Mathematica Notebook</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>ma</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>application/msword</para>
+              </entry>
+              <entry>
+                <para>Microsoft Word</para>
+              </entry>
+              <entry>
+                <para>Microsoft Word</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>doc</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>application/pdf</para>
+              </entry>
+              <entry>
+                <para>Adobe PDF</para>
+              </entry>
+              <entry>
+                <para>Adobe Portable Document Format</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>pdf</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>application/postscript</para>
+              </entry>
+              <entry>
+                <para>Postscript</para>
+              </entry>
+              <entry>
+                <para>Postscript Files</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>ai, eps, ps</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>application/sgml</para>
+              </entry>
+              <entry>
+                <para>SGML</para>
+              </entry>
+              <entry>
+                <para>SGML application (RFC 1874)</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>sgm, sgml</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>application/vnd.ms-excel</para>
+              </entry>
+              <entry>
+                <para>Microsoft Excel</para>
+              </entry>
+              <entry>
+                <para>Microsoft Excel</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>xls</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>application/vnd.ms-powerpoint</para>
+              </entry>
+              <entry>
+                <para>Microsoft Powerpoint</para>
+              </entry>
+              <entry>
+                <para>Microsoft Powerpoint</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>ppt</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>application/vnd.ms-project</para>
+              </entry>
+              <entry>
+                <para>Microsoft Project</para>
+              </entry>
+              <entry>
+                <para>Microsoft Project</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>mpd, mpp, mpx</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>application/vnd.visio</para>
+              </entry>
+              <entry>
+                <para>Microsoft Visio</para>
+              </entry>
+              <entry>
+                <para>Microsoft Visio</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>vsd</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>application/wordperfect5.1</para>
+              </entry>
+              <entry>
+                <para>WordPerfect</para>
+              </entry>
+              <entry>
+                <para>WordPerfect 5.1 document</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>wpd</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>application/x-dvi</para>
+              </entry>
+              <entry>
+                <para>TeX dvi</para>
+              </entry>
+              <entry>
+                <para>TeX dvi format</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>dvi</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>application/x-filemaker</para>
+              </entry>
+              <entry>
+                <para>FMP3</para>
+              </entry>
+              <entry>
+                <para>Filemaker Pro</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>fm</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>application/x-latex</para>
+              </entry>
+              <entry>
+                <para>LateX</para>
+              </entry>
+              <entry>
+                <para>LaTeX document</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>latex</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>application/x-photoshop</para>
+              </entry>
+              <entry>
+                <para>Photoshop</para>
+              </entry>
+              <entry>
+                <para>Photoshop</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>pdd, psd</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>application/x-tex</para>
+              </entry>
+              <entry>
+                <para>TeX</para>
+              </entry>
+              <entry>
+                <para>Tex/LateX document</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>tex</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>audio/basic</para>
+              </entry>
+              <entry>
+                <para>audio/basic</para>
+              </entry>
+              <entry>
+                <para>Basic Audio</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>au, snd</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>audio/x-aiff</para>
+              </entry>
+              <entry>
+                <para>AIFF</para>
+              </entry>
+              <entry>
+                <para>Audio Interchange File Format</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>aif, aifc, aiff</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>audio/x-mpeg</para>
+              </entry>
+              <entry>
+                <para>MPEG Audio</para>
+              </entry>
+              <entry>
+                <para>MPEG Audio</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>abs, mpa, mpega</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>audio/x-pn-realaudio</para>
+              </entry>
+              <entry>
+                <para>RealAudio</para>
+              </entry>
+              <entry>
+                <para>RealAudio file</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>ra, ram</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>audio/x-wav</para>
+              </entry>
+              <entry>
+                <para>WAV</para>
+              </entry>
+              <entry>
+                <para>Broadcase Wave Format</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>wav</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>image/gif</para>
+              </entry>
+              <entry>
+                <para>GIF</para>
+              </entry>
+              <entry>
+                <para>Graphics Interchange Format</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>gif</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>image/jpeg</para>
+              </entry>
+              <entry>
+                <para>JPEG</para>
+              </entry>
+              <entry>
+                <para>Joint Photographic Experts Group/JPEG File Interchange Format (JFIF)</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>jpeg, jpg</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>image/png</para>
+              </entry>
+              <entry>
+                <para>image/png</para>
+              </entry>
+              <entry>
+                <para>Portable Network Graphics</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>png</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>image/tiff</para>
+              </entry>
+              <entry>
+                <para>TIFF</para>
+              </entry>
+              <entry>
+                <para>Tag Image File Format</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>tif, tiff</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>image/x-ms-bmp</para>
+              </entry>
+              <entry>
+                <para>BMP</para>
+              </entry>
+              <entry>
+                <para>Microsoft Windows bitmap</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>bmp</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>image/x-photo-cd</para>
+              </entry>
+              <entry>
+                <para>Photo CD</para>
+              </entry>
+              <entry>
+                <para>Kodak Photo CD image</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>pcd</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>text/css</para>
+              </entry>
+              <entry>
+                <para>CSS</para>
+              </entry>
+              <entry>
+                <para>Cascading Style Sheets</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>css</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>text/html</para>
+              </entry>
+              <entry>
+                <para>HTML</para>
+              </entry>
+              <entry>
+                <para>Hypertext Markup Language</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>htm, html</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>text/plain</para>
+              </entry>
+              <entry>
+                <para>Text</para>
+              </entry>
+              <entry>
+                <para>Plain Text</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>asc, txt</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>text/richtext</para>
+              </entry>
+              <entry>
+                <para>RTF</para>
+              </entry>
+              <entry>
+                <para>Rich Text Format</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>rtf</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>text/xml</para>
+              </entry>
+              <entry>
+                <para>XML</para>
+              </entry>
+              <entry>
+                <para>Extensible Markup Language</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>xml</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>video/mpeg</para>
+              </entry>
+              <entry>
+                <para>MPEG</para>
+              </entry>
+              <entry>
+                <para>Moving Picture Experts Group</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>mpe, mpeg, mpg</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>video/quicktime</para>
+              </entry>
+              <entry>
+                <para>Video Quicktime</para>
+              </entry>
+              <entry>
+                <para>Video Quicktime</para>
+              </entry>
+              <entry>
+                <para>Known</para>
+              </entry>
+              <entry>
+                <para>false</para>
+              </entry>
+              <entry>
+                <para>mov, qt</para>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <para>
+        <anchor id="docbook-appendix.html-note2" xreflabel="¹ Used by system: do not remove"/>
+      </para>
+      <para>¹ Used by system: do not remove</para>
+    </section>
+  </chapter>
+
+

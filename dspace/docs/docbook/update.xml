@@ -1,0 +1,1097 @@
+<?xml version='1.0' encoding='UTF-8'?>
+  <chapter remap="h1">
+    <title>DSpace System Documentation: Updating a DSpace Installation</title>
+    <para>This section describes how to update a DSpace installation from one version to the next. Details of the differences between the functionality of each version are given in the <ulink url="history.html">Version History</ulink> section.</para>
+    <section remap="h2">
+      <title><anchor id="docbook-update.html-142_15" xreflabel="Updating From 1.4.2 to 1.5"/>Updating From 1.4.2 to 1.5</title>
+      <para>The changes in DSpace 1.5 are significant and wide spread involving database schema upgrades, code restructuring, completely new user and programatic interfaces, and new build system.</para>
+      <para>In the notes below <literal>[dspace]</literal> refers to the install directory for your existing DSpace installation, and <literal>[dspace-source]</literal> to the source directory for DSpace 1.5. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</para>
+      <orderedlist>
+        <listitem>
+          <para><emphasis role="bold">Backup your DSpace</emphasis> First and foremost, make a complete backup of your system, including:</para>
+          <itemizedlist>
+            <listitem>
+              <para> A snapshot of the database</para>
+            </listitem>
+            <listitem>
+              <para> The asset store (<literal>[dspace]/assetstore</literal> by default)</para>
+            </listitem>
+            <listitem>
+              <para> Your configuration files and customizations to DSpace</para>
+            </listitem>
+            <listitem>
+              <para> Your statistics scripts (<literal>[dspace]/bin/stat*</literal>) which contain customizable dates</para>
+            </listitem>
+          </itemizedlist>
+         </listitem>
+        <listitem>
+          <para><emphasis role="bold">Download DSpace 1.5</emphasis> Get the new DSpace 1.5 source code either as a download from <ulink url="#">SourceForge</ulink> or check it out directly from the <ulink url="#">SVN code repository</ulink>. If you downloaded DSpace do not unpack it on top of your existing installation.</para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Build DSpace</emphasis> The build process has radically changed for DSpace 1.5. With this new release the build system has moved to a maven-based system enabling the various projects (JSPUI, XMLUI, OAI, and Core API) into separate projects. See the <ulink url="install.html">Installation section</ulink> for more information on building DSpace using the new maven-based build system. Run the following commands to compile DSpace.</para>
+          <screen>
+  cd [dspace-source]/dspace/;
+  mvn package
+</screen>
+          <para>You will find the result in <literal>[dspace-source]/dspace/target/dspace-1.5-build.dir/</literal>; inside this directory is the compiled binary distribution of DSpace.</para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Stop Tomcat</emphasis> Take down your servlet container, for Tomcat use the <literal>bin/shutdown.sh</literal> script.</para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Update <literal>dspace.cfg</literal></emphasis> Serveral new parameters need to be added to your <literal>[dspace]/config/dspace.cfg</literal>. While it is advisable to start with a fresh <emphasis>DSpace 1.5 <literal>dspace.cfg</literal> configuration file</emphasis> here are the minimum set of parameters that need to be added to an old <emphasis>DSpace 1.4.2 configuration</emphasis>.</para>
+          <screen>
+#### Stackable Authentication Methods #####
+#
+# Stack of authentication methods
+#  (See org.dspace.authenticate.AuthenticationManager)
+# Note when upgrading you should remove the parameter:
+#  plugin.sequence.org.dspace.eperson.AuthenticationMethod
+plugin.sequence.org.dspace.authenticate.AuthenticationMethod = \
+        org.dspace.authenticate.PasswordAuthentication
+
+###### JSPUI item sytle plugin #####
+#
+# Specify which strategy use for select the style for an item
+plugin.single.org.dspace.app.webui.util.StyleSelection = \
+                      
+	org.dspace.app.webui.util.CollectionStyleSelection
+
+
+###### Browse Configuration ######
+#
+# The following configuration will mimic the previous
+# behavior exhibited  by DSpace 1.4.2. For alternative
+# configurations see the manual.
+
+# Browse indexes
+webui.browse.index.1 = dateissued:item:dateissued
+webui.browse.index.2 = author:metadata:dc.contributor.*:text
+webui.browse.index.3 = title:item:title
+webui.browse.index.4 = subject:metadata:dc.subject.*:text
+
+# Sorting options
+webui.itemlist.sort-option.1 = title:dc.title:title
+webui.itemlist.sort-option.2 = dateissued:dc.date.issued:date
+webui.itemlist.sort-option.3 =
+	dateaccessioned:dc.date.accessioned:date
+
+# Recent submissions
+recent.submissions.count = 5
+
+# Itemmapper browse index
+itemmap.author.index = author
+
+# Recent submission processor plugins
+plugin.sequence.org.dspace.plugin.CommunityHomeProcessor = \
+        org.dspace.app.webui.components.RecentCommunitySubmissions
+plugin.sequence.org.dspace.plugin.CollectionHomeProcessor = \
+        org.dspace.app.webui.components.RecentCollectionSubmissions
+
+#### Content Inline Disposition Threshold ####
+#
+# Set the max size of a bitstream that can be served inline
+# Use -1 to force all bitstream to be served inline
+# webui.content_disposition_threshold = -1
+webui.content_disposition_threshold = 8388608
+
+#### Event System Configuration ####
+#
+# default synchronous dispatcher (same behavior as traditional
+	DSpace)
+event.dispatcher.default.class = org.dspace.event.BasicDispatcher
+event.dispatcher.default.consumers = search, browse, eperson
+
+# consumer to maintain the search index
+event.consumer.search.class = org.dspace.search.SearchConsumer
+event.consumer.search.filters =
+	Item|Collection|Community|Bundle+Create|Modify|Modify_Metadata|Delete:
+Bundle+Add|Remove
+
+# consumer to maintain the browse index
+event.consumer.browse.class = org.dspace.browse.BrowseConsumer
+event.consumer.browse.filters =
+	Item+Create|Modify|Modify_Metadata:Collection+Add|Remove
+
+# consumer related to EPerson changes
+event.consumer.eperson.class = org.dspace.eperson.EPersonConsumer
+event.consumer.eperson.filters = EPerson+Create
+</screen>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Add <literal>xmlui.xconf</literal> Manakin configuration</emphasis> The new Manakin user interface available with DSpace 1.5 requires an extra configuration file that you will need to manually copy it over to your configuration directory.</para>
+          <screen>
+cp [dspace-source]/dspace/config/xmlui.xconf
+	[dspace]/config/xmlui.xconf
+</screen>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Add <literal>item-submission.xml</literal> and <literal>item-submission.dtd</literal> configurable submission configuration</emphasis> The new configurable submission system that enables an administrator to re-arrange, or add/remove item submission steps requires this configuration file. You need to manually copy it over to your configuration directory.</para>
+          <screen>
+cp [dspace-source]/dspace/config/item-submission.xml
+	[dspace]/config/item-submission.xml
+
+cp [dspace-source]/dspace/config/item-submission.dtd
+	[dspace]/config/item-submission.dtd
+</screen>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Add new <literal>input-forms.xml</literal> and <literal>input-forms.dtd</literal> configurable submission configuration</emphasis> The input-forms.xml now has an included dtd reference to support validation. You&apos;ll need to merge in your changes to both file/and or copy them into place.</para>
+          <screen>
+cp [dspace-source]/dspace/config/input-forms.xml
+	[dspace]/config/input-forms.xml
+
+cp [dspace-source]/dspace/config/input-forms.dtd
+	[dspace]/config/inputforms.dtd
+</screen>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Add <literal>sword-swap-ingest.xsl</literal> and <literal>xhtml-head-item.properties</literal> crosswalk files</emphasis> New crosswalk files are required to support SWORD and the inclusion of metadata into the head of items.</para>
+          <screen>
+cp [dspace-source]/dspace/config/crosswalks/sword-swap-ingest.xsl
+	[dspace]/config/crosswalks/sword-swap-ingest.xsl
+
+
+cp
+	[dspace-source]/dspace/config/crosswalks/xhtml-head-item.properties
+	[dspace]/config/crosswalks/xhtml-head-item.properties
+</screen>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Add <literal>registration_notify</literal> email files</emphasis> A new configuration option (<literal>registration.notify = you@your-email.com</literal>) can be set to send a notification email whenever a new user registers to use your DSpace. The email template for this email needs to be copied.</para>
+          <screen>
+cp [dspace-source]/dspace/config/emails/registration_notify
+	[dspace]/config/emails/registration_notify
+ 
+</screen>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Update the database</emphasis> The database schema needs updating. SQL files contain the relevant updates are provided, note if you have made any local customizations to the database schema you should consult these updates and make sure they will work for you.</para>
+          <itemizedlist>
+            <listitem>
+              <para> For PostgreSQL </para>
+              <para>
+                <literal>psql -U [dspace-user] -f [dspace-source]/dspace/etc/database_schema_14-15.sql [database-name]</literal>
+              </para>
+            </listitem>
+            <listitem>
+              <para> For Oracle </para>
+              <para><literal>[dspace-source]/dspace/etc/oracle/database_schema_142-15.sql</literal> contains the commands necessary to upgrade your database schema on oracle.</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Apply any customizations</emphasis> If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. Commonly these modifications are made to &quot;JSP&quot; pages located inside the <literal>[dspace 1.4.2]/jsp/local</literal> directory. These should be moved <literal>[dspace-source]/dspace/modules/jspui/src/main/webapp/</literal> in the new build structure. See <ulink url="configure.html#jspui-jsp">Customizing the JSP Pages</ulink> for more information.</para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Update DSpace</emphasis> Update the DSpace installed directory with new code and libraries. Inside the <literal>[dspace-source]/dspace/target/dspace-1.5-build.dir/</literal> directory run:</para>
+          <screen>
+cd [dspace-source]/dspace/target/dspace-1.5-build.dir/;
+ant -Dconfig=[dspace]/config/dspace.cfg update
+</screen>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Update the Metadata Registry</emphasis> New Metadata Registry updates are required to support SWORD.</para>
+          <screen>
+cp [dspace-source]/dspace/config/registries/sword-metadata.xml
+	[dspace]/config/registries/sword-metadata.xml;
+
+[dspace]/bin/dsrun org.dspace.administer.MetadataImporter -f
+	[dspace]/config/registries/sword-metadata.xml
+</screen>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Rebuild browse and search indexes</emphasis> One of the major new features of DSpace 1.5 is the browse system which necessitates that the indexes be recreated. To do this run the following command from your DSpace installed directory:</para>
+          <screen>
+[dspace]/bin/index-init
+</screen>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Update statistics scripts</emphasis> The statistics scripts have been rewritten for DSpace 1.5. Prior to 1.5 they were written in Perl, but have been rewritten in Java to avoid having to install Perl. First, make a note of the dates you have specified in your statistics scripts for the statistics to run from. You will find these in <literal>[dspace]/bin/stat-initial</literal>, as <literal>$start_year</literal> and <literal>$start_month</literal>. Note down these values.</para>
+          <para>Copy the new stats scripts:</para>
+          <screen>
+    cp [dspace-source]/dspace/bin/stat* [dspace]/bin/
+</screen>
+          <para>Then edit your statistics configuration file with the start details. Add the follwing to <literal>[dspace]/conf/dstat.cfg</literal></para>
+          <para>
+            <literal># the year and month to start creating reports from</literal>
+          </para>
+          <para>
+            <literal># - year as four digits (e.g. 2005)</literal>
+          </para>
+          <para>
+            <literal># - month as a number (e.g. January is 1, December is 12)</literal>
+          </para>
+          <para>
+            <literal>start.year = 2005</literal>
+          </para>
+          <para>
+            <literal>start.month = 1</literal>
+          </para>
+          <para> Replace &apos;2005&apos; and &apos;1&apos; as with the values you noted down.</para>
+          <para><literal>dstat.cfg</literal> also used to contain the hostname and service name as displayed at the top of the statistics. These values are now taken from <literal>dspace.cfg</literal> so you can remove <literal>host.name</literal> and <literal>host.url</literal> from <literal>dstat.cfg</literal> if you wish. The values now used are <literal>dspace.hostname</literal> and <literal>dspace.name</literal> from <literal>dspace.cfg</literal></para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Deploy webapplications</emphasis> Copy the webapplications files from your [dspace]/webapps directory to the subdirectory of your servlet container (e.g. Tomcat):</para>
+          <screen>
+cp [dspace]/webapps/* [tomcat]/webapps/
+</screen>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Restart Tomcat</emphasis> Restart your servlet container, for Tomcat use the <literal>bin/startup.sh</literal> script.</para>
+        </listitem>
+      </orderedlist>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-update.html-141_142" xreflabel="Updating From 1.4.1 to 1.4.2"/>Updating From 1.4.1 to 1.4.2</title>
+      <para> See <link linkend="docbook-update.html-14_14x">Updating From 1.4 to 1.4.x</link>; the same instructions apply. </para>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-update.html-14_14x" xreflabel="Updating From 1.4 to 1.4.x"/>Updating From 1.4 to 1.4.x</title>
+      <para>The changes in 1.4.x releases are only code and configuration changes so the update is simply a matter of rebuilding the wars and slight changes to your config file.</para>
+      <para>In the notes below <literal>[dspace]</literal> refers to the install directory for your existing DSpace installation, and <literal>[dspace-1.4.x-source]</literal> to the source directory for DSpace 1.4.x. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</para>
+      <orderedlist>
+        <listitem>
+          <para> Get the new DSpace 1.4.x source code from <ulink url="http://sourceforge.net/projects/dspace/">the DSpace page on SourceForge</ulink> and unpack it somewhere. Do not unpack it on top of your existing installation!!</para>
+        </listitem>
+        <listitem>
+          <para> Copy the PostgreSQL driver JAR to the source tree. For example:</para>
+          <screen>
+cd <emphasis> [dspace]</emphasis>/lib
+cp postgresql.jar <emphasis> [dspace-1.4.x-source]</emphasis>/lib
+</screen>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Note:</emphasis>  Licensing conditions for the <literal>handle.jar</literal> file have changed. As a result, the latest version of the <literal>handle.jar</literal> file is not included in this distribution. It is recommended you read the <ulink url="http://www.handle.net/upgrade_6-2_DSpace.html">new license conditions</ulink> and decide whether you wish to update your installation&apos;s <literal>handle.jar</literal>. If you decide to update, you should replace the existing <literal>handle.jar</literal> in <emphasis>[dspace-1.4.x-source]</emphasis>/lib with the new version.</para>
+        </listitem>
+        <listitem>
+          <para> Take down Tomcat (or whichever servlet container you&apos;re using).</para>
+        </listitem>
+        <listitem>
+          <para> A new configuration item <literal>webui.html.max-depth-guess</literal> has been added to avoid infinite URL spaces. Add the following to the dspace.cfg file:</para>
+          <screen>
+#### Multi-file HTML document/site settings #####
+#
+# When serving up composite HTML items, how deep can the request be
+	for us to
+# serve up a file with the same name?
+#
+# e.g. if we receive a request for &quot;foo/bar/index.html&quot;
+# and we have a bitstream called just &quot;index.html&quot;
+# we will serve up that bitstream for the request if
+	webui.html.max-depth-guess
+# is 2 or greater.  If webui.html.max-depth-guess is 1 or less, we
+	would not
+# serve that bitstream, as the depth of the file is greater.
+#
+# If webui.html.max-depth-guess is zero, the request filename and
+	path must
+# always exactly match the bitstream name.  Default value is 3.
+#
+webui.html.max-depth-guess = 3
+</screen>
+          <para>If <literal>webui.html.max-depth-guess</literal> is not present in <literal>dspace.cfg</literal> the default value is used. If archiving entire web sites or deeply nested HTML documents it is advisable to change the default to a higher value more suitable for these types of materials.</para>
+        </listitem>
+        <listitem>
+          <para> Your &apos;localized&apos; JSPs (those in jsp/local) now need to be maintained in the <emphasis>source</emphasis> directory. If you have locally modified JSPs in your <literal>[dspace]/jsp/local</literal> directory, you will need to merge the changes in the new 1.4.x versions into your locally modified ones. You can use the <literal>diff</literal> command to compare your JSPs against the 1.4.x versions to do this. You can also check against the <ulink url="http://dspace.cvs.sourceforge.net/dspace/">DSpace CVS</ulink>.</para>
+        </listitem>
+        <listitem>
+          <para> In <literal>[dspace-1.4.x-source]</literal> run:</para>
+          <screen>
+ant -Dconfig=<emphasis> [dspace]</emphasis>/config/dspace.cfg update
+</screen>
+        </listitem>
+        <listitem>
+          <para> Copy the <literal>.war</literal> Web application files in <literal>[dspace-1.4.x-source]/build</literal> to the <literal>webapps</literal> sub-directory of your servlet container (e.g. Tomcat). e.g.:</para>
+          <screen>
+cp <emphasis> [dspace-1.4.x-source]</emphasis>/build/*.war <emphasis>
+	[tomcat]</emphasis>/webapps
+</screen>
+          <para>If you&apos;re using Tomcat, you need to delete the directories corresponding to the old <literal>.war</literal> files. For example, if <literal>dspace.war</literal> is installed in <literal>[tomcat]/webapps/dspace.war</literal>, you should delete the <literal>[tomcat]/webapps/dspace</literal> directory. Otherwise, Tomcat will continue to use the old code in that directory.</para>
+        </listitem>
+        <listitem>
+          <para> Restart Tomcat.</para>
+        </listitem>
+      </orderedlist>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-update.html-132_14" xreflabel="Updating From 1.3.2 to 1.4.x"/>Updating From 1.3.2 to 1.4.x</title>
+      <orderedlist>
+        <listitem>
+          <para> First and foremost, <emphasis role="bold">make a complete backup</emphasis> of your system, including:</para>
+          <itemizedlist>
+            <listitem>
+              <para> A snapshot of the database</para>
+            </listitem>
+            <listitem>
+              <para> The asset store (<literal>[dspace]/assetstore</literal> by default)</para>
+            </listitem>
+            <listitem>
+              <para> Your configuration files and localized JSPs</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para> Download the <ulink url="http://sourceforge.net/projects/dspace/">latest DSpace 1.4.x source bundle</ulink> and unpack it in a suitable location (<emphasis>not</emphasis> over your existing DSpace installation or source tree!)</para>
+        </listitem>
+        <listitem>
+          <para> Copy the PostgreSQL driver JAR to the source tree. For example:</para>
+          <screen>
+cd <emphasis> [dspace]</emphasis>/lib
+cp postgresql.jar <emphasis> [dspace-1.4.x-source]</emphasis>/lib
+</screen>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Note:</emphasis>  Licensing conditions for the <literal>handle.jar</literal> file have changed. As a result, the latest version of the <literal>handle.jar</literal> file is not included in this distribution. It is recommended you read the <ulink url="http://www.handle.net/upgrade_6-2_DSpace.html">new license conditions</ulink> and decide whether you wish to update your installation&apos;s <literal>handle.jar</literal>. If you decide to update, you should replace the existing <literal>handle.jar</literal> in <emphasis>[dspace-1.4.x-source]</emphasis>/lib with the new version.</para>
+        </listitem>
+        <listitem>
+          <para> Take down Tomcat (or whichever servlet container you&apos;re using).</para>
+        </listitem>
+        <listitem>
+          <para> Your DSpace configuration will need some updating:</para>
+          <itemizedlist>
+            <listitem>
+              <para> In <literal>dspace.cfg</literal>, paste in the following lines for the new stackable authentication feature, the new method for managing Media Filters, and the Checksum Checker.</para>
+              <screen>
+#### Stackable Authentication Methods #####
+# Stack of authentication methods
+#  (See org.dspace.eperson.AuthenticationManager)
+plugin.sequence.org.dspace.eperson.AuthenticationMethod = \
+          org.dspace.eperson.PasswordAuthentication
+
+#### Example of configuring X.509 authentication
+#### (to use it, add org.dspace.eperson.X509Authentication to stack)
+
+## method 1, using keystore
+#authentication.x509.keystore.path = /var/local/tomcat/conf/keystore
+#authentication.x509.keystore.password = changeit
+
+## method 2, using CA certificate
+#authentication.x509.ca.cert = ${dspace.dir}/config/mitClientCA.der
+
+## Create e-persons for unknown names in valid certificates?
+#authentication.x509.autoregister = true
+
+
+#### Media Filter plugins (through PluginManager) ####
+
+plugin.sequence.org.dspace.app.mediafilter.MediaFilter = \
+    org.dspace.app.mediafilter.PDFFilter,
+	org.dspace.app.mediafilter.HTMLFilter, \
+    org.dspace.app.mediafilter.WordFilter,
+	org.dspace.app.mediafilter.JPEGFilter
+# to enable branded preview: remove last line above, and uncomment 2
+	lines below
+#   org.dspace.app.mediafilter.WordFilter,
+	org.dspace.app.mediafilter.JPEGFilter, \
+#   org.dspace.app.mediafilter.BrandedPreviewJPEGFilter
+
+filter.org.dspace.app.mediafilter.PDFFilter.inputFormats = Adobe PDF
+filter.org.dspace.app.mediafilter.HTMLFilter.inputFormats = HTML,
+	Text
+filter.org.dspace.app.mediafilter.WordFilter.inputFormats = Microsoft
+	Word
+filter.org.dspace.app.mediafilter.JPEGFilter.inputFormats = GIF,
+	JPEG, image/png
+filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormat
+s = GIF, JPEG, image/png
+
+
+#### Settings for Item Preview ####
+webui.preview.enabled = false
+# max dimensions of the preview image
+webui.preview.maxwidth = 600
+webui.preview.maxheight = 600
+# the brand text
+webui.preview.brand = My Institution Name
+# an abbreviated form of the above text, this will be used
+# when the preview image cannot fit the normal text
+webui.preview.brand.abbrev = MyOrg
+# the height of the brand
+webui.preview.brand.height = 20
+# font settings for the brand text
+webui.preview.brand.font = SansSerif
+webui.preview.brand.fontpoint = 12
+#webui.preview.dc = rights
+
+
+#### Checksum Checker Settings ####
+# Default dispatcher in case none specified
+plugin.single.org.dspace.checker.BitstreamDispatcher=org.dspace.checke
+r.SimpleDispatcher
+# Standard interface implementations. You shouldn&apos;t need to tinker
+	with these.
+plugin.single.org.dspace.checker.ReporterDAO=org.dspace.checker.Report
+erDAOImpl
+
+# check history retention
+checker.retention.default=10y
+checker.retention.CHECKSUM_MATCH=8w
+</screen>
+            </listitem>
+            <listitem>
+              <para> If you have customised advanced search fields (<literal>search.index.n</literal> fields, note that you now need to include the schema in the values. Dublin Core is specifed as <literal>dc</literal>. So for example, if in 1.3.2 you had:</para>
+              <screen>
+search.index.1 = title:title.alternative
+</screen>
+              <para>That needs to be changed to:</para>
+              <screen>
+search.index.1 = title:dc.title.alternative
+</screen>
+            </listitem>
+            <listitem>
+              <para> If you use LDAP or X509 authentication, you&apos;ll need to add <literal>org.dspace.eperson.LDAPAuthentication</literal> or <literal>org.dspace.eperson.X509Authentication</literal> respectively. See also <ulink url="configure.html#authenticate">configuring custom authentication code</ulink>.</para>
+            </listitem>
+            <listitem>
+              <para> If you have custom Media Filters, note that these are now configured through <literal>dspace.cfg</literal> (instead of <literal>mediafilter.cfg</literal> which is obsolete.)</para>
+            </listitem>
+            <listitem>
+              <para> Also, take a look through the default <literal>dspace.cfg</literal> file supplied with DSpace 1.4.x, as this contains configuration options for various new features you might like to use. In general, these new features default to &apos;off&apos; and you&apos;ll need to add configuration properties as described in the default 1.4.x <literal>dspace.cfg</literal> to activate them.</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para> Your &apos;localized&apos; JSPs (those in jsp/local) now need to be maintained in the <emphasis>source</emphasis> directory. If you have locally modified JSPs in your <literal>[dspace]/jsp/local</literal> directory, you will need to merge the changes in the new 1.4.x versions into your locally modified ones. You can use the <literal>diff</literal> command to compare your JSPs against the 1.4.x versions to do this. You can also check against the <ulink url="http://dspace.cvs.sourceforge.net/dspace/">DSpace CVS</ulink>.</para>
+        </listitem>
+        <listitem>
+          <para> In <literal>[dspace-1.4.x-source]</literal> run:</para>
+          <screen>
+ant -Dconfig=<emphasis> [dspace]</emphasis>/config/dspace.cfg update
+</screen>
+        </listitem>
+        <listitem>
+          <para> The database schema needs updating. SQL files containing the relevant file are provided. If you&apos;ve modified the schema locally, you may need to check over this and make alterations.</para>
+          <variablelist>
+            <varlistentry>
+              <term>For PostgreSQL</term>
+              <listitem>
+                <para> <literal>[dspace-1.4.x-source]/etc/database_schema_13-14.sql</literal> contains the SQL commands to achieve this for PostgreSQL. To apply the changes, go to the source directory, and run:</para>
+                <para>
+                  <literal>psql -f etc/database_schema_13-14.sql [DSpace database name] -h localhost</literal>
+                </para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>For Oracle</term>
+              <listitem>
+                <para> <literal>[dspace-1.4.x-source]/etc/oracle/database_schema_13-14.sql</literal> should be run on the DSpace database to update the schema.</para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+        </listitem>
+        <listitem>
+          <para> Rebuild the search indices:</para>
+          <para>
+            <literal>[dspace]/bin/index-all</literal>
+          </para>
+        </listitem>
+        <listitem>
+          <para> Copy the <literal>.war</literal> Web application files in <literal>[dspace-1.4-source]/build</literal> to the <literal>webapps</literal> sub-directory of your servlet container (e.g. Tomcat). e.g.:</para>
+          <screen>
+cp <emphasis> [dspace-1.4-source]</emphasis>/build/*.war <emphasis>
+	[tomcat]</emphasis>/webapps
+</screen>
+          <para>If you&apos;re using Tomcat, you need to delete the directories corresponding to the old <literal>.war</literal> files. For example, if <literal>dspace.war</literal> is installed in <literal>[tomcat]/webapps/dspace.war</literal>, you should delete the <literal>[tomcat]/webapps/dspace</literal> directory. Otherwise, Tomcat will continue to use the old code in that directory.</para>
+        </listitem>
+        <listitem>
+          <para> Restart Tomcat.</para>
+        </listitem>
+      </orderedlist>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-update.html-131_132" xreflabel="Updating From 1.3.1 to 1.3.2"/>Updating From 1.3.1 to 1.3.2</title>
+      <para>The changes in 1.3.2 are only code changes so the update is simply a matter of rebuilding the wars.</para>
+      <para>In the notes below <literal>[dspace]</literal> refers to the install directory for your existing DSpace installation, and <literal>[dspace-1.3.2-source]</literal> to the source directory for DSpace 1.3.2. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</para>
+      <orderedlist>
+        <listitem>
+          <para> Get the new DSpace 1.3.2 source code from <ulink url="http://sourceforge.net/projects/dspace/">the DSpace page on SourceForge</ulink> and unpack it somewhere. Do not unpack it on top of your existing installation!!</para>
+        </listitem>
+        <listitem>
+          <para> Copy the PostgreSQL driver JAR to the source tree. For example:</para>
+          <screen>
+cd <emphasis> [dspace]</emphasis>/lib
+cp postgresql.jar <emphasis> [dspace-1.3.2-source]</emphasis>/lib
+</screen>
+        </listitem>
+        <listitem>
+          <para> Take down Tomcat (or whichever servlet container you&apos;re using).</para>
+        </listitem>
+        <listitem>
+          <para> Your &apos;localized&apos; JSPs (those in jsp/local) now need to be maintained in the <emphasis>source</emphasis> directory. If you have locally modified JSPs in your <literal>[dspace]/jsp/local</literal> directory, you will need to merge the changes in the new 1.3.2 versions into your locally modified ones. You can use the <literal>diff</literal> command to compare the 1.3.1 and 1.3.2 versions to do this.</para>
+        </listitem>
+        <listitem>
+          <para> In <literal>[dspace-1.3.2-source]</literal> run:</para>
+          <screen>
+ant -Dconfig=<emphasis> [dspace]</emphasis>/config/dspace.cfg update
+</screen>
+        </listitem>
+        <listitem>
+          <para> Copy the <literal>.war</literal> Web application files in <literal>[dspace-1.3.2-source]/build</literal> to the <literal>webapps</literal> sub-directory of your servlet container (e.g. Tomcat). e.g.:</para>
+          <screen>
+cp <emphasis> [dspace-1.3.2-source]</emphasis>/build/*.war <emphasis>
+	[tomcat]</emphasis>/webapps
+</screen>
+          <para>If you&apos;re using Tomcat, you need to delete the directories corresponding to the old <literal>.war</literal> files. For example, if <literal>dspace.war</literal> is installed in <literal>[tomcat]/webapps/dspace.war</literal>, you should delete the <literal>[tomcat]/webapps/dspace</literal> directory. Otherwise, Tomcat will continue to use the old code in that directory.</para>
+        </listitem>
+        <listitem>
+          <para> Restart Tomcat.</para>
+        </listitem>
+      </orderedlist>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-update.html-12_13" xreflabel="Updating From 1.2.x to 1.3.x"/>Updating From 1.2.x to 1.3.x</title>
+      <para>In the notes below <literal>[dspace]</literal> refers to the install directory for your existing DSpace installation, and <literal>[dspace-1.3.x-source]</literal> to the source directory for DSpace 1.3.x. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</para>
+      <orderedlist>
+        <listitem>
+          <para> Step one is, of course, to <emphasis role="bold">back up all your data</emphasis> before proceeding!! Include all of the contents of <literal>[dspace]</literal> and the PostgreSQL database in your backup.</para>
+        </listitem>
+        <listitem>
+          <para> Get the new DSpace 1.3.x source code from <ulink url="http://sourceforge.net/projects/dspace/">the DSpace page on SourceForge</ulink> and unpack it somewhere. Do not unpack it on top of your existing installation!!</para>
+        </listitem>
+        <listitem>
+          <para> Copy the PostgreSQL driver JAR to the source tree. For example:</para>
+          <para>
+            <literal>cd [dspace]/lib</literal>
+          </para>
+          <para>
+            <literal>cp postgresql.jar [dspace-1.2.2-source]/lib</literal>
+          </para>
+        </listitem>
+        <listitem>
+          <para> Take down Tomcat (or whichever servlet container you&apos;re using).</para>
+        </listitem>
+        <listitem>
+          <para> Remove the old version of <literal>xerces.jar</literal> from your installation, so it is not inadvertently later used:</para>
+          <para>
+            <literal>rm [dspace]/lib/xerces.jar</literal>
+          </para>
+        </listitem>
+        <listitem>
+          <para> Install the new config files by moving <literal>dstat.cfg</literal> and <literal>dstat.map</literal> from <literal>[dspace-1.3.x-source]/config/</literal> to <literal>[dspace]/config</literal></para>
+        </listitem>
+        <listitem>
+          <para> You need to add new parameters to your <literal>[dspace]/dspace.cfg</literal>:</para>
+          <screen>
+###### Statistical Report Configuration Settings ######
+
+# should the stats be publicly available?  should be set to false if
+	you only
+# want administrators to access the stats, or you do not intend to
+	generate
+# any
+report.public = false
+
+# directory where live reports are stored
+report.dir = /dspace/reports/
+       
+</screen>
+        </listitem>
+        <listitem>
+          <para> Build and install the updated DSpace 1.3.x code. Go to the <literal>[dspace-1.3.x-source]</literal> directory, and run:</para>
+          <para>
+            <literal>ant -Dconfig=[dspace]/config/dspace.cfg update</literal>
+          </para>
+        </listitem>
+        <listitem>
+          <para> You&apos;ll need to make some changes to the database schema in your PostgreSQL database. <literal>[dspace-1.3.x-source]/etc/database_schema_12-13.sql</literal> contains the SQL commands to achieve this. If you&apos;ve modified the schema locally, you may need to check over this and make alterations.</para>
+          <para>To apply the changes, go to the source directory, and run:</para>
+          <para>
+            <literal>psql -f etc/database_schema_12-13.sql [DSpace database name] -h localhost</literal>
+          </para>
+        </listitem>
+        <listitem>
+          <para> Customise the stat generating statistics as per the instructions in <ulink url="configure.html#statistics">System Statistical Reports</ulink></para>
+        </listitem>
+        <listitem>
+          <para> Initialise the statistics using:</para>
+          <para>
+            <literal>[dspace]/bin/stat-initial</literal>
+          </para>
+          <para>
+            <literal>[dspace]/bin/stat-general</literal>
+          </para>
+          <para>
+            <literal>[dspace]/bin/stat-report-initial</literal>
+          </para>
+          <para>
+            <literal>[dspace]/bin/stat-report-general</literal>
+          </para>
+        </listitem>
+        <listitem>
+          <para> Rebuild the search indices:</para>
+          <para>
+            <literal>[dspace]/bin/index-all</literal>
+          </para>
+        </listitem>
+        <listitem>
+          <para> Copy the <literal>.war</literal> Web application files in <literal>[dspace-1.3.x-source]/build</literal> to the <literal>webapps</literal> sub-directory of your servlet container (e.g. Tomcat). e.g.:</para>
+          <para>
+            <literal>cp [dspace-1.3.x-source]/build/*.war [tomcat]/webapps</literal>
+          </para>
+        </listitem>
+        <listitem>
+          <para> Restart Tomcat.</para>
+        </listitem>
+      </orderedlist>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-update.html-121_122" xreflabel="Updating From 1.2.1 to 1.2.2"/>Updating From 1.2.1 to 1.2.2</title>
+      <para>The changes in 1.2.2 are only code and config changes so the update should be fairly simple.</para>
+      <para>In the notes below <literal>[dspace]</literal> refers to the install directory for your existing DSpace installation, and <literal>[dspace-1.2.2-source]</literal> to the source directory for DSpace 1.2.2. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</para>
+      <orderedlist>
+        <listitem>
+          <para> Get the new DSpace 1.2.2 source code from <ulink url="http://sourceforge.net/projects/dspace/">the DSpace page on SourceForge</ulink> and unpack it somewhere. Do not unpack it on top of your existing installation!!</para>
+        </listitem>
+        <listitem>
+          <para> Copy the PostgreSQL driver JAR to the source tree. For example:</para>
+          <screen>
+cd <emphasis> [dspace]</emphasis>/lib
+cp postgresql.jar <emphasis> [dspace-1.2.2-source]</emphasis>/lib
+</screen>
+        </listitem>
+        <listitem>
+          <para> Take down Tomcat (or whichever servlet container you&apos;re using).</para>
+        </listitem>
+        <listitem>
+          <para> Your &apos;localized&apos; JSPs (those in jsp/local) now need to be maintained in the <emphasis>source</emphasis> directory. If you have locally modified JSPs in your <literal>[dspace]/jsp/local</literal> directory, you might like to merge the changes in the new 1.2.2 versions into your locally modified ones. You can use the <literal>diff</literal> command to compare the 1.2.1 and 1.2.2 versions to do this. Also see <ulink url="history.html#jsp-changes-1_2_1-1_2_2">the version history</ulink> for a list of modified JSPs.</para>
+        </listitem>
+        <listitem>
+          <para> You need to add a new parameter to your <literal>[dspace]/dspace.cfg</literal> for configurable fulltext indexing</para>
+          <screen>
+##### Fulltext Indexing settings #####
+# Maximum number of terms indexed for a single field in Lucene.
+# Default is 10,000 words - often not enough for full-text indexing.
+# If you change this, you&apos;ll need to re-index for the change
+# to take effect on previously added items.
+# -1 = unlimited (Integer.MAX_VALUE)
+search.maxfieldlength = 10000
+</screen>
+        </listitem>
+        <listitem>
+          <para> In <literal>[dspace-1.2.2-source]</literal> run:</para>
+          <screen>
+ant -Dconfig=<emphasis> [dspace]</emphasis>/config/dspace.cfg update
+</screen>
+        </listitem>
+        <listitem>
+          <para> Copy the <literal>.war</literal> Web application files in <literal>[dspace-1.2.2-source]/build</literal> to the <literal>webapps</literal> sub-directory of your servlet container (e.g. Tomcat). e.g.:</para>
+          <screen>
+cp <emphasis> [dspace-1.2.2-source]</emphasis>/build/*.war <emphasis>
+	[tomcat]</emphasis>/webapps
+</screen>
+          <para>If you&apos;re using Tomcat, you need to delete the directories corresponding to the old <literal>.war</literal> files. For example, if <literal>dspace.war</literal> is installed in <literal>[tomcat]/webapps/dspace.war</literal>, you should delete the <literal>[tomcat]/webapps/dspace</literal> directory. Otherwise, Tomcat will continue to use the old code in that directory.</para>
+        </listitem>
+        <listitem>
+          <para> To finialise the install of the new configurable submission forms you need to copy the file <literal>[dspace-1.2.2-source]/config/input-forms.xml</literal> into <literal>[dspace]/config</literal>.</para>
+        </listitem>
+        <listitem>
+          <para> Restart Tomcat.</para>
+        </listitem>
+      </orderedlist>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-update.html-12_121" xreflabel="Updating From 1.2 to 1.2.1"/>Updating From 1.2 to 1.2.1</title>
+      <para>The changes in 1.2.1 are only code changes so the update should be fairly simple.</para>
+      <para>In the notes below <literal>[dspace]</literal> refers to the install directory for your existing DSpace installation, and <literal>[dspace-1.2.1-source]</literal> to the source directory for DSpace 1.2.1. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</para>
+      <orderedlist>
+        <listitem>
+          <para> Get the new DSpace 1.2.1 source code from <ulink url="http://sourceforge.net/projects/dspace/">the DSpace page on SourceForge</ulink> and unpack it somewhere. Do not unpack it on top of your existing installation!!</para>
+        </listitem>
+        <listitem>
+          <para> Copy the PostgreSQL driver JAR to the source tree. For example:</para>
+          <screen>
+cd <emphasis> [dspace]</emphasis>/lib
+cp postgresql.jar <emphasis> [dspace-1.2.1-source]</emphasis>/lib
+</screen>
+        </listitem>
+        <listitem>
+          <para> Take down Tomcat (or whichever servlet container you&apos;re using).</para>
+        </listitem>
+        <listitem>
+          <para> Your &apos;localized&apos; JSPs (those in jsp/local) now need to be maintained in the <emphasis>source</emphasis> directory. If you have locally modified JSPs in your <literal>[dspace]/jsp/local</literal> directory, you might like to merge the changes in the new 1.2.1 versions into your locally modified ones. You can use the <literal>diff</literal> command to compare the 1.2 and 1.2.1 versions to do this. Also see <ulink url="history.html#jsp-changes-1_2-1_2_1">the version history</ulink> for a list of modified JSPs.</para>
+        </listitem>
+        <listitem>
+          <para> You need to add a few new parameters to your <literal>[dspace]/dspace.cfg</literal> for browse/search and item thumbnails display, and for configurable DC metadata fields to be indexed.</para>
+          <screen>
+# whether to display thumbnails on browse and search results pages
+	(1.2+)
+webui.browse.thumbnail.show = false
+
+# max dimensions of the browse/search thumbs. Must be &lt;=
+	thumbnail.maxwidth
+# and thumbnail.maxheight. Only need to be set if required to be
+	smaller than
+# dimension of thumbnails generated by mediafilter (1.2+)
+#webui.browse.thumbnail.maxheight = 80
+#webui.browse.thumbnail.maxwidth = 80
+
+# whether to display the thumb against each bitstream (1.2+)
+webui.item.thumbnail.show = true
+
+# where should clicking on a thumbnail from browse/search take the
+	user
+# Only values currently supported are &quot;item&quot; and
+	&quot;bitstream&quot;
+#webui.browse.thumbnail.linkbehaviour = item
+
+
+ ##### Fields to Index for Search #####
+
+# DC metadata elements.qualifiers to be indexed for search
+# format: - search.index.[number] = [search field]:element.qualifier
+#         - * used as wildcard
+
+###      changing these will change your search results,     ###
+###  but will NOT automatically change your search displays  ###
+
+search.index.1 = author:contributor.*
+search.index.2 = author:creator.*
+search.index.3 = title:title.*
+search.index.4 = keyword:subject.*
+search.index.5 = abstract:description.abstract
+search.index.6 = author:description.statementofresponsibility
+search.index.7 = series:relation.ispartofseries
+search.index.8 = abstract:description.tableofcontents
+search.index.9 = mime:format.mimetype
+search.index.10 = sponsor:description.sponsorship
+search.index.11 = id:identifier.*
+</screen>
+        </listitem>
+        <listitem>
+          <para> In <literal>[dspace-1.2.1-source]</literal> run:</para>
+          <screen>
+ant -Dconfig=<emphasis> [dspace]</emphasis>/config/dspace.cfg update
+</screen>
+        </listitem>
+        <listitem>
+          <para> Copy the <literal>.war</literal> Web application files in <literal>[dspace-1.2.1-source]/build</literal> to the <literal>webapps</literal> sub-directory of your servlet container (e.g. Tomcat). e.g.:</para>
+          <screen>
+cp <emphasis> [dspace-1.2.1-source]</emphasis>/build/*.war <emphasis>
+	[tomcat]</emphasis>/webapps
+</screen>
+          <para>If you&apos;re using Tomcat, you need to delete the directories corresponding to the old <literal>.war</literal> files. For example, if <literal>dspace.war</literal> is installed in <literal>[tomcat]/webapps/dspace.war</literal>, you should delete the <literal>[tomcat]/webapps/dspace</literal> directory. Otherwise, Tomcat will continue to use the old code in that directory.</para>
+        </listitem>
+        <listitem>
+          <para> Restart Tomcat.</para>
+        </listitem>
+      </orderedlist>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-update.html-11_12" xreflabel="Updating From 1.1 (or 1.1.1) to 1.2"/>Updating From 1.1 (or 1.1.1) to 1.2</title>
+      <para>The process for upgrading to 1.2 from either 1.1 or 1.1.1 is the same. If you are running DSpace 1.0 or 1.0.1, you need to follow the <link linkend="docbook-update.html-101_11">instructions for upgrading from 1.0.1 to 1.1</link> to before following these instructions.</para>
+      <para>Note also that if you&apos;ve substantially modified DSpace, these instructions apply to an unmodified 1.1.1 DSpace instance, and you&apos;ll need to adapt the process to any modifications you&apos;ve made.</para>
+      <para>This document refers to the install directory for your existing DSpace installation as <literal>[dspace]</literal>, and to the source directory for DSpace 1.2 as <literal>[dspace-1.2-source]</literal>. Whenever you see these path references below, be sure to replace them with the actual path names on your local system.</para>
+      <orderedlist>
+        <listitem>
+          <para> Step one is, of course, to <emphasis role="bold">back up all your data</emphasis> before proceeding!! Include all of the contents of <literal>[dspace]</literal> and the PostgreSQL database in your backup.</para>
+        </listitem>
+        <listitem>
+          <para> Get the new DSpace 1.2 source code from <ulink url="http://sourceforge.net/projects/dspace/">the DSpace page on SourceForge</ulink> and unpack it somewhere. Do not unpack it on top of your existing installation!!</para>
+        </listitem>
+        <listitem>
+          <para> Copy the <ulink url="install.html#javalibs">required Java libraries</ulink> that we couldn&apos;t include in the bundle to the source tree. For example:</para>
+          <screen>
+cd <emphasis> [dspace]</emphasis>/lib
+cp activation.jar servlet.jar mail.jar <emphasis>
+	[dspace-1.2-source]</emphasis>/lib
+</screen>
+        </listitem>
+        <listitem>
+          <para> Stop Tomcat (or other servlet container.)</para>
+        </listitem>
+        <listitem>
+          <para> It&apos;s a good idea to upgrade all of the various third-party tools that DSpace uses to their latest versions:</para>
+          <itemizedlist>
+            <listitem>
+              <para> Java (note that now version 1.4.0 or later is <emphasis>required</emphasis>)</para>
+            </listitem>
+            <listitem>
+              <para> Tomcat (Any version after 4.0 will work; symbolic links are no longer an issue)</para>
+            </listitem>
+            <listitem>
+              <para> PostgreSQL (don&apos;t forget to build/download an updated JDBC driver .jar file! Also, <emphasis role="bold">back up the database</emphasis> first.)</para>
+            </listitem>
+            <listitem>
+              <para> Ant</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para> You need to add the following new parameters to your <literal>[dspace]/dspace.cfg</literal>:</para>
+          <screen>
+##### Media Filter settings #####
+# maximum width and height of generated thumbnails
+thumbnail.maxwidth  80
+thumbnail.maxheight 80
+</screen>
+          <para>There are one or two other, optional extra parameters (for controlling the pool of database connections). See <ulink url="history.html">the version history</ulink> for details. If you leave them out, defaults will be used.</para>
+          <para>Also, to avoid future confusion, you might like to <emphasis role="bold">remove</emphasis> the following property, which is no longer required:</para>
+          <screen>
+config.template.oai-web.xml = <emphasis>
+	[dspace]</emphasis>/oai/WEB-INF/web.xml
+</screen>
+        </listitem>
+        <listitem>
+          <para> The layout of the installation directory (i.e. the structure of the contents of <literal>[dspace]</literal>) has changed somewhat since 1.1.1. First up, your &apos;localized&apos; JSPs (those in jsp/local) now need to be maintained in the <emphasis>source</emphasis> directory. So make a copy of them now!</para>
+          <para>Once you&apos;ve done that, you can remove <literal>[dspace]/jsp</literal> and <literal>[dspace]/oai</literal>, these are no longer used. (.war Web application archive files are used instead).</para>
+          <para>Also, if you&apos;re using the same version of Tomcat as before, you need to <emphasis role="bold">remove the lines from Tomcat&apos;s conf/server.xml file that enable symbolic links for DSpace.</emphasis> These are the <literal>&lt;Context&gt;</literal> elements you added to get DSpace 1.1.1 working, looking something like this:</para>
+          <screen>
+&lt;Context path=&quot;/dspace&quot; docBase=&quot;dspace&quot; debug=&quot;0&quot; reloadable=&quot;true&quot;
+	crossContext=&quot;true&quot;&gt;
+  &lt;Resources className=&quot;org.apache.naming.resources.FileDirContext&quot;
+	allowLinking=&quot;true&quot; /&gt;
+&lt;/Context&gt;
+</screen>
+          <para>Be sure to remove the &lt;Context&gt; elements for both the Web UI and the OAI Web applications.</para>
+        </listitem>
+        <listitem>
+          <para> Build and install the updated DSpace 1.2 code. Go to the DSpace 1.2 source directory, and run:</para>
+          <screen>
+ant -Dconfig=<emphasis> [dspace]</emphasis>/config/dspace.cfg update
+</screen>
+        </listitem>
+        <listitem>
+          <para> Copy the new config files in <literal>config</literal> to your installation, e.g.:</para>
+          <screen>
+cp <emphasis> [dspace-1.2-source]</emphasis>/config/news-* <emphasis>
+	[dspace-1.2-source]</emphasis>/config/mediafilter.cfg <emphasis>
+	[dspace-1.2-source]</emphasis>/config/dc2mods.cfg <emphasis>
+	[dspace]</emphasis>/config
+</screen>
+        </listitem>
+        <listitem>
+          <para> You&apos;ll need to make some changes to the database schema in your PostgreSQL database. <literal>[dspace-1.2-source]/etc/database_schema_11-12.sql</literal> contains the SQL commands to achieve this. If you&apos;ve modified the schema locally, you may need to check over this and make alterations.</para>
+          <para>To apply the changes, go to the source directory, and run:</para>
+          <screen>
+psql -f etc/database_schema_11-12.sql [DSpace database name] -h
+	localhost
+</screen>
+        </listitem>
+        <listitem>
+          <para> A tool supplied with the DSpace 1.2 codebase will then update the actual data in the relational database. Run it using:</para>
+          <screen>
+<emphasis> [dspace]</emphasis>/bin/dsrun
+	org.dspace.administer.Upgrade11To12
+</screen>
+        </listitem>
+        <listitem>
+          <para> Then rebuild the search indices:</para>
+          <screen>
+<emphasis> [dspace]</emphasis>/bin/index-all
+</screen>
+        </listitem>
+        <listitem>
+          <para> Delete the existing symlinks from your servlet container&apos;s (e.g. Tomcat&apos;s) <literal>webapp</literal> sub-directory.</para>
+          <para>Copy the <literal>.war</literal> Web application files in <literal>[dspace-1.2-source]/build</literal> to the <literal>webapps</literal> sub-directory of your servlet container (e.g. Tomcat). e.g.:</para>
+          <screen>
+cp <emphasis> [dspace-1.2-source]</emphasis>/build/*.war <emphasis>
+	[tomcat]</emphasis>/webapps
+</screen>
+        </listitem>
+        <listitem>
+          <para> Restart Tomcat.</para>
+        </listitem>
+        <listitem>
+          <para> To get image thumbnails generated and full-text extracted for indexing automatically, you need to set up a &apos;cron&apos; job, for example one like this:</para>
+          <screen>
+# Run the media filter at 02:00 every day
+0 2 * * * <emphasis> [dspace]</emphasis>/bin/filter-media
+</screen>
+          <para>You might also wish to run it now to generate thumbnails and index full text for the content already in your system.</para>
+        </listitem>
+        <listitem>
+          <para> <emphasis role="bold">Note 1</emphasis>: This update process has effectively &apos;touched&apos; all of your items. Although the dates in the Dublin Core metadata won&apos;t have changed (accession date and so forth), the &apos;last modified&apos; date in the database for each will have been changed.</para>
+          <para>This means the e-mail subscription tool may be confused, thinking that all items in the archive have been deposited that day, and could thus send a rather long email to lots of subscribers. So, it is recommended that you <emphasis role="bold">turn off the e-mail subscription feature for the next day</emphasis>, by commenting out the relevant line in DSpace&apos;s cron job, and then re-activating it the next day.</para>
+          <para>Say you performed the update on 08-June-2004 (UTC), and your e-mail subscription cron job runs at 4am (UTC). When the subscription tool runs at 4am on 09-June-2004, it will find that everything in the system has a modification date in 08-June-2004, and accordingly send out huge emails. So, immediately after the update, you would edit DSpace&apos;s &apos;crontab&apos; and comment out the <literal>/dspace/bin/subs-daily</literal> line. Then, after 4am on 09-June-2004 you&apos;d &apos;un-comment&apos; it out, so that things proceed normally.</para>
+          <para>Of course this means, any <emphasis>real</emphasis> new deposits on 08-June-2004 won&apos;t get e-mailed, however if you&apos;re updating the system it&apos;s likely to be down for some time so this shouldn&apos;t be a big problem.</para>
+        </listitem>
+        <listitem>
+          <para> <emphasis role="bold">Note 2:</emphasis> After consulation with the OAI community, various OAI-PMH changes have occurred:</para>
+          <itemizedlist>
+            <listitem>
+              <para> The OAI-PMH identifiers have changed (they&apos;re now of the form <literal>oai:hostname:handle</literal> as opposed to just Handles)</para>
+            </listitem>
+            <listitem>
+              <para> The set structure has changed, due to the new sub-communities feature.</para>
+            </listitem>
+            <listitem>
+              <para> The default base URL has changed</para>
+            </listitem>
+            <listitem>
+              <para> As noted in note 1, every item has been &apos;touched&apos; and will need re-harvesting.</para>
+            </listitem>
+          </itemizedlist>
+          <para>The above means that, if already registered and harvested, you will need to re-register your repository, effectively as a &apos;new&apos; OAI-PMH data provider. You should also consider posting an announcement to the <ulink url="http://www.openarchives.org/mailman/listinfo/OAI-implementers">OAI implementers e-mail list</ulink> so that harvesters know to update their systems.</para>
+          <para>Also note that your site may, over the next few days, take quite a big hit from OAI-PMH harvesters. The resumption token support should alleviate this a little, but you might want to temporarily whack up the database connection pool parameters in <literal>[dspace]/config/dspace.cfg</literal>. See the <literal>dspace.cfg</literal> distributed with the source code to see what these parameters are and how to use them. (You need to stop and restart Tomcat after changing them.)</para>
+          <para>I realize this is not ideal; for discussion as to the reasons behind this please see relevant posts to the OAI community: <ulink url="http://openarchives.org/pipermail/oai-implementers/2004-June/001214.html">post one</ulink>, <ulink url="http://openarchives.org/pipermail/oai-implementers/2004-June/001224.html">post two</ulink>, as well as <ulink url="#">this post to the dspace-tech mailing list</ulink>.</para>
+          <para>If you really can&apos;t live with updating the base URL like this, you can fairly easily have thing proceed more-or-less as they are, by doing the following:</para>
+          <itemizedlist>
+            <listitem>
+              <para> Change the value of <literal>OAI_ID_PREFIX</literal> at the top of the <literal>org.dspace.app.oai.DSpaceOAICatalog</literal> class to <literal>hdl:</literal></para>
+            </listitem>
+            <listitem>
+              <para> Change the servlet mapping for the <literal>OAIHandler</literal> servlet back to <literal>/</literal> (from <literal>/request</literal>)</para>
+            </listitem>
+            <listitem>
+              <para> Rebuild and deploy <literal>oai.war</literal></para>
+            </listitem>
+          </itemizedlist>
+          <para>However, note that in this case, all the records will be re-harvested by harvesters anyway, so you still need to brace for the associated DB activity; also note that the set spec changes may not be picked up by some harvesters. It&apos;s recommended you read the above-linked mailing list posts to understand why the change was made.</para>
+        </listitem>
+      </orderedlist>
+      <para>Now, you should be finished!</para>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-update.html-11_111" xreflabel="Updating From 1.1 to 1.1.1"/>Updating From 1.1 to 1.1.1</title>
+      <para>Fortunately the changes in 1.1.1 are only code changes so the update is fairly simple.</para>
+      <para>In the notes below <literal>[dspace]</literal> refers to the install directory for your existing DSpace installation, and <literal>[dspace-1.1.1-source]</literal> to the source directory for DSpace 1.1.1. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</para>
+      <orderedlist>
+        <listitem>
+          <para> Take down Tomcat.</para>
+        </listitem>
+        <listitem>
+          <para> It would be a good idea to update any of the third-party tools used by DSpace at this point (e.g. PostgreSQL), following the instructions provided with the relevant tools.</para>
+        </listitem>
+        <listitem>
+          <para> In <literal>[dspace-1.1.1-source]</literal> run:</para>
+          <screen>
+ant -Dconfig=<emphasis> [dspace]</emphasis>/config/dspace.cfg update
+</screen>
+        </listitem>
+        <listitem>
+          <para> If you have locally modified JSPs of the following JSPs in your <literal>[dspace]/jsp/local</literal> directory, you might like to merge the changes in the new 1.1.1 versions into your locally modified ones. You can use the <literal>diff</literal> command to compare the 1.1 and 1.1.1 versions to do this. The changes are quite minor.</para>
+          <screen>
+collection-home.jsp
+admin/authorize-collection-edit.jsp
+admin/authorize-community-edit.jsp
+admin/authorize-item-edit.jsp
+admin/eperson-edit.jsp
+</screen>
+        </listitem>
+        <listitem>
+          <para> Restart Tomcat.</para>
+        </listitem>
+      </orderedlist>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-update.html-101_11" xreflabel="Updating From 1.0.1 to 1.1"/>Updating From 1.0.1 to 1.1</title>
+      <para>To upgrade from DSpace 1.0.1 to 1.1, follow the steps below. Your <literal>dspace.cfg</literal> does not need to be changed. In the notes below <literal>[dspace]</literal> refers to the install directory for your existing DSpace installation, and <literal>[dspace-1.1-source]</literal> to the source directory for DSpace 1.1. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</para>
+      <orderedlist>
+        <listitem>
+          <para> Take down Tomcat (or whichever servlet container you&apos;re using).</para>
+        </listitem>
+        <listitem>
+          <para> We recommend that you upgrage to the latest version of PostgreSQL (7.3.2). Included are some <ulink url="postgres-upgrade-notes.txt">notes to help you do this</ulink>. Note you will also have to upgrade Ant to version 1.5 if you do this.</para>
+        </listitem>
+        <listitem>
+          <para> Make the necessary changes to the DSpace database. These include a couple of minor schema changes, and some new indices which should improve performance. Also, the names of a couple of database views have been changed since the old names were so long they were causing problems. First run <literal>psql</literal> to access your database (e.g. <literal>psql -U dspace -W</literal> and then enter the password), and enter these SQL commands:</para>
+          <screen>
+ALTER TABLE bitstream ADD store_number INTEGER;
+UPDATE bitstream SET store_number = 0;
+
+ALTER TABLE item ADD last_modified TIMESTAMP;
+CREATE INDEX last_modified_idx ON Item(last_modified);
+
+CREATE INDEX eperson_email_idx ON EPerson(email);
+CREATE INDEX item2bundle_item_idx on Item2Bundle(item_id);
+REATE INDEX bundle2bitstream_bundle_idx ON
+	Bundle2Bitstream(bundle_id);
+CREATE INDEX dcvalue_item_idx on DCValue(item_id);
+CREATE INDEX collection2item_collection_idx ON
+	Collection2Item(collection_id);
+CREATE INDEX resourcepolicy_type_id_idx ON ResourcePolicy
+	(resource_type_id,resource_id);
+CREATE INDEX epersongroup2eperson_group_idx on
+	EPersonGroup2EPerson(eperson_group_id);
+CREATE INDEX handle_handle_idx ON Handle(handle);
+CREATE INDEX sort_author_idx on ItemsByAuthor(sort_author);
+CREATE INDEX sort_title_idx on ItemsByTitle(sort_title);
+CREATE INDEX date_issued_idx on ItemsByDate(date_issued);
+
+DROP VIEW CollectionItemsByDateAccessioned;
+
+DROP VIEW CommunityItemsByDateAccessioned;
+CREATE VIEW CommunityItemsByDateAccession as SELECT
+	Community2Item.community_id, ItemsByDateAccessioned.*  FROM
+	ItemsByDateAccessioned, Community2Item WHERE
+	ItemsByDateAccessioned.item_id = Community2Item.item_id;
+CREATE VIEW CollectionItemsByDateAccession AS SELECT
+	collection2item.collection_id,
+	itemsbydateaccessioned.items_by_date_accessioned_id,
+	itemsbydateaccessioned.item_id,
+	itemsbydateaccessioned.date_accessioned FROM itemsbydateaccessioned,
+	collection2item WHERE (itemsbydateaccessioned.item_id =
+	collection2item.item_id);
+</screen>
+        </listitem>
+        <listitem>
+          <para> Fix your JSPs for Unicode. If you&apos;ve modified the site &apos;skin&apos; (<literal>jsp/local/layout/header-default.jsp</literal>) you&apos;ll need to add the Unicode header, i.e.:</para>
+          <screen>
+&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html;
+	charset=UTF-8&quot;&gt;
+</screen>
+          <para>to the &lt;HEAD&gt; element. If you have any locally-edited JSPs, you need to add this page directive to the top of all of them:</para>
+          <screen>
+&lt;%@ page contentType=&quot;text/html;charset=UTF-8&quot; %&gt;
+</screen>
+          <para>(If you haven&apos;t modified any JSPs, you don&apos;t have to do anything.)</para>
+        </listitem>
+        <listitem>
+          <para> Copy the <ulink url="install.html#javalibs">required Java libraries</ulink> that we couldn&apos;t include in the bundle to the source tree. For example:</para>
+          <screen>
+cd <emphasis> [dspace]</emphasis>/lib
+cp *.policy activation.jar servlet.jar mail.jar <emphasis>
+	[dspace-1.1-source]</emphasis>/lib
+</screen>
+        </listitem>
+        <listitem>
+          <para> Compile up the new DSpace code, replacing <literal>[dspace]/config/dspace.cfg</literal> with the path to your current, LIVE configuration. (The second line, <literal>touch `find .`</literal>, is a precaution, which ensures that the new code has a current datestamp and will overwrite the old code. Note that those are back quotes.)</para>
+          <screen>
+cd <emphasis> [dspace-1.1-source]</emphasis>
+touch `find .`
+ant
+ant -Dconfig=<emphasis> [dspace]</emphasis>/config/dspace.cfg update
+</screen>
+        </listitem>
+        <listitem>
+          <para> Update the database tables using the upgrader tool, which sets up the new &gt;<literal>last_modified</literal> date in the item table:</para>
+          <screen>
+Run <emphasis> [dspace]</emphasis>/bin/dsrun
+	org.dspace.administer.Upgrade101To11
+</screen>
+        </listitem>
+        <listitem>
+          <para> Run the collection default authorisation policy tool:</para>
+          <screen>
+<emphasis> [dspace]</emphasis>/bin/dsrun
+	org.dspace.authorize.FixDefaultPolicies
+</screen>
+        </listitem>
+        <listitem>
+          <para> Fix the OAICat properties file. Edit <literal>[dspace]/config/templates/oaicat.properties</literal>. Change the line that says</para>
+          <screen>
+Identify.deletedRecord=yes
+</screen>
+          <para>To:</para>
+          <screen>
+Identify.deletedRecord=persistent
+</screen>
+          <para>This is needed to fix the OAI-PMH &apos;Identity&apos; verb response. Then run <literal>[dspace]/bin/install-configs</literal>.</para>
+        </listitem>
+        <listitem>
+          <para> Re-run the indexing to index abstracts and fill out the renamed database views:</para>
+          <screen>
+<emphasis> [dspace]</emphasis>/bin/index-all
+</screen>
+        </listitem>
+        <listitem>
+          <para> Restart Tomcat. Tomcat should be run with the following environment variable set, to ensure that Unicode is handled properly. Also, the default JVM memory heap sizes are rather small. Adjust <literal>-Xmx512M</literal> (512Mb maximum heap size) and <literal>-Xms64M</literal> (64Mb Java thread stack size) to suit your hardware.</para>
+          <screen>
+JAVA_OPTS=&quot;-Xmx512M -Xms64M -Dfile.encoding=UTF-8&quot;
+</screen>
+        </listitem>
+      </orderedlist>
+    </section>
+  </chapter>
+
+

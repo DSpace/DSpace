@@ -1,0 +1,209 @@
+<?xml version='1.0' encoding='UTF-8'?>
+  <chapter remap="h1">
+    <title>DSpace System Documentation: Architecture</title>
+    <section remap="h2">
+      <title><anchor id="docbook-architecture.html-overview" xreflabel="Overview"/>Overview</title>
+      <para>The DSpace system is organized into three layers, each of which consists of a number of components.</para>
+      <para>
+        <inlinemediaobject>
+          <imageobject>
+            <imagedata fileref="image/architecture-600x450.gif" format="GIF" width="6.5in" scalefit="1"/>
+          </imageobject>
+        </inlinemediaobject>
+      </para>
+      <para>DSpace System Architecture</para>
+      <para>The storage layer is responsible for physical storage of metadata and content. The business logic layer deals with managing the content of the archive, users of the archive (e-people), authorization, and workflow. The application layer contains components that communicate with the world outside of the individual DSpace installation, for example the Web user interface and the <ulink url="http://www.openarchives.org/">Open Archives Initiative</ulink> protocol for metadata harvesting service.</para>
+      <para>Each layer only invokes the layer below it; the application layer may not used the storage layer directly, for example. Each component in the storage and business logic layers has a defined public API. The union of the APIs of those components are referred to as the Storage API (in the case of the storage layer) and the DSpace Public API (in the case of the business logic layer). These APIs are in-process Java classes, objects and methods.</para>
+      <para>It is important to note that each layer is <emphasis>trusted</emphasis>. Although the logic for <emphasis>authorising actions</emphasis> is in the business logic layer, the system relies on individual applications in the application layer to correctly and securely <emphasis>authenticate</emphasis> e-people. If a &apos;hostile&apos; or insecure application were allowed to invoke the Public API directly, it could very easily perform actions as any e-person in the system.</para>
+      <para>The reason for this design choice is that authentication methods will vary widely between different applications, so it makes sense to leave the logic and responsibility for that in these applications.</para>
+      <para>The source code is organized to cohere very strictly to this three-layer architecture. Also, only methods in a component&apos;s public API are given the <literal>public</literal> access level. This means that the Java compiler helps ensure that the source code conforms to the architecture.</para>
+      <table frame="none">
+        <title>Source Code Packages</title>
+        <tgroup cols="2">
+          <colspec colname="c1" colwidth="50*"/>
+          <colspec colname="c2" colwidth="50*"/>
+          <tbody>
+            <row>
+              <entry>
+                <para>
+                  <emphasis role="bold">Packages within</emphasis>
+                </para>
+              </entry>
+              <entry>
+                <para>
+                  <emphasis role="bold">Correspond to components in</emphasis>
+                </para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>
+                  <literal>org.dspace.app</literal>
+                </para>
+              </entry>
+              <entry>
+                <para>Application layer</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>
+                  <literal>org.dspace</literal>
+                </para>
+              </entry>
+              <entry>
+                <para>Business logic layer (except <literal>storage</literal> and <literal>app</literal>)</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>
+                  <literal>org.dspace.storage</literal>
+                </para>
+              </entry>
+              <entry>
+                <para>Storage layer</para>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <para>The storage and business logic layer APIs are extensively documented with Javadoc-style comments. Generate the HTML version of these by entering the source directory and running:</para>
+      <screen>
+ant public_api
+</screen>
+      <para>The package-level documentation of each package usually contains an overview of the package and some example usage. This information is not repeated in this architecture document; this and the Javadoc APIs are intended to be used in parallel.</para>
+      <para>Each layer is described in a separate section:</para>
+      <itemizedlist>
+        <listitem>
+          <para>
+            <ulink url="storage.html">Storage Layer</ulink>
+            <itemizedlist>
+              <listitem>
+                <para>
+                  <ulink url="storage.html#rdbms">RDBMS</ulink>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <ulink url="storage.html#bitstreams">Bitstream Store</ulink>
+                </para>
+              </listitem>
+            </itemizedlist>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <ulink url="business.html">Business Logic Layer</ulink>
+            <itemizedlist>
+              <listitem>
+                <para>
+                  <ulink url="business.html#core">Core Classes</ulink>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <ulink url="business.html#content">Content Management API</ulink>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <ulink url="business.html#workflow">Workflow System</ulink>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <ulink url="business.html#administer">Administration Toolkit</ulink>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <ulink url="business.html#eperson">E-person/Group Manager</ulink>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <ulink url="business.html#authorize">Authorisation</ulink>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <ulink url="business.html#handle">Handle Manager/Handle Plugin</ulink>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <ulink url="business.html#search">Search</ulink>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <ulink url="business.html#browse">Browse API</ulink>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <ulink url="business.html#history">History Recorder</ulink>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <ulink url="business.html#checker">Checksum Checker</ulink>
+                </para>
+              </listitem>
+            </itemizedlist>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <ulink url="application.html">Application Layer</ulink>
+            <itemizedlist>
+              <listitem>
+                <para>
+                  <ulink url="application.html#webui">Web User Interface</ulink>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <ulink url="application.html#oai">OAI-PMH Data Provider</ulink>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <ulink url="application.html#itemimporter">Item Importer and Exporter</ulink>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <ulink url="application.html#transferitem">Transferring Items Between DSpace Instances</ulink>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <ulink url="application.html#registration">Registration</ulink>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <ulink url="application.html#mets">METS Tools</ulink>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <ulink url="application.html#mediafilters">Media Filters</ulink>
+                </para>
+              </listitem>
+              <listitem>
+                <para>
+                  <ulink url="application.html#filiator">Sub-Community Management</ulink>
+                </para>
+              </listitem>
+            </itemizedlist>
+          </para>
+        </listitem>
+      </itemizedlist>
+      <para> 2002-2008 The DSpace Foundation </para>
+    </section>
+  </chapter>
+
+

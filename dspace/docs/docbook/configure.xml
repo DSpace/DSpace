@@ -1,0 +1,2497 @@
+<?xml version='1.0' encoding='UTF-8'?>
+  <chapter remap="h1">
+    <title>DSpace System Documentation: Configuration and Customization</title>
+    <para>There are a number of ways in which DSpace can be configured and/or customized:</para>
+    <itemizedlist>
+      <listitem>
+        <para> Altering the configuration files in <literal>[dspace]/config</literal></para>
+      </listitem>
+      <listitem>
+        <para> Creating a new XMLUI (Manakin) theme to change the look-and-feel of the repository</para>
+      </listitem>
+      <listitem>
+        <para> Creating modified versions of the JSP pages for local changes in the JSPUI interface</para>
+      </listitem>
+      <listitem>
+        <para> Implementing a custom &apos;plug-in&apos; class -- for example, an &apos;authenticator&apos; class, so that user authentication in the Web UI can be adapted and integrated with any existing mechanisms your organization might use, or a &apos;media filter&apos; to generate thumbnails or extract full text from a new file format</para>
+      </listitem>
+      <listitem>
+        <para> Editing the source code</para>
+      </listitem>
+    </itemizedlist>
+    <para>Of these methods, only the last is likely to cause any headaches; if you update the DSpace source code directly, particularly core class files in <literal>org.dspace.*</literal> or <literal>org.dspace.storage.*</literal>, it may make applying future updates difficult. Before doing this, it is strongly recommended that you <ulink url="http://wiki.dspace.org/DspaceResources">e-mail the DSpace developer community</ulink> to find out the best way to proceed, and the best way to implement your change in a way that can be <ulink url="http://wiki.dspace.org/HowToContribute">contributed back to DSpace</ulink> for everyone&apos;s benefit.</para>
+    <section remap="h2">
+      <title><anchor id="docbook-configure.html-general" xreflabel="General Configuration"/>General Configuration</title>
+      <para>These are general configuration options that apply to the core of DSpace regardless of which interface you are using (JSPUI or XMLUI).</para>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-general-dspacecfg" xreflabel="The dspace.cfg Configuration Properties File"/>The <literal>dspace.cfg</literal> Configuration Properties File</title>
+        <para>The primary way of configuring DSpace is to edit the <literal>dspace.cfg</literal>. You&apos;ll definitely have to do this before you can operate DSpace properly. <literal>dspace.cfg</literal> contains basic information about a DSpace installation, including system path information, network host information, and other things like site name.</para>
+        <para>The default <literal>dspace.cfg</literal> is a good source of information, and contains comments for all properties. It&apos;s a basic Java properties file, where lines are either comments, starting with a &apos;<literal>#</literal>&apos;, blank lines, or property/value pairs of the form:</para>
+        <screen>
+property.name = property value
+</screen>
+        <para>The property value may contain <emphasis>references</emphasis> to other configuration properties, in the form <literal>${</literal>property.name<literal>}</literal>. This follows the <literal>ant</literal> convention of allowing references in property files. A property may not refer to itself. Examples:</para>
+        <screen>
+property.name = word1 ${other.property.name} more words
+property2.name = ${dspace.dir}/rest/of/path
+</screen>
+        <table frame="none">
+          <title>dspace.cfg Main Properties (Not Complete)</title>
+          <tgroup cols="3">
+            <colspec colname="c1" colwidth="33*"/>
+            <colspec colname="c2" colwidth="33*"/>
+            <colspec colname="c3" colwidth="33*"/>
+            <tbody>
+              <row>
+                <entry>
+                  <para>
+                    <emphasis role="bold">Property</emphasis>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <emphasis role="bold">Example Values</emphasis>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <emphasis role="bold">Notes</emphasis>
+                  </para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>dspace.dir</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>/dspace</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Root directory of DSpace installation. Omit the trailing &apos;/&apos;. Note that if you change this, there are several other parameters you will probably want to change to match, e.g. <literal>assetstore.dir</literal>.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>dspace.url</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>http://dspace.myu.edu</literal>
+                  </para>
+                  <para>
+                    <literal>http://dspacetest.myu.edu:8080</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Main URL at which DSpace Web UI webapp is deployed. Include any port number, but do not include a trailing &apos;/&apos;</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>dspace.hostname</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>dspace.myu.edu</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Fully qualified hostname; do not include port number</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>dspace.name</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>DSpace at My University</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Short and sweet site name, used throughout Web UI, e-mails and elsewhere (such as OAI protocol)</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>config.template.foo</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>/opt/othertool/cfg/foo</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>When <literal>install-configs</literal> is run, the file <literal>[dspace]/config/templates/foo</literal> file will be filled out with values from <literal>dspace.cfg</literal> and copied to the value of this property, in this example <literal>/opt/othertool/cfg/foo</literal>. <link linkend="docbook-configure.html-templates">See here for more information.</link></para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>plugin.sequence.org.dspace .authenticate.AuthenticationMethod</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>org.dspace.eperson .X509Authentication, org.dspace.authenticate .PasswordAuthentication</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Comma-separated list of classes implementing the <literal>org.dspace.authenticate.AuthenticationMethod</literal> interface, which make up the <anchor id="docbook-configure.html--authenticate" xreflabel="authentication
+stack"/>authentication stack. Authentication methods are called on in the order listed.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>authentication.x509.keystore.path</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>/tomcat/conf/keystore</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Path to Java keystore containing Client CA&apos;s certificiate for client X.509 certificates (Optional; only needed if X.509 user authentication is used.)</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>authentication.x509.keystore.password</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>changeit</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Password to Java keystore configured above in <literal>authentication.x509.keystore.path</literal></para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>handle.prefix</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>1721.1234</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>The Handle prefix for your site, <ulink url="install.html#handles">see the Handle section</ulink></para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>assetstore.dir</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>/bigdisk/store</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>The location in the file system for asset (bitstream) store number zero. This should be a directory for the sole use of DSpace.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>assetstore.dir.n</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>/anotherdisk/store1</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>The location in the file system of asset (bitstream) store number <literal>n</literal>. When adding additional stores, start with 1 (<literal>assetstore.dir.1</literal> and count upwards. Always leave asset store zero (<literal>assetstore.dir</literal>). For more details, see <ulink url="storage.html#bitstreams">the Bitstream Storage section</ulink>.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>assetstore.incoming</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>1</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>The asset store number to use for storing new bitstreams. For example, if <literal>assetstore.dir.1</literal> is <literal>/anotherdisk/store1</literal>, and <literal>assetstore.incoming</literal> is <literal>1</literal>, new bitstreams will be stored under <literal>/anotherdisk/store1</literal>. A value of <literal>0</literal> (zero) corresponds to <literal>assetstore.dir</literal>. For more details, see <ulink url="storage.html#bitstreams">the Bitstream Storage section</ulink>.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>srb.xxx</para>
+                  <para>srb.xxx.n</para>
+                </entry>
+                <entry>
+                  <para>/zone/home/user.domain</para>
+                </entry>
+                <entry>
+                  <para>The sets of SRB access parameters (see dspace.cfg) if one or more SRB accounts are used. The srb.xxx set would correspond to asset (bitstream) store number zero. The srb.xxx.n set would correspond to asset (bitstream) store number n. For more details, see <ulink url="storage.html#bitstreams">the Bitstream Storage section</ulink>.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>webui.submit.enable-cc</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>true</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Enable the Creative Commons license step in the submission process for the JSPUI interface. Submitters are given an opportunity to select a Creative Commons license to accompany the Item. Creative Commons licenses govern the use of the content. For more details, see <ulink url="http://creativecommons.org">the Creative Commons website</ulink>.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>default.locale</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>en</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>The default Locale your Installation is working with.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>webui.browse.thumbnail.maxheight</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>80</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Determines the maximum height of any system generated thumbnails.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>webui.browse.thumbnail.maxwidth</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>80</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Determines the maximum width of any system generated thumbnails.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>webui.feed.enable</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>true</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Set the value of this property to true to enable RSS feeds. If false, feeds will not be generated, and the feed links will not appear.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>webui.feed.cache.size</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>100</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>If caching is desired, set the value of this property to a positive number, which represents the total number of feeds kept in the cache at one time, for all communities and collections. A value of 0 disables caching, and the feed is generated on demand for each request.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>webui.cache.age</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>48</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>This property specifiers the age in hours that a cache web feed may remain valid for. A value of 0 will force a check with each request.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>webui.feed.formats</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>rss_1.0,rss_2.0</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>The RSS feature supports several different syndication formats.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>webui.feed.localresolve</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>false</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>By default, the RSS feed will return global handle server-based URLs to items, collections and communities (e.g. http://hdl.handle.net/123456789/1). This means if you have not registered your DSpace installation with the CNRI Handle Server (e.g. development or testing instance) the URLs returned by the feed will return an error if accessed. Setting webui.feed.localresolve = true will result in the RSS feed returning localised URLs (e.g. http://myserver.myorg/handle/123456789/1). If webui.feed.localresolve is set to false or not present the default global handle URL form is used.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>webui.feed.item.title</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>dc.title</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Specify which metadata field you want to be displayed as an item&apos;s title in the RSS feed.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>webui.feed.item.date</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>dc.date.issued</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Specify which metadata field you want to be displayed as an item&apos;s date in the RSS feed.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>webui.feed.item.description</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>dc.title, dc.creator,dc.description.abstract</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Specify which metadata fields should be displayed in an item&apos;s description field in the RSS feed. You can specify as many fields as you wish here.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para/>
+                </entry>
+                <entry>
+                  <para/>
+                </entry>
+                <entry>
+                  <para/>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para/>
+                </entry>
+                <entry>
+                  <para/>
+                </entry>
+                <entry>
+                  <para/>
+                </entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+        <para>Property values can include other, previously defined values, by enclosing the property name in ${...}. For example, if your dspace.cfg contains: -</para>
+        <screen>
+  dspace.dir = /dspace
+  dspace.history = ${dspace.dir}/history
+ 
+</screen>
+        <para>Then the value of the <literal>dspace.history</literal> property is expanded to be <literal>/dspace/history</literal>. This method is especially useful for handling commonly used file paths.</para>
+        <para>Whenever you edit <literal>dspace.cfg</literal>, you should then run <literal>[dspace]/bin/install-configs</literal> so that any changes you may have made are reflected in the configuration files of other applications, for example Apache. You may then need to restart those applications, depending on what you changed.</para>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-general-search" xreflabel="Configuring Lucene
+Search Indexes"/>Configuring Lucene Search Indexes</title>
+        <para>Search Indexes can be configured via the <literal>dspace.cfg</literal> file. This allows institutions to choose which DSpace metadata fields are indexed by Lucene.</para>
+        <para>For example, the following entries appear in a default DSpace installation:</para>
+        <screen>
+search.index.1 = author:dc.contributor.*
+search.index.2 = author:dc.creator.*
+search.index.3 = title:dc.title.*
+search.index.4 = keyword:dc.subject.*
+search.index.5 = abstract:dc.description.abstract
+search.index.6 = author:dc.description.statementofresponsibility
+search.index.7 = series:dc.relation.ispartofseries
+search.index.8 = abstract:dc.description.tableofcontents
+search.index.9 = mime:dc.format.mimetype
+search.index.10 = sponsor:dc.description.sponsorship
+search.index.11 = id:dc.identifier.*
+       
+</screen>
+        <para>The form of each entry is <literal>search.index.&lt;id&gt; = &lt;search &lt;schema&gt;field&gt;:&lt;metadata field&gt;</literal> where:</para>
+        <itemizedlist>
+          <listitem>
+            <para><literal>&lt;id&gt;</literal>  is an incremental number to distinguish each search index entry</para>
+          </listitem>
+          <listitem>
+            <para><literal>&lt;search field&gt;</literal>  is an identifier for the search field this index will correspond to</para>
+          </listitem>
+          <listitem>
+            <para><literal>&lt;metadata field&gt;</literal>  is the DSpace metadata field to be indexed</para>
+          </listitem>
+        </itemizedlist>
+        <para>So in the example above, search.indexes1, 2 and 6 are configured as the <literal>author</literal> search field. The <literal>author</literal> index is created by Lucene indexing all <literal>contributor</literal>, <literal>creator</literal> and <literal>description.statementofresponsibility</literal> medatata fields.</para>
+        <para>After changing the configuration, run <literal>index-all</literal> to recreate the indexes.</para>
+        <para><emphasis role="bold">NOTE:</emphasis> While the indexes are created, this only affects the search results and has no effect on the search components of the user interface. To add new search capability (e.g. to add a new search category to the Advanced Search) requires local customisation to the user interface.</para>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-general-browse" xreflabel="Browse
+Configuration"/>Browse Configuration</title>
+        <para>The browse indices for DSpace can be extensively configured. This section of the configuration allows you to take control of the indices you wish to browse on, and how you wish to present the results. This configuration is broken down into several parts: defining the indices, defining the fields upon which users can sort results, defining truncation for potentially long fields (e.g. author lists), setting cross-links between different browse contexts (e.g. from an author&apos;s name to a complete list of their items), how many recent submissions to display, and configuration for item mapping browse.</para>
+        <section remap="h4">
+          <title>Defining the Indices</title>
+          <para>The form is:</para>
+          <screen>
+webui.browse.index.&lt;n&gt; = &lt;index name&gt; : \
+                               &lt;schema
+	prefix&gt;.&lt;element&gt;[.&lt;qualifier&gt;|.*] : \
+                               (date | title | text) : \
+                               (full | single) \
+</screen>
+          <variablelist>
+            <varlistentry>
+              <term>index name</term>
+              <listitem>
+                <para>The name by which the index will be identified. This may be used in later configuration or to locate the message key for this index.</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>&lt;schema prefix&gt;.&lt;element&gt;[.&lt;qualifier&gt;|.*]</term>
+              <listitem>
+                <para>The metadata field declaration for the field to be indexed. This will be something like <literal>dc.date.issued</literal> or <literal>dc.contributor.*</literal> or <literal>dc.title</literal>.</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>(date | title | text)</term>
+              <listitem>
+                <para>This refers to the datatype of the field: <itemizedlist>
+                    <listitem>
+                      <para> date: the index type will be treated as a date object</para>
+                    </listitem>
+                    <listitem>
+                      <para> title: the index type will be treated like a title, which will include a link to the item page</para>
+                    </listitem>
+                    <listitem>
+                      <para> text: the index type will be treated as plain text. If single mode is specified then this will link to the full mode list</para>
+                    </listitem>
+                  </itemizedlist>
+</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>(full | single)</term>
+              <listitem>
+                <para>This refers to the way that the index will be displayed in the browse listing. &quot;Full&quot; will be the full item list as specified by <literal>webui.itemlist.columns</literal>; &quot;single&quot; will be a single list of only the indexed term.</para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+          <para>If you are customising this list beyond the default you will need to insert the text you wish to appear in the navigation and on link and buttons describing the browse index into the <literal>Messages.properties</literal> file. The system uses parameters of the form:</para>
+          <screen>
+browse.type.&lt;index name&gt;
+</screen>
+          <para>The Index numbers denoted by &lt;n&gt; must start from 1 and increment by 1 continuously thereafter. Deviation from this rule will cause an error during installation or during configuration update</para>
+          <para>This is an example configuration, as it appears by default in <literal>dspace.cfg</literal>.</para>
+          <screen>
+webui.browse.index.1 = dateissued:dc.date.issued:date:full
+webui.browse.index.2 = author:dc.contributor.*:text:single
+webui.browse.index.3 = title:dc.title:title:full
+webui.browse.index.4 = subject:dc.subject.*:text:single
+webui.browse.index.5 = dateaccessioned:dc.date.accessioned:date:full
+</screen>
+        </section>
+        <section remap="h4">
+          <title>Defining Sort Options</title>
+          <para>Sort options will be available when browsing a list of items (i.e. only in &quot;full&quot; mode, not &quot;single&quot; mode). You can define an arbitrary number of fields to sort on, irrespective of which fields you display using webui.itemlist.columns</para>
+          <para>The format is:</para>
+          <screen>
+webui.browse.sort-option.&lt;n&gt; = &lt;option name&gt; : \
+                               &lt;schema
+	prefix&gt;.&lt;element&gt;[.&lt;qualifier&gt;|.*] : \
+                               (date | text)
+</screen>
+          <variablelist>
+            <varlistentry>
+              <term>option name</term>
+              <listitem>
+                <para>The name by which the sort option will be identified. This may be used in later configuration or to locate the message key for this index.</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>&lt;schema prefix&gt;.&lt;element&gt;[.&lt;qualifier&gt;|.*]</term>
+              <listitem>
+                <para>The metadata field declaration for the field to be sorted on. This will be something like <literal>dc.title</literal> or <literal>dc.date.issued</literal>.</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>(date | text)</term>
+              <listitem>
+                <para>This refers to the datatype of the field: <itemizedlist>
+                    <listitem>
+                      <para> date: the sort type will be treated as a date object</para>
+                    </listitem>
+                    <listitem>
+                      <para> text: the sort type will be treated as plain text.</para>
+                    </listitem>
+                  </itemizedlist>
+</para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+          <para>This is the example configuration as it appears in the default <literal>dspace.cfg</literal>:</para>
+          <screen>
+                           
+webui.browse.sort-option.1 = title:dc.title:text
+webui.browse.sort-option.2 = date:dc.date.issued:date
+</screen>
+        </section>
+        <section remap="h4">
+          <title>Author (Multiple metadata value) Display</title>
+          <para>(Note: this section actually applies to any field with multiple values, but authors are the defined case)</para>
+          <para>You can define which field is the author (or editor, or other repeated field) which this configuration will deal with thus:</para>
+          <screen>
+webui.browse.author-field = dc.contributor.*
+</screen>
+          <para> Replace <literal>dc.contributor.*</literal> with another field if appropriate.  The field should be listed in the configuration for <literal>webui.itemlist.columns</literal>, otherwise you will not see its effect. It must also be defined in <literal>webui.itemlist.columns</literal> as being of data type <literal>text</literal>, otherwise the functionality will be overriden by the specific data type features.</para>
+          <para>Now that we know which field is our author or other multiple metadata value field we can provide the option to truncate the number of values displayed by default. We replace the remaining list of values with &quot;et al&quot; or the language pack specific alternative. Note that this is just for the default, and users will have the option of changing the number displayed when they browse the results</para>
+          <screen>
+webui.browse.author-limit = &lt;n&gt;
+</screen>
+          <para>Where &lt;n&gt; is an integer number of values to be displayed. Use <literal>-1</literal> for unlimited (default).</para>
+        </section>
+        <section remap="h4">
+          <title>Links to other browse contexts</title>
+          <para>We can define which fields link to other browse listings. This is useful, for example, to link an author&apos;s name to a list of just that author&apos;s items. The effect this has is to create links to browse views for the item clicked on. If it is a &quot;single&quot; type, it will link to a view of all the items which share that metadata element in common (i.e. all the papers by a single author). If it is a &quot;full&quot; type, it will link to a view of the standard full browse page, starting with the value of the link clicked on.</para>
+          <para>The form is:</para>
+          <screen>
+webui.browse.link.&lt;n&gt; = &lt;index name&gt;:&lt;display column
+	metadata&gt;
+</screen>
+          <para>This should associated the name of one of the browse indices (<literal>webui.browse.index.n</literal>) with a metadata field listed in <literal>webui.itemlist.columns</literal> above. If this condition is not fulfilled, cross-linking will not work. Note also that cross-linking only works for metadata fields not tagged as <literal>title</literal> in <literal>webui.itemlist.columns</literal>.</para>
+          <para>The following example shows the default in <literal>dspace.cfg</literal> which links author names to lists of their publications:</para>
+          <screen>
+webui.browse.link.1 = author:dc.contributor.*
+</screen>
+        </section>
+        <section remap="h4">
+          <title>Recent Submissions</title>
+          <para>This allows us to define which index to base Recent Submission display on, and how many we should show at any one time. This uses the PluginManager to automatically load the relevant plugin for the Community and Collection home pages. Values given in examples are the defaults supplied in <literal>dspace.cfg</literal></para>
+          <para>First define the sort name (from <literal>webui.browse.sort-option</literal>) to use for # displaying recent submissions. For example:</para>
+          <screen>
+recent.submissions.sort-option = dateaccessioned
+</screen>
+          <para>Define how many recent submissions should be displayed at any one time, for example:</para>
+          <screen>
+recent.submissions.count = 5
+</screen>
+          <para>Now we need to set up the processors that the <ulink url="business.html#plugin">PluginManager</ulink> will load to actually perform the recent submissions query on the relevant pages.</para>
+          <para>Tell the community and collection pages that we are using the Recent Submissions code</para>
+          <screen>
+plugin.sequence.org.dspace.plugin.CommunityHomeProcessor = \
+        org.dspace.app.webui.components.RecentCommunitySubmissions
+
+plugin.sequence.org.dspace.plugin.CollectionHomeProcessor = \
+        org.dspace.app.webui.components.RecentCollectionSubmissions
+</screen>
+          <para>This is already configured by default in <literal>dspace.cfg</literal> so there should be no need for you to worry about it</para>
+        </section>
+        <section remap="h4">
+          <title>Item Mapper</title>
+          <para>Because the item mapper requires a primitive implementation of the browse system to be present, we simply need to tell that system which of our indices defines the author browse (or equivalent) so that the mapper can list authors&apos; items for mapping</para>
+          <para>Define the the index name (from <literal>webui.browse.index</literal>) to use for displaying items by author</para>
+          <screen>
+itemmap.author.index = author
+</screen>
+          <para>So if you change the name of your author browse field, you will also need to update this configuration.</para>
+        </section>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-general-mediafilter" xreflabel="Configuring Media Filters"/>Configuring Media Filters</title>
+        <para>Media or Format Filters are classes used to generate derivative or alternative versions of content or bitstreams within DSpace. For example, the PDF Media Filter will extract textual content from PDF bitstreams, the JPEG Media Filter can create thumbnails from image bitstreams.</para>
+        <para>Media Filters are configured as <ulink url="business.html#plugin">Named Plugins</ulink>, with each filter also having a separate configuration setting (in <literal>dspace.cfg</literal>) indicating which formats it can process. The default configuration is shown below.</para>
+        <screen>
+        #### Media Filter / Format Filter plugins (through
+	PluginManager) ####
+
+        #Names of the enabled MediaFilter or FormatFilter plugins
+        filter.plugins = PDF Text Extractor, HTML Text Extractor, \
+                                                Word Text Extractor,
+	JPEG Thumbnail
+        # to enable branded preview: remove last line above, and
+	uncomment 2 lines below
+        #                                       Word Text Extractor,
+	JPEG Thumbnail, \
+        #                                       Branded Preview JPEG
+
+        #Assign &apos;human-understandable&apos; names to each filter
+        plugin.named.org.dspace.app.mediafilter.FormatFilter = \
+                org.dspace.app.mediafilter.PDFFilter = PDF Text
+	Extractor, \
+                org.dspace.app.mediafilter.HTMLFilter = HTML Text
+	Extractor, \
+                org.dspace.app.mediafilter.WordFilter = Word Text
+	Extractor, \
+                org.dspace.app.mediafilter.JPEGFilter = JPEG
+	Thumbnail, \
+                org.dspace.app.mediafilter.BrandedPreviewJPEGFilter =
+	Branded Preview JPEG
+
+        #Configure each filter&apos;s input format(s)
+        filter.org.dspace.app.mediafilter.PDFFilter.inputFormats =
+	Adobe PDF
+        filter.org.dspace.app.mediafilter.HTMLFilter.inputFormats =
+	HTML, Text
+        filter.org.dspace.app.mediafilter.WordFilter.inputFormats =
+	Microsoft Word
+        filter.org.dspace.app.mediafilter.JPEGFilter.inputFormats =
+	GIF, JPEG, image/png
+       
+	filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormat
+s = GIF, JPEG, image/png
+</screen>
+          <para>The enabled Media/Format Filters are named in the <literal>filter.plugins</literal> field above.</para>
+        <para>Names are assigned to each filter using the <literal>plugin.named.org.dspace.app.mediafilter.FormatFilter</literal> field (e.g. by default the <literal>PDFFilter</literal> is named &quot;PDF Text Extractor&quot;).</para>
+        <para>Finally the appropriate <literal>filter.&lt;class path&gt;.inputFormats</literal> defines the vaild input formats which each filter can be applied to. These format names <emphasis role="bold">must match</emphasis> the <literal>short description</literal> field of the <ulink url="appendix.html#bitstreamformatregistry">Bitstream Format Registry</ulink>.</para>
+        <para>You can also implement more dynamic or configurable Media/Format Filters which extend <ulink url="business.html#selfnamedplugin">
+            <literal>SelfNamedPlugin</literal>
+          </ulink>
+. More information is provide below in <anchor id="docbook-configure.html--newfilter" xreflabel="Creating
+a new Media/Format Filter"/>Creating a new Media/Format Filter</para>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-general-email" xreflabel="Wording of E-mail
+Messages"/>Wording of E-mail Messages</title>
+        <para>Sometimes DSpace automatically sends e-mail messages to users, for example to inform them of a new workflow task, or as a subscription e-mail alert. The wording of emails can be changed by editing the relevant file in <literal>[dspace]/config/emails</literal>. Each file is commented. Be careful to keep the right number &apos;placeholders&apos; (e.g.<literal>{2}</literal>).</para>
+        <para><emphasis role="bold">Note:</emphasis> You should replace the contact-information &quot;<literal>dspace-help@myu.edu or call us at xxx-555-xxxx</literal>&quot; with your own contact details in:</para>
+        <itemizedlist>
+          <listitem>
+            <para>
+              <literal>config/emails/change_password</literal>
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              <literal>config/emails/register</literal>
+            </para>
+          </listitem>
+        </itemizedlist>
+        </section>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-configure.html-general-registries" xreflabel="The
+Metadata and Bitstream Format Registries"/>The Metadata and Bitstream Format Registries</title>
+      <para>The <literal>[dspace]/config/registries</literal> directory contains three XML files. These are used to load the <emphasis>initial</emphasis> contents of the Metadata Schema Registry, <ulink url="appendix.html#dublincoreregistry">Dublin Core Metadata registry</ulink> and <ulink url="appendix.html#bitstreamformatregistry">Bitstream Format registry</ulink>. After the initial loading (performed by <literal>ant fresh_install</literal> above), the registries reside in the database; the XML files are not updated.</para>
+      <para>In order to change the registries, you may adjust the XML files before the first installation of DSpace. On an allready running instance it is recommended to change bitstream registries via DSpace admin UI, but the metadata registries can be loaded again at any time from the XML files without difficult. The changes made via admin UI are not reflected in the XML files.</para>
+      <section remap="h3">
+        <title>Metadata Schema Registry</title>
+        <para>The default metadata schema in DSpace is Dublin Core, so it is distributed with a single entry in the source XML file for that namespace. If you wish to add more schemas you can do this in one of two ways. Via the DSpace admin UI you may define new Metadata Schemas, edit existing schemas and move elements between schemas. But you may also modify the XML file (or provide an additional one), and re-import the data as follows:</para>
+        <screen>
+  [dspace]/bin/dsrun org.dspace.adminster.SchemaImporter -f [xml
+	file]
+ 
+</screen>
+        <para> The XML file should be structured as follows: <screen>
+        &lt;metadata-schemas&gt;
+                &lt;schema&gt;
+                        &lt;name&gt;[schema name]&lt;/name&gt;
+                       
+	&lt;namespace&gt;http://myu.edu/some/namespace&lt;/namespace&gt;
+                &lt;/schema&gt;
+        &lt;/metadata-schemas&gt;
+ 
+</screen></para>
+      </section>
+      <section remap="h3">
+        <title>Metadata Format Registries</title>
+        <para>The default metadata schema is Dublin Core, so DSpace is distributed with a default Dublin Core Metadata Registry. Currently, the system requires that every item have a Dublin Core record.</para>
+        <para>There is a set of Dublin Core Elements, which is used by the system and should not be removed or moved to another schema, see <ulink url="appendix.html#dublincoreregistry">Appendix: Default Dublin Core Metadata registry</ulink>.</para>
+        <para><emphasis role="bold">Note</emphasis>: altering a Metadata Registry has no effect on corresponding parts, e.g. item submission interface, item display, item import and vice versa. Every metadata element used in submission interface or item import must be registered before using it.</para>
+        <para><emphasis role="bold">Note</emphasis> also that deleting a metadata element will delete all its corresponding values.</para>
+        <para>If you wish to add more metadata elements, you can do this in one of two ways. Via the DSpace admin UI you may define new metadata elements in the different available schemas. But you may also modify the XML file (or provide an additional one), and re-import the data as follows:</para>
+        <screen>
+  [dspace]/bin/dsrun org.dspace.adminster.MetadataImporter -f [xml
+	file]
+ 
+</screen>
+        <para> The XML file should be structured as follows: <screen>
+        &lt;dspace-dc-types&gt;
+                &lt;dc-type&gt;
+                        &lt;schema&gt;dc&lt;/schema&gt;
+                        &lt;element&gt;contributor&lt;/element&gt;
+                        &lt;qualifier&gt;advisor&lt;/qualifier&gt;
+                        &lt;scope_note&gt;Use primarily for thesis
+	advisor.&lt;/scope_note&gt;
+                &lt;/dc-type&gt;
+        &lt;/dspace-dc-types&gt;
+       
+</screen></para>
+      </section>
+      <section remap="h3">
+        <title>Bitstream Format Registry</title>
+        <para>The bitstream formats recognized by the system and levels of support are similarly stored in the bitstream format registry. This can also be edited at install-time via <literal>[dspace]/config/registries/bitstream-formats.xml</literal> or by the administation Web UI. The contents of the bitstream format registry are entirely up to you, though the system requires that the following two formats are present:</para>
+        <itemizedlist>
+          <listitem>
+            <para>
+              <literal>Unknown</literal>
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              <literal>License</literal>
+            </para>
+          </listitem>
+        </itemizedlist>
+        <para> Deleting a format will cause any existing bitstreams of this format to be reverted to the unknown bitstream format. </para>
+      </section>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-configure.html-general-license" xreflabel="The Default
+Submission License"/>The Default Submission License</title>
+      <para>For each submitted item, a license must be granted. The license will be stored along with the item in the bundle LICENSE in order to keep the information under which terms an items has been published.</para>
+      <para>You may define a license for each collection seperately, when creating/editing a collection. If no collection specific license is defined, the default license is used.</para>
+      <para>The default license can be found in <literal>[dspace]/config/default.license</literal> and can be edited via the dspace-admin interface.</para>
+      <para>DSpace comes with a demo license, which you must adopt to your institutional needs and the legal regulations of your country.</para>
+      <para>If in doubt, contact the law department of your institution.</para>
+      <section remap="h3">
+        <title>Possible Points in a License</title>
+        <simpara>
+          <emphasis>Note, that this is no legal advice, just some starting thoughts for creating you own license.</emphasis>
+        </simpara>
+        <itemizedlist>
+          <listitem>
+            <para> Non-exclusive or exclusive right to</para>
+          </listitem>
+          <listitem>
+            <para>
+              <itemizedlist>
+                <listitem>
+                  <para> capture and store</para>
+                </listitem>
+                <listitem>
+                  <para> distribute</para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <itemizedlist>
+                      <listitem>
+                        <para> worldwide</para>
+                      </listitem>
+                      <listitem>
+                        <para> restricted (e.g. institutional wide</para>
+                      </listitem>
+                    </itemizedlist>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para> translate</para>
+                </listitem>
+                <listitem>
+                  <para> transform to other formats or mediums</para>
+                </listitem>
+                <listitem>
+                  <para> without changing the content</para>
+                </listitem>
+              </itemizedlist>
+            </para>
+          </listitem>
+          <listitem>
+            <para> Make sure no rights (copyright or any other) are violated by this publication</para>
+          </listitem>
+          <listitem>
+            <para> In case the type of submission (e.g. thesis) needs approval, make sure it is the final and approved version.</para>
+          </listitem>
+          <listitem>
+            <para> Distinguish between the document itself and the metadata</para>
+          </listitem>
+          <listitem>
+            <para> Point out that the license granted and the information who granted it will be stored.</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-configure.html-general-submission" xreflabel="Submission
+Configuration"/>Submission Configuration</title>
+      <para>Instructions for customizing and configuring the Item Submission user interface for either the JSP-UI or XML-UI are contained in the separate <ulink url="submission.html">Customizing and Configuring Submission User Interface</ulink> page.</para>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-configure.html-xmlui" xreflabel="XMLUI Interface Customizations
+(Manakin)"/>XMLUI Interface Customizations (Manakin)</title>
+      <para>The DSpace digital repository supports two user interfaces one based upon JSP technologies and the other based upon the Apache Cocoon framework. This section describes those parameters which are specific to the XMLUI interface based upon the Cocoon framework.</para>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-xmlui-dspacecfg" xreflabel="XMLUI
+Configuration Properties"/>XMLUI Configuration Properties</title>
+        <para>There are several options effecting how the XMLUI user interface for DSpace operates. Listed below are the major elements and their description, refere to the <literal>dspace.cfg</literal> file itself for the exhaustive list of configuration parameters.</para>
+        <informaltable frame="none">
+          <tgroup cols="3">
+            <colspec colname="c1" colwidth="175px"/>
+            <colspec colname="c2" colwidth="50*"/>
+            <colspec colname="c3" colwidth="50*"/>
+            <tbody>
+              <row>
+                <entry>
+                  <para>
+                    <emphasis role="bold">Property</emphasis>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <emphasis role="bold">Example Values</emphasis>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <emphasis role="bold">Notes</emphasis>
+                  </para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>xmlui.supportedLocales</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>en, de</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>A list of supported locales for Manakin. Manakin will look at a user&apos;s browser configuration for the first language that appears in this list to make available to in the interface. This parameter is a comma seperated list of Locales. All types of Locales country, country_language, country_language_variant Note that that if the approprate files are not present (i.e. Messages_XX_XX.xml) then Manakin will fall back through to a more general language.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>xmlui.user.registration</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>true</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Determine if new users should be allowed to register.This parameter is usefull in congunction with shibboleth where you want to disallow registration because shibboleth will automatically register the user. Default value is true.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>xmlui.user.editmetadata</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>true</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Determine if users should be allowed to edit their own metadata. This parameter is usefull in congunction with shibboleth where you want to disable the user&apos;s ability to edit their metadata because it came from Shibboleth. Default value is true.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>xmlui.user.assumelogin</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>true</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Determine if super administrators (those whom are in the Administrators group) can login as another user from the &quot;edit eperson&quot; page. This is usefull for debugging problems in a running dspace instance, especially in the workflow process so that you can see exactly what the user is seeing. The default value is false, i.e. no one may assume the login of another user.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>xmlui.user.loginredirect</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>/profile</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Determine where a user is directed after logging into the system. Leave this parameter blank or undefined to direct users to the repository homepage, or &quot;/profile&quot; for the user&apos;s profile, or another reasonable choice is &quot;/submissions&quot; to see if the user has any tasks awaiting their attention. The default is the repository home page.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>xmlui.google.analytics.key</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>UA-XXXXXXX-X</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>If you would like to use google analytics to track general website statistics then provide your google analytics key in this parameter. First sign up for an account at <ulink url="http://analytics.google.com">http://analytics.google.com</ulink>, then create an entry for your repositories website. Analytics will give you a snipit of javascript code to place on your site, inside that snip it is your google analytics key usually found in the line, &quot;<literal>_uacct = &apos;UA-XXXXXXX-X&apos;</literal>&quot; Take this key (just the <literal>UA-XXXXXX-X</literal> part) and place it here in this parameter.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>xmlui.controlpanel.activity.max</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>250</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Assign how many page views will be recorded and displayed in the control panel&apos;s activity viewer. The activity tab allows an administrator to debug problems in a running DSpace by understanding who and how their dspace is currently being used. The default value is 250.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>xmlui.force.ssl</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>true</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Force all authenticated connections to use SSL, only non-authenticated connections are allowed over plain http. If set to true, then you need to ensure that the &apos;dspace.hostname&apos; parameter is set to the correctly. Default value is false.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>xmlui.theme.allowoverrides</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>false</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>If set to true, then allow the user to override which theme is used to display a particular page. When submitting a request add the HTTP parameter &quot;themepath&quot; which corresponds to a particular theme, that specified theme will be used instead of the any other configured theme. Note that this is a potential security hole allowing execution of unintended code on the server, this option is only for development and debugging it should be turned off for any production repository. The default value unless otherwise specified is &quot;false&quot;</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>xmlui.bundle.upload</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>ORIGINAL, METADATA, THUMBNAIL, LICENSE, CC_LICENSE</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Determine which bundles administrators and collection administrators may upload into an existing item through the administrative interface. If the user does not have the appropriate privileges (add &amp; write) on the bundle then that bundle will not be shown to the user as an option.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>xmlui.community-list.render.full</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>True</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>On the community-list page should all the metadata about a community/collection be available to the theme. This parameter defaults to true, but if you are experiencing performance problems on the community-list page you should experiment with turning this option off.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>xmlui.community-list.cache</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>12 hours</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Normally, Manakin will fully verify any cache pages before using a cache copy. This means that when the community-list page is viewed the database is queried for each community/collection to see if their metadata has been modified. This can be expensive for repositories with a large community tree. To help solve this problem you can set the cache to be assumed valued for a specific set of time. The downside of this is that new or editing communities/collections may not show up the website for a period of time.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>xmlui.bitstream.mods</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>true</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Optionally you may configure Manakin to take advantage of metadata stored as a bitstream. The MODS metadata file must be inside the &quot;METADATA&quot; bundle and named either MODS.xml. If this option is set to <literal>true</literal> and the bitstream is present then it is made available to the theme for display.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>xmlui.bitstream.mets</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>true</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Optionally you may configure Manakin to take advantage of metadata stored as a bitstream. The METS metadata file must be inside the &quot;METADATA&quot; bundle and named either METS.xml. If this option is set to <literal>true</literal> and the bitstream is present then the stored METS file is merged with the METS file generated by Manakin for each item. Thus if the bitstream contains a <literal>dmdSec</literal> then there will be two <literal>dmdSec</literal> one from the bitstream and another generated from the Dublin Core stored inside the database.</para>
+                </entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-xmlui-configure" xreflabel="Configuring
+Themes and Aspects"/>Configuring Themes and Aspects</title>
+        <para>The Manakin user interface is composed of two distinct components: <emphasis>aspects</emphasis> and <emphasis>themes</emphasis>. Manakin aspects are like extensions or plugins for Manakin; they are interactive components that modify existing features or provide new features for the digital repository. Manakin themes stylize the look-and-feel of the repository, community, or collection.</para>
+        <para>The repository administrator is able to define which aspects and themes are installed for the particular repository by editing the <literal>[dspace]/config/xmlui.xconf</literal> configuration file. The <literal>xmlui.xconf</literal> file consists of two major sections: Aspects and Themes.</para>
+        <section remap="h4">
+          <title>Aspects</title>
+          <para>The <literal>&lt;aspects&gt;</literal> section defines the &quot;Aspect Chain&quot;, or the linear set of aspects that are installed in the repository. For each aspect that is installed in the repository, the aspect makes available new features to the interface. For example, if the &quot;submission&quot; aspect were to be commented out or removed from the <literal>xmlui.xconf</literal>, then users would not be able to submit new items into the repository (even the links and language prompting users to submit items are removed). Each <literal>&lt;aspect&gt;</literal> element has two attributes, <emphasis>name</emphasis> &amp; <emphasis>path</emphasis>. The name is used to identify the Aspect, while the path determines the directory where the aspect&apos;s code is located. Here is the default aspect configuration:</para>
+          <screen>
+   &lt;aspects&gt;
+     &lt;aspect name=&quot;Artifact Browser&quot;
+	path=&quot;resource://aspects/ArtifactBrowser/&quot; /&gt;
+     &lt;aspect name=&quot;Administration&quot;
+	path=&quot;resource://aspects/Administrative/&quot; /&gt;
+     &lt;aspect name=&quot;E-Person&quot; path=&quot;resource://aspects/EPerson/&quot;
+	/&gt;
+     &lt;aspect name=&quot;Submission and Workflow&quot;
+	path=&quot;resource://aspects/Submission/&quot; /&gt;
+   &lt;/aspects&gt;
+</screen>
+          <para> A standard distribution of Manakin/DSpace includes four &quot;core&quot; aspects: <itemizedlist>
+              <listitem>
+                <para>
+                  <emphasis role="bold">Artifact Browser</emphasis>
+                </para>
+                <para>  The Artifact Browser Aspect is responsible for browsing communities, collections, items and bitstreams, viewing an individual item and searching the repository.</para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis role="bold">E-Person</emphasis>
+                </para>
+                <para>  The E-Person Aspect is responsible for logging in, logging out, registering new users, dealing with forgotten passwords, editing profiles and changing passwords.</para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis role="bold">Submission</emphasis>
+                </para>
+                <para>  The Submission Aspect is responsible for submitting new items to DSpace, determining the workflow process and ingesting the new items into the DSpace repository.</para>
+              </listitem>
+              <listitem>
+                <para>
+                  <emphasis role="bold">Administrative</emphasis>
+                </para>
+                <para>  The Administrative Aspect is responsible for administrating DSpace, such as creating, modifying and removing all communities, collections, e-persons, groups, registries and authorizations.</para>
+              </listitem>
+            </itemizedlist>
+</para>
+        </section>
+        <section remap="h4">
+          <title>Themes</title>
+          <para>The <literal>&lt;themes&gt;</literal> section defines a set of &quot;rules&quot; that determine where themes are installed in the repository. Each rule is processed in the order that it appears, and the first rule that matches determines the theme that is applied (so order is important). Each rule consists of a <literal>&lt;theme&gt;</literal> element with several possible attributes:</para>
+          <itemizedlist>
+            <listitem>
+              <para><emphasis role="bold">name</emphasis>  (<emphasis>always required</emphasis>)</para>
+              <para> The name attribute is used to document the theme&apos;s name.</para>
+            </listitem>
+            <listitem>
+              <para><emphasis role="bold">path</emphasis>  (<emphasis>always required</emphasis>)</para>
+              <para> The path attribute determines where the theme is located relative to the <literal>themes/</literal> directory and must either contain a trailing slash or point directly to the theme&apos;s <literal>sitemap.xmap</literal> file.</para>
+            </listitem>
+            <listitem>
+              <para><emphasis role="bold">regex</emphasis>  (<emphasis>either regex and/or handle is required</emphasis>)</para>
+              <para> The regex attribute determines which URLs the theme should apply to.</para>
+            </listitem>
+            <listitem>
+              <para><emphasis role="bold">handle</emphasis>  (<emphasis>either regex and/or handle is required</emphasis>)</para>
+              <para> The handle attribute determines which community, collection, or item the theme should apply to.</para>
+            </listitem>
+          </itemizedlist>
+          <para>If you use the &quot;handle&quot; attribute, the effect is cascading, meaning if a rule is established for a community then all collections and items within that community will also have this theme apply to them as well. Here is an example configuration:</para>
+          <screen>
+  &lt;themes&gt;
+    &lt;theme name=&quot;Theme 1&quot; handle=&quot;123456789/23&quot;
+	path=&quot;theme1/&quot;/&gt;
+    &lt;theme name=&quot;Theme 2&quot; regex=&quot;community-list&quot;
+	path=&quot;theme2/&quot;/&gt;
+    &lt;theme name=&quot;Reference Theme&quot; regex=&quot;.*&quot;
+	path=&quot;Reference/&quot;/&gt;
+  &lt;/themes&gt;
+</screen>
+          <para>In the example above three themes are configured: &quot;Theme 1&quot;, &quot;Theme 2&quot;, and the &quot;Reference Theme&quot;. The first rule specifies that &quot;Theme 1&quot; will apply to all communities, collections, or items that are contained under the parent community &quot;123456789/23&quot;. The next rule specifies any URL containing the string &quot;community-list&quot; will get &quot;Theme 2&quot;. The final rule, using the regular expression &quot;.*&quot;, will match <emphasis role="bold">anything</emphasis>, so all pages which have not matched one of the preceding rules will be matched to the Reference Theme.</para>
+        </section>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-xmlui-multilingual" xreflabel="Multilingual Support"/>Multilingual Support</title>
+        <para>The XMLUI user interface supports multiple languages through the use of internationalization catalogues as defined by the <ulink url="http://cocoon.apache.org/2.1/userdocs/i18nTransformer.html">Cocoon Internationalization Transformer</ulink>. Each catalogue contains the translation of all user-displayed strings into a particular language or variant. Each catalogue is a single xml file whose name is based upon the language it is designated for, thus:</para>
+        <para> messages_<emphasis>language</emphasis>_<emphasis>country</emphasis>_<emphasis>variant</emphasis>.xml</para>
+        <para> messages_<emphasis>language</emphasis>_<emphasis>country</emphasis>.xml</para>
+        <para> messages_<emphasis>language</emphasis>.xml</para>
+        <para> messages.xml</para>
+        <para> The interface will automatically determine which file to select based upon the user&apos;s browser and system configuration. For example, if the user&apos;s browser is set to Australian English then first the system will check if <literal>messages_en_au.xml</literal> is available. If this translation is not available it will fall back to <literal>messages_en.xml</literal>, and finally if that is not available, <literal>messages.xml</literal>.</para>
+        <para>Manakin supplies an English only translation of the interface. In order to add other translations to the system, locate the <literal>[dspace-source]/dspace/modules/xmlui/src/main/webapp/i18n/</literal> directory. By default this directory will be empty; to add additional translations add alternative versions of the <literal>messages.xml</literal> file in specific language and country variants as needed for your installation.</para>
+        <para> To set a language other than English as the default language for the repository&apos;s interface, simply name the translation catalogue for the new default language &quot;<literal>messages.xml</literal>&quot;</para>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-xmlui-newtheme" xreflabel="Creating a New
+Theme"/>Creating a New Theme</title>
+        <para>Manakin themes stylize the look-and-feel of the repository, community, or collection and are distributed as self-contained packages. A Manakin/DSpace installation may have multiple themes installed and available to be used in different parts of the repository. The central component of a theme is the sitemap.xmap, which defines what resources are available to the theme such as XSL stylesheets, CSS stylesheets, images, or multimedia files.</para>
+        <simpara>
+          <emphasis role="bold">1) Create theme skeleton</emphasis>
+        </simpara>
+        <para>Most theme developers do not create a new theme from scratch; instead they start from the standard theme template, which defines a skeleton structure for a theme. The template is located at: <literal>[dspace-source]/dspace-xmlui/dspace-xmlui-webbapp/src/main/webbapp/themes/template</literal>. To start your new theme simply copy the theme template into your locally defined modules directory, <literal>[dspace-source]/dspace/modules/xmlui/src/main/webbapp/themes/[your theme&apos;s directory]/</literal>.</para>
+        <simpara>
+          <emphasis role="bold">2) Modify theme variables</emphasis>
+        </simpara>
+        <para>The next step is to modify the theme&apos;s parameters so that the theme knows where it is located. Open the <literal>[your theme&apos;s directory]/sitemap.xmap</literal> and look for <literal>&lt;global-variables&gt;</literal></para>
+        <screen>
+   &lt;global-variables&gt;
+      &lt;theme-path&gt;[your theme&apos;s
+	directory]&lt;/theme-path&gt;
+      &lt;theme-name&gt;[your theme&apos;s name]&lt;/theme-name&gt;
+   &lt;/global-variables&gt;
+</screen>
+        <para>Update both the theme&apos;s path to the directory name you created in step one. The theme&apos;s name is used only for documentation.</para>
+        <simpara>
+          <emphasis role="bold">3) Add your CSS stylesheets</emphasis>
+        </simpara>
+        <para>The base theme template will produce a repository interface without any style - just plain XHTML with no color or formatting. To make your theme useful you will need to supply a CSS Stylesheet that creates your desired look-and-feel. Add your new CSS stylesheets:</para>
+        <para><literal>[your theme&apos;s directory]/lib/style.css</literal> (The base style sheet used for all browsers)</para>
+        <para><literal>[your theme&apos;s directory]/lib/style-ie.css</literal> (Specific stylesheet used for internet explorer)</para>
+        <para>
+          <emphasis role="bold">4) Install theme and rebuild DSpace</emphasis>
+        </para>
+        <para>Next rebuild &amp; deploy DSpace as described in the <ulink url="install.html">installation portion of the manual</ulink>, and ensure the theme has been installed as described in the previous section &quot;<ulink url="configure.html#xmlui-configure">Configuring Themes and Aspects</ulink>&quot;.</para>
+      </section>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-configure.html-jspui" xreflabel="JSPUI Interface
+Customizations"/>JSPUI Interface Customizations</title>
+      <para>DSpace digital repository supports two user interfaces one based upon JSP technologies and the other based upon the Apache Cocoon framework. This section describes those parameters which are specific to the JSPUI interface.</para>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-jspui-dspacecfg" xreflabel="JSPUI
+Configuration Properties"/>JSPUI Configuration Properties</title>
+        <para>There are many options effecting how the JSP-based user interface for DSpace operates. Listed below are the major elements and their description, refere to the <literal>dspace.cfg</literal> file itself for the exhaustive list of configuration parameters.</para>
+        <informaltable frame="none">
+          <tgroup cols="3">
+            <colspec colname="c1" colwidth="33*"/>
+            <colspec colname="c2" colwidth="33*"/>
+            <colspec colname="c3" colwidth="33*"/>
+            <tbody>
+              <row>
+                <entry>
+                  <para>
+                    <emphasis role="bold">Property</emphasis>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <emphasis role="bold">Example Values</emphasis>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <emphasis role="bold">Notes</emphasis>
+                  </para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>webui.mydspace.showgroupmemberships</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>false</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Determine if the MyDSpace page should list all groups a user belongs too. The default behavior, if omitted, is false.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>webui.strengths.show</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>true</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Determine if communities and collections should display item counts when listed. The default behavior, if omitted, is true.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>webui.licence_bundle</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>true</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Setting this parameter to ture will result in a hyperlink being rendered on the item View page that points to the item&apos;s licence.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>webui.browse.thumbnail.show</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>true</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Determine if thumbnails should be displayed on browe-by pages and item view pages when available. The default behavior, if omitted, is false.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>webui.browse.thumbnail.linkbehaviour</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>item</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Direct the target when a thumbnail is clicked. Currently the values <literal>item</literal> and <literal>bitstream</literal> are allowed. If this configuration item is not set, or set incorrectly, the default is <literal>item</literal>.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>webui.suggest.enable</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>true</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Set the value of this property to <literal>true</literal> to expose the link to the recommendation form. If <literal>false</literal>, the link will not display.</para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>webui.suggest.loggedinusers.only</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>true</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>Enables only logged in users to suggest an item. The default value is false.</para>
+                </entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-jspui-controlledvocabulary" xreflabel="Configuring Controlled
+Vocabularies"/>Configuring Controlled Vocabularies</title>
+        <para>DSpace now supports controlled vocabularies to confine the set of keywords that users can use while describing items.</para>
+        <para>The need for a limited set of keywords is important since it eliminates the ambiguity of a free description system, consequently simplifying the task of finding specific items of information.</para>
+        <para>The controlled vocabulary add-on allows the user to choose from a defined set of keywords organised in an tree (taxonomy) and then use these keywords to describe items while they are being submitted.</para>
+        <para>We have also developed a small search engine that displays the classification tree (or taxonomy) allowing the user to select the branches that best describe the information that he/she seeks.</para>
+        <para>The taxonomies are described in XML following this (very simple) structure:</para>
+        <para>
+          <literal>&lt;node id=&quot;acmccs98&quot; label=&quot;ACMCCS98&quot;&gt; &lt;isComposedBy&gt; &lt;node id=&quot;A.&quot; label=&quot;General Literature&quot;&gt; &lt;isComposedBy&gt; &lt;node id=&quot;A.0&quot; label=&quot;GENERAL&quot;/&gt; &lt;node id=&quot;A.1&quot; label=&quot;INTRODUCTORY AND SURVEY&quot;/&gt; ... &lt;/isComposedBy&gt; &lt;/node&gt; ... &lt;/isComposedBy&gt; &lt;/node&gt;</literal>
+        </para>
+        <para>Your are free to use any application you want to create your controlled vocabularies. A simple text editor should be enough for small projects. Bigger projects will require more complex tools. You may use Protegé to create your taxonomies, save them as OWL and then use a XML Stylesheet (XSLT) to transform your documents to the appropriate format. Future enhancements to this add-on should make it compatible with standard schemas such as OWL or RDF.</para>
+        <para>In order to make DSpace compatible with WAI 2.0, the add-on is <emphasis role="bold">turned off</emphasis> by default (the add-on relies strongly on Javascript to function). It can be activated by setting the following property in <literal>dspace.cfg</literal>:</para>
+        <para>
+          <literal>webui.controlledvocabulary.enable = true</literal>
+        </para>
+        <para>New vocabularies should be placed in <literal>[dspace]/config/controlled-vocabularies/</literal> and must be according to the structure described. A validation XML Schema can be downloaded <ulink url="controlledvocabulary.xsd">here</ulink>.</para>
+        <para>Vocabularies need to be associated with the correspondant DC metadata fields. Edit the file <literal>[dspace]/config/input-forms.xml</literal> and place a <literal>&quot;vocabulary&quot;</literal> tag under the <literal>&quot;field&quot;</literal> element that you want to control. Set value of the <literal>&quot;vocabulary&quot;</literal> element to the name of the file that contains the vocabulary, leaving out the extension (the add-on will only load files with extension &quot;*.xml&quot;). For example:</para>
+        <para>
+          <literal>&lt;field&gt; &lt;dc-schema&gt;dc&lt;/dc-schema&gt; &lt;dc-element&gt;subject&lt;/dc-element&gt; &lt;dc-qualifier&gt;&lt;/dc-qualifier&gt; &lt;!-- An input-type of twobox MUST be marked as repeatable --&gt; &lt;repeatable&gt;true&lt;/repeatable&gt; &lt;label&gt;Subject Keywords&lt;/label&gt; &lt;input-type&gt;twobox&lt;/input-type&gt; &lt;hint&gt; Enter appropriate subject keywords or phrases below. &lt;/hint&gt; &lt;required&gt;&lt;/required&gt;&lt;vocabulary [closed=&quot;false&quot;]&gt;nsi&lt;/vocabulary&gt; &lt;/field&gt;</literal>
+        </para>
+        <para>The vocabulary element has an optional boolean attribute <emphasis role="bold">closed</emphasis> that can be used to force input only with the javascript of controlled-vocabulary add-on. The default behaviour (i.e. without this attribute) is as set <emphasis role="bold">closed=&quot;false&quot;</emphasis>. This allow the user also to enter the value in free way.</para>
+        <para>The following vocabularies are currently available by default:</para>
+        <itemizedlist>
+          <!-- <li><strong>acmccs98-1.2.4</strong> - <em>acmccs98-1.2.4.xml</em> - ACM Computing Classification System</li> -->
+          <listitem>
+            <para><emphasis role="bold">nsi</emphasis>  - <emphasis>nsi.xml</emphasis> - The Norwegian Science Index</para>
+          </listitem>
+          <listitem>
+            <para><emphasis role="bold">srsc</emphasis>  - <emphasis>srsc.xml</emphasis> - Swedish Research Subject Categories</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-jspui-multilingual" xreflabel="Configuring
+Multilingual Support"/>Configuring Multilingual Support</title>
+        <section remap="h4">
+          <title>Setting the default language for the application</title>
+          <para> The default language for the application is set via the <literal>[dspace]/config/dspace.cfg</literal> parameter <literal>default.locale</literal>. </para>
+          <para> This is a locale according to i18n and might consist of country, country_language or country_language_variant, </para>
+          <para> e. g.: <literal>default.locale=en</literal>. If not default locale is specified the server locale will be used instead. </para>
+        </section>
+        <section remap="h4">
+          <title>Supporting more than one language</title>
+          <section remap="h5">
+            <title>Changes in dspace.cfg</title>
+            <para> With the <literal>[dspace]/config/dspace.cfg</literal> parameter <literal>webui.supported.locales</literal> you may provide a comma seperated list of supported (including the default locale) locales. </para>
+            <para> The locales might have the form country, country_language or country_language_variant, e. g.:</para>
+            <para><literal>webui.supported.locales = en, de</literal> or <literal>webui.supported.locales = en, en_ca, de</literal>.</para>
+            <para> This will result in: <itemizedlist>
+                <listitem>
+                  <para> a language switch in the default header</para>
+                </listitem>
+                <listitem>
+                  <para> the user will able to choose his preferred language, this will be part of his profile</para>
+                </listitem>
+                <listitem>
+                  <para> wording of emails </para>
+                  <itemizedlist>
+                    <listitem>
+                      <para> mails to registered users e. g. alerting service will use the preferred language of the user</para>
+                    </listitem>
+                    <listitem>
+                      <para> mails to unregistered users e. g. suggest an item will use the language of the session</para>
+                    </listitem>
+                  </itemizedlist>
+                </listitem>
+                <listitem>
+                  <para> according to the language selected for the session, using dspace-admin Edit News will edit the news file of the language according to session</para>
+                </listitem>
+              </itemizedlist>
+</para>
+          </section>
+          <section remap="h5">
+            <title>Related files</title>
+            <para> If you set webui.supported.locales make sure that all the related additional files for each language are available. <literal>LOCALE</literal> should correspond to the locale set in <literal>webui.supported.locales</literal>, e. g.: for webui.supported.locales = en, de, fr, there should be: <itemizedlist>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/modules/jspui/src/main/resources/Messages.properties</literal>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/modules/jspui/src/main/resources/Messages_en.properties</literal>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/modules/jspui/src/main/resources/Messages_de.properties</literal>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/modules/jspui/src/main/resources/Messages_fr.properties</literal>
+                  </para>
+                </listitem>
+              </itemizedlist>
+ Files to be localized: <itemizedlist>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/modules/jspui/src/main/resources/Messages_LOCALE.properties</literal>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/config/input-forms_LOCALE.xml</literal>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/config/default_LOCALE.license</literal>
+                    <emphasis>should be pure ascii</emphasis>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/config/news-top_LOCALE.html</literal>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/config/news-side_LOCALE.html</literal>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/config/emails/change_password_LOCALE</literal>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/config/emails/feedback_LOCALE</literal>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/config/emails/internal_error_LOCALE</literal>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/config/emails/register_LOCALE</literal>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/config/emails/submit_archive_LOCALE</literal>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/config/emails/submit_reject_LOCALE</literal>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/config/emails/submit_task_LOCALE</literal>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/config/emails/subscription_LOCALE</literal>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/config/emails/suggest_LOCALE</literal>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/jsp/help/collection-admin_LOCALE.html</literal>
+                    <emphasis>in html keep the jump link as original</emphasis>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/jsp/help/index_LOCALE.html</literal>
+                  </para>
+                </listitem>
+                <listitem>
+                  <para>
+                    <literal>[dspace]/jsp/help/site-admin_LOCALE.html</literal>
+                  </para>
+                </listitem>
+              </itemizedlist>
+</para>
+          </section>
+        </section>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-jspui-jsp" xreflabel="Customizing the JSP
+pages"/>Customizing the JSP pages</title>
+        <para>The JSPUI interface is implemented using Java Servlets which handle the business logic, and JavaServer Pages (JSPs) which produce the HTML pages sent to an end-user. Since the JSPs are much closer to HTML than Java code, altering the look and feel of DSpace is relatively easy.</para>
+        <para>To make it even easier, DSpace allows you to &apos;override&apos; the JSPs included in the source distribution with modified versions, that are stored in a separate place, so when it comes to updating your site with a new DSpace release, your modified versions will not be overwritten. It should be possible to dramatically change the look of DSpace to suit your organization by just changing the CSS style file and the site &apos;skin&apos; or &apos;layout&apos; JSPs in <literal>jsp/layout</literal>; if possible, it is recommended you limit local customizations to these files to make future upgrades easier.</para>
+        <para>You can also easily edit the text that appears on each JSP page by editing the dictionary file. However, note that unless you change the entry in all of the different language message files, users of other languages will still see the default text for their language. See <ulink url="application.html#i18n">internationalization</ulink>.</para>
+        <para>Note that the data (attributes) passed from an underlying Servlet to the JSP may change between versions, so you may have to modify your customized JSP to deal with the new data.</para>
+        <para>Thus, if possible, it is recommeded you limit your changes to the &apos;layout&apos; JSPs and the stylesheet.</para>
+        <para>The JSPs are available in one of two places:</para>
+        <itemizedlist>
+          <listitem>
+            <para><literal>[dspace-source]/dspace-jspui/dspace-jspui-webapp/src/main/webapp/</literal>  - Only exists if you downloaded the full Source Release of DSpace</para>
+          </listitem>
+          <listitem>
+            <para><literal>[dspace-source]/dspace/target/dspace-[version].dir/webapps/dspace-jspui-webapp/</literal>  - The location where they are copied after first building DSpace.</para>
+          </listitem>
+        </itemizedlist>
+          <para>If you wish to modify a particular JSP, place your edited version in the <literal>[dspace-source]/dspace/modules/jspui/src/main/webapp/</literal> directory (<emphasis>this is the replacement for the pre-1.5 <literal>/jsp/local</literal> directory</emphasis>), with the same path as the original. If they exist, these will be used in preference to the default JSPs. For example:</para>
+        <informaltable frame="none">
+          <tgroup cols="2">
+            <colspec colname="c1" colwidth="50*"/>
+            <colspec colname="c2" colwidth="50*"/>
+            <tbody>
+              <row>
+                <entry>
+                  <para>
+                    <emphasis role="bold">DSpace default</emphasis>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <emphasis role="bold">Locally-modified version</emphasis>
+                  </para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>[jsp.dir]/community-list.jsp</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>[dspace-source]/dspace/modules/jspui/src/main/webapp/community-list.jsp</literal>
+                  </para>
+                </entry>
+              </row>
+              <row>
+                <entry>
+                  <para>
+                    <literal>[jsp.dir]/mydspace/main.jsp</literal>
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    <literal>[dspace-source]/dspace/modules/jspui/src/main/webapp/mydspace/main.jsp</literal>
+                  </para>
+                </entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+        <para>Heavy use is made of a style sheet, <literal>styles.css.jsp</literal>. If you make edits, copy the local version to <literal>[dspace-source]/dspace/modules/jspui/src/main/webapp/styles.css.jsp</literal>, and it will be used automatically in preference to the default, as described above.</para>
+        <para>Fonts and colors can be easily changed using the stylesheet. The stylesheet is a JSP so that the user&apos;s browser version can be detected and the stylesheet tweaked accordingly.</para>
+        <para>The &apos;layout&apos; of each page, that is, the top and bottom banners and the navigation bar, are determined by the JSPs <literal>/layout/header-*.jsp</literal> and <literal>/layout/footer-*.jsp</literal>. You can provide modified versions of these (in <literal>[dspace-source]/dspace/modules/jspui/src/main/webapp/layout</literal>), or define more styles and apply them to pages by using the &quot;style&quot; attribute of the <literal>dspace:layout</literal> tag.</para>
+        <para>After you&apos;ve customized your JSPs, <emphasis role="bold">you must rebuild the DSpace Web application</emphasis>. If you haven&apos;t already built and installed it, follow the <ulink url="install.html">install</ulink> directions. Otherwise, follow the steps below:</para>
+        <orderedlist>
+          <listitem>
+            <para> Rebuild the DSpace installation package by running the following command from your <literal>[dspace-source]/dspace/</literal> directory:</para>
+            <screen>
+mvn package
+</screen>
+          </listitem>
+          <listitem>
+            <para> Re-install the DSpace WAR(s) to <literal>[dspace]/webapps</literal> by running the following command from your <literal>[dspace-source]/dspace/target/dspace-[version].dir</literal> directory:</para>
+            <screen>
+ant -Dconfig=<emphasis> [dspace]</emphasis>/config/dspace.cfg update
+</screen>
+          </listitem>
+          <listitem>
+            <para> Depending on your setup with Tomcat, you may also need to do the following:</para>
+            <itemizedlist>
+              <listitem>
+                <para> Shut down Tomcat, and delete any existing <emphasis>[tomcat]</emphasis>/webapps/dspace directories.</para>
+              </listitem>
+              <listitem>
+                <para> Copy the new .war file(s) to the Tomcat webapps directory:</para>
+              </listitem>
+              <listitem>
+                <para> Restart Tomcat.</para>
+              </listitem>
+            </itemizedlist>
+            </listitem>
+        </orderedlist>
+        <para>When you restart the web server you should see your customized JSPs.</para>
+      </section>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-configure.html-advanced" xreflabel="Advanced DSpace
+Customizations"/>Advanced DSpace Customizations</title>
+      <para>Some customizations to the DSpace platform require advanced skills or knowlege to complete. The options list here will require either knowlege in system administration or may involve light programming.</para>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-checksum" xreflabel="Checksum Checker"/>Checksum Checker</title>
+        <para>There are three aspects of the Checksum Checker&apos;s operation that can be configured:</para>
+        <orderedlist>
+          <listitem>
+            <para> the execution mode</para>
+          </listitem>
+          <listitem>
+            <para> the logging output</para>
+          </listitem>
+          <listitem>
+            <para> the policy for removing old checksum results from the database</para>
+          </listitem>
+        </orderedlist>
+        <section remap="h4">
+          <title>Checker Execution Mode</title>
+          <para>Execution mode can be configured using command line options. Information on the options can be found at any time by running <literal>[dspace]/bin/checker --help</literal>. The different modes are described below; see the &quot;Which to use&quot; section that follows for details on the various pros and cons.</para>
+          <para>Unless a particular bitstream or handle is specified, the Checksum Checker will always check bitstreams in order of the least recently checked bitstream. (Note that this means that the most recently ingested bitstreams will be the last ones checked by the Checksum Checker.)</para>
+          <para>To check a specific number of bitstreams, use the -c option followed by an integer number of bitstreams to check:</para>
+          <screen>
+bin/checker -c 10
+</screen>
+          <para>Limited count mode is particularly useful for checking that the checker is executing properly. The Checksum Checker&apos;s default execution mode is to check a single bitstream, as if the -c 1 option had been given.</para>
+          <para>To run the Checker for a specific period of time, use the -d option with a time argument:</para>
+          <screen>
+bin/checker -d 10m
+bin/checker -d 2h
+</screen>
+          <para>Valid options for specifying duration are <literal>s</literal> for seconds, <literal>m</literal> for minutes, <literal>h</literal> for hours, <literal>d</literal> for days, <literal>w</literal> for weeks, and <literal>y</literal> for years (OK, so we&apos;re optimists).</para>
+          <para>The checker will keep starting new bitstream checks for the specified duration, so actual execution duration will be slightly longer than the specified duration. Bear this in mind when scheduling checks.</para>
+          <para>To check one or more particular bitstreams by ID, use the -b option followed by one or more bitstream IDs:</para>
+          <screen>
+bin/checker -b 1 2 3 4
+</screen>
+          <para>This mode is useful when analyzing problems reported in the logs and when verifying that a resolution has been successful.</para>
+          <para>Use the -a option followed by a handle:</para>
+          <screen>
+bin/checker -a 123456/123
+</screen>
+          <para>This will check all the bitstreams inside an item, collection or community.</para>
+          <para>There are two looping modes:</para>
+          <screen>
+bin/checker -l     # Loops once through the repository  
+bin/checker -L      # Loops continuously through the repository
+</screen>
+          <para>The -l option can be used if your repository is relatively small and your backup strategy requires it to be completely validated at a particular point. The -L option might be useful if you have a large repository, and you don&apos;t mind (or can avoid) the IO load caused by the checker.</para>
+          <para>The Checksum Checker was designed with the idea that most sys admins will run it from the cron. For small repositories we recommend using the -l option in the cron. For larger repositories that cannot be completely checked in a couple of hours, we recommend the -d option in the cron.</para>
+        </section>
+        <section remap="h4">
+          <title>Checker Reporting</title>
+          <para>Checksum Checker uses log4j to report its results. By default it will report to a log called <literal>[dspace]/log/checker.log</literal>, and it will report only on bitstreams for which the newly calculated checksum does not match the stored checksum. To report on all bitstreams checked regardless of outcome, use the <literal>-v</literal> (verbose) command line option:</para>
+          <screen>
+bin/checker -l -v    #Loop through the repository once and
+  report in detail about every bitstream checked.
+</screen>
+          <para>To change the location of the log, or to modify the prefix used on each line of output, edit the <literal>[dspace]/config/templates/log4j.properties</literal> file and run <literal>[dspace]/bin/install_configs</literal>.</para>
+        </section>
+        <section remap="h4">
+          <title>Checker Results Pruning</title>
+          <para>The Checksum Checker will store the result of every check in the checksum_history table. By default, successful checksum matches that are eight weeks old or older will be deleted when the -p command line option is used (unsuccessful ones will be retained indefinitely). The amount of time for which results are retained in the checksum_history table can be modified by one of two methods:</para>
+          <orderedlist>
+            <listitem>
+              <para> editing the retention policies in <literal>[dspace]/config/dspace.cfg</literal> OR</para>
+            </listitem>
+            <listitem>
+              <para> passing in a properties file containing retention policies when using the -p option.</para>
+            </listitem>
+          </orderedlist>
+          <para>Pruning is controlled by a number of properties, each of which describes a checksum result code, and the length of time for which results with that code should be retained. The format is <literal>checker.retention.[RESULT CODE]=[duration]</literal>. For example: -</para>
+          <screen>
+checker.retention.CHECKSUM_MATCH=8w
+</screen>
+          <para>indicates that successful checksum matches will be retained for eight weeks. Supported units of time are</para>
+          <informaltable frame="none">
+            <tgroup cols="2">
+              <colspec colname="c1" colwidth="50*"/>
+              <colspec colname="c2" colwidth="50*"/>
+              <tbody>
+                <row>
+                  <entry>
+                    <para>s</para>
+                  </entry>
+                  <entry>
+                    <para>Seconds</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>m</para>
+                  </entry>
+                  <entry>
+                    <para>Minutes</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>h</para>
+                  </entry>
+                  <entry>
+                    <para>Hours</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>d</para>
+                  </entry>
+                  <entry>
+                    <para>Days</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>w</para>
+                  </entry>
+                  <entry>
+                    <para>Weeks</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>y</para>
+                  </entry>
+                  <entry>
+                    <para>Years</para>
+                  </entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </informaltable>
+          <para>(Note that these units are also used for describing durations for the <literal>-d</literal> limited duration mode.)</para>
+          <para>There is a special property, <literal>checker.retention.default</literal>, that is used to assign a default retention period.</para>
+          <para>To execute the pruning you must use the -p command line option (with or without a properties file). Checksum Checker will prune the history table before beginning new checks. We recommend that you use this option regularly, as the checksum_history table can grow very large without it.</para>
+        </section>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-authentication" xreflabel="Custom
+Authentication"/>Custom Authentication</title>
+        <para>Since many institutions and organizations have exisiting authentication systems, DSpace has been designed to allow these to be easily integrated into an existing authentication infrastructure. It keeps a series, or &quot;stack&quot;, of <emphasis>authentication methods</emphasis>, so each one can be tried in turn. This makes it easy to add new authentication methods or rearrange the order without changing any existing code. You can also share authentication code with other sites.</para>
+        <para>The configuration property <literal>plugin.sequence.org.dspace.authenticate.AuthenticationMethod</literal> defines the authentication stack. It is a comma-separated list of class names. Each of these classes implements a different <emphasis>authentication method</emphasis>, or way of determining the identity of the user. They are invoked in the order specified until one succeeds.</para>
+        <para>An authentication method is a class that implements the interface <literal>org.dspace.authenticate.AuthenticationMethod</literal>. It <emphasis>authenticates</emphasis> a user by evaluating the <emphasis>credentials</emphasis> (e.g. username and password) he or she presents and checking that they are valid.</para>
+        <para>The basic authentication procedure in the DSpace Web UI is this:</para>
+        <orderedlist>
+          <listitem>
+            <para> A request is received from an end-user&apos;s browser that, if fulfilled, would lead to an action requiring authorization taking place.</para>
+          </listitem>
+          <listitem>
+            <para> If the end-user is already authenticated: </para>
+            <itemizedlist>
+              <listitem>
+                <para> If the end-user is allowed to perform the action, the action proceeds</para>
+              </listitem>
+              <listitem>
+                <para> If the end-user is NOT allowed to perform the action, an authorization error is displayed.</para>
+              </listitem>
+              <listitem>
+                <para> If the end-user is NOT authenticated, i.e. is accessing DSpace anonymously:</para>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+          <listitem>
+            <para> The parameters etc. of the request are stored</para>
+          </listitem>
+          <listitem>
+            <para> The Web UI&apos;s <literal>startAuthentication</literal> method is invoked.</para>
+          </listitem>
+          <listitem>
+            <para> First it tries all the authentication methods which do <emphasis>implicit</emphasis> authentication (i.e. they work with just the information already in the Web request, such as an X.509 client certificate). If one of these succeeds, it proceeds from Step 2 above.</para>
+          </listitem>
+          <listitem>
+            <para> If none of the implicit methods succeed, the UI responds by putting up a &quot;login&quot; page to collect credentials for one of the <emphasis>explicit</emphasis> authentication methods in the stack. The servlet processing that page then gives the proffered credentials to each authentication method in turn until one succeeds, at which point it retries the original operation from Step 2 above.</para>
+          </listitem>
+        </orderedlist>
+        <para>Please see the source files <literal>AuthenticationManager.java</literal> and <literal>AuthenticationMethod.java</literal> for more details about this mechanism.</para>
+        <section remap="h4">
+          <title>Authentication by Password</title>
+          <para>The default method <literal>org.dspace.authenticate.PasswordAuthentication</literal> has the following properties:</para>
+          <itemizedlist>
+            <listitem>
+              <para> Use of inbuilt e-mail address/password-based log-in. This is achieved by forwarding a request that is attempting an action requiring authorization to the password log-in servlet, <literal>/password-login</literal>. The password log-in servlet (<literal>org.dspace.app.webui.servlet.PasswordServlet</literal> contains code that will resume the original request if authentication is successful, as per step 3. described above.</para>
+            </listitem>
+            <listitem>
+              <para> Users can register themselves (i.e. add themselves as e-people without needing approval from the administrators), and can set their own passwords when they do this</para>
+            </listitem>
+            <listitem>
+              <para> Users are not members of any special (dynamic) e-person groups</para>
+            </listitem>
+            <listitem>
+              <para> You can restrict the domains from which new users are able to regiser. To enable this feature, uncomment the following line from dspace.cfg: <literal>authentication.password.domain.valid = example.com</literal> Example options might be &apos;<literal>@example.com</literal>&apos; to restrict registration to users with addresses ending in @example.com, or &apos;<literal>@example.com, .ac.uk</literal>&apos; to restrict registration to users with addresses ending in @example.com or with addresses in the .ac.uk domain.</para>
+            </listitem>
+          </itemizedlist>
+        </section>
+        <section remap="h4">
+          <title>X.509 Certificate Authentication</title>
+          <para>The X.509 authentication method uses an X.509 certificate sent by the client to establish his/her identity. It requires the client to have a personal Web certificate installed on their browser (or other client software) which is issued by a Certifying Authority (CA) recognized by the web server.</para>
+          <orderedlist>
+            <listitem>
+              <para> See the <ulink url="install.html#https">HTTPS installation instructions</ulink> to configure your Web server. If you are using HTTPS with Tomcat, note that the <literal>&lt;Connector&gt;</literal> tag <emphasis>must</emphasis> include the attribute <literal>clientAuth=&quot;true&quot;</literal> so the server requests a personal Web certificate from the client.</para>
+            </listitem>
+            <listitem>
+              <para> Add the <literal>org.dspace.authenticate.X509Authentication</literal> plugin <emphasis>first</emphasis> to the list of stackable authentication methods in the value of the configuration key <literal>plugin.sequence.org.dspace.authenticate.AuthenticationMethod</literal><emphasis>E.g.:</emphasis></para>
+              <screen>
+    plugin.sequence.org.dspace.authenticate.AuthenticationMethod = \
+        org.dspace.authenticate.X509Authentication, \
+        org.dspace.authenticate.PasswordAuthentication
+ 
+</screen>
+            </listitem>
+            <listitem>
+              <para> You must also configure DSpace with the same CA certificates as the web server, so it can accept and interpret the clients&apos; certificates. It can share the same keystore file as the web server, or a separate one, or a CA certificate in a file by itself. Configure it by <emphasis>one</emphasis> of these methods, either the Java keystore </para>
+              <screen>
+  authentication.x509.keystore.path = <emphasis> path to Java keystore
+	file</emphasis>
+  authentication.x509.keystore.password = <emphasis> password to access the
+	keystore</emphasis>
+</screen>
+              <para> ...or the separate CA certificate file (in PEM or DER format): </para>
+              <screen>
+  authentication.x509.ca.cert = <emphasis> path to certificate file for CA
+	whose client certs to accept.</emphasis>
+</screen>
+              </listitem>
+            <listitem>
+              <para> Choose whether to enable auto-registration: If you want users who authenticate successfully to be automatically registered as new E-Persons if they are not already, set the <literal>authentication.x509.autoregister</literal> configuration property to <literal>true</literal>. This lets you automatically accept all users with valid personal certificates. The default is <literal>false</literal>.</para>
+            </listitem>
+          </orderedlist>
+        </section>
+        <section remap="h4">
+          <title>Example of a Custom Authentication Method</title>
+          <para>Also included in the source is an implementation of an authentication method used at MIT, <literal>edu.mit.dspace.MITSpecialGroup</literal>. This does not actually authenticate a user, it <emphasis>only</emphasis> adds the current user to a special (dynamic) group called &apos;MIT Users&apos; (which must be present in the system!). This allows us to create authorization policies for MIT users without having to manually maintain membership of the MIT users group.</para>
+          <para>By keeping this code in a separate method, we can customize the authentication process for MIT by simply adding it to the stack in the DSpace configuration. None of the code has to be touched.</para>
+          <para>You can create your own custom authentication method and add it to the stack. Use the most similar existing method as a model, e.g. <literal>org.dspace.authenticate.PasswordAuthentication</literal> for an &quot;explicit&quot; method (with credentials entered interactively) or <literal>org.dspace.authenticate.X509Authentication</literal> for an implicit method.</para>
+        </section>
+        <section remap="h4">
+          <title><anchor id="docbook-configure.html-ipauthentication" xreflabel="Configuring IP
+Authentication"/>Configuring IP Authentication</title>
+          <para>You can enable IP authentication by adding its method to the stack in the DSpace configuration, e.g.:</para>
+          <screen>
+plugin.sequence.org.dspace.authenticate.AuthenticationMethod =
+	org.dspace.authenticate.IPAuthentication
+</screen>
+          <para>You are than able to map DSpace groups to IP&apos;s in dspace.cfg by setting authentication.ip.GROUPNAME = iprange[, iprange ...], e.g:</para>
+          <screen>
+  authentication.ip.MY_UNIVERSITY = 10.1.2.3, \            # Full IP
+                                    13.5, \                # Partial
+	IP
+                                    11.3.4.5/24, \         # with
+	CIDR
+                                    12.7.8.9/255.255.128.0 # with
+	netmask
+ 
+</screen>
+          <para><emphasis role="bold">Note:</emphasis> if the Groupname contains blanks you must escape the, e.g. Department\ of\ Statistics</para>
+        </section>
+        <section remap="h4">
+          <title><anchor id="docbook-configure.html-ldap" xreflabel="Configuring LDAP
+Authentication"/>Configuring LDAP Authentication</title>
+          <para>You can enable LDAP authentication by adding its method to the stack in the DSpace configuration, e.g.</para>
+          <screen>
+plugin.sequence.org.dspace.authenticate.AuthenticationMethod =
+	org.dspace.authenticate.LDAPAuthentication
+</screen>
+          <para>If LDAP is enabled in the dspace.cfg file, then new users will be able to register by entering their username and password without being sent the registration token. If users do not have a username and password, then they can still register and login with just their email address the same way they do now.</para>
+          <para>If you want to give any special privileges to LDAP users, create a stackable authentication method to automatically put people who have a netid into a special group. You might also want to give certain email addresses special privileges. Refer to the <anchor id="docbook-configure.html--authenticate.1" xreflabel="Custom Authentication Code"/>Custom Authentication Code section above for more information about how to do this.</para>
+          <para>Here is an explanation of what each of the different configuration parameters are for:</para>
+          <itemizedlist>
+            <listitem>
+              <para>
+                <emphasis role="bold">ldap.enable</emphasis>
+              </para>
+              <para>  This setting will enable or disable LDAP authentication in DSpace. With the setting off, users will be required to register and login with their email address. With this setting on, users will be able to login and register with their LDAP user ids and passwords.</para>
+            </listitem>
+            <listitem>
+              <para>
+                <emphasis role="bold">webui.ldap.autoregister</emphasis>
+              </para>
+              <para>  This will turn LDAP autoregistration on or off. With this on, a new EPerson object will be created for any user who successfully authenticates against the LDAP server when they first login. With this setting off, the user must first register to get an EPerson object by entering their ldap username and password and filling out the forms.</para>
+            </listitem>
+            <listitem>
+              <para>
+                <emphasis role="bold">ldap.provider_url = ldap://ldap.myu.edu/o=myu.edu</emphasis>
+              </para>
+              <para>  This is the url to your institution&apos;s ldap server. You may or may not need the /o=myu.edu part at the end. Your server may also require the ldaps:// protocol.</para>
+            </listitem>
+            <listitem>
+              <para>
+                <emphasis role="bold">ldap.id_field = uid</emphasis>
+              </para>
+              <para>  This is the unique identifier field in the LDAP directory where the username is stored.</para>
+            </listitem>
+            <listitem>
+              <para>
+                <emphasis role="bold">ldap.object_context = ou=people,o=myu.edu</emphasis>
+              </para>
+              <para>  This is the object context used when authenticating the user. It is appended to the ldap.id_field and username. For example uid=username,ou=people,o=myu.edu. You will need to modify this to match your ldap configuration.</para>
+            </listitem>
+            <listitem>
+              <para>
+                <emphasis role="bold">ldap.search_context = ou=people</emphasis>
+              </para>
+              <para>  This is the search context used when looking up a user&apos;s ldap object to retrieve their data for autoregistering. With ldap.autoregister turned on, when a user authenticates without an EPerson object we search the ldap directory to get their name and email address so that we can create one for them. So after we have authenticated against uid=username,ou=people,o=byu.edu we now search in ou=people for filtering on [uid=username]. Often the ldap.search_context is the same as the ldap.object_context parameter. But again this depends on your ldap server configuration.</para>
+            </listitem>
+            <listitem>
+              <para>
+                <emphasis role="bold">ldap.email_field = mail</emphasis>
+              </para>
+              <para>  This is the ldap object field where the user&apos;s email address is stored. &quot;mail&quot; is the default and the most common for ldap servers. If the mail field is not found the username will be used as the email address when creating the eperson object.</para>
+            </listitem>
+            <listitem>
+              <para>
+                <emphasis role="bold">ldap.surname_field = sn</emphasis>
+              </para>
+              <para>  This is the ldap object field where the user&apos;s last name is stored. &quot;sn&quot; is the default and is the most common for ldap servers. If the field is not found the field will be left blank in the new eperson object.</para>
+            </listitem>
+            <listitem>
+              <para>
+                <emphasis role="bold">ldap.givenname_field = givenName</emphasis>
+              </para>
+              <para>  This is the ldap object field where the user&apos;s given names are stored. I&apos;m not sure how common the givenName field is in different ldap instances. If the field is not found the field will be left blank in the new eperson object.</para>
+            </listitem>
+            <listitem>
+              <para>
+                <emphasis role="bold">ldap.phone_field = telephoneNumber</emphasis>
+              </para>
+              <para>  This is the field where the user&apos;s phone number is stored in the ldap directory. If the field is not found the field will be left blank in the new eperson object.</para>
+            </listitem>
+          </itemizedlist>
+        </section>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-statistics" xreflabel="Configuring System
+Statistical Reports"/>Configuring System Statistical Reports</title>
+        <para>Statistics for the system can be made available at <literal>http://www.mydspaceinstance.edu/statistics</literal>. To use the system statistics you will have to initialise them as per the installation documentation, but before you do so you need to perform the customisations discussed here in order to ensure that the reports are generated correctly.</para>
+        <section remap="h4">
+          <title>Configuration File</title>
+          <para>Configuration for the statistics system are in <literal>[dspace]/config/dstat.cfg</literal> and the file should guide you to correctly filling in the details required. For the most part you will not need to change this file. You may wish to edit <literal>start.year</literal> and <literal>start.month</literal> to customize the start date of the statistics.</para>
+        </section>
+        <section remap="h4">
+          <title>Generating the statistics</title>
+          <para>The following scripts must be run (in this order) generate the statistcis:</para>
+          <screen>
+stat-initial
+stat-general
+stat-monthly
+stat-report-initial
+stat-report-general
+stat-report-monthly
+</screen>
+          <para>Scripts eding with <literal>-general</literal> do the work for building reports spanning the entire history of the archive; scripts ending <literal>-initial</literal> are to initialise the reports by doing monthly reports from some start date up to the present; scripts ending <literal>-monthly</literal> generate a single monthly report <emphasis>for the current month</emphasis>.</para>
+          <para><literal>stat-inital</literal> and <literal>stat-report-inital</literal> must be run to generate the first set of statistics. Following that, <literal>stat-monthly</literal>, <literal>stat-general</literal>, <literal>stat-report-monthly</literal> and <literal>stat-report-general</literal> should be run daily to update the statistics reports.</para>
+          <para>If you want additional customisations, you can find additional information about the scripts by running:</para>
+          <screen>
+[dspace]/bin/dsrun org.dspace.app.statistics.LogAnalyser -help
+[dspace]/bin/dsrun org.dspace.app.statistics.ReportGenerator -help
+</screen>
+        </section>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-oai" xreflabel="Activating Additional OAI-PMH
+Crosswalks"/>Activating Additional OAI-PMH Crosswalks</title>
+        <para>DSpace comes with an unqualified DC Crosswalk used in the default OAI-PMH data provider. There are also other Crosswalks bundled with the DSpace distribution which can be activated by editing one or more configuration files. How to do this for each available Crosswalk is described below. The DSpace source includes the following crosswalk plugins available for use with OAI-PMH:</para>
+        <itemizedlist>
+          <listitem>
+            <para><emphasis role="bold">
+                <literal>mets</literal>
+              </emphasis>
+  - The manifest document from a DSpace METS SIP.</para>
+          </listitem>
+          <listitem>
+            <para><emphasis role="bold">
+                <literal>mods</literal>
+              </emphasis>
+  - MODS metadata, produced by the <link linkend="docbook-configure.html-mods">table-driven MODS dissemination crosswalk</link>.</para>
+          </listitem>
+          <listitem>
+            <para><emphasis role="bold">
+                <literal>qdc</literal>
+              </emphasis>
+  - Qualfied Dublin Core, produced by the <link linkend="docbook-configure.html-qdc">configurable QDC crosswalk</link>. Note that this QDC does <emphasis>not</emphasis> include all of the DSpace &quot;dublin core&quot; metadata fields, since the XML standard for QDC is defined for a different set of elements and qualifiers.</para>
+          </listitem>
+        </itemizedlist>
+        <para>OAI-PMH crosswalks based on Crosswalk Plugins are activated as follows:</para>
+        <orderedlist>
+          <listitem>
+            <para> Ensure the crosswalk plugin has a <emphasis>lower-case</emphasis> name (possibly in addition to its upper-case name) in the plugin configuration.</para>
+          </listitem>
+          <listitem>
+            <para> Add a line to the file <literal>config/templates/oaicat.properties</literal> of the form:</para>
+            <para>
+              <literal>Crosswalks.</literal>
+              <emphasis>plugin_name</emphasis>
+              <literal>=org.dspace.app.oai.PluginCrosswalk</literal>
+            </para>
+            <para> substituting the plugin&apos;s name, e.g. <literal>&quot;mets&quot;</literal> or <literal>&quot;qdc&quot;</literal>for <emphasis>plugin_name</emphasis>.</para>
+          </listitem>
+          <listitem>
+            <para> Run the <literal>bin/install-configs</literal> script</para>
+          </listitem>
+          <listitem>
+            <para> Restart your servlet container, e.g. Tomcat, for the change to take effect.</para>
+          </listitem>
+        </orderedlist>
+        <section remap="h4">
+          <title>DIDL</title>
+          <para>By activating the DIDL provider, DSpace items are represented as MPEG-21 DIDL objects. These DIDL objects are XML documents that wrap both the Dublin Core metadata that describes the DSpace item and its actual bitstreams. A bitstream is provided inline in the DIDL object in a base64 encoded manner, and/or by means of a pointer to the bitstream. The data provider exposes DIDL objects via the metadataPrefix didl.</para>
+          <para>The crosswalk does not deal with special characters and purposely skips dissemination of the <literal>license.txt</literal> file awaiting a better understanding on how to map DSpace rights information to MPEG21-DIDL.</para>
+          <para>The DIDL Crosswalk can be activated as follows:</para>
+          <itemizedlist>
+            <listitem>
+              <para> Uncomment the <literal>oai.didl.maxresponse</literal> item in <literal>dspace.cfg</literal></para>
+            </listitem>
+            <listitem>
+              <para> Uncomment the DIDL Crosswalk entry from the <literal>config/templates/oaicat.properties</literal> file</para>
+            </listitem>
+            <listitem>
+              <para> Run the <literal>bin/install-configs</literal> script</para>
+            </listitem>
+            <listitem>
+              <para> Restart Tomcat</para>
+            </listitem>
+            <listitem>
+              <para> Verify the Crosswalk is activated by accessing a URL such as <literal>http://mydspace/oai/request?verb=ListRecords&amp;metadataPrefix=didl</literal></para>
+            </listitem>
+          </itemizedlist>
+        </section>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-packager" xreflabel="Configuring Packager Plugins"/>Configuring Packager Plugins</title>
+        <para>Package ingester plugins are configured as <ulink url="business.html#plugin">named or self-named plugins</ulink> for the interface <literal>org.dspace.content.packager.PackageIngester</literal>. Package disseminator plugins are configured as <ulink url="business.html#plugin">named or self-named plugins</ulink> for the interface <literal>org.dspace.content.packager.PackageDisseminator</literal>.</para>
+        <para>You can add names for the existing plugins, and add new plugins, by altering these configuration properties. See the <ulink url="business.html#plugin">Plugin Manager</ulink> architecture for more information about plugins.</para>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-crosswalk" xreflabel="Configuring Crosswalk Plugins"/>Configuring Crosswalk Plugins</title>
+        <para>Ingestion crosswalk plugins are configured as <ulink url="business.html#plugin">named or self-named plugins</ulink> for the interface <literal>org.dspace.content.crosswalk.IngestionCrosswalk</literal>. Dissemination crosswalk plugins are configured as <ulink url="business.html#plugin">named or self-named plugins</ulink> for the interface <literal>org.dspace.content.crosswalk.DisseminationCrosswalk</literal>.</para>
+        <para>You can add names for existing crosswalks, add new plugin classes, and add new configurations for the configurable crosswalks as noted below.</para>
+        <section remap="h4">
+          <title><anchor id="docbook-configure.html-mods" xreflabel="Configurable MODS dissemination
+crosswalk"/>Configurable MODS dissemination crosswalk</title>
+          <para>The MODS crosswalk is a self-named plugin. To configure an instance of the MODS crosswalk, add a property to the DSpace configuration starting with <literal>&quot;crosswalk.mods.properties.&quot;</literal>; the final word of the property name becomes the plugin&apos;s name. For example, a property name <literal>crosswalk.mods.properties.MODS</literal> defines a crosswalk plugin named <literal>&quot;MODS&quot;</literal>.</para>
+          <para>The value of this property is a path to a separate properties file containing the configuration for this crosswalk. The pathname is relative to the DSpace configuration directory, i.e. the <literal>config</literal> subdirectory of the DSpace install directory. So, a line like:</para>
+          <screen>
+ crosswalk.mods.properties.MODS = crosswalks/mods.properties
+</screen>
+          <para> defines a crosswalk named <literal>MODS</literal> whose configuration comes from the file <literal>[dspace]/config/crosswalks/mods.properties</literal>.</para>
+          <para> The MODS crosswalk properties file is a list of properties describing how DSpace metadata elements are to be turned into elements of the MODS XML output document. The property name is a concatenation of the metadata schema, element name, and optionally the qualifier. For example, the <literal>contributor.author</literal> element in the native Dublin Core schema would be: <literal>dc.contributor.author</literal>. The value of the property is a line containing two segments separated by the vertical bar (<literal>&quot;|&quot;</literal>): The first part is an XML fragment which is copied into the output document. The second is an XPath expression describing where in that fragment to put the value of the metadata element. For example, in this property:</para>
+          <screen>
+dc.contributor.author = &lt;mods:name&gt;&lt;mods:role&gt;&lt;mods:roleTerm
+	type=&quot;text&quot;&gt;author&lt;/mods:roleTerm&gt;&lt;/mods:role&gt;&lt;mods:namePart&gt;%s&lt;/mods:
+;&lt;mods:namePart&gt;%s&lt;/mods:namePart&gt;&lt;/mods:name&gt; |
+	mods:namePart/text()
+</screen>
+          <para> Some of the examples include the string <literal>&quot;%s&quot;</literal> in the prototype XML where the text value is to be inserted, but don&apos;t pay any attention to it, it is an artifact that the crosswalk ignores.  For example, given an author named <emphasis>Jack Florey</emphasis>, the crosswalk will insert</para>
+          <screen>
+
+            <literal> &lt;mods:name&gt; &lt;mods:role&gt; &lt;mods:roleTerm
+	type=&quot;text&quot;&gt;author&lt;/mods:roleTerm&gt; &lt;/mods:role&gt;
+	&lt;mods:namePart&gt;</literal>
+            <emphasis> Jack Florey</emphasis>
+            <literal> &lt;/mods:namePart&gt;
+	&lt;/mods:name&gt;</literal>
+
+          </screen>
+          <para> into the output document. Read the example configuration file for more details. </para>
+        </section>
+        <section remap="h4">
+          <title><anchor id="docbook-configure.html-qdc" xreflabel="Configurable Qualified Dublin Core (QDC)
+dissemination crosswalk"/>Configurable Qualified Dublin Core (QDC) dissemination crosswalk</title>
+          <para>The QDC crosswalk is a self-named plugin. To configure an instance of the QDC crosswalk, add a property to the DSpace configuration starting with <literal>&quot;crosswalk.qdc.properties.&quot;</literal>; the final word of the property name becomes the plugin&apos;s name. For example, a property name <literal>crosswalk.qdc.properties.QDC</literal> defines a crosswalk plugin named <literal>&quot;QDC&quot;</literal>.</para>
+          <para>The value of this property is a path to a separate properties file containing the configuration for this crosswalk. The pathname is relative to the DSpace configuration directory, i.e. the <literal>config</literal> subdirectory of the DSpace install directory. So, a line like:</para>
+          <screen>
+  crosswalk.qdc.properties.QDC = crosswalks/qdc.properties
+</screen>
+          <para> defines a crosswalk named <literal>QDC</literal> whose configuration comes from the file <literal>[dspace]/config/crosswalks/qdc.properties</literal>.</para>
+          <para> You&apos;ll also need to configure the namespaces and schema location strings for the XML output generated by this crosswalk. The namespaces property names are of the format:</para>
+          <para><literal>crosswalk.qdc.namespace.</literal><emphasis>prefix</emphasis> = <emphasis>uri</emphasis></para>
+          <para> where <emphasis>prefix</emphasis> is the namespace prefix and <emphasis>uri</emphasis> is the namespace URI.</para>
+          <para>For example, this shows how a crosswalk named &quot;QDC&quot; would be configured:</para>
+          <screen>
+crosswalk.qdc.properties.QDC = crosswalks/QDC.properties
+crosswalk.qdc.namespace.QDC.dc = http://purl.org/dc/elements/1.1/
+crosswalk.qdc.namespace.QDC.dcterms = http://purl.org/dc/terms/
+crosswalk.qdc.schemaLocation.QDC  = \
+  http://purl.org/dc/terms/
+	http://dublincore.org/schemas/xmls/qdc/2003/04/02/qualifieddc.xsd
+</screen>
+            <para>The QDC crosswalk properties file is a list of properties describing how DSpace metadata elements are to be turned into elements of the Qualified DC XML output document. The property name is a concatenation of the metadata schema, element name, and optionally the qualifier. For example, the <literal>contributor.author</literal> element in the native Dublin Core schema would be: <literal>dc.contributor.author</literal>. The value of the property is an XML fragment, the element whose value will be set to the value of the metadata field in the property key.</para>
+          <para>For example, in this property:</para>
+          <screen>
+  dc.coverage.temporal = &lt;dcterms:temporal /&gt;
+</screen>
+          <para> the generated XML in the output document would look like,
+	e.g.: <screen>
+  &lt;dcterms:temporal&gt;Fall, 2005&lt;/dcterms:temporal&gt;
+</screen></para>
+        </section>
+        <section remap="h4">
+          <title>XSLT-based crosswalks</title>
+          <para>The XSLT crosswalks use XSL stylesheet transformation (XSLT) to transform an XML-based external metadata format to or from DSpace&apos;s internal metadata. XSLT crosswalks are much more powerful and flexible than the configurable MODS and QDC crosswalks, but they demand some esoteric knowledge (XSL stylesheets). Given that, you can create all the crosswalks you need just by adding stylesheets and configuration lines, without touching any of the Java code.</para>
+          <para>A submission crosswalk is described by a configuration key starting with &apos;<literal>crosswalk.submission.</literal>&quot;, like</para>
+          <screen>
+  crosswalk.submission.<emphasis> PluginName</emphasis>.stylesheet = <emphasis>
+	path</emphasis>
+</screen>
+          <para> The <emphasis>PluginName</emphasis> is, of course, the plugin&apos;s name. The <emphasis>path</emphasis> value is the path to the file containing the crosswalk stylesheet (relative to <literal>dspace.dir/config</literal>).</para>
+          <para> Here is an example that configures a crosswalk named &quot;LOM&quot; using a stylesheet in <literal>[dspace]/config/crosswalks/d-lom.xsl</literal>:</para>
+          <screen>
+  crosswalk.submission.stylesheet.LOM = crosswalks/d-lom.xsl
+</screen>
+            <para>A dissemination crosswalk is described by a configuration key starting with &apos;<literal>crosswalk.dissemination.</literal>&quot;, like</para>
+          <screen>
+  crosswalk.dissemination.<emphasis> PluginName</emphasis>.stylesheet = <emphasis>
+	path</emphasis>
+</screen>
+          <para> The <emphasis>PluginName</emphasis> is, of course, the plugin&apos;s name. The <emphasis>path</emphasis> value is the path to the file containing the crosswalk stylesheet (relative to <literal>dspace.dir/config</literal>).</para>
+          <para> You can make two different plugin names point to the same crosswalk, by adding two configuration entries with the same path, e.g.</para>
+          <screen>
+    crosswalk.submission.MyFormat.stylesheet =
+	crosswalks/myformat.xslt
+    crosswalk.submission.almost_DC.stylesheet =
+	crosswalks/myformat.xslt
+</screen>
+            <para>The dissemination crosswalk must also be configured with an XML Namespace (including prefix and URI) and an XML Schema for its output format. This is configured on additional properties in the DSpace Configuration, i.e.:</para>
+          <screen>
+   crosswalk.dissemination.<emphasis> PluginName</emphasis>.namespace.<emphasis> Prefix</emphasis> = <emphasis>
+	namespace-URI</emphasis>
+   crosswalk.dissemination.<emphasis> PluginName</emphasis>.schemaLocation = <emphasis>
+	schemaLocation value</emphasis>
+</screen>
+          <para> For example: <screen>
+   crosswalk.dissemination.qdc.namespace.dc =
+	http://purl.org/dc/elements/1.1/
+   crosswalk.dissemination.qdc.namespace.dcterms =
+	http://purl.org/dc/terms/
+   crosswalk.dissemination.qdc.schemaLocation = \
+      http://purl.org/dc/elements/1.1/
+	http://dublincore.org/schemas/xmls/qdc/2003/04/02/qualifieddc.xsd
+</screen></para>
+        </section>
+        <section remap="h4">
+          <title>DSpace Intermediate Metadata (DIM) format</title>
+          <para> XSLT crosswalk plugins translate between the external metadata format and an XML format called <emphasis>DSpace Intermediate Metadata</emphasis>, which exists <emphasis>only</emphasis> for the purpose of XSLT crosswalks. It is <emphasis>never</emphasis> to be exported from DSpace, since it is not an acknowledged metadata format, it is simply an expression of the way DSpace stores its metadata fields internally.  All the elements in a DIM document are in the namespace <literal>http://www.dspace.org/xmlns/dspace/dim</literal>.</para>
+          <para>The root element is named <literal>dim</literal>. It has zero or more children, all <literal>field</literal> elements. It may have an attribute <literal>dspaceType</literal>, which identifies the type of object (&quot;ITEM&quot;, &quot;COLLECTION&quot;, or &quot;COMMUNITY&quot;) this metadata describes. This attribute is only guaranteed to be set for dissemination crosswalks.</para>
+          <para>Each <literal>field</literal> element may have the following attributes:</para>
+          <itemizedlist>
+            <listitem>
+              <para><literal>mdschema</literal>  (Required) The metadata schema, e.g. <literal>&quot;dc&quot;</literal>.</para>
+            </listitem>
+            <listitem>
+              <para><literal>element</literal>  (Required) Element name, such as &quot;contributor&quot;.</para>
+            </listitem>
+            <listitem>
+              <para><literal>qualifier</literal>  Qualifier name, such as &quot;author&quot;.</para>
+            </listitem>
+            <listitem>
+              <para><literal>lang</literal>  Language code describing language of this entry.</para>
+            </listitem>
+          </itemizedlist>
+          <para> The value of <literal>field</literal> is the value of that metadata field. Fields with the same qualifiers may be repeated.  Here is an example of the DIM format:</para>
+          <screen>
+    &lt;dim:dim xmlns:dim=&quot;http://www.dspace.org/xmlns/dspace/dim&quot;
+	dspaceType=&quot;ITEM&quot;&gt;
+      &lt;dim:field mdschema=&quot;dc&quot; element=&quot;title&quot;
+	lang=&quot;en_US&quot;&gt;
+        The Endochronic Properties of Resublimated Thiotimonline
+      &lt;/dim:field&gt;
+      &lt;dim:field mdschema=&quot;dc&quot; element=&quot;contributor&quot;
+	qualifier=&quot;author&quot;&gt;
+        Isaac Asimov
+      &lt;/dim:field&gt;
+      &lt;dim:field mdschema=&quot;dc&quot; element=&quot;language&quot;
+	qualifier=&quot;iso&quot;&gt;
+        eng
+      &lt;/dim:field&gt;
+      &lt;dim:field mdschema=&quot;dc&quot; element=&quot;subject&quot; qualifier=&quot;other&quot;
+	lang=&quot;en_US&quot;&gt;
+        time-travel scifi hoax
+      &lt;/dim:field&gt;
+      &lt;dim:field element=&quot;publisher&quot;&gt;
+        Boston University Department of Biochemistry
+      &lt;/dim:field&gt;
+    &lt;/dim:dim&gt;
+</screen>
+          </section>
+        <section remap="h4">
+          <title>Testing XSLT Crosswalks</title>
+          <para> The XSLT crosswalks will automatically reload an XSL stylesheet that has been modified, so you can edit and test stylesheets without restarting DSpace.  You can test a dissemination crosswalk by hooking it up to an OAI-PMH crosswalk and using an OAI request to get the metadata for a known item.</para>
+          <para>Testing the submission crosswalk is more difficult, so we have supplied a command-line utility to help. It calls the crosswalk plugin to translate an XML document you submit, and displays the resulting intermediate XML (DIM). Invoke it with:</para>
+          <screen>
+<emphasis> [dspace]</emphasis>/bin/dsrun
+	org.dspace.content.crosswalk.XSLTIngestionCrosswalk [-l] <emphasis> plugin
+	input-file</emphasis>
+</screen>
+          <para> ..where <emphasis>plugin</emphasis> is the name of the crosswalk plugin to test (e.g. &quot;LOM&quot;), and <emphasis>input-file</emphasis> is a file containing an XML document of metadata in the appropriate format.</para>
+          <para> Add the <literal>-l</literal> option to to pass the ingestion crosswalk a list of elements instead of a whole document, as if the List form of the ingest() method had been called. This is needed to test ingesters for formats like DC that get called with lists of elements instead of a root element.</para>
+        </section>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-mediafilters" xreflabel="Creating a new Media/Format
+Filter"/>Creating a new Media/Format Filter</title>
+        <section remap="h4">
+          <title>Creating a simple Media Filter</title>
+          <para>New Media Filters <emphasis role="bold">must implement</emphasis> the <literal>org.dspace.app.mediafilter.FormatFilter</literal> interface. More information on the methods you need to implement is provided in the <literal>FormatFilter.java</literal> source file. For example:</para>
+          <screen>
+
+            <literal> public class MySimpleMediaFilter implements
+	FormatFilter</literal>
+
+          </screen>
+            <para>Alternatively, you could extend the <literal>org.dspace.app.mediafilter.MediaFilter</literal> class, which just defaults to performing no pre/post-processing of bitstreams before or after filtering.</para>
+          <screen>
+
+            <literal> public class MySimpleMediaFilter extends
+	MediaFilter</literal>
+
+          </screen>
+            <para>You must give your new filter a &quot;name&quot;, by adding it and its name to the <literal>plugin.named.org.dspace.app.mediafilter.FormatFilter</literal> field in <literal>dspace.cfg</literal>. In addition to naming your filter, make sure to specify its input formats in the <literal>filter.&lt;class path&gt;.inputFormats</literal> config item. Note the input formats must match the <literal>short description</literal> field in the <ulink url="appendix.html#bitstreamformatregistry">Bitstream Format Registry</ulink> (i.e. <literal>bitstreamformatregistry</literal> table).</para>
+          <screen>
+
+            <literal> plugin.named.org.dspace.app.mediafilter.FormatFilter = \
+	org.dspace.app.mediafilter.MySimpleMediaFilter = My Simple Text
+	Filter, \ ...
+	filter.org.dspace.app.mediafilter.MySimpleMediaFilter.inputFormats =
+	Text</literal>
+
+          </screen>
+            <simpara>
+            <emphasis>WARNING: If you neglect to define the <literal>inputFormats</literal> for a particular filter, the <literal>MediaFilterManager</literal> will never call that filter, since it will never find a bitstream which has a format matching that filter&apos;s input format(s).</emphasis>
+          </simpara>
+          <para>If you have a complex Media Filter class, which actually performs different filtering for different formats (e.g. conversion from Word to PDF <emphasis role="bold">and</emphasis> conversion from Excel to CSV), you should define this as a <ulink url="selfnamedfilter">Dynamic / Self-Named Format Filter</ulink>.</para>
+        </section>
+        <section remap="h4">
+          <title>Creating a Dynamic or &quot;Self-Named&quot; Format Filter</title>
+          <para>If you have a more complex Media/Format Filter, which actually performs <emphasis role="bold">multiple</emphasis> filtering or conversions for different formats (e.g. conversion from Word to PDF <emphasis role="bold">and</emphasis> conversion from Excel to CSV), you should have define a class which implements the <literal>FormatFilter</literal> interface, while also extending the <ulink url="business.html#selfnamedplugin">
+              <literal>SelfNamedPlugin</literal>
+            </ulink>
+ class. For example:</para>
+          <screen>
+
+            <literal> public class MyComplexMediaFilter extends
+	SelfNamedPlugin implements FormatFilter</literal>
+
+          </screen>
+            <para>Since <literal>SelfNamedPlugins</literal> are self-named (as stated), they must provide the various names the plugin uses by defining a <ulink url="business.html#pluginmethods">getPluginNames()</ulink> method. Generally speaking, each &quot;name&quot; the plugin uses should correspond to a different type of filter it implements (e.g. &quot;Word2PDF&quot; and &quot;Excel2CSV&quot; are two good names for a complex media filter which performs both Word to PDF and Excel to CSV conversions).</para>
+          <para>Self-Named Media/Format Filters are also configured differently in <literal>dspace.cfg</literal>. Below is a general template for a Self Named Filter (defined by an imaginary <literal>MyComplexMediaFilter</literal> class, which can perform both Word to PDF and Excel to CSV conversions):</para>
+          <screen>
+
+            <literal> #Add to a list of all Self Named filters
+	plugin.selfnamed.org.dspace.app.mediafilter.FormatFilter = \
+	org.dspace.app.mediafilter.MyComplexMediaFilter #Define input formats
+	for each &quot;named&quot; plugin this filter implements
+	filter.org.dspace.app.mediafilter.MyComplexMediaFilter.Word2PDF.inputF
+ormats = Microsoft Word
+	filter.org.dspace.app.mediafilter.MyComplexMediaFilter.Excel2CSV.input
+Formats = Microsoft Excel</literal>
+
+          </screen>
+            <para>As shown above, each Self-Named Filter class must be listed in the <literal>plugin.selfnamed.org.dspace.app.mediafilter.FormatFilter</literal> item in <literal>dspace.cfg</literal>. In addition, each Self-Named Filter <emphasis role="bold">must</emphasis> define the input formats for <emphasis>each named plugin</emphasis> defined by that filter. In the above example the <literal>MyComplexMediaFilter</literal> class is assumed to have defined two named plugins, <literal>Word2PDF</literal> and <literal>Excel2CSV</literal>. So, these two valid plugin names (&quot;Word2PDF&quot; and &quot;Excel2CSV&quot;) <emphasis role="bold">must</emphasis> be returned by the <literal>getPluginNames()</literal> method of the <literal>MyComplexMediaFilter</literal> class.</para>
+          <para>These named plugins take different input formats as defined above (see the corresponding <literal>inputFormats</literal> setting). <emphasis>WARNING: If you neglect to define the <literal>inputFormats</literal> for a particular named plugin, the <literal>MediaFilterManager</literal> will never call that plugin, since it will never find a bitstream which has a format matching that plugin&apos;s input format(s).</emphasis></para>
+          <para>For a particular Self-Named Filter, you are also welcome to define additional configuration settings in <literal>dspace.cfg</literal>. To continue with our current example, each of our imaginary plugins actually results in a different output format (Word2PDF creates &quot;Adobe PDF&quot;, while Excel2CSV creates &quot;Comma Separated Values&quot;). To allow this complex Media Filter to be even more configurable (especially across institutions, with potential different &quot;Bitstream Format Registries&quot;), you may wish to allow for the output format to be customizable for each named plugin. For example:</para>
+          <screen>
+
+            <literal> #Define output formats for each named plugin
+	filter.org.dspace.app.mediafilter.MyComplexMediaFilter.Word2PDF.output
+Format = Adobe PDF
+	filter.org.dspace.app.mediafilter.MyComplexMediaFilter.Excel2CSV.outpu
+tFormat = Comma Separated Values</literal>
+
+          </screen>
+            <para>Any custom configuration fields in <literal>dspace.cfg</literal> defined by your filter are ignored by the <literal>MediaFilterManager</literal>, so it is up to your custom media filter class to read those configurations and apply them as necessary. For example, you could use the following sample Java code in your <literal>MyComplexMediaFilter</literal> class to read these custom <literal>outputFormat</literal> configurations from <literal>dspace.cfg</literal> :</para>
+          <screen>
+
+            <literal> //get &quot;outputFormat&quot; configuration from dspace.cfg
+	String outputFormat =
+	ConfigurationManager.getProperty(MediaFilterManager.FILTER_PREFIX +
+	&quot;.&quot; + MyComplexMediaFilter.class.getName() + &quot;.&quot; +
+	this.getPluginInstanceName() + &quot;.outputFormat&quot;);</literal>
+
+          </screen>
+          </section>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-templates" xreflabel="Configuration Files for
+Other Applications"/>Configuration Files for Other Applications</title>
+        <para>To ease the hassle of keeping configuration files for other applications involved in running a DSpace site, for example Apache, in sync, the DSpace system can automatically update them for you when the main DSpace configuration is changed. This feature of the DSpace system is entirely optional, but we found it useful.</para>
+        <para>The way this is done is by placing the configuration files for those applications in <literal>[dspace]/config/templates</literal>, and inserting special values in the configuration file that will be filled out with appropriate DSpace configuration properties. Then, tell DSpace where to put filled-out, &apos;live&apos; version of the configuration by adding an appropriate property to <literal>dspace.cfg</literal>, and run <literal>[dspace]/bin/install-configs</literal>.</para>
+        <para>Take the <literal>apache13.conf</literal> file as an example. This contains plenty of Apache-specific stuff, but where it uses a value that should be kept in sync across DSpace and associated applications, a &apos;placeholder&apos; value is written. For example, the host name:</para>
+        <screen>
+ServerName @@dspace.hostname@@
+</screen>
+        <para>The text <literal>@@dspace.hostname@@</literal> will be filled out with the value of the <literal>dspace.hostname</literal> property in <literal>dspace.cfg</literal>. Then we decide where we want the &apos;live&apos; version, that is, the version actually read in by Apache when it starts up, will go.</para>
+        <para>Let&apos;s say we want the live version to be located at <literal>/opt/apache/conf/dspace-httpd.conf</literal>. To do this, we add the following property to <literal>dspace.cfg</literal> so DSpace knows where to put it:</para>
+        <screen>
+config.template.apache13.conf = /opt/apache/conf/dspace-httpd.conf
+</screen>
+        <para>Now, we run <literal>[dspace]/bin/install-configs</literal>. This reads in <literal>[dspace]/config/templates/apache13.conf</literal>, and places a copy at <literal>/opt/apache/conf/dspace-httpd.conf</literal> with the placeholders filled out.</para>
+        <para>So, in <literal>/opt/apache/conf/dspace-httpd.conf</literal>, there will be a line like:</para>
+        <screen>
+ServerName dspace.myu.edu
+</screen>
+        <para>The advantage of this approach is that if a property like the hostname changes, you can just change it in <literal>dspace.cfg</literal> and run <literal>install-configs</literal>, and all of your tools&apos; configuration files will be updated.</para>
+        <para>However, take care to make all your edits to the versions in <literal>[dspace]/config/templates</literal>! It&apos;s a wise idea to put a big reminder at the top of each file, since someone might unwittingly edit a &apos;live&apos; configuration file which would later be overwritten.</para>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-browse-index" xreflabel="Browse Index
+Creation"/>Browse Index Creation</title>
+        <!-- (ScottPhillips: This should not be here - this isn't describing how to customize dspace it's how to run the index command. Unfortunitaly there is not a good section for it to be place. Perhaps it needs a new top level area?) -->
+        <para>To create all the various browse indices that you define in the configuration as described in the section <anchor id="docbook-configure.html--browse" xreflabel="Browse
+Configuration"/>Browse Configuration there are a variety of options available to you. You can see these options at any time by running the indexer without any arguments, thus:</para>
+        <screen>
+[dspace]/bin/dsrun org.dspace.browse.IndexBrowse
+</screen>
+        <para>This will show you the following options are available to you:</para>
+        <variablelist>
+          <varlistentry>
+            <term>-r,--rebuild</term>
+            <listitem>
+              <para>should we rebuild all the indices, which removes old index tables and creates new ones. For use with -f. Mutually exclusive with -d</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>-s,--start</term>
+            <listitem>
+              <para>[-s &lt;int&gt;] start from this index number and work upward (mostly only useful for debugging). For use with -t and -f</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>-x,--execute</term>
+            <listitem>
+              <para>execute all the remove and create SQL against the database. For use with -t and -f</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>-i,--index</term>
+            <listitem>
+              <para>actually do the indexing. Mutually exclusive with -t and -f</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>-o,--out</term>
+            <listitem>
+              <para>[-o &lt;filename&gt;] write the remove and create SQL to the given file. For use with -t and -f</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>-p,--print</term>
+            <listitem>
+              <para>write the remove and create SQL to the stdout. For use with -t and -f</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>-t,--tables</term>
+            <listitem>
+              <para>create the tables only, do not attempt to index. Mutually exclusive with -f and -i</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>-f,--full</term>
+            <listitem>
+              <para>make the tables, and do the indexing. This forces -x. Mutually exclusive with -t and -i</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>-v,--verbose</term>
+            <listitem>
+              <para>print extra information to the stdout. If used in conjunction with -p, you cannot use the stdout to generate your database structure</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>-d,--delete</term>
+            <listitem>
+              <para>delete all the indices, but don&apos;t create new ones. For use with -f. This is mutually exclusive with -r</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>-h,--help</term>
+            <listitem>
+              <para>show this help documentation. Overrides all other arguments</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <para>The following, then, are examples of what you want to achieve and how this is done with the command line options</para>
+        <para>
+          <emphasis>Do a full browse re-index, tearing down all old tables and reconstructing with the new configuration</emphasis>
+        </para>
+        <screen>
+[dspace]/bin/dsrun org.dspace.browse.IndexBrowse -f -r
+</screen>
+        <para><emphasis>Do a full browse re-index without modifying the table structure</emphasis> (This should be your default approach if indexing, for example, via a cron job periodically)</para>
+        <screen>
+[dspace]/bin/dsrun org.dspace.browse.IndexBrowse -i
+</screen>
+        <para>
+          <emphasis>Destroy and rebuild the database, but do not do the indexing. Output the SQL to do this to the screen and a file, as well as executing it against the database, while being verbose</emphasis>
+        </para>
+        <screen>
+[dspace]/bin/dsrun org.dspace.browse.IndexBrowse -r -t -p -v -x -o
+	myfile.sql
+</screen>
+        <para>During installation you will have run the ant target:</para>
+        <screen>
+ant index
+</screen>
+        <para>This creates the index tables as per the configuration, and will produce your initial indexed state. From this point on, you should not use ant to generate your indices, as it is not a very good execution environment. Instead, if you feel the need, or your local customisations demand regular full indexing you should set up a regular script to execute:</para>
+        <screen>
+[dspace]/bin/dsrun org.dspace.browse.IndexBrowse -i
+</screen>
+      </section>
+    </section>
+  </chapter>
+
+

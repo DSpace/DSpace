@@ -1,0 +1,3322 @@
+<?xml version='1.0' encoding='UTF-8'?>
+  <chapter>
+    <title id="docbook-DRISchemaReference.html">docbook/DRISchemaReference.html</title>
+    <para> /* Code style */ div.element-example pre { border: 1px dashed black; overflow-x: hidden; background: rgb(240,240,240); margin: 0px; padding: 10px;} </para>
+  </chapter>
+  <chapter remap="h1">
+    <title>DRI Schema Reference</title>
+    <para><emphasis role="bold">D</emphasis>igital <emphasis role="bold">R</emphasis>epository <emphasis role="bold">I</emphasis>nterface (<emphasis role="bold">DRI</emphasis>) is a schema that governs the structure of a Manakin DSpace page when encoded as an XML Document. It determines what elements can be present in the Document and the relationship of those elements to each other. This reference document explains the purpose of DRI, provides a broad architectural overview, and explains common design patterns. The appendix includes a complete reference for elements used in the DRI Schema, a graphical representation of the element hierarchy, and a quick reference table of elements and attributes.</para>
+    <section remap="h2">
+      <title><anchor id="docbook-DRISchemaReference.html-Introduction" xreflabel="Introduction"/>Introduction</title>
+      <para>This manual describes the Digital Repository Interface (DRI) as it applies to the DSpace digital repository and XMLUI Manakin based interface. DSpace XML UI is a comprehensive user interface system. It is centralized and generic, allowing it to be applied to all DSpace pages, effectively replacing the JSP-based interface system. Its ability to apply specific styles to arbitrarily large sets of DSpace pages significantly eases the task of adapting the DSpace look and feel to that of the adopting institution. This also allows for several levels of branding, lending institutional credibility to the repository and collections.</para>
+      <para>Manakin, the second version of DSpace XML UI, consists of several components, written using Java, XML, and XSL, and is implemented in <ulink url="http://cocoon.apache.org/">Cocoon</ulink>. Central to the interface is the XML Document, which is a semantic representation of a DSpace page. In Manakin, the XML Document adheres to a schema called the Digital Repository Interface (DRI) Schema, which was developed in conjunction with Manakin and is the subject of this guide. For the remainder of this guide, the terms XML Document, DRI Document, and Document will be used interchangeably.</para>
+      <para>This reference document explains the purpose of DRI, provides a broad architectural overview, and explains common design patterns. The appendix includes a complete reference for elements used in the DRI Schema, a graphical representation of the element hierarchy, and a quick reference table of elements and attributes.</para>
+      <section remap="h3">
+        <title>The Purpose of DRI</title>
+        <para>DRI is a schema that governs the structure of the XML Document. It determines the elements that can be present in the Document and the relationship of those elements to each other. Since all Manakin components produce XML Documents that adhere to the DRI schema, The XML Document serves as the abstraction layer. Two such components, Themes and Aspects, are essential to the workings of Manakin and are described briefly in this manual.</para>
+      </section>
+      <section remap="h3">
+        <title>The Development of DRI</title>
+        <para>The DRI schema was developed for use in Manakin. The choice to develop our own schema rather than adapt an existing one came after a careful analysis of the schema&apos;s purpose as well as the lessons learned from earlier attempts at customizing the DSpace interface. Since every DSpace page in Manakin exists as an XML Document at some point in the process, the schema describing that Document had to be able to structurally represent all content, metadata and relationships between different parts of a DSpace page. It had to be precise enough to avoid losing any structural information, and yet generic enough to allow Themes a certain degree of freedom in expressing that information in a readable format.</para>
+        <para>Popular schemas such as XHTML suffer from the problem of not relating elements together explicitly. For example, if a heading precedes a paragraph, the heading is related to the paragraph not because it is encoded as such but because it happens to precede it. When these structures are attempted to be translated into formats where these types of relationships are explicit, the translation becomes tedious, and potentially problematic. More structured schemas, like TEI or Docbook, are domain specific (much like DRI itself) and therefore not suitable for our purposes.</para>
+        <para>We also decided that the schema should natively support a metadata standard for encoding artifacts. Rather than encoding artifact metadata in structural elements, like tables or lists, the schema would include artifacts as objects encoded in a particular standard. The inclusion of metadata in native format would enable the Theme to choose the best method to render the artifact for display without being tied to a particular structure.</para>
+        <para>Ultimately, we chose to develop our own schema. We have constructed the DRI schema by incorporating other standards when appropriate, such as <ulink url="http://cocoon.apache.org/2.1/userdocs/i18nTransformer.html">Cocoon&apos;s i18n schema</ulink> for internationalization, <ulink url="http://dublincore.org/">DCMI&apos;s Dublin Core</ulink>, and the <ulink url="http://www.loc.gov/standards/mets/">Library of Congress&apos;s METS schema</ulink>. The design of structural elements was derived primarily from <ulink url="http://www.tei-c.org/index.xml">TEI</ulink>, with some of the design patterns borrowed from other existing standards such as DocBook and XHTML. While the structural elements were designed to be easily translated into XHTML, they preserve the semantic relationships for use in more expressive languages.</para>
+      </section>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-DRISchemaReference.html-DRI_in_Manakin" xreflabel="DRI in Manakin"/>DRI in Manakin</title>
+      <para>The general process for handling a request in DSpace XML UI consists of two parts. The first part builds the XML Document, and the second part stylizes that Document for output. In Manakin, the two parts are not discrete and instead wrapped within two processes: Content Generation, which builds an XML representation of the page, and Style Application, which stylizes the resulting Document. Content Generation is performed by Aspect chaining, while Style Application is performed by a Theme.</para>
+      <section remap="h3">
+        <title>Themes</title>
+        <para>A Theme is a collection of XSL stylesheets and supporting files like images, CSS styles, translations, and help documents. The XSL stylesheets are applied to the DRI Document to covert it into a readable format and give it structure and basic visual formatting in that format. The supporting files are used to provide the page with a specific look and feel, insert images and other media, translate the content, and perform other tasks. The currently used output format is XHTML and the supporting files are generally limited to CSS, images, and JavaScript. More output formats, like PDF or SVG, may be added in the future.</para>
+        <para>A DSpace installation running Manakin may have several Themes associated with it. When applied to a page, a Theme determines most of the pageís look and feel. Different themes can be applied to different sets of DSpace pages allowing for both variety of styles between sets of pages and consistency within those sets. The xmlui.xconf configuration file determines which Themes are applied to which DSpace pages (see the <ulink url="configure.html#xmlui-configure">Configuration and Customization chapter</ulink> for more information on installing and configuring themes). Themes may be configured to apply to all pages of specific type, like browse-by-title, to all pages of a one particular community or collection or sets of communities and collections, and to any mix of the two. They can also be configured to apply to a singe arbitrary page or handle.</para>
+      </section>
+      <section remap="h3">
+        <title>Aspect Chains</title>
+        <para>Manakin Aspects are arrangements of Cocoon components (transformers, actions, matchers, etc) that implement a new set of coupled features for the system. These Aspects are chained together to form all the features of Manakin. Five Aspects exist in the default installation of Manakin, each handling a particular set of features of DSpace, and more can be added to implement extra features. All Aspects take a DRI Document as input and generate one as output. This allows Aspects to be linked together to form an Aspect chain. Each Aspect in the chain takes a DRI Document as input, adds its own functionality, and passes the modified Document to the next Aspect in the chain.</para>
+      </section>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-DRISchemaReference.html-Common_Design_Patterns" xreflabel="Common Design
+Patterns"/>Common Design Patterns</title>
+      <para>There are several design patterns used consistently within the DRI schema. This section identifies the need for and describes the implementation of these patterns. Three patterns are discussed: language and internationalization issues, standard attribute triplet (<emphasis>id</emphasis>, <emphasis>n</emphasis>, and <emphasis>rend</emphasis>), and the use of structure-oriented markup.</para>
+      <section remap="h3">
+        <title>Localization and Internationalization</title>
+        <para>Internationalization is a very important component of the DRI system. It allows content to be offered in other languages based on user&apos;s locale and conditioned upon availability of translations, as well as present dates and currency in a localized manner. There are two types of translated content: content stored and displayed by DSpace itself, and content introduced by the DRI styling process in the XSL transformations. Both types are handled by Cocoon&apos;s i18n transformer without regard to their origin.</para>
+        <para>When the Content Generation process produces a DRI Document, some of the textual content may be marked up with <literal>i18n</literal> elements to signify that translations are available for that content. During the Style Application process, the Theme can also introduce new textual content, marking it up with <literal>i18n</literal> tags. As a result, after the Theme&apos;s XSL templates are applied to the DRI Document, the final output consists of a DSpace page marked up in the chosen display format (like XHTML) with <literal>i18n</literal> elements from both DSpace and XSL content. This final document is sent through Cocoon&apos;s i18n transformer that translates the marked up text.</para>
+      </section>
+      <section remap="h3">
+        <title>Standard attribute triplet</title>
+        <para>Many elements in the DRI system (all top-level containers, character classes, and many others) contain one or several of the three standard attributes: <emphasis>id</emphasis>, <emphasis>n</emphasis>, and <emphasis>rend</emphasis>. The <emphasis>id</emphasis> and <emphasis>n</emphasis> attributes can be required or optional based on the elementís purpose, while the <emphasis>rend</emphasis> attribute is always optional. The first two are used for identification purposes, while the third is used as a display hint issued to the styling step.</para>
+        <para>Identification is important because it allows elements to be separated from their peers for sorting, special case rendering, and other tasks. The first attribute, <emphasis>id</emphasis>, is the global identifier and it is unique to the entire document. Any element that contains an <emphasis>id</emphasis> attribute can thus be uniquely referenced by it. The <emphasis>id</emphasis> attribute of an element can be either assigned explicitly, or generated from the Java Class Path of the originating object if no name is given. While all elements that can be uniquely identified can carry the <emphasis>id</emphasis> attribute, only those that are independent on their context are required to do so. For example, tables are required to have an id since they retain meaning regardless of their location in the document, while table rows and cells can omit the attribute since their meaning depends on the parent element.</para>
+        <para>The name attribute <emphasis>n</emphasis> is simply the name assigned to the element, and it is used to distinguish an element from its immediate peers. In the example of a particular list, all items in that list will have different names to distinguish them from each other. Other lists in the document, however, can also contain items whose names will be different from each other, but identical to those in the first list. The <emphasis>n</emphasis> attribute of an element is therefore unique only in the scope of that elementís parent and is used mostly for sorting purposes and special rendering of a certain class of elements, like, for example, all first items in lists, or all items named &quot;browse&quot;. The <emphasis>n</emphasis> attribute follows the same rules as id when determining whether or not it is required for a given element.</para>
+        <para>The last attribute in the standard triplet is <emphasis>rend</emphasis>. Unlike <emphasis>id</emphasis> and <emphasis>n</emphasis>, the <emphasis>rend</emphasis> attribute can consist of several space delimited values and is optional for all elements that can contain it. Its purpose is to provide a rendering hint from the middle layer component to the styling theme. How that hint is interpreted and whether it is used at all when provided, is completely up the theme. There are several cases, however, where the content of the <emphasis>rend</emphasis> attribute is outlined in detail and its use is encouraged. Those cases are the emphasis element <literal>hi</literal>, the division element <literal>div</literal>, and the <literal>list</literal> element. Please refer to the Element Reference for more detail on these elements.</para>
+      </section>
+      <section remap="h3">
+        <title>Structure-oriented markup</title>
+        <para>The final design pattern is the use of structure-oriented markup for content carried by the XML Document. Once generated by Cocoon, the Document contains two major types of information: metadata about the repository and its contents, and the actual content of the page to be displayed. A complete overview of metadata and content markup and their relationship to each other is given in the next section. An important thing to note here, however, is that the markup of the content is oriented towards explicitly stating structural relationships between the elements rather than focusing on the presentational aspects. This makes the markup used by the Document more similar to TEI or Docbook rather than HTML. For this reason, XSL templates are used by the themes to convert structural DRI markup to XHTML. Even then, an attempt is made to create XHTML as structural as possible, leaving presentation entirely to CSS. This allows the XML Document to be generic enough to represent any DSpace page without dictating how it should be rendered.</para>
+      </section>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-DRISchemaReference.html-Schema_Overview" xreflabel="Schema Overview"/>Schema Overview</title>
+      <para>The DRI XML Document consists of the root element document and three top-level elements that contain two major types of elements. The three top-level containers are <literal>meta</literal>, <literal>body</literal>, and <literal>options</literal>. The two types of elements they contain are metadata and content, carrying metadata about the page and the contents of the page, respectively. Figure 1 depicts the relationship between these six components.</para>
+      <informalfigure>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="image/DRISchemaOverview.png" format="PNG" width="6.5in" scalefit="1"/>
+          </imageobject>
+        </mediaobject>
+      </informalfigure>
+      <para>Figure 1: The two content types across three major divisions of a DRI page. The <literal>document</literal> element is the root for all DRI pages and contains all other elements. It bears only one attribute, <emphasis>version</emphasis>, that contains the version number of the DRI system and the schema used to validate the produced document. At the time of writing the working version number is &quot;1.1&quot;.</para>
+      <para>The <literal>meta</literal> element is a the top-level element under document and contains all metadata information about the page, the user that requested it, and the repository it is used with. It contains no structural elements, instead being the only container of metadata elements in a DRI Document. The metadata stored by the meta element is broken up into three major groups: <literal>userMeta</literal>, <literal>pageMeta</literal>, and <literal>objectMeta</literal>, each storing metadata information about their respective component. Please refer to the reference entries for more information about these elements.</para>
+      <para>The <literal>options</literal> element is another top-level element that contains all navigation and action options available to the user. The options are stored as items in list elements, broken up by the type of action they perform. The five types of actions are: browsing, search, language selection, actions that are always available, and actions that are context dependent. The two action types also contain sub-lists that contain actions available to users of varying degrees of access to the system. The <literal>options</literal> element contains no metadata elements and can only make use of a small set of structural elements, namely the <literal>list</literal> element and its children.</para>
+      <para>The last major top-level element is the <literal>body</literal> element. It contains all structural elements in a DRI Document, including the lists used by the <literal>options</literal> element. Structural elements are used to build a generic representation of a DSpace page. Any DSpace page can be represented with a combination of the structural elements, which will in turn be transformed by the XSL templates into another format. This is the core mechanism that allows DSpace XML UI to apply uniform templates and styling rules to all DSpace pages and is the fundamental difference from the JSP approach currently used by DSpace.</para>
+      <para>The <literal>body</literal> element directly contains only one type of element: <literal>div</literal>. The <literal>div</literal> element serves as a major division of content and any number of them can be contained by the <literal>body</literal>. Additionally, divisions are recursive, allowing <literal>divs</literal> to contain other <literal>divs</literal>. It is within these elements that all other structural elements are contained. Those elements include tables, paragraph elements <literal>p</literal>, and lists, as well as their various children elements. At the lower levels of this hierarchy lie the character container elements. These elements, namely paragraphs <literal>p</literal>, table <literal>cells</literal>, lists <literal>items</literal>, and the emphasis element <literal>hi</literal>, contain the textual content of a DSpace page, optionally modified with links, figures, and emphasis. If the division within which the character class is contained is tagged as interactive (via the <emphasis>interactive</emphasis> attribute), those elements can also contain interactive form fields. Divisions tagged as interactive must also provide <emphasis>method</emphasis> and <emphasis>action</emphasis> attributes for its fields to use.</para>
+      <informalfigure>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="image/DRISchema.png" format="PNG" width="6.5in" scalefit="1"/>
+          </imageobject>
+        </mediaobject>
+      </informalfigure>
+      <para>Figure 2: All the elements in the DRI schema. Note: This image is out-of-date, it does not reflect the changes between 1.0 and 1.1 such as reference and referenceSet.</para>
+     </section>
+    <section remap="h2">
+      <title><anchor id="docbook-DRISchemaReference.html-Merging_of_DRI_Documents" xreflabel="Merging of DRI
+Documents"/>Merging of DRI Documents</title>
+      <para>Having described the structure of the DRI Document, as well as its function in Manakin&apos;s Aspect chains, we now turn our attention to the one last detail of their use: merging two Documents into one. There are several situations where the need to merge two documents arises. In Manakin, for example, every Aspect is responsible for adding different functionality to a DSpace page. Since every instance of a page has to be a complete DRI Document, each Aspect is faced with the task of merging the Document it generated with the ones generated (and merged into one Document) by previously executed Aspects. For this reason rules exist that describe which elements can be merged together and what happens to their data and child elements in the process.</para>
+      <para>When merging two DRI Documents, one is considered to be the main document, and the other a feeder document that is added in. The three top level containers (<literal>meta</literal>, <literal>body</literal> and <literal>options</literal>) of both documents are then individually analyzed and merged. In the case of the <literal>options</literal> and <literal>meta</literal> elements, the children tags are taken individually as well and treated differently from their siblings.</para>
+      <para>The <literal>body</literal> elements are the easiest to merge: their respective <literal>div</literal> children are preserved along with their ordering and are grouped together under one element. Thus, the new <literal>body</literal> tag will contain all the <literal>divs</literal> of the main document followed by all the <literal>divs</literal> of the feeder. However, if two <literal>divs</literal> have the same <emphasis>n</emphasis> and <emphasis>rend</emphasis> attributes (and in case of an interactive <literal>div</literal> the same <emphasis>action</emphasis> and <emphasis>method</emphasis> attributes as well), those <literal>divs</literal> will be merged into one. The resulting div will bear the <emphasis>id</emphasis>, <emphasis>n</emphasis>, and <emphasis>rend</emphasis> attributes of the main document&apos;s div and contain all the <literal>divs</literal> of the main document followed by all the <literal>divs</literal> of the feeder. This process continues recursively until all the <literal>divs</literal> have been merged. It should be noted that two divisions with separate pagination rules cannot be merged together.</para>
+      <para>Merging the <literal>options</literal> elements is somewhat different. First, <literal>list</literal> elements under <literal>options</literal> of both documents are compared with each other. Those unique to either document are simply added under the new options element, just like <literal>divs</literal> under <literal>body</literal>. In case of duplicates, that is <literal>list</literal> elements that belong to both documents and have the same <emphasis>n</emphasis> attribute, the two <literal>lists</literal> will be merged into one. The new <literal>list</literal> element will consist of the main documentís head element, followed <literal>label-item</literal> pairs from the main document, and then finally the <literal>label-item</literal> pairs of the feeder, provided they are different from those of the main.</para>
+      <para>Finally, the <literal>meta</literal> elements are merged much like the elements under body. The three children of <literal>meta</literal> - <literal>userMeta</literal>, <literal>pageMeta</literal>, and <literal>objectMeta</literal> - are individually merged, adding the contents of the feeder after the contents of the main.</para>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-DRISchemaReference.html-version_changes" xreflabel="Version Changes"/>Version Changes</title>
+      <para>The DRI schema will continue to evolve overtime as the needs of interface design require. The version attribute on the document will indicate which version of the schema the document conforms to. At the time Manakin was incorporated into the standard distribution of DSpac the current version was &quot;1.1&quot;, however earlier versions of the Manakin interface may use &quot;1.0&quot;.</para>
+      <section remap="h3">
+        <title>Changes from 1.0 to 1.1</title>
+        <para>There were major structural changes between these two version numbers. Several elements were removed from the schema:<literal>includeSet</literal>, <literal>include</literal>, <literal>objectMeta</literal>, and <literal>object</literal>. Originaly all metadata for objects were included in-line with the DRI document, this proved to have several problems and has been removed in version 1.1 of the DRI schema. Instead of including metadata in-line, external references to the metadata is included. Thus, a <literal>reference</literal> element has been added along with <literal>referenceSet</literal>. These new elements operate like their counterparts in the previous version except refrencing metadata contained on the <literal>objectMeta</literal> element they reference metadata in external files. The <literal>repository</literal> and <literal>repositoryMeta</literal> elements were alse modified in a similar mannor removing in-line metadata and refrencing external metadata documents.</para>
+      </section>
+    </section>
+    <section remap="h2">
+      <title><anchor id="docbook-DRISchemaReference.html-Element_Reference" xreflabel="Element Refenence"/>Element Refenence</title>
+      <informaltable frame="all">
+        <tgroup cols="3">
+          <colspec colname="c1" colwidth="33*"/>
+          <colspec colname="c2" colwidth="33*"/>
+          <colspec colname="c3" colwidth="33*"/>
+          <tbody>
+            <row>
+              <entry>
+                <para>
+                  <emphasis role="bold">Element</emphasis>
+                </para>
+              </entry>
+              <entry>
+                <para>
+                  <emphasis role="bold">Attributes</emphasis>
+                </para>
+              </entry>
+              <entry>
+                <para>
+                  <emphasis role="bold">Required</emphasis>
+                </para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para><anchor id="docbook-DRISchemaReference.html--element:body" xreflabel="BODY"/>BODY</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry align="center" morerows="5" valign="middle">
+                <para><anchor id="docbook-DRISchemaReference.html--element:cell" xreflabel="cell"/>cell</para>
+              </entry>
+              <entry>
+                <para>cols</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>id</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>n</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>rend</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>role</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>rows</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry align="center" morerows="16" valign="middle">
+                <para><anchor id="docbook-DRISchemaReference.html--element:div" xreflabel="div"/>div</para>
+              </entry>
+              <entry>
+                <para>action</para>
+              </entry>
+              <entry>
+                <para>required for interactive</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>behavior</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>behaviorSensitivFields</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>currentPage</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>firstItemIndex</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>id</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>interactive</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>itemsTotal</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>lastItemIndex</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>method</para>
+              </entry>
+              <entry>
+                <para>required for interactive</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>n</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>nextPage</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>pagesTotal</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>pageURLMask</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>pagination</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>previousPage</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>rend</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para><anchor id="docbook-DRISchemaReference.html--element:document" xreflabel="DOCUMENT"/>DOCUMENT</para>
+              </entry>
+              <entry>
+                <para>version</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry align="center" morerows="5" valign="middle">
+                <para><anchor id="docbook-DRISchemaReference.html--element:field" xreflabel="field"/>field</para>
+              </entry>
+              <entry>
+                <para>disabled</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>id</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>n</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>rend</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>required</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>type</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry align="center" morerows="2" valign="middle">
+                <para><anchor id="docbook-DRISchemaReference.html--element:figure" xreflabel="figure"/>figure</para>
+              </entry>
+              <entry>
+                <para>rend</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>source</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>target</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry align="center" morerows="2" valign="middle">
+                <para><anchor id="docbook-DRISchemaReference.html--element:head" xreflabel="head"/>head</para>
+              </entry>
+              <entry>
+                <para>id</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>n</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>rend</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para><anchor id="docbook-DRISchemaReference.html--element:help" xreflabel="help"/>help</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para><anchor id="docbook-DRISchemaReference.html--element:hi" xreflabel="hi"/>hi</para>
+              </entry>
+              <entry>
+                <para>rend</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para><anchor id="docbook-DRISchemaReference.html--element:instance" xreflabel="instance"/>instance</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry align="center" morerows="2" valign="middle">
+                <para><anchor id="docbook-DRISchemaReference.html--element:item" xreflabel="item"/>item</para>
+              </entry>
+              <entry>
+                <para>id</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>n</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>rend</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry align="center" morerows="2" valign="middle">
+                <para><anchor id="docbook-DRISchemaReference.html--element:label" xreflabel="label"/>label</para>
+              </entry>
+              <entry>
+                <para>id</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>n</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>rend</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry align="center" morerows="3" valign="middle">
+                <para><anchor id="docbook-DRISchemaReference.html--element:list" xreflabel="list"/>list</para>
+              </entry>
+              <entry>
+                <para>id</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>n</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>rend</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>type</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para><anchor id="docbook-DRISchemaReference.html--element:meta" xreflabel="META"/>META</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry align="center" morerows="2" valign="middle">
+                <para><anchor id="docbook-DRISchemaReference.html--element:metadata" xreflabel="metadata"/>metadata</para>
+              </entry>
+              <entry>
+                <para>element</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>language</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>qualifier</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para><anchor id="docbook-DRISchemaReference.html--element:options" xreflabel="OPTIONS"/>OPTIONS</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry align="center" morerows="2" valign="middle">
+                <para><anchor id="docbook-DRISchemaReference.html--element:p" xreflabel="p"/>p</para>
+              </entry>
+              <entry>
+                <para>id</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>n</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>rend</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para><anchor id="docbook-DRISchemaReference.html--element:pageMeta" xreflabel="pageMeta"/>pageMeta</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry align="center" morerows="5" valign="middle">
+                <para><anchor id="docbook-DRISchemaReference.html--element:params" xreflabel="params"/>params</para>
+              </entry>
+              <entry>
+                <para>cols</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>maxlength</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>multiple</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>operations</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>rows</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>size</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry align="center" morerows="2" valign="middle">
+                <para><anchor id="docbook-DRISchemaReference.html--element:refrence" xreflabel="refrence"/>refrence</para>
+              </entry>
+              <entry>
+                <para>url</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>repositoryID</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>type</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry align="center" morerows="4" valign="middle">
+                <para><anchor id="docbook-DRISchemaReference.html--element:referenceSet" xreflabel="referenceSet"/>referenceSet</para>
+              </entry>
+              <entry>
+                <para>id</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>n</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>orderBy</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>rend</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>type</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry align="center" morerows="1" valign="middle">
+                <para><anchor id="docbook-DRISchemaReference.html--element:repository" xreflabel="repository"/>repository</para>
+              </entry>
+              <entry>
+                <para>repositoryID</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>url</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para><anchor id="docbook-DRISchemaReference.html--element:repositoryMeta" xreflabel="repositoryMeta"/>repositoryMeta</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry align="center" morerows="3" valign="middle">
+                <para><anchor id="docbook-DRISchemaReference.html--element:row" xreflabel="row"/>row</para>
+              </entry>
+              <entry>
+                <para>id</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>n</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>rend</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>role</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry align="center" morerows="4" valign="middle">
+                <para><anchor id="docbook-DRISchemaReference.html--element:table" xreflabel="table"/>table</para>
+              </entry>
+              <entry>
+                <para>cols</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>id</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>n</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>rend</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>rows</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry align="center" morerows="1" valign="middle">
+                <para><anchor id="docbook-DRISchemaReference.html--element:trail" xreflabel="trail"/>trail</para>
+              </entry>
+              <entry>
+                <para>rend</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>target</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para><anchor id="docbook-DRISchemaReference.html--element:userMeta" xreflabel="userMeta"/>userMeta</para>
+              </entry>
+              <entry>
+                <para>authenticated</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry align="center" morerows="2" valign="middle">
+                <para><anchor id="docbook-DRISchemaReference.html--element:value" xreflabel="value"/>value</para>
+              </entry>
+              <entry>
+                <para>optionSelected</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>optionValue</para>
+              </entry>
+              <entry>
+                <para/>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>type</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para><anchor id="docbook-DRISchemaReference.html--element:xref" xreflabel="xref"/>xref</para>
+              </entry>
+              <entry>
+                <para>target</para>
+              </entry>
+              <entry>
+                <para>required</para>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <!--start of elements-->
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:body" xreflabel="BODY"/>BODY</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Top-Level-Container" xreflabel="Top-Level Container"/>
+        </para>
+        <para>Top-Level Container</para>
+        <para>The <literal>body</literal> element is the main container for all content displayed to the user. It contains any number of <literal>div</literal> elements that group content into interactive and display blocks.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:document.1" xreflabel="document"/>
+        </para>
+        <para>document</para>
+        <para>Children</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:div.1" xreflabel="div"/>
+        </para>
+        <para>div</para>
+        <para> (any)</para>
+        <para>Attributes</para>
+        <para>None</para>
+        <screen>
+&lt;document version=1.0&gt;
+  &lt;meta&gt; ... &lt;/meta&gt;
+  <emphasis role="bold"> &lt;body&gt;</emphasis>
+    &lt;div n=&quot;division-example1&quot;
+	id=&quot;XMLExample.div.division-example1&quot;&gt;
+     ... 
+    &lt;/div&gt;
+    &lt;div n=&quot;division-example2&quot; id=&quot;XMLExample.div.division-example2&quot;
+	interactive=&quot;yes&quot; action=&quot;www.DRItest.com&quot;
+	method=&quot;post&quot;&gt;
+     ...
+    &lt;/div&gt;
+     ...
+  <emphasis role="bold"> &lt;/body&gt;</emphasis>
+  &lt;options&gt; ... &lt;/options&gt;
+&lt;/document&gt;
+</screen>
+        <!--end of body element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:cell" xreflabel="cell"/>cell</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Rich-Text-Container" xreflabel="Rich Text Container"/>
+        </para>
+        <para>Rich Text Container</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Structural-Element" xreflabel="Structural
+Element"/>
+        </para>
+        <para>Structural Element</para>
+        <para>The <literal>cell</literal> element contained in a <literal>row</literal> of a <literal>table</literal> carries content for that table. It is a character container, just like <literal>p</literal>, <literal>item</literal>, and <literal>hi</literal>, and its primary purpose is to display textual data, possibly enhanced with hyperlinks, emphasized blocks of text, images and form fields. Every <literal>cell</literal> can be annotated with a <emphasis>role</emphasis> (the most common being ìheaderî and ìdataî) and can stretch across any number of rows and columns. Since cells cannot exist outside their container, <literal>row</literal>, their <emphasis>id</emphasis> attribute is optional.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:row.1" xreflabel="row"/>
+        </para>
+        <para>row</para>
+        <para>Children</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:hi.1" xreflabel="hi"/>
+        </para>
+        <para>hi</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:xref.1" xreflabel="xref"/>
+        </para>
+        <para>xref</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:figure.1" xreflabel="figure"/>
+        </para>
+        <para>figure</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:field.1" xreflabel="field"/>
+        </para>
+        <para>field</para>
+        <para> (any)</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>cols</term>
+            <listitem>
+              <para>optional</para>
+              <para>The number of columns the cell spans.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>id</term>
+            <listitem>
+              <para>optional</para>
+              <para>A unique identifier of the element.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>n</term>
+            <listitem>
+              <para>optional</para>
+              <para>A local identifier used to differentiate the element from its siblings.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>rend</term>
+            <listitem>
+              <para>optional</para>
+              <para>A rendering hint used to override the default display of the element.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>role</term>
+            <listitem>
+              <para>optional</para>
+              <para>An optional attribute to override the containing rowís role settings.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>rows</term>
+            <listitem>
+              <para>optional</para>
+              <para>The number of rows the cell spans.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+&lt;table n=&quot;table-example&quot; id=&quot;XMLExample.table.table-example&quot; rows=&quot;2&quot;
+	cols=&quot;3&quot;&gt;
+    &lt;row role=&quot;head&quot;&gt;
+      <emphasis role="bold"> &lt;cell cols=&quot;2&quot;&gt;Data Label One and Two&lt;/cell&gt; &lt;cell&gt;Data Label
+	Three&lt;/cell&gt;</emphasis>
+      ...
+    &lt;/row&gt;
+    &lt;row&gt;
+      <emphasis role="bold"> &lt;cell&gt; Value One &lt;/cell&gt; &lt;cell&gt; Value Two &lt;/cell&gt; &lt;cell&gt; Value
+	Three &lt;/cell&gt;</emphasis>
+      ...
+    &lt;/row&gt;
+    ...
+&lt;/table&gt;
+</screen>
+        <!--end of cell element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:div" xreflabel="div"/>div</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Structural-Element.1" xreflabel="Structural Element"/>
+        </para>
+        <para>Structural Element</para>
+        <para>The <literal>div</literal> element represents a major section of content and can contain a wide variety of structural elements to present that content to the user. It can contain paragraphs, tables, and lists, as well as references to artifact information stored in <literal>artifactMeta</literal>, <literal>repositoryMeta</literal>, <literal>collections</literal>, and <literal>communities</literal>. The <literal>div</literal> element is also recursive, allowing it to be further divided into other divs. Divs can be of two types: interactive and static. The two types are set by the use of the <emphasis>interactive</emphasis> attribute and differ in their ability to contain interactive content. Children elements of divs tagged as interactive can contain form fields, with the <emphasis>action</emphasis> and <emphasis>method</emphasis> attributes of the <literal>div</literal> serving to resolve those fields.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:body.1" xreflabel="body"/>
+        </para>
+        <para>body</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:div.2" xreflabel="div"/>
+        </para>
+        <para>div</para>
+        <para>Children</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:head.1" xreflabel="head"/>
+        </para>
+        <para>head</para>
+        <para> (zero or one)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:pagination" xreflabel="pagination"/>
+        </para>
+        <para>pagination</para>
+        <para> (zero or one)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:table.1" xreflabel="table"/>
+        </para>
+        <para>table</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:p.1" xreflabel="p"/>
+        </para>
+        <para>p</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:referenceSet.1" xreflabel="referenceSet"/>
+        </para>
+        <para>referenceSet</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:list.1" xreflabel="list"/>
+        </para>
+        <para>list</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:div.3" xreflabel="div"/>
+        </para>
+        <para>div</para>
+        <para> (any)</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>action</term>
+            <listitem>
+              <para>required for interactive</para>
+              <para>The form action attribute determines where the form information should be sent for processing.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>behavior</term>
+            <listitem>
+              <para>optional for interactive</para>
+              <para>The acceptable behavior options that may be used on this form. The only possible value defined at this time is ìajaxî which means that the form may be submitted multiple times for each individual field in this form. Note that if the form is submitted multiple times it is best for the behaviorSensitiveFields to be updated as well.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>behaviorSensitiveFields</term>
+            <listitem>
+              <para>optional for interactive</para>
+              <para>A space separated list of field names that are sensitive to behavior. These fields must be updated each time a form is submitted with out a complete refresh of the page (i.e. ajax).</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>currentPage</term>
+            <listitem>
+              <para>optional</para>
+              <para>For paginated divs, the currentPage attribute indicates the index of the page currently displayed for this div.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>firstItemIndex</term>
+            <listitem>
+              <para>optional</para>
+              <para>For paginated divs, the firstItemIndex attribute indicates the index of the first item included in this div.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>id</term>
+            <listitem>
+              <para>required</para>
+              <para>A unique identifier of the element.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>interactive</term>
+            <listitem>
+              <para>optional</para>
+              <para>Accepted values are ìyesî, ìnoî. This attribute determines whether the div is interactive or static. Interactive divs must provide action and method and can contain field elements.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>itemsTotal</term>
+            <listitem>
+              <para>optional</para>
+              <para>For paginated divs, the itemsTotal attribute indicates how many items exit across all paginated divs.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>lastItemIndex</term>
+            <listitem>
+              <para>optional</para>
+              <para>For paginated divs, the lastItemIndex attribute indicates the index of the last item included in this div.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>method</term>
+            <listitem>
+              <para>required for interactive</para>
+              <para>Accepted values are ìgetî, ìpostî, and ìmultipartî. Determines the method used to pass gathered field values to the handler specified by the action attribute. The multipart method should be used for uploading files.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>n</term>
+            <listitem>
+              <para>required</para>
+              <para>A local identifier used to differentiate the element from its siblings.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>nextPage</term>
+            <listitem>
+              <para>optional</para>
+              <para>For paginated divs the nextPage attribute points to the URL of the next page of the div, if it exists.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>pagesTotal</term>
+            <listitem>
+              <para>optional</para>
+              <para>For paginated divs, the pagesTotal attribute indicates how many pages the paginated divs spans.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>pageURLMask</term>
+            <listitem>
+              <para>optional</para>
+              <para>For paginated divs, the pageURLMask attribute contains the mask of a url to a particular page within the paginated set. The destination pageís number should replace the {pageNum} string in the URL mask to generate a full URL to that page.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>pagination</term>
+            <listitem>
+              <para>optional</para>
+              <para>Accepted values are ìsimpleî, ìmaskedî. This attribute determines whether the div is spread over several pages. Simple paginated divs must provide previousPage, nextPage, itemsTotal, firstItemIndex, lastItemIndex attributes. Masked paginated divs must provide currentPage, pagesTotal, pageURLMask, itemsTotal, firstItemIndex, lastItemIndex attributes.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>previousPage</term>
+            <listitem>
+              <para>optional</para>
+              <para>For paginated divs the previousPage attribute points to the URL of the previous page of the div, if it exists.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>rend</term>
+            <listitem>
+              <para>optional</para>
+              <para>A rendering hint used to override the default display of the element. In the case of the div tag, it is also encouraged to label it as either ìprimaryî or ìsecondaryî. Divs marked as primary contain content, while secondary divs contain auxiliary information or supporting fields.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+&lt;body&gt;
+    <emphasis role="bold"> &lt;div n=&quot;division-example&quot;
+	id=&quot;XMLExample.div.division-example&quot;&gt;</emphasis>
+      &lt;head&gt; Example Division &lt;/head&gt;
+      &lt;p&gt; This example shows the use of divisions. &lt;/p&gt;
+      &lt;table ...&gt;
+        ...
+      &lt;/table&gt;
+      &lt;referenceSet ...&gt;
+        ...
+      &lt;/referenceSet&gt;
+      &lt;list ...&gt;
+        ...
+      &lt;/list&gt;
+      <emphasis role="bold"> &lt;div n=&quot;sub-division-example&quot;
+	id=&quot;XMLExample.div.sub-division-example&quot;&gt;</emphasis>
+        &lt;p&gt; Divisions may be nested &lt;/p&gt;
+        ...
+      <emphasis role="bold"> &lt;/div&gt;</emphasis>
+      ...
+    <emphasis role="bold"> &lt;/div&gt;</emphasis>
+    ...
+&lt;/body&gt;
+</screen>
+        <!--end of div element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:document" xreflabel="DOCUMENT"/>DOCUMENT</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Document-Root" xreflabel="Document Root"/>
+        </para>
+        <para>Document Root</para>
+        <para>The document element is the root container of an XML UI document. All other elements are contained within it either directly or indirectly. The only attribute it carries is the version of the Schema to which it conforms.</para>
+        <para>Parent</para>
+        <para>none</para>
+        <para>Children</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:meta.1" xreflabel="meta"/>
+        </para>
+        <para>meta</para>
+        <para> (one)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:body.2" xreflabel="body"/>
+        </para>
+        <para>body</para>
+        <para> (one)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:options.1" xreflabel="options"/>
+        </para>
+        <para>options</para>
+        <para> (one)</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>version</term>
+            <listitem>
+              <para>required</para>
+              <para>Version number of the schema this document adheres to. At the time of writing the only valid version number is ì1.0î. Future iterations of this schema may increment the version number.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+<emphasis role="bold"> &lt;document
+	version=&quot;1.0&quot;&gt;</emphasis>
+    &lt;meta&gt;
+      ...
+    &lt;/meta&gt;
+    &lt;body&gt;
+      ...
+    &lt;/body&gt;
+    &lt;options&gt;
+      ...
+    &lt;/options&gt;
+<emphasis role="bold"> &lt;/document&gt;</emphasis>
+</screen>
+        <!--end of document element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:field" xreflabel="field"/>field</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Text-Container" xreflabel="Text Container"/>
+        </para>
+        <para>Text Container</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Structural-Element.2" xreflabel="Structural
+Element"/>
+        </para>
+        <para>Structural Element</para>
+        <para>The <literal>field</literal> element is a container for all information necessary to create a form field. The required <emphasis>type</emphasis> attribute determines the type of the field, while the children tags carry the information on how to build it. Fields can only occur in divisions tagged as &quot;interactive&quot;.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:cell.1" xreflabel="cell"/>
+        </para>
+        <para>cell</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:p.2" xreflabel="p"/>
+        </para>
+        <para>p</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:hi.2" xreflabel="hi"/>
+        </para>
+        <para>hi</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:item.1" xreflabel="item"/>
+        </para>
+        <para>item</para>
+        <para>Children</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:params.1" xreflabel="params"/>
+        </para>
+        <para>params</para>
+        <para> (one)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:help.1" xreflabel="help"/>
+        </para>
+        <para>help</para>
+        <para> (zero or one)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:error" xreflabel="error"/>
+        </para>
+        <para>error</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:option" xreflabel="option"/>
+        </para>
+        <para>option</para>
+        <para> (any - only with the select type)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:value.1" xreflabel="value"/>
+        </para>
+        <para>value</para>
+        <para> (any - only available on fields of type: select, checkbox, or radio)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:field.2" xreflabel="field"/>
+        </para>
+        <para>field</para>
+        <para> (one or more - only with the composite type)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:valueSet" xreflabel="valueSet"/>
+        </para>
+        <para>valueSet</para>
+        <para> (any)</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>disabled</term>
+            <listitem>
+              <para>optional</para>
+              <para>Accepted values are ìyesî, ìnoî. Determines whether the field allows user input. Rendering of disabled fields may vary with implementation and display media.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>id</term>
+            <listitem>
+              <para>required</para>
+              <para>A unique identifier for a field element.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>n</term>
+            <listitem>
+              <para>required</para>
+              <para>A non-unique local identifier used to differentiate the element from its siblings within an interactive division. This is the name of the field use when data is submitted back to the server.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>rend</term>
+            <listitem>
+              <para>optional</para>
+              <para>A rendering hint used to override the default display of the element.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>required</term>
+            <listitem>
+              <para>optional</para>
+              <para>Accepted values are ìyesî, ìnoî. Determines whether the field is a required component of the form and thus cannot be left blank.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>type</term>
+            <listitem>
+              <para>required</para>
+              <para>A required attribute to specify the type of value. Accepted types are: <variablelist>
+                  <varlistentry>
+                    <term>button</term>
+                    <listitem>
+                      <para>A button input control that when activated by the user will submit the form, including all the fields, back to the server for processing.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>checkbox</term>
+                    <listitem>
+                      <para>A boolean input control which may be toggled by the user. A checkbox may have several fields which share the same name and each of those fields may be toggled independently. This is distinct from a radio button where only one field may be toggled.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>file</term>
+                    <listitem>
+                      <para>An input control that allows the user to select files to be submitted with the form. Note that a form which uses a file field must use the multipart method.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>hidden</term>
+                    <listitem>
+                      <para>An input control that is not rendered on the screen and hidden from the user.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>password</term>
+                    <listitem>
+                      <para>A single-line text input control where the input text is rendered in such a way as to hide the characters from the user.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>radio</term>
+                    <listitem>
+                      <para>A boolean input control which may be toggled by the user. Multiple radio button fields may share the same name. When this occurs only one field may be selected to be true. This is distinct from a checkbox where multiple fields may be toggled.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>select</term>
+                    <listitem>
+                      <para>A menu input control which allows the user to select from a list of available options.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>text</term>
+                    <listitem>
+                      <para>A single-line text input control.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>textarea</term>
+                    <listitem>
+                      <para>A multi-line text input control.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>composite</term>
+                    <listitem>
+                      <para>A composite input control combines several input controls into a single field. The only fields that may be combined together are: checkbox, password, select, text, and textarea. When fields are combined together they can posses multiple combined values.</para>
+                    </listitem>
+                  </varlistentry>
+                </variablelist>
+</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+&lt;p&gt;
+  &lt;hi&gt; ... &lt;/hi&gt;
+  &lt;xref&gt; ... &lt;/xref&gt;
+  &lt;figure&gt; ... &lt;/figure&gt;
+  ...
+  <emphasis role="bold"> &lt;field id=&quot;XMLExample.field.name&quot; n=&quot;name&quot; type=&quot;text&quot;
+	required=&quot;yes&quot;&gt;</emphasis>
+    &lt;params size=&quot;16&quot; maxlength=&quot;32&quot;/&gt;
+    &lt;help&gt;Some help text with &lt;i18n&gt;localized
+	content&lt;/i18n&gt;.&lt;/help&gt;
+    &lt;value type=&quot;raw&quot;&gt;Default value goes
+	here&lt;/value&gt;
+  <emphasis role="bold"> &lt;/field&gt;</emphasis>
+&lt;/p&gt;
+       
+</screen>
+        <!--end of field element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:figure" xreflabel="figure"/>figure</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Text-Container.1" xreflabel="Text Container"/>
+        </para>
+        <para>Text Container</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Structural-Element.3" xreflabel="Structural
+Element"/>
+        </para>
+        <para>Structural Element</para>
+        <para>The <literal>figure</literal> element is used to embed a reference to an image or a graphic element. It can be mixed freely with text, and any text within the tag itself will be used as an alternative descriptor or a caption.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:cell.2" xreflabel="cell"/>
+        </para>
+        <para>cell</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:p.3" xreflabel="p"/>
+        </para>
+        <para>p</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:hi.3" xreflabel="hi"/>
+        </para>
+        <para>hi</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:item.2" xreflabel="item"/>
+        </para>
+        <para>item</para>
+        <para>Children</para>
+        <para>none</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>rend</term>
+            <listitem>
+              <para>optional</para>
+              <para>A rendering hint used to override the default display of the element.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>source</term>
+            <listitem>
+              <para>optional</para>
+              <para>The source for the image, using either a URL or a pre-defined XML entity.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>target</term>
+            <listitem>
+              <para>optional</para>
+              <para>A target for an image used as a link, using either a URL or an id of an existing element as a destination.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+&lt;p&gt;
+    &lt;hi&gt; ... &lt;/hi&gt;
+    ...
+    &lt;xref&gt; ... &lt;/xref&gt;
+    ...
+    &lt;field&gt; ... &lt;/field&gt;
+    ...
+    <emphasis role="bold"> &lt;figure source=&quot;www.example.com/fig1&quot;&gt; This is a static image.
+	&lt;/figure&gt;</emphasis>
+    <emphasis role="bold"> &lt;figure source=&quot;www.example.com/fig1&quot;
+	target=&quot;www.example.net&quot;&gt;</emphasis>
+      This image is also a link.
+    <emphasis role="bold"> &lt;/figure&gt;</emphasis>
+    ...
+&lt;/p&gt;
+</screen>
+        <!--end of figure element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:head" xreflabel="head"/>head</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Text-Container.2" xreflabel="Text Container"/>
+        </para>
+        <para>Text Container</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Structural-Element.4" xreflabel="Structural
+Element"/>
+        </para>
+        <para>Structural Element</para>
+        <para>The <literal>head</literal> element is primarily used as a label associated with its parent element. The rendering is determined by its parent tag, but can be overridden by the <emphasis>rend</emphasis> attribute. Since there can only be one <literal>head</literal> element associated with a particular tag, the <emphasis>n</emphasis> attribute is not needed, and the <emphasis>id</emphasis> attribute is optional.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:div.4" xreflabel="div"/>
+        </para>
+        <para>div</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:table.2" xreflabel="table"/>
+        </para>
+        <para>table</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:list.2" xreflabel="list"/>
+        </para>
+        <para>list</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:referenceSet.2" xreflabel="referenceSet"/>
+        </para>
+        <para>referenceSet</para>
+        <para>Children</para>
+        <para>none</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>id</term>
+            <listitem>
+              <para>optional</para>
+              <para>A unique identifier of the element</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>n</term>
+            <listitem>
+              <para>optional</para>
+              <para>A local identifier used to differentiate the element from its siblings</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>rend</term>
+            <listitem>
+              <para>optional</para>
+              <para>A rendering hint used to override the default display of the element.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+&lt;div ...&gt;
+    <emphasis role="bold"> &lt;head&gt; This is a simple header associated with its div element.
+	&lt;/head&gt;</emphasis>
+    &lt;div ...&gt;
+      <emphasis role="bold"> &lt;head rend=&quot;green&quot;&gt; This header will be green.
+	&lt;/head&gt;</emphasis>
+      &lt;p&gt;
+        <emphasis role="bold"> &lt;head&gt; A header with &lt;i18n&gt;localized content&lt;/i18n&gt;.
+	&lt;/head&gt;</emphasis>
+        ...
+      &lt;/p&gt;
+    &lt;/div&gt;
+    &lt;table ...&gt;
+      <emphasis role="bold"> &lt;head&gt; ...
+	&lt;/head&gt;</emphasis>
+      ...
+    &lt;/table&gt;
+    &lt;list ...&gt;
+      <emphasis role="bold"> &lt;head&gt; ...
+	&lt;/head&gt;</emphasis>
+      ...
+    &lt;/list&gt;
+    ...
+&lt;/body&gt;
+</screen>
+        <!--end of head element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:help" xreflabel="help"/>help</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Text-Container.3" xreflabel="Text Container"/>
+        </para>
+        <para>Text Container</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Structural-Element.5" xreflabel="Structural
+Element"/>
+        </para>
+        <para>Structural Element</para>
+        <para>The optional <literal>help</literal> element is used to supply help instructions in plain text and is normally contained by the <literal>field</literal> element. The method used to render the help text in the target markup is up to the theme.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:field.3" xreflabel="field"/>
+        </para>
+        <para>field</para>
+        <para>Children</para>
+        <para>none</para>
+        <para>Attributes</para>
+        <para>None</para>
+        <screen>
+&lt;p&gt;
+    &lt;hi&gt; ... &lt;/hi&gt;
+    ...
+    &lt;xref&gt; ... &lt;/xref&gt;
+    ...
+    &lt;figure&gt; ... &lt;/figure&gt;
+    ...
+    &lt;field id=&quot;XMLExample.field.name&quot; n=&quot;name&quot; type=&quot;text&quot;
+	required=&quot;yes&quot;&gt;
+      &lt;params size=&quot;16&quot; maxlength=&quot;32&quot; /&gt;
+      <emphasis role="bold"> &lt;help&gt;Some help text with &lt;i18n&gt;localized
+	content&lt;/i18n&gt;.&lt;/help&gt;</emphasis>
+    &lt;/field&gt;
+    ...
+&lt;/p&gt;
+</screen>
+        <!--end of help element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:hi" xreflabel="hi"/>hi</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Rich-Text-Container.1" xreflabel="Rich Text Container"/>
+        </para>
+        <para>Rich Text Container</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Structural-Element.6" xreflabel="Structural
+Element"/>
+        </para>
+        <para>Structural Element</para>
+        <para>The <literal>hi</literal> element is used for emphasis of text and occurs inside character containers like <literal>p</literal> and <literal>list</literal> item. It can be mixed freely with text, and any text within the tag itself will be emphasized in a manner specified by the required <emphasis>rend</emphasis> attribute. Additionally, <literal>hi</literal> element is the only text container component that is a rich text container itself, meaning it can contain other tags in addition to plain text. This allows it to contain other text containers, including other <literal>hi</literal> tags.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:cell.3" xreflabel="cell"/>
+        </para>
+        <para>cell</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:p.4" xreflabel="p"/>
+        </para>
+        <para>p</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:item.3" xreflabel="item"/>
+        </para>
+        <para>item</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:hi.4" xreflabel="hi"/>
+        </para>
+        <para>hi</para>
+        <para>Children</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:hi.5" xreflabel="hi"/>
+        </para>
+        <para>hi</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:xref.2" xreflabel="xref"/>
+        </para>
+        <para>xref</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:figure.2" xreflabel="figure"/>
+        </para>
+        <para>figure</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:field.4" xreflabel="field"/>
+        </para>
+        <para>field</para>
+        <para> (any)</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>rend</term>
+            <listitem>
+              <para>required</para>
+              <para>A required attribute used to specify the exact type of emphasis to apply to the contained text. Common values include but are not limited to &quot;bold&quot;, &quot;italic&quot;, &quot;underline&quot;, and &quot;emph&quot;.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+&lt;p&gt;
+    This text is normal, while <emphasis role="bold"> &lt;hi rend=&quot;bold&quot;&gt;this text is bold and
+	this text is &lt;hi rend=&quot;italic&quot;&gt;bold and
+	italic.&lt;/hi&gt;&lt;/hi&gt;</emphasis>
+&lt;/p&gt;
+</screen>
+        <!--end of hi element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:instance" xreflabel="instance"/>instance</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Structural-Element.7" xreflabel="Structural Element"/>
+        </para>
+        <para>Structural Element</para>
+        <para>The <literal>instance</literal> element contains the value associated with a form fieldís multiple instances. Fields encoded as an instance should also include the values of each instance as a hidden field. The hidden field should be appended with the index number for the instance. Thus if the field is &quot;firstName&quot; each instance would be named &quot;firstName_1&quot;, &quot;firstName_2&quot;, &quot;firstName_3&quot;, etc...</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:field.5" xreflabel="field"/>
+        </para>
+        <para>field</para>
+        <para>Children</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:value.2" xreflabel="value"/>
+        </para>
+        <para>value</para>
+        <para>Attributes</para>
+        <para>None listed yet.</para>
+        <screen>
+Example needed.
+</screen>
+        <!--end of instance element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:item" xreflabel="item"/>item</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Rich-Text-Container.2" xreflabel="Rich Text Container"/>
+        </para>
+        <para>Rich Text Container</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Structural-Element.8" xreflabel="Structural
+Element"/>
+        </para>
+        <para>Structural Element</para>
+        <para>The <literal>item</literal> element is a rich text container used to display textual data in a list. As a rich text container it can contain hyperlinks, emphasized blocks of text, images and form fields in addition to plain text.</para>
+        <para>The <literal>item</literal> element can be associated with a label that directly precedes it. The Schema requires that if one <literal>item</literal> in a <literal>list</literal> has an associated <literal>label</literal>, then all other items must have one as well. This mitigates the problem of loose connections between elements that is commonly encountered in XHTML, since every item in particular list has the same structure.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:list.3" xreflabel="list"/>
+        </para>
+        <para>list</para>
+        <para>Children</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:hi.6" xreflabel="hi"/>
+        </para>
+        <para>hi</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:xref.3" xreflabel="xref"/>
+        </para>
+        <para>xref</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:figure.3" xreflabel="figure"/>
+        </para>
+        <para>figure</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:field.6" xreflabel="field"/>
+        </para>
+        <para>field</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:list.4" xreflabel="list"/>
+        </para>
+        <para>list</para>
+        <para> (any)</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>id</term>
+            <listitem>
+              <para>optional</para>
+              <para>A unique identifier of the element</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>n</term>
+            <listitem>
+              <para>optional</para>
+              <para>A non-unique local identifier used to differentiate the element from its siblings</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>rend</term>
+            <listitem>
+              <para>optional</para>
+              <para>A rendering hint used to override the default display of the element.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+&lt;list n=&quot;list-example&quot;
+	id=&quot;XMLExample.list.list-example&quot;&gt;
+  &lt;head&gt; Example List &lt;/head&gt;
+  <emphasis role="bold"> &lt;item&gt; This is the first item
+	&lt;/item&gt;</emphasis>
+  <emphasis role="bold"> &lt;item&gt; This is the second item with &lt;hi ...&gt;highlighted text&lt;/hi&gt;,
+	&lt;xref ...&gt; a link&lt;/xref&gt; and an &lt;figure
+	...&gt;image&lt;/figure&gt;.&lt;/item&gt;</emphasis>
+  ...
+  &lt;list n=&quot;list-example2&quot;
+	id=&quot;XMLExample.list.list-example2&quot;&gt;
+    &lt;head&gt; Example List &lt;/head&gt;
+    &lt;label&gt;ITEM ONE:&lt;/label&gt;
+    <emphasis role="bold"> &lt;item&gt; This is the first item
+	&lt;/item&gt;</emphasis>
+    &lt;label&gt;ITEM TWO:&lt;/label&gt;
+    <emphasis role="bold"> &lt;item&gt; This is the second item with &lt;hi ...&gt;highlighted
+	text&lt;/hi&gt;, &lt;xref ...&gt; a link&lt;/xref&gt; and an &lt;figure
+	...&gt;image&lt;/figure&gt;.&lt;/item&gt;</emphasis>
+    &lt;label&gt;ITEM THREE:&lt;/label&gt;
+    <emphasis role="bold"> &lt;item&gt; This is the third item with a &lt;field ...&gt; ... &lt;/field&gt;
+	&lt;/item&gt;</emphasis>
+    ...
+  &lt;/list&gt;
+  <emphasis role="bold"> &lt;item&gt; This is the third item in the list
+	&lt;/item&gt;</emphasis>
+  ...
+&lt;/list&gt;
+</screen>
+        <!--end of item element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:label" xreflabel="label"/>label</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Text-Container.4" xreflabel="Text Container"/>
+        </para>
+        <para>Text Container</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Structural-Element.9" xreflabel="Structural
+Element"/>
+        </para>
+        <para>Structural Element</para>
+        <para>The <literal>label</literal> element is associated with an item and annotates that item with a number, a textual description of some sort, or a simple bullet.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:item.4" xreflabel="item"/>
+        </para>
+        <para>item</para>
+        <para>Children</para>
+        <para>none</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>id</term>
+            <listitem>
+              <para>optional</para>
+              <para>A unique identifier of the element</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>n</term>
+            <listitem>
+              <para>optional</para>
+              <para>A local identifier used to differentiate the element from its siblings</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>rend</term>
+            <listitem>
+              <para>optional</para>
+              <para>An optional rend attribute provides a hint on how the label should be rendered, independent of its type.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+&lt;list n=&quot;list-example&quot;
+	id=&quot;XMLExample.list.list-example&quot;&gt;
+  &lt;head&gt;Example List&lt;/head&gt;
+  <emphasis role="bold"> &lt;label&gt;1&lt;/label&gt;</emphasis>
+  &lt;item&gt; This is the first item  &lt;/item&gt;
+  <emphasis role="bold"> &lt;label&gt;2&lt;/label&gt;</emphasis>
+  &lt;item&gt; This is the second item with &lt;hi ...&gt;highlighted text&lt;/hi&gt;,
+	&lt;xref ...&gt; a link&lt;/xref&gt; and an &lt;figure
+	...&gt;image&lt;/figure&gt;.&lt;/item&gt;
+  ...
+  &lt;list n=&quot;list-example2&quot;
+	id=&quot;XMLExample.list.list-example2&quot;&gt;
+    &lt;head&gt;Example Sublist&lt;/head&gt;
+    <emphasis role="bold"> &lt;label&gt;ITEM
+	ONE:&lt;/label&gt;</emphasis>
+    &lt;item&gt; This is the first item  &lt;/item&gt;
+    <emphasis role="bold"> &lt;label&gt;ITEM
+	TWO:&lt;/label&gt;</emphasis>
+    &lt;item&gt; This is the second item with &lt;hi ...&gt;highlighted
+	text&lt;/hi&gt;, &lt;xref ...&gt; a link&lt;/xref&gt; and an &lt;figure
+	...&gt;image&lt;/figure&gt;.&lt;/item&gt;
+    <emphasis role="bold"> &lt;label&gt;ITEM
+	THREE:&lt;/label&gt;</emphasis>
+    &lt;item&gt; This is the third item with a &lt;field ...&gt; ... &lt;/field&gt;
+	&lt;/item&gt;
+    ...
+  &lt;/list&gt;
+  &lt;item&gt; This is the third item in the list &lt;/item&gt;
+  ...
+&lt;/list&gt;
+</screen>
+        <!--end of label element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:list" xreflabel="list"/>list</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Structural-Element.10" xreflabel="Structural Element"/>
+        </para>
+        <para>Structural Element</para>
+        <para>The <literal>list</literal> element is used to display sets of sequential data. It contains an optional <literal>head</literal> element, as well as any number of <literal>item</literal> and <literal>list</literal> elements. <literal>Items</literal> contain textual information, while sublists contain other <literal>item</literal> or <literal>list</literal> elements. An <literal>item</literal> can also be associated with a <literal>label</literal> element that annotates an item with a number, a textual description of some sort, or a simple bullet. The list type (ordered, bulleted, gloss, etc.) is then determined either by the content of <literal>labels</literal> on <literal>items</literal> or by an explicit value of the <emphasis>type</emphasis> attribute. Note that if <literal>labels</literal> are used in conjunction with any <literal>items</literal> in a list, all of the <literal>items</literal> in that list must have a <literal>label</literal>. It is also recommended to avoid mixing <literal>label</literal> styles unless an explicit type is specified.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:div.5" xreflabel="div"/>
+        </para>
+        <para>div</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:list.5" xreflabel="list"/>
+        </para>
+        <para>list</para>
+        <para>Children</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:head.2" xreflabel="head"/>
+        </para>
+        <para>head</para>
+        <para> (zero or one)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:label.1" xreflabel="label"/>
+        </para>
+        <para>label</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:item.5" xreflabel="item"/>
+        </para>
+        <para>item</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:list.6" xreflabel="list"/>
+        </para>
+        <para>list</para>
+        <para> (any)</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>id</term>
+            <listitem>
+              <para>required</para>
+              <para>A unique identifier of the element</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>n</term>
+            <listitem>
+              <para>required</para>
+              <para>A local identifier used to differentiate the element from its siblings</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>rend</term>
+            <listitem>
+              <para>optional</para>
+              <para>An optional rend attribute provides a hint on how the list should be rendered, independent of its type. Common values are but not limited to: <variablelist>
+                  <varlistentry>
+                    <term>alphabet</term>
+                    <listitem>
+                      <para>The list should be rendered as an alphabetical index</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>columns</term>
+                    <listitem>
+                      <para>The list should be rendered in equal length columns as determined by the theme.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>columns2</term>
+                    <listitem>
+                      <para>The list should be rendered in two equal columns.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>columns3</term>
+                    <listitem>
+                      <para>The list should be rendered in three equal columns.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>horizontal</term>
+                    <listitem>
+                      <para>The list should be rendered horizontally.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>numeric</term>
+                    <listitem>
+                      <para>The list should be rendered as a numeric index.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>vertical</term>
+                    <listitem>
+                      <para>The list should be rendered vertically.</para>
+                    </listitem>
+                  </varlistentry>
+                </variablelist>
+</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>type</term>
+            <listitem>
+              <para>optional</para>
+              <para>An optional attribute to explicitly specify the type of list. In the absence of this attribute, the type of a list will be inferred from the presence and content of labels on its items. Accepted values are: <variablelist>
+                  <varlistentry>
+                    <term>form</term>
+                    <listitem>
+                      <para>Used for form lists that consist of a series of fields.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>bulleted</term>
+                    <listitem>
+                      <para>Used for lists with bullet-marked items.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>gloss</term>
+                    <listitem>
+                      <para>Used for lists consisting of a set of technical terms, each marked with a <literal>label</literal> element and accompanied by the definition marked as an <literal>item</literal> element.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>ordered</term>
+                    <listitem>
+                      <para>Used for lists with numbered or lettered items.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>progress</term>
+                    <listitem>
+                      <para>Used for lists consisting of a set of steps currently being performed to accomplish a task. For this type to apply, each <literal>item</literal> in the list should represent a step and be accompanied by a <literal>label</literal> that contains the displayable name for the step. The <literal>item</literal> contains an <literal>xref</literal> that references the step. Also the <emphasis>rend</emphasis> attribute on the <literal>item</literal> element should be: ìavailableî (meaning the user may jump to the step using the provided <literal>xref</literal>), ìunavailableî (the user has not meet the requirements to jump to the step), or ìcurrentî (the user is currently on the step)</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>simple</term>
+                    <listitem>
+                      <para>Used for lists with items not marked with numbers or bullets.</para>
+                    </listitem>
+                  </varlistentry>
+                </variablelist>
+</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+&lt;div ...&gt;
+  ...
+  <emphasis role="bold"> &lt;list n=&quot;list-example&quot;
+	id=&quot;XMLExample.list.list-example&quot;&gt;</emphasis>
+    &lt;head&gt;Example List&lt;/head&gt;
+    &lt;item&gt; ... &lt;/item&gt;
+    &lt;item&gt; ... &lt;/item&gt;
+    ...
+    <emphasis role="bold"> &lt;list n=&quot;list-example2&quot;
+	id=&quot;XMLExample.list.list-example2&quot;&gt;</emphasis>
+      &lt;head&gt;Example Sublist&lt;/head&gt;
+      &lt;label&gt; ... &lt;/label&gt;
+      &lt;item&gt; ... &lt;/item&gt;
+      &lt;label&gt; ... &lt;/label&gt;
+      &lt;item&gt; ... &lt;/item&gt;
+      &lt;label&gt; ... &lt;/label&gt;
+      &lt;item&gt; ... &lt;/item&gt;
+      ...
+    <emphasis role="bold"> &lt;/list&gt;</emphasis>
+    &lt;label&gt; ... &lt;/label&gt;
+    &lt;item&gt; ... &lt;/item&gt;
+    ...
+  <emphasis role="bold"> &lt;/list&gt;</emphasis>
+&lt;/div&gt;
+</screen>
+        <!--end of list element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:meta" xreflabel="META"/>META</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Top-Level-Container.1" xreflabel="Top-Level Container"/>
+        </para>
+        <para>Top-Level Container</para>
+        <para>The <literal>meta</literal> element is a top level element and exists directly inside the <literal>document</literal> element. It serves as a container element for all metadata associated with a document broken up into categories according to the type of metadata they carry.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:document.2" xreflabel="document"/>
+        </para>
+        <para>document</para>
+        <para>Children</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:userMeta.1" xreflabel="userMeta"/>
+        </para>
+        <para>userMeta</para>
+        <para> (one)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:pageMeta.1" xreflabel="pageMeta"/>
+        </para>
+        <para>pageMeta</para>
+        <para> (one)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:repositoryMeta.1" xreflabel="repositoryMeta"/>
+        </para>
+        <para>repositoryMeta</para>
+        <para> (one)</para>
+        <para>Attributes</para>
+        <para>None</para>
+        <screen>
+&lt;document version=1.0&gt;
+  <emphasis role="bold"> &lt;meta&gt;</emphasis>
+    &lt;userMeta&gt; ... &lt;/userMeta&gt;
+    &lt;pageMeta&gt; ... &lt;/pageMeta&gt;
+    &lt;repositoryMeta&gt; ... &lt;/repositoryMeta&gt;
+  <emphasis role="bold"> &lt;/meta&gt;</emphasis>
+  &lt;body&gt; ... &lt;/body&gt;
+  &lt;options&gt; ... &lt;/options&gt;
+&lt;/document&gt;
+</screen>
+        <!--end of META element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:metadata" xreflabel="metadata"/>metadata</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Text-Container.5" xreflabel="Text Container"/>
+        </para>
+        <para>Text Container</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Structural-Element.11" xreflabel="Structural
+Element"/>
+        </para>
+        <para>Structural Element</para>
+        <para>The <literal>metadata</literal> element carries generic metadata information in the form on an attribute-value pair. The type of information it contains is determined by two attributes: <emphasis>element</emphasis>, which specifies the general type of metadata stored, and an optional <emphasis>qualifier</emphasis> attribute that narrows the type down. The standard representation for this pairing is element.qualifier. The actual metadata is contained in the text of the tag itself. Additionally, a <emphasis>language</emphasis> attribute can be used to specify the language used for the metadata entry.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:userMeta.2" xreflabel="userMeta"/>
+        </para>
+        <para>userMeta</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:pageMeta.2" xreflabel="pageMeta"/>
+        </para>
+        <para>pageMeta</para>
+        <para>Children</para>
+        <para>none</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>element</term>
+            <listitem>
+              <para>required</para>
+              <para>The name of a metadata field.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>language</term>
+            <listitem>
+              <para>optional</para>
+              <para>An optional attribute to specify the language used in the metadata tag.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>qualifier</term>
+            <listitem>
+              <para>optional</para>
+              <para>An optional postfix to the field name used to further differentiate the names.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+&lt;meta&gt;
+  &lt;userMeta&gt;
+    <emphasis role="bold"> &lt;metadata element=&quot;identifier&quot; qualifier=&quot;firstName&quot;&gt; Bob
+	&lt;/metadata&gt;</emphasis>
+    <emphasis role="bold"> &lt;metadata element=&quot;identifier&quot; qualifier=&quot;lastName&quot;&gt; Jones
+	&lt;/metadata&gt;</emphasis>
+    <emphasis role="bold"> &lt;metadata ...&gt; ...
+	&lt;/metadata&gt;</emphasis>
+    ...
+  &lt;/userMeta&gt;
+  &lt;pageMeta&gt;
+    <emphasis role="bold"> &lt;metadata element=&quot;rights&quot;
+	qualifier=&quot;accessRights&quot;&gt;user&lt;/metadata&gt;</emphasis>
+
+
+    <emphasis role="bold"> &lt;metadata ...&gt; ...
+	&lt;/metadata&gt;</emphasis>
+    ...
+  &lt;/pageMeta&gt;
+&lt;/meta&gt;
+</screen>
+        <!--end of metadata element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:options" xreflabel="OPTIONS"/>OPTIONS</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Top-Level-Container.2" xreflabel="Top-Level Container"/>
+        </para>
+        <para>Top-Level Container</para>
+        <para>The <literal>options</literal> element is the main container for all actions and navigation options available to the user. It consists of any number of <literal>list</literal> elements whose items contain navigation information and actions. While any list of navigational options may be contained in this element, it is suggested that at least the following 5 lists be included.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:document.3" xreflabel="document"/>
+        </para>
+        <para>document</para>
+        <para>Children</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:list.7" xreflabel="list"/>
+        </para>
+        <para>list</para>
+        <para> (any)</para>
+        <para>Attributes</para>
+        <para>None</para>
+        <screen>
+&lt;document version=1.0&gt;
+
+    &lt;meta&gt; ... &lt;/meta&gt;
+
+    &lt;body&gt; ... &lt;/body&gt;
+
+    <emphasis role="bold"> &lt;options&gt;</emphasis>
+
+        &lt;list n=&quot;navigation-example1&quot;
+	id=&quot;XMLExample.list.navigation-example1&quot;&gt;
+
+            &lt;head&gt;Example Navigation List 1&lt;/head&gt;
+
+            &lt;item&gt;&lt;xref target=&quot;/link/to/option&quot;&gt;Option
+	One&lt;/xref&gt;&lt;/item&gt;
+
+            &lt;item&gt;&lt;xref target=&quot;/link/to/option&quot;&gt;Option
+	two&lt;/xref&gt;&lt;/item&gt;
+
+                ...
+
+        &lt;/list&gt;
+
+        &lt;list n=&quot;navigation-example2&quot;
+	id=&quot;XMLExample.list.navigation-example2&quot;&gt;
+
+            &lt;head&gt;Example Navigation List 2&lt;/head&gt;
+
+            &lt;item&gt;&lt;xref target=&quot;/link/to/option&quot;&gt;Option
+	One&lt;/xref&gt;&lt;/item&gt;
+
+            &lt;item&gt;&lt;xref target=&quot;/link/to/option&quot;&gt;Option
+	two&lt;/xref&gt;&lt;/item&gt;
+
+            ...
+
+        &lt;/list&gt;
+
+        ...
+
+    <emphasis role="bold"> &lt;/options&gt;</emphasis>
+
+&lt;/document&gt;
+</screen>
+        <!--end of OPTIONS element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:p" xreflabel="p"/>p</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Rich-Text-Container.3" xreflabel="Rich Text Container"/>
+        </para>
+        <para>Rich Text Container</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Structural-Element.12" xreflabel="Structural
+Element"/>
+        </para>
+        <para>Structural Element</para>
+        <para>The <literal>p</literal> element is a rich text container used by <literal>divs</literal> to display textual data in a paragraph format. As a rich text container it can contain hyperlinks, emphasized blocks of text, images and form fields in addition to plain text.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:div.6" xreflabel="div"/>
+        </para>
+        <para>div</para>
+        <para>Children</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:hi.7" xreflabel="hi"/>
+        </para>
+        <para>hi</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:xref.4" xreflabel="xref"/>
+        </para>
+        <para>xref</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:figure.4" xreflabel="figure"/>
+        </para>
+        <para>figure</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:field.7" xreflabel="field"/>
+        </para>
+        <para>field</para>
+        <para> (any)</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>id</term>
+            <listitem>
+              <para>optional</para>
+              <para>A unique identifier of the element.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>n</term>
+            <listitem>
+              <para>optional</para>
+              <para>A local identifier used to differentiate the element from its siblings.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>rend</term>
+            <listitem>
+              <para>optional</para>
+              <para>A rendering hint used to override the default display of the element.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+&lt;div n=&quot;division-example&quot;
+	id=&quot;XMLExample.div.division-example&quot;&gt;
+
+    <emphasis role="bold"> &lt;p&gt; This is a regular paragraph.
+	&lt;/p&gt;</emphasis>
+
+    <emphasis role="bold"> &lt;p&gt; This text is normal, while &lt;hi rend=&quot;bold&quot;&gt;this text is bold
+	and this text is &lt;hi rend=&quot;italic&quot;&gt;bold and italic.&lt;/hi&gt;&lt;/hi&gt;
+	&lt;/p&gt;</emphasis>
+
+    <emphasis role="bold"> &lt;p&gt; This paragraph contains a &lt;xref
+	target=&quot;/link/target&quot;&gt;link&lt;/xref&gt;, a static &lt;figure
+	source=&quot;/image.jpg&quot;&gt;image&lt;/figure&gt;, and a &lt;figure target=
+	&quot;/link/target&quot; source=&quot;/image.jpg&quot;&gt;image link.&lt;/figure&gt;
+	&lt;/p&gt;</emphasis>
+
+&lt;/div&gt;
+</screen>
+        <!--end of p element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:pageMeta" xreflabel="pageMeta"/>pageMeta</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Metadata-Element" xreflabel="Metadata Element"/>
+        </para>
+        <para>Metadata Element</para>
+        <para>The <literal>pageMeta</literal> element contains metadata associated with the document itself. It contains generic <literal>metadata</literal> elements to carry the content, and any number of <literal>trail</literal> elements to provide information on the userís current location in the system. Required and suggested values for <literal>metadata</literal> elements contained in <literal>pageMeta</literal> include but are not limited to:</para>
+        <itemizedlist>
+          <listitem>
+            <para> browser (suggested): The userís browsing agent as reported to server in the HTTP request.</para>
+          </listitem>
+          <listitem>
+            <para> browser.type (suggested): The general browser family as derived form the browser metadata field. Possible values may include &quot;MSIE&quot; (for Microsoft Internet Explorer), &quot;Opera&quot; (for the Opera browser), &quot;Apple&quot; (for Apple web kit based browsers), &quot;Gecko&quot; (for Netscape, Mozilla, and Firefox based browsers), or &quot;Lynx&quot; (for text based browsers).</para>
+          </listitem>
+          <listitem>
+            <para> browser.version (suggested): The browser version as reported by HTTP Request.</para>
+          </listitem>
+          <listitem>
+            <para> contextPath (required): The base URL of the Digital Repository system.</para>
+          </listitem>
+          <listitem>
+            <para> redirect.time (suggested): The time that must elapse before the page is redirected to an address specified by the redirect.url <literal>metadata</literal> element.</para>
+          </listitem>
+          <listitem>
+            <para> redirect.url (suggested): The URL destination of a redirect page</para>
+          </listitem>
+          <listitem>
+            <para> title (required): The title of the document/page that the user currently browsing.</para>
+          </listitem>
+        </itemizedlist>
+        <para> See the <literal>metadata</literal> and <literal>trail</literal> tag entries for more information on their structure. </para>
+        <para>Parent<anchor id="docbook-DRISchemaReference.html--element:meta.2" xreflabel="meta"/>metaChildren<anchor id="docbook-DRISchemaReference.html--element:metadata.1" xreflabel="metadata"/>metadata (any)<anchor id="docbook-DRISchemaReference.html--element:trail.1" xreflabel="trail"/>trail
+	(any)AttributesNone<screen>
+&lt;meta&gt;
+
+    &lt;userMeta&gt; ... &lt;/userMeta&gt;
+
+    <emphasis role="bold"> &lt;pageMeta&gt;</emphasis>
+
+        &lt;metadata element=&quot;title&quot;&gt;Examlpe DRI
+	page&lt;/metadata&gt;
+
+        &lt;metadata
+	element=&quot;contextPath&quot;&gt;/xmlui/&lt;/metadata&gt;
+
+        &lt;metadata ...&gt; ... &lt;/metadata&gt;
+
+        ...
+
+        &lt;trail source=&quot;123456789/6&quot;&gt; A bread crumb item
+	&lt;/trail&gt;
+
+        &lt;trail ...&gt; ... &lt;/trail&gt;
+
+        ...
+
+    <emphasis role="bold"> &lt;/pageMeta&gt;</emphasis>
+
+&lt;/meta&gt;
+</screen>          <!--end of pageMeta element-->
+</para>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:params" xreflabel="params"/>params</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Structural-Component" xreflabel="Structural Component"/>
+        </para>
+        <para>Structural Component</para>
+        <para>The <literal>params</literal> element identifies extra parameters used to build a form field. There are several attributes that may be available for this element depending on the field type.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:field.8" xreflabel="field"/>
+        </para>
+        <para>field</para>
+        <para>Children</para>
+        <para>none</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>cols</term>
+            <listitem>
+              <para>optional</para>
+              <para>The default number of columns that the text area should span. This applies only to textarea field types.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>maxlength</term>
+            <listitem>
+              <para>optional</para>
+              <para>The maximum length that the theme should accept for form input. This applies to text and password field types.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>multiple</term>
+            <listitem>
+              <para>optional</para>
+              <para>yes/no value. Determine if the field can accept multiple values for the field. This applies only to select lists.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>operations</term>
+            <listitem>
+              <para>optional</para>
+              <para> The possible operations that may be preformed on this field. The possible values are &quot;add&quot; and/or &quot;delete&quot;. If both operations are possible then they should be provided as a space separated list.</para>
+              <para>The &quot;add&quot; operations indicates that there may be multiple values for this field and the user may add to the set one at a time. The front-end should render a button that enables the user to add more fields to the set. The button must be named the field name appended with the string &quot;_add&quot;, thus if the fieldís name is &quot;firstName&quot; the button must be called &quot;firstName_add&quot;.</para>
+              <para>The &quot;delete&quot; operation indicates that there may be multiple values for this field each of which may be removed from the set. The front-end should render a checkbox by each field value, except for the first, The checkbox must be named the field name appended with the string &quot;_selected&quot;, thus if the fieldís name is &quot;firstName&quot; the checkbox must be called &quot;firstName_selected&quot; and the value of each successive checkbox should be the field name. The front-end must also render a delete button. The delete button name must be the fieldís name appended with the string &quot;_delete&quot;.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>rows</term>
+            <listitem>
+              <para>optional</para>
+              <para>The default number of rows that the text area should span. This applies only to textarea field types.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>size</term>
+            <listitem>
+              <para>optional</para>
+              <para>The default size for a field. This applies to text, password, and select field types.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+&lt;p&gt;
+
+    &lt;field id=&quot;XMLExample.field.name&quot; n=&quot;name&quot; type=&quot;text&quot;
+	required=&quot;yes&quot;&gt;
+
+        <emphasis role="bold"> &lt;params size=&quot;16&quot;
+	maxlength=&quot;32&quot;/&gt;</emphasis>
+
+        &lt;help&gt;Some help text with &lt;i18n&gt;localized
+	content&lt;/i18n&gt;.&lt;/help&gt;
+
+        &lt;default&gt;Default value goes here&lt;/default&gt;
+
+    &lt;/field&gt;
+
+&lt;/p&gt;
+</screen>
+        <!--end of params element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:refrence" xreflabel="refrence"/>refrence</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Metadata-Reference-Element" xreflabel="Metadata Reference
+Element"/>
+        </para>
+        <para>Metadata Reference Element</para>
+        <para><literal>refrence</literal> is a reference element used to access information stored in an extarnal metadata file. The <emphasis>url</emphasis> attribute is used to locate the external metadata file. The <emphasis>type</emphasis> attribute provides a short limited description of the referenced object&apos;s type.</para>
+        <para><literal>refrence</literal> elements can be both contained by <literal>includeSet</literal> elements and contain <literal>includeSets</literal> themselves, making the structure recursive.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:referenceSet.3" xreflabel="referenceSet"/>
+        </para>
+        <para>referenceSet</para>
+        <para>Children</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:referenceSet.4" xreflabel="referenceSet"/>
+        </para>
+        <para>referenceSet</para>
+        <para> (zero or more)</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>url</term>
+            <listitem>
+              <para>required</para>
+              <para>A url to the external metadata file.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>repositoryIdentifier</term>
+            <listitem>
+              <para>required</para>
+              <para>A reference to the repositoryIdentifier of the repository.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>type</term>
+            <listitem>
+              <para>optional</para>
+              <para>Description of the refrence object&apos;s type.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+            &lt;includeSet n=&quot;browse-list&quot;
+	id=&quot;XMLTest.includeSet.browse-list&quot;&gt;
+            <emphasis role="bold"> &lt;refrence url=&quot;/metadata/handle/123/4/mets.xml&quot;
+	repositoryID=&quot;123&quot; type=&quot;DSpace
+	Item&quot;/&gt;</emphasis>
+            <emphasis role="bold"> &lt;refrence url=&quot;/metadata/handle/123/5/mets.xml&quot;
+	repositoryID=&quot;123&quot; /&gt;</emphasis>
+            ...
+            &lt;/includeSet&gt;
+         
+</screen>
+        <!--end of objectInlcude element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:referenceSet" xreflabel="referenceSet"/>referenceSet</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Metadata-Reference-Element.1" xreflabel="Metadata Reference
+Element"/>
+        </para>
+        <para>Metadata Reference Element</para>
+        <para>The <literal>referenceSet</literal> element is a container of artifact or repository references.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:div.7" xreflabel="div"/>
+        </para>
+        <para>div</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:refrence.1" xreflabel="refrence"/>
+        </para>
+        <para>refrence</para>
+        <para>Children</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:head.3" xreflabel="head"/>
+        </para>
+        <para>head</para>
+        <para> (zero or one)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:refrence.2" xreflabel="refrence"/>
+        </para>
+        <para>refrence</para>
+        <para> (any)</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>id</term>
+            <listitem>
+              <para>required</para>
+              <para>A unique identifier of the element</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>n</term>
+            <listitem>
+              <para>required</para>
+              <para>Local identifier used to differentiate the element from its siblings</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>orderBy</term>
+            <listitem>
+              <para>optional</para>
+              <para>A reference to the metadata field that determines the ordering of artifacts or repository objects within the set. When the Dublin Core metadata scheme is used this attribute should be the element.qualifier value that the set is sorted by. As an example, for a browse by title list, the value should be sortedBy=title, while for browse by date list it should be sortedBy=date.created</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>rend</term>
+            <listitem>
+              <para>optional</para>
+              <para>A rendering hint used to override the default display of the element.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>type</term>
+            <listitem>
+              <para>required</para>
+              <para>Determines the level of detail for the given metadata. Accepted values are: <variablelist>
+                  <varlistentry>
+                    <term>summaryList</term>
+                    <listitem>
+                      <para>Indicates that the metadata from referenced artifacts or repository objects should be used to build a list representation that is suitable for quick scanning.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>summaryView</term>
+                    <listitem>
+                      <para>Indicates that the metadata from referenced artifacts or repository objects should be used to build a partial view of the referenced object or objects.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>detailList</term>
+                    <listitem>
+                      <para>Indicates that the metadata from referenced artifacts or repository objects should be used to build a list representation that provides a complete, or near complete, view of the referenced objects. Whether such a view is possible or different from summaryView depends largely on the repository at hand and the implementing theme.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>detailView</term>
+                    <listitem>
+                      <para>Indicates that the metadata from referenced artifacts or repository objects should be used to display complete information about the referenced object. Rendering of several references included under this type is up to the theme.</para>
+                    </listitem>
+                  </varlistentry>
+                </variablelist>
+</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+            &lt;div ...&gt;
+            &lt;head&gt; Example Division &lt;/head&gt;
+            &lt;p&gt; ... &lt;/p&gt;
+            &lt;table&gt; ... &lt;/table&gt;
+            &lt;list&gt;
+            ...
+            &lt;/list&gt;
+            <emphasis role="bold"> &lt;referenceSet n=&quot;browse-list&quot;
+	id=&quot;XMLTest.referenceSet.browse-list&quot; type=&quot;summaryView&quot;
+	informationModel=&quot;DSpace&quot;&gt;</emphasis>
+            &lt;head&gt;A header for the includeset&lt;/head&gt;
+            &lt;refrence
+	url=&quot;/metadata/handle/123/34/mets.xml&quot;/&gt;
+            &lt;refrence
+	url=&quot;&quot;metadata/handle/123/34/mets.xml/&gt;
+            <emphasis role="bold"> &lt;/referenceSet&gt;</emphasis>
+            ...
+            &lt;/p&gt;
+</screen>
+        <!--end of referenceSet element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:repository" xreflabel="repository"/>repository</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Metadata-Element.1" xreflabel="Metadata Element"/>
+        </para>
+        <para>Metadata Element</para>
+        <para>The <literal>repository</literal> element is used to describe the repository. Its principal component is a set of structural metadata that carrier information on how the repositoryís objects under <literal>objectMeta</literal> are related to each other. The principal method of encoding these relationships at the time of this writing is a METS document, although other formats, like RDF, may be employed in the future.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:repositoryMeta.2" xreflabel="repositoryMeta"/>
+        </para>
+        <para>repositoryMeta</para>
+        <para>Children</para>
+        <para>none</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>repositoryID</term>
+            <listitem>
+              <para>required</para>
+              <para>A unique identifier assigned to a repository. It is referenced by the <literal>object</literal> element to signify the repository that assigned its identifier.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>url</term>
+            <listitem>
+              <para>required</para>
+              <para>A url to the external METS metadata file for the repository.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+&lt;repositoryMeta&gt;
+
+    <emphasis role="bold"> &lt;repository repositoryID=&quot;123456789&quot;
+	url=&quot;/metadata/handle/1234/4/mets.xml&quot; /&gt;</emphasis>
+
+&lt;/repositoryMeta&gt;
+</screen>
+        <!--end of repository-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:repositoryMeta" xreflabel="repositoryMeta"/>repositoryMeta</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Metadata-Element.2" xreflabel="Metadata Element"/>
+        </para>
+        <para>Metadata Element</para>
+        <para>The <literal>repositoryMeta</literal> element contains metadata refernces about the repositories used in the used or refrenced in the documnet. It can contain any number of <literal>repository</literal> elements.</para>
+        <para>See the <literal>repository</literal> tag entry for more information on the structure of <literal>repository</literal> elements.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:Meta" xreflabel="Meta"/>
+        </para>
+        <para>Meta</para>
+        <para>Children</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:repository.1" xreflabel="repository"/>
+        </para>
+        <para>repository</para>
+        <para> (any)</para>
+        <para>Attributes</para>
+        <para>None</para>
+        <screen>
+&lt;meta&gt;
+
+  &lt;userMeta&gt; ... &lt;/usermeta&gt;
+
+  &lt;pageMeta&gt; ... &lt;/pageMeta&gt;
+
+    <emphasis role="bold"> &lt;repositoryMeta&gt;</emphasis>
+
+        &lt;repository repositoryIID=&quot;...&quot; url=&quot;...&quot;
+	/&gt;
+
+    <emphasis role="bold"> &lt;/repositoryMeta&gt;</emphasis>
+
+&lt;/meta&gt;
+</screen>
+        <!--end of repositoryMeta element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:row" xreflabel="row"/>row</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Structural-Element.13" xreflabel="Structural Element"/>
+        </para>
+        <para>Structural Element</para>
+        <para>The row element is contained inside a <literal>table</literal> and serves as a container of <literal>cell</literal> elements. A required <emphasis>role</emphasis> attribute determines how the row and its cells are rendered.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:table.3" xreflabel="table"/>
+        </para>
+        <para>table</para>
+        <para>Children</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:cell.4" xreflabel="cell"/>
+        </para>
+        <para>cell</para>
+        <para> (any)</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>id</term>
+            <listitem>
+              <para>optional</para>
+              <para>A unique identifier of the element</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>n</term>
+            <listitem>
+              <para>optional</para>
+              <para>A local identifier used to differentiate the element from its siblings</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>rend</term>
+            <listitem>
+              <para>optional</para>
+              <para>A rendering hint used to override the default display of the element.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>role</term>
+            <listitem>
+              <para>required</para>
+              <para>Indicates what kind of information the row carries. Possible values include &quot;header&quot; and &quot;data&quot;.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+&lt;table n=&quot;table-example&quot; id=&quot;XMLExample.table.table-example&quot; rows=&quot;2&quot;
+	cols=&quot;3&quot;&gt;
+
+    <emphasis role="bold"> &lt;row
+	role=&quot;head&quot;&gt;</emphasis>
+
+      &lt;cell cols=&quot;2&quot;&gt;Data Label One and
+	Two&lt;/cell&gt;
+
+        &lt;cell&gt;Data Label Three&lt;/cell&gt;
+
+        ...
+
+    <emphasis role="bold"> &lt;/row&gt; &lt;row&gt;</emphasis>
+
+      &lt;cell&gt; Value One &lt;/cell&gt;
+
+      &lt;cell&gt; Value Two &lt;/cell&gt;
+
+      &lt;cell&gt; Value Three &lt;/cell&gt;
+
+      ...
+
+    <emphasis role="bold"> &lt;/row&gt;</emphasis>
+
+    ...
+
+&lt;/table&gt;
+</screen>
+        <!--end of row element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:table" xreflabel="table"/>table</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Structural-Element.14" xreflabel="Structural Element"/>
+        </para>
+        <para>Structural Element</para>
+        <para>The <literal>table</literal> element is a container for information presented in tabular format. It consists of a set of <literal>row</literal> elements and an optional <literal>header</literal>.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:div.8" xreflabel="div"/>
+        </para>
+        <para>div</para>
+        <para>Children</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:head.4" xreflabel="head"/>
+        </para>
+        <para>head</para>
+        <para> (zero or one)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:row.2" xreflabel="row"/>
+        </para>
+        <para>row</para>
+        <para> (any)</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>cols</term>
+            <listitem>
+              <para>required</para>
+              <para>The number of columns in the table.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>id</term>
+            <listitem>
+              <para>required</para>
+              <para>A unique identifier of the element</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>n</term>
+            <listitem>
+              <para>required</para>
+              <para>A local identifier used to differentiate the element from its siblings</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>rend</term>
+            <listitem>
+              <para>optional</para>
+              <para>A rendering hint used to override the default display of the element.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>rows</term>
+            <listitem>
+              <para>required</para>
+              <para>The number of rows in the table.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+&lt;div n=&quot;division-example&quot;
+	id=&quot;XMLExample.div.division-example&quot;&gt;
+
+    <emphasis role="bold"> &lt;table n=&quot;table1&quot; id=&quot;XMLExample.table.table1&quot; rows=&quot;2&quot;
+	cols=&quot;3&quot;&gt;</emphasis>
+
+        &lt;row role=&quot;head&quot;&gt;
+
+          &lt;cell cols=&quot;2&quot;&gt;Data Label One and
+	Two&lt;/cell&gt;
+
+            &lt;cell&gt;Data Label Three&lt;/cell&gt;
+
+            ...
+
+        &lt;/row&gt;
+
+        &lt;row&gt;
+
+          &lt;cell&gt; Value One &lt;/cell&gt;
+
+          &lt;cell&gt; Value Two &lt;/cell&gt;
+
+          &lt;cell&gt; Value Three &lt;/cell&gt;
+
+          ...
+
+        &lt;/row&gt;
+
+        ...
+
+    <emphasis role="bold"> &lt;/table&gt;</emphasis>
+    ...
+&lt;/div&gt;
+</screen>
+        <!--end of table element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:trail" xreflabel="trail"/>trail</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Text-Container.6" xreflabel="Text Container"/>
+        </para>
+        <para>Text Container</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Metadata-Element.3" xreflabel="Metadata
+Element"/>
+        </para>
+        <para>Metadata Element</para>
+        <para>The <literal>trail</literal> element carries information about the userís current location in the system relative of the repositoryís root page. Each instance of the element serves as one link in the path from the root to the current page.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:pageMeta.3" xreflabel="pageMeta"/>
+        </para>
+        <para>pageMeta</para>
+        <para>Children</para>
+        <para>none</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>rend</term>
+            <listitem>
+              <para>optional</para>
+              <para>A rendering hint used to override the default display of the element.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>target</term>
+            <listitem>
+              <para>optional</para>
+              <para>An optional attribute to specify a target URL for a trail element serving as a hyperlink. The text inside the element will be used as the text of the link.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+&lt;pageMeta&gt;
+
+    &lt;metadata element=&quot;title&quot;&gt;Examlpe DRI
+	page&lt;/metadata&gt;
+
+    &lt;metadata
+	element=&quot;contextPath&quot;&gt;/xmlui/&lt;/metadata&gt;
+
+    &lt;metadata ...&gt; ... &lt;/metadata&gt;
+
+    ...
+
+    <emphasis role="bold"> &lt;trail target=&quot;/myDSpace&quot;&gt; A bread crumb item pointing to a
+	page. &lt;/trail&gt; &lt;trail ...&gt; ... &lt;/trail&gt;</emphasis>
+
+    ...
+
+&lt;/pageMeta&gt;
+</screen>
+        <!--end of trail element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:userMeta" xreflabel="userMeta"/>userMeta</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Metadata-Element.4" xreflabel="Metadata Element"/>
+        </para>
+        <para>Metadata Element</para>
+        <para>The <literal>userMeta</literal> element contains metadata associated with the user that requested the document. It contains generic <literal>metadata</literal> elements, which in turn carry the information. Required and suggested values for <literal>metadata</literal> elements contained in <literal>userMeta</literal> include but not limited to:</para>
+        <itemizedlist>
+          <listitem>
+            <para> identifier (suggested): A unique identifier associated with the user.</para>
+          </listitem>
+          <listitem>
+            <para> identifier.email (suggested): The requesting userís email address.</para>
+          </listitem>
+          <listitem>
+            <para> identifier.firstName (suggested): The requesting userís first name.</para>
+          </listitem>
+          <listitem>
+            <para> identifier.lastName (suggested): The requesting userís last name.</para>
+          </listitem>
+          <listitem>
+            <para> identifier.logoutURL (suggested): The URL that a user will be taken to when logging out.</para>
+          </listitem>
+          <listitem>
+            <para> identifier.url (suggested): A url reference to the userís page within the repository.</para>
+          </listitem>
+          <listitem>
+            <para> language.RFC3066 (suggested): The requesting userís preferred language selection code as describe by RFC3066</para>
+          </listitem>
+          <listitem>
+            <para> rights.accessRights (required): Determines the scope of actions that a user can perform in the system. Accepted values are: </para>
+            <itemizedlist>
+              <listitem>
+                <para> none: The user is either not authenticated or does not have a valid account on the system</para>
+              </listitem>
+              <listitem>
+                <para> user: The user is authenticated and has a valid account on the system</para>
+              </listitem>
+              <listitem>
+                <para> admin: The user is authenticated and belongs to the systemís administrative group</para>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+        </itemizedlist>
+        <para> See the <literal>metadata</literal> tag entry for more information on the structure of <literal>metadata</literal> elements. </para>
+        <para>Parent<anchor id="docbook-DRISchemaReference.html--element:meta.3" xreflabel="meta"/>metaChildren<anchor id="docbook-DRISchemaReference.html--element:metadata.2" xreflabel="metadata"/>metadata (any)Attributes<variablelist>
+            <varlistentry>
+              <term>authenticated</term>
+              <listitem>
+                <para>required</para>
+                <para>Accepted values are &quot;yes&quot;, &quot;no&quot;. Determines whether the user has been authenticated by the system.</para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+<screen>
+&lt;meta&gt;
+
+    <emphasis role="bold"> &lt;userMeta&gt;</emphasis>
+
+        &lt;metadata element=&quot;identifier&quot; qualifier=&quot;email&quot;&gt;
+	
+
+           bobJones@tamu.edu
+
+        &lt;/metadata&gt;
+
+        &lt;metadata element=&quot;identifier&quot; qualifier=&quot;firstName&quot;&gt; Bob
+	&lt;/metadata&gt;
+
+        &lt;metadata element=&quot;identifier&quot; qualifier=&quot;lastName&quot;&gt; Jones
+	&lt;/metadata&gt;
+
+        &lt;metadata element=&quot;rights&quot;
+	qualifier=&quot;accessRights&quot;&gt;user&lt;/metadata&gt;
+
+        &lt;metadata ...&gt; ... &lt;/metadata&gt;
+
+        ...
+
+        &lt;trail source=&quot;123456789/6&quot;&gt; A bread crumb item
+	&lt;/trail&gt;
+
+        &lt;trail ...&gt; ... &lt;/trail&gt;
+
+        ...
+
+    <emphasis role="bold"> &lt;/userMeta&gt;</emphasis>
+
+    &lt;pageMeta&gt; ... &lt;/pageMeta&gt;
+
+&lt;/meta&gt;
+</screen>          <!--end of userMeta element-->
+</para>
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:value" xreflabel="value"/>value</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Rich-Text-Container.4" xreflabel="Rich Text Container"/>
+        </para>
+        <para>Rich Text Container</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Structural-Element.15" xreflabel="Structural
+Element"/>
+        </para>
+        <para>Structural Element</para>
+        <para>The value element contains the value associated with a form field and can serve a different purpose for various field types. The value element is comprised of two subelements: the raw element which stores the unprocessed value directly from the user of other source, and the interpreted element which stores the value in a format appropriate for display to the user, possibly including rich text markup.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:field.9" xreflabel="field"/>
+        </para>
+        <para>field</para>
+        <para>Children</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:hi.8" xreflabel="hi"/>
+        </para>
+        <para>hi</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:xref.5" xreflabel="xref"/>
+        </para>
+        <para>xref</para>
+        <para> (any)</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:figure.5" xreflabel="figure"/>
+        </para>
+        <para>figure</para>
+        <para> (any)</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>optionSelected</term>
+            <listitem>
+              <para>optional</para>
+              <para>An optional attribute for select, checkbox, and radio fields to determine if the value is to be selected or not.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>optionValue</term>
+            <listitem>
+              <para>optional</para>
+              <para>An optional attribute for select, checkbox, and radio fields to determine the value that should be returned when this value is selected.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>type</term>
+            <listitem>
+              <para>required</para>
+              <para>A required attribute to specify the type of value. Accepted types are: <variablelist>
+                  <varlistentry>
+                    <term>raw</term>
+                    <listitem>
+                      <para>The raw type stores the unprocessed value directly from the user of other source.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>interpreted</term>
+                    <listitem>
+                      <para>The interpreted type stores the value in a format appropriate for display to the user, possibly including rich text markup.</para>
+                    </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                    <term>default</term>
+                    <listitem>
+                      <para>The default type stores a value supplied by the system, used when no other values are provided.</para>
+                    </listitem>
+                  </varlistentry>
+                </variablelist>
+</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+&lt;p&gt;
+  &lt;hi&gt; ... &lt;/hi&gt;
+  &lt;xref&gt; ... &lt;/xref&gt;
+  &lt;figure&gt; ... &lt;/figure&gt;
+  &lt;field id=&quot;XMLExample.field.name&quot; n=&quot;name&quot; type=&quot;text&quot;
+	required=&quot;yes&quot;&gt;
+    &lt;params size=&quot;16&quot; maxlength=&quot;32&quot;/&gt;
+    &lt;help&gt;Some help text with &lt;i18n&gt;localized
+	content&lt;/i18n&gt;.&lt;/help&gt;
+    <emphasis role="bold"> &lt;value type=&quot;default&quot;&gt;Author,
+	John&lt;/value&gt;</emphasis>
+  &lt;/field&gt; 
+&lt;/p&gt;
+       
+</screen>
+        <!--end of value element-->
+      </section>
+      <section remap="h3">
+        <title><anchor id="docbook-DRISchemaReference.html-element:xref" xreflabel="xref"/>xref</title>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Text-Container.7" xreflabel="Text Container"/>
+        </para>
+        <para>Text Container</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--type:Structural-Element.16" xreflabel="Structural
+Element"/>
+        </para>
+        <para>Structural Element</para>
+        <para>The <literal>xref</literal> element is a reference to an external document. It can be mixed freely with text, and any text within the tag itself will be used as part of the linkís visual body.</para>
+        <para>Parent</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:cell.5" xreflabel="cell"/>
+        </para>
+        <para>cell</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:p.5" xreflabel="p"/>
+        </para>
+        <para>p</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:item.6" xreflabel="item"/>
+        </para>
+        <para>item</para>
+        <para>
+          <anchor id="docbook-DRISchemaReference.html--element:hi.9" xreflabel="hi"/>
+        </para>
+        <para>hi</para>
+        <para>Children</para>
+        <para>none</para>
+        <para>Attributes</para>
+        <variablelist>
+          <varlistentry>
+            <term>target</term>
+            <listitem>
+              <para>required</para>
+              <para>A target for the reference, using either a URL or an id of an existing element as a destination for the <literal>xref</literal>.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+        <screen>
+&lt;p&gt;
+
+    <emphasis role="bold"> &lt;xref target=&quot;/url/link/target&quot;&gt;This text is shown as a
+	link.&lt;/xref&gt;</emphasis>
+
+&lt;/p&gt;
+</screen>
+        <!--end of xref element-->
+      </section>
+    </section>
+  </chapter>
+
+

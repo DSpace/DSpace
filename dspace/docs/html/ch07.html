@@ -1,0 +1,89 @@
+<html><head><META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Chapter&nbsp;7.&nbsp;DSpace System Documentation: Architecture</title><meta content="DocBook XSL Stylesheets V1.74.0" name="generator"><link rel="home" href="index.html" title="DSpace 1.5.1 Manual"><link rel="up" href="index.html" title="DSpace 1.5.1 Manual"><link rel="prev" href="ch06.html" title="Chapter&nbsp;6.&nbsp;DSpace System Documentation: Directories and Files"><link rel="next" href="ch08.html" title="Chapter&nbsp;8.&nbsp;DSpace System Documentation: Application Layer"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table summary="Navigation header" width="100%"><tr><th align="center" colspan="3">Chapter&nbsp;7.&nbsp;DSpace System Documentation: Architecture</th></tr><tr><td align="left" width="20%"><a accesskey="p" href="ch06.html">Prev</a>&nbsp;</td><th align="center" width="60%">&nbsp;</th><td align="right" width="20%">&nbsp;<a accesskey="n" href="ch08.html">Next</a></td></tr></table><hr></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="N128F7"></a>Chapter&nbsp;7.&nbsp;DSpace System Documentation: Architecture</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="ch07.html#N128FB">7.1. Overview</a></span></dt></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="N128FB"></a>7.1.&nbsp;<a name="docbook-architecture.html-overview"></a>Overview</h2></div></div></div><p>The DSpace system is organized into three layers, each of which consists of a number of components.</p><p>
+        <span class="inlinemediaobject"><img src="image/architecture-600x450.gif" width="585"></span>
+      </p><p>DSpace System Architecture</p><p>The storage layer is responsible for physical storage of metadata and content. The business logic layer deals with managing the content of the archive, users of the archive (e-people), authorization, and workflow. The application layer contains components that communicate with the world outside of the individual DSpace installation, for example the Web user interface and the <a class="ulink" href="http://www.openarchives.org/" target="_top">Open Archives Initiative</a> protocol for metadata harvesting service.</p><p>Each layer only invokes the layer below it; the application layer may not used the storage layer directly, for example. Each component in the storage and business logic layers has a defined public API. The union of the APIs of those components are referred to as the Storage API (in the case of the storage layer) and the DSpace Public API (in the case of the business logic layer). These APIs are in-process Java classes, objects and methods.</p><p>It is important to note that each layer is <span class="emphasis"><em>trusted</em></span>. Although the logic for <span class="emphasis"><em>authorising actions</em></span> is in the business logic layer, the system relies on individual applications in the application layer to correctly and securely <span class="emphasis"><em>authenticate</em></span> e-people. If a 'hostile' or insecure application were allowed to invoke the Public API directly, it could very easily perform actions as any e-person in the system.</p><p>The reason for this design choice is that authentication methods will vary widely between different applications, so it makes sense to leave the logic and responsibility for that in these applications.</p><p>The source code is organized to cohere very strictly to this three-layer architecture. Also, only methods in a component's public API are given the <code class="literal">public</code> access level. This means that the Java compiler helps ensure that the source code conforms to the architecture.</p><div class="table"><a name="N1292B"></a><p class="title"><b>Table&nbsp;7.1.&nbsp;Source Code Packages</b></p><div class="table-contents"><table summary="Source Code Packages" border="0"><colgroup><col><col></colgroup><tbody><tr><td>
+                <p>
+                  <span class="bold"><strong>Packages within</strong></span>
+                </p>
+              </td><td>
+                <p>
+                  <span class="bold"><strong>Correspond to components in</strong></span>
+                </p>
+              </td></tr><tr><td>
+                <p>
+                  <code class="literal">org.dspace.app</code>
+                </p>
+              </td><td>
+                <p>Application layer</p>
+              </td></tr><tr><td>
+                <p>
+                  <code class="literal">org.dspace</code>
+                </p>
+              </td><td>
+                <p>Business logic layer (except <code class="literal">storage</code> and <code class="literal">app</code>)</p>
+              </td></tr><tr><td>
+                <p>
+                  <code class="literal">org.dspace.storage</code>
+                </p>
+              </td><td>
+                <p>Storage layer</p>
+              </td></tr></tbody></table></div></div><br class="table-break"><p>The storage and business logic layer APIs are extensively documented with Javadoc-style comments. Generate the HTML version of these by entering the source directory and running:</p><pre class="screen">
+ant public_api
+</pre><p>The package-level documentation of each package usually contains an overview of the package and some example usage. This information is not repeated in this architecture document; this and the Javadoc APIs are intended to be used in parallel.</p><p>Each layer is described in a separate section:</p><div class="itemizedlist"><ul type="disc"><li><p>
+            <a class="ulink" href="storage.html" target="_top">Storage Layer</a>
+            <div class="itemizedlist"><ul type="circle"><li><p>
+                  <a class="ulink" href="storage.html#rdbms" target="_top">RDBMS</a>
+                </p></li><li><p>
+                  <a class="ulink" href="storage.html#bitstreams" target="_top">Bitstream Store</a>
+                </p></li></ul></div>
+          </p></li><li><p>
+            <a class="ulink" href="business.html" target="_top">Business Logic Layer</a>
+            <div class="itemizedlist"><ul type="circle"><li><p>
+                  <a class="ulink" href="business.html#core" target="_top">Core Classes</a>
+                </p></li><li><p>
+                  <a class="ulink" href="business.html#content" target="_top">Content Management API</a>
+                </p></li><li><p>
+                  <a class="ulink" href="business.html#workflow" target="_top">Workflow System</a>
+                </p></li><li><p>
+                  <a class="ulink" href="business.html#administer" target="_top">Administration Toolkit</a>
+                </p></li><li><p>
+                  <a class="ulink" href="business.html#eperson" target="_top">E-person/Group Manager</a>
+                </p></li><li><p>
+                  <a class="ulink" href="business.html#authorize" target="_top">Authorisation</a>
+                </p></li><li><p>
+                  <a class="ulink" href="business.html#handle" target="_top">Handle Manager/Handle Plugin</a>
+                </p></li><li><p>
+                  <a class="ulink" href="business.html#search" target="_top">Search</a>
+                </p></li><li><p>
+                  <a class="ulink" href="business.html#browse" target="_top">Browse API</a>
+                </p></li><li><p>
+                  <a class="ulink" href="business.html#history" target="_top">History Recorder</a>
+                </p></li><li><p>
+                  <a class="ulink" href="business.html#checker" target="_top">Checksum Checker</a>
+                </p></li></ul></div>
+          </p></li><li><p>
+            <a class="ulink" href="application.html" target="_top">Application Layer</a>
+            <div class="itemizedlist"><ul type="circle"><li><p>
+                  <a class="ulink" href="application.html#webui" target="_top">Web User Interface</a>
+                </p></li><li><p>
+                  <a class="ulink" href="application.html#oai" target="_top">OAI-PMH Data Provider</a>
+                </p></li><li><p>
+                  <a class="ulink" href="application.html#itemimporter" target="_top">Item Importer and Exporter</a>
+                </p></li><li><p>
+                  <a class="ulink" href="application.html#transferitem" target="_top">Transferring Items Between DSpace Instances</a>
+                </p></li><li><p>
+                  <a class="ulink" href="application.html#registration" target="_top">Registration</a>
+                </p></li><li><p>
+                  <a class="ulink" href="application.html#mets" target="_top">METS Tools</a>
+                </p></li><li><p>
+                  <a class="ulink" href="application.html#mediafilters" target="_top">Media Filters</a>
+                </p></li><li><p>
+                  <a class="ulink" href="application.html#filiator" target="_top">Sub-Community Management</a>
+                </p></li></ul></div>
+          </p></li></ul></div><p> 2002-2008 The DSpace Foundation </p></div></div><HR><p class="copyright">Copyright &copy; 2002-2008 
+        <a class="ulink" href="http://www.dspace.org/" target="_top">The DSpace Foundation</a>
+      </p><div class="legalnotice"><a name="N10017"></a><p>
+        <a class="ulink" href="http://creativecommons.org/licenses/by/3.0/us/" target="_top">
+        <span class="inlinemediaobject"><img src="http://i.creativecommons.org/l/by/3.0/us/88x31.png"></span>
+        Licensed under a Creative Commons Attribution 3.0 United States License
+        </a>
+      </p></div><div class="navfooter"><hr><table summary="Navigation footer" width="100%"><tr><td align="left" width="40%"><a accesskey="p" href="ch06.html">Prev</a>&nbsp;</td><td align="center" width="20%">&nbsp;</td><td align="right" width="40%">&nbsp;<a accesskey="n" href="ch08.html">Next</a></td></tr><tr><td valign="top" align="left" width="40%">Chapter&nbsp;6.&nbsp;DSpace System Documentation: Directories and Files&nbsp;</td><td align="center" width="20%"><a accesskey="h" href="index.html">Home</a></td><td valign="top" align="right" width="40%">&nbsp;Chapter&nbsp;8.&nbsp;DSpace System Documentation: Application Layer</td></tr></table></div></body></html>
