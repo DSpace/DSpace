@@ -5,6 +5,8 @@
 # Developed On Ubuntu Hardy Heron, you'll need at least:
 # apt-get install herold docbook-utils docbook2x xsltproc docbook-xsl dbdoclet
 
+VERSION="1.5.1Beta1"
+
 DBxml="docbook"
 HTMLfinal="html"
 PDFfinal="pdf"
@@ -12,58 +14,61 @@ PDFfinal="pdf"
 # The first part of this script is hypothetically to be used only once, to make
 # the initial transformation from html docs to docbook source.
 
+# See if there are any files in the docbook directory.  If not, make them.
 haveDB=`ls $DBxml | wc -w`
 if [ $haveDB -lt 1 ]; then
 	if [ ! -d $DBxml ]; then
 	  mkdir $DBxml
     fi
-	cp *.html $DBxml
+	cp html.legacy/*.html $DBxml
 	cd $DBxml
-	# A couple quick cleanups needed
-	sed -ie "762s/it>/i>/g" configure.html
-	sed -ie "2903,2905s/gt; . \&l/gt; ... \&l/" DRISchemaReference.html
-	#  sed -ie "/<div class=\"element-type\">/,/<\/div>/d" DRISchemaReference.html
-	sed -ie "s/href=\"#type/name=\"#type/g" DRISchemaReference.html
-	sed -ie "s/href=\"#Meta/name=\"#Meta/g" DRISchemaReference.html
-	sed -ie "s/href=\"#newfilter/name=\"#newfilter/g" configure.html
-	sed -ie "s/href=\"#browse/name=\"#browse/g" configure.html
-	sed -ie "s/href=\"#element/name=\"#element/g" DRISchemaReference.html
-	sed -ie "s/href=\"#stepDefinitions/name=\"#stepDefinitions/g" submission.html
-	sed -ie "s/href=\"#authenticate/name=\"#authenticate/g" configure.html
-	sed -ie "s/300px/175px/g" configure.html
-	sed -ie "/Back to contents/d" *html
-	sed -ie "/\&copy/d" *html
-	sed -ie "s/\&nbsp;/ /g" *html
-	sed -ie "11,63d" configure.html
-	sed -ie "44,56d" DRISchemaReference.html
-	sed -ie "2,34d" DRISchemaReference.html
-	sed -ie "11,28d" install.html
-	sed -ie "20,28d" submission.html
+	# A couple quick cleanups needed to the source documents
+	sed -i -e "762s/it>/i>/g" configure.html
+	sed -i -e "2903,2905s/gt; . \&l/gt; ... \&l/" DRISchemaReference.html
+	#  sed -i -e "/<div class=\"element-type\">/,/<\/div>/d" DRISchemaReference.html
+	sed -i -e "s/href=\"#type/name=\"#type/g" DRISchemaReference.html
+	sed -i -e "s/href=\"#Meta/name=\"#Meta/g" DRISchemaReference.html
+	sed -i -e "s/href=\"#newfilter/name=\"#newfilter/g" configure.html
+	sed -i -e "s/href=\"#browse/name=\"#browse/g" configure.html
+	sed -i -e "s/href=\"#element/name=\"#element/g" DRISchemaReference.html
+	sed -i -e "s/href=\"#stepDefinitions/name=\"#stepDefinitions/g" submission.html
+	sed -i -e "s/href=\"#authenticate/name=\"#authenticate/g" configure.html
+	sed -i -e "s/300px/175px/g" configure.html
+	sed -i -e "/Back to contents/d" *html
+	sed -i -e "/\&copy/d" *html
+	sed -i -e "s/\&nbsp;/ /g" *html
+	sed -i -e "11,63d" configure.html
+	sed -i -e "44,56d" DRISchemaReference.html
+	sed -i -e "2,34d" DRISchemaReference.html
+	sed -i -e "11,28d" install.html
+	sed -i -e "20,28d" submission.html
     filelist=`ls *html`
 	cd ..
 
-	title="DSpace 1.5.1 Manual"
+	title="DSpace $VERSION Manual"
 
-	# The initial raw conversion:
+	# The initial raw html to db conversion:
 	for file in $filelist; do
 	    herold --no-prolog --destination-encoding=UTF-8 \
     		-t "$title" -i $DBxml/$file -o $DBxml/${file/.html/.xml}
 	done
-	rm $DBxml/*html $DBxml/*htmle
+    # All done with the temporary html files, now touch up the docbook.
+	rm $DBxml/*html
 	for file in `ls $DBxml`; do
-		# Move the fixed section types into generic hierachies, built into chapters, and loose the article wrappers to form subset files.
+		# Move the fixed section types into generic hierarchies, built into
+        # chapters, and loose the article wrappers to form subset files.
 		sed -i -e "s/sect1>/chapter>/" -e "s/<sect1 /<chapter /" $DBxml/$file
 		sed -i -e "2,4d" -e "s,</article>,," $DBxml/$file
 		sed -i -e "s/sect[2-9]>/section>/g" -e "s/<sect[2-9] /<section /"  $DBxml/$file
 		# Tell the images to scale to fit
-		sed -ie "s/\<imagedata.*format=...../& width=\"6.5in\" scalefit=\"1\"/g" $DBxml/$file
-		sed -ie "s,docbook/image,image,g" $DBxml/$file
-		# Forcibly clean up any literal blocks (screen elements) that don't line wrap narrowly enough for a print formatted manual.
+		sed -i -e "s/\<imagedata.*format=...../& width=\"6.5in\" scalefit=\"1\"/g" $DBxml/$file
+		sed -i -e "s,docbook/image,image,g" $DBxml/$file
+		# Forcibly clean up any literal blocks (screen elements) that don't
+        #line wrap narrowly enough for a print formatted manual.
 		mv $DBxml/$file $DBxml/$file.prewrap
 		./wrapscreen.py $DBxml/$file.prewrap $DBxml/$file
 		rm $DBxml/$file.prewrap
 	done
-#    ln -s ../image $DBxml/image
 	# Generate the Book Wrapper
 	cat <<EOF >$DBxml/book.xml
 <?xml version='1.0' encoding='UTF-8'?>
@@ -88,7 +93,7 @@ if [ $haveDB -lt 1 ]; then
 
 <book>
   <bookinfo>
-    <title>DSpace 1.5.1 Manual</title>
+    <title>DSpace $VERSION Manual</title>
     
     <author>
       <surname>The DSpace Foundation</surname>
@@ -180,15 +185,11 @@ EOF
 <!-- <xsl:param name="html.stylesheet" select="'corpstyle.css'"/>
 <xsl:param name="admon.graphics" select="1"/> -->
 
-<!--  footer xsl stuff?
-(could use          user.footer.navigational too)
--->
 <xsl:template name="user.footer.content">
   <HR/>
   <xsl:apply-templates select="//copyright[1]" mode="titlepage.mode"/>
   <xsl:apply-templates select="//legalnotice[1]" mode="titlepage.mode"/>
 </xsl:template>
-
 
 <xsl:attribute-set name="monospace.verbatim.properties">
     <xsl:attribute name="wrap-option">wrap</xsl:attribute>
@@ -235,7 +236,7 @@ XSLTP=" -param body.start.indent 0pt \
 if [ "a$FOP_HOME" == "a" ]; then
     FOP_HOME=/usr/local/share/fop-0.94
 fi
-java -Xmx128m -Dfop.home=$FOP_HOME -jar $FOP_HOME/build/fop.jar -xml $DBxml/book.xml -xsl $xslprint -pdf $PDFfinal/book-foppure.pdf $XSLTP
+java -Xmx128m -Dfop.home=$FOP_HOME -jar $FOP_HOME/build/fop.jar -xml $DBxml/book.xml -xsl $xslprint -pdf $PDFfinal/DSpace-$VERSION.pdf $XSLTP
 
 # HTML it using XSL
 if [ ! -d $HTMLfinal ]; then
@@ -247,4 +248,47 @@ rm $HTMLfinal/*html
 java -Xmx64m -Dfop.home=$FOP_HOME -jar /usr/local/share/fop-0.94/build/fop.jar -xml $DBxml/book.xml  -xsl $xslhtml -foout fo.fo $XSLTP
 rm fo.fo
 mv $DBxml/*html $HTMLfinal
+ln -s ../image $HTMLfinal/image
 
+# Post-process the html to provide wiki annotation areas at the bottom of
+# the page as an option for dspace website
+if [ "a$WIKI" == "aYes" ] ; then
+    for file in `ls $HTMLfinal`; do
+        sed -i -f - $HTMLfinal/$file <<EOF
+s|</body></html>|\n|
+\$a\
+<hr/><p>If you are a wiki.dspace.org user, and have comments or improvements to this page, \
+please feel free to add them to the wiki page below.  You may also email suggestions to
+\$a\
+ <script language='JavaScript' type='text/javascript'>
+\$a\
+ <!--
+\$a\
+ var prefix = '&#109;a' + 'i&#108;' + '&#116;o'; \
+ var path = 'hr' + 'ef' + '='; \
+ var addy52874 = 'w&#101;bm&#97;st&#101;r' + '&#64;'; \
+ addy52874 = addy52874 + 'dsp&#97;c&#101;' + '&#46;' + '&#111;rg'; \
+ var addy_text52874 = 'w&#101;bm&#97;st&#101;r' + '&#64;' + 'dsp&#97;c&#101;' + '&#46;' + '&#111;rg'; \
+ document.write( '<a ' + path + '\\\\'' + prefix + ':' + addy52874 + '\\\\'>' ); \
+ document.write( addy_text52874 ); \
+ document.write( '<\\/a>' ); \
+ //-->
+\$a\
+ </script><script language='JavaScript' type='text/javascript'>
+\$a\
+ <!--
+\$a\
+ document.write( '<span style=\\\\'display: none;\\\\'>' ); \
+ //--> \
+ </script>This e-mail address is being protected from spam bots, you need JavaScript enabled to view it \
+ <script language='JavaScript' type='text/javascript'> \
+ <!-- \
+ document.write( '</' ); \
+ document.write( 'span>' ); \
+ //--> \
+ </script>.
+\$a\
+</p><br/><iframe src="http://wiki.dspace.org/index.php/AnnotateDoc_$VERSION_${file/.html/}" width="100%" height="600"/></body></html>
+EOF
+    done
+fi
