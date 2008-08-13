@@ -987,14 +987,14 @@
      {
 %>
         <div><fmt:message key="jsp.submit.edit-metadata.info1"/>
-        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, "help.index") + "#describe2"%>"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></div>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#describe2\"%>"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></div>
 <%
      } 
      else 
      {
 %>
     	<div><fmt:message key="jsp.submit.edit-metadata.info2"/>
-        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, "help.index") + "#describe3"%>"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></div>
+        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#describe3\"%>"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup></div>
     
 <%
      }
