@@ -101,7 +101,7 @@ property.name = property value
 property.name = word1 ${other.property.name} more words
 property2.name = ${dspace.dir}/rest/of/path
 </pre>
-
+Whenever you edit dspace.cfg in [dspace-source]/dspace/config/, you should then run 'ant init_configs' in the directory [dspace-source]/dspace/target/dspace-1.5.0-build.dir so that any changes you may have made are reflected in the configuration files of other applications, for example Apache.  You may then need to restart those applications, depending on what you changed.
   <table>
     <caption>
       <code>dspace.cfg</code> Main Properties (Not Complete)
@@ -1080,7 +1080,7 @@ To set a language other than English as the default language for the repository'
   
   <h3><a name="jspui-dspacecfg" id="jspui-dspacecfg">JSPUI Configuration Properties </a></h3>
 
-  <p>There are many options effecting how the JSP-based user interface for DSpace operates. Listed below are the major elements and their description, refere to the <code>dspace.cfg</code> file itself for the exhaustive list of configuration parameters.
+  <p>There are many options effecting how the JSP-based user interface for DSpace operates. Listed below are the major elements and their description, refer to the <code>dspace.cfg</code> file itself for the exhaustive list of configuration parameters.
 
   <table>
     <tbody>
@@ -1113,7 +1113,7 @@ To set a language other than English as the default language for the repository'
 
         <td><code>true</code></td>
 
-        <td>Setting this parameter to ture will result in a hyperlink being rendered on the item View page that points to the item's licence.</td>
+        <td>Setting this parameter to true will result in a hyperlink being rendered on the item View page that points to the item's licence.</td>
       </tr>
       
       <tr>
@@ -1121,7 +1121,7 @@ To set a language other than English as the default language for the repository'
 
         <td><code>true</code></td>
 
-        <td>Determine if thumbnails should be displayed on browe-by pages and item view pages when available. The default behavior, if omitted, is false.</td>
+        <td>Determine if thumbnails should be displayed on browse-by pages and item view pages when available. The default behavior, if omitted, is false.</td>
       </tr>
       
       <tr>
@@ -1249,12 +1249,12 @@ The following vocabularies are currently available by default:
    
 <h3><a name="jspui-multilingual" id="multilingualui">Configuring Multilingual Support</a></h3>
   <h4>Setting the default language for the application</h4>
-      The default language for the application is set via the <code><i>[dspace]</i>/config/dspace.cfg</code> parameter <code>default.locale</code>. <br />
+      The default language for the application is set via the <code><i>[dspace-source]</i>/config/dspace.cfg</code> parameter <code>default.locale</code>. <br />
       This is a locale according to i18n and might consist of country, country_language or country_language_variant, <br />
       e. g.: <code>default.locale=en</code>. If not default locale is specified the server locale will be used instead.
   <h4>Supporting more than one language</h4>
   <h5>Changes in dspace.cfg</h5>
-      With the <code><i>[dspace]</i>/config/dspace.cfg</code> parameter <code>webui.supported.locales</code> you may provide a comma seperated list of supported (including the default locale) locales. <br />
+      With the <code><i>[dspace-source]</i>/config/dspace.cfg</code> parameter <code>webui.supported.locales</code> you may provide a comma seperated list of supported (including the default locale) locales. <br />
       The locales might have the form country, country_language or country_language_variant, e. g.:<br />
      <code>webui.supported.locales = en, de</code> or <code>webui.supported.locales = en, en_ca, de</code>.<br />
      This will result in:
@@ -1273,30 +1273,30 @@ The following vocabularies are currently available by default:
         If you set webui.supported.locales make sure that all the related additional files for each language are available. <code>LOCALE</code> should correspond to the locale set in <code>webui.supported.locales</code>, 
         e. g.: for webui.supported.locales = en, de, fr, there should be:
     <ul>
-      <li><code><i>[dspace]</i>/modules/jspui/src/main/resources/Messages.properties</code></li>
-      <li><code><i>[dspace]</i>/modules/jspui/src/main/resources/Messages_en.properties</code></li>
-      <li><code><i>[dspace]</i>/modules/jspui/src/main/resources/Messages_de.properties</code></li>
-      <li><code><i>[dspace]</i>/modules/jspui/src/main/resources/Messages_fr.properties</code></li>
+      <li><code><i>[dspace-source]</i>/dspace/modules/jspui/src/main/resources/Messages.properties</code></li>
+      <li><code><i>[dspace-source]</i>/dspace/modules/jspui/src/main/resources/Messages_en.properties</code></li>
+      <li><code><i>[dspace-source]</i>/dspace/modules/jspui/src/main/resources/Messages_de.properties</code></li>
+      <li><code><i>[dspace-source]</i>/dspace/modules/jspui/src/main/resources/Messages_fr.properties</code></li>
     </ul>
     Files to be localized:
     <ul>
-    <li><code><i>[dspace]</i>/modules/jspui/src/main/resources/Messages_LOCALE.properties</code></li>
-      <li><code><i>[dspace]</i>/config/input-forms_LOCALE.xml</code></li>
-      <li><code><i>[dspace]</i>/config/default_LOCALE.license</code> <i>should be pure ascii</i></li>
-      <li><code><i>[dspace]</i>/config/news-top_LOCALE.html</code></li>
-      <li><code><i>[dspace]</i>/config/news-side_LOCALE.html</code></li>
-      <li><code><i>[dspace]</i>/config/emails/change_password_LOCALE</code></li>
-      <li><code><i>[dspace]</i>/config/emails/feedback_LOCALE</code></li>
-      <li><code><i>[dspace]</i>/config/emails/internal_error_LOCALE</code></li>
-      <li><code><i>[dspace]</i>/config/emails/register_LOCALE</code></li>
-      <li><code><i>[dspace]</i>/config/emails/submit_archive_LOCALE</code></li>
-      <li><code><i>[dspace]</i>/config/emails/submit_reject_LOCALE</code></li>
-      <li><code><i>[dspace]</i>/config/emails/submit_task_LOCALE</code></li>
-      <li><code><i>[dspace]</i>/config/emails/subscription_LOCALE</code></li>
-      <li><code><i>[dspace]</i>/config/emails/suggest_LOCALE</code></li>
-      <li><code><i>[dspace]</i>/jsp/help/collection-admin_LOCALE.html</code> <i>in html keep the jump link as original</i></li>
-      <li><code><i>[dspace]</i>/jsp/help/index_LOCALE.html</code></li>
-      <li><code><i>[dspace]</i>/jsp/help/site-admin_LOCALE.html</code></li>
+    <li><code><i>[dspace-source]</i>/dspace/modules/jspui/src/main/resources/Messages_LOCALE.properties</code></li>
+      <li><code><i>[dspace-source]</i>/dspace/config/input-forms_LOCALE.xml</code></li>
+      <li><code><i>[dspace-source]</i>/dspace/config/default_LOCALE.license</code> <i>should be pure ascii</i></li>
+      <li><code><i>[dspace-source]</i>/dspace/config/news-top_LOCALE.html</code></li>
+      <li><code><i>[dspace-source]</i>/dspace/config/news-side_LOCALE.html</code></li>
+      <li><code><i>[dspace-source]</i>/dspace/config/emails/change_password_LOCALE</code></li>
+      <li><code><i>[dspace-source]</i>/dspace/config/emails/feedback_LOCALE</code></li>
+      <li><code><i>[dspace-source]</i>/dspace/config/emails/internal_error_LOCALE</code></li>
+      <li><code><i>[dspace-source]</i>/dspace/config/emails/register_LOCALE</code></li>
+      <li><code><i>[dspace-source]</i>/dspace/config/emails/submit_archive_LOCALE</code></li>
+      <li><code><i>[dspace-source]</i>/dspace/config/emails/submit_reject_LOCALE</code></li>
+      <li><code><i>[dspace-source]</i>/dspace/config/emails/submit_task_LOCALE</code></li>
+      <li><code><i>[dspace-source]</i>/dspace/config/emails/subscription_LOCALE</code></li>
+      <li><code><i>[dspace-source]</i>/dspace/config/emails/suggest_LOCALE</code></li>
+      <li><code><i>[dspace]</i>/webapps/jspui/help/collection-admin_LOCALE.html</code> <i>in html keep the jump link as original; must be copied to [dspace-source]/dspace/modules/jspui/src/main/webapp/help</i></li>
+      <li><code><i>[dspace]</i>/webapps/jspui/help/index_LOCALE.html</code><i>must be copied to [dspace-source]/dspace/modules/jspui/src/main/webapp/help</i></li>
+      <li><code><i>[dspace]</i>/webapps/jspui/help/site-admin_LOCALE.html</code><i>must be copied to [dspace-source]/dspace/modules/jspui/src/main/webapp/help</i></li>
     </ul>
     
     
@@ -1310,7 +1310,7 @@ The following vocabularies are currently available by default:
 
   <p>Note that the data (attributes) passed from an underlying Servlet to the JSP may change between versions, so you may have to modify your customized JSP to deal with the new data.</p>
 
-  <p>Thus, if possible, it is recommeded you limit your changes to the 'layout' JSPs and the stylesheet.</P>
+  <p>Thus, if possible, it is recommended you limit your changes to the 'layout' JSPs and the stylesheet.</P>
 
   <p>The JSPs are available in one of two places:
      <ul>
@@ -1331,22 +1331,22 @@ The following vocabularies are currently available by default:
       <tr>
         <td><code><i>[jsp.dir]</i>/community-list.jsp</code></td>
 
-        <td><code><i>[dspace-source]</i>/dspace/modules/jspui/src/main/webapp/community-list.jsp</code></td>
+        <td><code><i>[jsp.custom-dir]</i>/dspace/modules/jspui/src/main/webapp/community-list.jsp</code></td>
       </tr>
 
       <tr>
         <td><code><i>[jsp.dir]</i>/mydspace/main.jsp</code></td>
 
-        <td><code><i>[dspace-source]</i>/dspace/modules/jspui/src/main/webapp/mydspace/main.jsp</code></td>
+        <td><code><i>[jsp.custom-dir]</i>/dspace/modules/jspui/src/main/webapp/mydspace/main.jsp</code></td>
       </tr>
     </tbody>
   </table>
 
-  <p>Heavy use is made of a style sheet, <code>styles.css.jsp</code>. If you make edits, copy the local version to <code><i>[dspace-source]</i>/dspace/modules/jspui/src/main/webapp/styles.css.jsp</code>, and it will be used automatically in preference to the default, as described above.</p>
+  <p>Heavy use is made of a style sheet, <code>styles.css.jsp</code>. If you make edits, copy the local version to <code><i>[jsp.custom-dir]</i>/dspace/modules/jspui/src/main/webapp/styles.css.jsp</code>, and it will be used automatically in preference to the default, as described above.</p>
 
   <p>Fonts and colors can be easily changed using the stylesheet. The stylesheet is a JSP so that the user's browser version can be detected and the stylesheet tweaked accordingly.</p>
 
-  <p>The 'layout' of each page, that is, the top and bottom banners and the navigation bar, are determined by the JSPs <code>/layout/header-*.jsp</code> and <code>/layout/footer-*.jsp</code>. You can provide modified versions of these (in <code><i>[dspace-source]</i>/dspace/modules/jspui/src/main/webapp/layout</code>), or define more styles and apply them to pages by using the "style" attribute of the <code>dspace:layout</code> tag.</p>
+  <p>The 'layout' of each page, that is, the top and bottom banners and the navigation bar, are determined by the JSPs <code>/layout/header-*.jsp</code> and <code>/layout/footer-*.jsp</code>. You can provide modified versions of these (in <code><i>[jsp.custom-dir]</i>/dspace/modules/jspui/src/main/webapp/layout</code>), or define more styles and apply them to pages by using the "style" attribute of the <code>dspace:layout</code> tag.</p>
 
   <p>After you've customized your JSPs, <strong>you must rebuild the DSpace Web application</strong>. If you haven't already built and installed it, follow the <a href="install.html">install</a> directions. Otherwise, follow the steps below:</p>
 
@@ -1358,7 +1358,7 @@ The following vocabularies are currently available by default:
     <li>
       <p>Re-install the DSpace WAR(s) to <code><i>[dspace]</i>/webapps</code> by running the following command from your <code><i>[dspace-source]</i>/dspace/target/dspace-[version].dir</code> directory:</p>
       <pre>
-ant -Dconfig=<i>[dspace]</i>/config/dspace.cfg update
+ant -Dconfig=<i>[dspace-source]</i>/config/dspace.cfg update
 </pre>
     </li>
 
@@ -1710,31 +1710,31 @@ bin/checker -L	    # Loops continuously through the repository</pre>
     This setting will enable or disable LDAP authentication in DSpace. With the setting off, users will be required to register and login with their email address. With this setting on, users will be able to login and register with their LDAP user ids and passwords.</li>
 
     <li><b>webui.ldap.autoregister</b><br>
-    This will turn LDAP autoregistration on or off. With this on, a new EPerson object will be created for any user who successfully authenticates against the LDAP server when they first login. With this setting off, the user must first register to get an EPerson object by entering their ldap username and password and filling out the forms.</li>
+    This will turn LDAP autoregistration on or off. With this on, a new EPerson object will be created for any user who successfully authenticates against the LDAP server when they first login. With this setting off, the user must first register to get an EPerson object by entering their LDAP username and password and filling out the forms.</li>
 
     <li><b>ldap.provider_url = ldap://ldap.myu.edu/o=myu.edu</b><br>
-    This is the url to your institution's ldap server. You may or may not need the /o=myu.edu part at the end. Your server may also require the ldaps:// protocol.</li>
+    This is the url to your institution's LDAP server. You may or may not need the /o=myu.edu part at the end. Your server may also require the ldaps:// protocol.</li>
 
     <li><b>ldap.id_field = uid</b><br>
     This is the unique identifier field in the LDAP directory where the username is stored.</li>
 
     <li><b>ldap.object_context = ou=people,o=myu.edu</b><br>
-    This is the object context used when authenticating the user. It is appended to the ldap.id_field and username. For example uid=username,ou=people,o=myu.edu. You will need to modify this to match your ldap configuration.</li>
+    This is the object context used when authenticating the user. It is appended to the ldap.id_field and username. For example uid=username,ou=people,o=myu.edu. You will need to modify this to match your LDAP configuration.</li>
 
     <li><b>ldap.search_context = ou=people</b><br>
-    This is the search context used when looking up a user's ldap object to retrieve their data for autoregistering. With ldap.autoregister turned on, when a user authenticates without an EPerson object we search the ldap directory to get their name and email address so that we can create one for them. So after we have authenticated against uid=username,ou=people,o=byu.edu we now search in ou=people for filtering on [uid=username]. Often the ldap.search_context is the same as the ldap.object_context parameter. But again this depends on your ldap server configuration.</li>
+    This is the search context used when looking up a user's LDAP object to retrieve their data for autoregistering. With ldap.autoregister turned on, when a user authenticates without an EPerson object we search the LDAP directory to get their name and email address so that we can create one for them. So after we have authenticated against uid=username,ou=people,o=byu.edu we now search in ou=people for filtering on [uid=username]. Often the ldap.search_context is the same as the ldap.object_context parameter. But again this depends on your LDAP server configuration.</li>
 
     <li><b>ldap.email_field = mail</b><br>
-    This is the ldap object field where the user's email address is stored. "mail" is the default and the most common for ldap servers. If the mail field is not found the username will be used as the email address when creating the eperson object.</li>
+    This is the LDAP object field where the user's email address is stored. "mail" is the default and the most common for ldap servers. If the mail field is not found the username will be used as the email address when creating the eperson object.</li>
 
     <li><b>ldap.surname_field = sn</b><br>
-    This is the ldap object field where the user's last name is stored. "sn" is the default and is the most common for ldap servers. If the field is not found the field will be left blank in the new eperson object.</li>
+    This is the LDAP object field where the user's last name is stored. "sn" is the default and is the most common for LDAP servers. If the field is not found the field will be left blank in the new eperson object.</li>
 
     <li><b>ldap.givenname_field = givenName</b><br>
-    This is the ldap object field where the user's given names are stored. I'm not sure how common the givenName field is in different ldap instances. If the field is not found the field will be left blank in the new eperson object.</li>
+    This is the LDAP object field where the user's given names are stored. I'm not sure how common the givenName field is in different LDAP instances. If the field is not found the field will be left blank in the new eperson object.</li>
 
     <li><b>ldap.phone_field = telephoneNumber</b><br>
-    This is the field where the user's phone number is stored in the ldap directory. If the field is not found the field will be left blank in the new eperson object.</li>
+    This is the field where the user's phone number is stored in the LDAP directory. If the field is not found the field will be left blank in the new eperson object.</li>
   </ul>
    
    

@@ -135,6 +135,7 @@ if [ $haveDB -lt 1 ]; then
 
 <!-- &art01; -->
 &art02;
+&art11;
 &art03;
 &art04;
 &art05;
@@ -143,7 +144,6 @@ if [ $haveDB -lt 1 ]; then
 &art08;
 &art09;
 &art10;
-&art11;
 &art12;
 &art13;
 &art14;

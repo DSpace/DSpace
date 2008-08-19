@@ -10,6 +10,50 @@
 <h1>DSpace System Documentation: Version History</h1>
 <p><a href="index.html">Back to contents</a></p>
 
+<h2><a name="version1_5">Changes in DSpace 1.5</a></h2>
+
+<h3>General Improvements</h3>
+<ul>
+<li>Highly configurable and theme-able new user interface (Manakin).</li>
+<li>Apache Maven-based modular build system.</li>
+<li>LNI (Lightweight Network Interface) service. Allows programmatic ingest of content via WebDAV or SOAP.</li>
+<li>SWORD (Simple Web-service Offering Repository Deposit): repository-standard  ingest service using Atom Publishing Protocol.</li>
+<li>Highly configurable item web submission system. All submission steps are configurable not just metadata pages.</li>
+<li>Browse functionality allowing customisation of the available indexes via dspace.cfg and pluggable normalisation of the sort strings. Integration with both JSP-UI and XML-UI included.</li>
+<li>Extensible content event notification service.</li>
+<li>Generation of Google and HTML sitemaps</li>
+</ul>
+<h3>Bug fixes and smaller patches</h3>
+<ul><li>New options for ItemImporter to support bitstream permissions and descriptions.</li>
+<li>1824710 Fix - Change in Creative Commons RDF.</li>
+<li>1794700 Fix - Stat-monthly and stat-report-monthly</li>
+<li>1566820 Patch - Authentication code moved to new org.dspace.authenticate package, add IP AUth</li>
+<li>1670093 Patch - More stable metadata and schema registry import
+ Option to generate community and collection "strength" as a batch job</li>
+<li>1659868 Patch - Improved database level debugging</li>
+<li>1620700 Patch - Add Community and Sub-Community to OAI Sets</li>
+<li>1679972 Fix - OAIDCCrosswalk NPE and invalid character fix, also invalid output prevented</li>
+<li>1549290 Fix - Suggest Features uses hard coded strings</li>
+<li>1727034 Fix - Method MetadataField.unique() is incorrect for null values</li>
+<li>1614546 Fix - Get rid of unused mets_bitstream_id column</li>
+<li>1450491 Patch - i18n configurable multilingualism support</li>
+<li>1764069 Patch - Replace "String" with "Integer" in PreparedStatement where needed</li>
+<li>1743188 Patch - for Request #1145499 - Move Items</li>
+<li>179196 Patch - Oracle SQL in Bitstream Checker</li>
+<li>1751638 Patch - Set http disposition header to force download of large bitstreams</li>
+<li>1799575 Patch - New EPersonConsumer event consumer</li>
+<li>1566572 Patch - Item metadata in XHTML head <meta> elements</li>
+<li>1589429 Patch - "Self-Named" Media Filters (i.e. MediaFilter Plugins) (updated version of this patch)</li>
+<li>1888652 Patch - Statistics Rewritten In Java</li>
+<li>1444364 Request - Metadata registry exporter</li>
+<li>1221957 Request - Admin browser for withdrawn items</li>
+<li>1740454 Fix - Concurrency</li>
+<li>1552760 Fix - Submit interface looks bad in Safari</li>
+<li>1642563 Patch - bin/update-handle-prefix rewritten in Java</li>
+<li>1724330 Fix - Removes "null" being displayed in community-home.jsp</li>
+<li>1763535 Patch - Alert DSpace administrator of new user registration</li>
+<li>1759438 Patch - Multilingualism Language Switch - DSpace Header</li>
+</ul>
 <h2><a name="version1_4_1">Changes in DSpace 1.4.1</a></h2>
 
 <h3>General Improvements</h3>

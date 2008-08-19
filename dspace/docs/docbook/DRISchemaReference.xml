@@ -95,16 +95,17 @@ Documents"/>Merging of DRI Documents</title>
       <para>The DRI schema will continue to evolve overtime as the needs of interface design require. The version attribute on the document will indicate which version of the schema the document conforms to. At the time Manakin was incorporated into the standard distribution of DSpac the current version was &quot;1.1&quot;, however earlier versions of the Manakin interface may use &quot;1.0&quot;.</para>
       <section remap="h3">
         <title>Changes from 1.0 to 1.1</title>
-        <para>There were major structural changes between these two version numbers. Several elements were removed from the schema:<literal>includeSet</literal>, <literal>include</literal>, <literal>objectMeta</literal>, and <literal>object</literal>. Originaly all metadata for objects were included in-line with the DRI document, this proved to have several problems and has been removed in version 1.1 of the DRI schema. Instead of including metadata in-line, external references to the metadata is included. Thus, a <literal>reference</literal> element has been added along with <literal>referenceSet</literal>. These new elements operate like their counterparts in the previous version except refrencing metadata contained on the <literal>objectMeta</literal> element they reference metadata in external files. The <literal>repository</literal> and <literal>repositoryMeta</literal> elements were alse modified in a similar mannor removing in-line metadata and refrencing external metadata documents.</para>
+        <para>There were major structural changes between these two version numbers. Several elements were removed from the schema:<literal>includeSet</literal>, <literal>include</literal>, <literal>objectMeta</literal>, and <literal>object</literal>. Originally all metadata for objects were included in-line with the DRI document, this proved to have several problems and has been removed in version 1.1 of the DRI schema. Instead of including metadata in-line, external references to the metadata is included. Thus, a <literal>reference</literal> element has been added along with <literal>referenceSet</literal>. These new elements operate like their counterparts in the previous version except refrencing metadata contained on the <literal>objectMeta</literal> element they reference metadata in external files. The <literal>repository</literal> and <literal>repositoryMeta</literal> elements were alse modified in a similar mannor removing in-line metadata and refrencing external metadata documents.</para>
       </section>
     </section>
     <section remap="h2">
-      <title><anchor id="docbook-DRISchemaReference.html-Element_Reference" xreflabel="Element Refenence"/>Element Refenence</title>
+      <title><anchor id="docbook-DRISchemaReference.html-Element_Reference" xreflabel="Element Reference"/>Element Reference</title>
       <informaltable frame="all">
-        <tgroup cols="3">
-          <colspec colname="c1" colwidth="33*"/>
-          <colspec colname="c2" colwidth="33*"/>
-          <colspec colname="c3" colwidth="33*"/>
+        <tgroup cols="4">
+          <colspec colname="c1" colwidth="25*"/>
+          <colspec colname="c2" colwidth="25*"/>
+          <colspec colname="c3" colwidth="25*"/>
+          <colspec colname="c4" colwidth="25*"/>
           <tbody>
             <row>
               <entry>
@@ -114,7 +115,7 @@ Documents"/>Merging of DRI Documents</title>
               </entry>
               <entry>
                 <para>
-                  <emphasis role="bold">Attributes</emphasis>
+                  <emphasis role="bold">Attributes (if required, noted)</emphasis>
                 </para>
               </entry>
               <entry>
@@ -193,12 +194,7 @@ Documents"/>Merging of DRI Documents</title>
                 <para>action</para>
               </entry>
               <entry>
-                <para>required for interactive</para>
-              </entry>
-            </row>
-            <row>
-              <entry>
-                <para>behavior</para>
+                <para>required for interactive behavior</para>
               </entry>
               <entry>
                 <para/>
@@ -702,7 +698,7 @@ Documents"/>Merging of DRI Documents</title>
             </row>
             <row>
               <entry align="center" morerows="2" valign="middle">
-                <para><anchor id="docbook-DRISchemaReference.html--element:refrence" xreflabel="refrence"/>refrence</para>
+                <para><anchor id="docbook-DRISchemaReference.html--element:reference" xreflabel="reference"/>reference</para>
               </entry>
               <entry>
                 <para>url</para>
@@ -2316,9 +2312,9 @@ Element"/>
         <screen>
 &lt;document version=1.0&gt;
 
-    &lt;meta&gt; ... &lt;/meta&gt;
+    &lt;meta&gt; Ö &lt;/meta&gt;
 
-    &lt;body&gt; ... &lt;/body&gt;
+    &lt;body&gt; Ö &lt;/body&gt;
 
     <emphasis role="bold"> &lt;options&gt;</emphasis>
 
@@ -2587,14 +2583,14 @@ Element"/>
         <!--end of params element-->
       </section>
       <section remap="h3">
-        <title><anchor id="docbook-DRISchemaReference.html-element:refrence" xreflabel="refrence"/>refrence</title>
+        <title><anchor id="docbook-DRISchemaReference.html-element:reference" xreflabel="reference"/>reference</title>
         <para>
           <anchor id="docbook-DRISchemaReference.html--type:Metadata-Reference-Element" xreflabel="Metadata Reference
 Element"/>
         </para>
         <para>Metadata Reference Element</para>
-        <para><literal>refrence</literal> is a reference element used to access information stored in an extarnal metadata file. The <emphasis>url</emphasis> attribute is used to locate the external metadata file. The <emphasis>type</emphasis> attribute provides a short limited description of the referenced object&apos;s type.</para>
-        <para><literal>refrence</literal> elements can be both contained by <literal>includeSet</literal> elements and contain <literal>includeSets</literal> themselves, making the structure recursive.</para>
+        <para><literal>reference</literal> is a reference element used to access information stored in an extarnal metadata file. The <emphasis>url</emphasis> attribute is used to locate the external metadata file. The <emphasis>type</emphasis> attribute provides a short limited description of the referenced object&apos;s type.</para>
+        <para><literal>reference</literal> elements can be both contained by <literal>includeSet</literal> elements and contain <literal>includeSets</literal> themselves, making the structure recursive.</para>
         <para>Parent</para>
         <para>
           <anchor id="docbook-DRISchemaReference.html--element:referenceSet.3" xreflabel="referenceSet"/>
@@ -2626,17 +2622,17 @@ Element"/>
             <term>type</term>
             <listitem>
               <para>optional</para>
-              <para>Description of the refrence object&apos;s type.</para>
+              <para>Description of the reference object&apos;s type.</para>
             </listitem>
           </varlistentry>
         </variablelist>
         <screen>
             &lt;includeSet n=&quot;browse-list&quot;
 	id=&quot;XMLTest.includeSet.browse-list&quot;&gt;
-            <emphasis role="bold"> &lt;refrence url=&quot;/metadata/handle/123/4/mets.xml&quot;
+            <emphasis role="bold"> &lt;reference url=&quot;/metadata/handle/123/4/mets.xml&quot;
 	repositoryID=&quot;123&quot; type=&quot;DSpace
 	Item&quot;/&gt;</emphasis>
-            <emphasis role="bold"> &lt;refrence url=&quot;/metadata/handle/123/5/mets.xml&quot;
+            <emphasis role="bold"> &lt;reference url=&quot;/metadata/handle/123/5/mets.xml&quot;
 	repositoryID=&quot;123&quot; /&gt;</emphasis>
             ...
             &lt;/includeSet&gt;
@@ -2658,9 +2654,9 @@ Element"/>
         </para>
         <para>div</para>
         <para>
-          <anchor id="docbook-DRISchemaReference.html--element:refrence.1" xreflabel="refrence"/>
+          <anchor id="docbook-DRISchemaReference.html--element:reference.1" xreflabel="reference"/>
         </para>
-        <para>refrence</para>
+        <para>reference</para>
         <para>Children</para>
         <para>
           <anchor id="docbook-DRISchemaReference.html--element:head.3" xreflabel="head"/>
@@ -2668,9 +2664,9 @@ Element"/>
         <para>head</para>
         <para> (zero or one)</para>
         <para>
-          <anchor id="docbook-DRISchemaReference.html--element:refrence.2" xreflabel="refrence"/>
+          <anchor id="docbook-DRISchemaReference.html--element:reference.2" xreflabel="reference"/>
         </para>
-        <para>refrence</para>
+        <para>reference</para>
         <para> (any)</para>
         <para>Attributes</para>
         <variablelist>
@@ -2748,9 +2744,9 @@ Element"/>
 	id=&quot;XMLTest.referenceSet.browse-list&quot; type=&quot;summaryView&quot;
 	informationModel=&quot;DSpace&quot;&gt;</emphasis>
             &lt;head&gt;A header for the includeset&lt;/head&gt;
-            &lt;refrence
+            &lt;reference
 	url=&quot;/metadata/handle/123/34/mets.xml&quot;/&gt;
-            &lt;refrence
+            &lt;reference
 	url=&quot;&quot;metadata/handle/123/34/mets.xml/&gt;
             <emphasis role="bold"> &lt;/referenceSet&gt;</emphasis>
             ...
@@ -2805,7 +2801,7 @@ Element"/>
           <anchor id="docbook-DRISchemaReference.html--type:Metadata-Element.2" xreflabel="Metadata Element"/>
         </para>
         <para>Metadata Element</para>
-        <para>The <literal>repositoryMeta</literal> element contains metadata refernces about the repositories used in the used or refrenced in the documnet. It can contain any number of <literal>repository</literal> elements.</para>
+        <para>The <literal>repositoryMeta</literal> element contains metadata refernces about the repositories used in the used or referenced in the document. It can contain any number of <literal>repository</literal> elements.</para>
         <para>See the <literal>repository</literal> tag entry for more information on the structure of <literal>repository</literal> elements.</para>
         <para>Parent</para>
         <para>

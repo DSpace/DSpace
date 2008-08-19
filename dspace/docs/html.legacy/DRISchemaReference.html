@@ -164,10 +164,10 @@
     
     <h3> Changes from 1.0 to 1.1 </h3>
     
-    <p>There were major structural changes between these two version numbers. Several elements were removed from the schema:<code>includeSet</code>, <code>include</code>, <code>objectMeta</code>, and <code>object</code>. Originaly all metadata for objects were included in-line with the DRI document, this proved to have several problems and has been removed in version 1.1 of the DRI schema. Instead of including metadata in-line, external references to the metadata is included. Thus, a <code>reference</code> element has been added along with <code>referenceSet</code>. These new elements operate like their counterparts in the previous version except refrencing metadata contained on the <code>objectMeta</code> element they reference metadata in external files. The <code>repository</code> and <code>repositoryMeta</code> elements were alse modified in a similar mannor removing in-line metadata and refrencing external metadata documents.</p>
+    <p>There were major structural changes between these two version numbers. Several elements were removed from the schema:<code>includeSet</code>, <code>include</code>, <code>objectMeta</code>, and <code>object</code>. Originally all metadata for objects were included in-line with the DRI document, this proved to have several problems and has been removed in version 1.1 of the DRI schema. Instead of including metadata in-line, external references to the metadata is included. Thus, a <code>reference</code> element has been added along with <code>referenceSet</code>. These new elements operate like their counterparts in the previous version except refrencing metadata contained on the <code>objectMeta</code> element they reference metadata in external files. The <code>repository</code> and <code>repositoryMeta</code> elements were alse modified in a similar mannor removing in-line metadata and refrencing external metadata documents.</p>
     
     
-    <h2><a name="Element_Reference">Element Refenence</a></h2>
+    <h2><a name="Element_Reference">Element Reference</a></h2>
     
     <div class="tables">
     	<table border="1">
@@ -182,7 +182,7 @@
 
 					<th>
 
-						Attributes 
+						Attributes (if required, noted)
 
 					</th>
 
@@ -340,17 +340,7 @@
 
 					<td>
 
-						required for interactive 
-
-					</td>
-
-				</tr>
-
-				<tr>
-
-					<td>
-
-						behavior 
+						required for interactive behavior 
 
 					</td>
 
@@ -1364,7 +1354,7 @@
     	    
     	    <td rowspan="3">
     	      
-    	      <a href="#element:refrence">refrence</a> 
+    	      <a href="#element:reference">reference</a> 
     	      
     	    </td>
     	    
@@ -3157,7 +3147,7 @@ Example needed.</pre>
       <div class="element">
         
         <h3 class="element-name">
-          <a name="element:refrence">refrence</a>
+          <a name="element:reference">reference</a>
         </h3>
         
         <div class="element-type">
@@ -3165,8 +3155,8 @@ Example needed.</pre>
         </div>
         
         <div class="element-descsription">
-          <p><code>refrence</code> is a reference element used to access information stored in an extarnal metadata file. The <em>url</em> attribute is used to locate the external metadata file. The <em>type</em> attribute provides a short limited description of the referenced object's type. </p>
-          <p><code>refrence</code> elements can be both contained by <code>includeSet</code> elements and contain <code>includeSets</code> themselves, making the structure recursive.</p>
+          <p><code>reference</code> is a reference element used to access information stored in an extarnal metadata file. The <em>url</em> attribute is used to locate the external metadata file. The <em>type</em> attribute provides a short limited description of the referenced object's type. </p>
+          <p><code>reference</code> elements can be both contained by <code>includeSet</code> elements and contain <code>includeSets</code> themselves, making the structure recursive.</p>
         </div>
         
         <div class="element-parents">
@@ -3190,15 +3180,15 @@ Example needed.</pre>
             <dd class="element-attribute-description">A reference to the repositoryIdentifier of the repository.</dd>   
             <dt>type</dt>
             <dd class="element-attribute-selection">optional</dd>
-            <dd class="element-attribute-description">Description of the refrence object's type.</dd>    
+            <dd class="element-attribute-description">Description of the reference object's type.</dd>    
           </dl>
         </div>
         
         <div class="element-example">
           <pre>
             &lt;includeSet n="browse-list" id="XMLTest.includeSet.browse-list"&gt;
-            <b>&lt;refrence url="/metadata/handle/123/4/mets.xml" repositoryID="123" type="DSpace Item"/&gt;</b>
-            <b>&lt;refrence url="/metadata/handle/123/5/mets.xml" repositoryID="123" /&gt;</b>
+            <b>&lt;reference url="/metadata/handle/123/4/mets.xml" repositoryID="123" type="DSpace Item"/&gt;</b>
+            <b>&lt;reference url="/metadata/handle/123/5/mets.xml" repositoryID="123" /&gt;</b>
             ...
             &lt;/includeSet&gt;
           </pre>
@@ -3223,13 +3213,13 @@ Example needed.</pre>
         <div class="element-parents">
           <span class="term">Parent</span>
           <span class="def"><a href="#element:div">div</a></span>
-          <span class="def"><a href="#element:refrence">refrence</a></span>
+          <span class="def"><a href="#element:reference">reference</a></span>
         </div>
         
         <div class="element-children">
           <span class="term">Children</span>
           <span class="def"><a href="#element:head">head</a> (zero or one)</span>
-          <span class="def"><a href="#element:refrence">refrence</a> (any)</span>
+          <span class="def"><a href="#element:reference">reference</a> (any)</span>
         </div>
         
         <div class="element-attributes">
@@ -3276,8 +3266,8 @@ Example needed.</pre>
             &lt;/list&gt;
             <b>&lt;referenceSet n="browse-list" id="XMLTest.referenceSet.browse-list" type="summaryView" informationModel="DSpace"&gt;</b>
             &lt;head&gt;A header for the includeset&lt;/head&gt;
-            &lt;refrence url="/metadata/handle/123/34/mets.xml"/&gt;
-            &lt;refrence url=""metadata/handle/123/34/mets.xml/&gt;
+            &lt;reference url="/metadata/handle/123/34/mets.xml"/&gt;
+            &lt;reference url=""metadata/handle/123/34/mets.xml/&gt;
             <b>&lt;/referenceSet&gt;</b>
             ...
             &lt;/p&gt;</pre>
@@ -3343,7 +3333,7 @@ Example needed.</pre>
       </div>
       
       <div class="element-description">
-        <p>The <code>repositoryMeta</code> element contains metadata refernces about the repositories used in the used or refrenced in the documnet. It can contain any number of <code>repository</code> elements.</p>
+        <p>The <code>repositoryMeta</code> element contains metadata refernces about the repositories used in the used or referenced in the document. It can contain any number of <code>repository</code> elements.</p>
         <p>See the <code>repository</code> tag entry for more information on the structure of <code>repository</code> elements.</p>
       </div>
       

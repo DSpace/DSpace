@@ -340,7 +340,7 @@ context.complete();
       </section>
       <section remap="h3">
         <title><anchor id="docbook-business.html-dublincore" xreflabel="Dublin Core Metadata"/>Dublin Core Metadata</title>
-        <para>The <literal>DCValue</literal> class is a simple container that represents a single Dublin Core element, optional qualifier, value and language. Note that as of DSpace 1.4 the <literal>MetadataValue</literal> and associated classes are preferred (see <link linkend="docbook-business.html-otherschemas">Support for Other Metadata Schemas</link>). The other classes starting with <literal>DC</literal> are utility classes for handling types of data in Dublin Core, such as people&apos;s names and dates. As supplied, the DSpace registry of elements and qualifiers corresponds to the <ulink url="http://www.dublincore.org/documents/2002/09/24/library-application-profile/">Library Application Profile</ulink> for Dublin Core. It should be noted that these utility classes assume that the values will be in a certain syntax, which will be true for all data generated within the DSpace system, but since Dublin Core does not always define strict syntax, this may not be true for Dublin Core originating outside DSpace.</para>
+        <para>The <literal>DCValue</literal> class is a simple container that represents a single Dublin Core element, optional qualifier, value and language. Note that since DSpace 1.4 the <literal>MetadataValue</literal> and associated classes are preferred (see <link linkend="docbook-business.html-otherschemas">Support for Other Metadata Schemas</link>). The other classes starting with <literal>DC</literal> are utility classes for handling types of data in Dublin Core, such as people&apos;s names and dates. As supplied, the DSpace registry of elements and qualifiers corresponds to the <ulink url="http://www.dublincore.org/documents/2002/09/24/library-application-profile/">Library Application Profile</ulink> for Dublin Core. It should be noted that these utility classes assume that the values will be in a certain syntax, which will be true for all data generated within the DSpace system, but since Dublin Core does not always define strict syntax, this may not be true for Dublin Core originating outside DSpace.</para>
         <para>Below is the specific syntax that DSpace expects various fields to adhere to:</para>
         <informaltable frame="none">
           <tgroup cols="4">
@@ -538,7 +538,7 @@ Schemas"/>Support for Other Metadata Schemas</title>
           <para>The Plugin Manager supports three different patterns of usage:</para>
           <orderedlist>
             <listitem>
-              <para><emphasis role="bold">Singleton Plugins</emphasis> There is only one implementation class for the plugin. It is indicated in the configuration. This type of plugin chooses an implementations of a service, for the entire system, at configuration time. Your application just fetches the plugin for that interface and gets the configured-in choice. See the <link linkend="docbook-business.html-pluginmethods">getSinglePlugin()</link> method.</para>
+              <para><emphasis role="bold">Singleton Plugins</emphasis> There is only one implementation class for the plugin. It is indicated in the configuration. This type of plugin chooses an implementation of a service, for the entire system, at configuration time. Your application just fetches the plugin for that interface and gets the configured-in choice. See the <link linkend="docbook-business.html-pluginmethods">getSinglePlugin()</link> method.</para>
             </listitem>
             <listitem>
               <para><emphasis role="bold">Sequence Plugins</emphasis> You need a sequence or series of plugins, to implement a mechanism like Stackable Authentication or a pipeline, where each plugin is called in order to contribute its implementation of a process to the whole. The Plugin Manager supports this by letting you configure a sequence of plugins for a given interface. See the <link linkend="docbook-business.html-pluginmethods">getPluginSequence()</link> method.</para>
@@ -789,7 +789,7 @@ osswalk = \
         <para>Here are some usage examples to illustrate how the Plugin Manager works.</para>
         <section remap="h4">
           <title>Managing the MediaFilter plugins transparently</title>
-          <para>The existing DSpace 1.3 MediaFilterManager implementation have been largely replaced by the Plugin Manager. The MediaFilter classes become plugins named in the configuration. Refer to the <ulink url="configure.html#mediafilters">configuration guide</ulink> for further details.</para>
+          <para>The existing DSpace 1.3 MediaFilterManager implementation has been largely replaced by the Plugin Manager. The MediaFilter classes become plugins named in the configuration. Refer to the <ulink url="configure.html#mediafilters">configuration guide</ulink> for further details.</para>
         </section>
         <section remap="h4">
           <title>A Singleton Plugin</title>
@@ -1454,7 +1454,7 @@ action --hasAgent--&gt;   User
     </section>
     <section remap="h2">
       <title><anchor id="docbook-business.html-checker" xreflabel="Checksum checker"/>Checksum checker</title>
-      <para>The architecture of the checker is documented in the package javadocs, run <literal>ant public_api</literal>, and look in <literal>build/public_api/index.html</literal>.</para>
+      <para>The architecture of the checker is documented in the package javadocs, run <literal>cd [dspace-source]/dspace;mvn javadoc:javadoc</literal>, and look in <literal>[dspace-source]dspace-api/target/site/apidocs/index.html</literal>.</para>
     </section>
   </chapter>
 

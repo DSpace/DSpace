@@ -340,7 +340,7 @@ Manakin)"/>Contents of XMLUI Web Application (aka Manakin)</title>
                 </para>
               </entry>
               <entry>
-                <para>Main DSpace log file. This is where the DSpace code writes a simple log of events and errors that occur within the DSpace code. You can control the verbosity of this by editing the <literal>[dspace]/config/templates/log4j.properties</literal> file and then running <literal>[dspace]/bin/install-configs</literal>.</para>
+                <para>Main DSpace log file. This is where the DSpace code writes a simple log of events and errors that occur within the DSpace code. You can control the verbosity of this by editing the <literal>[dspace-source]/config/templates/log4j.properties</literal> file and then running &quot;ant init_configs&quot;. [dspace]/bin/install-configs in [dspace-sorce]/dspace/target/dspace-1.5.0-build/.</para>
               </entry>
             </row>
             <row>
@@ -390,7 +390,7 @@ Manakin)"/>Contents of XMLUI Web Application (aka Manakin)</title>
                 </para>
               </entry>
               <entry>
-                <para>The Handle server runs as a separate process from the DSpace Web UI (which runs under Tomcat&apos;s JVM). Due to a limitation of log4j&apos;s &apos;rolling file appenders&apos;, the DSpace code running in the Handle server&apos;s JVM must use a separate log file. The DSpace code that is run as part of a Handle resolution request writes log information to this file. You can control the verbosity of this by editing <literal>[dspace]/config/templates/log4j-handle-plugin.properties</literal>.</para>
+                <para>The Handle server runs as a separate process from the DSpace Web UI (which runs under Tomcat&apos;s JVM). Due to a limitation of log4j&apos;s &apos;rolling file appenders&apos;, the DSpace code running in the Handle server&apos;s JVM must use a separate log file. The DSpace code that is run as part of a Handle resolution request writes log information to this file. You can control the verbosity of this by editing <literal>[dspace-source]/config/templates/log4j-handle-plugin.properties</literal>.</para>
               </entry>
             </row>
             <row>

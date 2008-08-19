@@ -711,7 +711,7 @@ archive_directory/
         file_1.png
         ...
 </screen>
-        <para>The <literal>dublin_core.xml</literal> file has the following format, where each Dublin Core element has it&apos;s own entry within a <literal>&lt;dcvalue&gt;</literal> tagset. There are currently three tag elements available in the <literal>&lt;dcvalue&gt;</literal> tagset:</para>
+        <para>The <literal>dublin_core.xml</literal> file has the following format, where each Dublin Core element has it&apos;s own entry within a <literal>&lt;dcvalue&gt;</literal> tagset. There are currently three tag attributes available in the <literal>&lt;dcvalue&gt;</literal> tagset:</para>
         <itemizedlist>
           <listitem>
             <para><literal>&lt;element&gt;</literal>  - the Dublin Core element</para>
@@ -736,7 +736,7 @@ t;
 &lt;/dublin_core&gt;
 
 </screen>
-        <para>(Note the optional language tag which notifies the system that the optional title is in French.)</para>
+        <para>(Note the optional language tag attribute which notifies the system that the optional title is in French.)</para>
         <para>The <literal>contents</literal> file simply enumerates, one file per line, the bitstream file names. The bitstream name may optionally be followed by the sequence:</para>
         <para>
           <literal>\tbundle:bundlename</literal>
@@ -892,7 +892,7 @@ dsrun org.dspace.app.itemimport.ItemImport -a -e joe@user.com  -c
         <para>First, the randomly generated internal ID is not used because DSpace does not control the file path and name of the bitstream. Instead, the file path and name are that specified in the <literal>contents</literal> file.</para>
         <para>Second, the <literal>store_number</literal> column of the bitstream database row contains the asset store number specified in the <literal>contents</literal> file.</para>
         <para>Third, the <literal>internal_id</literal> column of the bitstream database row contains a leading flag (<literal>-R</literal>) followed by the registered file path and name. For example, <literal>-Rfilepath</literal> where <literal>filepath</literal> is the file path and name relative to the asset store corresponding to the asset store number. The asset store could be traditional storage in the DSpace server&apos;s file system or an SRB account.</para>
-        <para>Fourth, an MD5 checksum is calculated by reading the registered file if it is in local storage. If the registerd file is in remote storage (say, SRB) a checksup is calulated on just the file name! This is an efficiency choice since registering a large number of large files that are in SRB would consume substantial network resources and time. A future option could be to have an SRB proxy process calculate MD5s and store them in SRB&apos;s metadata catalog (MCAT) for rapid retrieval. SRB offers such an option but it&apos;s not yet in production release.</para>
+        <para>Fourth, an MD5 checksum is calculated by reading the registered file if it is in local storage. If the registerd file is in remote storage (say, SRB) a checksum is calulated on just the file name! This is an efficiency choice since registering a large number of large files that are in SRB would consume substantial network resources and time. A future option could be to have an SRB proxy process calculate MD5s and store them in SRB&apos;s metadata catalog (MCAT) for rapid retrieval. SRB offers such an option but it&apos;s not yet in production release.</para>
         <para>Registered items and their bitstreams can be retrieved transparently just like normally ingested items.</para>
       </section>
       <section remap="h3">

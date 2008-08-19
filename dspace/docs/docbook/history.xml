@@ -2,6 +2,127 @@
   <chapter remap="h1">
     <title>DSpace System Documentation: Version History</title>
     <section remap="h2">
+      <title><anchor id="docbook-history.html-version1_5" xreflabel="Changes in DSpace 1.5"/>Changes in DSpace 1.5</title>
+      <section remap="h3">
+        <title>General Improvements</title>
+        <itemizedlist>
+          <listitem>
+            <para> Highly configurable and theme-able new user interface (Manakin).</para>
+          </listitem>
+          <listitem>
+            <para> Apache Maven-based modular build system.</para>
+          </listitem>
+          <listitem>
+            <para> LNI (Lightweight Network Interface) service. Allows programmatic ingest of content via WebDAV or SOAP.</para>
+          </listitem>
+          <listitem>
+            <para> SWORD (Simple Web-service Offering Repository Deposit): repository-standard ingest service using Atom Publishing Protocol.</para>
+          </listitem>
+          <listitem>
+            <para> Highly configurable item web submission system. All submission steps are configurable not just metadata pages.</para>
+          </listitem>
+          <listitem>
+            <para> Browse functionality allowing customisation of the available indexes via dspace.cfg and pluggable normalisation of the sort strings. Integration with both JSP-UI and XML-UI included.</para>
+          </listitem>
+          <listitem>
+            <para> Extensible content event notification service.</para>
+          </listitem>
+          <listitem>
+            <para> Generation of Google and HTML sitemaps</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+      <section remap="h3">
+        <title>Bug fixes and smaller patches</title>
+        <itemizedlist>
+          <listitem>
+            <para> New options for ItemImporter to support bitstream permissions and descriptions.</para>
+          </listitem>
+          <listitem>
+            <para> 1824710 Fix - Change in Creative Commons RDF.</para>
+          </listitem>
+          <listitem>
+            <para> 1794700 Fix - Stat-monthly and stat-report-monthly</para>
+          </listitem>
+          <listitem>
+            <para> 1566820 Patch - Authentication code moved to new org.dspace.authenticate package, add IP AUth</para>
+          </listitem>
+          <listitem>
+            <para> 1670093 Patch - More stable metadata and schema registry import Option to generate community and collection &quot;strength&quot; as a batch job</para>
+          </listitem>
+          <listitem>
+            <para> 1659868 Patch - Improved database level debugging</para>
+          </listitem>
+          <listitem>
+            <para> 1620700 Patch - Add Community and Sub-Community to OAI Sets</para>
+          </listitem>
+          <listitem>
+            <para> 1679972 Fix - OAIDCCrosswalk NPE and invalid character fix, also invalid output prevented</para>
+          </listitem>
+          <listitem>
+            <para> 1549290 Fix - Suggest Features uses hard coded strings</para>
+          </listitem>
+          <listitem>
+            <para> 1727034 Fix - Method MetadataField.unique() is incorrect for null values</para>
+          </listitem>
+          <listitem>
+            <para> 1614546 Fix - Get rid of unused mets_bitstream_id column</para>
+          </listitem>
+          <listitem>
+            <para> 1450491 Patch - i18n configurable multilingualism support</para>
+          </listitem>
+          <listitem>
+            <para> 1764069 Patch - Replace &quot;String&quot; with &quot;Integer&quot; in PreparedStatement where needed</para>
+          </listitem>
+          <listitem>
+            <para> 1743188 Patch - for Request #1145499 - Move Items</para>
+          </listitem>
+          <listitem>
+            <para> 179196 Patch - Oracle SQL in Bitstream Checker</para>
+          </listitem>
+          <listitem>
+            <para> 1751638 Patch - Set http disposition header to force download of large bitstreams</para>
+          </listitem>
+          <listitem>
+            <para> 1799575 Patch - New EPersonConsumer event consumer</para>
+          </listitem>
+          <listitem>
+            <para> 1566572 Patch - Item metadata in XHTML head elements</para>
+          </listitem>
+          <listitem>
+            <para> 1589429 Patch - &quot;Self-Named&quot; Media Filters (i.e. MediaFilter Plugins) (updated version of this patch)</para>
+          </listitem>
+          <listitem>
+            <para> 1888652 Patch - Statistics Rewritten In Java</para>
+          </listitem>
+          <listitem>
+            <para> 1444364 Request - Metadata registry exporter</para>
+          </listitem>
+          <listitem>
+            <para> 1221957 Request - Admin browser for withdrawn items</para>
+          </listitem>
+          <listitem>
+            <para> 1740454 Fix - Concurrency</para>
+          </listitem>
+          <listitem>
+            <para> 1552760 Fix - Submit interface looks bad in Safari</para>
+          </listitem>
+          <listitem>
+            <para> 1642563 Patch - bin/update-handle-prefix rewritten in Java</para>
+          </listitem>
+          <listitem>
+            <para> 1724330 Fix - Removes &quot;null&quot; being displayed in community-home.jsp</para>
+          </listitem>
+          <listitem>
+            <para> 1763535 Patch - Alert DSpace administrator of new user registration</para>
+          </listitem>
+          <listitem>
+            <para> 1759438 Patch - Multilingualism Language Switch - DSpace Header</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+    </section>
+    <section remap="h2">
       <title><anchor id="docbook-history.html-version1_4_1" xreflabel="Changes in DSpace 1.4.1"/>Changes in DSpace 1.4.1</title>
       <section remap="h3">
         <title>General Improvements</title>

@@ -68,7 +68,7 @@
       </LI>
       <LI>
         <P><strong>Oracle 9 or greater</strong></P>
-        <p> Details on aquiring Oracle can be downloaded from the following location: <a href="http://www.oracle.com/database/">http://www.oracle.com/database/</a><br>
+        <p> Details on acquiring Oracle can be downloaded from the following location: <a href="http://www.oracle.com/database/">http://www.oracle.com/database/</a><br>
           <br>
         You will need to create a database for DSpace. Make sure that the character set is one of the Unicode character sets. DSpace uses UTF-8 natively, and it is suggested that the Oracle database use the same character set. You will also need to create a user account for DSpace (e.g. <code>dspace</code>,) and ensure that it has permissions to add and remove tables in the database. Refer to the Quick Installation for more details.</p>
         <P><STRONG>NOTE:</STRONG> DSpace uses sequences to generate unique object IDs - beware Oracle sequences, which are said to lose their values when doing a database export/import, say restoring from a backup.  Be sure to run the script <code>etc/update-sequences.sql</code>.</P>
@@ -82,10 +82,13 @@
           <br>
         Tomcat can be dowloaded from the following location: <a href="http://tomcat.apache.org/whichversion.html">http://tomcat.apache.org</a><br>
         <br>
-      Note that DSpace will need to run as the same user as Tomcat, so you might want to install and run Tomcat as a user called '<code>dspace</code>'.<br>
+      Note that DSpace will need to run as the same user as Tomcat, so you might want to install and run Tomcat as a user called '<code>dspace</code>'.  Set the environment variable TOMCAT_USER appropriately.<br>
       <br>
+      Modifications in [tomcat]/tomcat.conf <br>
       You need to ensure that Tomcat has a) enough memory to run DSpace and b) uses UTF-8 as its default file encoding for international character support.  So ensure in your startup scripts (etc) that the following environment variable is set:
         <PRE>JAVA_OPTS="-Xmx512M -Xms64M -Dfile.encoding=UTF-8"</PRE>
+      <br>
+      Modifications in [tomcat]/config/server.xml <br>
       You also need to alter Tomcat's default configuration to support searching and browsing of multi-byte UTF-8 correctly.  You need to add a configuration option to the <code>&lt;Connector&gt;</code> element in <code><i>[tomcat]</i>/config/server.xml</code>:
         <PRE>URIEncoding="UTF-8"</PRE>
       e.g. if you're using the default Tomcat config, it should read:
@@ -95,6 +98,8 @@
            enableLookups="false" redirectPort="8443" acceptCount="100"
            connectionTimeout="20000" disableUploadTimeout="true"
            <strong>URIEncoding="UTF-8"</strong> /&gt;</PRE>
+      <br>
+      You may change the port from 8080 by editing it in the file above, and by setting the variable CONNECTOR_PORT in tomcat.conf
       </li>
       <li><strong>Jetty or Caucho Resin</strong><br>
         <br>
@@ -102,6 +107,7 @@
       <br>
       Jetty and Resin are configured for correct handling of UTF-8 by default.</li>
     </ul>
+    <h3>Perl (required for [dspace]/bin/dspace-info.pl) </h3>
     
   <p>&nbsp;</p>
   <H2><A NAME="installoptions">Installation Options</A></H2>
@@ -177,7 +183,7 @@
       An interface "overlay" allows you to only manage your local custom code (in your local CVS or SVN),
       and automatically download the rest of the interface code from the maven central repository whenever
       you build DSpace.  This reduces the amount of out-of-the-box
-    DSpace interface code maintained in your local CVS/SVN.</p>
+    DSpace interface code maintained in your local CVS / SVN.</p>
   
   <H3><A NAME="directories">Overview of DSpace Directories</A></H3>
 
@@ -426,12 +432,12 @@ cp -r <i>[dspace]</i>/webapps/oai <i>[tomcat]</i>/webapps</PRE>
     <P>For information on customising the output of this see <A HREF="configure.html#statistics">configuring system statistical reports</A>.</P>
 
 	<h3>Multilingual Installation</h3>
-	In order to deploy a multilingual version of DSpace you have to configure two parameters in <code><i>[dspace]</i>/config/dspace.cfg:</code><br />
+	In order to deploy a multilingual version of DSpace you have to configure two parameters in <code><i>[dspace-source]</i>/config/dspace.cfg:</code><br />
 	<code>default.locale</code>, e. g. default.locale = en<br />
 	<code>webui.supported locales</code>, e. g. webui.supported.locales = en, de<br />
 	The Locales might have the form country, country_language, country_language_variant.<br />
 	Accoding to the languages you wish to support, you have to make sure, that all the i18n related files are available 
-	see the <a href="configure.html#multilingualui">Multilingual User Interface</a> section in the configuration documentation.
+	see the <a href="configure.html#multilingualui">Multilingual User Interface Configuring MultiLingual Support</a> section for the JSPUI or the Multilingual Support for XMLUI in the configuration documentation.
 
     <H3><A NAME="https">DSpace over HTTPS</a></H3>
 
@@ -649,7 +655,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize 1024 \
     <P>A Handle server runs as a separate process that receives TCP requests from other Handle servers, and issues resolution requests to a global server or servers if a Handle entered locally does not correspond to some local content.  The Handle protocol is based on TCP, so it will need to be installed on a server that can broadcast and receive TCP on port 2641.</P>
 
     <P>The Handle server code is included with the DSpace code in
-<code><i>[dspace]</i>/lib/handle.jar</code>. <strong>Note:</strong> The latest version of the <code>handle.jar</code> file is not included in the release due to licensing conditions changing between the provided version and later versions. It is recommended you read the <a href="http://www.handle.net/upgrade_6-2_DSpace.html">new license conditions</a> and decide whether you wish to update your installation's <code>handle.jar</code>. If you decide to update, you should replace the existing <code>handle.jar</code> in <i>[dspace]</i>/lib with the new version and rebuild your war files.</p>
+<code><i>[dspace-source]</i>/lib/handle.jar</code>. <strong>Note:</strong> The latest version of the <code>handle.jar</code> file is not included in the release due to licensing conditions changing between the provided version and later versions. It is recommended you read the <a href="http://www.handle.net/upgrade_6-2_DSpace.html">new license conditions</a> and decide whether you wish to update your installation's <code>handle.jar</code>. If you decide to update, you should replace the existing <code>handle.jar</code> in <i>[dspace-source]</i>/lib with the new version and rebuild your war files.</p>
     <p>A script exists to create a simple Handle configuration - simply run <code><i>[dspace]</i>/bin/make-handle-config</code> after you've set the appropriate parameters in <code>dspace.cfg</code>.  You can also create a Handle configuration directly by following the <A HREF="http://www.handle.net/hs_manual_18jan02/server_manual_2.html">installation instructions on handle.net</A>, but with these changes:</P>
 
     <UL>
@@ -704,7 +710,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize 1024 \
 
     <p>When running <code>[dspace]/bin/generate-sitemaps</code> the script informs Google that the sitemaps have been updated. For this update to register correctly, you must first register your Google sitemap index page (<code>/dspace/sitemap</code>) with Google at <a href="http://www.google.com/webmasters/sitemaps/">http://www.google.com/webmasters/sitemaps/</a>. If your DSpace server requires the use of a HTTP proxy to connect to the Internet, ensure that you have set <code>http.proxy.host</code> and <code>http.proxy.port</code> in <code>[dspace]/config/dspace.cfg</code></p>
 	
-	<p>The URL for pinging Google, and in future, other search engines, is configured in <code>[dspace]/config/dspace.cfg</code> using the <code>sitemap.engineurls</code> setting where you can provide a comma-separated list of URLs to 'ping'.
+	<p>The URL for pinging Google, and in future, other search engines, is configured in <code>[dspace-space]/config/dspace.cfg</code> using the <code>sitemap.engineurls</code> setting where you can provide a comma-separated list of URLs to 'ping'.
 
     <p>You can generate the sitemaps automatically every day using an additional cron job:</p>
 

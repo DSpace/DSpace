@@ -35,432 +35,432 @@ property.name = property value
 property.name = word1 ${other.property.name} more words
 property2.name = ${dspace.dir}/rest/of/path
 </screen>
-        <table frame="none">
-          <title>dspace.cfg Main Properties (Not Complete)</title>
-          <tgroup cols="3">
-            <colspec colname="c1" colwidth="33*"/>
-            <colspec colname="c2" colwidth="33*"/>
-            <colspec colname="c3" colwidth="33*"/>
-            <tbody>
-              <row>
-                <entry>
-                  <para>
-                    <emphasis role="bold">Property</emphasis>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <emphasis role="bold">Example Values</emphasis>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <emphasis role="bold">Notes</emphasis>
-                  </para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>dspace.dir</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>/dspace</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>Root directory of DSpace installation. Omit the trailing &apos;/&apos;. Note that if you change this, there are several other parameters you will probably want to change to match, e.g. <literal>assetstore.dir</literal>.</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>dspace.url</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>http://dspace.myu.edu</literal>
-                  </para>
-                  <para>
-                    <literal>http://dspacetest.myu.edu:8080</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>Main URL at which DSpace Web UI webapp is deployed. Include any port number, but do not include a trailing &apos;/&apos;</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>dspace.hostname</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>dspace.myu.edu</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>Fully qualified hostname; do not include port number</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>dspace.name</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>DSpace at My University</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>Short and sweet site name, used throughout Web UI, e-mails and elsewhere (such as OAI protocol)</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>config.template.foo</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>/opt/othertool/cfg/foo</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>When <literal>install-configs</literal> is run, the file <literal>[dspace]/config/templates/foo</literal> file will be filled out with values from <literal>dspace.cfg</literal> and copied to the value of this property, in this example <literal>/opt/othertool/cfg/foo</literal>. <link linkend="docbook-configure.html-templates">See here for more information.</link></para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>plugin.sequence.org.dspace .authenticate.AuthenticationMethod</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>org.dspace.eperson .X509Authentication, org.dspace.authenticate .PasswordAuthentication</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>Comma-separated list of classes implementing the <literal>org.dspace.authenticate.AuthenticationMethod</literal> interface, which make up the <anchor id="docbook-configure.html--authenticate" xreflabel="authentication
+        <para> Whenever you edit dspace.cfg in [dspace-source]/dspace/config/, you should then run &apos;ant init_configs&apos; in the directory [dspace-source]/dspace/target/dspace-1.5.0-build.dir so that any changes you may have made are reflected in the configuration files of other applications, for example Apache. You may then need to restart those applications, depending on what you changed. <table frame="none">
+            <title>dspace.cfg Main Properties (Not Complete)</title>
+            <tgroup cols="3">
+              <colspec colname="c1" colwidth="33*"/>
+              <colspec colname="c2" colwidth="33*"/>
+              <colspec colname="c3" colwidth="33*"/>
+              <tbody>
+                <row>
+                  <entry>
+                    <para>
+                      <emphasis role="bold">Property</emphasis>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <emphasis role="bold">Example Values</emphasis>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <emphasis role="bold">Notes</emphasis>
+                    </para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>dspace.dir</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>/dspace</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>Root directory of DSpace installation. Omit the trailing &apos;/&apos;. Note that if you change this, there are several other parameters you will probably want to change to match, e.g. <literal>assetstore.dir</literal>.</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>dspace.url</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>http://dspace.myu.edu</literal>
+                    </para>
+                    <para>
+                      <literal>http://dspacetest.myu.edu:8080</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>Main URL at which DSpace Web UI webapp is deployed. Include any port number, but do not include a trailing &apos;/&apos;</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>dspace.hostname</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>dspace.myu.edu</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>Fully qualified hostname; do not include port number</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>dspace.name</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>DSpace at My University</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>Short and sweet site name, used throughout Web UI, e-mails and elsewhere (such as OAI protocol)</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>config.template.foo</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>/opt/othertool/cfg/foo</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>When <literal>install-configs</literal> is run, the file <literal>[dspace]/config/templates/foo</literal> file will be filled out with values from <literal>dspace.cfg</literal> and copied to the value of this property, in this example <literal>/opt/othertool/cfg/foo</literal>. <link linkend="docbook-configure.html-templates">See here for more information.</link></para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>plugin.sequence.org.dspace .authenticate.AuthenticationMethod</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>org.dspace.eperson .X509Authentication, org.dspace.authenticate .PasswordAuthentication</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>Comma-separated list of classes implementing the <literal>org.dspace.authenticate.AuthenticationMethod</literal> interface, which make up the <anchor id="docbook-configure.html--authenticate" xreflabel="authentication
 stack"/>authentication stack. Authentication methods are called on in the order listed.</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>authentication.x509.keystore.path</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>/tomcat/conf/keystore</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>Path to Java keystore containing Client CA&apos;s certificiate for client X.509 certificates (Optional; only needed if X.509 user authentication is used.)</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>authentication.x509.keystore.password</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>changeit</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>Password to Java keystore configured above in <literal>authentication.x509.keystore.path</literal></para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>handle.prefix</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>1721.1234</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>The Handle prefix for your site, <ulink url="install.html#handles">see the Handle section</ulink></para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>assetstore.dir</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>/bigdisk/store</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>The location in the file system for asset (bitstream) store number zero. This should be a directory for the sole use of DSpace.</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>assetstore.dir.n</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>/anotherdisk/store1</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>The location in the file system of asset (bitstream) store number <literal>n</literal>. When adding additional stores, start with 1 (<literal>assetstore.dir.1</literal> and count upwards. Always leave asset store zero (<literal>assetstore.dir</literal>). For more details, see <ulink url="storage.html#bitstreams">the Bitstream Storage section</ulink>.</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>assetstore.incoming</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>1</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>The asset store number to use for storing new bitstreams. For example, if <literal>assetstore.dir.1</literal> is <literal>/anotherdisk/store1</literal>, and <literal>assetstore.incoming</literal> is <literal>1</literal>, new bitstreams will be stored under <literal>/anotherdisk/store1</literal>. A value of <literal>0</literal> (zero) corresponds to <literal>assetstore.dir</literal>. For more details, see <ulink url="storage.html#bitstreams">the Bitstream Storage section</ulink>.</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>srb.xxx</para>
-                  <para>srb.xxx.n</para>
-                </entry>
-                <entry>
-                  <para>/zone/home/user.domain</para>
-                </entry>
-                <entry>
-                  <para>The sets of SRB access parameters (see dspace.cfg) if one or more SRB accounts are used. The srb.xxx set would correspond to asset (bitstream) store number zero. The srb.xxx.n set would correspond to asset (bitstream) store number n. For more details, see <ulink url="storage.html#bitstreams">the Bitstream Storage section</ulink>.</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>webui.submit.enable-cc</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>true</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>Enable the Creative Commons license step in the submission process for the JSPUI interface. Submitters are given an opportunity to select a Creative Commons license to accompany the Item. Creative Commons licenses govern the use of the content. For more details, see <ulink url="http://creativecommons.org">the Creative Commons website</ulink>.</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>default.locale</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>en</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>The default Locale your Installation is working with.</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>webui.browse.thumbnail.maxheight</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>80</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>Determines the maximum height of any system generated thumbnails.</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>webui.browse.thumbnail.maxwidth</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>80</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>Determines the maximum width of any system generated thumbnails.</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>webui.feed.enable</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>true</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>Set the value of this property to true to enable RSS feeds. If false, feeds will not be generated, and the feed links will not appear.</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>webui.feed.cache.size</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>100</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>If caching is desired, set the value of this property to a positive number, which represents the total number of feeds kept in the cache at one time, for all communities and collections. A value of 0 disables caching, and the feed is generated on demand for each request.</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>webui.cache.age</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>48</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>This property specifiers the age in hours that a cache web feed may remain valid for. A value of 0 will force a check with each request.</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>webui.feed.formats</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>rss_1.0,rss_2.0</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>The RSS feature supports several different syndication formats.</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>webui.feed.localresolve</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>false</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>By default, the RSS feed will return global handle server-based URLs to items, collections and communities (e.g. http://hdl.handle.net/123456789/1). This means if you have not registered your DSpace installation with the CNRI Handle Server (e.g. development or testing instance) the URLs returned by the feed will return an error if accessed. Setting webui.feed.localresolve = true will result in the RSS feed returning localised URLs (e.g. http://myserver.myorg/handle/123456789/1). If webui.feed.localresolve is set to false or not present the default global handle URL form is used.</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>webui.feed.item.title</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>dc.title</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>Specify which metadata field you want to be displayed as an item&apos;s title in the RSS feed.</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>webui.feed.item.date</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>dc.date.issued</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>Specify which metadata field you want to be displayed as an item&apos;s date in the RSS feed.</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para>
-                    <literal>webui.feed.item.description</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>
-                    <literal>dc.title, dc.creator,dc.description.abstract</literal>
-                  </para>
-                </entry>
-                <entry>
-                  <para>Specify which metadata fields should be displayed in an item&apos;s description field in the RSS feed. You can specify as many fields as you wish here.</para>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para/>
-                </entry>
-                <entry>
-                  <para/>
-                </entry>
-                <entry>
-                  <para/>
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  <para/>
-                </entry>
-                <entry>
-                  <para/>
-                </entry>
-                <entry>
-                  <para/>
-                </entry>
-              </row>
-            </tbody>
-          </tgroup>
-        </table>
-        <para>Property values can include other, previously defined values, by enclosing the property name in ${...}. For example, if your dspace.cfg contains: -</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>authentication.x509.keystore.path</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>/tomcat/conf/keystore</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>Path to Java keystore containing Client CA&apos;s certificiate for client X.509 certificates (Optional; only needed if X.509 user authentication is used.)</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>authentication.x509.keystore.password</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>changeit</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>Password to Java keystore configured above in <literal>authentication.x509.keystore.path</literal></para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>handle.prefix</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>1721.1234</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>The Handle prefix for your site, <ulink url="install.html#handles">see the Handle section</ulink></para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>assetstore.dir</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>/bigdisk/store</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>The location in the file system for asset (bitstream) store number zero. This should be a directory for the sole use of DSpace.</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>assetstore.dir.n</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>/anotherdisk/store1</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>The location in the file system of asset (bitstream) store number <literal>n</literal>. When adding additional stores, start with 1 (<literal>assetstore.dir.1</literal> and count upwards. Always leave asset store zero (<literal>assetstore.dir</literal>). For more details, see <ulink url="storage.html#bitstreams">the Bitstream Storage section</ulink>.</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>assetstore.incoming</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>1</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>The asset store number to use for storing new bitstreams. For example, if <literal>assetstore.dir.1</literal> is <literal>/anotherdisk/store1</literal>, and <literal>assetstore.incoming</literal> is <literal>1</literal>, new bitstreams will be stored under <literal>/anotherdisk/store1</literal>. A value of <literal>0</literal> (zero) corresponds to <literal>assetstore.dir</literal>. For more details, see <ulink url="storage.html#bitstreams">the Bitstream Storage section</ulink>.</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>srb.xxx</para>
+                    <para>srb.xxx.n</para>
+                  </entry>
+                  <entry>
+                    <para>/zone/home/user.domain</para>
+                  </entry>
+                  <entry>
+                    <para>The sets of SRB access parameters (see dspace.cfg) if one or more SRB accounts are used. The srb.xxx set would correspond to asset (bitstream) store number zero. The srb.xxx.n set would correspond to asset (bitstream) store number n. For more details, see <ulink url="storage.html#bitstreams">the Bitstream Storage section</ulink>.</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>webui.submit.enable-cc</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>true</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>Enable the Creative Commons license step in the submission process for the JSPUI interface. Submitters are given an opportunity to select a Creative Commons license to accompany the Item. Creative Commons licenses govern the use of the content. For more details, see <ulink url="http://creativecommons.org">the Creative Commons website</ulink>.</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>default.locale</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>en</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>The default Locale your Installation is working with.</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>webui.browse.thumbnail.maxheight</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>80</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>Determines the maximum height of any system generated thumbnails.</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>webui.browse.thumbnail.maxwidth</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>80</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>Determines the maximum width of any system generated thumbnails.</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>webui.feed.enable</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>true</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>Set the value of this property to true to enable RSS feeds. If false, feeds will not be generated, and the feed links will not appear.</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>webui.feed.cache.size</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>100</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>If caching is desired, set the value of this property to a positive number, which represents the total number of feeds kept in the cache at one time, for all communities and collections. A value of 0 disables caching, and the feed is generated on demand for each request.</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>webui.cache.age</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>48</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>This property specifiers the age in hours that a cache web feed may remain valid for. A value of 0 will force a check with each request.</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>webui.feed.formats</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>rss_1.0,rss_2.0</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>The RSS feature supports several different syndication formats.</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>webui.feed.localresolve</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>false</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>By default, the RSS feed will return global handle server-based URLs to items, collections and communities (e.g. http://hdl.handle.net/123456789/1). This means if you have not registered your DSpace installation with the CNRI Handle Server (e.g. development or testing instance) the URLs returned by the feed will return an error if accessed. Setting webui.feed.localresolve = true will result in the RSS feed returning localised URLs (e.g. http://myserver.myorg/handle/123456789/1). If webui.feed.localresolve is set to false or not present the default global handle URL form is used.</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>webui.feed.item.title</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>dc.title</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>Specify which metadata field you want to be displayed as an item&apos;s title in the RSS feed.</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>webui.feed.item.date</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>dc.date.issued</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>Specify which metadata field you want to be displayed as an item&apos;s date in the RSS feed.</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para>
+                      <literal>webui.feed.item.description</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <literal>dc.title, dc.creator,dc.description.abstract</literal>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>Specify which metadata fields should be displayed in an item&apos;s description field in the RSS feed. You can specify as many fields as you wish here.</para>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para/>
+                  </entry>
+                  <entry>
+                    <para/>
+                  </entry>
+                  <entry>
+                    <para/>
+                  </entry>
+                </row>
+                <row>
+                  <entry>
+                    <para/>
+                  </entry>
+                  <entry>
+                    <para/>
+                  </entry>
+                  <entry>
+                    <para/>
+                  </entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </table>
+ Property values can include other, previously defined values, by enclosing the property name in ${...}. For example, if your dspace.cfg contains: -</para>
         <screen>
   dspace.dir = /dspace
   dspace.history = ${dspace.dir}/history
@@ -1261,7 +1261,7 @@ Customizations"/>JSPUI Interface Customizations</title>
       <section remap="h3">
         <title><anchor id="docbook-configure.html-jspui-dspacecfg" xreflabel="JSPUI
 Configuration Properties"/>JSPUI Configuration Properties</title>
-        <para>There are many options effecting how the JSP-based user interface for DSpace operates. Listed below are the major elements and their description, refere to the <literal>dspace.cfg</literal> file itself for the exhaustive list of configuration parameters.</para>
+        <para>There are many options effecting how the JSP-based user interface for DSpace operates. Listed below are the major elements and their description, refer to the <literal>dspace.cfg</literal> file itself for the exhaustive list of configuration parameters.</para>
         <informaltable frame="none">
           <tgroup cols="3">
             <colspec colname="c1" colwidth="33*"/>
@@ -1327,7 +1327,7 @@ Configuration Properties"/>JSPUI Configuration Properties</title>
                   </para>
                 </entry>
                 <entry>
-                  <para>Setting this parameter to ture will result in a hyperlink being rendered on the item View page that points to the item&apos;s licence.</para>
+                  <para>Setting this parameter to true will result in a hyperlink being rendered on the item View page that points to the item&apos;s licence.</para>
                 </entry>
               </row>
               <row>
@@ -1342,7 +1342,7 @@ Configuration Properties"/>JSPUI Configuration Properties</title>
                   </para>
                 </entry>
                 <entry>
-                  <para>Determine if thumbnails should be displayed on browe-by pages and item view pages when available. The default behavior, if omitted, is false.</para>
+                  <para>Determine if thumbnails should be displayed on browse-by pages and item view pages when available. The default behavior, if omitted, is false.</para>
                 </entry>
               </row>
               <row>
@@ -1432,7 +1432,7 @@ Vocabularies"/>Configuring Controlled Vocabularies</title>
 Multilingual Support"/>Configuring Multilingual Support</title>
         <section remap="h4">
           <title>Setting the default language for the application</title>
-          <para> The default language for the application is set via the <literal>[dspace]/config/dspace.cfg</literal> parameter <literal>default.locale</literal>. </para>
+          <para> The default language for the application is set via the <literal>[dspace-source]/config/dspace.cfg</literal> parameter <literal>default.locale</literal>. </para>
           <para> This is a locale according to i18n and might consist of country, country_language or country_language_variant, </para>
           <para> e. g.: <literal>default.locale=en</literal>. If not default locale is specified the server locale will be used instead. </para>
         </section>
@@ -1440,7 +1440,7 @@ Multilingual Support"/>Configuring Multilingual Support</title>
           <title>Supporting more than one language</title>
           <section remap="h5">
             <title>Changes in dspace.cfg</title>
-            <para> With the <literal>[dspace]/config/dspace.cfg</literal> parameter <literal>webui.supported.locales</literal> you may provide a comma seperated list of supported (including the default locale) locales. </para>
+            <para> With the <literal>[dspace-source]/config/dspace.cfg</literal> parameter <literal>webui.supported.locales</literal> you may provide a comma seperated list of supported (including the default locale) locales. </para>
             <para> The locales might have the form country, country_language or country_language_variant, e. g.:</para>
             <para><literal>webui.supported.locales = en, de</literal> or <literal>webui.supported.locales = en, en_ca, de</literal>.</para>
             <para> This will result in: <itemizedlist>
@@ -1472,111 +1472,113 @@ Multilingual Support"/>Configuring Multilingual Support</title>
             <para> If you set webui.supported.locales make sure that all the related additional files for each language are available. <literal>LOCALE</literal> should correspond to the locale set in <literal>webui.supported.locales</literal>, e. g.: for webui.supported.locales = en, de, fr, there should be: <itemizedlist>
                 <listitem>
                   <para>
-                    <literal>[dspace]/modules/jspui/src/main/resources/Messages.properties</literal>
+                    <literal>[dspace-source]/dspace/modules/jspui/src/main/resources/Messages.properties</literal>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/modules/jspui/src/main/resources/Messages_en.properties</literal>
+                    <literal>[dspace-source]/dspace/modules/jspui/src/main/resources/Messages_en.properties</literal>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/modules/jspui/src/main/resources/Messages_de.properties</literal>
+                    <literal>[dspace-source]/dspace/modules/jspui/src/main/resources/Messages_de.properties</literal>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/modules/jspui/src/main/resources/Messages_fr.properties</literal>
+                    <literal>[dspace-source]/dspace/modules/jspui/src/main/resources/Messages_fr.properties</literal>
                   </para>
                 </listitem>
               </itemizedlist>
  Files to be localized: <itemizedlist>
                 <listitem>
                   <para>
-                    <literal>[dspace]/modules/jspui/src/main/resources/Messages_LOCALE.properties</literal>
+                    <literal>[dspace-source]/dspace/modules/jspui/src/main/resources/Messages_LOCALE.properties</literal>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/config/input-forms_LOCALE.xml</literal>
+                    <literal>[dspace-source]/dspace/config/input-forms_LOCALE.xml</literal>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/config/default_LOCALE.license</literal>
+                    <literal>[dspace-source]/dspace/config/default_LOCALE.license</literal>
                     <emphasis>should be pure ascii</emphasis>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/config/news-top_LOCALE.html</literal>
+                    <literal>[dspace-source]/dspace/config/news-top_LOCALE.html</literal>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/config/news-side_LOCALE.html</literal>
+                    <literal>[dspace-source]/dspace/config/news-side_LOCALE.html</literal>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/config/emails/change_password_LOCALE</literal>
+                    <literal>[dspace-source]/dspace/config/emails/change_password_LOCALE</literal>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/config/emails/feedback_LOCALE</literal>
+                    <literal>[dspace-source]/dspace/config/emails/feedback_LOCALE</literal>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/config/emails/internal_error_LOCALE</literal>
+                    <literal>[dspace-source]/dspace/config/emails/internal_error_LOCALE</literal>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/config/emails/register_LOCALE</literal>
+                    <literal>[dspace-source]/dspace/config/emails/register_LOCALE</literal>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/config/emails/submit_archive_LOCALE</literal>
+                    <literal>[dspace-source]/dspace/config/emails/submit_archive_LOCALE</literal>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/config/emails/submit_reject_LOCALE</literal>
+                    <literal>[dspace-source]/dspace/config/emails/submit_reject_LOCALE</literal>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/config/emails/submit_task_LOCALE</literal>
+                    <literal>[dspace-source]/dspace/config/emails/submit_task_LOCALE</literal>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/config/emails/subscription_LOCALE</literal>
+                    <literal>[dspace-source]/dspace/config/emails/subscription_LOCALE</literal>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/config/emails/suggest_LOCALE</literal>
+                    <literal>[dspace-source]/dspace/config/emails/suggest_LOCALE</literal>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/jsp/help/collection-admin_LOCALE.html</literal>
-                    <emphasis>in html keep the jump link as original</emphasis>
+                    <literal>[dspace]/webapps/jspui/help/collection-admin_LOCALE.html</literal>
+                    <emphasis>in html keep the jump link as original; must be copied to [dspace-source]/dspace/modules/jspui/src/main/webapp/help</emphasis>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/jsp/help/index_LOCALE.html</literal>
+                    <literal>[dspace]/webapps/jspui/help/index_LOCALE.html</literal>
+                    <emphasis>must be copied to [dspace-source]/dspace/modules/jspui/src/main/webapp/help</emphasis>
                   </para>
                 </listitem>
                 <listitem>
                   <para>
-                    <literal>[dspace]/jsp/help/site-admin_LOCALE.html</literal>
+                    <literal>[dspace]/webapps/jspui/help/site-admin_LOCALE.html</literal>
+                    <emphasis>must be copied to [dspace-source]/dspace/modules/jspui/src/main/webapp/help</emphasis>
                   </para>
                 </listitem>
               </itemizedlist>
@@ -1591,7 +1593,7 @@ pages"/>Customizing the JSP pages</title>
         <para>To make it even easier, DSpace allows you to &apos;override&apos; the JSPs included in the source distribution with modified versions, that are stored in a separate place, so when it comes to updating your site with a new DSpace release, your modified versions will not be overwritten. It should be possible to dramatically change the look of DSpace to suit your organization by just changing the CSS style file and the site &apos;skin&apos; or &apos;layout&apos; JSPs in <literal>jsp/layout</literal>; if possible, it is recommended you limit local customizations to these files to make future upgrades easier.</para>
         <para>You can also easily edit the text that appears on each JSP page by editing the dictionary file. However, note that unless you change the entry in all of the different language message files, users of other languages will still see the default text for their language. See <ulink url="application.html#i18n">internationalization</ulink>.</para>
         <para>Note that the data (attributes) passed from an underlying Servlet to the JSP may change between versions, so you may have to modify your customized JSP to deal with the new data.</para>
-        <para>Thus, if possible, it is recommeded you limit your changes to the &apos;layout&apos; JSPs and the stylesheet.</para>
+        <para>Thus, if possible, it is recommended you limit your changes to the &apos;layout&apos; JSPs and the stylesheet.</para>
         <para>The JSPs are available in one of two places:</para>
         <itemizedlist>
           <listitem>
@@ -1627,7 +1629,7 @@ pages"/>Customizing the JSP pages</title>
                 </entry>
                 <entry>
                   <para>
-                    <literal>[dspace-source]/dspace/modules/jspui/src/main/webapp/community-list.jsp</literal>
+                    <literal>[jsp.custom-dir]/dspace/modules/jspui/src/main/webapp/community-list.jsp</literal>
                   </para>
                 </entry>
               </row>
@@ -1639,16 +1641,16 @@ pages"/>Customizing the JSP pages</title>
                 </entry>
                 <entry>
                   <para>
-                    <literal>[dspace-source]/dspace/modules/jspui/src/main/webapp/mydspace/main.jsp</literal>
+                    <literal>[jsp.custom-dir]/dspace/modules/jspui/src/main/webapp/mydspace/main.jsp</literal>
                   </para>
                 </entry>
               </row>
             </tbody>
           </tgroup>
         </informaltable>
-        <para>Heavy use is made of a style sheet, <literal>styles.css.jsp</literal>. If you make edits, copy the local version to <literal>[dspace-source]/dspace/modules/jspui/src/main/webapp/styles.css.jsp</literal>, and it will be used automatically in preference to the default, as described above.</para>
+        <para>Heavy use is made of a style sheet, <literal>styles.css.jsp</literal>. If you make edits, copy the local version to <literal>[jsp.custom-dir]/dspace/modules/jspui/src/main/webapp/styles.css.jsp</literal>, and it will be used automatically in preference to the default, as described above.</para>
         <para>Fonts and colors can be easily changed using the stylesheet. The stylesheet is a JSP so that the user&apos;s browser version can be detected and the stylesheet tweaked accordingly.</para>
-        <para>The &apos;layout&apos; of each page, that is, the top and bottom banners and the navigation bar, are determined by the JSPs <literal>/layout/header-*.jsp</literal> and <literal>/layout/footer-*.jsp</literal>. You can provide modified versions of these (in <literal>[dspace-source]/dspace/modules/jspui/src/main/webapp/layout</literal>), or define more styles and apply them to pages by using the &quot;style&quot; attribute of the <literal>dspace:layout</literal> tag.</para>
+        <para>The &apos;layout&apos; of each page, that is, the top and bottom banners and the navigation bar, are determined by the JSPs <literal>/layout/header-*.jsp</literal> and <literal>/layout/footer-*.jsp</literal>. You can provide modified versions of these (in <literal>[jsp.custom-dir]/dspace/modules/jspui/src/main/webapp/layout</literal>), or define more styles and apply them to pages by using the &quot;style&quot; attribute of the <literal>dspace:layout</literal> tag.</para>
         <para>After you&apos;ve customized your JSPs, <emphasis role="bold">you must rebuild the DSpace Web application</emphasis>. If you haven&apos;t already built and installed it, follow the <ulink url="install.html">install</ulink> directions. Otherwise, follow the steps below:</para>
         <orderedlist>
           <listitem>
@@ -1660,7 +1662,8 @@ mvn package
           <listitem>
             <para> Re-install the DSpace WAR(s) to <literal>[dspace]/webapps</literal> by running the following command from your <literal>[dspace-source]/dspace/target/dspace-[version].dir</literal> directory:</para>
             <screen>
-ant -Dconfig=<emphasis> [dspace]</emphasis>/config/dspace.cfg update
+ant -Dconfig=<emphasis> [dspace-source]</emphasis>/config/dspace.cfg
+	update
 </screen>
           </listitem>
           <listitem>
@@ -1960,13 +1963,13 @@ plugin.sequence.org.dspace.authenticate.AuthenticationMethod =
               <para>
                 <emphasis role="bold">webui.ldap.autoregister</emphasis>
               </para>
-              <para>  This will turn LDAP autoregistration on or off. With this on, a new EPerson object will be created for any user who successfully authenticates against the LDAP server when they first login. With this setting off, the user must first register to get an EPerson object by entering their ldap username and password and filling out the forms.</para>
+              <para>  This will turn LDAP autoregistration on or off. With this on, a new EPerson object will be created for any user who successfully authenticates against the LDAP server when they first login. With this setting off, the user must first register to get an EPerson object by entering their LDAP username and password and filling out the forms.</para>
             </listitem>
             <listitem>
               <para>
                 <emphasis role="bold">ldap.provider_url = ldap://ldap.myu.edu/o=myu.edu</emphasis>
               </para>
-              <para>  This is the url to your institution&apos;s ldap server. You may or may not need the /o=myu.edu part at the end. Your server may also require the ldaps:// protocol.</para>
+              <para>  This is the url to your institution&apos;s LDAP server. You may or may not need the /o=myu.edu part at the end. Your server may also require the ldaps:// protocol.</para>
             </listitem>
             <listitem>
               <para>
@@ -1978,37 +1981,37 @@ plugin.sequence.org.dspace.authenticate.AuthenticationMethod =
               <para>
                 <emphasis role="bold">ldap.object_context = ou=people,o=myu.edu</emphasis>
               </para>
-              <para>  This is the object context used when authenticating the user. It is appended to the ldap.id_field and username. For example uid=username,ou=people,o=myu.edu. You will need to modify this to match your ldap configuration.</para>
+              <para>  This is the object context used when authenticating the user. It is appended to the ldap.id_field and username. For example uid=username,ou=people,o=myu.edu. You will need to modify this to match your LDAP configuration.</para>
             </listitem>
             <listitem>
               <para>
                 <emphasis role="bold">ldap.search_context = ou=people</emphasis>
               </para>
-              <para>  This is the search context used when looking up a user&apos;s ldap object to retrieve their data for autoregistering. With ldap.autoregister turned on, when a user authenticates without an EPerson object we search the ldap directory to get their name and email address so that we can create one for them. So after we have authenticated against uid=username,ou=people,o=byu.edu we now search in ou=people for filtering on [uid=username]. Often the ldap.search_context is the same as the ldap.object_context parameter. But again this depends on your ldap server configuration.</para>
+              <para>  This is the search context used when looking up a user&apos;s LDAP object to retrieve their data for autoregistering. With ldap.autoregister turned on, when a user authenticates without an EPerson object we search the LDAP directory to get their name and email address so that we can create one for them. So after we have authenticated against uid=username,ou=people,o=byu.edu we now search in ou=people for filtering on [uid=username]. Often the ldap.search_context is the same as the ldap.object_context parameter. But again this depends on your LDAP server configuration.</para>
             </listitem>
             <listitem>
               <para>
                 <emphasis role="bold">ldap.email_field = mail</emphasis>
               </para>
-              <para>  This is the ldap object field where the user&apos;s email address is stored. &quot;mail&quot; is the default and the most common for ldap servers. If the mail field is not found the username will be used as the email address when creating the eperson object.</para>
+              <para>  This is the LDAP object field where the user&apos;s email address is stored. &quot;mail&quot; is the default and the most common for ldap servers. If the mail field is not found the username will be used as the email address when creating the eperson object.</para>
             </listitem>
             <listitem>
               <para>
                 <emphasis role="bold">ldap.surname_field = sn</emphasis>
               </para>
-              <para>  This is the ldap object field where the user&apos;s last name is stored. &quot;sn&quot; is the default and is the most common for ldap servers. If the field is not found the field will be left blank in the new eperson object.</para>
+              <para>  This is the LDAP object field where the user&apos;s last name is stored. &quot;sn&quot; is the default and is the most common for LDAP servers. If the field is not found the field will be left blank in the new eperson object.</para>
             </listitem>
             <listitem>
               <para>
                 <emphasis role="bold">ldap.givenname_field = givenName</emphasis>
               </para>
-              <para>  This is the ldap object field where the user&apos;s given names are stored. I&apos;m not sure how common the givenName field is in different ldap instances. If the field is not found the field will be left blank in the new eperson object.</para>
+              <para>  This is the LDAP object field where the user&apos;s given names are stored. I&apos;m not sure how common the givenName field is in different LDAP instances. If the field is not found the field will be left blank in the new eperson object.</para>
             </listitem>
             <listitem>
               <para>
                 <emphasis role="bold">ldap.phone_field = telephoneNumber</emphasis>
               </para>
-              <para>  This is the field where the user&apos;s phone number is stored in the ldap directory. If the field is not found the field will be left blank in the new eperson object.</para>
+              <para>  This is the field where the user&apos;s phone number is stored in the LDAP directory. If the field is not found the field will be left blank in the new eperson object.</para>
             </listitem>
           </itemizedlist>
         </section>

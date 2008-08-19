@@ -68,11 +68,11 @@
           </tbody>
         </tgroup>
       </table>
-      <para>The storage and business logic layer APIs are extensively documented with Javadoc-style comments. Generate the HTML version of these by entering the source directory and running:</para>
+      <para>The storage and business logic layer APIs are extensively documented with Javadoc-style comments. Generate the HTML version of these by entering the [dspace-source]/dspace directory and running:</para>
       <screen>
-ant public_api
+mvn javadoc:javadoc
 </screen>
-      <para>The package-level documentation of each package usually contains an overview of the package and some example usage. This information is not repeated in this architecture document; this and the Javadoc APIs are intended to be used in parallel.</para>
+      <para> The resulting documentation will be at <literal>[dspace-source]dspace-api/target/site/apidocs/index.html</literal>.  The package-level documentation of each package usually contains an overview of the package and some example usage. This information is not repeated in this architecture document; this and the Javadoc APIs are intended to be used in parallel.</para>
       <para>Each layer is described in a separate section:</para>
       <itemizedlist>
         <listitem>

@@ -61,7 +61,7 @@ host  dspace  dspace  127.0.0.1  255.255.255.255  md5
             <para>
                <emphasis role="bold">Oracle 9 or greater</emphasis>
             </para>
-            <para>Details on aquiring Oracle can be downloaded from the following location: <ulink url="http://www.oracle.com/database/">http://www.oracle.com/database/</ulink></para>
+            <para>Details on acquiring Oracle can be downloaded from the following location: <ulink url="http://www.oracle.com/database/">http://www.oracle.com/database/</ulink></para>
             <para> You will need to create a database for DSpace. Make sure that the character set is one of the Unicode character sets. DSpace uses UTF-8 natively, and it is suggested that the Oracle database use the same character set. You will also need to create a user account for DSpace (e.g. <literal>dspace</literal>,) and ensure that it has permissions to add and remove tables in the database. Refer to the Quick Installation for more details.</para>
             <para><emphasis role="bold">NOTE:</emphasis> DSpace uses sequences to generate unique object IDs - beware Oracle sequences, which are said to lose their values when doing a database export/import, say restoring from a backup. Be sure to run the script <literal>etc/update-sequences.sql</literal>.</para>
             <para><emphasis role="bold">ALSO NOTE:</emphasis> Everything is fully functional, although Oracle limits you to 4k of text in text fields such as item metadata or collection descriptions.</para>
@@ -77,11 +77,13 @@ host  dspace  dspace  127.0.0.1  255.255.255.255  md5
               <emphasis role="bold">Jakarta Tomcat 4.x or later.</emphasis>
             </para>
             <para>  Tomcat can be dowloaded from the following location: <ulink url="http://tomcat.apache.org/whichversion.html">http://tomcat.apache.org</ulink></para>
-            <para> Note that DSpace will need to run as the same user as Tomcat, so you might want to install and run Tomcat as a user called &apos;<literal>dspace</literal>&apos;.</para>
+            <para> Note that DSpace will need to run as the same user as Tomcat, so you might want to install and run Tomcat as a user called &apos;<literal>dspace</literal>&apos;. Set the environment variable TOMCAT_USER appropriately.</para>
+            <para> Modifications in [tomcat]/tomcat.conf</para>
             <para> You need to ensure that Tomcat has a) enough memory to run DSpace and b) uses UTF-8 as its default file encoding for international character support. So ensure in your startup scripts (etc) that the following environment variable is set: </para>
             <screen>
 JAVA_OPTS=&quot;-Xmx512M -Xms64M -Dfile.encoding=UTF-8&quot;
 </screen>
+             <para> Modifications in [tomcat]/config/server.xml</para>
             <para> You also need to alter Tomcat&apos;s default configuration to support searching and browsing of multi-byte UTF-8 correctly. You need to add a configuration option to the <literal>&lt;Connector&gt;</literal> element in <literal>[tomcat]/config/server.xml</literal>: </para>
             <screen>
 URIEncoding=&quot;UTF-8&quot;
@@ -99,6 +101,7 @@ URIEncoding=&quot;UTF-8&quot;
            <emphasis role="bold"> URIEncoding=&quot;UTF-8&quot;</emphasis>
 	/&gt;
 </screen>
+             <para> You may change the port from 8080 by editing it in the file above, and by setting the variable CONNECTOR_PORT in tomcat.conf</para>
           </listitem>
           <listitem>
             <para>
@@ -108,6 +111,11 @@ URIEncoding=&quot;UTF-8&quot;
             <para> Jetty and Resin are configured for correct handling of UTF-8 by default.</para>
           </listitem>
         </itemizedlist>
+      </section>
+      <section remap="h3">
+        <title>Perl (required for [dspace]/bin/dspace-info.pl)</title>
+        <para>
+        </para>
       </section>
     </section>
     <section remap="h2">
@@ -214,7 +222,7 @@ dspace-&lt;version&gt;-src-release.zip )"/>Source Release ( dspace-&lt;version&g
             </para>
           </listitem>
         </itemizedlist>
-        <para>Both approaches provide you with the same control over how DSpace builds itself (especially in terms of adding completely custom/3rd-party DSpace &quot;modules&quot; you wish to use). Both methods allow you the ability to create more complex user interface &quot;overlays&quot; in Maven. An interface &quot;overlay&quot; allows you to only manage your local custom code (in your local CVS or SVN), and automatically download the rest of the interface code from the maven central repository whenever you build DSpace. This reduces the amount of out-of-the-box DSpace interface code maintained in your local CVS/SVN.</para>
+        <para>Both approaches provide you with the same control over how DSpace builds itself (especially in terms of adding completely custom/3rd-party DSpace &quot;modules&quot; you wish to use). Both methods allow you the ability to create more complex user interface &quot;overlays&quot; in Maven. An interface &quot;overlay&quot; allows you to only manage your local custom code (in your local CVS or SVN), and automatically download the rest of the interface code from the maven central repository whenever you build DSpace. This reduces the amount of out-of-the-box DSpace interface code maintained in your local CVS / SVN.</para>
       </section>
       <section remap="h3">
         <title><anchor id="docbook-install.html-directories" xreflabel="Overview of DSpace Directories"/>Overview of DSpace Directories</title>
@@ -451,11 +459,11 @@ crontab -e
       </section>
       <section remap="h3">
         <title>Multilingual Installation</title>
-        <para> In order to deploy a multilingual version of DSpace you have to configure two parameters in <literal>[dspace]/config/dspace.cfg:</literal></para>
+        <para> In order to deploy a multilingual version of DSpace you have to configure two parameters in <literal>[dspace-source]/config/dspace.cfg:</literal></para>
         <para><literal>default.locale</literal>, e. g. default.locale = en</para>
         <para><literal>webui.supported locales</literal>, e. g. webui.supported.locales = en, de</para>
         <para> The Locales might have the form country, country_language, country_language_variant.</para>
-        <para> Accoding to the languages you wish to support, you have to make sure, that all the i18n related files are available see the <ulink url="configure.html#multilingualui">Multilingual User Interface</ulink> section in the configuration documentation. </para>
+        <para> Accoding to the languages you wish to support, you have to make sure, that all the i18n related files are available see the <ulink url="configure.html#multilingualui">Multilingual User Interface Configuring MultiLingual Support</ulink> section for the JSPUI or the Multilingual Support for XMLUI in the configuration documentation. </para>
       </section>
       <section remap="h3">
         <title><anchor id="docbook-install.html-https" xreflabel="DSpace over HTTPS"/>DSpace over HTTPS</title>
@@ -629,7 +637,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
         </itemizedlist>
         <para>If you want to use the Handle system, you&apos;ll need to set up a Handle server. This is included with DSpace. Note that this is not required in order to evaluate DSpace; you only need one if you are running a production service. You&apos;ll need to obtain a Handle prefix from <ulink url="http://www.handle.net/">the central CNRI Handle site</ulink>.</para>
         <para>A Handle server runs as a separate process that receives TCP requests from other Handle servers, and issues resolution requests to a global server or servers if a Handle entered locally does not correspond to some local content. The Handle protocol is based on TCP, so it will need to be installed on a server that can broadcast and receive TCP on port 2641.</para>
-        <para>The Handle server code is included with the DSpace code in <literal>[dspace]/lib/handle.jar</literal>. <emphasis role="bold">Note:</emphasis> The latest version of the <literal>handle.jar</literal> file is not included in the release due to licensing conditions changing between the provided version and later versions. It is recommended you read the <ulink url="http://www.handle.net/upgrade_6-2_DSpace.html">new license conditions</ulink> and decide whether you wish to update your installation&apos;s <literal>handle.jar</literal>. If you decide to update, you should replace the existing <literal>handle.jar</literal> in <emphasis>[dspace]</emphasis>/lib with the new version and rebuild your war files.</para>
+        <para>The Handle server code is included with the DSpace code in <literal>[dspace-source]/lib/handle.jar</literal>. <emphasis role="bold">Note:</emphasis> The latest version of the <literal>handle.jar</literal> file is not included in the release due to licensing conditions changing between the provided version and later versions. It is recommended you read the <ulink url="http://www.handle.net/upgrade_6-2_DSpace.html">new license conditions</ulink> and decide whether you wish to update your installation&apos;s <literal>handle.jar</literal>. If you decide to update, you should replace the existing <literal>handle.jar</literal> in <emphasis>[dspace-source]</emphasis>/lib with the new version and rebuild your war files.</para>
         <para>A script exists to create a simple Handle configuration - simply run <literal>[dspace]/bin/make-handle-config</literal> after you&apos;ve set the appropriate parameters in <literal>dspace.cfg</literal>. You can also create a Handle configuration directly by following the <ulink url="http://www.handle.net/hs_manual_18jan02/server_manual_2.html">installation instructions on handle.net</ulink>, but with these changes:</para>
         <itemizedlist>
           <listitem>
@@ -689,7 +697,7 @@ java -cp /hs/bin/handle.jar net.handle.server.SimpleSetup /hs/svr_1
           </itemizedlist>
 </para>
         <para> When running <literal>[dspace]/bin/generate-sitemaps</literal> the script informs Google that the sitemaps have been updated. For this update to register correctly, you must first register your Google sitemap index page (<literal>/dspace/sitemap</literal>) with Google at <ulink url="http://www.google.com/webmasters/sitemaps/">http://www.google.com/webmasters/sitemaps/</ulink>. If your DSpace server requires the use of a HTTP proxy to connect to the Internet, ensure that you have set <literal>http.proxy.host</literal> and <literal>http.proxy.port</literal> in <literal>[dspace]/config/dspace.cfg</literal></para>
-        <para>The URL for pinging Google, and in future, other search engines, is configured in <literal>[dspace]/config/dspace.cfg</literal> using the <literal>sitemap.engineurls</literal> setting where you can provide a comma-separated list of URLs to &apos;ping&apos;.</para>
+        <para>The URL for pinging Google, and in future, other search engines, is configured in <literal>[dspace-space]/config/dspace.cfg</literal> using the <literal>sitemap.engineurls</literal> setting where you can provide a comma-separated list of URLs to &apos;ping&apos;.</para>
         <para>You can generate the sitemaps automatically every day using an additional cron job:</para>
         <screen>
 # Generate sitemaps
