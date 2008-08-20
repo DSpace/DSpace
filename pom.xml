@@ -162,7 +162,7 @@
          </releases>
          <snapshots>
             <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
+            <updatePolicy>daily</updatePolicy>
             <checksumPolicy>fail</checksumPolicy>
          </snapshots>
       </repository>
@@ -724,7 +724,6 @@
          <id>maven.dspace.org/snapshot</id>
          <name>DSpace Maven Repository</name>
          <url>scp://maven.dspace.org/var/maven/snapshot</url>
-         <uniqueVersion>false</uniqueVersion>
       </snapshotRepository>
       <site>
          <id>website</id>
