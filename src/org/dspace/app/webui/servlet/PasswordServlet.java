@@ -41,6 +41,7 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -48,14 +49,22 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.naming.NamingException;
 
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
+
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.servlet.RegisterServlet;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+
+import edu.yale.its.tp.cas.client.ProxyTicketValidator;
 
 import edu.umd.lims.dspace.Ldap;
 
@@ -77,9 +86,50 @@ public class PasswordServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        // Simply forward to the plain form
-        JSPManager.showJSP(request, response, "/login/password.jsp");
+	String checkcas = request.getParameter("check-cas");
+
+	if (checkcas != null) {
+	    // Checking for existing CAS login
+
+	    if (checkcas.equals("start")) {
+		// Callout to CAS, return here with check-cas=done
+		String returnurl = 
+		    ConfigurationManager.getProperty("dspace.url")
+		    + "/password-login"
+		    + "?check-cas=done"
+		    ;
+
+		String url = 
+		    ConfigurationManager.getProperty("cas.loginUrl")
+		    + "?service="
+		    + URLEncoder.encode(returnurl, Constants.DEFAULT_ENCODING)
+		    + "&gateway=true"
+		    ;
+
+		response.sendRedirect(response.encodeRedirectURL(url));
+
+	    } else if (checkcas.equals("done")) {
+		// Back from CAS
+
+		String ticket = request.getParameter("ticket");
+
+		if (ticket == null || ticket.equals("")) {
+		    // The user is not already logged in to CAS
+
+		    // Give the user an option on how to login
+		    JSPManager.showJSP(request, response, "/login/password.jsp");
+		} else {
+		    // The user is logged in to CAS
+		    String strCasUser = getCASAuthenticatedUser(request, ticket);
+		    doUmLogin(context, request, response, strCasUser);
+		}
+	    }
+	    else {
+		throw new ServletException("Invalid value for checkcas parameter");
+	    }
+	}
     }
+
 
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -87,20 +137,26 @@ public class PasswordServlet extends DSpaceServlet
     {
         // Process the POSTed information
         String email = request.getParameter("login_email");
- 	String uid = request.getParameter("login_uid");
-         String password = request.getParameter("login_password");
-
+        String password = request.getParameter("login_password");
 
 	if (email != null) {
 	    doLocalLogin(context, request, response, email, password);
-	} else if (uid != null) {
-	    doUmLogin(context, request, response, uid, password);
 	} else {
-	    // should not reach here
-	    log.info(LogManager.getHeader(context,
-					  "failed_login",
-					  "no login provided"));
-	    JSPManager.showJSP(request, response, "/login/password.jsp");
+	    // Callout to CAS, return here with check-cas=done
+	    String returnurl = 
+		ConfigurationManager.getProperty("dspace.url")
+		+ "/password-login"
+		+ "?check-cas=done"
+		;
+
+	    String url = 
+		ConfigurationManager.getProperty("cas.loginUrl")
+		+ "?service="
+		+ URLEncoder.encode(returnurl, Constants.DEFAULT_ENCODING)
+		;
+
+	    response.sendRedirect(response.encodeRedirectURL(url));
+
 	}
     }
 
@@ -151,19 +207,22 @@ public class PasswordServlet extends DSpaceServlet
 
 
     protected void doUmLogin(Context context,
-        HttpServletRequest request,
-	HttpServletResponse response, 
-	String uid,
-	String password)
+			     HttpServletRequest request,
+			     HttpServletResponse response,
+			     String strCasUser)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
 	HttpSession session = request.getSession();
 
 	Ldap ldap = null;
 	try {
-	    // check for valid uid/password
+	    // check for existing CAS user
+	    //	    String strCasUser = (String)session.getAttribute(CASFilter.CAS_FILTER_USER);
+	    String uid = strCasUser;
+
+	    // check for valid uid
 	    ldap = new Ldap(context);
-	    if (ldap.checkUid(uid) && ldap.checkPassword(password)) {
+	    if (ldap.checkUid(uid)) {
 		ldap.close();
 
 		String email = ldap.getEmail();
@@ -189,7 +248,6 @@ public class PasswordServlet extends DSpaceServlet
 		    }			
 		}
 
-		
 		// Logged in OK.
 		Authenticate.loggedIn(context, request, eperson);
 			
@@ -221,7 +279,57 @@ public class PasswordServlet extends DSpaceServlet
 	}
 
 	finally {
-	    ldap.close();
+	    if (ldap != null) {
+		ldap.close();
+	    }
 	}
     }
+
+
+    /**
+     * Converts a ticket parameter to a username, taking into account an
+     * optionally configured trusted proxy in the tier immediately in front
+     * of us.  Adapted from edu.yale.its.tp.cas.client.filter.CASFilter .
+     */
+    public static String getCASAuthenticatedUser(HttpServletRequest request, String ticket) throws ServletException {
+        ProxyTicketValidator pv = null;
+        try {
+            pv = new ProxyTicketValidator();
+
+            pv.setCasValidateUrl(ConfigurationManager.getProperty("cas.validateUrl"));
+            pv.setServiceTicket(ticket);
+            pv.setService(ConfigurationManager.getProperty("dspace.url")
+			  + "/password-login"
+			  + "?check-cas=done"
+			  );
+	    pv.setRenew(false);
+
+            pv.validate();
+
+            if (!pv.isAuthenticationSuccesful()) {
+                throw new ServletException(
+                    "CAS authentication error: " + pv.getErrorCode() + ": " + pv.getErrorMessage());
+	    }
+
+            if (pv.getProxyList().size() != 0) {
+                // ticket was proxied
+		throw new ServletException("this page does not accept proxied tickets");
+            }
+
+            return pv.getUser();
+
+        } catch (SAXException ex) {
+            String xmlResponse = "";
+            if (pv != null)
+                xmlResponse = pv.getResponse();
+            throw new ServletException(ex + " " + xmlResponse);
+
+        } catch (ParserConfigurationException ex) {
+            throw new ServletException(ex);
+
+        } catch (IOException ex) {
+            throw new ServletException(ex);
+        }
+    }
+
 }

@@ -76,7 +76,7 @@ public class SimpleAuthenticator implements SiteAuthenticator
         // Present the username/password screen
         response.sendRedirect(response.encodeRedirectURL(request
                 .getContextPath()
-                + "/password-login"));
+                + "/password-login?check-cas=start"));
     }
 
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
