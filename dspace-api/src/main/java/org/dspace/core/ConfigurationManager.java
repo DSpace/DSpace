@@ -79,6 +79,7 @@ import org.apache.log4j.helpers.OptionConverter;
  * 
  * @author Robert Tansley
  * @author Larry Stone - Interpolated values.
+ * @author Mark Diggory - General Improvements to detection, logging and loading.
  * @version $Revision$
  */
 public class ConfigurationManager
@@ -96,6 +97,15 @@ public class ConfigurationManager
     // configuration; anything greater than this is very likely to be a loop.
     private final static int RECURSION_LIMIT = 9;
 
+    /**
+     * Identify if DSpace is properly configured
+     * @return boolean true if configured, false otherwise
+     */
+    public static boolean isConfigured()
+    {
+        return properties != null;
+    }
+    
     /**
      * 
      */
@@ -800,7 +810,7 @@ public class ConfigurationManager
     
     private static void info(String string)
     {
-        if (!isConfigured())
+        if (!isLog4jConfigured())
         {
             System.out.println("INFO: " + string);
         }
@@ -812,7 +822,7 @@ public class ConfigurationManager
 
     private static void warn(String string)
     {
-        if (!isConfigured())
+        if (!isLog4jConfigured())
         {
             System.out.println("WARN: " + string);
         }
@@ -824,7 +834,7 @@ public class ConfigurationManager
 
     private static void fatal(String string, Exception e)
     {
-        if (!isConfigured())
+        if (!isLog4jConfigured())
         {
             System.out.println("FATAL: " + string);
             e.printStackTrace();
@@ -837,7 +847,7 @@ public class ConfigurationManager
 
     private static void fatal(String string)
     {
-        if (!isConfigured())
+        if (!isLog4jConfigured())
         {
             System.out.println("FATAL: " + string);
         }
@@ -851,7 +861,7 @@ public class ConfigurationManager
      * Only current solution available to detect 
      * if log4j is truly configured. 
      */
-    private static boolean isConfigured()
+    private static boolean isLog4jConfigured()
     {
         Enumeration en = org.apache.log4j.LogManager.getRootLogger()
                 .getAllAppenders();

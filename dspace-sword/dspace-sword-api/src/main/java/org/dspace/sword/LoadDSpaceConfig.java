@@ -43,21 +43,30 @@ import org.dspace.core.ConfigurationManager;
  * Simple servlet to load in DSpace and log4j configurations. Should always be
  * started up before other servlets (use <loadOnStartup>)
  * 
- * This class has been duplicated into the DSpace SWORD module from its
- * original home in the DSpace JSPUI, but authorship and copyright 
- * ownership are as dictated in this file.
+ * This class holds code to be removed in the next version of the DSpace XMLUI,
+ * it is now managed by a Shared Context Listener inthe dspace-api project.
  * 
+ * It is deprecated, rather than removed to maintain backward compatibility for
+ * local DSpace 1.5.x customized overlays.
+ * 
+ * TODO: Remove in trunk
+ *
+ * @deprecated Use Servlet Context Listener provided in dspace-api (remove in >
+ *             1.5.x)
+ *             
  * @author Robert Tansley
  */
 public class LoadDSpaceConfig extends HttpServlet
 {	
     public void init()
     {
-        // Get config parameter
-        String config = getServletContext().getInitParameter("dspace-config");
+        if(!ConfigurationManager.isConfigured())
+        {
+            // Get config parameter
+            String config = getServletContext().getInitParameter("dspace-config");
 
-        // Load in DSpace config
-        ConfigurationManager.loadConfig(config);
-
+            // Load in DSpace config
+            ConfigurationManager.loadConfig(config);
+        }
     }
 }

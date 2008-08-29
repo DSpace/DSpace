@@ -75,13 +75,21 @@ public class DSpaceCocoonServlet extends CocoonServlet
      */
     public static final String DSPACE_CONFIG_PARAMETER = "dspace-config";
 	
-    
-    
-    
     /**
-     * Before this servlet will become functional replace 
+     * This method holds code to be removed in the next version 
+     * of the DSpace XMLUI, it is now managed by a Shared Context 
+     * Listener inthe dspace-api project. 
+     * 
+     * It is deprecated, rather than removed to maintain backward 
+     * compatibility for local DSpace 1.5.x customized overlays.
+     * 
+     * TODO: Remove in trunk
+     *
+     * @deprecated Use Servlet Context Listener provided 
+     * in dspace-api (remove in > 1.5.x)
+     * @throws ServletException
      */
-    public void init() throws ServletException
+    private void initDSpace() throws ServletException
     {
         // On Windows, URL caches can cause problems, particularly with undeployment
         // So, here we attempt to disable them if we detect that we are running on Windows
@@ -103,59 +111,78 @@ public class DSpaceCocoonServlet extends CocoonServlet
             // Any errors thrown in disabling the caches aren't significant to
             // the normal execution of the application, so we ignore them
         }
+        
+        /**
+         * Previous stages moved to shared ServletListener available in dspace-api
+         */
+        String dspaceConfig = null;
+        String log4jConfig  = null;
+        
+        /**
+         * Stage 1
+         * 
+         * Locate the dspace config
+         */
+        
+        // first check the local per webapp parameter, then check the global parameter.
+        dspaceConfig = super.getInitParameter(DSPACE_CONFIG_PARAMETER);
+        if (dspaceConfig == null)
+            dspaceConfig = super.getServletContext().getInitParameter(DSPACE_CONFIG_PARAMETER);
+        
+        // Finaly, if no config parameter found throw an error
+        if (dspaceConfig == null || "".equals(dspaceConfig))
+        {
+            throw new ServletException(
+                    "\n\nDSpace has failed to initialize. This has occurred because it was unable to determine \n" +
+                    "where the dspace.cfg file is located. The path to the configuration file should be stored \n" +
+                    "in a context variable, '"+DSPACE_CONFIG_PARAMETER+"', in either the local servlet or global contexts. \n" +
+                    "No context variable was found in either location.\n\n");
+        }
+            
+        /**
+         * Stage 2
+         * 
+         * Load the dspace config. Also may load log4j configuration.
+         * (Please rely on ConfigurationManager or Log4j to configure logging)
+         * 
+         */
+        try 
+        {
+            if(!ConfigurationManager.isConfigured())
+            {
+                // Load in DSpace config
+                ConfigurationManager.loadConfig(dspaceConfig);
+            }
+            
+            
+        }
+        catch (Throwable t)
+        {
+            throw new ServletException(
+                    "\n\nDSpace has failed to initialize, during stage 2. Error while attempting to read the \n" +
+                    "DSpace configuration file (Path: '"+dspaceConfig+"'). \n" +
+                    "This has likely occurred because either the file does not exist, or it's permissions \n" +
+                    "are set incorrectly, or the path to the configuration file is incorrect. The path to \n" +
+                    "the DSpace configuration file is stored in a context variable, 'dspace-config', in \n" +
+                    "either the local servlet or global context.\n\n",t);
+        }
+    }
+    
+    /**
+     * Before this servlet will become functional replace 
+     */
+    public void init() throws ServletException
+    {
 
+        this.initDSpace();
+        
     	// Check if cocoon needs to do anything at init time?
     	super.init();
 
     	// Paths to the various config files
-    	String dspaceConfig = null;
-    	String log4jConfig  = null;
     	String webappConfigPath    = null;
     	String installedConfigPath = null;
-    	
-    	/**
-    	 * Stage 1
-    	 * 
-    	 * Locate the dspace config
-    	 */
-    	
-    	// first check the local per webapp parameter, then check the global parameter.
-    	dspaceConfig = super.getInitParameter(DSPACE_CONFIG_PARAMETER);
-    	if (dspaceConfig == null)
-    		dspaceConfig = super.getServletContext().getInitParameter(DSPACE_CONFIG_PARAMETER);
-        
-    	// Finaly, if no config parameter found throw an error
-    	if (dspaceConfig == null || "".equals(dspaceConfig))
-    	{
-    		throw new ServletException(
-    				"\n\nDSpace has failed to initialize. This has occurred because it was unable to determine \n" +
-    				"where the dspace.cfg file is located. The path to the configuration file should be stored \n" +
-    				"in a context variable, '"+DSPACE_CONFIG_PARAMETER+"', in either the local servlet or global contexts. \n" +
-    				"No context variable was found in either location.\n\n");
-    	}
-        	
-    	/**
-    	 * Stage 2
-    	 * 
-    	 * Load the dspace config. Also may load log4j configuration.
-    	 * (Please rely on ConfigurationManager or Log4j to configure logging)
-    	 * 
-    	 */
-    	try 
-    	{
-            ConfigurationManager.loadConfig(dspaceConfig);
-    	}
-    	catch (Throwable t)
-    	{
-    		throw new ServletException(
-    				"\n\nDSpace has failed to initialize, during stage 2. Error while attempting to read the \n" +
-    				"DSpace configuration file (Path: '"+dspaceConfig+"'). \n" +
-    				"This has likely occurred because either the file does not exist, or it's permissions \n" +
-    				"are set incorrectly, or the path to the configuration file is incorrect. The path to \n" +
-    				"the DSpace configuration file is stored in a context variable, 'dspace-config', in \n" +
-    				"either the local servlet or global context.\n\n",t);
-    	}
-                	            
+             	            
         /**
          * Stage 3
          * 

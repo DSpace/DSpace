@@ -124,25 +124,21 @@
     <url-pattern>/view-workspaceitem</url-pattern>
   </filter-mapping>
 
-    <!-- Listener to clean up Commons-FileUpload -->
-    <listener>
-      <listener-class>org.apache.commons.fileupload.servlet.FileCleanerCleanup</listener-class>
-    </listener>
-    <!-- Listener to initialise / clean up the application -->
-    <listener>
-        <listener-class>org.dspace.app.util.DSpaceContextListener</listener-class>
-    </listener>
+  <!-- Listener to clean up Commons-FileUpload -->
+  <listener>
+     <listener-class>
+        org.apache.commons.fileupload.servlet.FileCleanerCleanup
+     </listener-class>
+  </listener>
+  
+  <!-- Listener to initialise / clean up the application -->
+  <listener>
+     <listener-class>
+        org.dspace.app.util.DSpaceContextListener
+     </listener-class>
+  </listener>
 
-    
   <!-- Servlets -->
-
-  <!-- DSpace configuration initialisation.  This needs to be loaded before
-       other servlets. -->
-  <servlet>
-    <servlet-name>load-dspace-config</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.LoadDSpaceConfig</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
 
   <servlet>
     <servlet-name>authorize</servlet-name>
