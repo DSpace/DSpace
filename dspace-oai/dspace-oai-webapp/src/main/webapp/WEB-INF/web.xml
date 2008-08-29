@@ -70,13 +70,14 @@
     </description>
   </context-param>
 
-  <!-- DSpace configuration initialisation.  This needs to be loaded before
-       other servlets. -->
-  <servlet>
-    <servlet-name>load-dspace-config</servlet-name>
-    <servlet-class>org.dspace.app.oai.LoadDSpaceOAIConfig</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
+  <!-- 
+   Listener to initialise DSpace configuration and clean up the application 
+  -->
+  <listener>
+     <listener-class>
+        org.dspace.app.util.DSpaceContextListener
+     </listener-class>
+  </listener>
 
   <servlet>
     <servlet-name>oai-handler</servlet-name>

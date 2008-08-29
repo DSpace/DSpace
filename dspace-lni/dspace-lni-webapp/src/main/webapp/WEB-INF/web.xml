@@ -2,7 +2,7 @@
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <!--
- - lni-web.xml
+ - web.xml
  -
  - Version: $Revision$
  -
@@ -50,14 +50,17 @@
       The location of the main DSpace configuration file
     </description>
   </context-param>
+
+  <!-- 
+   Listener to initialise DSpace configuration and clean up the application 
+  -->
+  <listener>
+     <listener-class>
+        org.dspace.app.util.DSpaceContextListener
+     </listener-class>
+  </listener>
   
-  <!-- DSpace configuration initialisation.  This needs to be loaded before
-       other servlets. -->
-  <servlet>
-    <servlet-name>load-dspace-config</servlet-name>
-    <servlet-class>org.dspace.app.dav.LoadDSpaceLNIConfig</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
+  <!--  Servlets -->
 
   <servlet>
     <servlet-name>LNI-DAV</servlet-name>
