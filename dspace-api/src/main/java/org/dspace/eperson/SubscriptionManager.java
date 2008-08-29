@@ -41,8 +41,9 @@ package org.dspace.eperson;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -452,15 +453,44 @@ public class SubscriptionManager
      */
     public static void main(String[] argv) 
     {
+        String usage = "org.dspace.eperson.Subscribe [-t] or nothing to send out subscriptions.";
+        
         Options options = new Options();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine line = null;
-
-        options.addOption(
-                OptionBuilder.isRequired(false).withDescription(
-                "Run test session").withLongOpt("test").create("t"));
         
-        boolean test = options.hasOption("t");
+        {
+            Option opt = new Option("t", "test", false, "Run test session");
+            opt.setRequired(false);
+            options.addOption(opt);
+        }
+        
+        {
+            Option opt = new Option("h", "help", false, "Print this help message");
+            opt.setRequired(false);
+            options.addOption(opt);
+        }
+
+        try
+        {
+            line = new PosixParser().parse(options, argv);
+        }
+        catch (Exception e)
+        {
+            // automatically generate the help statement
+            formatter.printHelp(usage, e.getMessage(), options, "");
+            System.exit(1);
+        }
+
+        if (line.hasOption("h"))
+        {
+            // automatically generate the help statement
+            formatter.printHelp(usage, options);
+            System.exit(1);
+        }
+        
+        boolean test = line.hasOption("t");
+
 
         if(test)
             log.setLevel(Level.DEBUG);
