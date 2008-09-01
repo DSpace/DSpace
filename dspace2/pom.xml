@@ -4,13 +4,13 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace2</artifactId>
     <packaging>pom</packaging>
-    <version>2.0-RC1-SNAPSHOT</version>
     <name>DSpace Parent Project</name>
     <url>http://projects.dspace.org</url>
     <organization>
         <name>The DSpace Foundation</name>
         <url>http://www.dspace.org</url>
     </organization>
+    <version>2.0-RC1-SNAPSHOT</version><!-- dspace2.version -->
 
     <build>
         <plugins>
@@ -60,16 +60,16 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
-                <module>dspace-api</module>
-                <module>dspace-core</module>
-                <module>dspace-rest</module>
+                <module>api</module>
+                <module>impl</module>
+                <module>rest</module>
             </modules>
         </profile>
         <profile>
             <id>core</id>
             <modules>
-                <module>dspace-api</module>
-                <module>dspace-core</module>
+                <module>api</module>
+                <module>impl</module>
             </modules>
         </profile>
     </profiles>

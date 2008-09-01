@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dspace.dspace2</groupId>
+    <artifactId>impl</artifactId>
+    <name>DSpace Services IMPL</name>
+    <description>The implementation of the dSpace 2 services</description>
+    <url>http://projects.dspace.org</url>
+    <inceptionYear>Monday, September 1, 2008</inceptionYear>
+    <organization>
+        <name>The DSpace Foundation</name>
+        <url>http://www.dspace.org</url>
+    </organization>
+    <version>2.0-RC1-SNAPSHOT</version><!-- dspace2.version -->
+    <packaging>jar</packaging>
+
+    <dependencies>
+    	<dependency>
+    		<groupId>org.springframework</groupId>
+    		<artifactId>spring-core</artifactId>
+    		<version>2.5.5</version>
+    		<type>jar</type>
+    		<scope>compile</scope>
+    	</dependency>
+    	<dependency>
+    		<groupId>com.google.code.guice</groupId>
+    		<artifactId>guice</artifactId>
+    		<version>1.0</version>
+    		<type>pom</type>
+    		<scope>compile</scope>
+    	</dependency>
+    </dependencies>
+
+    <build>
+    	<sourceDirectory>src/java/main</sourceDirectory>
+    	<testSourceDirectory>src/java/test</testSourceDirectory>
+    	<filters>
+    	</filters>
+    </build>
+
+</project>
