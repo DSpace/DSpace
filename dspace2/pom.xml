@@ -62,6 +62,7 @@
             <modules>
                 <module>api</module>
                 <module>impl</module>
+                <module>utils</module>
                 <module>rest</module>
             </modules>
         </profile>
@@ -70,6 +71,7 @@
             <modules>
                 <module>api</module>
                 <module>impl</module>
+                <module>utils</module>
             </modules>
         </profile>
     </profiles>
