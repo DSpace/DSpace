@@ -106,16 +106,6 @@
          </modules>
       </profile>
 
-    <profile>
-        <id>2.0</id>
-        <activation>
-            <activeByDefault>false</activeByDefault>
-        </activation>
-        <modules>
-            <module>dspace2</module>
-        </modules>
-    </profile>
-
       <!-- 
          Use 'mvn package -Pdistributions' to create distributions 
          to upload to S.F.
