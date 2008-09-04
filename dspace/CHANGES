@@ -6,6 +6,7 @@
 - Fix for SF bug #2081930 xmlui hardcoded strings in EditGroupForm.java
 - Fix for SF bug #2080319 jspui hardcoded strings in browse
 - Fix for SF bug #2078305 xmlui hardcoded strings used in UI in xmlui-api
+- SF patch #2076066 Review in jspui submission non-dc metadata
 
 (Stuart Lewis)
 - [1947036] Patch for SF Bug1896960 SWORD authentication and LDAP + [1989874] LDAPAuthentication
