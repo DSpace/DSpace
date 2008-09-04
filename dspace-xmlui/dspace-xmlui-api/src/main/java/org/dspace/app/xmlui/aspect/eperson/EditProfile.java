@@ -170,6 +170,12 @@ public class EditProfile extends AbstractDSpaceTransformer
     private static final Message T_head_auth = 
         message("xmlui.EPerson.EditProfile.head_auth");
     
+    private static final Message T_head_identify =
+    	message("xmlui.EPerson.EditProfile.head_identify");
+    
+    private static final Message T_head_security =
+    	message("xmlui.EPerson.EditProfile.head_security");
+    
     
     
     /** The email address of the user registering for the first time.*/
@@ -270,7 +276,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        List form = profile.addList("form",List.TYPE_FORM);
        
        List identity = form.addList("identity",List.TYPE_FORM);
-       identity.setHead("Identity");       
+       identity.setHead(T_head_identify);       
        
        // Email
        identity.addLabel(T_email_address);
@@ -345,7 +351,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        if (allowSetPassword) 
        {
     	   List security = form.addList("security",List.TYPE_FORM);
-           security.setHead("Security");
+           security.setHead(T_head_security);
     	   
            if (registering) 
            {
