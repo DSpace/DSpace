@@ -1,3 +1,12 @@
+(Mark Diggory) 
+- Fix for SF Bug #2082236 Subscription notification (sub-daily) no emails sent
+
+(Claudia Juergen)
+- Fix for SF bug #2090761 Statistics wrong use of dspace.dir for log location
+- Fix for SF bug #2081930 xmlui hardcoded strings in EditGroupForm.java
+- Fix for SF bug #2080319 jspui hardcoded strings in browse
+- Fix for SF bug #2078305 xmlui hardcoded strings used in UI in xmlui-api
+
 (Stuart Lewis)
 - [1947036] Patch for SF Bug1896960 SWORD authentication and LDAP + [1989874] LDAPAuthentication
   pluggable method broken for current users
