@@ -944,6 +944,7 @@
 	<message key="xmlui.administrative.group.EditGroupForm.member">Member</message>
 	<message key="xmlui.administrative.group.EditGroupForm.cycle">Cycle</message>
 	<message key="xmlui.administrative.group.EditGroupForm.pending">Pending</message>
+	<message key="xmlui.administrative.group.EditGroupForm.pending_warn">Note, pending changes are not saved until you click the save button.</message>
 	<message key="xmlui.administrative.group.EditGroupForm.submit_add">Add</message>
 	<message key="xmlui.administrative.group.EditGroupForm.submit_remove">Remove</message>
 	<message key="xmlui.administrative.group.EditGroupForm.collection_para">This group is associated with collection: </message>

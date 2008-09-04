@@ -131,6 +131,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	private static final Message T_pending =
 		message("xmlui.administrative.group.EditGroupForm.pending");
 	
+	private static final Message T_pending_warn =
+		message("xmlui.administrative.group.EditGroupForm.pending_warn");
+	
 	private static final Message T_submit_add =
 		message("xmlui.administrative.group.EditGroupForm.submit_add");
 	
@@ -344,7 +347,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
     	buttons.addButton("submit_cancel").setValue(T_submit_cancel);
        
     	if (changes)
-    		main.addPara().addHighlight("warn").addContent("Note, pending changes are not saved until you click the save button.");
+    		main.addPara().addHighlight("warn").addContent(T_pending_warn);
     	
         
         main.addHidden("administrative-continue").setValue(knot.getId());
