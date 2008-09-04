@@ -275,8 +275,8 @@
 --%>
 		<fmt:message key="browse.single.order"/>
 		<select name="order">
-			<option value="ASC" <%= ascSelected %>>Ascending</option>
-			<option value="DESC" <%= descSelected %>>Descending</option>
+			<option value="ASC" <%= ascSelected %>><fmt:message key="browse.order.asc" /></option>
+			<option value="DESC" <%= descSelected %>><fmt:message key="browse.order.desc" /></option>
 		</select>
 		
 		<fmt:message key="browse.single.rpp"/>
