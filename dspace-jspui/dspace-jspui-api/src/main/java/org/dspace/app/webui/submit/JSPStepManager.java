@@ -140,24 +140,27 @@ public class JSPStepManager
         
         /*
          * Next, load the step's JSPUI binding class (using the current class loader)
+         * (Only load JSPUI binding class if specified...otherwise this is a non-interactive step)
          */
-        stepClass = loader
-                .loadClass(stepConfig.getJSPUIClassName());
+        if(stepConfig.getJSPUIClassName()!=null && stepConfig.getJSPUIClassName().length()>0)
+        {
+        	stepClass = loader
+                	.loadClass(stepConfig.getJSPUIClassName());
 
-        stepInstance =  stepClass.newInstance();
+        	stepInstance =  stepClass.newInstance();
         
-        if(stepInstance instanceof JSPStep)
-        {
-            // load the JSPStep interface for this step
-            stepManager.stepJSPUI = (JSPStep) stepClass.newInstance();
+	        if(stepInstance instanceof JSPStep)
+	        {
+	            // load the JSPStep interface for this step
+	            stepManager.stepJSPUI = (JSPStep) stepClass.newInstance();
+	        }
+	        else
+	        {
+	            throw new Exception("The submission step class specified by '" + stepConfig.getJSPUIClassName() + 
+	                    "' does not extend the class org.dspace.app.webui.JSPStep!" +
+	                    " Therefore it cannot be used by the Configurable Submission for the JSP user interface!");
+	        }
         }
-        else
-        {
-            throw new Exception("The submission step class specified by '" + stepConfig.getJSPUIClassName() + 
-                    "' does not extend the class org.dspace.app.webui.JSPStep!" +
-                    " Therefore it cannot be used by the Configurable Submission for the JSP user interface!");
-        }
-        
         return stepManager;
     }
 
@@ -307,7 +310,9 @@ public class JSPStepManager
         log.debug("Doing pre-processing for step " + this.getClass().getName());
 
         // first, do any pre-processing and get the JSP to display
-        stepJSPUI.doPreProcessing(context, request, response, subInfo);
+        // (assuming that this step has an interface)
+        if(stepJSPUI!=null)
+        	stepJSPUI.doPreProcessing(context, request, response, subInfo);
 
         // Complete this step, if this response has not already
         // been committed.

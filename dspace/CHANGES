@@ -21,6 +21,11 @@
 (Stuart Lewis / Claudia Juergen)
 - Updated installation and configuration documents for new statistics script, and removed references to Perl
 
+(Tim Donohue
+- Fix for SF bug #2095402 - Non-interactive Submission Steps don't work in JSPUI 1.5
+- Fix for SF bug #2013921 - Movement in Submission Workflow Causes Skipped Steps
+- Fix for SF bug #2015988 - Configurable Submission bug in SubmissionController
+
 1.5 final
 =========
 
