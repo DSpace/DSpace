@@ -6,6 +6,7 @@
 - Fix for SF bug #2081930 xmlui hardcoded strings in EditGroupForm.java
 - Fix for SF bug #2080319 jspui hardcoded strings in browse
 - Fix for SF bug #2078305 xmlui hardcoded strings used in UI in xmlui-api
+- Fix for SF bug #2078324 xmlui hardcoded strings used in UI in General-Handler.xsl
 - SF patch #2076066 Review in jspui submission non-dc metadata
 
 (Stuart Lewis)

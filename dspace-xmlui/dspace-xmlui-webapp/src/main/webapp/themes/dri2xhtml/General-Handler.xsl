@@ -206,10 +206,10 @@
             <p><i18n:text>xmlui.dri2xhtml.METS-1.0.license-text</i18n:text></p>
             <ul>
                 <xsl:if test="@USE='CC-LICENSE'">
-                    <li><a href="{mets:file/mets:FLocat[@xlink:title='license_text']/@xlink:href}">Creative Commons</a></li>
+                    <li><a href="{mets:file/mets:FLocat[@xlink:title='license_text']/@xlink:href}"><i18n:text>xmlui.dri2xhtml.structural.link_cc</i18n:text></a></li>
                 </xsl:if>
                 <xsl:if test="@USE='LICENSE'">
-                    <li><a href="{mets:file/mets:FLocat[@xlink:title='license.txt']/@xlink:href}">Original License</a></li>
+                    <li><a href="{mets:file/mets:FLocat[@xlink:title='license.txt']/@xlink:href}"><i18n:text>xmlui.dri2xhtml.structural.link_original_license</i18n:text></a></li>
                 </xsl:if>
             </ul>
         </div>
