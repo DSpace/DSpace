@@ -132,7 +132,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 {
 
 	private static Logger log = Logger.getLogger(BitstreamReader.class);
-	
+
     /**
      * Messages to be sent when the user is not authorized to view
      * a particular bitstream. They will be redirected to the login
@@ -173,7 +173,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
     /** The bitstream's name */
     protected String bitstreamName;
-    
+
     /**
      * Set up the bitstream reader.
      *
@@ -194,8 +194,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         {
             this.request = ObjectModelHelper.getRequest(objectModel);
             this.response = ObjectModelHelper.getResponse(objectModel);
-            Context context = ContextUtil.obtainContext(objectModel);            
-            
+            Context context = ContextUtil.obtainContext(objectModel);
+
             // Get our parameters that identify the bitstream
             int itemID = par.getParameterAsInteger("itemID", -1);
             int bitstreamID = par.getParameterAsInteger("bitstreamID", -1);
@@ -253,7 +253,14 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             }
 
             // Is there a User logged in and does the user have access to read it?
-            if (!AuthorizeManager.authorizeActionBoolean(context, bitstream, Constants.READ))
+            boolean isAuthorized = AuthorizeManager.authorizeActionBoolean(context, bitstream, Constants.READ);
+            if (item != null && item.isWithdrawn() && !AuthorizeManager.isAdmin(context))
+            {
+                isAuthorized = false;
+                log.info(LogManager.getHeader(context, "view_bitstream", "handle=" + item.getHandle() + ",withdrawn=true"));
+            }
+
+            if (!isAuthorized)
             {
             	if(this.request.getSession().getAttribute("dspace.current.user.id")!=null){
             		// A user is logged in, but they are not authorized to read this bitstream,
@@ -299,7 +306,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             this.bitstreamSize = bitstream.getSize();
             this.bitstreamMimeType = bitstream.getFormat().getMIMEType();
             this.bitstreamName = bitstream.getName();
-            
+
             // Trim any path information from the bitstream
             if (bitstreamName != null && bitstreamName.length() >0 )
             {
@@ -314,10 +321,10 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             	// In-case there is no bitstream name...
             	bitstreamName = "bitstream";
             }
-    		
-            
+
+
             // Log that the bitstream has been viewed.
-			log.info(LogManager.getHeader(context, "view_bitstream", "bitstream_id=" + bitstream.getID()));
+            log.info(LogManager.getHeader(context, "view_bitstream", "bitstream_id=" + bitstream.getID()));
         }
         catch (SQLException sqle)
         {
@@ -461,13 +468,13 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
         response.setDateHeader("Expires", System.currentTimeMillis()
                 + expires);
-    	
+
         // If this is a large bitstream then tell the browser it should treat it as a download.
         int threshold = ConfigurationManager.getIntProperty("xmlui.content_disposition_threshold");
         if (bitstreamSize > threshold && threshold != 0)
         {
 	    	String name  = bitstreamName;
-	    	
+
 	    	// Try and make the download file name formated for each browser.
 	    	try {
 		    	String agent = request.getHeader("USER-AGENT");

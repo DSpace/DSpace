@@ -53,6 +53,7 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
@@ -87,6 +88,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
@@ -94,12 +96,14 @@ import org.xml.sax.SAXException;
  * Implements all the browse functionality (browse by title, subject, authors,
  * etc.) The types of browse available are configurable by the implementor. See
  * dspace.cfg and documentation for instructions on how to configure.
- * 
+ *
  * @author Graham Triggs
  */
 public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         CacheableProcessingComponent
 {
+    private final static Logger log = Logger.getLogger(ConfigurableBrowse.class);
+
     /**
      * Static Messages for common text
      */
@@ -152,7 +156,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     /** The options for results per page */
     private static final int[] RESULTS_PER_PAGE_PROGRESSION = {5,10,20,40,60,80,100};
-    
+
     /** Cached validity object */
     private SourceValidity validity;
 
@@ -169,14 +173,14 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         try
         {
             BrowseParams params = getUserParams();
-            
+
             String key = params.getKey();
-            
+
             if (key != null)
             {
                 DSpaceObject dso = URIUtil.resolve(objectModel);
                 if (dso != null)
-                    key += "-" + IdentifierService.getCanonicalForm(dso);            
+                    key += "-" + IdentifierService.getCanonicalForm(dso);
 
                 return HashUtil.hash(key);
             }
@@ -185,7 +189,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         {
             // Ignore all errors and just don't cache.
         }
-        
+
         return "0";
     }
 
@@ -200,9 +204,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
                 if (dso != null)
                     validity.add(dso);
-                
+
                 BrowseInfo info = getBrowseInfo();
-                
+
                 // Are we browsing items, or unique metadata?
                 if (isItemBrowse(info))
                 {
@@ -220,14 +224,17 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                         validity.add(singleEntry);
                     }
                 }
+
+                this.validity =  validity.complete();
             }
             catch (Exception e)
             {
                 // Just ignore all errors and return an invalid cache.
             }
-            
+
+            log.info(LogManager.getHeader(context, "browse", this.validity.toString()));
         }
-        
+
         return this.validity;
     }
 
@@ -241,7 +248,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
         // Get the name of the index
         String type = info.getBrowseIndex().getName();
-        
+
         pageMeta.addMetadata("title").addContent(getTitleMessage(info));
 
         DSpaceObject dso = URIUtil.resolve(objectModel);
@@ -271,7 +278,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
         // Build the internal navigation (jump lists)
         addBrowseJumpNavigation(div, info, params);
-        
+
         // Build the sort and display controls
         addBrowseControls(div, info, params);
 
@@ -302,7 +309,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             // Create a table for the results
             Table singleTable = results.addTable("browse-by-" + type + "-results",
                     browseInfo.getResultCount() + 1, 1);
-            
+
             // Add the column heading
             singleTable.addRow(Row.ROLE_HEADER).addCell().addContent(
                     message("xmlui.ArtifactBrowser.ConfigurableBrowse." + type + ".column_heading"));
@@ -337,7 +344,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     /**
      * Makes the jump-list navigation for the results
-     * 
+     *
      * @param div
      * @param info
      * @param params
@@ -382,7 +389,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             year.addOption(false, "-1", T_choose_year);
             int currentYear = DCDate.getCurrent().getYear();
             int i = currentYear;
-            
+
             // Calculate where to move from 1, 5 to 10 year jumps
             int oneYearBreak = ((currentYear - ONE_YEAR_LIMIT) / 5) * 5;
             int fiveYearBreak = ((currentYear - FIVE_YEAR_LIMIT) / 10) * 10;
@@ -404,18 +411,18 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             jumpForm = jump.addPara();
             jumpForm.addContent(T_jump_year);
             jumpForm.addText("start_with").setHelp(T_jump_year_help);
-            
+
             jumpForm.addButton("submit").setValue(T_go);
         }
         else
         {
             // Create a clickable list of the alphabet
             List jumpList = jump.addList("jump-list", List.TYPE_SIMPLE, "alphabet");
-            
+
             Map<String, String> zeroQuery = new HashMap<String, String>(queryParams);
             zeroQuery.put(BrowseParams.STARTS_WITH, "0");
             jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, zeroQuery), "0-9");
-            
+
             for (char c = 'A'; c <= 'Z'; c++)
             {
                 Map<String, String> cQuery = new HashMap<String, String>(queryParams);
@@ -428,14 +435,14 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             Para jumpForm = jump.addPara();
             jumpForm.addContent(T_starts_with);
             jumpForm.addText(BrowseParams.STARTS_WITH).setHelp(T_starts_with_help);
-            
+
             jumpForm.addButton("submit").setValue(T_go);
         }
     }
 
     /**
      * Add the controls to changing sorting and display options.
-     * 
+     *
      * @param div
      * @param info
      * @param params
@@ -465,13 +472,13 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             {
                 // Create a drop down of the different sort columns available
                 Set<SortOption> sortOptions = SortOption.getSortOptions();
-                
+
                 // Only generate the list if we have multiple columns
                 if (sortOptions.size() > 1)
                 {
                     controlsForm.addContent(T_sort_by);
                     Select sortSelect = controlsForm.addSelect(BrowseParams.SORT_BY);
-    
+
                     for (SortOption so : sortOptions)
                     {
                         if (so.isVisible())
@@ -497,11 +504,11 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         // Create a control for the number of records to display
         controlsForm.addContent(T_rpp);
         Select rppSelect = controlsForm.addSelect(BrowseParams.RESULTS_PER_PAGE);
-        
+
         for (int i : RESULTS_PER_PAGE_PROGRESSION)
         {
             rppSelect.addOption((i == info.getResultsPerPage()), i, Integer.toString(i));
- 
+
         }
 
         // Create a control for the number of authors per item to display
@@ -526,7 +533,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     /**
      * The URL query string of of the previous page.
-     * 
+     *
      * Note: the query string does not start with a "?" or "&" those need to be
      * added as appropriate by the caller.
      */
@@ -552,7 +559,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     /**
      * The URL query string of of the next page.
-     * 
+     *
      * Note: the query string does not start with a "?" or "&" those need to be
      * added as appropriate by the caller.
      */
@@ -577,7 +584,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     /**
      * Get the query parameters supplied to the browse.
-     * 
+     *
      * @return
      * @throws SQLException
      * @throws UIException

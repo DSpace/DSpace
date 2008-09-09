@@ -75,6 +75,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.LogManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -86,7 +87,7 @@ import org.xml.sax.SAXException;
  */
 public class CommunityViewer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
-    private static final Logger log = Logger.getLogger(DSpaceFeedGenerator.class);
+    private static final Logger log = Logger.getLogger(CommunityViewer.class);
 	
     /** Language Strings */
     private static final Message T_dspace_home =
@@ -163,8 +164,9 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
      */
     public SourceValidity getValidity() 
     {
-    	if (this.validity == null)
+        if (this.validity == null)
     	{
+            Community community = null;
 	        try {
 	            DSpaceObject dso = URIUtil.resolve(objectModel);
 	            
@@ -174,7 +176,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	            if (!(dso instanceof Community))
 	                return null;
 	            
-	            Community community = (Community) dso;
+	            community = (Community) dso;
 	            
 	            DSpaceValidity validity = new DSpaceValidity();
 	            validity.add(community);
@@ -204,6 +206,8 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	        {
 	            // Ignore all errors and invalidate the cache.
 	        }
+
+            log.info(LogManager.getHeader(context, "view_community", "community_id=" + (community == null ? "" : community.getID())));
     	}
         return this.validity;
     }
