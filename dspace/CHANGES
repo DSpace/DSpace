@@ -1,6 +1,34 @@
+(Scott Philips)
+- (Scott Phillips) Fixed bug where users could not finish registering nor reset 
+  their password because the authentication method signatures were changed.
+- Jay Paz (SF#1898241) Additional fixes to patch to enable reuse of methods.
+- Added the ability to manage sessions with site wide alerts to prevent users from authenticating.
+- Fixes a bug where the ability to edit an item durring workflow step 2 is not displayed.
+- Jay Paz (SF#1898241) Add item Export from jspui and xmlui.
+- Added easy support for google analytics statistics
+- Added the ability for super admins to login as other users. 
+- Added an activity viewer to the Control Panel
+
 (Mark Diggory) 
 - Fix for SF Bug #2082236 Subscription notification (sub-daily) no emails sent
 - [2102580] William Hays: Duplicate Handle exception when replacing bitstreams
+- [2102617] Sands Fish: X509Authentication fails to assign appropriate specialgroups
+- (Sands Fish) Add "Select Primary Bitstream" functionality to submission workflow
+- Guard against Community/Collection metadata having only whitespace characters 
+  and eliminate cases where null pointer exceptions would be thrown
+- Improve DSIndexer logic in both branches to support removal of items from index 
+  when withdrawn from repository.
+- (Sands Fish) Provides fix for AuthenticationUtil where users ID's are not properly compared.
+- Fix NullPointerException cause by nullified Context object in LNI map item to new collection.
+- Block Basic Authentication &quot;details&quot; from being exposed in dspace logs.
+- (Bill Hays) Close InputStreamReaders explicitly to release any file handles back to OS.
+- correct linking on pages when xmlui is the ROOT webapplication
+- correct issue with sitemap redirection of mydspace uri.
+- Add serlet-api to overlay wars to reduce compile time errors when adding classes
+- Correct issues in feed generation
+- XMLUI Adjust Advanced Search to use search properties from dspace.cfg.
+- Correct bug in Body.toSAX where startElement is called instead of end element.
+- Correct issue with libraries being excluded from wars
 
 (Claudia Juergen)
 - Fix for SF bug #2090761 Statistics wrong use of dspace.dir for log location
@@ -9,6 +37,8 @@
 - Fix for SF bug #2078305 xmlui hardcoded strings used in UI in xmlui-api
 - Fix for SF bug #2078324 xmlui hardcoded strings used in UI in General-Handler.xsl
 - SF patch #2076066 Review in jspui submission non-dc metadata
+- SF Bug #1983859  added Foreign Lucene Analyzers to poms
+- SF Bug #1989916 - missing LDAP authentication key
 
 (Stuart Lewis)
 - [1947036] Patch for SF Bug1896960 SWORD authentication and LDAP + [1989874] LDAPAuthentication
@@ -22,10 +52,32 @@
 (Stuart Lewis / Claudia Juergen)
 - Updated installation and configuration documents for new statistics script, and removed references to Perl
 
-(Tim Donohue
+(Tim Donohue)
 - Fix for SF bug #2095402 - Non-interactive Submission Steps don't work in JSPUI 1.5
 - Fix for SF bug #2013921 - Movement in Submission Workflow Causes Skipped Steps
 - Fix for SF bug #2015988 - Configurable Submission bug in SubmissionController
+- Fix for SF bug #2034372 - Resorting Search Results in JSPUI always gives no results
+- Updates to Community/Collection Item Counts (i.e. strengths) for XMLUI.
+- 1.5 upgrade instructions were missing Metadata Registry updates necessary to support SWORD.
+
+(Graham Triggs)
+- Fix various problems with resources potentially not being freed, and other minor fixes suggested by FindBugs
+- Replace URLEncoder with StringEscapeUtils for better fix of escaping the hidden query field
+- Fix #2034372 - Resorting in JSPUI gives no results
+- Fix #1714851 - set eperson.subscription.onlynew in dspace.cfg to only include items that are new to the repository
+- Fix issue where the browse and search indexes will not be updated correctly if you move an Item
+- Fix problem with SWORD not accepting multiple concurrent submissions
+- Fix #1963060 Authors listed in reverse order
+- Fix #1970852 - XMLUI: Browse by Issue Date "Type in Year" doesn't work
+- Statistics viewer for XMLUI, based on existing DStat. Note that this generates 
+  the view from the analysis files (.dat), does not require HTML report generation.
+- Fixed incorrect downloading of bitstream on withdrawn item 
+- Add JSPUI compatible log messages to XMLUI transformers
+- Clean up use of ThreadLocal
+- Improved cleanup of database resources when web
+  application is unloaded
+- Fix bug #1931799 - duplicate &quot;FROM metadatavalue&quot
+- Fixed Oracle bugs with ILIKE operators and LIMIT/OFFSET clauses
 
 1.5 final
 =========
