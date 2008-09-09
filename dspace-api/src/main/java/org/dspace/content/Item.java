@@ -84,7 +84,7 @@ import java.util.StringTokenizer;
 /**
  * Class representing an item in DSpace. Note that everything is held in memory
  * until update() is called on the ItemDAO.
- * 
+ *
  * @author James Rutherford
  * @version $Revision$
  */
@@ -122,7 +122,7 @@ public class Item extends DSpaceObject
      * (to drive event mechanism)
      */
     private boolean modified;
-    
+
     public Item(Context context, int id)
     {
         this.id = id;
@@ -147,7 +147,7 @@ public class Item extends DSpaceObject
 
     /**
      * Find out if the item is part of the main archive
-     * 
+     *
      * @return true if the item is in the main archive
      */
     public boolean isArchived()
@@ -157,7 +157,7 @@ public class Item extends DSpaceObject
 
     /**
      * Only <code>WorkflowItem.archive()</code> should really set this.
-     * 
+     *
      * @param inArchive new value for the flag
      */
     public void setArchived(boolean inArchive)
@@ -167,7 +167,7 @@ public class Item extends DSpaceObject
 
     /**
      * Find out if the item has been withdrawn
-     * 
+     *
      * @return true if the item has been withdrawn
      */
     public boolean isWithdrawn()
@@ -183,7 +183,7 @@ public class Item extends DSpaceObject
     /**
      * Get the date the item was last modified, or the current date if
      * last_modified is null
-     * 
+     *
      * @return the date the item was last modified, or the current date if the
      *         column is null.
      */
@@ -200,7 +200,7 @@ public class Item extends DSpaceObject
 
     /**
      * Get the owning Collection for the item
-     * 
+     *
      * @return Collection that is the owner of the item
      */
     public Collection getOwningCollection()
@@ -211,7 +211,7 @@ public class Item extends DSpaceObject
 
     /**
      * List the owning Collection for the item
-     * 
+     *
      * @param owningCollection Collection
      */
     public void setOwningCollection(Collection owningCollection)
@@ -409,7 +409,7 @@ public class Item extends DSpaceObject
 
         return values.toArray(new DCValue[0]);
     }
-    
+
     /**
      * Retrieve metadata field values from a given metadata string
      * of the form <schema prefix>.<element>[.<qualifier>|.*]
@@ -421,7 +421,7 @@ public class Item extends DSpaceObject
     public DCValue[] getMetadata(String mdString)
     {
         StringTokenizer st = new StringTokenizer(mdString, ".");
-        
+
         String[] tokens = { "", "", "" };
         int i = 0;
         while(st.hasMoreTokens())
@@ -432,7 +432,7 @@ public class Item extends DSpaceObject
         String schema = tokens[0];
         String element = tokens[1];
         String qualifier = tokens[2];
-        
+
         DCValue[] values;
         if ("*".equals(qualifier))
         {
@@ -446,10 +446,10 @@ public class Item extends DSpaceObject
         {
             values = getMetadata(schema, element, qualifier, Item.ANY);
         }
-        
+
         return values;
     }
-    
+
     /**
      * Add metadata fields. These are appended to existing values.
      * Use <code>clearDC</code> to remove values. The ordering of values
@@ -504,7 +504,7 @@ public class Item extends DSpaceObject
                 continue;
 //                dcv.value = null;
             }
-            
+
             if (!metadata.contains(dcv))
             {
                 metadata.add(dcv);
@@ -628,7 +628,7 @@ public class Item extends DSpaceObject
 
     /**
      * Get the e-person that originally submitted this item
-     * 
+     *
      * @return the submitter
      */
     public EPerson getSubmitter()
@@ -641,7 +641,7 @@ public class Item extends DSpaceObject
      * method since it is handled by the WorkspaceItem class in the ingest
      * package. <code>update</code> must be called to write the change to the
      * database.
-     * 
+     *
      * @param submitter
      *            the submitter
      */
@@ -659,7 +659,7 @@ public class Item extends DSpaceObject
 
     /**
      * Get the bundles in this item.
-     * 
+     *
      * @return the bundles in an unordered array
      */
     public Bundle[] getBundles()
@@ -674,10 +674,10 @@ public class Item extends DSpaceObject
 
     /**
      * Get the bundles matching a bundle name (name corresponds roughly to type)
-     * 
+     *
      * @param name
      *            name of bundle (ORIGINAL/TEXT/THUMBNAIL)
-     * 
+     *
      * @return the bundles in an unordered array
      */
     public Bundle[] getBundles(String name)
@@ -695,7 +695,7 @@ public class Item extends DSpaceObject
 
     /**
      * Create a bundle in this item, with immediate effect
-     * 
+     *
      * @param name
      *            bundle name (ORIGINAL/TEXT/THUMBNAIL)
      * @return the newly created bundle
@@ -735,7 +735,7 @@ public class Item extends DSpaceObject
 
     /**
      * Add an existing bundle to this item. This has immediate effect.
-     * 
+     *
      * @param b
      *            the bundle to add
      */
@@ -765,7 +765,7 @@ public class Item extends DSpaceObject
      *
      * FIXME: Will this ever not be the case? Can multiple Items own the same
      * Bundle? (I think the answer is no).
-     * 
+     *
      * @param b
      *            the bundle to remove
      */
@@ -791,7 +791,7 @@ public class Item extends DSpaceObject
     /**
      * Create a single bitstream in a new bundle. Provided as a convenience
      * method for the most common use.
-     * 
+     *
      * @param is
      *            the stream to create the new bitstream from
      * @param name
@@ -818,7 +818,7 @@ public class Item extends DSpaceObject
 
     /**
      * Convenience method, calls createSingleBitstream() with name "ORIGINAL"
-     * 
+     *
      * @param is
      *            InputStream
      * @return created bitstream
@@ -835,7 +835,7 @@ public class Item extends DSpaceObject
      * Get all non-internal bitstreams in the item. This is mainly used for
      * auditing for provenance messages and adding format.* DC values. The order
      * is indeterminate.
-     * 
+     *
      * @return non-internal bitstreams.
      */
     public Bitstream[] getNonInternalBitstreams()
@@ -866,7 +866,7 @@ public class Item extends DSpaceObject
 
     /**
      * Store a copy of the license a user granted in this item.
-     * 
+     *
      * @param license
      *            the license the user granted
      * @param eperson
@@ -905,7 +905,7 @@ public class Item extends DSpaceObject
      * again (either the item was rejected, or resumed after saving)
      * <p>
      * This method is used by the org.dspace.submit.step.LicenseStep class
-     * 
+     *
      * @throws AuthorizeException
      * @throws IOException
      */
@@ -926,7 +926,7 @@ public class Item extends DSpaceObject
 
     /**
      * Remove all licenses from an item - it was rejected
-     * 
+     *
      * @throws AuthorizeException
      * @throws IOException
      */
@@ -965,7 +965,7 @@ public class Item extends DSpaceObject
     /**
      * Withdraw the item from the archive. It is kept in place, and the content
      * and metadata are not deleted, but it is not publicly accessible.
-     * 
+     *
      * @throws AuthorizeException
      * @throws IOException
      */
@@ -979,7 +979,7 @@ public class Item extends DSpaceObject
 
     /**
      * Reinstate a withdrawn item
-     * 
+     *
      * @throws AuthorizeException
      * @throws IOException
      */
@@ -992,7 +992,7 @@ public class Item extends DSpaceObject
 
     /**
      * Return true if the given Collection 'owns' this item.
-     * 
+     *
      * @param c Collection
      * @return true if this Collection owns this item
      */
@@ -1019,7 +1019,7 @@ public class Item extends DSpaceObject
 
     /**
      * Return type found in Constants
-     * 
+     *
      * @return int Constants.ITEM
      */
     public int getType()
@@ -1030,7 +1030,7 @@ public class Item extends DSpaceObject
     /**
      * remove all of the policies for item and replace them with a new list of
      * policies
-     * 
+     *
      * @param newpolicies -
      *            this will be all of the new policies for the item and its
      *            contents
@@ -1050,7 +1050,7 @@ public class Item extends DSpaceObject
     /**
      * remove all of the policies for item's bitstreams and bundles and replace
      * them with a new list of policies
-     * 
+     *
      * @param newpolicies -
      *            this will be all of the new policies for the bundle and
      *            bitstream contents
@@ -1090,7 +1090,7 @@ public class Item extends DSpaceObject
     /**
      * remove all of the policies for item's bitstreams and bundles that belong
      * to a given Group
-     * 
+     *
      * @param g
      *            Group referenced by policies that needs to be removed
      *
@@ -1128,7 +1128,7 @@ public class Item extends DSpaceObject
      * remove all policies on an item and its contents, and replace them with
      * the DEFAULT_ITEM_READ and DEFAULT_BITSTREAM_READ policies belonging to
      * the collection.
-     * 
+     *
      * @param c
      *            Collection
      * @throws AuthorizeException
@@ -1186,8 +1186,52 @@ public class Item extends DSpaceObject
     }
 
     /**
+     * Moves the item from one collection to another one
+     *
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    public void move (Collection from, Collection to) throws SQLException, AuthorizeException, IOException
+    {
+        // Move the Item from one Collection to the other
+        to.addItem(this);
+        from.removeItem(this);
+
+        // If we are moving from the owning collection, update that too
+        if (isOwningCollection(from))
+    	{
+    		setOwningCollection(to);
+    		update();
+    	}
+        else
+        {
+            // Although we haven't actually updated anything within the item
+            // we'll tell the event system that it has, so that any consumers that
+            // care about the structure of the repository can take account of the move
+
+            // Note that updating the owning collection above will have the same effect,
+            // so we only do this here if the owning collection hasn't changed.
+
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
+        }
+    }
+
+    /**
+     * Get the collections this item is not in.
+     *
+     * @return the collections this item is not in, if any.
+     * @throws SQLException
+     */
+    public Collection[] getCollectionsNotLinked() throws SQLException
+    {
+    	Collection[] allCollections = Collection.findAll(ourContext);
+       	Collection[] linkedCollections = getCollections();
+       	Collection[] notLinkedCollections = new Collection[allCollections.length - linkedCollections.length];
+
+    /**
      * return TRUE if context's user can edit item, false otherwise
-     * 
+     *
      * @return boolean true = current user can edit item
      */
     public boolean canEdit()
@@ -1312,12 +1356,12 @@ public class Item extends DSpaceObject
 
     /**
      * Get a thumbnail object out of the item.
-     * 
+     *
      * Warning: using this method actually instantiates an Item, which has a
      * corresponding performance hit on the database during browse listing
      * rendering.  That's your own fault for wanting to put images on your
      * browse page!
-     * 
+     *
      * @return
      */
     public Thumbnail getThumbnail()
@@ -1328,7 +1372,7 @@ public class Item extends DSpaceObject
         {
             return null;
         }
-        
+
         // if multiple bitstreams, check if the primary one is HTML
         boolean html = false;
         if (original[0].getBitstreams().length > 1)
@@ -1346,14 +1390,14 @@ public class Item extends DSpaceObject
 
         // now actually pull out the thumbnail (ouch!)
         Bundle[] thumbs = getBundles("THUMBNAIL");
-        
+
         // if there are thumbs and we're not dealing with an HTML item
         // then show the thumbnail
         if ((thumbs.length > 0) && !html)
         {
             Bitstream thumbnailBitstream;
             Bitstream originalBitstream;
-            
+
             if ((original[0].getBitstreams().length > 1) && (original[0].getPrimaryBitstreamID() > -1))
             {
                 originalBitstream = Bitstream.find(context, original[0].getPrimaryBitstreamID());
@@ -1364,7 +1408,7 @@ public class Item extends DSpaceObject
                 originalBitstream = original[0].getBitstreams()[0];
                 thumbnailBitstream = thumbs[0].getBitstreams()[0];
             }
-            
+
             if ((thumbnailBitstream != null)
                     && (AuthorizeManager.authorizeActionBoolean(context, thumbnailBitstream, Constants.READ)))
             {
@@ -1413,7 +1457,7 @@ public class Item extends DSpaceObject
         List<Item> items = dao.getItemsBySubmitter(eperson);
 
         ArrayList<Integer> list = new ArrayList<Integer>();
-        
+
         for (Item i : items)
         {
             list.add(i.getID());
@@ -1487,7 +1531,7 @@ public class Item extends DSpaceObject
     public void move (Collection from, Collection to) throws AuthorizeException, IOException
     {
         ArchiveManager.move(context, this, from, to);
-        
+
         /*
         if (isOwningCollection(from))
         {
