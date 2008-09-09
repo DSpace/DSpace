@@ -3,6 +3,36 @@ bug tracker:
 
 http://sourceforge.net/tracker/?group_id=19984&atid=119984
 
+2088526	List group membership    
+2088431	IP Authentication only works on logged in users 
+2088426	encoding in some form-fields buggy 
+2088360	xmlui hardcoded string in AuthenticationUtil.java 
+2086708	xmlui Creative Commons not properly displayed 
+2086673	xmlui selection of authentication method 
+2086565	provenance information while logged in as another user 
+2086481	xmlui Administrative log in as another eperson 
+2082623	Metadata values saved in incorrect order, xmlui 
+2082242	xmlui eperson language setting 
+2081981	Collection Admin role not working 
+2081957	hardcoded strings in DIDLCrosswalk 
+2073396	xmlui display navigation bar overlaps central page 
+2073344	Wrong count in list of withdrawn items 
+2041817	Archive Export access to restricted material 
+2016130	checksum checker can not retrieve very large bitstream 
+2002866	Not found page returns 200 OK instead of 404 Not Found 
+1993036	Bitstream access rights inheritenc, editing in_archive items 
+1991757	scalability problem in "view accepted submission" 
+1984110	DCInputsReader doesn't expand entity refs in input-forms.xml 
+1969190	javadoc creation documented wrong and/or broken 
+1968082	SWORD Service Document fails if Collection is untitled 
+1967482	DSpace OAI-PMH driver aborts context prematurely 
+1951859	DSpace Home link style in breadcrumb trail 
+1931796	DSpace 1.5 Controlled Vocab (edit-metadata.jsp) 
+1926296	order of aspects matters for nav options 
+1926285	null ids for certain fieldsets 
+
+Known issues in 1.5.0 that may or may not have been corrected.
+
 1904122 Help text in submission process doesn't parse html tags
 1899801 SWORD ingest fails with METSExport tool
 1899709 Creative Commons XMLUI Firefox displayed as text
