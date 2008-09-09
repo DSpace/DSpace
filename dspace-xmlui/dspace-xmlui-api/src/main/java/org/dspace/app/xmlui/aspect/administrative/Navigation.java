@@ -73,10 +73,10 @@ import java.sql.SQLException;
 import java.util.Map;
 
 /**
- * 
- * Create the navigation options for everything in the administrative aspects. This includes 
+ *
+ * Create the navigation options for everything in the administrative aspects. This includes
  * Epeople, group, item, access control, and registry management.
- * 
+ *
  * @author Scott Phillips
  * @author Afonso Araujo Neto (internationalization)
  * @author Alexey Maslov
@@ -108,27 +108,29 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_context_export_collection 		= message("xmlui.administrative.Navigation.context_export_collection");
     private static final Message T_context_export_community 		= message("xmlui.administrative.Navigation.context_export_community");
     private static final Message T_account_export			 		= message("xmlui.administrative.Navigation.account_export");
-   
-	
+
+    private static final Message T_statistics            	= message("xmlui.administrative.Navigation.statistics");
+
+
     /** exports available for download */
     java.util.List<String> availableExports = null;
 
     /** Cached validity object */
 	private SourceValidity validity;
-	
+
 	 /**
      * Generate the unique cache key.
      *
      * @return The generated key hashes the src
      */
-    public Serializable getKey() 
+    public Serializable getKey()
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
-        
-        // Special case, don't cache anything if the user is logging 
+
+        // Special case, don't cache anything if the user is logging
         // in. The problem occures because of timming, this cache key
-        // is generated before we know whether the operation has 
-        // succeded or failed. So we don't know whether to cache this 
+        // is generated before we know whether the operation has
+        // succeded or failed. So we don't know whether to cache this
         // under the user's specific cache or under the anonymous user.
         if (request.getParameter("login_email")    != null ||
             request.getParameter("login_password") != null ||
@@ -136,7 +138,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         {
             return "0";
         }
-                
+
         String key;
         if (context.getCurrentUser() != null)
         {
@@ -149,17 +151,17 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         }
         else
         	key = "anonymous";
-        
+
         return HashUtil.hash(key);
     }
-	
+
     /**
      * Generate the validity object.
      *
      * @return The generated validity object or <code>null</code> if the
      *         component is currently not cacheable.
      */
-    public SourceValidity getValidity() 
+    public SourceValidity getValidity()
     {
     	if (this.validity == null)
     	{
@@ -168,17 +170,17 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     		{
 		        try {
 		            DSpaceValidity validity = new DSpaceValidity();
-		            
+
 		            validity.add(eperson);
-		            
+
 		            Group[] groups = Group.allMemberGroups(context, eperson);
 		            for (Group group : groups)
 		            {
 		            	validity.add(group);
 		            }
-		            
+
 		            this.validity = validity.complete();
-		        } 
+		        }
 		        catch (SQLException sqle)
 		        {
 		            // Just ignore it and return invalid.
@@ -191,8 +193,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     	}
     	return this.validity;
     }
-	
-    
+
+
     public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
     	super.setup(resolver, objectModel, src, parameters);
     	try{
@@ -202,12 +204,12 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     		// nothing to do
     	}
     }
-    
+
     public void addOptions(Options options) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
     	/* Create skeleton menu structure to ensure consistent order between aspects,
-    	 * even if they are never used 
+    	 * even if they are never used
     	 */
         options.addList("browse");
         List account = options.addList("account");
@@ -223,7 +225,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         DSpaceObject dso = URIUtil.resolve(objectModel);
         if (dso instanceof Item)
     	{
-    		
+
     		Item item = (Item) dso;
     		if (item.canEdit())
     		{
@@ -235,83 +237,84 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     	else if (dso instanceof Collection)
     	{
     		Collection collection = (Collection) dso;
-    		
-    		
+
+
     		// can they admin this collection?
             if (AuthorizeManager.authorizeActionBoolean(this.context, collection, Constants.COLLECTION_ADMIN))
             {
             	context.setHead(T_context_head);
-            	context.addItemXref(contextPath+"/admin/collection?collectionID=" + collection.getID(), T_context_edit_collection);            	
-            	context.addItemXref(contextPath+"/admin/mapper?collectionID="+collection.getID(), T_context_item_mapper);    
+            	context.addItemXref(contextPath+"/admin/collection?collectionID=" + collection.getID(), T_context_edit_collection);
+            	context.addItemXref(contextPath+"/admin/mapper?collectionID="+collection.getID(), T_context_item_mapper);
             	context.addItem().addXref(contextPath+"/admin/export?collectionID="+collection.getID(), T_context_export_collection );
             }
     	}
     	else if (dso instanceof Community)
     	{
     		Community community = (Community) dso;
-    		
+
     		// can they admin this collection?
             if (community.canEditBoolean())
             {
             	context.setHead(T_context_head);
-            	context.addItemXref(contextPath+"/admin/community?communityID=" + community.getID(), T_context_edit_community);       
+            	context.addItemXref(contextPath+"/admin/community?communityID=" + community.getID(), T_context_edit_community);
             	context.addItem().addXref(contextPath+"/admin/export?communityID="+community.getID(), T_context_export_community );
             }
-            
+
             // can they add to this community?
             if (AuthorizeManager.authorizeActionBoolean(this.context, community,Constants.ADD))
             {
             	context.setHead(T_context_head);
-            	context.addItemXref(contextPath+"/admin/collection?createNew&communityID=" + community.getID(), T_context_create_collection);         	
+            	context.addItemXref(contextPath+"/admin/collection?createNew&communityID=" + community.getID(), T_context_create_collection);
             }
-            
+
             // Only administrators can create communities
             if (AuthorizeManager.isAdmin(this.context))
             {
             	context.setHead(T_context_head);
-            	context.addItemXref(contextPath+"/admin/community?createNew&communityID=" + community.getID(), T_context_create_subcommunity);  	
+            	context.addItemXref(contextPath+"/admin/community?createNew&communityID=" + community.getID(), T_context_create_subcommunity);
             }
     	}
-    	
+
     	if ("community-list".equals(this.sitemapURI))
     	{
     		if (AuthorizeManager.isAdmin(this.context))
             {
             	context.setHead(T_context_head);
-    			context.addItemXref(contextPath+"/admin/community?createNew", T_context_create_community);    			
+    			context.addItemXref(contextPath+"/admin/community?createNew", T_context_create_community);
             }
     	}
-        
-        
+
+
         // System Administrator options!
         if (AuthorizeManager.isAdmin(this.context))
         {
 	        admin.setHead(T_administrative_head);
-	                
+
 	        List epeople = admin.addList("epeople");
 	        List registries = admin.addList("registries");
-	        
-	        epeople.setHead(T_administrative_access_control);	        
-	        epeople.addItemXref(contextPath+"/admin/epeople", T_administrative_people);	        
-	        epeople.addItemXref(contextPath+"/admin/groups", T_administrative_groups);	        
-	        epeople.addItemXref(contextPath+"/admin/authorize", T_administrative_authorizations);	        
-	        
-	        registries.setHead(T_administrative_registries);	        
-	        registries.addItemXref(contextPath+"/admin/metadata-registry",T_administrative_metadata);	        
-	        registries.addItemXref(contextPath+"/admin/format-registry",T_administrative_format);	        
-	        
-	        admin.addItemXref(contextPath+"/admin/item", T_administrative_items);	        
-            admin.addItemXref(contextPath+"/admin/withdrawn", T_administrative_withdrawn);	        
+
+	        epeople.setHead(T_administrative_access_control);
+	        epeople.addItemXref(contextPath+"/admin/epeople", T_administrative_people);
+	        epeople.addItemXref(contextPath+"/admin/groups", T_administrative_groups);
+	        epeople.addItemXref(contextPath+"/admin/authorize", T_administrative_authorizations);
+
+	        registries.setHead(T_administrative_registries);
+	        registries.addItemXref(contextPath+"/admin/metadata-registry",T_administrative_metadata);
+	        registries.addItemXref(contextPath+"/admin/format-registry",T_administrative_format);
+
+	        admin.addItemXref(contextPath+"/admin/item", T_administrative_items);
+            admin.addItemXref(contextPath+"/admin/withdrawn", T_administrative_withdrawn);
 	        admin.addItemXref(contextPath+"/admin/panel", T_administrative_control_panel);
+            admin.addItemXref(contextPath+"/statistics", T_statistics);
         }
     }
-    
-    
+
+
     public int addContextualOptions(List context) throws SQLException, WingException
     {
     	// How many options were added.
     	int options = 0;
-    	
+
     	DSpaceObject dso = URIUtil.resolve(objectModel);
     	
     	if (dso instanceof Item)

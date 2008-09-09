@@ -44,6 +44,7 @@ import org.dspace.app.statistics.Report;
 import org.dspace.app.statistics.Stat;
 import org.dspace.app.statistics.Statistics;
 import org.dspace.app.statistics.ReportTools;
+import org.dspace.core.ConfigurationManager;
 
 import java.text.DateFormat;
 
@@ -54,13 +55,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.io.*;
 
 /**
  * This class provides HTML reports for the ReportGenerator class
  *
  * @author  Richard Jones
  */
-public class HTMLReport extends Report
+public class HTMLReport implements Report
 {
     // FIXME: all of these methods should do some content escaping before
     // outputting anything
@@ -79,6 +81,10 @@ public class HTMLReport extends Report
     
     /** end date for report */
     private Date end = null;
+
+    /** the output file to which to write aggregation data */
+   private static String output = ConfigurationManager.getProperty("dspace.dir") +
+                            File.separator + "log" + File.separator + "report";
     
     /**
      * constructor for HTML reporting
@@ -86,6 +92,14 @@ public class HTMLReport extends Report
     public void HTMLReport()
     {
         // empty constructor
+    }
+
+    public void setOutput(String newOutput)
+    {
+        if (newOutput != null)
+        {
+            output = newOutput;
+        }
     }
     
     /**
@@ -119,6 +133,23 @@ public class HTMLReport extends Report
         
         // output the footer and return
         frag.append(footer());
+
+        // NB: HTMLReport now takes responsibility to write the output file,
+        // so that the Report/ReportGenerator can have more general usage
+        // finally write the string into the output file
+        try
+        {
+        	FileOutputStream fos = new FileOutputStream(output);
+            OutputStreamWriter osr = new OutputStreamWriter(fos, "UTF-8");
+            PrintWriter out = new PrintWriter(osr);
+            out.write(frag.toString());
+            out.close();
+        }
+        catch (IOException e)
+        {
+            System.out.println("Unable to write to output file " + output);
+            System.exit(0);
+        }
         
         return frag.toString();
     }
