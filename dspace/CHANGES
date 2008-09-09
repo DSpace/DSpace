@@ -1,5 +1,6 @@
 (Mark Diggory) 
 - Fix for SF Bug #2082236 Subscription notification (sub-daily) no emails sent
+- [2102580] William Hays: Duplicate Handle exception when replacing bitstreams
 
 (Claudia Juergen)
 - Fix for SF bug #2090761 Statistics wrong use of dspace.dir for log location
