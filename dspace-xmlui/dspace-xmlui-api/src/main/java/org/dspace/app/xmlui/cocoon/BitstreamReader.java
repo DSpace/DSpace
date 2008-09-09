@@ -257,7 +257,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             if (item != null && item.isWithdrawn() && !AuthorizeManager.isAdmin(context))
             {
                 isAuthorized = false;
-                log.info(LogManager.getHeader(context, "view_bitstream", "handle=" + item.getHandle() + ",withdrawn=true"));
+                log.info(LogManager.getHeader(context, "view_bitstream", "handle=" + IdentifierService.getCanonicalForm(item) + ",withdrawn=true"));
             }
 
             if (!isAuthorized)
