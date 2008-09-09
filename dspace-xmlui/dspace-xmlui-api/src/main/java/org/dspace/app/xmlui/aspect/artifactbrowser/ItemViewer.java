@@ -44,6 +44,7 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -61,6 +62,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.LogManager;
 import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
@@ -71,30 +73,32 @@ import java.util.Map;
 
 /**
  * Display a single item.
- * 
+ *
  * @author Scott Phillips
  */
 public class ItemViewer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
+    private static final Logger log = Logger.getLogger(ItemViewer.class);
+
     /** Language strings */
     private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
-    
+
     private static final Message T_trail =
         message("xmlui.ArtifactBrowser.ItemViewer.trail");
-    
+
     private static final Message T_show_simple =
         message("xmlui.ArtifactBrowser.ItemViewer.show_simple");
-    
+
     private static final Message T_show_full =
         message("xmlui.ArtifactBrowser.ItemViewer.show_full");
-    
+
     private static final Message T_head_parent_collections =
         message("xmlui.ArtifactBrowser.ItemViewer.head_parent_collections");
-    
+
 	/** Cached validity object */
 	private SourceValidity validity = null;
-	
+
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
@@ -102,12 +106,12 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
     public Serializable getKey() {
         try {
             DSpaceObject dso = URIUtil.resolve(objectModel);
-            
+
             if (dso == null)
                 return "0"; // no item, something is wrong.
-            
+
             return HashUtil.hash(IdentifierService.getCanonicalForm(dso) + "full:" + showFullItem(objectModel));
-        } 
+        }
         catch (SQLException sqle)
         {
             // Ignore all errors and just return that the component is not cachable.
@@ -117,21 +121,25 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
     /**
      * Generate the cache validity object.
-     * 
-     * The validity object will include the item being viewed, 
+     *
+     * The validity object will include the item being viewed,
      * along with all bundles & bitstreams.
      */
-    public SourceValidity getValidity() 
+    public SourceValidity getValidity()
     {
     	if (this.validity == null)
     	{
 	        try {
 	            DSpaceObject dso = URIUtil.resolve(objectModel);
-	            
+
 	            DSpaceValidity validity = new DSpaceValidity();
 	            validity.add(dso);
 	            this.validity =  validity.complete();
-	        } 
+
+                // add log message that we are viewing the item
+                // done here, as the serialization may not occur if the cache is valid
+                log.info(LogManager.getHeader(context, "view_item", "handle=" + dso.getHandle()));
+	        }
 	        catch (Exception e)
 	        {
 	            // Ignore all errors and just invalidate the cache.
@@ -139,8 +147,8 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
     	}
     	return this.validity;
     }
-    
-    
+
+
     /**
      * Add the item's title and trail links to the page's metadata.
      */
@@ -199,7 +207,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             String link = IdentifierService.getURL(item).toString() + "?show=full";
             showfullPara.addXref(link).addContent(T_show_full);
         }
-        
+
         ReferenceSet referenceSet;
         if (showFullItem(objectModel))
         {
@@ -215,13 +223,13 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         // Refrence the actual Item
         ReferenceSet appearsInclude = referenceSet.addReference(item).addReferenceSet(ReferenceSet.TYPE_DETAIL_LIST,null,"hierarchy");
         appearsInclude.setHead(T_head_parent_collections);
-        
+
         // Reference all collections the item appears in.
         for (Collection collection : item.getCollections())
         {
             appearsInclude.addReference(collection);
         }
-        
+
         showfullPara = division.addPara(null,"item-view-toggle item-view-toggle-bottom");
 
         if (showFullItem(objectModel))
