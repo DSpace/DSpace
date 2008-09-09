@@ -262,7 +262,7 @@ public class DSpaceSWORDServer implements SWORDServer
         SWORDAuthentication auth = new SWORDAuthentication();
         EPerson ep = null;
         boolean authenticated = false;
-        if (auth.authenticates(this.context, un, pw))
+        if (auth.authenticates(context, un, pw))
         {
             // if authenticated, obtain the eperson object
             ep = EPerson.findByEmail(context, un);
@@ -278,7 +278,7 @@ public class DSpaceSWORDServer implements SWORDServer
             // authentication process fails
             if (obo != null)
             {
-                EPerson epObo= EPerson.findByEmail(this.context, obo);
+                EPerson epObo= EPerson.findByEmail(context, obo);
                 if (epObo != null)
                 {
                     sc.setOnBehalfOf(epObo);
@@ -293,7 +293,7 @@ public class DSpaceSWORDServer implements SWORDServer
         // deal with the context or throw an authentication exception
         if (ep != null && authenticated)
         {
-            this.context.setCurrentUser(ep);
+            context.setCurrentUser(ep);
             log.info(LogManager.getHeader(context, "sword_set_authenticated_user", "user_id=" + ep.getID()));
         }
         else
