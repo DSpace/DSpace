@@ -130,7 +130,7 @@
         org.apache.commons.fileupload.servlet.FileCleanerCleanup
      </listener-class>
   </listener>
-  
+
   <!-- Listener to initialise / clean up the application -->
   <listener>
      <listener-class>
@@ -165,10 +165,10 @@
 		<servlet-class>org.dspace.app.webui.servlet.admin.WithdrawnBrowserServlet</servlet-class>
 	</servlet>
 
-  <servlet>
+  <!-- servlet>
     <servlet-name>exportdownload</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.ItemExportArchiveServlet</servlet-class>
-  </servlet>
+  </servlet -->
 
   <servlet>
     <servlet-name>collection-wizard</servlet-name>
@@ -312,7 +312,7 @@
     <servlet-name>certificate-login</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.X509CertificateServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>profile</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.EditProfileServlet</servlet-class>
@@ -409,10 +409,10 @@
     <url-pattern>/advanced-search</url-pattern>
   </servlet-mapping>
 
-  <servlet-mapping>
+  <!-- servlet-mapping>
     <servlet-name>exportdownload</servlet-name>
     <url-pattern>/exportdownload/*</url-pattern>
-  </servlet-mapping>
+  </servlet-mapping -->
 
   <servlet-mapping>
     <servlet-name>browse</servlet-name>
@@ -573,7 +573,7 @@
     <servlet-name>certificate-login</servlet-name>
     <url-pattern>/certificate-login</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>profile</servlet-name>
     <url-pattern>/profile</url-pattern>

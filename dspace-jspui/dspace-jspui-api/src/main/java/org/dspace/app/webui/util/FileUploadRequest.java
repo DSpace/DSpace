@@ -55,6 +55,8 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -98,11 +100,15 @@ public class FileUploadRequest extends HttpServletRequestWrapper
         tempDir = ConfigurationManager.getProperty("upload.temp.dir");
         int maxSize = ConfigurationManager.getIntProperty("upload.max");
 
-        DiskFileUpload upload = new DiskFileUpload();
+        // Create a factory for disk-based file items
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+        factory.setRepository(new File(tempDir));
 
+        // Create a new file upload handler
+        ServletFileUpload upload = new ServletFileUpload(factory);
+        
         try
         {
-            upload.setRepositoryPath(tempDir);
             upload.setSizeMax(maxSize);
             items = upload.parseRequest(req);
             for (Iterator i = items.iterator(); i.hasNext();)
