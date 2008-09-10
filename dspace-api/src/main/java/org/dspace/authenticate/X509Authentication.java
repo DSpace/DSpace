@@ -52,18 +52,24 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.dspace.authenticate.AuthenticationMethod;
+import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 /**
  * Implicit authentication method that gets credentials from the X.509 client
@@ -92,6 +98,15 @@ import org.dspace.eperson.EPerson;
  *   authentication.x509.autoregister =
  * <em>
  * &quot;true&quot; if E-Person is created automatically for unknown new users.
+ * </em>
+ *   authentication.x509.groups = 
+ * <em>
+ * comma-delimited list of special groups to add user to if authenticated.
+ * </em>
+ *   authentication.x509.emaildomain = 
+ * <em>
+ * email address domain (after the 'at' symbol) to match before allowing 
+ * membership in special groups.
  * </em>
  * </pre>
  * 
@@ -409,10 +424,135 @@ public class X509Authentication implements AuthenticationMethod
     }
 
     /**
-     * No special groups.
+     * Returns a list of group names that the user should be added to upon
+     * successful authentication, configured in dspace.cfg.
+     * 
+     * @return List<String> of special groups configured for this authenticator
+     */
+    private List<String> getX509Groups()
+    {
+        List<String> groupNames = new ArrayList<String>();
+
+        String x509GroupConfig = null;
+        x509GroupConfig = ConfigurationManager
+                .getProperty("authentication.x509.groups");
+
+        if (null != x509GroupConfig && !x509GroupConfig.equals(""))
+        {
+            String[] groups = x509GroupConfig.split("\\s*,\\s*");
+
+            for (int i = 0; i < groups.length; i++)
+            {
+                groupNames.add(groups[i].trim());
+            }
+        }
+
+        return groupNames;
+    }
+
+    /**
+     * Checks for configured email domain required to grant special groups
+     * membership. If no email domain is configured to verify, special group
+     * membership is simply granted.
+     * 
+     * @param request -
+     *            The current request object
+     * @param email -
+     *            The email address from the x509 certificate
+     */
+    private void setSpecialGroupsFlag(HttpServletRequest request, String email)
+    {
+        String emailDomain = null;
+        emailDomain = (String) request
+                .getAttribute("authentication.x509.emaildomain");
+
+        HttpSession session = request.getSession(true);
+
+        if (null != emailDomain && !emailDomain.equals(""))
+        {
+            if (email.substring(email.length() - emailDomain.length()).equals(
+                    emailDomain))
+            {
+                session.setAttribute("x509Auth", new Boolean(true));
+            }
+        }
+        else
+        {
+            // No configured email domain to verify. Just flag
+            // as authenticated so special groups are granted.
+            session.setAttribute("x509Auth", new Boolean(true));
+        }
+    }
+
+    /**
+     * Return special groups configured in dspace.cfg for X509 certificate
+     * authentication.
+     * 
+     * @param Context
+     * @param HttpServletRequest
+     *            object potentially containing the cert
+     * 
+     * @return An int array of group IDs
+     * 
      */
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
+            throws SQLException
     {
+
+        Boolean authenticated = false;
+        HttpSession session = request.getSession(false);
+        authenticated = (Boolean) session.getAttribute("x509Auth");
+        authenticated = (null == authenticated) ? false : authenticated;
+
+        if (authenticated)
+        {
+            List<String> groupNames = new ArrayList<String>();
+            List<Integer> groupIDs = new ArrayList<Integer>();
+
+            groupNames = getX509Groups();
+
+            for (String groupName : groupNames)
+            {
+                if (groupName != null)
+                {
+                    Group group = Group.findByName(context, groupName);
+                    if (group != null)
+                    {
+                        groupIDs.add(new Integer(group.getID()));
+                    }
+                    else
+                    {
+                        log.warn(LogManager.getHeader(context,
+                                "configuration_error", "unknown_group="
+                                        + groupName));
+                    }
+                }
+            }
+
+            int[] results = new int[groupIDs.size()];
+            for (int i = 0; i < groupIDs.size(); i++)
+            {
+                results[i] = (groupIDs.get(i)).intValue();
+            }
+
+            if (log.isDebugEnabled())
+            {
+                StringBuffer gsb = new StringBuffer();
+
+                for (int i = 0; i < results.length; i++)
+                {
+                    if (i > 0)
+                        gsb.append(",");
+                    gsb.append(results[i]);
+                }
+
+                log.debug(LogManager.getHeader(context, "authenticated",
+                        "special_groups=" + gsb.toString()));
+            }
+
+            return results;
+        }
+
         return new int[0];
     }
 
@@ -487,6 +627,7 @@ public class X509Authentication implements AuthenticationMethod
                         context.commit();
                         context.setIgnoreAuthorization(false);
                         context.setCurrentUser(eperson);
+                        setSpecialGroupsFlag(request, email);
                         return SUCCESS;
                     }
                     else
@@ -514,6 +655,7 @@ public class X509Authentication implements AuthenticationMethod
                     log.info(LogManager.getHeader(context, "login",
                             "type=x509certificate"));
                     context.setCurrentUser(eperson);
+                    setSpecialGroupsFlag(request, email);
                     return SUCCESS;
                 }
             }
