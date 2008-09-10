@@ -5,7 +5,7 @@
    <packaging>war</packaging>
    <name>DSpace SWORD :: Web Application Resources</name>
    <description>DSpace SWORD Deposit Service Provider Web Application Resources</description>
-   <url>http://www.ukoln.ac.uk/repositories/digirep/index/SWORD</url>
+   <url>http://projects.dspace.org/dspace-sword-webapp</url>
 
    <!--
       A Parent POM that Maven inherits DSpace Default
