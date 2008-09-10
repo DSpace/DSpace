@@ -67,9 +67,10 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
-<%@ page import="org.dspace.content.Collection" %>
-<%@ page import="org.dspace.content.Community" %>
-<%@ page import="org.dspace.content.Item" %>
+<%@ page import="java.net.URLEncoder"            %>
+<%@ page import="org.dspace.content.Community"   %>
+<%@ page import="org.dspace.content.Collection"  %>
+<%@ page import="org.dspace.content.Item"        %>
 <%@ page import="org.dspace.search.QueryResults" %>
 <%@ page import="org.dspace.uri.IdentifierService" %>
 <%@ page import="java.net.URLEncoder" %>
@@ -85,23 +86,23 @@
     String sortedBy = (so == null) ? null : so.getName();
 
     // Get the attributes
-    Community community = (Community) request.getAttribute("community" );
-    Collection collection = (Collection) request.getAttribute("collection");
-    Community[] communityArray = (Community[]) request.getAttribute("community.array");
+    Community   community        = (Community   ) request.getAttribute("community" );
+    Collection  collection       = (Collection  ) request.getAttribute("collection");
+    Community[] communityArray   = (Community[] ) request.getAttribute("community.array");
     Collection[] collectionArray = (Collection[]) request.getAttribute("collection.array");
 
-    Item[] items = (Item[]) request.getAttribute("items");
-    Community[] communities = (Community[] )request.getAttribute("communities");
+    Item      [] items       = (Item[]      )request.getAttribute("items");
+    Community [] communities = (Community[] )request.getAttribute("communities");
     Collection[] collections = (Collection[])request.getAttribute("collections");
 
     String query = (String) request.getAttribute("query");
 
     QueryResults qResults = (QueryResults)request.getAttribute("queryresults");
 
-    int pageTotal = ((Integer)request.getAttribute("pagetotal")).intValue();
+    int pageTotal   = ((Integer)request.getAttribute("pagetotal"  )).intValue();
     int pageCurrent = ((Integer)request.getAttribute("pagecurrent")).intValue();
-    int pageLast = ((Integer)request.getAttribute("pagelast")).intValue();
-    int pageFirst = ((Integer)request.getAttribute("pagefirst")).intValue();
+    int pageLast    = ((Integer)request.getAttribute("pagelast"   )).intValue();
+    int pageFirst   = ((Integer)request.getAttribute("pagefirst"  )).intValue();
     int rpp         = qResults.getPageSize();
     int etAl        = qResults.getEtAl();
 
@@ -217,10 +218,10 @@ else
    <div align="center">
    <form method="get" action="<%= request.getContextPath() + searchScope + "/simple-search" %>">
    <table border="0">
-   <tr><td>
-       <input type="hidden" name="query" value="<%= query %>" />
-       <fmt:message key="search.results.perpage"/>
-       <select name="rpp">
+       <tr><td>
+           <input type="hidden" name="query" value="<%= URLEncoder.encode(query,"UTF-8") %>" />
+           <fmt:message key="search.results.perpage"/>
+           <select name="rpp">
 <%
            for (int i = 5; i <= 100 ; i += 5)
            {
