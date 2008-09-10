@@ -5,7 +5,7 @@
 # Developed On Ubuntu Hardy Heron, you'll need at least:
 # apt-get install herold docbook-utils docbook2x xsltproc docbook-xsl dbdoclet
 
-VERSION="1.5.1Beta1"
+VERSION="1.5.1"
 
 DBxml="docbook"
 HTMLfinal="html"
@@ -248,7 +248,9 @@ rm $HTMLfinal/*html
 java -Xmx64m -Dfop.home=$FOP_HOME -jar /usr/local/share/fop-0.94/build/fop.jar -xml $DBxml/book.xml  -xsl $xslhtml -foout fo.fo $XSLTP
 rm fo.fo
 mv $DBxml/*html $HTMLfinal
-ln -s ../image $HTMLfinal/image
+if [ ! -e $HTMLfinal/image ]; then
+  ln -s ../image $HTMLfinal/image
+fi
 
 # Post-process the html to provide wiki annotation areas at the bottom of
 # the page as an option for dspace website
