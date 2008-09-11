@@ -157,18 +157,26 @@ public class MapperMain extends AbstractDSpaceTransformer {
 		// get all items from that collection
         ItemIterator iterator = collection.getItems();
 
-        // iterate through the items in this collection, and count how many
-        // are native, and how many are imports, and which collections they
-        // came from
-        while (iterator.hasNext())
+        try
         {
-            Item item = iterator.next();
+            // iterate through the items in this collection, and count how many
+            // are native, and how many are imports, and which collections they
+            // came from
+            while (iterator.hasNext())
+            {
+                Item item = iterator.next();
 
-            if (item.isOwningCollection(collection))
-                count_native++;
-            else
-                count_import++;
-        }	
+                if (item.isOwningCollection(collection))
+                    count_native++;
+                else
+                    count_import++;
+            }
+        }
+        finally
+        {
+            if (iterator != null)
+                iterator.close();
+        }
         
         int[] counts = new int[2];
         counts[0] = count_native;

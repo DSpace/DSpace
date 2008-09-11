@@ -256,27 +256,34 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             TableRowIterator tri = DatabaseManager.queryTable(context, table, "SELECT * FROM " + table + " WHERE item_id=?", itemID);
             if (tri != null)
             {
-                while (tri.hasNext())
+                try
                 {
-                    TableRow tr = tri.next();
-
-                    // Check the item mappings to see if it contains this mapping
-                    boolean itemIsMapped = false;
-                    int trDistinctID = tr.getIntColumn("distinct_id");
-                    for (int i = 0; i < distinctIDs.length; i++)
+                    while (tri.hasNext())
                     {
-                        // Found this mapping
-                        if (distinctIDs[i] == trDistinctID)
-                        {
-                            // Flag it, and remove (-1) from the item mappings
-                            itemIsMapped = true;
-                            distinctIDs[i] = -1;
-                        }
-                    }
+                        TableRow tr = tri.next();
 
-                    // The item is no longer mapped to this community, so remove the database record
-                    if (!itemIsMapped)
-                        DatabaseManager.delete(context, tr);
+                        // Check the item mappings to see if it contains this mapping
+                        boolean itemIsMapped = false;
+                        int trDistinctID = tr.getIntColumn("distinct_id");
+                        for (int i = 0; i < distinctIDs.length; i++)
+                        {
+                            // Found this mapping
+                            if (distinctIDs[i] == trDistinctID)
+                            {
+                                // Flag it, and remove (-1) from the item mappings
+                                itemIsMapped = true;
+                                distinctIDs[i] = -1;
+                            }
+                        }
+
+                        // The item is no longer mapped to this community, so remove the database record
+                        if (!itemIsMapped)
+                            DatabaseManager.delete(context, tr);
+                    }
+                }
+                finally
+                {
+                    tri.close();
                 }
             }
 
@@ -569,27 +576,34 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             TableRowIterator tri = DatabaseManager.queryTable(context, "Communities2Item", "SELECT * FROM Communities2Item WHERE item_id=?", itemID);
             if (tri != null)
             {
-                while (tri.hasNext())
+                try
                 {
-                    TableRow tr = tri.next();
-
-                    // Check the item mappings to see if it contains this community mapping
-                    boolean itemIsMapped = false;
-                    int trCommID = tr.getIntColumn("community_id");
-                    for (int i = 0; i < commID.length; i++)
+                    while (tri.hasNext())
                     {
-                        // Found this community
-                        if (commID[i] == trCommID)
-                        {
-                            // Flag it, and remove (-1) from the item mappings
-                            itemIsMapped = true;
-                            commID[i] = -1;
-                        }
-                    }
+                        TableRow tr = tri.next();
 
-                    // The item is no longer mapped to this community, so remove the database record
-                    if (!itemIsMapped)
-                        DatabaseManager.delete(context, tr);
+                        // Check the item mappings to see if it contains this community mapping
+                        boolean itemIsMapped = false;
+                        int trCommID = tr.getIntColumn("community_id");
+                        for (int i = 0; i < commID.length; i++)
+                        {
+                            // Found this community
+                            if (commID[i] == trCommID)
+                            {
+                                // Flag it, and remove (-1) from the item mappings
+                                itemIsMapped = true;
+                                commID[i] = -1;
+                            }
+                        }
+
+                        // The item is no longer mapped to this community, so remove the database record
+                        if (!itemIsMapped)
+                            DatabaseManager.delete(context, tr);
+                    }
+                }
+                finally
+                {
+                    tri.close();
                 }
             }
 

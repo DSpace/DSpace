@@ -132,9 +132,9 @@ public class ItemExport
      * used for export download
      */
     public static final String COMPRESSED_EXPORT_MIME_TYPE = "application/zip";
-    
+
     /*
-     *  
+     *
      */
     public static void main(String[] argv) throws Exception
     {
@@ -245,7 +245,7 @@ public class ItemExport
             ExternalIdentifier eid = ExternalIdentifierService.parseCanonicalForm(c, myIDString);
             oi = eid.getObjectIdentifier();
         }
-        
+
         /*
         // First, add the namespace if necessary
         if (myIDString.indexOf('/') != -1)
@@ -314,9 +314,16 @@ public class ItemExport
             System.out.println("Exporting from collection: " + myIDString);
 
             // it's a collection, so do a bunch of items
-            ItemIterator i = mycollection.getItems();
-
-            exportItem(c, i, destDirName, seqStart);
+			ItemIterator i = mycollection.getItems();
+            try
+            {
+                exportItem(c, i, destDirName, seqStart);
+            }
+            finally
+            {
+                if (i != null)
+                    i.close();
+            }
         }
 
         c.complete();
@@ -440,7 +447,7 @@ public class ItemExport
         } else {
             filename = "metadata_" + schema + ".xml";
         }
-        
+
         File outFile = new File(destDir, filename);
 
         System.out.println("Attempting to create file " + outFile);
@@ -527,11 +534,11 @@ public class ItemExport
      * were originally registered will be marked in the contents file as such.
      * However, the export directory will contain actual copies of the content
      * files being exported.
-     * 
+     *
      * @param c the DSpace context
      * @param i the item being exported
      * @param destDir the item's export directory
-     * @throws Exception if there is any problem writing to the export 
+     * @throws Exception if there is any problem writing to the export
      * 		directory
      */
     private static void writeBitstreams(Context c, Item i, File destDir)
@@ -579,8 +586,8 @@ public class ItemExport
 
                             // write the manifest file entry
                             if (b.isRegisteredBitstream()) {
-                                out.println("-r -s " + b.getStoreNumber() 
-                                		+ " -f " + myName 
+                                out.println("-r -s " + b.getStoreNumber()
+                                		+ " -f " + myName
 										+ "\tbundle:" + bundleName);
                             } else {
                                 out.println(myName + "\tbundle:" + bundleName);
@@ -612,7 +619,7 @@ public class ItemExport
     /**
      * Convenience methot to create export a single Community, Collection, or
      * Item
-     * 
+     *
      * @param dso -
      *            the dspace object to export
      * @param context -
@@ -631,7 +638,7 @@ public class ItemExport
     /**
      * Convenience method to export a List of dspace objects (Community,
      * Collection or Item)
-     * 
+     *
      * @param dsObjects -
      *            List containing dspace objects
      * @param context -
@@ -648,7 +655,7 @@ public class ItemExport
     /**
      * Convenience methot to create export a single Community, Collection, or
      * Item
-     * 
+     *
      * @param dso -
      *            the dspace object to export
      * @param context -
@@ -667,7 +674,7 @@ public class ItemExport
     /**
      * Convenience method to export a List of dspace objects (Community,
      * Collection or Item)
-     * 
+     *
      * @param dsObjects -
      *            List containing dspace objects
      * @param context -
@@ -685,7 +692,7 @@ public class ItemExport
      * Does the work creating a List with all the Items in the Community or
      * Collection It then kicks off a new Thread to export the items, zip the
      * export directory and send confirmation email
-     * 
+     *
      * @param dsObjects -
      *            List of dspace objects to process
      * @param context -
@@ -714,40 +721,50 @@ public class ItemExport
     			Collection[] collections = community.getCollections();
     			for (Collection collection : collections) {
     				// get all the items in each collection
-    				ItemIterator iitems = collection.getItems();
-    				while (iitems.hasNext()) {
-    					Item item = iitems.next();
-    					// get all the bundles in the item
-    					Bundle[] bundles = item.getBundles();
-    					for (Bundle bundle : bundles) {
-    						// get all the bitstreams in each bundle
-    						Bitstream[] bitstreams = bundle.getBitstreams();
-    						for (Bitstream bit : bitstreams) {
-    							// add up the size
-    							size += bit.getSize();
-    						}
-    					}
-    					items.add(item.getID());
-    				}
+					ItemIterator iitems = collection.getItems();
+                    try {
+                        while (iitems.hasNext()) {
+                            Item item = iitems.next();
+                            // get all the bundles in the item
+                            Bundle[] bundles = item.getBundles();
+                            for (Bundle bundle : bundles) {
+                                // get all the bitstreams in each bundle
+                                Bitstream[] bitstreams = bundle.getBitstreams();
+                                for (Bitstream bit : bitstreams) {
+                                    // add up the size
+                                    size += bit.getSize();
+                                }
+                            }
+                            items.add(item.getID());
+                        }
+                    } finally {
+                        if (iitems != null)
+                            iitems.close();
+                    }
     			}
     		} else if (dso.getType() == Constants.COLLECTION) {
     			Collection collection = (Collection) dso;
     			// get all the items in the collection
-    			ItemIterator iitems = collection.getItems();
-    			while (iitems.hasNext()) {
-    				Item item = iitems.next();
-    				// get all thebundles in the item
-    				Bundle[] bundles = item.getBundles();
-    				for (Bundle bundle : bundles) {
-    					// get all the bitstreams in the bundle
-    					Bitstream[] bitstreams = bundle.getBitstreams();
-    					for (Bitstream bit : bitstreams) {
-    						// add up the size
-    						size += bit.getSize();
-    					}
-    				}
-    				items.add(item.getID());
-    			}
+                ItemIterator iitems = collection.getItems();
+                try {
+                    while (iitems.hasNext()) {
+                        Item item = iitems.next();
+                        // get all the bundles in the item
+                        Bundle[] bundles = item.getBundles();
+                        for (Bundle bundle : bundles) {
+                            // get all the bitstreams in each bundle
+                            Bitstream[] bitstreams = bundle.getBitstreams();
+                            for (Bitstream bit : bitstreams) {
+                                // add up the size
+                                size += bit.getSize();
+                            }
+                        }
+                        items.add(item.getID());
+                    }
+                } finally {
+                    if (iitems != null)
+                        iitems.close();
+                }
     		} else if (dso.getType() == Constants.ITEM) {
     			Item item = (Item) dso;
     			// get all the bundles in the item
@@ -791,12 +808,13 @@ public class ItemExport
     		Thread go = new Thread() {
     			public void run() {
     				Context context;
+                    ItemIterator iitems = null;
     				try {
     					// create a new dspace context
     					context = new Context();
     					// ignore auths
     					context.setIgnoreAuthorization(true);
-    					ItemIterator iitems = new ItemIterator(context, items);
+    					iitems = new ItemIterator(context, items);
     					String fileName = assembleFileName("item",eperson, new Date());
     					String workDir = getExportWorkDirectory()
     					+ System.getProperty("file.separator")
@@ -839,6 +857,10 @@ public class ItemExport
     					}
     					throw new RuntimeException(e1);
     				}
+    				finally {
+    				    if (iitems != null)
+    				        iitems.close();
+    				}
     			}
 
     		};
@@ -850,7 +872,7 @@ public class ItemExport
 
     /**
      * Create a file name based on the date and eperson
-     * 
+     *
      * @param eperson -
      *            eperson who requested export and will be able to download it
      * @param date -
@@ -882,7 +904,7 @@ public class ItemExport
     /**
      * Use config file entry for org.dspace.app.itemexport.download.dir and id
      * of the eperson to create a download directory name
-     * 
+     *
      * @param ePersonID -
      *            id of the eperson who requested export archive
      * @return String representing a directory in the form of
@@ -897,14 +919,14 @@ public class ItemExport
 			throw new Exception(
 					"A dspace.cfg entry for 'org.dspace.app.itemexport.download.dir' does not exist.");
 		}
-		
+
 		return downloadDir + System.getProperty("file.separator") + ePersonID;
-		
+
 	}
 
     /**
      * Returns config file entry for org.dspace.app.itemexport.work.dir
-     * 
+     *
      * @return String representing config file entry for
      *         org.dspace.app.itemexport.work.dir
      * @throws Exception
@@ -921,7 +943,7 @@ public class ItemExport
 
     /**
      * Used to read the export archived. Inteded for download.
-     * 
+     *
      * @param fileName
      *            the name of the file to download
      * @param eperson
@@ -941,7 +963,7 @@ public class ItemExport
 
     /**
      * Get the file size of the export archive represented by the file name
-     * 
+     *
      * @param fileName
      *            name of the file to get the size
      * @param eperson
@@ -983,7 +1005,7 @@ public class ItemExport
      * The file name of the export archive contains the eperson id of the person
      * who created it When requested for download this method can check if the
      * person requesting it is the same one that created it
-     * 
+     *
      * @param context
      *            dspace context
      * @param fileName
@@ -1010,7 +1032,7 @@ public class ItemExport
     /**
      * Reads the download directory for the eperson to see if any export
      * archives are available
-     * 
+     *
      * @param eperson
      * @return a list of file names representing export archives that have been
      *         processed
@@ -1042,7 +1064,7 @@ public class ItemExport
      * A clean up method that is ran before a new export archive is created. It
      * uses the config file entry 'org.dspace.app.itemexport.life.span.hours' to
      * determine if the current exports are too old and need pruging
-     * 
+     *
      * @param epersonID -
      *            the id of the eperson to clean up
      * @throws Exception
@@ -1070,7 +1092,7 @@ public class ItemExport
      * with calling method about success or failure. We accomplis this
      * communication with email instead. Send a success email once the export
      * archive is complete and ready for download
-     * 
+     *
      * @param toMail -
      *            email to send message to
      * @param fromMail -
@@ -1114,7 +1136,7 @@ public class ItemExport
      * with calling method about success or failure. We accomplis this
      * communication with email instead. Send an error email if the export
      * archive fails
-     * 
+     *
      * @param toMail -
      *            email to send message to
      * @param fromMail -

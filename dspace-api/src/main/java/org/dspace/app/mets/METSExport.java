@@ -102,7 +102,7 @@ import java.util.Properties;
 
 /**
  * Tool for exporting DSpace AIPs with the metadata serialised in METS format
- * 
+ *
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -211,64 +211,71 @@ public class METSExport
         }
 
         ItemIterator items = null;
-
-        if (line.hasOption('c'))
+        try
         {
-            /*
-            uri = getCanonicalForm(line.getOptionValue('c'));
+            if (line.hasOption('c'))
+            {
+                /*
+                uri = getCanonicalForm(line.getOptionValue('c'));
 
-            // Exporting a collection's worth of items
-            if (uri.indexOf(':') == -1)
-            {
-                // has no : must be a handle
-                uri = "hdl:" + uri;
-                System.out.println("no namespace provided. assuming handles.");
+                // Exporting a collection's worth of items
+                if (uri.indexOf(':') == -1)
+                {
+                    // has no : must be a handle
+                    uri = "hdl:" + uri;
+                    System.out.println("no namespace provided. assuming handles.");
+                }
+
+                ExternalIdentifier identifier = identifierDAO.retrieve(uri);
+                ObjectIdentifier oi = identifier.getObjectIdentifier();
+                DSpaceObject o = oi.getObject(context);
+                */
+
+                String uriPassed = line.getOptionValue("i");
+                DSpaceObject o = null;
+                ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(uriPassed);
+                if (oi == null)
+                {
+                    ExternalIdentifier eid = ExternalIdentifierService.parseCanonicalForm(context, uriPassed);
+                    oi = eid.getObjectIdentifier();
+                }
+                if (oi != null)
+                {
+                    // o = oi.getObject(context);
+                    o = (DSpaceObject) IdentifierService.getResource(context, oi);
+                }
+
+                if ((o != null) && o instanceof Collection)
+                {
+                    items = ((Collection) o).getItems();
+                }
+                else
+                {
+                    System.err.println(uri + " is not a valid collection URI");
+                    System.exit(1);
+                }
             }
 
-            ExternalIdentifier identifier = identifierDAO.retrieve(uri);
-            ObjectIdentifier oi = identifier.getObjectIdentifier();
-            DSpaceObject o = oi.getObject(context);
-*/
+            if (line.hasOption('a'))
+            {
+                items = Item.findAll(context);
+            }
 
-            String uriPassed = line.getOptionValue("i");
-            DSpaceObject o = null;
-            ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(uriPassed);
-            if (oi == null)
+            if (items == null)
             {
-                ExternalIdentifier eid = ExternalIdentifierService.parseCanonicalForm(context, uriPassed);
-                oi = eid.getObjectIdentifier();
-            }
-            if (oi != null)
-            {
-                // o = oi.getObject(context);
-                o = (DSpaceObject) IdentifierService.getResource(context, oi);
-            }
-            
-            if ((o != null) && o instanceof Collection)
-            {
-                items = ((Collection) o).getItems();
-            }
-            else
-            {
-                System.err.println(uri + " is not a valid collection URI");
+                System.err.println("Nothing to export specified!");
                 System.exit(1);
             }
-        }
 
-        if (line.hasOption('a'))
-        {
-            items = Item.findAll(context);
+            while (items.hasNext())
+            {
+                writeAIP(context, items.next(), dest);
+            }
         }
-
-        if (items == null)
+        finally
         {
-            System.err.println("Nothing to export specified!");
-            System.exit(1);
-        }
-
-        while (items.hasNext())
-        {
-            writeAIP(context, items.next(), dest);
+            if (items != null)
+                items.close();
         }
 
         context.abort();
@@ -277,7 +284,7 @@ public class METSExport
 
     /**
      * Initialise various variables, read in config etc.
-     * 
+     *
      * @param context
      *            DSpace context
      */
@@ -375,7 +382,7 @@ public class METSExport
 
     /**
      * Write METS metadata corresponding to the metadata for an item
-     * 
+     *
      * @param context
      *            DSpace context
      * @param item
@@ -481,7 +488,7 @@ public class METSExport
                 {
                     continue;
                 }
-                        
+
                 // First: we skip the license bundle, since it's included
                 // elsewhere
                 if (bitstreams[0].getFormat().getID() == licenseFormat)
@@ -591,14 +598,14 @@ public class METSExport
             {
                 mets.getContent().add(fileSec);
             }
-            
+
             // FIXME: Add Structmap here, but it is empty and we won't use it now.
             StructMap structMap = new StructMap();
             Div div = new Div();
             structMap.getContent().add(div);
             mets.getContent().add(structMap);
 
-            
+
             mets.validate(new MetsValidator());
 
             mets.write(new MetsWriter(os));
@@ -614,13 +621,13 @@ public class METSExport
 
     /**
      * Utility to find the license bitstream from an item
-     * 
+     *
      * @param context
      *            DSpace context
      * @param item
      *            the item
      * @return the license as a string
-     * 
+     *
      * @throws IOException
      *             if the license bitstream can't be read
      */
@@ -651,12 +658,12 @@ public class METSExport
     /**
      * For a bitstream that's a thumbnail or extracted text, find the
      * corresponding bitstream in the ORIGINAL bundle
-     * 
+     *
      * @param item
      *            the item we're dealing with
      * @param derived
      *            the derived bitstream
-     * 
+     *
      * @return the corresponding original bitstream (or null)
      */
     private static Bitstream findOriginalBitstream(Item item, Bitstream derived)
@@ -694,7 +701,7 @@ public class METSExport
     /**
      * Create MODS metadata from the DC in the item, and add to the given
      * XmlData METS object.
-     * 
+     *
      * @param item
      *            the item
      * @param xmlData

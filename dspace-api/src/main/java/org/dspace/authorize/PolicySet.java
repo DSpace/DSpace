@@ -57,7 +57,7 @@ import org.dspace.eperson.dao.GroupDAOFactory;
 /**
  * Was Hack/Tool to set policies for items, bundles, and bitstreams. Now has
  * helpful method, setPolicies();
- * 
+ *
  * @author dstuve
  * @version $Revision$
  */
@@ -110,11 +110,11 @@ public class PolicySet
         c.complete();
         System.exit(0);
     }
-    
+
     /**
      * Useful policy wildcard tool. Can set entire collections' contents'
      * policies
-     * 
+     *
      * @param c
      *            current context
      * @param containerType
@@ -142,13 +142,13 @@ public class PolicySet
             boolean isReplace, boolean clearOnly) throws AuthorizeException
     {
         setPoliciesFilter(c, containerType, containerID, contentType,
-                           actionID, groupID, isReplace, clearOnly, null);                         
+                           actionID, groupID, isReplace, clearOnly, null);
     }
 
     /**
      * Useful policy wildcard tool. Can set entire collections' contents'
      * policies
-     * 
+     *
      * @param c
      *            current context
      * @param containerType

@@ -162,13 +162,23 @@ public class DatabaseManager
         }
         
         PreparedStatement statement = context.getDBConnection().prepareStatement(query);
-        loadParameters(statement,parameters);
-        
-        TableRowIterator retTRI = new TableRowIterator(statement.executeQuery(),
-                canonicalize(table));
+        try
+        {
+            loadParameters(statement,parameters);
 
-        retTRI.setStatement(statement);
-        return retTRI;
+            TableRowIterator retTRI = new TableRowIterator(statement.executeQuery(),
+                    canonicalize(table));
+
+            retTRI.setStatement(statement);
+            return retTRI;
+        }
+        catch (SQLException sqle)
+        {
+            if (statement != null)
+                try { statement.close(); } catch (SQLException s) { }
+
+            throw sqle;
+        }
     }
     
     /**
@@ -204,13 +214,22 @@ public class DatabaseManager
         }
 
         PreparedStatement statement = context.getDBConnection().prepareStatement(query);
-        loadParameters(statement,parameters);
-        
-        TableRowIterator retTRI = new TableRowIterator(statement.executeQuery());
+        try
+        {
+            loadParameters(statement,parameters);
 
-        
-        retTRI.setStatement(statement);
-        return retTRI;
+            TableRowIterator retTRI = new TableRowIterator(statement.executeQuery());
+
+            retTRI.setStatement(statement);
+            return retTRI;
+        }
+        catch (SQLException sqle)
+        {
+            if (statement != null)
+                try { statement.close(); } catch (SQLException s) { }
+
+            throw sqle;
+        }
     }
     
     /**

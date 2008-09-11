@@ -432,4 +432,5 @@ public class EPerson extends DSpaceObject
         dao.delete(getID());
         context.addEvent(new Event(Event.DELETE, Constants.EPERSON, getID(), getEmail()));
     }
+
 }

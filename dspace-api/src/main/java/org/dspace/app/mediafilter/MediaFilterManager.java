@@ -165,7 +165,7 @@ public class MediaFilterManager
                        "(e.g. MediaFilterManager -p \n\"Word Text Extractor\",\"PDF Text Extractor\")");
         Option pluginOption = OptionBuilder.create('p');
         pluginOption.setArgs(Option.UNLIMITED_VALUES); //unlimited number of args
-        options.addOption(pluginOption);	
+        options.addOption(pluginOption);
 
          //create a "skip" option (to specify communities/collections/items to skip)
         OptionBuilder.withLongOpt("skip");
@@ -177,8 +177,8 @@ public class MediaFilterManager
                 "urn:uuid:6432e1d5-b089-44dd-91cc-504104cf80b0,urn:uuid:65263253-c4ce-416a-83c8-fbb2404156b8)");
         Option skipOption = OptionBuilder.create('s');
         skipOption.setArgs(Option.UNLIMITED_VALUES); //unlimited number of args
-        options.addOption(skipOption);    
-        
+        options.addOption(skipOption);
+
         CommandLine line = null;
         try
         {
@@ -339,15 +339,15 @@ public class MediaFilterManager
 
         //store our filter list into an internal array
         filterClasses = (FormatFilter[]) filterList.toArray(new FormatFilter[filterList.size()]);
-        
-        
+
+
         //Retrieve list of identifiers to skip (if any)
         String skipIds[] = null;
         if(line.hasOption('s'))
         {
             //specified which identifiers to skip when processing
             skipIds = line.getOptionValues('s');
-            
+
             if(skipIds==null || skipIds.length==0)
             {   //display error, since no identifiers specified to skip
                 System.err.println("\nERROR: -s (-skip) option requires at least one identifier to SKIP.\n" +
@@ -357,11 +357,11 @@ public class MediaFilterManager
                 myhelp.printHelp("MediaFilterManager\n", options);
                 System.exit(0);
             }
-            
+
             //save to a global skip list
             skipList = Arrays.asList(skipIds);
         }
-        
+
         Context c = null;
 
         try
@@ -436,18 +436,18 @@ public class MediaFilterManager
         CommunityDAO communityDAO = CommunityDAOFactory.getInstance(c);
 
         if(skipList!=null)
-        {    
+        {
             //if a skip-list exists, we need to filter community-by-community
             //so we can respect what is in the skip-list
             List<Community> topLevelCommunities =
                     communityDAO.getTopLevelCommunities();
-          
+
             for (Community community : topLevelCommunities)
             {
                 applyFiltersCommunity(c, community);
             }
         }
-        else 
+        else
         {
             //otherwise, just find every item and process
             List<Item> items = itemDAO.getItems();
@@ -466,14 +466,14 @@ public class MediaFilterManager
 
         // only apply filters if community not in skip-list
         if(!inSkipList(community.getIdentifier().getCanonicalForm()))
-        {    
+        {
            	List<Community> children =
                        communityDAO.getChildCommunities(community);
            	for (Community child : children)
            	{
            		applyFiltersCommunity(c, child);
            	}
-           	
+
            	List<Collection> collections =
                        collectionDAO.getChildCollections(community);
            	for (Collection collection : collections)
@@ -509,7 +509,7 @@ public class MediaFilterManager
     	  //cache this item in MediaFilterManager
     	  //so it can be accessed by MediaFilters as necessary
     	  currentItem = item;
-    	
+
           if (filterItem(c, item))
           {
         	  // commit changes after each filtered item
@@ -520,7 +520,7 @@ public class MediaFilterManager
           // clear item objects from context cache and internal cache
           itemDAO.decache(item);
           currentItem = null;
-        }  
+        }
     }
 
     /**
@@ -675,7 +675,7 @@ public class MediaFilterManager
 
             return false;
         }
-        
+
         InputStream destStream = formatFilter.getDestinationStream(source.retrieve());
         if (destStream == null)
         {
@@ -751,10 +751,10 @@ public class MediaFilterManager
 
     /**
      * Check whether or not to skip processing the given identifier
-     * 
+     *
      * @param identifier
      *            identifier (handle) of a community, collection or item
-     *            
+     *
      * @return true if this community, collection or item should be skipped
      *          during processing.  Otherwise, return false.
      */
@@ -764,7 +764,7 @@ public class MediaFilterManager
         {
             System.out.println("SKIP-LIST: skipped bitstreams within identifier " + identifier);
             return true;
-        }    
+        }
         else
             return false;
     }

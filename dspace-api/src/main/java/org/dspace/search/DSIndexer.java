@@ -287,12 +287,12 @@ public class DSIndexer
                     /** If the item is in the repository now, add it to the index*/
                     if (requiresIndexing(t, ((Item)dso).getLastModified()) || force)
                     {
-                        buildDocument(context, (Item) dso, t);                       
+                        buildDocument(context, (Item) dso, t);
                     }
-                }       
+                }
                 else
                 {
-                    /** 
+                    /**
                      * Make sure the item is not in the index if it is not in archive.
                      * TODO: Someday DSIndexer should block withdrawn
                      * content on search/retrieval and allow admins the ablitity to
@@ -561,7 +561,6 @@ public class DSIndexer
      * @param force
      */
     public static void updateIndex(Context context, boolean force) {
-
     		try
     		{
                 for (Item item : itemDAO.getItems())
@@ -742,7 +741,7 @@ public class DSIndexer
 		boolean inIndex = false;
 
 		IndexReader ir = DSQuery.getIndexReader();
-		
+
 		TermDocs docs = ir.termDocs(t);
 
 		while(docs.next())
@@ -836,7 +835,7 @@ public class DSIndexer
     private static void writeDocument(Term t, Document doc) throws IOException
     {
         IndexWriter writer = null;
-        
+
         try
         {
             writer = openIndex(false);
@@ -862,7 +861,7 @@ public class DSIndexer
      * @throws SQLException
      * @throws IOException
      */
-    private static void buildDocument(Context context, Community community, Term t)  
+    private static void buildDocument(Context context, Community community, Term t)
     throws SQLException, IOException
     {
         // Create Lucene Document
@@ -889,7 +888,7 @@ public class DSIndexer
      * @throws SQLException
      * @throws IOException
      */
-    private static void buildDocument(Context context, Collection collection, Term t)  
+    private static void buildDocument(Context context, Collection collection, Term t)
     throws SQLException, IOException
     {
         String location_text = buildCollectionLocationString(context, collection);
@@ -906,20 +905,20 @@ public class DSIndexer
         	doc.add(new Field("name", name, Field.Store.NO, Field.Index.TOKENIZED));
         	doc.add(new Field("default", name, Field.Store.NO, Field.Index.TOKENIZED));
         }
-        
+
         writeDocument(t, doc);
     }
 
     /**
      * Build a Lucene document for a DSpace Item and write the index
-     * 
+     *
      * @param context Users Context
      * @param item The DSpace Item to be indexed
      * @param t The Item handle term
      * @throws SQLException
      * @throws IOException
      */
-    private static void buildDocument(Context context, Item item, Term t) 
+    private static void buildDocument(Context context, Item item, Term t)
     throws SQLException, IOException
     {
     	// get the location string (for searching by collection & community)
@@ -1026,7 +1025,7 @@ public class DSIndexer
         }
 
         log.debug("  Added Sorting");
-        
+
         Vector<InputStreamReader> readers = new Vector<InputStreamReader>();
 
         try
@@ -1070,7 +1069,7 @@ public class DSIndexer
         {
         	log.error(e.getMessage(),e);
         }
-        
+
         //write the index and close the inputstreamreaders
         try {
             writeDocument(t, doc);
@@ -1097,7 +1096,7 @@ public class DSIndexer
 
     /**
      * Create Lucene document with all the shared fields initialized.
-     * 
+     *
      * @param type Type of DSpace Object
      * @param id
      * @param uri

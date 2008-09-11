@@ -160,12 +160,21 @@ class DAVCollection extends DAVDSpaceObject
     {
         Vector result = new Vector();
         ItemIterator ii = this.collection.getItems();
-        while (ii.hasNext())
+        try
         {
-            Item item = ii.next();
-            result.add(new DAVItem(this.context, this.request, this.response,
-                    makeChildPath(item), item));
+            while (ii.hasNext())
+            {
+                Item item = ii.next();
+                result.add(new DAVItem(this.context, this.request, this.response,
+                        makeChildPath(item), item));
+            }
         }
+        finally
+        {
+            if (ii != null)
+                ii.close();
+        }
+        
         return (DAVResource[]) result.toArray(new DAVResource[result.size()]);
     }
 

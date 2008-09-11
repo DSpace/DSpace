@@ -197,13 +197,18 @@ public class TableRowIterator
     {
         List<TableRow> resultsList = new ArrayList<TableRow>();
 
-        while (hasNext())
+        try
         {
-            resultsList.add(next());
+            while (hasNext())
+            {
+                resultsList.add(next());
+            }
         }
-
-        // Close the connection after converting it to a list.
-        this.close();
+        finally
+        {
+            // Close the connection after converting it to a list.
+            this.close();
+        }
         
         return resultsList;
     }

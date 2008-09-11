@@ -69,7 +69,7 @@ import org.dspace.uri.IdentifierService;
 
 /**
  * Command-line utility for generating HTML and Sitemaps.org protocol Sitemaps.
- * 
+ *
  * @author Robert Tansley
  * @author Stuart Lewis
  */
@@ -167,7 +167,7 @@ public class GenerateSitemaps
 
     /**
      * Generate sitemap.org protocol and/or basic HTML sitemaps.
-     * 
+     *
      * @param makeHTMLMap
      *            if {@code true}, generate an HTML sitemap.
      * @param makeSitemapOrg
@@ -190,7 +190,7 @@ public class GenerateSitemaps
         if (!outputDir.exists()) {
         	outputDir.mkdir();
         }
-        
+
         AbstractGenerator html = null;
         AbstractGenerator sitemapsOrg = null;
 
@@ -233,39 +233,47 @@ public class GenerateSitemaps
         }
 
         ItemIterator allItems = Item.findAll(c);
-        int itemCount = 0;
-
-        while (allItems.hasNext())
+        try
         {
-            Item i = allItems.next();
-            String url = IdentifierService.getURL(i).toString();
-            Date lastMod = i.getLastModified();
+            int itemCount = 0;
+
+            while (allItems.hasNext())
+            {
+                Item i = allItems.next();
+                String url = IdentifierService.getURL(i).toString();
+                Date lastMod = i.getLastModified();
+
+                if (makeHTMLMap)
+                    html.addURL(url, lastMod);
+                if (makeSitemapOrg)
+                    sitemapsOrg.addURL(url, lastMod);
+                i.decache();
+
+                itemCount++;
+            }
 
             if (makeHTMLMap)
-                html.addURL(url, lastMod);
+            {
+                int files = html.finish();
+                log.info(LogManager.getHeader(c, "write_sitemap",
+                        "type=html,num_files=" + files + ",communities="
+                                + comms.length + ",collections=" + colls.length
+                                + ",items=" + itemCount));
+            }
+
             if (makeSitemapOrg)
-                sitemapsOrg.addURL(url, lastMod);
-            i.decache();
-
-            itemCount++;
+            {
+                int files = sitemapsOrg.finish();
+                log.info(LogManager.getHeader(c, "write_sitemap",
+                        "type=html,num_files=" + files + ",communities="
+                                + comms.length + ",collections=" + colls.length
+                                + ",items=" + itemCount));
+            }
         }
-
-        if (makeHTMLMap)
+        finally
         {
-            int files = html.finish();
-            log.info(LogManager.getHeader(c, "write_sitemap",
-                    "type=html,num_files=" + files + ",communities="
-                            + comms.length + ",collections=" + colls.length
-                            + ",items=" + itemCount));
-        }
-
-        if (makeSitemapOrg)
-        {
-            int files = sitemapsOrg.finish();
-            log.info(LogManager.getHeader(c, "write_sitemap",
-                    "type=html,num_files=" + files + ",communities="
-                            + comms.length + ",collections=" + colls.length
-                            + ",items=" + itemCount));
+            if (allItems != null)
+                allItems.close();
         }
 
         c.abort();
