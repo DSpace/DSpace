@@ -140,10 +140,10 @@ public class BitstreamFormat
         {
 			// No short_description='Unknown' found in bitstreamformatregistry
 			// table. On first load of registries this is expected because it
-			// hasn't been inserted yet! So, catch but ignore this runtime 
+			// hasn't been inserted yet! So, catch but ignore this runtime
 			// exception thrown by method findUnknown.
 		}
-		
+
         // If the exception was thrown, unknown will == null so go ahead and
         // load the new description. If not, check that the unknown's
         // registry's name is not being reset.

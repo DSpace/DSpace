@@ -74,26 +74,26 @@ import org.dspace.workflow.dao.WorkflowItemDAOFactory;
 
 /**
  * Workflow state machine
- * 
+ *
  * Notes:
- * 
+ *
  * Determining item status from the database:
- * 
+ *
  * When an item has not been submitted yet, it is in the user's personal
  * workspace (there is a row in PersonalWorkspace pointing to it.)
- * 
+ *
  * When an item is submitted and is somewhere in a workflow, it has a row in the
  * WorkflowItem table pointing to it. The state of the workflow can be
  * determined by looking at WorkflowItem.getState()
- * 
+ *
  * When a submission is complete, the WorkflowItem pointing to the item is
  * destroyed and the archive() method is called, which hooks the item up to the
  * archive.
- * 
+ *
  * Notification: When an item enters a state that requires notification,
  * (WFSTATE_STEP1POOL, WFSTATE_STEP2POOL, WFSTATE_STEP3POOL,) the workflow needs
  * to notify the appropriate groups that they have a pending task to claim.
- * 
+ *
  * Revealing lists of approvers, editors, and reviewers. A method could be added
  * to do this, but it isn't strictly necessary. (say public List
  * getStateEPeople( WorkflowItem wi, int state ) could return people affected by
@@ -162,7 +162,7 @@ public class WorkflowManager
     /**
      * startWorkflow() begins a workflow - in a single transaction do away with
      * the PersonalWorkspace entry and turn it into a WorkflowItem.
-     * 
+     *
      * @param c
      *            Context
      * @param wsi
@@ -211,7 +211,7 @@ public class WorkflowManager
      * getOwnedTasks() returns a List of WorkflowItems containing the tasks
      * claimed and owned by an EPerson. The GUI displays this info on the
      * MyDSpace page.
-     * 
+     *
      * @param e
      *            The EPerson we want to fetch owned tasks for.
      */
@@ -224,7 +224,7 @@ public class WorkflowManager
     /**
      * getPooledTasks() returns a List of WorkflowItems an EPerson could claim
      * (as a reviewer, etc.) for display on a user's MyDSpace page.
-     * 
+     *
      * @param e
      *            The Eperson we want to fetch the pooled tasks for.
      */
@@ -244,7 +244,7 @@ public class WorkflowManager
 
     /**
      * claim() claims a workflow task for an EPerson
-     * 
+     *
      * @param wi
      *            WorkflowItem to do the claim on
      * @param e
@@ -295,7 +295,7 @@ public class WorkflowManager
      * the item arrives at the submit state, then remove the WorkflowItem and
      * call the archive() method to put it in the archive, and email notify the
      * submitter of a successful submission
-     * 
+     *
      * @param c
      *            Context
      * @param wi
@@ -349,7 +349,7 @@ public class WorkflowManager
 
     /**
      * unclaim() returns an owned task/item to the pool
-     * 
+     *
      * @param c
      *            Context
      * @param wi
@@ -400,7 +400,7 @@ public class WorkflowManager
      * abort() aborts a workflow, completely deleting it (administrator do this)
      * (it will basically do a reject from any state - the item ends up back in
      * the user's PersonalWorkspace
-     * 
+     *
      * @param c
      *            Context
      * @param wi
@@ -455,7 +455,7 @@ public class WorkflowManager
             {
                 // get a list of all epeople in group (or any subgroups)
                 EPerson[] epa = Group.allMembers(c, mygroup);
-                
+
                 // there were reviewers, change the state
                 //  and add them to the list
                 createTasks(c, wi, epa);
@@ -496,7 +496,7 @@ public class WorkflowManager
             {
                 //get a list of all epeople in group (or any subgroups)
                 EPerson[] epa = Group.allMembers(c, mygroup);
-                
+
                 // there were approvers, change the state
                 //  timestamp, and add them to the list
                 createTasks(c, wi, epa);
@@ -532,7 +532,7 @@ public class WorkflowManager
             {
                 // get a list of all epeople in group (or any subgroups)
                 EPerson[] epa = Group.allMembers(c, mygroup);
-                
+
                 // there were editors, change the state
                 //  timestamp, and add them to the list
                 createTasks(c, wi, epa);
@@ -594,7 +594,7 @@ public class WorkflowManager
      * Commit the contained item to the main archive. The item is associated
      * with the relevant collection, added to the search index, and any other
      * tasks such as assigning dates are performed.
-     * 
+     *
      * @return the fully archived item.
      */
     private static Item archive(Context c, WorkflowItem wfi)
@@ -633,7 +633,7 @@ public class WorkflowManager
             Email email = ConfigurationManager.getEmail(
                     I18nUtil.getEmailFilename(supportedLocale,
                         "submit_archive"));
-            
+
             // Here, we try to get an external identifier for the item to send
             // in the notification email. If no external identifier exists, we
             // just send the "local" item URL.
@@ -684,7 +684,7 @@ public class WorkflowManager
     /**
      * Return the workflow item to the workspace of the submitter. The workflow
      * item is removed, and a workspace item created.
-     * 
+     *
      * @param c
      *            Context
      * @param wfi
@@ -715,7 +715,7 @@ public class WorkflowManager
      * rejects an item - rejection means undoing a submit - WorkspaceItem is
      * created, and the WorkflowItem is removed, user is emailed
      * rejection_message.
-     * 
+     *
      * @param c
      *            Context
      * @param wi
@@ -825,17 +825,17 @@ public class WorkflowManager
                     {
                         case WFSTATE_STEP1POOL:
                             message = messages.getString("org.dspace.workflow.WorkflowManager.step1");
-                            
+
                             break;
-                            
+
                         case WFSTATE_STEP2POOL:
                             message = messages.getString("org.dspace.workflow.WorkflowManager.step2");
-                            
+
                             break;
-                            
+
                         case WFSTATE_STEP3POOL:
                             message = messages.getString("org.dspace.workflow.WorkflowManager.step3");
-                            
+
                             break;
                     }
                     email.addArgument(message);
@@ -856,7 +856,7 @@ public class WorkflowManager
     /**
      * Add all the specified people to the list of email recipients,
      * and send it
-     * 
+     *
      * @param c
      *            Context
      * @param epeople
@@ -925,7 +925,7 @@ public class WorkflowManager
 
     /**
      * get the title of the item in this workflow
-     * 
+     *
      * @param wi  the workflow item object
      */
     public static String getItemTitle(WorkflowItem wi)
@@ -946,7 +946,7 @@ public class WorkflowManager
 
     /**
      * get the name of the eperson who started this workflow
-     * 
+     *
      * @param wi  the workflow item
      */
     public static String getSubmitterName(WorkflowItem wi)

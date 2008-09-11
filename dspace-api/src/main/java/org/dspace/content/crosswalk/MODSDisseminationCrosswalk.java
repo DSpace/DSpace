@@ -260,9 +260,11 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
                 File.separator + "config" + File.separator;
             File propsFile = new File(parent, propsFilename);
             Properties modsConfig = new Properties();
+            FileInputStream pfs = null;
             try
             {
-                modsConfig.load(new FileInputStream(propsFile));
+                pfs = new FileInputStream(propsFile);
+                modsConfig.load(pfs);
             }
             catch (IOException e)
             {
@@ -270,6 +272,12 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
                 throw new CrosswalkInternalException("MODS crosswalk cannot "+
                     "open config file: "+e.toString());
             }
+            finally
+            {
+                if (pfs != null)
+                    try { pfs.close(); } catch (IOException ioe) { }
+            }
+
             modsMap = new HashMap();
             Enumeration pe = modsConfig.propertyNames();
             while (pe.hasMoreElements())

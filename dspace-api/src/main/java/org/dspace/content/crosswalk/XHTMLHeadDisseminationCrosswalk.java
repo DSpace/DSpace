@@ -120,7 +120,16 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
 
         // Read in configuration
         Properties crosswalkProps = new Properties();
-        crosswalkProps.load(new FileInputStream(config));
+        FileInputStream fis = new FileInputStream(config);
+        try
+        {
+            crosswalkProps.load(fis);
+        }
+        finally
+        {
+            if (fis != null)
+                try { fis.close(); } catch (IOException ioe) { }
+        }
 
         Enumeration e = crosswalkProps.keys();
         while (e.hasMoreElements())

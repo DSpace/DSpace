@@ -87,7 +87,7 @@ public class EPerson extends DSpaceObject
 
     /** Flag set when metadata is modified, for events */
     private boolean modifiedMetadata;
-    
+
     public enum EPersonMetadataField
     {
         FIRSTNAME ("firstname"),
@@ -136,7 +136,7 @@ public class EPerson extends DSpaceObject
             String>(EPersonMetadataField.class);
 
         context.cache(this, id);
-                
+
         modified = modifiedMetadata = false;
         clearDetails();
     }
@@ -212,7 +212,7 @@ public class EPerson extends DSpaceObject
     }
 
     // end identifier handling methos
-    
+
     /**
      * Get the e-person's full name, combining first and last name in a
      * displayable string.
@@ -278,7 +278,6 @@ public class EPerson extends DSpaceObject
     {
         this.requireCertificate = requireCertificate;
         modified = true;
-        modified = true;
     }
 
     public boolean getRequireCertificate()
@@ -289,7 +288,6 @@ public class EPerson extends DSpaceObject
     public void setSelfRegistered(boolean selfRegistered)
     {
         this.selfRegistered = selfRegistered;
-        modified = true;
         modified = true;
     }
 
@@ -327,7 +325,6 @@ public class EPerson extends DSpaceObject
     public void setPassword(String password)
     {
         metadata.put(EPersonMetadataField.PASSWORD, Utils.getMD5(password));
-        modified = true;
         modified = true;
     }
 
@@ -434,7 +431,5 @@ public class EPerson extends DSpaceObject
     {
         dao.delete(getID());
         context.addEvent(new Event(Event.DELETE, Constants.EPERSON, getID(), getEmail()));
-
-        
     }
 }

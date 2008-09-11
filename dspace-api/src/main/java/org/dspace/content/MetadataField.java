@@ -216,7 +216,7 @@ public class MetadataField
      * Return the HTML FORM key for the given field.
      *
      * FIXME: This is so utterly horrid and wrong I can't quite find the words.
-     * 
+     *
      * @param schema
      * @param element
      * @param qualifier

@@ -62,7 +62,7 @@ import java.util.List;
  * Utility class for extracting information about items, possibly just within a
  * certain community or collection, that have been created, modified or
  * withdrawn within a particular range of dates.
- * 
+ *
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -70,7 +70,7 @@ public class Harvest
 {
     /** log4j logger */
     private static Logger log = Logger.getLogger(Harvest.class);
-    
+
     /**
      * Obtain information about items that have been created, modified or
      * withdrawn within a given date range. You can also specify 'offset' and
@@ -80,7 +80,7 @@ public class Harvest
      * (and OAI-PMH).
      * <P>
      * FIXME: Assumes all in_archive items have public metadata
-     * 
+     *
      * @param context
      *            DSpace context
      * @param scope
@@ -135,7 +135,7 @@ public class Harvest
                     && ((limit == 0) || (index < (offset + limit))))
             {
                 HarvestedItemInfo itemInfo = new HarvestedItemInfo();
-                
+
                 itemInfo.context = context;
                 itemInfo.identifier = item.getIdentifier();
                 itemInfo.itemID = item.getID();
@@ -165,7 +165,7 @@ public class Harvest
     /**
      * Get harvested item info for a single item. <code>item</code> field in
      * returned <code>HarvestedItemInfo</code> object is always filled out.
-     * 
+     *
      * @param context
      *            DSpace context
      * @param identifier
@@ -174,7 +174,7 @@ public class Harvest
      *            if <code>true</code> the <code>collectionIdentifiers</code>
      *            field of the <code>HarvestedItemInfo</code> object is filled
      *            out
-     * 
+     *
      * @return <code>HarvestedItemInfo</code> object for the single item, or
      *         <code>null</code>
      */
@@ -218,7 +218,7 @@ public class Harvest
 
     /**
      * Fill out the containers field of the HarvestedItemInfo object
-     * 
+     *
      * @param context
      *            DSpace context
      * @param itemInfo

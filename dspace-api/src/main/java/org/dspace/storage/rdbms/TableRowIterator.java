@@ -108,7 +108,7 @@ public class TableRowIterator
     /**
      * Finalize -- this method is called when this object is GC-ed.
      */
-    public void finalize()
+    protected void finalize()
     {
         close();
     }

@@ -77,7 +77,7 @@ public class AuthorizeManager
      * Utility method, checks that the current user of the given context can
      * perform all of the specified actions on the given object. An
      * <code>AuthorizeException</code> if all the authorizations fail.
-     * 
+     *
      * @param c
      *            context with the current user
      * @param o
@@ -118,14 +118,14 @@ public class AuthorizeManager
      * Checks that the context's current user can perform the given action on
      * the given object. Throws an exception if the user is not authorized,
      * otherwise the method call does nothing.
-     * 
+     *
      * @param c
      *            context
      * @param o
      *            a DSpaceObject
      * @param action
      *            action to perform from <code>org.dspace.core.Constants</code>
-     * 
+     *
      * @throws AuthorizeException
      *             if the user is denied
      */
@@ -203,7 +203,7 @@ public class AuthorizeManager
     /**
      * same authorize, returns boolean for those who don't want to deal with
      * catching exceptions.
-     * 
+     *
      * @param c
      *            DSpace context, containing current user
      * @param o
@@ -211,7 +211,7 @@ public class AuthorizeManager
      * @param a
      *            action being attempted, from
      *            <code>org.dspace.core.Constants</code>
-     * 
+     *
      * @return <code>true</code> if the current user in the context is
      *         authorized to perform the given action on the given object
      */
@@ -241,7 +241,7 @@ public class AuthorizeManager
      * Check to see if the given user can perform the given action on the given
      * object. Always returns true if the ignore authorization flat is set in
      * the current context.
-     * 
+     *
      * @param c
      *            current context. User is irrelevant; "ignore authorization"
      *            flag is relevant
@@ -323,10 +323,10 @@ public class AuthorizeManager
      * Check to see if the current user is an admin. Always return
      * <code>true</code> if c.ignoreAuthorization is set. Anonymous users
      * can't be Admins (EPerson set to NULL)
-     * 
+     *
      * @param c
      *            current context
-     * 
+     *
      * @return <code>true</code> if user is an admin or ignore authorization
      *         flag set
      */
@@ -359,7 +359,7 @@ public class AuthorizeManager
 
     /**
      * Add a policy for an individual eperson
-     * 
+     *
      * @param c
      *            context. Current user irrelevant
      * @param o
@@ -368,7 +368,7 @@ public class AuthorizeManager
      *            ID of action from <code>org.dspace.core.Constants</code>
      * @param e
      *            eperson who can perform the action
-     * 
+     *
      * @throws AuthorizeException
      *             if current user in context is not authorized to add policies
      */
@@ -387,7 +387,7 @@ public class AuthorizeManager
 
     /**
      * Add a policy for a group
-     * 
+     *
      * @param c
      *            current context
      * @param o
@@ -414,10 +414,10 @@ public class AuthorizeManager
 
     /**
      * Return a List of the policies for an object
-     * 
+     *
      * @param c  current context
      * @param o  object to retrieve policies for
-     * 
+     *
      * @return List of <code>ResourcePolicy</code> objects
      */
     @Deprecated
@@ -438,10 +438,10 @@ public class AuthorizeManager
     {
         return ResourcePolicyDAOFactory.getInstance(c).getPolicies(g);
     }
-    
+
     /**
      * Return a list of policies for an object that match the action
-     * 
+     *
      * @param c
      *            context
      * @param o
@@ -457,7 +457,7 @@ public class AuthorizeManager
 
     /**
      * Add policies to an object to match those from a previous object
-     * 
+     *
      * @param c  context
      * @param src
      *            source of policies
@@ -479,7 +479,7 @@ public class AuthorizeManager
 
     /**
      * Copies policies from a list of resource policies to a given DSpaceObject
-     * 
+     *
      * @param c
      *            DSpace context
      * @param policies
@@ -514,7 +514,7 @@ public class AuthorizeManager
 
     /**
      * removes ALL policies for an object.  FIXME doesn't check authorization
-     * 
+     *
      * @param c
      *            DSpace context
      * @param o
@@ -533,7 +533,7 @@ public class AuthorizeManager
     /**
      * Remove all policies from an object that match a given action. FIXME
      * doesn't check authorization
-     * 
+     *
      * @param context
      *            current context
      * @param dso
@@ -564,7 +564,7 @@ public class AuthorizeManager
     /**
      * Removes all policies relating to a particular group. FIXME doesn't check
      * authorization
-     * 
+     *
      * @param c
      *            current context
      * @param groupID
@@ -590,7 +590,7 @@ public class AuthorizeManager
     /**
      * Removes all policies from a group for a particular object that belong to
      * a Group. FIXME doesn't check authorization
-     * 
+     *
      * @param c
      *            current context
      * @param o
@@ -611,7 +611,7 @@ public class AuthorizeManager
     /**
      * Returns all groups authorized to perform an action on an object. Returns
      * empty array if no matches.
-     * 
+     *
      * @param c
      *            current context
      * @param o

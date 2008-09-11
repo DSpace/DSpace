@@ -62,7 +62,7 @@ import org.dspace.eperson.EPerson;
  * aren't fully instantiated unless explicitly required. Could be wasted
  * effort, however, as the number of workspace items in memory at any given
  * time will typically be very low.
- * 
+ *
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -93,7 +93,7 @@ public class WorkspaceItem implements InProgressSubmission
 
         dao = WorkspaceItemDAOFactory.getInstance(context);
     }
-    
+
     public int getID()
     {
         return id;

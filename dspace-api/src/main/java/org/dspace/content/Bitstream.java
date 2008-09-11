@@ -62,7 +62,7 @@ import org.dspace.uri.ObjectIdentifier;
  * When modifying the bitstream metadata, changes are not reflected in the
  * database until <code>update</code> is called. Note that you cannot alter
  * the contents of a bitstream; you need to create a new bitstream.
- * 
+ *
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -139,7 +139,7 @@ public class Bitstream extends DSpaceObject
     /**
      * Get the name of this bitstream - typically the filename, without any path
      * information
-     * 
+     *
      * @return the name of the bitstream
      */
     public String getName()
@@ -158,7 +158,7 @@ public class Bitstream extends DSpaceObject
      * Get the source of this bitstream - typically the filename with path
      * information (if originally provided) or the name of the tool that
      * generated this bitstream
-     * 
+     *
      * @return the source of the bitstream
      */
     public String getSource()
@@ -187,7 +187,7 @@ public class Bitstream extends DSpaceObject
 
     /**
      * Get the checksum of the content of the bitstream.
-     * 
+     *
      * @return the checksum
      */
     public String getChecksum()
@@ -203,7 +203,7 @@ public class Bitstream extends DSpaceObject
 
     /**
      * Get the algorithm used to calculate the checksum
-     * 
+     *
      * @return the algorithm, e.g. "MD5"
      */
     public String getChecksumAlgorithm()
@@ -219,7 +219,7 @@ public class Bitstream extends DSpaceObject
 
     /**
      * Get the size of the bitstream
-     * 
+     *
      * @return the size in bytes
      */
     public long getSize()
@@ -236,7 +236,7 @@ public class Bitstream extends DSpaceObject
     /**
      * Set the user's format description. This implies that the format of the
      * bitstream is uncertain, and the format is set to "unknown."
-     * 
+     *
      * @param desc the user's description of the format
      */
     public void setUserFormatDescription(String desc)
@@ -250,7 +250,7 @@ public class Bitstream extends DSpaceObject
     /**
      * Get the user's format description. Returns null if the format is known by
      * the system.
-     * 
+     *
      * @return the user's format description.
      */
     public String getUserFormatDescription()
@@ -261,7 +261,7 @@ public class Bitstream extends DSpaceObject
     /**
      * Get the description of the format - either the user's or the description
      * of the format defined by the system.
-     * 
+     *
      * @return a description of the format.
      */
     public String getFormatDescription()
@@ -284,7 +284,7 @@ public class Bitstream extends DSpaceObject
 
     /**
      * Get the format of the bitstream
-     * 
+     *
      * @return the format of this bitstream
      */
     public BitstreamFormat getFormat()
@@ -296,7 +296,7 @@ public class Bitstream extends DSpaceObject
      * Set the format of the bitstream. If the user has supplied a type
      * description, it is cleared. Passing in <code>null</code> sets the type
      * of this bitstream to "unknown".
-     * 
+     *
      * @param f
      *            the format of this bitstream, or <code>null</code> for
      *            unknown
@@ -330,7 +330,7 @@ public class Bitstream extends DSpaceObject
 
     /**
      * Retrieve the contents of the bitstream
-     * 
+     *
      * @return a stream from which the bitstream can be read.
      * @throws AuthorizeException
      */
@@ -341,20 +341,20 @@ public class Bitstream extends DSpaceObject
 
         return BitstreamStorageManager.retrieve(context, getID());
     }
-    
+
     /**
      * Determine if this bitstream is registered
-     * 
+     *
      * @return true if the bitstream is registered, false otherwise
      */
     public boolean isRegisteredBitstream()
     {
         return BitstreamStorageManager.isRegisteredBitstream(internalID);
     }
-    
+
     /**
      * Get the asset store number where this bitstream is stored
-     * 
+     *
      * @return the asset store number of the bitstream
      */
     public int getStoreNumber()
@@ -407,7 +407,7 @@ public class Bitstream extends DSpaceObject
     static Bitstream register(Context context, int assetstore,
             String bitstreamPath) throws AuthorizeException, IOException
     {
-        
+
         Bitstream bitstream =  BitstreamDAOFactory.getInstance(context).register(assetstore,
                 bitstreamPath);
         context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, bitstream.getID(), "REGISTER"));
@@ -418,7 +418,7 @@ public class Bitstream extends DSpaceObject
     public void update() throws AuthorizeException
     {
         dao.update(this);
-        
+
         if (modified)
          {
              context.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null));

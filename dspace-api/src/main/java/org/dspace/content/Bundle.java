@@ -114,7 +114,6 @@ public class Bundle extends DSpaceObject
     {
         this.name = name;
         modifiedMetadata = true;
-        modifiedMetadata = true;
     }
 
     public void unsetPrimaryBitstreamID()
@@ -210,7 +209,7 @@ public class Bundle extends DSpaceObject
         AuthorizeManager.inheritPolicies(context, this, b);
 
         bitstreams.add(b);
-        
+
         context.addEvent(new Event(Event.ADD, Constants.BUNDLE, getID(), Constants.BITSTREAM, b.getID(), String.valueOf(b.getSequenceID())));
     }
 
@@ -223,7 +222,7 @@ public class Bundle extends DSpaceObject
             if (bitstream.getID() == b.getID())
             {
                 i.remove();
-                
+
                 context.addEvent(new Event(Event.REMOVE, Constants.BUNDLE, getID(), Constants.BITSTREAM, b.getID(), String.valueOf(b.getSequenceID())));
             }
         }
@@ -260,7 +259,7 @@ public class Bundle extends DSpaceObject
     public void update() throws AuthorizeException
     {
         dao.update(this);
-        
+
          if (modified)
         {
             context.addEvent(new Event(Event.MODIFY, Constants.BUNDLE, getID(), null));

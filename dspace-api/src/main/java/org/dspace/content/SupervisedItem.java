@@ -63,7 +63,7 @@ public class SupervisedItem extends WorkspaceItem
 {
     private GroupDAO groupDAO;
     private WorkspaceItemDAO wsiDAO;
-    
+
     public SupervisedItem(Context context, int id)
     {
         // construct a new workspace item
@@ -81,7 +81,7 @@ public class SupervisedItem extends WorkspaceItem
 
         return items.toArray(new SupervisedItem[0]);
     }
-    
+
     @Deprecated
     public static SupervisedItem[] findbyEPerson(Context context, EPerson ep)
     {
@@ -90,7 +90,7 @@ public class SupervisedItem extends WorkspaceItem
 
         return items.toArray(new SupervisedItem[0]);
     }
-    
+
     @Deprecated
     public Group[] getSupervisorGroups(Context context, int id)
     {
@@ -99,7 +99,7 @@ public class SupervisedItem extends WorkspaceItem
 
         return groups.toArray(new Group[0]);
     }
-    
+
     @Deprecated
     public Group[] getSupervisorGroups()
     {

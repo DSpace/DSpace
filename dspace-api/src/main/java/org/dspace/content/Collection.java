@@ -110,7 +110,7 @@ public class Collection extends DSpaceObject
 
     /** Flag set when metadata is modified, for events */
     private boolean modifiedMetadata;
-    
+
     // FIXME: Maybe we should be smart about this and only store the IDs. OTOH,
     // Groups aren't that heavyweight, and cacheing them may be a good thing
     // for performance. A proxy implementation that retrieved them on demand
@@ -173,7 +173,7 @@ public class Collection extends DSpaceObject
         setSubmitters(submitters);
 
         AuthorizeManager.addPolicy(context, this, Constants.ADD, submitters);
-        
+
 		modified = true;
         return submitters;
     }
@@ -227,7 +227,7 @@ public class Collection extends DSpaceObject
 
     public void setMetadata(String field, String value)
     {
-        if ((field.trim()).equals("name") 
+        if ((field.trim()).equals("name")
                 && (value == null || value.trim().equals("")))
         {
             try
@@ -449,7 +449,7 @@ public class Collection extends DSpaceObject
     public String getLicense()
     {
         String license = getMetadata("license");
-        
+
         if ((license == null) || license.equals(""))
         {
             // Fallback to site-wide default
@@ -623,7 +623,7 @@ public class Collection extends DSpaceObject
     public void update() throws AuthorizeException
     {
         dao.update(this);
-        
+
         if (modified)
         {
             context.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), null));

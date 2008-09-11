@@ -139,12 +139,13 @@ public class X509Authentication
         // First look for keystore full of trusted certs.
         if (keystorePath != null)
         {
+            FileInputStream fis = null;
             if (keystorePassword == null)
                 keystorePassword = "";
             try {
                 KeyStore ks = KeyStore.getInstance("JKS");
-                ks.load(new FileInputStream(keystorePath),
-                                     keystorePassword.toCharArray());
+                fis = new FileInputStream(keystorePath);
+                ks.load(fis, keystorePassword.toCharArray());
                 caCertKeyStore = ks;
             }
             catch (IOException e)
@@ -157,14 +158,22 @@ public class X509Authentication
                 log.error("X509Authentication: Failed to extract CA keystore, file="+
                             keystorePath+", error="+e.toString());
             }
+            finally
+            {
+                if (fis != null)
+                    try { fis.close(); } catch (IOException ioe) { }
+            }
         }
 
         // Second, try getting public key out of CA cert, if that's configured.
         if (caCertPath != null)
         {
+            InputStream is = null;
+            FileInputStream fis = null;
             try
             {
-                InputStream is = new BufferedInputStream(new FileInputStream(caCertPath));
+                fis = new FileInputStream(caCertPath);
+                is = new BufferedInputStream(fis);
                 X509Certificate cert = (X509Certificate) CertificateFactory
                                        .getInstance("X.509").generateCertificate(is);
                 if (cert != null)
@@ -179,6 +188,14 @@ public class X509Authentication
             {
                 log.error("X509Authentication: Failed to extract CA cert, file="+
                             caCertPath+", error="+e.toString());
+            }
+            finally
+            {
+                if (is != null)
+                    try { is.close(); } catch (IOException ioe) { }
+
+                if (fis != null)
+                    try { fis.close(); } catch (IOException ioe) { }
             }
         }
     }

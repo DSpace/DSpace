@@ -55,7 +55,7 @@ import org.dspace.workflow.dao.WorkflowItemDAOFactory;
 
 /**
  * Class representing an item going through the workflow process in DSpace
- * 
+ *
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -109,7 +109,7 @@ public class WorkflowItem implements InProgressSubmission
 
     /**
      * get owner of WorkflowItem
-     * 
+     *
      * @return EPerson owner
      */
     public EPerson getOwner()
@@ -132,7 +132,7 @@ public class WorkflowItem implements InProgressSubmission
 
     /**
      * Set the state of WorkflowItem.
-     * 
+     *
      * @param state new state (from <code>WorkflowManager</code>)
      */
     public void setState(int state)
@@ -145,7 +145,7 @@ public class WorkflowItem implements InProgressSubmission
     {
         return item;
     }
-    
+
     public void setItem(Item item)
     {
         this.item = item;
@@ -155,7 +155,7 @@ public class WorkflowItem implements InProgressSubmission
     {
         return collection;
     }
-    
+
     public void setCollection(Collection collection)
     {
         this.collection = collection;

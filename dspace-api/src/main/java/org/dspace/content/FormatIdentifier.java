@@ -50,7 +50,7 @@ import org.dspace.content.dao.BitstreamFormatDAOFactory;
  * registry in the database. For the moment, the format identifier simply uses
  * file extensions stored in the "BitstreamFormatIdentifier" table. This
  * probably isn't a particularly satisfactory long-term solution.
- * 
+ *
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -59,10 +59,10 @@ public class FormatIdentifier
     /**
      * Attempt to identify the format of a particular bitstream. If the format
      * is unknown, null is returned.
-     * 
+     *
      * @param bitstream
      *            the bitstream to identify the format of
-     * 
+     *
      * @return a format from the bitstream format registry, or null
      */
     public static BitstreamFormat guessFormat(Context context,
@@ -105,7 +105,7 @@ public class FormatIdentifier
         if (!formats.isEmpty())
         {
             // We can do no better than guess the first if there are multiple
-            // results. 
+            // results.
             retFormat = formats.get(0);
         }
 

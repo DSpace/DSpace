@@ -125,7 +125,7 @@ public class Community extends DSpaceObject
 
     public void setMetadata(String field, String value)
     {
-        if ((field.trim()).equals("name") 
+        if ((field.trim()).equals("name")
                 && (value == null || value.trim().equals("")))
         {
             try
@@ -142,7 +142,7 @@ public class Community extends DSpaceObject
         modifiedMetadata = true;
         addDetails(field);
     }
-    
+
     public String getName()
     {
         return getMetadata("name");
@@ -151,7 +151,7 @@ public class Community extends DSpaceObject
     /**
      * Get the logo for the community. <code>null</code> is return if the
      * community does not have a logo.
-     * 
+     *
      * @return the logo of the community, or <code>null</code>
      */
     public Bitstream getLogo()
@@ -330,11 +330,11 @@ public class Community extends DSpaceObject
             ArchiveManager.move(context, community, null, parent);
             context.addEvent(
                     new Event(
-                            Event.ADD, 
-                            Constants.COMMUNITY, 
+                            Event.ADD,
+                            Constants.COMMUNITY,
                             parent.getID(),
-                            Constants.COMMUNITY, 
-                            community.getID(), 
+                            Constants.COMMUNITY,
+                            community.getID(),
                             community.getIdentifier().getCanonicalForm()
                             ));
         }
@@ -342,16 +342,16 @@ public class Community extends DSpaceObject
         {
             context.addEvent(
                     new Event(
-                            Event.ADD, 
-                            Constants.SITE, 
-                            Site.SITE_ID, 
-                            Constants.COMMUNITY, 
-                            community.getID(), 
+                            Event.ADD,
+                            Constants.SITE,
+                            Site.SITE_ID,
+                            Constants.COMMUNITY,
+                            community.getID(),
                             community.getIdentifier().getCanonicalForm()
                             ));
         }
-        
-        
+
+
         return community;
     }
 
@@ -438,7 +438,7 @@ public class Community extends DSpaceObject
     public void update() throws AuthorizeException
     {
         dao.update(this);
-        
+
 		if (modified)
         {
             context.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, getID(), null));

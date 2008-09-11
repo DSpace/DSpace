@@ -89,7 +89,7 @@ public class Group extends DSpaceObject
 
     /** Flag set when metadata is modified, for events */
     private boolean modifiedMetadata;
-    
+
     public Group(Context context, int id)
     {
         this.id = id;
@@ -249,9 +249,9 @@ public class Group extends DSpaceObject
     {
         GroupDAO dao = GroupDAOFactory.getInstance(context);
         Group group = dao.create();
-        
+
 		context.addEvent(new Event(Event.CREATE, Constants.GROUP, group.getID(), null));
-        
+
         return group;
     }
 
@@ -259,7 +259,7 @@ public class Group extends DSpaceObject
     public void update() throws AuthorizeException
     {
         dao.update(this);
-        
+
         if (modifiedMetadata)
         {
             context.addEvent(new Event(Event.MODIFY_METADATA, Constants.GROUP, getID(), getDetails()));
@@ -273,7 +273,7 @@ public class Group extends DSpaceObject
     {
         dao.delete(this.getID());
         context.addEvent(new Event(Event.DELETE, Constants.GROUP, getID(), getName()));
-        
+
     }
 
     @Deprecated
