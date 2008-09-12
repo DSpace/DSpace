@@ -123,15 +123,8 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
                 // If the report isn't public
                 if (!showReport)
                 {
-                    try
-                    {
-                        // Administrators can always view reports
-                        showReport = AuthorizeManager.isAdmin(context);
-                    }
-                    catch (SQLException sqle)
-                    {
-                        log.error("Unable to check for administrator", sqle);
-                    }
+                    // Administrators can always view reports
+                    showReport = AuthorizeManager.isAdmin(context);
                 }
 
                 // Only generate a validity if the report is visible
