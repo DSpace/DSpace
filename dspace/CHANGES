@@ -1,3 +1,10 @@
+(Stuart Lewis)
+ - [2057231] Refactor LDAPServlet to use Stackable Authentication
+
+
+1.5.1 final
+===========
+
 (Scott Philips)
 - (Scott Phillips) Fixed bug where users could not finish registering nor reset 
   their password because the authentication method signatures were changed.
