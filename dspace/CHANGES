@@ -1,6 +1,8 @@
 (Stuart Lewis)
  - [2057231] Refactor LDAPServlet to use Stackable Authentication
 
+(Stuart Lewis / Chris Yates / Flavio Botelho / Alex Barbieri / Reuben Pasquini)
+ - [2057378] Hierarchical LDAP support
 
 1.5.1 final
 ===========
