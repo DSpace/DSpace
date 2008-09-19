@@ -140,19 +140,24 @@ public class LDAPHierarchicalAuthentication
     {
 		// Prevents anonymous users from being added to this group, and the second check
 		// ensures they are LDAP users
-		if ((context.getCurrentUser() != null) &&
-			(!context.getCurrentUser().getNetid().equals("")))
+		try
 		{
-			if (ldapGroup == null)
-			{ // Oops - the group isn't there.
-				log.warn(LogManager.getHeader(context,
-						"ldap_specialgroup",
-						"Group defined in ldap.login.specialgroup does not exist"));
-				return new int[0];
-			} else
+			if (!context.getCurrentUser().getNetid().equals(""))
 			{
-				return new int[] { ldapGroup.getID() };
+				if (ldapGroup == null)
+				{ // Oops - the group isn't there.
+					log.warn(LogManager.getHeader(context,
+							"ldap_specialgroup",
+							"Group defined in ldap.login.specialgroup does not exist"));
+					return new int[0];
+				} else
+				{
+					return new int[] { ldapGroup.getID() };
+				}
 			}
+		}
+		catch (NullPointerException npe) {
+			// The user is not an LDAP user, so we don't need to worry about them
 		}
 		return new int[0];
     }
