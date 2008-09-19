@@ -73,21 +73,7 @@ public class LDAPHierarchicalAuthentication
     private static Logger log = Logger.getLogger(LDAPHierarchicalAuthentication.class);
 
 	/** LDAP all members group */
-	Group ldapGroup;
-
-	public void init()
-	{
-		try
-			{
-				String groupName = ConfigurationManager.getProperty("ldap.login.specialgroup");
-				if ((groupName != null) && (!groupName.trim().equals("")))
-				{
-					ldapGroup = Group.findByName(new Context(), groupName);
-
-				}
-			} catch (SQLException e) {
-			}
-	}
+	private Group ldapGroup;
 
 	/**
      * Let a real auth method return true if it wants.
@@ -144,19 +130,25 @@ public class LDAPHierarchicalAuthentication
 		{
 			if (!context.getCurrentUser().getNetid().equals(""))
 			{
-				if (ldapGroup == null)
-				{ // Oops - the group isn't there.
-					log.warn(LogManager.getHeader(context,
-							"ldap_specialgroup",
-							"Group defined in ldap.login.specialgroup does not exist"));
-					return new int[0];
-				} else
+				String groupName = ConfigurationManager.getProperty("ldap.login.specialgroup");
+				if ((groupName != null) && (!groupName.trim().equals("")))
 				{
-					return new int[] { ldapGroup.getID() };
+					ldapGroup = Group.findByName(new Context(), groupName);
+					if (ldapGroup == null)
+					{
+						// Oops - the group isn't there.
+						log.warn(LogManager.getHeader(context,
+								"ldap_specialgroup",
+								"Group defined in ldap.login.specialgroup does not exist"));
+						return new int[0];
+					} else
+					{
+						return new int[] { ldapGroup.getID() };
+					}
 				}
 			}
 		}
-		catch (NullPointerException npe) {
+		catch (Exception npe) {
 			// The user is not an LDAP user, so we don't need to worry about them
 		}
 		return new int[0];
@@ -468,7 +460,7 @@ public class LDAPHierarchicalAuthentication
 							// Ambiguous user, can't continue
 
 						} else {
-							log.warn(LogManager.getHeader(context, "got DN", resultDN));
+							log.debug(LogManager.getHeader(context, "got DN", resultDN));
 							return resultDN;
 						}
 					}
