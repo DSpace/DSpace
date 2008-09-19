@@ -133,7 +133,7 @@ public class LDAPHierarchicalAuthentication
 				String groupName = ConfigurationManager.getProperty("ldap.login.specialgroup");
 				if ((groupName != null) && (!groupName.trim().equals("")))
 				{
-					ldapGroup = Group.findByName(new Context(), groupName);
+					ldapGroup = Group.findByName(context, groupName);
 					if (ldapGroup == null)
 					{
 						// Oops - the group isn't there.
