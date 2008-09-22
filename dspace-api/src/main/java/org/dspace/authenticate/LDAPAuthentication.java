@@ -60,6 +60,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 /**
  * Authentication module to authenticate against a flat LDAP tree where
@@ -119,14 +120,42 @@ public class LDAPAuthentication
     }
 
     /*
-     * Nothing here.
+     * Add authenticated users to the group defined in dspace.cfg by
+     * the ldap.login.specialgroup key.
      */
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
     {
-        return new int[0];
+		// Prevents anonymous users from being added to this group, and the second check
+		// ensures they are LDAP users
+		try
+		{
+			if (!context.getCurrentUser().getNetid().equals(""))
+			{
+				String groupName = ConfigurationManager.getProperty("ldap.login.specialgroup");
+				if ((groupName != null) && (!groupName.trim().equals("")))
+				{
+					ldapGroup = Group.findByName(context, groupName);
+					if (ldapGroup == null)
+					{
+						// Oops - the group isn't there.
+						log.warn(LogManager.getHeader(context,
+								"ldap_specialgroup",
+								"Group defined in ldap.login.specialgroup does not exist"));
+						return new int[0];
+					} else
+					{
+						return new int[] { ldapGroup.getID() };
+					}
+				}
+			}
+		}
+		catch (Exception npe) {
+			// The user is not an LDAP user, so we don't need to worry about them
+		}
+		return new int[0];
     }
-
-    /*
+	
+	/*
      * MIT policy on certs and groups, so always short-circuit.
      *
      * @return One of:

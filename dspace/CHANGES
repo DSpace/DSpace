@@ -1,5 +1,6 @@
 (Stuart Lewis)
  - [2057231] Refactor LDAPServlet to use Stackable Authentication
+ - Enable ldap.login.specialgroup special group for all LDAP users
 
 (Stuart Lewis / Chris Yates / Flavio Botelho / Alex Barbieri / Reuben Pasquini)
  - [2057378] Hierarchical LDAP support
