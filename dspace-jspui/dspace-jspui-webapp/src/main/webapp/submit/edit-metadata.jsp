@@ -100,7 +100,12 @@
     	
         if (enabled && useWithCurrentField) 
         {
-        	link = "<br/>" + 
+			// Deal with the issue of _0 being removed from fieldnames in the configurable submission system
+			if (fieldName.endsWith("_0"))
+			{
+				fieldName = fieldName.substring(0, fieldName.length() - 2);
+			}
+			link = "<br/>" +
 			"<a href='javascript:void(null);' onclick='javascript:popUp(\"" + 
 				contextPath + "/controlledvocabulary/controlledvocabulary.jsp?ID=" + 
 				fieldName + "&amp;vocabulary=" + vocabulary + "\")'>" +

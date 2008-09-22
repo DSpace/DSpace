@@ -5,6 +5,10 @@
 (Stuart Lewis / Chris Yates / Flavio Botelho / Alex Barbieri / Reuben Pasquini)
  - [2057378] Hierarchical LDAP support
 
+(Yin Latt)
+ - SF bug [1931796] DSpace 1.5 Controlled Vocab (edit-metadata.jsp) not working on first box in twobox
+ 
+
 1.5.1 final
 ===========
 
