@@ -72,9 +72,6 @@ public class LDAPHierarchicalAuthentication
     /** log4j category */
     private static Logger log = Logger.getLogger(LDAPHierarchicalAuthentication.class);
 
-	/** LDAP all members group */
-	private Group ldapGroup;
-
 	/**
      * Let a real auth method return true if it wants.
      */
@@ -133,7 +130,7 @@ public class LDAPHierarchicalAuthentication
 				String groupName = ConfigurationManager.getProperty("ldap.login.specialgroup");
 				if ((groupName != null) && (!groupName.trim().equals("")))
 				{
-					ldapGroup = Group.findByName(context, groupName);
+					Group ldapGroup = Group.findByName(context, groupName);
 					if (ldapGroup == null)
 					{
 						// Oops - the group isn't there.

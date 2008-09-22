@@ -134,7 +134,7 @@ public class LDAPAuthentication
 				String groupName = ConfigurationManager.getProperty("ldap.login.specialgroup");
 				if ((groupName != null) && (!groupName.trim().equals("")))
 				{
-					ldapGroup = Group.findByName(context, groupName);
+				Group ldapGroup = Group.findByName(context, groupName);
 					if (ldapGroup == null)
 					{
 						// Oops - the group isn't there.
