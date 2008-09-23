@@ -427,6 +427,7 @@ public class BrowseListTag extends TagSupport
             // now output each item row
             for (int i = 0; i < items.length; i++)
             {
+            	out.print("<tr>"); 
                 // now prepare the XHTML frag for this division
                 String rOddOrEven;
                 if (i == highlightRow)
