@@ -421,7 +421,7 @@ public class ItemTag extends TagSupport
                     }
                     else if (browseIndex != null)
                     {
-                    	out.print("<a href=\"" + request.getContextPath() + "/browse?type=" + browseIndex + "&value="
+                    	out.print("<a href=\"" + request.getContextPath() + "/browse?type=" + browseIndex + "&amp;value="
                     				+ URLEncoder.encode(values[j].value, "UTF-8") + "\">" + Utils.addEntities(values[j].value)
                     				+ "</a>");
                     }
