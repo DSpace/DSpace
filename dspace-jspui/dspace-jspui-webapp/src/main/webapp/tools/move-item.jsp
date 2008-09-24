@@ -110,7 +110,7 @@
 		 <tr>
        		<td class="standard"></td>
        		<td class="standard">
-				<input type="submit" name="submit" value="<fmt:message key="jsp.tools.move-item.button"/>">
+				<input type="submit" name="submit" value="<fmt:message key="jsp.tools.move-item.button"/>"/>
 			</td>
          </tr>
         </table>
@@ -118,7 +118,7 @@
       </tr>
      </table>
       <input type="hidden" name="action" value="<%=EditItemServlet.CONFIRM_MOVE_ITEM%>" />
-      <input type="hidden" name="item_id" value="<%=item.getID() %>"> 
+      <input type="hidden" name="item_id" value="<%=item.getID() %>"/> 
     </form>
 
 
