@@ -251,11 +251,17 @@ public class Context
         catch (SQLException se)
         {
             log.error(se.getMessage());
-            se.printStackTrace();
         }
         finally
         {
-            DatabaseManager.freeConnection(connection);
+            try
+            {
+                DatabaseManager.freeConnection(connection);
+            }
+            catch (Exception e)
+            {
+                log.error(e.getMessage());
+            }
             connection = null;
         }
     }

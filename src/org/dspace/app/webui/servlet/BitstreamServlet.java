@@ -43,6 +43,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 
+import java.net.SocketException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -202,9 +204,16 @@ public class BitstreamServlet extends DSpaceServlet
 	      }
 	    }
 
-            Utils.bufferedCopy(is, response.getOutputStream());
+            try {
+              Utils.bufferedCopy(is, response.getOutputStream());
+              response.getOutputStream().flush();
+            }
+            catch (SocketException e) {
+              log.warn(e.getMessage());
+              response.reset();
+              return;
+            }
             is.close();
-            response.getOutputStream().flush();
         }
         else
         {
