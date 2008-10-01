@@ -590,7 +590,7 @@ public class BrowseListTag extends TagSupport
 
                     out.print("<td headers=\"" + id + "\" class=\""
                         + rOddOrEven + "Row" + cOddOrEven[cOddOrEven.length - 2] + "Col\" nowrap>"
-                        + "<form method=get action=\"" + hrq.getContextPath() + "/tools/edit-item\">"
+                        + "<form method=\"get\" action=\"" + hrq.getContextPath() + "/tools/edit-item\">"
                         + "<input type=\"hidden\" name=\"handle\" value=\"" + items[i].getHandle() + "\" />"
                         + "<input type=\"submit\" value=\"Edit Item\" /></form>"
                         + "</td>");
