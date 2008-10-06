@@ -53,6 +53,7 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil; 
 
 /**
  * Servlet for editing the default license
@@ -94,7 +95,7 @@ public class LicenseEditServlet extends DSpaceServlet
         else if (!button.equals("submit_save"))
         {
             // Get the existing text from the ConfigurationManager
-            String license = ConfigurationManager.getDefaultSubmissionLicense();
+            String license = ConfigurationManager.getLicenseText(I18nUtil.getDefaultLicense(c)); 
 
             // Pass the existing license back to the JSP
             request.setAttribute("license", license);
@@ -111,7 +112,7 @@ public class LicenseEditServlet extends DSpaceServlet
             if (license.trim().equals(""))
             {
             	// Get the existing text from the ConfigurationManager
-                license = ConfigurationManager.getDefaultSubmissionLicense();
+                license = ConfigurationManager.getLicenseText(I18nUtil.getDefaultLicense(c)); 
 
                 // Pass the existing license back to the JSP
                 request.setAttribute("license", license);
@@ -125,7 +126,7 @@ public class LicenseEditServlet extends DSpaceServlet
             else
             {
 	            // Write the string out to file
-	            ConfigurationManager.writeLicenseFile(license);
+            	ConfigurationManager.writeLicenseFile(I18nUtil.getDefaultLicense(c), license); 
 	
 	            // Pass the existing license back to the JSP
 	            request.setAttribute("license", license);

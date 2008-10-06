@@ -58,7 +58,9 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.license.CreativeCommons;
 import org.dspace.submit.step.LicenseStep;
@@ -223,7 +225,14 @@ public class JSPLicenseStep extends JSPStep
     {
         // determine collection & get license
         Collection c = subInfo.getSubmissionItem().getCollection();
-        request.setAttribute("license", c.getLicense());
+        String license = c.getLicenseCollection();
+
+        if ((license == null) || license.equals(""))
+        {
+            // Fallback to site-wide default
+            license = ConfigurationManager.getLicenseText(I18nUtil.getDefaultLicense(context));
+        }
+        request.setAttribute("license", license);
 
         JSPStepManager.showJSP(request, response, subInfo, LICENSE_JSP);
     }

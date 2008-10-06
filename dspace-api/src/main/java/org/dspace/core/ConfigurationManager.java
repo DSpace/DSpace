@@ -468,11 +468,8 @@ public class ConfigurationManager
      * @param news
      *            the text to be written to the file.
      */
-    public static void writeLicenseFile(String newLicense)
+    public static void writeLicenseFile(String licenseFile, String newLicense)
     {
-        String licenseFile = getProperty("dspace.dir") + File.separator
-                             + "config" + File.separator + "default.license";
-
         try
         {
             // write the news out to the appropriate file
