@@ -874,7 +874,6 @@ public class WorkflowManager
                     email.addArgument(submitter);
 
                     ResourceBundle messages = ResourceBundle.getBundle("Messages", supportedLocale);
-                    log.info("Locale des Resource Bundles: " + messages.getLocale().getDisplayName());
                     switch (wi.getState())
                     {
                         case WFSTATE_STEP1POOL:
