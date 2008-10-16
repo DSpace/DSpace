@@ -93,7 +93,7 @@
     <% } %>
     </p>
     
-    <form method=POST>
+    <form method="post">
         <input type="hidden" name="cid" value="<%=collection.getID()%>">
         <input type="submit" name="submit" value="<fmt:message key="jsp.tools.itemmap-info.button.continue"/>">
     </form>
