@@ -832,7 +832,7 @@
 	<message key="xmlui.administrative.ItemExport.item.not.found">The item requested was not found.</message>
 	<message key="xmlui.administrative.ItemExport.collection.not.found">The collection requested was not found.</message>
 	<message key="xmlui.administrative.ItemExport.community.not.found">The community requested was not found.</message>
-	<message key="xmlui.administrative.ItemExport.export.success">The item was exported successfully.  You should receive an e-mail when the archive is ready for download.  You can also use the 'My Exports' link to view a list of your available archives.</message>
+	<message key="xmlui.administrative.ItemExport.item.success">The item was exported successfully.  You should receive an e-mail when the archive is ready for download.  You can also use the 'My Exports' link to view a list of your available archives.</message>
 	<message key="xmlui.administrative.ItemExport.collection.success">The collection was exported successfully.  You should receive an e-mail when the archive is ready for download.  You can also use the 'My Exports' link to view a list of your available archives.</message>
 	<message key="xmlui.administrative.ItemExport.community.success">The community was exported successfully.  You should receive an e-mail when the archive is ready for download.  You can also use the 'My Exports' link to view a list of your available archives.</message>
 	<message key="xmlui.administrative.ItemExport.available.head">Available export archives for download:</message>
