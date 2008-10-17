@@ -47,4 +47,4 @@
 # Get the DSPACE/bin directory
 BINDIR=`dirname $0`
 
-$BINDIR/dsrun dsrun org.dspace.administer.StructBuilder $@
+$BINDIR/dsrun org.dspace.administer.StructBuilder $@
