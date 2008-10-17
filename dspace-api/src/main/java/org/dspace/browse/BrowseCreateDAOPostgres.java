@@ -47,6 +47,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -189,10 +190,12 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     {
         try
         {
-            String[] arr = new String[3];
-            arr[0] = "CREATE INDEX " + disTable + "_value_idx ON " + disTable + "(sort_value);";
-            arr[1] = "CREATE INDEX " + mapTable + "_item_id_idx ON " + mapTable + "(item_id);";
-            arr[2] = "CREATE INDEX " + mapTable + "_dist_idx ON " + mapTable + "(distinct_id);";
+            String[] arr = new String[5];
+            arr[0] = "CREATE INDEX " + disTable + "_svalue_idx ON " + disTable + "(sort_value)";
+            arr[1] = "CREATE INDEX " + disTable + "_value_idx ON " + disTable + "(value)";
+            arr[2] = "CREATE INDEX " + disTable + "_uvalue_idx ON " + disTable + "(UPPER(value))";
+            arr[3] = "CREATE INDEX " + mapTable + "_item_id_idx ON " + mapTable + "(item_id)";
+            arr[4] = "CREATE INDEX " + mapTable + "_dist_idx ON " + mapTable + "(distinct_id)";
             
             if (execute)
             {
@@ -522,7 +525,17 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
         try
         {
             Object[] params = { value };
-            String select = "SELECT id FROM " + table + " WHERE value = ?";
+            String select = null;
+
+            if (ConfigurationManager.getBooleanProperty("webui.browse.metadata.case-insensitive", false))
+            {
+                select = "SELECT id FROM " + table + " WHERE UPPER(value) = UPPER(?)";
+            }
+            else
+            {
+                select = "SELECT id FROM " + table + " WHERE value = ?";
+            }
+
             tri = DatabaseManager.query(context, select, params);
             int distinctID = -1;
             if (!tri.hasNext())
