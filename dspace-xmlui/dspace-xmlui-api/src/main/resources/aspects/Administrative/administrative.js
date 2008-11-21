@@ -850,10 +850,9 @@ function doManageGroups()
  */
 function doEditGroup(groupID)
 {
-	
-	var groupName = ""; // This is only filled in if the user changes the group's name.
+	var groupName        = FlowGroupUtils.getName(getDSContext(),groupID);
 	var memberEPeopleIDs = FlowGroupUtils.getEPeopleMembers(getDSContext(),groupID);
-	var memberGroupIDs = FlowGroupUtils.getGroupMembers(getDSContext(),groupID);
+	var memberGroupIDs   = FlowGroupUtils.getGroupMembers(getDSContext(),groupID);
 	
 	assertEditGroup(groupName);
 	
