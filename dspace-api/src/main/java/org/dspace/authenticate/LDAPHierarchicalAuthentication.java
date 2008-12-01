@@ -206,7 +206,6 @@ public class LDAPHierarchicalAuthentication
         catch (SQLException e)
         {
         }
-        boolean loggedIn = false;
         SpeakerToLDAP ldap = new SpeakerToLDAP(log);
 
 		// Get the DN of the user
@@ -233,7 +232,7 @@ public class LDAPHierarchicalAuthentication
             {
                 if (ldap.ldapAuthenticate(dn, password, context))
                 {
-                    context.setCurrentUser(eperson = EPerson.findByNetid(context, netid.toLowerCase()));
+                    context.setCurrentUser(eperson);
                     log.info(LogManager
                         .getHeader(context, "authenticate", "type=ldap"));
                     return SUCCESS;
@@ -253,88 +252,91 @@ public class LDAPHierarchicalAuthentication
                 log.info(LogManager.getHeader(context,
                                 "autoregister", "netid=" + netid));
 
-				try
+				if ((ldap.ldapEmail!=null)&&(!ldap.ldapEmail.equals("")))
 				{
-					eperson = EPerson.findByNetid(context, netid.toLowerCase());
-					if (eperson!=null)
+					try
 					{
-						log.info(LogManager.getHeader(context,
-								"type=ldap-login", "type=ldap_but_already_email"));
-						context.setIgnoreAuthorization(true);
-						eperson.setNetid(netid);
-						eperson.update();
-						context.commit();
-						context.setIgnoreAuthorization(false);
-						context.setCurrentUser(eperson);
-						return SUCCESS;
-					}
-					else
-					{
-						if (canSelfRegister(context, request, netid))
+						eperson = EPerson.findByEmail(context, ldap.ldapEmail);
+						if (eperson!=null)
 						{
-							// TEMPORARILY turn off authorisation
-							try
-							{
-								context.setIgnoreAuthorization(true);
-								eperson = EPerson.create(context);
-								if ((ldap.ldapEmail != null) && (!ldap.ldapEmail.equals("")))
-								{
-									eperson.setEmail(ldap.ldapEmail);
-								}
-								else
-								{
-									eperson.setEmail(netid + ConfigurationManager.getProperty("ldap.netid_email_domain"));
-								}
-								if ((ldap.ldapGivenName!=null) && (!ldap.ldapGivenName.equals("")))
-								{
-									eperson.setFirstName(ldap.ldapGivenName);
-								}
-								if ((ldap.ldapSurname!=null) && (!ldap.ldapSurname.equals("")))
-								{
-									eperson.setLastName(ldap.ldapSurname);
-								}
-								if ((ldap.ldapPhone!=null)&&(!ldap.ldapPhone.equals("")))
-								{
-									eperson.setMetadata("phone", ldap.ldapPhone);
-								}
-								eperson.setNetid(netid);
-								eperson.setCanLogIn(true);
-								AuthenticationManager.initEPerson(context, request, eperson);
-								eperson.update();
-								context.commit();
-								context.setCurrentUser(eperson);
-							}
-							catch (AuthorizeException e)
-							{
-								return NO_SUCH_USER;
-							}
-							finally
-							{
-								context.setIgnoreAuthorization(false);
-							}
-
-							log.info(LogManager.getHeader(context, "authenticate",
-										"type=ldap-login, created ePerson"));
+							log.info(LogManager.getHeader(context,
+									"type=ldap-login", "type=ldap_but_already_email"));
+							context.setIgnoreAuthorization(true);
+							eperson.setNetid(netid);
+							eperson.update();
+							context.commit();
+							context.setIgnoreAuthorization(false);
+							context.setCurrentUser(eperson);
 							return SUCCESS;
 						}
 						else
 						{
-							// No auto-registration for valid certs
-							log.info(LogManager.getHeader(context,
-											"failed_login", "type=ldap_but_no_record"));
-							return NO_SUCH_USER;
+							if (canSelfRegister(context, request, netid))
+							{
+								// TEMPORARILY turn off authorisation
+								try
+								{
+									context.setIgnoreAuthorization(true);
+									eperson = EPerson.create(context);
+									if ((ldap.ldapEmail != null) && (!ldap.ldapEmail.equals("")))
+									{
+										eperson.setEmail(ldap.ldapEmail);
+									}
+									else
+									{
+										eperson.setEmail(netid + ConfigurationManager.getProperty("ldap.netid_email_domain"));
+									}
+									if ((ldap.ldapGivenName!=null) && (!ldap.ldapGivenName.equals("")))
+									{
+										eperson.setFirstName(ldap.ldapGivenName);
+									}
+									if ((ldap.ldapSurname!=null) && (!ldap.ldapSurname.equals("")))
+									{
+										eperson.setLastName(ldap.ldapSurname);
+									}
+									if ((ldap.ldapPhone!=null)&&(!ldap.ldapPhone.equals("")))
+									{
+										eperson.setMetadata("phone", ldap.ldapPhone);
+									}
+									eperson.setNetid(netid);
+									eperson.setCanLogIn(true);
+									AuthenticationManager.initEPerson(context, request, eperson);
+									eperson.update();
+									context.commit();
+									context.setCurrentUser(eperson);
+								}
+								catch (AuthorizeException e)
+								{
+									return NO_SUCH_USER;
+								}
+								finally
+								{
+									context.setIgnoreAuthorization(false);
+								}
+
+								log.info(LogManager.getHeader(context, "authenticate",
+											"type=ldap-login, created ePerson"));
+								return SUCCESS;
+							}
+							else
+							{
+								// No auto-registration for valid certs
+								log.info(LogManager.getHeader(context,
+												"failed_login", "type=ldap_but_no_record"));
+								return NO_SUCH_USER;
+							}
 						}
 					}
+					catch (AuthorizeException e)
+					{
+						eperson = null;
+					}
+					finally
+					{
+						context.setIgnoreAuthorization(false);
+					}
 				}
-				catch (AuthorizeException e)
-				{
-					eperson = null;
-				}
-				finally
-				{
-					context.setIgnoreAuthorization(false);
-				}
-            }
+			}
         }
         return BAD_ARGS;
     }
@@ -380,7 +382,7 @@ public class LDAPHierarchicalAuthentication
 			{
 				ldap_search_scope_value = Integer.parseInt(ldap_search_scope.trim());
 			}
-			catch (Exception e)
+			catch (NumberFormatException e)
 			{
 				// Log the error if it has been set but is invalid
 				if (ldap_search_scope != null)
