@@ -99,10 +99,10 @@ public class AuthenticateAction extends AbstractAction
 
         // Protect against NPE errors inside the authentication
         // class.
-        if (email == null)
-        	email = "";
-        if (password == null)
-        	password = "";
+        if ((email == null) || (password == null))
+		{
+			return null;
+		}
         
         try
         {
