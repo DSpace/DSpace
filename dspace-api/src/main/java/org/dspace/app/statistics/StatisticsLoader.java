@@ -352,7 +352,7 @@ public class StatisticsLoader
      */
     private static File[] getAnalysisAndReportFileList()
     {
-        File reportDir = new File(ConfigurationManager.getProperty("report.dir"));
+        File reportDir = new File(ConfigurationManager.getProperty("log.dir"));
         if (reportDir != null)
         {
             return reportDir.listFiles(new AnalysisAndReportFilter());
