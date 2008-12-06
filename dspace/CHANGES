@@ -9,7 +9,10 @@
 (Yin Latt)
  - SF bug [1931796] DSpace 1.5 Controlled Vocab (edit-metadata.jsp) not working on first box in twobox
  - SF bug [2137425] DSpace 1.5.1(XMLUI) Wrong dir usage of StatisticsLoader
- 
+
+(Claudia Juergen)
+ - [2041754] Feature Request #1896717 Registration notification missing information about instance
+
 
 1.5.1 final
 ===========
