@@ -2,6 +2,7 @@
  - [2057231] Refactor LDAPServlet to use Stackable Authentication
  - Enable ldap.login.specialgroup special group for all LDAP users
  - Fix for SF bug [2164955] DSpace1.5.1(XML) problem with Login to restricted bitstreams
+ - Fix for SF bug [2343281] XHTML Head Dissimination Crosswalk exposes provenance info
 
 (Stuart Lewis / Chris Yates / Flavio Botelho / Alex Barbieri / Reuben Pasquini)
  - [2057378] Hierarchical LDAP support

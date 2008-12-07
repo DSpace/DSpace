@@ -232,6 +232,9 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
                 key = v.schema + "." + v.element;
                 name = names.get(key);
             }
+		    
+            // Do not include description.provenance
+            boolean provenance = "description".equals(v.element) && "provenance".equals(v.qualifier);
 
             if (name == null)
             {
@@ -244,7 +247,7 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
                                     : handle) + " field " + originalKey);
                }
             }
-            else
+            else if (provenance != true)
             {
                 Element e = new Element("meta", XHTML_NAMESPACE);
                 e.setAttribute("name", name);
