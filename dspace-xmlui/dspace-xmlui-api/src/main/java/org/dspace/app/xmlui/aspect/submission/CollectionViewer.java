@@ -74,6 +74,9 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 	/** Language Strings */
     protected static final Message T_title = 
         message("xmlui.Submission.SelectCollection.title");
+    protected static final Message T_submit = 
+    	message("xmlui.Submission.CollectionViewer.link1");
+    
 	
     /** Cached validity object */
     private SourceValidity validity;
@@ -169,7 +172,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 	        Division home = body.addDivision("collection-home","primary repository collection");
 	        Division viewer = home.addDivision("collection-view","secondary");
 	        String submitURL = contextPath + "/handle/" + collection.getHandle() + "/submit";
-	        viewer.addPara().addXref(submitURL,"Submit a new item to this collection"); 
+	        viewer.addPara().addXref(submitURL,T_submit); 
         }
         
     }
