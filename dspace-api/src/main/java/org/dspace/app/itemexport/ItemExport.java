@@ -1016,7 +1016,7 @@ public class ItemExport {
 			String ccMail, String fileName) throws MessagingException {
 		StringBuffer content = new StringBuffer();
 		content
-				.append("The item export you requested from the repositry is now ready for download.");
+				.append("The item export you requested from the repository is now ready for download.");
 		content.append(System.getProperty("line.separator"));
 		content.append(System.getProperty("line.separator"));
 		content
