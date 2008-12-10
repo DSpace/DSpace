@@ -115,15 +115,15 @@ public class RetrieveServlet extends DSpaceServlet
             log.info(LogManager.getHeader(context, "view_bitstream",
                     "bitstream_id=" + bitstream.getID()));
 
+            // Pipe the bits
+            InputStream is = bitstream.retrieve();
+
             // Set the response MIME type
             response.setContentType(bitstream.getFormat().getMIMEType());
 
             // Response length
             response.setHeader("Content-Length", String.valueOf(bitstream
                     .getSize()));
-
-            // Pipe the bits
-            InputStream is = bitstream.retrieve();
 
             Utils.bufferedCopy(is, response.getOutputStream());
             is.close();
