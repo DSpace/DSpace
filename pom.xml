@@ -557,9 +557,13 @@
       <developer>
          <name>Andrea Bollini</name>
          <email>bollini at users.sourceforge.net</email>
+         <url>http://www.linkedin.com/in/andreabollini</url>
+         <organization>CILEA</organization>
+         <organizationUrl>http://www.cilea.it</organizationUrl>
          <roles>
             <role>commiter</role>
          </roles>
+         <timezone>+1</timezone>
       </developer>
       <developer>
          <name>Mark Diggory</name>
