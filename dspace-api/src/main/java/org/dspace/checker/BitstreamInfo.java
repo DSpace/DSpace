@@ -141,7 +141,7 @@ public final class BitstreamInfo
      * @param procStartDate
      *            When the last bitstream check started.
      */
-    public BitstreamInfo(boolean del, int storeNo, int sz, String bitstrmFmt,
+    public BitstreamInfo(boolean del, int storeNo, long sz, String bitstrmFmt,
             int bitstrmId, String usrFmtDesc, String intrnlId, String src,
             String chksumAlgorthm, String chksum, String nm, Date procEndDate,
             boolean toBeProc, Date procStartDate)
@@ -204,7 +204,7 @@ public final class BitstreamInfo
      * 
      * @return int
      */
-    public int getSize()
+    public long getSize()
     {
         return dspaceBitstream.getSize();
     }

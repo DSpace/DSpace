@@ -54,7 +54,7 @@ public final class DSpaceBitstreamInfo
     private String name;
 
     /** Stored size of the bitstream. */
-    private int size;
+    private long size;
 
     /** the check sum value stored in the database. */
     private String storedChecksum;
@@ -134,7 +134,7 @@ public final class DSpaceBitstreamInfo
      * @param desc
      *            Bitstream description
      */
-    public DSpaceBitstreamInfo(boolean del, int storeNo, int sz,
+    public DSpaceBitstreamInfo(boolean del, int storeNo, long sz,
             String bitstrmFmt, int bitstrmId, String usrFmtDesc,
             String intrnlId, String src, String chksumAlgorthm, String chksum,
             String nm, String desc)
@@ -199,7 +199,7 @@ public final class DSpaceBitstreamInfo
      * 
      * @return int
      */
-    public int getSize()
+    public long getSize()
     {
         return size;
     }
@@ -210,7 +210,7 @@ public final class DSpaceBitstreamInfo
      * @param size
      *            the bitstream size
      */
-    public void setSize(int size)
+    public void setSize(long size)
     {
         this.size = size;
     }
