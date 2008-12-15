@@ -353,7 +353,8 @@ public class Context
     {
         try
         {
-            connection.rollback();
+            if (!connection.isClosed())
+              connection.rollback();
         }
         catch (SQLException se)
         {
@@ -362,7 +363,15 @@ public class Context
         }
         finally
         {
-            DatabaseManager.freeConnection(connection);
+            try
+            {
+                if (!connection.isClosed())
+                  DatabaseManager.freeConnection(connection);
+            }
+            catch (Exception ex)
+            {
+                ex.printStackTrace();
+            }
             connection = null;
             events = null;
         }

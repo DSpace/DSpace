@@ -13,6 +13,7 @@
 
 (Claudia Juergen)
  - [2041754] Feature Request #1896717 Registration notification missing information about instance
+ - Patch for SF bugs 1775059 and 2352146 2 Authentications with LoginPage cause connection exhaust
 
 
 1.5.1 final
