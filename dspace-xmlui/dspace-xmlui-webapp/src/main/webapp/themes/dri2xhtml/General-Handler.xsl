@@ -162,12 +162,18 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </td>
-            <!-- Currently format carries forward the mime type. In the original DSpace, this 
-                would get resolved to an application via the Bitstream Registry, but we are
-                constrained by the capabilities of METS and can't really pass that info through. -->
-            <td><xsl:value-of select="substring-before(@MIMETYPE,'/')"/>
-                <xsl:text>/</xsl:text>
-                <xsl:value-of select="substring-after(@MIMETYPE,'/')"/>
+            <!-- Lookup File Type description in local messages.xml based on MIME Type.
+                In the original DSpace, this would get resolved to an application via
+                the Bitstream Registry, but we are constrained by the capabilities of METS
+                and can't really pass that info through. -->
+            <td>
+              <xsl:call-template name="getFileTypeDesc">
+                <xsl:with-param name="mimetype">
+                  <xsl:value-of select="substring-before(@MIMETYPE,'/')"/>
+                  <xsl:text>/</xsl:text>
+                  <xsl:value-of select="substring-after(@MIMETYPE,'/')"/>
+                </xsl:with-param>
+              </xsl:call-template>
             </td>
             <td>
                 <xsl:choose>
@@ -198,8 +204,29 @@
         </tr>
     </xsl:template>
     
+    <!--
+    File Type Mapping template
     
+    This maps format MIME Types to human friendly File Type descriptions.
+    Essentially, it looks for a corresponding 'key' in your messages.xml of this
+    format: xmlui.dri2xhtml.mimetype.{MIME Type}
     
+    (e.g.) <message key="xmlui.dri2xhtml.mimetype.application/pdf">PDF</message>
+
+    If a key is found, the translated value is displayed as the File Type (e.g. PDF)
+    If a key is NOT found, the MIME Type is displayed by default (e.g. application/pdf)
+    -->
+    <xsl:template name="getFileTypeDesc">
+      <xsl:param name="mimetype"/>
+
+      <!--Build full key name for MIME type (format: xmlui.dri2xhtml.mimetype.{MIME type})-->
+      <xsl:variable name="mimetype-key">xmlui.dri2xhtml.mimetype.<xsl:value-of select='$mimetype'/></xsl:variable>
+
+      <!--Lookup the MIME Type's key in messages.xml language file.  If not found, just display MIME Type-->
+      <i18n:text i18n:key="{$mimetype-key}"><xsl:value-of select="$mimetype"/></i18n:text>
+    </xsl:template>
+
+
     <!-- Generate the license information from the file section -->
     <xsl:template match="mets:fileGrp[@USE='CC-LICENSE' or @USE='LICENSE']">
         <div class="license-info">

@@ -1693,4 +1693,78 @@
 	<!-- tag used to handle the empty textarea tag added 09/28/2006 -->
 	<message key="xmlui.dri2xhtml.default.textarea.value"> </message>
 	
+  <!--###### File Format MIME Type Mappings ######-->
+
+  <!-- Application-based formats -->
+  <message key="xmlui.dri2xhtml.mimetype.application/marc">MARC record</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/mathematica">Mathematica</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/msword">Microsoft Word</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/octet-stream">Unknown</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/pdf">PDF</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/postscript">Postscript</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/sgml">SGML</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.ms-excel">Microsoft Excel</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.ms-powerpoint">Microsoft PowerPoint</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.ms-project">Microsoft Project</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.openoffice.database">OpenOffice Base</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.openoffice.drawing">OpenOffice Draw</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.openoffice.presentation">OpenOffice Impress</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.openoffice.spreadsheet">OpenOffice Calc</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.oasis.openoffice.text">OpenOffice Writer</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.openxmlformats-officedocument.presentationml.presentation">Microsoft PowerPoint 2007</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">Microsoft Excel 2007</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.openxmlformats-officedocument.wordprocessingml.document">Microsoft Word 2007</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.calc">OpenOffice Calc (1.x)</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.draw">OpenOffice Draw (1.x)</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.impress">OpenOffice Impress (1.x)</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.sun.xml.writer.global">OpenOffice Writer (1.x)</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/vnd.visio">Microsoft Visio</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/wordperfect5.1">WordPerfect</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/x-dvi">TeX DVI</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/x-filemaker">FileMaker Pro</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/x-java-applet">Java applet</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/x-latex">LaTeX</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/x-photoshop">Photoshop</message>
+  <message key="xmlui.dri2xhtml.mimetype.application/x-tex">TeX</message>
+
+  <!-- Audio-based formats -->
+  <message key="xmlui.dri2xhtml.mimetype.audio/basic">Basic Audio</message>
+  <message key="xmlui.dri2xhtml.mimetype.audio/flac">FLAC Audio</message>
+  <message key="xmlui.dri2xhtml.mimetype.audio/m4a">AAC audio</message>
+  <message key="xmlui.dri2xhtml.mimetype.audio/m4a-latm">AAC audio</message>
+  <message key="xmlui.dri2xhtml.mimetype.audio/mpeg">mp3 audio</message>
+  <message key="xmlui.dri2xhtml.mimetype.audio/x-aiff">AIFF audio</message>
+  <message key="xmlui.dri2xhtml.mimetype.audio/x-mpeg">MPEG Audio</message>
+  <message key="xmlui.dri2xhtml.mimetype.audio/x-ms-wma">WMA Audio</message>
+  <message key="xmlui.dri2xhtml.mimetype.audio/x-ms-wmv">WMV Audio</message>
+  <message key="xmlui.dri2xhtml.mimetype.audio/x-ogg">Ogg Vorbis</message>
+  <message key="xmlui.dri2xhtml.mimetype.audio/x-pn-realaudio">RealAudio</message>
+  <message key="xmlui.dri2xhtml.mimetype.audio/x-wav">WAV audio</message>
+
+  <!-- Image-based formats -->
+  <message key="xmlui.dri2xhtml.mimetype.image/gif">GIF image</message>
+  <message key="xmlui.dri2xhtml.mimetype.image/jp2">JPEG 2000 image</message>
+  <message key="xmlui.dri2xhtml.mimetype.image/jpeg">JPEG image</message>
+  <message key="xmlui.dri2xhtml.mimetype.image/png">PNG image</message>
+  <message key="xmlui.dri2xhtml.mimetype.image/tiff">TIFF image</message>
+  <message key="xmlui.dri2xhtml.mimetype.image/x-ms-bmp">BMP image</message>
+  <message key="xmlui.dri2xhtml.mimetype.image/x-photo-cd">Photo CD</message>
+
+  <!-- Text-based formats -->
+  <message key="xmlui.dri2xhtml.mimetype.text/css">CSS file</message>
+  <message key="xmlui.dri2xhtml.mimetype.text/csv">CSV file</message>
+  <message key="xmlui.dri2xhtml.mimetype.text/html">HTML</message>
+  <message key="xmlui.dri2xhtml.mimetype.text/javascript">Javascript</message>
+  <message key="xmlui.dri2xhtml.mimetype.text/plain">Text file</message>
+  <message key="xmlui.dri2xhtml.mimetype.text/richtext">RTF file</message>
+  <message key="xmlui.dri2xhtml.mimetype.text/xml">XML</message>
+
+  <!-- Video-based formats -->
+  <message key="xmlui.dri2xhtml.mimetype.video/avi">AVI video</message>
+  <message key="xmlui.dri2xhtml.mimetype.video/mjp2">Motion JPEG 2000</message>
+  <message key="xmlui.dri2xhtml.mimetype.video/mpeg">MPEG video</message>
+  <message key="xmlui.dri2xhtml.mimetype.video/mpeg2">MPEG-2 video</message>
+  <message key="xmlui.dri2xhtml.mimetype.video/mp4">MPEG-4 video</message>
+  <message key="xmlui.dri2xhtml.mimetype.video/quicktime">QuickTime video</message>
+
 </catalogue>
