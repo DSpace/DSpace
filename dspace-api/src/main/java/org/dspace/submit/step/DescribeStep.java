@@ -62,6 +62,7 @@ import org.dspace.content.DCSeriesNumber;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
 
@@ -102,6 +103,9 @@ public class DescribeStep extends AbstractProcessingStep
 
     // there were required fields that were not filled out
     public static final int STATUS_MISSING_REQUIRED_FIELDS = 2;
+    
+    // the metadata language qualifier
+    public static final String LANGUAGE_QUALIFIER = getDefaultLanguageQualifier();
 
     /** Constructor */
     public DescribeStep() throws ServletException
@@ -233,7 +237,7 @@ public class DescribeStep extends AbstractProcessingStep
                     {
                         if (!vals[z].equals(""))
                         {
-                            item.addMetadata(schema, element, qualifier, "en",
+                            item.addMetadata(schema, element, qualifier, LANGUAGE_QUALIFIER,
                                     vals[z]);
                         }
                     }
@@ -244,7 +248,7 @@ public class DescribeStep extends AbstractProcessingStep
                     || (inputType.equals("textarea")))
             {
                 readText(request, item, schema, element, qualifier, inputs[j]
-                        .getRepeatable(), "en");
+                        .getRepeatable(), LANGUAGE_QUALIFIER);
             }
             else
             {
@@ -360,7 +364,22 @@ public class DescribeStep extends AbstractProcessingStep
         
         return inputsReader;
     }
-
+    
+    /**
+     * @return the default language qualifier for metadata
+     */
+    
+    public static String getDefaultLanguageQualifier()
+    {
+       String language = "";
+       language = ConfigurationManager.getProperty("default.language");
+       if (language == null || language == "")
+       {
+    	   language = "en";
+       }
+       return language;
+    }
+    
     // ****************************************************************
     // ****************************************************************
     // METHODS FOR FILLING DC FIELDS FROM METADATA FORMS
