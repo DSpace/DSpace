@@ -264,7 +264,7 @@ public class DSQuery
 
     static String checkEmptyQuery(String myquery)
     {
-        if (myquery.equals(""))
+        if (myquery == null || myquery.equals("()") || myquery.equals(""))
         {
             myquery = "empty_query_string";
         }
