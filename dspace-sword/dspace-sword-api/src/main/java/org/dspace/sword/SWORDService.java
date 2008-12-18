@@ -78,7 +78,7 @@ public class SWORDService
 	/**
 	 * Set the DSpace context to use
 	 * 
-	 * @param context
+	 * @param context the context
 	 */
 	public void setContext(Context context)
 	{
