@@ -304,7 +304,8 @@ public class Group extends DSpaceObject
         loadData(); // make sure Group has data loaded
 
         // don't add if it's already a member
-        if (isMember(g))
+        // and don't add itself
+        if (isMember(g) || getID()==g.getID())
         {
             return;
         }

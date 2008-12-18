@@ -17,6 +17,8 @@
  - Fixed hardcoded metadata language qualifier in DescribeStep to use default.language configuration parameter
  - Fix for SF Bug #2125833 News stored not language dependend (code change in dspace-api-lang googlecode)
  - Fix for SF Bug #2343849 DSQuery invalid check for empty query string
+ - Fix for SF Bug #1725817 Error in authorization to submit when you add collection.
+   Avoids that groups can be added to themselves.
  
 (Elliot Metsger)
  - Patch for SF bug #2016130 checksum checker can not retrieve very large bitstream
