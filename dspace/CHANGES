@@ -3,6 +3,7 @@
  - Enable ldap.login.specialgroup special group for all LDAP users
  - Fix for SF bug [2164955] DSpace1.5.1(XML) problem with Login to restricted bitstreams
  - Fix for SF bug [2343281] XHTML Head Dissimination Crosswalk exposes provenance info
+ - Fix for SF bug [1896225] HTML tags not stripped in statistics display
 
 (Stuart Lewis / Chris Yates / Flavio Botelho / Alex Barbieri / Reuben Pasquini)
  - [2057378] Hierarchical LDAP support

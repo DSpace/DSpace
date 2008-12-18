@@ -429,7 +429,7 @@ public class HTMLReport implements Report
                 frag.append("<a href=\"" + stats[i].getReference() + "\" ");
                 frag.append("target=\"_blank\">");
             }
-            frag.append(stats[i].getKey());
+            frag.append(this.clean(stats[i].getKey()));
             if (stats[i].getReference() != null)
             {
                 frag.append("</a>");
@@ -505,6 +505,20 @@ public class HTMLReport implements Report
     public String footer()
     {
         return "";
+    }
+
+    /**
+     * Clean Stirngs for display in HTML
+     *
+     * @param s The String to clean
+     * @return The cleaned String
+     */
+    private String clean(String s)
+    {
+        // Clean up the statistics keys
+        s = s.replace("<", "&lt;");
+        s = s.replaceAll(">", "&gt;");
+        return s;
     }
     
 }
