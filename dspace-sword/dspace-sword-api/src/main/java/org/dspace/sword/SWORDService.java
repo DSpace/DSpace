@@ -39,6 +39,7 @@
 package org.dspace.sword;
 
 import java.sql.SQLException;
+import java.util.MissingResourceException;
 
 import org.apache.log4j.Logger;
 
@@ -46,6 +47,7 @@ import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -252,6 +254,17 @@ public class SWORDService
 		{
 			scol.setTitle(title);
 		}
+        else
+        {
+            try
+            {
+                scol.setTitle(I18nUtil.getMessage("org.dspace.content.Collection.untitled"));
+            }
+            catch (MissingResourceException e)
+            {
+                scol.setTitle("Untitled");
+            }
+        }
 		
 		// add the collection policy if it exists
 		if (collectionPolicy != null && !"".equals(collectionPolicy))
