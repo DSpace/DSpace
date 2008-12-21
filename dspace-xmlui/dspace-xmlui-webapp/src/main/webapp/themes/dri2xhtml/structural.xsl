@@ -387,7 +387,7 @@
             <xsl:attribute name="class">
                 <xsl:text>ds-trail-link </xsl:text>
                 <xsl:if test="position()=1">
-                    <xsl:text>first-link</xsl:text>
+                    <xsl:text>first-link </xsl:text>
                 </xsl:if>
                 <xsl:if test="position()=last()">
                     <xsl:text>last-link</xsl:text>
