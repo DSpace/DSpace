@@ -159,6 +159,7 @@
 			</map:reader>
 			<map:reader name="BitstreamReader" src="org.dspace.app.xmlui.cocoon.BitstreamReader"/>
 			<map:reader name="ExportReader" src="org.dspace.app.xmlui.cocoon.ItemExportDownloadReader"/>
+      <map:reader name="SitemapReader" src="org.dspace.app.xmlui.cocoon.SitemapReader"/>
 		</map:readers>
 		<map:actions>
 			<map:action name="locale" src="org.dspace.app.xmlui.cocoon.DSpaceLocaleAction"/>
@@ -331,6 +332,18 @@
 				<map:serialize type="xml"/>
 			</map:match>
 			
+      <!-- HTML Sitemaps and Sitemaps.org Sitemaps for whole repo -->
+      <map:match pattern="htmlmap">
+        <map:read type="SitemapReader">
+					<map:parameter name="type" value="html"/>
+				</map:read>
+      </map:match>
+      <map:match pattern="sitemap">
+        <map:read type="SitemapReader">
+					<map:parameter name="type" value="sitemaps.org"/>
+				</map:read>
+      </map:match>
+
 			<!-- handle common theme resources, such as dri2xhtml -->
 			<map:match pattern="themes/*">
 				<map:read src="themes/{1}"/>
