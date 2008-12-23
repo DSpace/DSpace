@@ -659,6 +659,13 @@
          </roles>
       </developer>
       <developer>
+         <name>Mark H. Wood</name>
+         <email>mwoodiupui at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
          <name>Scott Yeadon</name>
          <email>syeadon at users.sourceforge.net</email>
          <roles>
