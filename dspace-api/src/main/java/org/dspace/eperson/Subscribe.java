@@ -389,6 +389,7 @@ public class Subscribe
             Collection c = (Collection) collections.get(i);
 
             try {
+                boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.subscription", true);
                 List itemInfos = Harvest.harvest(context, c, startDate, endDate, 0, // Limit
                                                                                     // and
                                                                                     // offset
@@ -397,7 +398,8 @@ public class Subscribe
                                                                                     // everything
                         0, true, // Need item objects
                         false, // But not containers
-                        false); // Or withdrawals
+                        false, // Or withdrawals
+                        includeAll);
     
                 if (ConfigurationManager.getBooleanProperty("eperson.subscription.onlynew", false))
                 {

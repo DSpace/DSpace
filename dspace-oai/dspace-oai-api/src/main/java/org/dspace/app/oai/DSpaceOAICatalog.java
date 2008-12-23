@@ -236,10 +236,11 @@ public class DSpaceOAICatalog extends AbstractCatalog
 
             // Get the relevant OAIItemInfo objects to make headers
             DSpaceObject scope = resolveSet(context, set);
+            boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.oai", true);
             List itemInfos = Harvest.harvest(context, scope, from, until, 0, 0, // Everything
                                                                                 // for
                                                                                 // now
-                    false, true, true);
+                    false, true, true, includeAll);
 
             // No Item objects, but we need to know collections they're in and
             // withdrawn items
@@ -559,10 +560,11 @@ public class DSpaceOAICatalog extends AbstractCatalog
 
             // Get the relevant HarvestedItemInfo objects to make headers
             DSpaceObject scope = resolveSet(context, set);
+            boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.oai", true);
             List itemInfos = Harvest.harvest(context, scope, from, until,
                     offset, MAX_RECORDS, // Limit amount returned from one
                                          // request
-                    true, true, true); // Need items, containers + withdrawals
+                    true, true, true, includeAll); // Need items, containers + withdrawals
 
             // Build list of XML records from item info objects
             Iterator i = itemInfos.iterator();

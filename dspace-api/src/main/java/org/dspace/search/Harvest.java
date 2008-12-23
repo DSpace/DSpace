@@ -60,6 +60,8 @@ import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.eperson.Group;
 
 /**
  * Utility class for extracting information about items, possibly just within a
@@ -111,14 +113,16 @@ public class Harvest
      * @param withdrawn
      *            If <code>true</code>, information about withdrawn items is
      *            included
+     * @param nonAnon
+     *            If items without anonymous access should be included or not
      * @return List of <code>HarvestedItemInfo</code> objects
      * @throws SQLException
      * @throws ParseException If the date is not in a supported format
      */
     public static List harvest(Context context, DSpaceObject scope,
             String startDate, String endDate, int offset, int limit,
-            boolean items, boolean collections, boolean withdrawn)
-            throws SQLException, ParseException
+            boolean items, boolean collections, boolean withdrawn,
+            boolean nonAnon) throws SQLException, ParseException
     {
 
         // Put together our query. Note there is no need for an
@@ -261,7 +265,22 @@ public class Harvest
                         itemInfo.item = Item.find(context, itemInfo.itemID);
                     }
 
-                    infoObjects.add(itemInfo);
+                    if (nonAnon)
+                    {
+                        infoObjects.add(itemInfo);
+                    } else
+                    {
+                        Group[] authorizedGroups = AuthorizeManager.getAuthorizedGroups(context, itemInfo.item, Constants.READ);
+                        boolean added = false;
+                        for (int i = 0; i < authorizedGroups.length; i++)
+                        {
+                            if ((authorizedGroups[i].getID() == 0) && (!added))
+                            {
+                                infoObjects.add(itemInfo);
+                                added = true;
+                            }
+                        }
+                    }
                 }
 
                 index++;

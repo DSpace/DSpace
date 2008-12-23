@@ -5,6 +5,7 @@
  - Fix for SF bug [2343281] XHTML Head Dissimination Crosswalk exposes provenance info
  - Fix for SF bug [1896225] HTML tags not stripped in statistics display
  - Fix for SF bug [1951859] DSpace Home link style in breadcrumb trail
+ - Fix for SF bug [1730606] Restricted Items metadata exposed via OAI
 
 (Stuart Lewis / Chris Yates / Flavio Botelho / Alex Barbieri / Reuben Pasquini)
  - [2057378] Hierarchical LDAP support

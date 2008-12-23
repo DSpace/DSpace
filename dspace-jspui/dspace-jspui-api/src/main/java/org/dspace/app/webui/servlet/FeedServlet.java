@@ -277,8 +277,9 @@ public class FeedServlet extends DSpaceServlet
         
         // this invocation should return a non-empty list if even 1 item has changed
         try {
+            boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", true);
         	return (Harvest.harvest(context, dso, startDate, endDate,
-        		                0, 1, false, false, false).size() > 0);
+        		                0, 1, false, false, false, includeAll).size() > 0);
         }
         catch (ParseException pe)
         {
