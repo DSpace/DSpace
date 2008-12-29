@@ -209,8 +209,8 @@ public class DSpaceMETSGenerator extends AbstractGenerator
                     }
                     else if ("repository".equals(type))
                     {
-                        if (ConfigurationManager.getProperty("handle.prefix").equals(id))
-                        adapter = new RepositoryAdapter(context,contextPath);
+                        if (ConfigurationManager.getProperty("handle.prefix").equals(String.valueOf(id)))
+                            adapter = new RepositoryAdapter(context,contextPath);
                     }
 
                 }
