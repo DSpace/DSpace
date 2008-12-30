@@ -60,11 +60,12 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import org.dspace.content.DSpaceObject;
 
 
 /**
@@ -99,8 +100,14 @@ public class ItemAdapter extends AbstractAdapter
 
     /** A space seperated list of descriptive metadata sections */
     private StringBuffer dmdSecIDS;
+
+    /** A space seperated list of administrative metadata sections (for item)*/
+    private StringBuffer amdSecIDS;
     
-    
+    /** A hashmap of all Files and their corresponding space separated list of
+        administrative metadata sections */
+    private HashMap<String,StringBuffer> fileAmdSecIDs = new HashMap<String,StringBuffer>();
+
     /**
      * Construct a new ItemAdapter
      * 
@@ -193,8 +200,18 @@ public class ItemAdapter extends AbstractAdapter
     {
     	return "group_file_" + bitstream.getID();
     }
-    
-    
+
+    /**
+     * Return a techMD id for a bitstream.
+     */
+    protected String getAmdSecID(String admSecName, String mdType, DSpaceObject dso)
+    {
+        if (dso.getType() == Constants.BITSTREAM)
+          return admSecName + "_" + getFileID((Bitstream)dso) + "_" + mdType;
+        else
+          return admSecName + "_" + dso.getID() + "_" + mdType;
+    }
+
     /**
      * Render the METS descriptive section. This will create a new metadata
      * section for each crosswalk configured. Futher more, a special check 
@@ -433,6 +450,189 @@ public class ItemAdapter extends AbstractAdapter
     }
     
     /**
+     * Render the METS administrative section.
+     *
+     * Example:
+     * <amdSec>
+     *  <mdWrap MDTYPE="OTHER" OTHERMDTYPE="METSRights">
+     *    <xmlData>
+     *      ... content from the crosswalk ...
+     *    </xmlDate>
+     *  </mdWrap>
+     * </amdSec>
+     */
+    protected void renderAdministrativeSection() throws WingException, SAXException, CrosswalkException, IOException, SQLException
+    {
+        AttributeMap attributes;
+    	String groupID;
+
+        //Only create an <amdSec>, if we have amdTypes (or sub-sections) specified...
+        // (this keeps our METS file small, by default, and hides all our admin metadata)
+        if(amdTypes.size() > 0)
+    	{
+          ////////////////////////////////
+          // Start an administrative wrapper
+
+          // Administrative element's ID
+          String amdID = getGenericID("amd_");
+          attributes = new AttributeMap();
+          attributes.put("ID", amdID);
+          startElement(METS, "amdSec", attributes);
+
+          groupID = getGenericID("group_amd_");
+          attributes.put("GROUPID", groupID);
+        }
+
+        // For each administrative metadata section specified
+    	for (String amdSecName : amdTypes.keySet())
+    	{
+          //get a list of metadata crosswalks which will be used to build
+          // this administrative metadata section
+          List<String> mdTypes = amdTypes.get(amdSecName);
+
+          // For each crosswalk
+          for (String mdType : mdTypes)
+          {
+            //get our dissemination crosswalk
+            DisseminationCrosswalk crosswalk = getDisseminationCrosswalk(mdType);
+
+            //skip, if we cannot find this crosswalk in config file
+            if (crosswalk == null)
+              continue;
+
+            //First, check if this crosswalk can handle disseminating Item-level Administrative metadata
+            if(crosswalk.canDisseminate(item))
+            {
+              //Since this crosswalk works with items, first render a section for entire item
+              renderAmdSubSection(amdSecName, mdType, crosswalk, item);
+            }
+
+            //Next, we'll try and render Bitstream-level administrative metadata
+            // (Although, we're only rendering this metadata for the bundles specified)
+            List<Bundle> bundles = findEnabledBundles();
+            for (Bundle bundle : bundles)
+            {
+              Bitstream[] bitstreams = bundle.getBitstreams();
+
+              //Create a sub-section of <amdSec> for each bitstream in bundle
+              for(Bitstream bitstream : bitstreams)
+              {
+                 //Only render the section if crosswalk works with bitstreams
+                 if(crosswalk.canDisseminate(bitstream))
+                 {
+                    renderAmdSubSection(amdSecName, mdType, crosswalk, bitstream);
+                 }
+              }//end for each bitstream
+            }//end for each bundle
+          }//end for each crosswalk
+        }//end for each amdSec
+        
+        if(amdTypes.size() > 0)
+    	{
+          //////////////////////////////////
+          // End administrative section
+          endElement(METS,"amdSec");
+        }
+    }
+
+    /**
+     * Render a sub-section of the administrative metadata section.
+     * Valid sub-sections include: techMD, rightsMD, sourceMD, digiprovMD
+     *
+     * Example:
+     * <techMD>
+     *   <mdWrap MDTYPE="PREMIS">
+     *     <xmlData>
+     *       [PREMIS content ... ]
+     *     </xmlData>
+     *   </mdWrap>
+     * </techMD>
+     *
+     * @param amdSecName Name of administrative metadata section
+     * @param mdType Type of metadata section (e.g. PREMIS)
+     * @param crosswalk The DisseminationCrosswalk to use to generate this section
+     * @param dso The current DSpace object to use the crosswalk on
+     */
+    protected void renderAmdSubSection(String amdSecName, String mdType, DisseminationCrosswalk crosswalk, DSpaceObject dso)
+            throws WingException, SAXException, CrosswalkException, IOException, SQLException
+    {
+        /////////////////////////////////
+        // Start administrative metadata section wrapper
+        String amdSecID = getAmdSecID(amdSecName, mdType, dso);
+        AttributeMap attributes = new AttributeMap();
+        attributes.put("ID", amdSecID);
+        startElement(METS, amdSecName, attributes);
+
+        //If this is a bitstream
+        if (dso.getType() == Constants.BITSTREAM)
+        {
+          // Add this to our list of each file's administrative section IDs
+          String fileID = getFileID((Bitstream) dso);
+          if(fileAmdSecIDs.containsKey(fileID))
+            fileAmdSecIDs.get(fileID).append(" " + amdSecID);
+          else
+            fileAmdSecIDs.put(fileID, new StringBuffer(amdSecID));
+        }//else if an Item
+        else if (dso.getType() == Constants.ITEM)
+        {
+           //Add this to our list of item's administrative section IDs
+           if(amdSecIDS==null)
+             amdSecIDS = new StringBuffer(amdSecID);
+           else
+             amdSecIDS.append(" " + amdSecID);
+        }
+
+        ////////////////////////////////
+        // Start a metadata wrapper
+        attributes = new AttributeMap();
+        if (isDefinedMETStype(mdType))
+        {
+            attributes.put("MDTYPE", mdType);
+        }
+        else
+        {
+            attributes.put("MDTYPE","OTHER");
+            attributes.put("OTHERMDTYPE", mdType);
+        }
+        startElement(METS,"mdWrap",attributes);
+
+        //////////////////////////////////
+        // Start the xml data
+        startElement(METS,"xmlData");
+
+        /////////////////////////////////
+        // Send the actual XML content,
+        // using the PREMIS crosswalk for each bitstream
+        try {
+            Element dissemination = crosswalk.disseminateElement(dso);
+
+            SAXFilter filter = new SAXFilter(contentHandler, lexicalHandler, namespaces);
+            // Allow the basics for XML
+            filter.allowElements().allowIgnorableWhitespace().allowCharacters().allowCDATA().allowPrefixMappings();
+
+            SAXOutputter outputter = new SAXOutputter();
+            outputter.setContentHandler(filter);
+            outputter.setLexicalHandler(filter);
+            outputter.output(dissemination);
+        }
+        catch (JDOMException jdome)
+        {
+            throw new WingException(jdome);
+        }
+        catch (AuthorizeException ae)
+        {
+            // just ignore the authorize exception and continue on with
+            //out parsing the xml document.
+        }
+
+        // ////////////////////////////////
+        // End elements
+        endElement(METS,"xmlData");
+        endElement(METS,"mdWrap");
+        endElement(METS,amdSecName);
+    }
+
+    /**
      * Render the METS file section. This will contain a list of all bitstreams in the
      * item. Each bundle, even those that are not typically displayed will be listed.
      * 
@@ -458,23 +658,9 @@ public class ItemAdapter extends AbstractAdapter
         // Start a new file section
     	startElement(METS,"fileSec");
     	
-    
     	// Check if the user is requested a specific bundle or
     	// the all bundles.
-    	List<Bundle> bundles;
-    	if (fileGrpTypes.size() == 0)
-    		bundles = Arrays.asList(item.getBundles());
-    	else
-    	{
-    		bundles = new ArrayList<Bundle>();
-    		for (String fileGrpType : fileGrpTypes)
-    		{
-    			for (Bundle newBundle : item.getBundles(fileGrpType))
-    			{
-    				bundles.add(newBundle);
-    			}
-    		}
-    	}
+        List<Bundle> bundles = findEnabledBundles();
     	
     	// Loop over all requested bundles
         for (Bundle bundle : bundles)
@@ -495,11 +681,6 @@ public class ItemAdapter extends AbstractAdapter
             {
                 isDerivedBundle = true;
             }
-            
-            if (fileGrpTypes.size() != 0 && !fileGrpTypes.contains(use))
-            	// The user requested specific file groups and this is not one of them.
-            	continue;
-            
 
             // ///////////////////
             // Start bundle's file group
@@ -518,8 +699,13 @@ public class ItemAdapter extends AbstractAdapter
                 	originalBitstream = findOriginalBitstream(item, bitstream);
                 String groupID = getGroupFileID((originalBitstream == null) ? bitstream : originalBitstream );
 
+                //Check if there were administrative metadata sections corresponding to this file
+                String admIDs = null;
+                if(fileAmdSecIDs.containsKey(fileID))
+                  admIDs = fileAmdSecIDs.get(fileID).toString();
+  
                 // Render the actual file & flocate elements.
-                renderFile(item, bitstream, fileID, groupID);
+                renderFile(item, bitstream, fileID, groupID, admIDs);
 
                 // Remember all the viewable content bitstreams for later in the
                 // structMap.
@@ -573,6 +759,9 @@ public class ItemAdapter extends AbstractAdapter
     	// add references to the Descriptive metadata
     	if (dmdSecIDS != null)
     		attributes.put("DMDID", dmdSecIDS.toString());
+        // add references to the Administrative metadata
+    	if (amdSecIDS != null)
+    		attributes.put("AMDID", amdSecIDS.toString());
     	startElement(METS,"div",attributes);
     	
     	// add a fptr pointer to the primary bitstream.
@@ -669,8 +858,35 @@ public class ItemAdapter extends AbstractAdapter
     }
 
     
+    /**
+     * Checks which Bundles of current item a user has requested.
+     * If none specifically requested, then all Bundles are returned.
+     *
+     * @return List of enabled bundles
+     */
+    protected List<Bundle> findEnabledBundles() throws SQLException
+    {
+        // Check if the user is requested a specific bundle or
+    	// the all bundles.
+    	List<Bundle> bundles;
+    	if (fileGrpTypes.size() == 0)
+    		bundles = Arrays.asList(item.getBundles());
+    	else
+    	{
+    		bundles = new ArrayList<Bundle>();
+    		for (String fileGrpType : fileGrpTypes)
+    		{
+    			for (Bundle newBundle : item.getBundles(fileGrpType))
+    			{
+    				bundles.add(newBundle);
+    			}
+    		}
+    	}
     
+        return bundles;
+    }
     
+
     /**
      * For a bitstream that's a thumbnail or extracted text, find the
      * corresponding bitstream it was derived from, in the ORIGINAL bundle.

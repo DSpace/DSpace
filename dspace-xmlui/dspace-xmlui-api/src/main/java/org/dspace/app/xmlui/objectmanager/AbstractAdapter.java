@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.dspace.app.util.Util;
@@ -130,7 +131,7 @@ public abstract class AbstractAdapter
     /** The variables that dicatacte what part of the METS document to render */
     List<String> sections = new ArrayList<String>();
     List<String> dmdTypes = new ArrayList<String>();
-    List<String> amdTypes = new ArrayList<String>();
+    HashMap<String,List> amdTypes = new HashMap<String,List>();
     List<String> fileGrpTypes = new ArrayList<String>();
     List<String> structTypes = new ArrayList<String>();
     
@@ -169,20 +170,69 @@ public abstract class AbstractAdapter
     }
     
     /**
-     * A comma seperated list of METS administrative metadata formats to 
-     * render. 
-     * 
-     * @param sections Comma seperated list of METS metadata types.
+     * Store information about what will be rendered in the METS administrative
+     * metadata section.  HashMap format: keys = amdSec, value = List of mdTypes
+     *
+     * @param amdSec Section of <amdSec> where this administrative metadata
+     *                will be rendered
+     * @param mdTypes Comma seperated list of METS metadata types.
      */
-    public void setAmdTypes(String amdTypes)
+    public void setAmdTypes(String amdSec, String mdTypes)
     {
-    	if (amdTypes == null)
+    	if (mdTypes == null)
     		return;
 
-    	for (String amdType : amdTypes.split(","))
+        List<String> mdTypeList = new ArrayList<String>();
+    	for (String mdType : mdTypes.split(","))
     	{
-    		this.amdTypes.add(amdType);
+    		mdTypeList.add(mdType);
     	}
+        
+        this.amdTypes.put(amdSec, mdTypeList);
+    }
+
+    /**
+     * A comma seperated list of METS technical metadata formats to
+     * render.
+     *
+     * @param techMDTypes Comma seperated list of METS metadata types.
+     */
+    public void setTechMDTypes(String techMDTypes)
+    {
+    	setAmdTypes("techMD", techMDTypes);
+    }
+
+    /**
+     * A comma seperated list of METS intellectual property rights metadata
+     * formats to render.
+     *
+     * @param rightsMDTypes Comma seperated list of METS metadata types.
+     */
+    public void setRightsMDTypes(String rightsMDTypes)
+    {
+    	setAmdTypes("rightsMD", rightsMDTypes);
+    }
+
+    /**
+     * A comma seperated list of METS source metadata
+     * formats to render.
+     *
+     * @param sourceMDTypes Comma seperated list of METS metadata types.
+     */
+    public void setSourceMDTypes(String sourceMDTypes)
+    {
+    	setAmdTypes("sourceMD", sourceMDTypes);
+    }
+
+    /**
+     * A comma seperated list of METS digital provenance metadata
+     * formats to render.
+     *
+     * @param digiprovMDTypes Comma seperated list of METS metadata types.
+     */
+    public void setDigiProvMDTypes(String digiprovMDTypes)
+    {
+    	setAmdTypes("digiprovMD", digiprovMDTypes);
     }
     
     /**
@@ -341,8 +391,28 @@ public abstract class AbstractAdapter
 	protected void renderBehavioralSection() throws WingException, SAXException, CrosswalkException, IOException, SQLException  {}
 	protected void renderExtraSections() throws WingException, SAXException, CrosswalkException, SQLException, IOException {}
     
-    
-	
+
+
+    /**
+     * Generate a METS file element for a given bitstream.
+     *
+     * @param item
+     *            If the bitstream is associated with an item provid the item
+     *            otherwise leave null.
+     * @param bitstream
+     *            The bitstream to build a file element for.
+     * @param fileID
+     *            The unique file id for this file.
+     * @param groupID
+     *            The group id for this file, if it is derived from another file
+     *            then they should share the same groupID.
+     * @return The METS file element.
+     */
+	protected void renderFile(Item item, Bitstream bitstream, String fileID, String groupID) throws SAXException
+	{
+       renderFile(item, bitstream, fileID, groupID, null);
+    }
+
 	/**
      * Generate a METS file element for a given bitstream.
      * 
@@ -356,9 +426,12 @@ public abstract class AbstractAdapter
      * @param groupID
      *            The group id for this file, if it is derived from another file
      *            then they should share the same groupID.
+     * @param admID
+     *            The IDs of the administrative metadata sections which pertain
+     *            to this file
      * @return The METS file element.
      */
-	protected void renderFile(Item item, Bitstream bitstream, String fileID, String groupID) throws SAXException 
+	protected void renderFile(Item item, Bitstream bitstream, String fileID, String groupID, String admID) throws SAXException
 	{
 		AttributeMap attributes;
 		
@@ -376,10 +449,12 @@ public abstract class AbstractAdapter
         // Start the actual file
         attributes = new AttributeMap();
         attributes.put("ID", fileID);
-        attributes.put("GROUP_ID",groupID);
-        if (mimeType != null)
+        attributes.put("GROUPID",groupID);
+        if (admID != null && admID.length()>0)
+            attributes.put("ADMID", admID);
+        if (mimeType != null && mimeType.length()>0)
         	attributes.put("MIMETYPE", mimeType);
-        if (checksumType != null && checksumType != null)
+        if (checksumType != null && checksum != null)
         {
         	attributes.put("CHECKSUM", checksum);
         	attributes.put("CHECKSUMTYPE", checksumType);
@@ -488,7 +563,7 @@ public abstract class AbstractAdapter
      * attributes describing the metadata type 
      */
     public static String[] METS_DEFINED_TYPES = 
-    	{"MARC","MODS","EAD","DC","NISOIMG","LC-AV","VRA","TEIHDR","DDI","FGDC"/*,"OTHER"*/};
+    	{"MARC","MODS","EAD","DC","NISOIMG","LC-AV","VRA","TEIHDR","DDI","FGDC","PREMIS"/*,"OTHER"*/};
     
     /**
      * Determine if the provided metadata type is a stardard METS
