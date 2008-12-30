@@ -232,13 +232,19 @@ public class DSpaceMETSGenerator extends AbstractGenerator
 		Request request = ObjectModelHelper.getRequest(objectModel);
         String sections = request.getParameter("sections");
         String dmdTypes = request.getParameter("dmdTypes");
-        String amdTypes = request.getParameter("amdTypes");
+        String techMDTypes = request.getParameter("techMDTypes");
+        String rightsMDTypes = request.getParameter("rightsMDTypes");
+        String sourceMDTypes = request.getParameter("sourceMDTypes");
+        String digiprovMDTypes = request.getParameter("digiprovMDTypes");
         String fileGrpTypes = request.getParameter("fileGrpTypes");
         String structTypes = request.getParameter("structTypes");
         
         adapter.setSections(sections);
         adapter.setDmdTypes(dmdTypes);
-        adapter.setAmdTypes(amdTypes);
+        adapter.setTechMDTypes(techMDTypes);
+        adapter.setRightsMDTypes(rightsMDTypes);
+        adapter.setSourceMDTypes(sourceMDTypes);
+        adapter.setDigiProvMDTypes(digiprovMDTypes);
         adapter.setFileGrpTypes(fileGrpTypes);
         adapter.setStructTypes(structTypes);
 	}
