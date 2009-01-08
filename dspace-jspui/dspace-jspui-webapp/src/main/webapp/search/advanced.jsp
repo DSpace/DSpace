@@ -196,8 +196,10 @@
 <% if( request.getParameter("query") != null)
 {
     if( qResults.getErrorMsg()!=null )
-    {%>
-        <p align="center" class="submitFormWarn"><%= qResults.getErrorMsg() %></p>
+    {
+    	String qError = "jsp.search.error." + qResults.getErrorMsg();
+    %>
+        <p align="center" class="submitFormWarn"><fmt:message key="<%= qError %>"/></p>
      <%
     }else
     { %>

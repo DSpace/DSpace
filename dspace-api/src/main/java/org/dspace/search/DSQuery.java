@@ -239,24 +239,24 @@ public class DSQuery
         catch (NumberFormatException e)
         {
             log.warn(LogManager.getHeader(c, "Number format exception", "" + e));
-            qr.setErrorMsg("Number format exception");
+            qr.setErrorMsg("number-format-exception");
         }
         catch (ParseException e)
         {
             // a parse exception - log and return null results
             log.warn(LogManager.getHeader(c, "Invalid search string", "" + e));
-            qr.setErrorMsg("Invalid search string");
+            qr.setErrorMsg("invalid-search-string");
         }
         catch (TokenMgrError tme)
         {
             // Similar to parse exception
             log.warn(LogManager.getHeader(c, "Invalid search string", "" + tme));
-            qr.setErrorMsg("Invalid search string");
+            qr.setErrorMsg("invalid-search-string");
         }
         catch(BooleanQuery.TooManyClauses e)
         {
             log.warn(LogManager.getHeader(c, "Query too broad", e.toString()));
-            qr.setErrorMsg("Your query was too broad. Try a narrower query.");
+            qr.setErrorMsg("query-too-broad");
         }
 
         return qr;

@@ -24,6 +24,7 @@
  - Fix for SF Bug #1725817 Error in authorization to submit when you add collection.
    Avoids that groups can be added to themselves.
  - Fix for SF Bug #1968082 SWORD Service Document fails if Collection is untitled
+ - Fix for SF Bug #2493794 Hardcoded Strings in DSQuery
  
 (Elliot Metsger)
  - Patch for SF bug #2016130 checksum checker can not retrieve very large bitstream

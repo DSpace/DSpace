@@ -190,8 +190,9 @@
 
 <% if( qResults.getErrorMsg()!=null )
 {
+    String qError = "jsp.search.error." + qResults.getErrorMsg();
  %>
-    <p align="center" class="submitFormWarn"><%= qResults.getErrorMsg() %></p>
+    <p align="center" class="submitFormWarn"><fmt:message key="<%= qError %>"/></p>
 <%
 }
 else if( qResults.getHitCount() == 0 )
