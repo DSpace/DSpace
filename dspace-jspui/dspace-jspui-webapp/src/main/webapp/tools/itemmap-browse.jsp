@@ -59,7 +59,9 @@
 <%@ page import="java.net.URLEncoder"            %>
 <%@ page import="java.util.Iterator"             %>
 <%@ page import="java.util.Map"                  %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="org.dspace.content.Collection"  %>
+<%@ page import="org.dspace.content.DCValue"    %>
 <%@ page import="org.dspace.content.Item"        %>
 
 <%
@@ -136,22 +138,58 @@
 
     while( i.hasNext() )
     {
-        Item item = (Item)items.get(i.next());    
+        Item item = (Item)items.get(i.next());
+        // get the metadata or placeholders to display for date, contributor and title
+        String date = LocaleSupport.getLocalizedMessage(pageContext, "jsp.general.without-date");
+        DCValue[] dates = item.getMetadata("dc", "date", "issued", Item.ANY);
+        if (dates.length >= 1)
+        {
+            date = dates[0].value;
+        }
+        else
+        {
+         // do nothing the date is allready set to "without date"
+        }
+        String contributor = LocaleSupport.getLocalizedMessage(pageContext, "jsp.general.without-contributor");
+        DCValue[] contributors = item.getMetadata("dc", "contributor", Item.ANY, Item.ANY);
+        if (contributors.length >= 1)
+        {
+            contributor = contributors[0].value;
+            
+        }
+        else
+        {
+         // do nothing the contributor is allready set to anonymous
+        }
+        String title = LocaleSupport.getLocalizedMessage(pageContext, "jsp.general.untitled");
+        DCValue[] titles = item.getMetadata("dc", "title", null, Item.ANY);
+        if (titles.length >= 1)
+        {
+            title = titles[0].value;
+            
+        }
+        else
+        {
+         // do nothing the title is allready set to untitled
+            
+        }
+ 
+
 %>
         <tr>
         <td class="<%= row %>RowOddCol">
-        <%= item.getDC("date", "issued", Item.ANY)[0].value %>
+        <%= date %>
         </td>
         <td class="<%= row %>RowEvenCol">
-        <%= item.getDC("contributor", Item.ANY, Item.ANY)[0].value %>
+        <%= contributor %>
         </td>
         <td class="<%= row %>RowOddCol">
-          <%= item.getDC("title", null, Item.ANY)[0].value %></td>
+        <%= title %></td>
 
 <% if( showcollection.booleanValue() ) { %>
 <%-- not currently implemented --%>
         <td class="<%= row %>RowEvenCol">  <%= collection.getID() %>
-        <td class="<%= row %>RowOddCol"><%= item.getDC("title", null, Item.ANY)[0].value %></td>
+        <td class="<%= row %>RowOddCol"><%= title %></td>
 
 <% } else { %>
 
