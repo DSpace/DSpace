@@ -244,12 +244,59 @@ public class DCDate
      */
     public Date toDate()
     {
-        GregorianCalendar utcGC = new GregorianCalendar(TimeZone
-                .getTimeZone("UTC"));
+        int tmpmonth;
+        int tmpday;
+        int tmphours;
+        int tmpmin;
+        int tmpsec;
 
-        utcGC.set(year, month - 1, day, hours, minutes, seconds);
+        if (month < 0) {
+            // Month is unknown and set to -1
+            // but GregorianCalendar will interpret this as a rollback
+            // to December of the previous year
+            tmpmonth = 0;
+        }
+        else {
+            // Month is known, but GC calendar is 0 - 11, not 1 - 12
+            // so we'll do subtraction here
+            tmpmonth = month - 1;
+        }
+
+        if (day < 0) {
+            tmpday = 1;
+        }
+        else {
+            tmpday = day;
+        }
+
+        if (hours < 0) {
+            tmphours = 0;
+        }
+        else {
+            tmphours = hours;
+        }
+
+        if (minutes < 0) {
+            tmpmin = 0;
+        }
+        else {
+            tmpmin = minutes;
+        }
+
+        if (seconds < 0) {
+            tmpsec = 0;
+        }
+        else {
+            tmpsec = seconds;
+        }
+
+        GregorianCalendar utcGC = new GregorianCalendar(TimeZone
+                         .getTimeZone("UTC"));
+
+        utcGC.set(year, tmpmonth, tmpday, tmphours, tmpmin, tmpsec);
 
         return utcGC.getTime();
+
     }
 
     /**

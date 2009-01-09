@@ -37,6 +37,9 @@
  - Fixed small bug in XMLUI's org.dspace.app.xmlui.cocoon.DSpaceMETSGenerator which caused Repository-wide METS file to fail to generate.
  - [2477820] DSpace 1.5 XMLUI - Enable METS <amdSec> using crosswalks
 
+(Kim Shepherd)
+ - [2385187] Fix for toDate method in DCDate
+
 1.5.1 final
 ===========
 
