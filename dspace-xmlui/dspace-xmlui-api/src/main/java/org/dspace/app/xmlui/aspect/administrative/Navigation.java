@@ -105,13 +105,14 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_administrative_withdrawn  		= message("xmlui.administrative.Navigation.administrative_withdrawn");
     private static final Message T_administrative_control_panel 	= message("xmlui.administrative.Navigation.administrative_control_panel");
 
-    private static final Message T_statistics            	= message("xmlui.administrative.Navigation.statistics");
+    private static final Message T_statistics            	        = message("xmlui.administrative.Navigation.statistics");
 
     private static final Message T_context_export_item 				= message("xmlui.administrative.Navigation.context_export_item");
     private static final Message T_context_export_collection 		= message("xmlui.administrative.Navigation.context_export_collection");
     private static final Message T_context_export_community 		= message("xmlui.administrative.Navigation.context_export_community");
     private static final Message T_account_export			 		= message("xmlui.administrative.Navigation.account_export");
-	
+
+    private static final Message T_my_account                       = message("xmlui.EPerson.Navigation.my_account");
 
     /** Cached validity object */
 	private SourceValidity validity;
@@ -219,10 +220,11 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         List account = options.addList("account");
         List context = options.addList("context");
         List admin = options.addList("administrative");
+        account.setHead(T_my_account);	        
         
         // My Account options
         if(availableExports!=null && availableExports.size()>0){
-        	account.addItem().addXref(contextPath+"/admin/export", T_account_export);
+            account.addItem().addXref(contextPath+"/admin/export", T_account_export);
         }
         
         
