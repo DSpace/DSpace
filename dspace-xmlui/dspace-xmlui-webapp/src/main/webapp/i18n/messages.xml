@@ -1027,7 +1027,7 @@
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.name_help">A unique name for this format, (e.g. Microsoft Word XP or Microsoft Word 2000)</message>
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.name_error">The name field is required.</message>
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.mimetype">MIME Type</message>
-	<message key="xmlui.administrative.registries.EditBitstreamFormat.mimetype.help">The MIME type associated with this format, does not have to be unique.</message>
+	<message key="xmlui.administrative.registries.EditBitstreamFormat.mimetype_help">The MIME type associated with this format, does not have to be unique.</message>
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.description">Description</message>
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.support">Support level</message>
 	<message key="xmlui.administrative.registries.EditBitstreamFormat.support_help">The level of support your institution pledges for this format.</message>
