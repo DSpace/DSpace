@@ -8,6 +8,7 @@
  - Fix for SF bug [1730606] Restricted Items metadata exposed via OAI
  - Patch for SF feature request [1587270] Implicit group for all registered users
  - Fix for SF bug [2495728] 'My Account' disappears following exports
+ - Update XMLUI Google Analytics code to match latest tracking code
  
 (Stuart Lewis / Chris Yates / Flavio Botelho / Alex Barbieri / Reuben Pasquini)
  - [2057378] Hierarchical LDAP support

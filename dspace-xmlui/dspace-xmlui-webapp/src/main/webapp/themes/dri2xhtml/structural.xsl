@@ -232,10 +232,16 @@
             
             <!-- Add a google analytics script if the key is present -->
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">
-            	<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"><xsl:text>&#160;</xsl:text></script>
 				<script type="text/javascript">
-					<xsl:text>_uacct = "</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>";</xsl:text>
-					<xsl:text>urchinTracker();</xsl:text>
+					<xsl:text>var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");</xsl:text>
+					<xsl:text>document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));</xsl:text>
+				</script>
+
+				<script type="text/javascript">
+					<xsl:text>try {</xsl:text>
+						<xsl:text>var pageTracker = _gat._getTracker("</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>");</xsl:text>
+						<xsl:text>pageTracker._trackPageview();</xsl:text>
+					<xsl:text>} catch(err) {}</xsl:text>
 				</script>
             </xsl:if>
             
