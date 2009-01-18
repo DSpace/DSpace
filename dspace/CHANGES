@@ -10,6 +10,7 @@
  - Fix for SF bug [2495728] 'My Account' disappears following exports
  - Update XMLUI Google Analytics code to match latest tracking code
  - Fix for SF bug [1606439] Exception handling for deleting a metadata field
+ - [2513300] Fix for bug [1774958] Nested folders do not export correctly
  
 (Stuart Lewis / Chris Yates / Flavio Botelho / Alex Barbieri / Reuben Pasquini)
  - [2057378] Hierarchical LDAP support

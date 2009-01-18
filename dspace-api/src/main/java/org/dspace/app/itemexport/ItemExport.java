@@ -486,7 +486,14 @@ public class ItemExport {
 					// written
 
 					while (!isDone) {
-						File fout = new File(destDir, myName);
+                        if (myName.contains(File.separator))
+                        {
+                            String dirs = myName.substring(0, myName.lastIndexOf(File.separator));
+                            File fdirs = new File(destDir + File.separator + dirs);
+                            fdirs.mkdirs();
+                        }
+
+                        File fout = new File(destDir, myName);
 
 						if (fout.createNewFile()) {
 							FileOutputStream fos = new FileOutputStream(fout);
@@ -874,8 +881,6 @@ public class ItemExport {
 	 * 
 	 * @param fileName
 	 *            name of the file to get the size
-	 * @param eperson
-	 *            the eperson requesting file
 	 * @return
 	 * @throws Exception
 	 */
@@ -1051,9 +1056,8 @@ public class ItemExport {
 	 *            email for the from field
 	 * @param ccMail -
 	 *            carbon copy email
-	 * @param fileName -
-	 *            the file name to be downloaded. It is added to the url in the
-	 *            email
+	 * @param error -
+	 *            the error message
 	 * @throws MessagingException
 	 */
 	public static void emailErrorMessage(String toMail, String fromMail,
