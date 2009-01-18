@@ -59,9 +59,15 @@
 
     String typeName = type.getElement() +
         (type.getQualifier() == null ? "" : "." + type.getQualifier());
+
+    boolean failed = false;
+    if (request.getAttribute("failed") != null)
+    {
+        failed = ((Boolean)request.getAttribute("failed")).booleanValue();
+    }
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.list-metadata-elements.title"
+<dspace:layout titlekey="jsp.dspace-admin.confirm-delete-mdfield.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
@@ -78,22 +84,29 @@
         <fmt:param><%= typeName %></fmt:param>
     </fmt:message></p>
     
-    <%-- <P>This will result in an error if any items have values for this metadata field.</P> --%>
-    <p><fmt:message key="jsp.dspace-admin.confirm-delete-mdfield.warning"/></p>
+    <%
+        if (!failed) { %>
+            <%-- <P>This will result in an error if any items have values for this metadata field.</P> --%>
+            <p><fmt:message key="jsp.dspace-admin.confirm-delete-mdfield.warning"/></p>
+            <form method="post" action="">
+                <input type="hidden" name="dc_type_id" value="<%= type.getFieldID() %>">
+                <center>
+                    <table width="70%">
+                        <tr>
+                            <td align="left">
+                                <%-- <input type="submit" name="submit_confirm_delete" value="Delete"> --%>
+                                <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
+                                <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
+                                <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
+                            </td>
+                        </tr>
+                    </table>
+                </center>
+            </form><%
+        } else {%>
+            <%-- <P>Unable to delete this metadata field. This is most likely to be because it is referenced by at least one item.</P> --%>
+            <p><strong><fmt:message key="jsp.dspace-admin.confirm-delete-mdfield.failed"/></strong></p><%
+        }
+     %>
 
-    <form method="post" action="">
-        <input type="hidden" name="dc_type_id" value="<%= type.getFieldID() %>">
-        <center>
-            <table width="70%">
-                <tr>
-                    <td align="left">
-                        <%-- <input type="submit" name="submit_confirm_delete" value="Delete"> --%>
-                        <input type="submit" name="submit_confirm_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
-                        <%-- <input type="submit" name="submit_cancel" value="Cancel"> --%>
-                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
-                    </td>
-                </tr>
-            </table>
-        </center>
-    </form>
 </dspace:layout>

@@ -195,8 +195,18 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
             // User confirms deletion of type
             MetadataField dc = MetadataField.find(context, UIUtil
                     .getIntParameter(request, "dc_type_id"));
-            dc.delete(context);
-            showTypes(context, request, response, schemaID);
+            try
+            {
+                dc.delete(context);
+                request.setAttribute("failed", new Boolean(false));
+                showTypes(context, request, response, schemaID);
+            } catch (Exception e)
+            {
+                request.setAttribute("type", dc);
+                request.setAttribute("failed", true);
+                JSPManager.showJSP(request, response,
+                        "/dspace-admin/confirm-delete-mdfield.jsp");
+            }
             context.complete();
         }
         else if (button.equals("submit_move"))
