@@ -158,7 +158,11 @@
                    String storedVal = values[i].value;
                    String displayVal = inputs[z].getDisplayString(pairsName,
                                                                 storedVal);
-                   row.append(Utils.addEntities(displayVal));
+                   if (displayVal == null || displayVal.equals("")) 
+                   {
+                       // use the stored value as label rather than null
+                       row.append(Utils.addEntities(storedVal));
+                   }
                 }
                 else if (inputType.equals("qualdrop_value"))
                 {
@@ -167,9 +171,9 @@
                    String displayQual = inputs[z].getDisplayString(pairsName, 
                                                                  qual);
                    String displayValue = Utils.addEntities(values[i].value);
-                   if (displayQual != null)
+                   if (displayValue != null)
                    {
-                       row.append(displayQual + ":" + displayValue);
+                       row.append((displayQual == null ? qual : displayQual) + ":" + displayValue);
                    }
                 }
                 else 

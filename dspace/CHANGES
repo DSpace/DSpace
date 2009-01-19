@@ -31,6 +31,7 @@
  - Fix for SF Bug #1968082 SWORD Service Document fails if Collection is untitled
  - Fix for SF Bug #2493794 Hardcoded Strings in DSQuery
  - Fix for SF Bug #1745573 Itemmap-browse.jsp throws Exception on items without date
+ - Fix for SF Bug #1571645 NullPointerException possible in review.jsp
  
 (Elliot Metsger)
  - Patch for SF bug #2016130 checksum checker can not retrieve very large bitstream
