@@ -1,3 +1,5 @@
+(Mark Wood)
+ - [2002866] Return 404, not 200, when page Not Found
 (Stuart Lewis)
  - [2057231] Refactor LDAPServlet to use Stackable Authentication
  - Enable ldap.login.specialgroup special group for all LDAP users

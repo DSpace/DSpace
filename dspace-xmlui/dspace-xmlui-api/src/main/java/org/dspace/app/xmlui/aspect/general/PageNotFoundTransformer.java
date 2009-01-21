@@ -44,9 +44,12 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
@@ -199,6 +202,10 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
             notFound.addPara(T_para1); 
             
             notFound.addPara().addXref(contextPath,T_go_home);
+
+	    HttpServletResponse response = (HttpServletResponse)objectModel
+		.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+	    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
