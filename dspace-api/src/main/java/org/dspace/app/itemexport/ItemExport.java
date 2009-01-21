@@ -55,26 +55,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.mail.BodyPart;
-import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.apache.log4j.Logger;
+
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -87,7 +80,10 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
+import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
+import org.dspace.core.Email;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 
@@ -120,6 +116,9 @@ public class ItemExport
      * used for export download
      */
     public static final String COMPRESSED_EXPORT_MIME_TYPE = "application/zip";
+    
+     /** log4j logger */
+     private static Logger log = Logger.getLogger(ItemExport.class);
 
     /*
 	 * 
@@ -869,10 +868,7 @@ public class ItemExport
                                 + fileName + ".zip");
                         // email message letting user know the file is ready for
                         // download
-                        emailSuccessMessage(eperson.getEmail(),
-                                ConfigurationManager
-                                        .getProperty("mail.from.address"),
-                                additionalEmail, fileName + ".zip");
+                        emailSuccessMessage(context, eperson, fileName + ".zip");
                         // return to enforcing auths
                         context.setIgnoreAuthorization(false);
                     }
@@ -880,10 +876,7 @@ public class ItemExport
                     {
                         try
                         {
-                            emailErrorMessage(eperson.getEmail(),
-                                    ConfigurationManager
-                                            .getProperty("mail.from.address"),
-                                    additionalEmail, e1.getMessage());
+                            emailErrorMessage(eperson, e1.getMessage());
                         }
                         catch (Exception e)
                         {
@@ -1157,43 +1150,32 @@ public class ItemExport
      * communication with email instead. Send a success email once the export
      * archive is complete and ready for download
      * 
-     * @param toMail
-     *            - email to send message to
-     * @param fromMail
-     *            - email for the from field
-     * @param ccMail
-     *            - carbon copy email
+     * @param context
+     *            - the current Context
+     * @param eperson
+     *            - eperson to send the email to
      * @param fileName
      *            - the file name to be downloaded. It is added to the url in
      *            the email
      * @throws MessagingException
      */
-    public static void emailSuccessMessage(String toMail, String fromMail,
-            String ccMail, String fileName) throws MessagingException
+    public static void emailSuccessMessage(Context context, EPerson eperson,
+            String fileName) throws MessagingException
     {
-        StringBuffer content = new StringBuffer();
-        content
-                .append("The item export you requested from the repository is now ready for download.");
-        content.append(System.getProperty("line.separator"));
-        content.append(System.getProperty("line.separator"));
-        content
-                .append("You may download the compressed file using the following web address:");
-        content.append(System.getProperty("line.separator"));
-        content.append(ConfigurationManager.getProperty("dspace.url"));
-        content.append("/exportdownload/");
-        content.append(fileName);
-        content.append(System.getProperty("line.separator"));
-        content.append(System.getProperty("line.separator"));
-        content.append("Tis file will remain available for at least ");
-        content.append(ConfigurationManager
-                .getProperty("org.dspace.app.itemexport.life.span.hours"));
-        content.append(" hours.");
-        content.append(System.getProperty("line.separator"));
-        content.append(System.getProperty("line.separator"));
-        content.append("Thank you");
+        try
+        {
+            Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
+            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "export_success"));
+            email.addRecipient(eperson.getEmail());
+            email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/exportdownload/" + fileName);
+            email.addArgument(ConfigurationManager.getProperty("org.dspace.app.itemexport.life.span.hours"));
 
-        sendMessage(toMail, fromMail, ccMail,
-                "Item export requested is ready for download", content);
+            email.send();
+        }
+        catch (Exception e)
+        {
+            log.warn(LogManager.getHeader(context, "emailSuccessMessage", "cannot notify user of export"), e);
+        }
     }
 
     /**
@@ -1202,83 +1184,29 @@ public class ItemExport
      * communication with email instead. Send an error email if the export
      * archive fails
      * 
-     * @param toMail
-     *            - email to send message to
-     * @param fromMail
-     *            - email for the from field
-     * @param ccMail
-     *            - carbon copy email
+     * @param eperson
+     *            - EPerson to send the error message to
      * @param error
      *            - the error message
      * @throws MessagingException
      */
-    public static void emailErrorMessage(String toMail, String fromMail,
-            String ccMail, String error) throws MessagingException
-    {
-        StringBuffer content = new StringBuffer();
-        content.append("The item export you requested was not completed.");
-        content.append(System.getProperty("line.separator"));
-        content.append(System.getProperty("line.separator"));
-        content
-                .append("For more infrmation you may contact your system administrator.");
-        content.append(System.getProperty("line.separator"));
-        content.append(System.getProperty("line.separator"));
-        content.append("Error message received: ");
-        content.append(error);
-        content.append(System.getProperty("line.separator"));
-        content.append(System.getProperty("line.separator"));
-        content.append("Thank you");
-
-        sendMessage(toMail, fromMail, ccMail,
-                "Item export requested was not completed", content);
-    }
-
-    private static void sendMessage(String toMail, String fromMail,
-            String ccMail, String subject, StringBuffer content)
+    public static void emailErrorMessage(EPerson eperson, String error)
             throws MessagingException
     {
+        log.warn("An error occured during item export, the user will be notified. " + error);
         try
         {
-            if (toMail == null || !toMail.contains("@"))
-            {
-                return;
-            }
+            Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
+            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "export_success"));
+            email.addRecipient(eperson.getEmail());
+            email.addArgument(error);
+            email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/feedback");
 
-            // Get the mail configuration properties
-            String server = ConfigurationManager.getProperty("mail.server");
-
-            // Set up properties for mail session
-            Properties props = System.getProperties();
-            props.put("mail.smtp.host", server);
-
-            // Get session
-            Session session = Session.getDefaultInstance(props, null);
-
-            MimeMessage msg = new MimeMessage(session);
-            Multipart multipart = new MimeMultipart();
-
-            // create the first part of the email
-            BodyPart messageBodyPart = new MimeBodyPart();
-            messageBodyPart.setText(content.toString());
-
-            multipart.addBodyPart(messageBodyPart);
-            msg.setContent(multipart);
-            msg.setFrom(new InternetAddress(fromMail));
-            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-                    toMail));
-            if (ccMail != null && ccMail.contains("@"))
-            {
-                msg.addRecipient(Message.RecipientType.CC, new InternetAddress(
-                        ccMail));
-            }
-            msg.setSentDate(new Date());
-            msg.setSubject(subject);
-            Transport.send(msg);
+            email.send();
         }
-        catch (MessagingException e)
+        catch (Exception e)
         {
-            e.printStackTrace();
-            throw e;
+            log.warn("error during item export error notification", e);
         }
     }
 

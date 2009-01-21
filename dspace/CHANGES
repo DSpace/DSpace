@@ -22,7 +22,8 @@
 
 (Claudia Juergen)
  - [2041754] Feature Request #1896717 Registration notification missing information about instance
- - Patch for SF bugs 1775059 and 2352146 2 Authentications with LoginPage cause connection exhaust
+ - Fix for SF Bug #1775059 Repeated execution of chooser.jsp exhausts db conn pool
+ - Fix for SF Bug #2352146 2 Authentications with LoginPage cause connection exhaust
  - Fixed hardcoded metadata language qualifier in DescribeStep to use default.language configuration parameter
  - Fix for SF Bug #2125833 News stored not language dependend (code change in dspace-api-lang googlecode)
  - Fix for SF Bug #2343849 DSQuery invalid check for empty query string
@@ -35,6 +36,7 @@
  - Fix for SF Bug #2413800 Improper display of Umlauts / Encoding of messages_de.xml
  - SF Patch #2526153 Hardcoded String in jspui browse
  - Fix for SF Bug #2512868 Double quote problem in some fields of JSPUI
+ - Fix for SF Bug #2411653 Export Item email hardcoded strings in sources 
  
 (Elliot Metsger)
  - Patch for SF bug #2016130 checksum checker can not retrieve very large bitstream
