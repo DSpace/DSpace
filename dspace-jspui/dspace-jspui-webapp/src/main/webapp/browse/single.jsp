@@ -291,7 +291,7 @@
 	}
 %>
 		</select>
-		<input type="submit" name="submit_browse" value="Update"/>
+		<input type="submit" name="submit_browse" value="<fmt:message key="jsp.general.update"/>"/>
 	</form>
 	</div>
 
