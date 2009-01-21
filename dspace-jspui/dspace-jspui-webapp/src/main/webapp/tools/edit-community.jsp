@@ -54,6 +54,7 @@
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -138,7 +139,7 @@
      =========================================================== --%>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label1"/></td>
-                <td><input type="text" name="name" value="<%= name %>" size="50" /></td>
+                <td><input type="text" name="name" value="<%= Utils.addEntities(name) %>" size="50" /></td>
             </tr>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label2"/></td>

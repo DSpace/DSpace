@@ -54,6 +54,7 @@
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Item" %>
+<%@ page import="org.dspace.core.Utils" %>
 <%@ page import="org.dspace.eperson.Group" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
@@ -158,7 +159,7 @@
      =========================================================== --%>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label1"/></td>
-                <td><input type="text" name="name" value="<%= name %>" size="50" /></td>
+                <td><input type="text" name="name" value="<%= Utils.addEntities(name) %>" size="50" /></td>
             </tr>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label2"/></td>
