@@ -32,6 +32,7 @@
  - Fix for SF Bug #2493794 Hardcoded Strings in DSQuery
  - Fix for SF Bug #1745573 Itemmap-browse.jsp throws Exception on items without date
  - Fix for SF Bug #1571645 NullPointerException possible in review.jsp
+ - Fix for SF Bug #2413800 Improper display of Umlauts / Encoding of messages_de.xml
  
 (Elliot Metsger)
  - Patch for SF bug #2016130 checksum checker can not retrieve very large bitstream
