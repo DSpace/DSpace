@@ -1,5 +1,6 @@
 (Mark Wood)
  - [2002866] Return 404, not 200, when page Not Found
+
 (Stuart Lewis)
  - [2057231] Refactor LDAPServlet to use Stackable Authentication
  - Enable ldap.login.specialgroup special group for all LDAP users
@@ -17,6 +18,9 @@
 
 (Stuart Lewis / Chris Yates / Flavio Botelho / Alex Barbieri / Reuben Pasquini)
  - [2057378] Hierarchical LDAP support
+
+(Paul Needham / Jon Bell / Stuart Lewis)
+ - Inclusion of uketd_dc OAI-PMH crosswalk
 
 (Yin Latt)
  - SF bug [1931796] DSpace 1.5 Controlled Vocab (edit-metadata.jsp) not working on first box in twobox
