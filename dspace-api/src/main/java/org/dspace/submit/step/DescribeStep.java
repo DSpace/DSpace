@@ -769,7 +769,7 @@ public class DescribeStep extends AbstractProcessingStep
     {
         List vals = new LinkedList();
 
-        int i = 0;
+        int i = 1;    //start index at the first of the previously entered values
         boolean foundLast = false;
 
         log.debug("getRepeatedParameter: metadataField=" + metadataField
@@ -779,10 +779,19 @@ public class DescribeStep extends AbstractProcessingStep
         while (!foundLast)
         {
             String s = null;
-            if (i == 0)
+
+            //First, add the previously entered values.
+            // This ensures we preserve the order that these values were entered
+            s = request.getParameter(param + "_" + i);
+
+            // If there are no more previously entered values,
+            // see if there's a new value entered in textbox
+            if (s==null)
+            {
                 s = request.getParameter(param);
-            else
-                s = request.getParameter(param + "_" + i);
+                //this will be the last value added
+                foundLast = true;
+            }
 
             // We're only going to add non-null values
             if (s != null)
@@ -808,13 +817,7 @@ public class DescribeStep extends AbstractProcessingStep
                 }
 
                 if (addValue)
-                    vals.add(s.trim());
-            }
-            else
-            {
-                // If the value was null (as opposed to present,
-                // but empty) we've reached the last name
-                foundLast = true;
+                  vals.add(s.trim());
             }
 
             i++;
