@@ -364,14 +364,20 @@ public class DescribeStep extends AbstractSubmissionStep
                     {
                         String qualifier = value.qualifier;
                         String displayQual = input.getDisplayString(pairsName,qualifier);
-                        displayValue = displayQual + ":" + value.value;
+                        if (displayQual != null)
+                        {
+                            displayValue = displayQual + ":" + value.value;
+                        }
                     }
                     else 
                     {
                         displayValue = value.value;
                     }
-                    describeSection.addLabel(input.getLabel());
-                    describeSection.addItem(displayValue);
+                    if (displayValue != null)
+                    {
+                        describeSection.addLabel(input.getLabel());
+                        describeSection.addItem(displayValue);
+                    }
                 } // For each DCValue
             } // If values exist
         }// For each input
