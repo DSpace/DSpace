@@ -270,16 +270,22 @@ public class DescribeStep extends AbstractProcessingStep
 
         // Step 3:
         // Check to see if any fields are missing
-        clearErrorFields(request);
-        for (int i = 0; i < inputs.length; i++)
+        // Only check for required fields if user clicked the "next" button
+        // (or clicked progress bar)
+        //  @TODO: It'd be better if we allowed them to click *backwards* in Progress bar, but not *forwards*
+        if (buttonPressed.equals(NEXT_BUTTON) || buttonPressed.startsWith(PROGRESS_BAR_PREFIX))
         {
-            DCValue[] values = item.getMetadata(inputs[i].getSchema(),
-                    inputs[i].getElement(), inputs[i].getQualifier(), Item.ANY);
-
-            if (inputs[i].isRequired() && values.length == 0)
+            clearErrorFields(request);
+            for (int i = 0; i < inputs.length; i++)
             {
-                // since this field is missing add to list of error fields
-                addErrorField(request, getFieldName(inputs[i]));
+                DCValue[] values = item.getMetadata(inputs[i].getSchema(),
+                        inputs[i].getElement(), inputs[i].getQualifier(), Item.ANY);
+
+                if (inputs[i].isRequired() && values.length == 0)
+                {
+                    // since this field is missing add to list of error fields
+                    addErrorField(request, getFieldName(inputs[i]));
+                }
             }
         }
 
