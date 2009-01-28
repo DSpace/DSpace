@@ -1476,7 +1476,8 @@
         <div class="ds-form-content">
             <xsl:apply-templates select="dri:field" mode="compositeComponent"/>
             <xsl:if test="contains(dri:params/@operations,'add')">
-                <input type="submit" value="Add" name="{concat(@n,'_add')}" class="ds-button-field" />
+                <!-- Add buttons should be named "submit_[field]_add" so that we can ignore errors from required fields when simply adding new values-->
+                <input type="submit" value="Add" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button" />
             </xsl:if>
             <div class="spacer">&#160;</div>
             <xsl:apply-templates select="dri:field/dri:error" mode="compositeComponent"/>
@@ -1488,7 +1489,8 @@
                         <xsl:with-param name="position">1</xsl:with-param>
                     </xsl:call-template>
                     <xsl:if test="contains(dri:params/@operations,'delete') and (dri:instance or dri:field/dri:instance)">
-                        <input type="submit" value="Remove selected" name="{concat(@n,'_delete')}" class="ds-button-field" />
+                        <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
+                        <input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" />
                     </xsl:if>
                     <xsl:for-each select="dri:field">
                         <xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>
@@ -1519,7 +1521,8 @@
         <!-- Follow it up with an ADD button if the add operation is specified. This allows 
             entering more than one value for this field. -->
         <xsl:if test="contains(dri:params/@operations,'add')">
-            <input type="submit" value="Add" name="{concat(@n,'_add')}" class="ds-button-field" />
+            <!-- Add buttons should be named "submit_[field]_add" so that we can ignore errors from required fields when simply adding new values-->
+            <input type="submit" value="Add" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button" />
         </xsl:if>
         <br/>
         <xsl:apply-templates select="dri:help" mode="help"/>
@@ -1534,7 +1537,8 @@
                 <!-- Conclude with a DELETE button if the delete operation is specified. This allows 
                     removing one or more values stored for this field. -->
                 <xsl:if test="contains(dri:params/@operations,'delete') and dri:instance">
-                    <input type="submit" value="Remove selected" name="{concat(@n,'_delete')}" class="ds-button-field" />
+                    <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
+                    <input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" />
                 </xsl:if>
                 <!-- Behind the scenes, add hidden fields for every instance set. This is to make sure that
                     the form still submits the information in those instances, even though they are no 
@@ -1605,7 +1609,8 @@
         <!-- Follow it up with an ADD button if the add operation is specified. This allows 
             entering more than one value for this field. -->
         <xsl:if test="contains(dri:params/@operations,'add')">
-            <input type="submit" value="Add" name="{concat(@n,'_add')}" class="ds-button-field" />
+            <!-- Add buttons should be named "submit_[field]_add" so that we can ignore errors from required fields when simply adding new values-->
+            <input type="submit" value="Add" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button" />
         </xsl:if>
         <br/>
         <xsl:if test="dri:instance or dri:field/dri:instance">
@@ -1616,7 +1621,8 @@
                 <!-- Conclude with a DELETE button if the delete operation is specified. This allows 
                     removing one or more values stored for this field. -->
                 <xsl:if test="contains(dri:params/@operations,'delete') and (dri:instance or dri:field/dri:instance)">
-                    <input type="submit" value="Remove selected" name="{concat(@n,'_delete')}" class="ds-button-field" />
+                    <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
+                    <input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" />
                 </xsl:if>
                 <xsl:for-each select="dri:field">
                     <xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>
