@@ -697,6 +697,12 @@ Export"/>Import and Export</title>
       <title><anchor id="docbook-functional.html-checker" xreflabel="Checksum Checker"/>Checksum Checker</title>
       <para>The purpose of the checker is to verify that the content in a DSpace repository has not become corrupted or been tampered with. The functionality can be invoked on an ad-hoc basis from the command line, or configured via cron or similar. Options exist to support large repositories that cannot be entirely checked in one run of the tool. The tool is extensible to new reporting and checking priority approaches.</para>
     </section>
-  </chapter>
+    <section remap="h2">
+    	<title>
+    		<anchor id="docbook-functional.html-usage"
+    			xreflabel="Usage Instrumentation"></anchor>Usage Instrumentation</title>
+    	<para>DSpace can report usage events, such as bitstream downloads, to a pluggable event processor.  This can be used for developing customized usage statistics, for example.  Sample event processor plugins writes event records to a file as tab-separated values or XML.</para>
+    </section>
+</chapter>
 
 

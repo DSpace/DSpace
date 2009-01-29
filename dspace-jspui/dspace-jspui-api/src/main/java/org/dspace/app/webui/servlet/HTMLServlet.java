@@ -49,7 +49,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.statistics.AbstractUsageEvent;
 import org.dspace.app.webui.util.JSPManager;
+import org.dspace.app.webui.util.UsageEvent;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -237,6 +239,8 @@ public class HTMLServlet extends DSpaceServlet
         {
             log.info(LogManager.getHeader(context, "view_html", "handle="
                     + handle + ",bitstream_id=" + bitstream.getID()));
+            new UsageEvent().fire(request, context, AbstractUsageEvent.VIEW,
+					Constants.BITSTREAM, bitstream.getID());
 
             // Set the response MIME type
             response.setContentType(bitstream.getFormat().getMIMEType());

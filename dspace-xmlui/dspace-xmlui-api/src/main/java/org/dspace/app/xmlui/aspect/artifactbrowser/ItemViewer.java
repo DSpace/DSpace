@@ -54,6 +54,7 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.UsageEvent;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -66,6 +67,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
 import org.xml.sax.SAXException;
 
@@ -187,6 +189,9 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             return;
         Item item = (Item) dso;
 
+        new UsageEvent().fire((Request) ObjectModelHelper.getRequest(objectModel),
+                context, UsageEvent.VIEW, Constants.ITEM, item.getID());
+        
         // Build the item viewer division.
         Division division = body.addDivision("item-view","primary");
         String title = getItemTitle(item);

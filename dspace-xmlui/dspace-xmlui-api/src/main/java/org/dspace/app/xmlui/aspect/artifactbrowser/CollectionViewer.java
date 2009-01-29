@@ -44,6 +44,8 @@ import java.io.Serializable;
 import java.sql.SQLException;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
@@ -52,6 +54,7 @@ import org.dspace.app.xmlui.cocoon.DSpaceFeedGenerator;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.UsageEvent;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -71,6 +74,7 @@ import org.dspace.sort.SortException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
 import org.xml.sax.SAXException;
 
@@ -249,6 +253,9 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 
         // Set up the major variables
         Collection collection = (Collection) dso;
+        
+        new UsageEvent().fire((Request) ObjectModelHelper.getRequest(objectModel),
+                context, UsageEvent.VIEW, Constants.COLLECTION, collection.getID());
 
         // Build the collection viewer division.
         Division home = body.addDivision("collection-home", "primary repository collection");

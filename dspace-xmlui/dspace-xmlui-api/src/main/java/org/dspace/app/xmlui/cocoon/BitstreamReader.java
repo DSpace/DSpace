@@ -62,6 +62,7 @@ import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.environment.http.HttpResponse;
 import org.apache.cocoon.reading.AbstractReader;
 import org.apache.cocoon.util.ByteRange;
+import org.dspace.app.xmlui.utils.UsageEvent;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -316,6 +317,10 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             }
             // Log that the bitstream has been viewed.
             log.info(LogManager.getHeader(context, "view_bitstream", "bitstream_id=" + bitstream.getID()));
+            
+            // Fire a view event for this bitstream
+            new UsageEvent().fire((Request) ObjectModelHelper.getRequest(objectModel), 
+                    context, UsageEvent.VIEW, Constants.BITSTREAM, bitstream.getID());
         }
         catch (SQLException sqle)
         {

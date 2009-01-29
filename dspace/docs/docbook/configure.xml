@@ -2494,7 +2494,40 @@ ant index
 [dspace]/bin/dsrun org.dspace.browse.IndexBrowse -i
 </screen>
       </section>
+      <section remap="h3">
+      	<title>
+      		<anchor id="docbook-configure.html-usage-instrumentation" xreflabel="Configuring Usage Instrumentation Plugins"></anchor>Configuring Usage Instrumentation Plugins</title>
+			<para>A usage instrumentation plugin is configured as a
+				<link linkend="docbook-business.html-plugin">singleton plugin</link>
+				for the abstract class <code>org.dspace.app.statistics.AbstractUsageEvent</code>.
+			</para>
+			<section remap="h4">
+				<title>
+					<anchor id="docbook-configure.html-usage-insturmentation-passive" xreflabel="The Passive Plugin"></anchor>
+					The Passive Plugin
+				</title>
+				<para>
+					The Passive plugin is provided as the class <code>org.dspace.app.statistics.PassiveUsageEvent</code>.  It absorbs events without effect.  Use the Passive plugin when you have no use for usage event postings.  This is the default if no plugin is configured.
+				</para>
+			</section>
+			<section remap="h4">
+				<title>
+					<anchor id="docbook-configure.html-usage-instrumentation-tsv" xreflabel="The TSV File Logger Plugin"></anchor>
+					The Tab File Logger Plugin
+				</title>
+				<para>
+					The Tab File Logger plugin is provided as the class <code>org.dspace.app.statistics.UsageEventTabFileLogger</code>.  It writes event records to a file in tab-separated column format.  If left unconfigured, an error will be noted in the DSpace log and no file will be produced.  To specify the file path, provide an absolute path as the value for <code>usageEvent.tabFileLogger.file</code> in <code>dspace.cfg</code>.
+				</para>
+			</section>
+			<section remap="h4">
+				<title>
+					<anchor id="docbook-configure.html-usage-instrumentation-xml" xreflabel="The XML Logger Plugin"></anchor>
+					The XML Logger Plugin
+				</title>
+				<para>
+					The XML Logger plugin is provided as the class <code>org.dspace.app.statistics.UsageEventXMLLogger</code>.  It writes event records to a file in a simple XML-like format.  If left unconfigured, an error will be noted in the DSpace log and no file will be produced.  To specify the file path, provide an absolute path as the value for <code>usageEvent.xmlLogger.file</code> in <code>dspace.cfg</code>.
+				</para>
+			</section>
+      </section>
     </section>
   </chapter>
-
-

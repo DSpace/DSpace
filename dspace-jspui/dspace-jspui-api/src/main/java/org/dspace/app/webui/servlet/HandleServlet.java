@@ -40,9 +40,11 @@
 package org.dspace.app.webui.servlet;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.statistics.AbstractUsageEvent;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
+import org.dspace.app.webui.util.UsageEvent;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
@@ -157,6 +159,10 @@ public class HandleServlet extends DSpaceServlet
         {
             Item item = (Item) dso;
 
+            UsageEvent ue = new UsageEvent();
+            ue.fire(request, context, AbstractUsageEvent.VIEW, Constants.ITEM,
+                    dso.getID());
+
             // Only use last-modified if this is an anonymous access
             // - caching content that may be generated under authorisation
             //   is a security problem
@@ -189,6 +195,10 @@ public class HandleServlet extends DSpaceServlet
         else if (dso.getType() == Constants.COLLECTION)
         {
             Collection c = (Collection) dso;
+
+            UsageEvent ue = new UsageEvent();
+            ue.fire(request, context, AbstractUsageEvent.VIEW,
+                    Constants.COLLECTION, dso.getID());
 
             // Store collection location in request
             request.setAttribute("dspace.collection", c);
@@ -224,6 +234,10 @@ public class HandleServlet extends DSpaceServlet
         else if (dso.getType() == Constants.COMMUNITY)
         {
             Community c = (Community) dso;
+
+            UsageEvent ue = new UsageEvent();
+            ue.fire(request, context, AbstractUsageEvent.VIEW,
+                    Constants.COMMUNITY, dso.getID());
 
             // Store collection location in request
             request.setAttribute("dspace.community", c);

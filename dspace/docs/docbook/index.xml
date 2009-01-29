@@ -134,6 +134,11 @@
                 <ulink url="functional.html#checker">Checksum Checker</ulink>
               </para>
             </listitem>
+            <listitem>
+            	<para>
+            		<ulink url="functional.html#usage">Usage Instrumentation</ulink>
+            	</para>
+            </listitem>
           </itemizedlist>
         </para>
       </listitem>
