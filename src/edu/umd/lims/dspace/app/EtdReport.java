@@ -136,7 +136,7 @@ public class EtdReport {
       ZipFile zip = new ZipFile(new File(strZipFile), ZipFile.OPEN_READ);
 
       // Get the list of entries
-      Map map = readItems(zip);
+      Map map = EtdLoader.readItems(zip);
 
       // Process each entry
       for (Iterator i = map.keySet().iterator(); i.hasNext(); ) {
@@ -160,74 +160,6 @@ public class EtdReport {
     }
 
     System.out.println("Items read: " + lEtds);
-  }
-
-
-  /********************************************************** readItems */
-  /**
-   * Read and compile the entries from the zip file.  Return a map; the
-   * key is the item number, the value is list of file name/ZipEntry pairs 
-   * with the first entry being the metadata and the second entry being the
-   * primary pdf.
-   */
-
-  public static Map readItems(ZipFile zip) {
-
-    Map map = new TreeMap();
-
-    // Loop through the entries
-    for (Enumeration e = zip.entries(); e.hasMoreElements(); ) {
-      ZipEntry ze = (ZipEntry)e.nextElement();
-      String strName = ze.getName();
-
-      log.debug("zip entry: " + strName);
-
-      // skip directories
-      if (ze.isDirectory()) {
-        continue;
-      }
-
-      String s[] = strName.split("/");
-
-      if (s.length >= 2) {
-        String strItem = s[0];
-        String strFileName = s[s.length - 1];
-
-        // Get the list
-        ArrayList lmap = null;
-        if (map.containsKey(strItem)) {
-          lmap = (ArrayList)map.get(strItem);
-        } else {
-          lmap = new ArrayList();
-          lmap.add(0, new Object());
-          lmap.add(1, new Object());
-          lmap.add(2, new Object());
-          lmap.add(3, new Object());
-          map.put(strItem, lmap);
-        }
-
-        // Put the file in the right position
-        if (strFileName.equals("dissertation.xml") ||
-            strFileName.equals("umi-umd-" + strItem + ".xml"))
-          {
-            lmap.set(0, strFileName);
-            lmap.set(1, ze);
-          }
-        else if (strFileName.equals("dissertation.pdf") ||
-                 strFileName.equals("umi-umd-" + strItem + ".pdf"))
-          {
-            lmap.set(2, strFileName);
-            lmap.set(3, ze);
-          }
-        else {
-          lmap.add(strFileName);
-          lmap.add(ze);
-        }
-
-      }
-    }
-
-    return map;
   }
 
 
