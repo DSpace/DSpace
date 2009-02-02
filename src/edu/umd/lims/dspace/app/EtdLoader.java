@@ -146,18 +146,6 @@ import edu.umd.lims.util.ErrorHandling;
      if duplicate title send email notice
      if no mapped collections send email notice
  </pre>
- <pre>
- Revision History:
-
-   2007/02/01: Ben
-     - fix collection mapping
-
-   2007/01/31: Ben
-     - add new Embargoes statistic
-
-   2006/10/31: Ben
-     - initial version
- </pre>
 
  @author  Ben Wallberg
 
