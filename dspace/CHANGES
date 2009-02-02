@@ -56,6 +56,7 @@
  - [2477820] DSpace 1.5 XMLUI - Enable METS <amdSec> using crosswalks
  - Fix for SF bug [2541285] Submission Forms don't preserve order of values
  - Fix for SF bug [2543413] XMLUI Submission forms display validation errors on other fields during add/remove
+ - Fix for SF bug [2557654] Search with "%" causes NullPointerException in XMLUI
 
 (Kim Shepherd)
  - [2385187] Fix for toDate method in DCDate

@@ -199,7 +199,7 @@ public abstract class AbstractDSpaceTransformer extends AbstractWingTransformer
     {
     	if (unencodedString == null)
     		return "";
-    	
+
         try
         {
             return URLEncoder.encode(unencodedString,Constants.DEFAULT_ENCODING);
@@ -225,6 +225,12 @@ public abstract class AbstractDSpaceTransformer extends AbstractWingTransformer
     	
         try
         {
+            // Percent(%) is a special character, and must first be escaped as %25
+            if (encodedString.contains("%"))
+            {
+                encodedString = encodedString.replace("%", "%25");
+            }
+
             return URLDecoder.decode(encodedString, Constants.DEFAULT_ENCODING);
         }
         catch (UnsupportedEncodingException uee)
