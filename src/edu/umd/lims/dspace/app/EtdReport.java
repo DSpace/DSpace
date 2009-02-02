@@ -90,6 +90,9 @@ import org.jaxen.XPathFunctionContext;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+// DSpace
+import org.dspace.core.ConfigurationManager;
+
 // Lims
 import edu.umd.lims.util.ErrorHandling;
 
@@ -125,6 +128,11 @@ public class EtdReport {
 
     ErrorHandling.setDefaultLogging();
 
+    String strDspace     = ConfigurationManager.getProperty("dspace.dir");
+
+    // Log4j configuration
+    PropertyConfigurator.configure(strDspace + "/config/log4j-app.properties");
+
     // Properties
     Properties props     = System.getProperties();
 
@@ -151,8 +159,14 @@ public class EtdReport {
 
         // Get the title
         String title = getXPath("/DISS_submission/DISS_description/DISS_title").selectSingleNode(meta).getText();
-        
+
         System.out.println("  " + strItem + ": " + title);
+
+        // List the files
+        for (Iterator j = item.iterator(); j.hasNext(); ) {
+          System.out.println("    " + j.next());
+          j.next();
+        }
 
         lEtds++;
         
