@@ -173,12 +173,14 @@ public class EtdLoader
   static Collection etdcollection = null;
   static EPerson etdeperson = null;
 
-  static SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+  static SimpleDateFormat format = new SimpleDateFormat("MMddyyyy");
 
   static MarcStreamWriter marcwriter = null;
   static PrintWriter csvwriter = null;
 
   static Map mAllCollections = null;
+
+  static Pattern pZipEntry = Pattern.compile(".*_umd_0117._(\\d+)(.pdf|_DATA.xml)");
 
 
   /***************************************************************** main */
@@ -811,12 +813,18 @@ public class EtdLoader
    * Read and compile the entries from the zip file.  Return a map; the
    * key is the item number, the value is list of file name/ZipEntry pairs 
    * with the first entry being the metadata and the second entry being the
-   * primary pdf.
+   * primary pdf.  Note that each zip file now contains only one ETD item.
    */
 
   public static Map readItems(ZipFile zip) {
 
-    Map map = new TreeMap();
+    String strItem = null;
+
+    ArrayList lmap = new ArrayList();
+    lmap.add(0, new Object());
+    lmap.add(1, new Object());
+    lmap.add(2, new Object());
+    lmap.add(3, new Object());
 
     log.info("Reading " + zip.size() + " zip file entries");
 
@@ -832,45 +840,41 @@ public class EtdLoader
 	continue;
       }
 
+      // split into path components
       String s[] = strName.split("/");
 
-      if (s.length >= 2) {
-	String strItem = s[0];
-	String strFileName = s[s.length - 1];
+      String strFileName = s[s.length - 1];
 
-	// Get the list
-	ArrayList lmap = null;
-	if (map.containsKey(strItem)) {
-	  lmap = (ArrayList)map.get(strItem);
-	} else {
-	  lmap = new ArrayList();
-	  lmap.add(0, new Object());
-	  lmap.add(1, new Object());
-	  lmap.add(2, new Object());
-	  lmap.add(3, new Object());
-	  map.put(strItem, lmap);
+      Matcher m = pZipEntry.matcher(s[0]);
+      if (m.matches()) {
+
+        // Get the item number
+        if (strItem == null) {
+          strItem = m.group(1);
+
+          log.debug("item number is " + strItem);
 	}
 
 	// Put the file in the right position
-	if (strFileName.equals("dissertation.xml") ||
-	    strFileName.equals("umi-umd-" + strItem + ".xml"))
-	{
+	if (strFileName.endsWith("_DATA.xml")) {
 	  lmap.set(0, strFileName);
 	  lmap.set(1, ze);
-	}
-	else if (strFileName.equals("dissertation.pdf") ||
-		 strFileName.equals("umi-umd-" + strItem + ".pdf"))
-	{
+	} 
+
+        else if (strFileName.endsWith(".pdf")) {
 	  lmap.set(2, strFileName);
 	  lmap.set(3, ze);
 	}
-	else {
-	  lmap.add(strFileName);
-	  lmap.add(ze);
-	}
+      }
 
+      else {
+        lmap.add(strFileName);
+        lmap.add(ze);
       }
     }
+
+    Map map = new TreeMap();
+    map.put(strItem, lmap);
 
     return map;
   }
