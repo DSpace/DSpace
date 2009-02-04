@@ -258,6 +258,13 @@
                 	</xsl:otherwise>
                 </xsl:choose>
             </title>
+
+            <!-- Head metadata in item pages -->
+            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']">
+                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']"
+                              disable-output-escaping="yes"/>
+            </xsl:if>
+            
         </head>
     </xsl:template>
     
