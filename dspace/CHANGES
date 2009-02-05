@@ -45,7 +45,8 @@
  - SF Patch #2526153 Hardcoded String in jspui browse
  - Fix for SF Bug #2512868 Double quote problem in some fields of JSPUI
  - Fix for SF Bug #2411653 Export Item email hardcoded strings in sources
- - SF Patch #2537799 updated Thai translation (gone into google code) 
+ - SF Patch #2537799 jspui 1.updated Thai translation 1.4.2 (gone into google code)
+ - SF Patch #2540683 jspui Thai translation for 1.5.1 (gone into google code) 
  
 (Elliot Metsger)
  - Patch for SF bug #2016130 checksum checker can not retrieve very large bitstream
