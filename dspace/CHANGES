@@ -44,7 +44,8 @@
  - Fix for SF Bug #2413800 Improper display of Umlauts / Encoding of messages_de.xml
  - SF Patch #2526153 Hardcoded String in jspui browse
  - Fix for SF Bug #2512868 Double quote problem in some fields of JSPUI
- - Fix for SF Bug #2411653 Export Item email hardcoded strings in sources 
+ - Fix for SF Bug #2411653 Export Item email hardcoded strings in sources
+ - SF Patch #2537799 updated Thai translation (gone into google code) 
  
 (Elliot Metsger)
  - Patch for SF bug #2016130 checksum checker can not retrieve very large bitstream
