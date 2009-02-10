@@ -18,7 +18,7 @@
  - Fix for SF bug [2086481] xmlui Administrative log in as another eperson
  - Fix for SF bug [2155479] Submission verify page handles dc.identifier.* incorrectly
 
-(Stuart Lewis / Chris Yates / Flavio Botelho / Alex Barbieri / Reuben Pasquini)
+(Stuart Lewis / Chris Yates / Flavio Botelho / Alex Barbieri / Reuben Pasquini / Paulo Matos)
  - [2057378] Hierarchical LDAP support
 
 (Paul Needham / Jon Bell / Stuart Lewis)

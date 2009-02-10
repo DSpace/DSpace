@@ -397,10 +397,19 @@ public class LDAPHierarchicalAuthentication
 			env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 			env.put(javax.naming.Context.PROVIDER_URL, ldap_provider_url);
 
-			// Authenticate
-			env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "simple");
-			env.put(javax.naming.Context.SECURITY_PRINCIPAL, adminUser);
-			env.put(javax.naming.Context.SECURITY_CREDENTIALS, adminPassword);
+            if ((adminUser != null) && (!adminUser.trim().equals("")) &&
+                (adminPassword != null) && (!adminPassword.trim().equals("")))
+            {
+                // Use admin credencials for search// Authenticate
+                env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "simple");
+                env.put(javax.naming.Context.SECURITY_PRINCIPAL, adminUser);
+                env.put(javax.naming.Context.SECURITY_CREDENTIALS, adminPassword);
+            }
+            else
+            {
+                // Use anonymous authentication
+                env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "none");
+            }
 
 			DirContext ctx = null;
 			try
