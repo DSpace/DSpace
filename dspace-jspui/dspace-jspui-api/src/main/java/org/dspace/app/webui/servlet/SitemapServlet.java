@@ -111,8 +111,7 @@ public class SitemapServlet extends DSpaceServlet
             HttpServletResponse response, String file, String mimeType,
             boolean compressed) throws ServletException, IOException
     {
-        File f = new File(ConfigurationManager.getProperty("dspace.dir")
-                + File.separator + "sitemaps", file);
+        File f = new File(ConfigurationManager.getProperty("sitemap.dir"), file);
 
         if (!f.exists())
         {

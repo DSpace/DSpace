@@ -17,6 +17,7 @@
  - [2513300] Fix for bug [1774958] Nested folders do not export correctly
  - Fix for SF bug [2086481] xmlui Administrative log in as another eperson
  - Fix for SF bug [2155479] Submission verify page handles dc.identifier.* incorrectly
+ - SF patch [2560974] for SF feature request [2560839] Make sitemap directory configurable
 
 (Stuart Lewis / Chris Yates / Flavio Botelho / Alex Barbieri / Reuben Pasquini / Paulo Matos)
  - [2057378] Hierarchical LDAP support

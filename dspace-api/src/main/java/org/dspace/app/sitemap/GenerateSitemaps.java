@@ -186,8 +186,7 @@ public class GenerateSitemaps
         String handleURLStem = ConfigurationManager.getProperty("dspace.url")
                 + "/handle/";
 
-        File outputDir = new File(ConfigurationManager
-                .getProperty("dspace.dir"), "sitemaps");
+        File outputDir = new File(ConfigurationManager.getProperty("sitemap.dir"));
         if (!outputDir.exists()) {
         	outputDir.mkdir();
         }

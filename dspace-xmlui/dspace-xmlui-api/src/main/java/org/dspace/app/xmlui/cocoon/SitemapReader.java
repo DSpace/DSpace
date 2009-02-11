@@ -158,8 +158,7 @@ public class SitemapReader extends AbstractReader implements Recyclable
     private void sendFile(String file, 
             boolean compressed) throws IOException, ResourceNotFoundException
     {
-        File f = new File(ConfigurationManager.getProperty("dspace.dir")
-                + File.separator + "sitemaps", file);
+        File f = new File(ConfigurationManager.getProperty("sitemap.dir"), file);
 
         HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 
