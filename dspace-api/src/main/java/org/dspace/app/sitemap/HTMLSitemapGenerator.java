@@ -136,7 +136,7 @@ public class HTMLSitemapGenerator extends AbstractGenerator
 
         for (int i = 0; i < sitemapCount; i++)
         {
-            output.print("<A HREF=\"" + indexURLStem + i + indexURLTail
+            output.print("<LI><A HREF=\"" + indexURLStem + i + indexURLTail
                     + "\">sitemap " + i);
             output.print("</A></LI>");
         }
