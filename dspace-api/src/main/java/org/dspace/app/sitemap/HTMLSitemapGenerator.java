@@ -90,7 +90,7 @@ public class HTMLSitemapGenerator extends AbstractGenerator
     public String getLeadingBoilerPlate()
     {
         return "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n"
-                + "<HTML><HEAD><TITLE>URL List</TITLE></HEAD><BODY><UL>";
+                + "<html><head><title>URL List</title></head><body><ul>";
     }
 
     public int getMaxSize()
@@ -106,15 +106,15 @@ public class HTMLSitemapGenerator extends AbstractGenerator
 
     public String getTrailingBoilerPlate()
     {
-        return "</UL></BODY></HTML>\n";
+        return "</ul></body></html>\n";
     }
 
     public String getURLText(String url, Date lastMod)
     {
         StringBuffer urlText = new StringBuffer();
 
-        urlText.append("<LI><A HREF=\"").append(url).append("\">").append(url)
-                .append("</A></LI>");
+        urlText.append("<li><a href=\"").append(url).append("\">").append(url)
+                .append("</a></li>\n");
 
         return urlText.toString();
     }
@@ -136,9 +136,9 @@ public class HTMLSitemapGenerator extends AbstractGenerator
 
         for (int i = 0; i < sitemapCount; i++)
         {
-            output.print("<LI><A HREF=\"" + indexURLStem + i + indexURLTail
+            output.print("<li><a href=\"" + indexURLStem + i + indexURLTail
                     + "\">sitemap " + i);
-            output.print("</A></LI>");
+            output.print("</a></li>\n");
         }
 
         output.println(getTrailingBoilerPlate());
