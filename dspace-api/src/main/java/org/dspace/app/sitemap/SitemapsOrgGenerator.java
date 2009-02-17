@@ -125,7 +125,7 @@ public class SitemapsOrgGenerator extends AbstractGenerator
             urlText.append("<lastmod>").append(w3dtfFormat.format(lastMod))
                     .append("</lastmod>");
         }
-        urlText.append("</url>");
+        urlText.append("</url>\n");
 
         return urlText.toString();
     }
@@ -153,7 +153,7 @@ public class SitemapsOrgGenerator extends AbstractGenerator
         {
             output.print("<sitemap><loc>" + indexURLStem + i + indexURLTail
                     + "</loc>");
-            output.print("<lastmod>" + now + "</lastmod></sitemap>");
+            output.print("<lastmod>" + now + "</lastmod></sitemap>\n");
         }
 
         output.println("</sitemapindex>");
