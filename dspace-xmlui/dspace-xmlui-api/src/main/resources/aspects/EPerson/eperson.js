@@ -42,6 +42,7 @@ importClass(Packages.javax.mail.internet.AddressException);
 
 importClass(Packages.org.apache.cocoon.components.CocoonComponentManager);
 
+importClass(Packages.org.dspace.core.ConfigurationManager);
 importClass(Packages.org.dspace.core.Context);
 importClass(Packages.org.dspace.content.Collection);
 importClass(Packages.org.dspace.eperson.EPerson);
@@ -369,6 +370,13 @@ function doUpdateProfile()
  */
 function updateInformation(eperson) 
 {
+    if (!(ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true)))
+    {
+        // We're configured to not allow the user to update their metadata so return with no errors.
+        return new Array();
+    }
+
+
 	// Get the parameters from the form
 	var lastName = cocoon.request.getParameter("last_name");
 	var firstName = cocoon.request.getParameter("first_name");
