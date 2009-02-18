@@ -48,6 +48,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -830,7 +831,7 @@ public class ItemExport
             {
                 public void run()
                 {
-                    Context context;
+                    Context context = null;
                     ItemIterator iitems = null;
                     try
                     {
@@ -888,6 +889,13 @@ public class ItemExport
                     {
                         if (iitems != null)
                             iitems.close();
+                        
+                        // Make sure the database connection gets closed in all conditions.
+                    	try {
+							context.complete();
+						} catch (SQLException sqle) {
+							context.abort();
+						}
                     }
                 }
 
