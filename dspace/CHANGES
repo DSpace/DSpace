@@ -49,6 +49,7 @@
  - SF Patch #2540683 jspui Thai translation for 1.5.1 (gone into google code) 
  - SF patch [2560974] for SF feature request [2560839] Make sitemap directory configurable
  - SF patch [2615647] Greek translation for xmlui version 1.5.1 submitted to Google code
+ - SF patch [2612341] Patch for SF Feature Request [2609564] group delete confirm
  
 (Elliot Metsger)
  - Patch for SF bug #2016130 checksum checker can not retrieve very large bitstream
