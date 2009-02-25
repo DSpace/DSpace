@@ -372,6 +372,17 @@ public class DescribeStep extends AbstractProcessingStep
     }
     
     /**
+     * @param filename
+     *        file to get the input reader for
+     * @return the current DCInputsReader 
+     */
+    public static DCInputsReader getInputsReader(String filename) throws ServletException
+    {
+        inputsReader = new DCInputsReader(filename);
+        return inputsReader;
+    }
+    
+    /**
      * @return the default language qualifier for metadata
      */
     

@@ -42,6 +42,7 @@ package org.dspace.app.webui.submit.step;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -57,6 +58,7 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.submit.step.DescribeStep;
 
@@ -228,11 +230,15 @@ public class JSPDescribeStep extends JSPStep
             HttpServletResponse response, SubmissionInfo subInfo)
             throws SQLException, ServletException, IOException
     {
+        Locale sessionLocale = null;
+        sessionLocale = UIUtil.getSessionLocale(request);
+        String formFileName = I18nUtil.getInputFormsFileName(sessionLocale);
+        
         // determine collection
         Collection c = subInfo.getSubmissionItem().getCollection();
 
         // requires configurable form info per collection
-        request.setAttribute("submission.inputs", DescribeStep.getInputsReader().getInputs(c
+        request.setAttribute("submission.inputs", DescribeStep.getInputsReader(formFileName).getInputs(c
                 .getHandle()));
 
         // forward to edit-metadata JSP

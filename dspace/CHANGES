@@ -18,7 +18,7 @@
  - [2513300] Fix for bug [1774958] Nested folders do not export correctly
  - Fix for SF bug [2086481] xmlui Administrative log in as another eperson
  - Fix for SF bug [2155479] Submission verify page handles dc.identifier.* incorrectly
-
+ 
 (Stuart Lewis / Chris Yates / Flavio Botelho / Alex Barbieri / Reuben Pasquini / Paulo Matos)
  - [2057378] Hierarchical LDAP support
 
@@ -52,6 +52,7 @@
  - SF patch [2615647] Greek translation for xmlui version 1.5.1 submitted to Google code
  - SF patch [2612341] Patch for SF Feature Request [2609564] group delete confirm
  - SF patch [2612034] Remove Edit/Delete Button for Special Groups
+ - SF patch [2636514] multilingual input-forms reenabled
  
 (Elliot Metsger)
  - Patch for SF bug #2016130 checksum checker can not retrieve very large bitstream
