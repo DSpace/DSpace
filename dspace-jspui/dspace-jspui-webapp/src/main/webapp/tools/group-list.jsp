@@ -110,15 +110,31 @@
                     <%= groups[i].getName() %>
                 </td>
                 <td class="<%= row %>RowOddCol">
+<%
+	// no edit button for group anonymous
+	if (groups[i].getID() > 0 )
+	{
+%>                  
                     <form method="post" action="">
                         <input type="hidden" name="group_id" value="<%= groups[i].getID() %>"/>
   		        <input type="submit" name="submit_edit" value="<fmt:message key="jsp.tools.general.edit"/>" />
                    </form>
+<%
+	}
+%>                   
                 </td>
                 <td class="<%= row %>RowEvenCol">
+<%
+	// no delete button for group Anonymous 0 and Administrator 1 to avoid accidental deletion
+	if (groups[i].getID() > 1 )
+	{
+%>   
                     <form method="post" action="">
                         <input type="hidden" name="group_id" value="<%= groups[i].getID() %>"/>
 	                <input type="submit" name="submit_group_delete" value="<fmt:message key="jsp.tools.general.delete"/>" />
+<%
+	}
+%>	                
                     </form>
                 </td>
             </tr>
