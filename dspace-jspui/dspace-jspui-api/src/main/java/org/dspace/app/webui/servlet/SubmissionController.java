@@ -139,9 +139,6 @@ public class SubmissionController extends DSpaceServlet
     private static Logger log = Logger
             .getLogger(SubmissionController.class);
 
-    /** Configuration of current step in Item Submission Process */
-    private SubmissionStepConfig currentStepConfig;
-
     
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -245,6 +242,8 @@ public class SubmissionController extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
+    	// Configuration of current step in Item Submission Process
+        SubmissionStepConfig currentStepConfig;
         
         //need to find out what type of form we are dealing with
         String contentType = request.getContentType();
@@ -292,7 +291,10 @@ public class SubmissionController extends DSpaceServlet
         // First, check for a click on "Cancel/Save" button.
         if (UIUtil.getSubmitButton(request, "").equals(AbstractProcessingStep.CANCEL_BUTTON))
         {
-            // forward user to JSP which will confirm 
+        	// Get the current step
+            currentStepConfig = getCurrentStepConfig(request, subInfo);
+            
+        	// forward user to JSP which will confirm 
             // the cancel/save request.
             doCancelOrSave(context, request, response, subInfo,
                     currentStepConfig);
@@ -319,14 +321,14 @@ public class SubmissionController extends DSpaceServlet
             {
                 // user came from the cancel/save page, 
                 // so we need to process that page before proceeding
-                processCancelOrSave(context, request, response, subInfo);
+                processCancelOrSave(context, request, response, subInfo, currentStepConfig);
             }
             //check for click on "<- Previous" button
             else if (UIUtil.getSubmitButton(request, "").startsWith(
                     AbstractProcessingStep.PREVIOUS_BUTTON))
             {
                 // return to the previous step
-                doPreviousStep(context, request, response, subInfo);
+                doPreviousStep(context, request, response, subInfo, currentStepConfig);
             }
             //check for click on Progress Bar
             else if (UIUtil.getSubmitButton(request, "").startsWith(
@@ -363,6 +365,8 @@ public class SubmissionController extends DSpaceServlet
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
+    	SubmissionStepConfig currentStepConfig = null;
+    	
         if (subInfo.getSubmissionConfig() != null)
         {
             // get step to perform
@@ -417,7 +421,7 @@ public class SubmissionController extends DSpaceServlet
                 subInfo = getSubmissionInfo(context, request);
                 
                 //do the next step!
-                doNextStep(context, request, response, subInfo);
+                doNextStep(context, request, response, subInfo, currentStepConfig);
             }
             else
             {
@@ -446,7 +450,7 @@ public class SubmissionController extends DSpaceServlet
      *            SubmissionInfo pertaining to this submission
      */
     private void doNextStep(Context context, HttpServletRequest request,
-            HttpServletResponse response, SubmissionInfo subInfo)
+            HttpServletResponse response, SubmissionInfo subInfo, SubmissionStepConfig currentStepConfig)
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
@@ -511,7 +515,7 @@ public class SubmissionController extends DSpaceServlet
      *            SubmissionInfo pertaining to this submission
      */
     private void doPreviousStep(Context context, HttpServletRequest request,
-            HttpServletResponse response, SubmissionInfo subInfo)
+            HttpServletResponse response, SubmissionInfo subInfo, SubmissionStepConfig currentStepConfig)
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
@@ -742,14 +746,14 @@ public class SubmissionController extends DSpaceServlet
                     {
                         // call post-processing on Step (to save any inputs from JSP)
                         log.debug("Cancel/Save Request: calling processing for Step: '"
-                                + currentStepConfig.getProcessingClassName() + "'");
+                                + stepConfig.getProcessingClassName() + "'");
             
                         try
                         {
                             // load the step class (using the current class loader)
                             ClassLoader loader = this.getClass().getClassLoader();
                             Class stepClass = loader
-                                    .loadClass(currentStepConfig.getProcessingClassName());
+                                    .loadClass(stepConfig.getProcessingClassName());
             
                             // load the JSPStepManager object for this step
                             AbstractProcessingStep step = (AbstractProcessingStep) stepClass
@@ -765,7 +769,7 @@ public class SubmissionController extends DSpaceServlet
                         }
                         catch (Exception e)
                         {
-                            log.error("Error loading step class'" + currentStepConfig.getProcessingClassName() + "':", e);
+                            log.error("Error loading step class'" + stepConfig.getProcessingClassName() + "':", e);
                             JSPManager.showInternalError(request, response);
                         }
                     }//end if not file upload request
@@ -802,7 +806,7 @@ public class SubmissionController extends DSpaceServlet
      */
     private void processCancelOrSave(Context context,
             HttpServletRequest request, HttpServletResponse response,
-            SubmissionInfo subInfo) throws ServletException, IOException,
+            SubmissionInfo subInfo, SubmissionStepConfig currentStepConfig) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_back");
