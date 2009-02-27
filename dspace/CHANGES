@@ -2,6 +2,7 @@
  - [2002866] Return 404, not 200, when page Not Found
  - [2025998] Usage event (statistics) plugin hook
  - [2620307] 'ant init_configs' copies wrong dspace.cfg
+ - [DS-41] Small JSP cleanups
 
 (Stuart Lewis)
  - [2057231] Refactor LDAPServlet to use Stackable Authentication

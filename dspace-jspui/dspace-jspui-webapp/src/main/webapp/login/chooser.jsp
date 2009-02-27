@@ -103,7 +103,7 @@
 		<%-- This kludge is necessary because fmt:message won't
                      evaluate its attributes, so we can't use it on java expr --%>
                 <%= javax.servlet.jsp.jstl.fmt.LocaleSupport.getLocalizedMessage(pageContext, am.loginPageTitle(context)) %>
-                        </a></strong></li></p>
+                        </a></strong></p></li>
 <%
         }
         }
