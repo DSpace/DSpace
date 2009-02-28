@@ -1,5 +1,6 @@
 (Andrea Bollini)
 - S.F. Patch 2645776 for Bug 2645754 SubmissionController is not thread safe
+- [DS-1] Controlled vocab:he URL http://localhost:8080/jspui/subject-search gives internal error and a stack trace in dspace.log
 
 (Peter Coetzee)
 - S.F Patch 2031532 DAO Singletons

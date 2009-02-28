@@ -56,7 +56,7 @@
 %>
 
 
-<dspace:layout locbar="nolink" title="<%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.controlledvocabulary.search.title") %>">
+<dspace:layout locbar="nolink" title="<%= LocaleSupport.getLocalizedMessage(pageContext, \"jsp.controlledvocabulary.search.title\") %>">
 
 <h1><fmt:message key="jsp.controlledvocabulary.search.heading"/></h1>
 
