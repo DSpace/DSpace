@@ -203,11 +203,10 @@ public class FlowItemUtils
 				}
 			}
 		}
-			
 		
 		// STEP 3:
 		// Iterate over all the indexes within the scope and add them back in.
-		for (Integer index : indexes)
+		for (Integer index=1; index <= indexes.size(); ++index)
 		{
 			String name = request.getParameter("name_"+index);
 			String value = request.getParameter("value_"+index);

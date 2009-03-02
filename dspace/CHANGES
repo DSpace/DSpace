@@ -71,8 +71,11 @@
  - [2385187] Fix for toDate method in DCDate
  
 (Andrea Bollini)
-- S.F. Patch 2645776 for Bug 2645754 SubmissionController is not thread safe
-- [DS-1] Controlled vocab:he URL http://localhost:8080/jspui/subject-search gives internal error and a stack trace in dspace.log
+ - S.F. Patch 2645776 for Bug 2645754 SubmissionController is not thread safe
+ - [DS-1] Controlled vocab:he URL http://localhost:8080/jspui/subject-search gives internal error and a stack trace in dspace.log
+
+(Paulo Jobim)
+ - SF Patch [2655052] Authors re-ordered when item edited (xmlui)
 
 1.5.1 final
 ===========
