@@ -153,7 +153,7 @@
 
    <repositories>
       <repository>
-         <id>maven.dspace.org/snapshot</id>
+         <id>maven.dspace.org-snapshot</id>
          <name>DSpace Maven Snapshot Repository</name>
          <url>http://maven.dspace.org/snapshot</url>
          <releases>
@@ -732,7 +732,7 @@
          <url>scp://maven.dspace.org/var/maven/release</url>
       </repository>
       <snapshotRepository>
-         <id>maven.dspace.org/snapshot</id>
+         <id>maven.dspace.org-snapshot</id>
          <name>DSpace Maven Repository</name>
          <url>scp://maven.dspace.org/var/maven/snapshot</url>
       </snapshotRepository>
