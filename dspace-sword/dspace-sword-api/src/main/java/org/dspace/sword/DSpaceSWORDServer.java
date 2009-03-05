@@ -42,16 +42,17 @@ import org.apache.log4j.Logger;
 
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.eperson.EPerson;
-import org.dspace.authorize.AuthorizeException;
 
 import org.purl.sword.server.SWORDServer;
+import org.purl.sword.base.AtomDocumentRequest;
+import org.purl.sword.base.AtomDocumentResponse;
+import org.purl.sword.base.Deposit;
 import org.purl.sword.base.DepositResponse;
 import org.purl.sword.base.SWORDAuthenticationException;
+import org.purl.sword.base.SWORDErrorException;
 import org.purl.sword.base.SWORDException;
 import org.purl.sword.base.ServiceDocument;
 import org.purl.sword.base.ServiceDocumentRequest;
-import org.purl.sword.base.Deposit;
 
 import java.sql.SQLException;
 
@@ -75,29 +76,32 @@ public class DSpaceSWORDServer implements SWORDServer
 	 * @see org.purl.sword.SWORDServer#doServiceDocument(org.purl.sword.base.ServiceDocumentRequest)
 	 */
 	public ServiceDocument doServiceDocument(ServiceDocumentRequest request)
-		throws SWORDAuthenticationException, SWORDException
+		throws SWORDAuthenticationException, SWORDException, SWORDErrorException
 	{
-        Context context = constructContext(request.getIPAddress());
+		// gah.  bloody variable scoping.
+		// set up a dummy sword context for the "finally" block
+		SWORDContext sc = new SWORDContext();
 
-		if (log.isDebugEnabled())
-		{
-			log.debug(LogManager.getHeader(context, "sword_do_service_document", ""));
-		}
-		
 		try
 		{
 			// first authenticate the request
-			// note: this will build our context for us
-			SWORDContext sc = this.authenticate(context, request);
-			
+			// note: this will build our various DSpace contexts for us
+			SWORDAuthenticator auth = new SWORDAuthenticator();
+			sc = auth.authenticate(request);
+			Context context = sc.getContext();
+
+			if (log.isDebugEnabled())
+			{
+				log.debug(LogManager.getHeader(context, "sword_do_service_document", ""));
+			}
+
 			// log the request
 			log.info(LogManager.getHeader(context, "sword_service_document_request", "username=" + request.getUsername() + ",on_behalf_of=" + request.getOnBehalfOf()));
 			
 			// prep the service request, then get the service document out of it
-			SWORDService service = new SWORDService();
-			service.setContext(context);
-			service.setSWORDContext(sc);
-			ServiceDocument doc = service.getServiceDocument();
+			SWORDService service = new SWORDService(sc);
+			ServiceDocumentManager manager = new ServiceDocumentManager(service);
+			ServiceDocument doc = manager.getServiceDocument(request.getLocation());
 			
 			return doc;
 		}
@@ -109,10 +113,7 @@ public class DSpaceSWORDServer implements SWORDServer
 		finally
 		{
 			// this is a read operation only, so there's never any need to commit the context
-			if (context != null)
-			{
-				context.abort();
-			}
+			sc.abort();
 		}
 	}
 	
@@ -120,209 +121,94 @@ public class DSpaceSWORDServer implements SWORDServer
 	 * @see org.purl.sword.SWORDServer#doSWORDDeposit(org.purl.sword.server.Deposit)
 	 */
 	public DepositResponse doDeposit(Deposit deposit)
-		throws SWORDAuthenticationException, SWORDException
+		throws SWORDAuthenticationException, SWORDException, SWORDErrorException
 	{
-        Context context = constructContext(deposit.getIPAddress());
+		// gah.  bloody variable scoping.
+		// set up a dummy sword context for the "finally" block
+		SWORDContext sc = new SWORDContext();
 
 		try
 		{
+			// first authenticate the request
+			// note: this will build our various DSpace contexts for us
+			SWORDAuthenticator auth = new SWORDAuthenticator();
+			sc = auth.authenticate(deposit);
+			Context context = sc.getContext();
+
             if (log.isDebugEnabled())
 			{
 				log.debug(LogManager.getHeader(context, "sword_do_deposit", ""));
 			}
 			
-			// first authenticate the request
-			// note: this will build our context for us
-			SWORDContext sc = this.authenticate(context, deposit);
-			
 			// log the request
 			log.info(LogManager.getHeader(context, "sword_deposit_request", "username=" + deposit.getUsername() + ",on_behalf_of=" + deposit.getOnBehalfOf()));
 			
 			// prep and execute the deposit
-			DepositManager dm = new DepositManager();
-			dm.setContext(context);
-			dm.setDeposit(deposit);
-			dm.setSWORDContext(sc);
-			DepositResponse response = dm.deposit();
+			SWORDService service = new SWORDService(sc);
+			service.setVerbose(deposit.isVerbose());
+			DepositManager dm = new DepositManager(service);
+			DepositResponse response = dm.deposit(deposit);
 			
 			// if something hasn't killed it already (allowed), then complete the transaction
-			if (context != null && context.isValid())
-			{
-				context.commit();
-			}
+			sc.commit();
 			
 			return response;
 		}
 		catch (DSpaceSWORDException e)
 		{
 			log.error("caught exception:", e);
-			throw new SWORDAuthenticationException("There was a problem depositing the item", e);
-		}
-		catch (SQLException e)
-		{
-			log.error("caught exception: ", e);
-			throw new SWORDException("There was a problem completing the transaction", e);
+			throw new SWORDException("There was a problem depositing the item", e);
 		}
 		finally
 		{
 			// if, for some reason, we wind up here with a not null context
 			// then abort it (the above should commit it if everything works fine)
-			if (context != null && context.isValid())
-			{
-				context.abort();
-			}
+			sc.abort();
 		}
 	}
-	
-	/**
-	 * Construct the context object member variable of this class
-	 * using the passed IP address as part of the loggable
-	 * information
-	 * 
-	 * @param ip	the ip address of the incoming request
-	 * @throws SWORDException
-	 */
-	private Context constructContext(String ip)
-		throws SWORDException
-	{
-		try
-		{
-            Context context = new Context();
-            // Set the session ID and IP address
-            context.setExtraLogInfo("session_id=0:ip_addr=" + ip);
 
-            return context;
-        }
-		catch (SQLException e)
-		{
-			log.error("caught exception: ", e);
-			throw new SWORDException("There was a problem with the database", e);
-		}
-	}
-	
-	/**
-	 * Authenticate the incoming service document request.  Calls:
-	 * 
-	 * authenticatate(username, password, onBehalfOf)
-	 * 
-	 * @param request
-	 * @return	a SWORDContext object containing the relevant users
-	 * @throws SWORDAuthenticationException
-	 * @throws SWORDException
+	/* (non-Javadoc)
+	 * @see org.purl.sword.SWORDServer#doSWORDDeposit(org.purl.sword.server.Deposit)
 	 */
-	private SWORDContext authenticate(Context context, ServiceDocumentRequest request)
-		throws SWORDAuthenticationException, SWORDException
+	public AtomDocumentResponse doAtomDocument(AtomDocumentRequest adr)
+		throws SWORDAuthenticationException, SWORDException, SWORDErrorException
 	{
-		return this.authenticate(context, request.getUsername(), request.getPassword(), request.getOnBehalfOf());
-	}
-	
-	/**
-	 * Authenticate the incoming deposit request.  Calls:
-	 * 
-	 * authenticate(username, password, onBehalfOf)
-	 * 
-	 * @param deposit
-	 * @return	a SWORDContext object containing the relevant users
-	 * @throws SWORDAuthenticationException
-	 * @throws SWORDException
-	 */
-	private SWORDContext authenticate(Context context, Deposit deposit)
-		throws SWORDAuthenticationException, SWORDException
-	{
-		return this.authenticate(context, deposit.getUsername(), deposit.getPassword(), deposit.getOnBehalfOf());
-	}
-	
-	/**
-	 * Authenticate the given username/password pair, in conjunction with
-	 * the onBehalfOf user.  The rules are that the username/password pair
-	 * must successfully authenticate the user, and the onBehalfOf user
-	 * must exist in the user database.
-	 * 
-	 * @param un
-	 * @param pw
-	 * @param obo
-	 * @return	a SWORD context holding the various user information
-	 * @throws SWORDAuthenticationException
-	 * @throws SWORDException
-	 */
-	private SWORDContext authenticate(Context context, String un, String pw, String obo)
-		throws SWORDAuthenticationException, SWORDException
-	{
-		// smooth out the OnBehalfOf request, so that empty strings are
-		// treated as null
-		if ("".equals(obo))
-		{
-			obo = null;
-		}
-		
-		log.info(LogManager.getHeader(context, "sword_authenticate", "username=" + un + ",on_behalf_of=" + obo));
+		// gah.  bloody variable scoping.
+		// set up a dummy sword context for the "finally" block
+		SWORDContext sc = new SWORDContext();
+
 		try
 		{
-			// attempt to authenticate the primary user
-			SWORDContext sc = new SWORDContext();
-			SWORDAuthentication auth = new SWORDAuthentication();
-			EPerson ep = null;
-			boolean authenticated = false;
-			if (auth.authenticates(context, un, pw))
+			// first authenticate the request
+			// note: this will build our various DSpace contexts for us
+			SWORDAuthenticator auth = new SWORDAuthenticator();
+			sc = auth.authenticate(adr);
+			Context context = sc.getContext();
+
+			if (log.isDebugEnabled())
 			{
-				// if authenticated, obtain the eperson object
-				ep = context.getCurrentUser();
-				
-				if (ep != null)
-				{
-					authenticated = true;
-					sc.setAuthenticated(ep);
-				}
-				
-				// if there is an onBehalfOfuser, then find their eperson 
-				// record, and if it exists set it.  If not, then the
-				// authentication process fails
-				if (obo != null)
-				{
-					EPerson epObo= EPerson.findByEmail(context, obo);
-					if (epObo != null)
-					{
-						sc.setOnBehalfOf(epObo);
-					}
-					else
-					{
-						authenticated = false;
-					}
-				}
+				log.debug(LogManager.getHeader(context, "sword_do_atom_document", ""));
 			}
-			
-			// deal with the context or throw an authentication exception
-			if (ep != null && authenticated)
-			{
-				context.setCurrentUser(ep);
-				log.info(LogManager.getHeader(context, "sword_set_authenticated_user", "user_id=" + ep.getID()));
-			}
-			else
-			{
-				// decide what kind of error to throw
-				if (ep != null)
-				{
-					log.info(LogManager.getHeader(context, "sword_unable_to_set_user", "username=" + un));
-					throw new SWORDAuthenticationException("Unable to authenticate the supplied used");
-				}
-				else
-				{
-					log.info(LogManager.getHeader(context, "sword_unable_to_set_on_behalf_of", "username=" + un + ",on_behalf_of=" + obo));
-					throw new SWORDAuthenticationException("Unable to authenticate the onBehalfOf account");
-				}
-			}
-			
-			return sc;
+
+			// log the request
+			log.info(LogManager.getHeader(context, "sword_atom_document_request", "username=" + adr.getUsername()));
+
+			// prep the service request, then get the service document out of it
+			SWORDService service = new SWORDService(sc);
+			MediaEntryManager manager = new MediaEntryManager(service);
+			AtomDocumentResponse doc = manager.getMediaEntry(adr.getLocation());
+
+			return doc;
 		}
-		catch (SQLException e)
+		catch (DSpaceSWORDException e)
 		{
 			log.error("caught exception: ", e);
-			throw new SWORDException("There was a problem accessing the repository user database", e);
+			throw new SWORDException("The DSpace SWORD interface experienced an error", e);
 		}
-		catch (AuthorizeException e)
+		finally
 		{
-			log.error("caught exception: ", e);
-			throw new SWORDAuthenticationException("There was a problem authenticating or authorising the user", e);
+			// this is a read operation only, so there's never any need to commit the context
+			sc.abort();
 		}
 	}
 }

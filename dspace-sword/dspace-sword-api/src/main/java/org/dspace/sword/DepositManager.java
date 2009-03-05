@@ -38,21 +38,21 @@
 
 package org.dspace.sword;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
 
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.DepositResponse;
+import org.purl.sword.base.SWORDAuthenticationException;
 import org.purl.sword.base.SWORDEntry;
+import org.purl.sword.base.SWORDErrorException;
 
 /**
  * This class is responsible for initiating the process of 
@@ -65,40 +65,47 @@ public class DepositManager
 {
 	/** Log4j logger */
 	public static Logger log = Logger.getLogger(DepositManager.class);
-	
-	/** DSpace context object */
-	private Context context;
-	
-	/** SWORD Deposit request object */
-	private Deposit deposit;
-	
-	/** SWORD Context object */
-	private SWORDContext swordContext;
-	
-	/**
-	 * @param context the context to set
-	 */
-	public void setContext(Context context)
-	{
-		this.context = context;
-	}
+
+	/** The SWORD service implementation */
+	private SWORDService swordService;
 
 	/**
-	 * @param deposit the deposit to set
+	 * Construct a new DepositManager using the given instantiation of
+	 * the SWORD service implementation
+	 *
+	 * @param service
 	 */
-	public void setDeposit(Deposit deposit)
+	public DepositManager(SWORDService service)
 	{
-		this.deposit = deposit;
+		this.swordService = service;
+		log.debug("Created instance of DepositManager");
 	}
 
-	/**
-	 * @param sc	the sword context to set
-	 */
-	public void setSWORDContext(SWORDContext sc)
+	public DSpaceObject getDepositTarget(Deposit deposit)
+			throws DSpaceSWORDException, SWORDErrorException
 	{
-		this.swordContext = sc;
+		SWORDUrlManager urlManager = swordService.getUrlManager();
+		Context context = swordService.getContext();
+
+		// get the target collection
+		String loc = deposit.getLocation();
+		DSpaceObject dso = urlManager.getDSpaceObject(context, loc);
+
+		swordService.message("Performing deposit using location: " + loc);
+
+		if (dso instanceof Collection)
+		{
+			swordService.message("Location resolves to collection with handle: " + dso.getHandle() +
+				" and name: " + ((Collection) dso).getMetadata("name"));
+		}
+		else if (dso instanceof Item)
+		{
+			swordService.message("Location resolves to item with handle: " + dso.getHandle());
+		}
+
+		return dso;
 	}
-	
+
 	/**
 	 * Once this object is fully prepared, this method will execute
 	 * the deposit process.  The returned DepositRequest can be
@@ -107,28 +114,24 @@ public class DepositManager
 	 * @return	the response to the deposit request
 	 * @throws DSpaceSWORDException
 	 */
-	public DepositResponse deposit()
-		throws DSpaceSWORDException
+	public DepositResponse deposit(Deposit deposit)
+		throws DSpaceSWORDException, SWORDErrorException, SWORDAuthenticationException
 	{
 		// start the timer, and initialise the verboseness of the request
 		Date start = new Date();
-		StringBuilder verbs = new StringBuilder();
-		if (deposit.isVerbose())
-		{
-			verbs.append(start.toString() + "; \n\n");
-			verbs.append("Initialising verbose deposit; \n\n");
-		}
-		
-		// FIXME: currently we don't verify, because this is done higher
-		// up the stack
-		// first we want to verify that the deposit is safe
-		// check the checksums and all that stuff
-		// This throws an exception if it can't verify the deposit
-		// this.verify();
+		swordService.message("Initialising verbose deposit");
+
+		// get the things out of the service that we need
+		SWORDContext swordContext = swordService.getSwordContext();
+		Context context = swordService.getContext();
+
+		// get the deposit target
+		DSpaceObject dso = this.getDepositTarget(deposit);
 
 		// find out if the supplied SWORDContext can submit to the given
-		// collection
-		if (!this.canSubmit())
+		// dspace object
+		SWORDAuthenticator auth = new SWORDAuthenticator();
+		if (!auth.canSubmit(swordService, deposit, dso))
 		{
 			// throw an exception if the deposit can't be made
 			String oboEmail = "none";
@@ -136,25 +139,38 @@ public class DepositManager
 			{
 				oboEmail = swordContext.getOnBehalfOf().getEmail();
 			}
-			log.info(LogManager.getHeader(context, "deposit_failed_authorisation", "user=" + swordContext.getAuthenticated().getEmail() + ",on_behalf_of=" + oboEmail));
-			throw new DSpaceSWORDException("Cannot submit to the given collection with this context");
+			log.info(LogManager.getHeader(context, "deposit_failed_authorisation", "user=" +
+					swordContext.getAuthenticated().getEmail() + ",on_behalf_of=" + oboEmail));
+			throw new SWORDAuthenticationException("Cannot submit to the given collection with this context");
 		}
-		
+
 		// make a note of the authentication in the verbose string
-		if (deposit.isVerbose())
+		swordService.message("Authenticated user: " + swordContext.getAuthenticated().getEmail());
+		if (swordContext.getOnBehalfOf() != null)
 		{
-			verbs.append("Authenticated user " + swordContext.getAuthenticated().getEmail() + "; \n\n");
-			if (swordContext.getOnBehalfOf() != null)
-			{
-				verbs.append("Depositing on behalf of: " + swordContext.getOnBehalfOf().getEmail() + "; \n\n");
-			}
+			swordService.message("Depositing on behalf of: " + swordContext.getOnBehalfOf().getEmail());
 		}
-		
-		// Obtain the relevant ingester from the factory
-		SWORDIngester si = SWORDIngesterFactory.getInstance(context, deposit);
-		
-		// do the deposit
-		DepositResult result = si.ingest(context, deposit);
+
+		// determine which deposit engine we initialise
+		Depositor dep = null;
+		if (dso instanceof Collection)
+		{
+			swordService.message("Initialising depositor for an Item in a Collection");
+			dep = new CollectionDepositor(swordService, dso);
+		}
+		else if (dso instanceof Item)
+		{
+			swordService.message("Initialising depositor for a Bitstream in an Item");
+			dep = new ItemDepositor(swordService, dso);
+		}
+
+		if (dep == null)
+		{
+			log.error("The specified deposit target does not exist, or is not a collection or an item");
+			throw new DSpaceSWORDException("Deposit target is not a collection or an item");
+		}
+
+		DepositResult result = dep.doDeposit(deposit);
 
 		// now construct the deposit response.  The response will be
 		// CREATED if the deposit is in the archive, or ACCEPTED if
@@ -167,111 +183,45 @@ public class DepositManager
 		{
 			state = Deposit.ACCEPTED;
 		}
-		DepositResponse response = new DepositResponse(state);
-		DSpaceATOMEntry dsatom = new DSpaceATOMEntry();
-		SWORDEntry entry = dsatom.getSWORDEntry(result.getItem(), handle, deposit.isNoOp());
 		
+		DepositResponse response = new DepositResponse(state);
+		response.setLocation(result.getMediaLink());
+
+		DSpaceATOMEntry dsatom = null;
+		if (result.getItem() != null)
+		{
+			swordService.message("Initialising ATOM entry generator for an Item");
+			dsatom = new ItemEntryGenerator(swordService);
+		}
+		else if (result.getBitstream() != null)
+		{
+			swordService.message("Initialising ATOM entry generator for a Bitstream");
+			dsatom = new BitstreamEntryGenerator(swordService);
+		}
+		if (dsatom == null)
+		{
+			log.error("The deposit failed, see exceptions for explanation");
+			throw new DSpaceSWORDException("Result of deposit did not yield an Item or a Bitstream");
+		}
+		SWORDEntry entry = dsatom.getSWORDEntry(result, deposit);
+
 		// if this was a no-op, we need to remove the files we just
 		// deposited, and abort the transaction
-		String nooplog = "";
 		if (deposit.isNoOp())
 		{
-			this.undoDeposit(result);
-			nooplog = "NoOp Requested: Removed all traces of submission; \n\n";
+			dep.undoDeposit(result);
+			swordService.message("NoOp Requested: Removed all traces of submission");
 		}
 		
 		entry.setNoOp(deposit.isNoOp());
-		
-		if (deposit.isVerbose())
-		{
-			Date finish = new Date();
-			long delta = finish.getTime() - start.getTime();
-			String timer = "Total time for deposit processing: " + delta + " ms;";
-			String verboseness = result.getVerboseDescription();
-			if (verboseness != null && !"".equals(verboseness))
-			{
-				entry.setVerboseDescription(verbs.toString() + result.getVerboseDescription() + nooplog + timer);
-			}
-		}
-		
+
+		Date finish = new Date();
+		long delta = finish.getTime() - start.getTime();
+		swordService.message("Total time for deposit processing: " + delta + " ms");
+		entry.setVerboseDescription(swordService.getVerboseDescription().toString());
+
 		response.setEntry(entry);
 		
 		return response;
 	}
-	
-	/**
-	 * Can the users contained in this object's member SWORDContext
-	 * make a successful submission to the selected collection
-	 * 
-	 * @return	true if yes, false if not
-	 * @throws DSpaceSWORDException
-	 */
-	private boolean canSubmit()
-		throws DSpaceSWORDException
-	{
-		String loc = deposit.getLocation();
-		CollectionLocation cl = new CollectionLocation();
-		Collection collection = cl.getCollection(context, loc);
-		boolean submit = swordContext.canSubmitTo(context, collection);
-		return submit;
-	}
-	
-	/**
-	 * @deprecated	verification is currently done further up the stack
-	 * @throws DSpaceSWORDException
-	 */
-	private void verify()
-		throws DSpaceSWORDException
-	{
-		// FIXME: please implement
-		// in reality, all this is done higher up the stack, so we don't
-		// need to worry!
-	}
-	
-	/**
-	 * Remove all traces of the deposit from DSpace.  The database changes
-	 * are easy, as this method will call <code>context.abort()</code>, 
-	 * rolling back the transaction.  In additon, though, files which have
-	 * been placed on the disk are also removed.
-	 * 
-	 * @param result	the result of the deposit which is to be removed
-	 * @throws DSpaceSWORDException
-	 */
-	private void undoDeposit(DepositResult result)
-		throws DSpaceSWORDException
-	{
-		try
-		{
-			// obtain the item's owning collection (there can be only one)
-			// and ask it to remove the item.  Although we're going to abort
-			// the context, so that this nevers gets written to the db,
-			// it will get rid of the files on the disk
-			Item item = result.getItem();
-			Collection collection = item.getOwningCollection();
-			collection.removeItem(item);
-
-			// abort the context, so no database changes are written
-			if (context != null && context.isValid())
-			{
-				context.abort();
-			}
-		}
-		catch (IOException e)
-		{
-			log.error("caught exception: ", e);
-			throw new DSpaceSWORDException(e);
-		}
-		catch (AuthorizeException e)
-		{
-			log.error("authentication problem; caught exception: ", e);
-			throw new DSpaceSWORDException(e);
-		}
-		catch (SQLException e)
-		{
-			log.error("caught exception: ", e);
-			throw new DSpaceSWORDException(e);
-		}
-	}
-	
-	
 }

@@ -47,6 +47,7 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.packager.PackageIngester;
@@ -59,49 +60,49 @@ import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 
 import org.purl.sword.base.Deposit;
+import org.purl.sword.base.SWORDErrorException;
 
 public class SWORDMETSIngester implements SWORDIngester
 {
+	private SWORDService swordService;
+
 	/** Log4j logger */
 	public static Logger log = Logger.getLogger(SWORDMETSIngester.class);
-	
-	/** holder for the messages that may be delivered back to the user */
-	private StringBuilder verboseDesc = new StringBuilder();
-	
-	/** is this a verbose deposit request */
-	private boolean verbose = false;
-	
+
 	/* (non-Javadoc)
 	 * @see org.dspace.sword.SWORDIngester#ingest(org.dspace.core.Context, org.purl.sword.base.Deposit)
 	 */
-	public DepositResult ingest(Context context, Deposit deposit) 
-		throws DSpaceSWORDException
+	public DepositResult ingest(SWORDService service, Deposit deposit, DSpaceObject dso)
+		throws DSpaceSWORDException, SWORDErrorException
 	{
 		try
 		{
-			// set the verbosity of the response
-			this.verbose = deposit.isVerbose();
-			
+			// first, make sure this is the right kind of ingester, and set the collection
+			if (!(dso instanceof Collection))
+			{
+				throw new DSpaceSWORDException("Tried to run an ingester on wrong target type");
+			}
+			Collection collection = (Collection) dso;
+
+			// now set the sword service
+			swordService = service;
+
+			// get the things out of the service that we need
+			Context context = swordService.getContext();
+
 			// the DSpaceMETSIngester requires an input stream
 			InputStream is = deposit.getFile();
-			
-			// get the target collection
-			String loc = deposit.getLocation();
-			CollectionLocation cl = new CollectionLocation();
-			Collection collection = cl.getCollection(context, loc);
-			message("Performing deposit using location: " + loc + "; ");
-			message("Location resolves to collection with handle: " + collection.getHandle() + 
-					" and name: " + collection.getMetadata("name") + "; ");
-			
+
 			// load the plugin manager for the required configuration
 			String cfg = ConfigurationManager.getProperty("sword.mets-ingester.package-ingester");
 			if (cfg == null || "".equals(cfg))
 			{
 				cfg = "METS";  // default to METS
 			}
-			message("Using package manifest format: " + cfg);
+			swordService.message("Using package manifest format: " + cfg);
 			
 			PackageIngester pi = (PackageIngester) PluginManager.getNamedPlugin(PackageIngester.class, cfg);
+			swordService.message("Loaded package ingester: " + pi.getClass().getName());
 			
 			// the licence is either in the zip or the mets manifest.  Either way
 			// it's none of our business here
@@ -114,12 +115,13 @@ public class SWORDMETSIngester implements SWORDIngester
 			WorkspaceItem wsi = pi.ingest(context, collection, is, params, licence);
 			if (wsi == null)
 			{
-				message("Failed to ingest the package; throwing exception");
-				throw new DSpaceSWORDException("Package Ingest failed");
+				swordService.message("Failed to ingest the package; throwing exception");
+				throw new SWORDErrorException(DSpaceSWORDErrorCodes.UNPACKAGE_FAIL, "METS package ingester failed to unpack package");
 			}
 			
 			// now we can inject the newly constructed item into the workflow
 			WorkflowItem wfi = WorkflowManager.startWithoutNotify(context, wsi);
+			swordService.message("Workflow process started");
 			
 			// pull the item out so that we can report on it
 			Item installedItem = wfi.getItem();
@@ -145,21 +147,21 @@ public class SWORDMETSIngester implements SWORDIngester
 			// so we have to look it up
 			String handle = HandleManager.findHandle(context, installedItem);
 			
-			message("Ingest successful; ");
-			message("Item created with internal identifier: " + installedItem.getID() + "; ");
+			swordService.message("Ingest successful");
+			swordService.message("Item created with internal identifier: " + installedItem.getID());
 			if (handle != null)
 			{
-				message("Item created with external identifier: " + handle + "; ");
+				swordService.message("Item created with external identifier: " + handle);
 			}
 			else
 			{
-				message("No external identifier available at this stage (item in workflow); ");
+				swordService.message("No external identifier available at this stage (item in workflow)");
 			}
 			
 			DepositResult dr = new DepositResult();
 			dr.setItem(installedItem);
 			dr.setHandle(handle);
-			dr.setVerboseDescription(verboseDesc.toString());
+			dr.setTreatment(this.getTreatment());
 			
 			return dr;
 		}
@@ -169,24 +171,7 @@ public class SWORDMETSIngester implements SWORDIngester
 			throw new DSpaceSWORDException(e);
 		}
 	}
-	
-	/**
-	 * shortcut to registering a message with the verboseDescription
-	 * member variable.  This checks to see if the request is
-	 * verbose, meaning we don't have to do it inline and break nice
-	 * looking code up
-	 * 
-	 * @param msg
-	 */
-	private void message(String msg)
-	{
-		if (this.verbose)
-		{
-			verboseDesc.append("\n\n");
-			verboseDesc.append(msg);
-		}
-	}
-	
+
 	/**
 	 * Add the current date to the item metadata.  This looks up
 	 * the field in which to store this metadata in the configuration
@@ -208,6 +193,8 @@ public class SWORDMETSIngester implements SWORDIngester
 		item.clearMetadata(dc.schema, dc.element, dc.qualifier, Item.ANY);
 		DCDate date = new DCDate(new Date());
 		item.addMetadata(dc.schema, dc.element, dc.qualifier, null, date.toString());
+
+		swordService.message("Updated date added to response from item metadata where available");
 	}
 	
 	/**
@@ -238,6 +225,8 @@ public class SWORDMETSIngester implements SWORDIngester
 		DCValue dc = this.configToDC(field, null);
 		item.clearMetadata(dc.schema, dc.element, dc.qualifier, Item.ANY);
 		item.addMetadata(dc.schema, dc.element, dc.qualifier, null, slugVal);
+
+		swordService.message("Slug value set in response where available");
 	}
 	
 	/**
@@ -269,5 +258,19 @@ public class SWORDMETSIngester implements SWORDIngester
 		
 		return dcv;
 	}
-	
+
+	/**
+	 * The human readable description of the treatment this ingester has
+	 * put the deposit through
+	 * 
+	 * @return
+	 * @throws DSpaceSWORDException
+	 */
+	private String getTreatment() throws DSpaceSWORDException
+	{
+		return "The package has been deposited into DSpace.  Each file has been unpacked " +
+				"and provided with a unique identifier.  The metadata in the manifest has been " +
+				"extracted and attached to the DSpace item, which has been provided with " +
+				"an identifier leading to an HTML splash page.";
+	}
 }

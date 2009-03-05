@@ -38,9 +38,10 @@
 
 package org.dspace.sword;
 
-import org.dspace.core.Context;
+import org.dspace.content.DSpaceObject;
 
 import org.purl.sword.base.Deposit;
+import org.purl.sword.base.SWORDErrorException;
 
 /**
  * Interface behind which can be implemented ingest mechanisms
@@ -56,10 +57,9 @@ public interface SWORDIngester
 	 * Ingest the package as described in the given Deposit object
 	 * within the given DSpace Context
 	 * 
-	 * @param context
 	 * @param deposit
 	 * @return	the result of the deposit
 	 * @throws DSpaceSWORDException
 	 */
-	DepositResult ingest(Context context, Deposit deposit) throws DSpaceSWORDException;
+	DepositResult ingest(SWORDService service, Deposit deposit, DSpaceObject target) throws DSpaceSWORDException, SWORDErrorException;
 }

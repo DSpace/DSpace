@@ -21,7 +21,7 @@
 
    <repositories>
       <repository>
-         <id>maven.dspace.org-snapshot</id>
+         <id>maven.dspace.org/snapshot</id>
          <name>DSpace Maven Snapshot Repository</name>
          <url>http://maven.dspace.org/snapshot</url>
          <releases>
@@ -82,6 +82,66 @@
          <groupId>javax.servlet</groupId>
          <artifactId>servlet-api</artifactId>
       </dependency>
+
+       <!-- additional dependencies for the sword-common code -->
+                       <dependency>
+                        <groupId>commons-fileupload</groupId>
+                        <artifactId>commons-fileupload</artifactId>
+                        <version>1.2</version>
+                </dependency>
+                <dependency>
+                        <groupId>commons-httpclient</groupId>
+                        <artifactId>commons-httpclient</artifactId>
+                        <version>3.0.1</version>
+                </dependency>
+                <dependency>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>servlet-api</artifactId>
+                        <version>2.4</version>
+                </dependency>
+                <dependency>
+                        <groupId>junit</groupId>
+                        <artifactId>junit</artifactId>
+                        <version>4.0</version>
+                        <scope>test</scope>
+                </dependency>
+                <dependency>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                        <version>1.2.15</version>
+                        <exclusions>
+                                <exclusion>
+                                        <artifactId>jmxtools</artifactId>
+                                        <groupId>com.sun.jdmk</groupId>
+                                </exclusion>
+                                <exclusion>
+                                        <artifactId>jms</artifactId>
+                                        <groupId>javax.jms</groupId>
+                                </exclusion>
+                                <exclusion>
+                                        <artifactId>jmxri</artifactId>
+                                        <groupId>com.sun.jmx</groupId>
+                                </exclusion>
+                        </exclusions>
+                </dependency>
+       <!-- GUI client dependency
+                <dependency>
+                        <groupId>org.jdesktop</groupId>
+                        <artifactId>swing-worker</artifactId>
+                        <version>1.1</version>
+                </dependency>
+                -->
+                <dependency>
+                        <groupId>xom</groupId>
+                        <artifactId>xom</artifactId>
+                        <version>1.1</version>
+                </dependency>
+                <dependency>
+                        <groupId>commons-io</groupId>
+                        <artifactId>commons-io</artifactId>
+                        <version>1.3.1</version>
+                </dependency>
+
 
    </dependencies>
 

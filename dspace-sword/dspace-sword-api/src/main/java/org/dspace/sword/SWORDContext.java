@@ -39,34 +39,50 @@
 package org.dspace.sword;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.dspace.content.Collection;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
+import org.apache.log4j.Logger;
 
 /**
- * This class represents the users who are involved in the
- * deposit or service document request process.  This is the
- * authenticated primary user and the potentially null
- * onBehalfOf user.
- * 
- * It can then answer various authorisation questions regarding
- * those users.
+ * This class holds information about authenticated users (both the
+ * depositing user and the on-behalf-of user), and their associated
+ * DSpace Context objects.
+ *
+ * Since this class will be used to make authentication requests on
+ * both user types, it may hold up to 2 active DSpace Context objects
+ * at any one time
+ *
+ * WARNING: failure to use the contexts used in this class in the
+ * appropriate way may result in exceptions or data loss.  Unless
+ * you are performing authentication processes, you should always
+ * access the context under which to deposit content into the archive
+ * from:
+ *
+ * getContext()
+ *
+ * and not from any of the other context retrieval methods in this
+ * class
  * 
  * @author Richard Jones
  *
  */
 public class SWORDContext 
 {
+	/** logger */
+	private static Logger log = Logger.getLogger(SWORDContext.class);
+
 	/** The primary authenticated user for the request */
 	private EPerson authenticated = null;
 	
 	/** The onBehalfOf user for the request */
 	private EPerson onBehalfOf = null;
+
+	/** The primary context, representing the on behalf of user if exists, and the authenticated user if not */
+	private Context context;
+
+	/** the context for the authenticated user, which may not, therefore, be the primary context also */
+	private Context authenticatorContext;
 
 	/**
 	 * @return	the authenticated user
@@ -99,230 +115,114 @@ public class SWORDContext
 	{
 		this.onBehalfOf = onBehalfOf;
 	}
-	
+
 	/**
-	 * Is the authenticated user a DSpace administrator?  This translates
-	 * as asking the question of whether the given eperson is a member
-	 * of the special DSpace group Administrator, with id 1
-	 * 
-	 * @param eperson
-	 * @return	true if administrator, false if not
-	 * @throws SQLException
-	 */
-	public boolean isUserAdmin(Context context)
-		throws DSpaceSWORDException
-	{
-		try
-		{
-			if (this.authenticated != null)
-			{
-				Group admin = Group.find(context, 1);
-				return admin.isMember(this.authenticated);
-			}
-			return false;
-		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSWORDException(e);
-		}
-	}
-	
-	/**
-	 * Is the given onBehalfOf user DSpace administrator?  This translates
-	 * as asking the question of whether the given eperson is a member
-	 * of the special DSpace group Administrator, with id 1
-	 * 
-	 * @param eperson
-	 * @return	true if administrator, false if not
-	 * @throws SQLException
-	 */
-	public boolean isOnBehalfOfAdmin(Context context)
-		throws DSpaceSWORDException
-	{
-		try
-		{
-			if (this.onBehalfOf != null)
-			{
-				Group admin = Group.find(context, 1);
-				return admin.isMember(this.onBehalfOf);
-			}
-			return false;
-		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSWORDException(e);
-		}
-	}
-	
-	/**
-	 * Is the authenticated user a member of the given group
-	 * or one of its sub groups?
-	 * 
-	 * @param group
+	 * Returns the most appropriate context for operations on the
+	 * database.  This is the on-behalf-of user's context if the
+	 * user exists, or the authenticated user's context otherwise
+	 *
 	 * @return
 	 */
-	public boolean isUserInGroup(Group group)
+	public Context getContext()
 	{
-		if (this.authenticated != null)
-		{
-			return isInGroup(group, this.authenticated);
-		}
-		return false;
+		return context;
 	}
-	
+
+	public void setContext(Context context)
+	{
+		this.context = context;
+	}
+
 	/**
-	 * Is the onBehalfOf user a member of the given group or
-	 * one of its sub groups
-	 * 
-	 * @param group
+	 * Get the context of the user who authenticated.  This should only be
+	 * used for authentication purposes.  If there is an on-behalf-of user,
+	 * that context should be used to write database changes.  Use:
+	 *
+	 * getContext()
+	 *
+	 * on this class instead.
+	 *
 	 * @return
 	 */
-	public boolean isOnBehalfOfInGroup(Group group)
+	public Context getAuthenticatorContext()
 	{
+		return authenticatorContext;
+	}
+
+	public void setAuthenticatorContext(Context authenticatorContext)
+	{
+		this.authenticatorContext = authenticatorContext;
+	}
+
+	/**
+	 * Get the context of the on-behalf-of user.  This method should only
+	 * be used for authentication purposes.  In all other cases, use:
+	 *
+	 * getContext()
+	 *
+	 * on this class instead.  If there is no on-behalf-of user, this
+	 * method will return null.
+	 *
+	 * @return
+	 */
+	public Context getOnBehalfOfContext()
+	{
+		// return the obo context if this is an obo deposit, else return null
 		if (this.onBehalfOf != null)
 		{
-			return isInGroup(group, this.onBehalfOf);
+			return context;
 		}
-		return false;
+		return null;
 	}
-	
+
 	/**
-	 * Is the given eperson in the given group, or any of the groups
-	 * that are also members of that group.  This method recurses
-	 * until it has exhausted the tree of groups or finds the given
-	 * eperson
-	 * 
-	 * @param group
-	 * @param eperson
-	 * @return	true if in group, false if not
+	 * Abort all of the contexts held by this class.  No changes will
+	 * be written to the database
 	 */
-	public boolean isInGroup(Group group, EPerson eperson)
+	public void abort()
 	{
-		EPerson[] eps = group.getMembers();
-		Group[] groups = group.getMemberGroups();
-		
-		// is the user in the current group
-		for (int i = 0; i < eps.length; i++)
+		// abort both contexts
+		if (context != null && context.isValid())
 		{
-			if (eperson.getID() == eps[i].getID())
-			{
-				return true;
-			}
+			context.abort();
 		}
-		
-		// is the eperson in the sub-groups (recurse)
-		if (groups != null && groups.length > 0)
+
+		if (authenticatorContext != null && authenticatorContext.isValid())
 		{
-			for (int j = 0; j < groups.length; j++)
-			{
-				if (isInGroup(groups[j], eperson))
-				{
-					return true;
-				}
-			}
+			authenticatorContext.abort();
 		}
-		
-		// ok, we didn't find you
-		return false;
 	}
-	
+
 	/**
-	 * Get an array of all the collections that the current SWORD
-	 * context will allow deposit onto in the given DSpace context
-	 * 
-	 * @param context
-	 * @return	the array of allowed collections
+	 * Commit the primary context held by this class, and abort the authenticated
+	 * user's context if it is different.  This ensures that only changes written
+	 * through the appropriate user's context is persisted, and all other
+	 * operations are flushed.  You should, in general, not try to commit the contexts directly
+	 * when using the sword api.
+	 *
 	 * @throws DSpaceSWORDException
 	 */
-	public Collection[] getAllowedCollections(Context context)
-		throws DSpaceSWORDException
+	public void commit()
+			throws DSpaceSWORDException
 	{
 		try
 		{
-			// locate the collections to which the authenticated user has ADD rights
-			Collection[] cols = Collection.findAuthorized(context, null, Constants.ADD);
+			// commit the primary context
+			if (context != null && context.isValid())
+			{
+				context.commit();
+			}
 
-			// if there is no onBehalfOf user, just return the list
-			if (this.getOnBehalfOf() == null)
+			// the secondary context is for filtering permissions by only, and is
+			// never committed, so we abort here
+			if (authenticatorContext != null && authenticatorContext.isValid())
 			{
-				return cols;
+				authenticatorContext.abort();
 			}
-			
-			// if the onBehalfOf user is an administrator, return the list
-			if (this.isOnBehalfOfAdmin(context))
-			{
-				return cols;
-			}
-			
-			// if we are here, then we have to filter the list of collections
-			List<Collection> colList = new ArrayList<Collection>();
-			
-			for (int i = 0; i < cols.length; i++)
-			{
-				// we check each collection to see if the onBehalfOf user
-				// is permitted to deposit
-				
-				// urgh, this is so inefficient, but the authorisation API is
-				// a total hellish nightmare
-				Group subs = cols[i].getSubmitters();
-				if (isOnBehalfOfInGroup(subs))
-				{
-					colList.add(cols[i]);
-				}
-			}
-			
-			// now create the new array and return that
-			Collection[] newCols = new Collection[colList.size()];
-			newCols = colList.toArray((Collection[]) newCols);
-			return newCols;
 		}
 		catch (SQLException e)
 		{
 			throw new DSpaceSWORDException(e);
 		}
-	}
-	
-	/**
-	 * Can the current SWORD Context permit deposit into the given 
-	 * collection in the given DSpace Context
-	 * 
-	 * @param context
-	 * @param collection
-	 * @return
-	 * @throws DSpaceSWORDException
-	 */
-	public boolean canSubmitTo(Context context, Collection collection)
-		throws DSpaceSWORDException
-	{
-		Group subs = collection.getSubmitters();
-		if (isUserAdmin(context))
-		{
-			if (this.onBehalfOf != null)
-			{
-				if (isOnBehalfOfAdmin(context))
-				{
-					return true;
-				}
-				return isOnBehalfOfInGroup(subs);
-			}
-			return true;
-		}
-		else
-		{
-			if (isUserInGroup(subs))
-			{
-				if (this.onBehalfOf != null)
-				{
-					if (isOnBehalfOfAdmin(context))
-					{
-						return true;
-					}
-					return isOnBehalfOfInGroup(subs);
-				}
-				return true;
-			}
-			return false;
-		}
-		
 	}
 }

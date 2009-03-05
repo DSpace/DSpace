@@ -89,16 +89,26 @@
     <servlet-class>org.purl.sword.server.DepositServlet</servlet-class>
   </servlet>
 
+  <servlet>
+    <servlet-name>media-link</servlet-name>
+    <servlet-class>org.purl.sword.server.AtomDocumentServlet</servlet-class>
+  </servlet>
+
   <!-- Servlet Mappings -->
 
   <servlet-mapping>
     <servlet-name>servicedocument</servlet-name>
-    <url-pattern>/servicedocument</url-pattern>
+    <url-pattern>/servicedocument/*</url-pattern>
   </servlet-mapping>
   
   <servlet-mapping>
     <servlet-name>deposit</servlet-name>
     <url-pattern>/deposit/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>media-link</servlet-name>
+    <url-pattern>/media-link/*</url-pattern>
   </servlet-mapping>
   
 </web-app>

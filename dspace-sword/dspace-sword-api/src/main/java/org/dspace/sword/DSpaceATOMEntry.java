@@ -38,30 +38,18 @@
 
 package org.dspace.sword;
 
-import java.sql.SQLException;
-import java.text.ParseException;
-
 import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.handle.HandleManager;
 
 import org.purl.sword.base.SWORDEntry;
+import org.purl.sword.base.Deposit;
 
-import org.w3.atom.Author;
-import org.w3.atom.Content;
-import org.w3.atom.ContentType;
-import org.w3.atom.Contributor;
-import org.w3.atom.Generator;
-import org.w3.atom.InvalidMediaTypeException;
-import org.w3.atom.Link;
-import org.w3.atom.Rights;
-import org.w3.atom.Source;
-import org.w3.atom.Summary;
-import org.w3.atom.Title;
+import org.purl.sword.atom.Author;
+import org.purl.sword.atom.Contributor;
+import org.purl.sword.atom.Generator;
+import org.apache.log4j.Logger;
 
 /**
  * Class to represent a DSpace Item as an ATOM Entry.  This
@@ -72,14 +60,81 @@ import org.w3.atom.Title;
  * @author Richard Jones
  *
  */
-public class DSpaceATOMEntry
+public abstract class DSpaceATOMEntry
 {
+	private static Logger log = Logger.getLogger(DSpaceATOMEntry.class);
+
 	/** the SWORD ATOM entry which this class effectively decorates */
 	protected SWORDEntry entry;
 	
 	/** the item this ATOM entry represents */
-	protected Item item;
-	
+	protected Item item = null;
+
+	/** The bitstream this ATOM entry represents */
+	protected Bitstream bitstream = null;
+
+	/** the deposit result */
+	protected DepositResult result = null;
+
+	/** sword service implementation */
+	protected SWORDService swordService;
+
+	/** the original deposit */
+	protected Deposit deposit = null;
+
+	/**
+	 * Create a new atom entry object around the given service
+	 *
+	 * @param service
+	 */
+	protected DSpaceATOMEntry(SWORDService service)
+	{
+		this.swordService = service;
+	}
+
+	/**
+	 * Reset all the internal variables of the class to their original values
+	 */
+	public void reset()
+	{
+		this.entry = new SWORDEntry();
+		this.item = null;
+		this.bitstream = null;
+		this.result = null;
+		this.deposit = null;
+	}
+
+	/**
+	 * get the sword entry for the given dspace object.  In this case, we should be
+	 * responding to requests for the media link, so this method will throw an error
+	 * unless the dspace object is an instance of the Bitstream
+	 *
+	 * @param dso
+	 * @return
+	 * @throws DSpaceSWORDException
+	 */
+	public SWORDEntry getSWORDEntry(DSpaceObject dso)
+			throws DSpaceSWORDException
+	{
+		// reset the object, just in case
+		this.reset();
+
+		// NOTE: initially this exists just for the purposes of responding to media-link
+		// requests, so should only ever respond to entries on Bitstreams
+		if (dso instanceof Bitstream)
+		{
+			this.bitstream = (Bitstream) dso;
+		}
+		else
+		{
+			throw new DSpaceSWORDException("Can only recover a sword entry for a bitstream via this method");
+		}
+
+		this.constructEntry();
+
+		return entry;
+	}
+
 	/**
 	 * Construct the SWORDEntry object which represents the given
 	 * item with the given handle.  An argument as to whether this
@@ -87,63 +142,117 @@ public class DSpaceATOMEntry
 	 * assigned identifier for the item will not be added to the
 	 * SWORDEntry as it will be invalid.
 	 * 
-	 * @param item	the item to represent
-	 * @param handle	the handle for the item
-	 * @param noOp		whether this is a noOp request
+	 * @param result	the result of the deposit operation
+	 * @param deposit		the original deposit request
 	 * @return		the SWORDEntry for the item
 	 */
-	public SWORDEntry getSWORDEntry(Item item, String handle, boolean noOp)
+	public SWORDEntry getSWORDEntry(DepositResult result, Deposit deposit)
 		throws DSpaceSWORDException
 	{
-		entry = new SWORDEntry();
-		this.item = item;
+		this.reset();
+
+		this.entry = new SWORDEntry();
+		this.item = result.getItem();
+		this.bitstream = result.getBitstream();
+		this.result = result;
+		this.deposit = deposit;
+
+		this.constructEntry();
+
+		return entry;
+	}
+
+	/**
+	 * Construct the entry
+	 *
+	 * @throws DSpaceSWORDException
+	 */
+	protected void constructEntry()
+			throws DSpaceSWORDException
+	{
+		// set the generator
+		this.addGenerator();
 
 		// add the authors to the sword entry
 		this.addAuthors();
-		
+
 		// add the category information to the sword entry
 		this.addCategories();
-		
+
 		// add a content element to the sword entry
-		this.addContentElement(handle, noOp);
-		
+		this.addContentElement();
+
+		// add a packaging element to the sword entry
+		this.addPackagingElement();
+
 		// add contributors (authors plus any other bits) to the sword entry
 		this.addContributors();
-		
+
 		// add the identifier for the item, if the id is going
 		// to be valid by the end of the request
-		if (!noOp)
-		{
-			this.addIdentifier(handle, noOp);
-		}
-		
+		this.addIdentifier();
+
 		// add any appropriate links
-		this.addLinks(handle);
-		
+		this.addLinks();
+
 		// add the publish date
 		this.addPublishDate();
-		
+
 		// add the rights information
-		this.addRights(handle);
-		
-		// add the source infomation
-		this.addSource();
-		
+		this.addRights();
+
 		// add the summary of the item
 		this.addSummary();
-		
+
 		// add the title of the item
 		this.addTitle();
-		
+
 		// add the date on which the entry was last updated
 		this.addLastUpdatedDate();
-		
-		// set the format namespace for the response
-		this.setFormatNamespace();
-		
-		return entry;
+
+		// set the treatment
+		this.addTreatment();
 	}
-	
+
+	/**
+	 * Add deposit treatment text
+	 */
+	protected void addTreatment()
+	{
+		if (result != null)
+		{
+			entry.setTreatment(result.getTreatment());
+		}
+	}
+
+	/**
+	 * add the generator field content
+	 */
+	protected void addGenerator()
+	{
+		boolean identify = ConfigurationManager.getBooleanProperty("sword.identify-version");
+		SWORDUrlManager urlManager = swordService.getUrlManager();
+		String softwareUri = urlManager.getGeneratorUrl();
+		if (identify)
+		{
+			Generator generator = new Generator();
+			generator.setUri(softwareUri);
+			generator.setVersion(SWORDProperties.VERSION);
+			entry.setGenerator(generator);
+		}
+	}
+
+	/**
+	 * set the packaging format of the deposit
+	 */
+	protected void addPackagingElement()
+	{
+		if (deposit != null)
+		{
+			entry.setPackaging(deposit.getPackaging());
+		}
+	}
+
 	/**
 	 * add the author names from the bibliographic metadata.  Does
 	 * not supply email addresses or URIs, both for privacy, and
@@ -152,67 +261,15 @@ public class DSpaceATOMEntry
 	 */
 	protected void addAuthors()
 	{
-		DCValue[] dcv = item.getMetadata("dc.contributor.author");
-		if (dcv != null)
+		if (deposit != null)
 		{
-			for (int i = 0; i < dcv.length; i++)
-			{
-				Author author = new Author();
-				author.setName(dcv[i].value);
-				entry.addAuthors(author);
-			}
+			String username = this.deposit.getUsername();
+			Author author = new Author();
+			author.setName(username);
+			entry.addAuthors(author);
 		}
 	}
-	
-	/**
-	 * Add all the subject classifications from the bibliographic
-	 * metadata.
-	 *
-	 */
-	protected void addCategories()
-	{
-		DCValue[] dcv = item.getMetadata("dc.subject.*");
-		if (dcv != null)
-		{
-			for (int i = 0; i < dcv.length; i++)
-			{
-				entry.addCategory(dcv[i].value);
-			}
-		}
-	}
-	
-	/**
-	 * Set the content type that DSpace received.  This is just
-	 * "application/zip" in this default implementation.
-	 *
-	 */
-	protected void addContentElement(String handle, boolean noOp)
-	{
-		try
-		{
-			if (!noOp)
-			{
-				if (item.getHandle() != null)
-				{
-					handle = item.getHandle();
-				}
 
-				if (handle != null && !"".equals(handle))
-				{
-					Content content = new Content();
-					// content.setType("application/zip");
-					content.setType("text/html");
-					content.setSource(HandleManager.getCanonicalForm(handle));
-					entry.setContent(content);
-				}
-			}
-		}
-		catch (InvalidMediaTypeException e)
-		{
-			// do nothing; we'll live without the content type declaration!
-		}
-	}
-	
 	/**
 	 * Add the list of contributors to the item.  This will include
 	 * the authors, and any other contributors that are supplied
@@ -221,243 +278,76 @@ public class DSpaceATOMEntry
 	 */
 	protected void addContributors()
 	{
-		DCValue[] dcv = item.getMetadata("dc.contributor.*");
-		if (dcv != null)
+		if (deposit != null)
 		{
-			for (int i = 0; i < dcv.length; i++)
+			String obo = deposit.getOnBehalfOf();
+			if (obo != null)
 			{
 				Contributor cont = new Contributor();
-				cont.setName(dcv[i].value);
+				cont.setName(obo);
 				entry.addContributor(cont);
 			}
 		}
 	}
-	
+
+	/**
+	 * Add all the subject classifications from the bibliographic
+	 * metadata.
+	 *
+	 */
+	abstract void addCategories() throws DSpaceSWORDException;
+
+	/**
+	 * Set the content type that DSpace received.  This is just
+	 * "application/zip" in this default implementation.
+	 *
+	 */
+	abstract void addContentElement() throws DSpaceSWORDException;
+
+
 	/**
 	 * Add the identifier for the item.  If the item object has
 	 * a handle already assigned, this is used, otherwise, the 
 	 * passed handle is used.  It is set in the form that
 	 * they can be used to access the resource over http (i.e.
 	 * a real URL).
-	 * 
-	 * @param handle
 	 */
-	protected void addIdentifier(String handle, boolean noOp)
-	{
-		// it's possible that the item hasn't been assigned a handle yet
-		if (!noOp)
-		{
-			if (item.getHandle() != null)
-			{
-				handle = item.getHandle();
-			}
-
-			if (handle != null && !"".equals(handle))
-			{
-				entry.setId(HandleManager.getCanonicalForm(handle));
-				return;
-			}
-		}
-		
-		// if we get this far, then we just use the dspace url as the 
-		// property
-		String cfg = ConfigurationManager.getProperty("dspace.url");
-		entry.setId(cfg);
-		
-		// FIXME: later on we will maybe have a workflow page supplied
-		// by the sword interface?
-	}
+	abstract void addIdentifier() throws DSpaceSWORDException;
 	
 	/**
-	 * Add links associated with this item.  The default implementation
-	 * does not support item linking, so this method currently does
-	 * nothing
+	 * Add links associated with this item.
 	 *
 	 */
-	protected void addLinks(String handle)
-		throws DSpaceSWORDException
-	{
-		try
-		{
-			// if there is no handle, we can't generate links
-			if (handle == null)
-			{
-				return;
-			}
-			
-			String base = ConfigurationManager.getProperty("dspace.url");
-			
-			// in the default set up we just pass urls to all of the 
-			// inidivual files in the item
-			Bundle[] bundles = item.getBundles("ORIGINAL");
-			for (int i = 0; i < bundles.length ; i++)
-			{
-				Bitstream[] bss = bundles[i].getBitstreams();
-				for (int j = 0; j < bss.length; j++)
-				{
-					Link link = new Link();
-					String url = base + "/bitstream/" + handle + "/" + bss[j].getSequenceID() + "/" + bss[j].getName();
-					link.setHref(url);
-					entry.addLink(link);
-				}
-			}
-		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSWORDException(e);
-		}
-	}
+	abstract void addLinks() throws DSpaceSWORDException;
 	
 	/**
 	 * Add the date of publication from the bibliographic metadata
 	 *
 	 */
-	protected void addPublishDate()
-	{
-		try
-		{
-			DCValue[] dcv = item.getMetadata("dc.date.issued");
-			if (dcv != null)
-			{
-				if (dcv.length == 1)
-				{
-					entry.setPublished(dcv[0].value);
-				}
-			}
-		}
-		catch (ParseException e)
-		{
-			// do nothing; we'll live without the publication date
-		}
-	}
-	
+	abstract void addPublishDate() throws DSpaceSWORDException;
+
 	/**
 	 * Add rights information.  This attaches an href to the URL
 	 * of the item's licence file
 	 *
 	 */
-	protected void addRights(String handle)
-	{
-		try
-		{
-			// if there's no handle, we can't give a link
-			if (handle == null)
-			{
-				return;
-			}
-			
-			String base = ConfigurationManager.getProperty("dspace.url");
-			
-			// if there's no base URL, we are stuck
-			if (base == null)
-			{
-				return;
-			}
-			
-			StringBuilder rightsString = new StringBuilder();
-			Bundle[] bundles = item.getBundles("LICENSE");
-			for (int i = 0; i < bundles.length; i++)
-			{
-				Bitstream[] bss = bundles[i].getBitstreams();
-				for (int j = 0; j < bss.length; j++)
-				{
-					String url = base + "/bitstream/" + handle + "/" + bss[j].getSequenceID() + "/" + bss[j].getName();
-					rightsString.append(url + " ");
-				}
-			}
-			
-			Rights rights = new Rights();
-			rights.setContent(rightsString.toString());
-			rights.setType(ContentType.TEXT);
-			entry.setRights(rights);
-		}
-		catch (SQLException e)
-		{
-			// do nothing
-		}
-	}
-	
-	/**
-	 * Add the source of the bibliographic metadata.
-	 *
-	 */
-	protected void addSource()
-	{
-		String base = ConfigurationManager.getProperty("dspace.url");
-		String name = ConfigurationManager.getProperty("dspace.name");
-		Source source = new Source();
-		Generator gen = new Generator();
-		gen.setUri(base);
-		gen.setContent(name);
-		source.setGenerator(gen);
-		entry.setSource(source);
-	}
-	
+	abstract void addRights() throws DSpaceSWORDException;
+
 	/**
 	 * Add the summary/abstract from the bibliographic metadata
 	 *
 	 */
-	protected void addSummary()
-	{
-		DCValue[] dcv = item.getMetadata("dc.description.abstract");
-		if (dcv != null)
-		{
-			for (int i = 0; i < dcv.length; i++)
-			{
-				Summary summary = new Summary();
-				summary.setContent(dcv[i].value);
-				summary.setType(ContentType.TEXT);
-				entry.setSummary(summary);
-			}
-		}
-	}
+	abstract void addSummary() throws DSpaceSWORDException;
 	
 	/**
 	 * Add the title from the bibliographic metadata
 	 *
 	 */
-	protected void addTitle()
-	{
-		DCValue[] dcv = item.getMetadata("dc.title");
-		if (dcv != null)
-		{
-			for (int i = 0; i < dcv.length; i++)
-			{
-				Title title = new Title();
-				title.setContent(dcv[i].value);
-				title.setType(ContentType.TEXT);
-				entry.setTitle(title);
-			}
-		}
-	}
+	abstract void addTitle() throws DSpaceSWORDException;
 	
 	/**
 	 * Add the date that this item was last updated
 	 *
 	 */
-	protected void addLastUpdatedDate()
-	{
-		try
-		{
-			String config = ConfigurationManager.getProperty("sword.updated.field");
-			DCValue[] dcv = item.getMetadata(config);
-			if (dcv != null)
-			{
-				if (dcv.length == 1)
-				{
-					DCDate dcd = new DCDate(dcv[0].value);
-					entry.setUpdated(dcd.toString());
-				}
-			}
-		}
-		catch (ParseException e)
-		{
-			// do nothing
-		}
-	}
-	
-	protected void setFormatNamespace()
-	{
-		entry.setFormatNamespace("http://www.log.gov/METS");
-	}
+	abstract void addLastUpdatedDate() throws DSpaceSWORDException;
 }
