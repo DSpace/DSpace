@@ -44,6 +44,7 @@ import org.dspace.app.statistics.LogLine;
 
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 
@@ -51,9 +52,6 @@ import java.sql.SQLException;
 
 import java.lang.Long;
 import java.lang.StringBuffer;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -1145,10 +1143,10 @@ public class LogAnalyser
         {
             // set up a new log line object
             LogLine logLine = new LogLine(parseDate(match.group(1).trim()),
-                                          match.group(2).trim(),
-                                          match.group(3).trim(),
-                                          match.group(4).trim(),
-                                          match.group(5).trim());
+                                          LogManager.unescapeLogField(match.group(2)).trim(),
+                                          LogManager.unescapeLogField(match.group(3)).trim(),
+                                          LogManager.unescapeLogField(match.group(4)).trim(),
+                                          LogManager.unescapeLogField(match.group(5)).trim());
             
             return logLine;
         }

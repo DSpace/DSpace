@@ -148,7 +148,7 @@ public class DSQuery
             Searcher searcher = getSearcher(c);
 
             QueryParser qp = new QueryParser("default", DSIndexer.getAnalyzer());
-            log.info("Final query string: " + querystring);
+            log.debug("Final query string: " + querystring);
             
             if (operator == null || operator.equals("OR"))
             {
