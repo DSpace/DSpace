@@ -100,14 +100,17 @@ public class CurrentActivityAction extends AbstractAction
         Request request = ObjectModelHelper.getRequest(objectModel);
         Context context = ContextUtil.obtainContext(objectModel);
         
-        // Create and store our events
-        Event event = new Event(context,request);
-        events.add(event);
-        
-        // Remove the oldest element from the list if we are over our max
-        // number of elements.
-        while(events.size() > MAX_EVENTS)
-        	events.poll();
+        // Ensure only one thread is manipulating the events queue at a time.
+        synchronized (events) {
+	        // Create and store our events
+	        Event event = new Event(context,request);
+	        events.add(event);
+	        
+	        // Remove the oldest element from the list if we are over our max
+	        // number of elements.
+	        while(events.size() > MAX_EVENTS)
+	        	events.poll();
+        }
        
         return null;
     }
@@ -118,7 +121,10 @@ public class CurrentActivityAction extends AbstractAction
     public static List<Event> getEvents()
     {
     	List<Event> list = new ArrayList<Event>();
-    	list.addAll(events);
+    	// Make sure only one thread is manipulating the events queue at a time.
+    	synchronized (events) {
+	    	list.addAll(events);
+    	}
     	return list;
     }
     

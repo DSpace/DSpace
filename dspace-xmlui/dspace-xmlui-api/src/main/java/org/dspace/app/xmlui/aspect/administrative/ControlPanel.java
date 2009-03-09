@@ -540,7 +540,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		// 4) Display the results Table
         // TABLE: activeUsers
         Table activeUsers = div.addTable("users",1,1);
-        activeUsers.setHead(T_activity_head);
+        activeUsers.setHead(T_activity_head.parameterize(CurrentActivityAction.MAX_EVENTS));
         Row row = activeUsers.addRow(Row.ROLE_HEADER);
         if (sortBy == EventSort.TIME)
         	row.addCell().addHighlight("bold").addXref("?activity&sortBy="+EventSort.TIME+"&showSelf="+showSelf).addContent(T_activity_sort_time);
@@ -575,6 +575,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         int shown = 0;
 		for (CurrentActivityAction.Event event : events)
 		{	
+			if (event == null)
+				continue;
+			
 			// Skip out if the user does not want to see their requests.
 			if (showSelf.equals("false") && event.getEPersonID() == context.getCurrentUser().getID())
 				continue;
@@ -640,6 +643,14 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		 */
 		public int compare(E a, E b) 
 		{
+			// Protect against null events while sorting
+			if (a != null && b == null)
+				return 1; // A > B
+			else if (a == null && b != null)
+				return -1; // B > A
+			else if (a == null && b == null)
+				return 0; // A == B
+			
 			// Sort by the given ordering matrix
 			if (EventSort.URL == sortBy)
 			{
@@ -668,6 +679,15 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 			}
 			else if (EventSort.SESSION == sortBy)
 			{
+				// Ensure that all sessions with an EPersonID associated are
+				// ordered to the top. Otherwise fall back to comparing session
+				// IDs. Unfortunitaly we can not compare eperson names because 
+				// we do not have access to a context object.
+				if (a.getEPersonID() > 0  && b.getEPersonID() < 0)
+					return 1; // A > B
+				else if (a.getEPersonID() < 0  && b.getEPersonID() > 0)
+					return -1; // B > A
+				
 				String aSession = a.getSessionID();
 				String bSession = b.getSessionID();
 				int cmp = aSession.compareTo(bSession);
@@ -679,7 +699,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 			if (a.getTimeStamp() > b.getTimeStamp())
 				return 1;  // A > B
 			else if (a.getTimeStamp() > b.getTimeStamp())
-				return -1; // B < A
+				return -1; // B > A
 			return 0; // A == B
 		}
 	}
