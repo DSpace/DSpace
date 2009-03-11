@@ -262,7 +262,7 @@ public class LDAPHierarchicalAuthentication
 							log.info(LogManager.getHeader(context,
 									"type=ldap-login", "type=ldap_but_already_email"));
 							context.setIgnoreAuthorization(true);
-							eperson.setNetid(netid);
+							eperson.setNetid(netid.toLowerCase());
 							eperson.update();
 							context.commit();
 							context.setIgnoreAuthorization(false);
@@ -298,7 +298,7 @@ public class LDAPHierarchicalAuthentication
 									{
 										eperson.setMetadata("phone", ldap.ldapPhone);
 									}
-									eperson.setNetid(netid);
+									eperson.setNetid(netid.toLowerCase());
 									eperson.setCanLogIn(true);
 									AuthenticationManager.initEPerson(context, request, eperson);
 									eperson.update();

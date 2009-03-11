@@ -227,7 +227,7 @@ public class LDAPAuthentication
 	                        log.info(LogManager.getHeader(context,
 	                                "type=ldap-login", "type=ldap_but_already_email"));
 	                        context.setIgnoreAuthorization(true);
-	                        eperson.setNetid(netid);
+	                        eperson.setNetid(netid.toLowerCase());
 	                        eperson.update();
 	                        context.commit();
 	                        context.setIgnoreAuthorization(false);
@@ -248,7 +248,7 @@ public class LDAPAuthentication
 	                                if ((ldap.ldapGivenName!=null)&&(!ldap.ldapGivenName.equals(""))) eperson.setFirstName(ldap.ldapGivenName);
 	                                if ((ldap.ldapSurname!=null)&&(!ldap.ldapSurname.equals(""))) eperson.setLastName(ldap.ldapSurname);
 	                                if ((ldap.ldapPhone!=null)&&(!ldap.ldapPhone.equals(""))) eperson.setMetadata("phone", ldap.ldapPhone);
-	                                eperson.setNetid(netid);
+	                                eperson.setNetid(netid.toLowerCase());
 	                                eperson.setCanLogIn(true);
 	                                AuthenticationManager.initEPerson(context, request, eperson);
 	                                eperson.update();

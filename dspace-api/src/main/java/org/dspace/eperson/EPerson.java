@@ -637,11 +637,6 @@ public class EPerson extends DSpaceObject
      */
     public void setNetid(String s)
     {
-        if (s != null)
-        {
-            s = s.toLowerCase();
-        }
-
         myRow.setColumn("netid", s);
         modified = true;
     }
