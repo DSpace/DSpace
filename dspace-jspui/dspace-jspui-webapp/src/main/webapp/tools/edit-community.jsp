@@ -144,25 +144,25 @@
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label2"/></td>
                 <td>
-                    <input type="text" name="short_description" value="<%= shortDesc %>" size="50" />
+                    <input type="text" name="short_description" value="<%= Utils.addEntities(shortDesc) %>" size="50" />
                 </td>
             </tr>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label3"/></td>
                 <td>
-                    <textarea name="introductory_text" rows="6" cols="50"><%= intro %></textarea>
+                    <textarea name="introductory_text" rows="6" cols="50"><%= Utils.addEntities(intro) %></textarea>
                 </td>
             </tr>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label4"/></td>
                 <td>
-                    <textarea name="copyright_text" rows="6" cols="50"><%= copy %></textarea>
+                    <textarea name="copyright_text" rows="6" cols="50"><%= Utils.addEntities(copy) %></textarea>
                 </td>
             </tr>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label5"/></td>
                 <td>
-                    <textarea name="side_bar_text" rows="6" cols="50"><%= side %></textarea>
+                    <textarea name="side_bar_text" rows="6" cols="50"><%= Utils.addEntities(side) %></textarea>
                 </td>
             </tr>
 <%-- ===========================================================

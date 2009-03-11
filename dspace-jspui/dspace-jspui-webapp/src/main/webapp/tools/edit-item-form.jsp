@@ -74,6 +74,7 @@
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%
     Item item = (Item) request.getAttribute("item");
@@ -283,7 +284,7 @@
                 <td headers="t1" class="<%= row %>RowEvenCol"><%= dcv[i].element %>&nbsp;&nbsp;</td>
                 <td headers="t2" class="<%= row %>RowOddCol"><%= (dcv[i].qualifier == null ? "" : dcv[i].qualifier) %></td>
                 <td headers="t3" class="<%= row %>RowEvenCol">
-                    <textarea name="value_<%= key %>_<%= sequenceNumber %>" rows="3" cols="50"><%= dcv[i].value %></textarea>
+                    <textarea name="value_<%= key %>_<%= sequenceNumber %>" rows="3" cols="50"><%= Utils.addEntities(dcv[i].value) %></textarea>
                 </td>
                 <td headers="t4" class="<%= row %>RowOddCol">
                     <input type="text" name="language_<%= key %>_<%= sequenceNumber %>" value="<%= (dcv[i].language == null ? "" : dcv[i].language) %>" size="5"/>
@@ -383,19 +384,19 @@
 		     <td headers="t11"> </td>
 		<% } %>
                 <td headers="t12" class="<%= row %>RowOddCol">
-                    <input type="text" name="bitstream_name_<%= key %>" value="<%= (bitstreams[j].getName() == null ? "" : bitstreams[j].getName()) %>"/>
+                    <input type="text" name="bitstream_name_<%= key %>" value="<%= (bitstreams[j].getName() == null ? "" : Utils.addEntities(bitstreams[j].getName())) %>"/>
                 </td>
                 <td headers="t13" class="<%= row %>RowEvenCol">
                     <input type="text" name="bitstream_source_<%= key %>" value="<%= (bitstreams[j].getSource() == null ? "" : bitstreams[j].getSource()) %>"/>
                 </td>
                 <td headers="t14" class="<%= row %>RowOddCol">
-                    <input type="text" name="bitstream_description_<%= key %>" value="<%= (bitstreams[j].getDescription() == null ? "" : bitstreams[j].getDescription()) %>"/>
+                    <input type="text" name="bitstream_description_<%= key %>" value="<%= (bitstreams[j].getDescription() == null ? "" : Utils.addEntities(bitstreams[j].getDescription())) %>"/>
                 </td>
                 <td headers="t15" class="<%= row %>RowEvenCol">
-                    <input type="text" name="bitstream_format_id_<%= key %>" value="<%= bf.getID() %>" size="4"/> (<%= bf.getShortDescription() %>)
+                    <input type="text" name="bitstream_format_id_<%= key %>" value="<%= bf.getID() %>" size="4"/> (<%= Utils.addEntities(bf.getShortDescription()) %>)
                 </td>
                 <td headers="t16" class="<%= row %>RowOddCol">
-                    <input type="text" name="bitstream_user_format_description_<%= key %>" value="<%= (bitstreams[j].getUserFormatDescription() == null ? "" : bitstreams[j].getUserFormatDescription()) %>"/>
+                    <input type="text" name="bitstream_user_format_description_<%= key %>" value="<%= (bitstreams[j].getUserFormatDescription() == null ? "" : Utils.addEntities(bitstreams[j].getUserFormatDescription())) %>"/>
                 </td>
                 <td headers="t17" class="<%= row %>RowEvenCol">
                     <%-- <a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>">View</a>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="Remove"> --%>

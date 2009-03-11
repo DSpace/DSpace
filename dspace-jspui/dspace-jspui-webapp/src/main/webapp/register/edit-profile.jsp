@@ -60,6 +60,7 @@
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.eperson.EPerson, org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%
     EPerson eperson = (EPerson) request.getAttribute("eperson");
