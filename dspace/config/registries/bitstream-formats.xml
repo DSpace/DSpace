@@ -49,7 +49,7 @@
 
     <!-- Used by system: do not remove -->
   <bitstream-type>
-    <mimetype>text/plain</mimetype>
+    <mimetype>text/plain; charset=utf-8</mimetype>
     <short_description>License</short_description>
     <description>Item-specific license agreed upon to submission</description>
     <support_level>1</support_level>
