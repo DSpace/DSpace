@@ -42,18 +42,20 @@ package org.dspace.core;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.event.Dispatcher;
 import org.dspace.event.Event;
 import org.dspace.event.EventManager;
-import org.dspace.event.Dispatcher;
 import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
@@ -92,6 +94,15 @@ public class Context
     /** Indicates whether authorisation subsystem should be ignored */
     private boolean ignoreAuth;
 
+	/** A stack with the history of authoritation system check modify */
+	private Stack<Boolean> authStateChangeHistory;
+
+	/**
+	 * A stack with the name of the caller class that modify authoritation
+	 * system check
+	 */
+	private Stack<String> authStateClassCallHistory;
+    
     /** Object cache for this context */
     private Map objectCache;
 
@@ -124,6 +135,9 @@ public class Context
 
         objectCache = new HashMap();
         specialGroups = new ArrayList();
+        
+        authStateChangeHistory = new Stack<Boolean>();
+        authStateClassCallHistory = new Stack<String>();
     }
 
     /**
@@ -194,12 +208,82 @@ public class Context
     }
 
     /**
+     * Turn Off the Authorisation System for this context and store this change
+     * in a history for future use.
+     */
+    public void turnOffAuthorisationSystem()
+    {
+        authStateChangeHistory.push(ignoreAuth);
+        if (log.isDebugEnabled())
+        {
+            Thread currThread = Thread.currentThread();
+            StackTraceElement[] stackTrace = currThread.getStackTrace();
+            String caller = stackTrace[3].getClassName();
+
+            authStateClassCallHistory.push(caller);
+        }
+        ignoreAuth = true;
+    }
+
+    /**
+     * Restore the previous Authorisation System State. If the state was not
+     * changed by the current caller a warning will be displayed in log. Use:
+     * <code>
+     *     mycontext.turnOffAuthorisationSystem();
+     *     some java code that require no authorisation check
+     *     mycontext.restoreAuthSystemState(); 
+         * </code> If Context debug is enabled, the correct sequence calling will be
+     * checked and a warning will be displayed if not.
+     */
+    public void restoreAuthSystemState()
+    {
+        Boolean previousState;
+        try
+        {
+            previousState = authStateChangeHistory.pop();
+        }
+        catch (EmptyStackException ex)
+        {
+            log.warn(LogManager.getHeader(this, "restore_auth_sys_state",
+                    "not previous state info available "
+                            + ex.getLocalizedMessage()));
+            previousState = new Boolean(false);
+        }
+        if (log.isDebugEnabled())
+        {
+            Thread currThread = Thread.currentThread();
+            StackTraceElement[] stackTrace = currThread.getStackTrace();
+            String caller = stackTrace[3].getClassName();
+
+            String previousCaller = (String) authStateClassCallHistory.pop();
+
+            // if previousCaller is not the current caller *only* log a warning
+            if (!previousCaller.equals(caller))
+            {
+                log
+                        .warn(LogManager
+                                .getHeader(
+                                        this,
+                                        "restore_auth_sys_state",
+                                        "Class: "
+                                                + caller
+                                                + " call restore but previous state change made by "
+                                                + previousCaller));
+            }
+        }
+        ignoreAuth = previousState.booleanValue();
+    }    
+    
+    
+    /**
      * Specify whether the authorisation system should be ignored for this
      * context. This should be used sparingly.
      * 
+     * @deprecated use turnOffAuthorisationSystem() for make the change and
+     *             restoreAuthSystemState() when change are not more required
      * @param b
-     *            if <code>true</code>, authorisation should be ignored for
-     *            this session.
+     *            if <code>true</code>, authorisation should be ignored for this
+     *            session.
      */
     public void setIgnoreAuthorization(boolean b)
     {
