@@ -71,6 +71,9 @@
 
 (Kim Shepherd)
  - [2385187] Fix for toDate method in DCDate
+
+(Andrea Bollini /Kim Shepherd) 
+ - [DS-47] Add support for rendering DOI links in JSPUI (1.4, 1.5) - ID: 2521493
  
 (Andrea Bollini)
  - S.F. Patch 2645776 for Bug 2645754 SubmissionController is not thread safe
