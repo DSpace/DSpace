@@ -40,6 +40,7 @@
 package org.dspace.app.xmlui.aspect.administrative;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +79,12 @@ public class CurrentActivityAction extends AbstractAction
 	/** The ordered list of events, by access time */
 	private static Queue<Event> events = new LinkedList<Event>();
 	
+	/** record events that are from anynmous users */
+	private static boolean recordAnonymousEvents = true;
+	
+	/** record events from automatic bots */
+	private static boolean recordBotEvents = false;
+	
 	/**
 	 * Allow the DSpace.cfg to override our activity max and ip header.
 	 */
@@ -104,7 +111,16 @@ public class CurrentActivityAction extends AbstractAction
         synchronized (events) {
 	        // Create and store our events
 	        Event event = new Event(context,request);
-	        events.add(event);
+	        
+	        // Check if we should record the event
+	        boolean record = true;
+	        if (!recordAnonymousEvents && event.isAnonymous())
+	        	record = false;
+	        if (!recordBotEvents && event.isBot())
+	        	record = false;
+	        
+	        if (record)
+	        	events.add(event);
 	        
 	        // Remove the oldest element from the list if we are over our max
 	        // number of elements.
@@ -126,6 +142,23 @@ public class CurrentActivityAction extends AbstractAction
 	    	list.addAll(events);
     	}
     	return list;
+    }
+    
+	
+    public static boolean getRecordAnonymousEvents() {
+    	return recordAnonymousEvents;
+    }
+    
+    public static void setRecordAnonymousEvents(boolean record) {
+    	recordAnonymousEvents = record;
+    }
+    
+    public static boolean getRecordBotEvents() {
+    	return recordBotEvents;
+    }
+    
+    public static void setRecordBotEvents(boolean record) {
+    	recordBotEvents = record;
     }
     
     /**
@@ -172,7 +205,15 @@ public class CurrentActivityAction extends AbstractAction
     			
     			userAgent = request.getHeader("User-Agent");
     			
+    			System.out.println("New event:");
+    			Enumeration headerNames = request.getHeaderNames();
+    		    while(headerNames.hasMoreElements()) {
+    		      String headerName = (String)headerNames.nextElement();
+    		      System.out.println(" - "+headerName+" = '"+request.getHeader(headerName)+"'");
+    		    }
+
     			ip = request.getHeader(IP_HEADER);
+    			System.out.println(" - I pulled out value: "+ip);
     			if (ip == null)
     				ip = request.getRemoteAddr();
     		}
@@ -213,12 +254,49 @@ public class CurrentActivityAction extends AbstractAction
     	}
     	
     	/**
+    	 * Is this event anonymous?
+    	 * @return
+    	 */
+    	public boolean isAnonymous()
+    	{
+    		if (epersonID == -1)
+    			return true;
+    		else
+    			return false;
+    	}
+    	
+    	/**
+    	 * Is this event from a bot?
+    	 * @return
+    	 */
+    	public boolean isBot()
+    	{
+    		if (userAgent == null)
+    			return false;
+    		String ua = userAgent.toLowerCase();
+    		
+    		if (ua.contains("google/") || 
+    			ua.contains("msnbot/") ||
+    			ua.contains("googlebot/") || 
+    			ua.contains("webcrawler/") ||
+    			ua.contains("inktomi") ||
+    			ua.contains("teoma") ||
+    			ua.contains("bot"))
+    			return true;
+    		else
+    			return false;
+    	}
+    	
+    	/**
     	 * Return the activity viewer's best guess as to what browser or bot was initiating the request.
     	 * 
     	 * @return A short name for the browser or bot.
     	 */
     	public String getDectectedBrowser()
     	{
+    		if (userAgent == null)
+    			return "No browser provided";
+    		
     		// BOTS
     		if (userAgent.toLowerCase().contains("google/"))
     			return "Google (bot)";
@@ -238,6 +316,9 @@ public class CurrentActivityAction extends AbstractAction
     		if (userAgent.toLowerCase().contains("teoma"))
     			return "Teoma (bot)";
     		
+    		if (userAgent.toLowerCase().contains("bot"))
+    			return "Unknown (bot)";
+    		
     		// Normal Browsers
     		if (userAgent.contains("Lotus-Notes/"))
     			return "Lotus-Notes";
@@ -254,6 +335,8 @@ public class CurrentActivityAction extends AbstractAction
     		// Internet explorer browsers
     		if (userAgent.contains("MSIE"))
     		{
+    		    if (userAgent.contains("MSIE 9"))
+    		    	return "MSIE 9";
     		    if (userAgent.contains("MSIE 8"))
     		    	return "MSIE 8";
     		    if (userAgent.contains("MSIE 7"))
@@ -293,6 +376,9 @@ public class CurrentActivityAction extends AbstractAction
     		    
     		    if (userAgent.contains("Firefox/3"))
     		    	return "Firefox 3.x";
+    		    
+    		    if (userAgent.contains("Firefox/4"))
+    		    	return "Firefox 4.x";
     		   
     		    if (userAgent.contains("Firefox/"))
     		    	return "Firefox"; // can't find the exact version

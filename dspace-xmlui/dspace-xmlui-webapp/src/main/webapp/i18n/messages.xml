@@ -1492,7 +1492,6 @@
 	<message key="xmlui.administrative.ControlPanel.head">Control Panel</message>
 	<message key="xmlui.administrative.ControlPanel.option_java">Java Information</message>
 	<message key="xmlui.administrative.ControlPanel.option_dspace">DSpace Configuration</message>
-	<message key="xmlui.administrative.ControlPanel.option_knots">Web Continuations</message>
 	<message key="xmlui.administrative.ControlPanel.option_alerts">System-wide Alerts</message>
 	<message key="xmlui.administrative.ControlPanel.hours">{0} h</message>
 	<message key="xmlui.administrative.ControlPanel.minutes">{0} m</message>
@@ -1524,13 +1523,6 @@
 	<message key="xmlui.administrative.ControlPanel.mail_from_address">From E-mail Address</message>
 	<message key="xmlui.administrative.ControlPanel.mail_feedback_recipient">Feedback Recipient</message>
 	<message key="xmlui.administrative.ControlPanel.mail_admin">General Site Administration E-mail</message>
-	<message key="xmlui.administrative.ControlPanel.knots_head">Web Continuations</message>
-	<message key="xmlui.administrative.ControlPanel.knots_column1">Interpreter</message>
-	<message key="xmlui.administrative.ControlPanel.knots_column2">Last Access</message>
-	<message key="xmlui.administrative.ControlPanel.knots_column3">State</message>
-	<message key="xmlui.administrative.ControlPanel.knots_expired">Expired</message>
-	<message key="xmlui.administrative.ControlPanel.knots_active">Active</message>
-	<message key="xmlui.administrative.ControlPanel.knots_none">There are no active continuations.</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_head">System-wide Alerts</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_warning"><strong>Warning for load balanced systems</strong>: System-wide alerts are only effective for the node on which it is activated. You need to ensure that each node in the set receives the activate alert command.</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_message_label">Alert message</message>
@@ -1550,15 +1542,17 @@
 	<message key="xmlui.administrative.ControlPanel.alerts_submit_activate">Activate</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_submit_deactivate">Deactivate</message>
 	<message key="xmlui.administrative.ControlPanel.activity_head">Current Activity ({0} pages maximum)</message>
+	<message key="xmlui.administrative.ControlPanel.stop_anonymous">STOP recording anonymous activity.</message>
+	<message key="xmlui.administrative.ControlPanel.start_anonymous">START recording anonymous activity.</message>
+	<message key="xmlui.administrative.ControlPanel.stop_bot">STOP recording bot activity.</message>
+	<message key="xmlui.administrative.ControlPanel.start_bot">START recording bot activity.</message>
 	<message key="xmlui.administrative.ControlPanel.activity_sort_time">Time Stamp</message>
 	<message key="xmlui.administrative.ControlPanel.activity_sort_user">User</message>
 	<message key="xmlui.administrative.ControlPanel.activity_sort_ip">IP Address</message>
 	<message key="xmlui.administrative.ControlPanel.activity_sort_url">URL Page</message>
 	<message key="xmlui.administrative.ControlPanel.activity_sort_Agent">User-Agent</message>
 	<message key="xmlui.administrative.ControlPanel.activity_anonymous">Anonymous {0}</message>	
-	<message key="xmlui.administrative.ControlPanel.activity_hideself">Hide my page views</message>
-	<message key="xmlui.administrative.ControlPanel.activity_showself">Show my page views</message>
-	<message key="xmlui.administrative.ControlPanel.activity_none">Other than yourself, there have been no page views in the past {0} pages.</message>
+	<message key="xmlui.administrative.ControlPanel.activity_none">No page views have been recorded.</message>
 	
 	<message key="xmlui.administrative.ControlPanel.select_panel">Use the tabs above to select the information to display</message>
 	
