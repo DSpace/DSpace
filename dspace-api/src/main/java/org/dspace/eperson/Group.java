@@ -350,7 +350,8 @@ public class Group extends DSpaceObject
     }
 
     /**
-     * check to see if an eperson is a member
+     * check to see if an eperson is a direct member.
+     * If the eperson is a member via a subgroup will be returned <code>false</code>
      * 
      * @param e
      *            eperson to check membership
@@ -369,7 +370,8 @@ public class Group extends DSpaceObject
     }
 
     /**
-     * check to see if group is a member
+     * check to see if g is a direct group member.
+     * If g is a subgroup via another group will be returned <code>false</code>
      * 
      * @param g
      *            group to check
@@ -400,23 +402,9 @@ public class Group extends DSpaceObject
             return true;
         }
 
-        // first, check for membership if it's a special group
-        // (special groups can be set even if person isn't authenticated)
-        if (c.inSpecialGroup(groupid))
-        {
-            return true;
-        }
-
         EPerson currentuser = c.getCurrentUser();
 
-        // only test for membership if context contains a user
-        if (currentuser != null)
-        {
-            return epersonInGroup(c, groupid, currentuser);
-        }
-
-        // currentuser not set, return FALSE
-        return false;
+        return epersonInGroup(c, groupid, currentuser);
     }
 
     /**
@@ -455,38 +443,44 @@ public class Group extends DSpaceObject
     public static Set<Integer> allMemberGroupIDs(Context c, EPerson e)
             throws SQLException
     {
-        // two queries - first to get groups eperson is a member of
-        // second query gets parent groups for groups eperson is a member of
-
-        TableRowIterator tri = DatabaseManager.queryTable(c, "epersongroup2eperson",
-                "SELECT * FROM epersongroup2eperson WHERE eperson_id= ?",
-                 e.getID());
-
         Set<Integer> groupIDs = new HashSet<Integer>();
-
-        try
+        
+        if (e != null)
         {
-            while (tri.hasNext())
+            // two queries - first to get groups eperson is a member of
+            // second query gets parent groups for groups eperson is a member of
+
+            TableRowIterator tri = DatabaseManager.queryTable(c,
+                    "epersongroup2eperson",
+                    "SELECT * FROM epersongroup2eperson WHERE eperson_id= ?", e
+                            .getID());
+
+            try
             {
-                TableRow row = tri.next();
+                while (tri.hasNext())
+                {
+                    TableRow row = tri.next();
 
-                int childID = row.getIntColumn("eperson_group_id");
+                    int childID = row.getIntColumn("eperson_group_id");
 
-                groupIDs.add(new Integer(childID));
+                    groupIDs.add(new Integer(childID));
+                }
+            }
+            finally
+            {
+                // close the TableRowIterator to free up resources
+                if (tri != null)
+                    tri.close();
             }
         }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-                tri.close();
-        }
-
         // Also need to get all "Special Groups" user is a member of!
         // Otherwise, you're ignoring the user's membership to these groups!
         Group[] specialGroups = c.getSpecialGroups();
         for(int j=0; j<specialGroups.length;j++)
             groupIDs.add(new Integer(specialGroups[j].getID()));
+        
+        // all the users are members of the anonymous group 
+        groupIDs.add(new Integer(0));
         
         // now we have all owning groups, also grab all parents of owning groups
         // yes, I know this could have been done as one big query and a union,
@@ -510,16 +504,10 @@ public class Group extends DSpaceObject
                 groupQuery += " OR ";
         }
 
-        if ("".equals(groupQuery))
-        {
-            // don't do query, isn't member of any groups
-            return groupIDs;
-        }
-        
         // was member of at least one group
         // NOTE: even through the query is built dynamicaly all data is seperated into the
         // the parameters array.
-        tri = DatabaseManager.queryTable(c, "group2groupcache",
+        TableRowIterator tri = DatabaseManager.queryTable(c, "group2groupcache",
                 "SELECT * FROM group2groupcache WHERE " + groupQuery,
                 parameters);
 

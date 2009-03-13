@@ -58,6 +58,8 @@
 
 <%@ page import="org.dspace.eperson.Group" %>
 
+<%@ page import="org.dspace.core.Utils" %>
+
 
 <%
     int PAGESIZE = 50;
@@ -212,7 +214,7 @@ function clearGroups()
 			<td headers="t1" class="<%= row %>RowOddCol">
 				<input type="button" value="<%
 	if (multiple) { %><fmt:message key="jsp.tools.general.add"/><% }
-	else {          %><fmt:message key="jsp.tools.general.select"/><% } %>" onclick="javascript:<%= clearList %>addGroup(<%= g.getID() %>, '<%= fullname %>');<%= closeWindow %>"/></td>
+	else {          %><fmt:message key="jsp.tools.general.select"/><% } %>" onclick="javascript:<%= clearList %>addGroup('<%= g.getID() %>', '<%= Utils.addEntities(fullname) %>');<%= closeWindow %>"/></td>
 			<td headers="t2" class="<%= row %>RowEvenCol"><%= g.getID() %></td>
 			<td headers="t3" class="<%= row %>RowOddCol"> <%= g.getName()%></td>
         </tr>
