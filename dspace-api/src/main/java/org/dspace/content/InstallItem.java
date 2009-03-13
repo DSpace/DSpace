@@ -116,8 +116,14 @@ public class InstallItem
 
         String handleref = HandleManager.getCanonicalForm(handle);
 
-        // Add handle as identifier.uri DC value
-        item.addDC("identifier", "uri", null, handleref);
+        // Add handle as identifier.uri DC value, first check that identifier dosn't allready exist
+        boolean identifierExists = false;
+        DCValue[] identifiers = item.getDC("identifier", "uri", Item.ANY);
+        for (DCValue identifier : identifiers)
+        	if (handleref.equals(identifier.value))
+        		identifierExists = true;
+        if (!identifierExists)
+        	item.addDC("identifier", "uri", null, handleref);
 
         String provDescription = "Made available in DSpace on " + now
                 + " (GMT). " + getBitstreamProvenanceMessage(item);
