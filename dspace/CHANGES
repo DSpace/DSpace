@@ -83,6 +83,7 @@
  - [DS-58] Double quote problem in some fields of JSPUI (continued) - ID: 2528065
  - [DS-88] Anonymous group don't works as subgroup - ID: 1688445
  - [DS-61] IP Authentication only works on logged in users - ID: 2088431
+ - [DS-90] Workflow doesn't skipped if the wf group contains empty subgroups
  
 (Paulo Jobim)
  - SF Patch [2655052] Authors re-ordered when item edited (xmlui)

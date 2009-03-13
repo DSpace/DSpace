@@ -1051,19 +1051,29 @@ public class Group extends DSpaceObject
     }
     
     /**
-     * Return true if group has no members
+     * Return true if group has no direct or indirect members
      */
     public boolean isEmpty()
     {
         loadData(); // make sure all data is loaded
-
-        if ((epeople.size() == 0) && (groups.size() == 0))
+        
+        // the only fast check available is on epeople... 
+        boolean hasMembers = (epeople.size() != 0);
+        
+        if (hasMembers)
         {
-            return true;
+            return false;
         }
         else
         {
-            return false;
+            // well, groups is never null...
+            for (Group subGroup : groups){
+                hasMembers = !subGroup.isEmpty();
+                if (hasMembers){
+                    return false;
+                }
+            }
+            return !hasMembers;
         }
     }
 
