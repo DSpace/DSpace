@@ -122,10 +122,10 @@ public class UIUtil extends Util
                 String remAddr = (String)session.getAttribute("dspace.current.remote.addr");
                 if (remAddr != null && remAddr.equals(request.getRemoteAddr()))
                 {
-                EPerson e = EPerson.find(c, userID.intValue());
+                	EPerson e = EPerson.find(c, userID.intValue());
 
-                Authenticate.loggedIn(c, request, e);
-            }
+                	Authenticate.loggedIn(c, request, e);
+                }
                 else
                 {
                     log.warn("POSSIBLE HIJACKED SESSION: request from "+
