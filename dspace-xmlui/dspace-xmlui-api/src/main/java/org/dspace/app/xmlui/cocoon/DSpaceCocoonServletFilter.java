@@ -45,12 +45,15 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.cocoon.servlet.CocoonServlet;
-import org.apache.log.ContextMap;
 import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
@@ -63,7 +66,7 @@ import org.dspace.core.ConfigurationManager;
  * 
  * @author scott philips
  */
-public class DSpaceCocoonServlet extends CocoonServlet 
+public class DSpaceCocoonServletFilter implements Filter 
 {
 	
 	private static final long serialVersionUID = 1L;
@@ -89,7 +92,7 @@ public class DSpaceCocoonServlet extends CocoonServlet
      * in dspace-api (remove in > 1.5.x)
      * @throws ServletException
      */
-    private void initDSpace() throws ServletException
+    private void initDSpace(FilterConfig arg0) throws ServletException
     {
         // On Windows, URL caches can cause problems, particularly with undeployment
         // So, here we attempt to disable them if we detect that we are running on Windows
@@ -125,9 +128,9 @@ public class DSpaceCocoonServlet extends CocoonServlet
          */
         
         // first check the local per webapp parameter, then check the global parameter.
-        dspaceConfig = super.getInitParameter(DSPACE_CONFIG_PARAMETER);
+        dspaceConfig = arg0.getInitParameter(DSPACE_CONFIG_PARAMETER);
         if (dspaceConfig == null)
-            dspaceConfig = super.getServletContext().getInitParameter(DSPACE_CONFIG_PARAMETER);
+            dspaceConfig = arg0.getServletContext().getInitParameter(DSPACE_CONFIG_PARAMETER);
         
         // Finaly, if no config parameter found throw an error
         if (dspaceConfig == null || "".equals(dspaceConfig))
@@ -171,14 +174,10 @@ public class DSpaceCocoonServlet extends CocoonServlet
     /**
      * Before this servlet will become functional replace 
      */
-    public void init() throws ServletException
-    {
+    public void init(FilterConfig arg0) throws ServletException {
 
-        this.initDSpace();
+        this.initDSpace(arg0);
         
-    	// Check if cocoon needs to do anything at init time?
-    	super.init();
-
     	// Paths to the various config files
     	String webappConfigPath    = null;
     	String installedConfigPath = null;
@@ -194,7 +193,7 @@ public class DSpaceCocoonServlet extends CocoonServlet
     		// 1) inside the webapp's WEB-INF directory, or 2) inside the 
     		// installed dspace config directory along side the dspace.cfg.
     		
-    		webappConfigPath = super.getServletContext().getRealPath("/") 
+    		webappConfigPath = arg0.getServletContext().getRealPath("/") 
     				+ File.separator + "WEB-INF" + File.separator + "xmlui.xconf";
     		
     		installedConfigPath = ConfigurationManager.getProperty("dspace.dir")
@@ -222,44 +221,37 @@ public class DSpaceCocoonServlet extends CocoonServlet
      * should be resumed? If so replace the real request with a faked request and pass that off to 
      * cocoon.
      */
-    public void service(HttpServletRequest realRequest, HttpServletResponse realResponse)
-    throws ServletException, IOException 
-    {
-        try
-        {
-            // Check if there is a request to be resumed.
-            realRequest = AuthenticationUtil.resumeRequest(realRequest);
+	public void doFilter(ServletRequest request, ServletResponse response,
+			FilterChain arg2) throws IOException, ServletException { 
+    
+		HttpServletRequest realRequest = (HttpServletRequest)request;
+		HttpServletResponse realResponse = (HttpServletResponse) response;
+    	// Check if there is a request to be resumed.
+        realRequest = AuthenticationUtil.resumeRequest(realRequest);
 
-            // Send the real request or the resumed request off to
-            // cocoon....
+        // Send the real request or the resumed request off to
+        // cocoon....
 
-            // if force ssl is on and the user has authenticated and the request is not secure redirect to https
-            if ((ConfigurationManager.getBooleanProperty("xmlui.force.ssl")) && (realRequest.getSession().getAttribute("dspace.current.user.id")!=null) && (!realRequest.isSecure())) {
-                    StringBuffer location = new StringBuffer("https://");
-                    location.append(ConfigurationManager.getProperty("dspace.hostname")).append(realRequest.getContextPath()).append(realRequest.getServletPath()).append(
-                            realRequest.getQueryString() == null ? ""
-                                    : ("?" + realRequest.getQueryString()));
-                    realResponse.sendRedirect(location.toString());
-            }
-
-            super.service(realRequest, realResponse);
-
-            // Close out the DSpace context no matter what.
-            ContextUtil.closeContext(realRequest);
+        // if force ssl is on and the user has authenticated and the request is not secure redirect to https
+        if ((ConfigurationManager.getBooleanProperty("xmlui.force.ssl")) && (realRequest.getSession().getAttribute("dspace.current.user.id")!=null) && (!realRequest.isSecure())) {
+                StringBuffer location = new StringBuffer("https://");
+                location.append(ConfigurationManager.getProperty("dspace.hostname")).append(realRequest.getContextPath()).append(realRequest.getServletPath()).append(
+                        realRequest.getQueryString() == null ? ""
+                                : ("?" + realRequest.getQueryString()));
+                realResponse.sendRedirect(location.toString());
         }
-        finally
-        {
-            // Ensure that the current context is removed from ThreadLocal
-        	try {
-        		ContextMap.removeCurrentContext();
-        	} 
-        	catch (NoSuchMethodError nsme)
-        	{
-        		// just ignore this, it means we're using an out of date logging library.
-        	}
-        }
+
+        arg2.doFilter(realRequest, realResponse);
+
+        // Close out the DSpace context no matter what.
+        ContextUtil.closeContext(realRequest);
     }
-    
-    
+
+	public void destroy() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 
 }

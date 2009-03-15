@@ -39,6 +39,32 @@
    <dependencies>
 
       <!-- Custom build DSpace cocoon -->
+      	<dependency>
+			<groupId>jdom</groupId>
+			<artifactId>jdom</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cocoon</groupId>
+			<artifactId>cocoon-core</artifactId>
+			<version>2.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cocoon</groupId>
+			<artifactId>cocoon-servlet-service-components</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cocoon</groupId>
+			<artifactId>cocoon-template-impl</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cocoon</groupId>
+			<artifactId>cocoon-flowscript-impl</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<!-- 
       <dependency>
          <groupId>org.dspace.xmlui.cocoon</groupId>
          <artifactId>cocoon</artifactId>
@@ -50,14 +76,12 @@
          <version>2.1.9</version>
       </dependency>
 
-      <!-- Servlet -->
       <dependency>
          <groupId>javax.servlet</groupId>
          <artifactId>jstl</artifactId>
          <version>1.1.2</version>
       </dependency>
 
-      <!-- Avalon -->
       <dependency>
          <groupId>org.apache.avalon.framework</groupId>
          <artifactId>avalon-framework-api</artifactId>
@@ -79,8 +103,8 @@
             </exclusion>
          </exclusions>
       </dependency>
-
-      <!-- Commons -->
+-->
+      <!-- Commons
       <dependency>
          <groupId>commons-beanutils</groupId>
          <artifactId>commons-beanutils</artifactId>
@@ -117,12 +141,13 @@
          <groupId>commons-lang</groupId>
          <artifactId>commons-lang</artifactId>
       </dependency>
+       -->
       <dependency>
          <groupId>commons-logging</groupId>
          <artifactId>commons-logging</artifactId>
       </dependency>
 
-      <!-- concurrent -->
+      <!-- concurrent
       <dependency>
          <groupId>org.dspace.xmlui.concurrent</groupId>
          <artifactId>concurrent</artifactId>
@@ -130,7 +155,6 @@
       </dependency>
 
 
-      <!-- ehcache -->
       <dependency>
     	  <groupId>net.sf.ehcache</groupId>
     	  <artifactId>ehcache</artifactId>
@@ -138,7 +162,6 @@
 	  </dependency>
       
 
-      <!-- excalibur -->
       <dependency>
          <groupId>org.dspace.xmlui.excalibur</groupId>
          <artifactId>excalibur-component</artifactId>
@@ -210,13 +233,11 @@
          <version>2.1</version>
       </dependency>
 
-      <!-- JDOM -->
       <dependency>
          <groupId>jdom</groupId>
          <artifactId>jdom</artifactId>
       </dependency>
 
-      <!-- Jakarta -->
       <dependency>
          <groupId>org.dspace.xmlui.jakarta</groupId>
          <artifactId>jakarta-bcel</artifactId>
@@ -228,7 +249,6 @@
          <version>1.4</version>
       </dependency>
 
-      <!-- javac -->
       <dependency>
          <groupId>org.dspace.xmlui.javac</groupId>
          <artifactId>javacApi</artifactId>
@@ -240,46 +260,39 @@
          <version>0.9</version>
       </dependency>
 
-      <!-- JCS -->
       <dependency>
          <groupId>org.dspace.xmlui.jcs</groupId>
          <artifactId>jcs</artifactId>
          <version>1.2.5.20050313</version>
       </dependency>
 
-      <!-- jdtcore -->
       <dependency>
          <groupId>org.dspace.xmlui.eclipse</groupId>
          <artifactId>jdtcore</artifactId>
          <version>3.0.2</version>
       </dependency>
 
-      <!-- log4j -->
       <dependency>
          <groupId>log4j</groupId>
          <artifactId>log4j</artifactId>
       </dependency>
 
-      <!-- Rhino Continuations -->
       <dependency>
          <groupId>org.dspace.xmlui.rhino</groupId>
          <artifactId>rhino-continuations</artifactId>
          <version>1.5r4</version>
       </dependency>
 
-      <!-- Xalan -->
       <dependency>
          <groupId>xalan</groupId>
          <artifactId>xalan</artifactId>
       </dependency>
 
-      <!-- Xerces -->
       <dependency>
          <groupId>xerces</groupId>
          <artifactId>xercesImpl</artifactId>
       </dependency>
 
-      <!-- XML -->
       <dependency>
          <groupId>org.dspace.xmlui.xml</groupId>
          <artifactId>xml-apis</artifactId>
@@ -290,7 +303,7 @@
          <artifactId>xml-commons-resolver</artifactId>
          <version>1.1</version>
       </dependency>
-
+ -->
    </dependencies>
 
 </project>

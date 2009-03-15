@@ -41,7 +41,7 @@
 importClass(Packages.java.lang.Class);
 importClass(Packages.java.lang.ClassLoader);
 
-importClass(Packages.org.apache.cocoon.components.CocoonComponentManager);
+importClass(Packages.org.dspace.app.xmlui.utils.FlowscriptUtils);
 importClass(Packages.org.apache.cocoon.environment.http.HttpEnvironment);
 importClass(Packages.org.apache.cocoon.servlet.multipart.Part);
 
@@ -73,7 +73,7 @@ var ERROR_FIELDS = null;
  */
 function getObjectModel() 
 {
-  return CocoonComponentManager.getCurrentEnvironment().getObjectModel();
+  return FlowscriptUtils.getObjectModel(cocoon);
 }
 
 /**

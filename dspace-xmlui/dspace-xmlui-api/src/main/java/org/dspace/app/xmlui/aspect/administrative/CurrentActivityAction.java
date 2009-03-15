@@ -46,6 +46,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.acting.AbstractAction;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -199,7 +201,7 @@ public class CurrentActivityAction extends AbstractAction
     		if (request != null)
     		{
     			url = request.getSitemapURI();
-    			Session session = request.getSession(true);
+    			HttpSession session = request.getSession(true);
     			if (session != null)
     				sessionID = session.getId();
     			

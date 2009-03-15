@@ -45,6 +45,7 @@ import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -96,7 +97,7 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
 		String previous_email = request.getParameter("login_email");
 
 		// Get any message parameters
-		Session session = request.getSession();
+		HttpSession session = request.getSession();
 		String header = (String) session
 				.getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_HEADER);
 		String message = (String) session
@@ -123,7 +124,7 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
 		String previous_email = request.getParameter("login_email");
 
 		// Get any message parameters
-		Session session = request.getSession();
+		HttpSession session = request.getSession();
 		String header = (String) session
 				.getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_HEADER);
 		String message = (String) session
@@ -160,7 +161,7 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
 		Iterator authMethods = AuthenticationManager
 				.authenticationMethodIterator();
 		Request request = ObjectModelHelper.getRequest(objectModel);
-		Session session = request.getSession();
+		HttpSession session = request.getSession();
 
 		// Get any message parameters
 		String header = (String) session

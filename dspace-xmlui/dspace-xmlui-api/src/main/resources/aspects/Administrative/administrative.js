@@ -38,7 +38,7 @@
  * DAMAGE.
  */
 
-importClass(Packages.org.apache.cocoon.components.CocoonComponentManager);
+
 
 importClass(Packages.org.dspace.authorize.AuthorizeManager);
 importClass(Packages.org.dspace.core.Constants);
@@ -50,6 +50,7 @@ importClass(Packages.org.dspace.content.Community);
 importClass(Packages.org.dspace.eperson.EPerson);
 importClass(Packages.org.dspace.eperson.Group);
 
+importClass(Packages.org.dspace.app.xmlui.utils.FlowscriptUtils);
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowEPersonUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowGroupUtils);
@@ -65,7 +66,7 @@ importClass(Packages.java.lang.System);
  */
 function getObjectModel() 
 {
-  return CocoonComponentManager.getCurrentEnvironment().getObjectModel();
+  return FlowscriptUtils.getObjectModel(cocoon);
 }
 
 /**

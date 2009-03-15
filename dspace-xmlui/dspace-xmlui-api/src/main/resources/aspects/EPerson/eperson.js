@@ -40,7 +40,7 @@
  
 importClass(Packages.javax.mail.internet.AddressException);
 
-importClass(Packages.org.apache.cocoon.components.CocoonComponentManager);
+importClass(Packages.org.dspace.app.xmlui.utils.FlowscriptUtils);
 
 importClass(Packages.org.dspace.core.ConfigurationManager);
 importClass(Packages.org.dspace.core.Context);
@@ -65,7 +65,7 @@ importClass(Packages.java.lang.String);
 /** These functions should be common to all Manakin Flow scripts */
 function getObjectModel() 
 {
-  return CocoonComponentManager.getCurrentEnvironment().getObjectModel();
+  return FlowscriptUtils.getObjectModel(cocoon);
 }
 
 function getDSContext()
