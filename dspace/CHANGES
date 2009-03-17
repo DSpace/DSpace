@@ -68,6 +68,7 @@
  - Fix for SF bug [2543413] XMLUI Submission forms display validation errors on other fields during add/remove
  - Fix for SF bug [2557654] Search with "%" causes NullPointerException in XMLUI
  - Fix for Jira bug [DS-86] XMLUI Feedback form does not include any protection from spamming
+ - Fix for Jira [DS-87] XMLUI file download links break in Google search results if file 'sequence' number changes.
 
 (Kim Shepherd)
  - [2385187] Fix for toDate method in DCDate

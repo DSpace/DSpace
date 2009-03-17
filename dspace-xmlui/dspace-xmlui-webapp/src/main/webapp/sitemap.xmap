@@ -210,6 +210,7 @@
 				<map:match type="request-parameter" pattern="sequence">
 					<map:read type="BitstreamReader">
 						<map:parameter name="handle" value="{../1}/{../2}"/>
+            <map:parameter name="name" value="{../3}"/>
 						<map:parameter name="sequence" value="{1}"/>
 					</map:read>
 				</map:match>
@@ -230,6 +231,7 @@
 				<map:match type="request-parameter" pattern="sequence">
 					<map:read type="BitstreamReader">
 						<map:parameter name="itemID" value="{../1}"/>
+            <map:parameter name="name" value="{../2}"/>
 						<map:parameter name="sequence" value="{1}"/>
 					</map:read>
 				</map:match>
