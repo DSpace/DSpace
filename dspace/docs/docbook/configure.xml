@@ -1253,6 +1253,20 @@ Theme"/>Creating a New Theme</title>
         </para>
         <para>Next rebuild &amp; deploy DSpace as described in the <ulink url="install.html">installation portion of the manual</ulink>, and ensure the theme has been installed as described in the previous section &quot;<ulink url="configure.html#xmlui-configure">Configuring Themes and Aspects</ulink>&quot;.</para>
       </section>
+      <section remap="h3">
+        <title><anchor id="docbook-configure.html-xmlui-staticcontent" xreflabel="Static Content"/>Adding Static Content</title>
+        <para>The XMLUI user interface supports the addition of globally static content (as well as static content within individual themes).</para>
+        <para>Globally static content can be placed in the <literal>[dspace-source]/dspace/modules/xmlui/src/main/webapp/static/</literal> directory. By default this directory only contains the default <literal>robots.txt</literal> file, which provides helpful site information to web spiders/crawlers. However, you may also add static HTML (<literal>*.html</literal>) content to this directory, as needed for your installation.</para>
+        <para>Any static HTML content you add to this directory may also reference static content (e.g. CSS, Javascript, Images, etc.) from the same <literal>[dspace-source]/dspace/modules/xmlui/src/main/webapp/static/</literal> directory.  You may reference other static content from your static HTML files similar to the following:</para>
+        <screen>
+  &lt;link href=&quot;./static/mystyle.css&quot;
+  rel=&quot;stylesheet&quot; type=&quot;text/css&quot;/&gt;
+  &lt;img src=&quot;./static/images/static-image.gif&quot;
+  alt=&quot;Static image in /static/images/ directory&quot;/&gt;
+  &lt;img src=&quot;./static/static-image.jpg&quot;
+  alt=&quot;Static image in /static/ directory&quot;/&gt;
+ </screen>
+      </section>
     </section>
     <section remap="h2">
       <title><anchor id="docbook-configure.html-jspui" xreflabel="JSPUI Interface

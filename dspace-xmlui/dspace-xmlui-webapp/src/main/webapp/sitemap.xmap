@@ -356,7 +356,22 @@
 			<map:match pattern="themes/*/**">
                <map:mount check-reload="no" src="themes/{1}/sitemap.xmap" uri-prefix=""/>
   			</map:match>
-			
+
+      <!-- Load globally static content (*.txt or *.html) when requested.
+           This is specifically for global HTML files or robots.txt files,
+           either of which can be placed in the 'static/' directory.-->
+      <map:match pattern="*.txt">
+        <map:read src="static/{1}.txt"/>
+      </map:match>
+      <map:match pattern="*.html">
+        <map:read src="static/{1}.html"/>
+      </map:match>
+      <!-- Also, allow reference to globally static content via the /static path.
+           This will allow your globally static HTML docs to load static CSS or images. -->
+			<map:match pattern="static/*/**">
+         <map:read src="static/{1}/{2}"/>
+  		</map:match>
+
 		</map:pipeline>
 		<map:pipeline>
 			<!--<map:match pattern="**">-->
