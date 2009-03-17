@@ -341,12 +341,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 values = submission.getItem().getMetadata(input.getSchema(), input.getElement(), input.getQualifier(), Item.ANY);
             }
 
-            if (values.length == 0) 
-            {
-                describeSection.addLabel(input.getLabel());
-                describeSection.addItem().addHighlight("italic").addContent(ReviewStep.T_no_metadata);
-            }
-            else 
+            if (values.length > 0)
             {
                 for (DCValue value : values)
                 {
@@ -364,7 +359,7 @@ public class DescribeStep extends AbstractSubmissionStep
                     {
                         String qualifier = value.qualifier;
                         String displayQual = input.getDisplayString(pairsName,qualifier);
-                        if (displayQual != null)
+                        if (displayQual!=null && displayQual.length()>0)
                         {
                             displayValue = displayQual + ":" + value.value;
                         }
@@ -373,7 +368,9 @@ public class DescribeStep extends AbstractSubmissionStep
                     {
                         displayValue = value.value;
                     }
-                    if (displayValue != null)
+
+                    //Only display this field if we have a value to display
+                    if (displayValue!=null && displayValue.length()>0)
                     {
                         describeSection.addLabel(input.getLabel());
                         describeSection.addItem(displayValue);

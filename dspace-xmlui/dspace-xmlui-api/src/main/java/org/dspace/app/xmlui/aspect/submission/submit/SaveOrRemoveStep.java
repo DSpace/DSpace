@@ -107,9 +107,8 @@ public class SaveOrRemoveStep extends AbstractStep
 		saveOrCancel.setHead(T_head);
 		saveOrCancel.addItem(T_info1);
 		
-		saveOrCancel.addItem().addButton("submit_back").setValue(T_submit_back);
-		
         org.dspace.app.xmlui.wing.element.Item actions = saveOrCancel.addItem();
+        actions.addButton("submit_back").setValue(T_submit_back);
         actions.addButton("submit_save").setValue(T_submit_save);
 		actions.addButton("submit_remove").setValue(T_submit_remove);
 	}
