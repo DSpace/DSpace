@@ -45,10 +45,11 @@ import java.util.Map;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.selection.Selector;
 import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.authenticate.AuthenticationMethod;
 
 /**
- * Selector will count the number of AuthenticationMethods defined in the 
- * dpace configuration file
+ * Selector will count the number of interactive AuthenticationMethods defined in the 
+ * dspace configuration file
  * @author Jay Paz
  * @author Scott Phillips
  *
@@ -61,15 +62,17 @@ public class AuthenticationCountSelector implements Selector{
      */
 	public boolean select(String expression, Map objectModel, Parameters parameters) {
 		// get an iterator of all the AuthenticationMethods defined
-		final Iterator authMethods = AuthenticationManager
-		.authenticationMethodIterator();
+		final Iterator<AuthenticationMethod> authMethods = (Iterator<AuthenticationMethod>) AuthenticationManager
+		    .authenticationMethodIterator();
 		
 		int authMethodCount = 0;
 		
 		// iterate to count the methods
 		while(authMethods.hasNext()){
-			authMethods.next();
-			authMethodCount++;
+			AuthenticationMethod auth = authMethods.next();
+			if (!auth.isImplicit()){
+			    authMethodCount++;
+			}
 		}
 		
 		final Integer exp = new Integer(expression);
