@@ -81,6 +81,7 @@
  - [DS-62] Not right encoding for license and extracted texts - ID: 2234532
  - [DS-84] Improve API for "IgnoreAuthorization" blocks - ID: 1687783
  - [DS-58] Double quote problem in some fields of JSPUI (continued) - ID: 2528065
+ - [DS-78] Italian translation xmlui - ID: 1984513 (gone into google code)
  - [DS-88] Anonymous group don't works as subgroup - ID: 1688445
  - [DS-61] IP Authentication only works on logged in users - ID: 2088431
  - [DS-90] Workflow doesn't skipped if the wf group contains empty subgroups
