@@ -69,6 +69,7 @@
  - Fix for SF bug [2557654] Search with "%" causes NullPointerException in XMLUI
  - Fix for Jira bug [DS-86] XMLUI Feedback form does not include any protection from spamming
  - Fix for Jira [DS-87] XMLUI file download links break in Google search results if file 'sequence' number changes.
+ - Fix for Jira [DS-95] XMLUI: Visiting an item page with a trailing slash returns a 404 message
 
 (Kim Shepherd)
  - [2385187] Fix for toDate method in DCDate

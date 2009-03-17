@@ -265,7 +265,10 @@
 			<map:match pattern="html/*/*/**">
 				<map:redirect-to uri="{request:contextPath}/bitstream/handle/{1}/{2}/{3}" permanent="yes"/>
 			</map:match>
-			
+      <!--Redirect /handle/[handleprefix]/[handlePostfix]/ to the same path but without a trailing slash-->
+      <map:match pattern="handle/*/*/">
+				<map:redirect-to uri="{request:contextPath}/handle/{1}/{2}" permanent="yes"/>
+			</map:match>
 			<!--
 				Downloads for the package download export
 			-->
