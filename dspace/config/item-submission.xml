@@ -185,7 +185,7 @@
 	<!--If you disable the initial questions step you should insert the -->
 	<!--SkipInitialQuestionsStep below, to enable proper processing of  -->
 	<!--input-forms configuration                                       -->
-	
+	<!-- 
 	<step>
 		<processing-class>org.dspace.submit.step.SkipInitialQuestionsStep</processing-class>
 	</step>
