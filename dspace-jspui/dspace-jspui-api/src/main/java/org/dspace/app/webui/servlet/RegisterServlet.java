@@ -474,7 +474,7 @@ public class RegisterServlet extends DSpaceServlet
         EPerson eperson = null;
         if (email!=null) eperson = EPerson.findByEmail(context, email);
         EPerson eperson2 = null;
-        eperson2 = EPerson.findByNetid(context, netid.toLowerCase());
+        if (netid!=null) eperson2 = EPerson.findByNetid(context, netid.toLowerCase());
         if (eperson2 !=null) eperson = eperson2;
         
         if (eperson == null)
@@ -485,7 +485,7 @@ public class RegisterServlet extends DSpaceServlet
             context.setIgnoreAuthorization(true);
             eperson = EPerson.create(context);
             eperson.setEmail(email);
-            eperson.setNetid(netid.toLowerCase());
+            if (netid!=null) eperson.setNetid(netid.toLowerCase());
             eperson.update();
             context.setIgnoreAuthorization(false);
         }
