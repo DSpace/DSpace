@@ -375,6 +375,13 @@
                     <i18n:text>xmlui.dri2xhtml.structural.feedback-link</i18n:text>
                 </a>
             </div>
+            <!--Invisible link to HTML sitemap (for search engines) -->
+            <a>
+                <xsl:attribute name="href">
+                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                    <xsl:text>/htmlmap</xsl:text>
+                </xsl:attribute>
+            </a>
         </div>
         <!--                    
             <a href="http://di.tamu.edu">                            
