@@ -159,7 +159,8 @@
 			</map:reader>
 			<map:reader name="BitstreamReader" src="org.dspace.app.xmlui.cocoon.BitstreamReader"/>
 			<map:reader name="ExportReader" src="org.dspace.app.xmlui.cocoon.ItemExportDownloadReader"/>
-      <map:reader name="SitemapReader" src="org.dspace.app.xmlui.cocoon.SitemapReader"/>
+            <map:reader name="OpenURLReader" src="org.dspace.app.xmlui.cocoon.OpenURLReader"/>
+            <map:reader name="SitemapReader" src="org.dspace.app.xmlui.cocoon.SitemapReader"/>
 		</map:readers>
 		<map:actions>
 			<map:action name="locale" src="org.dspace.app.xmlui.cocoon.DSpaceLocaleAction"/>
@@ -287,6 +288,10 @@
 		<!-- non-bitstream pipeline -->
 		<map:pipeline>
 			<!--<map:parameter name="expires" value="now"/>-->
+
+		<map:match pattern="openURL">
+            <map:read type="OpenURLReader"/>
+        </map:match>
 
          <!-- 
             catch mydspace uri's and immediately redirect 

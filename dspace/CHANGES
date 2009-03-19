@@ -1,3 +1,8 @@
+
+(Mark Diggory)
+ - [DS-100] XMLUI OpenURL support contributed by the National Evolutionary Synthesis Center (NESCent) and @mire.
+ - [DS-93]  Upgrade XMLUI to Cocoon 2.2
+
 (Mark Wood)
  - [2002866] Return 404, not 200, when page Not Found
  - [2025998] Usage event (statistics) plugin hook
