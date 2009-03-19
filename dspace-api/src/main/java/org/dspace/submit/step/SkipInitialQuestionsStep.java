@@ -1,5 +1,5 @@
 /*
- * SampleStep.java
+ * SkipInitialQuestionsStep.java
  *
  * Version: $Revision$
  *
