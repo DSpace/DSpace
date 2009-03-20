@@ -864,7 +864,8 @@ public class ItemExport
             {
                 if (maxSize < (size / 1048576.00))
                 { // a megabyte
-                    throw new ItemExportException(ItemExportException.EXPORT_TOO_LARGE);
+                    throw new ItemExportException(ItemExportException.EXPORT_TOO_LARGE,
+                                                  "The overall size of this export is too large.  Please contact your administrator for more information.");
                 }
             }
         }

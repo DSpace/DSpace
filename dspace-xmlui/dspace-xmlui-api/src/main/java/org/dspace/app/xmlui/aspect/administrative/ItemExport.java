@@ -147,7 +147,7 @@ public class ItemExport extends AbstractDSpaceTransformer implements
 			} else {
 				try {
 					org.dspace.app.itemexport.ItemExport
-							.createDownloadableExport(item, context);
+							.createDownloadableExport(item, context, false);
 				} catch (Exception e) {
 					errors.add(message(e.getMessage()));
 				}
@@ -168,7 +168,7 @@ public class ItemExport extends AbstractDSpaceTransformer implements
 			} else {
 				try {
 					org.dspace.app.itemexport.ItemExport
-							.createDownloadableExport(col, context);
+							.createDownloadableExport(col, context, false);
 				} catch (Exception e) {
 					errors.add(message(e.getMessage()));
 				}
@@ -189,7 +189,7 @@ public class ItemExport extends AbstractDSpaceTransformer implements
 			} else {
 				try {
 					org.dspace.app.itemexport.ItemExport
-							.createDownloadableExport(com, context);
+							.createDownloadableExport(com, context, false);
 				} catch (Exception e) {
 					errors.add(message(e.getMessage()));
 				}

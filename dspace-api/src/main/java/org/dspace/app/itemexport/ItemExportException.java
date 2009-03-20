@@ -48,8 +48,9 @@ public class ItemExportException extends Exception
 
     private int reason;
 
-    public ItemExportException(int r)
+    public ItemExportException(int r, String message)
     {
+        super(message);
         reason = r;
     }
 
