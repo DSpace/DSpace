@@ -660,7 +660,7 @@ public class MediaFilterManager
         if (!overWrite && (existingBitstream != null))
         {
             System.out.println("SKIPPED: bitstream " + source.getID()
-                    + " because '" + newName + "' already exists");
+                    + " (item: " + item.getHandle() + ") because '" + newName + "' already exists");
 
             return false;
         }
@@ -669,7 +669,7 @@ public class MediaFilterManager
         if (destStream == null)
         {
             System.out.println("SKIPPED: bitstream " + source.getID()
-                    + " because of filtering error");
+                    + " (item: " + item.getHandle() + ") because filtering was unsuccessful");
 
             return false;
         }
@@ -712,7 +712,7 @@ public class MediaFilterManager
         }
 
         System.out.println("FILTERED: bitstream " + source.getID()
-                + " and created '" + newName + "'");
+                + " (item: " + item.getHandle() + ") and created '" + newName + "'");
 
         //do post-processing of the generated bitstream
         formatFilter.postProcessBitstream(c, item, b);
