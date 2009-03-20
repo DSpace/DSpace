@@ -419,7 +419,7 @@ public class Subscribe
                         isFirst = false;
                     }
     
-                    emailText.append(labels.getString("org.dspace.eperson.Subscribe.new-items")).append(
+                    emailText.append(labels.getString("org.dspace.eperson.Subscribe.new-items")).append(" ").append(
                             c.getMetadata("name")).append(": ").append(
                             itemInfos.size()).append("\n\n");
     
@@ -445,7 +445,7 @@ public class Subscribe
     
                         if (authors.length > 0)
                         {
-                            emailText.append("\n    ").append(labels.getString("org.dspace.eperson.Subscribe.authors")).append(
+                            emailText.append("\n    ").append(labels.getString("org.dspace.eperson.Subscribe.authors")).append(" ").append(
                                     authors[0].value);
     
                             for (int k = 1; k < authors.length; k++)
@@ -455,7 +455,7 @@ public class Subscribe
                             }
                         }
     
-                        emailText.append("\n         ").append(labels.getString("org.dspace.eperson.Subscribe.id")).append(
+                        emailText.append("\n         ").append(labels.getString("org.dspace.eperson.Subscribe.id")).append(" ").append(
                                 HandleManager.getCanonicalForm(hii.handle)).append(
                                 "\n\n");
                     }
