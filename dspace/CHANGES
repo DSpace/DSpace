@@ -62,6 +62,7 @@
  - SF patch [2612341] Patch for SF Feature Request [2609564] group delete confirm
  - SF patch [2612034] Remove Edit/Delete Button for Special Groups
  - SF patch [2636514] multilingual input-forms reenabled
+ - Added blanks between label and text in subscription email.
  
 (Elliot Metsger)
  - Patch for SF bug #2016130 checksum checker can not retrieve very large bitstream
