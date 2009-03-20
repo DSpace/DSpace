@@ -344,6 +344,15 @@
                 </form>
               </td>
             </tr>
+            <tr>
+            <td headers="t1" class="standard" align="center">
+              <form method="post" action="<%=request.getContextPath()%>/mydspace">
+                <input type="hidden" name="community_id" value="<%= community.getID() %>" />
+                <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_MIGRATE_ARCHIVE %>" />
+                <input type="submit" value="<fmt:message key="jsp.mydspace.request.export.migratecommunity"/>" />
+              </form>
+            </td>
+          </tr>
 			<% } %>
             <tr>
               <td headers="t1" class="standard" align="center">

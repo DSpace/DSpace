@@ -26,6 +26,7 @@
  - Fix for SF bug [2155479] Submission verify page handles dc.identifier.* incorrectly
  - [DS-60] netid.toLowerCase() in different classes and methods - ID: 2458187
  - Fix for Jira [DS-98] Key jsp.mydspace.request.export.community not set in Messages.properties
+ - [2696133] New export option (migrate) and fix for Jira [DS-59]
  
 (Stuart Lewis / Chris Yates / Flavio Botelho / Alex Barbieri / Reuben Pasquini / Paulo Matos)
  - [2057378] Hierarchical LDAP support

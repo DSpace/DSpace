@@ -135,6 +135,7 @@ public class ItemExport
         options.addOption("i", "id", true, "ID or handle of thing to export");
         options.addOption("d", "dest", true,
                 "destination where you want items to go");
+        options.addOption("m", "migrate", false, "export for migration (remove handle and metadata that will be re-created in new system)");
         options.addOption("n", "number", true,
                 "sequence number to begin exporting items with");
         options.addOption("h", "help", false, "help");
@@ -189,6 +190,12 @@ public class ItemExport
         if (line.hasOption('n')) // number
         {
             seqStart = Integer.parseInt(line.getOptionValue('n'));
+        }
+
+        boolean migrate = false;
+        if (line.hasOption('m')) // number
+        {
+            migrate = true;
         }
 
         // now validate the args
@@ -277,7 +284,7 @@ public class ItemExport
         if (myItem != null)
         {
             // it's only a single item
-            exportItem(c, myItem, destDirName, seqStart);
+            exportItem(c, myItem, destDirName, seqStart, migrate);
         }
         else
         {
@@ -287,7 +294,7 @@ public class ItemExport
             ItemIterator i = mycollection.getItems();
             try
             {
-                exportItem(c, i, destDirName, seqStart);
+                exportItem(c, i, destDirName, seqStart, migrate);
             }
             finally
             {
@@ -300,7 +307,7 @@ public class ItemExport
     }
 
     private static void exportItem(Context c, ItemIterator i,
-            String destDirName, int seqStart) throws Exception
+            String destDirName, int seqStart, boolean migrate) throws Exception
     {
         int mySequenceNumber = seqStart;
         int counter = SUBDIR_LIMIT - 1;
@@ -335,13 +342,13 @@ public class ItemExport
             }
 
             System.out.println("Exporting item to " + mySequenceNumber);
-            exportItem(c, i.next(), fullPath, mySequenceNumber);
+            exportItem(c, i.next(), fullPath, mySequenceNumber, migrate);
             mySequenceNumber++;
         }
     }
 
     private static void exportItem(Context c, Item myItem, String destDirName,
-            int seqStart) throws Exception
+            int seqStart, boolean migrate) throws Exception
     {
         File destDir = new File(destDirName);
 
@@ -362,9 +369,12 @@ public class ItemExport
             if (itemDir.mkdir())
             {
                 // make it this far, now start exporting
-                writeMetadata(c, myItem, itemDir);
+                writeMetadata(c, myItem, itemDir, migrate);
                 writeBitstreams(c, myItem, itemDir);
-                writeHandle(c, myItem, itemDir);
+                if (!migrate)
+                {
+                    writeHandle(c, myItem, itemDir);
+                }
             }
             else
             {
@@ -387,7 +397,7 @@ public class ItemExport
      * @param destDir
      * @throws Exception
      */
-    private static void writeMetadata(Context c, Item i, File destDir)
+    private static void writeMetadata(Context c, Item i, File destDir, boolean migrate)
             throws Exception
     {
         // Build a list of schemas for the item
@@ -404,13 +414,13 @@ public class ItemExport
         while (iterator.hasNext())
         {
             String schema = (String) iterator.next();
-            writeMetadata(c, schema, i, destDir);
+            writeMetadata(c, schema, i, destDir, migrate);
         }
     }
 
     // output the item's dublin core into the item directory
     private static void writeMetadata(Context c, String schema, Item i,
-            File destDir) throws Exception
+            File destDir, boolean migrate) throws Exception
     {
         String filename;
         if (schema.equals(MetadataSchema.DC_SCHEMA))
@@ -443,6 +453,9 @@ public class ItemExport
             utf8 = dcTag.getBytes("UTF-8");
             out.write(utf8, 0, utf8.length);
 
+            String dateIssued = null;
+            String dateAccessioned = null;
+
             for (int j = 0; j < dcorevalues.length; j++)
             {
                 DCValue dcv = dcorevalues[j];
@@ -458,6 +471,38 @@ public class ItemExport
                         + Utils.addEntities(dcv.value) + "</dcvalue>\n")
                         .getBytes("UTF-8");
 
+                if ((!migrate) ||
+                    (migrate && !(
+                     (dcv.element.equals("date") && qualifier.equals("issued")) ||
+                     (dcv.element.equals("date") && qualifier.equals("accessioned")) ||
+                     (dcv.element.equals("date") && qualifier.equals("available")) ||
+                     (dcv.element.equals("identifier") && qualifier.equals("uri")) ||
+                     (dcv.element.equals("description") && qualifier.equals("provenance")) ||
+                     (dcv.element.equals("format") && qualifier.equals("extent")) ||
+                     (dcv.element.equals("format") && qualifier.equals("mimetype")))))
+                {
+                    out.write(utf8, 0, utf8.length);
+                }
+
+                // Store the date issued and assection to see if they are different
+                // because we need to keep date.issued if they are, when migrating
+                if ((dcv.element.equals("date") && qualifier.equals("issued")))
+                {
+                    dateIssued = dcv.value;
+                }
+                if ((dcv.element.equals("date") && qualifier.equals("accessioned")))
+                {
+                    dateAccessioned = dcv.value;
+                }
+            }
+
+            // When migrating, only keep date.issued if it is different to date.accessioned
+            if ((migrate) && (!dateIssued.equals(dateAccessioned)))
+            {
+                utf8 = ("  <dcvalue element=\"date\" "
+                        + "qualifier=\"issued\">"
+                        + Utils.addEntities(dateIssued) + "</dcvalue>\n")
+                        .getBytes("UTF-8");
                 out.write(utf8, 0, utf8.length);
             }
 
@@ -614,13 +659,13 @@ public class ItemExport
      * @throws Exception
      */
     public static void createDownloadableExport(DSpaceObject dso,
-            Context context) throws Exception
+            Context context, boolean migrate) throws Exception
     {
         EPerson eperson = context.getCurrentUser();
         ArrayList<DSpaceObject> list = new ArrayList<DSpaceObject>(1);
         list.add(dso);
         processDownloadableExport(list, context, eperson == null ? null
-                : eperson.getEmail());
+                : eperson.getEmail(), migrate);
     }
 
     /**
@@ -634,11 +679,11 @@ public class ItemExport
      * @throws Exception
      */
     public static void createDownloadableExport(List<DSpaceObject> dsObjects,
-            Context context) throws Exception
+            Context context, boolean migrate) throws Exception
     {
         EPerson eperson = context.getCurrentUser();
         processDownloadableExport(dsObjects, context, eperson == null ? null
-                : eperson.getEmail());
+                : eperson.getEmail(), migrate);
     }
 
     /**
@@ -654,11 +699,11 @@ public class ItemExport
      * @throws Exception
      */
     public static void createDownloadableExport(DSpaceObject dso,
-            Context context, String additionalEmail) throws Exception
+            Context context, String additionalEmail, boolean migrate) throws Exception
     {
         ArrayList<DSpaceObject> list = new ArrayList<DSpaceObject>(1);
         list.add(dso);
-        processDownloadableExport(list, context, additionalEmail);
+        processDownloadableExport(list, context, additionalEmail, migrate);
     }
 
     /**
@@ -674,9 +719,9 @@ public class ItemExport
      * @throws Exception
      */
     public static void createDownloadableExport(List<DSpaceObject> dsObjects,
-            Context context, String additionalEmail) throws Exception
+            Context context, String additionalEmail, boolean migrate) throws Exception
     {
-        processDownloadableExport(dsObjects, context, additionalEmail);
+        processDownloadableExport(dsObjects, context, additionalEmail, migrate);
     }
 
     /**
@@ -693,9 +738,10 @@ public class ItemExport
      * @throws Exception
      */
     private static void processDownloadableExport(List<DSpaceObject> dsObjects,
-            Context context, final String additionalEmail) throws Exception
+            Context context, final String additionalEmail, boolean toMigrate) throws Exception
     {
         final EPerson eperson = context.getCurrentUser();
+        final boolean migrate = toMigrate;
 
         // before we create a new export archive lets delete the 'expired'
         // archives
@@ -818,8 +864,7 @@ public class ItemExport
             {
                 if (maxSize < (size / 1048576.00))
                 { // a megabyte
-                    throw new Exception(
-                            "The overall size of this export is too large.  Please contact your administrator for more information.");
+                    throw new ItemExportException(ItemExportException.EXPORT_TOO_LARGE);
                 }
             }
         }
@@ -862,7 +907,7 @@ public class ItemExport
                         }
 
                         // export the items using normal export method
-                        exportItem(context, iitems, workDir, 1);
+                        exportItem(context, iitems, workDir, 1, migrate);
                         // now zip up the export directory created above
                         zip(workDir, downloadDir
                                 + System.getProperty("file.separator")
