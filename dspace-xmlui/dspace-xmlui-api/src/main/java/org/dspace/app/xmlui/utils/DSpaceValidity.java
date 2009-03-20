@@ -57,20 +57,20 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
 /**
- * This is a validity object specificaly implemented for the caching 
+ * This is a validity object specifically implemented for the caching 
  * needs of DSpace, Manakin, and Cocoon.
  * 
  * The basic idea is that each time a DSpace object rendered by a cocoon 
  * component the object and everything about it that makes it unique should 
  * be reflected in the validity object for the component. By following this 
- * principle if the object has been updated externaly then the cache will be
+ * principle if the object has been updated externally then the cache will be
  * invalidated.
  * 
  * This DSpaceValidity object makes this processes easier by abstracting out
  * the processes of determining what is unique about a DSpace object. A class
  * is expected to create a new DSpaceValidity object and add() to it all 
  * DSpaceObjects that are rendered by the component. This validity object will 
- * seralize all those objects to a string, take a hash of the string and compare
+ * serialize all those objects to a string, take a hash of the string and compare
  * the hash of the string for any updates.
  * 
  * 
