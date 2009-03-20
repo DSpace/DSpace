@@ -80,6 +80,7 @@
  - Fix for Jira [DS-95] XMLUI: Visiting an item page with a trailing slash returns a 404 message
  - Fix for Jira [DS-96] XMLUI Wing-Framework 'Radio' class doesn't support adding radio buttons which are unselected by default.
  - Fix for Jira [DS-97] XMLUI does not come with a robots.txt out-of-the-box. It also does not provide suggestions for loading global static content.
+ - [1712125] Allow dsrun and dsrun.bat to use JAVA_OPTS
 
 (Kim Shepherd)
  - [2385187] Fix for toDate method in DCDate
