@@ -69,6 +69,9 @@ import ORG.oclc.oai.server.verb.ServerVerb;
 
 public class DIDLCrosswalk extends Crosswalk
 {
+    /** default value if no oai.didl.maxresponse property is defined */
+    public static int MAXRESPONSE_INLINE_BITSTREAM = 0;
+    
     public DIDLCrosswalk(Properties properties)
     {
     	super("urn:mpeg:mpeg21:2002:02-DIDL-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd ");
@@ -96,7 +99,7 @@ public class DIDLCrosswalk extends Crosswalk
         StringBuffer metadata = new StringBuffer();
         StringBuffer metadata1 = new StringBuffer();
         String itemhandle=item.getHandle();
-        int maxsize=  Integer.parseInt(ConfigurationManager.getProperty("oai.didl.maxresponse")); 
+        int maxsize = Integer.parseInt(ConfigurationManager.getProperty("oai.didl.maxresponse"), MAXRESPONSE_INLINE_BITSTREAM); 
         String currdate=ServerVerb.createResponseDate(new Date());
         
         metadata.append("<didl:DIDL ")
