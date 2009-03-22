@@ -99,7 +99,13 @@ public class DIDLCrosswalk extends Crosswalk
         StringBuffer metadata = new StringBuffer();
         StringBuffer metadata1 = new StringBuffer();
         String itemhandle=item.getHandle();
-        int maxsize = Integer.parseInt(ConfigurationManager.getProperty("oai.didl.maxresponse"), MAXRESPONSE_INLINE_BITSTREAM); 
+        String strMaxSize = ConfigurationManager.getProperty("oai.didl.maxresponse");
+        int maxsize = MAXRESPONSE_INLINE_BITSTREAM;
+        if (strMaxSize != null)
+        {
+            maxsize = Integer.parseInt(strMaxSize);
+        }
+         
         String currdate=ServerVerb.createResponseDate(new Date());
         
         metadata.append("<didl:DIDL ")

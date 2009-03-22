@@ -101,6 +101,7 @@
  - [DS-64] xmlui selection of authentication method - ID: 2086673
  - [DS-83] Hardcoded behaviour of Initial question step in the submission
  - [DS-101] Impossible to complete Registration in JSPUI
+ - [DS-107] DIDL Crosswalk thrown NPE
  
 (Paulo Jobim)
  - SF Patch [2655052] Authors re-ordered when item edited (xmlui)
