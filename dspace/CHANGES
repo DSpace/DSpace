@@ -9,6 +9,9 @@
  - [2620307] 'ant init_configs' copies wrong dspace.cfg
  - [DS-41] Small JSP cleanups
 
+(Mark Wood / Claudia Juergen / Andrea Bollini)
+- [DS-43] Manakin RSS feed generator cache timeout can't be adjusted - ID: 2593393
+
 (Stuart Lewis)
  - [2057231] Refactor LDAPServlet to use Stackable Authentication
  - Enable ldap.login.specialgroup special group for all LDAP users

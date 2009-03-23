@@ -139,6 +139,19 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     /** number of DSpace items per feed */
     private static int itemCount = 0;
     
+    /**
+     * How long should RSS feed cache entries be valid? milliseconds * seconds *
+     * minutes * hours default to 24 hours if config parameter is not present or
+     * wrong
+     */
+    private static final long CACHE_AGE;
+    static
+    {
+        final String ageCfgName = "webui.feed.cache.age";
+        final long ageCfg = ConfigurationManager.getIntProperty(ageCfgName, 24);
+        CACHE_AGE = 1000 * 60 * 60 * ageCfg;
+    }
+    
 	/**	default fields to display in item description */
     private static String defaultDescriptionFields = "dc.description.abstract, dc.description, dc.title.alternative, dc.title";
 
@@ -649,13 +662,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     private class FeedValidity extends DSpaceValidity 
     {
 		private static final long serialVersionUID = 1L;
-
-		/**
-    	 * How long should the cache assumed to be valid for, 
-    	 * milliseconds * seconds * minutes * hours
-    	 */
-    	private static final long CACHE_AGE = 1000 * 60 * 60 * 24;
-    	
+		   	
     	/** When the cache's validity expires */
     	private long expires = 0;
     	

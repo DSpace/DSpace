@@ -150,13 +150,32 @@ public class ConfigurationManager
      */
     public static int getIntProperty(String property)
     {
+        return getIntProperty(property, 0);
+    }
+
+    /**
+     * Get a configuration property as an integer, with default
+     * 
+     * @param property
+     *            the name of the property
+     *            
+     * @param defaultValue
+     *            value to return if property is not found or is not an Integer.
+     *
+     * @return the value of the property. <code>default</code> is returned if
+     *         the property does not exist or is not an Integer. To differentiate between this case
+     *         and when the property actually is false, use
+     *         <code>getProperty</code>.
+     */
+    public static int getIntProperty(String property, int defaultValue)
+    {
         if (properties == null)
         {
             loadConfig(null);
         }
 
         String stringValue = properties.getProperty(property);
-        int intValue = 0;
+        int intValue = defaultValue;
 
         if (stringValue != null)
         {
