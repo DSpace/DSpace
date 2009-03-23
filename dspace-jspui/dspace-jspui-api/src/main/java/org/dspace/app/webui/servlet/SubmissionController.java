@@ -666,7 +666,8 @@ public class SubmissionController extends DSpaceServlet
 
             // Integrity check: make sure they aren't going
             // forward or backward too far
-            if (nextStep < FIRST_STEP)
+            if ((!subInfo.isInWorkflow() && nextStep < FIRST_STEP) ||
+                    (subInfo.isInWorkflow() && nextStep < WORKFLOW_FIRST_STEP))
             {
                 nextStep = -1;
                 nextPage = -1;
