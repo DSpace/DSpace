@@ -207,15 +207,7 @@ public class CurrentActivityAction extends AbstractAction
     			
     			userAgent = request.getHeader("User-Agent");
     			
-    			System.out.println("New event:");
-    			Enumeration headerNames = request.getHeaderNames();
-    		    while(headerNames.hasMoreElements()) {
-    		      String headerName = (String)headerNames.nextElement();
-    		      System.out.println(" - "+headerName+" = '"+request.getHeader(headerName)+"'");
-    		    }
-
     			ip = request.getHeader(IP_HEADER);
-    			System.out.println(" - I pulled out value: "+ip);
     			if (ip == null)
     				ip = request.getRemoteAddr();
     		}
