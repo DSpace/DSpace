@@ -117,6 +117,9 @@
 (Paulo Jobim)
  - SF Patch [2655052] Authors re-ordered when item edited (xmlui)
 
+(Larry Stone)
+ - SF Patch [2621423] Add method to instrument Context's cache usage
+
 1.5.1 final
 ===========
 

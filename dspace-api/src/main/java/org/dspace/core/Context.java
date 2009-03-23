@@ -188,7 +188,7 @@ public class Context
     /**
      *  set the current Locale
      *  
-     *  @param Locale
+     *  @param locale
      *          the current Locale
      */
     public void setCurrentLocale(Locale locale)
@@ -527,6 +527,21 @@ public class Context
     public void clearCache()
     {
     	objectCache.clear();
+    }
+
+    /**
+     * Get the count of cached objects, which you can use to instrument
+     * an application to track whether it is "leaking" heap space by
+     * letting cached objects build up.  We recommend logging a cache
+     * count periodically or episodically at the INFO or DEBUG level,
+     * but ONLY when you are diagnosing cache leaks.
+     * @return count of entries in the cache.
+     *
+     * @return the number of items in the cache
+     */
+    public int getCacheSize()
+    {
+        return objectCache.size();
     }
     
     /**
