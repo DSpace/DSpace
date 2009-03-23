@@ -67,6 +67,9 @@
  - SF patch [2636514] multilingual input-forms reenabled
  - Added blanks between label and text in subscription email.
  
+ (Claudia Jurgen / Andrea Bollini)
+ - [DS-46] Bug 1617889 Years < 1000 do not display in simple item view - ID: 2524083 
+ 
 (Elliot Metsger)
  - Patch for SF bug #2016130 checksum checker can not retrieve very large bitstream
 
