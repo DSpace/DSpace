@@ -387,7 +387,17 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
         // User clicked "Save/Cancel" Button
         else if (cocoon.request.get(AbstractProcessingStep.CANCEL_BUTTON))
         {
-            submitStepSaveOrRemove(collectionHandle,workspaceID,step,page);	
+        	var inWorkflow = submissionInfo.isInWorkflow();
+        	if (inWorkflow && response_flag==AbstractProcessingStep.STATUS_COMPLETE)
+        	{
+        		var contextPath = cocoon.request.getContextPath();
+        		cocoon.redirectTo(contextPath+"/submissions",true);
+        		coocon.exit();
+        	}
+        	else if (!inWorkflow)
+        	{
+        			submitStepSaveOrRemove(collectionHandle,workspaceID,step,page);
+        	}
         }
         
         //User clicked on Progress Bar:
@@ -685,6 +695,19 @@ function stepHasUI(stepConfig)
  */
 function submitStepSaveOrRemove(collectionHandle,workspaceID,step,page)
 {
+	// we need to update the reached step to prevent smart user to skip file upload 
+    // or keep empty required metadata using the resume
+    var maxStep = FlowUtils.getMaximumStepReached(getDSContext(),workspaceID);
+    var maxPage = FlowUtils.getMaximumPageReached(getDSContext(),workspaceID);
+    var maxStepAndPage = parseFloat(maxStep + "." + maxPage);
+    
+    var currStepAndPage = parseFloat(step + "." + page);
+ 	   
+    if (maxStepAndPage > currStepAndPage)
+    {
+ 	   FlowUtils.setBackPageReached(getDSContext(),workspaceID, step, page);
+    }
+
     sendPageAndWait("handle/"+collectionHandle+"/submit/saveOrRemoveStep",{"id":workspaceID,"step":String(step),"page":String(page)});
     
     FlowUtils.processSaveOrRemove(getDSContext(), workspaceID, cocoon.request);
@@ -692,18 +715,6 @@ function submitStepSaveOrRemove(collectionHandle,workspaceID,step,page)
     if (cocoon.request.get("submit_save"))
     {
        // Allready saved...
-       // but we need to update the reached step to prevent smart user to skip file upload 
-       // or keep empty required metadata using the resume
-       var maxStep = FlowUtils.getMaximumStepReached(getDSContext(),workspaceID);
-       var maxPage = FlowUtils.getMaximumPageReached(getDSContext(),workspaceID);
-       var maxStepAndPage = parseFloat(maxStep + "." + maxPage);
-       
-       var currStepAndPage = parseFloat(step + "." + page);
-    	   
-       if (maxStepAndPage > currStepAndPage)
-       {
-    	   FlowUtils.setBackPageReached(getDSContext(),workspaceID, step, page);
-       }
        var contextPath = cocoon.request.getContextPath();
        cocoon.redirectTo(contextPath+"/submissions",true);
        cocoon.exit();
