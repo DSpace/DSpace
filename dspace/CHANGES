@@ -108,6 +108,9 @@
  - [DS-83] Hardcoded behaviour of Initial question step in the submission
  - [DS-101] Impossible to complete Registration in JSPUI
  - [DS-107] DIDL Crosswalk thrown NPE
+ - [DS-102] Submission without file possible with the skip upload functionality disabled
+ - [DS-103] Use of the Progress bar button don't save the current page modification
+ - [DS-104] Cancel/save button during edit of a workflow item doesn't work
  
 (Paulo Jobim)
  - SF Patch [2655052] Authors re-ordered when item edited (xmlui)

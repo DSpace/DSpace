@@ -268,10 +268,11 @@ public class DescribeStep extends AbstractProcessingStep
 
         // Step 3:
         // Check to see if any fields are missing
-        // Only check for required fields if user clicked the "next" button
-        // (or clicked progress bar)
-        //  @TODO: It'd be better if we allowed them to click *backwards* in Progress bar, but not *forwards*
-        if (buttonPressed.equals(NEXT_BUTTON) || buttonPressed.startsWith(PROGRESS_BAR_PREFIX))
+        // Only check for required fields if user clicked the "next", the "previous" or the "progress bar" button
+        if (buttonPressed.equals(NEXT_BUTTON)
+                || buttonPressed.startsWith(PROGRESS_BAR_PREFIX)
+                || buttonPressed.equals(PREVIOUS_BUTTON)
+                || buttonPressed.equals(CANCEL_BUTTON))
         {
             clearErrorFields(request);
             for (int i = 0; i < inputs.length; i++)
@@ -864,5 +865,4 @@ public class DescribeStep extends AbstractProcessingStep
         }
 
     }
-
 }

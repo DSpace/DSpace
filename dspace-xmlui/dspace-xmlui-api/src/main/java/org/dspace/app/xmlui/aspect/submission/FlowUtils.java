@@ -244,6 +244,31 @@ public class FlowUtils {
     }
 	
     /**
+     * Set a specific step and page as reached. 
+     * It will also "set back" where a user has reached.
+     * 
+     * @param context The current DSpace content
+     * @param id The unique ID of the current workflow/workspace
+     * @param step the step to set as reached, can be also a previous reached step
+     * @param page the page (within the step) to set as reached, can be also a previous reached page
+     */
+    public static void setBackPageReached(Context context, String id, int step,
+            int page) throws SQLException, AuthorizeException, IOException
+    {
+        InProgressSubmission submission = findSubmission(context, id);
+
+        if (submission instanceof WorkspaceItem)
+        {
+            WorkspaceItem workspaceItem = (WorkspaceItem) submission;
+
+            workspaceItem.setStageReached(step);
+            workspaceItem.setPageReached(page > 0 ? page : 1);
+            workspaceItem.update();
+            context.commit();
+        }
+    }
+    
+    /**
      * Find the maximum step the user has reached in the submission processes. 
      * If this submission is a workflow then return max-int.
      * 

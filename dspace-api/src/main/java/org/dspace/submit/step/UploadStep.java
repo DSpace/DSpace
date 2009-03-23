@@ -119,6 +119,8 @@ public class UploadStep extends AbstractProcessingStep
     /** log4j logger */
     private static Logger log = Logger.getLogger(UploadStep.class);
 
+    /** is the upload required? */
+    private boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
     
     /**
      * Do any processing of the information input by the user, and/or perform
@@ -154,11 +156,37 @@ public class UploadStep extends AbstractProcessingStep
         // get reference to item
         Item item = subInfo.getSubmissionItem().getItem();
 
+        // -----------------------------------
+        // Step #0: Upload new files (if any)
+        // -----------------------------------
+        String contentType = request.getContentType();
+
+        // if multipart form, then we are uploading a file
+        if ((contentType != null)
+                && (contentType.indexOf("multipart/form-data") != -1))
+        {
+            // This is a multipart request, so it's a file upload
+            // (return any status messages or errors reported)
+            int status = processUploadFile(context, request, response, subInfo);
+
+            // if error occurred, return immediately
+            if (status != STATUS_COMPLETE)
+                return status;
+        }
+            
         // if user pressed jump-to button in process bar,
         // return success (so that jump will occur)
         if (buttonPressed.startsWith(PROGRESS_BAR_PREFIX))
         {
-            return STATUS_COMPLETE;
+            // check if a file is required to be uploaded
+            if (fileRequired && !item.hasUploadedFiles())
+            {
+                return STATUS_NO_FILES_ERROR;
+            }
+            else
+            {
+                return STATUS_COMPLETE;
+            }
         }
 
         // ---------------------------------------------
@@ -248,30 +276,8 @@ public class UploadStep extends AbstractProcessingStep
             subInfo.setBitstream(null);
         }
 
-        // -----------------------------------
-        // Step #3: Upload new files (if any)
-        // -----------------------------------
-        String contentType = request.getContentType();
-
-        if (buttonPressed.equalsIgnoreCase(SUBMIT_UPLOAD_BUTTON) || buttonPressed.equalsIgnoreCase(NEXT_BUTTON))
-        {
-            // if multipart form, then we are uploading a file
-            if ((contentType != null)
-                    && (contentType.indexOf("multipart/form-data") != -1))
-            {
-                // This is a multipart request, so it's a file upload
-                // (return any status messages or errors reported)
-                int status = processUploadFile(context, request, response,
-                        subInfo);
-                
-                // if error occurred, return immediately
-                if (status != STATUS_COMPLETE)
-                    return status;
-            }
-        }
-
         // -------------------------------------------------
-        // Step #4: Check for a change in file description
+        // Step #3: Check for a change in file description
         // -------------------------------------------------
         String fileDescription = request.getParameter("description");
 
@@ -287,7 +293,7 @@ public class UploadStep extends AbstractProcessingStep
         }
 
         // ------------------------------------------
-        // Step #5: Check for a file format change
+        // Step #4: Check for a file format change
         // (if user had to manually specify format)
         // ------------------------------------------
         int formatTypeID = Util.getIntParameter(request, "format");
@@ -307,7 +313,7 @@ public class UploadStep extends AbstractProcessingStep
         }
 
         // ---------------------------------------------------
-        // Step #6: Check if primary bitstream has changed
+        // Step #5: Check if primary bitstream has changed
         // -------------------------------------------------
         if (request.getParameter("primary_bitstream_id") != null)
         {
@@ -318,29 +324,13 @@ public class UploadStep extends AbstractProcessingStep
         }
 
         // ---------------------------------------------------
-        // Step #7: Determine if there is an error because no
+        // Step #6: Determine if there is an error because no
         // files have been uploaded.
         // ---------------------------------------------------
         //check if a file is required to be uploaded
-        boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);     
-        if (fileRequired)
+        if (fileRequired && !item.hasUploadedFiles())
         {
-            Bundle[] bundles = item.getBundles("ORIGINAL");
-            if (bundles.length == 0)
-            {
-                // if no ORIGINAL bundle,
-                // throw an error that there is no file!
-                return STATUS_NO_FILES_ERROR;
-            }
-            else
-            {
-                Bitstream[] bitstreams = bundles[0].getBitstreams();
-                if (bitstreams.length == 0)
-                {
-                    // no files in ORIGINAL bundle!
-                    return STATUS_NO_FILES_ERROR;
-                }
-            }
+            return STATUS_NO_FILES_ERROR;
         }
 
         // commit all changes to database

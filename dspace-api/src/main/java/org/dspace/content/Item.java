@@ -2165,6 +2165,35 @@ public class Item extends DSpaceObject
     }
     
     /**
+     * Check the bundle ORIGINAL to see if there are any uploaded files
+     * 
+     * @param item
+     * @return true if there is a bundle named ORIGINAL with one or more
+     *         bitstreams inside
+     * @throws SQLException
+     */
+    public boolean hasUploadedFiles() throws SQLException
+    {
+        Bundle[] bundles = getBundles("ORIGINAL");
+        if (bundles.length == 0)
+        {
+            // if no ORIGINAL bundle,
+            // return false that there is no file!
+            return false;
+        }
+        else
+        {
+            Bitstream[] bitstreams = bundles[0].getBitstreams();
+            if (bitstreams.length == 0)
+            {
+                // no files in ORIGINAL bundle!
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    /**
      * Get the collections this item is not in.
      * 
      * @return the collections this item is not in, if any.
