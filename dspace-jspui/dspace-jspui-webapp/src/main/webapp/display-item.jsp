@@ -131,24 +131,22 @@
         if (admin_button)  // admin edit button
         { %>
             <td class="evenRowEvenCol" align="center">
-                <form method="get" action="<%= request.getContextPath() %>/tools/edit-item">
-                    <input type="hidden" name="item_id" value="<%= item.getID() %>" />
-                    <%--<input type="submit" name="submit" value="Edit...">--%>
-                    <input type="submit" name="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
-                </form>
-            </td>
-            <td class="evenRowEvenCol" align="center">
                 <form method="post" action="<%= request.getContextPath() %>/mydspace">
                     <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                     <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_EXPORT_ARCHIVE %>" />
                     <input type="submit" name="submit" value="<fmt:message key="jsp.mydspace.request.export.item"/>" />
                 </form>
-            </td>
-            <td class="evenRowEvenCol" align="center">
                 <form method="post" action="<%= request.getContextPath() %>/mydspace">
                     <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                     <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_MIGRATE_ARCHIVE %>" />
-                    <input type="submit" name="submit" value="<fmt:message key="jsp.mydspace.request.export.item"/>" />
+                    <input type="submit" name="submit" value="<fmt:message key="jsp.mydspace.request.export.migrateitem"/>" />
+                </form>
+            </td>
+            <td class="evenRowEvenCol" align="center">
+                <form method="get" action="<%= request.getContextPath() %>/tools/edit-item">
+                    <input type="hidden" name="item_id" value="<%= item.getID() %>" />
+                    <%--<input type="submit" name="submit" value="Edit...">--%>
+                    <input type="submit" name="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
                 </form>
             </td>
 <%      } %>
