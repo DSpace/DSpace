@@ -584,6 +584,16 @@ public class ItemExport
 
                     String myName = b.getName();
                     String oldName = myName;
+
+                    String description = b.getDescription();
+                    if ((description != null) && (!description.equals("")))
+                    {
+                        description = "\tdescription:" + description;
+                    } else
+                    {
+                        description = "";
+                    }
+
                     int myPrefix = 1; // only used with name conflict
 
                     InputStream is = b.retrieve();
@@ -616,12 +626,12 @@ public class ItemExport
                             if (b.isRegisteredBitstream())
                             {
                                 out.println("-r -s " + b.getStoreNumber()
-                                        + " -f " + myName + "\tbundle:"
-                                        + bundleName);
+                                        + " -f " + myName +
+                                        "\tbundle:" + bundleName + description);
                             }
                             else
                             {
-                                out.println(myName + "\tbundle:" + bundleName);
+                                out.println(myName + "\tbundle:" + bundleName + description);
                             }
 
                             isDone = true;

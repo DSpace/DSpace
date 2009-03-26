@@ -945,8 +945,7 @@ public class ItemImport
                 }
                 catch (IOException e1)
                 {
-                    System.err
-                            .println("Non-critical problem releasing resources.");
+                    System.err.println("Non-critical problem releasing resources.");
                 }
             }
         }
@@ -995,9 +994,8 @@ public class ItemImport
             	    String sRegistrationLine = line.trim();
             	    int iAssetstore = -1;
             	    String sFilePath = null;
-            	    String sBundle = null;
-                    StringTokenizer tokenizer = 
-                        	new StringTokenizer(sRegistrationLine);
+                    String sBundle = null;
+                    StringTokenizer tokenizer = new StringTokenizer(sRegistrationLine);
                     while (tokenizer.hasMoreTokens())
                     {
                         String sToken = tokenizer.nextToken(); 
@@ -1020,13 +1018,12 @@ public class ItemImport
                         else if (sToken.equals("-f") && tokenizer.hasMoreTokens())
                         {
                             sFilePath = tokenizer.nextToken();
-
                         }
                         else if (sToken.startsWith("bundle:"))
                         {
                             sBundle = sToken.substring(7);
                         }
-                        else 
+                        else
                         {
                             // unrecognized token - should be no problem
                         }
@@ -1040,8 +1037,9 @@ public class ItemImport
                     }
                     registerBitstream(c, i, iAssetstore, sFilePath, sBundle);
                     System.out.println("\tRegistering Bitstream: " + sFilePath
-                            + "\tAssetstore: " + iAssetstore 
-                            + "\tBundle: " + sBundle);
+                            + "\tAssetstore: " + iAssetstore
+                            + "\tBundle: " + sBundle
+                            + "\tDescription: " + sBundle);
                     continue;				// process next line in contents file
             	}
 
@@ -1107,10 +1105,9 @@ public class ItemImport
                     if (bundleExists)
                     {
                         String bundleName = line.substring(bMarkerIndex
-                                + bundleMarker.length(), bEndIndex);
+                                + bundleMarker.length(), bEndIndex).trim();
 
-                        processContentFileEntry(c, i, path, bitstreamName,
-                                bundleName);
+                        processContentFileEntry(c, i, path, bitstreamName, bundleName);
                         System.out.println("\tBitstream: " + bitstreamName
                                 + "\tBundle: " + bundleName);
                     }
@@ -1188,7 +1185,7 @@ public class ItemImport
                 newBundleName = "ORIGINAL";
             }
         }
-
+        
         if (!isTest)
         {
             // find the bundle
