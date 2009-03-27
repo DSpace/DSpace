@@ -68,7 +68,7 @@
  - SF patch [2636514] multilingual input-forms reenabled
  - Added blanks between label and text in subscription email.
  
- (Claudia Juergen / Andrea Bollini)
+(Claudia Juergen / Andrea Bollini)
  - [DS-46] Bug 1617889 Years < 1000 do not display in simple item view - ID: 2524083 
  
 (Elliot Metsger)
@@ -120,6 +120,9 @@
 
 (Larry Stone)
  - SF Patch [2621423] Add method to instrument Context's cache usage
+
+(Bruc Liong / Xiang Kevin Li)
+- [DS-48] shibboleth+dspace1.5.1 patch - ID: 2412723
 
 1.5.1 final
 ===========
