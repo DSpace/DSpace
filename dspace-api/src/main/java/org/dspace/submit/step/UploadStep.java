@@ -542,6 +542,23 @@ public class UploadStep extends AbstractProcessingStep
                     else
                     {
                         log.warn("Attempt to upload file format marked as internal system use only");
+                        
+                        // remove bitstream from bundle..
+                        // delete bundle if it's now empty
+                        Bundle[] bnd = b.getBundles();
+
+                        bnd[0].removeBitstream(b);
+
+                        Bitstream[] bitstreams = bnd[0].getBitstreams();
+
+                        // remove bundle if it's now empty
+                        if (bitstreams.length < 1)
+                        {
+                            item.removeBundle(bnd[0]);
+                            item.update();
+                        }
+
+                        subInfo.setBitstream(null);
                     }
                 }// if subInfo not null
                 else

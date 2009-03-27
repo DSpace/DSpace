@@ -115,6 +115,7 @@
  - [DS-105] Initial Questions button in the progress bar doesn't work in workflow
  - [DS-106] Save & exit button doesn't properly work in workflow
  - [DS-126] Request to [dspace-base-url]/bitstream throw NPE
+ - [DS-67] Impossible retry/resume after upload a file with internal format
  
 (Paulo Jobim)
  - SF Patch [2655052] Authors re-ordered when item edited (xmlui)
