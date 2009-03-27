@@ -395,7 +395,19 @@
     <servlet-name>subject-search</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.ControlledVocabularySearchServlet</servlet-class>
   </servlet>  
-  
+
+ 
+  <!-- shibbolized dspace -->
+  <servlet>
+    <servlet-name>shibboleth-login</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.ShibbolethServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>shibboleth-login</servlet-name>
+    <url-pattern>/shibboleth-login</url-pattern>
+  </servlet-mapping>
+ 
 
   <!-- Servlet Mappings -->
 
