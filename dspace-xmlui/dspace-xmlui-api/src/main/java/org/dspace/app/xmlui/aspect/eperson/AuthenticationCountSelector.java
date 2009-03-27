@@ -39,11 +39,17 @@
  */
 package org.dspace.app.xmlui.aspect.eperson;
 
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.selection.Selector;
+import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authenticate.AuthenticationMethod;
 
@@ -57,7 +63,7 @@ import org.dspace.authenticate.AuthenticationMethod;
 public class AuthenticationCountSelector implements Selector{
     /**
      * Returns true if the expression (in this case a number) is equal to the number
-     * of AuthenticationMethods defined in the dspace.cnf file
+     * of AuthenticationMethods defined in the dspace.cfg file
      * @return
      */
 	public boolean select(String expression, Map objectModel, Parameters parameters) {
@@ -65,14 +71,29 @@ public class AuthenticationCountSelector implements Selector{
 		final Iterator<AuthenticationMethod> authMethods = (Iterator<AuthenticationMethod>) AuthenticationManager
 		    .authenticationMethodIterator();
 		
+		  final HttpServletResponse httpResponse = (HttpServletResponse) objectModel
+          .get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+  final HttpServletRequest httpRequest = (HttpServletRequest) objectModel
+          .get(HttpEnvironment.HTTP_REQUEST_OBJECT);
+  
 		int authMethodCount = 0;
 		
 		// iterate to count the methods
 		while(authMethods.hasNext()){
 			AuthenticationMethod auth = authMethods.next();
-			if (!auth.isImplicit()){
-			    authMethodCount++;
-			}
+			try
+            {
+                if (auth.loginPageURL(
+                        ContextUtil.obtainContext(objectModel), httpRequest,
+                        httpResponse) != null){
+                    authMethodCount++;
+                }
+            }
+            catch (SQLException e)
+            {
+                // mmm... we should not never go here, anyway we convert it in an unchecked exception 
+                throw new RuntimeException(e);
+            }
 		}
 		
 		final Integer exp = new Integer(expression);

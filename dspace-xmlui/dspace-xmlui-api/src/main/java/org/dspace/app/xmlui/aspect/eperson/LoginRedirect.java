@@ -82,7 +82,8 @@ public class LoginRedirect extends AbstractAction {
         while (authMethods.hasNext())
         {
             AuthenticationMethod currAuthMethod = authMethods.next();
-            if (!currAuthMethod.isImplicit())
+            if (currAuthMethod.loginPageURL(ContextUtil
+                    .obtainContext(objectModel), httpRequest, httpResponse) != null)
             {
                 if (authMethod != null)
                 {
