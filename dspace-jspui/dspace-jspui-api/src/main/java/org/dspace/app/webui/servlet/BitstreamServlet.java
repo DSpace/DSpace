@@ -117,6 +117,11 @@ public class BitstreamServlet extends DSpaceServlet
         String filename = null;
         int sequenceID;
 
+        if (idString == null)
+        {
+            idString = "";
+        }
+        
         // Parse 'handle' and 'sequence' (bitstream seq. number) out
         // of remaining URL path, which is typically of the format:
         // {handle}/{sequence}/{bitstream-name}
