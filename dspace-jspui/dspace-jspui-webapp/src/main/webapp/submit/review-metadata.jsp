@@ -159,7 +159,11 @@
                    String storedVal = values[i].value;
                    String displayVal = inputs[z].getDisplayString(pairsName,
                                                                 storedVal);
-                   if (displayVal == null || displayVal.equals(""))
+                   if (displayVal != null && !displayVal.equals(""))
+                   {
+                       row.append(Utils.addEntities(displayVal));
+                   }
+                   else if (storedVal != null && !storedVal.equals(""))
                    {
                        // use the stored value as label rather than null
                        row.append(Utils.addEntities(storedVal));
