@@ -423,6 +423,10 @@ public class JSPUploadStep extends JSPStep
             throws SQLException, ServletException, IOException
     {
 
+        // set to null the bitstream in subInfo, we need to process a new file
+        // we don't need any info about previous files...
+        subInfo.setBitstream(null);
+        
         // load JSP which allows the user to select a file to upload
         JSPStepManager.showJSP(request, response, subInfo, CHOOSE_FILE_JSP);
     }

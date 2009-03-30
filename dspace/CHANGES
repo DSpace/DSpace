@@ -119,6 +119,7 @@
  - [DS-66] bitstream format registry, setting bitstream internal - ID: 1896055
  - [DS-115] metadata not showed in verify step
  - [DS-122] Problems with repeatable metadata
+ - [DS-116] File description not correct
  
 (Paulo Jobim)
  - SF Patch [2655052] Authors re-ordered when item edited (xmlui)
