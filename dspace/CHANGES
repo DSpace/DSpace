@@ -88,6 +88,7 @@
  - Fix for Jira [DS-96] XMLUI Wing-Framework 'Radio' class doesn't support adding radio buttons which are unselected by default.
  - Fix for Jira [DS-97] XMLUI does not come with a robots.txt out-of-the-box. It also does not provide suggestions for loading global static content.
  - [1712125] Allow dsrun and dsrun.bat to use JAVA_OPTS
+ - Fix for Jira [DS-130] XMLUI Browse by Author doesn't work for names with special characters (for example: é, è, ö, etc.)
 
 (Kim Shepherd)
  - [2385187] Fix for toDate method in DCDate
