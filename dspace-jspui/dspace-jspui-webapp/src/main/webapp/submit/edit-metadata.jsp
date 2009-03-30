@@ -169,13 +169,13 @@
       {
 	 first.setLength(0);
 	 first.append(fieldName).append("_first");
-	 if (repeatable && i>0)
-	    first.append('_').append(i);
+	 if (repeatable && i != fieldCount)
+	    first.append('_').append(i+1);
 
 	 last.setLength(0);
 	 last.append(fieldName).append("_last");
-	 if (repeatable && i>0)
-	    last.append('_').append(i);
+	 if (repeatable && i != fieldCount)
+	    last.append('_').append(i+1);
 	    
 	 if (i == 0) 
 	    sb.append("<tr><td class=\"submitFormLabel\">")
@@ -390,16 +390,16 @@
          sb.append("<td><input type=\"text\" name=\"")
            .append(fieldName)
 	   .append("_series");
-         if (repeatable && i>0)
-           sb.append("_").append(i);
+         if (repeatable && i!= fieldCount)
+           sb.append("_").append(i+1);
 
          sb.append("\" size=\"23\" value=\"")
            .append(sn.getSeries().replaceAll("\"", "&quot;"))
 	   .append("\"/></td>\n<td><input type=\"text\" name=\"")
 	   .append(fieldName)
 	   .append("_number");
-         if (repeatable && i>0)
-           sb.append("_").append(i);
+         if (repeatable && i!= fieldCount)
+           sb.append("_").append(i+1);
          sb.append("\" size=\"23\" value=\"")
            .append(sn.getNumber().replaceAll("\"", "&quot;"))
 	   .append("\"/></td>\n");
@@ -466,8 +466,8 @@
 
          sb.append("<td colspan=\"2\"><textarea name=\"")
            .append(fieldName);
-         if (repeatable && i>0)
-           sb.append("_").append(i);
+         if (repeatable && i!= fieldCount)
+           sb.append("_").append(i+1);
          sb.append("\" rows=\"4\" cols=\"45\"")
            .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
            .append(" >")
@@ -538,14 +538,14 @@
 
          sb.append("<td colspan=\"2\"><input type=\"text\" name=\"")
            .append(fieldName);
-         if (repeatable && i>0)
-           sb.append("_").append(i);
+         if (repeatable && i!= fieldCount)
+           sb.append("_").append(i+1);
          
          sb.append("\" size=\"50\" value=\"")
            .append(val +"\"")
            .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
 	   	.append("/>")
-	   .append(doControlledVocabulary(fieldName + (repeatable?"_" + i:""), pageContext, vocabulary))
+	   .append(doControlledVocabulary(fieldName + (repeatable&& i!= fieldCount?"_" + (i+1):""), pageContext, vocabulary))
 	   .append("</td>\n");
 	   
 
@@ -615,22 +615,30 @@
 
       for (int i = 0; i < fieldCount; i++) 
       {
-	 if (i == 0)
-	 {	 
-	    //param is just the field name
-	    fieldParam = fieldName;
-	     
-	    sb.append("<tr><td class=\"submitFormLabel\">")
-	      .append(label)
-	      .append("</td>");
-	 }
-	 else
-	 {  
-		//param is field name and index (e.g. myfield_2) 
-	    fieldParam = fieldName + "_" + i;
-	    sb.append("<tr><td>&nbsp;</td>");
-	 }
+		 if (i == 0)
+		 {	 
+		    sb.append("<tr><td class=\"submitFormLabel\">")
+		      .append(label)
+		      .append("</td>");
+		 }
+		 else
+		 {  
+		    sb.append("<tr><td>&nbsp;</td>");
+		 }
+		 
+		 if(i != fieldCount)
+		 {
+		   	 //param is field name and index, starting from 1 (e.g. myfield_2)
+		     fieldParam = fieldName + "_" + (i+1); 
+		 }
+		 else
+		 {
+		   	 //param is just the field name
+			 fieldParam = fieldName;
+		 }
+		 
          if (i < defaults.length)
+         {
            sb.append("<td align=\"left\"><input type=\"text\" name=\"")
              .append(fieldParam)
              .append("\" size=\"15\" value=\"")
@@ -644,62 +652,76 @@
 	     .append("\" value=\"")
 	     .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
 	     .append("\"/>")
-         .append(doControlledVocabulary(fieldName + "_" + i, pageContext, vocabulary))
+         .append(doControlledVocabulary(fieldParam, pageContext, vocabulary))
 	     .append("</td>\n");
+         }
          else 
-	 {
+	 	 {
            sb.append("<td align=\"left\"><input type=\"text\" name=\"")
              .append(fieldParam)
              .append("\" size=\"15\"")
              .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
              .append("/>")
-             .append(doControlledVocabulary(fieldName + "_" + i, pageContext, vocabulary))
+             .append(doControlledVocabulary(fieldParam, pageContext, vocabulary))
              .append("</td>\n");             
-	 }
-	 i++;
-	 //param is field name and index (e.g. myfield_2) 
-	 fieldParam = fieldName + "_" + i;
-	 if (i < defaults.length)
-           sb.append("<td align=\"left\"><input type=\"text\" name=\"")
-             .append(fieldParam)
-             .append("\" size=\"15\" value=\"")
-             .append(defaults[i].value.replaceAll("\"", "&quot;"))
-	         .append("\"")
-	         .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
-	         .append("/>&nbsp;<input type=\"submit\" name=\"submit_")
-	     .append(fieldName)
-	     .append("_remove_")
-	     .append(i)
-	     .append("\" value=\"")
-	     .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
-	     .append("\"/>")
-         .append(doControlledVocabulary(fieldName + "_" + i, pageContext, vocabulary))
-	     .append("</td></tr>\n");
-	 else 
-	 {
-           sb.append("<td align=\"left\"><input type=\"text\" name=\"")
-             .append(fieldParam)
-             //.append("\" size=\"15\"/></td>");
-             .append("\" size=\"15\"")
-             .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
-             .append("/>")
-             .append(doControlledVocabulary(fieldName + "_" + i, pageContext, vocabulary))
-             .append("</td>\n");             
+	 	}
+	 
+         i++;
 
-	   if (i+1 >= fieldCount) 
-	   {
-	     sb.append("<td><input type=\"submit\" name=\"submit_")
-	       .append(fieldName)
-	       .append("_add\" value=\"")
-	       .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-	       .append("\"/></td>\n");
-	   } 
-	   else 
-	   {
-	     sb.append("</td>");
-	   }
-	   sb.append("<td>&nbsp;</td></tr>");
-	 }
+    	 if(i != fieldCount)
+		 {
+		   	 //param is field name and index, starting from 1 (e.g. myfield_2)
+		     fieldParam = fieldName + "_" + (i+1); 
+		 }
+		 else
+		 {
+		   	 //param is just the field name
+			 fieldParam = fieldName;
+		 }
+	
+		 if (i < defaults.length)
+		 {
+	           sb.append("<td align=\"left\"><input type=\"text\" name=\"")
+	             .append(fieldParam)
+	             .append("\" size=\"15\" value=\"")
+	             .append(defaults[i].value.replaceAll("\"", "&quot;"))
+		         .append("\"")
+		         .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
+		         .append("/>&nbsp;<input type=\"submit\" name=\"submit_")
+		     .append(fieldName)
+		     .append("_remove_")
+		     .append(i)
+		     .append("\" value=\"")
+		     .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
+		     .append("\"/>")
+	         .append(doControlledVocabulary(fieldParam, pageContext, vocabulary))
+		     .append("</td></tr>\n");
+		 }
+		 else 
+		 {
+	           sb.append("<td align=\"left\"><input type=\"text\" name=\"")
+	             .append(fieldParam)
+	             //.append("\" size=\"15\"/></td>");
+	             .append("\" size=\"15\"")
+	             .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
+	             .append("/>")
+	             .append(doControlledVocabulary(fieldParam, pageContext, vocabulary))
+	             .append("</td>\n");             
+	
+		   if (i+1 >= fieldCount) 
+		   {
+		     sb.append("<td><input type=\"submit\" name=\"submit_")
+		       .append(fieldName)
+		       .append("_add\" value=\"")
+		       .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
+		       .append("\"/></td>\n");
+		   } 
+		   else 
+		   {
+		     sb.append("</td>");
+		   }
+		   sb.append("<td>&nbsp;</td></tr>");
+		 }
       }
 
       out.write(sb.toString());
@@ -761,8 +783,8 @@
 	 sb.append("<td colspan=\"2\"><select name=\"")
            .append(fieldName)
 	   .append("_qualifier");
-         if (repeatable && j>0) 
-           sb.append("_").append(j);
+         if (repeatable && j!= fieldCount) 
+           sb.append("_").append(j+1);
          sb.append("\">");
          for (int i = 0; i < qualMap.size(); i+=2)
          {
@@ -781,8 +803,8 @@
          sb.append("</select>&nbsp;<input type=\"text\" name=\"")
            .append(fieldName)
 	   .append("_value");
-         if (repeatable && j>0)
-           sb.append("_").append(j);
+         if (repeatable && j!= fieldCount)
+           sb.append("_").append(j+1);
          sb.append("\" size=\"34\" value=\"")
            .append(currentVal.replaceAll("\"", "&quot;"))
 	   .append("\"/></td>\n");
