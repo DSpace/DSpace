@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
   <chapter remap="h1">
-    <title>Customizing and Configuring Submission User Interface</title>
+    <title><anchor id="docbook-submission.html"/>Customizing and Configuring Submission User Interface</title>
     <para>This page explains various customization and configuration options that are available within DSpace for the Item Submission user interface.</para>
     <para>
       <anchor id="docbook-submission.html-configurationFile"/>
@@ -491,7 +491,7 @@ cribeStep&lt;/xmlui-binding&gt; &lt;workflow-editable&gt;true&lt;/workflow-edita
               </varlistentry>
             </variablelist>
             <para>Look at the example <literal>input-forms.xml</literal> and experiment with a a trial custom form to learn this specification language thoroughly. It is a very simple way to express the layout of data-entry forms, but the only way to learn all its subtleties is to use it.</para>
-            <para>For the use of controlled vocabularies see the <ulink url="configure.html#controlledvocabulary">Configuring Controlled Vocabularies</ulink> section.</para>
+            <para>For the use of controlled vocabularies see the <link linkend="docbook-configure.html-controlledvocabulary">Configuring Controlled Vocabularies</link> section.</para>
           </section>
           <section remap="h5">
             <title>Automatically Elided Fields</title>
@@ -676,7 +676,7 @@ cribeStep&lt;/xmlui-binding&gt; &lt;workflow-editable&gt;true&lt;/workflow-edita
           <para> (<emphasis role="bold">Required</emphasis>) Add a valid Step Definition to the <literal>item-submission.xml</literal> configuration file. </para>
           <itemizedlist>
             <listitem>
-              <para> This may also require that you add an I18N (Internationalization) key for this step&apos;s <literal>heading</literal>. See the sections on <ulink url="configure.html#jspui-multilingual">Configuring Multilingual Support for JSPUI</ulink> or <ulink url="configure.html#xmlui-multilingual">Configuring Multilingual Support for XMLUI</ulink> for more details.</para>
+              <para> This may also require that you add an I18N (Internationalization) key for this step&apos;s <literal>heading</literal>. See the sections on <link linkend="docbook-configure.html-jspui-multilingual">Configuring Multilingual Support for JSPUI</link> or <link linkend="docbook-configure.html#xmlui-multilingual">Configuring Multilingual Support for XMLUI</link> for more details.</para>
             </listitem>
             <listitem>
               <para> For more information on <literal>&lt;step&gt;</literal> definitions within the <literal>item-submission.xml</literal>, see the section above on <anchor id="docbook-submission.html--stepDefinitions.1" xreflabel="Defining Steps

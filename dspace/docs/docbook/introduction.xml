@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
   <chapter remap="h1">
-    <title>DSpace System Documentation: Introduction</title>
+    <title><anchor id="docbook-introduction.html"/>DSpace System Documentation: Introduction</title>
     <para>DSpace is an open source software platform that enables organisations to:</para>
     <itemizedlist>
       <listitem>
@@ -13,9 +13,9 @@
         <para> preserve digital assets over the long term</para>
       </listitem>
     </itemizedlist>
-    <para>This system documentation includes <ulink url="functional.html">a functional overview of the system</ulink>, which is a good introduction to the capabilities of the system, and should be readable by non-technical folk. Everyone should read this section first because it introduces some terminology used throughout the rest of the documentation.</para>
-    <para>For people actually running a DSpace service, there is <ulink url="install.html">an installation guide</ulink>, and sections on <ulink url="configure.html">configuration</ulink> and <ulink url="directories.html">the directory structure</ulink>. Note that as of DSpace 1.2, the administration user interface guide is now on-line help available from within the DSpace system.</para>
-    <para>Finally, for those interested in the details of how DSpace works, and those potentially interested in modifying the code for their own purposes, there is <ulink url="architecture.html">a detailed architecture and design section</ulink>.</para>
+    <para>This system documentation includes <link linkend="docbook-functional.html">a functional overview of the system</link>, which is a good introduction to the capabilities of the system, and should be readable by non-technical folk. Everyone should read this section first because it introduces some terminology used throughout the rest of the documentation.</para>
+    <para>For people actually running a DSpace service, there is <link linkend="docbook-install.html">an installation guide</link>, and sections on <link linkend="docbook-configure.html">configuration</link> and <link linkend="docbook-directories.html">the directory structure</link>. Note that as of DSpace 1.2, the administration user interface guide is now on-line help available from within the DSpace system.</para>
+    <para>Finally, for those interested in the details of how DSpace works, and those potentially interested in modifying the code for their own purposes, there is <link linkend="docbook-architecture.html">a detailed architecture and design section</link>.</para>
     <para>Other good sources of information are:</para>
     <itemizedlist>
       <listitem>

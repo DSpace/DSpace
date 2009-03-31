@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
   <chapter remap="h1">
-    <title>DSpace System Documentation: Updating a DSpace Installation</title>
-    <para>This section describes how to update a DSpace installation from one version to the next. Details of the differences between the functionality of each version are given in the <ulink url="history.html">Version History</ulink> section.</para>
+    <title><anchor id="docbook-update.html"/>DSpace System Documentation: Updating a DSpace Installation</title>
+    <para>This section describes how to update a DSpace installation from one version to the next. Details of the differences between the functionality of each version are given in the <link linkend="docbook-history.html">Version History</link> section.</para>
     <section remap="h2">
       <title><anchor id="docbook-update.html-142_15" xreflabel="Updating From 1.4.2 to 1.5"/>Updating From 1.4.2 to 1.5</title>
       <para>The changes in DSpace 1.5 are significant and wide spread involving database schema upgrades, code restructuring, completely new user and programatic interfaces, and new build system.</para>
@@ -28,7 +28,7 @@
           <para><emphasis role="bold">Download DSpace 1.5</emphasis> Get the new DSpace 1.5 source code either as a download from <ulink url="#">SourceForge</ulink> or check it out directly from the <ulink url="#">SVN code repository</ulink>. If you downloaded DSpace do not unpack it on top of your existing installation.</para>
         </listitem>
         <listitem>
-          <para><emphasis role="bold">Build DSpace</emphasis> The build process has radically changed for DSpace 1.5. With this new release the build system has moved to a maven-based system enabling the various projects (JSPUI, XMLUI, OAI, and Core API) into separate projects. See the <ulink url="install.html">Installation section</ulink> for more information on building DSpace using the new maven-based build system. Run the following commands to compile DSpace.</para>
+          <para><emphasis role="bold">Build DSpace</emphasis> The build process has radically changed for DSpace 1.5. With this new release the build system has moved to a maven-based system enabling the various projects (JSPUI, XMLUI, OAI, and Core API) into separate projects. See the <link linkend="docbook-install.html">Installation section</link> for more information on building DSpace using the new maven-based build system. Run the following commands to compile DSpace.</para>
           <screen>
   cd [dspace-source]/dspace/;
   mvn package
@@ -181,7 +181,7 @@ cp [dspace-source]/dspace/config/emails/registration_notify
           </itemizedlist>
         </listitem>
         <listitem>
-          <para><emphasis role="bold">Apply any customizations</emphasis> If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. Commonly these modifications are made to &quot;JSP&quot; pages located inside the <literal>[dspace 1.4.2]/jsp/local</literal> directory. These should be moved <literal>[dspace-source]/dspace/modules/jspui/src/main/webapp/</literal> in the new build structure. See <ulink url="configure.html#jspui-jsp">Customizing the JSP Pages</ulink> for more information.</para>
+          <para><emphasis role="bold">Apply any customizations</emphasis> If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. Commonly these modifications are made to &quot;JSP&quot; pages located inside the <literal>[dspace 1.4.2]/jsp/local</literal> directory. These should be moved <literal>[dspace-source]/dspace/modules/jspui/src/main/webapp/</literal> in the new build structure. See <link linkend="docbook-configure.html-jspui-jsp">Customizing the JSP Pages</link> for more information.</para>
         </listitem>
         <listitem>
           <para><emphasis role="bold">Update DSpace</emphasis> Update the DSpace installed directory with new code and libraries. Inside the <literal>[dspace-source]/dspace/target/dspace-1.5-build.dir/</literal> directory run:</para>
@@ -440,7 +440,7 @@ search.index.1 = title:dc.title.alternative
 </screen>
             </listitem>
             <listitem>
-              <para> If you use LDAP or X509 authentication, you&apos;ll need to add <literal>org.dspace.eperson.LDAPAuthentication</literal> or <literal>org.dspace.eperson.X509Authentication</literal> respectively. See also <ulink url="configure.html#authenticate">configuring custom authentication code</ulink>.</para>
+              <para> If you use LDAP or X509 authentication, you&apos;ll need to add <literal>org.dspace.eperson.LDAPAuthentication</literal> or <literal>org.dspace.eperson.X509Authentication</literal> respectively. See also <link linkend="docbook-configure.html-authenticate">configuring custom authentication code</link>.</para>
             </listitem>
             <listitem>
               <para> If you have custom Media Filters, note that these are now configured through <literal>dspace.cfg</literal> (instead of <literal>mediafilter.cfg</literal> which is obsolete.)</para>
@@ -600,7 +600,7 @@ report.dir = /dspace/reports/
           </para>
         </listitem>
         <listitem>
-          <para> Customise the stat generating statistics as per the instructions in <ulink url="configure.html#statistics">System Statistical Reports</ulink></para>
+          <para> Customise the stat generating statistics as per the instructions in <link linkend="docbook-configure.html-statistics">System Statistical Reports</link></para>
         </listitem>
         <listitem>
           <para> Initialise the statistics using:</para>
@@ -653,7 +653,7 @@ cp postgresql.jar <emphasis> [dspace-1.2.2-source]</emphasis>/lib
           <para> Take down Tomcat (or whichever servlet container you&apos;re using).</para>
         </listitem>
         <listitem>
-          <para> Your &apos;localized&apos; JSPs (those in jsp/local) now need to be maintained in the <emphasis>source</emphasis> directory. If you have locally modified JSPs in your <literal>[dspace]/jsp/local</literal> directory, you might like to merge the changes in the new 1.2.2 versions into your locally modified ones. You can use the <literal>diff</literal> command to compare the 1.2.1 and 1.2.2 versions to do this. Also see <ulink url="history.html#jsp-changes-1_2_1-1_2_2">the version history</ulink> for a list of modified JSPs.</para>
+          <para> Your &apos;localized&apos; JSPs (those in jsp/local) now need to be maintained in the <emphasis>source</emphasis> directory. If you have locally modified JSPs in your <literal>[dspace]/jsp/local</literal> directory, you might like to merge the changes in the new 1.2.2 versions into your locally modified ones. You can use the <literal>diff</literal> command to compare the 1.2.1 and 1.2.2 versions to do this. Also see <link linkend="docbook-history.html-jsp-changes-1_2_1-1_2_2">the version history</link> for a list of modified JSPs.</para>
         </listitem>
         <listitem>
           <para> You need to add a new parameter to your <literal>[dspace]/dspace.cfg</literal> for configurable fulltext indexing</para>
@@ -708,7 +708,7 @@ cp postgresql.jar <emphasis> [dspace-1.2.1-source]</emphasis>/lib
           <para> Take down Tomcat (or whichever servlet container you&apos;re using).</para>
         </listitem>
         <listitem>
-          <para> Your &apos;localized&apos; JSPs (those in jsp/local) now need to be maintained in the <emphasis>source</emphasis> directory. If you have locally modified JSPs in your <literal>[dspace]/jsp/local</literal> directory, you might like to merge the changes in the new 1.2.1 versions into your locally modified ones. You can use the <literal>diff</literal> command to compare the 1.2 and 1.2.1 versions to do this. Also see <ulink url="history.html#jsp-changes-1_2-1_2_1">the version history</ulink> for a list of modified JSPs.</para>
+          <para> Your &apos;localized&apos; JSPs (those in jsp/local) now need to be maintained in the <emphasis>source</emphasis> directory. If you have locally modified JSPs in your <literal>[dspace]/jsp/local</literal> directory, you might like to merge the changes in the new 1.2.1 versions into your locally modified ones. You can use the <literal>diff</literal> command to compare the 1.2 and 1.2.1 versions to do this. Also see <link linkend="docbook-history.html-jsp-changes-1_2-1_2_1">the version history</link> for a list of modified JSPs.</para>
         </listitem>
         <listitem>
           <para> You need to add a few new parameters to your <literal>[dspace]/dspace.cfg</literal> for browse/search and item thumbnails display, and for configurable DC metadata fields to be indexed.</para>
@@ -789,7 +789,7 @@ cp <emphasis> [dspace-1.2.1-source]</emphasis>/build/*.war <emphasis>
           <para> Get the new DSpace 1.2 source code from <ulink url="http://sourceforge.net/projects/dspace/">the DSpace page on SourceForge</ulink> and unpack it somewhere. Do not unpack it on top of your existing installation!!</para>
         </listitem>
         <listitem>
-          <para> Copy the <ulink url="install.html#javalibs">required Java libraries</ulink> that we couldn&apos;t include in the bundle to the source tree. For example:</para>
+          <para> Copy the <link linkend="docbook-install.html-javalibs">required Java libraries</link> that we couldn&apos;t include in the bundle to the source tree. For example:</para>
           <screen>
 cd <emphasis> [dspace]</emphasis>/lib
 cp activation.jar servlet.jar mail.jar <emphasis>
@@ -824,7 +824,7 @@ cp activation.jar servlet.jar mail.jar <emphasis>
 thumbnail.maxwidth  80
 thumbnail.maxheight 80
 </screen>
-          <para>There are one or two other, optional extra parameters (for controlling the pool of database connections). See <ulink url="history.html">the version history</ulink> for details. If you leave them out, defaults will be used.</para>
+          <para>There are one or two other, optional extra parameters (for controlling the pool of database connections). See <link linkend="docbook-history.html">the version history</link> for details. If you leave them out, defaults will be used.</para>
           <para>Also, to avoid future confusion, you might like to <emphasis role="bold">remove</emphasis> the following property, which is no longer required:</para>
           <screen>
 config.template.oai-web.xml = <emphasis>
@@ -1037,7 +1037,7 @@ CREATE VIEW CollectionItemsByDateAccession AS SELECT
           <para>(If you haven&apos;t modified any JSPs, you don&apos;t have to do anything.)</para>
         </listitem>
         <listitem>
-          <para> Copy the <ulink url="install.html#javalibs">required Java libraries</ulink> that we couldn&apos;t include in the bundle to the source tree. For example:</para>
+          <para> Copy the <link linkend="docbook-install.html-javalibs">required Java libraries</link> that we couldn&apos;t include in the bundle to the source tree. For example:</para>
           <screen>
 cd <emphasis> [dspace]</emphasis>/lib
 cp *.policy activation.jar servlet.jar mail.jar <emphasis>

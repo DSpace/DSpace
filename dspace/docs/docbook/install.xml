@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
   <chapter remap="h1">
-    <title>DSpace System Documentation: Installation</title>
+    <title><anchor id="docbook-install.html"/>DSpace System Documentation: Installation</title>
     <section remap="h2">
       <title><anchor id="docbook-install.html-prerequisite" xreflabel="Prerequisite Software"/>Prerequisite Software</title>
       <para>The list below describes the third-party components and tools you&apos;ll need to run a DSpace server. These are just guidelines. Since DSpace is built on open source, standards-based tools, there are numerous other possibilities and setups.</para>
@@ -251,7 +251,7 @@ dspace-&lt;version&gt;-src-release.zip )"/>Source Release ( dspace-&lt;version&g
  to <literal>[tomcat]/webapps/</literal> (with <literal>[tomcat]</literal> being wherever you installed Tomcat--also known as <literal>$CATALINA_HOME</literal>).</para>
           </listitem>
         </orderedlist>
-        <para>For details on the contents of these separate directory trees, refer to <ulink url="directories.html">directories.html</ulink>. <emphasis>Note that the <literal>[dspace-source]</literal> and <literal>[dspace]</literal> directories are always separate!</emphasis></para>
+        <para>For details on the contents of these separate directory trees, refer to <link linkend="docbook-directories.html">directories.html</link>. <emphasis>Note that the <literal>[dspace-source]</literal> and <literal>[dspace]</literal> directories are always separate!</emphasis></para>
       </section>
       <section remap="h3">
         <title><anchor id="docbook-install.html-installsteps" xreflabel="Installation"/>Installation</title>
@@ -455,7 +455,7 @@ crontab -e
 0 2 * * * [dspace]/bin/stat-report-monthly
 </screen>
         <para>Obviously, you should choose execution times which are most useful to you, and you should ensure that the <literal>-report-</literal> scripts run a short while after the analysis scripts to give them time to complete (a run of around 8 months worth of logs can take around 25 seconds to complete); the resulting reports will let you know how long analysis took and you can adjust your cron times accordingly.</para>
-        <para>For information on customising the output of this see <ulink url="configure.html#statistics">configuring system statistical reports</ulink>.</para>
+        <para>For information on customising the output of this see <link linkend="docbook-configure.html-statistics">configuring system statistical reports</link>.</para>
       </section>
       <section remap="h3">
         <title>Multilingual Installation</title>
@@ -463,7 +463,7 @@ crontab -e
         <para><literal>default.locale</literal>, e. g. default.locale = en</para>
         <para><literal>webui.supported locales</literal>, e. g. webui.supported.locales = en, de</para>
         <para> The Locales might have the form country, country_language, country_language_variant.</para>
-        <para> Accoding to the languages you wish to support, you have to make sure, that all the i18n related files are available see the <ulink url="configure.html#multilingualui">Multilingual User Interface Configuring MultiLingual Support</ulink> section for the JSPUI or the Multilingual Support for XMLUI in the configuration documentation. </para>
+        <para> Accoding to the languages you wish to support, you have to make sure, that all the i18n related files are available see the <link linkend="docbook-configure.html-multilingualui">Multilingual User Interface Configuring MultiLingual Support</link> section for the JSPUI or the Multilingual Support for XMLUI in the configuration documentation. </para>
       </section>
       <section remap="h3">
         <title><anchor id="docbook-install.html-https" xreflabel="DSpace over HTTPS"/>DSpace over HTTPS</title>
@@ -494,7 +494,7 @@ crontab -e
 </screen>
                 </listitem>
                 <listitem>
-                  <para> Optional -- ONLY if you need to accept client certificates for the X.509 certificate stackable authentication module See the <ulink url="configure.html#authenticate">configuration section</ulink> for instructions on enabling the X.509 authentication method. Load the keystore with the CA (certifying authority) certificates for the authorities of any clients whose certificates you wish to accept. For example, assuming the client CA certificate is in <literal>client1.pem</literal>:</para>
+                  <para> Optional -- ONLY if you need to accept client certificates for the X.509 certificate stackable authentication module See the <link linkend="docbook-configure.html-authenticate">configuration section</link> for instructions on enabling the X.509 authentication method. Load the keystore with the CA (certifying authority) certificates for the authorities of any clients whose certificates you wish to accept. For example, assuming the client CA certificate is in <literal>client1.pem</literal>:</para>
                   <screen>
  $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit
 	-trustcacerts -keystore $CATALINA_BASE/conf/keystore  -alias client1
@@ -587,7 +587,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
                   <para>When answering the questions to identify the certificate, be sure to respond to &quot;First and last name&quot; with the fully-qualified domain name of your server (e.g. <literal>test-dspace.myuni.edu</literal>). The other questions are not important.</para>
                 </listitem>
                 <listitem>
-                  <para> Optional -- ONLY if you need to accept client certificates for the X.509 certificate stackable authentication module See the <ulink url="configure.html#authenticate">configuration section</ulink> for instructions on enabling the X.509 authentication method. Load the keystore with the CA (certifying authority) certificates for the authorities of any clients whose certificates you wish to accept. For example, assuming the client CA certificate is in <literal>client1.pem</literal>:</para>
+                  <para> Optional -- ONLY if you need to accept client certificates for the X.509 certificate stackable authentication module See the <link linkend="docbook-configure.html-authenticate">configuration section</link> for instructions on enabling the X.509 authentication method. Load the keystore with the CA (certifying authority) certificates for the authorities of any clients whose certificates you wish to accept. For example, assuming the client CA certificate is in <literal>client1.pem</literal>:</para>
                   <screen>
  $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit
 	-trustcacerts -keystore $CATALINA_BASE/conf/keystore  -alias client1

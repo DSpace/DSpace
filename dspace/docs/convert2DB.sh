@@ -5,7 +5,9 @@
 # Developed On Ubuntu Hardy Heron, you'll need at least:
 # apt-get install herold docbook-utils docbook2x xsltproc docbook-xsl dbdoclet
 
-VERSION="1.5.1"
+if [ "a$DS_VERSION" == "a" ]; then
+  DS_VERSION="1.5.2"
+fi
 
 DBxml="docbook"
 HTMLfinal="html"
@@ -45,7 +47,7 @@ if [ $haveDB -lt 1 ]; then
     filelist=`ls *html`
 	cd ..
 
-	title="DSpace $VERSION Manual"
+	title="DSpace $DS_VERSION Manual"
 
 	# The initial raw html to db conversion:
 	for file in $filelist; do
@@ -93,7 +95,7 @@ if [ $haveDB -lt 1 ]; then
 
 <book>
   <bookinfo>
-    <title>DSpace $VERSION Manual</title>
+    <title>DSpace $DS_VERSION Manual</title>
     
     <author>
       <surname>The DSpace Foundation</surname>
@@ -236,7 +238,7 @@ XSLTP=" -param body.start.indent 0pt \
 if [ "a$FOP_HOME" == "a" ]; then
     FOP_HOME=/usr/local/share/fop-0.94
 fi
-java -Xmx128m -Dfop.home=$FOP_HOME -jar $FOP_HOME/build/fop.jar -xml $DBxml/book.xml -xsl $xslprint -pdf $PDFfinal/DSpace-$VERSION.pdf $XSLTP
+java -Xmx128m -Dfop.home=$FOP_HOME -jar $FOP_HOME/build/fop.jar -xml $DBxml/book.xml -xsl $xslprint -pdf $PDFfinal/DSpace-$DS_VERSION.pdf $XSLTP
 
 # HTML it using XSL
 if [ ! -d $HTMLfinal ]; then
@@ -290,7 +292,7 @@ please feel free to add them to the wiki page below.  You may also email suggest
  //--> \
  </script>.
 \$a\
-</p><br/><iframe src="http://wiki.dspace.org/index.php/AnnotateDoc_$VERSION_${file/.html/}" width="100%" height="600"/></body></html>
+</p><br/><iframe src="http://wiki.dspace.org/index.php/AnnotateDoc_$DS_VERSION_${file/.html/}" width="100%" height="600"/></body></html>
 EOF
     done
 fi

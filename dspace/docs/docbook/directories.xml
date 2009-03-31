@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
   <chapter remap="h1">
-    <title>DSpace System Documentation: Directories and Files</title>
+    <title><anchor id="docbook-directories.html"/>DSpace System Documentation: Directories and Files</title>
     <section remap="h2">
       <title><anchor id="docbook-directories.html-overview" xreflabel="Overview"/>Overview</title>
       <para>A complete DSpace installation consists of three separate directory trees:</para>

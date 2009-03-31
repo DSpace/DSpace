@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
   <chapter remap="h1">
-    <title>DSpace System Documentation: Functional Overview</title>
+    <title><anchor id="docbook-functional.html"/>DSpace System Documentation: Functional Overview</title>
     <para>The following sections describe the various functional aspects of the DSpace system.</para>
     <section remap="h2">
       <title><anchor id="docbook-functional.html-data_model" xreflabel="Data Model"/>Data Model</title>
@@ -152,7 +152,7 @@ DSpace in one of two ways:"/>Items can be removed from DSpace in one of two ways
       <title><anchor id="docbook-functional.html-plugin" xreflabel="Plugin Manager"/>Plugin Manager</title>
       <para>The PluginManager is a very simple component container. It creates and organizes components (plugins), and helps select a plugin in the cases where there are many possible choices. It also gives some limited control over the lifecycle of a plugin.</para>
       <para>A plugin is defined by a Java interface. The consumer of a plugin asks for its plugin by interface. A Plugin is an instance of any class that implements the plugin interface. It is interchangeable with other implementations, so that any of them may be &quot;plugged in&quot;.</para>
-      <para>The mediafilter is a simple example of a plugin implementation. Refer to the <ulink url="business.html#plugin">Business Logic Layer</ulink> for more details on Plugins.</para>
+      <para>The mediafilter is a simple example of a plugin implementation. Refer to the <link linkend="docbook-business.html-plugin">Business Logic Layer</link> for more details on Plugins.</para>
     </section>
     <section remap="h2">
       <title><anchor id="docbook-functional.html-metadata" xreflabel="Metadata"/>Metadata</title>

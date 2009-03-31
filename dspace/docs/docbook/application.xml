@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
   <chapter remap="h1">
-    <title>DSpace System Documentation: Application Layer</title>
+    <title><anchor id="docbook-application.html"/>DSpace System Documentation: Application Layer</title>
     <para>
-      <ulink url="architecture.html">Back to architecture overview</ulink>
+      <link linkend="docbook-architecture.html">Back to architecture overview</link>
     </para>
     <section remap="h2">
       <title><anchor id="docbook-application.html-webui" xreflabel="Web User Interface"/>Web User Interface</title>
@@ -106,7 +106,7 @@
                   </para>
                 </entry>
                 <entry>
-                  <para>This is where you can place customized versions of JSPs -- see <ulink url="configure.html#customui">the configuration section</ulink></para>
+                  <para>This is where you can place customized versions of JSPs -- see <link linkend="docbook-configure.html-customui">the configuration section</link></para>
                 </entry>
               </row>
               <row>
@@ -212,7 +212,7 @@ ant -D<emphasis> [dspace]</emphasis>/config/dspace.cfg update
         <para><literal>[dspace-source]/jsp/dspace-admin/index.jsp</literal>, the administration UI index page, is invoked directly by Tomcat and not through a servlet for similar reasons.</para>
         <para>At the top of each JSP file, right after the license and copyright header, is documented the appropriate attributes that a servlet must fill out prior to forwarding to that JSP. No validation is performed; if the servlet does not fill out the necessary attributes, it is likely that an internal server error will occur.</para>
         <para>Many JSPs containing forms will include hidden parameters that tell the servlets which form has been filled out. The submission UI servlet (<literal>SubmissionController</literal> is a prime example of a servlet that deals with the input from many different JSPs. The <literal>step</literal> and <literal>page</literal> hidden parameters (written out by the <literal>SubmissionController.getSubmissionParameters()</literal> method) are used to inform the servlet which page of which step has just been filled out (i.e. which page of the submission the user has just completed).</para>
-        <para>Below is a detailed, scary diagram depicting the flow of control during the whole process of processing and responding to an HTTP request. More information about the authentication mechanism is mostly <ulink url="configure.html#authenticate">described in the configuration section</ulink>.</para>
+        <para>Below is a detailed, scary diagram depicting the flow of control during the whole process of processing and responding to an HTTP request. More information about the authentication mechanism is mostly <link linkend="docbook-configure.html-authenticate">described in the configuration section</link>.</para>
         <para>
           <inlinemediaobject>
             <imageobject>
@@ -425,7 +425,7 @@ https://dspace.mit.edu/html/1721.1/12345/contents.html
 https://dspace.mit.edu/html/1721.1/12345/figure1.gif
 </screen>
         <para>The HTML document servlet can work out which item the user is looking at, and then which Bitstream in it is called <literal>figure1.gif</literal>, and serve up that bitstream. Similar for following links to other HTML pages. Of course all the links and image references have to be relative and not absolute.</para>
-        <para>HTML documents must be &quot;self-contained&quot;, as <ulink url="functional.html#html">explained here</ulink>. Provided that full path information is known by DSpace, any depth or complexity of HTML document can be served subject to those contraints. This is usually possible with some kind of batch import. If, however, the document has been uploaded one file at a time using the Web UI, the path information has been stripped. The system can cope with relative links that refer to a deeper path, e.g.</para>
+        <para>HTML documents must be &quot;self-contained&quot;, as <link linkend="docbook-functional.html-html">explained here</link>. Provided that full path information is known by DSpace, any depth or complexity of HTML document can be served subject to those contraints. This is usually possible with some kind of batch import. If, however, the document has been uploaded one file at a time using the Web UI, the path information has been stripped. The system can cope with relative links that refer to a deeper path, e.g.</para>
         <screen>
 &lt;IMG SRC=&quot;images/figure1.gif&quot;&gt;
 </screen>
@@ -746,7 +746,7 @@ t;
       <section remap="h3">
         <title><anchor id="docbook-application.html-importingitems" xreflabel="Importing
 Items"/>Importing Items</title>
-        <para><emphasis role="bold">Note:</emphasis> Before running the item importer over items previously exported from a DSpace instance, please first refer to <ulink url="application.html#transferitem">Transferring Items Between DSpace Instances</ulink>.</para>
+        <para><emphasis role="bold">Note:</emphasis> Before running the item importer over items previously exported from a DSpace instance, please first refer to <link linkend="docbook-application.html-transferitem">Transferring Items Between DSpace Instances</link>.</para>
         <para>The item importer is in <literal>org.dspace.app.itemimport.ItemImport</literal>, and is run with the <literal>import</literal> utility in the <literal>dspace/bin</literal> directory. Running it with -h gets the current command-line arguments. Another very important flag is the --test flag, which you can use with any command to simulate all of the actions it will perform without actually making any changes to your DSpace instance - very useful for validating your item directories before doing an import. In the importer&apos;s arguments you can use either the user&apos;s database ID or email address and the eperson ID, and the collection&apos;s database ID or handle as arguments. Currently with the importer you can add, remove, and replace items in a collection. If you specify more than one collection argument then the items will be imported to multiple collections, and the first collection specified becomes the &quot;owning&quot; collection. If there is an error and the import is aborted, there is a --resume flag that you can try to resume the import where you left off after you fix the error.</para>
         <para>To add items to a collection with an EPerson as the submitter, type:</para>
         <screen>
@@ -827,10 +827,10 @@ Between DSpace Instances"/>Transferring Items Between DSpace Instances</title>
     <section remap="h2">
       <title><anchor id="docbook-application.html-registration" xreflabel="Registering (Not
 Importing) Bitstreams"/>Registering (Not Importing) Bitstreams</title>
-      <para>Registration is an alternate means of incorporating items, their metadata, and their bitstreams into DSpace by taking advantage of the bitstreams already being in storage accessible to DSpace. An example might be that there is a repository for existing digital assets. Rather than using the normal <ulink url="functional.html#ingest">interactive ingest process</ulink> or the <ulink url="functional.html#importexport">batch import</ulink> to furnish DSpace the metadata and to upload bitstreams, registration provides DSpace the metadata and the location of the bitstreams. DSpace uses a variation of the import tool to accomplish registration.</para>
+      <para>Registration is an alternate means of incorporating items, their metadata, and their bitstreams into DSpace by taking advantage of the bitstreams already being in storage accessible to DSpace. An example might be that there is a repository for existing digital assets. Rather than using the normal <link linkend="docbook-functional.html-ingest">interactive ingest process</link> or the <link linkend="docbook-functional.html-importexport">batch import</link> to furnish DSpace the metadata and to upload bitstreams, registration provides DSpace the metadata and the location of the bitstreams. DSpace uses a variation of the import tool to accomplish registration.</para>
       <section remap="h3">
         <title>Accessible Storage</title>
-        <para>To register an item its bitstreams must reside on storage accessible to DSpace and therefore referenced by an asset store number in <literal>dspace.cfg</literal>. The configuration file <literal>dspace.cfg</literal> establishes one or more asset stores through the use of an integer asset store number. This number relates to a directory in the DSpace host&apos;s file system or a set of SRB account parameters. This asset store number is described in <ulink url="configure.html#dspacecfg">The <literal>dspace.cfg</literal> Configuration Properties File</ulink> section and in the <literal>dspace.cfg</literal> file itself. The asset store number(s) used for registered items should generally not be the value of the <literal>assetstore.incoming</literal> property since it is unlikely that that you will want to mix the bitstreams of normally ingested and imported items and registered items.</para>
+        <para>To register an item its bitstreams must reside on storage accessible to DSpace and therefore referenced by an asset store number in <literal>dspace.cfg</literal>. The configuration file <literal>dspace.cfg</literal> establishes one or more asset stores through the use of an integer asset store number. This number relates to a directory in the DSpace host&apos;s file system or a set of SRB account parameters. This asset store number is described in <link linkend="docbook-configure.html-dspacecfg">The <literal>dspace.cfg</literal> Configuration Properties File</link> section and in the <literal>dspace.cfg</literal> file itself. The asset store number(s) used for registered items should generally not be the value of the <literal>assetstore.incoming</literal> property since it is unlikely that that you will want to mix the bitstreams of normally ingested and imported items and registered items.</para>
       </section>
       <section remap="h3">
         <title>Registering Items Using the Item Importer</title>
@@ -882,9 +882,9 @@ dsrun org.dspace.app.itemimport.ItemImport --add
 dsrun org.dspace.app.itemimport.ItemImport -a -e joe@user.com  -c
 	collectionID -s items_dir -m mapfile
 </screen>
-        <para>The <literal>--workflow</literal> and <literal>--test</literal> flags will function as described in <ulink url="application.html#importingitems">Importing Items</ulink>.</para>
-        <para>The <literal>--delete</literal> flag will function as described in <ulink url="application.html#importingitems">Importing Items</ulink> but the registered content files will not be removed from storage. See <link linkend="docbook-application.html-deletingregistereditems">Deleting Registered Items</link>.</para>
-        <para>The <literal>--replace</literal> flag will function as described in <ulink url="application.html#importingitems">Importing Items</ulink> but care should be taken to consider different cases and implications. With old items and new items being registered or ingested normally, there are four combinations or cases to consider. Foremost, an old registered item deleted from DSpace using <literal>--replace</literal> will not be removed from the storage. See <ulink url="application.html#deletingregistereditems">Deleting Registered Items</ulink>. where is resides. A new item added to DSpace using <literal>--replace</literal> will be ingested normally or will be registered depending on whether or not it is marked in the <literal>contents</literal> files with the -r.</para>
+        <para>The <literal>--workflow</literal> and <literal>--test</literal> flags will function as described in <link linkend="docbook-application.html-importingitems">Importing Items</link>.</para>
+        <para>The <literal>--delete</literal> flag will function as described in <link linkend="docbook-application.html-importingitems">Importing Items</link> but the registered content files will not be removed from storage. See <link linkend="docbook-application.html-deletingregistereditems">Deleting Registered Items</link>.</para>
+        <para>The <literal>--replace</literal> flag will function as described in <link linkend="docbook-application.html-importingitems">Importing Items</link> but care should be taken to consider different cases and implications. With old items and new items being registered or ingested normally, there are four combinations or cases to consider. Foremost, an old registered item deleted from DSpace using <literal>--replace</literal> will not be removed from the storage. See <link linkend="docbook-application.html-deletingregistereditems">Deleting Registered Items</link>. where is resides. A new item added to DSpace using <literal>--replace</literal> will be ingested normally or will be registered depending on whether or not it is marked in the <literal>contents</literal> files with the -r.</para>
       </section>
       <section remap="h3">
         <title>Internal Identification and Retrieval of Registered Items</title>
@@ -905,7 +905,7 @@ dsrun org.dspace.app.itemimport.ItemImport -a -e joe@user.com  -c
       </section>
       <section remap="h3">
         <title><anchor id="docbook-application.html-deletingregistereditems"/>Deleting Registered Items</title>
-        <para>If a registered item is deleted from DSpace, either interactively or by using the <literal>--delete</literal> or <literal>--replace</literal> flags described in <ulink url="application.html#importingitems">Importing Items</ulink>, the item will disappear from DSpace but it&apos;s registered content files will remain in place just as they were prior to registration. Bitstreams not registered but added by DSpace as part of registration, such as <literal>license.txt</literal> files, will be deleted.</para>
+        <para>If a registered item is deleted from DSpace, either interactively or by using the <literal>--delete</literal> or <literal>--replace</literal> flags described in <link linkend="docbook-application.html-importingitems">Importing Items</link>, the item will disappear from DSpace but it&apos;s registered content files will remain in place just as they were prior to registration. Bitstreams not registered but added by DSpace as part of registration, such as <literal>license.txt</literal> files, will be deleted.</para>
       </section>
     </section>
     <section remap="h2">
@@ -975,7 +975,7 @@ dsrun org.dspace.app.itemimport.ItemImport -a -e joe@user.com  -c
           </listitem>
           <listitem>
             <para> A <literal>fileSec</literal> containing a list of the bitstreams in the item. Each bundle constitutes a <literal>fileGrp</literal>. Each bitstream is represented by a <literal>file</literal> element, which contains an <literal>FLocat</literal> element with a simple XLink to the bitstream in the same directory as the <literal>mets.xml</literal> file. The <literal>file</literal> attributes consist of most of the basic technical metadata for the bitstream. Additionally, for those bitstreams that are thumbnails or text extracted from another bitstream in the item, those &apos;derived&apos; bitstreams have the same <literal>GROUPID</literal> as the bitstream they were derived from, in order that clients understand that there is a relationship.</para>
-            <para>The <literal>OWNERID</literal> of each <literal>file</literal> is the <ulink url="functional.html#bitstream_ids">&apos;persistent&apos; bitstream identifier</ulink> assigned by the DSpace instance. The <literal>ID</literal> and <literal>GROUPID</literal> attributes consist of the item&apos;s Handle, together with the bitstream&apos;s sequence ID, which underscores used in place of dots and slashes. For example, a bitstream with sequence ID 24, in the item <literal>hdl:123.456/789</literal> will have the <literal>ID</literal><literal>123_456_789_24</literal>. This is because <literal>ID</literal> and <literal>GROUPID</literal> attributes must be of type <literal>xsd:id</literal>.</para>
+            <para>The <literal>OWNERID</literal> of each <literal>file</literal> is the <link linkend="docbook-functional.html-bitstream_ids">&apos;persistent&apos; bitstream identifier</link> assigned by the DSpace instance. The <literal>ID</literal> and <literal>GROUPID</literal> attributes consist of the item&apos;s Handle, together with the bitstream&apos;s sequence ID, which underscores used in place of dots and slashes. For example, a bitstream with sequence ID 24, in the item <literal>hdl:123.456/789</literal> will have the <literal>ID</literal><literal>123_456_789_24</literal>. This is because <literal>ID</literal> and <literal>GROUPID</literal> attributes must be of type <literal>xsd:id</literal>.</para>
           </listitem>
         </itemizedlist>
       </section>
@@ -1003,7 +1003,7 @@ dsrun org.dspace.app.itemimport.ItemImport -a -e joe@user.com  -c
     <section remap="h2">
       <title><anchor id="docbook-application.html-mediafilters" xreflabel="MediaFilters:
 Transforming DSpace Content"/>MediaFilters: Transforming DSpace Content</title>
-      <para>DSpace can apply filters to content/bitstreams, creating new content. Filters are included that extract text for <emphasis role="bold">full-text searching</emphasis>, and create <emphasis role="bold">thumbnails</emphasis> for items that contain images. The media filters are controlled by the <literal>MediaFilterManager</literal> which traverses the asset store, invoking the <literal>MediaFilter</literal> or <literal>FormatFilter</literal> classes on bitstreams. The media filter plugin configuration <literal>filter.plugins</literal> in <literal>dspace.cfg</literal> contains a list of all enabled media/format filter plugins (see <ulink url="configure.html#mediafilters">Configuring Media Filters</ulink> for more information). The media filter system is intended to be run from the command line (or regularly as a cron task):</para>
+      <para>DSpace can apply filters to content/bitstreams, creating new content. Filters are included that extract text for <emphasis role="bold">full-text searching</emphasis>, and create <emphasis role="bold">thumbnails</emphasis> for items that contain images. The media filters are controlled by the <literal>MediaFilterManager</literal> which traverses the asset store, invoking the <literal>MediaFilter</literal> or <literal>FormatFilter</literal> classes on bitstreams. The media filter plugin configuration <literal>filter.plugins</literal> in <literal>dspace.cfg</literal> contains a list of all enabled media/format filter plugins (see <link linkend="docbook-configure.html-mediafilters">Configuring Media Filters</link> for more information). The media filter system is intended to be run from the command line (or regularly as a cron task):</para>
       <screen>
 [dspace]/bin/filter-media
 </screen>
@@ -1087,7 +1087,7 @@ Transforming DSpace Content"/>MediaFilters: Transforming DSpace Content</title>
           </itemizedlist>
         </listitem>
       </itemizedlist>
-      <para>Adding your own filters is done by creating a class which <literal>implements</literal> the <literal>org.dspace.app.mediafilter.FormatFilter</literal> interface. See the <ulink url="configure.html#newfilter">Creating a new Media Filter</ulink> topic and comments in the source file FormatFilter.java for more information. In theory filters could be implemented in any programming language (C, Perl, etc.) However, they need to be invoked by the Java code in the Media Filter class that you create.</para>
+      <para>Adding your own filters is done by creating a class which <literal>implements</literal> the <literal>org.dspace.app.mediafilter.FormatFilter</literal> interface. See the <link linkend="docbook-configure.html-newfilter">Creating a new Media Filter</link> topic and comments in the source file FormatFilter.java for more information. In theory filters could be implemented in any programming language (C, Perl, etc.) However, they need to be invoked by the Java code in the Media Filter class that you create.</para>
     </section>
     <section remap="h2">
       <title><anchor id="docbook-application.html-filiator" xreflabel="Sub-Community

@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
   <chapter remap="h1">
-    <title>DSpace System Documentation: Business Logic Layer</title>
+    <title><anchor id="docbook-business.html"/>DSpace System Documentation: Business Logic Layer</title>
     <section remap="h2">
       <title><anchor id="docbook-business.html-core" xreflabel="Core Classes"/>Core Classes</title>
       <para>The <literal>org.dspace.core</literal> package provides some basic classes that are used throughout the DSpace code.</para>
       <section remap="h3">
         <title>The Configuration Manager (<literal>ConfigurationManager</literal>)</title>
         <para>The configuration manager is responsible for reading the main <literal>dspace.cfg</literal> properties file, managing the &apos;template&apos; configuration files for other applications such as Apache, and for obtaining the text for e-mail messages.</para>
-        <para>The system is configured by editing the relevant files in <literal>/dspace/config</literal>, as described in the <ulink url="configure.html">configuration section</ulink>.</para>
+        <para>The system is configured by editing the relevant files in <literal>/dspace/config</literal>, as described in the <link linkend="docbook-configure.html">configuration section</link>.</para>
         <para>
           <emphasis role="bold">When editing configuration files for applications that DSpace uses, such as Apache, remember to edit the file in /dspace/config/templates and then run /dspace/bin/install-configs rather than editing the &apos;live&apos; version directly!</emphasis>
         </para>
@@ -19,7 +19,7 @@
                 <literal> /dspace/bin/install-configs</literal>
 
               </screen>
- This processes and installs configuration files for other applications, as described in the <ulink url="configure.html#templates">configuration section</ulink>.</para>
+ This processes and installs configuration files for other applications, as described in the <link linkend="docbook-configure.html-templates">configuration section</link>.</para>
           </listitem>
           <listitem>
             <para><screen>
@@ -214,7 +214,7 @@
     <section remap="h2">
       <title><anchor id="docbook-business.html-content" xreflabel="Content Management API"/>Content Management API</title>
       <para>The content management API package <literal>org.dspace.content</literal> contains Java classes for reading and manipulating content stored in the DSpace system. This is the API that components in the application layer will probably use most.</para>
-      <para>Classes corresponding to the main elements in the <ulink url="functional.html#data_model">DSpace data model</ulink> (<literal>Community</literal>, <literal>Collection</literal>, <literal>Item</literal>, <literal>Bundle</literal> and <literal>Bitstream</literal>) are sub-classes of the abstract class <literal>DSpaceObject</literal>. The <literal>Item</literal> object handles the Dublin Core metadata record.</para>
+      <para>Classes corresponding to the main elements in the <link linkend="docbook-functional.html-data_model">DSpace data model</link> (<literal>Community</literal>, <literal>Collection</literal>, <literal>Item</literal>, <literal>Bundle</literal> and <literal>Bitstream</literal>) are sub-classes of the abstract class <literal>DSpaceObject</literal>. The <literal>Item</literal> object handles the Dublin Core metadata record.</para>
       <para>Each class generally has one or more static <literal>find</literal> methods, which are used to instantiate content objects. Constructors do not have public access and are just used internally. The reasons for this are:</para>
       <itemizedlist>
         <listitem>
@@ -240,7 +240,7 @@ Collection myNewCollection = existingCommunity.createCollection();
 </screen>
       <para>The primary reason for this is for determining authorization. In order to know whether an e-person may create an object, the system must know which container the object is to be added to. It makes no sense to create a collection outside of a community, and the authorization system does not have a policy for that.</para>
       <para><literal>Item</literal>s are first created in the form of an implementation of <literal>InProgressSubmission</literal>. An <literal>InProgressSubmission</literal> represents an item under construction; once it is complete, it is installed into the main archive and added to the relevant collection by the <literal>InstallItem</literal> class. The <literal>org.dspace.content</literal> package provides an implementation of <literal>InProgressSubmission</literal> called <literal>WorkspaceItem</literal>; this is a simple implementation that contains some fields used by the Web submission UI. The <literal>org.dspace.workflow</literal> also contains an implementation called <literal>WorkflowItem</literal> which represents a submission undergoing a workflow process.</para>
-      <para>In the previous chapter there is an <ulink url="functional.html#ingest">overview of the item ingest process</ulink> which should clarify the previous paragraph. Also see the section on <link linkend="docbook-business.html-workflow">the workflow system</link>.</para>
+      <para>In the previous chapter there is an <link linkend="docbook-functional.html-ingest">overview of the item ingest process</link> which should clarify the previous paragraph. Also see the section on <link linkend="docbook-business.html-workflow">the workflow system</link>.</para>
       <para><literal>Community</literal> and <literal>BitstreamFormat</literal> do have static <literal>create</literal> methods; one must be a site administrator to have authorization to invoke these.</para>
       <section remap="h3">
         <title>Other Classes</title>
@@ -789,7 +789,7 @@ osswalk = \
         <para>Here are some usage examples to illustrate how the Plugin Manager works.</para>
         <section remap="h4">
           <title>Managing the MediaFilter plugins transparently</title>
-          <para>The existing DSpace 1.3 MediaFilterManager implementation has been largely replaced by the Plugin Manager. The MediaFilter classes become plugins named in the configuration. Refer to the <ulink url="configure.html#mediafilters">configuration guide</ulink> for further details.</para>
+          <para>The existing DSpace 1.3 MediaFilterManager implementation has been largely replaced by the Plugin Manager. The MediaFilter classes become plugins named in the configuration. Refer to the <link linkend="docbook-configure.html-mediafilters">configuration guide</link> for further details.</para>
         </section>
         <section remap="h4">
           <title>A Singleton Plugin</title>
@@ -865,7 +865,7 @@ public class XsltDisseminationCrosswalk extends SelfNamedPlugin
           </section>
         <section remap="h4">
           <title>Stackable Authentication</title>
-          <para>The Stackable Authentication mechanism needs to know all of the plugins configured for the interface, in the order of configuration, since order is significant. It gets a Sequence Plugin from the Plugin Manager. Refer to the <ulink url="configure.html#authenticate">configuration guide</ulink> for further details.</para>
+          <para>The Stackable Authentication mechanism needs to know all of the plugins configured for the interface, in the order of configuration, since order is significant. It gets a Sequence Plugin from the Plugin Manager. Refer to the <link linkend="docbook-configure.html-authenticate">configuration guide</link> for further details.</para>
         </section>
       </section>
     </section>
@@ -1027,7 +1027,7 @@ hdl:1721.123/4567
 http://hdl.handle.net/1721.123/4567
 </screen>
       <para>It is the responsibility of the caller to extract the basic form from whichever displayed form is used.</para>
-      <para>The <literal>handle</literal> table maps these Handles to resource type/resource ID pairs, where resource type is a value from <literal>org.dspace.core.Constants</literal> and resource ID is the internal identifier (database primary key) of the object. This allows Handles to be assigned to any type of object in the system, though as <ulink url="functional.html#handles">explained in the functional overview</ulink>, only communities, collections and items are presently assigned Handles.</para>
+      <para>The <literal>handle</literal> table maps these Handles to resource type/resource ID pairs, where resource type is a value from <literal>org.dspace.core.Constants</literal> and resource ID is the internal identifier (database primary key) of the object. This allows Handles to be assigned to any type of object in the system, though as <link linkend="docbook-functional.html-handles">explained in the functional overview</link>, only communities, collections and items are presently assigned Handles.</para>
       <para><literal>HandleManager</literal> contains static methods for:</para>
       <itemizedlist>
         <listitem>

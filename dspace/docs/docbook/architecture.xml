@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
   <chapter remap="h1">
-    <title>DSpace System Documentation: Architecture</title>
+    <title><anchor id="docbook-architecture.html"/>DSpace System Documentation: Architecture</title>
     <section remap="h2">
       <title><anchor id="docbook-architecture.html-overview" xreflabel="Overview"/>Overview</title>
       <para>The DSpace system is organized into three layers, each of which consists of a number of components.</para>
@@ -77,16 +77,16 @@ mvn javadoc:javadoc
       <itemizedlist>
         <listitem>
           <para>
-            <ulink url="storage.html">Storage Layer</ulink>
+            <link linkend="docbook-storage.html">Storage Layer</link>
             <itemizedlist>
               <listitem>
                 <para>
-                  <ulink url="storage.html#rdbms">RDBMS</ulink>
+                  <link linkend="docbook-storage.html-rdbms">RDBMS</link>
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <ulink url="storage.html#bitstreams">Bitstream Store</ulink>
+                  <link linkend="docbook-storage.html-bitstreams">Bitstream Store</link>
                 </para>
               </listitem>
             </itemizedlist>
@@ -94,61 +94,61 @@ mvn javadoc:javadoc
         </listitem>
         <listitem>
           <para>
-            <ulink url="business.html">Business Logic Layer</ulink>
+            <link linkend="docbook-business.html">Business Logic Layer</link>
             <itemizedlist>
               <listitem>
                 <para>
-                  <ulink url="business.html#core">Core Classes</ulink>
+                  <link linkend="docbook-business.html-core">Core Classes</link>
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <ulink url="business.html#content">Content Management API</ulink>
+                  <link linkend="docbook-business.html-content">Content Management API</link>
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <ulink url="business.html#workflow">Workflow System</ulink>
+                  <link linkend="docbook-business.html-workflow">Workflow System</link>
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <ulink url="business.html#administer">Administration Toolkit</ulink>
+                  <link linkend="docbook-business.html-administer">Administration Toolkit</link>
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <ulink url="business.html#eperson">E-person/Group Manager</ulink>
+                  <link linkend="docbook-business.html-eperson">E-person/Group Manager</link>
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <ulink url="business.html#authorize">Authorisation</ulink>
+                  <link linkend="docbook-business.html-authorize">Authorisation</link>
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <ulink url="business.html#handle">Handle Manager/Handle Plugin</ulink>
+                  <link linkend="docbook-business.html-handle">Handle Manager/Handle Plugin</link>
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <ulink url="business.html#search">Search</ulink>
+                  <link linkend="docbook-business.html-search">Search</link>
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <ulink url="business.html#browse">Browse API</ulink>
+                  <link linkend="docbook-business.html-browse">Browse API</link>
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <ulink url="business.html#history">History Recorder</ulink>
+                  <link linkend="docbook-business.html-history">History Recorder</link>
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <ulink url="business.html#checker">Checksum Checker</ulink>
+                  <link linkend="docbook-business.html-checker">Checksum Checker</link>
                 </para>
               </listitem>
             </itemizedlist>
@@ -156,46 +156,46 @@ mvn javadoc:javadoc
         </listitem>
         <listitem>
           <para>
-            <ulink url="application.html">Application Layer</ulink>
+            <link linkend="docbook-application.html">Application Layer</link>
             <itemizedlist>
               <listitem>
                 <para>
-                  <ulink url="application.html#webui">Web User Interface</ulink>
+                  <link linkend="docbook-application.html-webui">Web User Interface</link>
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <ulink url="application.html#oai">OAI-PMH Data Provider</ulink>
+                  <link linkend="docbook-application.html-oai">OAI-PMH Data Provider</link>
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <ulink url="application.html#itemimporter">Item Importer and Exporter</ulink>
+                  <link linkend="docbook-application.html-itemimporter">Item Importer and Exporter</link>
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <ulink url="application.html#transferitem">Transferring Items Between DSpace Instances</ulink>
+                  <link linkend="docbook-application.html-transferitem">Transferring Items Between DSpace Instances</link>
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <ulink url="application.html#registration">Registration</ulink>
+                  <link linkend="docbook-application.html-registration">Registration</link>
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <ulink url="application.html#mets">METS Tools</ulink>
+                  <link linkend="docbook-application.html-mets">METS Tools</link>
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <ulink url="application.html#mediafilters">Media Filters</ulink>
+                  <link linkend="docbook-application.html-mediafilters">Media Filters</link>
                 </para>
               </listitem>
               <listitem>
                 <para>
-                  <ulink url="application.html#filiator">Sub-Community Management</ulink>
+                  <link linkend="docbook-application.html-filiator">Sub-Community Management</link>
                 </para>
               </listitem>
             </itemizedlist>
