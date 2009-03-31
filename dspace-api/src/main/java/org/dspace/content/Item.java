@@ -2018,21 +2018,7 @@ public class Item extends DSpaceObject
         for (int i = 0; i < bunds.length; i++)
         {
             Bundle mybundle = bunds[i];
-
-            Bitstream[] bs = mybundle.getBitstreams();
-
-            for (int j = 0; j < bs.length; j++)
-            {
-                Bitstream mybitstream = bs[j];
-
-                // change bitstream policies
-                AuthorizeManager.removeAllPolicies(ourContext, bs[j]);
-                AuthorizeManager.addPolicies(ourContext, newpolicies, bs[j]);
-            }
-
-            // change bundle policies
-            AuthorizeManager.removeAllPolicies(ourContext, mybundle);
-            AuthorizeManager.addPolicies(ourContext, newpolicies, mybundle);
+            mybundle.replaceAllBitstreamPolicies(newpolicies);
         }
     }
 

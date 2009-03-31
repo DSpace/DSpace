@@ -684,6 +684,14 @@ public class EditItemServlet extends DSpaceServlet
         {
             // set bundle's name to ORIGINAL
             b = item.createSingleBitstream(is, "ORIGINAL");
+            
+            // set the permission as defined in the owning collection
+            Collection owningCollection = item.getOwningCollection();
+            if (owningCollection != null)
+            {
+                Bundle bnd = b.getBundles()[0]; 
+                bnd.inheritCollectionDefaultPolicies(owningCollection);
+            }
         }
         else
         {

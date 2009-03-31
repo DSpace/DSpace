@@ -121,6 +121,7 @@
  - [DS-115] metadata not showed in verify step
  - [DS-122] Problems with repeatable metadata
  - [DS-116] File description not correct
+ - [DS-92] Bitstream access rights inheritenc, editing in_archive items - ID: 1993036
  
 (Paulo Jobim)
  - SF Patch [2655052] Authors re-ordered when item edited (xmlui)

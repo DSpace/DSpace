@@ -391,6 +391,14 @@ public class FlowItemUtils
 			{
 				// set bundle's name to ORIGINAL
 				bitstream = item.createSingleBitstream(is, bundleName);
+				
+				// set the permission as defined in the owning collection
+				Collection owningCollection = item.getOwningCollection();
+				if (owningCollection != null)
+				{
+				    Bundle bnd = bitstream.getBundles()[0]; 
+				    bnd.inheritCollectionDefaultPolicies(owningCollection);
+				}
 			}
 			else
 			{

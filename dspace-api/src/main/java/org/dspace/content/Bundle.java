@@ -50,6 +50,7 @@ import java.util.ListIterator;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -593,5 +594,68 @@ public class Bundle extends DSpaceObject
     public int getType()
     {
         return Constants.BUNDLE;
+    }
+    
+    /**
+     * remove all policies on the bundle and its contents, and replace them with
+     * the DEFAULT_BITSTREAM_READ policies belonging to the collection.
+     * 
+     * @param c
+     *            Collection
+     * @throws java.sql.SQLException
+     *             if an SQL error or if no default policies found. It's a bit
+     *             draconian, but default policies must be enforced.
+     * @throws AuthorizeException
+     */
+    public void inheritCollectionDefaultPolicies(Collection c)
+            throws java.sql.SQLException, AuthorizeException
+    {
+        List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c,
+                Constants.DEFAULT_BITSTREAM_READ);
+
+        // change the action to just READ
+        // just don't call update on the resourcepolicies!!!
+        Iterator<ResourcePolicy> i = policies.iterator();
+
+        if (!i.hasNext())
+        {
+            throw new java.sql.SQLException("Collection " + c.getID()
+                    + " has no default bitstream READ policies");
+        }
+
+        while (i.hasNext())
+        {
+            ResourcePolicy rp = (ResourcePolicy) i.next();
+            rp.setAction(Constants.READ);
+        }
+
+        replaceAllBitstreamPolicies(policies);
+    }
+    
+    /**
+     * remove all of the policies for the bundle and bitstream contents and replace
+     * them with a new list of policies
+     * 
+     * @param newpolicies -
+     *            this will be all of the new policies for the bundle and
+     *            bitstream contents
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    public void replaceAllBitstreamPolicies(List<ResourcePolicy> newpolicies)
+            throws SQLException, AuthorizeException
+    {
+        if (bitstreams != null && bitstreams.size() > 0)
+        {
+            for (Bitstream bs : bitstreams)
+            {
+                // change bitstream policies
+                AuthorizeManager.removeAllPolicies(ourContext, bs);
+                AuthorizeManager.addPolicies(ourContext, newpolicies, bs);
+            }
+        }
+        // change bundle policies
+        AuthorizeManager.removeAllPolicies(ourContext, this);
+        AuthorizeManager.addPolicies(ourContext, newpolicies, this);
     }
 }
