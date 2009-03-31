@@ -2,6 +2,7 @@
 (Mark Diggory)
  - [DS-100] XMLUI OpenURL support contributed by the National Evolutionary Synthesis Center (NESCent) and @mire.
  - [DS-93]  Upgrade XMLUI to Cocoon 2.2
+ - [DS-117] File uploads >=100KB lead to an error in the xmlui
 
 (Mark Wood)
  - [2002866] Return 404, not 200, when page Not Found
@@ -30,6 +31,7 @@
  - [DS-60] netid.toLowerCase() in different classes and methods - ID: 2458187
  - Fix for Jira [DS-98] Key jsp.mydspace.request.export.community not set in Messages.properties
  - [2696133] New export option (migrate) and fix for Jira [DS-59]
+ - [DS-113] Export item buttons
  - Fix for Jira [DS-127] Item exporter does not export bitsteam descriptions
  
 (Stuart Lewis / Chris Yates / Flavio Botelho / Alex Barbieri / Reuben Pasquini / Paulo Matos)
