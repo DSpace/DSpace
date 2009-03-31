@@ -122,6 +122,7 @@
  - [DS-122] Problems with repeatable metadata
  - [DS-116] File description not correct
  - [DS-92] Bitstream access rights inheritenc, editing in_archive items - ID: 1993036
+ - [DS-81] Subscription not sent correctly - ID: 2667590
  
 (Paulo Jobim)
  - SF Patch [2655052] Authors re-ordered when item edited (xmlui)
