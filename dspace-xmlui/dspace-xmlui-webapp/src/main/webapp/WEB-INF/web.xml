@@ -106,6 +106,19 @@
     <filter-class>org.dspace.app.xmlui.cocoon.DSpaceCocoonServletFilter</filter-class>
   </filter>
 
+  <!--
+    - Declare a filter to force UTF-8 encoding for all servlet requests
+    -->
+  <filter>
+    <filter-name>SetCharacterEncoding</filter-name>
+    <filter-class>org.dspace.app.xmlui.cocoon.SetCharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+  </filter>
+
+
   <!-- Filter mappings ================================================ -->
 
   <!--
@@ -118,6 +131,11 @@
 
   <filter-mapping>
     <filter-name>DSpaceCocoonServletFilter</filter-name>
+    <servlet-name>Cocoon</servlet-name>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>SetCharacterEncoding</filter-name>
     <servlet-name>Cocoon</servlet-name>
   </filter-mapping>
   
