@@ -143,7 +143,6 @@ public class IndexBrowse
     	throws SQLException, BrowseException
     {
     	this.context = context;
-    	this.context.setIgnoreAuthorization(true);
     	
     	// get the browse indices, and ensure that
     	// we have all the relevant tables prepped
@@ -615,6 +614,7 @@ public class IndexBrowse
 		throws SQLException, BrowseException, ParseException
 	{
         Context context = new Context();
+        context.turnOffAuthorisationSystem();
         IndexBrowse indexer = new IndexBrowse(context);
 	    
 	    // create an options object and populate it

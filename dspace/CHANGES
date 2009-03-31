@@ -123,6 +123,7 @@
  - [DS-116] File description not correct
  - [DS-92] Bitstream access rights inheritenc, editing in_archive items - ID: 1993036
  - [DS-81] Subscription not sent correctly - ID: 2667590
+ - [DS-99] Non-admin user and admin menu options (1.5.1 XMUI only) - ID: 2353606
  
 (Paulo Jobim)
  - SF Patch [2655052] Authors re-ordered when item edited (xmlui)

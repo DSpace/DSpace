@@ -147,8 +147,10 @@ public class BrowseConsumer implements Consumer
                 try
                 {
                     // Update browse indices
+                    ctx.turnOffAuthorisationSystem();
                     IndexBrowse ib = new IndexBrowse(ctx);
                     ib.indexItem(i);
+                    ctx.restoreAuthSystemState();
                 }
                 catch (BrowseException e)
                 {
