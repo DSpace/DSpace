@@ -12,14 +12,7 @@
     <!-- Activate Cocoon Spring Configurator -->
     <configurator:settings />
 
-    <!-- Configure Log4j -->
-    <bean name="org.apache.cocoon.spring.configurator.log4j"
-        class="org.apache.cocoon.spring.configurator.log4j.Log4JConfigurator"
-        scope="singleton">
-        <property name="settings"
-            ref="org.apache.cocoon.configuration.Settings" />
-        <property name="resource" value="/WEB-INF/log4j.xml" />
-    </bean>
+    <!-- NOTE: Cocoon's Log4j configurations are handled by DSpace's default log4j config file -->
 
     <!-- Activate Avalon Bridge -->
     <avalon:bridge />
