@@ -1,3 +1,5 @@
+(Graham Triggs)
+ - Fixes for critical bugs identified by Findbugs
 
 (Mark Diggory)
  - [DS-100] XMLUI OpenURL support contributed by the National Evolutionary Synthesis Center (NESCent) and @mire.

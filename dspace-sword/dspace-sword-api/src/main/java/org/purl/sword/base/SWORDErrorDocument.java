@@ -241,10 +241,10 @@ public class SWORDErrorDocument extends SWORDEntry
          if(errorURI.startsWith("http://purl.org/net/sword/error/"))
          {
              // check that the list of codes
-             if( ! (errorURI.equals(ErrorCodes.ERROR_CONTENT) |
-                    errorURI.equals(ErrorCodes.ERROR_CHECKSUM_MISMATCH) |
-                    errorURI.equals(ErrorCodes.ERROR_BAD_REQUEST) |
-                    errorURI.equals(ErrorCodes.TARGET_OWNER_UKNOWN) |
+             if( ! (errorURI.equals(ErrorCodes.ERROR_CONTENT) ||
+                    errorURI.equals(ErrorCodes.ERROR_CHECKSUM_MISMATCH) ||
+                    errorURI.equals(ErrorCodes.ERROR_BAD_REQUEST) ||
+                    errorURI.equals(ErrorCodes.TARGET_OWNER_UKNOWN) ||
                     errorURI.equals(ErrorCodes.MEDIATION_NOT_ALLOWED)) )
              {
                  info.addValidationInfo(new SwordValidationInfo(xmlName,

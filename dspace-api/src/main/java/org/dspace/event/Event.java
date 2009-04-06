@@ -406,7 +406,7 @@ public class Event implements Serializable
      */
     public static int parseObjectType(String s)
     {
-        if (s.equals("*") | s.equalsIgnoreCase("all"))
+        if ("*".equals(s) || "all".equalsIgnoreCase(s))
             return ALL_OBJECTS_MASK;
         else
         {
@@ -450,7 +450,7 @@ public class Event implements Serializable
      */
     public static int parseEventType(String s)
     {
-        if (s.equals("*") | s.equalsIgnoreCase("all"))
+        if ("*".equals(s) || "all".equalsIgnoreCase(s))
         {
             int result = 0;
             for (int i = 0; i < eventTypeText.length; ++i)

@@ -552,9 +552,12 @@ public class LNISmokeTest
 
         InputStream in = new FileInputStream(source);
         OutputStream out = conn.getOutputStream();
-        copyStream(in, out);
-        in.close();
-        out.close();
+        try {
+            copyStream(in, out);
+        } finally {
+            in.close();
+            out.close();
+        }
 
         int status = conn.getResponseCode();
         if (status < 200 || status >= 300)

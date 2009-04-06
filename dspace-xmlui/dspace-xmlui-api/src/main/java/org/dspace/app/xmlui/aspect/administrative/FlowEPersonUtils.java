@@ -192,7 +192,7 @@ public class FlowEPersonUtils {
     		EPerson personModified = EPerson.find(context, epersonID);
         	
     		// Make sure the email address we are changing to is unique
-        	if (personModified.getEmail() != email)
+        	if (!personModified.getEmail().equals(email))
         	{	
         		EPerson potentialDupicate = EPerson.findByEmail(context,email);
         		
@@ -207,13 +207,13 @@ public class FlowEPersonUtils {
         			return result;
         		}
         	}
-        	if (personModified.getFirstName() != first) {
+        	if (!personModified.getFirstName().equals(first)) {
         		personModified.setFirstName(first);
         	}
-        	if (personModified.getLastName() != last) {
+        	if (!personModified.getLastName().equals(last)) {
         		personModified.setLastName(last);
         	}
-        	if (personModified.getMetadata("phone") != phone) {
+        	if (!personModified.getMetadata("phone").equals(phone)) {
         		personModified.setMetadata("phone", phone);
         	}
         	personModified.setCanLogIn(login);

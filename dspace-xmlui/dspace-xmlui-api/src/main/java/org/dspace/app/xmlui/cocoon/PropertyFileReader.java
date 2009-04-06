@@ -76,8 +76,11 @@ public class PropertyFileReader {
 		
 		Properties props = new Properties();
 		InputStream in = new FileInputStream(propertyFile);
-		props.load(in);
-		in.close();
+        try {
+		    props.load(in);
+        } finally {
+		    in.close();
+        }
 		
 		final String[] parameterNames = parameters.getNames();
 		

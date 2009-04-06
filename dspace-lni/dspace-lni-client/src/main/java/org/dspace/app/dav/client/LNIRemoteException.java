@@ -28,7 +28,7 @@ public class LNIRemoteException  extends org.apache.axis.AxisFault  implements j
      * 
      * @return cause1
      */
-    public java.lang.Object getCause1() {
+    public synchronized java.lang.Object getCause1() {
         return cause1;
     }
 
@@ -38,7 +38,7 @@ public class LNIRemoteException  extends org.apache.axis.AxisFault  implements j
      * 
      * @param cause1
      */
-    public void setCause1(java.lang.Object cause1) {
+    public synchronized void setCause1(java.lang.Object cause1) {
         this.cause1 = cause1;
     }
 
@@ -48,7 +48,7 @@ public class LNIRemoteException  extends org.apache.axis.AxisFault  implements j
      * 
      * @return message1
      */
-    public java.lang.String getMessage1() {
+    public synchronized java.lang.String getMessage1() {
         return message1;
     }
 
@@ -58,7 +58,7 @@ public class LNIRemoteException  extends org.apache.axis.AxisFault  implements j
      * 
      * @param message1
      */
-    public void setMessage1(java.lang.String message1) {
+    public synchronized void setMessage1(java.lang.String message1) {
         this.message1 = message1;
     }
 
@@ -66,7 +66,6 @@ public class LNIRemoteException  extends org.apache.axis.AxisFault  implements j
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof LNIRemoteException)) return false;
         LNIRemoteException other = (LNIRemoteException) obj;
-        if (obj == null) return false;
         if (this == obj) return true;
         if (__equalsCalc != null) {
             return (__equalsCalc == obj);

@@ -216,13 +216,16 @@ public class DepositServlet extends HttpServlet {
 					+ request.getRemoteAddr() + "-" + counter.addAndGet(1);
 			InputStream inputStream = request.getInputStream();
 			OutputStream outputStream = new FileOutputStream(filename);
-			int data;
-			while ((data = inputStream.read()) != -1) {
-				outputStream.write(data);
-			}
-			inputStream.close();
-			outputStream.close();
-			
+            try {
+                int data;
+                while ((data = inputStream.read()) != -1) {
+                    outputStream.write(data);
+                }
+            } finally {
+                inputStream.close();
+                outputStream.close();
+            }
+            
 			// Check the size is OK
 			File file = new File(filename);
 		    long fLength = file.length() / 1024;

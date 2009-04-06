@@ -141,15 +141,21 @@ public class SitemapServlet extends DSpaceServlet
 
         // Pipe the bits
         InputStream is = new FileInputStream(f);
+        try
+        {
+            // Set the response MIME type
+            response.setContentType(mimeType);
 
-        // Set the response MIME type
-        response.setContentType(mimeType);
+            // Response length
+            response.setHeader("Content-Length", String.valueOf(f.length()));
 
-        // Response length
-        response.setHeader("Content-Length", String.valueOf(f.length()));
-
-        Utils.bufferedCopy(is, response.getOutputStream());
-        is.close();
+            Utils.bufferedCopy(is, response.getOutputStream());
+        }
+        finally
+        {
+            is.close();
+        }
+        
         response.getOutputStream().flush();
     }
 }
