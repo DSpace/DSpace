@@ -6,29 +6,29 @@
  - [DS-154] Make a backup of the config dir on Ant update
 
 (Mark Wood)
- - [2002866] Return 404, not 200, when page Not Found
- - [2025998] Usage event (statistics) plugin hook
- - [2620307] 'ant init_configs' copies wrong dspace.cfg
+ - [DS-2] [2002866] Return 404, not 200, when page Not Found
+ - [DS-150] [2025998] Usage event (statistics) plugin hook
+ - [DS-143] [2620307] 'ant init_configs' copies wrong dspace.cfg
  - [DS-41] Small JSP cleanups
 
 (Mark Wood / Andrea Bollini)
 - [DS-43] Manakin RSS feed generator cache timeout can't be adjusted - ID: 2593393
 
 (Stuart Lewis)
- - [2057231] Refactor LDAPServlet to use Stackable Authentication
+ - [DS-4] [2057231] Refactor LDAPServlet to use Stackable Authentication
  - Enable ldap.login.specialgroup special group for all LDAP users
- - Fix for SF bug [2164955] DSpace1.5.1(XML) problem with Login to restricted bitstreams
- - Fix for SF bug [2343281] XHTML Head Dissimination Crosswalk exposes provenance info
- - Fix for SF bug [1896225] HTML tags not stripped in statistics display
- - Fix for SF bug [1951859] DSpace Home link style in breadcrumb trail
- - Fix for SF bug [1730606] Restricted Items metadata exposed via OAI
- - Patch for SF feature request [1587270] Implicit group for all registered users
- - Fix for SF bug [2495728] 'My Account' disappears following exports
+ - [DS-5] Fix for SF bug [2164955] DSpace1.5.1(XML) problem with Login to restricted bitstreams
+ - [DS-6] Fix for SF bug [2343281] XHTML Head Dissimination Crosswalk exposes provenance info
+ - [DS-7] Fix for SF bug [1896225] HTML tags not stripped in statistics display
+ - [DS-8] Fix for SF bug [1951859] DSpace Home link style in breadcrumb trail
+ - [DS-9] Fix for SF bug [1730606] Restricted Items metadata exposed via OAI
+ - [DS-10] Patch for SF feature request [1587270] Implicit group for all registered users
+ - [DS-11] Fix for SF bug [2495728] 'My Account' disappears following exports
  - Update XMLUI Google Analytics code to match latest tracking code
- - Fix for SF bug [1606439] Exception handling for deleting a metadata field
- - [2513300] Fix for bug [1774958] Nested folders do not export correctly
- - Fix for SF bug [2086481] xmlui Administrative log in as another eperson
- - Fix for SF bug [2155479] Submission verify page handles dc.identifier.* incorrectly
+ - [DS-12] Fix for SF bug [1606439] Exception handling for deleting a metadata field
+ - [DS-13] [2513300] Fix for bug [1774958] Nested folders do not export correctly
+ - [DS-14] Fix for SF bug [2086481] xmlui Administrative log in as another eperson
+ - [DS-152] Fix for SF bug [2155479] Submission verify page handles dc.identifier.* incorrectly
  - [DS-60] netid.toLowerCase() in different classes and methods - ID: 2458187
  - Fix for Jira [DS-98] Key jsp.mydspace.request.export.community not set in Messages.properties
  - [2696133] New export option (migrate) and fix for Jira [DS-59]
@@ -36,55 +36,55 @@
  - Fix for Jira [DS-127] Item exporter does not export bitsteam descriptions
  
 (Stuart Lewis / Chris Yates / Flavio Botelho / Alex Barbieri / Reuben Pasquini / Paulo Matos)
- - [2057378] Hierarchical LDAP support
+ - [DS-16] [2057378] Hierarchical LDAP support
 
 (Paul Needham / Jon Bell / Stuart Lewis)
  - Inclusion of uketd_dc OAI-PMH crosswalk
 
 (Yin Latt)
- - SF bug [1931796] DSpace 1.5 Controlled Vocab (edit-metadata.jsp) not working on first box in twobox
- - SF bug [2137425] DSpace 1.5.1(XMLUI) Wrong dir usage of StatisticsLoader
+ - [DS-17] SF bug [1931796] DSpace 1.5 Controlled Vocab (edit-metadata.jsp) not working on first box in twobox
+ - [DS-18] SF bug [2137425] DSpace 1.5.1(XMLUI) Wrong dir usage of StatisticsLoader
 
 (Claudia Juergen)
- - [2041754] Feature Request #1896717 Registration notification missing information about instance
+ - [DS-19] [2041754] Feature Request #1896717 Registration notification missing information about instance
  - Fix for SF Bug #1775059 Repeated execution of chooser.jsp exhausts db conn pool
- - Fix for SF Bug #2352146 2 Authentications with LoginPage cause connection exhaust
- - Fixed hardcoded metadata language qualifier in DescribeStep to use default.language configuration parameter
- - Fix for SF Bug #2125833 News stored not language dependend (code change in dspace-api-lang googlecode)
- - Fix for SF Bug #2343849 DSQuery invalid check for empty query string
- - Fix for SF Bug #1725817 Error in authorization to submit when you add collection.
+ - [DS-20] Fix for SF Bug #2352146 2 Authentications with LoginPage cause connection exhaust
+ - [DS-21] Fixed hardcoded metadata language qualifier in DescribeStep to use default.language configuration parameter
+ - [DS-22] Fix for SF Bug #2125833 News stored not language dependend (code change in dspace-api-lang googlecode)
+ - [DS-23] Fix for SF Bug #2343849 DSQuery invalid check for empty query string
+ - [DS-24] Fix for SF Bug #1725817 Error in authorization to submit when you add collection.
    Avoids that groups can be added to themselves.
- - Fix for SF Bug #1968082 SWORD Service Document fails if Collection is untitled
- - Fix for SF Bug #2493794 Hardcoded Strings in DSQuery
- - Fix for SF Bug #1745573 Itemmap-browse.jsp throws Exception on items without date
- - Fix for SF Bug #1571645 NullPointerException possible in review.jsp
- - Fix for SF Bug #2413800 Improper display of Umlauts / Encoding of messages_de.xml
- - SF Patch #2526153 Hardcoded String in jspui browse
- - Fix for SF Bug #2512868 Double quote problem in some fields of JSPUI
- - Fix for SF Bug #2411653 Export Item email hardcoded strings in sources
- - SF Patch #2537799 jspui 1.updated Thai translation 1.4.2 (gone into google code)
- - SF Patch #2540683 jspui Thai translation for 1.5.1 (gone into google code) 
- - SF patch [2560974] for SF feature request [2560839] Make sitemap directory configurable
- - SF patch [2615647] Greek translation for xmlui version 1.5.1 submitted to Google code
- - SF patch [2612341] Patch for SF Feature Request [2609564] group delete confirm
- - SF patch [2612034] Remove Edit/Delete Button for Special Groups
- - SF patch [2636514] multilingual input-forms reenabled
+ - [DS-25] Fix for SF Bug #1968082 SWORD Service Document fails if Collection is untitled
+ - [DS-26] Fix for SF Bug #2493794 Hardcoded Strings in DSQuery
+ - [DS-28] Fix for SF Bug #1745573 Itemmap-browse.jsp throws Exception on items without date
+ - [DS-27] Fix for SF Bug #1571645 NullPointerException possible in review.jsp
+ - [DS-29] Fix for SF Bug #2413800 Improper display of Umlauts / Encoding of messages_de.xml
+ - [DS-30] SF Patch #2526153 Hardcoded String in jspui browse
+ - [DS-31] Fix for SF Bug #2512868 Double quote problem in some fields of JSPUI
+ - [DS-32] Fix for SF Bug #2411653 Export Item email hardcoded strings in sources
+ - [DS-148] SF Patch #2537799 jspui 1.updated Thai translation 1.4.2 (gone into google code)
+ - [DS-147] SF Patch #2540683 jspui Thai translation for 1.5.1 (gone into google code) 
+ - [DS-146] SF patch [2560974] for SF feature request [2560839] Make sitemap directory configurable
+ - [DS-145] SF patch [2615647] Greek translation for xmlui version 1.5.1 submitted to Google code
+ - [DS-144] SF patch [2612341] Patch for SF Feature Request [2609564] group delete confirm
+ - [DS-142] SF patch [2612034] Remove Edit/Delete Button for Special Groups
+ - [DS-141] SF patch [2636514] multilingual input-forms reenabled
  - Added blanks between label and text in subscription email.
  
 (Claudia Juergen / Andrea Bollini)
  - [DS-46] Bug 1617889 Years < 1000 do not display in simple item view - ID: 2524083 
  
 (Elliot Metsger)
- - Patch for SF bug #2016130 checksum checker can not retrieve very large bitstream
+ - [DS-33] Patch for SF bug #2016130 checksum checker can not retrieve very large bitstream
 
 (Tim Donohue)
- - [2433852] Add File Format Descriptions to XMLUI 1.5.x
- - [2462293] Enable Google Sitemaps for XMLUI
+ - [DS-34] [2433852] Add File Format Descriptions to XMLUI 1.5.x
+ - [DS-35] [2462293] Enable Google Sitemaps for XMLUI
  - Fixed small bug in XMLUI's org.dspace.app.xmlui.cocoon.DSpaceMETSGenerator which caused Repository-wide METS file to fail to generate.
- - [2477820] DSpace 1.5 XMLUI - Enable METS <amdSec> using crosswalks
- - Fix for SF bug [2541285] Submission Forms don't preserve order of values
- - Fix for SF bug [2543413] XMLUI Submission forms display validation errors on other fields during add/remove
- - Fix for SF bug [2557654] Search with "%" causes NullPointerException in XMLUI
+ - [DS-36] [2477820] DSpace 1.5 XMLUI - Enable METS <amdSec> using crosswalks
+ - [DS-153] Fix for SF bug [2541285] Submission Forms don't preserve order of values
+ - [DS-151] Fix for SF bug [2543413] XMLUI Submission forms display validation errors on other fields during add/remove
+ - [DS-149] Fix for SF bug [2557654] Search with "%" causes NullPointerException in XMLUI
  - Fix for Jira bug [DS-86] XMLUI Feedback form does not include any protection from spamming
  - Fix for Jira [DS-87] XMLUI file download links break in Google search results if file 'sequence' number changes.
  - Fix for Jira [DS-95] XMLUI: Visiting an item page with a trailing slash returns a 404 message
@@ -97,13 +97,13 @@
  - Fix for Jira [DS-85] XMLUI Cocoon logs should not be stored under [xmlui-webapp]/WEB-INF/logs/
 
 (Kim Shepherd)
- - [2385187] Fix for toDate method in DCDate
+ - [DS-39] [2385187] Fix for toDate method in DCDate
 
 (Andrea Bollini /Kim Shepherd) 
  - [DS-47] Add support for rendering DOI links in JSPUI (1.4, 1.5) - ID: 2521493
  
 (Andrea Bollini)
- - S.F. Patch 2645776 for Bug 2645754 SubmissionController is not thread safe
+ - [DS-40] S.F. Patch 2645776 for Bug 2645754 SubmissionController is not thread safe
  - [DS-1] Controlled vocab:he URL http://localhost:8080/jspui/subject-search gives internal error and a stack trace in dspace.log
  - [DS-62] Not right encoding for license and extracted texts - ID: 2234532
  - [DS-84] Improve API for "IgnoreAuthorization" blocks - ID: 1687783
@@ -132,7 +132,7 @@
  - [DS-99] Non-admin user and admin menu options (1.5.1 XMUI only) - ID: 2353606
  
 (Paulo Jobim)
- - SF Patch [2655052] Authors re-ordered when item edited (xmlui)
+ - [DS-138] SF Patch [2655052] Authors re-ordered when item edited (xmlui)
 
 (Larry Stone)
  - SF Patch [2621423] Add method to instrument Context's cache usage
