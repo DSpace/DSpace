@@ -340,7 +340,7 @@ Manakin)"/>Contents of XMLUI Web Application (aka Manakin)</title>
                 </para>
               </entry>
               <entry>
-                <para>Main DSpace log file. This is where the DSpace code writes a simple log of events and errors that occur within the DSpace code. You can control the verbosity of this by editing the <literal>[dspace-source]/config/templates/log4j.properties</literal> file and then running &quot;ant init_configs&quot;. [dspace]/bin/install-configs in [dspace-sorce]/dspace/target/dspace-1.5.0-build/.</para>
+                <para>Main DSpace log file. This is where the DSpace code writes a simple log of events and errors that occur within the DSpace code. You can control the verbosity of this by editing the <literal>[dspace-source]/config/templates/log4j.properties</literal> file and then running &quot;ant init_configs&quot;. [dspace]/bin/install-configs in [dspace-source]/dspace/target/dspace-1.5.2-build/.</para>
               </entry>
             </row>
             <row>

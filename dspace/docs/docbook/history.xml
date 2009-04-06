@@ -7,7 +7,8 @@
         <title>General Improvements</title>
         <itemizedlist>
           <listitem>
-            <para> TBD</para>
+            <para>The History System has been removed since DSpace 1.5.  The <literal>[dspace]/history</literal> directory and it's contents can be completely removed if you so choose as it is non functional.
+            </para>
           </listitem>
         </itemizedlist>
       </section>

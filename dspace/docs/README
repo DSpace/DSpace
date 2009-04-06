@@ -1,4 +1,4 @@
-The reference version of the documentation is now contained in the
+The definitive/reference version of the documentation is now contained in the
 docbook/ subdirectory.
 
 This version generates the contents of the pdf/ and html/ subdirectories.
@@ -9,7 +9,10 @@ html.legacy/.
 Any additions or edits should be done to the files in docbook/.
 
 The script that can handle conversion is in convert2db.sh, and it
-uses the wrapscreen.py script.
+uses the wrapscreen.py script.  Run this script to generate new .html
+and .pdf documentation.  Since these files, in html/ and pdf/ are 
+currently checked in to svn, this generates a fair amount of changes
+to be committed.
 
 In the near future, the legacy html will be removed, as will be the pdf
 and html directories.  The conversion scripts will be integrated into

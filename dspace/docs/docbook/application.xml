@@ -913,6 +913,7 @@ dsrun org.dspace.app.itemimport.ItemImport -a -e joe@user.com  -c
       <para>The experimental (incomplete) METS export tool writes DSpace items to a filesystem with the metadata held in a more standard format based on METS.</para>
       <section remap="h3">
         <title>The Export Tool</title>
+        <para>This tool is obsolete, and does not export a complete AIP.  It's use is strongly deprecated.</para>
         <para>The METS export tool is invoked via the command line like this:</para>
         <screen>
 <emphasis> [dspace]</emphasis>/bin/dsrun org.dspace.app.mets.METSExport
@@ -937,6 +938,7 @@ dsrun org.dspace.app.itemimport.ItemImport -a -e joe@user.com  -c
       </section>
       <section remap="h3">
         <title>The AIP Format</title>
+        <para>Note that this tool is deprecated, and the output format is not a true AIP</para>
         <para>Each exported item is written to a separate directory, created under the base directory specified in the command-line arguments, or in the current directory if <literal>--destination</literal> is omitted. The name of each directory is the Handle, URL-encoded so that the directory name is &apos;legal&apos;.</para>
         <para>Within each item directory is a <literal>mets.xml</literal> file which contains the METS-encoded metadata for the item. Bitstreams in the item are also stored in the directory. Their filenames are their MD5 checksums, firstly for easy integrity checking, and also to avoid any problems with &apos;special characters&apos; in the filenames that were legal on the original filing system they came from but are illegal in the server filing system. The <literal>mets.xml</literal> file includes XLink pointers to these bitstream files.</para>
         <para>An example AIP might look like this:</para>

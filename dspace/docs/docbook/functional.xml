@@ -251,7 +251,7 @@ DSpace in one of two ways:"/>Items can be removed from DSpace in one of two ways
       </section>
     <section remap="h2">
       <title><anchor id="docbook-functional.html-auth" xreflabel="Authorization"/>Authorization</title>
-      <para>DSpace&apos;s authorization system is based on associating actions with objects and the lists of EPeople who can perform them. The associations are called Resource Policies, and the lists of EPeople are called Groups. There are two special groups: &apos;administrators&apos;, who can do anything in a site, and &apos;anonymous&apos;, which is a list that contains all users. Assigning a policy for an action on an object to anonymous means giving everyone permission to do that action. (For example, most objects in DSpace sites have a policy of &apos;anonymous&apos; READ.) Permissions must be explicit - lack of an explicit permission results in the default policy of &apos;deny&apos;. Permissions also do not &apos;commute&apos;; for example, if an e-person has READ permission on an item, they might not necessarily have READ permission on the bundles and bitstreams in that item. Currently Collections, Communities and Items are discoverable in the browse and search systems regardless of READ authorization.</para>
+      <para>DSpace&apos;s authorization system is based on associating actions with objects and the lists of EPeople who can perform them. The associations are called Resource Policies, and the lists of EPeople are called Groups. There are two special groups: &apos;Administrators&apos;, who can do anything in a site, and &apos;Anonymous&apos;, which is a list that contains all users. Assigning a policy for an action on an object to anonymous means giving everyone permission to do that action. (For example, most objects in DSpace sites have a policy of &apos;anonymous&apos; READ.) Permissions must be explicit - lack of an explicit permission results in the default policy of &apos;deny&apos;. Permissions also do not &apos;commute&apos;; for example, if an e-person has READ permission on an item, they might not necessarily have READ permission on the bundles and bitstreams in that item. Currently Collections, Communities and Items are discoverable in the browse and search systems regardless of READ authorization.</para>
       <para>The following actions are possible:</para>
       <para>
         <emphasis role="bold">Community</emphasis>
@@ -301,7 +301,8 @@ DSpace in one of two ways:"/>Items can be removed from DSpace in one of two ways
                 <para>DEFAULT_BITSTREAM_READ</para>
               </entry>
               <entry>
-                <para>inherited as READ by bitstreams of all submitted items</para>
+                <para>inherited as READ by Bitstreams of all submitted items.  Note:  only affects
+    Bitstreams of an item at the time it is initially submitted.  If a Bitstream is added later, it does _not_ get the same default read policy.</para>
               </entry>
             </row>
             <row>
@@ -413,7 +414,7 @@ Workflow"/>Ingest Process and Workflow</title>
       <para>DSpace Ingest Process</para>
       <para>The batch item importer is an application, which turns an external SIP (an XML metadata document with some content files) into an &quot;in progress submission&quot; object. The Web submission UI is similarly used by an end-user to assemble an &quot;in progress submission&quot; object.</para>
       <para>Depending on the policy of the collection to which the submission in targeted, a workflow process may be started. This typically allows one or more human reviewers or &apos;gatekeepers&apos; to check over the submission and ensure it is suitable for inclusion in the collection.</para>
-      <para>When the Batch Ingester or Web Submit UI completes the InProgressSubmission object, and invokes the next stage of ingest (be that workflow or item installation), a provenance message is added to the Dublin Core which includes the filenames and checksums of the content of the submission. Likewise, each time a workflow changes state (e.g. a reviewer accepts the submission), a similar provenance statement is added. This allows us to track how the item has changed since a user submitted it. (The <link linkend="docbook-functional.html-history">History system</link> is also invoked, but provenance is easier for us to access at the moment.)</para>
+      <para>When the Batch Ingester or Web Submit UI completes the InProgressSubmission object, and invokes the next stage of ingest (be that workflow or item installation), a provenance message is added to the Dublin Core which includes the filenames and checksums of the content of the submission. Likewise, each time a workflow changes state (e.g. a reviewer accepts the submission), a similar provenance statement is added. This allows us to track how the item has changed since a user submitted it. </para>
       <para>Once any workflow process is successfully and positively completed, the InProgressSubmission object is consumed by an &quot;item installer&quot;, that converts the InProgressSubmission into a fully blown archived item in DSpace. The item installer:</para>
       <itemizedlist>
         <listitem>
@@ -637,11 +638,6 @@ Support"/>Creative Commons Support</title>
     <section remap="h2">
       <title><anchor id="docbook-functional.html-subscriptions" xreflabel="Subscriptions"/>Subscriptions</title>
       <para>As <link linkend="docbook-functional.html-epeople">noted above</link>, end-users (e-people) may &apos;subscribe&apos; to collections in order to be alerted when new items appear in those collections. Each day, end-users who are subscribed to one or more collections will receive an e-mail giving brief details of all new items that appeared in any of those collections the previous day. If no new items appeared in any of the subscribed collections, no e-mail is sent. Users can unsubscribe themselves at any time. RSS feeds of new items are also available for collections and communities.</para>
-    </section>
-    <section remap="h2">
-      <title><anchor id="docbook-functional.html-history" xreflabel="History"/>History</title>
-      <para>While provenance information in the form of prose is very useful, it is not easily programmatically manipulated. The History system captures a time-based record of significant changes in DSpace, in a manner suitable for later &apos;refactoring&apos; or repurposing.</para>
-      <para>Currently, the History subsystem is explicitly invoked when significant events occur (e.g., DSpace accepts an item into the archive). The History subsystem then creates RDF data describing the current state of the object. The RDF data is modeled using <ulink url="http://www.metadata.net/harmony/">Harmony/ABC</ulink>, an ontology for describing temporal-based data, and stored in the file system. Some simple indices for unwinding the data are available.</para>
     </section>
     <section remap="h2">
       <title><anchor id="docbook-functional.html-importexport" xreflabel="Import and

@@ -35,7 +35,7 @@ property.name = property value
 property.name = word1 ${other.property.name} more words
 property2.name = ${dspace.dir}/rest/of/path
 </screen>
-        <para> Whenever you edit dspace.cfg in [dspace-source]/dspace/config/, you should then run &apos;ant init_configs&apos; in the directory [dspace-source]/dspace/target/dspace-1.5.0-build.dir so that any changes you may have made are reflected in the configuration files of other applications, for example Apache. You may then need to restart those applications, depending on what you changed. <table frame="none">
+        <para> Whenever you edit dspace.cfg in [dspace-source]/dspace/config/, you should then run &apos;ant init_configs&apos; in the directory [dspace-source]/dspace/target/dspace-1.5.2-build.dir so that any changes you may have made are reflected in the configuration files of other applications, for example Apache. You may then need to restart those applications, depending on what you changed. <table frame="none">
             <title>dspace.cfg Main Properties (Not Complete)</title>
             <tgroup cols="3">
               <colspec colname="c1" colwidth="33*"/>
