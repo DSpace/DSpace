@@ -1,3 +1,6 @@
+(Mark Diggory)
+ - [DS-155] Maven war plugin changes cause war to include libraries as well
+ 
 (Andrea Bollini)
 - S.F. Patch 2645776 for Bug 2645754 SubmissionController is not thread safe
 - [DS-1] Controlled vocab:he URL http://localhost:8080/jspui/subject-search gives internal error and a stack trace in dspace.log
