@@ -19,6 +19,16 @@
             platform.  
          -->
          <plugin>
+			<artifactId>maven-release-plugin</artifactId>
+			<configuration>
+				<!--
+					During release:perform, enable the "addons" profile
+				-->
+				<releaseProfiles>addons</releaseProfiles>
+				<goals>deploy</goals>
+			</configuration>
+		 </plugin>
+         <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
                <source>1.5</source>
