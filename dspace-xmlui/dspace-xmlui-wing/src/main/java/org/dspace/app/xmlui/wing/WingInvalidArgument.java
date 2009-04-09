@@ -1,9 +1,9 @@
 /*
  * WingInvalidArgument.java
  *
- * Version: $Revision: 1.2 $
+ * Version: $Revision$
  *
- * Date: $Date: 2005/10/21 21:16:33 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

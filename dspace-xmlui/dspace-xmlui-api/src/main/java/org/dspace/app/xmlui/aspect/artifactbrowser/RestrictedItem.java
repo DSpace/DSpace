@@ -1,9 +1,9 @@
 /*
  * RestrictedItem.java
  *
- * Version: $Revision: 1.1 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/08/08 20:58:55 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

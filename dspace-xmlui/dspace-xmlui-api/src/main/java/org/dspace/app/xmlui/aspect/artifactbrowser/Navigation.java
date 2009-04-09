@@ -1,9 +1,9 @@
 /*
  * Navigation.java
  *
- * Version: $Revision: 1.14 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/08/08 20:58:45 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

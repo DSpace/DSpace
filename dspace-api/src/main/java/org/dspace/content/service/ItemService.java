@@ -1,9 +1,9 @@
 /*
  * ItemService.java
  *
- * Version: $Revision: 1.0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2008/01/01 04:11:09 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

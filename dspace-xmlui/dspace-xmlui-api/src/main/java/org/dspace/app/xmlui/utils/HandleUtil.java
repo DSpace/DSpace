@@ -1,9 +1,9 @@
 /*
  * HandleUtil.java
  *
- * Version: $Revision: 1.6 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/08/08 21:00:27 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

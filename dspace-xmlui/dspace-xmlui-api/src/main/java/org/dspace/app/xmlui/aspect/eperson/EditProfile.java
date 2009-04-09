@@ -1,9 +1,9 @@
 /*
  * EditProfile.java
  *
- * Version: $Revision: 1.10 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/08/17 14:51:46 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

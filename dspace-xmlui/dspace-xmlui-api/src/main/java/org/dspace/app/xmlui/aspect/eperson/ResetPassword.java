@@ -1,9 +1,9 @@
 /*
  * ResetPassword.java
  *
- * Version: $Revision: 1.8 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/28 20:08:18 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

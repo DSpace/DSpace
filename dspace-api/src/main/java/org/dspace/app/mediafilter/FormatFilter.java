@@ -1,9 +1,9 @@
 /*
  * FormatFilter.java
  *
- * Version: $Revision: 1491 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006-03-29 21:46:42 -0500 (Wed, 29 Mar 2006) $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

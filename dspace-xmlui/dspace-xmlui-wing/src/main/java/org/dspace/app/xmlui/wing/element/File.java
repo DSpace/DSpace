@@ -1,9 +1,9 @@
 /*
  * File.java
  *
- * Version: $Revision: 1.2 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/06 19:31:14 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

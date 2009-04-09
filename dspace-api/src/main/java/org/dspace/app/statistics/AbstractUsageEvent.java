@@ -1,9 +1,9 @@
 /*
  * AbstractUsageEvent.java
  *
- * Version: $Revision: 0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2008/02/08 10:33:00 $
+ * Date: $Date$
  *
  * Copyright (C) 2008, The DSpace Foundation.  All rights reserved.
  *
@@ -44,7 +44,7 @@ import org.dspace.eperson.EPerson;
  * Base class to be extended by usage event handlers.
  * 
  * @author Mark H. Wood
- * @version $Revision: 0 $
+ * @version $Revision$
  */
 public abstract class AbstractUsageEvent
 {

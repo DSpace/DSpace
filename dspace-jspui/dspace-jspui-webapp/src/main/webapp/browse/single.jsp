@@ -1,9 +1,9 @@
 <%--
   - single.jsp
   -
-  - Version: $Revision: 1.9 $
+  - Version: $Revision$
   -
-  - Date: $Date: 2005/08/25 17:20:26 $
+  - Date: $Date$
   -
   - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.

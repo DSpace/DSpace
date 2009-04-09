@@ -1,9 +1,9 @@
 /*
  * CollectionStyleSelection.java
  *
- * Version: $Revision: 1 $
+ * Version: $Revision$
  *
- * Date: $Date: 2007-10-25 09:00:00 +0100 (thu, 25 oct 2007) $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -53,7 +53,7 @@ import org.dspace.core.ConfigurationManager;
  * Style name is case insensitive.
  * 
  * @author Andrea Bollini
- * @version $Revision: 1 $
+ * @version $Revision$
  * 
  */
 public class CollectionStyleSelection extends AKeyBasedStyleSelection

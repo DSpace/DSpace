@@ -1,9 +1,9 @@
 /*
  * CrossLinks.java
  *
- * Version: $Revision: 1.9 $
+ * Version: $Revision$
  *
- * Date: $Date: 2005/04/20 14:23:12 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

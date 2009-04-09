@@ -1,9 +1,9 @@
 /*
  * OrderFormat.java
  *
- * Version: $Revision: 1.0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2007/03/02 11:22:13 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -71,7 +71,7 @@ import org.dspace.sort.OrderFormatText;
  * (ie. run 'index-all', or 'dsrun org.dspace.browse.InitializeBrowse')
  * 
  * @author Graham Triggs
- * @version $Revision: 1.0 $
+ * @version $Revision$
  */
 public class OrderFormat
 {

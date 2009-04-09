@@ -1,9 +1,9 @@
 /*
  * PassiveUsageEvent.java
  *
- * Version: $Revision: 0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2008/02/08 10:33:00 $
+ * Date: $Date$
  *
  * Copyright (C) 2008, the DSpace Foundation.  All rights reserved.
  *
@@ -43,7 +43,7 @@ package org.dspace.app.statistics;
  * cheaply.
  * 
  * @author Mark H. Wood
- * @version $Revision: 0 $
+ * @version $Revision$
  */
 public class PassiveUsageEvent extends AbstractUsageEvent
 {

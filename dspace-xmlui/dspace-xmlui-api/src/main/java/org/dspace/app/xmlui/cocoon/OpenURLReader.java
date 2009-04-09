@@ -1,9 +1,9 @@
 /*
  * OpenURLReader.java
  *
- * Version: $Revision: 1189 $
+ * Version: $Revision$
  *
- * Date: $Date: 2005-04-20 07:23:44 -0700 (Wed, 20 Apr 2005) $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
@@ -75,7 +75,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Robert Tansley
  * @author Mark Diggory (mdiggory at mire.be)
- * @version $Revision: 1189 $
+ * @version $Revision$
  */
 public class OpenURLReader extends AbstractReader implements Recyclable {
 

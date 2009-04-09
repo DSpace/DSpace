@@ -1,9 +1,9 @@
 /*
  * HandleMatcher.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2005/11/18 00:49:32 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

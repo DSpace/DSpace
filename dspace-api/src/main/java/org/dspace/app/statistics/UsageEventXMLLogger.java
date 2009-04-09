@@ -1,9 +1,9 @@
 /*
  * UsageEventXmlLogger.java
  *
- * Version: $Revision: 0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2008/02/08 10:33:00 $
+ * Date: $Date$
  *
  * Copyright (C) 2008, the DSpace Foundation.  All rights reserved.
  *
@@ -56,7 +56,7 @@ import org.dspace.core.ConfigurationManager;
  * {@code usageEvent.xmlLogger.file}.
  * 
  * @author Mark H. Wood
- * @version $Revision: 0 $
+ * @version $Revision$
  */
 public class UsageEventXMLLogger extends AbstractUsageEvent
 {

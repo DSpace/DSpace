@@ -1,9 +1,9 @@
 /*
  * BrowseListTag.java
  *
- * Version: $Revision: 1.30 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/04/05 02:15:45 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -73,7 +73,7 @@ import java.util.StringTokenizer;
  * Tag for display a list of items
  *
  * @author Robert Tansley
- * @version $Revision: 1.30 $
+ * @version $Revision$
  */
 public class BrowseListTag extends TagSupport
 {

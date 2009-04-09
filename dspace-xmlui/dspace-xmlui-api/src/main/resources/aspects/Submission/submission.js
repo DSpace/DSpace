@@ -1,9 +1,9 @@
 /*
  * submission.js
  *
- * Version: $Revision: 1.2 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/06/02 21:37:32 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

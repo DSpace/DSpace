@@ -1,9 +1,9 @@
 /*
  * Include.java
  *
- * Version: $Revision: 1.4 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/04/25 15:29:42 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

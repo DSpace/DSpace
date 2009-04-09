@@ -1,9 +1,9 @@
 /*
  * ItemExportArchiveServlet.java
  *
- * Version: $Revision: 2073 $
+ * Version: $Revision$
  *
- * Date: $Date: 2007-07-19 11:45:10 -0500 (Thu, 19 Jul 2007) $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

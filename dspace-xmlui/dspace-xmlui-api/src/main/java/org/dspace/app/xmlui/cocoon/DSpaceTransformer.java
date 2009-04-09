@@ -1,9 +1,9 @@
 /*
  * DSpaceTransformer.java
  *
- * Version: $Revision: 1.5 $
+ * Version: $Revision$
  *
- * Date: $Date: 2005/11/16 22:20:46 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

@@ -1,9 +1,9 @@
 /*
  * AbstractBrowserServlet.java
  *
- * Version: $Revision: 1189 $
+ * Version: $Revision$
  *
- * Date: $Date: 2005-04-20 15:23:44 +0100 (Wed, 20 Apr 2005) $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -80,7 +80,7 @@ import org.dspace.core.LogManager;
  * - etal: integer number to limit multiple value items specified in config to
  *
  * @author Richard Jones
- * @version $Revision:  $
+ * @version $Revision$
  */
 public abstract class AbstractBrowserServlet extends DSpaceServlet
 {

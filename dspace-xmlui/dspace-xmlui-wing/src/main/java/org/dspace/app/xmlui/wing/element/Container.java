@@ -1,9 +1,9 @@
 /*
  * Container.java
  *
- * Version: $Revision: 1.1 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/05 21:40:01 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

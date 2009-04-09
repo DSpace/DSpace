@@ -1,9 +1,9 @@
 /*
  * RDFCrosswalk.java
  *
- * Version: $Revision: 1.7 $
+ * Version: $Revision$
  *
- * Date: $Date: 2005/04/20 14:22:34 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -61,7 +61,7 @@ import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
  * DSpace items into typed RDF format.
  * 
  * @author Richard Rodgers
- * @version $Revision: 1.0 $
+ * @version $Revision$
  */
 public class RDFCrosswalk extends Crosswalk
 {

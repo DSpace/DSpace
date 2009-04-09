@@ -1,9 +1,9 @@
 /*
  * ItemAdapter.java
  *
- * Version: $Revision: 1.7 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/05/02 01:24:11 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

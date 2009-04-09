@@ -1,9 +1,9 @@
 /*
  * SetCharacterEncodingFilter.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/05 21:39:29 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -79,7 +79,7 @@ import javax.servlet.ServletResponse;
  *
  * @author Craig McClanahan - Apache
  * @author Tim Donohue (minor modifications)
- * @version $Revision: 267129 $ $Date: 2004-03-18 11:40:35 -0500 (Thu, 18 Mar 2004) $
+ * @version $Revision$ $Date$
  */
 
 public class SetCharacterEncodingFilter implements Filter

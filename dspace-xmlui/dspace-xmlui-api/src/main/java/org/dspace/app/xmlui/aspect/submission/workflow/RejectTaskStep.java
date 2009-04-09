@@ -1,9 +1,9 @@
 /*
  * RejectTaskStep.java
  *
- * Version: $Revision: 1.21 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/27 18:24:34 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

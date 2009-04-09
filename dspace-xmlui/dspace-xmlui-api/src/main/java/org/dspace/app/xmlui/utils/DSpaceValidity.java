@@ -1,9 +1,9 @@
 /*
  * DSpaceValidity.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/04/27 01:19:52 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

@@ -1,9 +1,9 @@
 /*
  * WithdrawnItems.java
  *
- * Version: $Revision: 1.0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2007/08/28 10:00:00 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

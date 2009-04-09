@@ -1,9 +1,9 @@
 <%--
   - group-confirm-delete.jsp
   -
-  - Version: $Revision:  $
+  - Version: $Revision$
   -
-  - Date: $Date:  $
+  - Date: $Date$
   -
   - Copyright (C) 2009, The DSpace Foundation.  All rights reserved.
   -

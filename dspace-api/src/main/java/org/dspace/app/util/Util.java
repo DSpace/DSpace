@@ -1,9 +1,9 @@
 /*
  * Util.java
  *
- * Version: $Revision: $
+ * Version: $Revision$
  *
- * Date: $Date: $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -55,7 +55,7 @@ import org.dspace.core.Constants;
  * 
  * @author Robert Tansley
  * @author Mark Diggory
- * @version $Revision: $
+ * @version $Revision$
  */
 public class Util {
 

@@ -1,9 +1,9 @@
 /*
  * RequestInfo.java
  *
- * Version: $Revision: 1.5 $
+ * Version: $Revision$
  *
- * Date: $Date: 2005/04/20 14:23:00 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -58,7 +58,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
  * 
  * @author Robert Tansley
  * @author Scott Phillips
- * @version $Revision: 1.5 $
+ * @version $Revision$
  */
 public class RequestInfo
 {

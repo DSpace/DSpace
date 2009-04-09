@@ -1,9 +1,9 @@
 /**
  * UsageEvent.java
  *
- * Version: $Revision: 0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2008/02/08 10:33:00 $
+ * Date: $Date$
  *
  * Copyright (C) 2008, The DSpace Foundation.  All rights reserved.
  *
