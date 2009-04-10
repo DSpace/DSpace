@@ -460,9 +460,32 @@
          </dependencies>
       </profile>
 
-   </profiles>
+      <!--  
+         Using xpdf filters requires the inclusion
+         Of Sun dependencies these are not redistributable
+         and you will need to install them locally in your
+         maven repository prior to building your dspace instance
+      -->
+      <profile>
+         <id>xpdf-mediafilter-support</id>
+         <activation>
+            <activeByDefault>false</activeByDefault>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>com.sun.media</groupId>
+               <artifactId>jai_imageio</artifactId>
+               <version>1.0_01</version>
+            </dependency>
+            <dependency>
+               <groupId>javax.media</groupId>
+               <artifactId>jai_core</artifactId>
+               <version>1.1.2_01</version>
+            </dependency>
+         </dependencies>
+      </profile>
    
-   <!-- 
+      <!-- 
       Builds Overlay Modules for DSpace
    -->
    <modules>
