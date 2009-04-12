@@ -1,5 +1,10 @@
-Detailed bug descriptions and current status can be found on the SourceForge
-bug tracker:
+Detailed Issue Tracking for DSpace is done on our JIRA Issue Tracker
+
+http://jira.dspace.org
+
+In the past we used Sourceforge Trackers to track issues with. Older
+detailed bug descriptions and some status may still be available on 
+the SourceForge bug tracker:
 
 http://sourceforge.net/tracker/?group_id=19984&atid=119984
 
