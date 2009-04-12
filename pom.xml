@@ -509,8 +509,8 @@
    </licenses>
 
    <issueManagement>
-      <system>Sourceforge Issue Tracking</system>
-      <url>http://sourceforge.net/tracker/?group_id=19984</url>
+      <system>JIRA</system>
+      <url>http://jira.dspace.org/jira/browse/DS</url>
    </issueManagement>
 
    <mailingLists>
