@@ -38,7 +38,8 @@
  - [2696133] New export option (migrate) and fix for Jira [DS-59]
  - [DS-113] Export item buttons
  - Fix for Jira [DS-127] Item exporter does not export bitsteam descriptions
- 
+ - [DS-182] Speed up SWORD deposits
+
 (Stuart Lewis / Chris Yates / Flavio Botelho / Alex Barbieri / Reuben Pasquini / Paulo Matos)
  - [DS-16] [2057378] Hierarchical LDAP support
 

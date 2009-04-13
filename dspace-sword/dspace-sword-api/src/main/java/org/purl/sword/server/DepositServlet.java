@@ -214,18 +214,23 @@ public class DepositServlet extends HttpServlet {
 			// Write the file to the temp directory
 			filename = tempDirectory + "SWORD-"
 					+ request.getRemoteAddr() + "-" + counter.addAndGet(1);
-			InputStream inputStream = request.getInputStream();
-			OutputStream outputStream = new FileOutputStream(filename);
-            try {
-                int data;
-                while ((data = inputStream.read()) != -1) {
-                    outputStream.write(data);
-                }
-            } finally {
-                inputStream.close();
-                outputStream.close();
-            }
-            
+			InputStream inputstream = request.getInputStream();
+			OutputStream outputstream = new FileOutputStream(new File(filename));
+			try
+			{
+			    byte[] buf = new byte[1024];
+			    int len;
+			    while ((len = inputstream.read(buf)) > 0)
+			    {
+			        outputstream.write(buf, 0, len);
+			    }
+			}
+			finally
+			{
+			    inputstream.close();
+			    outputstream.close();
+			}
+
 			// Check the size is OK
 			File file = new File(filename);
 		    long fLength = file.length() / 1024;
