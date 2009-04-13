@@ -2297,6 +2297,122 @@ crosswalk.qdc.schemaLocation.QDC  = \
           <para> Add the <literal>-l</literal> option to to pass the ingestion crosswalk a list of elements instead of a whole document, as if the List form of the ingest() method had been called. This is needed to test ingesters for formats like DC that get called with lists of elements instead of a root element.</para>
         </section>
       </section>
+
+    <section remap="h3">
+    <title> XPDF Filter </title>
+    <para>These filters handle PDF resources with more sophisticated tools that can produce thumbnail images of PDF and 3D PDF files, and do much faster (and more complete) text extraction as well.</para>
+    <section remap="h4">
+    <title>
+      <emphasis role="bold">Installation</emphasis>
+    </title>
+    <para>There is probably a very complicated way to do this correctly by adding new Maven modules and POMs and things, but here is what I did, being in a hurry and just wanting immediate results (and <emphasis>not</emphasis> caring about maintaining a DSpace installation, upgrading, etc):</para>
+    <orderedlist>
+      <listitem>
+        <para>  Obtain a <emphasis>source</emphasis> distribution of DSpace 1.5.1, configure, and build it.</para>
+      </listitem>
+      <listitem>
+        <para>  Edit configuration lines in dspace.cfg</para>
+      </listitem>
+      <listitem>
+        <para> Add -Pxpdf-mediafilter-support to maven build</para>
+      </listitem>
+      <listitem>
+        <para>  Build and install.</para>
+      </listitem>
+    </orderedlist>
+    </section>
+    <section remap="h4">
+      <title>
+        <emphasis role="bold">Install XPDF tools</emphasis>
+      </title>
+      <para>First, you need to <ulink url="http://www.foolabs.com/xpdf/">download the XPDF suite</ulink> and install it on your server, e.g. under /usr/local/bin.</para>
+      <para>The only tools you <emphasis>really</emphasis> need are:</para>
+      <itemizedlist>
+        <listitem>
+          <para>  pdftoppm</para>
+        </listitem>
+        <listitem>
+          <para>  pdfinfo</para>
+        </listitem>
+        <listitem>
+          <para>  pdftotext</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+    <section remap="h4">
+      <title>
+        <emphasis role="bold">Installation within DSpace</emphasis>
+      </title>
+      <section remap="h5">
+        <title>
+          <emphasis role="bold">Fetch and install jai_imageio JAR</emphasis>
+        </title>
+        <para>Download the jai_imageio library version 1.0_01 or 1.1, find it with google if <ulink url="http://download.java.net/media/jai-imageio/builds/release/1_0_01/jai_imageio-1_0_01-lib-linux-i586.tar.gz">this link</ulink> doesn&apos;t give satisfactory results.</para>
+        <para>Install it in your local Maven repository with the command (assuming the library is installed locally at <emphasis role="bold">/opt/facade/lib/jai_imageio.jar</emphasis>):</para>
+	<screen>
+        mvn install:install-file  \
+         -Dfile=/opt/facade/lib/jai_imageio.jar               \
+         -DgroupId=com.sun.media                              \
+         -DartifactId=jai_imageio                             \
+         -Dversion=1.0_01                                     \
+         -Dpackaging=jar                                      \
+         -DgeneratePom=true
+	</screen>
+      </section>
+      <section remap="h5">
+        <title>
+          <emphasis role="bold">Edit DSpace Configuration</emphasis>
+        </title>
+        <para>First, be sure there is a value for thumbnail.maxwidth and that it corresponds to the size you want for preview images for the UI, e.g.: (<emphasis>NOTE:</emphasis> this code doesn&apos;t pay any attention to thumbnail.maxheight but it&apos;s best to set it too so the other thumbnail filters make square images.)</para>
+	<screen>
+        # maximum width and height of generated thumbnails
+        thumbnail.maxwidth  300
+        thumbnail.maxheight 300
+        </screen>
+        <para>Now, add the absolute paths of the XPDF tools you installed:</para>
+	<screen>
+        xpdf.path.pdftotext = /var/local/bin/pdftotext
+        xpdf.path.pdftoppm = /var/local/bin/pdftoppm
+        xpdf.path.pdfinfo = /var/local/bin/pdfinfo
+	</screen>
+        <para>Also be sure the mediafilter configuration includes the new filters, e.g: (New sections are in bold)</para>
+	<screen>
+        filter.plugins = \
+         <emphasis role="bold">PDF Text Extractor,</emphasis> \
+         <emphasis role="bold">PDF Thumbnail,</emphasis> \
+         HTML Text Extractor, \
+         Word Text Extractor, \
+         JPEG Thumbnail
+        plugin.named.org.dspace.app.mediafilter.FormatFilter = \
+         <emphasis role="bold">org.dspace.app.mediafilter.XPDF2Text = PDF Text Extractor, \</emphasis>
+         <emphasis role="bold">org.dspace.app.mediafilter.XPDF2Thumbnail = PDF Thumbnail,</emphasis> \
+         org.dspace.app.mediafilter.HTMLFilter = HTML Text Extractor, \
+         org.dspace.app.mediafilter.WordFilter = Word Text Extractor, \
+         org.dspace.app.mediafilter.JPEGFilter = JPEG Thumbnail, \
+         org.dspace.app.mediafilter.BrandedPreviewJPEGFilter = Branded Preview JPEG
+	</screen>
+        <para>#Configure each filter&apos;s input format(s)</para>
+        <para>....</para>
+        <screen>
+          <emphasis role="bold">filter.org.dspace.app.mediafilter.XPDF2Thumbnail.inputFormats = Adobe PDF</emphasis>
+          <emphasis role="bold">filter.org.dspace.app.mediafilter.XPDF2Text.inputFormats = Adobe PDF</emphasis>
+          <emphasis role="bold">Add -Pxpdf-mediafilter-support to maven build</emphasis>
+        </screen>
+        <para>Edit the POM for the <emphasis role="bold">dspace-api</emphasis> module. Within the &lt;dependencies&gt; element, add this new element:</para>
+        <screen>
+	%mvn -Pxpdf-mediafilter-support package
+	</screen>
+      </section>
+      <section remap="h5">
+        <title>
+          <emphasis role="bold">Build and Install</emphasis>
+        </title>
+        <para>Follow the usual DSpace installation/update procedure.</para>
+        <para>Retrieved from &quot;<ulink url="http://libstaff.mit.edu/facade/index.php/DSpace_PDF_Media_Filters">http://libstaff.mit.edu/facade/index.php/DSpace_PDF_Media_Filters</ulink>&quot;</para>
+      </section>
+    </section>
+  </section>
+
       <section remap="h3">
         <title><anchor id="docbook-configure.html-mediafilters" xreflabel="Creating a new Media/Format
 Filter"/>Creating a new Media/Format Filter</title>

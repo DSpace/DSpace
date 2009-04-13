@@ -247,7 +247,7 @@ fi
 rm $HTMLfinal/*html
 # Lie to Fop, and tell it we're generating an fo (which will be empty with these stylesheets).
 # This saves figuring out a separate set of dependencies, classpath and command line for the underlying Xalan.
-java -Xmx64m -Dfop.home=$FOP_HOME -jar /usr/local/share/fop-0.94/build/fop.jar -xml $DBxml/book.xml  -xsl $xslhtml -foout fo.fo $XSLTP
+java -Xmx64m -Dfop.home=$FOP_HOME -jar $FOP_HOME/build/fop.jar -xml $DBxml/book.xml  -xsl $xslhtml -foout fo.fo $XSLTP
 rm fo.fo
 mv $DBxml/*html $HTMLfinal
 if [ ! -e $HTMLfinal/image ]; then
