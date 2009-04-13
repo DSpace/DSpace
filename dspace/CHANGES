@@ -8,6 +8,7 @@
  - [DS-154] Make a backup of the config dir on Ant update
  - [DS-155] Maven war plugin changes cause war to include libraries as well
  - [DS-183] XPDF support for filtering PDFs for text extraction/search authored by Larry Stone
+ - [DS-185] bin files in DOS format
  
 (Mark Wood)
  - [DS-2] [2002866] Return 404, not 200, when page Not Found
