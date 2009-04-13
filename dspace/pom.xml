@@ -485,7 +485,9 @@
          </dependencies>
       </profile>
    
-      <!-- 
+   </profiles>
+   
+   <!-- 
       Builds Overlay Modules for DSpace
    -->
    <modules>
