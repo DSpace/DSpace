@@ -226,6 +226,8 @@ public class ShibAuthentication implements AuthenticationMethod
         java.util.Set groups = new java.util.HashSet();
         String roleHeader = ConfigurationManager
                 .getProperty("authentication.shib.role-header");
+        boolean roleHeader_ignoreScope = ConfigurationManager
+                .getBooleanProperty("authentication.shib.role-header.ignore-scope");
         if (roleHeader == null || roleHeader.trim().length() == 0)
             roleHeader = "Shib-EP-UnscopedAffiliation"; // fall back to default
         String affiliations = request.getHeader(roleHeader);
@@ -250,6 +252,13 @@ public class ShibAuthentication implements AuthenticationMethod
             while (st.hasMoreTokens())
             {
                 String affiliation = st.nextToken().trim();
+
+                // strip scope if present and roleHeader_ignoreScope
+                if (roleHeader_ignoreScope) 
+                {
+                        int index = affiliation.indexOf("@");
+                        if (index != -1) affiliation = affiliation.substring(0,index);
+                }
 
                 // perform mapping here if necessary
                 String groupLabels = ConfigurationManager
