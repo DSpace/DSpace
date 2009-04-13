@@ -144,7 +144,7 @@
 (Larry Stone)
  - SF Patch [2621423] Add method to instrument Context's cache usage
 
-(Bruc Liong / Xiang Kevin Li)
+(Bruc Liong / Xiang Kevin Li / Stuart Hicks)
 - [DS-48] shibboleth+dspace1.5.1 patch - ID: 2412723
 
 1.5.1 final
