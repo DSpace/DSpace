@@ -1,3 +1,7 @@
+(Claudia Jürgen)
+- [DS-188] Misspell exclude.type=indentifier in dstat.cfg
+
+1.5.2 (final)
 (Graham Triggs)
  - Fixes for critical bugs identified by Findbugs
 
