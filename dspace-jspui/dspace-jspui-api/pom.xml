@@ -14,7 +14,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-jspui</artifactId>
-      <version>1.5.3-SNAPSHOT</version>
+      <version>1.6.0-SNAPSHOT</version>
    </parent>
 
    <repositories>
@@ -40,9 +40,9 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-jspui/dspace-jspui-api</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-jspui/dspace-jspui-api</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace-jspui/dspace-jspui-api</url>
+      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-jspui/dspace-jspui-api</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-jspui/dspace-jspui-api</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-jspui/dspace-jspui-api</url>
    </scm>
 
    <dependencies>
