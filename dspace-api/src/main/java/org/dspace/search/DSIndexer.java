@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Calendar;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Vector;
 import java.text.SimpleDateFormat;
@@ -65,6 +66,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.DateTools;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
@@ -76,16 +78,14 @@ import org.dspace.content.Community;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.dao.ItemDAO;
-import org.dspace.content.dao.ItemDAOFactory;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.IdentifierService;
-import org.dspace.uri.IdentifierException;
+import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
+import org.dspace.handle.HandleManager;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.OrderFormat;
 
@@ -94,18 +94,18 @@ import org.dspace.sort.OrderFormat;
  * collections, communities, etc. It is meant to either be invoked from the
  * command line (see dspace/bin/index-all) or via the indexContent() methods
  * within DSpace.
- *
+ * 
  * As of 1.4.2 this class has new incremental update of index functionality
  * and better detection of locked state thanks to Lucene 2.1 moving write.lock.
  * It will attempt to attain a lock on the index in the event that an update
  * is requested and will wait a maximum of 30 seconds (a worst case scenario)
- * to attain the lock before giving up and logging the failure to log4j and
- * to the DSpace administrator email account.
- *
+ * to attain the lock before giving up and logging the failure to log4j and 
+ * to the DSpace administrator email account. 
+ * 
  * The Administrator can choose to run DSIndexer in a cron that
  * repeats regularly, a failed attempt to index from the UI will be "caught" up
  * on in that cron.
- *
+ * 
  * @author Mark Diggory
  * @author Graham Triggs
  */
@@ -114,11 +114,9 @@ public class DSIndexer
     private static final Logger log = Logger.getLogger(DSIndexer.class);
 
     private static final String LAST_INDEXED_FIELD = "DSIndexer.lastIndexed";
-
+    
     private static final long WRITE_LOCK_TIMEOUT = 30000 /* 30 sec */;
-
-    private static ItemDAO itemDAO;
-
+    
     // Class to hold the index configuration (one instance per config line)
     private static class IndexConfig
     {
@@ -141,11 +139,11 @@ public class DSIndexer
             this.type = type;
         }
     }
-
+    
     private static String index_directory = ConfigurationManager.getProperty("search.dir");
-
+    
     private static int maxfieldlength = -1;
-
+    	
     // TODO: Support for analyzers per language, or multiple indices
     /** The analyzer for this DSpace instance */
     private static Analyzer analyzer = null;
@@ -168,13 +166,13 @@ public class DSIndexer
     };
 
     static {
-
+    	
     	// calculate maxfieldlength
     	if (ConfigurationManager.getProperty("search.maxfieldlength") != null)
         {
             maxfieldlength = ConfigurationManager.getIntProperty("search.maxfieldlength");
         }
-
+    	
         // read in indexes from the config
         ArrayList<String> indexConfigList = new ArrayList<String>();
 
@@ -183,24 +181,24 @@ public class DSIndexer
         {
             indexConfigList.add(ConfigurationManager.getProperty("search.index." + i));
         }
-
+    
         if (indexConfigList.size() > 0)
         {
             indexConfigArr = new IndexConfig[indexConfigList.size()];
-
+            
             for (int i = 0; i < indexConfigList.size(); i++)
             {
                 indexConfigArr[i] = new IndexConfig();
                 String index = indexConfigList.get(i);
-
+    
                 String[] configLine = index.split(":");
-
+                
                 indexConfigArr[i].indexName = configLine[0];
-
+    
                 // Get the schema, element and qualifier for the index
                 // TODO: Should check valid schema, element, qualifier?
                 String[] parts = configLine[1].split("\\.");
-
+    
                 switch (parts.length)
                 {
                 case 3:
@@ -222,12 +220,12 @@ public class DSIndexer
                 }
             }
         }
-
+        
         /*
          * Increase the default write lock so that Indexing can be interupted.
          */
         IndexWriter.setDefaultWriteLockTimeout(WRITE_LOCK_TIMEOUT);
-
+    
         /*
          * Create the index directory if it doesn't already exist.
          */
@@ -244,37 +242,45 @@ public class DSIndexer
     }
 
     /**
-     * If a persistent identifier for the "dso" already exists in the index,
-     * and the "dso" has a lastModified timestamp that is newer than the
-     * document in the index then it is updated, otherwise a new document is
-     * added.
-     *
+     * If the handle for the "dso" already exists in the index, and
+     * the "dso" has a lastModified timestamp that is newer than 
+     * the document in the index then it is updated, otherwise a 
+     * new document is added.
+     * 
      * @param context Users Context
      * @param dso DSpace Object (Item, Collection or Community
+     * @throws SQLException
      * @throws IOException
      */
     public static void indexContent(Context context, DSpaceObject dso)
-    throws IOException
+    throws SQLException
     {
     	indexContent(context, dso, false);
     }
     /**
-     * If a persistent identifier for the "dso" already exists in the index,
-     * and the "dso" has a lastModified timestamp that is newer than the
-     * document in the index then it is updated, otherwise a new document is
-     * added.
-     *
+     * If the handle for the "dso" already exists in the index, and
+     * the "dso" has a lastModified timestamp that is newer than 
+     * the document in the index then it is updated, otherwise a 
+     * new document is added.
+     * 
      * @param context Users Context
      * @param dso DSpace Object (Item, Collection or Community
      * @param force Force update even if not stale.
+     * @throws SQLException
      * @throws IOException
      */
     public static void indexContent(Context context, DSpaceObject dso, boolean force)
-    throws IOException
+    throws SQLException
     {
-        String uri = dso.getIdentifier().getCanonicalForm();
+    	
+    	String handle = dso.getHandle();
+    	
+    	if(handle == null)
+    	{
+    		handle = HandleManager.findHandle(context, dso);   
+    	}
 
-        Term t = new Term("uri", uri);
+		Term t = new Term("handle", handle);
 
         try
         {
@@ -287,33 +293,32 @@ public class DSIndexer
                     /** If the item is in the repository now, add it to the index*/
                     if (requiresIndexing(t, ((Item)dso).getLastModified()) || force)
                     {
-                        buildDocument(context, (Item) dso, t);
+                        buildDocument(context, (Item) dso, t);                       
                     }
-                }
+                }       
                 else
                 {
-                    /**
+                    /** 
                      * Make sure the item is not in the index if it is not in archive.
                      * TODO: Someday DSIndexer should block withdrawn
                      * content on search/retrieval and allow admins the ablitity to
                      * still search for withdrawn Items.
                      */
-                    DSIndexer.unIndexContent(context, uri);
-                    log.info("Removed Item: " + uri + " from Index");
+                    DSIndexer.unIndexContent(context, handle);
+                    log.info("Removed Item: " + handle + " from Index");
                 }
-
                 break;
-
+                
             case Constants.COLLECTION :
             	buildDocument(context, (Collection) dso, t);
-            	log.info("Wrote Collection: " + uri + " to Index");
+            	log.info("Wrote Collection: " + handle + " to Index");
             	break;
 
             case Constants.COMMUNITY :
             	buildDocument(context, (Community) dso, t);
-                log.info("Wrote Community: " + uri + " to Index");
+                log.info("Wrote Community: " + handle + " to Index");
                 break;
-
+                
             default :
                 log.error("Only Items, Collections and Communities can be Indexed");
             }
@@ -325,20 +330,19 @@ public class DSIndexer
 
     /**
      * unIndex removes an Item, Collection, or Community only works if the
-     * DSpaceObject has a persistent identifier (uses a persistent identifier
-     * for its unique ID)
-     *
+     * DSpaceObject has a handle (uses the handle for its unique ID)
+     * 
      * @param context
      * @param dso DSpace Object, can be Community, Item, or Collection
+     * @throws SQLException
      * @throws IOException
      */
     public static void unIndexContent(Context context, DSpaceObject dso)
-            throws IOException
+            throws SQLException, IOException
     {
         try
         {
-            unIndexContent(context,
-                    dso.getIdentifier().getCanonicalForm());
+        	unIndexContent(context, dso.getHandle());
         }
         catch(Exception exception)
         {
@@ -349,28 +353,33 @@ public class DSIndexer
 
     /**
      * Unindex a Docment in the Lucene Index.
-     *
+     * 
      * @param context
-     * @param uri
+     * @param handle 
+     * @throws SQLException
      * @throws IOException
      */
-    public static void unIndexContent(Context context, String uri)
-            throws IOException
+    public static void unIndexContent(Context context, String handle)
+            throws SQLException, IOException
     {
-
+        
         IndexWriter writer = openIndex(false);
-
+        
         try
         {
-            if (uri != null)
+            if (handle != null)
             {
-                // we have a persistent identifier (our unique ID, so remove)
-                Term t = new Term("uri", uri);
+                // we have a handle (our unique ID, so remove)
+                Term t = new Term("handle", handle);
                 writer.deleteDocuments(t);
             }
             else
             {
-                log.warn("unindex of content with null uri attempted");
+                log.warn("unindex of content with null handle attempted");
+
+                // FIXME: no handle, fail quietly - should log failure
+                //System.out.println("Error in unIndexContent: Object had no
+                // handle!");
             }
         }
         finally
@@ -378,8 +387,8 @@ public class DSIndexer
             writer.close();
         }
     }
-
-
+    
+    
 
     /**
      * reIndexContent removes something from the index, then re-indexes it
@@ -388,7 +397,7 @@ public class DSIndexer
      * @param dso  object to re-index
      */
     public static void reIndexContent(Context context, DSpaceObject dso)
-            throws IOException
+            throws SQLException, IOException
     {
         try
         {
@@ -400,32 +409,32 @@ public class DSIndexer
             emailException(exception);
         }
     }
-
+    
     /**
 	 * create full index - wiping old index
-	 *
+	 * 
 	 * @param c context to use
 	 */
-    public static void createIndex(Context c) throws IOException
+    public static void createIndex(Context c) throws SQLException, IOException
     {
-        itemDAO = ItemDAOFactory.getInstance(c);
 
     	/* Create a new index, blowing away the old. */
         openIndex(true).close();
-
+        
         /* Reindex all content preemptively. */
         DSIndexer.updateIndex(c, true);
 
     }
-
+    
     /**
-     * Optimize the existing index. Iimportant to do regularly to reduce
+     * Optimize the existing index. Iimportant to do regularly to reduce 
      * filehandle usage and keep performance fast!
-     *
+     * 
      * @param c Users Context
+     * @throws SQLException
      * @throws IOException
      */
-    public static void optimizeIndex(Context c) throws IOException
+    public static void optimizeIndex(Context c) throws SQLException, IOException
     {
         IndexWriter writer = openIndex(false);
 
@@ -440,30 +449,30 @@ public class DSIndexer
     }
 
     /**
-     * When invoked as a command-line tool, creates, updates, removes
+     * When invoked as a command-line tool, creates, updates, removes 
      * content from the whole index
      *
      * @param args
      *            the command-line arguments, none used
-     * @throws IOException
-     * @throws SQLException
+     * @throws IOException 
+     * @throws SQLException 
      */
-    public static void main(String[] args) throws IOException, SQLException
+    public static void main(String[] args) throws SQLException, IOException
     {
 
-        Context context = new Context();
+    	Context context = new Context();
         context.setIgnoreAuthorization(true);
-
-        String usage = "org.dspace.search.DSIndexer [-cbhof[r <item uri>]] or nothing to update/clean an existing index.";
+        
+        String usage = "org.dspace.search.DSIndexer [-cbhof[r <item handle>]] or nothing to update/clean an existing index.";
         Options options = new Options();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine line = null;
 
         options.addOption(OptionBuilder
-                        .withArgName("item uri")
+                        .withArgName("item handle")
                         .hasArg(true)
                         .withDescription(
-                                "remove an Item, Collection or Community from index based on its uri")
+                                "remove an Item, Collection or Community from index based on its handle")
                         .create("r"));
 
         options.addOption(OptionBuilder.isRequired(false).withDescription(
@@ -482,7 +491,7 @@ public class DSIndexer
         options.addOption(OptionBuilder
                         .isRequired(false)
                         .withDescription(
-                                "if updating existing index, force each document to be reindexed even if uptodate")
+                                "if updating existing index, force each handle to be reindexed even if uptodate")
                         .create("f"));
 
         options.addOption(OptionBuilder.isRequired(false).withDescription(
@@ -540,110 +549,109 @@ public class DSIndexer
      * Iterates over all Items, Collections and Communities. And updates
      * them in the index. Uses decaching to control memory footprint.
      * Uses indexContent and isStale ot check state of item in index.
-     *
+     * 
      * @param context
      */
     public static void updateIndex(Context context) {
     	updateIndex(context,false);
     }
-
+    
     /**
      * Iterates over all Items, Collections and Communities. And updates
      * them in the index. Uses decaching to control memory footprint.
      * Uses indexContent and isStale ot check state of item in index.
-     *
+     * 
      * At first it may appear counterintuitive to have an IndexWriter/Reader
      * opened and closed on each DSO. But this allows the UI processes
      * to step in and attain a lock and write to the index even if other
      * processes/jvms are running a reindex.
-     *
+     * 
      * @param context
-     * @param force
+     * @param force 
      */
     public static void updateIndex(Context context, boolean force) {
     		try
     		{
-                for (Item item : itemDAO.getItems())
+                ItemIterator items = null;
+                try
                 {
-    	            indexContent(context,item,force);
-    	            item.decache();
-    	        }
+                    for(items = Item.findAll(context);items.hasNext();)
+                    {
+                        Item item = (Item) items.next();
+                        indexContent(context,item,force);
+                        item.decache();
+                    }
+                }
+                finally
+                {
+                    if (items != null)
+                        items.close();
+                }
 
-    			Collection[] collections = Collection.findAll(context);
+                Collection[] collections = Collection.findAll(context);
     	        for (int i = 0; i < collections.length; i++)
     	        {
     	            indexContent(context,collections[i],force);
     	            context.removeCached(collections[i], collections[i].getID());
-
+    	            
     	        }
-
+    		
     			Community[] communities = Community.findAll(context);
     	        for (int i = 0; i < communities.length; i++)
     	        {
     	            indexContent(context,communities[i],force);
     	            context.removeCached(communities[i], communities[i].getID());
     	        }
-
+    			
     	        optimizeIndex(context);
-
+    			
     		}
     		catch(Exception e)
     		{
     			log.error(e.getMessage(), e);
     		}
-
-	}
-
+    }
+    
     /**
-     * Iterates over all documents in the Lucene index and verifies they
+     * Iterates over all documents in the Lucene index and verifies they 
      * are in database, if not, they are removed.
-     *
+     * 
      * @param context
-     * @throws IOException
+     * @throws IOException 
+     * @throws SQLException 
      */
-    public static void cleanIndex(Context context) throws IOException
-    {
-        try
-        {
-            ObjectIdentifier oi = null;
+    public static void cleanIndex(Context context) throws IOException, SQLException {
 
-            IndexReader reader = DSQuery.getIndexReader();
+    	IndexReader reader = DSQuery.getIndexReader();
+    	
+    	for(int i = 0 ; i < reader.numDocs(); i++)
+    	{
+    		if(!reader.isDeleted(i))
+    		{
+    			Document doc = reader.document(i);
+        		String handle = doc.get("handle");
+        		
+        		DSpaceObject o = HandleManager.resolveToObject(context, handle);
 
-            for(int i = 0 ; i < reader.numDocs(); i++)
-            {
-                if(!reader.isDeleted(i))
+                if (o == null)
                 {
-                    Document doc = reader.document(i);
-                    String uri = doc.get("uri");
-
-                    oi = ObjectIdentifier.parseCanonicalForm(uri);
-                    DSpaceObject o = (DSpaceObject) IdentifierService.getResource(context, oi);
-
-                    if (o == null)
-                    {
-                        log.info("Deleting: " + uri);
-                        /* Use IndexWriter to delete, its easier to manage write.lock */
-                        DSIndexer.unIndexContent(context, uri);
-                    }
-                    else
-                    {
-                        context.removeCached(o, o.getID());
-                        log.debug("Keeping: " + uri);
-                    }
+                	log.info("Deleting: " + handle);
+                	/* Use IndexWriter to delete, its easier to manage write.lock */
+                	DSIndexer.unIndexContent(context, handle);
                 }
                 else
                 {
-                    log.debug("Encountered deleted doc: " + i);
+                	context.removeCached(o, o.getID());
+                	log.debug("Keeping: " + handle);
                 }
-            }
-        }
-        catch (IdentifierException e)
-        {
-            log.error("caught exception: ", e);
-            throw new RuntimeException(e);
-        }
-    }
-
+    		}
+    		else
+    		{
+    			log.debug("Encountered deleted doc: " + i);
+    		}
+    	}
+	}
+    
 	/**
      * Get the Lucene analyzer to use according to current configuration (or
      * default). TODO: Should have multiple analyzers (and maybe indices?) for
@@ -683,7 +691,7 @@ public class DSIndexer
         return analyzer;
     }
 
-
+    
     ////////////////////////////////////
     //      Private
     ////////////////////////////////////
@@ -695,7 +703,7 @@ public class DSIndexer
 					.getProperty("alert.recipient");
 
 			if (recipient != null) {
-				Email email = ConfigurationManager.getEmail("internal_error");
+				Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "internal_error"));
 				email.addRecipient(recipient);
 				email.addArgument(ConfigurationManager
 						.getProperty("dspace.url"));
@@ -722,28 +730,27 @@ public class DSIndexer
 		}
 
 	}
-
+    
     /**
 	 * Is stale checks the lastModified time stamp in the database and the index
 	 * to determine if the index is stale.
-	 *
-	 * @param uri
+	 * 
+	 * @param handle
 	 * @param lastModified
-
 	 * @throws SQLException
 	 * @throws IOException
 	 */
     private static boolean requiresIndexing(Term t, Date lastModified)
     throws SQLException, IOException
     {
-
+		
 		boolean reindexItem = false;
 		boolean inIndex = false;
-
+		
 		IndexReader ir = DSQuery.getIndexReader();
-
+		
 		TermDocs docs = ir.termDocs(t);
-
+						
 		while(docs.next())
 		{
 			inIndex = true;
@@ -752,7 +759,7 @@ public class DSIndexer
 
 			Field lastIndexed = doc.getField(LAST_INDEXED_FIELD);
 
-			if (lastIndexed == null || Long.parseLong(lastIndexed.stringValue()) <
+			if (lastIndexed == null || Long.parseLong(lastIndexed.stringValue()) < 
 					lastModified.getTime()) {
 				reindexItem = true;
 			}
@@ -767,7 +774,7 @@ public class DSIndexer
     private static IndexWriter openIndex(boolean wipe_existing)
             throws IOException
     {
-
+    	
     	IndexWriter writer = new IndexWriter(index_directory, getAnalyzer(), wipe_existing);
 
         /* Set maximum number of terms to index if present in dspace.cfg */
@@ -779,17 +786,19 @@ public class DSIndexer
         {
             writer.setMaxFieldLength(maxfieldlength);
         }
-
+        
         return writer;
     }
 
     /**
-     *
+     * 
      * @param c
      * @param myitem
      * @return
+     * @throws SQLException
      */
     private static String buildItemLocationString(Context c, Item myitem)
+            throws SQLException
     {
         // build list of community ids
         Community[] communities = myitem.getCommunities();
@@ -802,16 +811,16 @@ public class DSIndexer
         int i = 0;
 
         for (i = 0; i < communities.length; i++)
-            location = location + " m" + communities[i].getID();
+            location = new String(location + " m" + communities[i].getID());
 
         for (i = 0; i < collections.length; i++)
-            location = location + " l" + collections[i].getID();
+            location = new String(location + " l" + collections[i].getID());
 
         return location;
     }
 
     private static String buildCollectionLocationString(Context c,
-            Collection target)
+            Collection target) throws SQLException
     {
         // build list of community ids
         Community[] communities = target.getCommunities();
@@ -821,7 +830,7 @@ public class DSIndexer
         int i = 0;
 
         for (i = 0; i < communities.length; i++)
-            location = location + " m" + communities[i].getID();
+            location = new String(location + " m" + communities[i].getID());
 
         return location;
     }
@@ -835,7 +844,7 @@ public class DSIndexer
     private static void writeDocument(Term t, Document doc) throws IOException
     {
         IndexWriter writer = null;
-
+        
         try
         {
             writer = openIndex(false);
@@ -855,22 +864,21 @@ public class DSIndexer
     }
     /**
      * Build a Lucene document for a DSpace Community.
-     *
+     * 
      * @param context Users Context
      * @param community Community to be indexed
      * @throws SQLException
      * @throws IOException
      */
-    private static void buildDocument(Context context, Community community, Term t)
+    private static void buildDocument(Context context, Community community, Term t)  
     throws SQLException, IOException
     {
         // Create Lucene Document
-        String uri = community.getIdentifier().getCanonicalForm();
-        Document doc = buildDocument(Constants.COMMUNITY, community.getID(), uri, null);
+        Document doc = buildDocument(Constants.COMMUNITY, community.getID(), community.getHandle(), null);
 
         // and populate it
         String name = community.getMetadata("name");
-
+        
         if (name != null)
         {
         	doc.add(new Field("name", name, Field.Store.NO, Field.Index.TOKENIZED));
@@ -882,55 +890,57 @@ public class DSIndexer
 
     /**
      * Build a Lucene document for a DSpace Collection.
-     *
+     * 
      * @param context Users Context
      * @param collection Collection to be indexed
      * @throws SQLException
      * @throws IOException
      */
-    private static void buildDocument(Context context, Collection collection, Term t)
+    private static void buildDocument(Context context, Collection collection, Term t)  
     throws SQLException, IOException
     {
         String location_text = buildCollectionLocationString(context, collection);
 
         // Create Lucene Document
-        String uri = collection.getIdentifier().getCanonicalForm();
-        Document doc = buildDocument(Constants.COLLECTION, collection.getID(), uri, location_text);
+        Document doc = buildDocument(Constants.COLLECTION, collection.getID(), collection.getHandle(), location_text);
 
         // and populate it
         String name = collection.getMetadata("name");
-
-        if(name != null)
+        
+        if (name != null)
         {
         	doc.add(new Field("name", name, Field.Store.NO, Field.Index.TOKENIZED));
         	doc.add(new Field("default", name, Field.Store.NO, Field.Index.TOKENIZED));
         }
-
+        
         writeDocument(t, doc);
     }
 
     /**
      * Build a Lucene document for a DSpace Item and write the index
-     *
+     * 
      * @param context Users Context
      * @param item The DSpace Item to be indexed
      * @param t The Item handle term
      * @throws SQLException
      * @throws IOException
      */
-    private static void buildDocument(Context context, Item item, Term t)
+    private static void buildDocument(Context context, Item item, Term t) 
     throws SQLException, IOException
     {
+    	String handle = item.getHandle();
+    	
+    	if(handle == null)
+    	{
+    		handle = HandleManager.findHandle(context, item);   
+    	}
+    	
     	// get the location string (for searching by collection & community)
         String location = buildItemLocationString(context, item);
 
-        // FIXME: Need to check to make sure the Item has a persistent
-        // identifier?
-        String uri = item.getIdentifier().getCanonicalForm();
+        Document doc = buildDocument(Constants.ITEM, item.getID(), handle, location);
 
-        Document doc = buildDocument(Constants.ITEM, item.getID(), uri, location);
-
-        log.debug("Building Item: " + uri);
+        log.debug("Building Item: " + handle);
 
         int j;
         int k = 0;
@@ -995,7 +1005,7 @@ public class DSIndexer
                                                Field.Store.NO,
                                                Field.Index.TOKENIZED));
                         }
-
+                        
                         doc.add( new Field("default", mydc[j].value, Field.Store.NO, Field.Index.TOKENIZED));
                     }
                 }
@@ -1025,7 +1035,7 @@ public class DSIndexer
         }
 
         log.debug("  Added Sorting");
-
+        
         Vector<InputStreamReader> readers = new Vector<InputStreamReader>();
 
         try
@@ -1069,11 +1079,11 @@ public class DSIndexer
         {
         	log.error(e.getMessage(),e);
         }
-
+        
         //write the index and close the inputstreamreaders
         try {
             writeDocument(t, doc);
-            log.info("Wrote Item: " + uri + " to Index");
+            log.info("Wrote Item: " + handle + " to Index");
         }
         catch(Exception e)
         {
@@ -1096,14 +1106,13 @@ public class DSIndexer
 
     /**
      * Create Lucene document with all the shared fields initialized.
-     *
+     * 
      * @param type Type of DSpace Object
      * @param id
-     * @param uri
-     * @param location
-     * @return
+     *@param handle
+     * @param location @return
      */
-    private static Document buildDocument(int type, int id, String uri, String location)
+    private static Document buildDocument(int type, int id, String handle, String location)
     {
         Document doc = new Document();
 
@@ -1112,28 +1121,26 @@ public class DSIndexer
         doc.add(new Field(LAST_INDEXED_FIELD, Long.toString(System.currentTimeMillis()), Field.Store.YES, Field.Index.UN_TOKENIZED));
 
         // KEPT FOR BACKWARDS COMPATIBILITY
-        // do location, type, uri first
+        // do location, type, handle first
         doc.add(new Field("type", Integer.toString(type), Field.Store.YES, Field.Index.NO));
 
         // New fields to weaken the dependence on handles, and allow for faster list display
         doc.add(new Field("search.resourcetype", Integer.toString(type), Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field("search.resourceid",   Integer.toString(id),   Field.Store.YES, Field.Index.NO));
 
-        // want to be able to search for uri, so use keyword
+        // want to be able to search for handle, so use keyword
         // (not tokenized, but it is indexed)
-        if (uri != null)
+        if (handle != null)
         {
-            // FIXME: Figure out wtf is going on here.
-
             // ??? not sure what the "handletext" field is but it was there in writeItemIndex ???
-            doc.add(new Field("handletext", uri, Field.Store.YES, Field.Index.TOKENIZED));
+            doc.add(new Field("handletext", handle, Field.Store.YES, Field.Index.TOKENIZED));
 
-            // want to be able to search for uri, so use keyword
+            // want to be able to search for handle, so use keyword
             // (not tokenized, but it is indexed)
-            doc.add(new Field("uri", uri, Field.Store.YES, Field.Index.UN_TOKENIZED));
+            doc.add(new Field("handle", handle, Field.Store.YES, Field.Index.UN_TOKENIZED));
 
             // add to full text index
-            doc.add(new Field("default", uri, Field.Store.NO, Field.Index.TOKENIZED));
+            doc.add(new Field("default", handle, Field.Store.NO, Field.Index.TOKENIZED));
         }
 
         if(location != null)
@@ -1147,7 +1154,7 @@ public class DSIndexer
 
     /**
      * Helper function to retrieve a date using a best guess of the potential date encodings on a field
-     *
+     *  
      * @param t
      * @return
      */
@@ -1199,7 +1206,7 @@ public class DSIndexer
                 log.error("Unable to parse date format", pe);
             }
         }
-
+        
         return null;
     }
 }

@@ -72,8 +72,6 @@
 <%@ page import="org.dspace.content.Collection"  %>
 <%@ page import="org.dspace.content.Item"        %>
 <%@ page import="org.dspace.search.QueryResults" %>
-<%@ page import="org.dspace.uri.IdentifierService" %>
-<%@ page import="java.net.URLEncoder" %>
 <%@ page import="org.dspace.sort.SortOption" %>
 <%@ page import="java.util.Enumeration" %>
 <%@ page import="java.util.Set" %>
@@ -108,21 +106,18 @@
 
     // retain scope when navigating result sets
     String searchScope = "";
-    if (community == null && collection == null)
-    {
-	    searchScope = "";
-    }
-    else if (collection == null)
-    {
-	    searchScope = IdentifierService.getURL(community).toString();
-    }
-    else
-    {
-	    searchScope = IdentifierService.getURL(collection).toString();
+    if (community == null && collection == null) {
+	searchScope = "";
+    } else if (collection == null) {
+	searchScope = "/handle/" + community.getHandle();
+    } else {
+	searchScope = "/handle/" + collection.getHandle();
     }
 %>
 
 <dspace:layout titlekey="jsp.search.results.title">
+
+    <%-- <h1>Search Results</h1> --%>
 
 <h1><fmt:message key="jsp.search.results.title"/></h1>
 
@@ -134,6 +129,7 @@
                     <table>
                         <tr>
                             <td>
+                                <%-- <strong>Search:</strong>&nbsp;<select name="location"> --%>
                                 <label for="tlocation"><strong><fmt:message key="jsp.search.results.searchin"/></strong></label>&nbsp;<select name="location" id="tlocation">
 <%
     if (community == null && collection == null)
@@ -141,12 +137,13 @@
         // Scope of the search was all of DSpace.  The scope control will list
         // "all of DSpace" and the communities.
 %>
+                                    <%-- <option selected value="/">All of DSpace</option> --%>
                                     <option selected="selected" value="/"><fmt:message key="jsp.general.genericScope"/></option>
 <%
         for (int i = 0; i < communityArray.length; i++)
         {
 %>
-                                    <option value="<%= communityArray[i].getIdentifier().getCanonicalForm() %>"><%= communityArray[i].getMetadata("name") %></option>
+                                    <option value="<%= communityArray[i].getHandle() %>"><%= communityArray[i].getMetadata("name") %></option>
 <%
         }
     }
@@ -155,13 +152,14 @@
         // Scope of the search was within a community.  Scope control will list
         // "all of DSpace", the community, and the collections within the community.
 %>
+                                    <%-- <option value="/">All of DSpace</option> --%>
                                     <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
-                                    <option selected="selected" value="<%= community.getIdentifier().getCanonicalForm() %>"><%= community.getMetadata("name") %></option>
+                                    <option selected="selected" value="<%= community.getHandle() %>"><%= community.getMetadata("name") %></option>
 <%
         for (int i = 0; i < collectionArray.length; i++)
         {
 %>
-                                    <option value="<%= collectionArray[i].getIdentifier().getCanonicalForm() %>"><%= collectionArray[i].getMetadata("name") %></option>
+                                    <option value="<%= collectionArray[i].getHandle() %>"><%= collectionArray[i].getMetadata("name") %></option>
 <%
         }
     }
@@ -169,9 +167,10 @@
     {
         // Scope of the search is a specific collection
 %>
+                                    <%-- <option value="/">All of DSpace</option> --%>
                                     <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
-                                    <option value="<%= community.getIdentifier().getCanonicalForm() %>"><%= community.getMetadata("name") %></option>
-                                    <option selected="selected" value="<%= collection.getIdentifier().getCanonicalForm() %>"><%= collection.getMetadata("name") %></option>
+                                    <option value="<%= community.getHandle() %>"><%= community.getMetadata("name") %></option>
+                                    <option selected="selected" value="<%= collection.getHandle() %>"><%= collection.getMetadata("name") %></option>
 <%
     }
 %>
@@ -189,32 +188,32 @@
         </table>
     </form>
 
-<%
-if (qResults.getErrorMsg() != null)
+<% if( qResults.getErrorMsg()!=null )
 {
+    String qError = "jsp.search.error." + qResults.getErrorMsg();
  %>
-    <p align="center" class="submitFormWarn"><%= qResults.getErrorMsg() %></p>
+    <p align="center" class="submitFormWarn"><fmt:message key="<%= qError %>"/></p>
 <%
 }
-else if (qResults.getHitCount() == 0)
+else if( qResults.getHitCount() == 0 )
 {
  %>
+    <%-- <p align="center">Search produced no results.</p> --%>
     <p align="center"><fmt:message key="jsp.search.general.noresults"/></p>
 <%
 }
 else
 {
 %>
+    <%-- <p align="center">Results <//%=qResults.getStart()+1%>-<//%=qResults.getStart()+qResults.getHitHandles().size()%> of --%>
 	<p align="center"><fmt:message key="jsp.search.results.results">
         <fmt:param><%=qResults.getStart()+1%></fmt:param>
-        <fmt:param><%=qResults.getStart()+qResults.getHitURIs().size()%></fmt:param>
+        <fmt:param><%=qResults.getStart()+qResults.getHitHandles().size()%></fmt:param>
         <fmt:param><%=qResults.getHitCount()%></fmt:param>
     </fmt:message></p>
 
-<%
-}
-%>
-<%-- Include a component for modifying sort by, order, results per page, and et-al limit --%>
+<% } %>
+    <%-- Include a component for modifying sort by, order, results per page, and et-al limit --%>
    <div align="center">
    <form method="get" action="<%= request.getContextPath() + searchScope + "/simple-search" %>">
    <table border="0">
@@ -223,44 +222,44 @@ else
            <fmt:message key="search.results.perpage"/>
            <select name="rpp">
 <%
-           for (int i = 5; i <= 100 ; i += 5)
-           {
-               String selected = (i == rpp ? "selected=\"selected\"" : "");
-%>
-               <option value="<%= i %>" <%= selected %>><%= i %></option>
-<%
-           }
-%>
-       </select>
-       &nbsp;|&nbsp;
-<%
-       Set<SortOption> sortOptions = SortOption.getSortOptions();
-       if (sortOptions.size() > 1)
-       {
-%>
-           <fmt:message key="search.results.sort-by"/>
-           <select name="sort_by">
-               <option value="0"><fmt:message key="search.sort-by.relevance"/></option>
-<%
-           for (SortOption sortBy : sortOptions)
-           {
-               if (sortBy.isVisible())
+               for (int i = 5; i <= 100 ; i += 5)
                {
-                   String selected = (sortBy.getName().equals(sortedBy) ? "selected=\"selected\"" : "");
-                   String mKey = "search.sort-by." + sortBy.getName();
-                   %> <option value="<%= sortBy.getNumber() %>" <%= selected %>><fmt:message key="<%= mKey %>"/></option><%
+                   String selected = (i == rpp ? "selected=\"selected\"" : "");
+%>
+                   <option value="<%= i %>" <%= selected %>><%= i %></option>
+<%
                }
-           }
 %>
            </select>
+           &nbsp;|&nbsp;
 <%
-       }
+           Set<SortOption> sortOptions = SortOption.getSortOptions();
+           if (sortOptions.size() > 1)
+           {
 %>
-       <fmt:message key="search.results.order"/>
-       <select name="order">
-           <option value="ASC" <%= ascSelected %>><fmt:message key="search.order.asc" /></option>
-           <option value="DESC" <%= descSelected %>><fmt:message key="search.order.desc" /></option>
-       </select>
+               <fmt:message key="search.results.sort-by"/>
+               <select name="sort_by">
+                   <option value="0"><fmt:message key="search.sort-by.relevance"/></option>
+<%
+               for (SortOption sortBy : sortOptions)
+               {
+                   if (sortBy.isVisible())
+                   {
+                       String selected = (sortBy.getName().equals(sortedBy) ? "selected=\"selected\"" : "");
+                       String mKey = "search.sort-by." + sortBy.getName();
+                       %> <option value="<%= sortBy.getNumber() %>" <%= selected %>><fmt:message key="<%= mKey %>"/></option><%
+                   }
+               }
+%>
+               </select>
+<%
+           }
+%>
+           <fmt:message key="search.results.order"/>
+           <select name="order">
+               <option value="ASC" <%= ascSelected %>><fmt:message key="search.order.asc" /></option>
+               <option value="DESC" <%= descSelected %>><fmt:message key="search.order.desc" /></option>
+           </select>
            <fmt:message key="search.results.etal" />
            <select name="etal">
 <%
@@ -303,37 +302,32 @@ else
                }
 %>
            </select>
-       <%-- add results per page, etc. --%>
-       <input type="submit" name="submit_search" value="<fmt:message key="search.update" />" />
-   </td></tr>
+           <%-- add results per page, etc. --%>
+           <input type="submit" name="submit_search" value="<fmt:message key="search.update" />" />
+       </td></tr>
    </table>
    </form>
    </div>
-<%
-if (communities.length > 0)
-{
-%>
+
+<% if (communities.length > 0 ) { %>
+    <%-- <h3>Community Hits:</h3> --%>
     <h3><fmt:message key="jsp.search.results.comhits"/></h3>
     <dspace:communitylist  communities="<%= communities %>" />
-<%
-}
-if (collections.length > 0)
-{
-%>
+<% } %>
+
+<% if (collections.length > 0 ) { %>
     <br/>
+    <%-- <h3>Collection hits:</h3> --%>
     <h3><fmt:message key="jsp.search.results.colhits"/></h3>
     <dspace:collectionlist collections="<%= collections %>" />
-<%
-}
-if (items.length > 0)
-{
-%>
+<% } %>
+
+<% if (items.length > 0) { %>
     <br/>
+    <%-- <h3>Item hits:</h3> --%>
     <h3><fmt:message key="jsp.search.results.itemhits"/></h3>
     <dspace:itemlist items="<%= items %>" sortOption="<%= so %>" authorLimit="<%= qResults.getEtAl() %>" />
-<%
-}
-%>
+<% } %>
 
 <p align="center">
 
@@ -361,10 +355,10 @@ if (items.length > 0)
 if (pageFirst != pageCurrent)
 {
     %><a href="<%= prevURL %>"><fmt:message key="jsp.search.general.previous" /></a><%
-}
+};
 
 
-for (int q = pageFirst; q <= pageLast; q++)
+for( int q = pageFirst; q <= pageLast; q++ )
 {
     String myLink = "<a href=\""
                     + request.getContextPath()
@@ -378,7 +372,7 @@ for (int q = pageFirst; q <= pageLast; q++)
                     + "&amp;start=";
 
 
-    if (q == pageCurrent)
+    if( q == pageCurrent )
     {
         myLink = "" + q;
     }

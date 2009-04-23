@@ -1,9 +1,9 @@
 /*
  * FlowGroupUtils.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -78,7 +78,7 @@ public class FlowGroupUtils {
 	 * @param groupID The group id.
 	 * @return The group's name.
 	 */
-	public static String getName(Context context, int groupID)
+	public static String getName(Context context, int groupID) throws SQLException
 	{
 		if (groupID < 0)
 			return "New Group";	
@@ -98,7 +98,7 @@ public class FlowGroupUtils {
 	 * @param groupID The group's id.
 	 * @return An array of ids.
 	 */
-	public static String[] getEPeopleMembers(Context context, int groupID)
+	public static String[] getEPeopleMembers(Context context, int groupID) throws SQLException
 	{
 		// New group, just return an empty list
 		if (groupID < 0)
@@ -125,7 +125,7 @@ public class FlowGroupUtils {
 	 * @param groupID The group's id.
 	 * @return An array of ids.
 	 */
-	public static String[] getGroupMembers(Context context, int groupID)
+	public static String[] getGroupMembers(Context context, int groupID) throws SQLException
 	{
 		if (groupID < 0)
 			return new String[0];
@@ -344,7 +344,7 @@ public class FlowGroupUtils {
 	 * @param groupIDs A list of groups to be removed.
 	 * @return A results object.
 	 */
-	public static FlowResult processDeleteGroups(Context context, String[] groupIDs) throws AuthorizeException, UIException, IOException
+	public static FlowResult processDeleteGroups(Context context, String[] groupIDs) throws SQLException, AuthorizeException, IOException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(true);
@@ -364,21 +364,13 @@ public class FlowGroupUtils {
 	    		{
 		    		if (role == Role.Administrators)
 		    		{
-		    		    // FIXME: This should unregister this role from the collection 
-		                // object however there is no method available to do this. Once 
-		                // Manakin is integrated into dspace this situatiotion should be 
-		                // resolved.
-		                
-		                throw new UIException("This operation can not be preformed untill the DSpace API is modified to enable the removal of collection administrators.");
-		            } 
+		    			collection.removeAdministrators();
+		    			collection.update();
+		    		} 
 		    		else if (role == Role.Submitters)
 		    		{
-		                // FIXME: This should unregister this role from the collection 
-		                // object however there is no method available to do this. Once 
-		                // Manakin is integrated into dspace this situatiotion should be 
-		                // resolved.
-		                
-		                throw new UIException("This operation can not be preformed untill the DSpace API is modified to enable the removal of collection submitters.");
+		    			collection.removeSubmitters();
+		    			collection.update();
 		    		}
 		    		else if (role == Role.WorkflowStep1)
 		    		{

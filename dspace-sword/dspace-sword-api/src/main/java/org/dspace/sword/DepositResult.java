@@ -39,6 +39,7 @@
 package org.dspace.sword;
 
 import org.dspace.content.Item;
+import org.dspace.content.Bitstream;
 
 /**
  * The DSpace class for representing the results of a deposit
@@ -56,9 +57,36 @@ public class DepositResult
 	/** the item created during deposit */
 	private Item item;
 
-	/** the verbose description string to be returned to the requester */
-	private String verboseDescription;
-	
+	/** Bitstream created as a result of the deposit */
+	private Bitstream bitstream;
+
+	/** The treatment of the item during deposit */
+	private String treatment;
+
+	/** The media linkto the created object */
+	private String mediaLink;
+
+
+	public Bitstream getBitstream()
+	{
+		return bitstream;
+	}
+
+	public void setBitstream(Bitstream bitstream)
+	{
+		this.bitstream = bitstream;
+	}
+
+	public String getTreatment()
+	{
+		return treatment;
+	}
+
+	public void setTreatment(String treatment)
+	{
+		this.treatment = treatment;
+	}
+
 	/**
 	 * @return the item
 	 */
@@ -91,19 +119,13 @@ public class DepositResult
 		this.handle = handle;
 	}
 
-	/**
-	 * @return the verboseDescription
-	 */
-	public String getVerboseDescription()
+	public String getMediaLink()
 	{
-		return verboseDescription;
+		return mediaLink;
 	}
 
-	/**
-	 * @param verboseDescription the verboseDescription to set
-	 */
-	public void setVerboseDescription(String verboseDescription)
+	public void setMediaLink(String mediaLink)
 	{
-		this.verboseDescription = verboseDescription;
+		this.mediaLink = mediaLink;
 	}
 }

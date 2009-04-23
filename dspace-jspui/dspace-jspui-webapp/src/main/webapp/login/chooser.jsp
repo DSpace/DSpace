@@ -49,9 +49,16 @@
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
-<%@ page import="org.dspace.core.Context" %>
+<%@ page import="java.sql.SQLException" %>
+
+<%@ page import="org.apache.log4j.Logger" %>
+
+<%@ page import="org.dspace.app.webui.util.JSPManager" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.authenticate.AuthenticationManager" %>
 <%@ page import="org.dspace.authenticate.AuthenticationMethod" %>
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.core.LogManager" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
@@ -80,11 +87,14 @@
 <%
     Iterator ai = AuthenticationManager.authenticationMethodIterator();
     AuthenticationMethod am;
-    Context context = new Context();
-    int count = 0;
-    String url = null;
-    while (ai.hasNext())
+    Context context = null;
+    try
     {
+    	context = UIUtil.obtainContext(request);
+    	int count = 0;
+    	String url = null;
+    	while (ai.hasNext())
+    	{
         am = (AuthenticationMethod)ai.next();
         if ((url = am.loginPageURL(context, request, response)) != null)
         {
@@ -93,10 +103,28 @@
 		<%-- This kludge is necessary because fmt:message won't
                      evaluate its attributes, so we can't use it on java expr --%>
                 <%= javax.servlet.jsp.jstl.fmt.LocaleSupport.getLocalizedMessage(pageContext, am.loginPageTitle(context)) %>
-                        </a></strong></li></p>
+                        </a></strong></p></li>
 <%
         }
+        }
     }
+    catch(SQLException se)
+    {
+    	// Database error occurred.
+        Logger log = Logger.getLogger("org.dspace.jsp");
+        log.warn(LogManager.getHeader(context,
+                "database_error",
+                se.toString()), se);
+
+        // Also email an alert
+        UIUtil.sendAlert(request, se);
+        JSPManager.showInternalError(request, response);
+    }
+    finally 
+    {
+    	context.abort();
+    }
+  
 %>
           </ul>
         </td>

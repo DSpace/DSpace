@@ -1,9 +1,9 @@
 /*
  * HttpServletRequestCocoonWrapper.java
  *
- * Version: $Revision: 1.8 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/03/13 17:19:39 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -152,11 +152,11 @@ public class HttpServletRequestCocoonWrapper implements HttpServletRequest{
 	}
 
 	public String getRemoteUser() {
-		return this.getRemoteUser();
+		return this.cocoonRequest.getRemoteUser();
 	}
 
 	public String getRequestURI() {
-		return this.getRequestURI();
+		return this.cocoonRequest.getRequestURI();
 	}
 
 	public StringBuffer getRequestURL() {
@@ -168,15 +168,15 @@ public class HttpServletRequestCocoonWrapper implements HttpServletRequest{
 	}
 
 	public String getServletPath() {
-		return this.getServletPath();
+		return this.cocoonRequest.getServletPath();
 	}
 
 	public HttpSession getSession() {
-		return this.getSession();
+		return (HttpSession) this.cocoonRequest.getSession();
 	}
 
 	public HttpSession getSession(boolean arg0) {
-		return this.getSession(arg0);
+		return (HttpSession) this.cocoonRequest.getSession(arg0);
 	}
 
 	public Principal getUserPrincipal() {

@@ -1,9 +1,9 @@
 /*
  * AdvancedSearch
  *
- * Version: $Revision: 1.14 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/27 18:24:34 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -42,6 +42,7 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -209,7 +210,6 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         	query.addHidden("query"+i).setValue(field.getQuery());
         }
 
-        buildSearchControls(query);
         buildSearchControls(query);
         query.addPara(null, "button-list").addButton("submit").setValue(T_go);
         

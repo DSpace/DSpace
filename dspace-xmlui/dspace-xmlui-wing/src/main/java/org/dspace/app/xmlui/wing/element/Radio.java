@@ -1,9 +1,9 @@
 /*
  * Radio.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/20 21:47:44 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -133,7 +133,10 @@ public class Radio extends Field
     public Option addOption(boolean selected, String returnValue)
             throws WingException
     {
-        setOptionSelected(returnValue);
+        if (selected)
+        {
+            setOptionSelected(returnValue);
+        }
         return addOption(returnValue);
     }
     
@@ -165,7 +168,10 @@ public class Radio extends Field
      */
     public void addOption(boolean selected,String returnValue, String characters) throws WingException
     {
-        setOptionSelected(returnValue);
+        if (selected)
+        {
+            setOptionSelected(returnValue);
+        }
         addOption(returnValue,characters);
     }
     
@@ -197,7 +203,10 @@ public class Radio extends Field
      */
     public void addOption(boolean selected, int returnValue, String characters) throws WingException
     {
-        setOptionSelected(returnValue);
+        if (selected)
+        {
+            setOptionSelected(returnValue);
+        }
         addOption(returnValue,characters);
     }
     
@@ -229,7 +238,10 @@ public class Radio extends Field
      */
     public void addOption(boolean selected, String returnValue, Message message) throws WingException
     {
-        setOptionSelected(returnValue);
+        if (selected)
+        {
+            setOptionSelected(returnValue);
+        }
         addOption(returnValue,message);
     }
     
@@ -261,7 +273,10 @@ public class Radio extends Field
      */
     public void addOption(boolean selected, int returnValue, Message message) throws WingException
     {
-        setOptionSelected(returnValue);
+        if (selected)
+        {
+            setOptionSelected(returnValue);
+        }
         addOption(returnValue,message);
     }
     

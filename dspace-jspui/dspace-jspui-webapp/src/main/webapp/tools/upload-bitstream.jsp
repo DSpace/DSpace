@@ -66,8 +66,10 @@
                parentlink="/dspace-admin"
                nocache="true">
 
+    <%-- <h1>Upload Bitstream</h1> --%>
 	<h1><fmt:message key="jsp.tools.upload-bitstream.title"/></h1>
     
+    <%-- <p>Select the bitstream to upload</p> --%>
 	<p><fmt:message key="jsp.tools.upload-bitstream.info"/></p>
     
     <form method="post" enctype="multipart/form-data" action="">
@@ -77,6 +79,7 @@
         
         <input type="hidden" name="item_id" value="<%= item.getID() %>"/>
 
+        <!-- <p align="center"><input type="submit" name="submit" value="Upload"></p> -->
 		<p align="center"><input type="submit" name="submit" value="<fmt:message key="jsp.tools.upload-bitstream.upload"/>" /></p>
     </form>
     

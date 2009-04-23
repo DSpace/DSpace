@@ -1,9 +1,9 @@
 <%--
   - single.jsp
   -
-  - Version: $Revision: 1.9 $
+  - Version: $Revision$
   -
-  - Date: $Date: 2005/08/25 17:20:26 $
+  - Date: $Date$
   -
   - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.
@@ -48,15 +48,14 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="org.dspace.app.webui.util.UIUtil" %>
-<%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.browse.BrowseInfo" %>
+<%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.DCDate" %>
-<%@ page import="org.dspace.core.Utils" %>
-<%@ page import="org.dspace.uri.IdentifierService" %>
 <%@ page import="java.net.URLEncoder" %>
+<%@ page import="org.dspace.core.Utils" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
 <%
     request.setAttribute("LanguageSwitch", "hide");
@@ -101,13 +100,11 @@
 	String linkBase = request.getContextPath() + "/";
 	if (collection != null)
 	{
-//		linkBase = linkBase + "handle/" + collection.getHandle() + "/";
-		linkBase = IdentifierService.getURL(collection).toString() + "/";
+		linkBase = linkBase + "handle/" + collection.getHandle() + "/";
 	}
 	if (community != null)
 	{
-//		linkBase = linkBase + "handle/" + community.getHandle() + "/";
-		linkBase = IdentifierService.getURL(community).toString() + "/";
+		linkBase = linkBase + "handle/" + community.getHandle() + "/";
 	}
 	
 	String direction = (bi.isAscending() ? "ASC" : "DESC");
@@ -119,27 +116,25 @@
 	String next = sharedLink;
 	String prev = sharedLink;
 	
-    if (bi.hasNextPage())
+	if (bi.hasNextPage())
     {
         next = next + "&amp;offset=" + bi.getNextOffset();
     }
 
-    if (bi.hasPrevPage())
+	if (bi.hasPrevPage())
     {
         prev = prev + "&amp;offset=" + bi.getPrevOffset();
     }
-	
+
 	// prepare a url for use by form actions
 	String formaction = request.getContextPath() + "/";
 	if (collection != null)
 	{
-//		formaction = formaction + "handle/" + collection.getHandle() + "/";
-		formaction = IdentifierService.getURL(collection).toString() + "/";
+		formaction = formaction + "handle/" + collection.getHandle() + "/";
 	}
 	if (community != null)
 	{
-//		formaction = formaction + "handle/" + community.getHandle() + "/";
-		formaction = IdentifierService.getURL(community).toString() + "/";
+		formaction = formaction + "handle/" + community.getHandle() + "/";
 	}
 	formaction = formaction + "browse";
 	
@@ -280,8 +275,8 @@
 --%>
 		<fmt:message key="browse.single.order"/>
 		<select name="order">
-			<option value="ASC" <%= ascSelected %>>Ascending</option>
-			<option value="DESC" <%= descSelected %>>Descending</option>
+			<option value="ASC" <%= ascSelected %>><fmt:message key="browse.order.asc" /></option>
+			<option value="DESC" <%= descSelected %>><fmt:message key="browse.order.desc" /></option>
 		</select>
 		
 		<fmt:message key="browse.single.rpp"/>
@@ -296,7 +291,7 @@
 	}
 %>
 		</select>
-		<input type="submit" name="submit_browse" value="Update"/>
+		<input type="submit" name="submit_browse" value="<fmt:message key="jsp.general.update"/>"/>
 	</form>
 	</div>
 

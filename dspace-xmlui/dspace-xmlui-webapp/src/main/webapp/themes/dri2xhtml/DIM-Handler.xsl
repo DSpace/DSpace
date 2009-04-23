@@ -3,9 +3,9 @@
 <!--
   DS-METS-1.0-DIM.xsl
 
-  Version: $Revision: 1.2 $
+  Version: $Revision$
  
-  Date: $Date: 2006/07/27 22:54:52 $
+  Date: $Date$
  
   Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
   Institute of Technology.  All rights reserved.
@@ -54,8 +54,13 @@
     xmlns:xlink="http://www.w3.org/TR/xlink/"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
     xmlns="http://www.w3.org/1999/xhtml"
-    exclude-result-prefixes="i18n dri mets dim  xlink xsl">
+    xmlns:xalan="http://xml.apache.org/xalan" 
+    xmlns:encoder="xalan://java.net.URLEncoder"
+    exclude-result-prefixes="xalan encoder i18n dri mets dim  xlink xsl">
+    <!--  
+    the above should be replaced with if Saxon is going to be used.
     
+     -->
     <xsl:output indent="yes"/>
     
        
@@ -131,15 +136,20 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <xsl:choose>
-                        <xsl:when test="dim:field[@element='title']">
-                            <xsl:value-of select="dim:field[@element='title'][1]/node()"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:element>
+                    <span class="Z3988">
+                        <xsl:attribute name="title">
+                            <xsl:call-template name="renderCOinS"/>
+                        </xsl:attribute>
+                        <xsl:choose>
+                            <xsl:when test="dim:field[@element='title']">
+                                <xsl:value-of select="dim:field[@element='title'][1]/node()"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </span>
+                </xsl:element>    
             </div>
             <div class="artifact-info">
                 <span class="author">
@@ -440,24 +450,30 @@
                 </td>
             </tr>-->
             <tr class="ds-table-row even">
+            
                 <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-title</i18n:text>: </span></td>
                 <td>
-                    <xsl:choose>
-                        <xsl:when test="count(dim:field[@element='title'][not(@qualifier)]) &gt; 1">
-                            <xsl:for-each select="dim:field[@element='title'][not(@qualifier)]">
-                            	<xsl:value-of select="./node()"/>
-                            	<xsl:if test="count(following-sibling::dim:field[@element='title'][not(@qualifier)]) != 0">
+                    <span class="Z3988">
+                        <xsl:attribute name="title">
+                            <xsl:call-template name="renderCOinS"/>
+                        </xsl:attribute>
+                        <xsl:choose>
+                            <xsl:when test="count(dim:field[@element='title'][not(@qualifier)]) &gt; 1">
+                                <xsl:for-each select="dim:field[@element='title'][not(@qualifier)]">
+                            	   <xsl:value-of select="./node()"/>
+                            	   <xsl:if test="count(following-sibling::dim:field[@element='title'][not(@qualifier)]) != 0">
 	                                    <xsl:text>; </xsl:text><br/>
 	                                </xsl:if>
-                            </xsl:for-each>
-                        </xsl:when>
-                         <xsl:when test="count(dim:field[@element='title'][not(@qualifier)]) = 1">
-                            <xsl:value-of select="dim:field[@element='title'][not(@qualifier)][1]/node()"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
-                        </xsl:otherwise>
-                    </xsl:choose>
+                                </xsl:for-each>
+                            </xsl:when>
+                            <xsl:when test="count(dim:field[@element='title'][not(@qualifier)]) = 1">
+                                <xsl:value-of select="dim:field[@element='title'][not(@qualifier)][1]/node()"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </span>
                 </td>
             </tr>
             <xsl:if test="dim:field[@element='contributor'][@qualifier='author'] or dim:field[@element='creator'] or dim:field[@element='contributor']">
@@ -650,6 +666,11 @@
     
     <!-- The block of templates used to render the complete DIM contents of a DRI object -->
     <xsl:template match="dim:dim" mode="itemDetailView-DIM">
+        <span class="Z3988">
+            <xsl:attribute name="title">
+                 <xsl:call-template name="renderCOinS"/>
+            </xsl:attribute>
+        </span>                
 		<table class="ds-includeSet-table">
 		    <xsl:apply-templates mode="itemDetailView-DIM"/>
 		</table>
@@ -768,6 +789,47 @@
    
     
     
+       <!--  
+    *********************************************
+    OpenURL COinS Rendering Template
+    *********************************************
+ 
+    COinS Example:
+    
+    <span class="Z3988" 
+    title="ctx_ver=Z39.88-2004&amp;
+    rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;
+    rfr_id=info%3Asid%2Focoins.info%3Agenerator&amp;
+    rft.title=Making+WordPress+Content+Available+to+Zotero&amp;
+    rft.aulast=Kraus&amp;
+    rft.aufirst=Kari&amp;
+    rft.subject=News&amp;
+    rft.source=Zotero%3A+The+Next-Generation+Research+Tool&amp;
+    rft.date=2007-02-08&amp;
+    rft.type=blogPost&amp;
+    rft.format=text&amp;
+    rft.identifier=http://www.zotero.org/blog/making-wordpress-content-available-to-zotero/&amp;
+    rft.language=English"></span>
+
+    This Code does not parse authors names, instead relying on dc.contributor to populate the
+    coins
+     -->
+
+    <xsl:template name="renderCOinS">
+       <xsl:text>ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;</xsl:text>
+       <xsl:for-each select=".//dim:field[@element = 'identifier']">
+            <xsl:text>rft_id=</xsl:text>
+            <xsl:value-of select="encoder:encode(string(.))"/>
+            <xsl:text>&amp;</xsl:text>
+        </xsl:for-each>
+        <xsl:text>rfr_id=info%3Asid%2Fdatadryad.org%3Arepo&amp;</xsl:text>
+        <xsl:for-each select=".//dim:field[@element != 'description' and @mdschema !='dc' and @qualifier != 'provenance']">
+            <xsl:value-of select="concat('rft.', @element,'=',encoder:encode(string(.))) "/>
+            <xsl:if test="position()!=last()">
+                <xsl:text>&amp;</xsl:text>
+            </xsl:if>
+        </xsl:for-each>
+    </xsl:template>
     
     
 </xsl:stylesheet>

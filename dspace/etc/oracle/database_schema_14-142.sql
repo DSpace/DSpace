@@ -1,9 +1,9 @@
 --
 -- database_schema_14-142.sql
 --
--- Version: $Revision: 1.0 $
+-- Version: $Revision$
 --
--- Date:    $Date: 2007/02/21 06:06:55 $
+-- Date:    $Date$
 --
 -- Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
 -- Institute of Technology.  All rights reserved.

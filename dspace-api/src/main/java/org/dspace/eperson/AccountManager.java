@@ -40,6 +40,7 @@
 package org.dspace.eperson;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Locale;
@@ -47,13 +48,14 @@ import java.util.Locale;
 import javax.mail.MessagingException;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.Utils;
-import org.dspace.eperson.dao.RegistrationDataDAO;
-import org.dspace.eperson.dao.RegistrationDataDAOFactory;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
 
 /**
  * Methods for handling registration by email and forgotten passwords. When
@@ -93,7 +95,8 @@ public class AccountManager
      *            Email address to send the registration email to
      */
     public static void sendRegistrationInfo(Context context, String email)
-            throws IOException, MessagingException
+            throws SQLException, IOException, MessagingException,
+            AuthorizeException
     {
         sendInfo(context, email, true, true);
     }
@@ -112,7 +115,8 @@ public class AccountManager
      *            Email address to send the forgot-password email to
      */
     public static void sendForgotPasswordInfo(Context context, String email)
-            throws IOException, MessagingException
+            throws SQLException, IOException, MessagingException,
+            AuthorizeException
     {
         sendInfo(context, email, false, true);
     }
@@ -138,6 +142,7 @@ public class AccountManager
      *                database.
      */
     public static EPerson getEPerson(Context context, String token)
+            throws SQLException, AuthorizeException
     {
         String email = getEmail(context, token);
 
@@ -162,18 +167,22 @@ public class AccountManager
      * @return The email address corresponding to token, or null.
      */
     public static String getEmail(Context context, String token)
+            throws SQLException
     {
-        RegistrationDataDAO dao =
-            RegistrationDataDAOFactory.getInstance(context);
-
-        RegistrationData rd = dao.retrieveByToken(token);
+        TableRow rd = DatabaseManager.findByUnique(context, "RegistrationData",
+                "token", token);
 
         if (rd == null)
         {
             return null;
         }
 
-        return rd.getEmail();
+        /*
+         * ignore the expiration date on tokens Date expires =
+         * rd.getDateColumn("expires"); if (expires != null) { if ((new
+         * java.util.Date()).after(expires)) return null; }
+         */
+        return rd.getStringColumn("email");
     }
 
     /**
@@ -187,8 +196,10 @@ public class AccountManager
      *                If a database error occurs
      */
     public static void deleteToken(Context context, String token)
+            throws SQLException
     {
-        RegistrationDataDAOFactory.getInstance(context).delete(token);
+        DatabaseManager.deleteByValue(context, "RegistrationData", "token",
+                token);
     }
 
     /*
@@ -209,26 +220,24 @@ public class AccountManager
      * registration; otherwise, it is for forgot-password @param send If true,
      * send email; otherwise do not send any email
      */
-    protected static void sendInfo(Context context, String email,
-            boolean isRegister, boolean send)
-        throws IOException, MessagingException
+    protected static TableRow sendInfo(Context context, String email,
+            boolean isRegister, boolean send) throws SQLException, IOException,
+            MessagingException, AuthorizeException
     {
         // See if a registration token already exists for this user
-        RegistrationDataDAO dao =
-            RegistrationDataDAOFactory.getInstance(context);
-
-        RegistrationData rd = dao.retrieveByEmail(email);
+        TableRow rd = DatabaseManager.findByUnique(context, "registrationdata",
+                "email", email);
 
         // If it already exists, just re-issue it
         if (rd == null)
         {
-            rd = dao.create();
-            rd.setToken(Utils.generateHexKey());
+            rd = DatabaseManager.create(context, "RegistrationData");
+            rd.setColumn("token", Utils.generateHexKey());
 
             // don't set expiration date any more
-            // rd.setExpiryDate(getDefaultExpirationDate());
-            rd.setEmail(email);
-            dao.update(rd);
+            //            rd.setColumn("expires", getDefaultExpirationDate());
+            rd.setColumn("email", email);
+            DatabaseManager.update(context, rd);
 
             // This is a potential problem -- if we create the callback
             // and then crash, registration will get SNAFU-ed.
@@ -236,8 +245,8 @@ public class AccountManager
             if (log.isDebugEnabled())
             {
                 log.debug("Created callback "
-                        + rd.getID()
-                        + " with token " + rd.getToken()
+                        + rd.getIntColumn("registrationdata_id")
+                        + " with token " + rd.getStringColumn("token")
                         + " with email \"" + email + "\"");
             }
         }
@@ -246,6 +255,8 @@ public class AccountManager
         {
             sendEmail(context, email, isRegister, rd);
         }
+
+        return rd;
     }
 
     /**
@@ -266,9 +277,8 @@ public class AccountManager
      * @exception IOException
      *                If an error occurs while reading the email template.
      */
-    private static void sendEmail(Context context, String email,
-            boolean isRegister, RegistrationData rd)
-        throws IOException, MessagingException
+    private static void sendEmail(Context context, String email, boolean isRegister, TableRow rd)
+            throws MessagingException, IOException, SQLException
     {
         String base = ConfigurationManager.getProperty("dspace.url");
 
@@ -276,7 +286,7 @@ public class AccountManager
         String specialLink = new StringBuffer().append(base).append(
                 base.endsWith("/") ? "" : "/").append(
                 isRegister ? "register" : "forgot").append("?")
-                .append("token=").append(rd.getToken())
+                .append("token=").append(rd.getStringColumn("token"))
                 .toString();
         Locale locale = context.getCurrentLocale();
         Email bean = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(locale, isRegister ? "register"

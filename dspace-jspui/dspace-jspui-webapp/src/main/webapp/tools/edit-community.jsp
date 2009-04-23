@@ -54,6 +54,7 @@
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -103,7 +104,7 @@
     {
 %>
     <h1><fmt:message key="jsp.tools.edit-community.heading2">
-        <fmt:param><%= community.getIdentifier().getCanonicalForm() %></fmt:param>
+        <fmt:param><%= community.getHandle() %></fmt:param>
         </fmt:message>
     </h1>
     <% if(admin_button ) { %>
@@ -138,30 +139,30 @@
      =========================================================== --%>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label1"/></td>
-                <td><input type="text" name="name" value="<%= name %>" size="50" /></td>
+                <td><input type="text" name="name" value="<%= Utils.addEntities(name) %>" size="50" /></td>
             </tr>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label2"/></td>
                 <td>
-                    <input type="text" name="short_description" value="<%= shortDesc %>" size="50" />
+                    <input type="text" name="short_description" value="<%= Utils.addEntities(shortDesc) %>" size="50" />
                 </td>
             </tr>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label3"/></td>
                 <td>
-                    <textarea name="introductory_text" rows="6" cols="50"><%= intro %></textarea>
+                    <textarea name="introductory_text" rows="6" cols="50"><%= Utils.addEntities(intro) %></textarea>
                 </td>
             </tr>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label4"/></td>
                 <td>
-                    <textarea name="copyright_text" rows="6" cols="50"><%= copy %></textarea>
+                    <textarea name="copyright_text" rows="6" cols="50"><%= Utils.addEntities(copy) %></textarea>
                 </td>
             </tr>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label5"/></td>
                 <td>
-                    <textarea name="side_bar_text" rows="6" cols="50"><%= side %></textarea>
+                    <textarea name="side_bar_text" rows="6" cols="50"><%= Utils.addEntities(side) %></textarea>
                 </td>
             </tr>
 <%-- ===========================================================

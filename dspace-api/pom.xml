@@ -13,12 +13,12 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>SNAPSHOT</version>
+      <version>1.5.3-SNAPSHOT</version>
    </parent>
 
    <repositories>
       <repository>
-         <id>maven.dspace.org/snapshot</id>
+         <id>maven.dspace.org-snapshot</id>
          <name>DSpace Maven Snapshot Repository</name>
          <url>http://maven.dspace.org/snapshot</url>
          <releases>
@@ -39,9 +39,9 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace</url>
+      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace</url>
    </scm>
 
    <!-- 
@@ -68,6 +68,10 @@
          <groupId>org.apache.lucene</groupId>
          <artifactId>lucene-core</artifactId>
       </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-analyzers</artifactId>
+      </dependency>      
       <dependency>
          <groupId>commons-cli</groupId>
          <artifactId>commons-cli</artifactId>

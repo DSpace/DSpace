@@ -70,8 +70,8 @@
     </description>
   </context-param>
 
-  <!--
-   Listener to initialise DSpace configuration and clean up the application
+  <!-- 
+   Listener to initialise DSpace configuration and clean up the application 
   -->
   <listener>
      <listener-class>

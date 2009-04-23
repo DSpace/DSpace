@@ -1,9 +1,9 @@
 /*
  * administrative.js
  *
- * Version: $Revision: 1.2 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/06/02 21:37:32 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -38,7 +38,7 @@
  * DAMAGE.
  */
 
-importClass(Packages.org.apache.cocoon.components.CocoonComponentManager);
+
 
 importClass(Packages.org.dspace.authorize.AuthorizeManager);
 importClass(Packages.org.dspace.core.Constants);
@@ -50,6 +50,7 @@ importClass(Packages.org.dspace.content.Community);
 importClass(Packages.org.dspace.eperson.EPerson);
 importClass(Packages.org.dspace.eperson.Group);
 
+importClass(Packages.org.dspace.app.xmlui.utils.FlowscriptUtils);
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowEPersonUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowGroupUtils);
@@ -65,7 +66,7 @@ importClass(Packages.java.lang.System);
  */
 function getObjectModel() 
 {
-  return CocoonComponentManager.getCurrentEnvironment().getObjectModel();
+  return FlowscriptUtils.getObjectModel(cocoon);
 }
 
 /**
@@ -466,7 +467,7 @@ function startEditItem()
 	doEditItem(itemID);
 	
 	var item = Item.find(getDSContext(),itemID);
-	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+item.getExternalIdentifier().getCanonicalForm(),true);
+	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+item.getHandle(),true);
 	getDSContext().complete();
 	item = null;
 	cocoon.exit();
@@ -485,7 +486,7 @@ function startMapItems()
 	doMapItems(collectionID);
 	
 	var collection = Collection.find(getDSContext(),collectionID);
-	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+collection.getExternalIdentifier().getCanonicalForm(),true);
+	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+collection.getHandle(),true);
     getDSContext().complete();
 	collection = null;
 	cocoon.exit();  
@@ -522,7 +523,7 @@ function startEditCollection()
 	
 	// Go back to the collection
 	var collection = Collection.find(getDSContext(),collectionID);
-	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+collection.getExternalIdentifier().getCanonicalForm(),true);
+	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+collection.getHandle(),true);
 	getDSContext().complete();
 	collection = null;
 	cocoon.exit(); 
@@ -558,7 +559,7 @@ function startEditCommunity()
 	
 	// Go back to the community
 	var community = Community.find(getDSContext(),communityID);
-	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+community.getExternalIdentifier().getCanonicalForm(),true);
+	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+community.getHandle(),true);
 	getDSContext().complete();
 	community = null;
 	cocoon.exit(); 
@@ -741,7 +742,7 @@ function doEditEPerson(epersonID)
         		// the user is loged in as another user, we can't let them continue on
         		// using this flow because they might not have permissions. So forward
         		// them to the homepage.
-        		cocoon.redirectTo("/",true);
+        		cocoon.redirectTo(cocoon.request.getContextPath(),true);
 				getDSContext().complete();
 				cocoon.exit(); 
         	}

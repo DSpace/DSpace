@@ -1,9 +1,9 @@
 /*
  * ManageEPeopleMain.java
  *
- * Version: $Revision: 1.0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -150,9 +150,7 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
         int highlightID   = parameters.getParameterAsInteger("highlightID",-1);
         String query      = URLDecode(parameters.getParameter("query",null));
         String baseURL    = contextPath+"/admin/epeople?administrative-continue="+knot.getId();
-//        int resultCount   = EPerson.searchResultCount(context, query);	
-        // FIXME: This is horribly inefficient
-        int resultCount   = EPerson.search(context, query).length;
+        int resultCount   = EPerson.searchResultCount(context, query);	
         EPerson[] epeople = EPerson.search(context, query, page*PAGE_SIZE, PAGE_SIZE);
         
         
@@ -220,7 +218,7 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
         	String fullName = person.getFullName();
         	String email = person.getEmail();
         	String url = baseURL+"&submit_edit&epersonID="+epersonID;
-        	//Vector<String> deleteConstraints = person.getDeleteConstraints();
+        	Vector<String> deleteConstraints = person.getDeleteConstraints();
         	
         	
         	Row row;
@@ -233,8 +231,8 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
         	selectEPerson = row.addCell().addCheckBox("select_eperson");
         	selectEPerson.setLabel(epersonID);
         	selectEPerson.addOption(epersonID);
-        	//if (deleteConstraints != null && deleteConstraints.size() > 0)
-        	//	selectEPerson.setDisabled();
+        	if (deleteConstraints != null && deleteConstraints.size() > 0)
+        		selectEPerson.setDisabled();
         	
         	
         	row.addCellContent(epersonID);

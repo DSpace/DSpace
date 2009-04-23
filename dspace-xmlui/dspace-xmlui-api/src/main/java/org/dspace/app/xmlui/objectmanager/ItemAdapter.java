@@ -1,9 +1,9 @@
 /*
  * ItemAdapter.java
  *
- * Version: $Revision: 1.7 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/05/02 01:24:11 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -50,7 +50,6 @@ import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
-import org.dspace.uri.IdentifierService;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.SAXOutputter;
@@ -101,7 +100,7 @@ public class ItemAdapter extends AbstractAdapter
 
     /** A space seperated list of descriptive metadata sections */
     private StringBuffer dmdSecIDS;
-    
+
     /** A space seperated list of administrative metadata sections (for item)*/
     private StringBuffer amdSecIDS;
     
@@ -146,7 +145,9 @@ public class ItemAdapter extends AbstractAdapter
      */
     protected String getMETSOBJID()
     {
-        return IdentifierService.getURL(item).toString();
+    	if (item.getHandle() != null)
+    		return contextPath+"/handle/" + item.getHandle();
+    	return null;
     }
 
     /**
@@ -162,7 +163,10 @@ public class ItemAdapter extends AbstractAdapter
      */
     protected String getMETSID()
     {
-        return IdentifierService.getCanonicalForm(item);
+        if (item.getHandle() == null)
+        	return "item:"+item.getID();
+        else
+        	return "hdl:"+item.getHandle();
     }
 
     /**
@@ -196,7 +200,7 @@ public class ItemAdapter extends AbstractAdapter
     {
     	return "group_file_" + bitstream.getID();
     }
-    
+
     /**
      * Return a techMD id for a bitstream.
      */
@@ -207,7 +211,7 @@ public class ItemAdapter extends AbstractAdapter
         else
           return admSecName + "_" + dso.getID() + "_" + mdType;
     }
-    
+
     /**
      * Render the METS descriptive section. This will create a new metadata
      * section for each crosswalk configured. Futher more, a special check 
@@ -522,7 +526,7 @@ public class ItemAdapter extends AbstractAdapter
             }//end for each bundle
           }//end for each crosswalk
         }//end for each amdSec
-
+        
         if(amdTypes.size() > 0)
     	{
           //////////////////////////////////
@@ -677,7 +681,7 @@ public class ItemAdapter extends AbstractAdapter
             {
                 isDerivedBundle = true;
             }
-            
+
             // ///////////////////
             // Start bundle's file group
             attributes = new AttributeMap();
@@ -699,7 +703,7 @@ public class ItemAdapter extends AbstractAdapter
                 String admIDs = null;
                 if(fileAmdSecIDs.containsKey(fileID))
                   admIDs = fileAmdSecIDs.get(fileID).toString();
-
+  
                 // Render the actual file & flocate elements.
                 renderFile(item, bitstream, fileID, groupID, admIDs);
 

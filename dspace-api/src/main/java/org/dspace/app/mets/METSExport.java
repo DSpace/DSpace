@@ -39,6 +39,39 @@
  */
 package org.dspace.app.mets;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.Properties;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
+import org.dspace.content.DCValue;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.Utils;
+import org.dspace.handle.HandleManager;
+import org.dspace.app.util.Util;
+
 import edu.harvard.hul.ois.mets.Agent;
 import edu.harvard.hul.ois.mets.AmdSec;
 import edu.harvard.hul.ois.mets.BinData;
@@ -65,44 +98,10 @@ import edu.harvard.hul.ois.mets.helper.MetsValidator;
 import edu.harvard.hul.ois.mets.helper.MetsWriter;
 import edu.harvard.hul.ois.mets.helper.PCData;
 import edu.harvard.hul.ois.mets.helper.PreformedXML;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
-import org.dspace.app.util.Util;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
-import org.dspace.core.Utils;
-import org.dspace.uri.*;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URLEncoder;
-import java.util.Date;
-import java.util.Properties;
 
 /**
  * Tool for exporting DSpace AIPs with the metadata serialised in METS format
- *
+ * 
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -112,15 +111,9 @@ public class METSExport
 
     private static Properties dcToMODS;
 
-    /**
-     * FIXME: throws Exception is just not cool.
-     */
     public static void main(String[] args) throws Exception
     {
         Context context = new Context();
-
-        ExternalIdentifierDAO identifierDAO =
-            ExternalIdentifierDAOFactory.getInstance(context);
 
         init(context);
 
@@ -130,8 +123,8 @@ public class METSExport
         Options options = new Options();
 
         options.addOption("c", "collection", true,
-                "URI of collection to export (canonical form)");
-        options.addOption("i", "item", true, "URI of item to export (canonical form)");
+                "Handle of collection to export");
+        options.addOption("i", "item", true, "Handle of item to export");
         options.addOption("a", "all", false, "Export all items in the archive");
         options.addOption("d", "destination", true, "Destination directory");
         options.addOption("h", "help", false, "Help");
@@ -164,39 +157,12 @@ public class METSExport
             }
         }
 
-        String uri = null;
-
         if (line.hasOption('i'))
         {
-            /*
-            uri = getCanonicalForm(line.getOptionValue('i'));
+            String handle = getHandleArg(line.getOptionValue('i'));
 
             // Exporting a single item
-            if (uri.indexOf(':') == -1)
-            {
-                // has no : must be a handle
-                uri = "hdl:" + uri;
-                System.out.println("no namespace provided. assuming handles.");
-            }
-
-            ExternalIdentifier identifier = identifierDAO.retrieve(uri);
-            ObjectIdentifier oi = identifier.getObjectIdentifier();
-            DSpaceObject o = oi.getObject(context);
-            */
-
-            String uriPassed = line.getOptionValue("i");
-            DSpaceObject o = null;
-            ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(uriPassed);
-            if (oi == null)
-            {
-                ExternalIdentifier eid = ExternalIdentifierService.parseCanonicalForm(context, uriPassed);
-                oi = eid.getObjectIdentifier();
-            }
-            if (oi != null)
-            {
-                // o = oi.getObject(context);
-                o = (DSpaceObject) IdentifierService.getResource(context, oi);
-            }
+            DSpaceObject o = HandleManager.resolveToObject(context, handle);
 
             if ((o != null) && o instanceof Item)
             {
@@ -205,7 +171,8 @@ public class METSExport
             }
             else
             {
-                System.err.println(uri + " is not a valid item URI");
+                System.err.println(line.getOptionValue('i')
+                        + " is not a valid item Handle");
                 System.exit(1);
             }
         }
@@ -215,35 +182,10 @@ public class METSExport
         {
             if (line.hasOption('c'))
             {
-                /*
-                uri = getCanonicalForm(line.getOptionValue('c'));
+                String handle = getHandleArg(line.getOptionValue('c'));
 
                 // Exporting a collection's worth of items
-                if (uri.indexOf(':') == -1)
-                {
-                    // has no : must be a handle
-                    uri = "hdl:" + uri;
-                    System.out.println("no namespace provided. assuming handles.");
-                }
-
-                ExternalIdentifier identifier = identifierDAO.retrieve(uri);
-                ObjectIdentifier oi = identifier.getObjectIdentifier();
-                DSpaceObject o = oi.getObject(context);
-                */
-
-                String uriPassed = line.getOptionValue("i");
-                DSpaceObject o = null;
-                ObjectIdentifier oi = ObjectIdentifier.parseCanonicalForm(uriPassed);
-                if (oi == null)
-                {
-                    ExternalIdentifier eid = ExternalIdentifierService.parseCanonicalForm(context, uriPassed);
-                    oi = eid.getObjectIdentifier();
-                }
-                if (oi != null)
-                {
-                    // o = oi.getObject(context);
-                    o = (DSpaceObject) IdentifierService.getResource(context, oi);
-                }
+                DSpaceObject o = HandleManager.resolveToObject(context, handle);
 
                 if ((o != null) && o instanceof Collection)
                 {
@@ -251,7 +193,8 @@ public class METSExport
                 }
                 else
                 {
-                    System.err.println(uri + " is not a valid collection URI");
+                    System.err.println(line.getOptionValue('c')
+                            + " is not a valid collection Handle");
                     System.exit(1);
                 }
             }
@@ -277,18 +220,18 @@ public class METSExport
             if (items != null)
                 items.close();
         }
-
+        
         context.abort();
         System.exit(0);
     }
 
     /**
      * Initialise various variables, read in config etc.
-     *
+     * 
      * @param context
      *            DSpace context
      */
-    private static void init(Context context) throws IOException
+    private static void init(Context context) throws SQLException, IOException
     {
         // Don't init again if initialised already
         if (licenseFormat != -1)
@@ -322,9 +265,9 @@ public class METSExport
 
     /**
      * Write out the AIP for the given item to the given directory. A new
-     * directory will be created with the URI (URL-encoded) as the directory
+     * directory will be created with the Handle (URL-encoded) as the directory
      * name, and inside, a mets.xml file written, together with the bitstreams.
-     *
+     * 
      * @param context
      *            DSpace context to use
      * @param item
@@ -333,13 +276,13 @@ public class METSExport
      *            destination directory
      */
     public static void writeAIP(Context context, Item item, String dest)
-            throws IOException, AuthorizeException, MetsException
+            throws SQLException, IOException, AuthorizeException, MetsException
     {
-        System.out.println("Exporting item " + item.getIdentifier().getCanonicalForm());
+        System.out.println("Exporting item hdl:" + item.getHandle());
 
         // Create aip directory
         java.io.File aipDir = new java.io.File(dest
-                + URLEncoder.encode(item.getIdentifier().getCanonicalForm(), "UTF-8"));
+                + URLEncoder.encode("hdl:" + item.getHandle(), "UTF-8"));
 
         if (!aipDir.mkdir())
         {
@@ -382,7 +325,7 @@ public class METSExport
 
     /**
      * Write METS metadata corresponding to the metadata for an item
-     *
+     * 
      * @param context
      *            DSpace context
      * @param item
@@ -395,7 +338,7 @@ public class METSExport
      *            only the filename itself will be used.
      */
     public static void writeMETS(Context context, Item item, OutputStream os, boolean fullURL)
-            throws IOException, AuthorizeException
+            throws SQLException, IOException, AuthorizeException
     {
         try
         {
@@ -405,7 +348,7 @@ public class METSExport
             Mets mets = new Mets();
 
             // Top-level stuff
-            mets.setOBJID(item.getIdentifier().getCanonicalForm());
+            mets.setOBJID("hdl:" + item.getHandle());
             mets.setLABEL("DSpace Item");
             mets.setSchema("mods", "http://www.loc.gov/mods/v3",
                     "http://www.loc.gov/standards/mods/v3/mods-3-0.xsd");
@@ -433,7 +376,7 @@ public class METSExport
             mets.getContent().add(metsHdr);
 
             DmdSec dmdSec = new DmdSec();
-            dmdSec.setID("DMD_hdl_" + item.getIdentifier().getCanonicalForm());
+            dmdSec.setID("DMD_hdl_" + item.getHandle());
 
             MdWrap mdWrap = new MdWrap();
             mdWrap.setMDTYPE(Mdtype.MODS);
@@ -447,7 +390,7 @@ public class METSExport
 
             // amdSec
             AmdSec amdSec = new AmdSec();
-            amdSec.setID("TMD_hdl_" + item.getIdentifier().getCanonicalForm());
+            amdSec.setID("TMD_hdl_" + item.getHandle());
 
             // FIXME: techMD here
             // License as <rightsMD><mdWrap><binData>base64encoded</binData>...
@@ -488,7 +431,7 @@ public class METSExport
                 {
                     continue;
                 }
-
+                        
                 // First: we skip the license bundle, since it's included
                 // elsewhere
                 if (bitstreams[0].getFormat().getID() == licenseFormat)
@@ -512,7 +455,7 @@ public class METSExport
                     String bitstreamPID = ConfigurationManager
                             .getProperty("dspace.url")
                             + "/bitstream/"
-                            + item.getIdentifier().getCanonicalForm()
+                            + item.getHandle()
                             + "/"
                             + bitstreams[bits].getSequenceID()
                             + "/"
@@ -522,11 +465,12 @@ public class METSExport
                     edu.harvard.hul.ois.mets.File file = new edu.harvard.hul.ois.mets.File();
 
                     /*
-                     * ID: we use the canonical form of the persistent ID, i.e.
-                     * the but with _'s instead of /'s so it's a legal xsd:ID.
+                     * ID: we use the unique part of the persistent ID, i.e. the
+                     * Handle + sequence number, but with _'s instead of /'s so
+                     * it's a legal xsd:ID.
                      */
-                    String uri = item.getIdentifier().getCanonicalForm();
-                    String xmlIDstart = uri.replaceAll("/", "_") + "_";
+                    String xmlIDstart = item.getHandle().replaceAll("/", "_")
+                            + "_";
 
                     file.setID(xmlIDstart + bitstreams[bits].getSequenceID());
 
@@ -598,14 +542,14 @@ public class METSExport
             {
                 mets.getContent().add(fileSec);
             }
-
+            
             // FIXME: Add Structmap here, but it is empty and we won't use it now.
             StructMap structMap = new StructMap();
             Div div = new Div();
             structMap.getContent().add(div);
             mets.getContent().add(structMap);
 
-
+            
             mets.validate(new MetsValidator());
 
             mets.write(new MetsWriter(os));
@@ -621,18 +565,18 @@ public class METSExport
 
     /**
      * Utility to find the license bitstream from an item
-     *
+     * 
      * @param context
      *            DSpace context
      * @param item
      *            the item
      * @return the license as a string
-     *
+     * 
      * @throws IOException
      *             if the license bitstream can't be read
      */
     private static InputStream findLicense(Context context, Item item)
-            throws IOException, AuthorizeException
+            throws SQLException, IOException, AuthorizeException
     {
         Bundle[] bundles = item.getBundles();
 
@@ -658,15 +602,16 @@ public class METSExport
     /**
      * For a bitstream that's a thumbnail or extracted text, find the
      * corresponding bitstream in the ORIGINAL bundle
-     *
+     * 
      * @param item
      *            the item we're dealing with
      * @param derived
      *            the derived bitstream
-     *
+     * 
      * @return the corresponding original bitstream (or null)
      */
     private static Bitstream findOriginalBitstream(Item item, Bitstream derived)
+    				throws SQLException
     {
         Bundle[] bundles = item.getBundles();
 
@@ -701,7 +646,7 @@ public class METSExport
     /**
      * Create MODS metadata from the DC in the item, and add to the given
      * XmlData METS object.
-     *
+     * 
      * @param item
      *            the item
      * @param xmlData
@@ -752,29 +697,23 @@ public class METSExport
     }
 
     /**
-     * Get the persistent identifier from the command line in the form
-     * xyz:123.456/789.
-     *
-     * FIXME: I think this is totally broken.
-     *
+     * Get the handle from the command line in the form 123.456/789. Doesn't
+     * matter if incoming handle has 'hdl:' or 'http://hdl....' before it.
+     * 
      * @param original
-     *            Persistent identifier as passed in by user
-     * @return Canonical form
+     *            Handle as passed in by user
+     * @return Handle as can be looked up in our table
      */
-    private static String getCanonicalForm(String original)
+    private static String getHandleArg(String original)
     {
-        Object[] types =
-                PluginManager.getPluginSequence(ExternalIdentifierType.class);
-        if (types != null)
+        if (original.startsWith("hdl:"))
         {
-            for (ExternalIdentifierType type : (ExternalIdentifierType[]) types)
-            {
-                String url = type.getProtocol() + "://" + type.getBaseURI();
-                if (original.startsWith(url))
-                {
-                    original = type.getNamespace() + ":" + original.substring(url.length());
-                }
-            }
+            return original.substring(4);
+        }
+
+        if (original.startsWith("http://hdl.handle.net/"))
+        {
+            return original.substring(22);
         }
 
         return original;

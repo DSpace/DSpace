@@ -1,9 +1,9 @@
 /*
  * FlowUtils.java
  *
- * Version: $Revision: 1.21 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/27 18:24:34 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -66,8 +66,8 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.handle.HandleManager;
 import org.dspace.submit.AbstractProcessingStep;
-import org.dspace.uri.IdentifierService;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 
@@ -244,6 +244,31 @@ public class FlowUtils {
     }
 	
     /**
+     * Set a specific step and page as reached. 
+     * It will also "set back" where a user has reached.
+     * 
+     * @param context The current DSpace content
+     * @param id The unique ID of the current workflow/workspace
+     * @param step the step to set as reached, can be also a previous reached step
+     * @param page the page (within the step) to set as reached, can be also a previous reached page
+     */
+    public static void setBackPageReached(Context context, String id, int step,
+            int page) throws SQLException, AuthorizeException, IOException
+    {
+        InProgressSubmission submission = findSubmission(context, id);
+
+        if (submission instanceof WorkspaceItem)
+        {
+            WorkspaceItem workspaceItem = (WorkspaceItem) submission;
+
+            workspaceItem.setStageReached(step);
+            workspaceItem.setPageReached(page > 0 ? page : 1);
+            workspaceItem.update();
+            context.commit();
+        }
+    }
+    
+    /**
      * Find the maximum step the user has reached in the submission processes. 
      * If this submission is a workflow then return max-int.
      * 
@@ -365,12 +390,11 @@ public class FlowUtils {
         // See if that gave the item a Handle. If it did,
         // the item made it into the archive, so we
         // should display a suitable page.
-//        String handle = HandleManager.findHandle(context, item);
+        String handle = HandleManager.findHandle(context, item);
 
         context.commit();
         
-//        if (handle != null)
-        if (item.isArchived())
+        if (handle != null)
         {
             return true;
         }
@@ -452,7 +476,7 @@ public class FlowUtils {
 			//Load the Submission Process for the collection this WSI is associated with
             Collection c = wsi.getCollection();
             SubmissionConfigReader subConfigReader = new SubmissionConfigReader();
-            SubmissionConfig subConfig = subConfigReader.getSubmissionConfig(IdentifierService.getCanonicalForm(c), false);
+            SubmissionConfig subConfig = subConfigReader.getSubmissionConfig(c.getHandle(), false);
             
             // Set the "stage_reached" column on the workspace item
             // to the LAST page of the LAST step in the submission process 
@@ -584,4 +608,3 @@ public class FlowUtils {
         return (Double[]) listStepNumbers.toArray(new Double[listStepNumbers.size()]);
     }
 }
-

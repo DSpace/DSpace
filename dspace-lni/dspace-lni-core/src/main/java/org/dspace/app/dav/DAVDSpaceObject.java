@@ -39,6 +39,12 @@
  */
 package org.dspace.app.dav;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
@@ -48,15 +54,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierService;
-import org.dspace.uri.IdentifierException;
+import org.dspace.handle.HandleManager;
 import org.jdom.Element;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.sql.SQLException;
 
 
 /**
@@ -102,12 +101,12 @@ abstract class DAVDSpaceObject extends DAVResource
      */
     protected static String getPathElt(DSpaceObject dso)
     {
-        String oid = dso.getIdentifier().getCanonicalForm();
-        if (oid == null)
+        String handle = dso.getHandle();
+        if (handle == null)
         {
             return null;
         }
-        return getPathElt(oid);
+        return getPathElt(handle);
     }
 
     /**
@@ -117,16 +116,16 @@ abstract class DAVDSpaceObject extends DAVResource
      * 
      * @return path element string or null if no handle.
      */
-    protected static String getPathElt(String identifier)
+    protected static String getPathElt(String handle)
     {
         int hs;
-        if (handleSeparator != '/' && (hs = identifier.indexOf('/')) >= 0)
+        if (handleSeparator != '/' && (hs = handle.indexOf('/')) >= 0)
         {
-            char hc[] = identifier.toCharArray();
+            char hc[] = handle.toCharArray();
             hc[hs] = handleSeparator;
-            identifier = String.copyValueOf(hc);
+            handle = String.copyValueOf(hc);
         }
-        return "dso_" + encodeHandle(identifier);
+        return "dso_" + encodeHandle(handle);
     }
 
     /**
@@ -150,97 +149,86 @@ abstract class DAVDSpaceObject extends DAVResource
             String pathElt[]) throws DAVStatusException, SQLException,
             AuthorizeException
     {
-        try {
-// Match /dso_<handle>{...} .. look for last "dso_" element
-            if (pathElt[0].startsWith("dso_"))
+        // Match /dso_<handle>{...} .. look for last "dso_" element
+        if (pathElt[0].startsWith("dso_"))
+        {
+            int i = 1;
+            for (; i < pathElt.length && pathElt[i].startsWith("dso_"); ++i)
             {
-                int i = 1;
-                for (; i < pathElt.length && pathElt[i].startsWith("dso_"); ++i)
-                {
-                    // empty
-                }
-                --i;
-                String handle = decodeHandle(pathElt[i].substring(4));
+                // empty
+            }
+            --i;
+            String handle = decodeHandle(pathElt[i].substring(4));
 
-                // Replace substituted handle separator char with '/' to
-                // get back a normal handle: (inverse of getPathElt() above)
-                int sepIndex = handle.indexOf(handleSeparator);
-                if (sepIndex >= 0)
-                {
-                    char hc[] = handle.toCharArray();
-                    hc[sepIndex] = '/';
-                    handle = String.copyValueOf(hc);
-                }
+            // Replace substituted handle separator char with '/' to
+            // get back a normal handle: (inverse of getPathElt() above)
+            int sepIndex = handle.indexOf(handleSeparator);
+            if (sepIndex >= 0)
+            {
+                char hc[] = handle.toCharArray();
+                hc[sepIndex] = '/';
+                handle = String.copyValueOf(hc);
+            }
 
-                // FIXME: in reality, these aren't handles any more, they are UUIDs from the ObjectIdentifiers, but
-                // it's too big a job at the moment to modify all the semantics, so I have just done so where necessary
-    //            DSpaceObject dso = HandleManager.resolveToObject(context, handle);
-                ResolvableIdentifier dsi = IdentifierService.resolve(context, handle);
-                DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, dsi);
-
-                if (dso == null)
+            DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+            if (dso == null)
+            {
+                throw new DAVStatusException(HttpServletResponse.SC_NOT_FOUND,
+                        "Cannot resolve handle \"" + handle + "\"");
+            }
+            else if (dso.getType() == Constants.ITEM)
+            {
+                if (i + 1 < pathElt.length)
                 {
-                    throw new DAVStatusException(HttpServletResponse.SC_NOT_FOUND,
-                            "Cannot resolve handle \"" + handle + "\"");
-                }
-                else if (dso.getType() == Constants.ITEM)
-                {
-                    if (i + 1 < pathElt.length)
+                    if (pathElt[i + 1].startsWith("bitstream_"))
                     {
-                        if (pathElt[i + 1].startsWith("bitstream_"))
-                        {
-                            Bitstream bs = DAVBitstream.findBitstream(context,
-                                    (Item) dso, pathElt[i + 1]);
-                            if (bs == null)
-                            {
-                                throw new DAVStatusException(
-                                        HttpServletResponse.SC_NOT_FOUND,
-                                        "Bitstream \"" + pathElt[i + 1]
-                                                + "\" not found in item: "
-                                                + pathElt[i]);
-                            }
-                            return new DAVBitstream(context, request, response,
-                                    pathElt, (Item) dso, bs);
-                        }
-                        else
+                        Bitstream bs = DAVBitstream.findBitstream(context,
+                                (Item) dso, pathElt[i + 1]);
+                        if (bs == null)
                         {
                             throw new DAVStatusException(
                                     HttpServletResponse.SC_NOT_FOUND,
-                                    "Illegal resource path, \""
-                                            + pathElt[i + 1]
-                                            + "\" is not a Bitstream identifier for item: "
+                                    "Bitstream \"" + pathElt[i + 1]
+                                            + "\" not found in item: "
                                             + pathElt[i]);
                         }
+                        return new DAVBitstream(context, request, response,
+                                pathElt, (Item) dso, bs);
                     }
                     else
                     {
-                        return new DAVItem(context, request, response, pathElt,
-                                (Item) dso);
+                        throw new DAVStatusException(
+                                HttpServletResponse.SC_NOT_FOUND,
+                                "Illegal resource path, \""
+                                        + pathElt[i + 1]
+                                        + "\" is not a Bitstream identifier for item: "
+                                        + pathElt[i]);
                     }
-                }
-                else if (dso.getType() == Constants.COLLECTION)
-                {
-                    return new DAVCollection(context, request, response, pathElt,
-                            (Collection) dso);
-                }
-                else if (dso.getType() == Constants.COMMUNITY)
-                {
-                    return new DAVCommunity(context, request, response, pathElt,
-                            (Community) dso);
                 }
                 else
                 {
-                    throw new DAVStatusException(
-                            HttpServletResponse.SC_BAD_REQUEST,
-                            "Unrecognized DSpace object type for handle=" + handle);
+                    return new DAVItem(context, request, response, pathElt,
+                            (Item) dso);
                 }
             }
-            return null;
+            else if (dso.getType() == Constants.COLLECTION)
+            {
+                return new DAVCollection(context, request, response, pathElt,
+                        (Collection) dso);
+            }
+            else if (dso.getType() == Constants.COMMUNITY)
+            {
+                return new DAVCommunity(context, request, response, pathElt,
+                        (Community) dso);
+            }
+            else
+            {
+                throw new DAVStatusException(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "Unrecognized DSpace object type for handle=" + handle);
+            }
         }
-        catch (IdentifierException e)
-        {
-            throw new RuntimeException(e);
-        }
+        return null;
     }
 
     /**
@@ -264,7 +252,7 @@ abstract class DAVDSpaceObject extends DAVResource
 
         if (elementsEqualIsh(property, handleProperty))
         {
-            value = canonicalizeHandle(this.dso.getIdentifier().getCanonicalForm());
+            value = canonicalizeHandle(this.dso.getHandle());
         }
         else if (elementsEqualIsh(property, current_user_privilege_setProperty))
         {

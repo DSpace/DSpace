@@ -1,9 +1,9 @@
 /*
  * EditFileStep.java
  *
- * Version: $Revision: 1.4 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,11 +39,15 @@
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Map;
+
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.SourceResolver;
-import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -56,12 +60,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
 import org.dspace.content.FormatIdentifier;
-import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Map;
 
 /**
  * This is a sub step of the Upload step during item submission. This 
@@ -140,8 +139,8 @@ public class EditFileStep extends AbstractStep
             UIException, SQLException, IOException, AuthorizeException
     {
 		Collection collection = submission.getCollection();
-		String actionURL = IdentifierService.getURL(collection).toString() + "/submit/" + knot.getId() + ".continue";
-		
+		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
+
     	// Get the bitstream and all the various formats
 		BitstreamFormat currentFormat = bitstream.getFormat();
         BitstreamFormat guessedFormat = FormatIdentifier.guessFormat(context, bitstream);

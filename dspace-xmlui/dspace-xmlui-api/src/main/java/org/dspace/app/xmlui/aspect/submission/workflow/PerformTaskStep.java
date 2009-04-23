@@ -1,9 +1,9 @@
 /*
  * PerformTaskStep.java
  *
- * Version: $Revision: 1.4 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,6 +39,9 @@
  */
 package org.dspace.app.xmlui.aspect.submission.workflow;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.aspect.submission.AbstractStep;
@@ -53,13 +56,9 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.uri.IdentifierService;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  * 
@@ -134,7 +133,7 @@ public class PerformTaskStep extends AbstractStep
     	// Get any metadata that may be removed by unselecting one of these options.
     	Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = IdentifierService.getURL(collection).toString() + "/workflow";
+		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/workflow";
 		int state = ((WorkflowItem) submission).getState();
     	
     	Request request = ObjectModelHelper.getRequest(objectModel);
@@ -216,7 +215,7 @@ public class PerformTaskStep extends AbstractStep
         }
         
         if (state == WFSTATE_STEP2 ||
-            state == WFSTATE_STEP3 )
+        	state == WFSTATE_STEP3 )
         {
 	        // Edit metadata
 	        row = table.addRow();

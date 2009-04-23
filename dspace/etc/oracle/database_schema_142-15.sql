@@ -3,7 +3,7 @@
 --
 -- Version: $$
 --
--- Date:    $Date:$
+-- Date:    $Date$
 --
 -- Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
 -- Institute of Technology.  All rights reserved.

@@ -1,9 +1,9 @@
 /*
  * GroupEditForm.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,6 +39,12 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.group;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Queue;
+
 import org.dspace.app.xmlui.aspect.administrative.FlowGroupUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -56,13 +62,6 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.uri.IdentifierService;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Queue;
 
 /**
  * Present the user with the group's current state. The user may select to 
@@ -131,6 +130,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	
 	private static final Message T_pending =
 		message("xmlui.administrative.group.EditGroupForm.pending");
+	
+	private static final Message T_pending_warn =
+		message("xmlui.administrative.group.EditGroupForm.pending_warn");
 	
 	private static final Message T_submit_add =
 		message("xmlui.administrative.group.EditGroupForm.submit_add");
@@ -291,8 +293,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	    {
 	    	Para para = main.addPara();
 	    	para.addContent(T_collection_para);
-	    	para.addXref(IdentifierService.getURL(collection).toString(), collection.getMetadata("name"));
+	    	para.addXref(contextPath+"/handle/"+collection.getHandle(), collection.getMetadata("name"));
 	    }
+	   
 
 	    // DIVISION: group-actions
 	    Division actions = main.addDivision("group-edit-actions");
@@ -344,7 +347,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
     	buttons.addButton("submit_cancel").setValue(T_submit_cancel);
        
     	if (changes)
-    		main.addPara().addHighlight("warn").addContent("Note, pending changes are not saved until you click the save button.");
+    		main.addPara().addHighlight("warn").addContent(T_pending_warn);
     	
         
         main.addHidden("administrative-continue").setValue(knot.getId());
@@ -357,9 +360,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	 */
 	private void addEPeopleSearch(Division div, String query, int page, Group group, ArrayList<Integer> memberEPeopleIDs) throws SQLException, WingException
 	{
-//		int resultCount = EPerson.searchResultCount(context, query);
-        // FIXME: super-inefficient
-		int resultCount = EPerson.search(context, query).length;
+		int resultCount = EPerson.searchResultCount(context, query);
         EPerson[] epeople = EPerson.search(context, query, page*RESULTS_PER_PAGE, RESULTS_PER_PAGE);
 		
 		Division results = div.addDivision("results");
@@ -432,9 +433,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	 */
 	private void addGroupSearch(Division div, Group sourceGroup, String query, int page, Group parent, ArrayList<Integer> memberGroupIDs) throws WingException, SQLException
 	{
-//		int resultCount = Group.searchResultCount(context, query);
-        // FIXME: super-inefficient
-		int resultCount = Group.search(context, query).length;
+		int resultCount = Group.searchResultCount(context, query);
         Group[] groups = Group.search(context, query, page*RESULTS_PER_PAGE, RESULTS_PER_PAGE);
 		
 		Division results = div.addDivision("results");
@@ -500,7 +499,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	        		
 	        		Highlight highlight = cell.addHighlight("fade");
 	        		highlight.addContent("[");
-	        		highlight.addXref(IdentifierService.getURL(collection).toString(), T_groups_collection_link);
+	        		highlight.addXref(contextPath+"/handle/"+collection.getHandle(), T_groups_collection_link);
 	        		highlight.addContent("]");
         		}
         	}

@@ -73,6 +73,7 @@
 <%@ page import="org.dspace.eperson.Group"   %>
 <%@ page import="org.dspace.workflow.WorkflowItem" %>
 <%@ page import="org.dspace.workflow.WorkflowManager" %>
+<%@ page import="java.util.List" %>
 
 <%
     EPerson user = (EPerson) request.getAttribute("mydspace.user");
@@ -94,6 +95,8 @@
 
     SupervisedItem[] supervisedItems =
         (SupervisedItem[]) request.getAttribute("supervised.items");
+    
+    List<String> exportsAvailable = (List<String>)request.getAttribute("export.archives");
     
     // Is the logged in user an admin
     Boolean displayMembership = (Boolean)request.getAttribute("display.groupmemberships");
@@ -438,4 +441,13 @@
 <%
   }
 %>
+
+	<%if(exportsAvailable!=null && exportsAvailable.size()>0){ %>
+	<h2><fmt:message key="jsp.mydspace.main.heading7"/></h2>
+	<ol class="exportArchives">
+		<%for(String fileName:exportsAvailable){%>
+			<li><a href="<%=request.getContextPath()+"/exportdownload/"+fileName%>" title="<fmt:message key="jsp.mydspace.main.export.archive.title"><fmt:param><%= fileName %></fmt:param></fmt:message>"><%=fileName%></a></li> 
+		<% } %>
+	</ol>
+	<%} %>
 </dspace:layout>

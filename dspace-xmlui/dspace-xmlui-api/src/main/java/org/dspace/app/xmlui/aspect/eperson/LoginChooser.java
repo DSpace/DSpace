@@ -1,9 +1,9 @@
 /*
  * LoginChooser.java
  *
- * Version: $Revision: 1 $
+ * Version: $Revision$
  *
- * Date: $Date: 2007/02/07 11:08:42 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -45,6 +45,7 @@ import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -96,7 +97,7 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
 		String previous_email = request.getParameter("login_email");
 
 		// Get any message parameters
-		Session session = request.getSession();
+		HttpSession session = request.getSession();
 		String header = (String) session
 				.getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_HEADER);
 		String message = (String) session
@@ -123,7 +124,7 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
 		String previous_email = request.getParameter("login_email");
 
 		// Get any message parameters
-		Session session = request.getSession();
+		HttpSession session = request.getSession();
 		String header = (String) session
 				.getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_HEADER);
 		String message = (String) session
@@ -160,7 +161,7 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
 		Iterator authMethods = AuthenticationManager
 				.authenticationMethodIterator();
 		Request request = ObjectModelHelper.getRequest(objectModel);
-		Session session = request.getSession();
+		HttpSession session = request.getSession();
 
 		// Get any message parameters
 		String header = (String) session
@@ -192,9 +193,9 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
 
 		List list = loginChooser.addList("login-options", List.TYPE_SIMPLE);
 
-        while (authMethods.hasNext()) {
-            final AuthenticationMethod authMethod = (AuthenticationMethod) authMethods
-                    .next();
+		while (authMethods.hasNext()) {
+			final AuthenticationMethod authMethod = (AuthenticationMethod) authMethods
+					.next();
 
             HttpServletRequest hreq = (HttpServletRequest) this.objectModel
                     .get(HttpEnvironment.HTTP_REQUEST_OBJECT);
@@ -227,7 +228,7 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
                 item.addXref(loginURL, message(authTitle));
             }
 
-        }
-    }
+		}
+	}
 
 }

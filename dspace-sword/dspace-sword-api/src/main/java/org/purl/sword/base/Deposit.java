@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2007, Aberystwyth University
+ * Copyright (c) 2008, Aberystwyth University
  *
  * All rights reserved.
  * 
@@ -37,6 +37,8 @@
 package org.purl.sword.base;
 
 import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,7 +46,6 @@ import javax.servlet.http.HttpServletResponse;
  * Represents a deposit. 
  * 
  * @author Stuart Lewis 
- * 
  */
 public class Deposit 
 {
@@ -52,33 +53,47 @@ public class Deposit
    /** The File deposited */
    private InputStream file;
    
+   /** The content type */
    private String contentType;
    
+   /** The content length */
    private int contentLength;
    
+   /** The username */
    private String username;
    
+   /** The password */
    private String password;
    
+   /** The onBehalfOf value */
    private String onBehalfOf;
    
+   /** The slug string */
    private String slug;
    
+   /** MD5 hash */
    private String md5;
    
+   /** True if verbose should be used */
    private boolean verbose;
    
+   /** True if this is a no-operation command */
    private boolean noOp;
    
-   private String formatNamespace;
+   /** The packaging format */
+   private String packaging;
    
+   /** Deposit ID */
    private String depositID;
    
+   /** The IP Address */
    private String IPAddress;
    
+   /** The location */
    private String location;
-   
-   private String filename; 
+     
+   /** The content disposition */
+   private String contentDisposition; 
    
    /**
     * Submission created
@@ -175,17 +190,17 @@ public class Deposit
    }
 
    /**
-    * @return the formatNamespace
+    * @return the packaging
     */
-   public String getFormatNamespace() {
-      return formatNamespace;
+   public String getPackaging() {
+      return packaging;
    }
 
    /**
-    * @param formatNamespace the formatNamespace to set
+    * @param packaging the packaging to set
     */
-   public void setFormatNamespace(String formatNamespace) {
-      this.formatNamespace = formatNamespace;
+   public void setPackaging(String packaging) {
+      this.packaging = packaging;
    }
 
    /**
@@ -295,23 +310,54 @@ public class Deposit
    }
 
    /**
-    * Retrieve the filename that is associated with this deposit. 
+    * Retrieve the filename that is associated with this deposit. This
+    * is extracted from the content disposition value.  
     * 
     * @return The filename. 
     */
    public String getFilename() 
    {
-	  return filename;
+	   String filename = null; // default return value
+	   if( contentDisposition != null ) 
+	   {
+		   try
+		   {
+			   String filePattern = ".*filename=(.*?)((; *.*)|( +)){0,1}";
+			   Pattern p = Pattern.compile(filePattern);
+			   Matcher m = p.matcher(contentDisposition);
+
+			   if( m.matches() && m.groupCount() > 2 )
+			   {
+				   filename = m.group(1);
+			   }
+		   }
+		   catch( Exception ex )
+		   {
+			   ex.printStackTrace();
+		   }
+	   }
+	   return filename; 
    }
 
    /**
-    * Set the filename that is to be used for this deposit.   
+    * Set the content disposition that is to be used for this deposit.  
+    * This will include the filename, if specified.  
     *  
-    * @param filename The filename. 
+    * @param disposition The content disposition value. 
     */
-   public void setFilename(String filename) 
+   public void setContentDisposition(String disposition) 
    {
-      this.filename = filename; 
+      this.contentDisposition = disposition;
+   }
+   
+   /**
+    * Return the content disposition value. 
+    * 
+    * @return The value. 
+    */
+   public String getContentDisposition()
+   {
+	   return this.contentDisposition;
    }
    
 }

@@ -39,6 +39,7 @@
  */
 package org.dspace.authenticate;
 
+import java.sql.SQLException;
 import java.util.Hashtable;
 
 import javax.naming.NamingEnumeration;
@@ -59,16 +60,13 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 /**
- * This is UNTESTED, since I do not have LDAP servers available.
- * It was adpated from LDAPServlet and should replace it.
- * See the <code>AuthenticationMethod</code> interface for more details.
+ * Authentication module to authenticate against a flat LDAP tree where
+ * all users are in the same unit.
  *
- * As of August 2005 we need a volunteer to complete and test this
- * implementation.  They should add themselves to the author tag below.
- *
- * @author Larry Stone
+ * @author Larry Stone, Stuart Lewis
  * @version $Revision$
  */
 public class LDAPAuthentication
@@ -83,6 +81,7 @@ public class LDAPAuthentication
     public boolean canSelfRegister(Context context,
                                    HttpServletRequest request,
                                    String username)
+        throws SQLException
     {
         // XXX might also want to check that username exists in LDAP.
 
@@ -94,6 +93,7 @@ public class LDAPAuthentication
      */
     public void initEPerson(Context context, HttpServletRequest request,
             EPerson eperson)
+        throws SQLException
     {
         // XXX should we try to initialize netid based on email addr,
         // XXX  for eperson created by some other method??
@@ -105,6 +105,7 @@ public class LDAPAuthentication
     public boolean allowSetPassword(Context context,
                                     HttpServletRequest request,
                                     String username)
+        throws SQLException
     {
         // XXX is this right?
         return false;
@@ -119,14 +120,42 @@ public class LDAPAuthentication
     }
 
     /*
-     * Nothing here.
+     * Add authenticated users to the group defined in dspace.cfg by
+     * the ldap.login.specialgroup key.
      */
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
     {
-        return new int[0];
+		// Prevents anonymous users from being added to this group, and the second check
+		// ensures they are LDAP users
+		try
+		{
+			if (!context.getCurrentUser().getNetid().equals(""))
+			{
+				String groupName = ConfigurationManager.getProperty("ldap.login.specialgroup");
+				if ((groupName != null) && (!groupName.trim().equals("")))
+				{
+				Group ldapGroup = Group.findByName(context, groupName);
+					if (ldapGroup == null)
+					{
+						// Oops - the group isn't there.
+						log.warn(LogManager.getHeader(context,
+								"ldap_specialgroup",
+								"Group defined in ldap.login.specialgroup does not exist"));
+						return new int[0];
+					} else
+					{
+						return new int[] { ldapGroup.getID() };
+					}
+				}
+			}
+		}
+		catch (Exception npe) {
+			// The user is not an LDAP user, so we don't need to worry about them
+		}
+		return new int[0];
     }
-
-    /*
+	
+	/*
      * MIT policy on certs and groups, so always short-circuit.
      *
      * @return One of:
@@ -137,12 +166,23 @@ public class LDAPAuthentication
                             String password,
                             String realm,
                             HttpServletRequest request)
+        throws SQLException
     {
         log.info(LogManager.getHeader(context, "auth", "attempting trivial auth of user="+netid));
 
-        // Locate the eperson
-        EPerson eperson = EPerson.findByNetid(context, netid.toLowerCase());
+        // Skip out when no netid or password is given.
+        if (netid == null || password == null)
+        	return BAD_ARGS;
 
+        // Locate the eperson
+        EPerson eperson = null;
+        try
+        {
+        		eperson = EPerson.findByNetid(context, netid.toLowerCase());
+        }
+        catch (SQLException e)
+        {
+        }
         boolean loggedIn = false;
         SpeakerToLDAP ldap = new SpeakerToLDAP(log);
 
@@ -157,6 +197,7 @@ public class LDAPAuthentication
             {
                 if (ldap.ldapAuthenticate(netid, password, context))
                 {
+                    context.setCurrentUser(eperson = EPerson.findByNetid(context, netid.toLowerCase()));
                     log.info(LogManager
                         .getHeader(context, "authenticate", "type=ldap"));
                     return SUCCESS;
@@ -186,16 +227,9 @@ public class LDAPAuthentication
 	                        log.info(LogManager.getHeader(context,
 	                                "type=ldap-login", "type=ldap_but_already_email"));
 	                        context.setIgnoreAuthorization(true);
-	                        eperson.setNetid(netid);
+	                        eperson.setNetid(netid.toLowerCase());
 	                        eperson.update();
-                            try
-                            {
-	                            context.commit();
-                            }
-                            catch (java.sql.SQLException sqle)
-                            {
-                                throw new RuntimeException(sqle);
-                            }
+	                        context.commit();
 	                        context.setIgnoreAuthorization(false);
 	                        context.setCurrentUser(eperson);
 	                        return SUCCESS;
@@ -214,20 +248,17 @@ public class LDAPAuthentication
 	                                if ((ldap.ldapGivenName!=null)&&(!ldap.ldapGivenName.equals(""))) eperson.setFirstName(ldap.ldapGivenName);
 	                                if ((ldap.ldapSurname!=null)&&(!ldap.ldapSurname.equals(""))) eperson.setLastName(ldap.ldapSurname);
 	                                if ((ldap.ldapPhone!=null)&&(!ldap.ldapPhone.equals(""))) eperson.setMetadata("phone", ldap.ldapPhone);
-	                                eperson.setNetid(netid);
+	                                eperson.setNetid(netid.toLowerCase());
 	                                eperson.setCanLogIn(true);
 	                                AuthenticationManager.initEPerson(context, request, eperson);
 	                                eperson.update();
 	                                context.commit();
-	                            }
+									context.setCurrentUser(eperson);
+								}
 	                            catch (AuthorizeException e)
 	                            {
 	                                return NO_SUCH_USER;
 	                            }
-                                catch (java.sql.SQLException sqle)
-                                {
-                                    throw new RuntimeException(sqle);
-                                }
 	                            finally
 	                            {
 	                                context.setIgnoreAuthorization(false);
@@ -292,33 +323,33 @@ public class LDAPAuthentication
                 String ldap_id_field = ConfigurationManager.getProperty("ldap.id_field");
                 String ldap_search_context = ConfigurationManager.getProperty("ldap.search_context");
                 String ldap_object_context = ConfigurationManager.getProperty("ldap.object_context");
-         
+
                 // Set up environment for creating initial context
                 Hashtable env = new Hashtable(11);
                 env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
                 env.put(javax.naming.Context.PROVIDER_URL, ldap_provider_url);
-         
+
                 // Authenticate
                 env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "simple");
                 env.put(javax.naming.Context.SECURITY_PRINCIPAL, ldap_id_field+"="+netid+","+ldap_object_context);
                 env.put(javax.naming.Context.SECURITY_CREDENTIALS, password);
-         
+
                 DirContext ctx = null;
                 try
                 {
                     // Create initial context
                     ctx = new InitialDirContext(env);
-         
+
                     String ldap_email_field = ConfigurationManager.getProperty("ldap.email_field");
                     String ldap_givenname_field = ConfigurationManager.getProperty("ldap.givenname_field");
                     String ldap_surname_field = ConfigurationManager.getProperty("ldap.surname_field");
                     String ldap_phone_field = ConfigurationManager.getProperty("ldap.phone_field");
-         
+
                     Attributes matchAttrs = new BasicAttributes(true);
                     matchAttrs.put(new BasicAttribute(ldap_id_field, netid));
-         
+
                     String attlist[] = {ldap_email_field, ldap_givenname_field, ldap_surname_field, ldap_phone_field};
-         
+
                     // look up attributes
                     try
                     {
@@ -327,25 +358,25 @@ public class LDAPAuthentication
                             SearchResult sr = (SearchResult)answer.next();
                             Attributes atts = sr.getAttributes();
                             Attribute att;
-         
+
                             if (attlist[0]!=null)
                             {
                                     att = atts.get(attlist[0]);
                                     if (att != null) ldapEmail = (String)att.get();
                             }
-         
+
                             if (attlist[1]!=null)
                             {
                                     att = atts.get(attlist[1]);
                                     if (att != null) ldapGivenName = (String)att.get();
                             }
-         
+
                             if (attlist[2]!=null)
                             {
                                     att = atts.get(attlist[2]);
                                     if (att != null) ldapSurname = (String)att.get();
                             }
-         
+
                             if (attlist[3]!=null)
                             {
                                     att = atts.get(attlist[3]);
@@ -385,7 +416,7 @@ public class LDAPAuthentication
             {
                 return false;
             }
-         
+
             return true;
         }
 

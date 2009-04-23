@@ -1,9 +1,9 @@
 /*
  * CollectionViewer.java
  *
- * Version: $Revision: 1.21 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/27 18:24:34 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -44,6 +44,8 @@ import java.io.Serializable;
 import java.sql.SQLException;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
@@ -52,7 +54,7 @@ import org.dspace.app.xmlui.cocoon.DSpaceFeedGenerator;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.utils.URIUtil;
+import org.dspace.app.xmlui.utils.UsageEvent;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -65,14 +67,14 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
+import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
-import org.dspace.uri.IdentifierService;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
 import org.xml.sax.SAXException;
 
@@ -121,7 +123,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     private static final int RECENT_SUBMISISONS = 5;
 
     /** The cache of recently submitted items */
-    private java.util.List<Item> recentSubmissionItems;
+    private java.util.List<BrowseItem> recentSubmissionItems;
     
     /** Cached validity object */
     private SourceValidity validity;
@@ -134,12 +136,12 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     {
         try
         {
-            DSpaceObject dso = URIUtil.resolve(objectModel);
+            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
             if (dso == null)
                 return "0";
                 
-            return HashUtil.hash(IdentifierService.getCanonicalForm(dso));
+            return HashUtil.hash(dso.getHandle());
         }
         catch (SQLException sqle)
         {
@@ -163,7 +165,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             Collection collection = null;
 	        try
 	        {
-	            DSpaceObject dso = URIUtil.resolve(objectModel);
+	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 	
 	            if (dso == null)
 	                return null;
@@ -179,7 +181,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 	            validity.add(collection);
 	
 	            // add reciently submitted items
-	            for(Item item : getRecientlySubmittedIems(collection))
+	            for(BrowseItem item : getRecientlySubmittedIems(collection))
 	            {
 	                validity.add(item);
 	            }
@@ -204,7 +206,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
-        DSpaceObject dso = URIUtil.resolve(objectModel);
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Collection))
             return;
 
@@ -233,7 +235,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 				
 				String feedFormat = parts[0].trim()+"+xml";
 					
-				String feedURL = IdentifierService.getURL(collection).toString() + "/"+format.trim();
+				String feedURL = contextPath+"/feed/"+format.trim()+"/"+collection.getHandle();
 				pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
 			}
 		}
@@ -245,12 +247,15 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
-        DSpaceObject dso = URIUtil.resolve(objectModel);
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Collection))
             return;
 
         // Set up the major variables
         Collection collection = (Collection) dso;
+        
+        new UsageEvent().fire((Request) ObjectModelHelper.getRequest(objectModel),
+                context, UsageEvent.VIEW, Constants.COLLECTION, collection.getID());
 
         // Build the collection viewer division.
         Division home = body.addDivision("collection-home", "primary repository collection");
@@ -267,7 +272,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 
             // Search query
             Division query = search.addInteractiveDivision("collection-search",
-                    IdentifierService.getURL(collection).toString() + "/search",
+                    contextPath + "/handle/" + collection.getHandle() + "/search", 
                     Division.METHOD_POST, "secondary search");
             
             Para para = query.addPara("search-query", null);
@@ -276,15 +281,14 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             para.addText("query");
             para.addContent(" ");
             para.addButton("submit").setValue(T_go);
+            query.addPara().addXref(contextPath + "/handle/" + collection.getHandle()+ "/advanced-search", T_advanced_search_link);
             
-            para.addXref(IdentifierService.getURL(collection).toString() + "/advanced-search", T_advanced_search_link);
-
             // Browse by list
             Division browseDiv = search.addDivision("collection-browse","secondary browse");
             List browse = browseDiv.addList("collection-browse", List.TYPE_SIMPLE,
                     "collection-browse");
             browse.setHead(T_head_browse);
-            String url = IdentifierService.getURL(collection).toString();
+            String url = contextPath + "/handle/" + collection.getHandle();
             browse.addItemXref(url + "/browse?type=title",T_browse_titles);
             browse.addItemXref(url + "/browse?type=author",T_browse_authors);
             browse.addItemXref(url + "/browse?type=dateissued",T_browse_dates);
@@ -300,7 +304,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 
         // Recently submitted items
         {
-            java.util.List<Item> items = getRecientlySubmittedIems(collection);
+            java.util.List<BrowseItem> items = getRecientlySubmittedIems(collection);
 
             Division lastSubmittedDiv = home
                     .addDivision("collection-recent-submission","secondary recent-submission");
@@ -308,7 +312,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             ReferenceSet lastSubmitted = lastSubmittedDiv.addReferenceSet(
                     "collection-last-submitted", ReferenceSet.TYPE_SUMMARY_LIST,
                     null, "recent-submissions");
-            for (Item item : items)
+            for (BrowseItem item : items)
             {
                 lastSubmitted.addReference(item);
             }
@@ -324,7 +328,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
      * @param collection The collection.
      */
     @SuppressWarnings("unchecked") // The cast from getLastSubmitted is correct, it dose infact return a list of Items.
-    private java.util.List<Item> getRecientlySubmittedIems(Collection collection) 
+    private java.util.List<BrowseItem> getRecientlySubmittedIems(Collection collection) 
         throws SQLException
     {
         if (recentSubmissionItems != null)
@@ -375,4 +379,3 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
         super.recycle();
     }
 }
-

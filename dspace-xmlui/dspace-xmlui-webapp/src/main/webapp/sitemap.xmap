@@ -1,10 +1,10 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   sitemap.xmap
 
-  Version: $Revision: 1.18 $
+  Version: $Revision$
  
-  Date: $Date: 2006/05/01 21:56:29 $
+  Date: $Date$
  
   Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
   Institute of Technology.  All rights reserved.
@@ -131,7 +131,7 @@
 				<map:parameter name="ignore-missing-tables" value="true"/>
 			</map:matcher>
 			<map:matcher name="request" src="org.apache.cocoon.matching.RequestParameterMatcher"/>
-        </map:matchers>
+		</map:matchers>
 		<map:selectors>
 			<map:selector name="browser" src="org.apache.cocoon.selection.BrowserSelector"
 				logger="sitemap.selector.browser">
@@ -159,7 +159,8 @@
 			</map:reader>
 			<map:reader name="BitstreamReader" src="org.dspace.app.xmlui.cocoon.BitstreamReader"/>
 			<map:reader name="ExportReader" src="org.dspace.app.xmlui.cocoon.ItemExportDownloadReader"/>
-      <map:reader name="SitemapReader" src="org.dspace.app.xmlui.cocoon.SitemapReader"/>
+            <map:reader name="OpenURLReader" src="org.dspace.app.xmlui.cocoon.OpenURLReader"/>
+            <map:reader name="SitemapReader" src="org.dspace.app.xmlui.cocoon.SitemapReader"/>
 		</map:readers>
 		<map:actions>
 			<map:action name="locale" src="org.dspace.app.xmlui.cocoon.DSpaceLocaleAction"/>
@@ -200,8 +201,6 @@
 
 
 			<!--
-			(legacy)
-			
 				Bitstreams for items that have a handle assigned. If the
 				sequence parameter is given then that will be used to resolve the
 				bitstream, other wise the name will attempt to be matched.
@@ -212,6 +211,7 @@
 				<map:match type="request-parameter" pattern="sequence">
 					<map:read type="BitstreamReader">
 						<map:parameter name="handle" value="{../1}/{../2}"/>
+            <map:parameter name="name" value="{../3}"/>
 						<map:parameter name="sequence" value="{1}"/>
 					</map:read>
 				</map:match>
@@ -232,6 +232,7 @@
 				<map:match type="request-parameter" pattern="sequence">
 					<map:read type="BitstreamReader">
 						<map:parameter name="itemID" value="{../1}"/>
+            <map:parameter name="name" value="{../2}"/>
 						<map:parameter name="sequence" value="{1}"/>
 					</map:read>
 				</map:match>
@@ -265,13 +266,16 @@
 			<map:match pattern="html/*/*/**">
 				<map:redirect-to uri="{request:contextPath}/bitstream/handle/{1}/{2}/{3}" permanent="yes"/>
 			</map:match>
-			
+      <!--Redirect /handle/[handleprefix]/[handlePostfix]/ to the same path but without a trailing slash-->
+      <map:match pattern="handle/*/*/">
+				<map:redirect-to uri="{request:contextPath}/handle/{1}/{2}" permanent="yes"/>
+			</map:match>
 			<!--
 				Downloads for the package download export
 			-->
 			<map:match pattern="exportdownload/*">
 				<map:read type="ExportReader">
-				<map:parameter name="fileName" value="{1}"/>
+					<map:parameter name="fileName" value="{1}"/>
 				</map:read>
 			</map:match>
 			
@@ -284,6 +288,10 @@
 		<!-- non-bitstream pipeline -->
 		<map:pipeline>
 			<!--<map:parameter name="expires" value="now"/>-->
+
+		<map:match pattern="openURL">
+            <map:read type="OpenURLReader"/>
+        </map:match>
 
          <!-- 
             catch mydspace uri's and immediately redirect 
@@ -353,7 +361,22 @@
 			<map:match pattern="themes/*/**">
                <map:mount check-reload="no" src="themes/{1}/sitemap.xmap" uri-prefix=""/>
   			</map:match>
-			
+
+      <!-- Load globally static content (*.txt or *.html) when requested.
+           This is specifically for global HTML files or robots.txt files,
+           either of which can be placed in the 'static/' directory.-->
+      <map:match pattern="*.txt">
+        <map:read src="static/{1}.txt"/>
+      </map:match>
+      <map:match pattern="*.html">
+        <map:read src="static/{1}.html"/>
+      </map:match>
+      <!-- Also, allow reference to globally static content via the /static path.
+           This will allow your globally static HTML docs to load static CSS or images. -->
+			<map:match pattern="static/*/**">
+         <map:read src="static/{1}/{2}"/>
+  		</map:match>
+
 		</map:pipeline>
 		<map:pipeline>
 			<!--<map:match pattern="**">-->

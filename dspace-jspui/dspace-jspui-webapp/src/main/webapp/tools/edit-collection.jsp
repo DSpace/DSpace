@@ -54,6 +54,7 @@
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Item" %>
+<%@ page import="org.dspace.core.Utils" %>
 <%@ page import="org.dspace.eperson.Group" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
@@ -127,7 +128,7 @@
     <h1><fmt:message key="jsp.tools.edit-collection.heading1"/></h1>
 <% } else { %>
     <h1><fmt:message key="jsp.tools.edit-collection.heading2">
-        <fmt:param><%= collection.getIdentifier().getCanonicalForm() %></fmt:param>
+        <fmt:param><%= collection.getHandle() %></fmt:param>
         </fmt:message>
     </h1>
     <% if(admin_button ) { %>
@@ -158,42 +159,42 @@
      =========================================================== --%>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label1"/></td>
-                <td><input type="text" name="name" value="<%= name %>" size="50" /></td>
+                <td><input type="text" name="name" value="<%= Utils.addEntities(name) %>" size="50" /></td>
             </tr>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label2"/></td>
                 <td>
-                    <input type="text" name="short_description" value="<%= shortDesc %>" size="50"/>
+                    <input type="text" name="short_description" value="<%= Utils.addEntities(shortDesc) %>" size="50"/>
                 </td>
             </tr>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label3"/></td>
                 <td>
-                    <textarea name="introductory_text" rows="6" cols="50"><%= intro %></textarea>
+                    <textarea name="introductory_text" rows="6" cols="50"><%= Utils.addEntities(intro) %></textarea>
                 </td>
             </tr>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label4"/></td>
                 <td>
-                    <textarea name="copyright_text" rows="6" cols="50"><%= copy %></textarea>
+                    <textarea name="copyright_text" rows="6" cols="50"><%= Utils.addEntities(copy) %></textarea>
                 </td>
             </tr>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label5"/></td>
                 <td>
-                    <textarea name="side_bar_text" rows="6" cols="50"><%= side %></textarea>
+                    <textarea name="side_bar_text" rows="6" cols="50"><%= Utils.addEntities(side) %></textarea>
                 </td>
             </tr>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label6"/></td>
                 <td>
-                    <textarea name="license" rows="6" cols="50"><%= license %></textarea>
+                    <textarea name="license" rows="6" cols="50"><%= Utils.addEntities(license) %></textarea>
                 </td>
             </tr>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label7"/></td>
                 <td>
-                    <textarea name="provenance_description" rows="6" cols="50"><%= provenance %></textarea>
+                    <textarea name="provenance_description" rows="6" cols="50"><%= Utils.addEntities(provenance) %></textarea>
                 </td>
             </tr>
 <%-- ===========================================================

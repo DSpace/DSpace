@@ -45,6 +45,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -107,6 +109,11 @@ public class DCDate
      */
 	private static Locale langMonth = null;
     
+	
+	private final Pattern fullDateTimePattern = Pattern.compile("(\\d*)-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})Z");
+	private final Pattern datePattern = Pattern.compile("(\\d*)-(\\d{2})-(\\d{2})");
+	private final Pattern yearMonthPattern = Pattern.compile("(\\d*)-(\\d{2})");
+    
     /**
      * Construct a clean date
      */
@@ -137,29 +144,36 @@ public class DCDate
 
         try
         {
-            switch (fromDC.length())
+         
+            Matcher fullDateTimeMatcher = fullDateTimePattern.matcher(fromDC);
+            Matcher dateMatcher = datePattern.matcher(fromDC);
+            Matcher yearMonthMatcher = yearMonthPattern.matcher(fromDC);
+            
+            if (fullDateTimeMatcher.matches())
             {
-            case 20:
-
-                // Full date and time
-                hours = Integer.parseInt(fromDC.substring(11, 13));
-                minutes = Integer.parseInt(fromDC.substring(14, 16));
-                seconds = Integer.parseInt(fromDC.substring(17, 19));
-
-            case 10:
-
-                // Just full date
-                day = Integer.parseInt(fromDC.substring(8, 10));
-
-            case 7:
-
-                // Just year and month
-                month = Integer.parseInt(fromDC.substring(5, 7));
-
-            case 4:
-
-                // Just the year
-                year = Integer.parseInt(fromDC.substring(0, 4));
+                year = Integer.parseInt(fullDateTimeMatcher.group(1));
+                month = Integer.parseInt(fullDateTimeMatcher.group(2));
+                day = Integer.parseInt(fullDateTimeMatcher.group(3));
+                
+                hours = Integer.parseInt(fullDateTimeMatcher.group(4));
+                minutes = Integer.parseInt(fullDateTimeMatcher.group(5));
+                seconds = Integer.parseInt(fullDateTimeMatcher.group(6));
+                  
+            }
+            else if (dateMatcher.matches())
+            {
+                year = Integer.parseInt(dateMatcher.group(1));
+                month = Integer.parseInt(dateMatcher.group(2));
+                day = Integer.parseInt(dateMatcher.group(3));
+            }
+            else if (yearMonthMatcher.matches())
+            {
+                year = Integer.parseInt(yearMonthMatcher.group(1));
+                month = Integer.parseInt(yearMonthMatcher.group(2));
+            }
+            else
+            { // only the year
+                year = Integer.parseInt(fromDC);
             }
         }
         catch (NumberFormatException e)
@@ -244,12 +258,59 @@ public class DCDate
      */
     public Date toDate()
     {
-        GregorianCalendar utcGC = new GregorianCalendar(TimeZone
-                .getTimeZone("UTC"));
+        int tmpmonth;
+        int tmpday;
+        int tmphours;
+        int tmpmin;
+        int tmpsec;
 
-        utcGC.set(year, month - 1, day, hours, minutes, seconds);
+        if (month < 0) {
+            // Month is unknown and set to -1
+            // but GregorianCalendar will interpret this as a rollback
+            // to December of the previous year
+            tmpmonth = 0;
+        }
+        else {
+            // Month is known, but GC calendar is 0 - 11, not 1 - 12
+            // so we'll do subtraction here
+            tmpmonth = month - 1;
+        }
+
+        if (day < 0) {
+            tmpday = 1;
+        }
+        else {
+            tmpday = day;
+        }
+
+        if (hours < 0) {
+            tmphours = 0;
+        }
+        else {
+            tmphours = hours;
+        }
+
+        if (minutes < 0) {
+            tmpmin = 0;
+        }
+        else {
+            tmpmin = minutes;
+        }
+
+        if (seconds < 0) {
+            tmpsec = 0;
+        }
+        else {
+            tmpsec = seconds;
+        }
+
+        GregorianCalendar utcGC = new GregorianCalendar(TimeZone
+                         .getTimeZone("UTC"));
+
+        utcGC.set(year, tmpmonth, tmpday, tmphours, tmpmin, tmpsec);
 
         return utcGC.getTime();
+
     }
 
     /**

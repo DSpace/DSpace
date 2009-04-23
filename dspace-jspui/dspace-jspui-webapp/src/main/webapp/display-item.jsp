@@ -61,16 +61,14 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.handle.HandleManager" %>
 <%@ page import="org.dspace.license.CreativeCommons" %>
-<%@ page import="org.dspace.uri.ExternalIdentifier" %>
-<%@ page import="org.dspace.uri.IdentifierService" %>
-<%@ page import="org.dspace.uri.ObjectIdentifier" %>
-<%@ page import="java.util.List" %>
 
 <%
     // Attributes
@@ -86,43 +84,86 @@
     // get the workspace id if one has been passed
     Integer workspace_id = (Integer) request.getAttribute("workspace_id");
 
-    // get the persistent identifier if the item has one yet
-    // ExternalIdentifier identifier = item.getExternalIdentifier();
-    List<ExternalIdentifier> eids = item.getExternalIdentifiers();
-    ObjectIdentifier oid = item.getIdentifier();
-    String uri = "";
-    String citationLink = "";
-    String link = IdentifierService.getURL(item).toString();
+    // get the handle if the item has one yet
+    String handle = item.getHandle();
 
     // CC URL & RDF
     String cc_url = CreativeCommons.getLicenseURL(item);
     String cc_rdf = CreativeCommons.getLicenseRDF(item);
 
     // Full title needs to be put into a string to use as tag argument
-    String cf = IdentifierService.getCanonicalForm(item);
-    String title = "FIXME";
-    DCValue[] titleValue = item.getMetadata("dc", "title", null, Item.ANY);
-    if (titleValue.length != 0)
-    {
-        title = titleValue[0].value + " (" + cf + ")";
-    }
-    else
-    {
-        title = "Item " + cf;
-    }
+    String title = "";
+    if (handle == null)
+ 	{
+		title = "Workspace Item";
+	}
+	else 
+	{
+		DCValue[] titleValue = item.getDC("title", null, Item.ANY);
+		if (titleValue.length != 0)
+		{
+			title = titleValue[0].value;
+		}
+		else
+		{
+			title = "Item " + handle;
+		}
+	}
 %>
 
+<%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 <dspace:layout title="<%= title %>">
 
-    <dspace:external-identifiers ids="<%= eids %>" type="<%= item.getType() %>"/>
-
 <%
+    if (handle != null)
+    {
+%>
+
+    <table align="center" class="miscTable">
+        <tr>
+            <td class="evenRowEvenCol" align="center">
+                <%-- <strong>Please use this identifier to cite or link to this item:
+                <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>--%>
+                <strong><fmt:message key="jsp.display-item.identifier"/>
+                <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>
+            </td>
+<%
+        if (admin_button)  // admin edit button
+        { %>
+            <td class="evenRowEvenCol" align="center">
+                <form method="post" action="<%= request.getContextPath() %>/mydspace">
+                    <input type="hidden" name="item_id" value="<%= item.getID() %>" />
+                    <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_EXPORT_ARCHIVE %>" />
+                    <input type="submit" name="submit" value="<fmt:message key="jsp.mydspace.request.export.item"/>" />
+                </form>
+                <form method="post" action="<%= request.getContextPath() %>/mydspace">
+                    <input type="hidden" name="item_id" value="<%= item.getID() %>" />
+                    <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_MIGRATE_ARCHIVE %>" />
+                    <input type="submit" name="submit" value="<fmt:message key="jsp.mydspace.request.export.migrateitem"/>" />
+                </form>
+            </td>
+            <td class="evenRowEvenCol" align="center">
+                <form method="get" action="<%= request.getContextPath() %>/tools/edit-item">
+                    <input type="hidden" name="item_id" value="<%= item.getID() %>" />
+                    <%--<input type="submit" name="submit" value="Edit...">--%>
+                    <input type="submit" name="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
+                </form>
+            </td>
+<%      } %>
+        </tr>
+    </table>
+    <br />
+<%
+    }
+
     String displayStyle = (displayAll ? "full" : "");
 %>
     <dspace:item-preview item="<%= item %>" />
     <dspace:item item="<%= item %>" collections="<%= collections %>" style="<%= displayStyle %>" />
 
 <%
+    String locationLink = request.getContextPath() + "/handle/" + handle;
+
     if (displayAll)
     {
 %>
@@ -141,7 +182,7 @@
         else
         {
 %>
-    <form method="get" action="<%= link %>">
+    <form method="get" action="<%=locationLink %>">
         <input type="hidden" name="mode" value="simple"/>
         <input type="submit" name="submit_simple" value="<fmt:message key="jsp.display-item.text1"/>" />
     </form>
@@ -168,7 +209,7 @@
         else
         {
 %>
-    <form method="get" action="<%= link %>">
+    <form method="get" action="<%=locationLink %>">
         <input type="hidden" name="mode" value="full"/>
         <input type="submit" name="submit_simple" value="<fmt:message key="jsp.display-item.text2"/>" />
     </form>
@@ -177,8 +218,7 @@
         if (suggestLink)
         {
 %>
-    <%-- FIXME: This really ought to be escaped --%>
-    <a href="<%= request.getContextPath() %>/suggest?uri=<%= uri %>" target="new_window">
+    <a href="<%= request.getContextPath() %>/suggest?handle=<%= handle %>" target="new_window">
        <fmt:message key="jsp.display-item.suggest"/></a>
 <%
         }
@@ -208,7 +248,7 @@
     {
 %>
     <p align="center">
-        <a href="<dspace:sfxlink item="<%= item %>"/>"><img src="<%= request.getContextPath() %>/image/sfx-link.gif" border="0" alt="SFX Query" /></a>
+        <a href="<dspace:sfxlink item="<%= item %>"/>" /><img src="<%= request.getContextPath() %>/image/sfx-link.gif" border="0" alt="SFX Query" /></a>
     </p>
 <%
     }
@@ -228,46 +268,4 @@
     }
 %>
     <p class="submitFormHelp"><fmt:message key="jsp.display-item.copyright"/></p>
-
-    <%-- the UUID of the item --%>
-    <p class="page_identifier"><%= oid.getCanonicalForm() %></p>
-
-
-    <%
-        if (admin_button)  // admin edit button
-        { %>
-    <dspace:sidebar>
-<table class="miscTable" align="center">
-      <tr>
-	    <td class="evenRowEvenCol" colspan="2">
-	     <table>
-            <tr>
-              <th id="t1" class="standard">
-                 <strong><fmt:message key="jsp.admintools"/></strong>
-              </th>
-            </tr>
-        <tr>
-              <td headers="t1" class="standard" align="center">
-                <form method="get" action="<%= request.getContextPath() %>/tools/edit-item">
-                    <input type="hidden" name="item_id" value="<%= item.getID() %>" />
-                    <input type="submit" name="submit" value="<fmt:message key="jsp.general.edit.button"/>" />
-                </form>
-            </td>
-            <td class="evenRowEvenCol" align="center">
-                <form method="post" action="<%= request.getContextPath() %>/mydspace">
-                    <input type="hidden" name="item_id" value="<%= item.getID() %>" />
-                    <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_EXPORT_ARCHIVE %>" />
-                    <%--<input type="submit" name="submit" value="Edit...">--%>
-                    <input type="submit" name="submit" value="<fmt:message key="jsp.mydspace.request.export.item"/>" />
-                </form>
-            </td>
- <%      } %>
-        </tr>
-        </table>
-        </td></tr></table>
-
-    </dspace:sidebar>
-
-<%      } %>
-
 </dspace:layout>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2007, Aberystwyth University
+ * Copyright (c) 2008, Aberystwyth University
  *
  * All rights reserved.
  * 
@@ -35,13 +35,6 @@
  * SUCH DAMAGE.
  */
 package org.purl.sword.base;
-
-/**
- *   Author   : $Author: nst $
- *   Date     : $Date: 2007/09/21 15:18:53 $
- *   Revision : $Revision: 1.2 $
- *   Name     : $Name:  $
- */
 
 import nu.xom.Element;
 

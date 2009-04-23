@@ -83,9 +83,50 @@ public class LogManager
         {
             contextExtraInfo = "no_context";
         }
+        
 
         StringBuilder result = new StringBuilder();
-        result.append(email).append(":").append(contextExtraInfo).append(":").append(action).append(":").append(extrainfo);
+        // Escape everthing but the extra context info because for some crazy reason two fields
+        // are generated inside this entry one for the session id, and another for the ip 
+        // address. Everything else should be escaped.
+        result.append(escapeLogField(email)).append(":").append(contextExtraInfo).append(":").append(escapeLogField(action)).append(":").append(escapeLogField(extrainfo));
         return result.toString();
+    }
+    
+    
+    /**
+     * If any string within the log line contains a field seperator (:) they need to be escaped so as the 
+     * line may be parsed and analysed later. This method will escape a log field.
+     * 
+     * Single slashes and colons will be escaped so that colons no longer appear in the logs
+     * 
+     * @param field The unescaped log field
+     * @return An escaped log field
+     */
+    public static String escapeLogField(String field)
+    {
+        if (field != null)
+        {
+        	field = field.replaceAll("\\\\", "\\\\\\\\;");
+        	field = field.replaceAll(":","\\\\colon;");
+        }
+        return field;
+    }
+    
+    /**
+     * Unescape a log field.
+     * 
+     * @param field The escaped log field
+     * @return the original log field
+     */
+    public static String unescapeLogField(String field)
+    {
+    	
+    	if (field != null)
+        {
+        	field = field.replaceAll("\\\\colon;", ":");
+        	field = field.replaceAll("\\\\\\\\;","\\\\");
+        }
+        return field;
     }
 }

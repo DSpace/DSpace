@@ -1,3 +1,40 @@
+/**
+ * Copyright (c) 2008, Aberystwyth University
+ *
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions 
+ * are met:
+ * 
+ *  - Redistributions of source code must retain the above 
+ *    copyright notice, this list of conditions and the 
+ *    following disclaimer.
+ *  
+ *  - Redistributions in binary form must reproduce the above copyright 
+ *    notice, this list of conditions and the following disclaimer in 
+ *    the documentation and/or other materials provided with the 
+ *    distribution.
+ *    
+ *  - Neither the name of the Centre for Advanced Software and 
+ *    Intelligent Systems (CASIS) nor the names of its 
+ *    contributors may be used to endorse or promote products derived 
+ *    from this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON 
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR 
+ * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF 
+ * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
+ * SUCH DAMAGE.
+ */
+
 package org.purl.sword.server;
 
 import java.io.File;
@@ -8,8 +45,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,266 +58,425 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
+import org.purl.sword.atom.Summary;
+import org.purl.sword.atom.Title;
 import org.purl.sword.base.ChecksumUtils;
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.DepositResponse;
+import org.purl.sword.base.ErrorCodes;
 import org.purl.sword.base.HttpHeaders;
 import org.purl.sword.base.SWORDAuthenticationException;
-import org.purl.sword.base.SWORDContentTypeException;
+import org.purl.sword.base.SWORDErrorDocument;
 import org.purl.sword.base.SWORDException;
+import org.purl.sword.base.SWORDErrorException;
 
+/**
+ * DepositServlet
+ * 
+ * @author Stuart Lewis
+ */
 public class DepositServlet extends HttpServlet {
-	
-	private SWORDServer myRepository;
-	
+
+	/** Sword repository */
+	protected SWORDServer myRepository;
+
+	/** Authentication type */
 	private String authN;
 	
+	/** Maximum file upload size in kB **/
+	private int maxUploadSize;
+
+	/** Temp directory */
 	private String tempDirectory;
-	
-	private static int counter = 0;
-	
+
+	/** Counter */
+	private static AtomicInteger counter = new AtomicInteger(0);
+
+	/** Logger */
 	private static Logger log = Logger.getLogger(DepositServlet.class);
-	
-	public void init() {
+
+	/**
+	 * Initialise the servlet
+	 * 
+	 * @throws ServletException
+	 */
+	public void init() throws ServletException {
 		// Instantiate the correct SWORD Server class
-		String className = getServletContext().getInitParameter("server-class");
+		String className = getServletContext().getInitParameter("sword-server-class");
 		if (className == null) {
 			log.fatal("Unable to read value of 'sword-server-class' from Servlet context");
 		} else {
 			try {
-				myRepository = (SWORDServer)Class.forName(className).newInstance();
+				myRepository = (SWORDServer) Class.forName(className)
+						.newInstance();
 				log.info("Using " + className + " as the SWORDServer");
 			} catch (Exception e) {
-				log.fatal("Unable to instantiate class from 'sword-server-class': " + className);
+				log
+						.fatal("Unable to instantiate class from 'sword-server-class': "
+								+ className);
+				throw new ServletException(
+						"Unable to instantiate class from 'sword-server-class': "
+								+ className);
 			}
 		}
-		
+
 		authN = getServletContext().getInitParameter("authentication-method");
 		if ((authN == null) || (authN.equals(""))) {
 			authN = "None";
 		}
 		log.info("Authentication type set to: " + authN);
-		
-		tempDirectory = getServletContext().getInitParameter("upload-temp-directory");
+
+		String maxUploadSizeStr = getServletContext().getInitParameter("maxUploadSize");
+		if ((maxUploadSizeStr == null) || 
+		    (maxUploadSizeStr.equals("")) || 
+		    (maxUploadSizeStr.equals("-1"))) {
+			maxUploadSize = -1;
+			log.warn("No maxUploadSize set, so setting max file upload size to unlimited.");
+		} else {
+			try {
+				maxUploadSize = Integer.parseInt(maxUploadSizeStr);
+				log.info("Setting max file upload size to " + maxUploadSize);
+			} catch (NumberFormatException nfe) {
+				maxUploadSize = -1;
+				log.warn("maxUploadSize not a number, so setting max file upload size to unlimited.");
+			}
+		}
+
+		tempDirectory = getServletContext().getInitParameter(
+				"upload-temp-directory");
 		if ((tempDirectory == null) || (tempDirectory.equals(""))) {
 			tempDirectory = System.getProperty("java.io.tmpdir");
 		}
 		File tempDir = new File(tempDirectory);
 		log.info("Upload temporary directory set to: " + tempDir);
+		if (!tempDir.exists()) {
+			if (!tempDir.mkdirs()) {
+				throw new ServletException(
+						"Upload directory did not exist and I can't create it. "
+								+ tempDir);
+			}
+		}
 		if (!tempDir.isDirectory()) {
-			log.fatal("Upload temporary directory is not a directory: " + tempDir);
+			log.fatal("Upload temporary directory is not a directory: "
+					+ tempDir);
+			throw new ServletException(
+					"Upload temporary directory is not a directory: " + tempDir);
 		}
 		if (!tempDir.canWrite()) {
-			log.fatal("Upload temporary directory cannot be written to: " + tempDir);
-		}		
+			log.fatal("Upload temporary directory cannot be written to: "
+					+ tempDir);
+			throw new ServletException(
+					"Upload temporary directory cannot be written to: "
+							+ tempDir);
+		}
 	}
-	
-	protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response) throws ServletException, IOException
-    {
+
+	/**
+	 * Process the Get request. This will return an unimplemented response.
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// Send a '501 Not Implemented'
 		response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
-    }
-   
-    protected void doPost(HttpServletRequest request,
-                          HttpServletResponse response) throws ServletException, IOException
-    {
-    	// Create the Deposit request
+	}
+
+	/**
+	 * Process a post request.
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// Create the Deposit request
 		Deposit d = new Deposit();
 		Date date = new Date();
-    	log.debug("Starting deposit processing at " + date.toString() + " by " + request.getRemoteAddr());
-    	
+		log.debug("Starting deposit processing at " + date.toString() + " by "
+				+ request.getRemoteAddr());
+
 		// Are there any authentication details?
-    	String usernamePassword = getUsernamePassword(request);
-    	if ((usernamePassword != null) && (!usernamePassword.equals(""))) {
+		String usernamePassword = getUsernamePassword(request);
+		if ((usernamePassword != null) && (!usernamePassword.equals(""))) {
 			int p = usernamePassword.indexOf(":");
 			if (p != -1) {
 				d.setUsername(usernamePassword.substring(0, p));
-				d.setPassword(usernamePassword.substring(p+1));
-			} 
-        } else if (authenticateWithBasic()) {
+				d.setPassword(usernamePassword.substring(p + 1));
+			}
+		} else if (authenticateWithBasic()) {
 			String s = "Basic realm=\"SWORD\"";
-	    	response.setHeader("WWW-Authenticate", s);
-	    	response.setStatus(401);
-	    	return;
+			response.setHeader("WWW-Authenticate", s);
+			response.setStatus(401);
+			return;
 		}
-		 
+		
+		// Set up some variables
+		String filename = null;
+		File f = null;
+		FileInputStream fis = null;
+
 		// Do the processing
 		try {
 			// Write the file to the temp directory
-			// TODO: Improve the filename creation
-			String filename = tempDirectory + "SWORD-" + 
-			                  request.getRemoteAddr() + "-" + counter++;
-			InputStream inputStream = request.getInputStream();
-			OutputStream outputStream = new FileOutputStream(filename); 
-			int data;
-			while((data = inputStream.read()) != -1)
+			filename = tempDirectory + "SWORD-"
+					+ request.getRemoteAddr() + "-" + counter.addAndGet(1);
+			InputStream inputstream = request.getInputStream();
+			OutputStream outputstream = new FileOutputStream(new File(filename));
+			try
 			{
-			   outputStream.write(data);
+			    byte[] buf = new byte[1024];
+			    int len;
+			    while ((len = inputstream.read(buf)) > 0)
+			    {
+			        outputstream.write(buf, 0, len);
+			    }
 			}
-			inputStream.close();
-			outputStream.close();
-			
+			finally
+			{
+			    inputstream.close();
+			    outputstream.close();
+			}
+
+			// Check the size is OK
+			File file = new File(filename);
+		    long fLength = file.length() / 1024;
+		    if ((maxUploadSize != -1) && (fLength > maxUploadSize)) {
+		    	this.makeErrorDocument(ErrorCodes.MAX_UPLOAD_SIZE_EXCEEDED, 
+		    			               HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE, 
+		    			               "The uploaded file exceeded the maximum file size this server will accept (the file is " + 
+		    			               fLength + "kB but the server will only accept files as large as " + 
+		    			               maxUploadSize + "kB)",
+		    			               request,
+		    			               response);
+		    	return;
+		    }
+		    
 			// Check the MD5 hash
 			String receivedMD5 = ChecksumUtils.generateMD5(filename);
 			log.debug("Received filechecksum: " + receivedMD5);
 			d.setMd5(receivedMD5);
-			String md5 = request.getHeader("Content-MD5"); 
+			String md5 = request.getHeader("Content-MD5");
 			log.debug("Received file checksum header: " + md5);
 			if ((md5 != null) && (!md5.equals(receivedMD5))) {
-				response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
-				response.setHeader(HttpHeaders.X_ERROR_CODE, "ErrorChecksumMismatch");
+				// Return an error document
+				this.makeErrorDocument(ErrorCodes.ERROR_CHECKSUM_MISMATCH, 
+						               HttpServletResponse.SC_PRECONDITION_FAILED,
+						               "The received MD5 checksum for the deposited file did not match the checksum sent by the deposit client",
+						               request,
+						               response);
 				log.debug("Bad MD5 for file. Aborting with appropriate error message");
+				return;
 			} else {
 				// Set the file
-				File f = new File(filename);
-				FileInputStream fis = new FileInputStream(f);
+				f = new File(filename);
+				fis = new FileInputStream(f);
 				d.setFile(fis);
-				
+
 				// Set the X-On-Behalf-Of header
-				d.setOnBehalfOf(request.getHeader(HttpHeaders.X_ON_BEHALF_OF.toString()));
-				
-				// Set the X-Format-Namespace header
-				d.setFormatNamespace(request.getHeader(HttpHeaders.X_FORMAT_NAMESPACE));
-	
+                String onBehalfOf = request.getHeader(HttpHeaders.X_ON_BEHALF_OF.toString());
+				if ((onBehalfOf != null) && (onBehalfOf.equals("reject"))) {
+                    // user name is "reject", so throw a not know error to allow the client to be tested
+                    throw new SWORDErrorException(ErrorCodes.TARGET_OWNER_UKNOWN,"unknown user \"reject\"");
+                } else {
+                    d.setOnBehalfOf(onBehalfOf);
+                }
+
+				// Set the X-Packaging header
+				d.setPackaging(request.getHeader(HttpHeaders.X_PACKAGING));
+
 				// Set the X-No-Op header
 				String noop = request.getHeader(HttpHeaders.X_NO_OP);
+                log.error("X_NO_OP value is " + noop);
 				if ((noop != null) && (noop.equals("true"))) {
 					d.setNoOp(true);
-				} else {
+				} else if ((noop != null) && (noop.equals("false"))) {
 					d.setNoOp(false);
-				}
-	
+                }else if (noop == null) {
+                    d.setNoOp(false);
+				} else {
+                    throw new SWORDErrorException(ErrorCodes.ERROR_BAD_REQUEST,"Bad no-op");
+                }
+
 				// Set the X-Verbose header
 				String verbose = request.getHeader(HttpHeaders.X_VERBOSE);
 				if ((verbose != null) && (verbose.equals("true"))) {
 					d.setVerbose(true);
-				} else {
+				} else if ((verbose != null) && (verbose.equals("false"))) {
 					d.setVerbose(false);
-				}
-				
+                }else if (verbose == null) {
+                    d.setVerbose(false);
+				} else {
+                    throw new SWORDErrorException(ErrorCodes.ERROR_BAD_REQUEST,"Bad verbose");
+                }
+
 				// Set the slug
 				String slug = request.getHeader(HttpHeaders.SLUG);
 				if (slug != null) {
 					d.setSlug(slug);
 				}
-				
+
 				// Set the content disposition
-				d.setFilename(request.getHeader(HttpHeaders.CONTENT_DISPOSITION));
-				
+				d.setContentDisposition(request.getHeader(HttpHeaders.CONTENT_DISPOSITION));
+
 				// Set the IP address
 				d.setIPAddress(request.getRemoteAddr());
-				
+
 				// Set the deposit location
 				d.setLocation(getUrl(request));
-				
+
 				// Set the content type
 				d.setContentType(request.getContentType());
-				
+
 				// Set the content length
 				String cl = request.getHeader(HttpHeaders.CONTENT_LENGTH);
 				if ((cl != null) && (!cl.equals(""))) {
-					d.setContentLength(Integer.parseInt(cl));	
+					d.setContentLength(Integer.parseInt(cl));
+				}
+
+				// Get the DepositResponse
+				DepositResponse dr = myRepository.doDeposit(d);
+				
+				// Echo back the user agent
+				if (request.getHeader(HttpHeaders.USER_AGENT.toString()) != null) {
+					dr.getEntry().setUserAgent(request.getHeader(HttpHeaders.USER_AGENT.toString()));
 				}
 				
-		        // Get the DepositResponse
-				DepositResponse dr = myRepository.doDeposit(d);
+				// Echo back the packaging format
+				if (request.getHeader(HttpHeaders.X_PACKAGING.toString()) != null) {
+					dr.getEntry().setPackaging(request.getHeader(HttpHeaders.X_PACKAGING.toString()));
+				}
 				
 				// Print out the Deposit Response
 				response.setStatus(dr.getHttpResponse());
-				// response.setContentType("application/atomserv+xml");
-				response.setContentType("application/xml");
+				if ((dr.getLocation() != null) && (!dr.getLocation().equals("")))
+				{
+					response.setHeader("Location", dr.getLocation());
+				}
+				response.setContentType("application/atom+xml; charset=UTF-8");
 				PrintWriter out = response.getWriter();
-		        out.write(dr.marshall());
-		        out.flush();
-		        
-		        // Close the input stream if it still open
-		        fis.close();
-		        
-		        // Try deleting the temp file
-		        f = new File(filename);
-		        f.delete();
+				out.write(dr.marshall());
+				out.flush();
 			}
 		} catch (SWORDAuthenticationException sae) {
-			// Ask for credentials
+			// Ask for credentials again
 			if (authN.equals("Basic")) {
-		    	String s = "Basic realm=\"SWORD\"";
-		    	response.setHeader("WWW-Authenticate", s);
-		    	response.setStatus(401);
+				String s = "Basic realm=\"SWORD\"";
+				response.setHeader("WWW-Authenticate", s);
+				response.setStatus(401);
 			}
-		} catch (SWORDContentTypeException scte) {
-			// Throw a 415
-			response.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+		} catch (SWORDErrorException see) {
+			// Get the details and send the right SWORD error document
+			log.error(see.toString());
+			this.makeErrorDocument(see.getErrorURI(), 
+		               			   see.getStatus(),
+		               			   see.getDescription(),
+		                           request,
+		                           response);
+			return;
 		} catch (SWORDException se) {
-			// Throw a HTTP 500
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			
-			// Is there an appropriate error header to return?
-			if (se.getErrorCode() != null) {
-				response.setHeader(HttpHeaders.X_ERROR_CODE, se.getErrorCode());
-			}
-			System.out.println(se.toString());
 			log.error(se.toString());
-		} catch (IOException ioe) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			log.error(ioe.toString());
 		} catch (NoSuchAlgorithmException nsae) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			log.error(nsae.toString());
 		}
+		
+		finally {
+			// Close the input stream if it still open
+			if (fis != null) {
+				fis.close();
+			}
+
+			// Try deleting the temp file
+			if (filename != null) {
+				f = new File(filename);
+				f.delete();
+			}
+		}
 	}
 	
-    /**
-     * Utiliy method to return the username and password (separated by a colon ':')
-     * 
-     * @param request
-     * @return The username and password combination
-     */
-	private String getUsernamePassword(HttpServletRequest request) {
-        try {
-            String authHeader = request.getHeader("Authorization");
-            if (authHeader != null) {
-                StringTokenizer st = new StringTokenizer(authHeader);
-                if (st.hasMoreTokens()) {
-                    String basic = st.nextToken();
-                    if (basic.equalsIgnoreCase("Basic")) {
-                        String credentials = st.nextToken();
-                        String userPass = new String(Base64.decodeBase64(credentials.getBytes()));
-                        return userPass;
-                    }
-                }
-            }
-        } catch (Exception e) {
-        	log.debug(e.toString());
-        }
-        return null;
-    }
-	
 	/**
-	 * Utility method to deicde if we are using HTTP Basic authentication
+	 * Utility method to construct a SWORDErrorDocumentTest
+	 * 
+	 * @param errorURI The error URI to pass
+	 * @param status The HTTP status to return
+	 * @param summary The textual description to give the user
+	 * @param request The HttpServletRequest object
+	 * @param response The HttpServletResponse to send the error document to
+	 * @throws IOException 
+	 */
+	protected void makeErrorDocument(String errorURI, int status, String summary, 
+			                       HttpServletRequest request, HttpServletResponse response) throws IOException
+	{
+		SWORDErrorDocument sed = new SWORDErrorDocument(errorURI);
+		Title title = new Title();
+		title.setContent("ERROR");
+		sed.setTitle(title);
+		Calendar calendar = Calendar.getInstance();
+		String utcformat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+		SimpleDateFormat zulu = new SimpleDateFormat(utcformat);
+		String serializeddate = zulu.format(calendar.getTime());
+		sed.setUpdated(serializeddate);
+		Summary sum = new Summary();
+		sum.setContent(summary);
+		sed.setSummary(sum);
+		if (request.getHeader(HttpHeaders.USER_AGENT.toString()) != null) {
+			sed.setUserAgent(request.getHeader(HttpHeaders.USER_AGENT.toString()));
+		}
+		response.setStatus(status);
+    	response.setContentType("application/atom+xml; charset=UTF-8");
+		PrintWriter out = response.getWriter();
+    	out.write(sed.marshall().toXML());
+		out.flush();
+	}
+
+	/**
+	 * Utility method to return the username and password (separated by a colon
+	 * ':')
+	 * 
+	 * @param request
+	 * @return The username and password combination
+	 */
+	protected String getUsernamePassword(HttpServletRequest request) {
+		try {
+			String authHeader = request.getHeader("Authorization");
+			if (authHeader != null) {
+				StringTokenizer st = new StringTokenizer(authHeader);
+				if (st.hasMoreTokens()) {
+					String basic = st.nextToken();
+					if (basic.equalsIgnoreCase("Basic")) {
+						String credentials = st.nextToken();
+						String userPass = new String(Base64
+								.decodeBase64(credentials.getBytes()));
+						return userPass;
+					}
+				}
+			}
+		} catch (Exception e) {
+			log.debug(e.toString());
+		}
+		return null;
+	}
+
+	/**
+	 * Utility method to decide if we are using HTTP Basic authentication
 	 * 
 	 * @return if HTTP Basic authentication is in use or not
 	 */
-	private boolean authenticateWithBasic() {
+	protected boolean authenticateWithBasic() {
 		if (authN.equalsIgnoreCase("Basic")) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Utility method to construct the URL called for this Servlet
 	 * 
 	 * @param req The request object
 	 * @return The URL
 	 */
-	private static String getUrl(HttpServletRequest req) {
-        String reqUrl = req.getRequestURL().toString();
-        String queryString = req.getQueryString();   // d=789
-        if (queryString != null) {
-            reqUrl += "?"+queryString;
-        }
-        return reqUrl;
-    }
+	protected static String getUrl(HttpServletRequest req) {
+		String reqUrl = req.getRequestURL().toString();
+		String queryString = req.getQueryString();
+		if (queryString != null) {
+			reqUrl += "?" + queryString;
+		}
+		return reqUrl;
+	}
 }

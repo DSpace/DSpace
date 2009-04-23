@@ -1,9 +1,9 @@
 /*
  * DeleteMetadataFieldsConfirm.java
  *
- * Version: $Revision: 1.0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -133,7 +133,7 @@ public class DeleteMetadataFieldsConfirm extends AbstractDSpaceTransformer
     		if (field == null)
     			continue;
     		
-    		String fieldID = String.valueOf(field.getID());
+    		String fieldID = String.valueOf(field.getFieldID());
 			String fieldEelement = field.getElement();
 			String fieldQualifier = field.getQualifier();
 			

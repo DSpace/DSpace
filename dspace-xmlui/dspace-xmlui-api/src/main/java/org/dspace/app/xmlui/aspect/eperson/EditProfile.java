@@ -1,9 +1,9 @@
 /*
  * EditProfile.java
  *
- * Version: $Revision: 1.10 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/08/17 14:51:46 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -67,8 +67,7 @@ import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
-//import org.dspace.eperson.Subscribe;
-import org.dspace.eperson.SubscriptionManager;
+import org.dspace.eperson.Subscribe;
 import org.xml.sax.SAXException;
 
 /**
@@ -171,6 +170,12 @@ public class EditProfile extends AbstractDSpaceTransformer
     private static final Message T_head_auth = 
         message("xmlui.EPerson.EditProfile.head_auth");
     
+    private static final Message T_head_identify =
+    	message("xmlui.EPerson.EditProfile.head_identify");
+    
+    private static final Message T_head_security =
+    	message("xmlui.EPerson.EditProfile.head_security");
+    
     
     
     /** The email address of the user registering for the first time.*/
@@ -271,7 +276,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        List form = profile.addList("form",List.TYPE_FORM);
        
        List identity = form.addList("identity",List.TYPE_FORM);
-       identity.setHead("Identity");       
+       identity.setHead(T_head_identify);       
        
        // Email
        identity.addLabel(T_email_address);
@@ -320,8 +325,7 @@ public class EditProfile extends AbstractDSpaceTransformer
     	   
     	   subscribe.addItem(T_subscriptions_help);
     	   
-//    	   Collection[] currentList = Subscribe.getSubscriptions(context, context.getCurrentUser());
-    	   Collection[] currentList = SubscriptionManager.getSubscriptions(context, context.getCurrentUser());
+    	   Collection[] currentList = Subscribe.getSubscriptions(context, context.getCurrentUser());
     	   Collection[] possibleList = Collection.findAll(context);
     	   
     	   Select subscriptions = subscribe.addItem().addSelect("subscriptions");
@@ -347,7 +351,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        if (allowSetPassword) 
        {
     	   List security = form.addList("security",List.TYPE_FORM);
-           security.setHead("Security");
+           security.setHead(T_head_security);
     	   
            if (registering) 
            {

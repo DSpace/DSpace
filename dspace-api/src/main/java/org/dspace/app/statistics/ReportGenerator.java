@@ -40,15 +40,6 @@
 
 package org.dspace.app.statistics;
 
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierService;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.IdentifierService;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -56,6 +47,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -70,7 +62,12 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.sql.SQLException;
+
+import org.dspace.content.DCValue;
+import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.dspace.handle.HandleManager;
 
 /**
  * This class performs the action of coordinating a usage report being
@@ -185,7 +182,8 @@ public class ReportGenerator
      * main method to be run from command line.  See usage information for
      * details as to how to use the command line flags
      */
-    public static void main(String [] argv) throws Exception
+    public static void main(String [] argv)
+        throws Exception, SQLException
     {
         // create context as super user
         Context context = new Context();
@@ -245,7 +243,7 @@ public class ReportGenerator
     public static void processReport(Context context, String myFormat, 
                                      String myInput, String myOutput,
                                      String myMap)
-        throws Exception
+        throws Exception, SQLException
     {
         // create the relevant report type
         // FIXME: at the moment we only support HTML report generation
@@ -346,7 +344,7 @@ public class ReportGenerator
         // process the items in preparation to be displayed.  This includes sorting
         // by view number, building the links, and getting further info where
         // necessary
-        Statistics viewedItems = new Statistics("Item/URI", "Number of views", itemFloor);
+        Statistics viewedItems = new Statistics("Item/Handle", "Number of views", itemFloor);
         viewedItems.setSectionHeader("Items Viewed");
         
         Stat[] items = new Stat[itemAggregator.size()];
@@ -356,7 +354,7 @@ public class ReportGenerator
         while (keys.hasNext())
         {
             String key = (String) keys.next();
-            String link = url + "uri/" + key;
+            String link = url + "handle/" + key;
             value = Integer.parseInt((String) itemAggregator.get(key));
             items[i] = new Stat(key, value, link);
             i++;
@@ -790,31 +788,31 @@ public class ReportGenerator
     }
     
     /**
-     * get the information for the item with the given URI
+     * get the information for the item with the given handle
      *
      * @param   context     the DSpace context we are operating under
-     * @param   uri         the uri of the item being looked up, in the form
-     *                      xyz:1234/567 and so forth
+     * @param   handle      the handle of the item being looked up, in the form
+     *                      1234/567 and so forth
      *
      * @return      a string containing a reference (almost citation) to the
      *              article
      */
-    public static String getItemInfo(Context context, String uri)
+    public static String getItemInfo(Context context, String handle)
+        throws SQLException
     {
         Item item = null;
         
-        // ensure that the URI exists
+        // ensure that the handle exists
         try 
         {
-            ExternalIdentifier identifier = ExternalIdentifierService.parseCanonicalForm(context, uri);
-            item = (Item) IdentifierService.getResource(context, identifier);
+            item = (Item) HandleManager.resolveToObject(context, handle);
         } 
         catch (Exception e)
         {
             return null;
         }
         
-        // if no URI that matches is found then also return null
+        // if no handle that matches is found then also return null
         if (item == null)
         {
             return null;

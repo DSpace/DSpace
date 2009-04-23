@@ -72,6 +72,7 @@
 <%@ page import="org.dspace.core.I18nUtil" %>
 <%@ page import="org.dspace.eperson.EPerson, org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.eperson.Group"   %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%
     EPerson eperson = (EPerson) request.getAttribute("eperson");
@@ -137,7 +138,7 @@
             <%-- <td>Last Name:</td> --%>
             <td><label for="tlastname"><fmt:message key="jsp.dspace-admin.eperson.general.lastname"/></label></td>
             <td>
-                <input name="lastname" id="tlastname" size="24" value="<%=lastName == null ? "" : lastName%>"/>
+                <input name="lastname" id="tlastname" size="24" value="<%=lastName == null ? "" : Utils.addEntities(lastName) %>"/>
             </td>
         </tr>
 
@@ -145,7 +146,7 @@
             <%-- <td>First Name:</td> --%>
             <td><label for="tfirstname"><fmt:message key="jsp.dspace-admin.eperson.general.firstname"/></label></td>
             <td>
-                <input name="firstname" id="tfirstname" size="24" value="<%=firstName == null ? "" : firstName%>"/>
+                <input name="firstname" id="tfirstname" size="24" value="<%=firstName == null ? "" : Utils.addEntities(firstName) %>"/>
             </td>
         </tr>
 
@@ -153,7 +154,7 @@
 	<tr>
             <td>LDAP NetID:</td>
             <td>
-                <input name="netid" size="24" value="<%=netid == null ? "" : netid%>" />
+                <input name="netid" size="24" value="<%=netid == null ? "" : Utils.addEntities(netid) %>" />
             </td>
         </tr>
         <% } %>
@@ -162,7 +163,7 @@
             <%-- <td>Phone:</td> --%>
             <td><label for="tphone"><fmt:message key="jsp.dspace-admin.eperson-edit.phone"/></label></td>
             <td>
-                <input name="phone" id="tphone" size="24" value="<%=phone == null ? "" : phone%>"/>
+                <input name="phone" id="tphone" size="24" value="<%=phone == null ? "" : Utils.addEntities(phone) %>"/>
             </td>
         </tr>
         <tr>

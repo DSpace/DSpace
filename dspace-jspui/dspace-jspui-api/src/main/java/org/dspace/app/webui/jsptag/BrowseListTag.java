@@ -1,9 +1,9 @@
 /*
  * BrowseListTag.java
  *
- * Version: $Revision: 1.30 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/04/05 02:15:45 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,23 +39,21 @@
  */
 package org.dspace.app.webui.jsptag;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.browse.BrowseException;
-import org.dspace.browse.BrowseIndex;
-import org.dspace.browse.BrowseInfo;
-import org.dspace.browse.CrossLinks;
-import org.dspace.browse.Thumbnail;
+import org.dspace.browse.*;
 import org.dspace.content.Bitstream;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.Thumbnail;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
-import org.dspace.uri.IdentifierService;
 import org.dspace.sort.SortOption;
 
 import javax.imageio.ImageIO;
@@ -73,18 +71,17 @@ import java.util.StringTokenizer;
 
 /**
  * Tag for display a list of items
- * 
+ *
  * @author Robert Tansley
- * @version $Revision: 1.30 $
+ * @version $Revision$
  */
 public class BrowseListTag extends TagSupport
 {
 	 /** log4j category */
     private static Logger log = Logger.getLogger(BrowseListTag.class);
-    
+
     /** Items to display */
-//    private BrowseItem[] items;
-    private Item[] items;
+    private BrowseItem[] items;
 
     /** Row to highlight, -1 for no row */
     private int highlightRow = -1;
@@ -108,33 +105,47 @@ public class BrowseListTag extends TagSupport
 
     /** Config to disable cross links */
     private boolean disableCrossLinks = false;
-    
+
     /** The default fields to be displayed when listing items */
-    private static String listFields = "dc.date.issued(date), dc.title, dc.contributor.*";
-    
+    private static String listFields;
+
+    /** The default widths for the columns */
+    private static String listWidths;
+
     /** The default field which is bound to the browse by date */
     private static String dateField = "dc.date.issued";
-    
+
     /** The default field which is bound to the browse by title */
     private static String titleField = "dc.title";
-    
+
     private static String authorField = "dc.contributor.*";
-    
+
     private static int authorLimit = -1;
-    
+
     private BrowseInfo browseInfo;
-    
+
     public BrowseListTag()
     {
         super();
         getThumbSettings();
+
+        if (showThumbs)
+        {
+            listFields = "thumbnail, dc.date.issued(date), dc.title, dc.contributor.*";
+            listWidths = "*, 130, 60%, 40%";
+        }
+        else
+        {
+            listFields = "dc.date.issued(date), dc.title, dc.contributor.*";
+            listWidths = "130, 60%, 40%";
+        }
     }
 
     public int doStartTag() throws JspException
     {
         JspWriter out = pageContext.getOut();
         HttpServletRequest hrq = (HttpServletRequest) pageContext.getRequest();
-        
+
         /* just leave this out now
         boolean emphasiseDate = false;
         boolean emphasiseTitle = false;
@@ -145,9 +156,10 @@ public class BrowseListTag extends TagSupport
             emphasiseTitle = emphColumn.equalsIgnoreCase("title");
         }
         */
-        
+
         // get the elements to display
-        String browseListLine = null;
+        String browseListLine  = null;
+        String browseWidthLine = null;
 
         // As different indexes / sort options may require different columns to be displayed
         // try to obtain a custom configuration based for the browse that has been performed
@@ -161,7 +173,10 @@ public class BrowseListTag extends TagSupport
             {
                 // First, try to get a configuration for this browse and sort option combined
                 if (so != null && browseListLine == null)
-                    browseListLine = ConfigurationManager.getProperty("webui.itemlist.browse." + bix.getName() + ".sort." + so.getName() + ".columns");
+                {
+                    browseListLine  = ConfigurationManager.getProperty("webui.itemlist.browse." + bix.getName() + ".sort." + so.getName() + ".columns");
+                    browseWidthLine = ConfigurationManager.getProperty("webui.itemlist.browse." + bix.getName() + ".sort." + so.getName() + ".widths");
+                }
 
                 // We haven't got a sort option defined, so get one for the index
                 // - it may be required later
@@ -171,147 +186,282 @@ public class BrowseListTag extends TagSupport
 
             // If no config found, attempt to get one for this sort option
             if (so != null && browseListLine == null)
-                browseListLine = ConfigurationManager.getProperty("webui.itemlist.sort." + so.getName() + ".columns");
+            {
+                browseListLine  = ConfigurationManager.getProperty("webui.itemlist.sort." + so.getName() + ".columns");
+                browseWidthLine = ConfigurationManager.getProperty("webui.itemlist.sort." + so.getName() + ".widths");
+            }
 
             // If no config found, attempt to get one for this browse index
             if (bix != null && browseListLine == null)
-                browseListLine = ConfigurationManager.getProperty("webui.itemlist.browse." + bix.getName() + ".columns");
+            {
+                browseListLine  = ConfigurationManager.getProperty("webui.itemlist.browse." + bix.getName() + ".columns");
+                browseWidthLine = ConfigurationManager.getProperty("webui.itemlist.browse." + bix.getName() + ".widths");
+            }
 
             // If no config found, attempt to get a general one, using the sort name
             if (so != null && browseListLine == null)
-                browseListLine = ConfigurationManager.getProperty("webui.itemlist." + so.getName() + ".columns");
+            {
+                browseListLine  = ConfigurationManager.getProperty("webui.itemlist." + so.getName() + ".columns");
+                browseWidthLine = ConfigurationManager.getProperty("webui.itemlist." + so.getName() + ".widths");
+            }
 
             // If no config found, attempt to get a general one, using the index name
             if (bix != null && browseListLine == null)
-                browseListLine = ConfigurationManager.getProperty("webui.itemlist." + bix.getName() + ".columns");
+            {
+                browseListLine  = ConfigurationManager.getProperty("webui.itemlist." + bix.getName() + ".columns");
+                browseWidthLine = ConfigurationManager.getProperty("webui.itemlist." + bix.getName() + ".widths");
+            }
         }
 
         if (browseListLine == null)
         {
-            browseListLine = ConfigurationManager.getProperty("webui.itemlist.columns");
+            browseListLine  = ConfigurationManager.getProperty("webui.itemlist.columns");
+            browseWidthLine = ConfigurationManager.getProperty("webui.itemlist.widths");
         }
 
+        // Have we read a field configration from dspace.cfg?
         if (browseListLine != null)
         {
+            // If thumbnails are disabled, strip out any thumbnail column from the configuration
+            if (!showThumbs && browseListLine.contains("thumbnail"))
+            {
+                // Ensure we haven't got any nulls
+                browseListLine  = browseListLine  == null ? "" : browseListLine;
+                browseWidthLine = browseWidthLine == null ? "" : browseWidthLine;
+
+                // Tokenize the field and width lines
+                StringTokenizer bllt = new StringTokenizer(browseListLine,  ",");
+                StringTokenizer bwlt = new StringTokenizer(browseWidthLine, ",");
+
+                StringBuilder newBLLine = new StringBuilder();
+                StringBuilder newBWLine = new StringBuilder();
+                while (bllt.hasMoreTokens() || bwlt.hasMoreTokens())
+                {
+                    String browseListTok  = bllt.hasMoreTokens() ? bllt.nextToken() : null;
+                    String browseWidthTok = bwlt.hasMoreTokens() ? bwlt.nextToken() : null;
+
+                    // Only use the Field and Width tokens, if the field isn't 'thumbnail'
+                    if (browseListTok == null || !browseListTok.trim().equals("thumbnail"))
+                    {
+                        if (browseListTok != null)
+                        {
+                            if (newBLLine.length() > 0)
+                                newBLLine.append(",");
+
+                            newBLLine.append(browseListTok);
+                        }
+
+                        if (browseWidthTok != null)
+                        {
+                            if (newBWLine.length() > 0)
+                                newBWLine.append(",");
+
+                            newBWLine.append(browseWidthTok);
+                        }
+                    }
+                }
+
+                // Use the newly built configuration file
+                browseListLine  = newBLLine.toString();
+                browseWidthLine = newBWLine.toString();
+            }
+
             listFields = browseListLine;
+            listWidths = browseWidthLine;
         }
-        
+
         // get the date and title fields
         String dateLine = ConfigurationManager.getProperty("webui.browse.index.date");
         if (dateLine != null)
         {
             dateField = dateLine;
         }
-        
+
         String titleLine = ConfigurationManager.getProperty("webui.browse.index.title");
         if (titleLine != null)
         {
             titleField = titleLine;
         }
-        
+
         // get the author truncation config
         String authorLine = ConfigurationManager.getProperty("webui.browse.author-field");
         if (authorLine != null)
         {
         	authorField = authorLine;
         }
-        
-        StringTokenizer st = new StringTokenizer(listFields, ",");
-        
-        // make an array to hold all the frags that we will use
-        int columns = st.countTokens();
-        if (linkToEdit)
-            columns++;
-        String[] frags = new String[columns * items.length];
-        
-        try 
+
+        // Arrays used to hold the information we will require when outputting each row
+        String[] fieldArr  = listFields == null ? new String[0] : listFields.split("\\s*,\\s*");
+        String[] widthArr  = listWidths == null ? new String[0] : listWidths.split("\\s*,\\s*");
+        boolean isDate[]   = new boolean[fieldArr.length];
+        boolean emph[]     = new boolean[fieldArr.length];
+        boolean isAuthor[] = new boolean[fieldArr.length];
+        boolean viewFull[] = new boolean[fieldArr.length];
+        String[] browseType = new String[fieldArr.length];
+        String[] cOddOrEven = new String[fieldArr.length];
+
+        try
         {
-        	// get the interlinking configuration too
+        	// Get the interlinking configuration too
             CrossLinks cl = new CrossLinks();
-            
-            out.println("<table align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
-            out.println("<tr>");
-            
-            //      Write the column headings
-            int colCount = 1;
-            boolean isDate = false;
-            boolean emph = false;
-            boolean isAuthor = false;
-            
-            while (st.hasMoreTokens())
+
+            // Get a width for the table
+            String tablewidth = ConfigurationManager.getProperty("webui.itemlist.tablewidth");
+
+            // If we have column widths, try to use a fixed layout table - faster for browsers to render
+            // but not if we have to add an 'edit item' button - we can't know how big it will be
+            if (widthArr.length > 0 && widthArr.length == fieldArr.length && !linkToEdit)
             {
-                String field = st.nextToken().toLowerCase().trim();
-                String cOddOrEven = ((colCount % 2) == 0 ? "Odd" : "Even");
-                
+                // If the table width has been specified, we can make this a fixed layout
+                if (!StringUtils.isEmpty(tablewidth))
+                {
+                    out.println("<table style=\"width: " + tablewidth + "; table-layout: fixed;\" align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+                }
+                else
+                {
+                    // Otherwise, don't constrain the width
+                    out.println("<table align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+                }
+
+                // Output the known column widths
+                out.print("<colgroup>");
+
+                for (int w = 0; w < widthArr.length; w++)
+                {
+                    out.print("<col width=\"");
+
+                    // For a thumbnail column of width '*', use the configured max width for thumbnails
+                    if (fieldArr[w].equals("thumbnail") && widthArr[w].equals("*"))
+                    {
+                        out.print(thumbItemListMaxWidth);
+                    }
+                    else
+                    {
+                        out.print(StringUtils.isEmpty(widthArr[w]) ? "*" : widthArr[w]);
+                    }
+
+                    out.print("\" />");
+                }
+
+                out.println("</colgroup>");
+            }
+            else if (!StringUtils.isEmpty(tablewidth))
+            {
+                out.println("<table width=\"" + tablewidth + "\" align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+            }
+            else
+            {
+                out.println("<table align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+            }
+
+            // Output the table headers
+            out.println("<tr>");
+
+            for (int colIdx = 0; colIdx < fieldArr.length; colIdx++)
+            {
+                String field = fieldArr[colIdx].toLowerCase().trim();
+                cOddOrEven[colIdx] = (((colIdx + 1) % 2) == 0 ? "Odd" : "Even");
+
                 // find out if the field is a date
                 if (field.indexOf("(date)") > 0)
                 {
                     field = field.replaceAll("\\(date\\)", "");
-                    isDate = true;
+                    isDate[colIdx] = true;
                 }
-                
+
+                // Cache any modifications to field
+                fieldArr[colIdx] = field;
+
                 // find out if this is the author column
                 if (field.equals(authorField))
                 {
-                	isAuthor = true;
+                	isAuthor[colIdx] = true;
                 }
-                
+
                 // find out if this field needs to link out to other browse views
-                String browseType = "";
-                boolean viewFull = false;
                 if (cl.hasLink(field))
                 {
-                	browseType = cl.getLinkType(field);
-                	viewFull = BrowseIndex.getBrowseIndex(browseType).isItemIndex();
+                	browseType[colIdx] = cl.getLinkType(field);
+                	viewFull[colIdx] = BrowseIndex.getBrowseIndex(browseType[colIdx]).isItemIndex();
                 }
-                
-                
-                // get the schema and the element qualifier pair
-                // (Note, the schema is not used for anything yet)
-                // (second note, I hate this bit of code.  There must be
-                // a much more elegant way of doing this.  Tomcat has
-                // some weird problems with variations on this code that 
-                // I tried, which is why it has ended up the way it is)
-                StringTokenizer eq = new StringTokenizer(field, ".");
-                
-                String[] tokens = { "", "", "" };
-                int k = 0;
-                while(eq.hasMoreTokens())
-                {
-                    tokens[k] = eq.nextToken().toLowerCase().trim();
-                    k++;
-                }
-                String schema = tokens[0];
-                String element = tokens[1];
-                String qualifier = tokens[2];
-                
+
                 // find out if we are emphasising this field
                 /*
-                if ((field.equals(dateField) && emphasiseDate) || 
+                if ((field.equals(dateField) && emphasiseDate) ||
                         (field.equals(titleField) && emphasiseTitle))
                 {
-                    emph = true;
+                    emph[colIdx] = true;
                 }
                 */
                 if (field.equals(emphColumn))
                 {
-                	emph = true;
+                	emph[colIdx] = true;
                 }
-                
+
                 // prepare the strings for the header
-                String id = "t" + Integer.toString(colCount);
-                String css = "oddRow" + cOddOrEven + "Col";
+                String id = "t" + Integer.toString(colIdx + 1);
+                String css = "oddRow" + cOddOrEven[colIdx] + "Col";
                 String message = "itemlist." + field;
-                
+
                 // output the header
                 out.print("<th id=\"" + id +  "\" class=\"" + css + "\">"
-                        + (emph ? "<strong>" : "")
+                        + (emph[colIdx] ? "<strong>" : "")
                         + LocaleSupport.getLocalizedMessage(pageContext, message)
-                        + (emph ? "</strong>" : "") + "</th>");
-                
-                // now prepare the frags for each of the table elements
-                for (int i = 0; i < items.length; i++)
+                        + (emph[colIdx] ? "</strong>" : "") + "</th>");
+            }
+
+            if (linkToEdit)
+            {
+                String id = "t" + Integer.toString(cOddOrEven.length + 1);
+                String css = "oddRow" + cOddOrEven[cOddOrEven.length - 2] + "Col";
+
+                // output the header
+                out.print("<th id=\"" + id +  "\" class=\"" + css + "\">"
+                        + (emph[emph.length - 2] ? "<strong>" : "")
+                        + "&nbsp;" //LocaleSupport.getLocalizedMessage(pageContext, message)
+                        + (emph[emph.length - 2] ? "</strong>" : "") + "</th>");
+            }
+
+            out.print("</tr>");
+
+            // now output each item row
+            for (int i = 0; i < items.length; i++)
+            {
+            	out.print("<tr>"); 
+                // now prepare the XHTML frag for this division
+                String rOddOrEven;
+                if (i == highlightRow)
                 {
+                    rOddOrEven = "highlight";
+                }
+                else
+                {
+                    rOddOrEven = ((i % 2) == 1 ? "odd" : "even");
+                }
+
+                for (int colIdx = 0; colIdx < fieldArr.length; colIdx++)
+                {
+                    String field = fieldArr[colIdx];
+
+                    // get the schema and the element qualifier pair
+                    // (Note, the schema is not used for anything yet)
+                    // (second note, I hate this bit of code.  There must be
+                    // a much more elegant way of doing this.  Tomcat has
+                    // some weird problems with variations on this code that
+                    // I tried, which is why it has ended up the way it is)
+                    StringTokenizer eq = new StringTokenizer(field, ".");
+
+                    String[] tokens = { "", "", "" };
+                    int k = 0;
+                    while(eq.hasMoreTokens())
+                    {
+                        tokens[k] = eq.nextToken().toLowerCase().trim();
+                        k++;
+                    }
+                    String schema = tokens[0];
+                    String element = tokens[1];
+                    String qualifier = tokens[2];
+
                     // first get hold of the relevant metadata for this column
                     DCValue[] metadataArray;
                     if (qualifier.equals("*"))
@@ -326,31 +476,28 @@ public class BrowseListTag extends TagSupport
                     {
                         metadataArray = items[i].getMetadata(schema, element, qualifier, Item.ANY);
                     }
-                    
+
                     // save on a null check which would make the code untidy
                     if (metadataArray == null)
                     {
                     	metadataArray = new DCValue[0];
                     }
-                    
+
                     // now prepare the content of the table division
                     String metadata = "-";
-                    if (metadataArray.length > 0)
+                    if (field.equals("thumbnail"))
+                    {
+                        metadata = getThumbMarkup(hrq, items[i]);
+                    }
+                    else if (metadataArray.length > 0)
                     {
                         // format the date field correctly
-                        if (isDate)
+                        if (isDate[colIdx])
                         {
-                            // FIXME: why on _earth_ is this here.  Thumbnail config should
-                        	// be part of the display columns configuration
-                            String thumbs = "";
-                            if (showThumbs)
-                            {
-                                thumbs = getThumbMarkup(hrq, items[i]);
-                            }
                             DCDate dd = new DCDate(metadataArray[0].value);
-                            metadata = UIUtil.displayDate(dd, false, false, hrq) + thumbs;
+                            metadata = UIUtil.displayDate(dd, false, false, hrq);
                         }
-                        // format the title field correctly for withdrawn items (ie. don't link)                      
+                        // format the title field correctly for withdrawn items (ie. don't link)
                         else if (field.equals(titleField) && items[i].isWithdrawn())
                         {
                             metadata = Utils.addEntities(metadataArray[0].value);
@@ -358,13 +505,8 @@ public class BrowseListTag extends TagSupport
                         // format the title field correctly (as long as the item isn't withdrawn, link to it)
                         else if (field.equals(titleField))
                         {
-//                            metadata = "<a href=\"" + hrq.getContextPath() + "/handle/" 
-//                            + items[i].getHandle() + "\">" 
-//                            + Utils.addEntities(metadataArray[0].value)
-//                            + "</a>";
-                            // IdentifierService.getURL(items[i]).toString()
-                            metadata = "<a href=\""
-                            + IdentifierService.getURL(items[i]).toString() + "\">"
+                            metadata = "<a href=\"" + hrq.getContextPath() + "/handle/"
+                            + items[i].getHandle() + "\">"
                             + Utils.addEntities(metadataArray[0].value)
                             + "</a>";
                         }
@@ -375,29 +517,29 @@ public class BrowseListTag extends TagSupport
                         	// -1, then the limit is the full list)
                         	boolean truncated = false;
                         	int loopLimit = metadataArray.length;
-                        	if (isAuthor)
+                        	if (isAuthor[colIdx])
                         	{
                         		int fieldMax = (authorLimit == -1 ? metadataArray.length : authorLimit);
                         		loopLimit = (fieldMax > metadataArray.length ? metadataArray.length : fieldMax);
                         		truncated = (fieldMax < metadataArray.length);
                         		log.debug("Limiting output of field " + field + " to " + Integer.toString(loopLimit) + " from an original " + Integer.toString(metadataArray.length));
                         	}
-                        	                        	
+
                             StringBuffer sb = new StringBuffer();
                             for (int j = 0; j < loopLimit; j++)
                             {
                             	String startLink = "";
                             	String endLink = "";
-                            	if (!"".equals(browseType) && !disableCrossLinks)
+                            	if (!StringUtils.isEmpty(browseType[colIdx]) && !disableCrossLinks)
                             	{
                             		String argument = "value";
-                            		if (viewFull)
+                            		if (viewFull[colIdx])
                             		{
                             			argument = "vfocus";
                             		}
-                            		startLink = "<a href=\"" + hrq.getContextPath() + "/browse?type=" + browseType + "&amp;" +
+                            		startLink = "<a href=\"" + hrq.getContextPath() + "/browse?type=" + browseType[colIdx] + "&amp;" +
                                             argument + "=" + Utils.addEntities(metadataArray[j].value);
-                                    
+
                                     if (metadataArray[j].language != null)
                                     {
                                         startLink = startLink + "&amp;" +
@@ -426,98 +568,47 @@ public class BrowseListTag extends TagSupport
                             metadata = "<em>" + sb.toString() + "</em>";
                         }
                     }
-                    
-                    // now prepare the XHTML frag for this division
-                    String rOddOrEven;
-                    if (i == highlightRow)
-                    {
-                        rOddOrEven = "highlight";
-                    }
-                    else
-                    {
-                        rOddOrEven = ((i % 2) == 1 ? "odd" : "even");
-                    }
-                    
+
                     // prepare extra special layout requirements for dates
                     String extras = "";
-                    if (isDate)
+                    if (isDate[colIdx])
                     {
                         extras = "nowrap=\"nowrap\" align=\"right\"";
                     }
-                    
-                    int idx = ((i + 1) * columns) - columns + colCount - 1;
-                    frags[idx] = "<td headers=\"" + id + "\" class=\"" 
-                    	+ rOddOrEven + "Row" + cOddOrEven + "Col\" " + extras + ">"
-                    	+ (emph ? "<strong>" : "") + metadata + (emph ? "</strong>" : "")
-                    	+ "</td>";
-                    
+
+                    String id = "t" + Integer.toString(colIdx + 1);
+                    out.print("<td headers=\"" + id + "\" class=\""
+                    	+ rOddOrEven + "Row" + cOddOrEven[colIdx] + "Col\" " + extras + ">"
+                    	+ (emph[colIdx] ? "<strong>" : "") + metadata + (emph[colIdx] ? "</strong>" : "")
+                    	+ "</td>");
                 }
-                
-                colCount++;
-                isDate = false;
-                emph = false;
-                isAuthor = false;
-            }
 
-            // Add column for 'edit item' links
-            if (linkToEdit)
-            {
-                String cOddOrEven = ((columns % 2) == 0 ? "Odd" : "Even");
-                String id = "t" + Integer.toString(colCount);
-                String css = "oddRow" + cOddOrEven + "Col";
-
-                // output the header
-                out.print("<th id=\"" + id +  "\" class=\"" + css + "\">"
-                        + (emph ? "<strong>" : "")
-                        + "&nbsp;" //LocaleSupport.getLocalizedMessage(pageContext, message)
-                        + (emph ? "</strong>" : "") + "</th>");
-
-                for (int i = 0; i < items.length; i++)
+                // Add column for 'edit item' links
+                if (linkToEdit)
                 {
-                    // now prepare the XHTML frag for this division
-                    String rOddOrEven;
-                    if (i == highlightRow)
-                    {
-                        rOddOrEven = "highlight";
-                    }
-                    else
-                    {
-                        rOddOrEven = ((i % 2) == 1 ? "odd" : "even");
-                    }
+                    String id = "t" + Integer.toString(cOddOrEven.length + 1);
 
-                    int idx = ((i + 1) * columns) - 1;
-                    frags[idx] = "<td headers=\"" + id + "\" class=\""
-                    	+ rOddOrEven + "Row" + cOddOrEven + "Col\" nowrap>"
-                    	+ "<form method=get action=\"" + hrq.getContextPath() + "/tools/edit-item\">"
-//                        + "<input type=\"hidden\" name=\"handle\" value=\"" + items[i].getHandle() + "\" />"
-                        + "<input type=\"hidden\" name=\"item_id\" value=\"" + items[i].getID() + "\" />"
+                    out.print("<td headers=\"" + id + "\" class=\""
+                        + rOddOrEven + "Row" + cOddOrEven[cOddOrEven.length - 2] + "Col\" nowrap>"
+                        + "<form method=\"get\" action=\"" + hrq.getContextPath() + "/tools/edit-item\">"
+                        + "<input type=\"hidden\" name=\"handle\" value=\"" + items[i].getHandle() + "\" />"
                         + "<input type=\"submit\" value=\"Edit Item\" /></form>"
-                    	+ "</td>";
+                        + "</td>");
                 }
+
+                out.println("</tr>");
             }
-            
-            out.println("</tr>");
-            
-            // now output all the frags in the right order for the page
-            for (int i = 0; i < frags.length; i++)
-            {
-                if ((i + 1) % columns == 1)
-                {
-                    out.println("<tr>");
-                }
-                out.println(frags[i]);
-                if ((i + 1) % columns == 0)
-                {
-                    out.println("</tr>");
-                }
-            }
-            
+
             // close the table
             out.println("</table>");
         }
         catch (IOException ie)
         {
             throw new JspException(ie);
+        }
+        catch (SQLException e)
+        {
+        	throw new JspException(e);
         }
         catch (BrowseException e)
         {
@@ -531,7 +622,7 @@ public class BrowseListTag extends TagSupport
     {
     	return browseInfo;
     }
-    
+
     public void setBrowseInfo(BrowseInfo browseInfo)
     {
     	this.browseInfo = browseInfo;
@@ -561,30 +652,28 @@ public class BrowseListTag extends TagSupport
 
     /**
      * Get the items to list
-     * 
+     *
      * @return the items
      */
-//    public BrowseItem[] getItems()
-    public Item[] getItems()
+    public BrowseItem[] getItems()
     {
         return items;
     }
 
     /**
      * Set the items to list
-     * 
+     *
      * @param itemsIn
      *            the items
      */
-//    public void setItems(BrowseItem[] itemsIn)
-    public void setItems(Item[] itemsIn)
+    public void setItems(BrowseItem[] itemsIn)
     {
         items = itemsIn;
     }
 
     /**
      * Get the row to highlight - null or -1 for no row
-     * 
+     *
      * @return the row to highlight
      */
     public String getHighlightrow()
@@ -594,7 +683,7 @@ public class BrowseListTag extends TagSupport
 
     /**
      * Set the row to highlight
-     * 
+     *
      * @param highlightRowIn
      *            the row to highlight or -1 for no highlight
      */
@@ -619,7 +708,7 @@ public class BrowseListTag extends TagSupport
 
     /**
      * Get the column to emphasise - "title", "date" or null
-     * 
+     *
      * @return the column to emphasise
      */
     public String getEmphcolumn()
@@ -629,7 +718,7 @@ public class BrowseListTag extends TagSupport
 
     /**
      * Set the column to emphasise - "title", "date" or null
-     * 
+     *
      * @param emphColumnIn
      *            column to emphasise
      */
@@ -750,15 +839,15 @@ public class BrowseListTag extends TagSupport
     }
 
     /* generate the (X)HTML required to show the thumbnail */
-//    private String getThumbMarkup(HttpServletRequest hrq, BrowseItem item)
-    private String getThumbMarkup(HttpServletRequest hrq, Item item)
+    private String getThumbMarkup(HttpServletRequest hrq, BrowseItem item)
             throws JspException
     {
     	try
     	{
-    		Thumbnail thumbnail = item.getThumbnail();
-    		
-    		if (thumbnail == null)
+            Context c = UIUtil.obtainContext(hrq);
+            Thumbnail thumbnail = ItemService.getThumbnail(c, item.getID(), linkToBitstream);
+
+            if (thumbnail == null)
     		{
     			return "";
     		}
@@ -767,24 +856,33 @@ public class BrowseListTag extends TagSupport
         	if (linkToBitstream)
         	{
         		Bitstream original = thumbnail.getOriginal();
-//        		String link = hrq.getContextPath() + "/bitstream/" + item.getHandle() + "/" + original.getSequenceID() + "/" +
-        		String link = IdentifierService.getURL(original).toString();
+        		String link = hrq.getContextPath() + "/bitstream/" + item.getHandle() + "/" + original.getSequenceID() + "/" +
+        						UIUtil.encodeBitstreamName(original.getName(), Constants.DEFAULT_ENCODING);
         		thumbFrag.append("<a target=\"_blank\" href=\"" + link + "\" />");
         	}
         	else
         	{
-//        		String link = hrq.getContextPath() + "/handle/" + item.getHandle();
-        		String link = IdentifierService.getURL(item).toString();
+        		String link = hrq.getContextPath() + "/handle/" + item.getHandle();
         		thumbFrag.append("<a href=\"" + link + "\" />");
         	}
-        	
+
         	Bitstream thumb = thumbnail.getThumb();
-        	String img = hrq.getContextPath() + "/retrieve/" + thumb.getID() + "/" + 
+        	String img = hrq.getContextPath() + "/retrieve/" + thumb.getID() + "/" +
         				UIUtil.encodeBitstreamName(thumb.getName(), Constants.DEFAULT_ENCODING);
         	String alt = thumb.getName();
-        	thumbFrag.append("<img src=\"" + img + "\" alt=\"" + alt + "\" /></a>");
-        	
+            String scAttr = getScalingAttr(hrq, thumb);
+            thumbFrag.append("<img src=\"")
+                     .append(img)
+                     .append("\" alt=\"")
+                     .append(alt + "\" ")
+                     .append(scAttr)
+                     .append("/ border=\"0\"></a>");
+
         	return thumbFrag.toString();
+        }
+        catch (SQLException sqle)
+        {
+        	throw new JspException(sqle.getMessage());
         }
         catch (UnsupportedEncodingException e)
         {

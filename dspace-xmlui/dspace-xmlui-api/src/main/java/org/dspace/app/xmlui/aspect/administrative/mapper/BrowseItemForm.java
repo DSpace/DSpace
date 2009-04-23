@@ -1,9 +1,9 @@
 /*
  * BrowseItemForm.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -59,7 +59,6 @@ import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.Constants;
-import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
 
 /**
@@ -148,7 +147,7 @@ public class BrowseItemForm extends AbstractDSpaceTransformer {
 			if (dcTitles != null && dcTitles.length >= 1)
 				title = dcTitles[0].value;
 
-			String url = IdentifierService.getURL(item).toString();
+			String url = contextPath+"/handle/"+item.getHandle();
 			
 			Row row = table.addRow();
 			

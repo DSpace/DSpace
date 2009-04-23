@@ -51,53 +51,83 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.dspace.authenticate.AuthenticationMethod;
+import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 /**
- * Implicit authentication method that gets credentials from the X.509
- * client certificate supplied by the HTTPS client when connecting to
- * this server.  The email address in that certificate is taken as the
- * authenticated user name with no further checking, so be sure
- * your HTTP server (e.g. Tomcat) is configured correctly to accept only
- * client certificates it can validate.
+ * Implicit authentication method that gets credentials from the X.509 client
+ * certificate supplied by the HTTPS client when connecting to this server. The
+ * email address in that certificate is taken as the authenticated user name
+ * with no further checking, so be sure your HTTP server (e.g. Tomcat) is
+ * configured correctly to accept only client certificates it can validate.
  * <p>
  * See the <code>AuthenticationMethod</code> interface for more details.
  * <p>
- * <b>Configuration:</b><pre>
- *   authentication.x509.keystore.path = <em>path to Java keystore file</em>
- *   authentication.x509.keystore.password = <em>password to access the keystore</em>
- *   authentication.x509.ca.cert = <em>path to certificate file for CA whose client certs to accept.</em>
- *   authentication.x509.autoregister = <em>"true" if E-Person is created automatically for unknown new users.</em>
+ * <b>Configuration:</b>
+ * 
+ * <pre>
+ *   authentication.x509.keystore.path =
+ * <em>
+ * path to Java keystore file
+ * </em>
+ *   authentication.x509.keystore.password =
+ * <em>
+ * password to access the keystore
+ * </em>
+ *   authentication.x509.ca.cert =
+ * <em>
+ * path to certificate file for CA whose client certs to accept.
+ * </em>
+ *   authentication.x509.autoregister =
+ * <em>
+ * &quot;true&quot; if E-Person is created automatically for unknown new users.
+ * </em>
+ *   authentication.x509.groups = 
+ * <em>
+ * comma-delimited list of special groups to add user to if authenticated.
+ * </em>
+ *   authentication.x509.emaildomain = 
+ * <em>
+ * email address domain (after the 'at' symbol) to match before allowing 
+ * membership in special groups.
+ * </em>
  * </pre>
+ * 
  * Only one of the "<code>keystore.path</code>" or "<code>ca.cert</code>"
- * options is required.  If you supply a keystore, then all of the "trusted"
- * certificates in the keystore represent CAs whose client certificates will
- * be accepted.  The <code>ca.cert</code> option only allows a single CA to be named.
+ * options is required. If you supply a keystore, then all of the "trusted"
+ * certificates in the keystore represent CAs whose client certificates will be
+ * accepted. The <code>ca.cert</code> option only allows a single CA to be
+ * named.
  * <p>
- * You can configure <em>both</em> a keystore and a CA cert, and both will
- * be used.
+ * You can configure <em>both</em> a keystore and a CA cert, and both will be
+ * used.
  * <p>
- * The <code>autoregister</code> configuration parameter determines what
- * the <code>canSelfRegister()</code> method returns.  It also allows an
- * EPerson record to be created automatically when the presented
- * certificate is acceptable but there is no corresponding EPerson.
- *
+ * The <code>autoregister</code> configuration parameter determines what the
+ * <code>canSelfRegister()</code> method returns. It also allows an EPerson
+ * record to be created automatically when the presented certificate is
+ * acceptable but there is no corresponding EPerson.
+ * 
  * @author Larry Stone
  * @version $Revision$
  */
-public class X509Authentication
-    implements AuthenticationMethod
+public class X509Authentication implements AuthenticationMethod
 {
 
     /** log4j category */
@@ -110,27 +140,31 @@ public class X509Authentication
     private static KeyStore caCertKeyStore = null;
 
     private static String loginPageTitle = null;
-    
+
     private static String loginPageURL = null;
-    
+
     /**
-     * Initialization:
-     *  Set caPublicKey and/or keystore.  This loads the information
-     *  needed to check if a client cert presented is valid and acceptable.
+     * Initialization: Set caPublicKey and/or keystore. This loads the
+     * information needed to check if a client cert presented is valid and
+     * acceptable.
      */
     static
     {
         /*
-         * allow identification of alternative entry points 
-         * for certificate authentication when
-         * selected by the user rather than implicitly.
+         * allow identification of alternative entry points for certificate
+         * authentication when selected by the user rather than implicitly.
          */
-        loginPageTitle = ConfigurationManager.getProperty("authentication.x509.chooser.title.key");
-        loginPageURL = ConfigurationManager.getProperty("authentication.x509.chooser.uri");
-        
-        String keystorePath = ConfigurationManager.getProperty("authentication.x509.keystore.path");
-        String keystorePassword = ConfigurationManager.getProperty("authentication.x509.keystore.password");
-        String caCertPath = ConfigurationManager.getProperty("authentication.x509.ca.cert");
+        loginPageTitle = ConfigurationManager
+                .getProperty("authentication.x509.chooser.title.key");
+        loginPageURL = ConfigurationManager
+                .getProperty("authentication.x509.chooser.uri");
+
+        String keystorePath = ConfigurationManager
+                .getProperty("authentication.x509.keystore.path");
+        String keystorePassword = ConfigurationManager
+                .getProperty("authentication.x509.keystore.password");
+        String caCertPath = ConfigurationManager
+                .getProperty("authentication.x509.ca.cert");
 
         // backward-compatible kludge
         if (caCertPath == null)
@@ -142,7 +176,8 @@ public class X509Authentication
             FileInputStream fis = null;
             if (keystorePassword == null)
                 keystorePassword = "";
-            try {
+            try
+            {
                 KeyStore ks = KeyStore.getInstance("JKS");
                 fis = new FileInputStream(keystorePath);
                 ks.load(fis, keystorePassword.toCharArray());
@@ -150,18 +185,26 @@ public class X509Authentication
             }
             catch (IOException e)
             {
-                log.error("X509Authentication: Failed to load CA keystore, file="+
-                            keystorePath+", error="+e.toString());
+                log
+                        .error("X509Authentication: Failed to load CA keystore, file="
+                                + keystorePath + ", error=" + e.toString());
             }
             catch (GeneralSecurityException e)
             {
-                log.error("X509Authentication: Failed to extract CA keystore, file="+
-                            keystorePath+", error="+e.toString());
+                log
+                        .error("X509Authentication: Failed to extract CA keystore, file="
+                                + keystorePath + ", error=" + e.toString());
             }
             finally
             {
                 if (fis != null)
-                    try { fis.close(); } catch (IOException ioe) { }
+                    try
+                    {
+                        fis.close();
+                    }
+                    catch (IOException ioe)
+                    {
+                    }
             }
         }
 
@@ -175,44 +218,58 @@ public class X509Authentication
                 fis = new FileInputStream(caCertPath);
                 is = new BufferedInputStream(fis);
                 X509Certificate cert = (X509Certificate) CertificateFactory
-                                       .getInstance("X.509").generateCertificate(is);
+                        .getInstance("X.509").generateCertificate(is);
                 if (cert != null)
                     caPublicKey = cert.getPublicKey();
             }
             catch (IOException e)
             {
-                log.error("X509Authentication: Failed to load CA cert, file="+
-                            caCertPath+", error="+e.toString());
+                log.error("X509Authentication: Failed to load CA cert, file="
+                        + caCertPath + ", error=" + e.toString());
             }
             catch (CertificateException e)
             {
-                log.error("X509Authentication: Failed to extract CA cert, file="+
-                            caCertPath+", error="+e.toString());
+                log
+                        .error("X509Authentication: Failed to extract CA cert, file="
+                                + caCertPath + ", error=" + e.toString());
             }
             finally
             {
                 if (is != null)
-                    try { is.close(); } catch (IOException ioe) { }
+                    try
+                    {
+                        is.close();
+                    }
+                    catch (IOException ioe)
+                    {
+                    }
 
                 if (fis != null)
-                    try { fis.close(); } catch (IOException ioe) { }
+                    try
+                    {
+                        fis.close();
+                    }
+                    catch (IOException ioe)
+                    {
+                    }
             }
         }
     }
 
     /**
-     * Return the email address from <code>certificate</code>, or null
-     * if an email address cannot be found in the certificate.
+     * Return the email address from <code>certificate</code>, or null if an
+     * email address cannot be found in the certificate.
      * <p>
      * Note that the certificate parsing has only been tested with certificates
      * granted by the MIT Certification Authority, and may not work elsewhere.
-     *
+     * 
      * @param certificate -
      *            An X509 certificate object
      * @return - The email address found in certificate, or null if an email
      *         address cannot be found in the certificate.
      */
     private static String getEmail(X509Certificate certificate)
+            throws SQLException
     {
         Principal principal = certificate.getSubjectDN();
 
@@ -247,7 +304,7 @@ public class X509Authentication
     /**
      * Verify CERTIFICATE against KEY. Return true if and only if CERTIFICATE is
      * valid and can be verified against KEY.
-     *
+     * 
      * @param certificate -
      *            An X509 certificate object
      * @param key -
@@ -255,8 +312,7 @@ public class X509Authentication
      * @return - True if CERTIFICATE is valid and can be verified against KEY,
      *         false otherwise.
      */
-    private static boolean isValid(Context context,
-                                   X509Certificate certificate)
+    private static boolean isValid(Context context, X509Certificate certificate)
     {
         if (certificate == null)
             return false;
@@ -269,7 +325,8 @@ public class X509Authentication
         catch (CertificateException e)
         {
             log.info(LogManager.getHeader(context, "authentication",
-                    "X.509 Certificate is EXPIRED or PREMATURE: "+e.toString()));
+                    "X.509 Certificate is EXPIRED or PREMATURE: "
+                            + e.toString()));
             return false;
         }
 
@@ -284,7 +341,8 @@ public class X509Authentication
             catch (GeneralSecurityException e)
             {
                 log.info(LogManager.getHeader(context, "authentication",
-                        "X.509 Certificate FAILED SIGNATURE check: "+e.toString()));
+                        "X.509 Certificate FAILED SIGNATURE check: "
+                                + e.toString()));
             }
         }
 
@@ -297,11 +355,12 @@ public class X509Authentication
 
                 while (ke.hasMoreElements())
                 {
-                    String alias = (String)ke.nextElement();
+                    String alias = (String) ke.nextElement();
                     if (caCertKeyStore.isCertificateEntry(alias))
                     {
                         Certificate ca = caCertKeyStore.getCertificate(alias);
-                        try {
+                        try
+                        {
                             certificate.verify(ca.getPublicKey());
                             return true;
                         }
@@ -310,13 +369,16 @@ public class X509Authentication
                         }
                     }
                 }
-                log.info(LogManager.getHeader(context, "authentication",
-                        "Keystore method FAILED SIGNATURE check on client cert."));
+                log
+                        .info(LogManager
+                                .getHeader(context, "authentication",
+                                        "Keystore method FAILED SIGNATURE check on client cert."));
             }
             catch (GeneralSecurityException e)
             {
                 log.info(LogManager.getHeader(context, "authentication",
-                        "X.509 Certificate FAILED SIGNATURE check: "+e.toString()));
+                        "X.509 Certificate FAILED SIGNATURE check: "
+                                + e.toString()));
             }
 
         }
@@ -324,24 +386,23 @@ public class X509Authentication
     }
 
     /**
-     * Predicate, can new user automatically create EPerson.
-     * Checks configuration value.  You'll probably want this to
-     * be true to take advantage of a Web certificate infrastructure
-     * with many more users than are already known by DSpace.
+     * Predicate, can new user automatically create EPerson. Checks
+     * configuration value. You'll probably want this to be true to take
+     * advantage of a Web certificate infrastructure with many more users than
+     * are already known by DSpace.
      */
-    public boolean canSelfRegister(Context context,
-                                   HttpServletRequest request,
-                                   String username)
+    public boolean canSelfRegister(Context context, HttpServletRequest request,
+            String username) throws SQLException
     {
         return ConfigurationManager
-            .getBooleanProperty("authentication.x509.autoregister");
+                .getBooleanProperty("authentication.x509.autoregister");
     }
 
     /**
-     *  Nothing extra to initialize.
+     * Nothing extra to initialize.
      */
     public void initEPerson(Context context, HttpServletRequest request,
-            EPerson eperson)
+            EPerson eperson) throws SQLException
     {
     }
 
@@ -349,8 +410,7 @@ public class X509Authentication
      * We don't use EPerson password so there is no reason to change it.
      */
     public boolean allowSetPassword(Context context,
-                                    HttpServletRequest request,
-                                    String username)
+            HttpServletRequest request, String username) throws SQLException
     {
         return false;
     }
@@ -364,44 +424,166 @@ public class X509Authentication
     }
 
     /**
-     * No special groups.
+     * Returns a list of group names that the user should be added to upon
+     * successful authentication, configured in dspace.cfg.
+     * 
+     * @return List<String> of special groups configured for this authenticator
+     */
+    private List<String> getX509Groups()
+    {
+        List<String> groupNames = new ArrayList<String>();
+
+        String x509GroupConfig = null;
+        x509GroupConfig = ConfigurationManager
+                .getProperty("authentication.x509.groups");
+
+        if (null != x509GroupConfig && !x509GroupConfig.equals(""))
+        {
+            String[] groups = x509GroupConfig.split("\\s*,\\s*");
+
+            for (int i = 0; i < groups.length; i++)
+            {
+                groupNames.add(groups[i].trim());
+            }
+        }
+
+        return groupNames;
+    }
+
+    /**
+     * Checks for configured email domain required to grant special groups
+     * membership. If no email domain is configured to verify, special group
+     * membership is simply granted.
+     * 
+     * @param request -
+     *            The current request object
+     * @param email -
+     *            The email address from the x509 certificate
+     */
+    private void setSpecialGroupsFlag(HttpServletRequest request, String email)
+    {
+        String emailDomain = null;
+        emailDomain = (String) request
+                .getAttribute("authentication.x509.emaildomain");
+
+        HttpSession session = request.getSession(true);
+
+        if (null != emailDomain && !emailDomain.equals(""))
+        {
+            if (email.substring(email.length() - emailDomain.length()).equals(
+                    emailDomain))
+            {
+                session.setAttribute("x509Auth", new Boolean(true));
+            }
+        }
+        else
+        {
+            // No configured email domain to verify. Just flag
+            // as authenticated so special groups are granted.
+            session.setAttribute("x509Auth", new Boolean(true));
+        }
+    }
+
+    /**
+     * Return special groups configured in dspace.cfg for X509 certificate
+     * authentication.
+     * 
+     * @param Context
+     * @param HttpServletRequest
+     *            object potentially containing the cert
+     * 
+     * @return An int array of group IDs
+     * 
      */
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
+            throws SQLException
     {
+
+        Boolean authenticated = false;
+        HttpSession session = request.getSession(false);
+        authenticated = (Boolean) session.getAttribute("x509Auth");
+        authenticated = (null == authenticated) ? false : authenticated;
+
+        if (authenticated)
+        {
+            List<String> groupNames = new ArrayList<String>();
+            List<Integer> groupIDs = new ArrayList<Integer>();
+
+            groupNames = getX509Groups();
+
+            for (String groupName : groupNames)
+            {
+                if (groupName != null)
+                {
+                    Group group = Group.findByName(context, groupName);
+                    if (group != null)
+                    {
+                        groupIDs.add(new Integer(group.getID()));
+                    }
+                    else
+                    {
+                        log.warn(LogManager.getHeader(context,
+                                "configuration_error", "unknown_group="
+                                        + groupName));
+                    }
+                }
+            }
+
+            int[] results = new int[groupIDs.size()];
+            for (int i = 0; i < groupIDs.size(); i++)
+            {
+                results[i] = (groupIDs.get(i)).intValue();
+            }
+
+            if (log.isDebugEnabled())
+            {
+                StringBuffer gsb = new StringBuffer();
+
+                for (int i = 0; i < results.length; i++)
+                {
+                    if (i > 0)
+                        gsb.append(",");
+                    gsb.append(results[i]);
+                }
+
+                log.debug(LogManager.getHeader(context, "authenticated",
+                        "special_groups=" + gsb.toString()));
+            }
+
+            return results;
+        }
+
         return new int[0];
     }
 
     /**
-     * X509 certificate authentication. The client certificate
-     * is obtained from the <code>ServletRequest</code> object.
+     * X509 certificate authentication. The client certificate is obtained from
+     * the <code>ServletRequest</code> object.
      * <ul>
      * <li>If the certificate is valid, and corresponds to an existing EPerson,
      * and the user is allowed to login, return success.</li>
      * <li>If the user is matched but is not allowed to login, it fails.</li>
      * <li>If the certificate is valid, but there is no corresponding EPerson,
-     * the <code>"authentication.x509.autoregister"</code>
-     * configuration parameter is checked (via <code>canSelfRegister()</code>)
+     * the <code>"authentication.x509.autoregister"</code> configuration
+     * parameter is checked (via <code>canSelfRegister()</code>)
      * <ul>
-     * <li>If it's true, a new EPerson record is created for the certificate, and
-     * the result is success.</li>
+     * <li>If it's true, a new EPerson record is created for the certificate,
+     * and the result is success.</li>
      * <li>If it's false, return that the user was unknown.</li>
      * </ul>
      * </li>
      * </ul>
-     *
+     * 
      * @return One of: SUCCESS, BAD_CREDENTIALS, NO_SUCH_USER, BAD_ARGS
      */
-    public int authenticate(Context context,
-                            String username,
-                            String password,
-                            String realm,
-                            HttpServletRequest request)
+    public int authenticate(Context context, String username, String password,
+            String realm, HttpServletRequest request) throws SQLException
     {
         // Obtain the certificate from the request, if any
         X509Certificate[] certs = null;
         if (request != null)
             certs = (X509Certificate[]) request
-                .getAttribute("javax.servlet.request.X509Certificate");
+                    .getAttribute("javax.servlet.request.X509Certificate");
 
         if ((certs == null) || (certs.length == 0))
             return BAD_ARGS;
@@ -412,8 +594,10 @@ public class X509Authentication
             {
                 if (!isValid(context, certs[0]))
                 {
-                    log.warn(LogManager.getHeader(context, "authenticate",
-                        "type=x509certificate, status=BAD_CREDENTIALS (not valid)"));
+                    log
+                            .warn(LogManager
+                                    .getHeader(context, "authenticate",
+                                            "type=x509certificate, status=BAD_CREDENTIALS (not valid)"));
                     return BAD_CREDENTIALS;
                 }
 
@@ -425,37 +609,34 @@ public class X509Authentication
                 if (eperson == null)
                 {
                     // Cert is valid, but no record.
-                    if (email != null && canSelfRegister(context, request, null))
+                    if (email != null
+                            && canSelfRegister(context, request, null))
                     {
                         // Register the new user automatically
-                        log.info(LogManager.getHeader(context,
-                                "autoregister", "from=x.509, email=" + email));
+                        log.info(LogManager.getHeader(context, "autoregister",
+                                "from=x.509, email=" + email));
 
                         // TEMPORARILY turn off authorisation
                         context.setIgnoreAuthorization(true);
                         eperson = EPerson.create(context);
                         eperson.setEmail(email);
                         eperson.setCanLogIn(true);
-                        AuthenticationManager.initEPerson(context,
-                                request, eperson);
+                        AuthenticationManager.initEPerson(context, request,
+                                eperson);
                         eperson.update();
-                        try
-                        {
-                            context.commit();
-                        }
-                        catch (java.sql.SQLException sqle)
-                        {
-                            throw new RuntimeException(sqle);
-                        }
+                        context.commit();
                         context.setIgnoreAuthorization(false);
                         context.setCurrentUser(eperson);
+                        setSpecialGroupsFlag(request, email);
                         return SUCCESS;
                     }
                     else
                     {
                         // No auto-registration for valid certs
-                        log.warn(LogManager.getHeader(context, "authenticate",
-                                "type=cert_but_no_record, cannot auto-register"));
+                        log
+                                .warn(LogManager
+                                        .getHeader(context, "authenticate",
+                                                "type=cert_but_no_record, cannot auto-register"));
                         return NO_SUCH_USER;
                     }
                 }
@@ -464,7 +645,8 @@ public class X509Authentication
                 else if (!eperson.canLogIn())
                 {
                     log.warn(LogManager.getHeader(context, "authenticate",
-                            "type=x509certificate, email="+email+", canLogIn=false, rejecting."));
+                            "type=x509certificate, email=" + email
+                                    + ", canLogIn=false, rejecting."));
                     return BAD_ARGS;
                 }
 
@@ -473,6 +655,7 @@ public class X509Authentication
                     log.info(LogManager.getHeader(context, "login",
                             "type=x509certificate"));
                     context.setCurrentUser(eperson);
+                    setSpecialGroupsFlag(request, email);
                     return SUCCESS;
                 }
             }
@@ -488,32 +671,32 @@ public class X509Authentication
 
     /**
      * Returns URL of password-login servlet.
-     *
+     * 
      * @param context
-     *  DSpace context, will be modified (EPerson set) upon success.
-     *
+     *            DSpace context, will be modified (EPerson set) upon success.
+     * 
      * @param request
-     *  The HTTP request that started this operation, or null if not applicable.
-     *
+     *            The HTTP request that started this operation, or null if not
+     *            applicable.
+     * 
      * @param response
-     *  The HTTP response from the servlet method.
-     *
+     *            The HTTP response from the servlet method.
+     * 
      * @return fully-qualified URL
      */
-    public String loginPageURL(Context context,
-                            HttpServletRequest request,
-                            HttpServletResponse response)
+    public String loginPageURL(Context context, HttpServletRequest request,
+            HttpServletResponse response)
     {
         return loginPageURL;
     }
 
     /**
-     * Returns message key for title of the "login" page, to use
-     * in a menu showing the choice of multiple login methods.
-     *
+     * Returns message key for title of the "login" page, to use in a menu
+     * showing the choice of multiple login methods.
+     * 
      * @param context
-     *  DSpace context, will be modified (EPerson set) upon success.
-     *
+     *            DSpace context, will be modified (EPerson set) upon success.
+     * 
      * @return Message key to look up in i18n message catalog.
      */
     public String loginPageTitle(Context context)

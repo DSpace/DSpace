@@ -1,9 +1,9 @@
 /*
  * EditEPersonForm.java
  *
- * Version: $Revision: 1.0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -215,7 +215,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 		String phoneValue = eperson.getMetadata("phone");
 		boolean canLogInValue = eperson.canLogIn();
 		boolean certificatValue = eperson.getRequireCertificate();
-		//Vector<String> deleteConstraints = eperson.getDeleteConstraints();
+		Vector<String> deleteConstraints = eperson.getDeleteConstraints();
 		
 		if (request.getParameter("email_address") != null)
 			emailValue = request.getParameter("email_address");
@@ -326,7 +326,6 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	        if (!ConfigurationManager.getBooleanProperty("xmlui.user.assumelogin", false))
 	        	submitLoginAs.setDisabled();
 	       
-	        /*
 	        if (deleteConstraints != null && deleteConstraints.size() > 0)
 	        {
 	        	submitDelete.setDisabled();
@@ -359,7 +358,6 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
         		}
 	        	hi.addContent(".");
 	        }
-	        */
         }
         
         

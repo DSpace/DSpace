@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2007, Aberystwyth University
+ * Copyright (c) 2008, Aberystwyth University
  *
  * All rights reserved.
  * 
@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServletResponse;
  * the SWORD protocol. 
  * 
  * @author Neil Taylor
+ * @author Stuart Lewis
  *
  */
 public interface HttpHeaders
@@ -63,9 +64,9 @@ public interface HttpHeaders
 	public static final String X_ON_BEHALF_OF = "X-On-Behalf-Of";
   
     /**
-     * The HTTP Header label that specifies the Format Namespace information.
+     * The HTTP Header label that specifies the Packaging information.
      */
-    public static final String X_FORMAT_NAMESPACE = "X-Format-Namespace";
+    public static final String X_PACKAGING = "X-Packaging";
   
     /**
      * The HTTP Header label that specifies the desired Verbose status. 
@@ -73,14 +74,25 @@ public interface HttpHeaders
     public static final String X_VERBOSE = "X-Verbose";
   
     /**
-     * The HTTP Header label that specifies the desired NoOp status.  
+     * The HTTP Header label that specifies the desired NoOp status.
      */
     public static final String X_NO_OP = "X-No-Op";
-  
+
+    /**
+     * An HTTP Header label that the server should not epect, and thus
+     * created a corrupt header.
+     */
+    public static final String X_CORRUPT = "X-wibble";
+
     /**
      * The HTTP Header that specifies the error code information. 
      */
     public static final String X_ERROR_CODE = "X-Error-Code";
+    
+    /**
+     * The user agent.
+     */
+    public static final String USER_AGENT = "User-Agent";
   
     /**
      * The Slug header.

@@ -1,9 +1,9 @@
 /*
  * DSpaceObjectManager.java
  *
- * Version: $Revision: 1.1 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/03/20 22:39:04 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -40,18 +40,18 @@
 
 package org.dspace.app.xmlui.objectmanager;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import org.dspace.app.xmlui.wing.ObjectManager;
 import org.dspace.app.xmlui.wing.WingException;
+import org.dspace.browse.BrowseItem;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.uri.IdentifierService;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 
 /**
@@ -77,12 +77,12 @@ public class DSpaceObjectManager implements ObjectManager
     public boolean manageObject(Object object) throws WingException
     {
     	// First check that the object is of a type we can manage.
-//    	if (object instanceof BrowseItem)
-//    	{
-//    		dsos.add((BrowseItem) object);
-//    		return true;
-//    	}
-    	if (object instanceof Item)
+    	if (object instanceof BrowseItem)
+    	{
+    		dsos.add((BrowseItem) object);
+    		return true;
+    	}
+    	else if (object instanceof Item)
     	{
     		dsos.add((Item) object);
     		return true;
@@ -113,8 +113,7 @@ public class DSpaceObjectManager implements ObjectManager
 		if (object instanceof DSpaceObject)
 		{
 			DSpaceObject dso = (DSpaceObject) object;
-            String handle = IdentifierService.getCanonicalForm(dso);
-            // String handle = dso.getExternalIdentifier().getCanonicalForm();
+			String handle = dso.getHandle();
 			
 			// If the object has a handle then refrence it by it's handle.
 			if (handle != null)
@@ -124,7 +123,7 @@ public class DSpaceObjectManager implements ObjectManager
 			else
 			{
 				// No handle then refrence it by an internal ID.
-				if (dso instanceof Item)
+				if (dso instanceof Item || dso instanceof BrowseItem)
 		    	{
 		    		return "/metadata/internal/item/" + dso.getID() + "/mets.xml";
 		    	}
@@ -148,7 +147,7 @@ public class DSpaceObjectManager implements ObjectManager
 	 */
 	public String getObjectType(Object object) throws WingException 
 	{
-		if (object instanceof Item)
+		if (object instanceof Item || object instanceof BrowseItem)
     	{
     		return "DSpace Item";
     	}

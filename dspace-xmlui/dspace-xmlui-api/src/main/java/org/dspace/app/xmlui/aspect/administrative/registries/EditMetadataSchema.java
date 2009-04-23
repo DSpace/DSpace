@@ -1,9 +1,9 @@
 /*
  * EditMetadataSchema.java
  *
- * Version: $Revision: 1.0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -195,7 +195,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 		
 		for (MetadataField field : fields)
 		{
-			String id = String.valueOf(field.getID());
+			String id = String.valueOf(field.getFieldID());
 			String fieldElement = field.getElement();
 			String fieldQualifier = field.getQualifier();
 			
@@ -204,7 +204,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 				fieldName += "."+fieldQualifier;
 				
 			boolean highlight = false;
-			if (field.getID() == highlightID)
+			if (field.getFieldID() == highlightID)
 				highlight = true;
 			
 			String fieldScopeNote = field.getScopeNote();
@@ -319,7 +319,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 		
 		
 		Division newField = div.addDivision("edit-schema-update-field");
-		newField.setHead(T_head4.parameterize(field.getID()));
+		newField.setHead(T_head4.parameterize(field.getFieldID()));
 		
 		List form = newField.addList("edit-schema-update-field-form",List.TYPE_FORM);
 		

@@ -42,7 +42,7 @@
   - Task completed message page
   -
   - Attributes:
-  -   identifier - Persistent identifier of the item that's just gone in the archive.
+  -   handle - Handle of the item that's just gone in the archive.
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -53,7 +53,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
-    String identifier = (String) request.getAttribute("identifier");
+    String handle = (String) request.getAttribute("handle");
 %>
 
 <dspace:layout locbar="link"
@@ -67,7 +67,7 @@
     <%--<p>The submission has been placed in the main archive.  It has been assigned
     the following identifier:</p>--%>
 	<p><fmt:message key="jsp.mydspace.in-archive.text1"/></p>
-    <p><a href="<%= identifier %>"><%= identifier %></a></p>
+    <p><a href="<%= handle %>"><%= handle %></a></p>
 
     <%--<p>Notification has been sent to the appropriate people.</p>--%>
 	<p><fmt:message key="jsp.mydspace.in-archive.text2"/></p>

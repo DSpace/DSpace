@@ -1,9 +1,9 @@
 /*
  * InitialQuestionsStep.java
  *
- * Version: $Revision: 1.4 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,8 +39,11 @@
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
-import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -51,11 +54,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  * This is the first official step of the item submission processes. This
@@ -124,8 +123,8 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
     	// Get any metadata that may be removed by unselecting one of these options.
     	Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = IdentifierService.getURL(collection).toString() + "/submit/" + knot.getId() + ".continue";
-		
+		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
+
 		DCValue[] titles = item.getDC("title", "alternative", Item.ANY);
 		
 		DCValue[] dateIssued = item.getDC("date", "issued", Item.ANY);

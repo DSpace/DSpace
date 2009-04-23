@@ -149,17 +149,17 @@ public class JSPStepManager
 
         	stepInstance =  stepClass.newInstance();
         
-        	if(stepInstance instanceof JSPStep)
-        	{
-            	// load the JSPStep interface for this step
-            	stepManager.stepJSPUI = (JSPStep) stepClass.newInstance();
-        	}
-        	else
-        	{
-            	throw new Exception("The submission step class specified by '" + stepConfig.getJSPUIClassName() + 
-                    	"' does not extend the class org.dspace.app.webui.JSPStep!" +
-                    	" Therefore it cannot be used by the Configurable Submission for the JSP user interface!");
-        	}
+	        if(stepInstance instanceof JSPStep)
+	        {
+	            // load the JSPStep interface for this step
+	            stepManager.stepJSPUI = (JSPStep) stepClass.newInstance();
+	        }
+	        else
+	        {
+	            throw new Exception("The submission step class specified by '" + stepConfig.getJSPUIClassName() + 
+	                    "' does not extend the class org.dspace.app.webui.JSPStep!" +
+	                    " Therefore it cannot be used by the Configurable Submission for the JSP user interface!");
+	        }
         }
         return stepManager;
     }

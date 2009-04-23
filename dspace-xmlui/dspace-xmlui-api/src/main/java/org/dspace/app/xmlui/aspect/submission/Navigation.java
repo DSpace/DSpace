@@ -1,9 +1,9 @@
 /*
  * Navigation.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -97,13 +97,13 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         options.addList("administrative");
     	
 //      This dosn't flow very well, lets remove it and see if anyone misses it.  
-//    	DSpaceObject dso = URIUtil.resolve(objectModel);
+//    	DSpaceObject dso = HandleUtil.obtainHandle(objectModel);	
 //    	if (dso != null && dso instanceof Collection)
 //    	{
 //    		Collection collection = (Collection) dso;  		
 //    		if (AuthorizeManager.authorizeActionBoolean(context, collection, Constants.ADD))
 //    		{
-//    	        String submitURL = contextPath + "/handle/" + collection.getExternalIdentifier().getCanonicalForm() + "/submit";
+//    	        String submitURL = contextPath + "/handle/" + collection.getHandle() + "/submit";
 //		        account.addItemXref(submitURL,"Submit to this collection");
 //    		}
 //    	}

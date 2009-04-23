@@ -1,11 +1,11 @@
 /*
  * ItemDAOFactory.java
  *
- * Version: $Revision: 1727 $
+ * Version: $Revision$
  *
- * Date: $Date: 2007-01-19 10:52:10 +0000 (Fri, 19 Jan 2007) $
+ * Date: $Date$
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+ * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,23 +37,28 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
+
 package org.dspace.content.dao;
 
-import org.dspace.content.dao.postgres.ItemDAOPostgres;
 import org.dspace.core.Context;
-import org.dspace.dao.StackableDAOFactory;
+import org.dspace.core.ConfigurationManager;
 
 /**
- * @author James Rutherford
+ * Created by IntelliJ IDEA.
+ * User: Graham
+ * Date: 19-Dec-2007
+ * Time: 13:13:51
+ * To change this template use File | Settings | File Templates.
  */
 public class ItemDAOFactory
 {
     public static ItemDAO getInstance(Context context)
     {
-        return StackableDAOFactory.prepareStack(context,
-                ItemDAO.class,
-                new ItemDAOCore(context),
-                new ItemDAOPostgres(context),
-                "dao.stack.item.enabled");
+        if (ConfigurationManager.getProperty("db.name").equalsIgnoreCase("oracle"))
+        {
+            return new ItemDAOOracle(context);
+        }
+
+        return new ItemDAOPostgres(context);
     }
 }

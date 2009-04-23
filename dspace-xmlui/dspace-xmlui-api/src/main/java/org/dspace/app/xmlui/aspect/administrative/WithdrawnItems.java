@@ -1,9 +1,9 @@
 /*
  * WithdrawnItems.java
  *
- * Version: $Revision: 1.0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2007/08/28 10:00:00 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -40,6 +40,14 @@
 
 package org.dspace.app.xmlui.aspect.administrative;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -51,7 +59,6 @@ import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.RequestUtils;
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -69,6 +76,7 @@ import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
+import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
@@ -76,21 +84,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.sort.SortException;
-import org.dspace.sort.SortOption;
-import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Implements all the browse functionality (browse by title, subject, authors,
@@ -173,9 +169,9 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
             if (key != null)
             {
-                DSpaceObject dso = URIUtil.resolve(objectModel);
+                DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
                 if (dso != null)
-                    key += "-" + IdentifierService.getCanonicalForm(dso);
+                    key += "-" + dso.getHandle();
 
                 return HashUtil.hash(key);
             }
@@ -195,7 +191,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             try
             {
                 DSpaceValidity validity = new DSpaceValidity();
-                DSpaceObject dso = URIUtil.resolve(objectModel);
+                DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
                 if (dso != null)
                     validity.add(dso);
@@ -206,7 +202,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                 if (isItemBrowse(info))
                 {
                     // Add the browse items to the validity
-                    for (Item item : (java.util.List<Item>) info.getResults())
+                    for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
                     {
                         validity.add(item);
                     }
@@ -243,7 +239,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
         pageMeta.addMetadata("title").addContent(getTitleMessage(info));
 
-        DSpaceObject dso = URIUtil.resolve(objectModel);
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         if (dso != null)
@@ -298,7 +294,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
         if (isItemBrowse(info))
         {
             // Add the items to the browse results
-            for (Item item : (java.util.List<Item>) info.getResults())
+            for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
             {
                 referenceSet.addReference(item);
             }
@@ -595,7 +591,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
         params.scope = new BrowserScope(context);
 
         // Are we in a community or collection?
-        DSpaceObject dso = URIUtil.resolve(objectModel);
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (dso instanceof Community)
             params.scope.setCommunity((Community) dso);
         if (dso instanceof Collection)

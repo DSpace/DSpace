@@ -66,5 +66,11 @@ JARS=`echo $DSPACEDIR/lib/*.jar | sed 's/ /\:/g'`
 #   The WEB-INF/classes directory
 FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config
 
+#Allow user to specify java options through JAVA_OPTS variable
+if [ "$JAVA_OPTS" = "" ]; then
+   #Default Java to use 256MB of memory
+   JAVA_OPTS=-Xmx256m
+fi
+
 # Now invoke Java
-java -Xmx256m -classpath $FULLPATH "$@"
+java $JAVA_OPTS -classpath $FULLPATH "$@"

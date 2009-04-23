@@ -1,9 +1,9 @@
 /* 
   style-ie7.css
 
-  Version: $Revision: 1.18 $
+  Version: $Revision$
  
-  Date: $Date: 2006/05/01 21:56:29 $
+  Date: $Date$
  
   Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
   Institute of Technology.  All rights reserved.
@@ -124,7 +124,8 @@ div#sidebar
 
 
 
-/* the checkboxes on the Initial Questions of item submission */
+
+/* the checkboxes on the Initial Questions of item submission
 fieldset#aspect_submission_StepTransformer_field_multiple_titles 
 {   
     position: absolute;
@@ -137,6 +138,26 @@ fieldset#aspect_submission_StepTransformer_field_published_before
     left: 143px;
     top: 60px;
 }
+ */
+ 
+/* the text on the Initial Questions of item submission */
+#aspect_submission_StepTransformer_list_submit-initial-questions span.field-help
+{
+    position: relative;
+    top: -22px;
+    left: 28px;
+}
+#aspect_submission_StepTransformer_list_submit-initial-questions label input
+{
+    position: relative;
+    top: -2px;
+}
+
+
+
+
+
+
 
 
 

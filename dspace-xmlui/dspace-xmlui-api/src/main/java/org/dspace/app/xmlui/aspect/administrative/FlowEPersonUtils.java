@@ -1,9 +1,9 @@
 /*
  * FlowEPersonUtils.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -192,7 +192,8 @@ public class FlowEPersonUtils {
     		EPerson personModified = EPerson.find(context, epersonID);
         	
     		// Make sure the email address we are changing to is unique
-        	if (personModified.getEmail() != email)
+        	String originalEmail = personModified.getEmail();
+            if (originalEmail == null || !originalEmail.equals(email))
         	{	
         		EPerson potentialDupicate = EPerson.findByEmail(context,email);
         		
@@ -207,13 +208,16 @@ public class FlowEPersonUtils {
         			return result;
         		}
         	}
-        	if (personModified.getFirstName() != first) {
+        	String originalFirstName = personModified.getFirstName();
+            if (originalFirstName == null || !originalFirstName.equals(first)) {
         		personModified.setFirstName(first);
         	}
-        	if (personModified.getLastName() != last) {
+        	String originalLastName = personModified.getLastName();
+            if (originalLastName == null || !originalLastName.equals(last)) {
         		personModified.setLastName(last);
         	}
-        	if (personModified.getMetadata("phone") != phone) {
+        	String originalPhone = personModified.getMetadata("phone");
+            if (originalPhone == null || !originalPhone.equals(phone)) {
         		personModified.setMetadata("phone", phone);
         	}
         	personModified.setCanLogIn(login);

@@ -58,7 +58,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.app.webui.servlet.FeedServlet;
-import org.dspace.uri.IdentifierService;
 
 /**
  * Tag for HTML page layout ("skin").
@@ -83,8 +82,8 @@ import org.dspace.uri.IdentifierService;
  * <li><code>dspace.current.user</code> - the EPerson currently logged in, or
  * <code>null</code> if anonymous access</li>
  * <li><code>dspace.layout.feeddata</code> - <code>String</code>. "NONE"
- * means no feed from this page; otherwise the canonical form of the URI of the
- * object (community or collection) the feed is from</li>
+ * means no feed from this page; otherwise the Handle of object (community or
+ * collection) the feed is from</li>
  * <li><code>dspace.layout.linkparts</code> - <code>String[]</code>. A
  * cycling sequence of: 2nd part of MIME type (e.g. <code>rdf+rss</code>);
  * title of feed; path component to go after /feed/ for the actual feed URL
@@ -222,7 +221,7 @@ public class LayoutTag extends TagSupport
                     for (int i = 0; i < comms.length; i++)
                     {
                         parents.add(comms[i].getMetadata("name"));
-                        parentLinks.add(IdentifierService.getURL(comms[i]).toString());
+                        parentLinks.add("/handle/" + comms[i].getHandle());
                     }
                 }
             }
@@ -239,7 +238,7 @@ public class LayoutTag extends TagSupport
             else
             {
                 // Grab parents from the URL - these should have been picked up
-                // by the URIServlet
+                // by the HandleServlet
                 Collection col = (Collection) request
                         .getAttribute("dspace.collection");
                 Community[] comms = (Community[]) request
@@ -250,13 +249,13 @@ public class LayoutTag extends TagSupport
                     for (int i = 0; i < comms.length; i++)
                     {
                         parents.add(comms[i].getMetadata("name"));
-                        parentLinks.add(IdentifierService.getURL(comms[i]).toString());
+                        parentLinks.add("/handle/" + comms[i].getHandle());
                     }
 
                     if (col != null)
                     {
                         parents.add(col.getMetadata("name"));
-                        parentLinks.add(IdentifierService.getURL(col).toString());
+                        parentLinks.add("/handle/" + col.getHandle());
                     }
                 }
             }
@@ -307,12 +306,12 @@ public class LayoutTag extends TagSupport
         	if ( commLinks )
         	{
                 Community com = (Community)request.getAttribute("dspace.community");
-        		request.setAttribute("dspace.layout.feedref", com.getIdentifier().getCanonicalForm());
+        		request.setAttribute("dspace.layout.feedref", com.getHandle());
         	}
         	else if( collLinks )
         	{
         		Collection col = (Collection)request.getAttribute("dspace.collection");
-        		request.setAttribute("dspace.layout.feedref", col.getIdentifier().getCanonicalForm());
+        		request.setAttribute("dspace.layout.feedref", col.getHandle());
         	}
         	else //feed is across all of DSpace and not Community/Collection specific
         	{

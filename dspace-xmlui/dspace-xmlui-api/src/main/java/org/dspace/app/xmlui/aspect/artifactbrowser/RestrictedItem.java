@@ -1,9 +1,9 @@
 /*
  * RestrictedItem.java
  *
- * Version: $Revision: 1.1 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/08/08 20:58:55 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,12 +39,14 @@
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.utils.URIUtil;
+import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -56,11 +58,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  * Display an item restricted message.
@@ -114,7 +112,7 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
-    	DSpaceObject dso = URIUtil.resolve(objectModel);
+    	DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
     	
     	pageMeta.addMetadata("title").addContent(T_title);
                
@@ -130,7 +128,7 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
             UIException, SQLException, IOException, AuthorizeException
     {   
     	Request  request = ObjectModelHelper.getRequest(objectModel);
-        DSpaceObject dso = URIUtil.resolve(objectModel);
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         
         Division unauthorized = body.addDivision("unauthorized-resource","primary");
 
@@ -172,15 +170,14 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
         	else
         	{
         		String identifier = "unknown";
-
-        		String handle = IdentifierService.getCanonicalForm(dso);
+        		String handle = dso.getHandle();
             	if (handle == null || "".equals(handle))
             	{
             		identifier =  "internal ID: " + dso.getID();
             	}
             	else
             	{
-            		identifier = handle;
+            		identifier = "hdl:"+handle;
             	}
         		unauthorized.setHead(T_head_item);
                 unauthorized.addPara(T_para_item.parameterize(identifier));

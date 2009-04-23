@@ -1,9 +1,9 @@
 /*
  * DSpaceMETSGenerator.java
  *
- * Version: $Revision: 1.14 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/05/02 05:30:55 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -59,11 +59,9 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
-import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierService;
-import org.dspace.uri.IdentifierException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -158,70 +156,64 @@ public class DSpaceMETSGenerator extends AbstractGenerator
 	 * @return Return the correct adaptor or null if none found.
 	 */
 	private AbstractAdapter resolveAdapter(Context context) throws SQLException 
-	{
-        try {
-            Request request = ObjectModelHelper.getRequest(objectModel);
-            String contextPath = request.getContextPath();
+	{			
+		Request request = ObjectModelHelper.getRequest(objectModel);
+        String contextPath = request.getContextPath();
 
-            // Determine the correct adatper to use for this item
-            String uri = parameters.getParameter("handle",null);
-            String internal = parameters.getParameter("internal",null);
-
-            AbstractAdapter adapter = null;
-            if (uri != null)
-            {
-                ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
-                DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, ri);
-
-// Handles can be either items or containers.
-                if (dso instanceof Item)
-                    adapter = new ItemAdapter((Item) dso, contextPath);
-                else if (dso instanceof Collection || dso instanceof Community)
-                	adapter = new ContainerAdapter(context, dso, contextPath);
-            }
-            else if (internal != null)
-            {
-// Internal identifier, format: "type:id".
-                String[] parts = internal.split(":");
-
-                if (parts.length == 2)
-                {
-                    String type = parts[0];
-                    int id = Integer.valueOf(parts[1]);
-
-                    if ("item".equals(type))
-                    {
-                        Item item = Item.find(context,id);
-                        if (item != null)
-                            adapter = new ItemAdapter(item,contextPath);
-                    }
-                    else if ("collection".equals(type))
-                    {
-                        Collection collection = Collection.find(context,id);
-                        if (collection != null)
-                        	adapter = new ContainerAdapter(context, collection,contextPath);
-                    }
-                    else if ("community".equals(type))
-                    {
-                        Community community = Community.find(context,id);
-                        if (community != null)
-                        	adapter = new ContainerAdapter(context, community,contextPath);
-                    }
-                    else if ("repository".equals(type))
-                    {
-                        if (ConfigurationManager.getProperty("handle.prefix").equals(String.valueOf(id)))
-                            adapter = new RepositoryAdapter(context,contextPath);
-                    }
-
-                }
-            }
-            return adapter;
-        }
-        catch (IdentifierException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
+        // Determine the correct adatper to use for this item
+        String handle = parameters.getParameter("handle",null);
+        String internal = parameters.getParameter("internal",null);
+		
+        AbstractAdapter adapter = null;
+		 if (handle != null)
+         {
+			// Specified using a regular handle. 
+         	DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+         	
+         	// Handles can be either items or containers.
+         	if (dso instanceof Item)
+         		adapter = new ItemAdapter((Item) dso, contextPath);
+         	else if (dso instanceof Collection || dso instanceof Community)
+         		adapter = new ContainerAdapter(context, dso, contextPath);
+         }
+         else if (internal != null)
+         {
+        	// Internal identifier, format: "type:id".
+         	String[] parts = internal.split(":");
+         	
+         	if (parts.length == 2)
+         	{
+         		String type = parts[0];
+         		int id = Integer.valueOf(parts[1]);
+         		
+         		if ("item".equals(type))
+         		{
+         			Item item = Item.find(context,id);
+         			if (item != null)
+         				adapter = new ItemAdapter(item,contextPath);
+         		}
+         		else if ("collection".equals(type))
+         		{
+         			Collection collection = Collection.find(context,id);
+         			if (collection != null)
+         				adapter = new ContainerAdapter(context, collection,contextPath);
+         		}
+         		else if ("community".equals(type))
+         		{
+         			Community community = Community.find(context,id);
+         			if (community != null)
+         				adapter = new ContainerAdapter(context, community,contextPath);
+         		}
+         		else if ("repository".equals(type))
+     			{
+         			if (ConfigurationManager.getProperty("handle.prefix").equals(String.valueOf(id)))
+                        adapter = new RepositoryAdapter(context,contextPath);
+     			}
+         		
+         	}
+         }
+		 return adapter;
+	}
 	
 	/**
 	 * Configure the adapter according to the supplied parameters.

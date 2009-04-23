@@ -1528,7 +1528,7 @@ public class DatabaseManager
             {
                 maxIdle = -1;
             }
-            
+
             boolean useStatementPool = ConfigurationManager.getBooleanProperty("db.statementpool",true);
 
             // Create object pool

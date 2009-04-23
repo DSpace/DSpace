@@ -66,6 +66,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.FormatIdentifier;
+import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -162,7 +163,7 @@ public class JSPUploadStep extends JSPStep
             Collection c = subInfo.getSubmissionItem().getCollection();
             DCInputsReader inputsReader = new DCInputsReader();
             request.setAttribute("submission.inputs", inputsReader.getInputs(c
-                    .getIdentifier().getCanonicalForm()));
+                    .getHandle()));
         }
 
         // show whichever upload page is appropriate
@@ -215,7 +216,7 @@ public class JSPUploadStep extends JSPStep
                 showUploadFileList(context, request, response, subInfo, true,
                         false);
             }
-
+            
             return; // return immediately, since we are skipping upload
         }
         
@@ -249,14 +250,14 @@ public class JSPUploadStep extends JSPStep
                     showUploadPage(context, request, response, subInfo, false);
                 }
                 else
-                {    
-                    // So, we need to show the file upload error page
+                {
+                    // We need to show the file upload error page
                     if (subInfo != null)
                     {
                         Collection c = subInfo.getSubmissionItem().getCollection();
                         DCInputsReader inputsReader = new DCInputsReader();
                         request.setAttribute("submission.inputs", inputsReader
-                                .getInputs(c.getIdentifier().getCanonicalForm()));
+                                .getInputs(c.getHandle()));
                     }
                     JSPStepManager.showJSP(request, response, subInfo, UPLOAD_ERROR_JSP);
                 }
@@ -269,7 +270,7 @@ public class JSPUploadStep extends JSPStep
                 showGetFileFormat(context, request, response, subInfo);
             }
         }
-
+        
         // As long as there are no errors, clicking Next
         // should immediately send them to the next step
         if (status == UploadStep.STATUS_COMPLETE && buttonPressed.equals(UploadStep.NEXT_BUTTON))
@@ -422,6 +423,10 @@ public class JSPUploadStep extends JSPStep
             throws SQLException, ServletException, IOException
     {
 
+        // set to null the bitstream in subInfo, we need to process a new file
+        // we don't need any info about previous files...
+        subInfo.setBitstream(null);
+        
         // load JSP which allows the user to select a file to upload
         JSPStepManager.showJSP(request, response, subInfo, CHOOSE_FILE_JSP);
     }

@@ -1,9 +1,9 @@
 /*
  * ManageGroupsMain.java
  *
- * Version: $Revision: 1.0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,6 +39,8 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.group;
 
+import java.sql.SQLException;
+
 import org.dspace.app.xmlui.aspect.administrative.FlowGroupUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -55,9 +57,6 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Collection;
 import org.dspace.eperson.Group;
-import org.dspace.uri.IdentifierService;
-
-import java.sql.SQLException;
 
 /**
  * Manage groups page is the entry point for group management. From here the user
@@ -153,9 +152,7 @@ public class ManageGroupsMain extends AbstractDSpaceTransformer
 		String query    = URLDecode(parameters.getParameter("query",""));
 		int page        = parameters.getParameterAsInteger("page",0);
 		int highlightID = parameters.getParameterAsInteger("highlightID",-1);
-        // FIXME: Bad!
-//        int resultCount = Group.searchResultCount(context, query);
-        int resultCount = Group.search(context, query).length;
+        int resultCount = Group.searchResultCount(context, query);
         Group[] groups  = Group.search(context, query, page*PAGE_SIZE, PAGE_SIZE);
 		
 		
@@ -266,7 +263,7 @@ public class ManageGroupsMain extends AbstractDSpaceTransformer
 	        		Highlight highlight = cell.addHighlight("fade");
 	        		
 	        		highlight.addContent("[");
-	        		highlight.addXref(IdentifierService.getURL(collection).toString(), T_collection_link);
+	        		highlight.addXref(contextPath+"/handle/"+collection.getHandle(), T_collection_link);
 	        		highlight.addContent("]");
         		}
         	}

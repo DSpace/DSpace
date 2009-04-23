@@ -49,12 +49,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
-import org.dspace.app.util.SubmissionConfig;
-import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.webui.util.JSPManager;
-import org.dspace.app.webui.util.UIUtil;
 import org.dspace.app.itemexport.ItemExport;
+import org.dspace.app.itemexport.ItemExportException;
+import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.util.SubmissionConfig;
+import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -62,19 +62,15 @@ import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.SupervisedItem;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.content.dao.WorkspaceItemDAO;
-import org.dspace.content.dao.WorkspaceItemDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.handle.HandleManager;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
-import org.dspace.workflow.dao.WorkflowItemDAO;
-import org.dspace.workflow.dao.WorkflowItemDAOFactory;
-import org.dspace.uri.IdentifierService;
 
 /**
  * Servlet for constructing the components of the "My DSpace" page
@@ -105,6 +101,9 @@ public class MyDSpaceServlet extends DSpaceServlet
     
     /** The "request export archive for download" page */
     public static final int REQUEST_EXPORT_ARCHIVE = 5;
+
+    /** The "request export migrate archive for download" page */
+    public static final int REQUEST_MIGRATE_ARCHIVE = 6;
 
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -144,17 +143,23 @@ public class MyDSpaceServlet extends DSpaceServlet
             break;
 
         case REJECT_REASON_PAGE:
-        	processRejectReason(context, request, response);
+            processRejectReason(context, request, response);
 
-        	break;
+            break;
         case REQUEST_EXPORT_ARCHIVE:
-        	processExportArchive(context, request, response);
+            processExportArchive(context, request, response, false);
 
-        	break;
+            break;
+
+        case REQUEST_MIGRATE_ARCHIVE:
+            processExportArchive(context, request, response, true);
+
+            break;
+
         default:
-        	log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-        			.getRequestLogInfo(request)));
-        JSPManager.showIntegrityError(request, response);
+            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+                    .getRequestLogInfo(request)));
+            JSPManager.showIntegrityError(request, response);
         }
     }
 
@@ -167,9 +172,6 @@ public class MyDSpaceServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        WorkflowItemDAO wfDAO = WorkflowItemDAOFactory.getInstance(context);
-        WorkspaceItemDAO wsDAO = WorkspaceItemDAOFactory.getInstance(context);
-
         String buttonPressed = UIUtil.getSubmitButton(request, "submit_own");
 
         // Get workspace item, if any
@@ -178,7 +180,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         try
         {
             int wsID = Integer.parseInt(request.getParameter("workspace_id"));
-            workspaceItem = wsDAO.retrieve(wsID);
+            workspaceItem = WorkspaceItem.find(context, wsID);
         }
         catch (NumberFormatException nfe)
         {
@@ -191,7 +193,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         try
         {
             int wfID = Integer.parseInt(request.getParameter("workflow_id"));
-            workflowItem = wfDAO.retrieve(wfID);
+            workflowItem = WorkflowItem.find(context, wfID);
         }
         catch (NumberFormatException nfe)
         {
@@ -459,11 +461,17 @@ public class MyDSpaceServlet extends DSpaceServlet
             WorkflowManager.advance(context, workflowItem, context
                     .getCurrentUser());
 
-            if (item.isArchived())
-            {
-                String uri = IdentifierService.getURL(item).toString();
+            // FIXME: This should be a return value from advance()
+            // See if that gave the item a Handle. If it did,
+            // the item made it into the archive, so we
+            // should display a suitable page.
+            String handle = HandleManager.findHandle(context, item);
 
-                request.setAttribute("identifier", uri);
+            if (handle != null)
+            {
+                String displayHandle = HandleManager.getCanonicalForm(handle);
+
+                request.setAttribute("handle", displayHandle);
                 JSPManager.showJSP(request, response,
                         "/mydspace/in-archive.jsp");
             }
@@ -566,7 +574,7 @@ public class MyDSpaceServlet extends DSpaceServlet
             Collection c = wsi.getCollection();
             SubmissionConfigReader subConfigReader = new SubmissionConfigReader();
             SubmissionConfig subConfig = subConfigReader.getSubmissionConfig(c
-                    .getIdentifier().getCanonicalForm(), false);
+                    .getHandle(), false);
 
             // Set the "stage_reached" column on the workspace item
             // to the LAST page of the LAST step in the submission process
@@ -587,6 +595,117 @@ public class MyDSpaceServlet extends DSpaceServlet
         }
     }
 
+    private void processExportArchive(Context context,
+            HttpServletRequest request, HttpServletResponse response, boolean migrate) throws ServletException, IOException{
+    	
+    	if (request.getParameter("item_id") != null) {
+			Item item = null;
+			try {
+				item = Item.find(context, Integer.parseInt(request
+						.getParameter("item_id")));
+			} catch (Exception e) {
+				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+	                    .getRequestLogInfo(request)));
+	            JSPManager.showIntegrityError(request, response);
+	            return;
+			}
+
+			if (item == null) {
+				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+	                    .getRequestLogInfo(request)));
+	            JSPManager.showIntegrityError(request, response);
+	            return;
+			} else {
+				try {
+					ItemExport.createDownloadableExport(item, context, migrate);
+				} catch (ItemExportException iee) {
+                    log.warn(LogManager.getHeader(context, "export_too_large_error", UIUtil
+		                    .getRequestLogInfo(request)));
+		            JSPManager.showJSP(request, response, "/mydspace/export-error.jsp");
+		            return;
+                }
+                catch (Exception e) {
+                    log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+		                    .getRequestLogInfo(request)));
+		            JSPManager.showIntegrityError(request, response);
+		            return;
+				}
+			}
+			
+			// success
+			JSPManager.showJSP(request, response, "/mydspace/task-complete.jsp");
+		} else if (request.getParameter("collection_id") != null) {
+			Collection col = null;
+			try {
+				col = Collection.find(context, Integer.parseInt(request
+						.getParameter("collection_id")));
+			} catch (Exception e) {
+				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+	                    .getRequestLogInfo(request)));
+	            JSPManager.showIntegrityError(request, response);
+	            return;
+			}
+
+			if (col == null) {
+				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+	                    .getRequestLogInfo(request)));
+	            JSPManager.showIntegrityError(request, response);
+	            return;
+			} else {
+				try {
+					ItemExport.createDownloadableExport(col, context, migrate);
+				} catch (ItemExportException iee) {
+                    log.warn(LogManager.getHeader(context, "export_too_large_error", UIUtil
+		                    .getRequestLogInfo(request)));
+		            JSPManager.showJSP(request, response, "/mydspace/export-error.jsp");
+		            return;
+                }
+                catch (Exception e) {
+					log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+		                    .getRequestLogInfo(request)));
+		            JSPManager.showIntegrityError(request, response);
+		            return;
+				}
+			}
+			JSPManager.showJSP(request, response, "/mydspace/task-complete.jsp");
+		} else if (request.getParameter("community_id") != null) {
+			Community com = null;
+			try {
+				com = Community.find(context, Integer.parseInt(request
+						.getParameter("community_id")));
+			} catch (Exception e) {
+				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+	                    .getRequestLogInfo(request)));
+	            JSPManager.showIntegrityError(request, response);
+	            return;
+			}
+
+			if (com == null) {
+				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+	                    .getRequestLogInfo(request)));
+	            JSPManager.showIntegrityError(request, response);
+	            return;
+			} else {
+				try {
+					org.dspace.app.itemexport.ItemExport.createDownloadableExport(com, context, migrate);
+				} catch (ItemExportException iee) {
+                    log.warn(LogManager.getHeader(context, "export_too_large_error", UIUtil
+		                    .getRequestLogInfo(request)));
+		            JSPManager.showJSP(request, response, "/mydspace/export-error.jsp");
+		            return;
+                }
+                catch (Exception e) {
+					log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
+		                    .getRequestLogInfo(request)));
+		            JSPManager.showIntegrityError(request, response);
+		            return;
+				}
+			}
+			JSPManager.showJSP(request, response, "/mydspace/task-complete.jsp");
+		}
+    	
+    	
+    }
     // ****************************************************************
     // ****************************************************************
     // METHODS FOR SHOWING FORMS
@@ -634,7 +753,16 @@ public class MyDSpaceServlet extends DSpaceServlet
 
         SupervisedItem[] supervisedItems = SupervisedItem.findbyEPerson(
                 context, currentUser);
-
+        // export archives available for download
+        List<String> exportArchives = null;
+        try{
+        	exportArchives = ItemExport.getExportsAvailable(currentUser);
+        }
+        catch (Exception e) {
+			// nothing to do they just have no export archives available for download
+		}
+        
+        
         // Set attributes
         request.setAttribute("mydspace.user", currentUser);
         request.setAttribute("workspace.items", workspaceItems);
@@ -644,6 +772,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         request.setAttribute("group.memberships", memberships);
         request.setAttribute("display.groupmemberships", new Boolean(displayMemberships));
         request.setAttribute("supervised.items", supervisedItems);
+        request.setAttribute("export.archives", exportArchives);
 
         // Forward to main mydspace page
         JSPManager.showJSP(request, response, "/mydspace/main.jsp");
@@ -696,99 +825,5 @@ public class MyDSpaceServlet extends DSpaceServlet
         request.setAttribute("items", items);
 
         JSPManager.showJSP(request, response, "/mydspace/own-submissions.jsp");
-    }
-
-    private void processExportArchive(Context context,
-    		HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
-
-    	if (request.getParameter("item_id") != null) {
-    		Item item = null;
-    		try {
-    			item = Item.find(context, Integer.parseInt(request
-    					.getParameter("item_id")));
-    		} catch (Exception e) {
-    			log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-    					.getRequestLogInfo(request)));
-    			JSPManager.showIntegrityError(request, response);
-    			return;
-    		}
-
-    		if (item == null) {
-    			log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-    					.getRequestLogInfo(request)));
-    			JSPManager.showIntegrityError(request, response);
-    			return;
-    		} else {
-    			try {
-    				ItemExport.createDownloadableExport(item, context);
-    			} catch (Exception e) {
-    				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-    						.getRequestLogInfo(request)));
-    				JSPManager.showIntegrityError(request, response);
-    				return;
-    			}
-    		}
-
-    		// success
-    		JSPManager.showJSP(request, response, "/mydspace/task-complete.jsp");
-    	} else if (request.getParameter("collection_id") != null) {
-    		Collection col = null;
-    		try {
-    			col = Collection.find(context, Integer.parseInt(request
-    					.getParameter("collection_id")));
-    		} catch (Exception e) {
-    			log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-    					.getRequestLogInfo(request)));
-    			JSPManager.showIntegrityError(request, response);
-    			return;
-    		}
-
-    		if (col == null) {
-    			log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-    					.getRequestLogInfo(request)));
-    			JSPManager.showIntegrityError(request, response);
-    			return;
-    		} else {
-    			try {
-    				ItemExport.createDownloadableExport(col, context);
-    			} catch (Exception e) {
-    				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-    						.getRequestLogInfo(request)));
-    				JSPManager.showIntegrityError(request, response);
-    				return;
-    			}
-    		}
-    		JSPManager.showJSP(request, response, "/mydspace/task-complete.jsp");
-    	} else if (request.getParameter("community_id") != null) {
-    		Community com = null;
-    		try {
-    			com = Community.find(context, Integer.parseInt(request
-    					.getParameter("community_id")));
-    		} catch (Exception e) {
-    			log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-    					.getRequestLogInfo(request)));
-    			JSPManager.showIntegrityError(request, response);
-    			return;
-    		}
-
-    		if (com == null) {
-    			log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-    					.getRequestLogInfo(request)));
-    			JSPManager.showIntegrityError(request, response);
-    			return;
-    		} else {
-    			try {
-    				org.dspace.app.itemexport.ItemExport.createDownloadableExport(com, context);
-    			} catch (Exception e) {
-    				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-    						.getRequestLogInfo(request)));
-    				JSPManager.showIntegrityError(request, response);
-    				return;
-    			}
-    		}
-    		JSPManager.showJSP(request, response, "/mydspace/task-complete.jsp");
-    	}
-
-
     }
 }

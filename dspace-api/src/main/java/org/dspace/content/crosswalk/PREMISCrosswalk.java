@@ -55,10 +55,6 @@ import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
-import org.dspace.content.dao.BitstreamDAO;
-import org.dspace.content.dao.BitstreamDAOFactory;
-import org.dspace.content.dao.BitstreamFormatDAO;
-import org.dspace.content.dao.BitstreamFormatDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -108,9 +104,6 @@ public class PREMISCrosswalk
     public void ingest(Context context, DSpaceObject dso, List ml)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
-        BitstreamDAO bsDAO = BitstreamDAOFactory.getInstance(context);
-        BitstreamFormatDAO bfDAO = BitstreamFormatDAOFactory.getInstance(context);
-
         // we only understand how to crosswalk PREMIS to a Bitstream.
         if (dso.getType() != Constants.BITSTREAM)
             throw new CrosswalkObjectNotSupported("Wrong target object type, PREMISCrosswalk can only crosswalk to a Bitstream.");
@@ -200,7 +193,7 @@ public class PREMISCrosswalk
                 // get it from that, otherwise try to divine from file extension
                 // (guessFormat() looks at bitstream Name, which we just set)
                 BitstreamFormat bf = (MIMEType == null) ? null :
-                        bfDAO.retrieveByMimeType(MIMEType);
+                        BitstreamFormat.findByMIMEType(context, MIMEType);
                 if (bf == null)
                     bf = FormatIdentifier.guessFormat(context, bitstream);
                 if (bf != null)
@@ -209,8 +202,7 @@ public class PREMISCrosswalk
             else
                 log.debug("Skipping element: "+me.toString());
         }
-
-        bsDAO.update(bitstream);
+        bitstream.update();
     }
 
     /*----------- Dissemination functions -------------------*/
@@ -259,14 +251,14 @@ public class PREMISCrosswalk
         //  c. made-up name based on sequence ID and extension.
         String sid = String.valueOf(bitstream.getSequenceID());
         String baseUrl = ConfigurationManager.getProperty("dspace.url");
-        String uri = null;
-        // get uri of parent Item of this bitstream, if there is one:
+        String handle = null;
+        // get handle of parent Item of this bitstream, if there is one:
         Bundle[] bn = bitstream.getBundles();
         if (bn.length > 0)
         {
             Item bi[] = bn[0].getItems();
             if (bi.length > 0)
-                uri = bi[0].getIdentifier().getCanonicalForm();
+                handle = bi[0].getHandle();
         }
         // get or make up name for bitstream:
         String bsName = bitstream.getName();
@@ -275,10 +267,10 @@ public class PREMISCrosswalk
             String ext[] = bitstream.getFormat().getExtensions();
             bsName = "bitstream_"+sid+ (ext.length > 0 ? ext[0] : "");
         }
-        if (uri != null && baseUrl != null)
+        if (handle != null && baseUrl != null)
             oiv.setText(baseUrl
                     + "/bitstream/"
-                    + URLEncoder.encode(uri, "UTF-8")
+                    + URLEncoder.encode(handle, "UTF-8")
                     + "/"
                     + sid
                     + "/"

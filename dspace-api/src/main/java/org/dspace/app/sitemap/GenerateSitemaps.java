@@ -1,9 +1,9 @@
 /*
  * GenerateSitemaps.java
  *
- * Version: $Revision: 1.1 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/03/17 00:04:38 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2006, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -65,11 +65,10 @@ import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.uri.IdentifierService;
 
 /**
  * Command-line utility for generating HTML and Sitemaps.org protocol Sitemaps.
- *
+ * 
  * @author Robert Tansley
  * @author Stuart Lewis
  */
@@ -167,7 +166,7 @@ public class GenerateSitemaps
 
     /**
      * Generate sitemap.org protocol and/or basic HTML sitemaps.
-     *
+     * 
      * @param makeHTMLMap
      *            if {@code true}, generate an HTML sitemap.
      * @param makeSitemapOrg
@@ -184,13 +183,14 @@ public class GenerateSitemaps
                 + "/sitemap";
         String htmlMapStem = ConfigurationManager.getProperty("dspace.url")
                 + "/htmlmap";
+        String handleURLStem = ConfigurationManager.getProperty("dspace.url")
+                + "/handle/";
 
-        File outputDir = new File(ConfigurationManager
-                .getProperty("dspace.dir"), "sitemaps");
+        File outputDir = new File(ConfigurationManager.getProperty("sitemap.dir"));
         if (!outputDir.exists()) {
         	outputDir.mkdir();
         }
-
+        
         AbstractGenerator html = null;
         AbstractGenerator sitemapsOrg = null;
 
@@ -212,7 +212,7 @@ public class GenerateSitemaps
 
         for (int i = 0; i < comms.length; i++)
         {
-            String url = IdentifierService.getURL(comms[i]).toString();
+            String url = handleURLStem + comms[i].getHandle();
 
             if (makeHTMLMap)
                 html.addURL(url, null);
@@ -224,7 +224,7 @@ public class GenerateSitemaps
 
         for (int i = 0; i < colls.length; i++)
         {
-            String url = IdentifierService.getURL(colls[i]).toString();
+            String url = handleURLStem + colls[i].getHandle();
 
             if (makeHTMLMap)
                 html.addURL(url, null);
@@ -240,7 +240,7 @@ public class GenerateSitemaps
             while (allItems.hasNext())
             {
                 Item i = allItems.next();
-                String url = IdentifierService.getURL(i).toString();
+                String url = handleURLStem + i.getHandle();
                 Date lastMod = i.getLastModified();
 
                 if (makeHTMLMap)
@@ -275,7 +275,7 @@ public class GenerateSitemaps
             if (allItems != null)
                 allItems.close();
         }
-
+        
         c.abort();
     }
 

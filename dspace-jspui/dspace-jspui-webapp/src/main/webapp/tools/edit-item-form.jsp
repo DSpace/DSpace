@@ -44,7 +44,7 @@
   - Attributes:
   -    item        - item to edit
   -    collections - collections the item is in, if any
-  -    uri         - item's URI, if any (canonical form -- String)
+  -    handle      - item's Handle, if any (String)
   -    dc.types    - MetadataField[] - all metadata fields in the registry
   --%>
 
@@ -55,28 +55,30 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="org.dspace.app.webui.servlet.admin.EditItemServlet" %>
-<%@ page import="org.dspace.content.Bitstream" %>
-<%@ page import="org.dspace.content.BitstreamFormat" %>
-
-<%@ page import="org.dspace.content.Bundle" %>
-<%@ page import="org.dspace.content.Collection" %>
-
-<%@ page import="org.dspace.content.DCDate" %>
-<%@ page import="org.dspace.content.DCValue" %>
-<%@ page import="org.dspace.content.Item" %>
-<%@ page import="org.dspace.content.MetadataField" %>
-<%@ page import="org.dspace.core.ConfigurationManager" %>
-<%@ page import="org.dspace.eperson.EPerson" %>
-<%@ page import="org.dspace.uri.IdentifierService" %>
-<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="java.util.Date" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
 
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="javax.servlet.jsp.PageContext" %>
+
+<%@ page import="org.dspace.content.MetadataField" %>
+<%@ page import="org.dspace.app.webui.servlet.admin.AuthorizeAdminServlet" %>
+<%@ page import="org.dspace.app.webui.servlet.admin.EditItemServlet" %>
+<%@ page import="org.dspace.content.Bitstream" %>
+<%@ page import="org.dspace.content.BitstreamFormat" %>
+<%@ page import="org.dspace.content.Bundle" %>
+<%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.content.DCDate" %>
+<%@ page import="org.dspace.content.DCValue" %>
+<%@ page import="org.dspace.content.Item" %>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.eperson.EPerson" %>
+<%@ page import="org.dspace.core.Utils" %>
+
 <%
     Item item = (Item) request.getAttribute("item");
-    String uri = item.getIdentifier().getCanonicalForm();
-    String link = IdentifierService.getURL(item).toString();
+    String handle = (String) request.getAttribute("handle");
     Collection[] collections = (Collection[]) request.getAttribute("collections");
     MetadataField[] dcTypes = (MetadataField[])  request.getAttribute("dc.types");
     HashMap metadataFields = (HashMap) request.getAttribute("metadataFields");
@@ -162,8 +164,9 @@
                 </td>
             </tr>
             <tr>
-				<td class="submitFormLabel"><fmt:message key="jsp.tools.edit-item-form.uri"/></td>
-                <td class="standard"><%= (uri == null ? "None" : uri) %></td>
+                <%-- <td class="submitFormLabel">Handle:</td> --%>
+				<td class="submitFormLabel"><fmt:message key="jsp.tools.edit-item-form.handle"/></td>
+                <td class="standard"><%= (handle == null ? "None" : handle) %></td>
             </tr>
             <tr>
                 <%-- <td class="submitFormLabel">Last modified:</td> --%>
@@ -184,10 +187,11 @@
                 <%-- <td class="submitFormLabel">Item page:</td> --%>
 				<td class="submitFormLabel"><fmt:message key="jsp.tools.edit-item-form.itempage"/></td>
                 <td class="standard">
-<%  if (link == null) { %>
+<%  if (handle == null) { %>
                     <em><fmt:message key="jsp.tools.edit-item-form.na"/></em>
-<%  } else { %>
-                    <a target="_blank" href="<%= link %>"><%= link %></a>
+<%  } else {
+    String url = ConfigurationManager.getProperty("dspace.url") + "/handle/" + handle; %>
+                    <a target="_blank" href="<%= url %>"><%= url %></a>
 <%  } %>
                 </td>
             </tr>
@@ -199,7 +203,7 @@
 				<td class="submitFormLabel"><fmt:message key="jsp.tools.edit-item-form.item"/></td>
                 <td>
                     <form method="post" action="<%= request.getContextPath() %>/dspace-admin/authorize">
-                        <input type="hidden" name="uri" value="<%= uri %>" />
+                        <input type="hidden" name="handle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>" />
                         <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                         <%-- <input type="submit" name="submit_item_select" value="Edit..."> --%>
 						<input type="submit" name="submit_item_select" value="<fmt:message key="jsp.tools.general.edit"/>"/>
@@ -280,7 +284,7 @@
                 <td headers="t1" class="<%= row %>RowEvenCol"><%= dcv[i].element %>&nbsp;&nbsp;</td>
                 <td headers="t2" class="<%= row %>RowOddCol"><%= (dcv[i].qualifier == null ? "" : dcv[i].qualifier) %></td>
                 <td headers="t3" class="<%= row %>RowEvenCol">
-                    <textarea name="value_<%= key %>_<%= sequenceNumber %>" rows="3" cols="50"><%= dcv[i].value %></textarea>
+                    <textarea name="value_<%= key %>_<%= sequenceNumber %>" rows="3" cols="50"><%= Utils.addEntities(dcv[i].value) %></textarea>
                 </td>
                 <td headers="t4" class="<%= row %>RowOddCol">
                     <input type="text" name="language_<%= key %>_<%= sequenceNumber %>" value="<%= (dcv[i].language == null ? "" : dcv[i].language) %>" size="5"/>
@@ -301,7 +305,7 @@
                     <select name="addfield_dctype">
 <%  for (int i = 0; i < dcTypes.length; i++) 
     { 
-    	Integer fieldID = new Integer(dcTypes[i].getID());
+    	Integer fieldID = new Integer(dcTypes[i].getFieldID());
     	String displayName = (String)metadataFields.get(fieldID);
 %>
                         <option value="<%= fieldID.intValue() %>"><%= displayName %></option>
@@ -380,19 +384,19 @@
 		     <td headers="t11"> </td>
 		<% } %>
                 <td headers="t12" class="<%= row %>RowOddCol">
-                    <input type="text" name="bitstream_name_<%= key %>" value="<%= (bitstreams[j].getName() == null ? "" : bitstreams[j].getName()) %>"/>
+                    <input type="text" name="bitstream_name_<%= key %>" value="<%= (bitstreams[j].getName() == null ? "" : Utils.addEntities(bitstreams[j].getName())) %>"/>
                 </td>
                 <td headers="t13" class="<%= row %>RowEvenCol">
                     <input type="text" name="bitstream_source_<%= key %>" value="<%= (bitstreams[j].getSource() == null ? "" : bitstreams[j].getSource()) %>"/>
                 </td>
                 <td headers="t14" class="<%= row %>RowOddCol">
-                    <input type="text" name="bitstream_description_<%= key %>" value="<%= (bitstreams[j].getDescription() == null ? "" : bitstreams[j].getDescription()) %>"/>
+                    <input type="text" name="bitstream_description_<%= key %>" value="<%= (bitstreams[j].getDescription() == null ? "" : Utils.addEntities(bitstreams[j].getDescription())) %>"/>
                 </td>
                 <td headers="t15" class="<%= row %>RowEvenCol">
-                    <input type="text" name="bitstream_format_id_<%= key %>" value="<%= bf.getID() %>" size="4"/> (<%= bf.getShortDescription() %>)
+                    <input type="text" name="bitstream_format_id_<%= key %>" value="<%= bf.getID() %>" size="4"/> (<%= Utils.addEntities(bf.getShortDescription()) %>)
                 </td>
                 <td headers="t16" class="<%= row %>RowOddCol">
-                    <input type="text" name="bitstream_user_format_description_<%= key %>" value="<%= (bitstreams[j].getUserFormatDescription() == null ? "" : bitstreams[j].getUserFormatDescription()) %>"/>
+                    <input type="text" name="bitstream_user_format_description_<%= key %>" value="<%= (bitstreams[j].getUserFormatDescription() == null ? "" : Utils.addEntities(bitstreams[j].getUserFormatDescription())) %>"/>
                 </td>
                 <td headers="t17" class="<%= row %>RowEvenCol">
                     <%-- <a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>">View</a>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="Remove"> --%>
@@ -423,7 +427,7 @@
 				s = ccBundle.length > 0 ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-item-form.replacecc.button") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.edit-item-form.addcc.button");
 		%>
                     <input type="submit" name="submit_addcc" value="<%= s %>" />
-                    <!-- input type="hidden" name="uri" value="<%= uri %>"/ -->
+                    <input type="hidden" name="handle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>"/>
                     <input type="hidden" name="item_id" value="<%= item.getID() %>"/>
        <%
 			}

@@ -1,9 +1,9 @@
 /*
  * Statistics.java
  *
- * Version: $Revision: 1.0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2007/08/28 10:00:00 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -123,8 +123,15 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
                 // If the report isn't public
                 if (!showReport)
                 {
-                    // Administrators can always view reports
-                    showReport = AuthorizeManager.isAdmin(context);
+                    try
+                    {
+                        // Administrators can always view reports
+                        showReport = AuthorizeManager.isAdmin(context);
+                    }
+                    catch (SQLException sqle)
+                    {
+                        log.error("Unable to check for administrator", sqle);
+                    }
                 }
 
                 // Only generate a validity if the report is visible
@@ -459,20 +466,20 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
                     Row row = block.addRow();
                     if (stats[i].getReference() != null)
                     {
-                        row.addCell().addXref(stats[i].getReference()).addContent(stats[i].getKey());
+                        row.addCell().addXref(stats[i].getReference()).addContent(label(stats[i].getKey()));
                     }
                     else
                     {
-                        row.addCell().addContent(stats[i].getKey());
+                        row.addCell().addContent(label(stats[i].getKey()));
                     }
 
                     if (stats[i].getUnits() != null)
                     {
-                        row.addCell(null, null, "right").addContent(stats[i].getValue() + " " + stats[i].getUnits());
+                        row.addCell(null, null, "right").addContent(entry(stats[i].getValue() + " " + stats[i].getUnits()));
                     }
                     else
                     {
-                        row.addCell(null, null, "right").addContent(ReportTools.numberFormat(stats[i].getValue()));
+                        row.addCell(null, null, "right").addContent(entry(ReportTools.numberFormat(stats[i].getValue())));
                     }
                 }
             }
@@ -629,5 +636,27 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         {
             this.end = end;
         }
+    }
+    
+    
+    /**
+     * Protect the display from excessively wrong data, typically this occures if a long word finds it's way 
+     * into the data that is not breakable by the browser because there is no space, dash, period, or other 
+     * delimiter character. This just prevents the page from blowing up when bad data is being presented.
+     */
+    private static final int MAX_ENTRY_LENGTH = 50;
+    private static String entry(String entry) 
+    {
+    	if (entry != null && entry.length() > MAX_ENTRY_LENGTH)
+    		entry = entry.substring(0,MAX_ENTRY_LENGTH-3) + "...";
+    	return entry;
+    }
+    
+    private static final int MAX_LABEL_LENGTH = 100;
+    private static String label(String label) 
+    {
+    	if (label != null && label.length() > MAX_LABEL_LENGTH)
+    		label = label.substring(0,MAX_LABEL_LENGTH-3) + "...";
+    	return label;
     }
 }

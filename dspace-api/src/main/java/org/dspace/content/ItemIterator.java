@@ -42,14 +42,11 @@ package org.dspace.content;
 import java.sql.SQLException;
 
 import java.util.Iterator;
-import java.util.List;
+import java.util.ArrayList;
 
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
-
-import org.dspace.content.dao.ItemDAO;
-import org.dspace.content.dao.ItemDAOFactory;
 
 /**
  * Specialized iterator for DSpace Items. This iterator is used for loading
@@ -59,9 +56,6 @@ import org.dspace.content.dao.ItemDAOFactory;
  *
  * Note that this class is not a real Iterator, as it does not implement
  * the Iterator interface
- *
- * FIXME: I want to bin this class. It's more or less utterly pointless now we
- * have ItemProxy. -- James Rutherford
  * 
  * @author Robert Tansley
  * @author Richard Jones
@@ -81,8 +75,6 @@ public class ItemIterator
 
     /** a real iterator which works over the item ids when present */
     private Iterator iditr;
-
-    private ItemDAO dao;
     
     /**
      * Construct an item iterator using a set of TableRow objects from
@@ -97,7 +89,6 @@ public class ItemIterator
     {
         ourContext = context;
         itemRows = rows;
-        dao = ItemDAOFactory.getInstance(context);
     }
 
     /**
@@ -108,11 +99,10 @@ public class ItemIterator
      * @param iids
      *            the array list to be iterated over
      */
-    public ItemIterator(Context context, List iids)
+    public ItemIterator(Context context, ArrayList iids)
     {
     	ourContext = context;
     	iditr = iids.iterator();
-        dao = ItemDAOFactory.getInstance(context);
     }
     
     /**
@@ -178,7 +168,7 @@ public class ItemIterator
             }
             else
             {
-                return dao.retrieve(id);
+                return Item.find(ourContext, id);
             }
         }
         else
@@ -257,10 +247,23 @@ public class ItemIterator
     private Item nextByRow()
     	throws SQLException
     {
-        ItemDAO dao = ItemDAOFactory.getInstance(ourContext);
     	if (itemRows.hasNext())
         {
-            return dao.retrieve(itemRows.next().getIntColumn("item_id"));
+            // Convert the row into an Item object
+            TableRow row = itemRows.next();
+
+            // Check cache
+            Item fromCache = (Item) ourContext.fromCache(Item.class, row
+                    .getIntColumn("item_id"));
+
+            if (fromCache != null)
+            {
+                return fromCache;
+            }
+            else
+            {
+                return new Item(ourContext, row);
+            }
         }
         else
         {

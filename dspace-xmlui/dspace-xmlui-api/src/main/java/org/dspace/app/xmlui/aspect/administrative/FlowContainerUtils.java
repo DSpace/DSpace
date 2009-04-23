@@ -1,9 +1,9 @@
 /*
  * FlowContainerUtils.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -273,21 +273,11 @@ public class FlowContainerUtils
 		// First, Unregister the role
 		if (ROLE_ADMIN.equals(roleName))
 		{
-			// FIXME: This should unregister this role from the collection 
-			// object however there is no method available to do this. Once 
-			// Manakin is integrated into dspace this situatiotion should be 
-			// resolved.
-			
-			throw new UIException("This operation can not be preformed untill the DSpace API is modified to enable the removal of collection administrators.");
+			collection.removeAdministrators();
 		} 
 		else if (ROLE_SUBMIT.equals(roleName))
 		{
-			// FIXME: This should unregister this role from the collection 
-			// object however there is no method available to do this. Once 
-			// Manakin is integrated into dspace this situatiotion should be 
-			// resolved.
-			
-			throw new UIException("This operation can not be preformed untill the DSpace API is modified to enable the removal of collection submitters.");
+			collection.removeSubmitters();
 		}
 		else if (ROLE_WF_STEP1.equals(roleName))
 		{	

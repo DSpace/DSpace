@@ -39,14 +39,18 @@
  */
 package org.dspace.authenticate;
 
+import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 /**
  * A stackable authentication method
@@ -86,6 +90,7 @@ public class PasswordAuthentication
     public boolean canSelfRegister(Context context,
                                    HttpServletRequest request,
                                    String email)
+                                                 throws SQLException
     {
         // Is there anything set in authentication.password.domain.valid?
         String domains = ConfigurationManager.getProperty("authentication.password.domain.valid");
@@ -120,6 +125,7 @@ public class PasswordAuthentication
      */
     public void initEPerson(Context context, HttpServletRequest request,
             EPerson eperson)
+        throws SQLException
     {
     }
 
@@ -129,6 +135,7 @@ public class PasswordAuthentication
     public boolean allowSetPassword(Context context,
                                     HttpServletRequest request,
                                     String username)
+        throws SQLException
     {
         return true;
     }
@@ -144,11 +151,39 @@ public class PasswordAuthentication
     }
 
     /**
-     * No special groups.
+     * Add authenticated users to the group defined in dspace.cfg by
+     * the password.login.specialgroup key.
      */
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
     {
-        return new int[0];
+        // Prevents anonymous users from being added to this group, and the second check
+		// ensures they are password users
+		try
+		{
+			if (!context.getCurrentUser().getMetadata("password").equals(""))
+			{
+				String groupName = ConfigurationManager.getProperty("password.login.specialgroup");
+				if ((groupName != null) && (!groupName.trim().equals("")))
+				{
+				    Group specialGroup = Group.findByName(context, groupName);
+					if (specialGroup == null)
+					{
+						// Oops - the group isn't there.
+						log.warn(LogManager.getHeader(context,
+								"password_specialgroup",
+								"Group defined in password.login.specialgroup does not exist"));
+						return new int[0];
+					} else
+					{
+						return new int[] { specialGroup.getID() };
+					}
+				}
+			}
+		}
+		catch (Exception e) {
+			// The user is not a password user, so we don't need to worry about them
+		}
+		return new int[0];
     }
 
     /**
@@ -189,12 +224,20 @@ public class PasswordAuthentication
                             String password,
                             String realm,
                             HttpServletRequest request)
+        throws SQLException
     {
         if (username != null && password != null)
         {
             EPerson eperson = null;
             log.info(LogManager.getHeader(context, "authenticate", "attempting password auth of user="+username));
-            eperson = EPerson.findByEmail(context, username.toLowerCase());
+            try
+            {
+                eperson = EPerson.findByEmail(context, username.toLowerCase());
+            }
+            catch (AuthorizeException e)
+            {
+                // ignore exception, treat it as lookup failure.
+            }
 
             // lookup failed.
             if (eperson == null)

@@ -1,9 +1,9 @@
 /*
  * CollectionStyleSelection.java
  *
- * Version: $Revision: 1 $
+ * Version: $Revision$
  *
- * Date: $Date: 2007-10-25 09:00:00 +0100 (thu, 25 oct 2007) $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,14 +39,13 @@
  */
 package org.dspace.app.webui.util;
 
+import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.uri.ObjectIdentifier;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -54,13 +53,13 @@ import org.dspace.core.ConfigurationManager;
  * Style name is case insensitive.
  * 
  * @author Andrea Bollini
- * @version $Revision: 1 $
+ * @version $Revision$
  * 
  */
 public class CollectionStyleSelection extends AKeyBasedStyleSelection
 {
-    /** Hashmap of collection identifiers to styles to use, from dspace.cfg */
-    private static java.util.Map<ObjectIdentifier, String> styles;
+    /** Hashmap of collection Handles to styles to use, from dspace.cfg */
+    private static java.util.Map<String, String> styles;
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(CollectionStyleSelection.class);
@@ -68,21 +67,17 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
     /**
      * Get the style using the owning collection handle
      */
-    public String getStyleForItem(Item item)
+    public String getStyleForItem(Item item) throws SQLException
     {
         Collection c = item.getOwningCollection();
-
-        if (c != null)
-        {
+ 
+        if(c!=null)
+        {    
             // Style specified & exists
-            return getFromMap(c.getIdentifier());
+            return getFromMap(c.getHandle());
         }
         else
-        {
-            // If the Item hasn't hit a Collection yet (most likely an
-            // InProgressSubmission), we don't give it a specific style.
-            return "default";
-        }
+            return "default";  //no specific style - item is an in progress Submission
     }
     
     /**
@@ -90,7 +85,7 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
      */
     private void readKeyStyleConfig()
     {
-        styles = new HashMap<ObjectIdentifier, String>();
+        styles = new HashMap();
 
         Enumeration e = ConfigurationManager.propertyNames();
 
@@ -109,9 +104,7 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
 
                 for (int i = 0; i < collections.length; i++)
                 {
-                    styles.put(
-                            ObjectIdentifier.parseCanonicalForm(collections[i].trim()),
-                            styleName.toLowerCase());
+                    styles.put(collections[i].trim(), styleName.toLowerCase());
                 }
             }
         }
@@ -122,17 +115,17 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
      * initialized read it from dspace.cfg
      * Check for the style configuration: return the default style if no configuration has found.
      * 
-     * @param oid
+     * @param handle
      * @return the specific style or the default if not properly defined
      */
-    public String getFromMap(ObjectIdentifier oid)
+    public String getFromMap(String handle)
     {
         if (styles == null)
         {
             readKeyStyleConfig();
         }
 
-        String styleName = (String) styles.get(oid);
+        String styleName = (String) styles.get(handle);
 
         if (styleName == null)
         {
@@ -144,8 +137,7 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
         if (isConfigurationDefinedForStyle(styleName))
         {
             log.warn("dspace.cfg specifies undefined item display style '"
-                    + styleName + "' for collection handle "
-                    + oid.getCanonicalForm() + ".  Using default");
+                    + styleName + "' for collection handle " + handle + ".  Using default");
             return "default";
         }
 

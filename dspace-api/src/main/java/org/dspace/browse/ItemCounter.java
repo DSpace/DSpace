@@ -94,6 +94,7 @@ public class ItemCounter
 	 */
 	public ItemCounter(Context context)
 		throws ItemCountException
+		
 	{
 		this.context = context;
 		this.dao = ItemCountDAOFactory.getInstance(this.context);
@@ -109,10 +110,18 @@ public class ItemCounter
 	public void buildItemCounts()
 		throws ItemCountException
 	{
-		Community[] tlc = Community.findAllTop(context);
-		for (int i = 0; i < tlc.length; i++)
+		try
 		{
-			count(tlc[i]);
+			Community[] tlc = Community.findAllTop(context);
+			for (int i = 0; i < tlc.length; i++)
+			{
+				count(tlc[i]);
+			}
+		}
+		catch (SQLException e)
+		{
+			log.error("caught exception: ", e);
+			throw new ItemCountException(e);
 		}
 	}
 	
@@ -140,12 +149,22 @@ public class ItemCounter
 		// if we make it this far, we need to manually count
 		if (dso instanceof Collection)
 		{
-			return ((Collection) dso).countItems();
+			try {
+				return ((Collection) dso).countItems();
+			} catch (SQLException e) {
+				log.error("caught exception: ", e);
+				throw new ItemCountException(e);
+			}
 		}
 		
 		if (dso instanceof Community)
 		{
-			return ((Community) dso).countItems();
+			try {
+				return ((Community) dso).countItems();
+			} catch (SQLException e) {
+				log.error("caught exception: ", e);
+				throw new ItemCountException(e);
+			}
 		}
 		
 		return 0;
@@ -178,22 +197,30 @@ public class ItemCounter
 	private void count(Community community)
 		throws ItemCountException
 	{
-		// first count the community we are in
-		int count = community.countItems();
-		dao.communityCount(community, count);
-		
-		// now get the sub-communities
-		Community[] scs = community.getSubcommunities();
-		for (int i = 0; i < scs.length; i++)
+		try
 		{
-			count(scs[i]);
+			// first count the community we are in
+			int count = community.countItems();
+			dao.communityCount(community, count);
+			
+			// now get the sub-communities
+			Community[] scs = community.getSubcommunities();
+			for (int i = 0; i < scs.length; i++)
+			{
+				count(scs[i]);
+			}
+			
+			// now get the collections
+			Collection[] cols = community.getCollections();
+			for (int i = 0; i < cols.length; i++)
+			{
+				count(cols[i]);
+			}
 		}
-		
-		// now get the collections
-		Collection[] cols = community.getCollections();
-		for (int i = 0; i < cols.length; i++)
+		catch (SQLException e)
 		{
-			count(cols[i]);
+			log.error("caught exception: ", e);
+			throw new ItemCountException(e);
 		}
 	}
 	
@@ -206,7 +233,15 @@ public class ItemCounter
 	private void count(Collection collection)
 		throws ItemCountException
 	{
-		int ccount = collection.countItems();
-		dao.collectionCount(collection, ccount);
+		try
+		{
+			int ccount = collection.countItems();
+			dao.collectionCount(collection, ccount);
+		}
+		catch (SQLException e)
+		{
+			log.error("caught exception: ", e);
+			throw new ItemCountException(e);
+		}
 	}
 }

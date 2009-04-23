@@ -123,8 +123,7 @@ CREATE TABLE BitstreamFormatRegistry
   description         TEXT,
   support_level       INTEGER,
   -- Identifies internal types
-  internal            BOOL,
-  uuid                VARCHAR(36)
+  internal             BOOL
 );
 
 -------------------------------------------------------
@@ -156,8 +155,7 @@ CREATE TABLE Bitstream
    internal_id             VARCHAR(256),
    deleted                 BOOL,
    store_number            INTEGER,
-   sequence_id             INTEGER,
-   uuid                    VARCHAR(36)
+   sequence_id             INTEGER
 );
 
 CREATE INDEX bit_bitstream_fk_idx ON Bitstream(bitstream_format_id);
@@ -179,8 +177,7 @@ CREATE TABLE EPerson
   sub_frequency       INTEGER,
   phone	              VARCHAR(32),
   netid               VARCHAR(64),
-  language            VARCHAR(64),
-  uuid                VARCHAR(36)
+  language            VARCHAR(64)
 );
 
 -- index by email
@@ -195,8 +192,7 @@ CREATE INDEX eperson_netid_idx ON EPerson(netid);
 CREATE TABLE EPersonGroup
 (
   eperson_group_id INTEGER PRIMARY KEY,
-  name             VARCHAR(256) UNIQUE,
-  uuid             VARCHAR(36)
+  name             VARCHAR(256) UNIQUE
 );
 
 ------------------------------------------------------
@@ -241,8 +237,7 @@ CREATE TABLE Item
   in_archive      BOOL,
   withdrawn       BOOL,
   last_modified   TIMESTAMP WITH TIME ZONE,
-  owning_collection INTEGER,
-  uuid            VARCHAR(36)
+  owning_collection INTEGER
 );
 
 CREATE INDEX item_submitter_fk_idx ON Item(submitter_id);
@@ -253,9 +248,8 @@ CREATE INDEX item_submitter_fk_idx ON Item(submitter_id);
 CREATE TABLE Bundle
 (
   bundle_id          INTEGER PRIMARY KEY,
-  name               VARCHAR(16),  -- ORIGINAL | THUMBNAIL | TEXT
-  primary_bitstream_id	INTEGER REFERENCES Bitstream(bitstream_id),
-  uuid               VARCHAR(36)
+  name               VARCHAR(16),  -- ORIGINAL | THUMBNAIL | TEXT 
+  primary_bitstream_id	INTEGER REFERENCES Bitstream(bitstream_id)
 );
 
 CREATE INDEX bundle_primary_fk_idx ON Bundle(primary_bitstream_id);
@@ -297,26 +291,17 @@ CREATE TABLE MetadataSchemaRegistry
 (
   metadata_schema_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadataschemaregistry_seq'),
   namespace          VARCHAR(256) UNIQUE,
-  short_id           VARCHAR(32) UNIQUE,
-  uuid               VARCHAR(36)
+  short_id           VARCHAR(32) UNIQUE
 );
 
 CREATE TABLE MetadataFieldRegistry
 (
   metadata_field_id   INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatafieldregistry_seq'),
---  metadata_schema_id  INTEGER NOT NULL REFERENCES MetadataSchemaRegistry(metadata_schema_id),
-  metadata_schema_id  INTEGER REFERENCES MetadataSchemaRegistry(metadata_schema_id),
+  metadata_schema_id  INTEGER NOT NULL REFERENCES MetadataSchemaRegistry(metadata_schema_id),
   element             VARCHAR(64),
   qualifier           VARCHAR(64),
-  scope_note          TEXT,
-  uuid                VARCHAR(36)
+  scope_note          TEXT
 );
-
--- FIXME: Sort this out before the 1.6 release.
--- This is necessary because of the way in which entries in the field registry
--- are created. Eventually, it should be possible to re-introduce this
--- constraint.
-ALTER TABLE metadatafieldregistry ALTER COLUMN metadata_schema_id DROP NOT NULL;
 
 CREATE TABLE MetadataValue
 (
@@ -325,8 +310,7 @@ CREATE TABLE MetadataValue
   metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
   text_value         TEXT,
   text_lang          VARCHAR(24),
-  place              INTEGER,
-  uuid               VARCHAR(36)
+  place              INTEGER
 );
 
 -- Create a dcvalue view for backwards compatibilty
@@ -357,8 +341,7 @@ CREATE TABLE Community
   introductory_text TEXT,
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
   copyright_text    TEXT,
-  side_bar_text     TEXT,
-  uuid              VARCHAR(36)
+  side_bar_text     TEXT
 );
 
 CREATE INDEX community_logo_fk_idx ON Community(logo_bitstream_id);
@@ -382,8 +365,7 @@ CREATE TABLE Collection
   workflow_step_2   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_3   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   submitter         INTEGER REFERENCES EPersonGroup( eperson_group_id ),
-  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id ),
-  uuid              VARCHAR(36)
+  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id)
 );
 
 CREATE INDEX collection_logo_fk_idx ON Collection(logo_bitstream_id);
@@ -449,8 +431,7 @@ CREATE TABLE ResourcePolicy
   eperson_id           INTEGER REFERENCES EPerson(eperson_id),
   epersongroup_id      INTEGER REFERENCES EPersonGroup(eperson_group_id),
   start_date           DATE,
-  end_date             DATE,
-  uuid                 VARCHAR(36)
+  end_date             DATE
 );
 
 -- index by resource_type,resource_id - all queries by
@@ -475,22 +456,21 @@ CREATE INDEX epersongroup2eperson_group_idx on EPersonGroup2EPerson(eperson_grou
 
 CREATE INDEX epg2ep_eperson_fk_idx ON EPersonGroup2EPerson(eperson_id);
 
--- NOTE: there is no longer an explicit Handle table (v1.6; Richard Jones)
 -------------------------------------------------------
 -- Handle table
 -------------------------------------------------------
---CREATE TABLE Handle
---(
---  handle_id        INTEGER PRIMARY KEY,
---  handle           VARCHAR(256) UNIQUE,
---  resource_type_id INTEGER,
---  resource_id      INTEGER
---);
+CREATE TABLE Handle
+(
+  handle_id        INTEGER PRIMARY KEY,
+  handle           VARCHAR(256) UNIQUE,
+  resource_type_id INTEGER,
+  resource_id      INTEGER
+);
 
 -- index by handle, commonly looked up
---CREATE INDEX handle_handle_idx ON Handle(handle);
+CREATE INDEX handle_handle_idx ON Handle(handle);
 -- index by resource id and resource type id
---CREATE INDEX handle_resource_id_and_type_idx ON handle(resource_id, resource_type_id);
+CREATE INDEX handle_resource_id_and_type_idx ON handle(resource_id, resource_type_id);
 
 -------------------------------------------------------
 --  WorkspaceItem table
@@ -506,8 +486,7 @@ CREATE TABLE WorkspaceItem
   multiple_files    BOOL,
   -- How for the user has got in the submit process
   stage_reached     INTEGER,
-  page_reached      INTEGER,
-  uuid              VARCHAR(36)
+  page_reached      INTEGER
 );
 
 CREATE INDEX workspace_item_fk_idx ON WorkspaceItem(item_id);
@@ -527,10 +506,10 @@ CREATE TABLE WorkflowItem
   -- Answers to questions on first page of submit UI
   multiple_titles       BOOL,
   published_before      BOOL,
-  multiple_files        BOOL,
+  multiple_files        BOOL
   -- Note: stage reached not applicable here - people involved in workflow
   -- can always jump around submission UI
-  uuid           VARCHAR(36)
+
 );
 
 CREATE INDEX workflow_item_fk_idx ON WorkflowItem(item_id);
@@ -569,8 +548,7 @@ CREATE TABLE Subscription
 (
   subscription_id   INTEGER PRIMARY KEY,
   eperson_id        INTEGER REFERENCES EPerson(eperson_id),
-  collection_id     INTEGER REFERENCES Collection(collection_id),
-  uuid              VARCHAR(36)
+  collection_id     INTEGER REFERENCES Collection(collection_id)
 );
 
 CREATE INDEX subs_eperson_fk_idx ON Subscription(eperson_id);
@@ -637,13 +615,10 @@ CREATE TABLE community_item_count (
 -------------------------------------------------------
 --  Create 'special' groups, for anonymous access
 --  and administrators
---
--- FIXME: This should be done in Java using the Group API. If it did, we
--- wouldn't need these horrible hard-coded UUIDs.
 -------------------------------------------------------
 -- We don't use getnextid() for 'anonymous' since the sequences start at '1'
-INSERT INTO epersongroup VALUES(0, 'Anonymous', '3aa7309d-1bef-4f24-bd1e-ff7921238259');
-INSERT INTO epersongroup VALUES(getnextid('epersongroup'), 'Administrator', 'd3e477f0-d28f-413f-8a38-4379279814ed');
+INSERT INTO epersongroup VALUES(0, 'Anonymous');
+INSERT INTO epersongroup VALUES(getnextid('epersongroup'), 'Administrator');
 
 
 -------------------------------------------------------
@@ -763,24 +738,5 @@ values
 );
 
 
--------------------------------------------------------
--- Create the UUID Table and Index
--------------------------------------------------------
 
-CREATE TABLE uuid (
-    uuid VARCHAR(36) not null,
-    resource_type integer,
-    resource_id integer
-);
 
-CREATE INDEX uuid_idx ON uuid (uuid);
-
-CREATE TABLE externalidentifier (
-    namespace varchar(20),
-    identifier text,
-    resource_type_id integer,
-    resource_id integer,
-    tombstone integer
-);
-
-CREATE INDEX externalidentifier_idx ON externalidentifier(namespace, identifier);

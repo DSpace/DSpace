@@ -1,9 +1,9 @@
 /*
  * ItemViewer.java
  *
- * Version: $Revision: 1.14 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/08/08 20:58:30 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,6 +39,15 @@
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringWriter;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -49,69 +58,72 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.utils.URIUtil;
+import org.dspace.app.xmlui.utils.UsageEvent;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
-import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
-import org.dspace.uri.IdentifierService;
+import org.dspace.core.PluginManager;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.Map;
 
 /**
  * Display a single item.
- *
+ * 
  * @author Scott Phillips
  */
 public class ItemViewer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
     private static final Logger log = Logger.getLogger(ItemViewer.class);
-
+    
     /** Language strings */
     private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
-
+    
     private static final Message T_trail =
         message("xmlui.ArtifactBrowser.ItemViewer.trail");
-
+    
     private static final Message T_show_simple =
         message("xmlui.ArtifactBrowser.ItemViewer.show_simple");
-
+    
     private static final Message T_show_full =
         message("xmlui.ArtifactBrowser.ItemViewer.show_full");
-
+    
     private static final Message T_head_parent_collections =
         message("xmlui.ArtifactBrowser.ItemViewer.head_parent_collections");
-
+    
 	/** Cached validity object */
 	private SourceValidity validity = null;
-
+	
+	/** XHTML crosswalk instance */
+	private DisseminationCrosswalk xHTMLHeadCrosswalk = null;
+	
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
      */
     public Serializable getKey() {
         try {
-            DSpaceObject dso = URIUtil.resolve(objectModel);
-
+            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+            
             if (dso == null)
                 return "0"; // no item, something is wrong.
-
-            return HashUtil.hash(IdentifierService.getCanonicalForm(dso) + "full:" + showFullItem(objectModel));
-        }
+            
+            return HashUtil.hash(dso.getHandle() + "full:" + showFullItem(objectModel));
+        } 
         catch (SQLException sqle)
         {
             // Ignore all errors and just return that the component is not cachable.
@@ -121,19 +133,19 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
     /**
      * Generate the cache validity object.
-     *
-     * The validity object will include the item being viewed,
+     * 
+     * The validity object will include the item being viewed, 
      * along with all bundles & bitstreams.
      */
-    public SourceValidity getValidity()
+    public SourceValidity getValidity() 
     {
         DSpaceObject dso = null;
 
         if (this.validity == null)
     	{
 	        try {
-	            dso = URIUtil.resolve(objectModel);
-
+	            dso = HandleUtil.obtainHandle(objectModel);
+	            
 	            DSpaceValidity validity = new DSpaceValidity();
 	            validity.add(dso);
 	            this.validity =  validity.complete();
@@ -145,12 +157,12 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
             // add log message that we are viewing the item
             // done here, as the serialization may not occur if the cache is valid
-            log.info(LogManager.getHeader(context, "view_item", "handle=" + (dso == null ? "" : IdentifierService.getCanonicalForm(dso))));
+            log.info(LogManager.getHeader(context, "view_item", "handle=" + (dso == null ? "" : dso.getHandle())));
     	}
     	return this.validity;
     }
-
-
+    
+    
     /**
      * Add the item's title and trail links to the page's metadata.
      */
@@ -158,8 +170,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
-
-        DSpaceObject dso = URIUtil.resolve(objectModel);
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Item))
             return;
         Item item = (Item) dso;
@@ -170,11 +181,42 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         if (title != null)
             pageMeta.addMetadata("title").addContent(title);
         else
-            pageMeta.addMetadata("title").addContent(IdentifierService.getCanonicalForm(item));
+            pageMeta.addMetadata("title").addContent(item.getHandle());
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         HandleUtil.buildHandleTrail(item,pageMeta,contextPath);
         pageMeta.addTrail().addContent(T_trail);
+        
+        // Metadata for <head> element
+        if (xHTMLHeadCrosswalk == null)
+        {
+            xHTMLHeadCrosswalk = (DisseminationCrosswalk) PluginManager.getNamedPlugin(
+              DisseminationCrosswalk.class, "XHTML_HEAD_ITEM");
+        }
+
+        // Produce <meta> elements for header from crosswalk
+        try
+        {
+            List l = xHTMLHeadCrosswalk.disseminateList(item);
+            StringWriter sw = new StringWriter();
+
+            XMLOutputter xmlo = new XMLOutputter();
+            for (int i = 0; i < l.size(); i++)
+            {
+                Element e = (Element) l.get(i);
+                // FIXME: we unset the Namespace so it's not printed.
+                // This is fairly yucky, but means the same crosswalk should
+                // work for Manakin as well as the JSP-based UI.
+                e.setNamespace(null);
+                xmlo.output(e, sw);
+            }
+            pageMeta.addMetadata("xhtml_head_item").addContent(sw.toString());
+        }
+        catch (CrosswalkException ce)
+        {
+            // TODO: Is this the right exception class?
+            throw new WingException(ce);
+        }
     }
 
     /**
@@ -184,32 +226,36 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             UIException, SQLException, IOException, AuthorizeException
     {
 
-        DSpaceObject dso = URIUtil.resolve(objectModel);
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Item))
             return;
         Item item = (Item) dso;
 
+        new UsageEvent().fire((Request) ObjectModelHelper.getRequest(objectModel),
+                context, UsageEvent.VIEW, Constants.ITEM, item.getID());
+        
         // Build the item viewer division.
         Division division = body.addDivision("item-view","primary");
         String title = getItemTitle(item);
         if (title != null)
             division.setHead(title);
         else
-            division.setHead(IdentifierService.getCanonicalForm(item));
+            division.setHead(item.getHandle());
 
         Para showfullPara = division.addPara(null, "item-view-toggle item-view-toggle-top");
 
         if (showFullItem(objectModel))
         {
-            String link = IdentifierService.getURL(item).toString();
+            String link = contextPath + "/handle/" + item.getHandle();
             showfullPara.addXref(link).addContent(T_show_simple);
         }
         else
         {
-            String link = IdentifierService.getURL(item).toString() + "?show=full";
+            String link = contextPath + "/handle/" + item.getHandle()
+                    + "?show=full";
             showfullPara.addXref(link).addContent(T_show_full);
         }
-
+        
         ReferenceSet referenceSet;
         if (showFullItem(objectModel))
         {
@@ -225,23 +271,24 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         // Refrence the actual Item
         ReferenceSet appearsInclude = referenceSet.addReference(item).addReferenceSet(ReferenceSet.TYPE_DETAIL_LIST,null,"hierarchy");
         appearsInclude.setHead(T_head_parent_collections);
-
+        
         // Reference all collections the item appears in.
         for (Collection collection : item.getCollections())
         {
             appearsInclude.addReference(collection);
         }
-
+        
         showfullPara = division.addPara(null,"item-view-toggle item-view-toggle-bottom");
 
         if (showFullItem(objectModel))
         {
-            String link = IdentifierService.getURL(item).toString();
+            String link = contextPath + "/handle/" + item.getHandle();
             showfullPara.addXref(link).addContent(T_show_simple);
         }
         else
         {
-            String link = IdentifierService.getURL(item).toString() + "?show=full";
+            String link = contextPath + "/handle/" + item.getHandle()
+                    + "?show=full";
             showfullPara.addXref(link).addContent(T_show_full);
         }
     }

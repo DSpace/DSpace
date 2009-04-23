@@ -62,9 +62,7 @@ import org.dspace.content.DCSeriesNumber;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.WorkspaceItem;
-import org.dspace.content.dao.WorkspaceItemDAO;
-import org.dspace.content.dao.WorkspaceItemDAOFactory;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
 
@@ -105,6 +103,9 @@ public class DescribeStep extends AbstractProcessingStep
 
     // there were required fields that were not filled out
     public static final int STATUS_MISSING_REQUIRED_FIELDS = 2;
+    
+    // the metadata language qualifier
+    public static final String LANGUAGE_QUALIFIER = getDefaultLanguageQualifier();
 
     /** Constructor */
     public DescribeStep() throws ServletException
@@ -143,8 +144,6 @@ public class DescribeStep extends AbstractProcessingStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        WorkspaceItemDAO wsiDAO = WorkspaceItemDAOFactory.getInstance(context);
-
         // check what submit button was pressed in User Interface
         String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
 
@@ -154,8 +153,7 @@ public class DescribeStep extends AbstractProcessingStep
 
         // lookup applicable inputs
         Collection c = subInfo.getSubmissionItem().getCollection();
-        DCInput[] inputs = inputsReader.getInputs(
-                c.getIdentifier().getCanonicalForm()).getPageRows(
+        DCInput[] inputs = inputsReader.getInputs(c.getHandle()).getPageRows(
                 currentPage - 1,
                 subInfo.getSubmissionItem().hasMultipleTitles(),
                 subInfo.getSubmissionItem().isPublishedBefore());
@@ -239,7 +237,7 @@ public class DescribeStep extends AbstractProcessingStep
                     {
                         if (!vals[z].equals(""))
                         {
-                            item.addMetadata(schema, element, qualifier, "en",
+                            item.addMetadata(schema, element, qualifier, LANGUAGE_QUALIFIER,
                                     vals[z]);
                         }
                     }
@@ -250,7 +248,7 @@ public class DescribeStep extends AbstractProcessingStep
                     || (inputType.equals("textarea")))
             {
                 readText(request, item, schema, element, qualifier, inputs[j]
-                        .getRepeatable(), "en");
+                        .getRepeatable(), LANGUAGE_QUALIFIER);
             }
             else
             {
@@ -270,10 +268,11 @@ public class DescribeStep extends AbstractProcessingStep
 
         // Step 3:
         // Check to see if any fields are missing
-        // Only check for required fields if user clicked the "next" button
-        // (or clicked progress bar)
-        //  @TODO: It'd be better if we allowed them to click *backwards* in Progress bar, but not *forwards*
-        if (buttonPressed.equals(NEXT_BUTTON) || buttonPressed.startsWith(PROGRESS_BAR_PREFIX))
+        // Only check for required fields if user clicked the "next", the "previous" or the "progress bar" button
+        if (buttonPressed.equals(NEXT_BUTTON)
+                || buttonPressed.startsWith(PROGRESS_BAR_PREFIX)
+                || buttonPressed.equals(PREVIOUS_BUTTON)
+                || buttonPressed.equals(CANCEL_BUTTON))
         {
             clearErrorFields(request);
             for (int i = 0; i < inputs.length; i++)
@@ -291,7 +290,7 @@ public class DescribeStep extends AbstractProcessingStep
 
         // Step 4:
         // Save changes to database
-        wsiDAO.update((WorkspaceItem) subInfo.getSubmissionItem());
+        subInfo.getSubmissionItem().update();
 
         // commit changes
         context.commit();
@@ -350,7 +349,7 @@ public class DescribeStep extends AbstractProcessingStep
         if (subInfo.getSubmissionItem() != null)
         {
             collectionHandle = subInfo.getSubmissionItem().getCollection()
-                    .getIdentifier().getCanonicalForm();
+                    .getHandle();
         }
 
         // get number of input pages (i.e. "Describe" pages)
@@ -372,7 +371,33 @@ public class DescribeStep extends AbstractProcessingStep
         
         return inputsReader;
     }
-
+    
+    /**
+     * @param filename
+     *        file to get the input reader for
+     * @return the current DCInputsReader 
+     */
+    public static DCInputsReader getInputsReader(String filename) throws ServletException
+    {
+        inputsReader = new DCInputsReader(filename);
+        return inputsReader;
+    }
+    
+    /**
+     * @return the default language qualifier for metadata
+     */
+    
+    public static String getDefaultLanguageQualifier()
+    {
+       String language = "";
+       language = ConfigurationManager.getProperty("default.language");
+       if (language == null || language == "")
+       {
+    	   language = "en";
+       }
+       return language;
+    }
+    
     // ****************************************************************
     // ****************************************************************
     // METHODS FOR FILLING DC FIELDS FROM METADATA FORMS
@@ -775,7 +800,7 @@ public class DescribeStep extends AbstractProcessingStep
 
             //First, add the previously entered values.
             // This ensures we preserve the order that these values were entered
-                s = request.getParameter(param + "_" + i);
+            s = request.getParameter(param + "_" + i);
 
             // If there are no more previously entered values,
             // see if there's a new value entered in textbox
@@ -810,7 +835,7 @@ public class DescribeStep extends AbstractProcessingStep
                 }
 
                 if (addValue)
-                    vals.add(s.trim());
+                  vals.add(s.trim());
             }
 
             i++;
@@ -840,6 +865,4 @@ public class DescribeStep extends AbstractProcessingStep
         }
 
     }
-
 }
-

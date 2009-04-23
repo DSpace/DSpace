@@ -3,9 +3,9 @@
 <!--
   structural.xsl
 
-  Version: $Revision: 1.7 $
+  Version: $Revision$
  
-  Date: $Date: 2006/07/27 22:54:52 $
+  Date: $Date$
  
   Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
   Institute of Technology.  All rights reserved.
@@ -153,6 +153,7 @@
     <xsl:template name="buildHead">
         <head>
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+            <meta name="Generator" content="DSpace" />
             <!-- Add stylsheets -->
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='stylesheet']">
                 <link rel="stylesheet" type="text/css">
@@ -232,10 +233,16 @@
             
             <!-- Add a google analytics script if the key is present -->
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">
-            	<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"><xsl:text>&#160;</xsl:text></script>
 				<script type="text/javascript">
-					<xsl:text>_uacct = "</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>";</xsl:text>
-					<xsl:text>urchinTracker();</xsl:text>
+					<xsl:text>var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");</xsl:text>
+					<xsl:text>document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));</xsl:text>
+				</script>
+
+				<script type="text/javascript">
+					<xsl:text>try {</xsl:text>
+						<xsl:text>var pageTracker = _gat._getTracker("</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>");</xsl:text>
+						<xsl:text>pageTracker._trackPageview();</xsl:text>
+					<xsl:text>} catch(err) {}</xsl:text>
 				</script>
             </xsl:if>
             
@@ -252,6 +259,13 @@
                 	</xsl:otherwise>
                 </xsl:choose>
             </title>
+
+            <!-- Head metadata in item pages -->
+            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']">
+                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']"
+                              disable-output-escaping="yes"/>
+            </xsl:if>
+            
         </head>
     </xsl:template>
     
@@ -361,6 +375,13 @@
                     <i18n:text>xmlui.dri2xhtml.structural.feedback-link</i18n:text>
                 </a>
             </div>
+            <!--Invisible link to HTML sitemap (for search engines) -->
+            <a>
+                <xsl:attribute name="href">
+                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                    <xsl:text>/htmlmap</xsl:text>
+                </xsl:attribute>
+            </a>
         </div>
         <!--                    
             <a href="http://di.tamu.edu">                            
@@ -387,7 +408,7 @@
             <xsl:attribute name="class">
                 <xsl:text>ds-trail-link </xsl:text>
                 <xsl:if test="position()=1">
-                    <xsl:text>first-link</xsl:text>
+                    <xsl:text>first-link </xsl:text>
                 </xsl:if>
                 <xsl:if test="position()=last()">
                     <xsl:text>last-link</xsl:text>

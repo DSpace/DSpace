@@ -39,57 +39,6 @@
  */
 package org.dspace.app.itemimport;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
-import org.apache.xpath.XPathAPI;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
-import org.dspace.authorize.dao.ResourcePolicyDAO;
-import org.dspace.authorize.dao.ResourcePolicyDAOFactory;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.FormatIdentifier;
-import org.dspace.content.InstallItem;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
-import org.dspace.content.WorkspaceItem;
-import org.dspace.content.dao.BitstreamDAO;
-import org.dspace.content.dao.BitstreamDAOFactory;
-import org.dspace.content.dao.CollectionDAO;
-import org.dspace.content.dao.CollectionDAOFactory;
-import org.dspace.content.dao.ItemDAO;
-import org.dspace.content.dao.ItemDAOFactory;
-import org.dspace.content.dao.WorkspaceItemDAO;
-import org.dspace.content.dao.WorkspaceItemDAOFactory;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
-import org.dspace.eperson.dao.GroupDAO;
-import org.dspace.eperson.dao.GroupDAOFactory;
-import org.dspace.uri.*;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
-import org.dspace.workflow.WorkflowManager;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -103,10 +52,46 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Vector;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
+import org.apache.xpath.XPathAPI;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
+import org.dspace.content.FormatIdentifier;
+import org.dspace.content.InstallItem;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+import org.dspace.handle.HandleManager;
+import org.dspace.workflow.WorkflowManager;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Import items into DSpace. The conventional use is upload files by copying
@@ -131,18 +116,10 @@ public class ItemImport
     static boolean isTest = false;
 
     static boolean isResume = false;
-
+    
     static boolean template = false;
 
     static PrintWriter mapOut = null;
-
-    private static CollectionDAO collectionDAO;
-
-    private static ItemDAO itemDAO;
-
-    private static ExternalIdentifierDAO identifierDAO;
-
-    private static Context context;
 
     // File listing filter to look for metadata files
     static FilenameFilter metadataFileFilter = new FilenameFilter()
@@ -163,6 +140,7 @@ public class ItemImport
         }
     };
 
+
     public static void main(String[] argv) throws Exception
     {
         // create an options object and populate it
@@ -176,7 +154,7 @@ public class ItemImport
                 "delete items listed in mapfile");
         options.addOption("s", "source", true, "source of items (directory)");
         options.addOption("c", "collection", true,
-                "destination collection(s) URIs (canonical form) or database ID");
+                "destination collection(s) Handle or database ID");
         options.addOption("m", "mapfile", true, "mapfile items in mapfile");
         options.addOption("e", "eperson", true,
                 "email of eperson doing importing");
@@ -196,7 +174,7 @@ public class ItemImport
         String sourcedir = null;
         String mapfile = null;
         String eperson = null; // db ID or email
-        String[] collections = null; // db ID or URIs
+        String[] collections = null; // db ID or handles
         int status = 0;
 
         if (line.hasOption('h'))
@@ -240,7 +218,7 @@ public class ItemImport
             isTest = true;
             System.out.println("**Test Run** - not actually importing items.");
         }
-
+        
         if (line.hasOption('p'))
         {
             template = true;
@@ -356,11 +334,6 @@ public class ItemImport
 
         // create a context
         Context c = new Context();
-        context =c ;
-
-        collectionDAO = CollectionDAOFactory.getInstance(c);
-        itemDAO = ItemDAOFactory.getInstance(c);
-        identifierDAO = ExternalIdentifierDAOFactory.getInstance(c);
 
         // find the EPerson, assign to context
         EPerson myEPerson = null;
@@ -396,16 +369,36 @@ public class ItemImport
             // validate each collection arg to see if it's a real collection
             for (int i = 0; i < collections.length; i++)
             {
-                ObjectIdentifier oid = ObjectIdentifier.parseCanonicalForm(collections[i]);
-                // DSpaceObject dso = oid.getObject(c);
-                DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(c, oid);
-
-                if (!(dso instanceof Collection))
+                // is the ID a handle?
+                if (collections[i].indexOf('/') != -1)
                 {
-                    throw new IllegalArgumentException(collections[i] + " does not resolve to a Collection");
+                    // string has a / so it must be a handle - try and resolve
+                    // it
+                    mycollections[i] = (Collection) HandleManager
+                            .resolveToObject(c, collections[i]);
+
+                    // resolved, now make sure it's a collection
+                    if ((mycollections[i] == null)
+                            || (mycollections[i].getType() != Constants.COLLECTION))
+                    {
+                        mycollections[i] = null;
+                    }
                 }
-                mycollections[i] = (Collection) dso;
-                
+                // not a handle, try and treat it as an integer collection
+                // database ID
+                else if (collections[i] != null)
+                {
+                    mycollections[i] = Collection.find(c, Integer
+                            .parseInt(collections[i]));
+                }
+
+                // was the collection valid?
+                if (mycollections[i] == null)
+                {
+                    throw new IllegalArgumentException("Cannot resolve "
+                            + collections[i] + " to collection");
+                }
+
                 // print progress info
                 String owningPrefix = "";
 
@@ -414,9 +407,10 @@ public class ItemImport
                     owningPrefix = "Owning ";
                 }
 
-                System.out.println(owningPrefix + " Collection: " + mycollections[i].getMetadata("name"));
+                System.out.println(owningPrefix + " Collection: "
+                        + mycollections[i].getMetadata("name"));
             }
-        }
+        } // end of validating collections
 
         try
         {
@@ -526,7 +520,6 @@ public class ItemImport
     private void replaceItems(Context c, Collection[] mycollections,
             String sourceDir, String mapFile, boolean template) throws Exception
     {
-        /*
         // verify the source directory
         File d = new java.io.File(sourceDir);
 
@@ -537,78 +530,60 @@ public class ItemImport
             System.exit(1);
         }
 
-        // read in HashMap first, to get list of uris & source dirs
+        // read in HashMap first, to get list of handles & source dirs
         Map myhash = readMapFile(mapFile);
 
-        // for each uri, re-import the item, discard the new uri
-        // and re-assign the old uri
+        // for each handle, re-import the item, discard the new handle
+        // and re-assign the old handle
         Iterator i = myhash.keySet().iterator();
         ArrayList itemsToDelete = new ArrayList();
 
         while (i.hasNext())
         {
-            // get the old uri
+            // get the old handle
             String newItemName = (String) i.next();
-            String oldURI = (String) myhash.get(newItemName);
+            String oldHandle = (String) myhash.get(newItemName);
 
             Item oldItem = null;
             Item newItem = null;
 
-            if (oldURI.indexOf('/') != -1)
+            if (oldHandle.indexOf('/') != -1)
             {
-                if (oldURI.indexOf(':') == -1)
-                {
-                    // has no : must be a handle
-                    oldURI = "hdl:" + oldURI;
-                    System.out.println("no namespace provided. assuming handles.");
-                }
-
-                System.out.println("\tReplacing:  " + oldURI);
+                System.out.println("\tReplacing:  " + oldHandle);
 
                 // add new item, locate old one
-                ExternalIdentifier identifier = identifierDAO.retrieve(oldURI);
-                ObjectIdentifier oi = identifier.getObjectIdentifier();
-                oldItem = (Item) oi.getObject(c);
+                oldItem = (Item) HandleManager.resolveToObject(c, oldHandle);
             }
             else
             {
-                oldItem = itemDAO.retrieve(Integer.parseInt(oldURI));
+                oldItem = Item.find(c, Integer.parseInt(oldHandle));
             }
-*/
-            /*
-             * FIXME: This isn't true any more, now that we have persistent
-             * identifiers, and items can have as many as they need.
-             *
-             * Rather than exposing public item methods to change persistent
-             * identifiers -- two handles can't exist at the same time due to
-             * key constraints so would require temp handle being stored, old
-             * being copied to new and new being copied to old, all a bit messy
-             * -- a handle file is written to the import directory containing
-             * the old handle, the existing item is deleted and then the
-             * import runs as though it were loading an item which had already
-             * been assigned a handle (so a new handle is not even assigned).
-             * As a commit does not occur until after a successful add, it is
-             * safe to do a delete as any error results in an aborted
-             * transaction without harming the original item
-             */
-        /*
-            File uriFile = new File(sourceDir + File.separatorChar + newItemName + File.separatorChar + "uri");
-            PrintWriter uriOut = new PrintWriter(new FileWriter(uriFile, true));
+            
+            /* Rather than exposing public item methods to change handles -- 
+             * two handles can't exist at the same time due to key constraints
+             * so would require temp handle being stored, old being copied to new and
+             * new being copied to old, all a bit messy -- a handle file is written to
+             * the import directory containing the old handle, the existing item is 
+             * deleted and then the import runs as though it were loading an item which 
+             * had already been assigned a handle (so a new handle is not even assigned).
+             * As a commit does not occur until after a successful add, it is safe to 
+             * do a delete as any error results in an aborted transaction without harming
+             * the original item */
+            File handleFile = new File(sourceDir + File.separatorChar + newItemName + File.separatorChar + "handle");
+            PrintWriter handleOut = new PrintWriter(new FileWriter(handleFile, true));
 
-            if (uriOut == null)
+            if (handleOut == null)
             {
-                throw new Exception("can't open uri file: " + uriFile.getCanonicalPath());
+                throw new Exception("can't open handle file: " + handleFile.getCanonicalPath());
             }
-
-            uriOut.println(oldURI);
-            uriOut.close();
-
+            
+            handleOut.println(oldHandle);
+            handleOut.close();
+            
             deleteItem(c, oldItem);
-
+            
             newItem = addItem(c, mycollections, sourceDir, newItemName, null, template);
-
         }
-    */
     }
 
     private void deleteItems(Context c, String mapFile) throws Exception
@@ -627,21 +602,14 @@ public class ItemImport
 
             if (itemID.indexOf('/') != -1)
             {
-                if (itemID.indexOf(':') == -1)
-                {
-                    // has no : must be a handle
-                    itemID = "hdl:" + itemID;
-                    System.out.println("no namespace provided. assuming handles.");
-                }
-
-                String myURI = itemID;
-                System.out.println("Deleting item " + myURI);
-                deleteItem(c, myURI);
+                String myhandle = itemID;
+                System.out.println("Deleting item " + myhandle);
+                deleteItem(c, myhandle);
             }
             else
             {
                 // it's an ID
-                Item myitem = itemDAO.retrieve(Integer.parseInt(itemID));
+                Item myitem = Item.find(c, Integer.parseInt(itemID));
                 System.out.println("Deleting item " + itemID);
                 deleteItem(c, myitem);
             }
@@ -649,14 +617,13 @@ public class ItemImport
     }
 
     /**
-     * item? try and add it to the archive c mycollection path itemname URI -
-     * non-null means we have a pre-defined URI already mapOut - mapfile we're
-     * writing
+     * item? try and add it to the archive c mycollection path itemname handle -
+     * non-null means we have a pre-defined handle already mapOut - mapfile
+     * we're writing
      */
     private Item addItem(Context c, Collection[] mycollections, String path,
             String itemname, PrintWriter mapOut, boolean template) throws Exception
     {
-        WorkspaceItemDAO wsiDAO = WorkspaceItemDAOFactory.getInstance(c);
         String mapOutput = null;
 
         System.out.println("Adding item from directory " + itemname);
@@ -667,7 +634,7 @@ public class ItemImport
 
         if (!isTest)
         {
-            wi = wsiDAO.create(mycollections[0], template);
+            wi = WorkspaceItem.create(c, mycollections[0], template);
             myitem = wi.getItem();
         }
 
@@ -681,23 +648,9 @@ public class ItemImport
         Vector options = processContentsFile(c, myitem, path
                 + File.separatorChar + itemname, "contents");
 
-        // get the suggested or desired identifiers for the item
-        ObjectIdentifier oid = getObjectIdentifier(path + File.separatorChar + itemname + File.separatorChar);
-        List<ExternalIdentifier> eids = getExternalIdentifiers(path + File.separatorChar + itemname + File.separatorChar);
-
-        if (oid != null)
-        {
-            myitem.setIdentifier(oid);
-        }
-        
-        if (eids.size() > 0)
-        {
-            myitem.setExternalIdentifiers(eids);
-        }
-
         if (useWorkflow)
         {
-            // don't process URI file
+            // don't process handle file
             // start up a workflow
             if (!isTest)
             {
@@ -709,19 +662,19 @@ public class ItemImport
         }
         else
         {
-            // only process URI file if not using workflow system
-            String uri = processURIFile(c, myitem, path
-                    + File.separatorChar + itemname, "uri");
+            // only process handle file if not using workflow system
+            String myhandle = processHandleFile(c, myitem, path
+                    + File.separatorChar + itemname, "handle");
 
             // put item in system
             if (!isTest)
             {
-                Item item = InstallItem.installItem(c, wi);
-//                Item item = InstallItem.installItem(c, wi, uri);
+                InstallItem.installItem(c, wi, myhandle);
 
-                uri = item.getIdentifier().getCanonicalForm();
+                // find the handle, and output to map file
+                myhandle = HandleManager.findHandle(c, myitem);
 
-                mapOutput = itemname + " " + uri;
+                mapOutput = itemname + " " + myhandle;
             }
 
             // set permissions if specified in contents file
@@ -770,15 +723,12 @@ public class ItemImport
         }
     }
 
-    // remove, given a uri
-    private void deleteItem(Context c, String uri) throws Exception
+    // remove, given a handle
+    private void deleteItem(Context c, String myhandle) throws Exception
     {
-        /* FIXME
         // bit of a hack - to remove an item, you must remove it
         // from all collections it's a part of, then it will be removed
-        ExternalIdentifier identifier = identifierDAO.retrieve(uri);
-        ObjectIdentifier oi = identifier.getObjectIdentifier();
-        Item myitem = (Item) oi.getObject(c);
+        Item myitem = (Item) HandleManager.resolveToObject(c, myhandle);
 
         if (myitem == null)
         {
@@ -787,13 +737,13 @@ public class ItemImport
         else
         {
             deleteItem(c, myitem);
-        }*/
+        }
     }
 
     ////////////////////////////////////
     // utility methods
     ////////////////////////////////////
-    // read in the map file and generate a hashmap of (file,uri) pairs
+    // read in the map file and generate a hashmap of (file,handle) pairs
     private Map readMapFile(String filename) throws Exception
     {
         Map myhash = new HashMap();
@@ -808,9 +758,9 @@ public class ItemImport
             while ((line = is.readLine()) != null)
             {
                 String myfile;
-                String myURI;
+                String myhandle;
 
-                // a line should be archive filename<whitespace>uri
+                // a line should be archive filename<whitespace>handle
                 StringTokenizer st = new StringTokenizer(line);
 
                 if (st.hasMoreTokens())
@@ -824,14 +774,14 @@ public class ItemImport
 
                 if (st.hasMoreTokens())
                 {
-                    myURI = st.nextToken();
+                    myhandle = st.nextToken();
                 }
                 else
                 {
                     throw new Exception("Bad mapfile line:\n" + line);
                 }
 
-                myhash.put(myfile, myURI);
+                myhash.put(myfile, myhandle);
             }
         }
         finally
@@ -847,8 +797,8 @@ public class ItemImport
 
     // Load all metadata schemas into the item.
     private void loadMetadata(Context c, Item myitem, String path)
-        throws IOException, ParserConfigurationException, SAXException,
-                          TransformerException
+            throws SQLException, IOException, ParserConfigurationException,
+            SAXException, TransformerException, AuthorizeException
     {
         // Load the dublin core metadata
         loadDublinCore(c, myitem, path + "dublin_core.xml");
@@ -863,8 +813,8 @@ public class ItemImport
     }
 
     private void loadDublinCore(Context c, Item myitem, String filename)
-        throws IOException, ParserConfigurationException, SAXException,
-                          TransformerException
+            throws SQLException, IOException, ParserConfigurationException,
+            SAXException, TransformerException, AuthorizeException
     {
         Document document = loadXML(filename);
 
@@ -883,7 +833,7 @@ public class ItemImport
         {
             schema = schemaAttr.getNodeValue();
         }
-
+         
         // Get the nodes corresponding to formats
         NodeList dcNodes = XPathAPI.selectNodeList(document,
                 "/dublin_core/dcvalue");
@@ -898,8 +848,7 @@ public class ItemImport
         }
     }
 
-    private void addDCValue(Context c, Item i, String schema, Node n)
-        throws TransformerException
+    private void addDCValue(Context c, Item i, String schema, Node n) throws TransformerException, SQLException, AuthorizeException
     {
         String value = getStringValue(n); //n.getNodeValue();
         // compensate for empty value getting read as "null", which won't display
@@ -940,35 +889,35 @@ public class ItemImport
         {
             // If we're just test the import, let's check that the actual metadata field exists.
         	MetadataSchema foundSchema = MetadataSchema.find(c,schema);
-
+        	
         	if (foundSchema == null)
         	{
         		System.out.println("ERROR: schema '"+schema+"' was not found in the registry.");
         		return;
         	}
-
-        	int schemaID = foundSchema.getID();
+        	
+        	int schemaID = foundSchema.getSchemaID();
         	MetadataField foundField = MetadataField.findByElement(c, schemaID, element, qualifier);
-
+        	
         	if (foundField == null)
         	{
         		System.out.println("ERROR: Metadata field: '"+schema+"."+element+"."+qualifier+"' was not found in the registry.");
         		return;
-            }
+            }		
         }
     }
 
     /**
-     * Read in the URI file or return null if empty or doesn't exist
+     * Read in the handle file or return null if empty or doesn't exist
      */
-    private String processURIFile(Context c, Item i, String path,
+    private String processHandleFile(Context c, Item i, String path,
             String filename)
     {
         String filePath = path + File.separatorChar + filename;
         String line = "";
         String result = null;
 
-        System.out.println("Processing URI file: " + filename);
+        System.out.println("Processing handle file: " + filename);
         BufferedReader is = null;
         try
         {
@@ -977,14 +926,14 @@ public class ItemImport
             // result gets contents of file, or null
             result = is.readLine();
 
-            System.out.println("read URI: '" + result + "'");
+            System.out.println("read handle: '" + result + "'");
 
         }
         catch (Exception e)
         {
-            // probably no URI file, just return null
-            System.out.println(
-                    "It appears there is no URI file -- generating one");
+            // probably no handle file, just return null
+            System.out
+                    .println("It appears there is no handle file -- generating one");
         }
         finally
         {
@@ -996,8 +945,7 @@ public class ItemImport
                 }
                 catch (IOException e1)
                 {
-                    System.err
-                            .println("Non-critical problem releasing resources.");
+                    System.err.println("Non-critical problem releasing resources.");
                 }
             }
         }
@@ -1011,7 +959,8 @@ public class ItemImport
      * file that request non-default bitstream permission
      */
     private Vector processContentsFile(Context c, Item i, String path,
-            String filename) throws IOException, AuthorizeException
+            String filename) throws SQLException, IOException,
+            AuthorizeException
     {
         String contentspath = path + File.separatorChar + filename;
         String line = "";
@@ -1038,19 +987,18 @@ public class ItemImport
             	    // line should be one of these two:
             	    // -r -s n -f filepath
             	    // -r -s n -f filepath\tbundle:bundlename
-            	    // where
+            	    // where 
             	    //		n is the assetstore number
             	    //  	filepath is the path of the file to be registered
             	    //  	bundlename is an optional bundle name
             	    String sRegistrationLine = line.trim();
             	    int iAssetstore = -1;
             	    String sFilePath = null;
-            	    String sBundle = null;
-                    StringTokenizer tokenizer =
-                        	new StringTokenizer(sRegistrationLine);
+                    String sBundle = null;
+                    StringTokenizer tokenizer = new StringTokenizer(sRegistrationLine);
                     while (tokenizer.hasMoreTokens())
                     {
-                        String sToken = tokenizer.nextToken();
+                        String sToken = tokenizer.nextToken(); 
                         if (sToken.equals("-r"))
                         {
                             continue;
@@ -1059,9 +1007,9 @@ public class ItemImport
                         {
                             try
                             {
-                                iAssetstore =
+                                iAssetstore = 
                                     Integer.parseInt(tokenizer.nextToken());
-                            }
+                            } 
                             catch (NumberFormatException e)
                             {
                                 // ignore - iAssetstore remains -1
@@ -1070,7 +1018,6 @@ public class ItemImport
                         else if (sToken.equals("-f") && tokenizer.hasMoreTokens())
                         {
                             sFilePath = tokenizer.nextToken();
-
                         }
                         else if (sToken.startsWith("bundle:"))
                         {
@@ -1081,7 +1028,7 @@ public class ItemImport
                             // unrecognized token - should be no problem
                         }
                     } // while
-                    if (iAssetstore == -1 || sFilePath == null)
+                    if (iAssetstore == -1 || sFilePath == null) 
                     {
                         System.out.println("\tERROR: invalid contents file line");
                         System.out.println("\t\tSkipping line: "
@@ -1091,7 +1038,8 @@ public class ItemImport
                     registerBitstream(c, i, iAssetstore, sFilePath, sBundle);
                     System.out.println("\tRegistering Bitstream: " + sFilePath
                             + "\tAssetstore: " + iAssetstore
-                            + "\tBundle: " + sBundle);
+                            + "\tBundle: " + sBundle
+                            + "\tDescription: " + sBundle);
                     continue;				// process next line in contents file
             	}
 
@@ -1157,10 +1105,9 @@ public class ItemImport
                     if (bundleExists)
                     {
                         String bundleName = line.substring(bMarkerIndex
-                                + bundleMarker.length(), bEndIndex);
+                                + bundleMarker.length(), bEndIndex).trim();
 
-                        processContentFileEntry(c, i, path, bitstreamName,
-                                bundleName);
+                        processContentFileEntry(c, i, path, bitstreamName, bundleName);
                         System.out.println("\tBitstream: " + bitstreamName
                                 + "\tBundle: " + bundleName);
                     }
@@ -1213,10 +1160,9 @@ public class ItemImport
      * @throws AuthorizeException
      */
     private void processContentFileEntry(Context c, Item i, String path,
-            String fileName, String bundleName)
-        throws IOException, AuthorizeException
+            String fileName, String bundleName) throws SQLException,
+            IOException, AuthorizeException
     {
-        BitstreamDAO bsDAO = BitstreamDAOFactory.getInstance(c);
         String fullpath = path + File.separatorChar + fileName;
 
         // get an input stream
@@ -1239,7 +1185,7 @@ public class ItemImport
                 newBundleName = "ORIGINAL";
             }
         }
-
+        
         if (!isTest)
         {
             // find the bundle
@@ -1268,7 +1214,7 @@ public class ItemImport
             BitstreamFormat bf = FormatIdentifier.guessFormat(c, bs);
             bs.setFormat(bf);
 
-            bsDAO.update(bs);
+            bs.update();
         }
     }
 
@@ -1280,12 +1226,13 @@ public class ItemImport
      * @param assetstore
      * @param bitstreamPath the full filepath expressed in the contents file
      * @param bundleName
+     * @throws SQLException
      * @throws IOException
      * @throws AuthorizeException
      */
     private void registerBitstream(Context c, Item i, int assetstore, 
             String bitstreamPath, String bundleName )
-        throws IOException, AuthorizeException
+        	throws SQLException, IOException, AuthorizeException
     {
         // TODO validate assetstore number
         // TODO make sure the bitstream is there
@@ -1360,7 +1307,7 @@ public class ItemImport
      * @throws AuthorizeException
      */
     private void processOptions(Context c, Item myItem, Vector options)
-            throws AuthorizeException
+            throws SQLException, AuthorizeException
     {
         for (int i = 0; i < options.size(); i++)
         {
@@ -1435,8 +1382,16 @@ public class ItemImport
                     actionID = Constants.WRITE;
                 }
 
-                GroupDAO groupDAO = GroupDAOFactory.getInstance(c);
-                myGroup = groupDAO.retrieve(groupName);
+                try
+                {
+                    myGroup = Group.findByName(c, groupName);
+                }
+                catch (SQLException sqle)
+                {
+                    System.out.println("SQL Exception finding group name: "
+                            + groupName);
+                    // do nothing, will check for null group later
+                }
             }
 
             String thisDescription = "";
@@ -1513,23 +1468,21 @@ public class ItemImport
      * @throws AuthorizeException
      */
     private void setPermission(Context c, Group g, int actionID, Bitstream bs)
-            throws AuthorizeException
+            throws SQLException, AuthorizeException
     {
         if (!isTest)
         {
-            ResourcePolicyDAO rpDAO = ResourcePolicyDAOFactory.getInstance(c);
-
             // remove the default policy
             AuthorizeManager.removeAllPolicies(c, bs);
 
             // add the policy
-            ResourcePolicy rp = rpDAO.create();
+            ResourcePolicy rp = ResourcePolicy.create(c);
 
             rp.setResource(bs);
             rp.setAction(actionID);
             rp.setGroup(g);
 
-            rpDAO.update(rp);
+            rp.update();
         }
         else
         {
@@ -1600,59 +1553,12 @@ public class ItemImport
      * 
      * @return the DOM representation of the XML file
      */
-    private static Document loadXML(String filename)
-        throws IOException, ParserConfigurationException, SAXException
+    private static Document loadXML(String filename) throws IOException,
+            ParserConfigurationException, SAXException
     {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance()
                 .newDocumentBuilder();
 
         return builder.parse(new File(filename));
-    }
-
-    /**
-     * Returns the first internal identifier encoungered in the uri file
-     * 
-     * @param directory
-     * @return
-     * @throws IOException
-     */
-    private ObjectIdentifier getObjectIdentifier(String directory)
-        throws IOException
-    {
-        File uriFile = new File(directory + "uri");
-        FileReader reader = new FileReader(uriFile);
-        BufferedReader br = new BufferedReader(reader);
-        String line = null;
-        while ((line = br.readLine()) != null)
-        {
-            ObjectIdentifier oid = ObjectIdentifier.parseCanonicalForm(line);
-            if (oid != null)
-            {
-                return oid;
-            }
-        }
-
-        return null;   
-    }
-
-    private List<ExternalIdentifier> getExternalIdentifiers(String directory)
-            throws IOException, IdentifierException
-    {
-        File uriFile = new File(directory + "uri");
-        FileReader reader = new FileReader(uriFile);
-        BufferedReader br = new BufferedReader(reader);
-        String line = null;
-        ArrayList<ExternalIdentifier> eids = new ArrayList<ExternalIdentifier>();
-        // ExternalIdentifier[] eidPlugins = (ExternalIdentifier[]) PluginManager.getPluginSequence(ExternalIdentifier.class);
-        while ((line = br.readLine()) != null)
-        {
-            ExternalIdentifier eid = ExternalIdentifierService.parseCanonicalForm(context, line);
-            if (eid != null)
-            {
-                eids.add(eid);
-            }
-        }
-        
-        return eids;
     }
 }

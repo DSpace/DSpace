@@ -1,9 +1,9 @@
 /*
  * FlowMapperUtils.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -44,13 +44,12 @@ import java.sql.SQLException;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.IndexBrowse;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.content.dao.CollectionDAO;
-import org.dspace.content.dao.CollectionDAOFactory;
-import org.dspace.content.dao.ItemDAO;
-import org.dspace.content.dao.ItemDAOFactory;
-import org.dspace.core.ArchiveManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
 /**
@@ -75,21 +74,33 @@ public class FlowMapperUtils
 	 */
 	public static FlowResult processMapItems(Context context, int collectionID, String[] itemIDs) throws SQLException, AuthorizeException, UIException, IOException
 	{
-        CollectionDAO collectionDAO = CollectionDAOFactory.getInstance(context);
-        ItemDAO itemDAO = ItemDAOFactory.getInstance(context);
-
-        FlowResult result = new FlowResult();
+		FlowResult result = new FlowResult();
 		result.setContinue(false);
 
-		Collection toCollection = collectionDAO.retrieve(collectionID);
+		Collection toCollection = Collection.find(context,collectionID);
 		
 		for (String itemID : itemIDs)
         {
-            Item item = itemDAO.retrieve(Integer.valueOf(itemID));
+            Item item = Item.find(context, Integer.valueOf(itemID));
 
-            // FIXME: Why did this check for READ permissions??
-            // if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ))
-            ArchiveManager.move(context, item, null, toCollection);
+            if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ))
+            {
+                // make sure item doesn't belong to this collection
+                if (!item.isOwningCollection(toCollection))
+                {
+                    toCollection.addItem(item);
+                    // FIXME Exception handling
+                    try
+                    {
+                    	IndexBrowse ib = new IndexBrowse(context);
+                    	ib.indexItem(item);
+                    }
+                    catch (BrowseException bex)
+                    {
+                    	throw new UIException("Unable to process browse", bex);
+                    }
+                }
+            }
         }
 		
 		context.commit();
@@ -111,21 +122,33 @@ public class FlowMapperUtils
 	 */
 	public static FlowResult processUnmapItems(Context context, int collectionID, String[] itemIDs) throws SQLException, AuthorizeException, UIException, IOException
 	{
-        CollectionDAO collectionDAO = CollectionDAOFactory.getInstance(context);
-        ItemDAO itemDAO = ItemDAOFactory.getInstance(context);
-
-        FlowResult result = new FlowResult();
+		FlowResult result = new FlowResult();
 		result.setContinue(false);
 
-		Collection fromCollection = collectionDAO.retrieve(collectionID);
+		Collection toCollection = Collection.find(context,collectionID);
 		
 		for (String itemID : itemIDs)
         {
-            Item item = itemDAO.retrieve(Integer.valueOf(itemID));
+            Item item = Item.find(context, Integer.valueOf(itemID));
 
-            // FIXME: Why did this check for READ permissions??
-            //if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ))
-            ArchiveManager.move(context, item, fromCollection, null);
+            if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ))
+            {
+                // make sure item doesn't belong to this collection
+                if (!item.isOwningCollection(toCollection))
+                {
+                    toCollection.removeItem(item);
+                    // FIXME Exception handling
+                    try
+                    {
+                    	IndexBrowse ib = new IndexBrowse(context);
+                    	ib.indexItem(item);
+                    }
+                    catch (BrowseException bex)
+                    {
+                    	throw new UIException("Unable to process browse", bex);
+                    }
+                }
+            }
         }
 		
 		context.commit();
@@ -136,4 +159,5 @@ public class FlowMapperUtils
 		
 		return result;
 	}
+	
 }

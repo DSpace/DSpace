@@ -1,9 +1,9 @@
 /*
  * EditCommunityMetadataForm.java
  *
- * Version: $Revision: 1.0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,6 +39,8 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.community;
 
+import java.sql.SQLException;
+
 import org.dspace.app.xmlui.aspect.administrative.FlowContainerUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -54,9 +56,6 @@ import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Community;
-import org.dspace.uri.IdentifierService;
-
-import java.sql.SQLException;
 
 /**
  * Presents the user (in this case an administrator over the community) with the
@@ -108,7 +107,7 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 	    
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("community-metadata-edit",contextPath+"/admin/community",Division.METHOD_MULTIPART,"primary administrative community");
-	    main.setHead(T_main_head.parameterize(IdentifierService.getCanonicalForm(thisCommunity)));
+	    main.setHead(T_main_head.parameterize(thisCommunity.getHandle()));
 	    
 	    if (AuthorizeManager.isAdmin(context))
 	    {

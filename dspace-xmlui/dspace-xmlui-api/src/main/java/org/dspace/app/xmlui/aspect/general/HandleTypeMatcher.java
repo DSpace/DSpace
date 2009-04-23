@@ -1,9 +1,9 @@
 /*
  * HandleTypeMatcher.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/08/08 21:00:07 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -40,17 +40,17 @@
 
 package org.dspace.app.xmlui.aspect.general;
 
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.avalon.framework.logger.AbstractLogEnabled;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.matching.Matcher;
 import org.apache.cocoon.sitemap.PatternException;
-import org.dspace.app.xmlui.utils.URIUtil;
+import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
-
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Test the current URL to see if it contains a reference to a DSpaceObject, if
@@ -106,7 +106,7 @@ public class HandleTypeMatcher extends AbstractLogEnabled implements Matcher
         try
         {
             // HandleUtil handles caching if needed.
-            dso = URIUtil.resolve(objectModel);
+            dso = HandleUtil.obtainHandle(objectModel);
         }
         catch (SQLException sqle)
         {

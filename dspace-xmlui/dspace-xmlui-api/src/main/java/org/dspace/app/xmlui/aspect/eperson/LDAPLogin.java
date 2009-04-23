@@ -1,9 +1,9 @@
 /*
  * LDAPLogin.java
  *
- * Version: $Revision: 1.12 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/08/08 20:57:03 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -42,6 +42,8 @@ package org.dspace.app.xmlui.aspect.eperson;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+
+import javax.servlet.http.HttpSession;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -98,7 +100,7 @@ public class LDAPLogin extends AbstractDSpaceTransformer implements
 		String previous_username = request.getParameter("username");
 
 		// Get any message parameters
-		Session session = request.getSession();
+		HttpSession session = request.getSession();
 		String header = (String) session
 				.getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_HEADER);
 		String message = (String) session
@@ -125,7 +127,7 @@ public class LDAPLogin extends AbstractDSpaceTransformer implements
 		String previous_username = request.getParameter("username");
 
 		// Get any message parameters
-		Session session = request.getSession();
+		HttpSession session = request.getSession();
 		String header = (String) session
 				.getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_HEADER);
 		String message = (String) session
@@ -161,7 +163,7 @@ public class LDAPLogin extends AbstractDSpaceTransformer implements
 			WingException {
 		// Check if the user has previously attempted to login.
 		Request request = ObjectModelHelper.getRequest(objectModel);
-		Session session = request.getSession();
+		HttpSession session = request.getSession();
 		String previousUserName = request.getParameter("username");
 
 		// Get any message parameters

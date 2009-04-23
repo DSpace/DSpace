@@ -3,9 +3,9 @@
 <!--
   DS-METS-1.0.xsl
 
-  Version: $Revision: 1.2 $
+  Version: $Revision$
  
-  Date: $Date: 2007/06/27 22:54:52 $
+  Date: $Date$
  
   Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
   Institute of Technology.  All rights reserved.
@@ -206,7 +206,7 @@
     
     <!--
     File Type Mapping template
-    
+
     This maps format MIME Types to human friendly File Type descriptions.
     Essentially, it looks for a corresponding 'key' in your messages.xml of this
     format: xmlui.dri2xhtml.mimetype.{MIME Type}
@@ -233,10 +233,10 @@
             <p><i18n:text>xmlui.dri2xhtml.METS-1.0.license-text</i18n:text></p>
             <ul>
                 <xsl:if test="@USE='CC-LICENSE'">
-                    <li><a href="{mets:file/mets:FLocat[@xlink:title='license_text']/@xlink:href}">Creative Commons</a></li>
+                    <li><a href="{mets:file/mets:FLocat[@xlink:title='license_text']/@xlink:href}"><i18n:text>xmlui.dri2xhtml.structural.link_cc</i18n:text></a></li>
                 </xsl:if>
                 <xsl:if test="@USE='LICENSE'">
-                    <li><a href="{mets:file/mets:FLocat[@xlink:title='license.txt']/@xlink:href}">Original License</a></li>
+                    <li><a href="{mets:file/mets:FLocat[@xlink:title='license.txt']/@xlink:href}"><i18n:text>xmlui.dri2xhtml.structural.link_original_license</i18n:text></a></li>
                 </xsl:if>
             </ul>
         </div>

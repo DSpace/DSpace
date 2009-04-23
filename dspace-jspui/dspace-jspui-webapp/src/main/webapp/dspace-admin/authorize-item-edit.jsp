@@ -113,7 +113,8 @@
     <tr>
       <td align="left">
 	<h1><fmt:message key="jsp.dspace-admin.authorize-item-edit.policies">
-        <fmt:param><%= item.getIdentifier().getCanonicalForm() %></fmt:param>
+        <fmt:param><%= item.getHandle() %></fmt:param>
+        <fmt:param><%= item.getID() %></fmt:param>
     </fmt:message></h1>
       </td>
       <td align="right" class="standard">
@@ -150,7 +151,7 @@
         ResourcePolicy rp = (ResourcePolicy) i.next();
 %>
         <tr>
-            <td class="<%= row %>RowOddCol"><%= rp.getSimpleIdentifier().getCanonicalForm() %></td>
+            <td class="<%= row %>RowOddCol"><%= rp.getID() %></td>
             <td class="<%= row %>RowEvenCol">
                     <%= rp.getActionText() %>
             </td>
@@ -186,7 +187,7 @@
 %>                
         <h3><fmt:message key="jsp.dspace-admin.authorize-item-edit.bundle">
             <fmt:param><%=myBun.getName()%></fmt:param>
-            <fmt:param><%=myBun.getIdentifier().getCanonicalForm() %></fmt:param>
+            <fmt:param><%=myBun.getID()%></fmt:param>
         </fmt:message></h3>
 
         <form method="post" action="">
@@ -215,7 +216,7 @@
         ResourcePolicy rp = (ResourcePolicy) i.next();
 %>
         <tr>
-            <td class="<%= row %>RowOddCol"><%= rp.getSimpleIdentifier().getCanonicalForm() %></td>
+            <td class="<%= row %>RowOddCol"><%= rp.getID() %></td>
             <td class="<%= row %>RowEvenCol">
                     <%= rp.getActionText() %>
             </td>
@@ -254,7 +255,7 @@
             // display bitstream's policies
 %>                        
             <p><fmt:message key="jsp.dspace-admin.authorize-item-edit.bitstream">
-                <fmt:param><%=myBits.getIdentifier().getCanonicalForm() %></fmt:param>
+                <fmt:param><%=myBits.getID()%></fmt:param>
                 <fmt:param><%=myBits.getName()%></fmt:param>
             </fmt:message></p>
             <form method="post" action="">
@@ -281,7 +282,7 @@
         ResourcePolicy rp = (ResourcePolicy) i.next();
 %>
         <tr>
-            <td class="<%= row %>RowOddCol"><%= rp.getSimpleIdentifier().getCanonicalForm() %></td>
+            <td class="<%= row %>RowOddCol"><%= rp.getID() %></td>
             <td class="<%= row %>RowEvenCol">
                     <%= rp.getActionText() %>
             </td>

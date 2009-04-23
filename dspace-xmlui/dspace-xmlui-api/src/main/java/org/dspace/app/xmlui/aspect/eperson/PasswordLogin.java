@@ -1,9 +1,9 @@
 /*
  * PasswordLogin.java
  *
- * Version: $Revision: 1.12 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/08/08 20:57:03 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -43,10 +43,11 @@ package org.dspace.app.xmlui.aspect.eperson;
 import java.io.Serializable;
 import java.sql.SQLException;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.environment.Session;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -65,10 +66,10 @@ import org.xml.sax.SAXException;
 
 /**
  * Query the user for their authentication credentials.
- *
- * The parameter "return-url" may be passed to give a location
+ * 
+ * The parameter "return-url" may be passed to give a location 
  * where to redirect the user to after sucessfully authenticating.
- *
+ * 
  * @author Sid
  * @author Scott Phillips
  */
@@ -80,38 +81,38 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements Cacheabl
 
     public static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
-
+    
     public static final Message T_trail =
         message("xmlui.EPerson.PasswordLogin.trail");
-
+    
     public static final Message T_head1 =
         message("xmlui.EPerson.PasswordLogin.head1");
-
+    
     public static final Message T_email_address =
         message("xmlui.EPerson.PasswordLogin.email_address");
-
-    public static final Message T_error_bad_login =
+    
+    public static final Message T_error_bad_login = 
         message("xmlui.EPerson.PasswordLogin.error_bad_login");
-
-    public static final Message T_password =
+    
+    public static final Message T_password = 
         message("xmlui.EPerson.PasswordLogin.password");
-
-    public static final Message T_forgot_link =
+    
+    public static final Message T_forgot_link = 
         message("xmlui.EPerson.PasswordLogin.forgot_link");
-
-    public static final Message T_submit =
+    
+    public static final Message T_submit = 
         message("xmlui.EPerson.PasswordLogin.submit");
-
-    public static final Message T_head2 =
+    
+    public static final Message T_head2 = 
         message("xmlui.EPerson.PasswordLogin.head2");
-
+    
     public static final Message T_para1 =
         message("xmlui.EPerson.PasswordLogin.para1");
-
-    public static final Message T_register_link =
+    
+    public static final Message T_register_link = 
         message("xmlui.EPerson.PasswordLogin.register_link");
-
-
+    
+    
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
@@ -120,14 +121,14 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements Cacheabl
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
         String previous_email = request.getParameter("login_email");
-
+        
         // Get any message parameters
-        Session session = request.getSession();
+        HttpSession session = request.getSession();
         String header = (String) session.getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_HEADER);
         String message = (String) session.getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_MESSAGE);
         String characters = (String) session.getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_CHARACTERS);
-
-
+        
+        
         // If there is a message or previous email attempt then the page is not cachable
         if (header == null && message == null && characters == null && previous_email == null)
             // cacheable
@@ -144,14 +145,14 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements Cacheabl
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
         String previous_email = request.getParameter("login_email");
-
+        
         // Get any message parameters
-        Session session = request.getSession();
+        HttpSession session = request.getSession();
         String header = (String) session.getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_HEADER);
         String message = (String) session.getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_MESSAGE);
         String characters = (String) session.getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_CHARACTERS);
-
-
+        
+        
         // If there is a message or previous email attempt then the page is not cachable
         if (header == null && message == null && characters == null && previous_email == null)
             // Always valid
@@ -159,9 +160,9 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements Cacheabl
         else
             // invalid
             return null;
-    }
-
-
+    } 
+    
+    
     /**
      * Set the page title and trail.
      */
@@ -181,36 +182,36 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements Cacheabl
     {
         // Check if the user has previously attempted to login.
         Request request = ObjectModelHelper.getRequest(objectModel);
-        Session session = request.getSession();
+        HttpSession session = request.getSession();
         String previousEmail = request.getParameter("login_email");
-
+        
         // Get any message parameters
         String header = (String) session.getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_HEADER);
         String message = (String) session.getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_MESSAGE);
         String characters = (String) session.getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_CHARACTERS);
-
+        
         if (header != null || message != null || characters != null)
         {
         	Division reason = body.addDivision("login-reason");
-
+        	
         	if (header != null)
         		reason.setHead(message(header));
         	else
         		// Allways have a head.
         		reason.setHead("Authentication Required");
-
+        	
         	if (message != null)
         		reason.addPara(message(message));
-
+        	
         	if (characters != null)
         		reason.addPara(characters);
         }
-
-
+        
+        
         Division login = body.addInteractiveDivision("login", contextPath
                 + "/password-login", Division.METHOD_POST, "primary");
         login.setHead(T_head1);
-
+        
         List list = login.addList("password-login",List.TYPE_FORM);
 
         Text email = list.addItem().addText("login_email");
@@ -221,7 +222,7 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements Cacheabl
             email.setValue(previousEmail);
             email.addError(T_error_bad_login);
         }
-
+        
 
         Item item = list.addItem();
         Password password = item.addPassword("login_password");
@@ -232,7 +233,7 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements Cacheabl
         list.addLabel();
         Item submit = list.addItem("login-in", null);
         submit.addButton("submit").setValue(T_submit);
-
+        
         if (ConfigurationManager.getBooleanProperty("xmlui.user.registration", true))
         {
 	        Division register = login.addDivision("register");

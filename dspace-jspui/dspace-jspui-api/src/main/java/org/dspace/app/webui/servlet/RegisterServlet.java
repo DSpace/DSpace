@@ -45,9 +45,7 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.*;
 import org.dspace.eperson.AccountManager;
 import org.dspace.eperson.EPerson;
 
@@ -253,7 +251,7 @@ public class RegisterServlet extends DSpaceServlet
         String password = request.getParameter("password");
         EPerson eperson = EPerson.findByEmail(context, email);
         EPerson eperson2 = null;
-        if (netid!=null) eperson2 = EPerson.findByNetid(context, netid);
+        if (netid!=null) eperson2 = EPerson.findByNetid(context, netid.toLowerCase());
 
         try
         {
@@ -476,7 +474,7 @@ public class RegisterServlet extends DSpaceServlet
         EPerson eperson = null;
         if (email!=null) eperson = EPerson.findByEmail(context, email);
         EPerson eperson2 = null;
-        eperson2 = EPerson.findByNetid(context, netid);
+        if (netid!=null) eperson2 = EPerson.findByNetid(context, netid.toLowerCase());
         if (eperson2 !=null) eperson = eperson2;
         
         if (eperson == null)
@@ -487,7 +485,7 @@ public class RegisterServlet extends DSpaceServlet
             context.setIgnoreAuthorization(true);
             eperson = EPerson.create(context);
             eperson.setEmail(email);
-            eperson.setNetid(netid);
+            if (netid!=null) eperson.setNetid(netid.toLowerCase());
             eperson.update();
             context.setIgnoreAuthorization(false);
         }
@@ -529,6 +527,7 @@ public class RegisterServlet extends DSpaceServlet
             eperson.update();
 
             request.setAttribute("eperson", eperson);
+
             JSPManager.showJSP(request, response, "/register/registered.jsp");
             context.complete();
         }

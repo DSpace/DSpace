@@ -39,6 +39,8 @@
  */
 package org.dspace.authorize;
 
+//import org.dspace.browse.Browse;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -143,7 +145,7 @@ public class FixDefaultPolicies
      * check to see if a collection has any policies for a given action
      */
     private static boolean checkForPolicy(Context c, DSpaceObject t,
-            int myaction)
+            int myaction) throws SQLException
     {
         // check to see if any policies exist for this action
         List policies = AuthorizeManager
@@ -158,7 +160,7 @@ public class FixDefaultPolicies
      * action
      */
     private static void addAnonymousPolicy(Context c, DSpaceObject t,
-            int myaction) throws AuthorizeException
+            int myaction) throws SQLException, AuthorizeException
     {
         // group 0 is the anonymous group!
         Group anonymousGroup = Group.find(c, 0);

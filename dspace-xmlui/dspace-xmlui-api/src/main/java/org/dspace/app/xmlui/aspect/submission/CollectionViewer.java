@@ -1,9 +1,9 @@
 /*
  * CollectionViewer.java
  *
- * Version: $Revision: 1.21 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/27 18:24:34 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,13 +39,17 @@
  */
 package org.dspace.app.xmlui.aspect.submission;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
+
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
+import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -56,12 +60,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
-import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
 
 /**
  * Add a single link to the display item page that allows
@@ -75,6 +74,9 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 	/** Language Strings */
     protected static final Message T_title = 
         message("xmlui.Submission.SelectCollection.title");
+    protected static final Message T_submit = 
+    	message("xmlui.Submission.CollectionViewer.link1");
+    
 	
     /** Cached validity object */
     private SourceValidity validity;
@@ -87,12 +89,12 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     {
         try
         {
-            DSpaceObject dso = URIUtil.resolve(objectModel);
+            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
             if (dso == null)
                 return "0";
                 
-            return HashUtil.hash(IdentifierService.getCanonicalForm(dso));
+            return HashUtil.hash(dso.getHandle());
         }
         catch (SQLException sqle)
         {
@@ -115,7 +117,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     	{
 	        try
 	        {
-	            DSpaceObject dso = URIUtil.resolve(objectModel);
+	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 	
 	            if (dso == null)
 	                return null;
@@ -157,7 +159,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
-        DSpaceObject dso = URIUtil.resolve(objectModel);
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Collection))
             return;
  
@@ -169,8 +171,8 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
         {
 	        Division home = body.addDivision("collection-home","primary repository collection");
 	        Division viewer = home.addDivision("collection-view","secondary");
-                String submitURL = IdentifierService.getURL(collection) + "/submit";
-	        viewer.addPara().addXref(submitURL,"Submit a new item to this collection"); 
+	        String submitURL = contextPath + "/handle/" + collection.getHandle() + "/submit";
+	        viewer.addPara().addXref(submitURL,T_submit); 
         }
         
     }

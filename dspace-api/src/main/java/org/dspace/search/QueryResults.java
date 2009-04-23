@@ -55,11 +55,11 @@ public class QueryResults
 
     private int pageSize; // max number of hits returned
 
-    private List hitURIs;   // URIs of content (items, collections,
-                            // communities)
+    private List hitHandles; // handles of content (items, collections,
+                             // communities)
 
     private List hitTypes; // Resource type - from Constants
-    private List hitIds;   // Resource ids
+    private List hitIds;   // Resource ids 
 
     private String errorMsg; //error string, if there is one
 
@@ -84,7 +84,7 @@ public class QueryResults
         this.etAl = etAl;
     }
 
-    /** set total number of hits found by search engine, not number in hitURI */
+    /** set total number of hits found by search engine, not number in hitHandles */
     public void setHitCount(int newCount)
     {
         hitCount = newCount;
@@ -123,16 +123,16 @@ public class QueryResults
         return pageSize;
     }
 
-    /** set the List of URIs corresponding to hits */
-    public void setHitURIs(List myHits)
+    /** set the List of handles corresponding to hits */
+    public void setHitHandles(List myHits)
     {
-        hitURIs = myHits;
+        hitHandles = myHits;
     }
 
-    /** get the List of URIs corresponding to hits */
-    public List getHitURIs()
+    /** get the List of handles corresponding to hits */
+    public List getHitHandles()
     {
-        return hitURIs;
+        return hitHandles;
     }
 
     /** set the List of ids corresponding to hits */
@@ -147,13 +147,13 @@ public class QueryResults
         return hitIds;
     }
 
-    /** set the List of types corresponding to URIs */
+    /** set the List of types corresponding to handles */
     public void setHitTypes(List newTypes)
     {
         hitTypes = newTypes;
     }
 
-    /** get the List of types corresponding to URIs */
+    /** get the List of types corresponding to handles */
     public List getHitTypes()
     {
         return hitTypes;

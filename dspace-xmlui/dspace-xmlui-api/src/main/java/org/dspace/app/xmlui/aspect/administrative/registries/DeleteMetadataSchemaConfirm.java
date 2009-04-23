@@ -1,9 +1,9 @@
 /*
  * DeleteMetadataSchemaConfirm.java
  *
- * Version: $Revision: 1.0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -128,7 +128,7 @@ public class DeleteMetadataSchemaConfirm extends AbstractDSpaceTransformer
     	for (MetadataSchema schema : schemas) 
     	{
     		Row row = table.addRow();
-    		row.addCell().addContent(schema.getID());
+    		row.addCell().addContent(schema.getSchemaID());
         	row.addCell().addContent(schema.getNamespace());
         	row.addCell().addContent(schema.getName());
 	    }

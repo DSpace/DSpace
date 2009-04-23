@@ -48,9 +48,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.uri.IdentifierService;
-import org.dspace.uri.IdentifierException;
-import org.dspace.uri.ResolvableIdentifier;
+import org.dspace.handle.HandleManager;
 
 /**
  * This class provides a single point of contact for
@@ -77,7 +75,7 @@ public class CollectionLocation
 	public String getLocation(Collection collection)
 		throws DSpaceSWORDException
 	{
-		return IdentifierService.getURL(this.getBaseUrl(), collection);
+		return this.getBaseUrl() + "/" + collection.getHandle();
 	}
 	
 	/**
@@ -99,23 +97,31 @@ public class CollectionLocation
 			{
 				throw new DSpaceSWORDException("The deposit URL is incomplete");
 			}
-            
-            ResolvableIdentifier ri = IdentifierService.resolve(context, location);
-            DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, ri);
-
+			String handle = location.substring(baseUrl.length());
+			if (handle.startsWith("/"))
+			{
+				handle = handle.substring(1);
+			}
+			if ("".equals(handle))
+			{
+				throw new DSpaceSWORDException("The deposit URL is incomplete");
+			}
+			
+			DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+			
 			if (!(dso instanceof Collection))
 			{
 				throw new DSpaceSWORDException("The deposit URL does not resolve to a valid collection");
 			}
-
+			
 			return (Collection) dso;
-        }
-        catch (IdentifierException e)
+		}
+		catch (SQLException e)
 		{
 			log.error("Caught exception:", e);
 			throw new DSpaceSWORDException("There was a problem resolving the collection", e);
 		}
-    }
+	}
 	
 	/**
 	 * Get the base deposit URL for the DSpace SWORD implementation.  This

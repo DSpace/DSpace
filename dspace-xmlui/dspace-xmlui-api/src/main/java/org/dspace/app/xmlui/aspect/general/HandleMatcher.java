@@ -1,9 +1,9 @@
 /*
  * HandleMatcher.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2005/11/18 00:49:32 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -40,20 +40,20 @@
 
 package org.dspace.app.xmlui.aspect.general;
 
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.avalon.framework.logger.AbstractLogEnabled;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.matching.Matcher;
 import org.apache.cocoon.sitemap.PatternException;
-import org.dspace.app.xmlui.utils.URIUtil;
+import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
-
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Test the current URL to see if it or any of it's parants match against the
@@ -81,7 +81,7 @@ public class HandleMatcher extends AbstractLogEnabled implements Matcher
     {
         try
         {
-            DSpaceObject dso = URIUtil.resolve(objectModel);
+            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
             if (dso == null)
                 return null;
 
@@ -121,8 +121,9 @@ public class HandleMatcher extends AbstractLogEnabled implements Matcher
 
         while (current != null)
         {
+
             // Check if the current object has the handle we are looking for.
-            if (current.getExternalIdentifier().getCanonicalForm().equals(handle))
+            if (current.getHandle().equals(handle))
                 return current;
 
             if (dso.getType() == Constants.ITEM)

@@ -61,6 +61,7 @@
 
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.eperson.Group"   %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%
     Group group = (Group) request.getAttribute("group");
@@ -80,7 +81,7 @@
   <table width="95%">
     <tr>
       <td align="left">
-	<h1><fmt:message key="jsp.tools.group-edit.title"/> : <%=group.getName()%> (<%=group.getIdentifier().getCanonicalForm() %>)</h1>
+	<h1><fmt:message key="jsp.tools.group-edit.title"/> : <%=group.getName()%> (id: <%=group.getID()%>)</h1>
       </td>
       <td align="right" class="standard">
 	<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.collection-admin\") +\"#groupeditor\"%>"><fmt:message key="jsp.help"/></dspace:popup>
@@ -90,7 +91,7 @@
 
   <center>
     <form name="epersongroup" method="post" action="">
-	<p><label for="tgroup_name"><fmt:message key="jsp.tools.group-edit.name"/></label><input name="group_name" id="tgroup_name" value="<%=group.getName()%>"/></p>
+	<p><label for="tgroup_name"><fmt:message key="jsp.tools.group-edit.name"/></label><input name="group_name" id="tgroup_name" value="<%= Utils.addEntities(group.getName()) %>"/></p>
    	    <h3><fmt:message key="jsp.tools.group-edit.heading"/></h3>
 
         <input type="hidden" name="group_id" value="<%=group.getID()%>"/>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2007, Aberystwyth University
+ * Copyright (c) 2008-2009, Aberystwyth University
  *
  * All rights reserved.
  * 
@@ -36,20 +36,12 @@
  */
 package org.purl.sword.base;
 
-/**
- *   Author   : $Author: nst $
- *   Date     : $Date: 2007/09/21 15:18:55 $
- *   Revision : $Revision: 1.3 $
- *   Name     : $Name:  $
- */
-
+import java.util.ArrayList;
+import java.util.Properties;
+import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import org.apache.log4j.Logger;
 
 /**
  * Parent class for all classes that represent an XML element. This provides
@@ -58,42 +50,105 @@ import java.util.GregorianCalendar;
  * 
  * @author Neil Taylor
  */
-public class XmlElement 
+public abstract class XmlElement
 {
+
+    /** Logger */
+   private static Logger log = Logger.getLogger(XmlElement.class);
+
+
    /**
-    * The name to use for the prefix. 
+    *
     */
-   protected String prefix; 
+   protected XmlName xmlName;
+
+
+   public XmlName getXmlName()
+   {
+       // FIXME - should this be a clone?
+       return xmlName; 
+   }
+
+   /**
+    * The name to use for the prefix. E.g. atom:title, atom is the prefix. 
+    */
+   //protected String prefix;
    
    /**
-    * 
+    * The local name of the element. E.g. atom:title, title is the local name. 
     */
-   protected String localName; 
-   
+   //protected String localName;
+      
    /**
+    * Create a new instance. Set the local name that will be used. 
     * 
-    * @param localName
+    * @param localName The local name for the element. 
     */
    public XmlElement(String localName)
    {
-      this.localName = localName;
+      this("", localName);
    }
    
    /**
-    * Create a new instance. 
+    * Create a new instance. Set the prefix and local name. 
+    * 
+    * @param prefix The prefix for the element. 
+    * @param localName The local name for the element. 
     */
    public XmlElement(String prefix, String localName)
    {
-      this.prefix = prefix;
-      this.localName = localName;
+      this.xmlName = new XmlName(prefix, localName, "");
    }
-   
+
+   /**
+    * Create a new insatnce. Set the prefix, local name and the namespace URI.
+    *
+    * @param prefix       The prefix.
+    * @param localName    The element's local name. 
+    * @param namespaceUri The namespace URI.
+    */
+   public XmlElement(String prefix, String localName, String namespaceUri)
+   {
+       this.xmlName = new XmlName(prefix, localName, namespaceUri);
+   }
+
+   /**
+    * 
+    * @param name
+    */
+   public XmlElement(XmlName name)
+   {
+       xmlName = name; 
+   }
    
    /**
     * The Date format that is used to parse dates to and from the ISO format 
     * in the XML data. 
     */
    protected static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+   
+   /**
+    * Array of possible date formats that are permitted for date elements. 
+    */
+   protected static final String[] DATE_FORMATS = 
+   {
+      "yyyy-MM-dd'T'HH:mm:ss'Z'",
+      "yyyy-MM-dd'T'HH:mm:ss.SZ",
+      "yyyy-MM-dd'T'HH:mm:ss.Sz",
+      "yyyy-MM-dd'T'HH:mm:ssZ",
+      "yyyy-MM-dd'T'HH:mm:ssz",
+      "yyyy-MM-dd'T'HH:mmZZZZ",
+      "yyyy-MM-dd'T'HH:mmzzzz",
+      "yyyy-MM-dd'T'HHZZZZ",
+      "yyyy-MM-dd'T'HHzzzz",
+      "yyyy-MM-dd'T'HH:mm:ss.S",
+      "yyyy-MM-dd'T'HH:mm:ss",
+      "yyyy-MM-dd'T'HH:mm",
+      "yyyy-MM-dd'T'HH",
+      "yyyy-MM-dd",
+      "yyyy-MM",
+      "yyyy"
+   };
    
    /**
     * Extract a boolean value from the specified element. The boolean value 
@@ -108,7 +163,7 @@ public class XmlElement
    protected boolean unmarshallBoolean( Element element )
    throws UnmarshallException 
    {
-	   if( element.getChildCount() != 1 )
+	  if( element.getChildCount() != 1 )
       {
          throw new UnmarshallException("Missing Boolean Value", null);
       }
@@ -135,7 +190,6 @@ public class XmlElement
       {
          throw new UnmarshallException("Error accessing Boolean element", ex);
       }
-      
    }
 
    /**
@@ -149,7 +203,7 @@ public class XmlElement
    protected String unmarshallString( Element element )
    throws UnmarshallException
    {
-      if( element.getChildCount() != 1 )
+       if( element.getChildCount() != 1 )
 	   {
 	      throw new UnmarshallException("Missing String Value", null);
 	   }
@@ -162,7 +216,7 @@ public class XmlElement
 	   }
 	   catch( IndexOutOfBoundsException ex )
 	   {
-	      throw new UnmarshallException("Error accessing Boolean element", ex);
+	      throw new UnmarshallException("Error accessing String element", ex);
 	   } 
 	   
    }
@@ -193,76 +247,14 @@ public class XmlElement
 	   }
 	   catch( IndexOutOfBoundsException ex )
 	   {
-	      throw new UnmarshallException("Error accessing Boolean element", ex);
+	      throw new UnmarshallException("Error accessing Integer", ex);
 	   } 
 	   catch( NumberFormatException nfex )
 	   {
-	      throw new UnmarshallException("Error fomratting the number", nfex);	   
+	      throw new UnmarshallException("Error formatting the number", nfex);
 	   }
    }
-   
-   /**
-    * Extract an date value from the specified element. The date value 
-    * is represented as a string in the only child of the element. 
-    * 
-    * @param element The element that contains the date. 
-    * @return The date. 
-    * @throws UnmarshallException If the element does not contain a single child, or if
-    * the child does not contain the valid date. 
-    */
-   protected Date unmarshallDate(Element element)
-   throws UnmarshallException 
-   {
-	   try
-	   {
-	      String content = unmarshallString(element);
-	      return stringToDate(content);
-	   }
-	   catch( UnmarshallException ue )
-	   {
-	      throw new UnmarshallException("Error accessing the date.", ue);
-	   } 
-	   catch (ParseException pe)
-      {
-	      throw new UnmarshallException("Error accessing the date.", pe);
-      }
-   }
-   
-   /**
-    * Convert the date to a string. If the date is null,
-    * the result will result to a default date of 1st January 1970. 
-    * FIXME - is this sensible?  
-    * 
-    * @param date The Date object. 
-    * @return The Date, expressed as a string in the format 
-    * yyyy-MM-ddTHH:mm:ssZ.
-    */
-   protected String dateToString(Date date)
-   {
-	  if( date == null )
-	  {
-		  GregorianCalendar cal = new GregorianCalendar(1970, 0, 1, 0, 0, 0);
-		  date = cal.getTime();
-	  }
-      SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
-      return formatter.format(date);
-   }
-   
-   /**
-    * Convert the string into a Date object. 
-    * 
-    * @param date The date, represented as a string. 
-    * @return A Date. 
-    * @throws ParseException If the string does not match the format 
-    * of yyyy-MM-ddTHH:mm:ssZ.
-    */
-   protected Date stringToDate(String date)
-   throws ParseException 
-   {
-      SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
-      return formatter.parse(date);
-   }
-   
+      
    /**
     * Determines if the specified element is an instance of the element name. If 
     * you are checking the name title in the ATOM namespace, then the local name
@@ -278,6 +270,18 @@ public class XmlElement
       return (localName.equals(element.getLocalName()) && 
               namespaceURI.equals(element.getNamespaceURI()) );
    }
+
+   /**
+    * 
+    * @param element
+    * @param xmlName
+    * @return
+    */
+   protected boolean isInstanceOf(Element element, XmlName xmlName)
+   {
+       return (xmlName.getLocalName().equals(element.getLocalName()) &&
+               xmlName.getNamespace().equals(element.getNamespaceURI()));
+   }
    
    /**
     * Retrieve the qualified name for this object. This uses the
@@ -287,7 +291,7 @@ public class XmlElement
     */
    public String getQualifiedName()
    {
-      return getQualifiedName(localName);
+      return getQualifiedName(xmlName.getLocalName());
    }
 
    /**
@@ -299,11 +303,104 @@ public class XmlElement
     */
    public String getQualifiedName(String name)
    {
-      String p = prefix; 
-      if( p != null )
-      {
-         p += ":";
-      }
-      return p + name;
+      return xmlName.getQualifiedName();
+ 
    }
+   
+   /**
+    * Get the qualified name for the given prefix and name
+    * 
+    * @param prefix the prefix
+    * @param name the name
+    * @return the qualified name
+    */
+   public String getQualifiedNameWithPrefix(String prefix, String name)
+   {
+	   return prefix + ":" + name;
+   }
+
+
+   public abstract SwordValidationInfo validate(Properties validationContext);
+
+   protected void processUnexpectedAttributes(Element element, ArrayList<SwordValidationInfo> attributeItems)
+   {
+       int attributeCount = element.getAttributeCount();
+       Attribute attribute = null;
+
+       for( int i = 0; i < attributeCount; i++ )
+       {
+            attribute = element.getAttribute(i);
+            XmlName attributeName = new XmlName(attribute.getNamespacePrefix(),
+                       attribute.getLocalName(),
+                       attribute.getNamespaceURI());
+
+            SwordValidationInfo info = new SwordValidationInfo(xmlName, attributeName,
+                       SwordValidationInfo.UNKNOWN_ATTRIBUTE,
+                       SwordValidationInfoType.INFO);
+            info.setContentDescription(attribute.getValue());
+            attributeItems.add(info);
+       }
+   }
+
+   /**
+    * Add the information to the unmarshall attribute section of the specified
+    * info object.
+    * 
+    * @param element
+    * @param info
+    */
+   protected void processUnexpectedAttributes(Element element, SwordValidationInfo info)
+   {
+       int attributeCount = element.getAttributeCount();
+       Attribute attribute = null;
+
+       for( int i = 0; i < attributeCount; i++ )
+       {
+            attribute = element.getAttribute(i);
+            XmlName attributeName = new XmlName(attribute.getNamespacePrefix(),
+                       attribute.getLocalName(),
+                       attribute.getNamespaceURI());
+
+            SwordValidationInfo item = new SwordValidationInfo(xmlName, attributeName,
+                       SwordValidationInfo.UNKNOWN_ATTRIBUTE,
+                       SwordValidationInfoType.INFO);
+            item.setContentDescription(attribute.getValue());
+            info.addUnmarshallAttributeInfo(item);
+       }
+   }
+
+   protected SwordValidationInfo handleIncorrectElement(Element element, Properties validationProperties)
+   throws UnmarshallException
+   {
+       log.error("Unexpected element. Expected: " + getQualifiedName() + ". Got: " +
+				   ((element != null) ? element.getQualifiedName() : "null" ));
+
+       if( validationProperties != null )
+       {
+          SwordValidationInfo info = new SwordValidationInfo(
+                    new XmlName(element.getNamespacePrefix(), element.getLocalName(), element.getNamespaceURI()),
+                    "This is not the expected element. Received: " + element.getQualifiedName() + " for namespaceUri: " + element.getNamespaceURI(),
+                    SwordValidationInfoType.ERROR
+                    );
+          return info;
+       }
+       else
+       {
+           throw new UnmarshallException( "Not a " + getQualifiedName() + " element" );
+       }
+   }
+
+   protected SwordValidationInfo createValidAttributeInfo(String name, String content)
+   {
+      XmlName attributeName = new XmlName(xmlName.getPrefix(),
+                       name,
+                       xmlName.getNamespace());
+
+      SwordValidationInfo item = new SwordValidationInfo(xmlName, attributeName);
+      item.setContentDescription(content);
+      //attributeItems.add(item);
+      return item; 
+   }
+
+   
 }

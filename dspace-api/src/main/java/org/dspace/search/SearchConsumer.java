@@ -49,8 +49,6 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.IdentifierService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
@@ -69,8 +67,8 @@ public class SearchConsumer implements Consumer
     // collect Items, Collections, Communities that need indexing
     private Set<DSpaceObject> objectsToUpdate = null;
 
-    // oid to delete since IDs are not useful by now.
-    private Set<ObjectIdentifier> objectsToDelete = null;
+    // handles to delete since IDs are not useful by now.
+    private Set<String> handlesToDelete = null;
 
     public void initialize() throws Exception
     {
@@ -93,7 +91,7 @@ public class SearchConsumer implements Consumer
         if (objectsToUpdate == null)
         {
             objectsToUpdate = new HashSet<DSpaceObject>();
-            objectsToDelete = new HashSet<ObjectIdentifier>();
+            handlesToDelete = new HashSet<String>();
         }
 
         int st = event.getSubjectType();
@@ -126,8 +124,7 @@ public class SearchConsumer implements Consumer
                 subject = ((Bundle) subject).getItems()[0];
                 if (log.isDebugEnabled())
                     log.debug("Transforming Bundle event into MODIFY of Item "
-                    // + dso.getHandle());
-                            + subject.getID());
+                            + subject.getHandle());
             }
             else
                 return;
@@ -139,8 +136,7 @@ public class SearchConsumer implements Consumer
         case Event.MODIFY:
         case Event.MODIFY_METADATA:
             if (subject == null)
-                log.warn(event.getEventTypeAsString()
-                        + " event, could not get object for "
+                log.warn(event.getEventTypeAsString() + " event, could not get object for "
                         + event.getSubjectTypeAsString() + " id="
                         + String.valueOf(event.getSubjectID())
                         + ", perhaps it has been deleted.");
@@ -164,6 +160,7 @@ public class SearchConsumer implements Consumer
                 objectsToUpdate.add(object);
             }
             break;
+            
         case Event.DELETE:
             String detail = event.getDetail();
             if (detail == null)
@@ -171,13 +168,15 @@ public class SearchConsumer implements Consumer
             else
             {
                 log.debug("consume() adding event to delete queue: " + event.toString());
-                objectsToDelete.add(ObjectIdentifier.parseCanonicalForm(detail));
+                handlesToDelete.add(detail);
             }
             break;
         default:
-            log.warn("SearchConsumer should not have been "
-                    + "given a event of type=" + event.getEventTypeAsString()
-                    + " on subject=" + event.getSubjectTypeAsString());
+            log
+                    .warn("SearchConsumer should not have been given a event of type="
+                            + event.getEventTypeAsString()
+                            + " on subject="
+                            + event.getSubjectTypeAsString());
             break;
         }
     }
@@ -189,69 +188,61 @@ public class SearchConsumer implements Consumer
      */
     public void end(Context ctx) throws Exception
     {
-
-        if (objectsToUpdate != null && objectsToDelete != null)
+        
+        if(objectsToUpdate != null && handlesToDelete != null)
         {
-
-            // update the changed Items not deleted because they were on create
-            // list
+         
+            // update the changed Items not deleted because they were on create list
             for (DSpaceObject iu : objectsToUpdate)
             {
                 /* we let all types through here and 
                  * allow the search DSIndexer to make 
                  * decisions on indexing and/or removal
                  */
-                
-                // if handle is NOT in list of deleted objects, index it:
-                ObjectIdentifier oid = iu.getIdentifier();
-                if (oid != null && !objectsToDelete.contains(oid))
+                String hdl = iu.getHandle();
+                if (hdl != null && !handlesToDelete.contains(hdl))
                 {
                     try
                     {
-                        DSIndexer.indexContent(ctx, iu,true);
-                        if (log.isDebugEnabled())
-                            log.debug("re-indexed "
-                                    + Constants.typeText[iu.getType()]
-                                    + ", id=" + String.valueOf(iu.getID())
-                                    + ", oid=" + oid.getCanonicalForm());
+                        DSIndexer.indexContent(ctx, iu, true);
+                        log.debug("Indexed "
+                             + Constants.typeText[iu.getType()]
+                             + ", id=" + String.valueOf(iu.getID())
+                             + ", handle=" + hdl);
                     }
                     catch (Exception e)
                     {
-                        log.error("Failed while re-indexing object: ", e);
-                        objectsToUpdate = null;
-                        objectsToDelete = null;
+                        log.error("Failed while indexing object: ", e);
                     }
                 }
             }
 
-            for (ObjectIdentifier oid : objectsToDelete)
+            for (String hdl : handlesToDelete)
             {
                 try
                 {
-                    DSIndexer.unIndexContent(ctx, (DSpaceObject) IdentifierService.getResource(ctx, oid));
+                    DSIndexer.unIndexContent(ctx, hdl);
                     if (log.isDebugEnabled())
-                        log.debug("un-indexed Item, oid="
-                                + oid.getCanonicalForm());
+                        log.debug("UN-Indexed Item, handle=" + hdl);
                 }
                 catch (Exception e)
                 {
-                    log.error("Failed while un-indexing object: "
-                            + oid.getCanonicalForm(), e);
-                    objectsToUpdate = new HashSet<DSpaceObject>();
-                    objectsToDelete = new HashSet<ObjectIdentifier>();
+                    log.error("Failed while UN-indexing object: " + hdl, e);
                 }
 
             }
 
         }
-
+        
         // "free" the resources
         objectsToUpdate = null;
-        objectsToDelete = null;
+        handlesToDelete = null;
     }
 
     public void finish(Context ctx) throws Exception
     {
         // No-op
+
     }
+
 }

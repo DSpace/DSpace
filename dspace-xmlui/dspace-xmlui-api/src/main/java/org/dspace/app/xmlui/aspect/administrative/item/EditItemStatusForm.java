@@ -1,9 +1,9 @@
 /*
  * EditItemStatus.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,6 +39,8 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.item;
 
+import java.sql.SQLException;
+
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -50,9 +52,7 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.uri.IdentifierService;
-
-import java.sql.SQLException;
+import org.dspace.core.ConfigurationManager;
 
 /**
  * Display basic meta-meta information about the item and allow the user to change 
@@ -145,9 +145,8 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		itemInfo.addItem(String.valueOf(item.getID()));
 		
 		itemInfo.addLabel(T_label_handle);
-//      itemInfo.addItem(item.getHandle()==null?"None":item.getHandle());
-        itemInfo.addItem(IdentifierService.getCanonicalForm(item));
-
+		itemInfo.addItem(item.getHandle()==null?"None":item.getHandle());
+		
 		itemInfo.addLabel(T_label_modified);
 		itemInfo.addItem(item.getLastModified().toString());
 		
@@ -160,20 +159,14 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		}
 		
 		itemInfo.addLabel(T_label_page);
-//		if(item.getHandle()==null){
-        /*
-        if(item.getExternalIdentifier()==null){
-			itemInfo.addItem(T_na);
+		if(item.getHandle()==null){
+			itemInfo.addItem(T_na);		
 		}
 		else{
-//            itemInfo.addItem().addXref(ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getHandle(),ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getHandle());
-            itemInfo.addItem().addXref(ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getExternalIdentifier().getCanonicalForm(),ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getExternalIdentifier().getCanonicalForm());
-        }
-		*/
-        String url = IdentifierService.getURL(item).toString();
-        itemInfo.addItem().addXref(url, url);
-
-        itemInfo.addLabel(T_label_auth);
+			itemInfo.addItem().addXref(ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getHandle(),ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getHandle());		
+		}
+		
+		itemInfo.addLabel(T_label_auth);
 		addAdministratorOnlyButton(itemInfo.addItem(), "submit_authorization", T_submit_authorizations);
 	
 		if(!item.isWithdrawn())

@@ -42,8 +42,8 @@
     - The XMLUI (Manakin Release) configuration file
     -
     - Authors: Scott Phillips
-    - Version: $Revision: 1.2 $
-    - Date:    $Date: 2007/01/09 22:00:00 $
+    - Version: $Revision$
+    - Date:    $Date$
 -->
 
 <xmlui>

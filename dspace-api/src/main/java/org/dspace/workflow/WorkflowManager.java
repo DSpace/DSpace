@@ -40,6 +40,7 @@
 package org.dspace.workflow;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,9 +60,6 @@ import org.dspace.content.DCValue;
 import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.content.dao.WorkspaceItemDAO;
-import org.dspace.content.dao.WorkspaceItemDAOFactory;
-import org.dspace.uri.IdentifierService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -69,31 +67,33 @@ import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.workflow.dao.WorkflowItemDAO;
-import org.dspace.workflow.dao.WorkflowItemDAOFactory;
+import org.dspace.handle.HandleManager;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
  * Workflow state machine
- *
+ * 
  * Notes:
- *
+ * 
  * Determining item status from the database:
- *
+ * 
  * When an item has not been submitted yet, it is in the user's personal
  * workspace (there is a row in PersonalWorkspace pointing to it.)
- *
+ * 
  * When an item is submitted and is somewhere in a workflow, it has a row in the
  * WorkflowItem table pointing to it. The state of the workflow can be
  * determined by looking at WorkflowItem.getState()
- *
+ * 
  * When a submission is complete, the WorkflowItem pointing to the item is
  * destroyed and the archive() method is called, which hooks the item up to the
  * archive.
- *
+ * 
  * Notification: When an item enters a state that requires notification,
  * (WFSTATE_STEP1POOL, WFSTATE_STEP2POOL, WFSTATE_STEP3POOL,) the workflow needs
  * to notify the appropriate groups that they have a pending task to claim.
- *
+ * 
  * Revealing lists of approvers, editors, and reviewers. A method could be added
  * to do this, but it isn't strictly necessary. (say public List
  * getStateEPeople( WorkflowItem wi, int state ) could return people affected by
@@ -162,7 +162,7 @@ public class WorkflowManager
     /**
      * startWorkflow() begins a workflow - in a single transaction do away with
      * the PersonalWorkspace entry and turn it into a WorkflowItem.
-     *
+     * 
      * @param c
      *            Context
      * @param wsi
@@ -170,20 +170,32 @@ public class WorkflowManager
      * @return The resulting workflow item
      */
     public static WorkflowItem start(Context c, WorkspaceItem wsi)
-            throws AuthorizeException, IOException
+            throws SQLException, AuthorizeException, IOException
     {
         // FIXME Check auth
-        WorkflowItemDAO dao = WorkflowItemDAOFactory.getInstance(c);
-        WorkflowItem wfi = dao.create(wsi);
-        Item item = wfi.getItem();
+        Item myitem = wsi.getItem();
+        Collection collection = wsi.getCollection();
 
-        log.info(LogManager.getHeader(c, "start_workflow",
-            "workspace_item_id=" + wsi.getID() +
-            "item_id=" + item.getID() +
-            "collection_id=" + wfi.getCollection().getID()));
+        log.info(LogManager.getHeader(c, "start_workflow", "workspace_item_id="
+                + wsi.getID() + "item_id=" + myitem.getID() + "collection_id="
+                + collection.getID()));
 
         // record the start of the workflow w/provenance message
-        recordStart(c, item);
+        recordStart(c, myitem);
+
+        // create the WorkflowItem
+        TableRow row = DatabaseManager.create(c, "workflowitem");
+        row.setColumn("item_id", myitem.getID());
+        row.setColumn("collection_id", wsi.getCollection().getID());
+
+        WorkflowItem wfi = new WorkflowItem(c, row);
+
+        wfi.setMultipleFiles(wsi.hasMultipleFiles());
+        wfi.setMultipleTitles(wsi.hasMultipleTitles());
+        wfi.setPublishedBefore(wsi.isPublishedBefore());
+
+        // remove the WorkspaceItem
+        wsi.deleteWrapper();
 
         // now get the worflow started
         doState(c, wfi, WFSTATE_STEP1POOL, null);
@@ -198,7 +210,7 @@ public class WorkflowManager
      * subsequent notifications happen normally
      */
     public static WorkflowItem startWithoutNotify(Context c, WorkspaceItem wsi)
-            throws AuthorizeException, IOException
+            throws SQLException, AuthorizeException, IOException
     {
         // make a hash table entry with item ID for no notify
         // notify code checks no notify hash for item id
@@ -211,47 +223,80 @@ public class WorkflowManager
      * getOwnedTasks() returns a List of WorkflowItems containing the tasks
      * claimed and owned by an EPerson. The GUI displays this info on the
      * MyDSpace page.
-     *
+     * 
      * @param e
      *            The EPerson we want to fetch owned tasks for.
      */
-    public static List getOwnedTasks(Context context, EPerson eperson)
+    public static List getOwnedTasks(Context c, EPerson e)
+            throws java.sql.SQLException
     {
-        WorkflowItemDAO dao = WorkflowItemDAOFactory.getInstance(context);
-        return dao.getWorkflowItemsByOwner(eperson);
+        ArrayList mylist = new ArrayList();
+
+        String myquery = "SELECT * FROM WorkflowItem WHERE owner= ? ";
+
+        TableRowIterator tri = DatabaseManager.queryTable(c, 
+        		"workflowitem", myquery,e.getID());
+
+        try
+        {
+            while (tri.hasNext())
+            {
+                mylist.add(new WorkflowItem(c, tri.next()));
+            }
+        }
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
+
+        return mylist;
     }
 
     /**
      * getPooledTasks() returns a List of WorkflowItems an EPerson could claim
      * (as a reviewer, etc.) for display on a user's MyDSpace page.
-     *
+     * 
      * @param e
      *            The Eperson we want to fetch the pooled tasks for.
      */
-    public static List getPooledTasks(Context context, EPerson eperson)
+    public static List getPooledTasks(Context c, EPerson e) throws SQLException
     {
-        WorkflowItemDAO dao = WorkflowItemDAOFactory.getInstance(context);
-        List<TaskListItem> tlItems = dao.getTaskListItems(eperson);
-        List<WorkflowItem> wfItems = new ArrayList<WorkflowItem>();
+        ArrayList mylist = new ArrayList();
 
-        for (TaskListItem tli : tlItems)
+        String myquery = "SELECT workflowitem.* FROM workflowitem, TaskListItem" +
+        		" WHERE tasklistitem.eperson_id= ? " +
+        		" AND tasklistitem.workflow_id=workflowitem.workflow_id";
+
+        TableRowIterator tri = DatabaseManager
+                .queryTable(c, "workflowitem", myquery, e.getID());
+
+        try
         {
-            wfItems.add(dao.retrieve(tli.getWorkflowItemID()));
+            while (tri.hasNext())
+            {
+                mylist.add(new WorkflowItem(c, tri.next()));
+            }
         }
-
-        return wfItems;
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
+        
+        return mylist;
     }
 
     /**
      * claim() claims a workflow task for an EPerson
-     *
+     * 
      * @param wi
      *            WorkflowItem to do the claim on
      * @param e
      *            The EPerson doing the claim
      */
     public static void claim(Context c, WorkflowItem wi, EPerson e)
-            throws IOException, AuthorizeException
+            throws SQLException, IOException, AuthorizeException
     {
         int taskstate = wi.getState();
 
@@ -295,7 +340,7 @@ public class WorkflowManager
      * the item arrives at the submit state, then remove the WorkflowItem and
      * call the archive() method to put it in the archive, and email notify the
      * submitter of a successful submission
-     *
+     * 
      * @param c
      *            Context
      * @param wi
@@ -304,7 +349,7 @@ public class WorkflowManager
      *            EPerson doing the approval
      */
     public static void advance(Context c, WorkflowItem wi, EPerson e)
-            throws IOException, AuthorizeException
+            throws SQLException, IOException, AuthorizeException
     {
         int taskstate = wi.getState();
 
@@ -349,7 +394,7 @@ public class WorkflowManager
 
     /**
      * unclaim() returns an owned task/item to the pool
-     *
+     * 
      * @param c
      *            Context
      * @param wi
@@ -358,7 +403,7 @@ public class WorkflowManager
      *            EPerson doing the operation
      */
     public static void unclaim(Context c, WorkflowItem wi, EPerson e)
-            throws IOException, AuthorizeException
+            throws SQLException, IOException, AuthorizeException
     {
         int taskstate = wi.getState();
 
@@ -400,7 +445,7 @@ public class WorkflowManager
      * abort() aborts a workflow, completely deleting it (administrator do this)
      * (it will basically do a reject from any state - the item ends up back in
      * the user's PersonalWorkspace
-     *
+     * 
      * @param c
      *            Context
      * @param wi
@@ -409,7 +454,7 @@ public class WorkflowManager
      *            EPerson doing the operation
      */
     public static void abort(Context c, WorkflowItem wi, EPerson e)
-            throws AuthorizeException, IOException
+            throws SQLException, AuthorizeException, IOException
     {
         // authorize a DSpaceActions.ABORT
         if (!AuthorizeManager.isAdmin(c))
@@ -432,7 +477,8 @@ public class WorkflowManager
 
     // returns true if archived
     private static boolean doState(Context c, WorkflowItem wi, int newstate,
-            EPerson newowner) throws IOException, AuthorizeException
+            EPerson newowner) throws SQLException, IOException,
+            AuthorizeException
     {
         Collection mycollection = wi.getCollection();
         Group mygroup = null;
@@ -455,7 +501,7 @@ public class WorkflowManager
             {
                 // get a list of all epeople in group (or any subgroups)
                 EPerson[] epa = Group.allMembers(c, mygroup);
-
+                
                 // there were reviewers, change the state
                 //  and add them to the list
                 createTasks(c, wi, epa);
@@ -496,7 +542,7 @@ public class WorkflowManager
             {
                 //get a list of all epeople in group (or any subgroups)
                 EPerson[] epa = Group.allMembers(c, mygroup);
-
+                
                 // there were approvers, change the state
                 //  timestamp, and add them to the list
                 createTasks(c, wi, epa);
@@ -532,7 +578,7 @@ public class WorkflowManager
             {
                 // get a list of all epeople in group (or any subgroups)
                 EPerson[] epa = Group.allMembers(c, mygroup);
-
+                
                 // there were editors, change the state
                 //  timestamp, and add them to the list
                 createTasks(c, wi, epa);
@@ -578,6 +624,11 @@ public class WorkflowManager
                 // indexer causes this
                 throw e;
             }
+            catch (SQLException e)
+            {
+                // problem starting workflow
+                throw e;
+            }
 
             break;
         }
@@ -594,11 +645,11 @@ public class WorkflowManager
      * Commit the contained item to the main archive. The item is associated
      * with the relevant collection, added to the search index, and any other
      * tasks such as assigning dates are performed.
-     *
+     * 
      * @return the fully archived item.
      */
     private static Item archive(Context c, WorkflowItem wfi)
-            throws IOException, AuthorizeException
+            throws SQLException, IOException, AuthorizeException
     {
         // FIXME: Check auth
         Item item = wfi.getItem();
@@ -608,12 +659,11 @@ public class WorkflowManager
                 + wfi.getID() + "item_id=" + item.getID() + "collection_id="
                 + collection.getID()));
 
-        item = InstallItem.installItem(c, wfi);
-        String uri = item.getIdentifier().getCanonicalForm();
+        InstallItem.installItem(c, wfi);
 
         // Log the event
         log.info(LogManager.getHeader(c, "install_item", "workflow_id="
-                + wfi.getID() + ", item_id=" + item.getID() + "uri=" + uri));
+                + wfi.getID() + ", item_id=" + item.getID() + "handle=FIXME"));
 
         return item;
     }
@@ -622,7 +672,7 @@ public class WorkflowManager
      * notify the submitter that the item is archived
      */
     private static void notifyOfArchive(Context c, Item i, Collection coll)
-            throws IOException
+            throws SQLException, IOException
     {
         try
         {
@@ -630,33 +680,17 @@ public class WorkflowManager
             EPerson ep = i.getSubmitter();
             // Get the Locale
             Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
-            Email email = ConfigurationManager.getEmail(
-                    I18nUtil.getEmailFilename(supportedLocale,
-                        "submit_archive"));
-
-            // Here, we try to get an external identifier for the item to send
-            // in the notification email. If no external identifier exists, we
-            // just send the "local" item URL.
-            /*
-            ExternalIdentifier identifier = i.getExternalIdentifier();
-            String uri = "";
-            if (identifier != null)
-            {
-                uri = identifier.getURI().toString();
-            }
-            else
-            {
-                uri = IdentifierService.getURL(i).toString();
-            }*/
-            String uri = IdentifierService.getURL(i).toString();
+            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
+            
+            // Get the item handle to email to user
+            String handle = HandleManager.findHandle(c, i);
 
             // Get title
             DCValue[] titles = i.getDC("title", null, Item.ANY);
             String title = "";
             try
             {
-                title = I18nUtil.getMessage(
-                        "org.dspace.workflow.WorkflowManager.untitled");
+                title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
             }
             catch (MissingResourceException e)
             {
@@ -670,7 +704,7 @@ public class WorkflowManager
             email.addRecipient(ep.getEmail());
             email.addArgument(title);
             email.addArgument(coll.getMetadata("name"));
-            email.addArgument(uri);
+            email.addArgument(HandleManager.getCanonicalForm(handle));
 
             email.send();
         }
@@ -684,7 +718,7 @@ public class WorkflowManager
     /**
      * Return the workflow item to the workspace of the submitter. The workflow
      * item is removed, and a workspace item created.
-     *
+     * 
      * @param c
      *            Context
      * @param wfi
@@ -692,30 +726,44 @@ public class WorkflowManager
      * @return the workspace item
      */
     private static WorkspaceItem returnToWorkspace(Context c, WorkflowItem wfi)
-        throws AuthorizeException, IOException
+            throws SQLException, IOException, AuthorizeException
     {
-        WorkflowItemDAO wfiDAO = WorkflowItemDAOFactory.getInstance(c);
-        WorkspaceItemDAO wsiDAO = WorkspaceItemDAOFactory.getInstance(c);
-        WorkspaceItem wsi = wsiDAO.create(wfi);
+        Item myitem = wfi.getItem();
+        Collection mycollection = wfi.getCollection();
 
-        // remove any licenses that the item may have been given
-        wsi.getItem().removeLicenses();
+        // FIXME: How should this interact with the workflow system?
+        // FIXME: Remove license
+        // FIXME: Provenance statement?
+        // Create the new workspace item row
+        TableRow row = DatabaseManager.create(c, "workspaceitem");
+        row.setColumn("item_id", myitem.getID());
+        row.setColumn("collection_id", mycollection.getID());
+        DatabaseManager.update(c, row);
+
+        int wsi_id = row.getIntColumn("workspace_item_id");
+        WorkspaceItem wi = WorkspaceItem.find(c, wsi_id);
+        wi.setMultipleFiles(wfi.hasMultipleFiles());
+        wi.setMultipleTitles(wfi.hasMultipleTitles());
+        wi.setPublishedBefore(wfi.isPublishedBefore());
+        wi.update();
 
         //myitem.update();
         log.info(LogManager.getHeader(c, "return_to_workspace",
-                "workflow_item_id=" + wfi.getID() +
-                "workspace_item_id=" + wsi.getID()));
+                "workflow_item_id=" + wfi.getID() + "workspace_item_id="
+                        + wi.getID()));
 
-        wfiDAO.delete(wfi.getID());
+        // Now remove the workflow object manually from the database
+        DatabaseManager.updateQuery(c,
+                "DELETE FROM WorkflowItem WHERE workflow_id=" + wfi.getID());
 
-        return wsi;
+        return wi;
     }
 
     /**
      * rejects an item - rejection means undoing a submit - WorkspaceItem is
      * created, and the WorkflowItem is removed, user is emailed
      * rejection_message.
-     *
+     * 
      * @param c
      *            Context
      * @param wi
@@ -726,7 +774,8 @@ public class WorkflowManager
      *            message to email to user
      */
     public static WorkspaceItem reject(Context c, WorkflowItem wi, EPerson e,
-            String rejection_message) throws AuthorizeException, IOException
+            String rejection_message) throws SQLException, AuthorizeException,
+            IOException
     {
         // authorize a DSpaceActions.REJECT
         // stop workflow
@@ -765,26 +814,31 @@ public class WorkflowManager
 
     // creates workflow tasklist entries for a workflow
     // for all the given EPeople
-    private static void createTasks(Context c, WorkflowItem wfi, EPerson[] e)
+    private static void createTasks(Context c, WorkflowItem wi, EPerson[] epa)
+            throws SQLException
     {
-        WorkflowItemDAO dao = WorkflowItemDAOFactory.getInstance(c);
-
         // create a tasklist entry for each eperson
-        for (EPerson eperson : e)
+        for (int i = 0; i < epa.length; i++)
         {
-            dao.createTask(wfi, eperson);
+            // can we get away without creating a tasklistitem class?
+            // do we want to?
+            TableRow tr = DatabaseManager.create(c, "tasklistitem");
+            tr.setColumn("eperson_id", epa[i].getID());
+            tr.setColumn("workflow_id", wi.getID());
+            DatabaseManager.update(c, tr);
         }
     }
 
     // deletes all tasks associated with a workflowitem
-    static void deleteTasks(Context context, WorkflowItem wfi)
+    static void deleteTasks(Context c, WorkflowItem wi) throws SQLException
     {
-        WorkflowItemDAO dao = WorkflowItemDAOFactory.getInstance(context);
-        dao.deleteTasks(wfi);
+        String myrequest = "DELETE FROM TaskListItem WHERE workflow_id= ? ";
+       
+        DatabaseManager.updateQuery(c, myrequest, wi.getID());
     }
 
     private static void notifyGroupOfTask(Context c, WorkflowItem wi,
-            Group mygroup, EPerson[] epa) throws IOException
+            Group mygroup, EPerson[] epa) throws SQLException, IOException
     {
         // check to see if notification is turned off
         // and only do it once - delete key after notification has
@@ -820,22 +874,21 @@ public class WorkflowManager
                     email.addArgument(submitter);
 
                     ResourceBundle messages = ResourceBundle.getBundle("Messages", supportedLocale);
-                    log.info("Locale des Resource Bundles: " + messages.getLocale().getDisplayName());
                     switch (wi.getState())
                     {
                         case WFSTATE_STEP1POOL:
                             message = messages.getString("org.dspace.workflow.WorkflowManager.step1");
-
+                            
                             break;
-
+                            
                         case WFSTATE_STEP2POOL:
                             message = messages.getString("org.dspace.workflow.WorkflowManager.step2");
-
+                            
                             break;
-
+                            
                         case WFSTATE_STEP3POOL:
                             message = messages.getString("org.dspace.workflow.WorkflowManager.step3");
-
+                            
                             break;
                     }
                     email.addArgument(message);
@@ -856,7 +909,7 @@ public class WorkflowManager
     /**
      * Add all the specified people to the list of email recipients,
      * and send it
-     *
+     * 
      * @param c
      *            Context
      * @param epeople
@@ -865,7 +918,7 @@ public class WorkflowManager
      *            Email object containing the message
      */
     private static void emailRecipients(Context c, EPerson[] epa, Email email)
-            throws MessagingException
+            throws SQLException, MessagingException
     {
         for (int i = 0; i < epa.length; i++)
         {
@@ -917,6 +970,7 @@ public class WorkflowManager
 
     // FIXME - are the following methods still needed?
     private static EPerson getSubmitterEPerson(WorkflowItem wi)
+            throws SQLException
     {
         EPerson e = wi.getSubmitter();
 
@@ -925,10 +979,10 @@ public class WorkflowManager
 
     /**
      * get the title of the item in this workflow
-     *
+     * 
      * @param wi  the workflow item object
      */
-    public static String getItemTitle(WorkflowItem wi)
+    public static String getItemTitle(WorkflowItem wi) throws SQLException
     {
         Item myitem = wi.getItem();
         DCValue[] titles = myitem.getDC("title", null, Item.ANY);
@@ -946,17 +1000,17 @@ public class WorkflowManager
 
     /**
      * get the name of the eperson who started this workflow
-     *
+     * 
      * @param wi  the workflow item
      */
-    public static String getSubmitterName(WorkflowItem wi)
+    public static String getSubmitterName(WorkflowItem wi) throws SQLException
     {
         EPerson e = wi.getSubmitter();
 
         return getEPersonName(e);
     }
 
-    private static String getEPersonName(EPerson e)
+    private static String getEPersonName(EPerson e) throws SQLException
     {
         String submitter = e.getFullName();
 
@@ -967,7 +1021,7 @@ public class WorkflowManager
 
     // Record approval provenance statement
     private static void recordApproval(Context c, WorkflowItem wi, EPerson e)
-            throws IOException, AuthorizeException
+            throws SQLException, IOException, AuthorizeException
     {
         Item item = wi.getItem();
 
@@ -991,7 +1045,7 @@ public class WorkflowManager
 
     // Create workflow start provenance message
     private static void recordStart(Context c, Item myitem)
-            throws IOException, AuthorizeException
+            throws SQLException, IOException, AuthorizeException
     {
         // Get non-internal format bitstreams
         Bitstream[] bitstreams = myitem.getNonInternalBitstreams();

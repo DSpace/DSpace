@@ -1,9 +1,9 @@
 /*
  * ContainerAdapter.java
  *
- * Version: $Revision: 1.6 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/05/02 01:24:11 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -40,6 +40,10 @@
 
 package org.dspace.app.xmlui.objectmanager;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
@@ -54,17 +58,12 @@ import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.uri.IdentifierService;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.SAXOutputter;
 import org.xml.sax.SAXException;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  * This is an adapter which translates DSpace containers 
@@ -92,7 +91,7 @@ public class ContainerAdapter extends AbstractAdapter
 
     /** A space seperated list of descriptive metadata sections */
     private StringBuffer dmdSecIDS;
-
+    
     /** Current DSpace context **/
     private Context dspaceContext;
 
@@ -132,7 +131,9 @@ public class ContainerAdapter extends AbstractAdapter
      */
     protected String getMETSOBJID()
     {
-    	return IdentifierService.getURL(dso).toString();
+    	if (dso.getHandle() != null)
+    		return contextPath+"/handle/" + dso.getHandle();
+    	return null;
     }
 
     /**
@@ -148,7 +149,15 @@ public class ContainerAdapter extends AbstractAdapter
      */
     protected String getMETSID()
     {
-        return IdentifierService.getCanonicalForm(dso);
+    	if (dso.getHandle() == null)
+    	{
+        	if (dso instanceof Collection)
+        		return "collection:"+dso.getID();
+        	else
+        		return "community:"+dso.getID();
+    	}
+        else
+        	return "hdl:"+dso.getHandle();
     }
 
     /**
@@ -268,8 +277,7 @@ public class ContainerAdapter extends AbstractAdapter
                 String description = collection.getMetadata("introductory_text");
                 String description_abstract = collection.getMetadata("short_description");
                 String description_table = collection.getMetadata("side_bar_text");
-                // FIXME: Oh, so broken.
-                String identifier_uri = IdentifierService.getURL(collection).toString();
+                String identifier_uri = "http://hdl.handle.net/" + collection.getHandle();
                 String provenance = collection.getMetadata("provenance_description");
                 String rights = collection.getMetadata("copyright_text");
                 String rights_license = collection.getMetadata("license");
@@ -293,7 +301,7 @@ public class ContainerAdapter extends AbstractAdapter
 	                {	//try to determine Collection size (i.e. # of items)
 	                	int size = new ItemCounter(this.dspaceContext).getCount(collection);
 	                	createField("dc","format","extent",null, String.valueOf(size)); 
-	                } 
+	                }
 	                catch(ItemCountException e)
 	                {
 	                    IOException ioe = new IOException("Could not obtain Collection item-count");
@@ -309,8 +317,7 @@ public class ContainerAdapter extends AbstractAdapter
                 String description = community.getMetadata("introductory_text");
                 String description_abstract = community.getMetadata("short_description");
                 String description_table = community.getMetadata("side_bar_text");
-                // FIXME: Oh, so broken.
-                String identifier_uri = IdentifierService.getURL(community).toString();
+                String identifier_uri = "http://hdl.handle.net/" + community.getHandle();
                 String rights = community.getMetadata("copyright_text");
                 String title = community.getMetadata("name");
                 

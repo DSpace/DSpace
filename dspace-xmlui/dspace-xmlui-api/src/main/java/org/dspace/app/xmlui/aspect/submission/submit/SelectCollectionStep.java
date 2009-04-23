@@ -1,9 +1,9 @@
 /*
  * SelectCollectionStep.java
  *
- * Version: $Revision: 1.4 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -56,10 +56,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierService;
-import org.dspace.uri.IdentifierException;
 import org.dspace.core.Constants;
+import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -103,56 +101,42 @@ public class SelectCollectionStep extends AbstractSubmissionStep
   
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
-    {
-        try
+    {     
+		Collection[] collections; // List of possible collections.
+		String actionURL = contextPath + "/submit/" + knot.getId() + ".continue";
+		DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+
+		if (dso != null && dso instanceof Community)
+		{
+			collections = Collection.findAuthorized(context, ((Community) dso), Constants.ADD);   
+		} 
+		else
+		{
+			collections = Collection.findAuthorized(context, null, Constants.ADD);
+		}
+        
+		// Basic form with a drop down list of all the collections
+		// you can submit too.
+        Division div = body.addInteractiveDivision("select-collection",actionURL,Division.METHOD_POST,"primary submission");
+		div.setHead(T_submission_head);
+        
+        List list = div.addList("select-collection", List.TYPE_FORM);
+        list.setHead(T_head);       
+        Select select = list.addItem().addSelect("handle");
+        select.setLabel(T_collection);
+        select.setHelp(T_collection_help);
+        
+        select.addOption("",T_collection_default);
+        for (Collection collection : collections) 
         {
-            Collection[] collections; // List of possible collections.
-            String actionURL = contextPath + "/submit/" + knot.getId() + ".continue";
-			ResolvableIdentifier eid = IdentifierService.resolve(context, handle);
-
-            DSpaceObject dso = null;
-            if (eid != null)
-            {
-                dso = (DSpaceObject) IdentifierService.getResource(context, eid);
-            }
-
-            if (dso != null && dso instanceof Community)
-            {
-                collections = Collection.findAuthorized(context, ((Community) dso), Constants.ADD);
-            }
-            else
-            {
-                collections = Collection.findAuthorized(context, null, Constants.ADD);
-            }
-
-            // Basic form with a drop down list of all the collections
-            // you can submit too.
-            Division div = body.addInteractiveDivision("select-collection",actionURL,Division.METHOD_POST,"primary submission");
-            div.setHead(T_submission_head);
-
-            List list = div.addList("select-collection", List.TYPE_FORM);
-            list.setHead(T_head);
-            Select select = list.addItem().addSelect("handle");
-            select.setLabel(T_collection);
-            select.setHelp(T_collection_help);
-
-            select.addOption("",T_collection_default);
-            for (Collection collection : collections)
-            {
-                String name = collection.getMetadata("name");
-                      if (name.length() > 50)
-                          name = name.substring(0, 47) + "...";
-                select.addOption(IdentifierService.getCanonicalForm(collection),name);
-            }
-
-            Button submit = list.addItem().addButton("submit");
-            submit.setValue(T_submit_next);
+        	String name = collection.getMetadata("name");
+   		   	if (name.length() > 50)
+   		   		name = name.substring(0, 47) + "...";
+        	select.addOption(collection.getHandle(),name);
         }
-        catch (IdentifierException e)
-        {
-            throw new RuntimeException(e);
-        }
-
+        
+        Button submit = list.addItem().addButton("submit");
+        submit.setValue(T_submit_next);
     }
     
     /** 

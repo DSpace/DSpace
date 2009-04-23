@@ -67,82 +67,82 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="org.dspace.content.Collection" %>
-<%@ page import="org.dspace.content.Community" %>
-<%@ page import="org.dspace.content.Item" %>
+<%@ page import="java.net.URLEncoder"            %>
+<%@ page import="org.dspace.content.Community"   %>
+<%@ page import="org.dspace.content.Collection"  %>
+<%@ page import="org.dspace.content.Item"        %>
 <%@ page import="org.dspace.search.QueryResults" %>
-<%@ page import="org.dspace.uri.IdentifierService" %>
-<%@ page import="java.net.URLEncoder" %>
 
 <%
     // Get the attributes
-    Community community = (Community) request.getAttribute("community" );
-    Collection collection = (Collection) request.getAttribute("collection");
-    Community[] communityArray = (Community[]) request.getAttribute("community.array");
+    Community   community        = (Community   ) request.getAttribute("community" );
+    Collection  collection       = (Collection  ) request.getAttribute("collection");
+    Community[] communityArray   = (Community[] ) request.getAttribute("community.array");
     Collection[] collectionArray = (Collection[]) request.getAttribute("collection.array");
     
-    Item[] items = (Item[])request.getAttribute("items");
-    Community[] communities = (Community[])request.getAttribute("communities");
+    Item      [] items       = (Item[]      )request.getAttribute("items");
+    Community [] communities = (Community[] )request.getAttribute("communities");
     Collection[] collections = (Collection[])request.getAttribute("collections");
 
     String query = (String) request.getAttribute("query");
 
     QueryResults qResults = (QueryResults)request.getAttribute("queryresults");
 
-    int pageTotal = ((Integer)request.getAttribute("pagetotal")).intValue();
+    int pageTotal   = ((Integer)request.getAttribute("pagetotal"  )).intValue();
     int pageCurrent = ((Integer)request.getAttribute("pagecurrent")).intValue();
-    int pageLast = ((Integer)request.getAttribute("pagelast")).intValue();
-    int pageFirst = ((Integer)request.getAttribute("pagefirst")).intValue();
+    int pageLast    = ((Integer)request.getAttribute("pagelast"   )).intValue();
+    int pageFirst   = ((Integer)request.getAttribute("pagefirst"  )).intValue();
 %>
 
 <dspace:layout titlekey="jsp.search.results.title">
 
+    <%-- <h1>Search Results</h1> --%>
+    
 <h1><fmt:message key="jsp.search.results.title"/></h1>
     
   
 
-<%
-if (qResults.getErrorMsg() != null)
+<% if( qResults.getErrorMsg()!=null )
 {
  %>
     <p align="center" class="submitFormWarn"><%= qResults.getErrorMsg() %></p>
 <%
 }
-else if (qResults.getHitCount() == 0)
+else if( qResults.getHitCount() == 0 )
 {
  %>
+    <%-- <p align="center">Search produced no results.</p> --%>
     <p align="center"><fmt:message key="jsp.search.general.noresults"/></p>
 <%
 }
 else
 {
 %>
+    <%-- <p align="center">Results <//%=qResults.getStart()+1%>-<//%=qResults.getStart()+qResults.getHitHandles().size()%> of --%>
 	<p align="center"><fmt:message key="jsp.search.results.results">
         <fmt:param><%=qResults.getStart()+1%></fmt:param>
-        <fmt:param><%=qResults.getStart()+qResults.getHitURIs().size()%></fmt:param>
+        <fmt:param><%=qResults.getStart()+qResults.getHitHandles().size()%></fmt:param>
         <fmt:param><%=qResults.getHitCount()%></fmt:param>
     </fmt:message></p>
 
 <% } %>
 
-<%
-if (communities.length > 0)
-{
-%>
+<% if (communities.length > 0 ) { %>
+    <%-- <h3>Community Hits:</h3> --%>
     <h3><fmt:message key="jsp.search.results.comhits"/></h3>
     <dspace:communitylist  communities="<%= communities %>" />
-<%
-}
-if (collections.length > 0)
-{
-%>
+<% } %>
+
+<% if (collections.length > 0 ) { %>   
     <br/>
+    <%-- <h3>Collection hits:</h3> --%>
     <h3><fmt:message key="jsp.search.results.colhits"/></h3>
     <dspace:collectionlist collections="<%= collections %>" />
 <% } %>
 
 <% if (items.length > 0) { %>
     <br/>
+    <%-- <h3>Item hits:</h3> --%>
     <h3><fmt:message key="jsp.search.results.itemhits"/></h3>
     <dspace:itemlist items="<%= items %>" />
 <% } %>
@@ -152,17 +152,12 @@ if (collections.length > 0)
 <%
     // retain scope when navigating result sets
     String searchScope = ""; 
-    if (community == null && collection == null)
-    {
-	    searchScope = "";
-    }
-    else if (collection == null)
-    {
-	    searchScope = IdentifierService.getURL(community).toString();
-    }
-    else
-    {
-	    searchScope = IdentifierService.getURL(collection).toString();
+    if (community == null && collection == null) {
+	searchScope = "";
+    } else if (collection == null) {
+	searchScope = "/handle/" + community.getHandle();
+    } else {
+	searchScope = "/handle/" + collection.getHandle();
     } 
 
     // create the URLs accessing the previous and next search result pages
@@ -184,10 +179,10 @@ if (collections.length > 0)
 if (pageFirst != pageCurrent)
 {
     %><a href="<%= prevURL %>"><fmt:message key="jsp.search.general.previous" /></a><%
-}
+};
 
 
-for (int q = pageFirst; q <= pageLast; q++)
+for( int q = pageFirst; q <= pageLast; q++ )
 {
     String myLink = "<a href=\""
                     + request.getContextPath()
@@ -197,7 +192,7 @@ for (int q = pageFirst; q <= pageLast; q++)
                     + "&amp;start=";
 
 
-    if (q == pageCurrent)
+    if( q == pageCurrent )
     {
         myLink = "" + q;
     }

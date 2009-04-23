@@ -154,7 +154,7 @@ public class EPersonAdminServlet extends DSpaceServlet
 
                     if (netid != null)
                     {
-                        e.setNetid(netid.equals("") ? null : netid);
+                        e.setNetid(netid.equals("") ? null : netid.toLowerCase());
                     }
                     else
                     {
@@ -199,7 +199,7 @@ public class EPersonAdminServlet extends DSpaceServlet
                 // no change to email
                 if (netid != null)
                 {
-                    e.setNetid(netid.equals("") ? null : netid);
+                    e.setNetid(netid.equals("") ? null : netid.toLowerCase());
                 }
                 else
                 {

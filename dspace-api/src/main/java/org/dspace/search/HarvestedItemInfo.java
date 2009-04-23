@@ -43,14 +43,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.dspace.content.Item;
-import org.dspace.uri.ObjectIdentifier;
 import org.dspace.core.Context;
 
 /**
  * Simple container class containing information about a harvested DSpace item.
  * 
  * @author Robert Tansley
- * @author James Rutherford
  * @version $Revision$
  */
 public class HarvestedItemInfo
@@ -58,11 +56,11 @@ public class HarvestedItemInfo
     /** Context used when creating this object */
     public Context context;
     
-    /** Internal item ID (as opposed to item's OAI ID, which is the URI) */
+    /** Internal item ID (as opposed to item's OAI ID, which is the Handle) */
     public int itemID;
 
-    /** The (first) object identifier */
-    public ObjectIdentifier identifier;
+    /** The Handle, with no prefix */
+    public String handle;
 
     /** The datestamp */
     public Date datestamp;
@@ -71,11 +69,11 @@ public class HarvestedItemInfo
     public Item item;
 
     /**
-     * Identifiers of collections this item is in. Only filled out if
-     * originally requested when invoking <code>Harvest</code> (N.B. not
-     * Collection objects)
+     * A List of Strings. The Handles of collections this item is in. Only
+     * filled out if originally requested when invoking <code>Harvest</code>
+     * (N.B. not Collection objects)
      */
-    public List<ObjectIdentifier> collectionIdentifiers;
+    public List collectionHandles;
 
     /** True if this item has been withdrawn */
     public boolean withdrawn;

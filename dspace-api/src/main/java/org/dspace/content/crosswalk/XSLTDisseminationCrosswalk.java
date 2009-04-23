@@ -41,6 +41,7 @@
 package org.dspace.content.crosswalk;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -187,7 +188,8 @@ public class XSLTDisseminationCrosswalk
     }
 
     public Element disseminateElement(DSpaceObject dso)
-        throws CrosswalkException, IOException, AuthorizeException
+        throws CrosswalkException,
+               IOException, SQLException, AuthorizeException
     {
         init();
 
@@ -212,7 +214,8 @@ public class XSLTDisseminationCrosswalk
     }
 
     public List disseminateList(DSpaceObject dso)
-        throws CrosswalkException, IOException, AuthorizeException
+        throws CrosswalkException,
+               IOException, SQLException, AuthorizeException
     {
         init();
 

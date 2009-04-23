@@ -1,9 +1,9 @@
 /*
  * Password.java
  *
- * Version: $Revision: 1.1 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/05 21:40:00 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -44,7 +44,7 @@ package org.dspace.app.xmlui.wing.element;
  * A class representing a password input control. The password control acts just
  * like a text control but the value being typed by the user is hidden from
  * view.
- *
+ * 
  * @author Scott Phillips
  */
 
@@ -56,7 +56,7 @@ public class Password extends Field
 
     /**
      * Construct a new field.
-     *
+     * 
      * @param context
      *            (Required) The context this element is contained in, such as
      *            where to route SAX events and what i18n catalogue to use.
@@ -79,7 +79,7 @@ public class Password extends Field
 
     /**
      * Set the size of the password field.
-     *
+     * 
      * @param size
      *            (Required) The size of the password field.
      */
@@ -90,7 +90,7 @@ public class Password extends Field
 
     /**
      * Set the size and maximum length of the field.
-     *
+     * 
      * @param size
      *            (May be zero for no defined value) The size of the password field.
      * @param maxLength

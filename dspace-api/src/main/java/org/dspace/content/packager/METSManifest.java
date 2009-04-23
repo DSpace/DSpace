@@ -58,14 +58,12 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
-import org.dspace.content.crosswalk.IngestionCrosswalk;
 import org.dspace.content.crosswalk.MetadataValidationException;
+import org.dspace.content.crosswalk.IngestionCrosswalk;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierType;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -852,35 +850,25 @@ public class METSManifest
     }
 
     /**
-     * Find URI (if any) identifier labelling this manifest.
-     *
-     * @return uri (never null)
-     * @throws MetadataValidationException if no uri available.
+     * Find Handle (if any) identifier labelling this manifest.
+     * @return handle (never null)
+     * @throws MetadataValidationException if no handle available.
      */
-    public String getURI() throws MetadataValidationException
+    public String getHandle()
+        throws MetadataValidationException
     {
-        // TODO: XXX Make configurable? URI optionally passed in?
+        // TODO: XXX Make configurable? Handle optionally passed in?
         // FIXME: Not sure if OBJID is really the right place
 
-        String uri = mets.getAttributeValue("OBJID");
+        String handle = mets.getAttributeValue("OBJID");
 
-        if (uri != null)
+        if (handle != null && handle.startsWith("hdl:"))
         {
-            Object[] types =
-                    PluginManager.getPluginSequence(ExternalIdentifierType.class);
-            if (types != null)
-            {
-                for (ExternalIdentifierType t : (ExternalIdentifierType[]) types)
-                {
-                    if (uri.startsWith(t.getNamespace() + ":"))
-                    {
-                        // It's something we understand.
-                        return uri;
-                    }
-                }
-            }
+            return handle.substring(4);
         }
-
-        throw new MetadataValidationException("Item has no valid URI (OBJID)");
+        else
+        {
+            throw new MetadataValidationException("Item has no valid Handle (OBJID)");
+        }
     }
 }

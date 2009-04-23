@@ -77,13 +77,11 @@
                titlekey="jsp.submit.choose-file.title"
                nocache="true">
 
-	<form method="post" action="<%= request.getContextPath() %>/submit" onkeydown="return disableEnterKey(event);">
+    <form method="post" action="<%= request.getContextPath() %>/submit" enctype="multipart/form-data" onkeydown="return disableEnterKey(event);">
+		
 		<jsp:include page="/submit/progressbar.jsp"/>
 		<%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
         <%= SubmissionController.getSubmissionParameters(context, request) %>
-	</form>
-
-    <form method="post" action="<%= request.getContextPath() %>/submit" enctype="multipart/form-data" onkeydown="return disableEnterKey(event);">
 
         <%-- <h1>Submit: Upload a File</h1> --%>
 		<h1><fmt:message key="jsp.submit.choose-file.heading"/></h1>

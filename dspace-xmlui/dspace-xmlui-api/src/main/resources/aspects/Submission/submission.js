@@ -1,9 +1,9 @@
 /*
  * submission.js
  *
- * Version: $Revision: 1.2 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/06/02 21:37:32 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -41,7 +41,7 @@
 importClass(Packages.java.lang.Class);
 importClass(Packages.java.lang.ClassLoader);
 
-importClass(Packages.org.apache.cocoon.components.CocoonComponentManager);
+importClass(Packages.org.dspace.app.xmlui.utils.FlowscriptUtils);
 importClass(Packages.org.apache.cocoon.environment.http.HttpEnvironment);
 importClass(Packages.org.apache.cocoon.servlet.multipart.Part);
 
@@ -73,7 +73,7 @@ var ERROR_FIELDS = null;
  */
 function getObjectModel() 
 {
-  return CocoonComponentManager.getCurrentEnvironment().getObjectModel();
+  return FlowscriptUtils.getObjectModel(cocoon);
 }
 
 /**
@@ -277,7 +277,7 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
 {
 	//load initial submission information
 	var submissionInfo = getSubmissionInfo(workspaceID);
-	 
+	
 	//Initialize a Cocoon Local Page to save current state information
 	//(This lets us handle when users click the browser "back button"
 	// by caching the state of that previous page, etc.)
@@ -288,12 +288,13 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
     //it's used to step back and forth between pages!
     var stepsInSubmission = getSubmissionSteps(submissionInfo);
     
+	
     //if we didn't have a page passed in, go to first page in process
     if(initStepAndPage==null)
     	state.stepAndPage = stepsInSubmission[0];
     else
 	    state.stepAndPage = initStepAndPage;
-    	
+		
     var response_flag = 0;
     
     do { 
@@ -316,10 +317,14 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
 	  
 	  	//Load this step's configuration
 	  	var stepConfig = submissionInfo.getSubmissionConfig().getStep(step);
-	  	 	
+	  		
     	//Pass it all the info it needs, including any response/error flags
     	//in case an error occurred
     	response_flag = doNextPage(collectionHandle, workspaceID, stepConfig, state.stepAndPage, response_flag); 
+    	
+    	var maxStep = FlowUtils.getMaximumStepReached(getDSContext(),workspaceID);
+        var maxPage = FlowUtils.getMaximumPageReached(getDSContext(),workspaceID);
+        var maxStepAndPage = parseFloat(maxStep + "." + maxPage);
     	
     	//----------------------------------------------------------
     	// #2: Determine which page/step the user should be sent to next
@@ -354,7 +359,8 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
            		cocoon.log.debug("Next Step & Page=" + state.stepAndPage);
         	}
         }//User clicked "<- Previous" button
-        else if (cocoon.request.get(AbstractProcessingStep.PREVIOUS_BUTTON))
+        else if (cocoon.request.get(AbstractProcessingStep.PREVIOUS_BUTTON) && 
+        			(response_flag==AbstractProcessingStep.STATUS_COMPLETE || state.stepAndPage == maxStepAndPage))
         {  
             var stepBack = true;
             
@@ -381,21 +387,27 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
         // User clicked "Save/Cancel" Button
         else if (cocoon.request.get(AbstractProcessingStep.CANCEL_BUTTON))
         {
-            submitStepSaveOrRemove(collectionHandle,workspaceID,step);	
+        	var inWorkflow = submissionInfo.isInWorkflow();
+        	if (inWorkflow && response_flag==AbstractProcessingStep.STATUS_COMPLETE)
+        	{
+        		var contextPath = cocoon.request.getContextPath();
+        		cocoon.redirectTo(contextPath+"/submissions",true);
+        		coocon.exit();
+        	}
+        	else if (!inWorkflow)
+        	{
+        			submitStepSaveOrRemove(collectionHandle,workspaceID,step,page);
+        	}
         }
         
         //User clicked on Progress Bar:
         // only check for a 'step_jump' (i.e. click on progress bar)
         // if there are no errors to be resolved
-        if(response_flag==AbstractProcessingStep.STATUS_COMPLETE)
+        if(response_flag==AbstractProcessingStep.STATUS_COMPLETE || state.stepAndPage == maxStepAndPage)
         {
 	        var names = cocoon.request.getParameterNames();
 	        while(names.hasMoreElements())
 	        {
-	            var maxStep = FlowUtils.getMaximumStepReached(getDSContext(),workspaceID);
-	            var maxPage = FlowUtils.getMaximumPageReached(getDSContext(),workspaceID);
-	            var maxStepAndPage = parseFloat(maxStep + "." + maxPage);
-	                     
 	            var name = names.nextElement(); 
 	            if (name.startsWith(AbstractProcessingStep.PROGRESS_BAR_PREFIX))
 	            {
@@ -681,15 +693,28 @@ function stepHasUI(stepConfig)
  * This step is used when ever the user clicks save/cancel during the submission 
  * processes. We ask them if they would like to save the submission or remove it.
  */
-function submitStepSaveOrRemove(collectionHandle,workspaceID,step)
+function submitStepSaveOrRemove(collectionHandle,workspaceID,step,page)
 {
-    sendPageAndWait("handle/"+collectionHandle+"/submit/saveOrRemoveStep",{"id":workspaceID,"step":String(step)});
+	// we need to update the reached step to prevent smart user to skip file upload 
+    // or keep empty required metadata using the resume
+    var maxStep = FlowUtils.getMaximumStepReached(getDSContext(),workspaceID);
+    var maxPage = FlowUtils.getMaximumPageReached(getDSContext(),workspaceID);
+    var maxStepAndPage = parseFloat(maxStep + "." + maxPage);
+    
+    var currStepAndPage = parseFloat(step + "." + page);
+ 	   
+    if (maxStepAndPage > currStepAndPage)
+    {
+ 	   FlowUtils.setBackPageReached(getDSContext(),workspaceID, step, page);
+    }
+
+    sendPageAndWait("handle/"+collectionHandle+"/submit/saveOrRemoveStep",{"id":workspaceID,"step":String(step),"page":String(page)});
     
     FlowUtils.processSaveOrRemove(getDSContext(), workspaceID, cocoon.request);
     
     if (cocoon.request.get("submit_save"))
     {
-       // Allready saved, just take them back to dspace home.
+       // Allready saved...
        var contextPath = cocoon.request.getContextPath();
        cocoon.redirectTo(contextPath+"/submissions",true);
        cocoon.exit();
@@ -830,6 +855,5 @@ function workflowStepReject(handle,workflowID)
     } while (1 == 1)
     
 }
-
 
 

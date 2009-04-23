@@ -274,7 +274,7 @@ public final class BitstreamInfoDAO extends DAOSupport
             if (rs.next())
             {
                 info = new BitstreamInfo(rs.getBoolean("deleted"), rs
-                        .getInt("store_number"), rs.getInt("size_bytes"), rs
+                        .getInt("store_number"), rs.getLong("size_bytes"), rs
                         .getString("short_description"), rs
                         .getInt("bitstream_id"), rs
                         .getString("user_format_description"), rs
@@ -546,7 +546,7 @@ public final class BitstreamInfoDAO extends DAOSupport
     /**
      * Get the bitstream ids for a given collection
      * 
-     * @param itemId
+     * @param collectionId The id of the collection
      * @return the list of bitstream ids for this item
      */
     public List getCollectionBitstreams(int collectionId)
@@ -589,7 +589,7 @@ public final class BitstreamInfoDAO extends DAOSupport
     /**
      * Get the bitstream ids for a given community
      * 
-     * @param itemId
+     * @param communityId the community id
      * @return the list of bitstream ids for this item
      */
     public List getCommunityBitstreams(int communityId)

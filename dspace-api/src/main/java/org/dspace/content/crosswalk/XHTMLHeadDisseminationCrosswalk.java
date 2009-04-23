@@ -188,13 +188,16 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
     {
         if (dso.getType() != Constants.ITEM)
         {
+            String h = dso.getHandle();
             throw new CrosswalkObjectNotSupported(
                     "Can only support items; object passed in with DB ID "
                             + dso.getID() + ", type "
-                            + Constants.typeText[dso.getType()]);
+                            + Constants.typeText[dso.getType()] + ", handle "
+                            + (h == null ? "null" : h));
         }
 
         Item item = (Item) dso;
+        String handle = item.getHandle();
         List<Element> metas = new ArrayList<Element>();
         DCValue[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
@@ -229,6 +232,9 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
                 key = v.schema + "." + v.element;
                 name = names.get(key);
             }
+		    
+            // Do not include description.provenance
+            boolean provenance = "description".equals(v.element) && "provenance".equals(v.qualifier);
 
             if (name == null)
             {
@@ -236,10 +242,12 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
                 // element is OK, so just report at DEBUG level
                if (log.isDebugEnabled())
                {
-                   log.debug("No <meta> field for item " + dso.getID());
+                   log.debug("No <meta> field for item "
+                            + (handle == null ? String.valueOf(dso.getID())
+                                    : handle) + " field " + originalKey);
                }
             }
-            else
+            else if (provenance != true)
             {
                 Element e = new Element("meta", XHTML_NAMESPACE);
                 e.setAttribute("name", name);

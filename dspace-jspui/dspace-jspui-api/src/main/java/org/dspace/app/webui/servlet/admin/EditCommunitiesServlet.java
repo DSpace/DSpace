@@ -45,7 +45,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -64,14 +63,10 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
-import org.dspace.content.dao.CollectionDAOFactory;
-import org.dspace.content.dao.CommunityDAO;
-import org.dspace.content.dao.CommunityDAOFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
-import org.dspace.uri.IdentifierService;
 
 /**
  * Servlet for editing communities and collections, including deletion,
@@ -127,8 +122,6 @@ public class EditCommunitiesServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        CommunityDAO dao = CommunityDAOFactory.getInstance(context);
-
         // First, see if we have a multipart request (uploading a logo)
         String contentType = request.getContentType();
 
@@ -152,14 +145,12 @@ public class EditCommunitiesServlet extends DSpaceServlet
          * get null if we try and find something with ID -1, we'll just try and
          * find both here to save hassle later on
          */
-        Community community = dao.retrieve(UIUtil.getIntParameter(request,
-                    "community_id"));
-        Community parentCommunity =
-            dao.retrieve(UIUtil.getIntParameter(request,
-                        "parent_community_id"));
-        Collection collection =
-            CollectionDAOFactory.getInstance(context).retrieve(
-                    UIUtil.getIntParameter(request, "collection_id"));
+        Community community = Community.find(context, UIUtil.getIntParameter(
+                request, "community_id"));
+        Community parentCommunity = Community.find(context, UIUtil
+                .getIntParameter(request, "parent_community_id"));
+        Collection collection = Collection.find(context, UIUtil
+                .getIntParameter(request, "collection_id"));
 
         // Just about every JSP will need the values we received
         request.setAttribute("community", community);
@@ -243,14 +234,13 @@ public class EditCommunitiesServlet extends DSpaceServlet
         case CONFIRM_DELETE_COMMUNITY:
 
             // remember the parent community, if any
-            //Community parent = community.getParentCommunity();
-            List<Community> parents = dao.getParentCommunities(community);
+            Community parent = community.getParentCommunity();
 
             // Delete the community
-            dao.delete(community.getID());
+            community.delete();
 
             // if community was top-level, redirect to community-list page
-            if (parents.size() == 0)
+            if (parent == null)
             {
                 response.sendRedirect(response.encodeRedirectURL(request
                         .getContextPath()
@@ -259,7 +249,9 @@ public class EditCommunitiesServlet extends DSpaceServlet
             else
             // redirect to parent community page
             {
-                response.sendRedirect(response.encodeRedirectURL(IdentifierService.getURL(parents.get(0)).toString()));
+                response.sendRedirect(response.encodeRedirectURL(request
+                        .getContextPath()
+                        + "/handle/" + parent.getHandle()));
             }
 
             // Show main control page
@@ -320,7 +312,9 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
         if (community != null)
         {
-            response.sendRedirect(response.encodeRedirectURL(IdentifierService.getURL(community).toString()));
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/handle/" + community.getHandle()));
         }
         else
         {
@@ -329,7 +323,9 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
             if (parent != null)
             {
-                response.sendRedirect(response.encodeRedirectURL(IdentifierService.getURL(parent).toString()));
+                response.sendRedirect(response.encodeRedirectURL(request
+                        .getContextPath()
+                        + "/handle/" + parent.getHandle()));
             }
             else
             {
@@ -360,16 +356,14 @@ public class EditCommunitiesServlet extends DSpaceServlet
     {
         if (request.getParameter("create").equals("true"))
         {
-            CommunityDAO dao = CommunityDAOFactory.getInstance(context);
-
             // if there is a parent community id specified, create community
             // as its child; otherwise, create it as a top-level community
-            int parentID = UIUtil.getIntParameter(request,
+            int parentCommunityID = UIUtil.getIntParameter(request,
                     "parent_community_id");
 
-            if (parentID != -1)
+            if (parentCommunityID != -1)
             {
-                Community parent = dao.retrieve(parentID);
+                Community parent = Community.find(context, parentCommunityID);
 
                 if (parent != null)
                 {
@@ -378,7 +372,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             }
             else
             {
-                community = dao.create();
+                community = Community.create(null, context);
             }
 
             // Set attribute
@@ -573,6 +567,17 @@ public class EditCommunitiesServlet extends DSpaceServlet
                     .getContextPath()
                     + "/tools/group-edit?group_id=" + newGroup.getID()));
         }
+        else if (button.equals("submit_admins_delete"))
+        {
+        	// Remove the administrators group.
+        	Group g = collection.getAdministrators();
+        	collection.removeAdministrators();
+            collection.update();
+            g.delete();
+
+            // Show edit page again - attributes set in doDSPost()
+            JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
+        }
         else if (button.equals("submit_submitters_create"))
         {
             // Create new group
@@ -582,6 +587,17 @@ public class EditCommunitiesServlet extends DSpaceServlet
             response.sendRedirect(response.encodeRedirectURL(request
                     .getContextPath()
                     + "/tools/group-edit?group_id=" + newGroup.getID()));
+        }
+        else if (button.equals("submit_submitters_delete"))
+        {
+        	// Remove the administrators group.
+        	Group g = collection.getSubmitters();
+        	collection.removeSubmitters();
+            collection.update();
+            g.delete();
+
+            // Show edit page again - attributes set in doDSPost()
+            JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
         }
         else if (button.equals("submit_authorization_edit"))
         {
@@ -694,12 +710,10 @@ public class EditCommunitiesServlet extends DSpaceServlet
         // Wrap multipart request to get the submission info
         FileUploadRequest wrapper = new FileUploadRequest(request);
 
-        int id = UIUtil.getIntParameter(wrapper, "community_id");
-        Community community =
-            CommunityDAOFactory.getInstance(context).retrieve(id);
-        Collection collection =
-            CollectionDAOFactory.getInstance(context).retrieve(
-                    UIUtil.getIntParameter(wrapper, "collection_id"));
+        Community community = Community.find(context, UIUtil.getIntParameter(
+                wrapper, "community_id"));
+        Collection collection = Collection.find(context, UIUtil
+                .getIntParameter(wrapper, "collection_id"));
 
         File temp = wrapper.getFile("file");
 

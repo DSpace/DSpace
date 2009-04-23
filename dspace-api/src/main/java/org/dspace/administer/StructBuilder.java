@@ -55,10 +55,6 @@ import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.dao.CollectionDAO;
-import org.dspace.content.dao.CollectionDAOFactory;
-import org.dspace.content.dao.CommunityDAO;
-import org.dspace.content.dao.CommunityDAOFactory;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.jdom.Element;
@@ -113,9 +109,8 @@ public class StructBuilder
      * 
      * StructBuilder -f [xml source] -e [administrator email] -o [output file]
      * 
-     * The output file will contain exactly the same as the source xml
-     * document, but with the canonical form of a URI for each imported item
-     * added as an attribute.
+     * The output file will contain exactly the same as the source xml document, but
+     * with the handle for each imported item added as an attribute.
      */
     public static void main(String[] argv) 
     	throws Exception
@@ -218,7 +213,7 @@ public class StructBuilder
     private static void usage()
     {
         System.out.println("Usage: java StructBuilder -f <source XML file> -o <output file> -e <eperson email>");
-        System.out.println("Communitities will be created from the top level, and a map of communities to URIs will be returned in the output file");
+        System.out.println("Communitities will be created from the top level, and a map of communities to handles will be returned in the output file");
         return;
     }
     
@@ -407,12 +402,11 @@ public class StructBuilder
      * @param parent the parent community of the nodelist of communities to create
      * 
      * @return an element array containing additional information regarding the 
-     * 			created communities (e.g. the URIs they have been assigned)
+     * 			created communities (e.g. the handles they have been assigned)
      */
     private static Element[] handleCommunities(Context context, NodeList communities, Community parent)
     	throws TransformerException, SQLException, Exception
     {
-        CommunityDAO communityDAO = CommunityDAOFactory.getInstance(context);
         Element[] elements = new Element[communities.getLength()];
         
         for (int i = 0; i < communities.getLength(); i++)
@@ -427,7 +421,7 @@ public class StructBuilder
             }
             else
             {
-                community = communityDAO.create();
+                community = Community.create(null, context);
             }
             
             // default the short description to be an empty string
@@ -449,20 +443,25 @@ public class StructBuilder
             }
             
             // FIXME: at the moment, if the community already exists by name
-            // then this will throw a SQLException on a duplicate key
+            // then this will throw a PSQLException on a duplicate key
             // violation
             // Ideally we'd skip this row and continue to create sub
-            // communities and so forth where they don't exist, but it's
-            // proving difficult to isolate the community that already exists
-            // without hitting the database directly.
-            communityDAO.update(community);
+            // communities
+            // and so forth where they don't exist, but it's proving
+            // difficult
+            // to isolate the community that already exists without hitting
+            // the database directly.
+            community.update();
             
-            // build the element with the URI that identifies the new community
+            // build the element with the handle that identifies the new
+            // community
             // along with all the information that we imported here
-            // This looks like a lot of repetition of getting information from
-            // above but it's here to keep it separate from the create process
-            // in case we want to move it or make it switchable later
-            element.setAttribute("uri", community.getIdentifier().getCanonicalForm());
+            // This looks like a lot of repetition of getting information
+            // from above
+            // but it's here to keep it separate from the create process in
+            // case
+            // we want to move it or make it switchable later
+            element.setAttribute("identifier", community.getHandle());
             
             Element nameElement = new Element("name");
             nameElement.setText(community.getMetadata("name"));
@@ -528,12 +527,11 @@ public class StructBuilder
      * @param parent the parent community to whom the collections belong
      * 
      * @return an Element array containing additional information about the
-     * 			created collections (e.g. the URI)
+     * 			created collections (e.g. the handle)
      */
     private static Element[] handleCollections(Context context, NodeList collections, Community parent)
     	throws TransformerException, SQLException, AuthorizeException, IOException, Exception
     {
-        CollectionDAO collectionDAO = CollectionDAOFactory.getInstance(context);
         Element[] elements = new Element[collections.getLength()];
         
         for (int i = 0; i < collections.getLength(); i++)
@@ -559,9 +557,9 @@ public class StructBuilder
                 }
             }
             
-            collectionDAO.update(collection);
+            collection.update();
             
-            element.setAttribute("uri", collection.getIdentifier().getCanonicalForm());
+            element.setAttribute("identifier", collection.getHandle());
             
             Element nameElement = new Element("name");
             nameElement.setText(collection.getMetadata("name"));

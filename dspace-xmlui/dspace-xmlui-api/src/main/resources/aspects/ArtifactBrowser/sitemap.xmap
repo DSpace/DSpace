@@ -1,10 +1,10 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   sitemap.xmap
 
-  Version: $Revision: 1.19 $
+  Version: $Revision$
  
-  Date: $Date: 2006/08/08 22:00:02 $
+  Date: $Date$
  
   Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
   Institute of Technology.  All rights reserved.
@@ -64,15 +64,17 @@ and searching the repository.
 			<map:transformer name="Contact" src="org.dspace.app.xmlui.aspect.artifactbrowser.Contact"/>
 			<map:transformer name="RestrictedItem" src="org.dspace.app.xmlui.aspect.artifactbrowser.RestrictedItem"/>
 			<map:transformer name="FrontPageSearch" src="org.dspace.app.xmlui.aspect.artifactbrowser.FrontPageSearch"/>
+
             <map:transformer name="Statistics" src="org.dspace.app.xmlui.aspect.artifactbrowser.StatisticsViewer"/>
         </map:transformers>
+
 
 		<map:matchers default="wildcard">
 			<map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
 			<map:matcher name="HandleAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.general.HandleAuthorizedMatcher"/>
 		</map:matchers>
-
-
+		
+		
 		<map:actions>
 			<map:action name="SendFeedbackAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.SendFeedbackAction"/>
 		</map:actions>
@@ -81,49 +83,49 @@ and searching the repository.
     <map:selectors>
     	<map:selector name="AuthenticatedSelector" src="org.dspace.app.xmlui.aspect.general.AuthenticatedSelector"/>
     </map:selectors>
-
+		
 	</map:components>
 	<map:pipelines>
 		<map:pipeline>
-
-
+			
+			
 			<map:generate/>
-
-			<!--
+			
+			<!-- 
 					Add the basic navigation content to everypage. This includes:
-
-					1) Metadata about the current page (really just what the current
+					
+					1) Metadata about the current page (really just what the current 
 					   context path is)
 					2) Navigation links to browse the repository.
-					   - This includes links that are relative to the currently
+					   - This includes links that are relative to the currently 
 					     selected community or collection.
 					3) Metadata about the search urls.
 					-->
 			<map:transform type="Navigation"/>
-
-
+			
+			
 			<!--
-					Display the DSpace homepage. This includes the news.xml file
-					along with a list of top level communities in DSpace.
+					Display the DSpace homepage. This includes the news.xml file 
+					along with a list of top level communities in DSpace. 
 					-->
 			<map:match pattern="">
-			    <!--
+			    <!-- 
 			    	DSpacePropertyFileReader will read the DSpace property file and
-			    	place the selected properties' value in this scope
+			    	place the selected properties' value in this scope 
 			    -->
 				<map:act type="DSpacePropertyFileReader">
 					<map:parameter name="dspace.dir" value="dspace.dir" />
-					<map:transform type="Include" src="file://{dspace.dir}/config/news-xmlui.xml" />
-				</map:act>
-
+					<map:transform type="Include" src="file://{dspace.dir}/config/news-xmlui.xml" /> 
+				</map:act>				
+				
 				<map:transform type="FrontPageSearch"/>
 				<map:transform type="CommunityBrowser">
 					<map:parameter name="depth" value="1"/>
 				</map:transform>
 				<map:serialize type="xml"/>
 			</map:match>
-
-
+			
+			
 			<!-- List all communities & collections in DSpace -->
 			<map:match pattern="community-list">
 				<map:transform type="CommunityBrowser">
@@ -131,124 +133,45 @@ and searching the repository.
 				</map:transform>
 				<map:serialize type="xml"/>
 			</map:match>
-
-
+	
+			
 			<!-- Search -->
 			<map:match pattern="search">
 				<map:transform type="SimpleSearch"/>
 				<map:serialize type="xml"/>
-			</map:match>
+			</map:match>		
 			<map:match pattern="simple-search">
 				<map:transform type="SimpleSearch"/>
 				<map:serialize type="xml"/>
-			</map:match>
+			</map:match>	
 			<map:match pattern="advanced-search">
 				<map:transform type="AdvancedSearch"/>
 				<map:serialize type="xml"/>
-			</map:match>
-
-
+			</map:match>	
+			
+			
 			<!-- Browse (by anything) -->
 			<map:match pattern="browse">
 				<map:transform type="ConfigurableBrowse"/>
 				<map:serialize type="xml"/>
 			</map:match>
 
-			  <!-- restricted resource -->
+            <!-- Display statistics -->
+            <map:match pattern="statistics">
+                <map:transform type="Statistics"/>
+                <map:serialize type="xml"/>
+            </map:match>
+            
+            
+            <!-- restricted resource -->
 			<map:match pattern="restricted-resource">
 				<map:transform type="RestrictedItem"/>
-				<map:serialize type="xml"/>
+				<map:serialize type="xml"/>	
 			</map:match>
+	
 
-            <!-- general identifier features -->
-			<map:match pattern="resource/**">
-
-                <!-- Inform the user that the item they are viewing is a restricted resource -->
-                <map:match pattern="resource/*/restricted-resource">
-                    <map:transform type="RestrictedItem"/>
-                    <map:serialize type="xml"/>
-                </map:match>
-
-                <!-- Scoped browse by features -->
-                <map:match type="HandleAuthorizedMatcher" pattern="READ">
-                    <map:match type="HandleTypeMatcher" pattern="community,collection">
-
-                        <!-- Browse (by anything) -->
-                        <map:match pattern="resource/*/browse">
-                            <map:transform type="ConfigurableBrowse"/>
-                            <map:serialize type="xml"/>
-                        </map:match>
-
-                        <!-- Simple search -->
-                        <map:match pattern="resource/*/search">
-                            <map:transform type="SimpleSearch"/>
-                            <map:serialize type="xml"/>
-                        </map:match>
-
-                        <!-- Simple search again, but this time they said it -->
-                        <map:match pattern="resource/*/simple-search">
-                            <map:transform type="SimpleSearch"/>
-                            <map:serialize type="xml"/>
-                        </map:match>
-
-                        <!-- Advanced search -->
-                        <map:match pattern="resource/*/advanced-search">
-                            <map:transform type="AdvancedSearch"/>
-                            <map:serialize type="xml"/>
-                        </map:match>
-
-                    </map:match>
-                    <!-- End match community or collection -->
-                </map:match>
-                <!-- End match can read -->
-
-
-                <!-- Community, Collection, and Item Viewers -->
-                <map:match pattern="resource/**">
-                    <map:match type="HandleAuthorizedMatcher" pattern="READ">
-                        <map:match type="HandleTypeMatcher" pattern="community">
-                            <map:transform type="CommunityViewer"/>
-                            <map:serialize type="xml"/>
-                        </map:match>
-                        <map:match type="HandleTypeMatcher" pattern="collection">
-                            <map:transform type="CollectionViewer"/>
-                            <map:serialize type="xml"/>
-                        </map:match>
-                        <map:match type="HandleTypeMatcher" pattern="item">
-                            <map:transform type="ItemViewer"/>
-                            <map:serialize type="xml"/>
-                        </map:match>
-                    </map:match>
-
-                    <map:match type="HandleAuthorizedMatcher" pattern="!READ">
-                        <map:select type="AuthenticatedSelector">
-                            <map:when test="eperson">
-                                <map:transform type="RestrictedItem"/>
-                                <map:serialize/>
-                            </map:when>
-                            <map:otherwise>
-                                <map:act type="StartAuthentication">
-                                    <map:parameter name="header"
-                                                   value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
-                                    <map:parameter name="message"
-                                                   value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"/>
-                                </map:act>
-                                <map:serialize/>
-                            </map:otherwise>
-                        </map:select>
-                    </map:match>
-                </map:match>
-
-            </map:match>
-
-			<!-- Handle specific features (legacy) -->
+            <!-- Handle specific features -->
 			<map:match pattern="handle/*/**">
-
-                <!-- Display statistics -->
-                <map:match pattern="statistics">
-                    <map:transform type="Statistics"/>
-                    <map:serialize type="xml"/>
-                </map:match>
 
 				<!-- Inform the user that the item they are viewing is a restricted resource -->
 				<map:match pattern="handle/*/*/restricted-resource">

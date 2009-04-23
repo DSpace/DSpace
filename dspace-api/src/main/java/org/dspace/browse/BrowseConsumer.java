@@ -1,9 +1,9 @@
 /*
  * BrowseConsumer.java
  *
- * Version: $Revision: 1.4 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/04/10 04:11:09 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -69,7 +69,7 @@ import org.dspace.event.Event;
  *
  * Recommended filter:  Item+Create|Modify|Modify_Metadata:Collection+Add|Remove
  *
- * @version $Revision: 1.1 $
+ * @version $Revision$
  */
 public class BrowseConsumer implements Consumer
 {
@@ -147,8 +147,10 @@ public class BrowseConsumer implements Consumer
                 try
                 {
                     // Update browse indices
+                    ctx.turnOffAuthorisationSystem();
                     IndexBrowse ib = new IndexBrowse(ctx);
                     ib.indexItem(i);
+                    ctx.restoreAuthSystemState();
                 }
                 catch (BrowseException e)
                 {
@@ -157,16 +159,16 @@ public class BrowseConsumer implements Consumer
                 }
 
                 if (log.isDebugEnabled())
-                {
-                    log.debug("Updated browse indices for Item id=" + i.getID()
-                            + ", oid=" + i.getIdentifier().getCanonicalForm());
-                }
+                    log.debug("Updated browse indices for Item id="
+                            + String.valueOf(i.getID()) + ", hdl="
+                            + i.getHandle());
             }
 
             // NOTE: Removed items are necessarily handled inline (ugh).
 
             // browse updates wrote to the DB, so we have to commit.
-            ctx.commit();
+            ctx.getDBConnection().commit();
+
         }
         
         // clean out toUpdate
@@ -175,7 +177,5 @@ public class BrowseConsumer implements Consumer
     
     public void finish(Context ctx) {
     	
-    	toUpdate = null;
-    	return;
     }
 }

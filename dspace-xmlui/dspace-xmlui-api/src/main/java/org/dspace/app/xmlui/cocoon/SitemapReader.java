@@ -1,9 +1,9 @@
 /*
  * SitemapReader.java
  *
- * Version: $Revision: 1.2 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/04/25 15:24:23 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -158,8 +158,7 @@ public class SitemapReader extends AbstractReader implements Recyclable
     private void sendFile(String file, 
             boolean compressed) throws IOException, ResourceNotFoundException
     {
-        File f = new File(ConfigurationManager.getProperty("dspace.dir")
-                + File.separator + "sitemaps", file);
+        File f = new File(ConfigurationManager.getProperty("sitemap.dir"), file);
 
         HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 

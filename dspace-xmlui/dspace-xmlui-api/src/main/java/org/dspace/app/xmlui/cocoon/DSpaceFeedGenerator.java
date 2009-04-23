@@ -1,9 +1,9 @@
 /*
  * DSpaceFeedGenerator.java
  *
- * Version: $Revision: 1.4 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/01/10 04:28:19 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -40,11 +40,14 @@
 
 package org.dspace.app.xmlui.cocoon;
 
-import com.sun.syndication.feed.rss.Channel;
-import com.sun.syndication.feed.rss.Description;
-import com.sun.syndication.feed.rss.Image;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.WireFeedOutput;
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 import org.apache.avalon.excalibur.pool.Recyclable;
 import org.apache.avalon.framework.configuration.Configurable;
 import org.apache.avalon.framework.configuration.Configuration;
@@ -66,6 +69,7 @@ import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
+import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
@@ -79,24 +83,18 @@ import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.sort.SortException;
-import org.dspace.sort.SortOption;
-import org.dspace.uri.IdentifierService;
-import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierException;
+import org.dspace.handle.HandleManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import com.sun.syndication.feed.rss.Channel;
+import com.sun.syndication.feed.rss.Description;
+import com.sun.syndication.feed.rss.Image;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.WireFeedOutput;
 
 /**
  * 
@@ -136,10 +134,23 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 	private String format = null;
 	
 	/** The feed's scope, null if no scope */
-	private String uri = null;
+	private String handle = null;
 	
     /** number of DSpace items per feed */
     private static int itemCount = 0;
+    
+    /**
+     * How long should RSS feed cache entries be valid? milliseconds * seconds *
+     * minutes * hours default to 24 hours if config parameter is not present or
+     * wrong
+     */
+    private static final long CACHE_AGE;
+    static
+    {
+        final String ageCfgName = "webui.feed.cache.age";
+        final long ageCfg = ConfigurationManager.getIntProperty(ageCfgName, 24);
+        CACHE_AGE = 1000 * 60 * 60 * ageCfg;
+    }
     
 	/**	default fields to display in item description */
     private static String defaultDescriptionFields = "dc.description.abstract, dc.description, dc.title.alternative, dc.title";
@@ -156,7 +167,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     private DSpaceValidity validity = null;
     
     /** The cache of recently submitted items */
-    private java.util.List<Item> recentSubmissionItems;
+    private java.util.List<BrowseItem> recentSubmissionItems;
     
     /**
      * Generate the unique caching key.
@@ -164,7 +175,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      */
     public Serializable getKey()
     {
-    	String key = "key:" + this.uri + ":" + this.format;
+    	String key = "key:" + this.handle + ":" + this.format;
     	return HashUtil.hash(key);
     }
 
@@ -174,9 +185,6 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      * The validity object will include the collection being viewed and 
      * all recently submitted items. This does not include the community / collection
      * hierarch, when this changes they will not be reflected in the cache.
-     *
-     * FIXME: This depends on the "handle" string being of the form "hdl:12/34"
-     * rather than just "12/34".
      */
     public SourceValidity getValidity()
     {
@@ -189,16 +197,14 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     			Context context = ContextUtil.obtainContext(objectModel);
 
     			DSpaceObject dso = null;
-    			if (uri != null && !uri.contains("site"))
-                        {
-                            ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
-                            dso = (DSpaceObject) IdentifierService.getResource(context, ri);
-                        }
+    			
+    			if (handle != null && !handle.contains("site"))
+    				dso = HandleManager.resolveToObject(context, handle);
     			
     			validity.add(dso);
     			
     			// add reciently submitted items
-    			for(Item item : getRecientlySubmittedItems(context,dso))
+    			for(BrowseItem item : getRecientlySubmittedItems(context,dso))
     			{
     				validity.add(item);
     			}
@@ -226,9 +232,6 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     
     /**
      * Setup configuration for this request
-     *
-     * FIXME: This should use a parameter called "uri", not "handle", but I
-     * have no idea how to do this with Manakin, so it will have to wait. --JR
      */
     public void setup(SourceResolver resolver, Map objectModel, String src,
             Parameters par) throws ProcessingException, SAXException,
@@ -238,38 +241,33 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         
         
         this.format = par.getParameter("feedFormat", null);
-        this.uri = par.getParameter("handle",null);
+        this.handle = par.getParameter("handle",null);
     }
     
     
     /**
      * Generate the syndication feed.
-     *
-     * FIXME: This depends on the "handle" string being of the form "hdl:12/34"
-     * rather than just "12/34".
      */
     public void generate() throws IOException, SAXException, ProcessingException
     {
-		try
-        {
+		try {
 			Context context = ContextUtil.obtainContext(objectModel);
 			DSpaceObject dso = null;
 			
-			if (uri != null && !uri.contains("site"))
+			if (handle != null && !handle.contains("site"))
 			{
-                ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
-                dso = (DSpaceObject) IdentifierService.getResource(context, ri);
+				dso = HandleManager.resolveToObject(context, handle);
 				
-                if (dso == null)
+				if (dso == null)
 				{
-					// If we were unable to find a uri then return page not found.
-					throw new ResourceNotFoundException("Unable to find DSpace object matching the given URI: "+uri);
+					// If we were unable to find a handle then return page not found.
+					throw new ResourceNotFoundException("Unable to find DSpace object matching the given handle: "+handle);
 				}
 				
 				if (!(dso.getType() == Constants.COLLECTION || dso.getType() == Constants.COMMUNITY))
 				{
-					// The uri is valid but the object is not a container.
-					throw new ResourceNotFoundException("Unable to syndicate DSpace object: "+uri);
+					// The handle is valid but the object is not a container.
+					throw new ResourceNotFoundException("Unable to syndicate DSpace object: "+handle);
 				}
 				
 			}
@@ -302,11 +300,6 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 		{
 			throw new SAXException(sqle);
 		}
-        catch (IdentifierException e)
-        {
-            log.error("caught exception: ", e);
-            throw new ProcessingException(e);
-        }
     	
     }
     
@@ -430,7 +423,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     	List<com.sun.syndication.feed.rss.Item> items = 
     		new ArrayList<com.sun.syndication.feed.rss.Item>();
     	
-		for(Item item : getRecientlySubmittedItems(context,dso))
+		for(BrowseItem item : getRecientlySubmittedItems(context,dso))
 		{
 			items.add(itemFromDSpaceItem(context, item));
 		}
@@ -450,7 +443,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      * @return an object representing a feed entry
      */
     private com.sun.syndication.feed.rss.Item itemFromDSpaceItem(Context context,
-    		                                                     Item dspaceItem)
+    		                                                     BrowseItem dspaceItem)
     	throws SQLException
     {
         com.sun.syndication.feed.rss.Item rssItem = 
@@ -469,10 +462,10 @@ public class DSpaceFeedGenerator extends AbstractGenerator
             dateField = "dc.date.issued";
         }   
         
-        //Set item link
-    	String itemLink = resolveURL(dspaceItem);
+        //Set item handle
+    	String itHandle = resolveURL(dspaceItem);
 
-        rssItem.setLink(itemLink);
+        rssItem.setLink(itHandle);
         
         //get first title
         String title = null;
@@ -534,6 +527,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
         rssItem.setDescription(descrip);
         
+        
         // set date field
         String dcDate = null;
         try
@@ -558,7 +552,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     
     
     @SuppressWarnings("unchecked")
-    private java.util.List<Item> getRecientlySubmittedItems(Context context, DSpaceObject dso) 
+    private java.util.List<BrowseItem> getRecientlySubmittedItems(Context context, DSpaceObject dso) 
             throws SQLException
     {
     	if (recentSubmissionItems != null)
@@ -626,21 +620,18 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     	
 		if (ConfigurationManager.getBooleanProperty("webui.feed.localresolve"))
 		{
-            /*
-            Request request = ObjectModelHelper.getRequest(objectModel);
-
+			Request request = ObjectModelHelper.getRequest(objectModel);
+			
 			String url = (request.isSecure()) ? "https://" : "http://";
 			url += ConfigurationManager.getProperty("dspace.hostname");
 			url += ":" + request.getServerPort();
 			url += request.getContextPath();
-			url += "/handle/" + dso.getExternalIdentifier().getCanonicalForm();
-			return url;
-			*/
-            return IdentifierService.getLocalURL(dso).toString();
-        }
+			url += "/handle/" + dso.getHandle();
+			return url;	
+		}
 		else
 		{
-            return IdentifierService.getURL(dso).toString();
+			return HandleManager.getCanonicalForm(dso.getHandle()); 
 		}
     }
     
@@ -652,7 +643,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     public void recycle()
     {
     	this.format = null;
-    	this.uri = null;
+    	this.handle = null;
     	this.validity = null;
         this.recentSubmissionItems = null;
     	super.recycle();
@@ -671,13 +662,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     private class FeedValidity extends DSpaceValidity 
     {
 		private static final long serialVersionUID = 1L;
-
-		/**
-    	 * How long should the cache assumed to be valid for, 
-    	 * milliseconds * seconds * minutes * hours
-    	 */
-    	private static final long CACHE_AGE = 1000 * 60 * 60 * 24;
-    	
+		   	
     	/** When the cache's validity expires */
     	private long expires = 0;
     	
@@ -767,7 +752,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      *            <schema prefix>.<element>[.<qualifier>|.*]
      * @throws SQLException 
      */
-    private static DCValue[] getMetadata(Item item, String mdString)
+    private static DCValue[] getMetadata(BrowseItem item, String mdString) throws SQLException
     {
         StringTokenizer dcf = new StringTokenizer(mdString, ".");
         

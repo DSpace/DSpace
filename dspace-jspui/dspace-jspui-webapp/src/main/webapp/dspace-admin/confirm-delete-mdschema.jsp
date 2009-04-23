@@ -78,8 +78,8 @@
     <%-- <P>This will result in an error if any metadata fields exist within this schema.</P>  --%>
     <P><fmt:message key="jsp.dspace-admin.confirm-delete-mdschema.warning"/></P>
 
-    <form method=POST>
-        <input type="hidden" name="dc_schema_id" value="<%= schema.getID() %>">
+    <form method="post">
+        <input type="hidden" name="dc_schema_id" value="<%= schema.getSchemaID() %>">
 
         <center>
             <table width="70%">

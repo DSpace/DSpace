@@ -335,7 +335,7 @@ public class SubmissionController extends DSpaceServlet
                     AbstractProcessingStep.PROGRESS_BAR_PREFIX))
             {
                 // jumping to a particular step/page
-                doStepJump(context, request, response, subInfo);
+                doStepJump(context, request, response, subInfo, currentStepConfig);
             }
             else
             {
@@ -519,6 +519,24 @@ public class SubmissionController extends DSpaceServlet
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
+        int result = doSaveCurrentState(context, request, response, subInfo, currentStepConfig);
+        
+        int currStep=currentStepConfig.getStepNumber();
+        int currPage=AbstractProcessingStep.getCurrentPage(request);
+        double currStepAndPage = Float.parseFloat(currStep+"."+currPage);
+        // default value if we are in workflow
+        double stepAndPageReached = -1;
+        
+        if (!subInfo.isInWorkflow())
+        {
+            stepAndPageReached = Float.parseFloat(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
+        }
+        
+        if (result != AbstractProcessingStep.STATUS_COMPLETE && currStepAndPage != stepAndPageReached)
+        {
+            doStep(context, request, response, subInfo, currStep);
+        }
+        
         // find current Step number
         int currentStepNum;
         if (currentStepConfig == null)
@@ -613,23 +631,14 @@ public class SubmissionController extends DSpaceServlet
      * @param subInfo
      *            SubmissionInfo pertaining to this submission
      */
-    public void doStepJump(Context context, HttpServletRequest request,
-            HttpServletResponse response, SubmissionInfo subInfo)
+    private void doStepJump(Context context, HttpServletRequest request,
+            HttpServletResponse response, SubmissionInfo subInfo, SubmissionStepConfig currentStepConfig)
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
         // Find the button that was pressed. It would start with
         // "submit_jump_".
         String buttonPressed = UIUtil.getSubmitButton(request, "");
-
-        // Now, if the request was a multi-part (file upload), we need to
-        // get the original request back out, as the wrapper causes problems
-        // further down the line.
-        if (request instanceof FileUploadRequest)
-        {
-            FileUploadRequest fur = (FileUploadRequest) request;
-            request = fur.getOriginalRequest();
-        }
 
         int nextStep = -1; // next step to load
         int nextPage = -1; // page within the nextStep to load
@@ -657,7 +666,8 @@ public class SubmissionController extends DSpaceServlet
 
             // Integrity check: make sure they aren't going
             // forward or backward too far
-            if (nextStep < FIRST_STEP)
+            if ((!subInfo.isInWorkflow() && nextStep < FIRST_STEP) ||
+                    (subInfo.isInWorkflow() && nextStep < WORKFLOW_FIRST_STEP))
             {
                 nextStep = -1;
                 nextPage = -1;
@@ -681,17 +691,51 @@ public class SubmissionController extends DSpaceServlet
         }
         else
         {
-            // save page info to request (for the step to access)
-            AbstractProcessingStep.setCurrentPage(request, nextPage);
+            int result = doSaveCurrentState(context, request, response,
+                    subInfo, currentStepConfig);
+
+            // Now, if the request was a multi-part (file upload), we need to
+            // get the original request back out, as the wrapper causes problems
+            // further down the line.
+            if (request instanceof FileUploadRequest)
+            {
+                FileUploadRequest fur = (FileUploadRequest) request;
+                request = fur.getOriginalRequest();
+            }
+
+            int currStep = currentStepConfig.getStepNumber();
+            int currPage = AbstractProcessingStep.getCurrentPage(request);
+            double currStepAndPage = Float
+                    .parseFloat(currStep + "." + currPage);
+            // default value if we are in workflow
+            double stepAndPageReached = -1;
             
-            //flag that we are going back to the start of this step (for JSPStepManager class)
-            setBeginningOfStep(request, true);
+            if (!subInfo.isInWorkflow())
+            {
+                stepAndPageReached = Float.parseFloat(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
+            }
+            
+            if (result != AbstractProcessingStep.STATUS_COMPLETE
+                    && currStepAndPage != stepAndPageReached)
+            {
+                doStep(context, request, response, subInfo, currStep);
+            }
+            else
+            {
+                // save page info to request (for the step to access)
+                AbstractProcessingStep.setCurrentPage(request, nextPage);
 
-            log.debug("Jumping to Step " + nextStep + " and Page " + nextPage);
+                // flag that we are going back to the start of this step (for
+                // JSPStepManager class)
+                setBeginningOfStep(request, true);
 
-            // do the step (the step should take care of going to 
-            // the specified page)
-            doStep(context, request, response, subInfo, nextStep);
+                log.debug("Jumping to Step " + nextStep + " and Page "
+                        + nextPage);
+
+                // do the step (the step should take care of going to
+                // the specified page)
+                doStep(context, request, response, subInfo, nextStep);
+            }
         }
     }
 
@@ -715,14 +759,24 @@ public class SubmissionController extends DSpaceServlet
     private void doCancelOrSave(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo,
             SubmissionStepConfig stepConfig) throws ServletException, IOException,
-            SQLException
+            SQLException, AuthorizeException
     {
         // If this is a workflow item, we need to return the
         // user to the "perform task" page
         if (subInfo.isInWorkflow())
         {
-            request.setAttribute("workflow.item", subInfo.getSubmissionItem());
-            JSPManager.showJSP(request, response, "/mydspace/perform-task.jsp");
+            int result = doSaveCurrentState(context, request, response, subInfo, stepConfig);
+            
+            if (result == AbstractProcessingStep.STATUS_COMPLETE)
+            {
+                request.setAttribute("workflow.item", subInfo.getSubmissionItem());
+                JSPManager.showJSP(request, response, "/mydspace/perform-task.jsp");                
+            }
+            else
+            {
+                int currStep=stepConfig.getStepNumber();
+                doStep(context, request, response, subInfo, currStep);
+            }
         }
         else
         {
@@ -736,48 +790,24 @@ public class SubmissionController extends DSpaceServlet
             }
             else
             {
+                //tell the step class to do its processing (to save any inputs)
+                //but, send flag that this is a "cancellation"
+                setCancellationInProgress(request, true);
                 
-                // As long as we're not uploading a file, go ahead and SAVE
-                // all of the user's inputs for later
-                try
-                {
-                    if (!Class.forName("org.dspace.app.webui.util.FileUploadRequest")
-                            .isInstance(request))
-                    {
-                        // call post-processing on Step (to save any inputs from JSP)
-                        log.debug("Cancel/Save Request: calling processing for Step: '"
-                                + stepConfig.getProcessingClassName() + "'");
-            
-                        try
-                        {
-                            // load the step class (using the current class loader)
-                            ClassLoader loader = this.getClass().getClassLoader();
-                            Class stepClass = loader
-                                    .loadClass(stepConfig.getProcessingClassName());
-            
-                            // load the JSPStepManager object for this step
-                            AbstractProcessingStep step = (AbstractProcessingStep) stepClass
-                                        .newInstance();
-            
-                            //tell the step class to do its processing (to save any inputs)
-                            //but, send flag that this is a "cancellation"
-                            setCancellationInProgress(request, true);
-                            step.doProcessing(context, request, response, subInfo);   
-                                      
-                            //commit & close context
-                            context.complete();
-                        }
-                        catch (Exception e)
-                        {
-                            log.error("Error loading step class'" + stepConfig.getProcessingClassName() + "':", e);
-                            JSPManager.showInternalError(request, response);
-                        }
-                    }//end if not file upload request
+                int result = doSaveCurrentState(context, request, response, subInfo,
+                        stepConfig);
+                
+                int currStep=stepConfig.getStepNumber();
+                int currPage=AbstractProcessingStep.getCurrentPage(request);
+                double currStepAndPage = Float.parseFloat(currStep+"."+currPage);
+                double stepAndPageReached = Float.parseFloat(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
+                
+                if (result != AbstractProcessingStep.STATUS_COMPLETE && currStepAndPage < stepAndPageReached){
+                    setReachedStepAndPage(subInfo, currStep, currPage);
                 }
-                catch(Exception e)
-                {
-                    throw new ServletException(e);
-                }
+                
+                //commit & close context
+                context.complete();
                 
                 // save changes to submission info & step info for JSP
                 saveSubmissionInfo(request, subInfo);
@@ -788,6 +818,48 @@ public class SubmissionController extends DSpaceServlet
                         "/submit/cancel.jsp");
             }
         }
+    }
+
+    private int doSaveCurrentState(Context context,
+            HttpServletRequest request, HttpServletResponse response,
+            SubmissionInfo subInfo, SubmissionStepConfig stepConfig)
+            throws ServletException
+    {
+        int result = -1;
+        // As long as we're not uploading a file, go ahead and SAVE
+        // all of the user's inputs for later
+        try
+        {
+            // call post-processing on Step (to save any inputs from JSP)
+            log
+                    .debug("Cancel/Save or Jump/Previous Request: calling processing for Step: '"
+                            + stepConfig.getProcessingClassName() + "'");
+
+            try
+            {
+                // load the step class (using the current class loader)
+                ClassLoader loader = this.getClass().getClassLoader();
+                Class stepClass = loader.loadClass(stepConfig
+                        .getProcessingClassName());
+
+                // load the JSPStepManager object for this step
+                AbstractProcessingStep step = (AbstractProcessingStep) stepClass
+                        .newInstance();
+
+                result = step.doProcessing(context, request, response, subInfo);
+            }
+            catch (Exception e)
+            {
+                log.error("Error loading step class'"
+                        + stepConfig.getProcessingClassName() + "':", e);
+                JSPManager.showInternalError(request, response);
+            }
+        }
+        catch(Exception e)
+        {
+            throw new ServletException(e);
+        }
+        return result;
     }
 
     /**
@@ -838,7 +910,7 @@ public class SubmissionController extends DSpaceServlet
         }
         else
         {
-            doStepJump(context, request, response, subInfo);
+            doStepJump(context, request, response, subInfo, currentStepConfig);
         }
     }
 
@@ -1223,7 +1295,30 @@ public class SubmissionController extends DSpaceServlet
             }
         }
     }
+    
+    /**
+    * Set a specific step and page as reached. 
+    * It will also "set back" where a user has reached.
+    * 
+    * @param subInfo
+     *            the SubmissionInfo object pertaining to the current submission
+    * @param step the step to set as reached, can be also a previous reached step
+    * @param page the page (within the step) to set as reached, can be also a previous reached page
+    */
+    private void setReachedStepAndPage(SubmissionInfo subInfo, int step,
+            int page) throws SQLException, AuthorizeException, IOException
+    {
+        if (!subInfo.isInWorkflow() && subInfo.getSubmissionItem() != null)
+        {
+            WorkspaceItem wi = (WorkspaceItem) subInfo.getSubmissionItem();
 
+            wi.setStageReached(step);
+            wi.setPageReached(page);
+            wi.update();
+        }
+    }
+
+    
     /**
      * Find out which step a user has reached in the submission process. If the
      * submission is in the workflow process, this returns -1.

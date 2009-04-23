@@ -1,9 +1,9 @@
 /*
  * SearchItemForm.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -57,12 +57,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierService;
-import org.dspace.uri.IdentifierException;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
-import org.dspace.uri.dao.ExternalIdentifierStorageException;
+import org.dspace.handle.HandleManager;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
@@ -143,7 +138,7 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 			if (dcTitles != null && dcTitles.length >= 1)
 				title = dcTitles[0].value;
 
-			String url = IdentifierService.getURL(item).toString();
+			String url = contextPath+"/handle/"+item.getHandle();
 			
 			Row row = table.addRow();
 			
@@ -175,54 +170,33 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 	 */
 	private ArrayList<Item> preformSearch(Collection collection, String query) throws SQLException, IOException
 	{
+		
+		// Search the repository
+        QueryArgs queryArgs = new QueryArgs();
+        queryArgs.setQuery(query);
+        queryArgs.setPageSize(Integer.MAX_VALUE);
+        QueryResults results = DSQuery.doQuery(context, queryArgs);
+        
 
-        try
+        // Get a list of found items
+        ArrayList<Item> items = new ArrayList<Item>();
+        @SuppressWarnings("unchecked")
+        java.util.List<String> handles = results.getHitHandles();
+        for (String handle : handles)
         {
-// Search the repository
-            QueryArgs queryArgs = new QueryArgs();
-            queryArgs.setQuery(query);
-            queryArgs.setPageSize(Integer.MAX_VALUE);
-            QueryResults results = DSQuery.doQuery(context, queryArgs);
+            DSpaceObject resultDSO = HandleManager.resolveToObject(context, handle);
 
-            ExternalIdentifierDAO identifierDAO =
-                ExternalIdentifierDAOFactory.getInstance(context);
-
-            // Get a list of found items
-            ArrayList<Item> items = new ArrayList<Item>();
-            @SuppressWarnings("unchecked")
-            java.util.List<String> uris = results.getHitURIs();
-//        java.util.List<String> handles = results.getHithandles();
-//        for (String handle : handles)
-            for (String uri : uris)
+            if (resultDSO instanceof Item)
             {
-    //            DSpaceObject resultDSO = HandleManager.resolveToObject(context, handle);
-                /*
-                ExternalIdentifier identifier = identifierDAO.retrieve(uri);
-                DSpaceObject resultDSO =
-                    identifier.getObjectIdentifier().getObject(context);*/
-                ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
-                DSpaceObject resultDSO = (DSpaceObject) IdentifierService.getResource(context, ri);
-
-                if (resultDSO instanceof Item)
-                {
-                    Item item = (Item) resultDSO;
-
-                    if (!item.isOwningCollection(collection))
-                        items.add(item);
-                }
+            	Item item = (Item) resultDSO;
+            	
+            	if (!item.isOwningCollection(collection))
+            		items.add(item);
             }
-
-            return items;
         }
-        catch (ExternalIdentifierStorageException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (IdentifierException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
+        
+        return items;
+	}
 	
 	
 	

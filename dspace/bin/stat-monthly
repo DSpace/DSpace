@@ -41,8 +41,8 @@
 ###########################################################################
 
 ###########################################################################
-# This script generates a report from the first of the current month to the end
-# of the current month.  This is not great, and will be superceded soon
+# This script generates a report from the first of the current month to the
+# end of the current month.  This is not great, and will be superceded soon
 ###########################################################################
 
 # Get the DSPACE/bin directory

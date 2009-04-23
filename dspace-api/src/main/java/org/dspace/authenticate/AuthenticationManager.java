@@ -39,14 +39,24 @@
  */
 package org.dspace.authenticate;
 
+import java.io.IOException;
+
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
+import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -183,8 +193,15 @@ public class AuthenticationManager
         {
             if (!implicitOnly || methodStack[i].isImplicit())
             {
-                int ret = methodStack[i].authenticate(context, username, password, realm, request);
-
+                int ret = 0;
+                try
+                {
+                    ret = methodStack[i].authenticate(context, username, password, realm, request);
+                }
+                catch (SQLException e)
+                {
+                    ret = AuthenticationMethod.NO_SUCH_USER;
+                }
                 if (ret == AuthenticationMethod.SUCCESS)
                     return ret;
                 if (ret < bestRet)
@@ -210,6 +227,7 @@ public class AuthenticationManager
     public static boolean canSelfRegister(Context context,
                                    HttpServletRequest request,
                                    String username)
+        throws SQLException
     {
         for (int i = 0; i < methodStack.length; ++i)
             if (methodStack[i].canSelfRegister(context, request, username))
@@ -233,6 +251,7 @@ public class AuthenticationManager
     public static boolean allowSetPassword(Context context,
                                     HttpServletRequest request,
                                     String username)
+        throws SQLException
     {
         for (int i = 0; i < methodStack.length; ++i)
             if (methodStack[i].allowSetPassword(context, request, username))
@@ -256,6 +275,7 @@ public class AuthenticationManager
     public static void initEPerson(Context context,
                                    HttpServletRequest request,
                                    EPerson eperson)
+        throws SQLException
     {
         for (int i = 0; i < methodStack.length; ++i)
             methodStack[i].initEPerson(context, request, eperson);
@@ -278,6 +298,7 @@ public class AuthenticationManager
      */
     public static int[] getSpecialGroups(Context context,
                                          HttpServletRequest request)
+        throws SQLException
     {
         ArrayList gll = new ArrayList();
         int totalLen = 0;

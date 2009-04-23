@@ -1,9 +1,9 @@
 <%--
   - full.jsp
   -
-  - Version: $Revision: 1.0 $
+  - Version: $Revision$
   -
-  - Date: $Date: 2006/04/27 00:00:00 $
+  - Date: $Date$
   -
   - Copyright (c) 2006, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.
@@ -48,17 +48,17 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="org.dspace.app.webui.util.UIUtil" %>
-<%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.browse.BrowseInfo" %>
 <%@ page import="org.dspace.sort.SortOption" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Community" %>
-<%@ page import="org.dspace.content.DCDate" %>
+<%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
-<%@ page import="org.dspace.uri.IdentifierService" %>
 <%@ page import="java.net.URLEncoder" %>
-<%@ page import="java.util.Set" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="org.dspace.content.DCDate" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
 <%
     request.setAttribute("LanguageSwitch", "hide");
@@ -115,13 +115,11 @@
 	String linkBase = request.getContextPath() + "/";
 	if (collection != null)
 	{
-//		linkBase = linkBase + "handle/" + collection.getHandle() + "/";
-		linkBase = IdentifierService.getURL(collection).toString() + "/";
+		linkBase = linkBase + "handle/" + collection.getHandle() + "/";
 	}
 	if (community != null)
 	{
-//		linkBase = linkBase + "handle/" + community.getHandle() + "/";
-		linkBase = IdentifierService.getURL(community).toString() + "/";
+		linkBase = linkBase + "handle/" + community.getHandle() + "/";
 	}
 	
 	String direction = (bi.isAscending() ? "ASC" : "DESC");
@@ -145,12 +143,12 @@
 	String next = sharedLink;
 	String prev = sharedLink;
 	
-    if (bi.hasNextPage())
+	if (bi.hasNextPage())
     {
         next = next + "&amp;offset=" + bi.getNextOffset();
     }
-
-    if (bi.hasPrevPage())
+	
+	if (bi.hasPrevPage())
     {
         prev = prev + "&amp;offset=" + bi.getPrevOffset();
     }
@@ -159,13 +157,11 @@
 	String formaction = request.getContextPath() + "/";
 	if (collection != null)
 	{
-//		formaction = formaction + "handle/" + collection.getHandle() + "/";
-		formaction = IdentifierService.getURL(collection).toString() + "/";
+		formaction = formaction + "handle/" + collection.getHandle() + "/";
 	}
 	if (community != null)
 	{
-//		formaction = formaction + "handle/" + community.getHandle() + "/";
-		formaction = IdentifierService.getURL(community).toString() + "/";
+		formaction = formaction + "handle/" + community.getHandle() + "/";
 	}
 	formaction = formaction + urlFragment;
 	
@@ -188,6 +184,7 @@
 
 <%-- OK, so here we start to develop the various components we will use in the UI --%>
 
+<%@page import="java.util.Set"%>
 <dspace:layout titlekey="browse.page-title" navbar="<%=layoutNavbar %>">
 
 	<%-- Build the header (careful use of spacing) --%>
@@ -430,7 +427,7 @@
 %>
 		</select>
 		
-		<input type="submit" name="submit_browse" value="Update"/>
+		<input type="submit" name="submit_browse" value="<fmt:message key="jsp.general.update"/>"/>
 	</form>
 	</div>
 

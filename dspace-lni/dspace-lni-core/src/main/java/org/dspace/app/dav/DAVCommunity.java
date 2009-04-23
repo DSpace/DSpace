@@ -167,7 +167,7 @@ class DAVCommunity extends DAVDSpaceObject
             value = getObjectMetadata("name");
             if (value == null)
             {
-                value = this.community.getIdentifier().getCanonicalForm();
+                value = this.community.getHandle();
             }
         }
 
@@ -187,7 +187,7 @@ class DAVCommunity extends DAVDSpaceObject
 
         else if (elementsEqualIsh(property, handleProperty))
         {
-            value = canonicalizeHandle(this.community.getIdentifier().getCanonicalForm());
+            value = canonicalizeHandle(this.community.getHandle());
         }
         else if (elementsEqualIsh(property, short_descriptionProperty))
         {

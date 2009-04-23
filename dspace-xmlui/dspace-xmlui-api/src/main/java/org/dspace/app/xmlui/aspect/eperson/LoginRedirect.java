@@ -1,9 +1,9 @@
 /*
  * LoginRedirect.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -74,18 +74,37 @@ public class LoginRedirect extends AbstractAction {
 				.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 		final HttpServletRequest httpRequest = (HttpServletRequest) objectModel
 				.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
-		final Iterator authMethods = AuthenticationManager
-				.authenticationMethodIterator();
+		final Iterator<AuthenticationMethod> authMethods = (Iterator<AuthenticationMethod>) AuthenticationManager
+				    .authenticationMethodIterator();
 
-		final String url = ((AuthenticationMethod) authMethods.next())
-				.loginPageURL(ContextUtil.obtainContext(objectModel),
-						httpRequest, httpResponse);
+		AuthenticationMethod authMethod = null;
 
-		if (authMethods.hasNext()) {
-			throw new IllegalStateException(
-					"Multiple authentication methods found when only one was expected.");
-		}
+        while (authMethods.hasNext())
+        {
+            AuthenticationMethod currAuthMethod = authMethods.next();
+            if (currAuthMethod.loginPageURL(ContextUtil
+                    .obtainContext(objectModel), httpRequest, httpResponse) != null)
+            {
+                if (authMethod != null)
+                {
+                    throw new IllegalStateException(
+                            "Multiple explicit authentication methods found when only one was expected.");
+                }
+                authMethod = currAuthMethod;
+            }
+        }
 
+        if (authMethods == null)
+        {
+            throw new IllegalStateException(
+                    "No explicit authentication methods found when exactly one was expected.");
+        }
+
+        final String url = ((AuthenticationMethod) authMethod).loginPageURL(
+                ContextUtil.obtainContext(objectModel), httpRequest,
+                httpResponse);
+
+	      
 		// now we want to check for the force ssl property
 		if (ConfigurationManager.getBooleanProperty("xmlui.force.ssl")) {
 

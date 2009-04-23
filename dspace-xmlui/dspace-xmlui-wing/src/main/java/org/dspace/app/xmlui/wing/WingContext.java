@@ -1,9 +1,9 @@
 /*
  * WingContext.java
  *
- * Version: $Revision: 1.5 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/03/20 22:41:02 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -49,7 +49,7 @@ package org.dspace.app.xmlui.wing;
  * @author Scott Phillips
  */
 
-import org.apache.avalon.framework.logger.Logger;
+import org.apache.commons.logging.Log;
 
 public class WingContext
 {
@@ -63,7 +63,7 @@ public class WingContext
     private String componentName;
 
     /** Cocoon logger for debugging Wing elements */
-    private Logger logger;
+    private Log logger;
 
 
     /**
@@ -97,7 +97,7 @@ public class WingContext
      * 
      * @return
      */
-    public Logger getLogger()
+    public Log getLogger()
     {
         return this.logger;
     }
@@ -108,9 +108,9 @@ public class WingContext
      * @param contentHandler
      *            A new content handler.
      */
-    public void setLogger(Logger logger)
+    public void setLogger(Log log)
     {
-        this.logger = logger;
+        this.logger = log;
     }
 
     /**

@@ -3,7 +3,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-parent</artifactId>
    <packaging>pom</packaging>
-   <version>SNAPSHOT</version>
+   <version>1.5.3-SNAPSHOT</version>
    <name>DSpace Parent Project</name>
    <url>http://projects.dspace.org</url>
 
@@ -18,6 +18,16 @@
             Java 1.5 is our officially endorsed build target
             platform.  
          -->
+         <plugin>
+			<artifactId>maven-release-plugin</artifactId>
+			<configuration>
+				<!--
+					During release:perform, enable the "addons" profile
+				-->
+				<releaseProfiles>addons</releaseProfiles>
+				<goals>deploy</goals>
+			</configuration>
+		 </plugin>
          <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
@@ -105,7 +115,7 @@
             <module>dspace-sword</module>
          </modules>
       </profile>
-
+      
       <!-- 
          Use 'mvn package -Pdistributions' to create distributions 
          to upload to S.F.
@@ -153,7 +163,7 @@
 
    <repositories>
       <repository>
-         <id>maven.dspace.org/snapshot</id>
+         <id>maven.dspace.org-snapshot</id>
          <name>DSpace Maven Snapshot Repository</name>
          <url>http://maven.dspace.org/snapshot</url>
          <releases>
@@ -162,7 +172,7 @@
          </releases>
          <snapshots>
             <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
+            <updatePolicy>daily</updatePolicy>
             <checksumPolicy>fail</checksumPolicy>
          </snapshots>
       </repository>
@@ -271,6 +281,11 @@
             <artifactId>lucene-core</artifactId>
             <version>2.3.0</version>
          </dependency>
+         <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers</artifactId>
+            <version>2.3.0</version>
+         </dependency>         
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
@@ -494,8 +509,8 @@
    </licenses>
 
    <issueManagement>
-      <system>Sourceforge Issue Tracking</system>
-      <url>http://sourceforge.net/tracker/?group_id=19984</url>
+      <system>JIRA</system>
+      <url>http://jira.dspace.org/jira/browse/DS</url>
    </issueManagement>
 
    <mailingLists>
@@ -654,6 +669,13 @@
          </roles>
       </developer>
       <developer>
+         <name>Mark H. Wood</name>
+         <email>mwoodiupui at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
          <name>Scott Yeadon</name>
          <email>syeadon at users.sourceforge.net</email>
          <roles>
@@ -702,15 +724,9 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection>
-         scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/trunk
-      </connection>
-      <developerConnection>
-         scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk
-      </developerConnection>
-      <url>
-         http://dspace.svn.sourceforge.net/viewvc/dspace/trunk
-      </url>
+      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x</url>
    </scm>
 
    <!-- 
@@ -726,10 +742,9 @@
          <url>scp://maven.dspace.org/var/maven/release</url>
       </repository>
       <snapshotRepository>
-         <id>maven.dspace.org/snapshot</id>
+         <id>maven.dspace.org-snapshot</id>
          <name>DSpace Maven Repository</name>
          <url>scp://maven.dspace.org/var/maven/snapshot</url>
-         <uniqueVersion>false</uniqueVersion>
       </snapshotRepository>
       <site>
          <id>website</id>

@@ -181,17 +181,19 @@ public class DCInputsReader
     }
    
     /**
-     * Returns the set of DC inputs used for a particular collection,
-     * or the default set if no inputs defined for the collection
-     * @param  collectionURI   collection's unique URI
+     * Returns the set of DC inputs used for a particular collection, or the
+     * default set if no inputs defined for the collection
+     * 
+     * @param collectionHandle
+     *            collection's unique Handle
      * @return DC input set
      * @throws ServletException
      *             if no default set defined
      */
-    public DCInputSet getInputs(String collectionURI)
+    public DCInputSet getInputs(String collectionHandle)
     		throws ServletException
     {
-       	String formName = (String)whichForms.get(collectionURI);
+       	String formName = (String)whichForms.get(collectionHandle);
     	if (formName == null)
     	{
     		formName = (String)whichForms.get(DEFAULT_COLLECTION);
@@ -217,14 +219,14 @@ public class DCInputsReader
     
     /**
      * Return the number of pages the inputs span for a desginated collection
-     * @param  collectionURI   collection's unique URI
+     * @param  collectionHandle   collection's unique Handle
      * @return number of pages of input
      * @throws ServletException if no default set defined
      */
-    public int getNumberInputPages(String collectionURI)
+    public int getNumberInputPages(String collectionHandle)
     	throws ServletException
     {
-    	return getInputs(collectionURI).getNumberPages();
+    	return getInputs(collectionHandle).getNumberPages();
     }
     
     /**
@@ -281,9 +283,9 @@ public class DCInputsReader
     /**
      * Process the form-map section of the XML file.
      * Each element looks like: 
-     *   <name-map collection-uri="uri" form-name="name" />
-     * Extract the collection URI and form name, put name in hashmap keyed
-     * by the collection URI.
+     *   <name-map collection-handle="hdl" form-name="name" />
+     * Extract the collection handle and form name, put name in hashmap keyed
+     * by the collection handle.
      */
     private void processMap(Node e) 
         throws SAXException
@@ -295,12 +297,12 @@ public class DCInputsReader
     		Node nd = nl.item(i);
     		if (nd.getNodeName().equals("name-map"))
     		{
-    			String id = getAttribute(nd, "collection-uri");
+    			String id = getAttribute(nd, "collection-handle");
     			String value = getAttribute(nd, "form-name");
-                String content = getValue(nd);
+			String content = getValue(nd);
     			if (id == null)
     			{
-    				throw new SAXException("name-map element is missing collection-uri attribute");
+    				throw new SAXException("name-map element is missing collection-handle attribute");
     			}
 			if (value == null)
 			{

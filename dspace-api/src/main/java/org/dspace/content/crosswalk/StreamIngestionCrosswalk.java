@@ -1,9 +1,9 @@
 /*
  * StreamIngestionCrosswalk
  *
- * Version: $Revision: 1.4 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/04/10 04:11:09 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -40,15 +40,13 @@
 
 package org.dspace.content.crosswalk;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 
-import org.dspace.core.Constants;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.crosswalk.CrosswalkException;
 
 
 /**
@@ -63,7 +61,7 @@ import org.dspace.content.crosswalk.CrosswalkException;
  * just refer to the desired crosswalk by its plugin name.
  *
  * @author  Larry Stone
- * @version $Revision: 1.0 $
+ * @version $Revision$
  */
 public interface StreamIngestionCrosswalk
 {

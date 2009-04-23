@@ -1,10 +1,10 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   sitemap.xmap
 
-  Version: $Revision: 1.5 $
+  Version: $Revision$
  
-  Date: $Date: 2006/08/08 22:00:26 $
+  Date: $Date$
  
   Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
   Institute of Technology.  All rights reserved.
@@ -70,6 +70,7 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 		
 		<map:actions>
 			<map:action name="AuthenticateAction" src="org.dspace.app.xmlui.aspect.eperson.AuthenticateAction"/>
+			<map:action name="ShibbolethAction" src="org.dspace.app.xmlui.aspect.eperson.ShibbolethAction"/>
 			<map:action name="LDAPAuthenticateAction" src="org.dspace.app.xmlui.aspect.eperson.LDAPAuthenticateAction"/>
 			<map:action name="UnAuthenticateAction" src="org.dspace.app.xmlui.aspect.eperson.UnAuthenticateAction"/>
 			<map:action name="LoginRedirect" src="org.dspace.app.xmlui.aspect.eperson.LoginRedirect" />
@@ -193,7 +194,7 @@ registration, forgotten passwords, editing profiles, and changing passwords.
          </map:match>
          
 			<map:match pattern="shibboleth-login">
-				<map:act type="AuthenticateAction">
+				<map:act type="ShibbolethAction">
 					<!-- Loggin succeeded, request will be forwarded. -->
 					<map:serialize type="xml"/>
 				</map:act>

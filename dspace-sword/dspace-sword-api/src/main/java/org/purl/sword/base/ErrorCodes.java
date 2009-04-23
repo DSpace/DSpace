@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2007, Aberystwyth University
+ * Copyright (c) 2008, Aberystwyth University
  *
  * All rights reserved.
  * 
@@ -38,7 +38,9 @@ package org.purl.sword.base;
 
 /**
  * Definition of the error codes that will be used in 
- * the SWORD protocol (in X-Error-Code).
+ * SWORD error documents.
+ * 
+ * @see org.purl.sword.atom.SWORDErrorDocument
  * 
  * @author Stuart Lewis
  */
@@ -49,28 +51,34 @@ public interface ErrorCodes
      * identified in the X-Format-Namespace and/or that supported by the
      * server
      */
-	public static final String ERROR_CONTENT = "ErrorContent";
+	public static final String ERROR_CONTENT = "http://purl.org/net/sword/error/ErrorContent";
  
 	/**
-	 * ErrorChecksumMismatch - where the checksum of the file recevied does 
+	 * ErrorChecksumMismatch - where the checksum of the file received does 
 	 * not match the checksum given in the header
 	 */
-	public static final String ERROR_CHECKSUM_MISMATCH = "ErrorChecksumMismatch";
+	public static final String ERROR_CHECKSUM_MISMATCH = "http://purl.org/net/sword/error/ErrorChecksumMismatch";
 	
 	/**
 	 * ErrorBadRequest - where parameters are not understood
 	 */
-	public static final String ERROR_BAD_REQUEST = "ErrorBadRequest";
+	public static final String ERROR_BAD_REQUEST = "http://purl.org/net/sword/error/ErrorBadRequest";
 	
 	/**
 	 * TargetOwnerUnknown - where the server cannot identify the specified
 	 * TargetOwner
 	 */
-	public static final String TARGET_OWNER_UKNOWN = "TargetOwnerUnknown";
+	public static final String TARGET_OWNER_UKNOWN = "http://purl.org/net/sword/error/TargetOwnerUnknown";
 	
 	/**
 	 * MediationNotAllowed - where a client has attempted a mediated deposit,
 	 * but this is not supported by the server
   	 */
-	public static final String MEDIATION_NOT_ALLOWED = "MediationNotAllowed";
+	public static final String MEDIATION_NOT_ALLOWED = "http://purl.org/net/sword/error/MediationNotAllowed";
+	
+	/**
+	 * MediationNotAllowed - where a client has attempted a mediated deposit,
+	 * but this is not supported by the server
+  	 */
+	public static final String MAX_UPLOAD_SIZE_EXCEEDED = "http://purl.org/net/sword/error/MAX_UPLOAD_SIZE_EXCEEDED";
 }

@@ -39,38 +39,22 @@
  */
 package org.dspace.content;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
-import org.apache.log4j.Logger;
-import org.dspace.core.Context;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.Identifiable;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.SimpleIdentifier;
-import org.dspace.uri.UnsupportedIdentifierException;
+import java.sql.SQLException;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 /**
  * Abstract base class for DSpace objects
  */
-public abstract class DSpaceObject implements Identifiable
+public abstract class DSpaceObject
 {
-    private static Logger log = Logger.getLogger(DSpaceObject.class);
-    
     // accumulate information to add to "detail" element of content Event,
     // e.g. to document metadata fields touched, etc.
     private StringBuffer eventDetails = null;
 
-    protected Context context;
-    protected int id;
-    // protected UUID uuid;
-    protected ObjectIdentifier oid;
-    protected List<ExternalIdentifier> identifiers;
-    
     /**
      * Reset the cache of event details.
      */
@@ -84,22 +68,18 @@ public abstract class DSpaceObject implements Identifiable
      * separates entries with a comma.
      * Subclass can just start calling addDetails, since it creates
      * the cache if it needs to.
-     * @param d detail string to add.
+     * @param detail detail string to add.
      */
-    protected void addDetails(String detail)
+    protected void addDetails(String d)
     {
         if (eventDetails == null)
-        {
-            eventDetails = new StringBuffer(detail);
-        }
+            eventDetails = new StringBuffer(d);
         else
-        {
-            eventDetails.append(", ").append(detail);
-        }
+            eventDetails.append(", ").append(d);
     }
 
     /**
-     * @return summary of event details, or null if there are none.
+     * @returns summary of event details, or null if there are none.
      */
     protected String getDetails()
     {
@@ -117,87 +97,16 @@ public abstract class DSpaceObject implements Identifiable
      * Get the internal ID (database primary key) of this object
      * 
      * @return internal ID of object
-     */ 
-    public int getID()
-    {
-        return id;
-    }
-
-    public SimpleIdentifier getSimpleIdentifier()
-    {
-        return oid;
-    }
-
-    public void setSimpleIdentifier(SimpleIdentifier sid)
-        throws UnsupportedIdentifierException
-    {
-        if (sid instanceof ObjectIdentifier)
-        {
-            this.setIdentifier((ObjectIdentifier) sid);
-        }
-        else
-        {
-            throw new UnsupportedIdentifierException("DSpaceObjects must use ObjectIdentifiers, not SimpleIdentifiers");
-        }
-    }
-
-    public ObjectIdentifier getIdentifier()
-    {
-        return oid;
-    }
-
-    public void setIdentifier(ObjectIdentifier oid)
-    {
-        // ensure that the identifier is configured for the item
-        this.oid = oid;
-    }
+     */
+    public abstract int getID();
 
     /**
-     * For those cases where you only want one, and you don't care what sort.
-     *
-     * FIXME: this shouldn't be here
+     * Get the Handle of the object. This may return <code>null</code>
+     * 
+     * @return Handle of the object, or <code>null</code> if it doesn't have
+     *         one
      */
-    @Deprecated
-    public ExternalIdentifier getExternalIdentifier()
-    {
-        if ((identifiers != null) && (identifiers.size() > 0))
-        {
-            return identifiers.get(0);
-        }
-        else
-        {
-            log.warn("no external identifiers found. type=" + getType() +
-                    ", id=" + getID());
-            return null;
-        }
-    }
-
-    public List<ExternalIdentifier> getExternalIdentifiers()
-    {
-        if (identifiers == null)
-        {
-            identifiers = new ArrayList<ExternalIdentifier>();
-        }
-
-        return identifiers;
-    }
-
-    public void addExternalIdentifier(ExternalIdentifier identifier)
-            throws UnsupportedIdentifierException
-    {
-        identifier.setObjectIdentifier(this.getIdentifier());
-        this.identifiers.add(identifier);
-    }
-
-    public void setExternalIdentifiers(List<ExternalIdentifier> identifiers)
-            throws UnsupportedIdentifierException
-    {
-        for (ExternalIdentifier eid :  identifiers)
-        {
-            eid.setObjectIdentifier(this.getIdentifier());
-        }
-        this.identifiers = identifiers;
-    }
+    public abstract String getHandle();
 
     /**
      * Get a proper name for the object. This may return <code>null</code>.
@@ -206,50 +115,32 @@ public abstract class DSpaceObject implements Identifiable
      * @return Name for the object, or <code>null</code> if it doesn't have
      *         one
      */
-    public abstract String getName();
+    abstract public String getName();
 
-    ////////////////////////////////////////////////////////////////////
-    // Utility methods
-    ////////////////////////////////////////////////////////////////////
-
-    public String toString()
+    /**
+     * Generic find for when the precise type of a DSO is not known, just the
+     * a pair of type number and database ID.
+     *
+     * @param context - the context
+     * @param type - type number
+     * @param id - id within table of type'd objects
+     * @return the object found, or null if it does not exist.
+     * @throws SQLException only upon failure accessing the database.
+     */
+    public static DSpaceObject find(Context context, int type, int id)
+        throws SQLException
     {
-        return ToStringBuilder.reflectionToString(this,
-                ToStringStyle.MULTI_LINE_STYLE);
-    }
-
-    public boolean equals(Object o)
-    {
-        return EqualsBuilder.reflectionEquals(this, o);
-    }
-
-    public boolean equals(DSpaceObject other)
-    {
-        if (this.getType() == other.getType())
+        switch (type)
         {
-            if (this.getID() == other.getID())
-            {
-                return true;
-            }
+            case Constants.BITSTREAM : return Bitstream.find(context, id);
+            case Constants.BUNDLE    : return Bundle.find(context, id);
+            case Constants.ITEM      : return Item.find(context, id);
+            case Constants.COLLECTION: return Collection.find(context, id);
+            case Constants.COMMUNITY : return Community.find(context, id);
+            case Constants.GROUP     : return Group.find(context, id);
+            case Constants.EPERSON   : return EPerson.find(context, id);
+            case Constants.SITE      : return Site.find(context, id);
         }
-
-        return false;
-    }
-
-    public boolean contains(List<? extends DSpaceObject> dsos, DSpaceObject dso)
-    {
-        for (DSpaceObject obj : dsos)
-        {
-            if (obj.equals(dso))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public int hashCode()
-    {
-        return HashCodeBuilder.reflectionHashCode(this);
+        return null;
     }
 }

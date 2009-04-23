@@ -1,9 +1,9 @@
 /*
  * eperson.js
  *
- * Version: $Revision: 1.2 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/06/02 21:37:32 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -40,13 +40,14 @@
  
 importClass(Packages.javax.mail.internet.AddressException);
 
-importClass(Packages.org.apache.cocoon.components.CocoonComponentManager);
+importClass(Packages.org.dspace.app.xmlui.utils.FlowscriptUtils);
 
+importClass(Packages.org.dspace.core.ConfigurationManager);
 importClass(Packages.org.dspace.core.Context);
 importClass(Packages.org.dspace.content.Collection);
 importClass(Packages.org.dspace.eperson.EPerson);
 importClass(Packages.org.dspace.eperson.AccountManager);
-importClass(Packages.org.dspace.eperson.SubscriptionManager);
+importClass(Packages.org.dspace.eperson.Subscribe);
 
 importClass(Packages.org.dspace.app.xmlui.utils.AuthenticationUtil);
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
@@ -64,7 +65,7 @@ importClass(Packages.java.lang.String);
 /** These functions should be common to all Manakin Flow scripts */
 function getObjectModel() 
 {
-  return CocoonComponentManager.getCurrentEnvironment().getObjectModel();
+  return FlowscriptUtils.getObjectModel(cocoon);
 }
 
 function getDSContext()
@@ -332,7 +333,7 @@ function doUpdateProfile()
             var collection = Collection.find(getDSContext(),cocoon.request.get("subscriptions"));
             if (collection != null)
             {
-                SubscriptionManager.subscribe(getDSContext(),getEPerson(),collection);
+                Subscribe.subscribe(getDSContext(),getEPerson(),collection);
                 getDSContext().commit();
             }
         }
@@ -347,7 +348,7 @@ function doUpdateProfile()
 	            	var collectionID = cocoon.request.get(names[i]);
 	                var collection = Collection.find(getDSContext(),collectionID);
 	                if (collection != null)
-	                    SubscriptionManager.unsubscribe(getDSContext(),getEPerson(),collection);
+	                    Subscribe.unsubscribe(getDSContext(),getEPerson(),collection);
 	            }
             }
             getDSContext().commit();
@@ -369,6 +370,13 @@ function doUpdateProfile()
  */
 function updateInformation(eperson) 
 {
+    if (!(ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true)))
+    {
+        // We're configured to not allow the user to update their metadata so return with no errors.
+        return new Array();
+    }
+
+
 	// Get the parameters from the form
 	var lastName = cocoon.request.getParameter("last_name");
 	var firstName = cocoon.request.getParameter("first_name");

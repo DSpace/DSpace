@@ -302,7 +302,7 @@ class DAVEPersonEPerson extends DAVResource
         }
         else if (elementsEqualIsh(property, handleProperty))
         {
-            value = canonicalizeHandle(this.eperson.getIdentifier().getCanonicalForm());
+            value = canonicalizeHandle(this.eperson.getHandle());
             if (!adminOrSelf(this.context))
             {
                 throw new DAVStatusException(HttpServletResponse.SC_FORBIDDEN,

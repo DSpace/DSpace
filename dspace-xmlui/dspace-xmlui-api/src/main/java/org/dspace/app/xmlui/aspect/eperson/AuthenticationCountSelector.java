@@ -1,9 +1,9 @@
 /*
  * AuthenticationCountSelector.java
  *
- * Version: $Revision: 1.0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/04/25 15:24:23 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,16 +39,23 @@
  */
 package org.dspace.app.xmlui.aspect.eperson;
 
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.selection.Selector;
+import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.authenticate.AuthenticationMethod;
 
 /**
- * Selector will count the number of AuthenticationMethods defined in the 
- * dpace configuration file
+ * Selector will count the number of interactive AuthenticationMethods defined in the 
+ * dspace configuration file
  * @author Jay Paz
  * @author Scott Phillips
  *
@@ -56,20 +63,37 @@ import org.dspace.authenticate.AuthenticationManager;
 public class AuthenticationCountSelector implements Selector{
     /**
      * Returns true if the expression (in this case a number) is equal to the number
-     * of AuthenticationMethods defined in the dspace.cnf file
+     * of AuthenticationMethods defined in the dspace.cfg file
      * @return
      */
 	public boolean select(String expression, Map objectModel, Parameters parameters) {
 		// get an iterator of all the AuthenticationMethods defined
-		final Iterator authMethods = AuthenticationManager
-		.authenticationMethodIterator();
+		final Iterator<AuthenticationMethod> authMethods = (Iterator<AuthenticationMethod>) AuthenticationManager
+		    .authenticationMethodIterator();
 		
+		  final HttpServletResponse httpResponse = (HttpServletResponse) objectModel
+          .get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+  final HttpServletRequest httpRequest = (HttpServletRequest) objectModel
+          .get(HttpEnvironment.HTTP_REQUEST_OBJECT);
+  
 		int authMethodCount = 0;
 		
 		// iterate to count the methods
 		while(authMethods.hasNext()){
-			authMethods.next();
-			authMethodCount++;
+			AuthenticationMethod auth = authMethods.next();
+			try
+            {
+                if (auth.loginPageURL(
+                        ContextUtil.obtainContext(objectModel), httpRequest,
+                        httpResponse) != null){
+                    authMethodCount++;
+                }
+            }
+            catch (SQLException e)
+            {
+                // mmm... we should not never go here, anyway we convert it in an unchecked exception 
+                throw new RuntimeException(e);
+            }
 		}
 		
 		final Integer exp = new Integer(expression);

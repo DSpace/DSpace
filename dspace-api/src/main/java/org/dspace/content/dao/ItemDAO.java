@@ -1,11 +1,11 @@
 /*
  * ItemDAO.java
  *
- * Version: $Revision: 1727 $
+ * Version: $Revision$
  *
- * Date: $Date: 2007-01-19 10:52:10 +0000 (Fri, 19 Jan 2007) $
+ * Date: $Date$
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+ * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,185 +37,26 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
+
 package org.dspace.content.dao;
 
-import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
-import org.dspace.dao.CRUD;
-import org.dspace.dao.Link;
-import org.dspace.eperson.EPerson;
-import org.dspace.uri.dao.*;
+import org.dspace.content.Bitstream;
 
-import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.sql.SQLException;
 
-public abstract class ItemDAO extends ContentDAO<ItemDAO>
-        implements CRUD<Item>, Link<Item, Bundle>
+public abstract class ItemDAO
 {
-    protected Logger log = Logger.getLogger(ItemDAO.class);
-
     protected Context context;
-    protected BundleDAO bundleDAO;
-    protected BitstreamDAO bitstreamDAO;
-    protected ExternalIdentifierDAO identifierDAO;
-    protected ObjectIdentifierDAO oidDAO;
 
-    protected ItemDAO childDAO;
-
-    public ItemDAO()
+    protected ItemDAO(Context ctx)
     {
+        context = ctx;
     }
 
-    public ItemDAO(Context context)
-    {
-        try
-        {
-            this.context = context;
+    public abstract Bitstream getPrimaryBitstream(int itemId, String bundleName) throws SQLException;
 
-            bundleDAO = BundleDAOFactory.getInstance(context);
-            bitstreamDAO = BitstreamDAOFactory.getInstance(context);
-            identifierDAO = ExternalIdentifierDAOFactory.getInstance(context);
-            oidDAO = ObjectIdentifierDAOFactory.getInstance(context);
-        }
-        catch (ExternalIdentifierStorageException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (ObjectIdentifierStorageException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
+    public abstract Bitstream getFirstBitstream(int itemId, String bundleName) throws SQLException;
 
-    public ItemDAO getChild()
-    {
-        return childDAO;
-    }
-
-    public void setChild(ItemDAO childDAO)
-    {
-        this.childDAO = childDAO;
-    }
-
-    public Item create() throws AuthorizeException
-    {
-        return childDAO.create();
-    }
-
-    public Item retrieve(int id)
-    {
-        return childDAO.retrieve(id);
-    }
-
-    public Item retrieve(UUID uuid)
-    {
-        return childDAO.retrieve(uuid);
-    }
-
-    public void update(Item item) throws AuthorizeException
-    {
-        childDAO.update(item);
-    }
-
-    public void delete(int id) throws AuthorizeException
-    {
-        childDAO.delete(id);
-    }
-
-    public void decache(Item item)
-    {
-        childDAO.decache(item);
-    }
-
-    /**
-     * Returns a list of items that are both in the archive and not withdrawn.
-     */
-    public List<Item> getItems()
-    {
-        return childDAO.getItems();
-    }
-
-    /**
-     * This function primarily exists to service the Harvest class. See that
-     * class for documentation on usage.
-     */
-    public List<Item> getItems(DSpaceObject scope,
-            String startDate, String endDate,
-            int offset, int limit,
-            boolean items, boolean collections,
-            boolean withdrawn)
-            throws ParseException
-    {
-        return childDAO.getItems(scope, startDate, endDate, offset, limit,
-                items, collections, withdrawn);
-    }
-
-    /**
-     * This is a simple 'search' function that returns Items that are in the
-     * archive, are not withdrawn, and match the given schema, field, and
-     * value.
-     */
-    public List<Item> getItems(MetadataValue value)
-    {
-        return childDAO.getItems(value);
-    }
-
-    /**
-     * The dates passed in here are used to limit the results by ingest date
-     * (dc.date.accessioned).
-     */
-    public List<Item> getItems(MetadataValue value, Date startDate, Date endDate)
-    {
-        return childDAO.getItems(value, startDate, endDate);
-    }
-
-    public List<Item> getItemsByCollection(Collection collection)
-    {
-        return childDAO.getItemsByCollection(collection);
-    }
-
-    public List<Item> getItemsBySubmitter(EPerson eperson)
-    {
-        return childDAO.getItemsBySubmitter(eperson);
-    }
-
-    public List<Item> getParentItems(Bundle bundle)
-    {
-        return childDAO.getParentItems(bundle);
-    }
-
-    public void link(Item item, Bundle bundle) throws AuthorizeException
-    {
-        childDAO.link(item, bundle);
-    }
-
-    public void unlink(Item item, Bundle bundle) throws AuthorizeException
-    {
-        childDAO.unlink(item, bundle);
-    }
-
-    public boolean linked(Item item, Bundle bundle)
-    {
-        return childDAO.linked(item, bundle);
-    }
-
-    public void loadMetadata(Item item)
-    {
-        childDAO.loadMetadata(item);
-    }
-
-    public List<DCValue> getMetadata(Item item, String schema, String element,
-            String qualifier, String lang)
-    {
-        return childDAO.getMetadata(item, schema, element, qualifier, lang);
-    }
+    public abstract Bitstream getNamedBitstream(int itemId, String bundleName, String fileName) throws SQLException;
 }

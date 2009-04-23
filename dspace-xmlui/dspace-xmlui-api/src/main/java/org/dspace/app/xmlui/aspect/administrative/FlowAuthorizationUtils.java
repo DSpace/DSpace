@@ -1,9 +1,9 @@
 /*
  * FlowAuthorizationUtils.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -40,6 +40,9 @@
 
 package org.dspace.app.xmlui.aspect.administrative;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -51,15 +54,11 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
-import org.dspace.uri.IdentifierService;
-import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierException;
+import org.dspace.handle.HandleManager;
 
-import java.sql.SQLException;
-import java.util.List;
+import org.dspace.core.Constants;
 
 
 
@@ -88,59 +87,51 @@ public class FlowAuthorizationUtils {
 	 */
 	public static FlowResult resolveItemIdentifier(Context context, String identifier) throws SQLException 
 	{
-        try
-        {
-            FlowResult result = new FlowResult();
-            result.setContinue(false);
-            //Check whether it's a handle or internal id (by check ing if it has a slash in the string)
-            if (identifier.contains("/")) {
-                ResolvableIdentifier ri = IdentifierService.resolve(context, identifier);
-                DSpaceObject dso = (DSpaceObject) IdentifierService.getResource(context, ri);
-
-                if (dso != null && dso.getType() == Constants.ITEM) {
-                    result.setParameter("itemID", dso.getID());
-                    result.setParameter("type", Constants.ITEM);
-                    result.setContinue(true);
-                    return result;
-                }
-                else if (dso != null && dso.getType() == Constants.COLLECTION) {
-                    result.setParameter("collectionID", dso.getID());
-                    result.setParameter("type", Constants.COLLECTION);
-                    result.setContinue(true);
-                    return result;
-                }
-                else if (dso != null && dso.getType() == Constants.COMMUNITY) {
-                    result.setParameter("communityID", dso.getID());
-                    result.setParameter("type", Constants.COMMUNITY);
-                    result.setContinue(true);
-                    return result;
-                }
-            }
-            // Otherwise, it's assumed to be a DSpace Item
-            else {
-                Item item = null;
-                try {
-                    item = Item.find(context, Integer.valueOf(identifier));
-                } catch (NumberFormatException e) {
-                    // ignoring the exception in case of a malformed input string
-                }
-
-                if (item != null) {
-                    result.setParameter("itemID", item.getID());
-                    result.setParameter("type", Constants.ITEM);
-                    result.setContinue(true);
-                    return result;
-                }
-            }
-
-            result.addError("identifier");
-            return result;
-        }
-        catch (IdentifierException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
+		FlowResult result = new FlowResult();
+		result.setContinue(false);
+		//Check whether it's a handle or internal id (by check ing if it has a slash in the string)
+		if (identifier.contains("/")) {
+			DSpaceObject dso = HandleManager.resolveToObject(context, identifier);
+			
+			if (dso != null && dso.getType() == Constants.ITEM) { 
+				result.setParameter("itemID", dso.getID());
+				result.setParameter("type", Constants.ITEM);
+				result.setContinue(true);
+				return result;
+			}
+			else if (dso != null && dso.getType() == Constants.COLLECTION) { 
+				result.setParameter("collectionID", dso.getID());
+				result.setParameter("type", Constants.COLLECTION);
+				result.setContinue(true);
+				return result;
+			}
+			else if (dso != null && dso.getType() == Constants.COMMUNITY) { 
+				result.setParameter("communityID", dso.getID());
+				result.setParameter("type", Constants.COMMUNITY);
+				result.setContinue(true);
+				return result;
+			}
+		}
+		// Otherwise, it's assumed to be a DSpace Item
+		else {
+			Item item = null;
+			try {
+				item = Item.find(context, Integer.valueOf(identifier));
+			} catch (NumberFormatException e) {
+				// ignoring the exception in case of a malformed input string
+			}
+			
+			if (item != null) {
+				result.setParameter("itemID", item.getID());
+				result.setParameter("type", Constants.ITEM);
+				result.setContinue(true);
+				return result;
+			}
+		}
+		
+		result.addError("identifier");
+		return result;	
+	}
 	
 	
 	/**

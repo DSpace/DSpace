@@ -39,11 +39,6 @@
  */
 package org.dspace.core;
 
-import org.apache.log4j.Category;
-import org.apache.log4j.Logger;
-import org.apache.log4j.helpers.OptionConverter;
-import org.dspace.content.DCValue;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -58,6 +53,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
+import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
+import org.apache.log4j.helpers.OptionConverter;
 
 /**
  * Class for reading the DSpace system configuration. The main configuration is
@@ -148,13 +150,32 @@ public class ConfigurationManager
      */
     public static int getIntProperty(String property)
     {
+        return getIntProperty(property, 0);
+    }
+
+    /**
+     * Get a configuration property as an integer, with default
+     * 
+     * @param property
+     *            the name of the property
+     *            
+     * @param defaultValue
+     *            value to return if property is not found or is not an Integer.
+     *
+     * @return the value of the property. <code>default</code> is returned if
+     *         the property does not exist or is not an Integer. To differentiate between this case
+     *         and when the property actually is false, use
+     *         <code>getProperty</code>.
+     */
+    public static int getIntProperty(String property, int defaultValue)
+    {
         if (properties == null)
         {
             loadConfig(null);
         }
 
         String stringValue = properties.getProperty(property);
-        int intValue = 0;
+        int intValue = defaultValue;
 
         if (stringValue != null)
         {
@@ -273,41 +294,6 @@ public class ConfigurationManager
         {
             return defaultValue;
         }
-    }
-
-    public static DCValue getMetadataProperty(String property)
-    {
-        if (properties == null)
-        {
-            loadConfig(null);
-        }
-
-        String stringValue = properties.getProperty(property);
-
-        if (stringValue != null)
-        {
-        	stringValue = stringValue.trim();
-            String[] bits = stringValue.split("\\.");
-            DCValue dcv = new DCValue();
-            for (int i = 0; i < 3 && i < bits.length; i++)
-            {
-                switch (i)
-                {
-                    case 0:
-                        dcv.schema = bits[i];
-                        break;
-                    case 1:
-                        dcv.element = bits[i];
-                        break;
-                    case 2:
-                        dcv.qualifier = bits[i];
-                        break;
-                }
-            }
-            return dcv;
-        }
-        
-        return null;
     }
 
     /**
@@ -501,11 +487,8 @@ public class ConfigurationManager
      * @param news
      *            the text to be written to the file.
      */
-    public static void writeLicenseFile(String newLicense)
+    public static void writeLicenseFile(String licenseFile, String newLicense)
     {
-        String licenseFile = getProperty("dspace.dir") + File.separator
-                             + "config" + File.separator + "default.license";
-
         try
         {
             // write the news out to the appropriate file

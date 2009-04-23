@@ -39,30 +39,16 @@
  */
 package org.dspace.authorize;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
-import org.apache.log4j.Logger;
-import org.dspace.authorize.dao.ResourcePolicyDAO;
-import org.dspace.authorize.dao.ResourcePolicyDAOFactory;
+import java.sql.SQLException;
+import java.util.Date;
+
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.dao.EPersonDAO;
-import org.dspace.eperson.dao.EPersonDAOFactory;
-import org.dspace.eperson.dao.GroupDAO;
-import org.dspace.eperson.dao.GroupDAOFactory;
-import org.dspace.uri.Identifiable;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.SimpleIdentifier;
-import org.dspace.uri.UnsupportedIdentifierException;
-import org.dspace.uri.ExternalIdentifier;
-
-import java.util.Date;
-import java.util.List;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
 
 /**
  * Class representing a ResourcePolicy
@@ -70,90 +56,88 @@ import java.util.List;
  * @author David Stuve
  * @version $Revision$
  */
-public class ResourcePolicy implements Identifiable
+public class ResourcePolicy
 {
-    private static Logger log = Logger.getLogger(ResourcePolicy.class);
+    /** Our context */
+    private Context myContext;
 
-    private Context context;
-    private ResourcePolicyDAO dao;
-    private EPersonDAO epersonDAO;
-    private GroupDAO groupDAO;
+    /** The row in the table representing this object */
+    private TableRow myRow;
 
-    private int id;
-    // private ObjectIdentifier oid;
-
-    private SimpleIdentifier sid;
-
-    // FIXME: Figure out a way to replace all of this using the
-    // ObjectIdentifier class.
-    private int resourceID;
-    private int resourceTypeID;
-
-    private int actionID;
-    private int epersonID;
-    private int groupID;
-
-    private Date startDate;
-    private Date endDate;
-
-    public ResourcePolicy(Context context, int id)
+    /**
+     * Construct an ResourcePolicy
+     * 
+     * @param context
+     *            the context this object exists in
+     * @param row
+     *            the corresponding row in the table
+     */
+    ResourcePolicy(Context context, TableRow row)
     {
-        this.context = context;
-        this.id = id;
-
-        dao = ResourcePolicyDAOFactory.getInstance(context);
-        epersonDAO = EPersonDAOFactory.getInstance(context);
-        groupDAO = GroupDAOFactory.getInstance(context);
-
-        resourceID = -1;
-        resourceTypeID = -1;
-        actionID = -1;
-        epersonID = -1;
-        groupID = -1;
-
-        context.cache(this, id);
+        myContext = context;
+        myRow = row;
     }
 
+    /**
+     * Get an ResourcePolicy from the database.
+     * 
+     * @param context
+     *            DSpace context object
+     * @param id
+     *            ID of the ResourcePolicy
+     * 
+     * @return the ResourcePolicy format, or null if the ID is invalid.
+     */
+    public static ResourcePolicy find(Context context, int id)
+            throws SQLException
+    {
+        TableRow row = DatabaseManager.find(context, "ResourcePolicy", id);
+
+        if (row == null)
+        {
+            return null;
+        }
+        else
+        {
+            return new ResourcePolicy(context, row);
+        }
+    }
+
+    /**
+     * Create a new ResourcePolicy
+     * 
+     * @param context
+     *            DSpace context object
+     */
+    public static ResourcePolicy create(Context context) throws SQLException,
+            AuthorizeException
+    {
+        // FIXME: Check authorisation
+        // Create a table row
+        TableRow row = DatabaseManager.create(context, "ResourcePolicy");
+
+        return new ResourcePolicy(context, row);
+    }
+
+    /**
+     * Delete an ResourcePolicy
+     *  
+     */
+    public void delete() throws SQLException
+    {
+        // FIXME: authorizations
+        // Remove ourself
+        DatabaseManager.delete(myContext, myRow);
+    }
+
+    /**
+     * Get the e-person's internal identifier
+     * 
+     * @return the internal identifier
+     */
     public int getID()
     {
-        return id;
-    }
-
-    public SimpleIdentifier getSimpleIdentifier()
-    {
-        return sid;
-    }
-
-    public void setSimpleIdentifier(SimpleIdentifier sid)
-    {
-        this.sid = sid;
-    }
-
-    public ObjectIdentifier getIdentifier()
-    {
-        return null;
-    }
-
-    public void setIdentifier(ObjectIdentifier oid)
-    {
-        this.sid = oid;
-    }
-
-    public List<ExternalIdentifier> getExternalIdentifiers()
-    {
-        return null;
-    }
-
-    public void setExternalIdentifiers(List<ExternalIdentifier> eids)
-            throws UnsupportedIdentifierException
-    {
-        throw new UnsupportedIdentifierException("ResourcePolicy does not support the use of ExternalIdentifiers");
-    }
-
-    public void addExternalIdentifier(ExternalIdentifier eid)
-            throws UnsupportedIdentifierException
-    {
-        throw new UnsupportedIdentifierException("ResourcePolicy does not support the use of ExternalIdentifiers");
+        return myRow.getIntColumn("policy_id");
     }
 
     /**
@@ -163,7 +147,7 @@ public class ResourcePolicy implements Identifiable
      */
     public int getResourceType()
     {
-        return resourceTypeID;
+        return myRow.getIntColumn("resource_type_id");
     }
 
     /**
@@ -178,58 +162,70 @@ public class ResourcePolicy implements Identifiable
 
     /**
      * Set the type of the resource referred to by the policy
+     * 
+     * @param mytype
+     *            type of the resource
      */
-    public void setResourceType(int resourceTypeID)
+    public void setResourceType(int mytype)
     {
-        this.resourceTypeID = resourceTypeID;
+        myRow.setColumn("resource_type_id", mytype);
     }
 
     /**
      * Get the ID of a resource pointed to by the policy (is null if policy
      * doesn't apply to a single resource.)
+     * 
+     * @return resource_id
      */
     public int getResourceID()
     {
-        return resourceID;
+        return myRow.getIntColumn("resource_id");
     }
 
     /**
      * If the policy refers to a single resource, this is the ID of that
      * resource.
+     * 
+     * @param myid   id of resource (database primary key)
      */
-    public void setResourceID(int resourceID)
+    public void setResourceID(int myid)
     {
-        this.resourceID = resourceID;
+        myRow.setColumn("resource_id", myid);
     }
 
     /**
-     * Returns the action this policy authorizes.
+     * @return get the action this policy authorizes
      */
     public int getAction()
     {
-        return actionID;
+        return myRow.getIntColumn("action_id");
     }
 
+    /**
+     * @return action text or 'null' if action row empty
+     */
     public String getActionText()
     {
-        if (actionID == -1)
+        int myAction = myRow.getIntColumn("action_id");
+
+        if (myAction == -1)
         {
             return "...";
         }
         else
         {
-            return Constants.actionText[actionID];
+            return Constants.actionText[myAction];
         }
     }
 
     /**
      * set the action this policy authorizes
      * 
-     * @param actionID action ID from <code>org.dspace.core.Constants</code>
+     * @param myid  action ID from <code>org.dspace.core.Constants</code>
      */
-    public void setAction(int actionID)
+    public void setAction(int myid)
     {
-        this.actionID = actionID;
+        myRow.setColumn("action_id", myid);
     }
 
     /**
@@ -237,12 +233,7 @@ public class ResourcePolicy implements Identifiable
      */
     public int getEPersonID()
     {
-        return epersonID;
-    }
-
-    public void setEPersonID(int epersonID)
-    {
-        this.epersonID = epersonID;
+        return myRow.getIntColumn("eperson_id");
     }
 
     /**
@@ -250,14 +241,16 @@ public class ResourcePolicy implements Identifiable
      * 
      * @return EPerson, or null
      */
-    public EPerson getEPerson()
+    public EPerson getEPerson() throws SQLException
     {
-        if (epersonID == -1)
+        int eid = myRow.getIntColumn("eperson_id");
+
+        if (eid == -1)
         {
             return null;
         }
 
-        return epersonDAO.retrieve(epersonID);
+        return EPerson.find(myContext, eid);
     }
 
     /**
@@ -265,15 +258,15 @@ public class ResourcePolicy implements Identifiable
      * 
      * @param e EPerson
      */
-    public void setEPerson(EPerson eperson)
+    public void setEPerson(EPerson e)
     {
-        if (eperson != null)
+        if (e != null)
         {
-            epersonID = eperson.getID();
+            myRow.setColumn("eperson_id", e.getID());
         }
         else
         {
-            epersonID = -1;
+            myRow.setColumnNull("eperson_id");
         }
     }
 
@@ -284,12 +277,7 @@ public class ResourcePolicy implements Identifiable
      */
     public int getGroupID()
     {
-        return groupID;
-    }
-
-    public void setGroupID(int groupID)
-    {
-        this.groupID = groupID;
+        return myRow.getIntColumn("epersongroup_id");
     }
 
     /**
@@ -297,77 +285,36 @@ public class ResourcePolicy implements Identifiable
      * 
      * @return Group, or -1 if no group set
      */
-    public Group getGroup()
+    public Group getGroup() throws SQLException
     {
-        if (groupID == -1)
+        int gid = myRow.getIntColumn("epersongroup_id");
+
+        if (gid == -1)
         {
             return null;
         }
-
-        return groupDAO.retrieve(groupID);
+        else
+        {
+            return Group.find(myContext, gid);
+        }
     }
 
     /**
      * set Group for this policy
+     * 
+     * @param g group
      */
-    public void setGroup(Group group)
+    public void setGroup(Group g)
     {
-        if (group != null)
+        if (g != null)
         {
-            groupID = group.getID();
+            myRow.setColumn("epersongroup_id", g.getID());
         }
         else
         {
-            groupID = -1;
+            myRow.setColumnNull("epersongroup_id");
         }
     }
-
-    /**
-     * Get the start date of the policy
-     * 
-     * @return start date, or null if there is no start date set (probably most
-     *         common case)
-     */
-    public Date getStartDate()
-    {
-        return startDate;
-    }
-
-    /**
-     * Set the start date for the policy
-     * 
-     * @param d
-     *            date, or null for no start date
-     */
-    public void setStartDate(Date startDate)
-    {
-        this.startDate = startDate;
-    }
-
-    /**
-     * Get end date for the policy
-     * 
-     * @return end date or null for no end date
-     */
-    public Date getEndDate()
-    {
-        return endDate;
-    }
-
-    /**
-     * Set end date for the policy
-     * 
-     * @param d
-     *            end date, or null
-     */
-    public void setEndDate(Date endDate)
-    {
-        this.endDate = endDate;
-    }
-
-    ////////////////////////////////////////////////////////////////////
-    // Utility methods
-    ////////////////////////////////////////////////////////////////////
 
     /**
      * figures out if the date is valid for the policy
@@ -413,64 +360,55 @@ public class ResourcePolicy implements Identifiable
         return true; // date must be okay
     }
 
-    @Deprecated
-    ResourcePolicy(Context context, org.dspace.storage.rdbms.TableRow row)
+    /**
+     * Get the start date of the policy
+     * 
+     * @return start date, or null if there is no start date set (probably most
+     *         common case)
+     */
+    public java.util.Date getStartDate()
     {
-        this(context, row.getIntColumn("policy_id"));
+        return myRow.getDateColumn("start_date");
     }
 
-    @Deprecated
-    public static ResourcePolicy find(Context context, int id)
+    /**
+     * Set the start date for the policy
+     * 
+     * @param d
+     *            date, or null for no start date
+     */
+    public void setStartDate(java.util.Date d)
     {
-        return ResourcePolicyDAOFactory.getInstance(context).retrieve(id);
+        myRow.setColumn("start_date", d);
     }
 
-    @Deprecated
-    public static ResourcePolicy create(Context context)
-        throws AuthorizeException
+    /**
+     * Get end date for the policy
+     * 
+     * @return end date or null for no end date
+     */
+    public java.util.Date getEndDate()
     {
-        return ResourcePolicyDAOFactory.getInstance(context).create();
+        return myRow.getDateColumn("end_date");
     }
 
-    @Deprecated
-    public void delete()
+    /**
+     * Set end date for the policy
+     * 
+     * @param d
+     *            end date, or null
+     */
+    public void setEndDate(java.util.Date d)
     {
-        dao.delete(getID());
+        myRow.setColumn("end_date", d);
     }
 
-    @Deprecated
-    public void update()
+    /**
+     * Update the ResourcePolicy
+     */
+    public void update() throws SQLException
     {
-        dao.update(this);
-    }
-
-    ////////////////////////////////////////////////////////////////////
-    // Utility methods
-    ////////////////////////////////////////////////////////////////////
-
-    public String toString()
-    {
-        return ToStringBuilder.reflectionToString(this,
-                ToStringStyle.MULTI_LINE_STYLE);
-    }
-
-    public boolean equals(Object o)
-    {
-        return EqualsBuilder.reflectionEquals(this, o);
-    }
-
-    public boolean equals(ResourcePolicy other)
-    {
-        if (this.getID() == other.getID())
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    public int hashCode()
-    {
-        return HashCodeBuilder.reflectionHashCode(this);
+        // FIXME: Check authorisation
+        DatabaseManager.update(myContext, myRow);
     }
 }

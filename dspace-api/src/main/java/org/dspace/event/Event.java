@@ -40,21 +40,18 @@
 
 package org.dspace.event;
 
-import org.apache.log4j.Logger;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.uri.ObjectIdentifier;
-import org.dspace.uri.ObjectIdentifierService;
-import org.dspace.uri.IdentifierService;
-import org.dspace.uri.IdentifierException;
-
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
 
 /**
  * An Event object represents a single action that changed one object in the
@@ -320,28 +317,14 @@ public class Event implements Serializable
      * 
      * @returns DSpaceObject or null if none can be found or no object was set.
      */
-    public DSpaceObject getObject(Context context)
+    public DSpaceObject getObject(Context context) throws SQLException
     {
-        try
-        {
-            int type = getObjectType();
-            int id = getObjectID();
-            if (type < 0 || id < 0)
-            {
-                return null;
-            }
-            else
-            {
-                ObjectIdentifier oid = ObjectIdentifierService.get(context, type, id);
-                // ObjectIdentifier oid = new ObjectIdentifier(id, type);
-                return (DSpaceObject) IdentifierService.getResource(context, oid);
-            }
-        }
-        catch (IdentifierException e)
-        {
-            log.error("caught exception: ", e);
-            throw new RuntimeException(e);
-        }
+        int type = getObjectType();
+        int id = getObjectID();
+        if (type < 0 || id < 0)
+            return null;
+        else
+            return DSpaceObject.find(context, type, id);
     }
 
     /**
@@ -350,19 +333,9 @@ public class Event implements Serializable
      * 
      * @returns DSpaceObject or null if none can be found.
      */
-    public DSpaceObject getSubject(Context context)
+    public DSpaceObject getSubject(Context context) throws SQLException
     {
-        try
-        {
-            ObjectIdentifier oid = ObjectIdentifierService.get(context, getSubjectType(), getSubjectID());
-            // ObjectIdentifier oid = new ObjectIdentifier(getSubjectID(), getSubjectType());
-            return (DSpaceObject) IdentifierService.getResource(context, oid);
-        }
-        catch (IdentifierException e)
-        {
-            log.error("caught exception: ", e);
-            throw new RuntimeException(e);
-        }
+        return DSpaceObject.find(context, getSubjectType(), getSubjectID());
     }
 
     /**
@@ -433,7 +406,7 @@ public class Event implements Serializable
      */
     public static int parseObjectType(String s)
     {
-        if (s.equals("*") | s.equalsIgnoreCase("all"))
+        if ("*".equals(s) || "all".equalsIgnoreCase(s))
             return ALL_OBJECTS_MASK;
         else
         {
@@ -477,7 +450,7 @@ public class Event implements Serializable
      */
     public static int parseEventType(String s)
     {
-        if (s.equals("*") | s.equalsIgnoreCase("all"))
+        if ("*".equals(s) || "all".equalsIgnoreCase(s))
         {
             int result = 0;
             for (int i = 0; i < eventTypeText.length; ++i)

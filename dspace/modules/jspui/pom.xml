@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.dspace</groupId>
 		<artifactId>modules</artifactId>
-		<version>SNAPSHOT</version>
+		<version>1.5.3-SNAPSHOT</version>
 	</parent>
 
 	<profiles>
@@ -74,7 +74,7 @@
 
 	<repositories>
 		<repository>
-			<id>maven.dspace.org/snapshot</id>
+			<id>maven.dspace.org-snapshot</id>
 			<name>DSpace Maven Snapshot Repository</name>
 			<url>http://maven.dspace.org/snapshot</url>
 			<releases>
@@ -89,9 +89,9 @@
 	</repositories>
 
 	<scm>
-		<connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/jspui</connection>
-		<developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/jspui</developerConnection>
-		<url>http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace/modules/jspui</url>
+		<connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/jspui</connection>
+		<developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/jspui</developerConnection>
+		<url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace/modules/jspui</url>
 	</scm>
 
 	<build>
@@ -132,12 +132,12 @@
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-jspui-api</artifactId>
 		</dependency>
-      <dependency>
-         <groupId>javax.servlet</groupId>
-         <artifactId>servlet-api</artifactId>
-         <version>2.3</version>
-         <scope>provided</scope>
-      </dependency>
+		<dependency>
+		   <groupId>javax.servlet</groupId>
+		   <artifactId>servlet-api</artifactId>
+		   <version>2.3</version>
+		   <scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 </project>

@@ -53,11 +53,10 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.browse.BrowseInfo" %>
-<%@ page  import="org.dspace.content.Collection" %>
+<%@ page  import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.content.Community" %>
-<%@ page import="org.dspace.uri.IdentifierService" %>
-<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="org.dspace.content.Collection" %>
 
 <%
     request.setAttribute("LanguageSwitch", "hide");
@@ -88,17 +87,17 @@
     // FIXME: this is not using the i18n
     // Description of what the user is actually browsing, and where link back
     String linkText = LocaleSupport.getLocalizedMessage(pageContext, "jsp.general.home");
-    String linkBack = request.getContextPath();
+    String linkBack = "/";
 
     if (collection != null)
     {
         linkText = collection.getMetadata("name");
-        linkBack = IdentifierService.getURL(collection).toString();
+        linkBack = "/handle/" + collection.getHandle();
     }
     else if (community != null)
     {
         linkText = community.getMetadata("name");
-        linkBack = IdentifierService.getURL(community).toString();
+        linkBack = "/handle/" + community.getHandle();
     }
 %>
 
@@ -133,7 +132,7 @@
    %>
  </p>
    
-    <p><a href="<%= linkBack %>"><%= linkText %></a></p>
+    <p><a href="<%= request.getContextPath() %><%= linkBack %>"><%= linkText %></a></p>
 
     <%-- dump the results for debug (uncomment to enable) --%>
     <%--

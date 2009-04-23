@@ -1,9 +1,9 @@
 /*
  * RDFCrosswalk.java
  *
- * Version: $Revision: 1.7 $
+ * Version: $Revision$
  *
- * Date: $Date: 2005/04/20 14:22:34 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -40,6 +40,7 @@
 package org.dspace.app.oai;
 
 import java.util.Properties;
+import java.sql.SQLException;
 
 import org.dspace.app.util.Util;
 import org.dspace.content.DCValue;
@@ -60,7 +61,7 @@ import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
  * DSpace items into typed RDF format.
  * 
  * @author Richard Rodgers
- * @version $Revision: 1.0 $
+ * @version $Revision$
  */
 public class RDFCrosswalk extends Crosswalk
 {
@@ -119,7 +120,7 @@ public class RDFCrosswalk extends Crosswalk
         metadata.append("<ow:Publication rdf:about=\"oai:")
                 .append(hostName)
                 .append(":")
-                .append(item.getIdentifier().getCanonicalForm())
+                .append(item.getHandle())
                 .append("\">");
 
         for (int i = 0; i < allDC.length; i++)
@@ -172,11 +173,17 @@ public class RDFCrosswalk extends Crosswalk
         Community[] comms = null;
         Bundle[] origBundles = null;
         Bundle[] thumbBundles = null;
-
-        colls = item.getCollections();
-        comms = item.getCommunities();
-        origBundles = item.getBundles("ORIGINAL");
-        thumbBundles = item.getBundles("THUMBNAIL");
+        try
+        {
+        	colls = item.getCollections();
+        	comms = item.getCommunities();
+        	origBundles = item.getBundles("ORIGINAL");
+        	thumbBundles = item.getBundles("THUMBNAIL");
+        }
+        catch(SQLException sqlE)
+        {
+        	;
+        }
         
         // all parent communities map to DC source
         for (int i = 0; i < comms.length; i++)
@@ -200,15 +207,15 @@ public class RDFCrosswalk extends Crosswalk
         	for (int j = 0; j < bitstreams.length; j++)
         	{
         		String tName = bitstreams[j].getName() + ".jpg";
-                Bitstream tb = null;
+				Bitstream tb = null;
 
                 if (thumbBundles.length > 0)
                 {
                     tb = thumbBundles[0].getBitstreamByName(tName);
                 }
 
-                if (tb != null)
-                {
+				if (tb != null)
+				{
 					String thumbUrl = null;
 					try
 					{

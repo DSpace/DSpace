@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2007, Aberystwyth University
+ * Copyright (c) 2008, Aberystwyth University
  *
  * All rights reserved.
  * 
@@ -44,16 +44,25 @@ package org.purl.sword.base;
  */
 public class ServiceDocumentRequest 
 {
-   
+   /** The username */
    private String username;
    
+   /** The password */
    private String password;
    
+   /** The onBehalf of name */
    private String onBehalfOf;
    
+   /** The IP Address */
    private String  IPAddress;
+   
+   /** The location */
+   private String location;
+   
 
    /**
+    * Retrieve the username. 
+    * 
     * @return the authenticatedUserName
     */
    public String getUsername() {
@@ -61,6 +70,8 @@ public class ServiceDocumentRequest
    }
 
    /**
+    * Set the username. 
+    * 
     * @param authenticatedUserName the authenticatedUserName to set
     */
    public void setUsername(String username) {
@@ -68,6 +79,8 @@ public class ServiceDocumentRequest
    }
 
    /**
+    * Get the password. 
+    * 
     * @return the authenticatedUserPassword
     */
    public String getPassword() {
@@ -75,6 +88,8 @@ public class ServiceDocumentRequest
    }
 
    /**
+    * Set the password. 
+    * 
     * @param password the password to set
     */
    public void setPassword(String password) {
@@ -82,6 +97,8 @@ public class ServiceDocumentRequest
    }
 
    /**
+    * Get the onBehalfOf name. 
+    * 
     * @return the onBehalfOf
     */
    public String getOnBehalfOf() {
@@ -89,6 +106,8 @@ public class ServiceDocumentRequest
    }
 
    /**
+    * Set the onBehalfOf name. 
+    * 
     * @param onBehalfOf the onBehalfOf to set
     */
    public void setOnBehalfOf(String onBehalfOf) {
@@ -112,4 +131,23 @@ public class ServiceDocumentRequest
    public void setIPAddress(String IPAddress) {
 	   this.IPAddress = IPAddress;
    }
+   
+   /**
+    * Get the location of the service document
+    * 
+    * @return the location of the service document
+    */
+   public String getLocation() {
+	   return location;
+   }
+   
+   /**
+    * Set the location of the service document
+    *
+    * @param String the location
+    */
+   public void setLocation(String location) {
+	   this.location = location;
+   }
+
 }

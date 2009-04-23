@@ -40,6 +40,8 @@
 package org.dspace.workflow;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -47,15 +49,16 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
-import org.dspace.uri.ObjectIdentifier;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.workflow.dao.WorkflowItemDAO;
-import org.dspace.workflow.dao.WorkflowItemDAOFactory;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
  * Class representing an item going through the workflow process in DSpace
- *
+ * 
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -64,10 +67,14 @@ public class WorkflowItem implements InProgressSubmission
     /** log4j category */
     private static Logger log = Logger.getLogger(WorkflowItem.class);
 
-    private Context context;
-    private WorkflowItemDAO dao;
-
+    /** The item this workflow object pertains to */
     private Item item;
+
+    /** Our context */
+    private Context ourContext;
+
+    /** The table row corresponding to this workflow item */
+    private TableRow wfRow;
 
     /** The collection the item is being submitted to */
     private Collection collection;
@@ -75,41 +82,235 @@ public class WorkflowItem implements InProgressSubmission
     /** EPerson owning the current state */
     private EPerson owner;
 
-    private int id;
-    private ObjectIdentifier oid;
-    private int state;
-    private boolean multipleFiles;
-    private boolean multipleTitles;
-    private boolean publishedBefore;
-
-    public WorkflowItem(Context context, int id)
+    /**
+     * Construct a workspace item corresponding to the given database row
+     * 
+     * @param context
+     *            the context this object exists in
+     * @param row
+     *            the database row
+     */
+    WorkflowItem(Context context, TableRow row) throws SQLException
     {
-        this.context = context;
-        this.id = id;
+        ourContext = context;
+        wfRow = row;
 
-        dao = WorkflowItemDAOFactory.getInstance(context);
+        item = Item.find(context, wfRow.getIntColumn("item_id"));
+        collection = Collection.find(context, wfRow
+                .getIntColumn("collection_id"));
 
-        context.cache(this, id);
+        if (wfRow.isColumnNull("owner"))
+        {
+            owner = null;
+        }
+        else
+        {
+            owner = EPerson.find(context, wfRow.getIntColumn("owner"));
+        }
+
+        // Cache ourselves
+        context.cache(this, row.getIntColumn("workflow_id"));
     }
 
+    /**
+     * Get a workflow item from the database. The item, collection and submitter
+     * are loaded into memory.
+     * 
+     * @param context
+     *            DSpace context object
+     * @param id
+     *            ID of the workspace item
+     * 
+     * @return the workflow item, or null if the ID is invalid.
+     */
+    public static WorkflowItem find(Context context, int id)
+            throws SQLException
+    {
+        // First check the cache
+        WorkflowItem fromCache = (WorkflowItem) context.fromCache(
+                WorkflowItem.class, id);
+
+        if (fromCache != null)
+        {
+            return fromCache;
+        }
+
+        TableRow row = DatabaseManager.find(context, "workflowitem", id);
+
+        if (row == null)
+        {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context, "find_workflow_item",
+                        "not_found,workflow_id=" + id));
+            }
+
+            return null;
+        }
+        else
+        {
+            if (log.isDebugEnabled())
+            {
+                log.debug(LogManager.getHeader(context, "find_workflow_item",
+                        "workflow_id=" + id));
+            }
+
+            return new WorkflowItem(context, row);
+        }
+    }
+
+    /**
+     * return all workflowitems
+     * 
+     * @param c  active context
+     * @return WorkflowItem [] of all workflows in system
+     */
+    public static WorkflowItem[] findAll(Context c) throws SQLException
+    {
+        List wfItems = new ArrayList();
+        TableRowIterator tri = DatabaseManager.queryTable(c, "workflowitem",
+                "SELECT * FROM workflowitem");
+
+        try
+        {
+            // make a list of workflow items
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+                WorkflowItem wi = new WorkflowItem(c, row);
+                wfItems.add(wi);
+            }
+        }
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
+
+        WorkflowItem[] wfArray = new WorkflowItem[wfItems.size()];
+        wfArray = (WorkflowItem[]) wfItems.toArray(wfArray);
+
+        return wfArray;
+    }
+
+    /**
+     * Get all workflow items that were original submissions by a particular
+     * e-person. These are ordered by workflow ID, since this should likely keep
+     * them in the order in which they were created.
+     * 
+     * @param context
+     *            the context object
+     * @param ep
+     *            the eperson
+     * 
+     * @return the corresponding workflow items
+     */
+    public static WorkflowItem[] findByEPerson(Context context, EPerson ep)
+            throws SQLException
+    {
+        List wfItems = new ArrayList();
+
+        TableRowIterator tri = DatabaseManager.queryTable(context, "workflowitem",
+                "SELECT workflowitem.* FROM workflowitem, item WHERE " +
+                "workflowitem.item_id=item.item_id AND " +
+                "item.submitter_id= ? " + 
+                "ORDER BY workflowitem.workflow_id",
+                ep.getID());
+
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+
+                // Check the cache
+                WorkflowItem wi = (WorkflowItem) context.fromCache(
+                        WorkflowItem.class, row.getIntColumn("workflow_id"));
+
+                if (wi == null)
+                {
+                    wi = new WorkflowItem(context, row);
+                }
+
+                wfItems.add(wi);
+            }
+        }
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
+
+        WorkflowItem[] wfArray = new WorkflowItem[wfItems.size()];
+        wfArray = (WorkflowItem[]) wfItems.toArray(wfArray);
+
+        return wfArray;
+    }
+
+    /**
+     * Get all workflow items for a particular collection.
+     * 
+     * @param context
+     *            the context object
+     * @param c
+     *            the collection
+     * 
+     * @return array of the corresponding workflow items
+     */
+    public static WorkflowItem[] findByCollection(Context context, Collection c)
+            throws SQLException
+    {
+        List wsItems = new ArrayList();
+
+        TableRowIterator tri = DatabaseManager.queryTable(context, "workflowitem",
+                "SELECT workflowitem.* FROM workflowitem WHERE " +
+                "workflowitem.collection_id= ? ",
+                c.getID());
+
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+
+                // Check the cache
+                WorkflowItem wi = (WorkflowItem) context.fromCache(
+                        WorkflowItem.class, row.getIntColumn("workflow_id"));
+
+                // not in cache? turn row into workflowitem
+                if (wi == null)
+                {
+                    wi = new WorkflowItem(context, row);
+                }
+
+                wsItems.add(wi);
+            }
+        }
+        finally
+        {
+            if (tri != null)
+                tri.close();
+        }
+
+        WorkflowItem[] wsArray = new WorkflowItem[wsItems.size()];
+        wsArray = (WorkflowItem[]) wsItems.toArray(wsArray);
+
+        return wsArray;
+    }
+
+    /**
+     * Get the internal ID of this workflow item
+     * 
+     * @return the internal identifier
+     */
     public int getID()
     {
-        return id;
-    }
-
-    public ObjectIdentifier getIdentifier()
-    {
-        return oid;
-    }
-
-    public void setIdentifier(ObjectIdentifier oid)
-    {
-        this.oid = oid;
+        return wfRow.getIntColumn("workflow_id");
     }
 
     /**
      * get owner of WorkflowItem
-     *
+     * 
      * @return EPerson owner
      */
     public EPerson getOwner()
@@ -117,27 +318,77 @@ public class WorkflowItem implements InProgressSubmission
         return owner;
     }
 
-    public void setOwner(EPerson owner)
+    /**
+     * set owner of WorkflowItem
+     * 
+     * @param ep
+     *            owner
+     */
+    public void setOwner(EPerson ep)
     {
-        this.owner = owner;
+        owner = ep;
+
+        if (ep == null)
+        {
+            wfRow.setColumnNull("owner");
+        }
+        else
+        {
+            wfRow.setColumn("owner", ep.getID());
+        }
     }
 
     /**
-     * Get state of WorkflowItem, as defined in <code>WorkflowManager</code>.
+     * Get state of WorkflowItem
+     * 
+     * @return state
      */
     public int getState()
     {
-        return state;
+        return wfRow.getIntColumn("state");
     }
 
     /**
-     * Set the state of WorkflowItem.
-     *
-     * @param state new state (from <code>WorkflowManager</code>)
+     * Set state of WorkflowItem
+     * 
+     * @param newstate
+     *            new state (from <code>WorkflowManager</code>)
      */
-    public void setState(int state)
+    public void setState(int newstate)
     {
-        this.state = state;
+        wfRow.setColumn("state", newstate);
+    }
+
+    /**
+     * Update the workflow item, including the unarchived item.
+     */
+    public void update() throws SQLException, IOException, AuthorizeException
+    {
+        // FIXME check auth
+        log.info(LogManager.getHeader(ourContext, "update_workflow_item",
+                "workflow_item_id=" + getID()));
+
+        // Update the item
+        item.update();
+
+        // Update ourselves
+        DatabaseManager.update(ourContext, wfRow);
+    }
+
+    /**
+     * delete the WorkflowItem, retaining the Item
+     */
+    public void deleteWrapper() throws SQLException, IOException,
+            AuthorizeException
+    {
+        // Remove from cache
+        ourContext.removeCached(this, getID());
+
+        // delete any pending tasks
+        WorkflowManager.deleteTasks(ourContext, this);
+
+        // FIXME - auth?
+        DatabaseManager.delete(ourContext, wfRow);
     }
 
     // InProgressSubmission methods
@@ -146,103 +397,43 @@ public class WorkflowItem implements InProgressSubmission
         return item;
     }
 
-    public void setItem(Item item)
-    {
-        this.item = item;
-    }
-
     public Collection getCollection()
     {
         return collection;
     }
 
-    public void setCollection(Collection collection)
-    {
-        this.collection = collection;
-    }
-
-    public EPerson getSubmitter()
+    public EPerson getSubmitter() throws SQLException
     {
         return item.getSubmitter();
     }
 
     public boolean hasMultipleFiles()
     {
-        return multipleFiles;
+        return wfRow.getBooleanColumn("multiple_files");
     }
 
-    public void setMultipleFiles(boolean multipleFiles)
+    public void setMultipleFiles(boolean b)
     {
-        this.multipleFiles = multipleFiles;
+        wfRow.setColumn("multiple_files", b);
     }
 
     public boolean hasMultipleTitles()
     {
-        return multipleTitles;
+        return wfRow.getBooleanColumn("multiple_titles");
     }
 
     public void setMultipleTitles(boolean b)
     {
-        this.multipleTitles = multipleTitles;
+        wfRow.setColumn("multiple_titles", b);
     }
 
     public boolean isPublishedBefore()
     {
-        return publishedBefore;
+        return wfRow.getBooleanColumn("published_before");
     }
 
-    public void setPublishedBefore(boolean publishedBefore)
+    public void setPublishedBefore(boolean b)
     {
-        this.publishedBefore = publishedBefore;
-    }
-
-    ////////////////////////////////////////////////////////////////////
-    // Deprecated methods
-    ////////////////////////////////////////////////////////////////////
-
-    @Deprecated
-    public void update() throws IOException, AuthorizeException
-    {
-        dao.update(this);
-    }
-
-    @Deprecated
-    public void deleteWrapper() throws IOException, AuthorizeException
-    {
-        dao.delete(getID());
-    }
-
-    @Deprecated
-    public static WorkflowItem find(Context context, int id)
-    {
-        WorkflowItemDAO dao = WorkflowItemDAOFactory.getInstance(context);
-        return dao.retrieve(id);
-    }
-
-    @Deprecated
-    public static WorkflowItem[] findAll(Context c)
-    {
-        WorkflowItemDAO dao = WorkflowItemDAOFactory.getInstance(c);
-        List<WorkflowItem> wfItems = dao.getWorkflowItems();
-
-        return (WorkflowItem[]) wfItems.toArray(new WorkflowItem[0]);
-    }
-
-    @Deprecated
-    public static WorkflowItem[] findByEPerson(Context context, EPerson e)
-    {
-        WorkflowItemDAO dao = WorkflowItemDAOFactory.getInstance(context);
-        List<WorkflowItem> wfItems = dao.getWorkflowItemsBySubmitter(e);
-
-        return (WorkflowItem[]) wfItems.toArray(new WorkflowItem[0]);
-    }
-
-    @Deprecated
-    public static WorkflowItem[] findByCollection(Context context, Collection c)
-    {
-        WorkflowItemDAO dao = WorkflowItemDAOFactory.getInstance(context);
-        List<WorkflowItem> wfItems = dao.getWorkflowItems(c);
-
-        return (WorkflowItem[]) wfItems.toArray(new WorkflowItem[0]);
+        wfRow.setColumn("published_before", b);
     }
 }

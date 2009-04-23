@@ -1,9 +1,9 @@
 /*
  * ThemeMatcher.java
  *
- * Version: $Revision: 1.1 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/01/10 05:18:41 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -40,24 +40,23 @@
 
 package org.dspace.app.xmlui.cocoon;
 
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
 import org.apache.avalon.framework.logger.AbstractLogEnabled;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.matching.Matcher;
 import org.apache.cocoon.sitemap.PatternException;
-import org.dspace.app.xmlui.configuration.Theme;
 import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
+import org.dspace.app.xmlui.configuration.Theme;
 import org.dspace.app.xmlui.utils.HandleUtil;
-import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
-
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * This class determines the correct Aspect to use. This is determined by the
@@ -96,7 +95,7 @@ public class ThemeMatcher extends AbstractLogEnabled implements Matcher {
 		try {
 			Request request = ObjectModelHelper.getRequest(objectModel);
 			String uri = request.getSitemapURI();
-			DSpaceObject dso = URIUtil.resolve(objectModel);
+			DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
 			
 			// Allow the user to override the theme configuration

@@ -1,9 +1,9 @@
 /*
  * UploadStep.java
  *
- * Version: $Revision: 1.4 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,12 +39,16 @@
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Map;
+
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.log4j.Logger;
-import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -64,13 +68,8 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.uri.IdentifierService;
 import org.dspace.workflow.WorkflowItem;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Map;
 
 /**
  * This is a step of the item submission processes. The upload
@@ -100,6 +99,8 @@ public class UploadStep extends AbstractSubmissionStep
         message("xmlui.Submission.submit.UploadStep.file_help");
     protected static final Message T_file_error = 
         message("xmlui.Submission.submit.UploadStep.file_error");
+    protected static final Message T_upload_error =
+        message("xmlui.Submission.submit.UploadStep.upload_error");
     protected static final Message T_description = 
         message("xmlui.Submission.submit.UploadStep.description");
     protected static final Message T_description_help = 
@@ -189,7 +190,7 @@ public class UploadStep extends AbstractSubmissionStep
         // Get a list of all files in the original bundle
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = IdentifierService.getURL(collection).toString() + "/submit/" + knot.getId() + ".continue";
+		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 		boolean workflow = submission instanceof WorkflowItem;
 		Bundle[] bundles = item.getBundles("ORIGINAL");
 		Bitstream[] bitstreams = new Bitstream[0];
@@ -219,7 +220,15 @@ public class UploadStep extends AbstractSubmissionStep
 	        
 	        //if no files found error was thrown by processing class, display it!
 	        if (this.errorFlag==org.dspace.submit.step.UploadStep.STATUS_NO_FILES_ERROR)
-	        	file.addError(T_file_error);
+	        {
+                file.addError(T_file_error);
+            }
+
+            // if an upload error was thrown by processing class, display it!
+            if (this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_UPLOAD_ERROR)
+            {
+                file.addError(T_upload_error);
+            }
 	        	
 	        Text description = upload.addItem().addText("description");
 	        description.setLabel(T_description);

@@ -62,7 +62,7 @@
         </tr>
     </table>
 
-    <p align=center><strong><fmt:message key="jsp.login.ldap-incorrect.errormsg"/></strong></p>
+    <p align="center"><strong><fmt:message key="jsp.login.ldap-incorrect.errormsg"/></strong></p>
 
     <dspace:include page="/components/ldap-form.jsp" />
 </dspace:layout>

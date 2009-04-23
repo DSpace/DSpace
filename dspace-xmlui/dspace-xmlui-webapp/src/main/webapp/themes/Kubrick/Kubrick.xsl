@@ -3,9 +3,9 @@
 <!--
   template.xsl
 
-  Version: $Revision: 1.0 $
+  Version: $Revision$
  
-  Date: $Date: 2008/01/25 22:54:52 $
+  Date: $Date$
 
 -->
 

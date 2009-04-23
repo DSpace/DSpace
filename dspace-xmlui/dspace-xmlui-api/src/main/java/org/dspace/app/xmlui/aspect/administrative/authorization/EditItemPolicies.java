@@ -1,9 +1,9 @@
 /*
  * AuthorizationMain.java
  *
- * Version: $Revision: 1.0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,6 +39,9 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.authorization;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -58,10 +61,6 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
-import org.dspace.uri.IdentifierService;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
 
 /**
  * @author Alexey Maslov
@@ -147,7 +146,7 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
 
 		// DIVISION: main
 		Division main = body.addInteractiveDivision("edit-item-policies",contextPath+"/admin/authorize",Division.METHOD_POST,"primary administrative authorization");
-		main.setHead(T_main_head.parameterize(IdentifierService.getCanonicalForm(item),item.getID()));
+		main.setHead(T_main_head.parameterize(item.getHandle(),item.getID()));
 		main.addPara().addHighlight("italic").addContent(T_main_para1);
 		main.addPara().addHighlight("italic").addContent(T_main_para2);
 		

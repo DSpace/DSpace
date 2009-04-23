@@ -1,9 +1,9 @@
 /*
  * AbstractAdapter.java
  *
- * Version: $Revision: 1.11 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/06/07 22:13:39 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -40,6 +40,13 @@
 
 package org.dspace.app.xmlui.objectmanager;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.Namespace;
@@ -50,19 +57,11 @@ import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.PluginManager;
-import org.dspace.uri.IdentifierService;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.NamespaceSupport;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 
 /**
@@ -173,7 +172,7 @@ public abstract class AbstractAdapter
     /**
      * Store information about what will be rendered in the METS administrative
      * metadata section.  HashMap format: keys = amdSec, value = List of mdTypes
-     * 
+     *
      * @param amdSec Section of <amdSec> where this administrative metadata
      *                will be rendered
      * @param mdTypes Comma seperated list of METS metadata types.
@@ -188,10 +187,10 @@ public abstract class AbstractAdapter
     	{
     		mdTypeList.add(mdType);
     	}
-
+        
         this.amdTypes.put(amdSec, mdTypeList);
     }
-    
+
     /**
      * A comma seperated list of METS technical metadata formats to
      * render.
@@ -235,7 +234,7 @@ public abstract class AbstractAdapter
     {
     	setAmdTypes("digiprovMD", digiprovMDTypes);
     }
-
+    
     /**
      * A comma seperated list of METS fileGrps to render. If no value
      * is provided then all groups are rendered.
@@ -392,11 +391,11 @@ public abstract class AbstractAdapter
 	protected void renderBehavioralSection() throws WingException, SAXException, CrosswalkException, IOException, SQLException  {}
 	protected void renderExtraSections() throws WingException, SAXException, CrosswalkException, SQLException, IOException {}
     
-    
-	
-	/**
+
+
+    /**
      * Generate a METS file element for a given bitstream.
-     * 
+     *
      * @param item
      *            If the bitstream is associated with an item provid the item
      *            otherwise leave null.
@@ -409,14 +408,14 @@ public abstract class AbstractAdapter
      *            then they should share the same groupID.
      * @return The METS file element.
      */
-	protected void renderFile(Item item, Bitstream bitstream, String fileID, String groupID) throws SAXException 
+	protected void renderFile(Item item, Bitstream bitstream, String fileID, String groupID) throws SAXException
 	{
        renderFile(item, bitstream, fileID, groupID, null);
     }
 
 	/**
      * Generate a METS file element for a given bitstream.
-     *
+     * 
      * @param item
      *            If the bitstream is associated with an item provid the item
      *            otherwise leave null.
@@ -474,10 +473,9 @@ public abstract class AbstractAdapter
         // be null if a handle has not yet been assigned. In this case refrence the
         // item its internal id. In the last case where the bitstream is not associated
         // with an item (such as a community logo) then refrence the bitstreamID directly.
-        /*
         String identifier = null;
-        if (item != null && item.getExternalIdentifier().getCanonicalForm() != null)
-        	identifier = "handle/"+item.getExternalIdentifier().getCanonicalForm();
+        if (item != null && item.getHandle() != null)
+        	identifier = "handle/"+item.getHandle();
         else if (item != null)
         	identifier = "item/"+item.getID();
         else
@@ -485,8 +483,6 @@ public abstract class AbstractAdapter
         
         
         String url = contextPath + "/bitstream/"+identifier+"/";
-        */
-        String url = contextPath + IdentifierService.getURL(bitstream).toString();
         
         // If we can put the pretty name of the bitstream on the end of the URL
         try

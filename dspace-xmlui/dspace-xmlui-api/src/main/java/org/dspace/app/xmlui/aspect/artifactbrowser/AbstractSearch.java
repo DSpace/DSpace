@@ -1,9 +1,9 @@
 /*
  * AbstractSearch.java
  *
- * Version: $Revision: 1.18 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/27 18:24:34 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,6 +39,13 @@
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
@@ -47,16 +54,14 @@ import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
+import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Cell;
 import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
-import org.dspace.app.xmlui.wing.element.Row;
+import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Row;
@@ -69,32 +74,21 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Constants;
+import org.dspace.handle.HandleManager;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
-import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
-import org.dspace.uri.IdentifierService;
-import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierException;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
-import org.dspace.uri.dao.ExternalIdentifierStorageException;
+import org.dspace.sort.SortException;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This is an abstract search page. It is a collection of search methods that
  * are common between diffrent search implementation. An implementer must
  * implement at least three methods: addBody(), getQuery(), and generateURL().
- *
+ * 
  * See the two implementors: SimpleSearch and AdvancedSearch.
- *
+ * 
  * @author Scott Phillips
  */
 public abstract class AbstractSearch extends AbstractDSpaceTransformer
@@ -102,27 +96,27 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     private static final Logger log = Logger.getLogger(AbstractSearch.class);
 
 	/** Language strings */
-    private static final Message T_result_query =
+    private static final Message T_result_query = 
         message("xmlui.ArtifactBrowser.AbstractSearch.result_query");
-
+    
     private static final Message T_head1_community =
         message("xmlui.ArtifactBrowser.AbstractSearch.head1_community");
-
-    private static final Message T_head1_collection =
+    
+    private static final Message T_head1_collection =  
         message("xmlui.ArtifactBrowser.AbstractSearch.head1_collection");
-
-    private static final Message T_head1_none =
+    
+    private static final Message T_head1_none =  
         message("xmlui.ArtifactBrowser.AbstractSearch.head1_none");
-
+    
     private static final Message T_head2 =
         message("xmlui.ArtifactBrowser.AbstractSearch.head2");
-
+    
     private static final Message T_head3 =
         message("xmlui.ArtifactBrowser.AbstractSearch.head3");
-
+    
     private static final Message T_no_results =
         message("xmlui.ArtifactBrowser.AbstractSearch.no_results");
-
+    
     private static final Message T_all_of_dspace =
         message("xmlui.ArtifactBrowser.AbstractSearch.all_of_dspace");
 
@@ -136,7 +130,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     private final static Message T_order_desc = message("xmlui.ArtifactBrowser.AbstractSearch.order.desc");
 
     private final static Message T_rpp = message("xmlui.ArtifactBrowser.AbstractSearch.rpp");
-
+    
     /** The options for results per page */
     private static final int[] RESULTS_PER_PAGE_PROGRESSION = {5,10,20,40,60,80,100};
 
@@ -145,20 +139,20 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 
     /** Cached query results */
     private QueryResults queryResults;
-
+    
     /** Cached validity object */
     private SourceValidity validity;
-
+    
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
      */
     public Serializable getKey()
     {
-        try
+        try 
         {
             String key = "";
-
+            
             // Page Parameter
             Request request = ObjectModelHelper.getRequest(objectModel);
             key += "-" + getParameterPage();
@@ -170,8 +164,8 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             // What scope the search is at
             DSpaceObject scope = getScope();
             if (scope != null)
-                key += "-" + IdentifierService.getCanonicalForm(scope);
-
+                key += "-" + scope.getHandle();
+            
             // The actualy search query.
             key += "-" + getQuery();
 
@@ -186,7 +180,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 
     /**
      * Generate the cache validity object.
-     *
+     * 
      * This validity object should never "over cache" because it will
      * perform the search, and serialize the results using the
      * DSpaceValidity object.
@@ -198,26 +192,20 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 	        try
 	        {
 	            DSpaceValidity validity = new DSpaceValidity();
-
+	            
 	            DSpaceObject scope = getScope();
 	            validity.add(scope);
-
+	            
 	            performSearch();
-
-                ExternalIdentifierDAO dao =
-                    ExternalIdentifierDAOFactory.getInstance(context);
-
+	            
 	            @SuppressWarnings("unchecked") // This cast is correct
-	            java.util.List<String> uris = queryResults.getHitURIs();
-//	            java.util.List<String> handles = queryResults.getHitHandles();
-//	            for (String handle : handles)
-	            for (String uri : uris)
+	            java.util.List<String> handles = queryResults.getHitHandles();
+	            for (String handle : handles)
 	            {
-                        ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
-                        DSpaceObject resultDSO = (DSpaceObject) IdentifierService.getResource(context, ri);
-                        validity.add(resultDSO);
+	                DSpaceObject resultDSO = HandleManager.resolveToObject(context, handle);
+	                validity.add(resultDSO);
 	            }
-
+	            
 	            this.validity = validity.complete();
             }
 	        catch (Exception e)
@@ -231,8 +219,8 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     	}
     	return this.validity;
     }
-
-
+    
+    
     /**
      * Build the resulting search DRI document.
      */
@@ -240,155 +228,139 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             UIException, SQLException, IOException, AuthorizeException;
 
     /**
-     *
+     * 
      * Attach a division to the given search division named "search-results"
      * which contains results for this search query.
-     *
+     * 
      * @param search
      *            The search division to contain the search-results division.
      */
     protected void buildSearchResultsDivision(Division search)
             throws IOException, SQLException, WingException
     {
-        try
+        if (getQuery().length() > 0)
         {
-            if (getQuery().length() > 0)
+
+            // Preform the actual search
+            performSearch();
+            DSpaceObject searchScope = getScope();
+            
+            Para para = search.addPara("result-query","result-query");
+
+            String query = getQuery();
+            int hitCount = queryResults.getHitCount();
+            para.addContent(T_result_query.parameterize(query,hitCount));
+            
+            Division results = search.addDivision("search-results","primary");
+            
+            if (searchScope instanceof Community)
             {
-                ExternalIdentifierDAO dao =
-                    ExternalIdentifierDAOFactory.getInstance(context);
+                Community community = (Community) searchScope;
+                String communityName = community.getMetadata("name");
+                results.setHead(T_head1_community.parameterize(communityName));
+            }
+            else if (searchScope instanceof Collection)
+            {
+                Collection collection = (Collection) searchScope;
+                String collectionName = collection.getMetadata("name");
+                results.setHead(T_head1_collection.parameterize(collectionName));
+            }
+            else
+            {
+                results.setHead(T_head1_none);
+            }
 
-                // Preform the actual search
-                performSearch();
-                DSpaceObject searchScope = getScope();
+            if (queryResults.getHitCount() > 0)
+            {
+                // Pagination variables.
+                int itemsTotal = queryResults.getHitCount();
+                int firstItemIndex = queryResults.getStart() + 1;
+                int lastItemIndex = queryResults.getStart()
+                        + queryResults.getPageSize();
+                if (itemsTotal < lastItemIndex)
+                    lastItemIndex = itemsTotal;
+                int currentPage = (queryResults.getStart() / queryResults
+                        .getPageSize()) + 1;
+                int pagesTotal = ((queryResults.getHitCount() - 1) / queryResults
+                        .getPageSize()) + 1;
+                Map<String, String> parameters = new HashMap<String, String>();
+                parameters.put("page", "{pageNum}");
+                String pageURLMask = generateURL(parameters);
 
-                Para para = search.addPara("result-query","result-query");
+                results.setMaskedPagination(itemsTotal, firstItemIndex,
+                        lastItemIndex, currentPage, pagesTotal, pageURLMask);
 
-                String query = getQuery();
-                int hitCount = queryResults.getHitCount();
-                para.addContent(T_result_query.parameterize(query,hitCount));
-
-                Division results = search.addDivision("search-results","primary");
-
-                if (searchScope instanceof Community)
+                // Look for any communities or collections in the mix
+                ReferenceSet referenceSet = null;
+                boolean resultsContainsBothContainersAndItems = false;
+                
+                @SuppressWarnings("unchecked") // This cast is correct
+                java.util.List<String> containerHandles = queryResults.getHitHandles();
+                for (String handle : containerHandles)
                 {
-                    Community community = (Community) searchScope;
-                    String communityName = community.getMetadata("name");
-                    results.setHead(T_head1_community.parameterize(communityName));
-                }
-                else if (searchScope instanceof Collection)
-                {
-                    Collection collection = (Collection) searchScope;
-                    String collectionName = collection.getMetadata("name");
-                    results.setHead(T_head1_collection.parameterize(collectionName));
-                }
-                else
-                {
-                    results.setHead(T_head1_none);
-                }
+                    DSpaceObject resultDSO = HandleManager.resolveToObject(
+                            context, handle);
 
-                if (queryResults.getHitCount() > 0)
-                {
-                    // Pagination variables.
-                    int itemsTotal = queryResults.getHitCount();
-                    int firstItemIndex = queryResults.getStart() + 1;
-                    int lastItemIndex = queryResults.getStart()
-                            + queryResults.getPageSize();
-                    if (itemsTotal < lastItemIndex)
-                        lastItemIndex = itemsTotal;
-                    int currentPage = (queryResults.getStart() / queryResults
-                            .getPageSize()) + 1;
-                    int pagesTotal = ((queryResults.getHitCount() - 1) / queryResults
-                            .getPageSize()) + 1;
-                    Map<String, String> parameters = new HashMap<String, String>();
-                    parameters.put("page", "{pageNum}");
-                    String pageURLMask = generateURL(parameters);
-
-                    results.setMaskedPagination(itemsTotal, firstItemIndex,
-                            lastItemIndex, currentPage, pagesTotal, pageURLMask);
-
-                    // Look for any communities or collections in the mix
-                    ReferenceSet referenceSet = null;
-                    boolean resultsContainsBothContainersAndItems = false;
-
-                    @SuppressWarnings("unchecked") // This cast is correct
-                    java.util.List<String> containerURIs = queryResults.getHitURIs();
-    //                java.util.List<String> containerHandles = queryResults.getHitHandles();
-    //                for (String handle : containerHandles)
-                    for (String uri : containerURIs)
+                    if (resultDSO instanceof Community
+                            || resultDSO instanceof Collection)
                     {
-                        ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
-                        DSpaceObject resultDSO = (DSpaceObject) IdentifierService.getResource(context, ri);
-
-                        if (resultDSO instanceof Community
-                                || resultDSO instanceof Collection)
-                        {
-                            if (referenceSet == null) {
-                                referenceSet = results.addReferenceSet("search-results-repository",
-                                        ReferenceSet.TYPE_SUMMARY_LIST,null,"repository-search-results");
-                                // Set a heading showing that we will be listing containers that matched:
-                                referenceSet.setHead(T_head2);
-                                resultsContainsBothContainersAndItems = true;
-                            }
-                            referenceSet.addReference(resultDSO);
+                        if (referenceSet == null) {
+                            referenceSet = results.addReferenceSet("search-results-repository",
+                                    ReferenceSet.TYPE_SUMMARY_LIST,null,"repository-search-results");
+                            // Set a heading showing that we will be listing containers that matched:
+                            referenceSet.setHead(T_head2);
+                            resultsContainsBothContainersAndItems = true;
                         }
+                        referenceSet.addReference(resultDSO);
                     }
-
-
-                    // Look for any items in the result set.
-                    referenceSet = null;
-
-                    @SuppressWarnings("unchecked") // This cast is correct
-                    java.util.List<String> itemURIs = queryResults.getHitURIs();
-    //                java.util.List<String> itemHandles = queryResults.getHitHandles();
-    //                for (String handle : itemHandles)
-                    for (String uri : itemURIs)
-                    {
-                        ResolvableIdentifier ri = IdentifierService.resolve(context, uri);
-                        DSpaceObject resultDSO = (DSpaceObject) IdentifierService.getResource(context, ri);
-                        if (resultDSO instanceof Item)
-                        {
-                            if (referenceSet == null) {
-                                referenceSet = results.addReferenceSet("search-results-repository",
-                                        ReferenceSet.TYPE_SUMMARY_LIST,null,"repository-search-results");
-                                // Only set a heading if there are both containers and items.
-                                if (resultsContainsBothContainersAndItems)
-                                    referenceSet.setHead(T_head3);
-                            }
-                            referenceSet.addReference(resultDSO);
-                        }
-                    }
-
                 }
-                else
+                
+                
+                // Look for any items in the result set.
+                referenceSet = null;
+                
+                @SuppressWarnings("unchecked") // This cast is correct
+                java.util.List<String> itemHandles = queryResults.getHitHandles();
+                for (String handle : itemHandles)
                 {
-                    results.addPara(T_no_results);
+                    DSpaceObject resultDSO = HandleManager.resolveToObject(
+                            context, handle);
+
+                    if (resultDSO instanceof Item)
+                    {
+                        if (referenceSet == null) {
+                            referenceSet = results.addReferenceSet("search-results-repository",
+                                    ReferenceSet.TYPE_SUMMARY_LIST,null,"repository-search-results");
+                            // Only set a heading if there are both containers and items.
+                            if (resultsContainsBothContainersAndItems)
+                            	referenceSet.setHead(T_head3);  
+                        }
+                        referenceSet.addReference(resultDSO);
+                    }
                 }
-            }// Empty query
-        }
-        catch (ExternalIdentifierStorageException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (IdentifierException e)
-        {
-            throw new RuntimeException(e);
-        }
+                
+            }
+            else
+            {
+                results.addPara(T_no_results);
+            }
+        }// Empty query
     }
-
+    
     /**
      * Add options to the search scope field. This field determines in what
      * communities or collections to search for the query.
-     *
+     * 
      * The scope list will depend upon the current search scope. There are three
      * cases:
-     *
+     * 
      * No current scope: All top level communities are listed.
-     *
+     * 
      * The current scope is a community: All collections contained within the
      * community are listed.
-     *
+     * 
      * The current scope is a collection: All parent communities are listed.
-     *
+     * 
      * @param scope
      *            The current scope field.
      */
@@ -404,7 +376,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             scope.setOptionSelected("/");
             for (Community community : Community.findAllTop(context))
             {
-                scope.addOption(IdentifierService.getCanonicalForm(community),community.getMetadata("name"));
+                scope.addOption(community.getHandle(),community.getMetadata("name"));
             }
         }
         else if (scopeDSO instanceof Community)
@@ -413,12 +385,12 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             // within
             Community community = (Community) scopeDSO;
             scope.addOption("/",T_all_of_dspace);
-            scope.addOption(IdentifierService.getCanonicalForm(community),community.getMetadata("name"));
-            scope.setOptionSelected(IdentifierService.getCanonicalForm(community));
+            scope.addOption(community.getHandle(),community.getMetadata("name"));
+            scope.setOptionSelected(community.getHandle());
 
             for (Collection collection : community.getCollections())
             {
-                scope.addOption(IdentifierService.getCanonicalForm(collection),collection.getMetadata("name"));
+                scope.addOption(collection.getHandle(),collection.getMetadata("name"));
             }
         }
         else if (scopeDSO instanceof Collection)
@@ -426,14 +398,14 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             // The scope is a collection, display all parent collections.
             Collection collection = (Collection) scopeDSO;
             scope.addOption("/",T_all_of_dspace);
-            scope.addOption(IdentifierService.getCanonicalForm(collection),collection.getMetadata("name"));
-            scope.setOptionSelected(IdentifierService.getCanonicalForm(collection));
-
+            scope.addOption(collection.getHandle(),collection.getMetadata("name"));
+            scope.setOptionSelected(collection.getHandle());
+            
             Community[] communities = collection.getCommunities()[0]
                     .getAllParents();
             for (Community community : communities)
             {
-                scope.addOption(IdentifierService.getCanonicalForm(community),community.getMetadata("name"));
+                scope.addOption(community.getHandle(),community.getMetadata("name"));
             }
         }
     }
@@ -441,14 +413,14 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     /**
      * Query DSpace for a list of all items / collections / or communities that
      * match the given search query.
-     *
+     * 
      * @return The associated query results.
      */
     protected void performSearch() throws SQLException, IOException, UIException
     {
         if (queryResults != null)
             return;
-
+        
         Context context = ContextUtil.obtainContext(objectModel);
         String query = getQuery();
         DSpaceObject scope = getScope();
@@ -463,7 +435,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         catch (SortException se)
         {
         }
-
+        
         queryArgs.setSortOrder(getParameterOrder());
 
         queryArgs.setQuery(query);
@@ -493,44 +465,24 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
      * Determine the current scope. This may be derived from the current url
      * handle if present or the scope parameter is given. If no scope is
      * specified then null is returned.
-     *
-     * FIXME: This depends on the "handle" string being of the form "hdl:12/34"
-     * rather than just "12/34".
-     *
+     * 
      * @return The current scope.
      */
     protected DSpaceObject getScope() throws SQLException
     {
-        try
-        {
-            Request request = ObjectModelHelper.getRequest(objectModel);
-            String scopeString = request.getParameter("scope");
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        String scopeString = request.getParameter("scope");
 
-            ExternalIdentifierDAO dao =
-                ExternalIdentifierDAOFactory.getInstance(context);
+        // Are we in a community or collection?
+        DSpaceObject dso;
+        if (scopeString == null || "".equals(scopeString))
+            // get the search scope from the url handle
+            dso = HandleUtil.obtainHandle(objectModel);
+        else
+            // Get the search scope from the location parameter
+            dso = HandleManager.resolveToObject(context, scopeString);
 
-            // Are we in a community or collection?
-            /*
-            DSpaceObject dso;
-                if (scopeString == null || "".equals(scopeString) || "/".equals(scopeString))
-                {
-                    // get the search scope from the url handle
-                    dso = URIUtil.resolve(objectModel);
-                }
-                else
-                {
-                    // Get the search scope from the location parameter
-                    ResolvableIdentifier ri = IdentifierService.resolve(context, scopeString);
-                    dso = ri.getObject(context);
-                }*/
-            DSpaceObject dso = URIUtil.resolve(objectModel);
-
-            return dso;
-        }
-        catch (ExternalIdentifierStorageException e)
-        {
-            throw new RuntimeException(e);
-        }
+        return dso;
     }
 
     protected int getParameterPage()
@@ -589,25 +541,25 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 
     /**
      * Determine if the scope of the search should fixed or is changeable by the
-     * user.
-     *
-     * The search scope when preformed by url, i.e. they are at the url handle/xxxx/xx/search
+     * user. 
+     * 
+     * The search scope when preformed by url, i.e. they are at the url handle/xxxx/xx/search 
      * then it is fixed. However at the global level the search is variable.
-     *
+     * 
      * @return true if the scope is variable, false otherwise.
      */
     protected boolean variableScope() throws SQLException
     {
-        if (URIUtil.resolve(objectModel) == null)
+        if (HandleUtil.obtainHandle(objectModel) == null)
             return true;
-        else
+        else 
             return false;
     }
-
+    
     /**
      * Extract the query string. Under most implementations this will be derived
      * from the url parameters.
-     *
+     * 
      * @return The query string.
      */
     abstract protected String getQuery() throws UIException;
@@ -615,18 +567,18 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     /**
      * Generate a url to the given search implementation with the associated
      * parameters included.
-     *
+     * 
      * @param parameters
      * @return The post URL
      */
     abstract protected String generateURL(Map<String, String> parameters)
             throws UIException;
 
-
+    
     /**
      * Recycle
      */
-    public void recycle()
+    public void recycle() 
     {
         this.queryResults = null;
         this.validity = null;
@@ -732,7 +684,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         {
             // Ignore, as we are only trying to get the scope to add detail to the log message
         }
-
+        
         log.info(LogManager.getHeader(context, "search", logInfo + "query=\""
                 + queryArgs.getQuery() + "\",results=(" + countCommunities + ","
                 + countCollections + "," + countItems + ")"));

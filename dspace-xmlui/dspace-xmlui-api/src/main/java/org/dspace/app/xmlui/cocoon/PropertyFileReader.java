@@ -1,9 +1,9 @@
 /*
  * PropertyFileReader.java
  *
- * Version: $Revision: 1.2 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/04/25 15:24:23 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -76,8 +76,11 @@ public class PropertyFileReader {
 		
 		Properties props = new Properties();
 		InputStream in = new FileInputStream(propertyFile);
-		props.load(in);
-		in.close();
+        try {
+		    props.load(in);
+        } finally {
+		    in.close();
+        }
 		
 		final String[] parameterNames = parameters.getNames();
 		

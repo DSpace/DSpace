@@ -259,7 +259,7 @@ public class XSLTIngestionCrosswalk
                         qualifier = null;
                     }
                     MetadataField mf = MetadataField.findByElement(context,
-                                  ms.getID(), element, qualifier);
+                                  ms.getSchemaID(), element, qualifier);
                     if (mf == null)
                         System.err.println("DIM Error, Cannot find metadata field for: schema=\""+schema+
                             "\", element=\""+element+"\", qualifier=\""+qualifier+"\"");

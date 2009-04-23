@@ -1,9 +1,9 @@
 /*
  * CCLicensePage.java
  *
- * Version: $Revision: 1.4 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,10 +39,13 @@
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
-import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -53,11 +56,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.license.CreativeCommons;
-import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  * This is an optional page of the item submission processes. The Creative 
@@ -113,8 +112,8 @@ public class CCLicenseStep extends AbstractSubmissionStep
 		// Build the url to and from creative commons
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = IdentifierService.getURL(collection).toString() + "/submit/" + knot.getId() + ".continue";
-		
+		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
+
 		Request request = ObjectModelHelper.getRequest(objectModel);
 		boolean https = request.isSecure();
 		String server = request.getServerName();

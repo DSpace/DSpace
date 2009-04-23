@@ -1,9 +1,9 @@
 /*
  * SendFeedbackAction.java
  *
- * Version: $Revision: 1.1 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/05/01 22:33:39 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -66,13 +66,13 @@ public class SendFeedbackAction extends AbstractAction
 {
 
     /**
-     * 
+     *
      */
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
-            
+
         String page = request.getParameter("page");
         String address = request.getParameter("email");
         String agent = request.getHeader("User-Agent");
@@ -109,31 +109,31 @@ public class SendFeedbackAction extends AbstractAction
         String eperson = null;
         if (loggedin != null)
             eperson = loggedin.getEmail();
-        
+
         if (page == null || page.equals(""))
         {
             page = fromPage;
         }
-        
+
         // Check all data is there
         if ((address == null) || address.equals("")
                 || (comments == null) || comments.equals(""))
         {
-            // Either the user did not fill out the form or this is the 
-            // first time they are visiting the page. 
+            // Either the user did not fill out the form or this is the
+            // first time they are visiting the page.
             Map<String,String> map = new HashMap<String,String>();
             map.put("page",page);
-            
+
             if (address == null || address.equals(""))
                 map.put("email",eperson);
             else
                 map.put("email",address);
-            
+
             map.put("comments",comments);
-            
+
             return map;
         }
-        
+
         // All data is there, send the email
         Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "feedback"));
         email.addRecipient(ConfigurationManager

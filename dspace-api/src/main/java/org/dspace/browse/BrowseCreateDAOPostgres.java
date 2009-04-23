@@ -1,9 +1,9 @@
 /*
  * BrowseCreateDAOPostgres.java
  *
- * Version: $Revision: $
+ * Version: $Revision$
  *
- * Date: $Date:  $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -47,6 +47,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -181,7 +182,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             throw new BrowseException(e);
         }
     }
-
+    
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#createDatabaseIndices(java.lang.String, boolean)
      */
@@ -189,11 +190,13 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     {
         try
         {
-            String[] arr = new String[3];
-            arr[0] = "CREATE INDEX " + disTable + "_value_idx ON " + disTable + "(sort_value);";
-            arr[1] = "CREATE INDEX " + mapTable + "_item_id_idx ON " + mapTable + "(item_id);";
-            arr[2] = "CREATE INDEX " + mapTable + "_dist_idx ON " + mapTable + "(distinct_id);";
-
+            String[] arr = new String[5];
+            arr[0] = "CREATE INDEX " + disTable + "_svalue_idx ON " + disTable + "(sort_value)";
+            arr[1] = "CREATE INDEX " + disTable + "_value_idx ON " + disTable + "(value)";
+            arr[2] = "CREATE INDEX " + disTable + "_uvalue_idx ON " + disTable + "(UPPER(value))";
+            arr[3] = "CREATE INDEX " + mapTable + "_item_id_idx ON " + mapTable + "(item_id)";
+            arr[4] = "CREATE INDEX " + mapTable + "_dist_idx ON " + mapTable + "(distinct_id)";
+            
             if (execute)
             {
                 for (String query : arr)
@@ -201,7 +204,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
                     DatabaseManager.updateQuery(context, query);
                 }
             }
-
+            
             return arr;
         }
         catch (SQLException e)
@@ -210,7 +213,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             throw new BrowseException(e);
         }
     }
-    
+
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#createDistinctMap(java.lang.String, java.lang.String, boolean)
      */
@@ -308,7 +311,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
 
         return false;
     }
-    
+
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#createDistinctTable(java.lang.String, boolean)
      */
@@ -522,7 +525,17 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
         try
         {
             Object[] params = { value };
-            String select = "SELECT id FROM " + table + " WHERE value = ?";
+            String select = null;
+
+            if (ConfigurationManager.getBooleanProperty("webui.browse.metadata.case-insensitive", false))
+            {
+                select = "SELECT id FROM " + table + " WHERE UPPER(value) = UPPER(?)";
+            }
+            else
+            {
+                select = "SELECT id FROM " + table + " WHERE value = ?";
+            }
+
             tri = DatabaseManager.query(context, select, params);
             int distinctID = -1;
             if (!tri.hasNext())
@@ -554,7 +567,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             }
         }
     }
-
+    
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#updateCommunityMappings(int)
      */
@@ -784,7 +797,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
 
             if (map != null)
             {
-                String deleteDistinct = "DELETE FROM " + map   + " WHERE item_id IN ( SELECT item_id FROM " + map   + " EXCEPT " + itemQuery + ")";
+                String deleteDistinct = "DELETE FROM " + map + " WHERE item_id IN ( SELECT item_id FROM " + map   + " EXCEPT " + itemQuery + ")";
                 DatabaseManager.updateQuery(context, deleteDistinct);
             }
         }

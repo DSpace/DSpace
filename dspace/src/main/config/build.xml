@@ -43,11 +43,11 @@
 
 <project name="DSpace" default="help">
 
-	<!-- ============================================================= -->
-	<!-- Description                                                   -->
-	<!-- ============================================================= -->
+    <!-- ============================================================= -->
+    <!-- Description                                                   -->
+    <!-- ============================================================= -->
 
-	<description>
+    <description>
 ====================== DSpace platform build file ======================
 
 Common usage:
@@ -61,205 +61,410 @@ Common usage:
 ========================================================================
   </description>
 
-	<!-- ============================================================= -->
-	<!-- Will be using various environment variables                   -->
-	<!-- ============================================================= -->
+    <!-- ============================================================= -->
+    <!-- Will be using various environment variables                   -->
+    <!-- ============================================================= -->
 
-	<property environment="env" />
+    <property environment="env" />
 
 
-	<!-- ============================================================= -->
-	<!-- Build parameters that are likely to need tweaking             -->
-	<!-- ============================================================= -->
+    <!-- ============================================================= -->
+    <!-- Build parameters that are likely to need tweaking             -->
+    <!-- ============================================================= -->
 
-	<!-- Default configuration to use.  This may be overridden. -->
-	<property name="config" value="config/dspace.cfg" />
+    <!-- Default configuration to use.  This may be overridden. -->
+    <property name="config" value="config/dspace.cfg" />
 
-	<!-- Give user a chance to override without editing this file 
+    <!-- Give user a chance to override without editing this file 
        (and without typing -D each time s/he compiles it) -->
-	<property file="${user.home}/.dspace.properties" />
+    <property file="${user.home}/.dspace.properties" />
 
-	<!-- First, set the dspace.dir property so it can be
+    <!-- First, set the dspace.dir property so it can be
        interpolated when loading the config file.
        This crudely mimics the way ConfigurationManager interpolates properties.
        Note that it ONLY works for directories that interpolate ${dspace.dir}
        but that _should_ cover all cases used in this build configuration.
     -->
-	<loadproperties srcFile="${config}">
-		<filterchain>
-			<linecontainsregexp>
-				<regexp pattern="^\s*dspace\.dir\s+" />
-			</linecontainsregexp>
-		</filterchain>
-	</loadproperties>
+    <loadproperties srcFile="${config}">
+        <filterchain>
+            <linecontainsregexp>
+                <regexp pattern="^\s*dspace\.dir\s+" />
+            </linecontainsregexp>
+        </filterchain>
+    </loadproperties>
 
-	<!-- Load the configuration -->
-	<property file="${config}" />
+    <!-- Load the configuration -->
+    <property file="${config}" />
 
     <!-- Timestamp date used when creating backup directories -->
-	<tstamp>
-		<format property="build.date" pattern="yyyyMMdd-HHmmss" />
-	</tstamp>
-	
-
-	<!-- ============================================================= -->
-	<!-- The DSpace class path for executing installation targets      -->
-	<!-- ============================================================= -->
-
-	<!-- We will include the environment CLASSPATH -->
-	<path id="class.path">
-		<pathelement path="${env.CLASSPATH}" />
-		<fileset dir="lib">
-			<include name="**/*.jar" />
-		</fileset>
-	</path>
+    <tstamp>
+        <format property="build.date" pattern="yyyyMMdd-HHmmss" />
+    </tstamp>
 
 
-	<!-- ============================================================= -->
-	<!-- Print some useful help text                                  -->
-	<!-- ============================================================= -->
-	<target name="help">
+    <!-- ============================================================= -->
+    <!-- The DSpace class path for executing installation targets      -->
+    <!-- ============================================================= -->
 
-		<echo message="" />
-		<echo message="DSpace configuration file" />
-		<echo message="-----------------------------------" />
-		<echo message="" />
-		<echo message="Available targets are:" />
-		<echo message="" />
-		<echo message="update          --> Update installed code and web applications without "/>
-	    <echo message="                    touching your config or data" />
-		<echo message="update_code     --> Update compiled code (bin, lib, and etc directories)"  />
-		<echo message="update_webapps  --> Update web applications" />
-		<echo message="" />
-		<echo message="init_configs    --> Write the configuration files to ${dspace.dir}/config" />
-		<echo message="install_code    --> Install compiled code into ${dspace.dir}" />
-		<echo message="" />
-		<echo message="fresh_install   --> Perform a fresh installation of the software, "/>
-		<echo message="                    including the databases &amp; config" />
-		<echo message="setup_database  --> Create database tables" />
-		<echo message="load_registries --> Load metadata &amp; file format registries into the "/>
-	    <echo message="                    database" />
-		<echo message="" />
-		<echo message="clean_database  --> Remove DSpace database tables, destroying data" />
-		<echo message=""/>
-		<echo message=""/>
-		<echo message="Available parameters are:" />
-		<echo message=""/>
-		<echo message="-Dconfig=&lt;path/to/dspace.cfg&gt;  -- Where your dspace.cfg configuration"/> 
-		<echo message="                                  is located"/>
-		<echo message="-Dwars=true                    -- Build .war files when updating web"/>
-		<echo message="                                  applications"/>
-		<echo message=""/>
+    <!-- We will include the environment CLASSPATH -->
+    <path id="class.path">
+        <pathelement path="${env.CLASSPATH}" />
+        <fileset dir="lib">
+            <include name="**/*.jar" />
+        </fileset>
+    </path>
 
-	</target>
 
-	<!-- ============================================================= -->
-	<!-- Update an installation (except database)                      -->
-	<!-- ============================================================= -->
+    <!-- ============================================================= -->
+    <!-- Print some useful help text                                  -->
+    <!-- ============================================================= -->
+    <target name="help">
 
-	<target name="update" depends="update_code,update_webapps" description="Update installed code and web applications (without clobbering data/config)">
-	</target>
+        <echo message="" />
+        <echo message="DSpace configuration file" />
+        <echo message="-----------------------------------" />
+        <echo message="" />
+        <echo message="Available targets are:" />
+        <echo message="" />
+        <echo message="update          --> Update ${dspace.dir} config, etc, lib and web applications without " />
+        <echo message="                    touching your data" />
+    	<echo message="update_configs  --> Update your configs directory with new configuration files"/>        
+        <echo message="update_code     --> Update compiled code (bin, lib, and etc directories)" />
+        <echo message="update_webapps  --> Update web applications" />
+        <echo message="" />
+        <echo message="init_configs    --> Write the configuration files to ${dspace.dir}/config" />
+        <echo message="install_code    --> Install compiled code into ${dspace.dir}" />
+        <echo message="" />
+        <echo message="fresh_install   --> Perform a fresh installation of the software, " />
+        <echo message="                    including the databases &amp; config" />
+        <echo message="setup_database  --> Create database tables" />
+        <echo message="load_registries --> Load metadata &amp; file format registries into the " />
+        <echo message="                    database" />
+        <echo message="" />
+        <echo message="clean_database  --> Remove DSpace database tables, destroying data" />
+        <echo message="" />
+        <echo message="" />
+        <echo message="Available parameters are:" />
+        <echo message="" />
+        <echo message="-Dconfig=&lt;path/to/dspace.cfg&gt;  -- Where your dspace.cfg configuration" />
+        <echo message="                                  is located" />
+    	<echo message="-Doverwrite=true               -- Will force update_configs to copy existing"/>
+    	<echo message="                                  config to .old files when they conflict with"/>
+    	<echo message="                                  the new config.  Otherwise, new conflicting"/>
+    	<echo message="                                  file with be suffixed with .new."/>
+    	
+        <echo message="-Dwars=true                    -- Build .war files when updating web" />
+        <echo message="                                  applications" />
+        <echo message="" />
 
-	
-	<!-- ============================================================= -->
-	<!-- Update an installation (except database)                      -->
-	<!-- ============================================================= -->
+    </target>
 
-	<target name="update_code" description="Update installed code (without clobbering data/config)">
 
-		<move todir="${dspace.dir}/bin.bak-${build.date}" failonerror="no">
-			<fileset dir="${dspace.dir}/bin">
-				<include name="**/*" />
-			</fileset>
-		</move>
-		
-		<copy todir="${dspace.dir}/bin" preservelastmodified="true">
-			<fileset dir="bin" />
-		</copy>
+    <!-- ============================================================= -->
+    <!-- clean out backup directories                  -->
+    <!-- ============================================================= -->
+    <target name="clean_backups">
+        <delete includeemptydirs="true">
+            <fileset dir="${dspace.dir}" includes="lib.bak-**/**" />
+        </delete>
+        <delete includeemptydirs="true">
+            <fileset dir="${dspace.dir}" includes="etc.bak-**/**" />
+        </delete>
+        <delete includeemptydirs="true">
+            <fileset dir="${dspace.dir}" includes="webapps.bak-**/**" />
+        </delete>
+        <delete includeemptydirs="true">
+            <fileset dir="${dspace.dir}" includes="bin.bak-**/**" />
+        </delete>
+    </target>
 
-		<chmod dir="${dspace.dir}/bin" perm="u+x" includes="**/*" />
+    <!-- ============================================================= -->
+    <!-- Update an installation (except database)                      -->
+    <!-- ============================================================= -->
 
-		<move todir="${dspace.dir}/lib.bak-${build.date}" failonerror="no">
-			<fileset dir="${dspace.dir}/lib">
-				<include name="**/*" />
-			</fileset>
-		</move>
+    <target name="update" depends="update_configs,update_code,update_webapps" description="Update installed code and web applications (without clobbering data/config)">
+    </target>
 
-		<copy todir="${dspace.dir}/lib" preservelastmodified="true">
-			<fileset dir="lib" />
-		</copy>
+    <!-- ============================================================= -->
+    <!-- Update the config dir, only adds files, if a file is altered  -->
+    <!-- in the target directory, the new file is suffixed wth *.new   -->
+    <!-- and should be hand updated afterward                .          -->
+    <!-- ============================================================= -->
+    <target name="update_configs" depends="overwrite_configs" description="Updates the Configuration Directory">
 
-		<move todir="${dspace.dir}/etc.bak-${build.date}" failonerror="no">
-			<fileset dir="${dspace.dir}/etc">
-				<include name="**/*"/>
-			</fileset>
-		</move>
+    
+    
+    </target>
+        
+    <target name="overwrite_configs" description="Overwrites a configuration directory." if="overwrite" depends="copy_configs_keep">
+        
+        <!-- 
+        Copy files that are absent in target 
+        -->
+        <copy todir="${dspace.dir}/config" preservelastmodified="true">
+            <fileset dir="config-temp" includes="**/*">
+                <present present="srconly" targetdir="${dspace.dir}/config" />
+            </fileset>
+        </copy>
+                
+        <!-- 
+        Copy files that are different in target to *.old suffix
+        -->
+        <copy todir="${dspace.dir}/config" preservelastmodified="true" overwrite="true">
+            <intersect>
+                <fileset dir="${dspace.dir}/config">
+                    <different targetdir="config-temp" ignoreFileTimes="true" />
+                    <type type="file" />
+                </fileset>
+                <fileset dir="${dspace.dir}/config">
+                    <present present="both" targetdir="config-temp" />
+                    <type type="file" />                                        
+                </fileset>
+            </intersect>            
+            <globmapper from="*" to="*-${build.date}.old" />
+        </copy>
 
-		<copy todir="${dspace.dir}/etc" preservelastmodified="true">
-			<fileset dir="etc" />
-		</copy>
+        <!--
+        Force overwrite of whats left
+        -->
+        <copy todir="${dspace.dir}/config" preservelastmodified="true" overwrite="true">
+            <fileset dir="config-temp">
+                <different targetdir="${dspace.dir}/config" ignoreFileTimes="true" />
+                <type type="file" />
+            </fileset>
+        </copy>
 
-		<echo>
+        <!--
+        Remove the work directory
+        -->
+        <delete dir="config-temp" />
+
+        <echo>
+====================================================================
+ The DSpace configuration has been updated.
+ 
+ During the upgrade process the build has attempted to overwrite the
+ previous configuration while preserving your previous changes in files
+ suffixed "*.old"
+            
+ To complete installation, you should do the following:
+ 
+ * Check that you've properly merged any differences in the following files:
+            
+        </echo>
+        
+        <fileset dir="${dspace.dir}/config" id="config.files">
+              <include name="**/*.old"/>
+        </fileset>
+          
+        <pathconvert pathsep="${line.separator}" property="configfiles" refid="config.files"/>
+
+        <echo>${configfiles}</echo>
+        
+        <echo>   
+            
+  * To properly merge your previous configuration files, its 
+    best to try to take the newer version and copy your 
+    previous changes into it.
+====================================================================
+        </echo>
+        
+    </target>
+
+    <target name="copy_configs_keep" unless="overwrite" depends="prepare_configs">
+
+        <!-- 
+        Copy files that are absent in target 
+        -->
+        <copy todir="${dspace.dir}/config" preservelastmodified="true">
+            <fileset dir="config-temp" includes="**/*">
+                <present present="srconly" targetdir="${dspace.dir}/config" />
+            </fileset>
+        </copy>
+        
+        <!-- 
+        Copy files that are different to target to *.new suffix
+        -->
+        <copy todir="${dspace.dir}/config" preservelastmodified="true">
+            <fileset dir="config-temp">
+                <different targetdir="${dspace.dir}/config" ignoreFileTimes="true" />
+                <type type="file" />
+            </fileset>
+            <globmapper from="*" to="*.new" />
+        </copy>
+
+        <!--
+            Remove the work directory
+            -->
+        <delete dir="config-temp" />
+
+        <echo>
+====================================================================
+ The DSpace configuration has been updated.
+ 
+ During the upgrade process the build has preserved your original 
+ configuration and placed any conflicting new files next to your 
+ original suffixed with the "*.new" extension.
+            
+ To complete installation, you should do the following:
+ 
+ * Check that you've properly merged any differences in the following files:
+            
+        </echo>
+        
+        <fileset dir="${dspace.dir}/config" id="config.files">
+              <include name="**/*.new"/>
+        </fileset>
+          
+        <pathconvert pathsep="${line.separator}" property="configfiles" refid="config.files"/>
+
+        <echo>${configfiles}</echo>
+        
+        <echo>   
+            
+  * To properly merge your previous configuration files, its 
+    best to try to take the newer version and copy your 
+    previous changes into it. Delete the old and remove the
+    ".new" suffix from the new file.
+            
+====================================================================
+        </echo>
+            
+    </target>
+
+    <target name="prepare_configs" description="Updates a configuration directory.">
+
+        <mkdir dir="config-temp" />
+
+        <!-- 
+        Copy designated dspace.cfg 
+        -->
+        <copy file="${config}" tofile="config-temp/dspace.cfg" preservelastmodified="true" />
+
+        <!--
+        If designated config isn't the one in config/dspace.cfg then lets put a copy of that next to it
+        -->
+        <copy todir="config-temp" preservelastmodified="true" overwrite="true" >
+            <fileset dir="config" includes="dspace.cfg">
+                <different targetdir="${dspace.dir}/config" ignoreFileTimes="true" />
+            </fileset>
+            <globmapper from="*" to="*.default" />
+        </copy>
+
+        <!-- 
+        Prepare properly filtered files
+        -->
+        <copy todir="config-temp" preservelastmodified="true" overwrite="true" failonerror="false">
+            <fileset dir="config" excludes="dspace.cfg" />
+            <filterchain>
+                <expandproperties />
+            </filterchain>
+        </copy>
+
+    </target>
+
+
+
+
+    <!-- ============================================================= -->
+    <!-- Update an installation (except database)                      -->
+    <!-- ============================================================= -->
+
+    <target name="update_code" description="Update installed code (without clobbering data/config)">
+
+        <move todir="${dspace.dir}/bin.bak-${build.date}" failonerror="no">
+            <fileset dir="${dspace.dir}/bin">
+                <include name="**/*" />
+            </fileset>
+        </move>
+
+        <copy todir="${dspace.dir}/bin" preservelastmodified="true">
+            <fileset dir="bin" />
+        </copy>
+
+        <chmod dir="${dspace.dir}/bin" perm="u+x" includes="**/*" />
+
+        <move todir="${dspace.dir}/lib.bak-${build.date}" failonerror="no">
+            <fileset dir="${dspace.dir}/lib">
+                <include name="**/*" />
+            </fileset>
+        </move>
+
+        <copy todir="${dspace.dir}/lib" preservelastmodified="true">
+            <fileset dir="lib" />
+        </copy>
+
+        <move todir="${dspace.dir}/etc.bak-${build.date}" failonerror="no">
+            <fileset dir="${dspace.dir}/etc">
+                <include name="**/*" />
+            </fileset>
+        </move>
+
+        <copy todir="${dspace.dir}/etc" preservelastmodified="true">
+            <fileset dir="etc" />
+        </copy>
+
+        <echo>
 ====================================================================
  ${dspace.dir}/bin was backed up to
-						
+                        
  ${dspace.dir}/bin.bak-${build.date}
-			
+            
  ${dspace.dir}/lib was backed up to
-			
+            
  ${dspace.dir}/lib.bak-${build.date}
 
  ${dspace.dir}/etc was backed up to
-			
+            
  ${dspace.dir}/etc.bak-${build.date}
-			
+            
  Please review these directories and delete if no longer needed.
 ====================================================================
-		</echo>
-		
-	</target>
-	
+        </echo>
 
-	<!-- ============================================================= -->
-	<!-- Update Web Applications only                                  -->
-	<!-- ============================================================= -->
+    </target>
 
-	<target name="update_webapps" description="Update Web Applications (without clobbering data/config)">
 
-		<move todir="${dspace.dir}/webapps.bak-${build.date}" failonerror="no">
-			<fileset dir="${dspace.dir}/webapps">
-				<include name="**/*"/>
-			</fileset>
-		</move>
+    <!-- ============================================================= -->
+    <!-- Update Web Applications only                                  -->
+    <!-- ============================================================= -->
 
-		<copy todir="${dspace.dir}/webapps" preservelastmodified="true" failonerror="no">
-			<fileset dir="webapps">
-				<exclude name="**/web.xml" />
-			</fileset>
-		</copy>
+    <target name="update_webapps" description="Update Web Applications (without clobbering data/config)">
 
-		<copy todir="${dspace.dir}/webapps" preservelastmodified="false" failonerror="no">
-			<fileset dir="webapps">
-				<include name="**/web.xml" />
-			</fileset>
-			<filterchain>
-				<expandproperties />
-			</filterchain>
-		</copy>
+        <move todir="${dspace.dir}/webapps.bak-${build.date}" failonerror="no">
+            <fileset dir="${dspace.dir}/webapps">
+                <include name="**/*" />
+            </fileset>
+        </move>
 
-		<echo>
+        <copy todir="${dspace.dir}/webapps" preservelastmodified="true" failonerror="no">
+            <fileset dir="webapps">
+                <exclude name="**/web.xml" />
+            </fileset>
+        </copy>
+
+        <copy todir="${dspace.dir}/webapps" preservelastmodified="false" failonerror="no">
+            <fileset dir="webapps">
+                <include name="**/web.xml" />
+            </fileset>
+            <filterchain>
+                <expandproperties />
+            </filterchain>
+        </copy>
+
+        <echo>
 ====================================================================
  ${dspace.dir}/webapps was backed up to
-					
+                    
  ${dspace.dir}/webapps.bak-${build.date}
-					
+                    
  Please review this directory and delete it if its no longer needed.
 ====================================================================
-		</echo>
+        </echo>
 
-		<antcall target="build_webapps_wars"/>
-		
-		<echo>
+        <antcall target="build_webapps_wars" />
+
+        <echo>
 ====================================================================
  Updated DSpace Web application directories are in the 
  '${dspace.dir}/webapps' directory.
@@ -281,241 +486,241 @@ Common usage:
 
  * Start up your Web servlet container again.
 ====================================================================
-    	</echo>
-
-	</target>
-	
-	
-	<!-- ============================================================= -->
-	<!-- Compress Web Applications                                     -->
-	<!-- (Only executes if the "wars" property is defined)             -->
-	<!-- ============================================================= -->
-
-	<target name="build_webapps_wars" description="Compress Web Applications into .war files" if="wars">
-
-		<war destfile="${dspace.dir}/webapps/xmlui.war">
-			<fileset dir="${dspace.dir}/webapps/xmlui/"/>
-		</war>
-		
-		<war destfile="${dspace.dir}/webapps/oai.war">
-			<fileset dir="${dspace.dir}/webapps/oai/"/>
-		</war>
-		
-		<war destfile="${dspace.dir}/webapps/lni.war">
-			<fileset dir="${dspace.dir}/webapps/lni/"/>
-		</war>
-		
-		<war destfile="${dspace.dir}/webapps/jspui.war">
-			<fileset dir="${dspace.dir}/webapps/jspui/"/>
-		</war>
-		
-		<war destfile="${dspace.dir}/webapps/sword.war">
-			<fileset dir="${dspace.dir}/webapps/sword/"/>
-		</war>
-
-	</target>
-	
-	
-	<!-- ============================================================= -->
-	<!-- Install DSpace and Dependencies                               -->
-	<!-- ============================================================= -->
-
-	<target name="init_installation">
-
-		<mkdir dir="${dspace.dir}/bin" />
-
-		<mkdir dir="${dspace.dir}/config" />
-
-		<mkdir dir="${dspace.dir}/lib" />
-
-		<mkdir dir="${dspace.dir}/webapps" />
-
-		<mkdir dir="${assetstore.dir}" />
-
-		<mkdir dir="${handle.dir}" />
-
-		<mkdir dir="${search.dir}" />
-
-		<mkdir dir="${log.dir}" />
-
-		<mkdir dir="${upload.temp.dir}" />
-
-		<mkdir dir="${report.dir}" />
-
-	</target>
-
-
-	<!-- ============================================================= -->
-	<!-- Fresh install of config files                                 -->
-	<!-- ============================================================= -->
-
-	<!-- Writes the configuration files to ${dspace.dir}/config.  It does *not*
-       run the install-configs script.  The "log4j.build.properties" file is
-       copied to ${dspace.dir}/config so there's a simple log4j.properties
-       file present for the initial run of "install-configs". -->
-	<target name="init_configs" depends="init_installation">
-
-		<copy todir="${dspace.dir}/config" preservelastmodified="true" failonerror="false">
-			<fileset dir="config"/>
-			<filterchain>
-				<expandproperties/>
-			</filterchain>
-		</copy>
-
-		<copy file="${config}" tofile="${dspace.dir}/config/dspace.cfg" preservelastmodified="true" />
-
-	</target>
-
-
-	<!-- ============================================================= -->
-	<!-- Create the database tables                                    -->
-	<!-- ============================================================= -->
-
-	<!-- We execute InitializeDatabase, passing in the simple log4j properties
-    -  file in etc/ and the DSpace configuration file using system
-    -  properties -->
-	<target name="setup_database" description="Create database tables">
-
-		<!-- Load the Schema -->
-		<java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
-			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-			<sysproperty key="dspace.log.init.disable" value="true"/>
-			<sysproperty key="dspace.configuration" value="${config}" />
-			<arg value="database_schema.sql" />
-		</java>
-
-		<!-- Add the browse tables -->
-        <java classname="org.dspace.browse.IndexBrowse" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-			<sysproperty key="dspace.log.init.disable" value="true"/>
-            <sysproperty key="dspace.configuration" value="${config}" />
-            <arg line="-t -x" />
-        </java>
-	</target>
-
-
-	<!-- ============================================================= -->
-	<!-- Remove the database tables                                    -->
-	<!-- ============================================================= -->
-
-	<!-- We execute InitializeDatabase, passing in the simple log4j properties
-    -  file in etc/ and the DSpace configuration file using system
-    -  properties -->
-	<target name="clean_database" description="Removes DSpace database tables, destroying data">
-
-		<java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
-			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-			<sysproperty key="dspace.log.init.disable" value="true"/>
-			<sysproperty key="dspace.configuration" value="${config}" />
-			<arg value="clean-database.sql" />
-		</java>
-
-	</target>
-
-
-	<!-- ============================================================= -->
-	<!-- Load the initial contents of the registries into the database -->
-	<!-- ============================================================= -->
-
-	<!-- Loads bitstream format and Dublin Core type registries -->
-	<target name="load_registries" description="Load initial contents of registries">
-
-		<!-- first import the bitstream registry -->
-		<java classname="org.dspace.administer.RegistryLoader" classpathref="class.path" fork="yes" failonerror="yes">
-			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-			<sysproperty key="dspace.log.init.disable" value="true"/>
-			<sysproperty key="dspace.configuration" value="${config}" />
-			<arg value="-bitstream" />
-			<arg value="${dspace.dir}/config/registries/bitstream-formats.xml" />
-		</java>
-
-		<!-- finally import the metadata elements -->
-		<java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties"/>
-			<sysproperty key="dspace.log.init.disable" value="true"/>
-            <sysproperty key="dspace.configuration" value="${config}"/>
-		    <arg line="-f '${dspace.dir}/config/registries/dublin-core-types.xml'"/>
-		</java>
-
-        <!-- FIXME: this should be more modular -->
-        <!-- import the SWORD required metadata -->
-        <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
-            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties"/>
-			<sysproperty key="dspace.log.init.disable" value="true"/>
-            <sysproperty key="dspace.configuration" value="${config}"/>
-		    <arg line="-f '${dspace.dir}/config/registries/sword-metadata.xml'"/>
-		</java>
+        </echo>
 
     </target>
 
 
-	<!-- ============================================================= -->
-	<!-- Do a fresh system install                                     -->
-	<!-- ============================================================= -->
+    <!-- ============================================================= -->
+    <!-- Compress Web Applications                                     -->
+    <!-- (Only executes if the "wars" property is defined)             -->
+    <!-- ============================================================= -->
 
-	<target name="fresh_install" depends="init_installation,init_configs,setup_database,load_registries" description="Do a fresh install of the system, overwriting any data">
+    <target name="build_webapps_wars" description="Compress Web Applications into .war files" if="wars">
 
-		<delete failonerror="no">
-			<fileset dir="${dspace.dir}/bin" includes="**/*"/>
-		</delete>
+        <war destfile="${dspace.dir}/webapps/xmlui.war">
+            <fileset dir="${dspace.dir}/webapps/xmlui/" />
+        </war>
 
-		<copy todir="${dspace.dir}/bin" preservelastmodified="true">
-			<fileset dir="bin" />
-		</copy>
+        <war destfile="${dspace.dir}/webapps/oai.war">
+            <fileset dir="${dspace.dir}/webapps/oai/" />
+        </war>
 
-		<chmod dir="${dspace.dir}/bin" perm="u+x" includes="**/*" />
+        <war destfile="${dspace.dir}/webapps/lni.war">
+            <fileset dir="${dspace.dir}/webapps/lni/" />
+        </war>
 
-		<delete failonerror="no">
-			<fileset dir="${dspace.dir}/lib" includes="**/*"/>
-		</delete>
+        <war destfile="${dspace.dir}/webapps/jspui.war">
+            <fileset dir="${dspace.dir}/webapps/jspui/" />
+        </war>
 
-		<copy todir="${dspace.dir}/lib" preservelastmodified="true">
-			<fileset dir="lib" />
-		</copy>
-		
-		<delete failonerror="no">
-			<fileset dir="${dspace.dir}/etc" includes="**/*"/>
-		</delete>
-		
-		<copy todir="${dspace.dir}/etc" preservelastmodified="true">
-			<fileset dir="etc" />
-		</copy>
+        <war destfile="${dspace.dir}/webapps/sword.war">
+            <fileset dir="${dspace.dir}/webapps/sword/" />
+        </war>
 
-		<delete failonerror="no">
-			<fileset dir="${dspace.dir}/webapps" includes="**/*"/>
-		</delete>
+    </target>
 
-		<copy todir="${dspace.dir}/webapps" preservelastmodified="true" failonerror="no">
-			<fileset dir="webapps">
-				<exclude name="**/web.xml" />
-			</fileset>
-		</copy>
 
-		<copy todir="${dspace.dir}/webapps" preservelastmodified="false" failonerror="no">
-			<fileset dir="webapps">
-				<include name="**/web.xml" />
-			</fileset>
-			<filterchain>
-				<expandproperties />
-			</filterchain>
-		</copy>
+    <!-- ============================================================= -->
+    <!-- Install DSpace and Dependencies                               -->
+    <!-- ============================================================= -->
 
-		<antcall target="build_webapps_wars"/>
-		
-		<java classname="org.dspace.browse.IndexBrowse" classpathref="class.path" fork="yes" failonerror="yes">
-			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-			<sysproperty key="dspace.log.init.disable" value="true"/>
-			<sysproperty key="dspace.configuration" value="${config}" />
-			<arg line="-f" />
-		</java>
+    <target name="init_installation">
 
-		<java classname="org.dspace.search.DSIndexer" classpathref="class.path" fork="yes" failonerror="yes">
-			<sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
-			<sysproperty key="dspace.log.init.disable" value="true"/>
-			<sysproperty key="dspace.configuration" value="${config}" />
-		</java>
+        <mkdir dir="${dspace.dir}/bin" />
 
-		<echo>
+        <mkdir dir="${dspace.dir}/config" />
+
+        <mkdir dir="${dspace.dir}/lib" />
+
+        <mkdir dir="${dspace.dir}/webapps" />
+
+        <mkdir dir="${assetstore.dir}" />
+
+        <mkdir dir="${handle.dir}" />
+
+        <mkdir dir="${search.dir}" />
+
+        <mkdir dir="${log.dir}" />
+
+        <mkdir dir="${upload.temp.dir}" />
+
+        <mkdir dir="${report.dir}" />
+
+    </target>
+
+
+    <!-- ============================================================= -->
+    <!-- Fresh install of config files                                 -->
+    <!-- ============================================================= -->
+
+    <!-- Writes the configuration files to ${dspace.dir}/config.  It does *not*
+       run the install-configs script.  The "log4j.build.properties" file is
+       copied to ${dspace.dir}/config so there's a simple log4j.properties
+       file present for the initial run of "install-configs". -->
+    <target name="init_configs" depends="init_installation">
+
+        <copy todir="${dspace.dir}/config" preservelastmodified="true" failonerror="false">
+            <fileset dir="config" excludes="dspace.cfg" />
+            <filterchain>
+                <expandproperties />
+            </filterchain>
+        </copy>
+
+        <copy file="${config}" tofile="${dspace.dir}/config/dspace.cfg" preservelastmodified="true" />
+
+    </target>
+
+
+    <!-- ============================================================= -->
+    <!-- Create the database tables                                    -->
+    <!-- ============================================================= -->
+
+    <!-- We execute InitializeDatabase, passing in the simple log4j properties
+    -  file in etc/ and the DSpace configuration file using system
+    -  properties -->
+    <target name="setup_database" description="Create database tables">
+
+        <!-- Load the Schema -->
+        <java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+            <arg value="database_schema.sql" />
+        </java>
+
+        <!-- Add the browse tables -->
+        <java classname="org.dspace.browse.IndexBrowse" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+            <arg line="-t -x" />
+        </java>
+    </target>
+
+
+    <!-- ============================================================= -->
+    <!-- Remove the database tables                                    -->
+    <!-- ============================================================= -->
+
+    <!-- We execute InitializeDatabase, passing in the simple log4j properties
+    -  file in etc/ and the DSpace configuration file using system
+    -  properties -->
+    <target name="clean_database" description="Removes DSpace database tables, destroying data">
+
+        <java classname="org.dspace.storage.rdbms.InitializeDatabase" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+            <arg value="clean-database.sql" />
+        </java>
+
+    </target>
+
+
+    <!-- ============================================================= -->
+    <!-- Load the initial contents of the registries into the database -->
+    <!-- ============================================================= -->
+
+    <!-- Loads bitstream format and Dublin Core type registries -->
+    <target name="load_registries" description="Load initial contents of registries">
+
+        <!-- first import the bitstream registry -->
+        <java classname="org.dspace.administer.RegistryLoader" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+            <arg value="-bitstream" />
+            <arg value="${dspace.dir}/config/registries/bitstream-formats.xml" />
+        </java>
+
+        <!-- finally import the metadata elements -->
+        <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+            <arg line="-f '${dspace.dir}/config/registries/dublin-core-types.xml'" />
+        </java>
+
+        <!-- FIXME: this should be more modular -->
+        <!-- import the SWORD required metadata -->
+        <java classname="org.dspace.administer.MetadataImporter" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+            <arg line="-f '${dspace.dir}/config/registries/sword-metadata.xml'" />
+        </java>
+
+    </target>
+
+
+    <!-- ============================================================= -->
+    <!-- Do a fresh system install                                     -->
+    <!-- ============================================================= -->
+
+    <target name="fresh_install" depends="init_installation,init_configs,setup_database,load_registries" description="Do a fresh install of the system, overwriting any data">
+
+        <delete failonerror="no">
+            <fileset dir="${dspace.dir}/bin" includes="**/*" />
+        </delete>
+
+        <copy todir="${dspace.dir}/bin" preservelastmodified="true">
+            <fileset dir="bin" />
+        </copy>
+
+        <chmod dir="${dspace.dir}/bin" perm="u+x" includes="**/*" />
+
+        <delete failonerror="no">
+            <fileset dir="${dspace.dir}/lib" includes="**/*" />
+        </delete>
+
+        <copy todir="${dspace.dir}/lib" preservelastmodified="true">
+            <fileset dir="lib" />
+        </copy>
+
+        <delete failonerror="no">
+            <fileset dir="${dspace.dir}/etc" includes="**/*" />
+        </delete>
+
+        <copy todir="${dspace.dir}/etc" preservelastmodified="true">
+            <fileset dir="etc" />
+        </copy>
+
+        <delete failonerror="no">
+            <fileset dir="${dspace.dir}/webapps" includes="**/*" />
+        </delete>
+
+        <copy todir="${dspace.dir}/webapps" preservelastmodified="true" failonerror="no">
+            <fileset dir="webapps">
+                <exclude name="**/web.xml" />
+            </fileset>
+        </copy>
+
+        <copy todir="${dspace.dir}/webapps" preservelastmodified="false" failonerror="no">
+            <fileset dir="webapps">
+                <include name="**/web.xml" />
+            </fileset>
+            <filterchain>
+                <expandproperties />
+            </filterchain>
+        </copy>
+
+        <antcall target="build_webapps_wars" />
+
+        <java classname="org.dspace.browse.IndexBrowse" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+            <arg line="-f" />
+        </java>
+
+        <java classname="org.dspace.search.DSIndexer" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+        </java>
+
+        <echo>
 ====================================================================
  The DSpace code has been installed, and the database initialized.
  
@@ -542,8 +747,8 @@ Common usage:
  
    ${dspace.url}/dspace-admin
 ====================================================================
-    	</echo>
+        </echo>
 
-	</target>
+    </target>
 
 </project>

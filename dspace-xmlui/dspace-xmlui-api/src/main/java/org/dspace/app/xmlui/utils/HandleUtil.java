@@ -1,9 +1,9 @@
 /*
  * HandleUtil.java
  *
- * Version: $Revision: 1.6 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/08/08 21:00:27 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -54,17 +54,12 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierService;
-import org.dspace.uri.IdentifierException;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.handle.HandleManager;
 
 /**
  * Simple utility class for extracting handles.
- *
- * NOTE: this class is effectively deprecated, and exists to provide legacy support for
- * handle resolution
  * 
  * @author Scott Phillips
  */
@@ -87,39 +82,40 @@ public class HandleUtil
     public static DSpaceObject obtainHandle(Map objectModel)
             throws SQLException
     {
-        try
+        Request request = ObjectModelHelper.getRequest(objectModel);
+
+        DSpaceObject dso = (DSpaceObject) request.getAttribute(DSPACE_OBJECT);
+
+        if (dso == null)
         {
-            Request request = ObjectModelHelper.getRequest(objectModel);
+            String uri = request.getSitemapURI();
 
-            DSpaceObject dso = (DSpaceObject) request.getAttribute(DSPACE_OBJECT);
+            if (!uri.startsWith(HANDLE_PREFIX))
+                // Dosn't start with the prefix then no match
+                return null;
 
-            if (dso == null)
-            {
-                String uri = request.getSitemapURI();
+            String handle = uri.substring(HANDLE_PREFIX.length());
 
-                if (!uri.startsWith(HANDLE_PREFIX))
-                    // Dosn't start with the prefix then no match
-                    return null;
+            int firstSlash = handle.indexOf('/');
+            if (firstSlash < 0)
+                // If there is no first slash then no match
+                return null;
 
-                String handle = uri.substring(HANDLE_PREFIX.length());
+            int secondSlash = handle.indexOf('/', firstSlash + 1);
+            if (secondSlash < 0)
+                // A trailing slash is not nesssary if there is nothing after
+                // the handle.
+                secondSlash = handle.length();
 
-                // now fudge the legacy version of the handle
-                handle = "hdl:" + handle;
+            handle = handle.substring(0, secondSlash);
 
-                Context context = ContextUtil.obtainContext(objectModel);
+            Context context = ContextUtil.obtainContext(objectModel);
+            dso = HandleManager.resolveToObject(context, handle);
 
-                ResolvableIdentifier ri = IdentifierService.resolve(context, handle);
-                dso = (DSpaceObject) IdentifierService.getResource(context, ri);
-
-                request.setAttribute(DSPACE_OBJECT, dso);
-            }
-
-            return dso;
+            request.setAttribute(DSPACE_OBJECT, dso);
         }
-        catch (IdentifierException e)
-        {
-            throw new RuntimeException(e);
-        }
+
+        return dso;
     }
 
     /**
@@ -141,7 +137,7 @@ public class HandleUtil
         {
 
             // Check if the current object has the handle we are looking for.
-            if (current.getExternalIdentifier().getCanonicalForm().equals(parent))
+            if (current.getHandle().equals(parent))
                 return true;
 
             if (current.getType() == Constants.ITEM)
@@ -231,18 +227,18 @@ public class HandleUtil
             	Collection collection = (Collection) pop;
             	String name = collection.getMetadata("name");
             	if (name == null || name.length() == 0)
-            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getExternalIdentifier().getCanonicalForm(), new Message("default","xmlui.general.untitled") );
+            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), new Message("default","xmlui.general.untitled") );
             	else
-            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getExternalIdentifier().getCanonicalForm(), name);
+            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), name);
             }
             else if (pop instanceof Community)
             {
             	Community community = (Community) pop;
             	String name = community.getMetadata("name");
             	if (name == null || name.length() == 0)
-            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getExternalIdentifier().getCanonicalForm(), new Message("default","xmlui.general.untitled") );
+            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), new Message("default","xmlui.general.untitled") );
             	else
-            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getExternalIdentifier().getCanonicalForm(), name);
+            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), name);
             }
 
         }

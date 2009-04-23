@@ -1,9 +1,9 @@
 /*
  * Metadata.java
  *
- * Version: $Revision: 1.6 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/08/08 21:59:25 $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

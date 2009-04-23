@@ -54,11 +54,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-import org.dspace.content.dao.ItemDAO;
-import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.Context;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
@@ -111,8 +108,8 @@ public class IndexBrowse
 	
 	/** the DAO for write operations on the database */
 	private BrowseCreateDAO dao;
-	
-	/** the outputter class */
+    
+    /** the outputter class */
 	private BrowseOutput output;
 	
     /**
@@ -143,10 +140,9 @@ public class IndexBrowse
      * @throws BrowseException
      */
     public IndexBrowse(Context context)
-    	throws BrowseException
+    	throws SQLException, BrowseException
     {
     	this.context = context;
-    	this.context.setIgnoreAuthorization(true);
     	
     	// get the browse indices, and ensure that
     	// we have all the relevant tables prepped
@@ -298,7 +294,7 @@ public class IndexBrowse
     {
     	return this.outFile;
     }
-        
+    
     private void removeIndex(int itemID, String table)
         throws BrowseException
     {
@@ -536,7 +532,7 @@ public class IndexBrowse
                     sortMap.put(key, nValue);
                 }
             }
-
+            
             return sortMap;
         }
         catch (SortException se)
@@ -571,7 +567,7 @@ public class IndexBrowse
 	    return true;
 	}
 
-    /**
+	/**
 	 * remove all the indices for the given item
 	 * 
 	 * @param item		the item to be removed
@@ -586,15 +582,15 @@ public class IndexBrowse
 
     public boolean itemRemoved(int itemID)
             throws BrowseException
-    {
+	{
 		// go over the indices and index the item
 		for (int i = 0; i < bis.length; i++)
 		{
 		    if (bis[i].isMetadataIndex())
 		    {
-                log.debug("Removing indexing for removed item " + itemID + ", for index: " + bis[i].getTableName());
-                removeIndex(itemID, bis[i].getMapTableName());
-            }
+    			log.debug("Removing indexing for removed item " + itemID + ", for index: " + bis[i].getTableName());
+    			removeIndex(itemID, bis[i].getMapTableName());
+		    }
 	    }
 
         // Remove from the item indexes (archive and withdrawn)
@@ -618,6 +614,7 @@ public class IndexBrowse
 		throws SQLException, BrowseException, ParseException
 	{
         Context context = new Context();
+        context.turnOffAuthorisationSystem();
         IndexBrowse indexer = new IndexBrowse(context);
 	    
 	    // create an options object and populate it
@@ -785,7 +782,7 @@ public class IndexBrowse
     		{
     			String tableName = BrowseIndex.getTableName(i, false, false, false, false);
                 String distinctTableName = BrowseIndex.getTableName(i, false, false, true, false);
-                String distinctMapName = BrowseIndex.getTableName(i, false, false, false, true);
+    			String distinctMapName = BrowseIndex.getTableName(i, false, false, false, true);
                 String sequence = BrowseIndex.getSequenceName(i, false, false);
                 String mapSequence = BrowseIndex.getSequenceName(i, false, true);
                 String distinctSequence = BrowseIndex.getSequenceName(i, true, false);
@@ -799,11 +796,11 @@ public class IndexBrowse
 
     			output.message("Checking for " + tableName);
     			if (dao.testTableExistance(tableName))
-                {
+    			{
                     output.message("...found");
-
+                    
                     output.message("Deleting old index and associated resources: " + tableName);
-
+    			    
                     // prepare a statement which will delete the table and associated
                     // resources
                     String dropper = dao.dropIndexAndRelated(tableName, this.execute());
@@ -817,8 +814,8 @@ public class IndexBrowse
                     String dropComView = dao.dropView( comViewName, this.execute() );
                     output.sql(dropColView);
                     output.sql(dropComView);
-                }
-
+    			}
+    			
                 // NOTE: we need a secondary context to check for the existance
                 // of the table, because if an SQLException is thrown, then
                 // the connection is aborted, and no more transaction stuff can be
@@ -840,9 +837,9 @@ public class IndexBrowse
                 else
                 {
         			output.message("...found");
-
+        			
         			output.message("Deleting old index and associated resources: " + distinctTableName);
-
+        			
     				// prepare statements that will delete the distinct value tables
     				String dropDistinctTable = dao.dropIndexAndRelated(distinctTableName, this.execute());
     				String dropMap = dao.dropIndexAndRelated(distinctMapName, this.execute());
@@ -860,7 +857,7 @@ public class IndexBrowse
                     output.sql(dropDistinctColView);
                     output.sql(dropDistinctComView);
                 }
-
+    			
     			i++;
     		}
 
@@ -951,7 +948,7 @@ public class IndexBrowse
             throws BrowseException
     {
         String tableName = bix.getTableName();
-        
+
         String itemSeq   = dao.createSequence(bix.getSequenceName(false, false), this.execute());
         String itemTable = dao.createPrimaryTable(tableName, sortCols, execute);
         String[] itemIndices = dao.createDatabaseIndices(tableName, sortCols, false, this.execute());
@@ -978,11 +975,11 @@ public class IndexBrowse
 			if (bi.isMetadataIndex())
 			{
 	            // if this is a single view, create the DISTINCT tables and views
-	            String distinctTableName = bi.getDistinctTableName();
+                String distinctTableName = bi.getDistinctTableName();
 				String distinctSeq = bi.getSequenceName(true, false);
-				String distinctMapName = bi.getMapTableName();
+                String distinctMapName = bi.getMapTableName();
 				String mapSeq = bi.getSequenceName(false, true);
-				
+
 				// FIXME: at the moment we have not defined INDEXes for this data
 				// add this later when necessary
 				
@@ -991,7 +988,7 @@ public class IndexBrowse
 				String createDistinctTable = dao.createDistinctTable(distinctTableName, this.execute());
 				String createDistinctMap = dao.createDistinctMap(distinctTableName, distinctMapName, this.execute());
                 String[] mapIndices = dao.createMapIndices(distinctTableName, distinctMapName, this.execute());
-				
+
 				output.sql(distinctTableSeq);
 				output.sql(distinctMapSeq);
 				output.sql(createDistinctTable);
@@ -1098,19 +1095,15 @@ public class IndexBrowse
     		}
     		
     		// now get the ids of ALL the items in the database
-//            BrowseItemDAO biDao = BrowseDAOFactory.getItemInstance(context);
-//            BrowseItem[] items = biDao.findAll();
-            ItemDAO itemDAO = ItemDAOFactory.getInstance(context);
-            List<Item> items = itemDAO.getItems();
+            BrowseItemDAO biDao = BrowseDAOFactory.getItemInstance(context);
+            BrowseItem[] items = biDao.findAll();
 
     		// go through every item id, grab the relevant metadata
     		// and write it into the database
     		
-//    		for (int j = 0; j < items.length; j++)
-    		for (Item item : items)
+    		for (int j = 0; j < items.length; j++)
     		{
-//                indexItem(new ItemMetadataProxy(items[j].getID(), items[j]));
-                indexItem(new ItemMetadataProxy(item));
+                indexItem(new ItemMetadataProxy(items[j].getID(), items[j]));
     			
     			// after each item we commit the context and clear the cache
     			context.commit();
@@ -1124,8 +1117,7 @@ public class IndexBrowse
             // Make sure the deletes are written back
             context.commit();
     		
-//    		return items.length;
-    		return items.size();
+    		return items.length;
     	}
     	catch (SQLException e)
     	{
@@ -1178,26 +1170,25 @@ public class IndexBrowse
 	// private inner class
 	//	 Hides the Item / BrowseItem in such a way that we can remove
 	//	 the duplication in indexing an item.
-    // FIXME: I (JR) think this is pointless now that BrowseItem doesn't exist.
 	private class ItemMetadataProxy
 	{
 	    private Item item;
-//	    private BrowseItem browseItem;
+	    private BrowseItem browseItem;
 	    private int id;
 	    
 	    ItemMetadataProxy(Item item)
 	    {
 	        this.item       = item;
-//	        this.browseItem = null;
+	        this.browseItem = null;
 	        this.id         = 0;
 	    }
 
-//	    ItemMetadataProxy(int id, BrowseItem browseItem)
-//	    {
-//	        this.item       = null;
-//	        this.browseItem = browseItem;
-//	        this.id         = id;
-//	    }
+	    ItemMetadataProxy(int id, BrowseItem browseItem)
+	    {
+	        this.item       = null;
+	        this.browseItem = browseItem;
+	        this.id         = id;
+	    }
 
 	    public DCValue[] getMetadata(String schema, String element, String qualifier, String lang)
 	        throws SQLException
@@ -1207,18 +1198,17 @@ public class IndexBrowse
 	            return item.getMetadata(schema, element, qualifier, lang);
 	        }
 	        
-            throw new IllegalStateException("this shouldn't have happened");
-//	        return browseItem.getMetadata(schema, element, qualifier, lang);
+	        return browseItem.getMetadata(schema, element, qualifier, lang);
 	    }
 	    
 	    public int getID()
 	    {
-//	        if (item != null)
-//	        {
+	        if (item != null)
+	        {
 	            return item.getID();
-//	        }
-//	        
-//	        return id;
+	        }
+	        
+	        return id;
 	    }
 	    
 	    /**
@@ -1227,12 +1217,12 @@ public class IndexBrowse
 	     */
 	    public boolean isArchived()
 	    {
-//	    	if (item != null)
-//	    	{
+	    	if (item != null)
+	    	{
 	    		return item.isArchived();
-//	    	}
-//	    	
-//	    	return browseItem.isArchived();
+	    	}
+	    	
+	    	return browseItem.isArchived();
 	    }
 	    
         /**
@@ -1241,12 +1231,12 @@ public class IndexBrowse
          */
         public boolean isWithdrawn()
         {
-//            if (item != null)
-//            {
+            if (item != null)
+            {
             	return item.isWithdrawn();
-//            }
-//            
-//            return browseItem.isWithdrawn();
+            }
+            
+            return browseItem.isWithdrawn();
         }
 	}
 }

@@ -13,12 +13,12 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>SNAPSHOT</version>
+      <version>1.5.3-SNAPSHOT</version>
    </parent>
 
    <repositories>
       <repository>
-         <id>maven.dspace.org/snapshot</id>
+         <id>maven.dspace.org-snapshot</id>
          <name>DSpace Maven Snapshot Repository</name>
          <url>http://maven.dspace.org/snapshot</url>
          <releases>
@@ -33,9 +33,9 @@
    </repositories>
 
    <scm>
-      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/xmlui</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/xmlui</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/xmlui</url>
+      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/xmlui</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/xmlui</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/xmlui</url>
    </scm>
 
    <build>
@@ -168,7 +168,7 @@
          <version>2.3</version>
          <scope>provided</scope>
       </dependency>
-      
+
    </dependencies>
 
 </project>

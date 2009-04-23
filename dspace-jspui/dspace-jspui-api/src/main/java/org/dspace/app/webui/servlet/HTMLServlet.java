@@ -39,32 +39,29 @@
  */
 package org.dspace.app.webui.servlet;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLDecoder;
+import java.sql.SQLException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
+import org.dspace.app.statistics.AbstractUsageEvent;
 import org.dspace.app.webui.util.JSPManager;
+import org.dspace.app.webui.util.UsageEvent;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
-import org.dspace.content.dao.ItemDAOFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
-import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierService;
-import org.dspace.uri.IdentifierException;
-import org.dspace.uri.dao.ExternalIdentifierDAO;
-import org.dspace.uri.dao.ExternalIdentifierDAOFactory;
-import org.dspace.uri.dao.ExternalIdentifierStorageException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLDecoder;
-import java.sql.SQLException;
+import org.dspace.handle.HandleManager;
 
 /**
  * Servlet for HTML bitstream support.
@@ -151,141 +148,122 @@ public class HTMLServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        try
+        Item item = null;
+        Bitstream bitstream = null;
+
+        String idString = request.getPathInfo();
+        String filenameNoPath = null;
+        String fullpath = null;
+        String handle = null;
+
+        // Parse URL
+        if (idString != null)
         {
-            ExternalIdentifierDAO identifierDAO =
-                ExternalIdentifierDAOFactory.getInstance(context);
-
-            Item item = null;
-            Bitstream bitstream = null;
-
-            String idString = request.getPathInfo();
-            String filenameNoPath = null;
-            String fullpath = null;
-            String uri = null;
-
-            // Parse URL
-            if (idString != null)
+            // Remove leading slash
+            if (idString.startsWith("/"))
             {
-                // Remove leading slash
-                if (idString.startsWith("/"))
-                {
-                    idString = idString.substring(1);
-                }
+                idString = idString.substring(1);
+            }
 
-                // Get uri and full file path
-                int slashIndex = idString.indexOf('/');
+            // Get handle and full file path
+            int slashIndex = idString.indexOf('/');
+            if (slashIndex != -1)
+            {
+                slashIndex = idString.indexOf('/', slashIndex + 1);
                 if (slashIndex != -1)
                 {
-                    slashIndex = idString.indexOf('/', slashIndex + 1);
+                    handle = idString.substring(0, slashIndex);
+                    fullpath = URLDecoder.decode(idString
+                            .substring(slashIndex + 1),
+                            Constants.DEFAULT_ENCODING);
+
+                    // Get filename with no path
+                    slashIndex = fullpath.indexOf('/');
                     if (slashIndex != -1)
                     {
-                        uri = idString.substring(0, slashIndex);
-                        fullpath = URLDecoder.decode(idString
-                                .substring(slashIndex + 1),
-                                Constants.DEFAULT_ENCODING);
-
-                        // Get filename with no path
-                        slashIndex = fullpath.indexOf('/');
-                        if (slashIndex != -1)
+                        String[] pathComponents = fullpath.split("/");
+                        if (pathComponents.length <= maxDepthGuess + 1)
                         {
-                            String[] pathComponents = fullpath.split("/");
-                            if (pathComponents.length <= maxDepthGuess + 1)
-                            {
-                                filenameNoPath = pathComponents[pathComponents.length - 1];
-                            }
+                            filenameNoPath = pathComponents[pathComponents.length - 1];
                         }
                     }
                 }
             }
+        }
 
-            if (uri != null && fullpath != null)
+        if (handle != null && fullpath != null)
+        {
+            // Find the item
+            try
             {
-                // Find the item
-                try
+                /*
+                 * If the original item doesn't have a Handle yet (because it's
+                 * in the workflow) what we actually have is a fake Handle in
+                 * the form: db-id/1234 where 1234 is the database ID of the
+                 * item.
+                 */
+                if (handle.startsWith("db-id"))
                 {
-                    /*
-                     * If the original item doesn't have a persistent identifier
-                     * yet (because it's in the workflow) what we actually have is
-                     * a URL of the form: db-id/1234 where 1234 is the database ID
-                     * of the item.
-                     *
-                     * FIXME: This first part could be totally omitted now that we
-                     * have the dsi:x/y format of identification.
-                    */
-                    if (uri.startsWith("db-id"))
-                    {
-                        String dbIDString = uri
-                                .substring(uri.indexOf('/') + 1);
-                        int dbID = Integer.parseInt(dbIDString);
-                        item = ItemDAOFactory.getInstance(context).retrieve(dbID);
-                    }
-                    else
-                    {
-                        ResolvableIdentifier di = IdentifierService.resolveCanonical(context, uri);
-                        //ExternalIdentifier identifier = identifierDAO.retrieve(uri);
-                        //ObjectIdentifier oi = identifier.getObjectIdentifier();
-                        item = (Item) IdentifierService.getResource(context, di);
-                    }
+                    String dbIDString = handle
+                            .substring(handle.indexOf('/') + 1);
+                    int dbID = Integer.parseInt(dbIDString);
+                    item = Item.find(context, dbID);
                 }
-                catch (NumberFormatException nfe)
+                else
                 {
-                    // Invalid ID - this will be dealt with below
+                    item = (Item) HandleManager
+                            .resolveToObject(context, handle);
                 }
             }
-
-            if (item != null)
+            catch (NumberFormatException nfe)
             {
-                // Try to find bitstream with exactly matching name + path
-                bitstream = getItemBitstreamByName(item, fullpath);
-
-                if (bitstream == null && filenameNoPath != null)
-                {
-                    // No match with the full path, but we can try again with
-                    // only the filename
-                    bitstream = getItemBitstreamByName(item, filenameNoPath);
-                }
-            }
-
-            // Did we get a bitstream?
-            if (bitstream != null)
-            {
-                log.info(LogManager.getHeader(context, "view_html", "uri="
-                        + uri + ",bitstream_id=" + bitstream.getID()));
-
-                // Set the response MIME type
-                response.setContentType(bitstream.getFormat().getMIMEType());
-
-                // Response length
-                response.setHeader("Content-Length", String.valueOf(bitstream
-                        .getSize()));
-
-                // Pipe the bits
-                InputStream is = bitstream.retrieve();
-
-                Utils.bufferedCopy(is, response.getOutputStream());
-                is.close();
-                response.getOutputStream().flush();
-            }
-            else
-            {
-                // No bitstream - we got an invalid ID
-                log.info(LogManager.getHeader(context, "view_html",
-                        "invalid_bitstream_id=" + idString));
-
-                JSPManager.showInvalidIDError(request, response, idString,
-                        Constants.BITSTREAM);
+                // Invalid ID - this will be dealt with below
             }
         }
-        catch (ExternalIdentifierStorageException e)
+
+        if (item != null)
         {
-            log.error("caught exception: ", e);
-            throw new RuntimeException(e);
+            // Try to find bitstream with exactly matching name + path
+            bitstream = getItemBitstreamByName(item, fullpath);
+            
+            if (bitstream == null && filenameNoPath != null)
+            {
+                // No match with the full path, but we can try again with
+                // only the filename
+                bitstream = getItemBitstreamByName(item, filenameNoPath);
+            }
         }
-        catch (IdentifierException e)
+
+        // Did we get a bitstream?
+        if (bitstream != null)
         {
-            log.error("caught exception: ", e);
-            throw new RuntimeException(e);
+            log.info(LogManager.getHeader(context, "view_html", "handle="
+                    + handle + ",bitstream_id=" + bitstream.getID()));
+            new UsageEvent().fire(request, context, AbstractUsageEvent.VIEW,
+					Constants.BITSTREAM, bitstream.getID());
+
+            // Set the response MIME type
+            response.setContentType(bitstream.getFormat().getMIMEType());
+
+            // Response length
+            response.setHeader("Content-Length", String.valueOf(bitstream
+                    .getSize()));
+
+            // Pipe the bits
+            InputStream is = bitstream.retrieve();
+
+            Utils.bufferedCopy(is, response.getOutputStream());
+            is.close();
+            response.getOutputStream().flush();
+        }
+        else
+        {
+            // No bitstream - we got an invalid ID
+            log.info(LogManager.getHeader(context, "view_html",
+                    "invalid_bitstream_id=" + idString));
+
+            JSPManager.showInvalidIDError(request, response, idString,
+                    Constants.BITSTREAM);
         }
     }
 }

@@ -1,10 +1,10 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   sitemap.xmap
   
-  Version: $Revision: 1.1 $
+  Version: $Revision$
   
-  Date: $Date: 2005/10/18 21:36:45 $
+  Date: $Date$
   
   Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
   Institute of Technology.  All rights reserved.
@@ -73,7 +73,6 @@
     <map:matchers default="wildcard">
       <map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
       <map:matcher name="HandleAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.general.HandleAuthorizedMatcher"/>
-      <map:matcher name="IdentifierMatcher" src="org.dspace.app.xmlui.cocoon.IdentifierMatcher" />
     </map:matchers>
     
     <map:actions>
@@ -91,7 +90,7 @@
   
   <map:pipelines>
     <map:pipeline>
-         
+    
       <!-- Make sure the user is atleast logged in -->
       <map:select type="AuthenticatedSelector">
         <map:when test="eperson">
@@ -118,19 +117,19 @@
           </map:match>
           
           <!-- Start a new submission to specific collection -->
-          <map:match pattern="resource/$/submit" type="IdentifierMatcher">
+          <map:match pattern="handle/*/*/submit">
             <map:call function="doSubmission">
-              <map:parameter name="handle" value="{1}"/>
+              <map:parameter name="handle" value="{1}/{2}"/>
             </map:call>
           </map:match>
           
           <!-- Continue an existing submission-->
-          <map:match pattern="resource/$/submit/*.continue" type="IdentifierMatcher">
-             <map:call continuation="{2}"/>
+          <map:match pattern="handle/*/*/submit/*.continue">
+             <map:call continuation="{3}"/>
           </map:match>
           
           <!-- Workflow task "flow" -->
-          <map:match pattern="resource/$/workflow" type="IdentifierMatcher">
+          <map:match pattern="handle/*/*/workflow">
             <map:match type="request" pattern="submission-continue">
               <map:call continuation="{1}"/>
             </map:match>
@@ -150,7 +149,6 @@
               will add a link to the collection homepage for submitting
               new items to the collection. 
               -->
-            <!--
           <map:match pattern="handle/*/*">
             <map:match type="HandleTypeMatcher" pattern="collection">
                <map:match type="HandleAuthorizedMatcher" pattern="READ">	
@@ -158,16 +156,8 @@
                </map:match>
              </map:match>			
           </map:match>
-          -->
-
-            <map:match pattern="resource/$" type="IdentifierMatcher">
-            <map:match type="HandleTypeMatcher" pattern="collection">
-               <map:match type="HandleAuthorizedMatcher" pattern="READ">
-                 <map:transform type="CollectionViewer"/>
-               </map:match>
-             </map:match>
-          </map:match>
-
+          
+                    
           <!--
               The submissions page provides a list of all submission 
               related tasks/items/thingys. It is used by both those
@@ -212,7 +202,7 @@
                 with a set of options such as approve or reject the item, 
                 in some cases the user may also edit the item's metadata.
                 -->
-            <map:match pattern="resource/$/workflow/performTaskStep" type="IdentifierMatcher">
+            <map:match pattern="handle/*/*/workflow/performTaskStep">
               <map:transform type="PerformTaskStep">
                 <map:parameter name="id" value="{flow-attribute:id}"/>
                 <map:parameter name="step" value="{flow-attribute:step}"/>
@@ -223,7 +213,7 @@
                 This step will ask the user for a reason why they are 
                 rejecting the item.
                 -->
-            <map:match pattern="resource/$/workflow/rejectTaskStep" type="IdentifierMatcher">
+            <map:match pattern="handle/*/*/workflow/rejectTaskStep">
               <map:transform type="RejectTaskStep">
                 <map:parameter name="id" value="{flow-attribute:id}"/>
                 <map:parameter name="step" value="{flow-attribute:step}"/>
@@ -253,14 +243,14 @@
               and forwards to the appropriate step transformer class to 
               generate the necessary DRI!
             -->
-            <map:match pattern="resource/$/submit/continue" type="IdentifierMatcher">
+            <map:match pattern="handle/*/*/submit/continue">
               <map:transform type="StepTransformer">
                 <map:parameter name="id" value="{flow-attribute:id}"/>
                 <map:parameter name="step" value="{flow-attribute:step}"/>
                 <map:parameter name="transformer" value="{flow-attribute:transformer}"/>
                 <map:parameter name="error" value="{flow-attribute:error}"/>
                 <map:parameter name="error_fields" value="{flow-attribute:error_fields}"/>
-                <map:parameter name="handle" value="{1}"/>
+                <map:parameter name="handle" value="{1}/{2}"/>
               </map:transform>
             </map:match>
           
@@ -268,7 +258,7 @@
                 This step is used when resuming unfinished submissions, the user is
                 taken here after clicking the link from the submissions page.
                 -->
-            <map:match pattern="resource/$/submit/resumeStep" type="IdentifierMatcher">
+            <map:match pattern="handle/*/*/submit/resumeStep">
               <map:transform type="ResumeStep">
                 <map:parameter name="id" value="{flow-attribute:id}"/>
                 <map:parameter name="step" value="{flow-attribute:step}"/>
@@ -280,7 +270,7 @@
                 even the user clicks save / cancel. At this page they are asked
                 if they would like to keep the submission or remove it. 
                 -->
-            <map:match pattern="resource/$/submit/saveOrRemoveStep" type="IdentifierMatcher">
+            <map:match pattern="handle/*/*/submit/saveOrRemoveStep">
               <map:transform type="SaveOrRemoveStep">
                 <map:parameter name="id" value="{flow-attribute:id}"/>
                 <map:parameter name="step" value="{flow-attribute:step}"/>
@@ -291,7 +281,7 @@
                 This is step is a confirmation page that the submission was
                 successfully removed from the system.
                 -->
-            <map:match pattern="resource/$/submit/removedStep" type="IdentifierMatcher">
+            <map:match pattern="handle/*/*/submit/removedStep">
               <map:transform type="RemovedStep"/>
             </map:match>
             
@@ -299,7 +289,7 @@
                 This step is meurly a confirmation page letting the user 
                 know that they have completed submitting a new item to dspace.
                 -->
-            <map:match pattern="resource/$/submit/completedStep" type="IdentifierMatcher">
+            <map:match pattern="handle/*/*/submit/completedStep">
               <map:transform type="CompletedStep">
                 <map:parameter name="handle" value="{flow-attribute:handle}"/>
               </map:transform>
@@ -329,11 +319,11 @@
             <map:act type="StartAuthentication"/>
           </map:match>
 
-          <map:match pattern="resource/*/submit">
+          <map:match pattern="handle/*/*/submit">
             <map:act type="StartAuthentication"/>
           </map:match>
     
-          <map:match pattern="resource/*/workflow">
+          <map:match pattern="handle/*/*/workflow">
             <map:act type="StartAuthentication"/>
           </map:match>
           

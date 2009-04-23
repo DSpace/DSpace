@@ -1,9 +1,9 @@
 /*
  * CommunityBrowser.java
  *
- * Version: $Revision: 1.15 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/08/08 20:58:04 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,6 +39,13 @@
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Stack;
+
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
@@ -53,10 +60,10 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Reference;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
+import org.dspace.app.xmlui.wing.element.List;
+import org.dspace.app.xmlui.wing.element.Reference;
+import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -64,24 +71,17 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
-import org.dspace.uri.IdentifierService;
-import org.xml.sax.SAXException;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Stack;
+import org.xml.sax.SAXException;
 
 /**
  * Display a list of Communities and collections.
- *
+ * 
  * This item may be configured so that it will only display to a specific depth,
  * and may include or exclude collections from the tree.
- *
+ * 
  * The configuration option available: <depth exclude-collections="true">999</depth>
- *
+ * 
  * @author Scott Phillips
  */
 public class CommunityBrowser extends AbstractDSpaceTransformer implements CacheableProcessingComponent
@@ -91,19 +91,19 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     /** Language Strings */
     public static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
-
+    
     public static final Message T_title =
         message("xmlui.ArtifactBrowser.CommunityBrowser.title");
-
+    
     public static final Message T_trail =
         message("xmlui.ArtifactBrowser.CommunityBrowser.trail");
-
+    
     public static final Message T_head =
         message("xmlui.ArtifactBrowser.CommunityBrowser.head");
-
+    
     public static final Message T_select =
         message("xmlui.ArtifactBrowser.CommunityBrowser.select");
-
+    
     /** Should collections be excluded from the list */
     protected boolean excludeCollections = false;
 
@@ -115,10 +115,10 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 
     /** Cached version the community / collection hierarch */
     protected TreeNode root;
-
+    
     /** cached validity object */
     private SourceValidity validity;
-
+    
     /**
      * Set the component up, pulling any configuration values from the sitemap
      * parameters.
@@ -146,8 +146,8 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 
     /**
      * Generate the cache validity object.
-     *
-     * The validity object will include a list of all communities
+     * 
+     * The validity object will include a list of all communities 
      * & collection being browsed along with there logo bitstreams.
      */
     public SourceValidity getValidity()
@@ -156,34 +156,34 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     	{
 	        try {
 	            DSpaceValidity validity = new DSpaceValidity();
-
+	            
 	            TreeNode root = buildTree(Community.findAllTop(context));
-
+	            
 	            Stack<TreeNode> stack = new Stack<TreeNode>();
 	            stack.push(root);
-
+	            
 	            int objectCount = 0;
 	            while (!stack.empty())
 	            {
 	            	objectCount++;
 	                TreeNode node = stack.pop();
-
+	                
 	                validity.add(node.getDSO());
-
+	                
 	                for (TreeNode child : node.getChildren())
 	                {
 	                    stack.push(child);
 	                }
 	            }
-
+	            
 	            // Check if we are configured to assume validity.
 	            String assumeCacheValidity = ConfigurationManager.getProperty("xmlui.community-list.cache");
 	            if (assumeCacheValidity != null)
 	            	validity.setAssumedValidityDelay(assumeCacheValidity);
-
+	            
 	            this.validity = validity.complete();
-	        }
-	        catch (SQLException sqle)
+	        } 
+	        catch (SQLException sqle) 
 	        {
 	            // ignore all errors and return an invalid cache.
 	        }
@@ -218,105 +218,105 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         division.addPara(T_select);
 
         TreeNode root = buildTree(Community.findAllTop(context));
-
+        
         boolean full = ConfigurationManager.getBooleanProperty("xmlui.community-list.render.full", true);
-
+        
         if (full)
         {
 	        ReferenceSet referenceSet = division.addReferenceSet("community-browser",
 	                ReferenceSet.TYPE_SUMMARY_LIST,null,"hierarchy");
-
+	        
 	        ArrayList<TreeNode> rootNodes = root.getChildrenOfType(Constants.COMMUNITY);
-
+	        
 	        for (TreeNode node : rootNodes)
 	        {
-	            buildReferenceSet(referenceSet,node);
+	            buildReferenceSet(referenceSet,node);   
 	        }
         }
         else
         {
         	List list = division.addList("comunity-browser");
-
+        	
         	ArrayList<TreeNode> rootNodes = root.getChildrenOfType(Constants.COMMUNITY);
-
+ 	        
  	        for (TreeNode node : rootNodes)
  	        {
- 	            buildList(list,node);
+ 	            buildList(list,node);   
  	        }
-
+        	
         }
-    }
-
+    } 
+    
     /**
      * Recursively build an includeset of the community / collection hierarcher based upon
      * the given NodeTree.
-     *
+     * 
      * @param referenceSet The include set
      * @param node The current node of the hierarch.
      */
     public void buildReferenceSet(ReferenceSet referenceSet, TreeNode node) throws WingException
     {
         DSpaceObject dso = node.getDSO();
-
+        
         Reference objectInclude = referenceSet.addReference(dso);
-
+        
         // Add all the sub-collections;
         ArrayList<TreeNode> collectionNodes = node.getChildrenOfType(Constants.COLLECTION);
         if (collectionNodes != null && collectionNodes.size() > 0)
         {
             ReferenceSet collectionSet = objectInclude.addReferenceSet(ReferenceSet.TYPE_SUMMARY_LIST);
-
+            
             for (TreeNode collectionNode : collectionNodes)
             {
                 collectionSet.addReference(collectionNode.getDSO());
             }
         }
-
+        
         // Add all the sub-communities
         ArrayList<TreeNode> communityNodes = node.getChildrenOfType(Constants.COMMUNITY);
         if (communityNodes != null && communityNodes.size() > 0)
         {
             ReferenceSet communitySet = objectInclude.addReferenceSet(ReferenceSet.TYPE_SUMMARY_LIST);
-
+            
             for (TreeNode communityNode : communityNodes)
             {
                 buildReferenceSet(communitySet,communityNode);
             }
         }
     }
-
+    
     /**
      * Recursively build a list of the community / collection hierarchery based upon
      * the given NodeTree.
-     *
+     * 
      * @param List The parent list
      * @param node The current node of the hierarch.
      */
     public void buildList(List list, TreeNode node) throws WingException
     {
         DSpaceObject dso = node.getDSO();
-
+        
         String name = null;
         if (dso instanceof Community)
         	name = ((Community) dso).getMetadata("name");
         else if (dso instanceof Collection)
         	name = ((Collection) dso).getMetadata("name");
-
-        String url = IdentifierService.getURL(dso).toString();
+        
+        String url = contextPath + "/handle/"+dso.getHandle();
         list.addItem().addHighlight("bold").addXref(url, name);
-
+        
         List subList = null;
-
+        
         // Add all the sub-collections;
         ArrayList<TreeNode> collectionNodes = node.getChildrenOfType(Constants.COLLECTION);
         if (collectionNodes != null && collectionNodes.size() > 0)
         {
         	subList = list.addList("sub-list-"+dso.getID());
-
+        
             for (TreeNode collectionNode : collectionNodes)
             {
                 String collectionName = ((Collection) collectionNode.getDSO()).getMetadata("name");
-                String collectionUrl = IdentifierService.getURL(collectionNode.getDSO()).toString();
+                String collectionUrl = contextPath + "/handle/"+collectionNode.getDSO().getHandle();
                 subList.addItemXref(collectionUrl, collectionName);
             }
         }

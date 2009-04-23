@@ -54,10 +54,10 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="org.dspace.content.Collection" %>
-
-<%@ page import="org.dspace.uri.IdentifierService" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+
+<%@ page import="org.dspace.content.Community" %>
+<%@ page import="org.dspace.content.Collection" %>
 
 <%
     Collection[] subscriptions =
@@ -113,7 +113,7 @@
                   --%>
 
                  <td class="<%= row %>RowOddCol">
-                      <a href="<%= IdentifierService.getURL(subscriptions[i]).toString() %>"><%= subscriptions[i].getMetadata("name") %></a>
+                      <a href="<%= request.getContextPath() %>/handle/<%= subscriptions[i].getHandle() %>"><%= subscriptions[i].getMetadata("name") %></a>
                  </td>
                  <td class="<%= row %>RowEvenCol">
                     <form method="post" action=""> 

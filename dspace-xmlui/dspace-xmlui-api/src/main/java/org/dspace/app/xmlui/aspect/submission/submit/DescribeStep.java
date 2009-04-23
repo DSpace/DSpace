@@ -1,9 +1,9 @@
 /*
  * DescribeStep.java
  *
- * Version: $Revision: 1.4 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,13 +39,21 @@
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Locale;
+
+import javax.servlet.ServletException;
+
 import org.apache.log4j.Logger;
+
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.aspect.submission.FlowUtils;
-import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -65,14 +73,9 @@ import org.dspace.content.DCPersonName;
 import org.dspace.content.DCSeriesNumber;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-import org.dspace.uri.IdentifierService;
-import org.xml.sax.SAXException;
 
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Locale;
+
+import org.xml.sax.SAXException;
 
 /**
  * This is a step of the item submission processes. The describe step queries 
@@ -176,13 +179,13 @@ public class DescribeStep extends AbstractSubmissionStep
 		// Obtain the inputs (i.e. metadata fields we are going to display)
 		Item item = submission.getItem();
 		Collection collection = submission.getCollection();
-		String actionURL = IdentifierService.getURL(collection).toString() + "/submit/" + knot.getId() + ".continue";
+		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 
 		DCInputSet inputSet = null;
 		DCInput[] inputs = {};
 		try 
 		{
-			inputSet = getInputsReader().getInputs(IdentifierService.getCanonicalForm(submission.getCollection()));
+			inputSet = getInputsReader().getInputs(submission.getCollection().getHandle());
 			inputs = inputSet.getPageRows(getPage()-1, submission.hasMultipleTitles(), submission.isPublishedBefore());
 		} 
 		catch (ServletException se) 
@@ -310,7 +313,7 @@ public class DescribeStep extends AbstractSubmissionStep
         DCInputSet inputSet = null;
         try 
         {
-            inputSet = getInputsReader().getInputs(IdentifierService.getCanonicalForm(submission.getCollection()));
+            inputSet = getInputsReader().getInputs(submission.getCollection().getHandle());
         } 
         catch (ServletException se) 
         {
@@ -338,12 +341,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 values = submission.getItem().getMetadata(input.getSchema(), input.getElement(), input.getQualifier(), Item.ANY);
             }
 
-            if (values.length == 0) 
-            {
-                describeSection.addLabel(input.getLabel());
-                describeSection.addItem().addHighlight("italic").addContent(ReviewStep.T_no_metadata);
-            }
-            else 
+            if (values.length > 0)
             {
                 for (DCValue value : values)
                 {
@@ -361,14 +359,22 @@ public class DescribeStep extends AbstractSubmissionStep
                     {
                         String qualifier = value.qualifier;
                         String displayQual = input.getDisplayString(pairsName,qualifier);
-                        displayValue = displayQual + ":" + value.value;
+                        if (displayQual!=null && displayQual.length()>0)
+                        {
+                            displayValue = displayQual + ":" + value.value;
+                        }
                     }
                     else 
                     {
                         displayValue = value.value;
                     }
-                    describeSection.addLabel(input.getLabel());
-                    describeSection.addItem(displayValue);
+
+                    //Only display this field if we have a value to display
+                    if (displayValue!=null && displayValue.length()>0)
+                    {
+                        describeSection.addLabel(input.getLabel());
+                        describeSection.addItem(displayValue);
+                    }
                 } // For each DCValue
             } // If values exist
         }// For each input

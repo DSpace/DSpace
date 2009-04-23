@@ -166,7 +166,7 @@ abstract class DAVInProgressSubmission extends DAVResource
         if (elementsEqualIsh(property, collectionProperty))
         {
             value = canonicalizeHandle(this.inProgressItem.getCollection()
-                    .getIdentifier().getCanonicalForm());
+                    .getHandle());
         }
         else if (elementsEqualIsh(property, submitterProperty))
         {

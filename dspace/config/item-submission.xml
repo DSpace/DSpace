@@ -17,7 +17,7 @@
  <!-- which does not appear in this map will be associated with the mapping-->
  <!-- for handle "default".                                                -->
  <submission-map>
-   <name-map collection-uri="default" submission-name="traditional" />
+   <name-map collection-handle="default" submission-name="traditional" />
  </submission-map>
 
 
@@ -180,8 +180,17 @@
 		<jspui-binding>org.dspace.app.webui.submit.step.JSPInitialQuestionsStep</jspui-binding>   	    
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.InitialQuestionsStep</xmlui-binding>
 	    <workflow-editable>true</workflow-editable>
-	  </step>  
-          
+	  </step>
+	
+	<!--If you disable the initial questions step you should insert the -->
+	<!--SkipInitialQuestionsStep below, to enable proper processing of  -->
+	<!--input-forms configuration                                       -->
+	<!-- 
+	<step>
+		<processing-class>org.dspace.submit.step.SkipInitialQuestionsStep</processing-class>
+	</step>
+    -->  
+      
       <!--Step 2 will be to Describe the item.-->
       <step>
         <heading>submit.progressbar.describe</heading>
@@ -223,4 +232,3 @@
  </submission-definitions>
 
 </item-submission>
-

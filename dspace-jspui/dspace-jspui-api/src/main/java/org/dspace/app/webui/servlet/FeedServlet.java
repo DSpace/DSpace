@@ -40,12 +40,24 @@
 
 package org.dspace.app.webui.servlet;
 
-import com.sun.syndication.feed.rss.Channel;
-import com.sun.syndication.feed.rss.Description;
-import com.sun.syndication.feed.rss.Image;
-import com.sun.syndication.feed.rss.TextInput;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.WireFeedOutput;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.text.MessageFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.StringTokenizer;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
@@ -67,48 +79,36 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.handle.HandleManager;
 import org.dspace.search.Harvest;
-import org.dspace.uri.ResolvableIdentifier;
-import org.dspace.uri.IdentifierService;
-import org.dspace.uri.IdentifierException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.StringTokenizer;
+import com.sun.syndication.feed.rss.Channel;
+import com.sun.syndication.feed.rss.Description;
+import com.sun.syndication.feed.rss.Image;
+import com.sun.syndication.feed.rss.TextInput;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.WireFeedOutput;
 
 /**
- * Servlet for handling requests for a syndication feed. The URI of the collection
- * or community is extracted from the URL, e.g: <code>/feed/rss_1.0/xyz:1234/5678</code>.
+ * Servlet for handling requests for a syndication feed. The Handle of the collection
+ * or community is extracted from the URL, e.g: <code>/feed/rss_1.0/1234/5678</code>.
  * Currently supports only RSS feed formats.
- *
- * @author Ben Bosman, Richard Rodgers, James Rutherford
+ * 
+ * @author Ben Bosman, Richard Rodgers
  * @version $Revision$
  */
 public class FeedServlet extends DSpaceServlet
 {
 	//	key for site-wide feed
 	public static final String SITE_FEED_KEY = "site";
-
+	
 	// one hour in milliseconds
 	private static final long HOUR_MSECS = 60 * 60 * 1000;
     /** log4j category */
     private static Logger log = Logger.getLogger(FeedServlet.class);
     private String clazz = "org.dspace.app.webui.servlet.FeedServlet";
 
-
+    
     // are syndication feeds enabled?
     private static boolean enabled = false;
     // number of DSpace items per feed
@@ -121,19 +121,19 @@ public class FeedServlet extends DSpaceServlet
     private static int cacheAge = 0;
     // supported syndication formats
     private static List formats = null;
-
+    
     // localized resource bundle
     private static ResourceBundle labels = null;
-
+    
     //default fields to display in item description
     private static String defaultDescriptionFields = "dc.title, dc.contributor.author, dc.contributor.editor, dc.description.abstract, dc.description";
 
-
+    
     static
     {
     	enabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");
     }
-
+    
     public void init()
     {
     	// read rest of config info if enabled
@@ -163,116 +163,107 @@ public class FeedServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
 	{
+        String path = request.getPathInfo();
+        String feedType = null;
+        String handle = null;
+
+        if(labels==null)
+        {    
+            // Get access to the localized resource bundle
+            Locale locale = request.getLocale();
+            labels = ResourceBundle.getBundle("Messages", locale);
+        }
+        
+        if (path != null)
+        {
+            // substring(1) is to remove initial '/'
+            path = path.substring(1);
+            int split = path.indexOf("/");
+            if (split != -1)
+            {
+            	feedType = path.substring(0,split);
+            	handle = path.substring(split+1);
+            }
+        }
+
+        DSpaceObject dso = null;
+        
+        //as long as this is not a site wide feed, 
+        //attempt to retrieve the Collection or Community object
+        if(handle != null && !handle.equals(SITE_FEED_KEY))
+        { 	
+        	// Determine if handle is a valid reference
+        	dso = HandleManager.resolveToObject(context, handle);
+        }
+        
+        if (! enabled || (dso != null && 
+        	(dso.getType() != Constants.COLLECTION && dso.getType() != Constants.COMMUNITY)) )
+        {
+            log.info(LogManager.getHeader(context, "invalid_id", "path=" + path));
+            JSPManager.showInvalidIDError(request, response, path, -1);
+            return;
+        }
+        
+        // Determine if requested format is supported
+        if( feedType == null || ! formats.contains( feedType ) )
+        {
+            log.info(LogManager.getHeader(context, "invalid_syndformat", "path=" + path));
+            JSPManager.showInvalidIDError(request, response, path, -1);
+            return;
+        }
+        
+        // Lookup or generate the feed
+        Channel channel = null;
+        if (feedCache != null)
+        {
+            // Cache key is handle
+        	CacheFeed cFeed = (CacheFeed)feedCache.get(handle);
+        	if (cFeed != null)  // cache hit, but...
+        	{
+        		// Is the feed current?
+        		boolean cacheFeedCurrent = false;
+        		if (cFeed.timeStamp + (cacheAge * HOUR_MSECS) < System.currentTimeMillis())
+        		{
+        			cacheFeedCurrent = true;
+        		}
+        		// Not current, but have any items changed since feed was created/last checked?
+        		else if ( ! itemsChanged(context, dso, cFeed.timeStamp))
+        		{
+        			// no items have changed, re-stamp feed and use it
+          			cFeed.timeStamp = System.currentTimeMillis();
+          			cacheFeedCurrent = true;
+        		}
+        		if (cacheFeedCurrent)
+        		{
+        			channel = cFeed.access();		
+        		}
+        	}
+        }
+        
+        // either not caching, not found in cache, or feed in cache not current
+        if (channel == null)
+        {
+        	channel = generateFeed(context, dso);
+        	if (feedCache != null)
+        	{
+        		cache(handle, new CacheFeed(channel));
+        	}
+        }
+        
+        // set the feed to the requested type & return it
+        channel.setFeedType(feedType);
+        WireFeedOutput feedWriter = new WireFeedOutput();
         try
         {
-            String path = request.getPathInfo();
-            String feedType = null;
-            String uri = null;
-
-            if(labels==null)
-            {
-                // Get access to the localized resource bundle
-                Locale locale = request.getLocale();
-                labels = ResourceBundle.getBundle("Messages", locale);
-            }
-
-            if (path != null)
-            {
-                // substring(1) is to remove initial '/'
-                path = path.substring(1);
-                int split = path.indexOf("/");
-                if (split != -1)
-                {
-                    feedType = path.substring(0,split);
-                    uri = path.substring(split+1);
-                }
-            }
-
-            DSpaceObject dso = null;
-
-            //as long as this is not a site wide feed,
-            //attempt to retrieve the Collection or Community object
-            if(!uri.equals(SITE_FEED_KEY))
-            {
-                // Determine if the URI is a valid reference
-                ResolvableIdentifier di = IdentifierService.resolve(context, uri);
-                dso = (DSpaceObject) IdentifierService.getResource(context, di);
-            }
-
-            if (! enabled || (dso != null &&
-                (dso.getType() != Constants.COLLECTION && dso.getType() != Constants.COMMUNITY)) )
-            {
-                log.info(LogManager.getHeader(context, "invalid_id", "path=" + path));
-                JSPManager.showInvalidIDError(request, response, path, -1);
-                return;
-            }
-
-            // Determine if requested format is supported
-            if( feedType == null || ! formats.contains( feedType ) )
-            {
-                log.info(LogManager.getHeader(context, "invalid_syndformat", "path=" + path));
-                JSPManager.showInvalidIDError(request, response, path, -1);
-                return;
-            }
-
-            // Lookup or generate the feed
-            Channel channel = null;
-            if (feedCache != null)
-            {
-                // Cache key is URI
-                CacheFeed cFeed = (CacheFeed)feedCache.get(uri);
-                if (cFeed != null)  // cache hit, but...
-                {
-                    // Is the feed current?
-                    boolean cacheFeedCurrent = false;
-                    if (cFeed.timeStamp + (cacheAge * HOUR_MSECS) < System.currentTimeMillis())
-                    {
-                        cacheFeedCurrent = true;
-                    }
-                    // Not current, but have any items changed since feed was created/last checked?
-                    else if ( ! itemsChanged(context, dso, cFeed.timeStamp))
-                    {
-                        // no items have changed, re-stamp feed and use it
-                          cFeed.timeStamp = System.currentTimeMillis();
-                          cacheFeedCurrent = true;
-                    }
-                    if (cacheFeedCurrent)
-                    {
-                        channel = cFeed.access();
-                    }
-                }
-            }
-
-            // either not caching, not found in cache, or feed in cache not current
-            if (channel == null)
-            {
-                channel = generateFeed(context, dso);
-                if (feedCache != null)
-                {
-                    cache(uri, new CacheFeed(channel));
-                }
-            }
-
-            // set the feed to the requested type & return it
-            channel.setFeedType(feedType);
-            WireFeedOutput feedWriter = new WireFeedOutput();
-            try
-            {
         	response.setContentType("text/xml; charset=UTF-8");
-                feedWriter.output(channel, response.getWriter());
-            }
-            catch( FeedException fex )
-            {
-                throw new IOException(fex.getMessage());
-            }
+        	feedWriter.output(channel, response.getWriter());
         }
-        catch (IdentifierException e)
+        catch( FeedException fex )
         {
-            log.error("caught exception: ", e);
-            throw new ServletException(e);
+        	throw new IOException(fex.getMessage());
         }
     }
-
+       
     private boolean itemsChanged(Context context, DSpaceObject dso, long timeStamp)
             throws SQLException
     {
@@ -283,11 +274,12 @@ public class FeedServlet extends DSpaceServlet
         // convert dates to ISO 8601, stripping the time
         String startDate = dcStartDate.toString().substring(0, 10);
         String endDate = dcEndDate.toString().substring(0, 10);
-
+        
         // this invocation should return a non-empty list if even 1 item has changed
         try {
+            boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", true);
         	return (Harvest.harvest(context, dso, startDate, endDate,
-        		                0, 1, false, false, false).size() > 0);
+        		                0, 1, false, false, false, includeAll).size() > 0);
         }
         catch (ParseException pe)
         {
@@ -295,15 +287,15 @@ public class FeedServlet extends DSpaceServlet
         	return false;
         }
     }
-
+    
     /**
      * Generate a syndication feed for a collection or community
      * or community
-     *
+     * 
      * @param context	the DSpace context object
-     *
+     * 
      * @param dso		DSpace object - collection or community
-     *
+     * 
      * @return		an object representing the feed
      */
     private Channel generateFeed(Context context, DSpaceObject dso)
@@ -311,7 +303,7 @@ public class FeedServlet extends DSpaceServlet
     {
     	try
     	{
-    		// container-level elements
+    		// container-level elements  	
     		String dspaceUrl = ConfigurationManager.getProperty("dspace.url");
     		String type = null;
     		String description = null;
@@ -319,7 +311,7 @@ public class FeedServlet extends DSpaceServlet
     		Bitstream logo = null;
     		// browse scope
     		// BrowseScope scope = new BrowseScope(context);
-
+    		
     		// new method of doing the browse:
     		String idx = ConfigurationManager.getProperty("recent.submissions.sort-option");
     		if (idx == null)
@@ -331,7 +323,7 @@ public class FeedServlet extends DSpaceServlet
     		{
     			throw new IOException("There is no browse index with the name: " + idx);
     		}
-
+    		
     		BrowserScope scope = new BrowserScope(context);
     		scope.setBrowseIndex(bix);
             for (SortOption so : SortOption.getSortOptions())
@@ -340,11 +332,11 @@ public class FeedServlet extends DSpaceServlet
                     scope.setSortBy(so.getNumber());
             }
             scope.setOrder(SortOption.DESCENDING);
-
-    		// the feed
+    		
+            // the feed
     		Channel channel = new Channel();
-
-    		//Special Case: if DSpace Object passed in is null,
+    		
+    		//Special Case: if DSpace Object passed in is null, 
     		//generate a feed for the entire DSpace site!
     		if(dso == null)
     		{
@@ -361,8 +353,8 @@ public class FeedServlet extends DSpaceServlet
     				description = col.getMetadata("short_description");
     				title = col.getMetadata("name");
     				logo = col.getLogo();
-    				// scope.setScope(col);
-    				scope.setBrowseContainer(col);
+    				// scope.setScope(col); 
+    				scope.setBrowseContainer(col); 
     			}
     			else if (dso.getType() == Constants.COMMUNITY)
     			{
@@ -371,23 +363,14 @@ public class FeedServlet extends DSpaceServlet
     				description = comm.getMetadata("short_description");
     				title = comm.getMetadata("name");
     				logo = comm.getLogo();
-    				// scope.setScope(comm);
-    				scope.setBrowseContainer(comm);
+    				// scope.setScope(comm); 
+    				scope.setBrowseContainer(comm); 
     			}
-
-                        String objectUrl = "";
-                        if (dso.getExternalIdentifier() != null)
-                        {
-                                objectUrl = ConfigurationManager.getBooleanProperty("webui.feed.localresolve")
-                                    ? IdentifierService.getURL(dso).toString()
-                                    : dso.getExternalIdentifier().getURI().toString();
-                        }
-                        else
-                        {
-                                // If no external identifier is available, use the local URL
-                                objectUrl = IdentifierService.getURL(dso).toString();
-                        }
-
+    			
+    			String objectUrl = ConfigurationManager.getBooleanProperty("webui.feed.localresolve")
+    			? HandleManager.resolveToURL(context, dso.getHandle())
+    					: HandleManager.getCanonicalForm(dso.getHandle()); 
+    			
     			// put in container-level data
     			channel.setDescription(description == null ? "" : description.replaceAll("\\p{Cntrl}", ""));
     			channel.setLink(objectUrl);
@@ -395,7 +378,7 @@ public class FeedServlet extends DSpaceServlet
     			String channelTitle = MessageFormat.format(labels.getString(clazz + ".feed.title"),
     					new Object[]{type, title});
     			channel.setTitle(channelTitle);
-
+    			
     			//if collection or community has a logo
     			if (logo != null)
     			{
@@ -408,7 +391,7 @@ public class FeedServlet extends DSpaceServlet
     				channel.setImage(image);
     			}
     		}
-
+    		
     		// this is a direct link to the search-engine of dspace. It searches
     		// in the current collection. Since the current version of DSpace
     		// can't search within collections anymore, this works only in older
@@ -416,9 +399,9 @@ public class FeedServlet extends DSpaceServlet
     		TextInput input = new TextInput();
     		input.setLink(dspaceUrl + "/simple-search");
     		input.setDescription( labels.getString(clazz + ".search.description") );
-
-    		String searchTitle = "";
-
+    		
+    		String searchTitle = ""; 
+    		
     		//if a "type" of feed was specified, build search title off that
     		if(type!=null)
     		{
@@ -429,23 +412,23 @@ public class FeedServlet extends DSpaceServlet
     		{
     			searchTitle = labels.getString(clazz + ".search.title.default");
     		}
-
+    		
     		input.setTitle(searchTitle);
     		input.setName(labels.getString(clazz + ".search.name"));
     		channel.setTextInput(input);
-
+    		
     		// gather & add items to the feed.
     		scope.setResultsPerPage(itemCount);
-
+    		
     		BrowseEngine be = new BrowseEngine(context);
     		BrowseInfo bi = be.browseMini(scope);
-    		Item[] results = bi.getBrowseItemResults(context);
+    		Item[] results = bi.getItemResults(context);
     		List items = new ArrayList();
     		for (int i = 0; i < results.length; i++)
     		{
     			items.add(itemFromDSpaceItem(context, results[i]));
     		}
-
+    		
     		channel.setItems(items);
 
             // If the description is null, replace it with an empty string
@@ -466,42 +449,42 @@ public class FeedServlet extends DSpaceServlet
     		throw new IOException(e.getMessage());
     	}
     }
-
+    
     /**
      * The metadata fields of the given item will be added to the given feed.
-     *
+     * 
      * @param context	DSpace context object
-     *
+     * 
      * @param dspaceItem	DSpace Item
-     *
+     * 
      * @return an object representing a feed entry
      */
     private com.sun.syndication.feed.rss.Item itemFromDSpaceItem(Context context,
     		                                                     Item dspaceItem)
     	throws SQLException
     {
-        com.sun.syndication.feed.rss.Item rssItem =
+        com.sun.syndication.feed.rss.Item rssItem = 
         	new com.sun.syndication.feed.rss.Item();
-
+        
         //get the title and date fields
         String titleField = ConfigurationManager.getProperty("webui.feed.item.title");
         if (titleField == null)
         {
             titleField = "dc.title";
         }
-
+        
         String dateField = ConfigurationManager.getProperty("webui.feed.item.date");
         if (dateField == null)
         {
             dateField = "dc.date.issued";
-        }
+        }   
+        
+        //Set item handle
+    	String itHandle = ConfigurationManager.getBooleanProperty("webui.feed.localresolve")
+		? HandleManager.resolveToURL(context, dspaceItem.getHandle())
+		: HandleManager.getCanonicalForm(dspaceItem.getHandle());
 
-        //Set item URI
-    	String link = ConfigurationManager.getBooleanProperty("webui.feed.localresolve")
-            ? IdentifierService.getURL(dspaceItem).toString()
-            : dspaceItem.getExternalIdentifier().getURI().toString();
-
-        rssItem.setLink(link);
+        rssItem.setLink(itHandle);
         
         //get first title
         String title = null;

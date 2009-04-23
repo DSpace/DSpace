@@ -1,9 +1,9 @@
 /*
  * DSpaceValidity.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/04/27 01:19:52 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -40,8 +40,12 @@
 
 package org.dspace.app.xmlui.utils;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
+import org.dspace.browse.BrowseItem;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -51,26 +55,22 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.uri.IdentifierService;
-
-import java.io.IOException;
-import java.sql.SQLException;
 
 /**
- * This is a validity object specificaly implemented for the caching 
+ * This is a validity object specifically implemented for the caching 
  * needs of DSpace, Manakin, and Cocoon.
  * 
  * The basic idea is that each time a DSpace object rendered by a cocoon 
  * component the object and everything about it that makes it unique should 
  * be reflected in the validity object for the component. By following this 
- * principle if the object has been updated externaly then the cache will be
+ * principle if the object has been updated externally then the cache will be
  * invalidated.
  * 
  * This DSpaceValidity object makes this processes easier by abstracting out
  * the processes of determining what is unique about a DSpace object. A class
  * is expected to create a new DSpaceValidity object and add() to it all 
  * DSpaceObjects that are rendered by the component. This validity object will 
- * seralize all those objects to a string, take a hash of the string and compare
+ * serialize all those objects to a string, take a hash of the string and compare
  * the hash of the string for any updates.
  * 
  * 
@@ -263,8 +263,7 @@ public class DSpaceValidity implements SourceValidity
             Community community = (Community) dso;
 
             validityKey.append("Community:");
-            validityKey.append(IdentifierService.getCanonicalForm(community));
-            // validityKey.append(community.getExternalIdentifier().getCanonicalForm());
+            validityKey.append(community.getHandle());
             validityKey.append(community.getMetadata("introductory_text"));
             validityKey.append(community.getMetadata("short_description"));
             validityKey.append(community.getMetadata("side_bar_text"));
@@ -280,8 +279,7 @@ public class DSpaceValidity implements SourceValidity
             Collection collection = (Collection) dso;
             
             validityKey.append("Collection:");
-            validityKey.append(IdentifierService.getCanonicalForm(collection));
-            // validityKey.append(collection.getExternalIdentifier().getCanonicalForm());
+            validityKey.append(collection.getHandle());
             validityKey.append(collection.getMetadata("introductory_text"));
             validityKey.append(collection.getMetadata("short_description"));
             validityKey.append(collection.getMetadata("side_bar_text"));
@@ -299,8 +297,7 @@ public class DSpaceValidity implements SourceValidity
             Item item = (Item) dso;
             
             validityKey.append("Item:");
-            validityKey.append(IdentifierService.getCanonicalForm(item));
-            //validityKey.append(item.getExternalIdentifier().getCanonicalForm());
+            validityKey.append(item.getHandle());            
             // Include all metadata values in the validity key.
             DCValue[] dcvs = item.getDC(Item.ANY,Item.ANY,Item.ANY);
             for (DCValue dcv : dcvs)
@@ -318,22 +315,22 @@ public class DSpaceValidity implements SourceValidity
                 this.add(bundle);
             }
         }
-//        else if (dso instanceof BrowseItem)
-//        {
-//        	BrowseItem browseItem = (BrowseItem) dso;
-//        	
-//        	validityKey.append("BrowseItem:");
-//        	validityKey.append(browseItem.getExternalIdentifier().getCanonicalForm());
-//        	DCValue[] dcvs = browseItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-//            for (DCValue dcv : dcvs)
-//            {
-//                validityKey.append(dcv.schema + ".");
-//                validityKey.append(dcv.element + ".");
-//                validityKey.append(dcv.qualifier + ".");
-//                validityKey.append(dcv.language + "=");
-//                validityKey.append(dcv.value);
-//            }
-//        }
+        else if (dso instanceof BrowseItem)
+        {
+        	BrowseItem browseItem = (BrowseItem) dso;
+        	
+        	validityKey.append("BrowseItem:");
+        	validityKey.append(browseItem.getHandle());
+        	DCValue[] dcvs = browseItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+            for (DCValue dcv : dcvs)
+            {
+                validityKey.append(dcv.schema + ".");
+                validityKey.append(dcv.element + ".");
+                validityKey.append(dcv.qualifier + ".");
+                validityKey.append(dcv.language + "=");
+                validityKey.append(dcv.value);
+            }
+        }
         else if (dso instanceof Bundle)
         {
             Bundle bundle = (Bundle) dso;

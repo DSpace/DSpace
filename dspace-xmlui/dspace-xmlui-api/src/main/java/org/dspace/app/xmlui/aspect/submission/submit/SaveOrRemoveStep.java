@@ -1,9 +1,9 @@
 /*
  * SaveOrRemoveStep.java
  *
- * Version: $Revision: 1.4 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,8 +39,12 @@
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
-import org.dspace.app.xmlui.aspect.submission.AbstractStep;
+import java.io.IOException;
+import java.sql.SQLException;
+
+
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -48,11 +52,7 @@ import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
-import org.dspace.uri.IdentifierService;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  * This is sort-of a step of the submission processes (not
@@ -96,8 +96,8 @@ public class SaveOrRemoveStep extends AbstractStep
 	UIException, SQLException, IOException, AuthorizeException
 	{	
 		Collection collection = submission.getCollection();
-		String actionURL = IdentifierService.getURL(collection).toString() + "/submit/" + knot.getId() + ".continue";
-		
+		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
+
 		Division div = body.addInteractiveDivision("submit-save-or-cancel",actionURL, Division.METHOD_POST,"primary submission");
 		div.setHead(T_submission_head);
 		addSubmissionProgressList(div);
@@ -107,9 +107,8 @@ public class SaveOrRemoveStep extends AbstractStep
 		saveOrCancel.setHead(T_head);
 		saveOrCancel.addItem(T_info1);
 		
-		saveOrCancel.addItem().addButton("submit_back").setValue(T_submit_back);
-		
         org.dspace.app.xmlui.wing.element.Item actions = saveOrCancel.addItem();
+        actions.addButton("submit_back").setValue(T_submit_back);
         actions.addButton("submit_save").setValue(T_submit_save);
 		actions.addButton("submit_remove").setValue(T_submit_remove);
 	}

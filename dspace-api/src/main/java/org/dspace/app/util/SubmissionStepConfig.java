@@ -53,7 +53,7 @@ import org.apache.log4j.Logger;
  *
  * Note: Implements Serializable as it will be saved to the current session during submission.
  * Please ensure that nothing is added to this class that isn't also serializable
- *
+ * 
  * @see org.dspace.app.util.SubmissionConfigReader
  * @see org.dspace.app.util.SubmissionConfig
  * 

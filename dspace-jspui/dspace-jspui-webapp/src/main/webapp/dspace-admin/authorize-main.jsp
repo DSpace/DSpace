@@ -44,7 +44,7 @@
   -   submit_community
   -   submit_collection
   -   submit_item
-  -       item_uri
+  -       item_handle
   -       item_id
   -   submit_advanced
   -

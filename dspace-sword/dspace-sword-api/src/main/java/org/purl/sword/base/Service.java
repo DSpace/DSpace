@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2007, Aberystwyth University
+ * Copyright (c) 2008-2009, Aberystwyth University
  *
  * All rights reserved.
  * 
@@ -36,21 +36,17 @@
  */
 package org.purl.sword.base;
 
-/**
- *   Author   : $Author: nst $
- *   Date     : $Date: 2007/09/21 15:18:54 $
- *   Revision : $Revision: 1.4 $
- *   Name     : $Name:  $
- */
-
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
-import org.purl.sword.base.Namespaces;
-
-import nu.xom.Element; 
+import java.util.Properties;
+import nu.xom.Element;
 import nu.xom.Elements;
+
+import org.apache.log4j.Logger;
+import org.purl.sword.atom.Generator;
+
 
 /**
  * Represents an Atom Publishing Protocol Service element, with 
@@ -60,52 +56,54 @@ import nu.xom.Elements;
  */
 public class Service extends XmlElement implements SwordElementInterface
 {
+
+   private SwordVersion swordVersion;
+
+   private SwordNoOp swordNoOp;
+
+   private SwordVerbose swordVerbose;
+
+   private SwordMaxUploadSize swordMaxUploadSize;
+
    /**
-    * The local name for the element. 
+    * The details of the server software that generated the service document.
     */
-   private static final String ELEMENT_NAME = "service";
-   
-   /**
-    * The service compliance level. 
-    */
-   private ServiceLevel complianceLevel; 
-   
-   /**
-    * The noOp value. 
-    */
-   private boolean noOp; 
-   
-   /**
-    * Flag to record if the noOp value has been set by a user of the class. 
-    */
-   private boolean isNoOp; 
-   
-   /**
-    * The verbose value. 
-    */
-   private boolean verbose;
-   
-   /**
-    * Flag to record if the verbose value has been set by a user of the class. 
-    */
-   private boolean isVerbose; 
-   
+   private Generator generator;
+
    /**
     * List of Workspaces. 
     */
    private List<Workspace> workspaces; 
    
+   /** Logger */
+   private static Logger log = Logger.getLogger(Service.class);
+   
+   /**
+    * MaxUploadSize
+    */
+   @Deprecated
+   public static final String ELEMENT_GENERATOR = "generator";
+
+   /**
+    * Name for this element. 
+    */
+   @Deprecated
+   public static final String ELEMENT_NAME = "service";
+
+   /**
+    * The XML NAME (prefix, local name and namespace) for this element.
+    */
+   private static XmlName XML_NAME =
+           new XmlName(Namespaces.PREFIX_APP, "service", Namespaces.NS_APP);
+
+
    /**
     * Create a new instance. 
     */
    public Service()
    {
-      super("app");
-      
-      isVerbose = false;
-      isNoOp = false; 
-      workspaces = new ArrayList<Workspace>();
-      complianceLevel = ServiceLevel.UNDEFINED;
+      super(XML_NAME);
+      initialise();
    }
    
    /**
@@ -113,10 +111,10 @@ public class Service extends XmlElement implements SwordElementInterface
     * 
     * @param complianceLevel The service compliance level. 
     */
-   public Service( ServiceLevel complianceLevel)
+   public Service(String version)
    {
       this();
-      this.complianceLevel = complianceLevel;
+      setVersion(version);
    }
    
    /**
@@ -127,32 +125,61 @@ public class Service extends XmlElement implements SwordElementInterface
     * @param noOp             The noOp.
     * @param verbose          The verbose element. 
     */
-   public Service( ServiceLevel complianceLevel, boolean noOp, boolean verbose ) 
+   public Service(String version, boolean noOp, boolean verbose) 
    {
       this();
-      this.complianceLevel = complianceLevel; 
+      setVersion(version);
       setNoOp(noOp);
       setVerbose(verbose);
    }
 
-   /**
-    * Get the service compliance level. 
-    * 
-    * @return The compliance level. 
-    */
-   public ServiceLevel getComplianceLevel()
+   public static XmlName elementName()
    {
-      return complianceLevel;
+      return XML_NAME; 
+   }
+   /**
+    * Initialise the data structures in this tool.
+    */
+   private void initialise()
+   {
+      workspaces = new ArrayList<Workspace>();
+      swordVersion = null;
+      swordNoOp = null; 
+      swordVerbose = null; 
+      swordMaxUploadSize = null;
+      generator = null;
+   }
+
+
+   /**
+    * Get the SWORD version. 
+    * 
+    * @return The version. 
+    */
+   public String getVersion()
+   {
+      if( swordVersion == null )
+      {
+          return null;
+      }
+      return swordVersion.getContent();
    }
 
    /**
-    * Set the service compliance level. 
+    * Set the SWORD version. 
     * 
-    * @param The compliance level. 
+    * @param version The version. 
     */
-   public void setComplianceLevel(ServiceLevel complianceLevel)
+   public void setVersion(String version)
    {
-      this.complianceLevel = complianceLevel;
+      if( version == null )
+      {
+         // clear the value 
+         swordVersion = null;
+         return; 
+      }
+
+      swordVersion = new SwordVersion(version);
    }
 
    /**
@@ -162,7 +189,12 @@ public class Service extends XmlElement implements SwordElementInterface
     */
    public boolean isNoOp()
    {
-      return noOp;
+       if( swordNoOp == null  )
+       {
+           return false;
+       }
+       
+       return swordNoOp.getContent();
    }
 
    /**
@@ -172,8 +204,7 @@ public class Service extends XmlElement implements SwordElementInterface
     */
    public void setNoOp(boolean noOp)
    {
-      this.noOp = noOp;
-      isNoOp = true;
+      swordNoOp = new SwordNoOp(noOp);
    }
    
    /**
@@ -185,7 +216,12 @@ public class Service extends XmlElement implements SwordElementInterface
     */
    public boolean isNoOpSet()
    {
-      return isNoOp; 
+      if( swordNoOp == null )
+      {
+          return false;
+      }
+
+      return swordNoOp.isSet();
    }
 
    /**
@@ -195,7 +231,12 @@ public class Service extends XmlElement implements SwordElementInterface
     */
    public boolean isVerbose()
    {
-      return verbose;
+      if( swordVerbose == null  )
+       {
+           return false;
+       }
+
+       return swordVerbose.getContent();
    }
 
    /**
@@ -205,8 +246,7 @@ public class Service extends XmlElement implements SwordElementInterface
     */
    public void setVerbose(boolean verbose)
    {
-      this.verbose = verbose;
-      isVerbose = true;  
+      swordVerbose = new SwordVerbose(verbose);
    }
 
    /**
@@ -218,9 +258,49 @@ public class Service extends XmlElement implements SwordElementInterface
     */
    public boolean isVerboseSet()
    {
-      return isVerbose; 
+      if( swordVerbose == null )
+      {
+          return false;
+      }
+
+      return swordVerbose.isSet();
    }
    
+   /**
+    * Set the maximum file upload size in kB
+    * 
+    * @param maxUploadSize Max upload file size in kB
+    */
+   public void setMaxUploadSize(int maxUploadSize)
+   {
+      swordMaxUploadSize = new SwordMaxUploadSize(maxUploadSize);
+   }
+   
+   /**
+    * Get the maximum upload file size (in kB)
+    *
+    * @return the maximum file upload size. If no value has been set, this will
+    * be equal to Integer.MIN_VALUE. 
+    */
+   public int getMaxUploadSize()
+   {
+	   if( swordMaxUploadSize == null )
+       {
+           return Integer.MIN_VALUE;
+       }
+       return swordMaxUploadSize.getContent();
+   }
+
+   public Generator getGenerator()
+   {
+       return generator;
+   }
+   
+   public void setGenerator(Generator generator)
+   {
+       this.generator = generator; 
+   }
+
    /**
     * Get an Iterator over the workspaces. 
     * 
@@ -266,76 +346,42 @@ public class Service extends XmlElement implements SwordElementInterface
     */
    public Element marshall( )
    {
-      Element service = new Element(ELEMENT_NAME, Namespaces.NS_APP);
-      service.addNamespaceDeclaration("atom", Namespaces.NS_ATOM);
-      service.addNamespaceDeclaration("dcterms", Namespaces.NS_DC_TERMS);
-      service.addNamespaceDeclaration("sword", Namespaces.NS_SWORD);
-      
-      
-      if( complianceLevel != ServiceLevel.UNDEFINED )
+      Element service = new Element(getQualifiedName(), Namespaces.NS_APP);
+      service.addNamespaceDeclaration(Namespaces.PREFIX_ATOM, Namespaces.NS_ATOM);
+      service.addNamespaceDeclaration(Namespaces.PREFIX_DC_TERMS, Namespaces.NS_DC_TERMS);
+      service.addNamespaceDeclaration(Namespaces.PREFIX_SWORD, Namespaces.NS_SWORD);
+
+      if( swordVersion != null )
       {
-    	 //System.out.println("The compliance level is: " + complianceLevel );
-         Element compliance = new Element("sword:level", Namespaces.NS_SWORD);
-         compliance.appendChild(Integer.toString(complianceLevel.number()));
-         service.appendChild(compliance);
+          service.appendChild(swordVersion.marshall());
       }
-      
-      if( isVerboseSet() )
+
+      if( swordVerbose != null )
       {
-         Element verboseElement = new Element("sword:verbose", Namespaces.NS_SWORD); 
-         verboseElement.appendChild(Boolean.toString(verbose));
-         service.appendChild(verboseElement);
+         service.appendChild(swordVerbose.marshall());
       }
-      
-      if( isNoOpSet() ) 
+
+      if( swordNoOp != null )
       {
-         Element noOpElement = new Element("sword:noOp", Namespaces.NS_SWORD);
-         noOpElement.appendChild(Boolean.toString(noOp)); 
-         service.appendChild(noOpElement);
+          service.appendChild(swordNoOp.marshall());
       }
-      
-      for( Workspace item : workspaces )
+
+      if( swordMaxUploadSize != null )
       {
-         service.appendChild(item.marshall());
+         service.appendChild(swordMaxUploadSize.marshall());
+      }
+
+      if( generator != null )
+      {
+          service.appendChild(generator.marshall());
+      }
+
+      for (Workspace item : workspaces)
+      {
+    	  service.appendChild(item.marshall());
       }
       
       return service;    
-   }
-   
-   
-   /**
-    * Get a service level that corresponds to the specified value. Used 
-    * during the unmarshall process. 
-    * 
-    * @param level The integer version of a service level. 
-    * 
-    * @return If the parameter matches one of the defined levels, 
-    *    a ServiceLevel of ONE or ZERO is returned. Otherwise, 
-    *    ServiceLevel.UNDEFINED is returned. 
-    */
-   private ServiceLevel getServiceLevel( int level ) 
-   {
-      ServiceLevel theLevel = ServiceLevel.UNDEFINED; 
-      
-      switch( level )
-      {
-         case 0: 
-            theLevel = ServiceLevel.ZERO;
-            break;
-               
-         case 1: 
-            theLevel = ServiceLevel.ONE;
-            break;
-               
-         default: 
-            // FIXME - should this default to ZERO instead? 
-            theLevel = ServiceLevel.UNDEFINED;
-            InfoLogger.getLogger().writeError("Invalid value for sword:level");
-            break;
-      }
-      
-      return theLevel; 
-      
    }
      
    /**
@@ -348,49 +394,238 @@ public class Service extends XmlElement implements SwordElementInterface
    public void unmarshall( Element service )
    throws UnmarshallException
    {
-      if( ! isInstanceOf(service, "service", Namespaces.NS_APP))
+      unmarshall(service, null);
+   }
+
+   /**
+    * 
+    * @param service
+    * @param validate
+    * @return
+    * @throws org.purl.sword.base.UnmarshallException
+    */
+   public SwordValidationInfo unmarshall( Element service, Properties validationProperties)
+   throws UnmarshallException
+   {
+      if (!isInstanceOf(service, xmlName))
       {
-         throw new UnmarshallException( "Not an app:service element" );
+         return handleIncorrectElement(service, validationProperties);
       }
-      
+
+      ArrayList<SwordValidationInfo> validationItems =
+              new ArrayList<SwordValidationInfo>(); 
+
       try
       {
-         workspaces.clear(); 
-         
-         // retrieve all of the sub-elements
+         initialise(); 
+
+         // Retrieve all of the sub-elements
          Elements elements = service.getChildElements();
-         Element element = null; 
+         Element element = null;
          int length = elements.size();
-         
-         for(int i = 0; i < length; i++ )
+
+         for (int i = 0; i < length; i++ )
          {
             element = elements.get(i);
 
-            if( isInstanceOf(element, "level", Namespaces.NS_SWORD ) )
+            if (isInstanceOf(element, SwordVersion.elementName() ) )
             {
-               int level = unmarshallInteger(element); 
-               complianceLevel = getServiceLevel(level);
+                //validationItems.add(unmarshallVersion(element, validate));
+                if( swordVersion == null )
+                {
+                   swordVersion = new SwordVersion();
+                   validationItems.add(swordVersion.unmarshall(element, validationProperties));
+                }
+                else if( validationProperties != null )
+                {
+                   SwordValidationInfo info = new SwordValidationInfo(SwordVersion.elementName(),
+                           SwordValidationInfo.DUPLICATE_ELEMENT,
+                           SwordValidationInfoType.WARNING);
+                   info.setContentDescription(element.getValue());
+                   validationItems.add(info);
+                }
             }
-            else if( isInstanceOf(element, "verbose", Namespaces.NS_SWORD))
+            else if (isInstanceOf(element, SwordVerbose.elementName()))
             {
-               setVerbose(unmarshallBoolean(element)); 
+                if( swordVerbose == null )
+                {
+                   swordVerbose = new SwordVerbose();
+                   validationItems.add(swordVerbose.unmarshall(element, validationProperties));
+                }
+                else if( validationProperties != null )
+                {
+                   SwordValidationInfo info = new SwordValidationInfo(SwordVerbose.elementName(),
+                           SwordValidationInfo.DUPLICATE_ELEMENT,
+                           SwordValidationInfoType.WARNING);
+                   info.setContentDescription(element.getValue());
+                   validationItems.add(info);
+                }
             }
-            else if( isInstanceOf(element, "noOp", Namespaces.NS_SWORD))
+            else if (isInstanceOf(element, SwordNoOp.elementName()) )
             {
-               setNoOp(unmarshallBoolean(element));
+               if( swordNoOp == null )
+               {
+                   swordNoOp = new SwordNoOp();
+                   validationItems.add(swordNoOp.unmarshall(element, validationProperties));
+               }
+               else if( validationProperties != null )
+               {
+                   SwordValidationInfo info = new SwordValidationInfo(SwordNoOp.elementName(),
+                           SwordValidationInfo.DUPLICATE_ELEMENT,
+                           SwordValidationInfoType.WARNING);
+                   info.setContentDescription(element.getValue());
+                   validationItems.add(info);
+               }
             }
-            else if( isInstanceOf(element, "workspace", Namespaces.NS_APP ))
+            else if (isInstanceOf(element, SwordMaxUploadSize.elementName()))
+            {
+               if( swordMaxUploadSize == null )
+               {
+                  swordMaxUploadSize = new SwordMaxUploadSize();
+                  validationItems.add(swordMaxUploadSize.unmarshall(element, validationProperties));
+               }
+               else if( validationProperties != null )
+               {
+                   SwordValidationInfo info = new SwordValidationInfo(SwordNoOp.elementName(),
+                           SwordValidationInfo.DUPLICATE_ELEMENT,
+                           SwordValidationInfoType.WARNING);
+                   info.setContentDescription(element.getValue());
+                   validationItems.add(info);
+               }
+            }
+            else if (isInstanceOf(element, Generator.elementName()))
+            {
+               if( generator == null ) 
+               {
+                  generator = new Generator();
+                  validationItems.add(generator.unmarshall(element, validationProperties));
+               }
+               else if( validationProperties != null ) 
+               {
+                   SwordValidationInfo info = new SwordValidationInfo(Generator.elementName(),
+                           SwordValidationInfo.DUPLICATE_ELEMENT,
+                           SwordValidationInfoType.WARNING);
+                   info.setContentDescription(element.getValue());
+                   validationItems.add(info);
+               }
+            }
+            else if (isInstanceOf(element, Workspace.elementName() ))
             {
                Workspace workspace = new Workspace( );
-               workspace.unmarshall(element);
+               validationItems.add(workspace.unmarshall(element, validationProperties));
                workspaces.add(workspace);
+            }
+            else if( validationProperties != null )
+            {
+                // report on any additional items. They are permitted because of
+                // the Atom/APP specification. Report the items for information 
+                XmlName name = new XmlName(element.getNamespacePrefix(), 
+                                           element.getLocalName(), 
+                                           element.getNamespaceURI());
+                
+                validationItems.add(new SwordValidationInfo(name,
+                           SwordValidationInfo.UNKNOWN_ELEMENT,
+                           SwordValidationInfoType.INFO));
             }
          }
       }
       catch( Exception ex )
       {
-         InfoLogger.getLogger().writeError("Unable to parse an element in Service: " + ex.getMessage());
+         log.error("Unable to parse an element in Service: " + ex.getMessage());
+         ex.printStackTrace();
          throw new UnmarshallException("Unable to parse element in Service", ex);
       }
+
+      // now process the validation information
+      SwordValidationInfo result = null;
+      if( validationProperties != null )
+      {
+          result = validate(validationItems, validationProperties);
+      }
+      return result;
+
+   }
+
+
+   public SwordValidationInfo validate(Properties validationContext)
+   {
+       return validate(null, validationContext);
+   }
+
+   /**
+    *
+    * @param existing
+    * @return
+    */
+   protected SwordValidationInfo validate(ArrayList<SwordValidationInfo> existing,
+           Properties validationContext)
+   {
+
+      boolean validateAll = (existing != null);
+      
+      SwordValidationInfo result = new SwordValidationInfo(xmlName);
+      
+      // process the basic rules
+      if( swordVersion == null )
+      {
+          SwordValidationInfo info = new SwordValidationInfo(SwordVersion.elementName(),
+                  SwordValidationInfo.MISSING_ELEMENT_WARNING,
+                  SwordValidationInfoType.WARNING);
+          result.addValidationInfo(info);
+      }
+      
+      if( generator == null )
+      {
+          SwordValidationInfo info = new SwordValidationInfo(Generator.elementName(),
+                  SwordValidationInfo.MISSING_ELEMENT_WARNING,
+                  SwordValidationInfoType.WARNING);
+          result.addValidationInfo(info);
+      }
+
+
+      if( workspaces == null || workspaces.size() == 0 )
+      {
+          SwordValidationInfo info = new SwordValidationInfo(Workspace.elementName(),
+                  "This element SHOULD be included unless the authenticated user does not have permission to deposit.",
+                  SwordValidationInfoType.WARNING);
+          result.addValidationInfo(info);
+      }
+
+      if( validateAll )
+      {
+         if( swordVersion != null )
+         {
+            result.addValidationInfo(swordVersion.validate(validationContext));
+         }
+
+         if( swordNoOp != null )
+         {
+            result.addValidationInfo(swordNoOp.validate(validationContext));
+         }
+
+         if( swordVerbose != null )
+         {
+            result.addValidationInfo(swordVerbose.validate(validationContext));
+         }
+
+         if( swordMaxUploadSize != null )
+         {
+            result.addValidationInfo(swordMaxUploadSize.validate(validationContext));
+         }
+
+         if( generator != null )
+         {
+            result.addValidationInfo(generator.validate(validationContext));
+         }
+
+         Iterator<Workspace> iterator = workspaces.iterator();
+         while( iterator.hasNext() )
+         {
+            result.addValidationInfo(iterator.next().validate(validationContext));
+         }
+      }
+
+      result.addUnmarshallValidationInfo(existing, null);
+      return result; 
    }
 }

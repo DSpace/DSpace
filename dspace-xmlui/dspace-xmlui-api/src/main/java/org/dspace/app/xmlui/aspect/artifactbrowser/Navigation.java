@@ -1,9 +1,9 @@
 /*
  * Navigation.java
  *
- * Version: $Revision: 1.14 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/08/08 20:58:45 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,6 +39,12 @@
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -46,8 +52,8 @@ import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.utils.URIUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
@@ -60,15 +66,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.uri.IdentifierService;
 import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This transform applys the basic navigational links that should be available
@@ -103,9 +102,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             Request request = ObjectModelHelper.getRequest(objectModel);
             String key = request.getScheme() + request.getServerName() + request.getServerPort() + request.getSitemapURI() + request.getQueryString();
             
-            DSpaceObject dso = URIUtil.resolve(objectModel);
+            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
             if (dso != null)
-                key += "-" + IdentifierService.getCanonicalForm(dso);
+                key += "-" + dso.getHandle();
 
             return HashUtil.hash(key);
         } 
@@ -162,7 +161,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         // Add the configured browse lists for 'top level' browsing
         addBrowseOptions(browseGlobal, contextPath + "/browse");
 
-        DSpaceObject dso = URIUtil.resolve(objectModel);
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (dso != null)
         {
             if (dso instanceof Item)
@@ -182,7 +181,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             }
 
             // Add the configured browse lists for scoped browsing
-            String handle = IdentifierService.getCanonicalForm(dso);
+            String handle = dso.getHandle();
             addBrowseOptions(browseContext, contextPath + "/handle/" + handle + "/browse");
         }
     }
@@ -221,19 +220,19 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         pageMeta.addMetadata("page","contactURL").addContent(contextPath + "/contact");
         pageMeta.addMetadata("page","feedbackURL").addContent(contextPath + "/feedback");
         
-        DSpaceObject dso = URIUtil.resolve(objectModel);
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (dso != null)
         {
             if (dso instanceof Item)
             {
-                pageMeta.addMetadata("focus","object").addContent(IdentifierService.getCanonicalForm(dso));
+                pageMeta.addMetadata("focus","object").addContent("hdl:"+dso.getHandle());
                 this.getObjectManager().manageObject(dso);
                 dso = ((Item) dso).getOwningCollection();
             }
             
             if (dso instanceof Collection || dso instanceof Community)
             {
-                pageMeta.addMetadata("focus","container").addContent(IdentifierService.getCanonicalForm(dso));
+                pageMeta.addMetadata("focus","container").addContent("hdl:"+dso.getHandle());
                 this.getObjectManager().manageObject(dso);
             }
         }

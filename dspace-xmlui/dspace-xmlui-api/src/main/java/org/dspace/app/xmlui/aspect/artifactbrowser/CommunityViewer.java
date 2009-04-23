@@ -1,9 +1,9 @@
 /*
  * CommunityViewer.java
  *
- * Version: $Revision: 1.22 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/08/30 19:16:56 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -44,6 +44,8 @@ import java.io.Serializable;
 import java.sql.SQLException;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
@@ -52,7 +54,7 @@ import org.dspace.app.xmlui.cocoon.DSpaceFeedGenerator;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.utils.URIUtil;
+import org.dspace.app.xmlui.utils.UsageEvent;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -66,15 +68,15 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
+import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
-import org.dspace.uri.IdentifierService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
 import org.xml.sax.SAXException;
 
@@ -130,7 +132,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
     private static final int RECENT_SUBMISISONS = 5;
 
     /** The cache of recently submitted items */
-    private java.util.List<Item> recentSubmittedItems;
+    private java.util.List<BrowseItem> recentSubmittedItems;
     
     /** Cached validity object */
     private SourceValidity validity;
@@ -141,12 +143,12 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
      */
     public Serializable getKey() {
         try {
-            DSpaceObject dso = URIUtil.resolve(objectModel);
+            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
             
             if (dso == null)
                 return "0"; // no item, something is wrong
             
-            return HashUtil.hash(IdentifierService.getCanonicalForm(dso));
+            return HashUtil.hash(dso.getHandle());
         } 
         catch (SQLException sqle)
         {
@@ -168,7 +170,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
     	{
             Community community = null;
 	        try {
-	            DSpaceObject dso = URIUtil.resolve(objectModel);
+	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 	            
 	            if (dso == null)
 	                return null;
@@ -195,7 +197,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	            }
 	
 	            // Recently submitted items
-	            for (Item item : getRecientlySubmittedIems(community))
+	            for (BrowseItem item : getRecientlySubmittedIems(community))
 	            {
 	                validity.add(item);
 	            }
@@ -220,7 +222,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
-        DSpaceObject dso = URIUtil.resolve(objectModel);
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Community))
             return;
 
@@ -250,8 +252,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 				
 				String feedFormat = parts[0].trim()+"+xml";
 					
-				// theres a problem here, the url for the feed has the format further in.	
-				String feedURL = IdentifierService.getURL(community).toString() +"/"+format.trim();
+				String feedURL = contextPath+"/feed/"+format.trim()+"/"+community.getHandle();
 				pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
 			}
 		}
@@ -265,7 +266,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             UIException, SQLException, IOException, AuthorizeException
     {
 
-        DSpaceObject dso = URIUtil.resolve(objectModel);
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Community))
             return;
 
@@ -273,6 +274,10 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         Community community = (Community) dso;
         Community[] subCommunities = community.getSubcommunities();
         Collection[] collections = community.getCollections();
+        
+        new UsageEvent().fire((Request) ObjectModelHelper
+                .getRequest(objectModel), context, UsageEvent.VIEW,
+                Constants.ITEM, community.getID());
 
         // Build the community viewer division.
         Division home = body.addDivision("community-home", "primary repository community");
@@ -289,7 +294,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 
             // Search query
             Division query = search.addInteractiveDivision("community-search",
-                    IdentifierService.getURL(community).toString() + "/search",
+                    contextPath + "/handle/" + community.getHandle() + "/search", 
                     Division.METHOD_POST, "secondary search");
             
             Para para = query.addPara("search-query", null);
@@ -298,15 +303,14 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             para.addText("query");
             para.addContent(" ");
             para.addButton("submit").setValue(T_go);
-            
-            query.addPara().addXref(IdentifierService.getURL(community).toString() + "/advanced-search", T_advanced_search_link);
+            query.addPara().addXref(contextPath + "/handle/" + community.getHandle() + "/advanced-search", T_advanced_search_link);
 
             // Browse by list
             Division browseDiv = search.addDivision("community-browse","secondary browse");
             List browse = browseDiv.addList("community-browse", List.TYPE_SIMPLE,
                     "community-browse");
             browse.setHead(T_head_browse);
-            String url = IdentifierService.getURL(community).toString();
+            String url = contextPath + "/handle/" + community.getHandle();
             browse.addItemXref(url + "/browse?type=title",T_browse_titles);
             browse.addItemXref(url + "/browse?type=author",T_browse_authors);
             browse.addItemXref(url + "/browse?type=dateissued",T_browse_dates);
@@ -353,7 +357,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 
         // Reciently submitted items
         {
-            java.util.List<Item> items = getRecientlySubmittedIems(community);
+            java.util.List<BrowseItem> items = getRecientlySubmittedIems(community);
 
             Division lastSubmittedDiv = home
                     .addDivision("community-recent-submission","secondary recent-submission");
@@ -361,7 +365,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             ReferenceSet lastSubmitted = lastSubmittedDiv.addReferenceSet(
                     "collection-last-submitted", ReferenceSet.TYPE_SUMMARY_LIST,
                     null, "recent-submissions");
-            for (Item item : items)
+            for (BrowseItem item : items)
             {
                 lastSubmitted.addReference(item);
             }
@@ -374,7 +378,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
      * @param community The community.
      */
     @SuppressWarnings("unchecked") 
-    private java.util.List<Item> getRecientlySubmittedIems(Community community)
+    private java.util.List<BrowseItem> getRecientlySubmittedIems(Community community)
             throws SQLException
     {
         if (recentSubmittedItems != null)
@@ -427,4 +431,3 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
     
     
 }
-

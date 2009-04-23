@@ -57,7 +57,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.apache.oro.text.perl.Perl5Util;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
@@ -65,9 +64,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.sort.SortOption;
-import org.dspace.core.PluginManager;
-import org.dspace.uri.ExternalIdentifier;
-import org.dspace.uri.ExternalIdentifierType;
 
 // issues
 // need to filter query string for security
@@ -127,13 +123,13 @@ public class DSQuery
     {
         String querystring = args.getQuery();
         QueryResults qr = new QueryResults();
-        List<Integer> hitIds     = new ArrayList<Integer>();
-        List<String> hitURIs = new ArrayList<String>();
-        List<Integer> hitTypes = new ArrayList<Integer>();
+        List hitHandles = new ArrayList();
+        List hitIds     = new ArrayList();
+        List hitTypes   = new ArrayList();
 
         // set up the QueryResults object
+        qr.setHitHandles(hitHandles);
         qr.setHitIds(hitIds);
-        qr.setHitURIs(hitURIs);
         qr.setHitTypes(hitTypes);
         qr.setStart(args.getStart());
         qr.setPageSize(args.getPageSize());
@@ -143,7 +139,7 @@ public class DSQuery
         querystring = checkEmptyQuery(querystring); // change nulls to an empty string
         // We no longer need to work around the Lucene bug with recent versions
         //querystring = workAroundLuceneBug(querystring); // logicals changed to && ||, etc.
-        querystring = stripURIs(querystring); // remove URIs from query string
+        querystring = stripHandles(querystring); // remove handles from query string
         querystring = stripAsterisk(querystring); // remove asterisk from beginning of string
 
         try
@@ -152,7 +148,7 @@ public class DSQuery
             Searcher searcher = getSearcher(c);
 
             QueryParser qp = new QueryParser("default", DSIndexer.getAnalyzer());
-            log.info("Final query string: " + querystring);
+            log.debug("Final query string: " + querystring);
             
             if (operator == null || operator.equals("OR"))
             {
@@ -193,12 +189,12 @@ public class DSQuery
                 log.error("Unable to use speficied sort option: " + (args.getSortOption() == null ? "type/relevance": args.getSortOption().getName()));
                 hits = searcher.search(myquery, new Sort(SortField.FIELD_SCORE));
             }
-
+            
             // set total number of hits
             qr.setHitCount(hits.length());
 
             // We now have a bunch of hits - snip out a 'window'
-            // defined in start, count and return the URIs
+            // defined in start, count and return the handles
             // from that window
             // first, are there enough hits?
             if (args.getStart() < hits.length())
@@ -217,10 +213,10 @@ public class DSQuery
                     String resourceId   = d.get("search.resourceid");
                     String resourceType = d.get("search.resourcetype");
 
-                    String uriText = d.get("uri");
-                    String uriType = d.get("type");
+                    String handleText = d.get("handle");
+                    String handleType = d.get("type");
 
-                    switch (Integer.parseInt( resourceType != null ? resourceType : uriType))
+                    switch (Integer.parseInt( resourceType != null ? resourceType : handleType))
                     {
                         case Constants.ITEM:
                             hitTypes.add(new Integer(Constants.ITEM));
@@ -235,7 +231,7 @@ public class DSQuery
                             break;
                     }
 
-                    hitURIs.add(uriText);
+                    hitHandles.add( handleText );
                     hitIds.add( resourceId == null ? null: Integer.parseInt(resourceId) );
                 }
             }
@@ -243,24 +239,24 @@ public class DSQuery
         catch (NumberFormatException e)
         {
             log.warn(LogManager.getHeader(c, "Number format exception", "" + e));
-            qr.setErrorMsg("Number format exception");
+            qr.setErrorMsg("number-format-exception");
         }
         catch (ParseException e)
         {
             // a parse exception - log and return null results
             log.warn(LogManager.getHeader(c, "Invalid search string", "" + e));
-            qr.setErrorMsg("Invalid search string");
+            qr.setErrorMsg("invalid-search-string");
         }
         catch (TokenMgrError tme)
         {
             // Similar to parse exception
             log.warn(LogManager.getHeader(c, "Invalid search string", "" + tme));
-            qr.setErrorMsg("Invalid search string");
+            qr.setErrorMsg("invalid-search-string");
         }
         catch(BooleanQuery.TooManyClauses e)
         {
             log.warn(LogManager.getHeader(c, "Query too broad", e.toString()));
-            qr.setErrorMsg("Your query was too broad. Try a narrower query.");
+            qr.setErrorMsg("query-too-broad");
         }
 
         return qr;
@@ -268,7 +264,7 @@ public class DSQuery
 
     static String checkEmptyQuery(String myquery)
     {
-        if (myquery.equals(""))
+        if (myquery == null || myquery.equals("()") || myquery.equals(""))
         {
             myquery = "empty_query_string";
         }
@@ -279,7 +275,7 @@ public class DSQuery
     /**
      * Workaround Lucene bug that breaks wildcard searching.
      * This is no longer required with Lucene upgrades.
-     *
+     * 
      * @param myquery
      * @return
      * @deprecated
@@ -297,30 +293,11 @@ public class DSQuery
                       .toLowerCase();
     }
 
-    static String stripURIs(String myquery)
+    static String stripHandles(String myquery)
     {
-        // FIXME: Do we need to strip "local" identifier prefixes as well?
-
-        Object[] types =
-                PluginManager.getPluginSequence(ExternalIdentifierType.class);
-        if (types != null)
-        {
-            for (ExternalIdentifierType t : (ExternalIdentifierType[]) types)
-            {
-                if (myquery.startsWith(t.getBaseURI() + "/"))
-                {
-                    int urlPos = myquery.indexOf(t.getBaseURI() + "/");
-                    return myquery.substring(urlPos + 1);
-                }
-                if (myquery.startsWith(t.getNamespace() + ":"))
-                {
-                    int namespacePos = myquery.indexOf(t.getNamespace() + ":");
-                    return myquery.substring(namespacePos + 1);
-                }
-            }
-        }
-
-        return myquery;
+        // Drop beginning pieces of full handle strings
+        return myquery.replaceAll("^\\s*http://hdl\\.handle\\.net/", "")
+                      .replaceAll("^\\s*hdl:", "");
     }
 
     static String stripAsterisk(String myquery)
@@ -353,7 +330,10 @@ public class DSQuery
 
         String location = "l" + (coll.getID());
 
-        args.setQuery("+(" + querystring + ") +location:\"" + location + "\"");
+        String newquery = new String("+(" + querystring + ") +location:\""
+                + location + "\"");
+
+        args.setQuery(newquery);
 
         return doQuery(c, args);
     }
@@ -379,7 +359,10 @@ public class DSQuery
 
         String location = "m" + (comm.getID());
 
-        args.setQuery("+(" + querystring + ") +location:\"" + location + "\"");
+        String newquery = new String("+(" + querystring + ") +location:\""
+                + location + "\"");
+
+        args.setQuery(newquery);
 
         return doQuery(c, args);
     }
@@ -403,17 +386,17 @@ public class DSQuery
 
             QueryResults results = doQuery(c, args);
 
-            Iterator i = results.getHitURIs().iterator();
+            Iterator i = results.getHitHandles().iterator();
             Iterator j = results.getHitTypes().iterator();
 
             while (i.hasNext())
             {
-                String thisURI = (String) i.next();
+                String thisHandle = (String) i.next();
                 Integer thisType = (Integer) j.next();
                 String type = Constants.typeText[thisType.intValue()];
 
                 // also look up type
-                System.out.println(type + "\t" + thisURI);
+                System.out.println(type + "\t" + thisHandle);
             }
         }
         catch (Exception e)
@@ -440,7 +423,7 @@ public class DSQuery
             }
         }
     }
-
+    
     public static void main(String[] args)
     {
         if (args.length > 0)

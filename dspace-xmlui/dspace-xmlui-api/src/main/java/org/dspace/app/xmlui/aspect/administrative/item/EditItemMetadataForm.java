@@ -1,9 +1,9 @@
 /*
  * EditItemMetadataForm.java
  *
- * Version: $Revision: 1.3 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -158,7 +158,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
 		MetadataField[] fields = MetadataField.findAll(context);
 		for (MetadataField field : fields)
 		{
-			int fieldID = field.getID();
+			int fieldID = field.getFieldID();
 			MetadataSchema schema = MetadataSchema.find(context, field.getSchemaID());
 			String name = schema.getName() +"."+field.getElement();
 			if (field.getQualifier() != null)

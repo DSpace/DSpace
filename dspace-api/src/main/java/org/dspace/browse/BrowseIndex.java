@@ -1,9 +1,9 @@
 /*
  * BrowseIndex.java
  *
- * Version: $Revision: $
+ * Version: $Revision$
  *
- * Date: $Date:  $
+ * Date: $Date$
  *
  * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -88,7 +88,7 @@ public class BrowseIndex
     private String[][] mdBits;
 
     /** default order (asc / desc) for this index */
-    private String defaultOrder;
+    private String defaultOrder = SortOption.ASCENDING;
 
     /** additional 'internal' tables that are always defined */
     private static BrowseIndex itemIndex      = new BrowseIndex("bi_item");
@@ -348,7 +348,7 @@ public class BrowseIndex
     {
         if (isDistinct || isMap)
             return BrowseIndex.getSequenceName(number, isDistinct, isMap);
-
+        
         return BrowseIndex.getSequenceName(tableBaseName, isDistinct, isMap);
     }
     
@@ -525,7 +525,7 @@ public class BrowseIndex
     {
     	return getTableName(false, false, false, true);
     }
-
+    
     /**
      * Get the default name of the distinct table.  This is the same as calling
      *
@@ -636,7 +636,7 @@ public class BrowseIndex
             else
                 focusField = "sort_1";  // Use the first sort column
         }
-
+        
         return focusField;
     }
     

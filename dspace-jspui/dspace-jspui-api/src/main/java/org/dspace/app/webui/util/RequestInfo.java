@@ -55,7 +55,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
  *
  * Note: Implements Serializable as it will be saved to the current session during submission.
  * Please ensure that nothing is added to this class that isn't also serializable
- * 
+ *
  * @author Robert Tansley
  * @version $Revision$
  */

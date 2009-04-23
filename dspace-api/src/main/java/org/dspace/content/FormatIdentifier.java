@@ -39,18 +39,18 @@
  */
 package org.dspace.content;
 
-import java.util.List;
+import java.sql.SQLException;
 
 import org.dspace.core.Context;
-import org.dspace.content.dao.BitstreamFormatDAO;
-import org.dspace.content.dao.BitstreamFormatDAOFactory;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
  * This class handles the recognition of bitstream formats, using the format
  * registry in the database. For the moment, the format identifier simply uses
  * file extensions stored in the "BitstreamFormatIdentifier" table. This
  * probably isn't a particularly satisfactory long-term solution.
- *
+ * 
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -59,14 +59,14 @@ public class FormatIdentifier
     /**
      * Attempt to identify the format of a particular bitstream. If the format
      * is unknown, null is returned.
-     *
+     * 
      * @param bitstream
      *            the bitstream to identify the format of
-     *
+     * 
      * @return a format from the bitstream format registry, or null
      */
     public static BitstreamFormat guessFormat(Context context,
-            Bitstream bitstream)
+            Bitstream bitstream) throws SQLException
     {
         // FIXME: Just setting format to first guess
         // For now just get the file name
@@ -96,19 +96,33 @@ public class FormatIdentifier
             return null;
         }
 
-        // See if the extension is associated with any formats
-        BitstreamFormatDAO dao = BitstreamFormatDAOFactory.getInstance(context);
-        List<BitstreamFormat> formats = dao.getBitstreamFormats(extension);
+        // See if the extension is in the fileextension table
+        TableRowIterator tri = DatabaseManager.query(context,
+                "SELECT bitstreamformatregistry.* FROM bitstreamformatregistry, " + 
+                "fileextension WHERE fileextension.extension LIKE ? " + 
+                "AND bitstreamformatregistry.bitstream_format_id=" + 
+                "fileextension.bitstream_format_id",
+                extension);
 
         BitstreamFormat retFormat = null;
-
-        if (!formats.isEmpty())
+        try
         {
-            // We can do no better than guess the first if there are multiple
-            // results.
-            retFormat = formats.get(0);
+            if (tri.hasNext())
+            {
+                // Return first match
+                retFormat = new BitstreamFormat(context, tri.next());
+            }
+            else
+            {
+                retFormat = null;
+            }
         }
-
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
         return retFormat;
     }
 }

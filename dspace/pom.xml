@@ -16,12 +16,12 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>SNAPSHOT</version>
+      <version>1.5.3-SNAPSHOT</version>
    </parent>
 
    <repositories>
       <repository>
-         <id>maven.dspace.org/snapshot</id>
+         <id>maven.dspace.org-snapshot</id>
          <name>DSpace Maven Snapshot Repository</name>
          <url>http://maven.dspace.org/snapshot</url>
          <releases>
@@ -41,13 +41,9 @@
    	into the snapshot repository below.
    -->
    <scm>
-   	<connection>
-   		scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace
-   	</connection>
-   	<developerConnection>
-   		scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace
-   	</developerConnection>
-   	<url>http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace</url>
+   	<connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace</connection>
+   	<developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace</developerConnection>
+   	<url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace</url>
    </scm>
 
    <profiles>
@@ -195,7 +191,7 @@
 
        <!--
          Builds SWORD WAR for DSpace
-         -->
+      -->
       <profile>
 
          <id>dspace-sword-api</id>
@@ -209,10 +205,9 @@
          </modules>
       </profile>
 
-      
       <!--
          Builds SWORD WAR for DSpace
-          -->
+      -->
       <profile>
 
          <id>dspace-sword-webapp</id>
@@ -226,10 +221,9 @@
          </modules>
       </profile>
 
-      
       <!--
          Builds SWORD WAR for DSpace
-         -->
+      -->
       <profile>
 
          <id>dspace-sword</id>
@@ -243,9 +237,9 @@
          </modules>
       </profile>
 
-      
       <!-- 
          Builds each separate XMLUI module for the XMLUI war (for development/Eclipse)
+      -->
       <profile>
          <id>dspace-xmlui-api</id>
          <activation>
@@ -293,10 +287,10 @@
             <module>../dspace-xmlui-lang</module>
          </modules>
       </profile>
-      -->
+      
       <!-- 
          Builds XMLUI WAR for DSpace
-
+      -->
       <profile>
          <id>dspace-xmlui</id>
          <activation>
@@ -308,7 +302,7 @@
             <module>../dspace-xmlui</module>
          </modules>
       </profile>
--->
+
       <!-- 
          Builds each separate LNI module for the LNI war (for development/Eclipse)
       -->
@@ -466,6 +460,31 @@
          </dependencies>
       </profile>
 
+      <!--  
+         Using xpdf filters requires the inclusion
+         Of Sun dependencies these are not redistributable
+         and you will need to install them locally in your
+         maven repository prior to building your dspace instance
+      -->
+      <profile>
+         <id>xpdf-mediafilter-support</id>
+         <activation>
+            <activeByDefault>false</activeByDefault>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>com.sun.media</groupId>
+               <artifactId>jai_imageio</artifactId>
+               <version>1.0_01</version>
+            </dependency>
+            <dependency>
+               <groupId>javax.media</groupId>
+               <artifactId>jai_core</artifactId>
+               <version>1.1.2_01</version>
+            </dependency>
+         </dependencies>
+      </profile>
+   
    </profiles>
    
    <!-- 

@@ -155,18 +155,18 @@ public class IPAuthentication implements AuthenticationMethod
     }
 
     public boolean canSelfRegister(Context context, HttpServletRequest request,
-            String username)
+            String username) throws SQLException
     {
         return false;
     }
 
     public void initEPerson(Context context, HttpServletRequest request,
-            EPerson eperson)
+            EPerson eperson) throws SQLException
     {
     }
 
     public boolean allowSetPassword(Context context,
-            HttpServletRequest request, String username)
+            HttpServletRequest request, String username) throws SQLException
     {
         return false;
     }
@@ -177,6 +177,7 @@ public class IPAuthentication implements AuthenticationMethod
     }
 
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
+            throws SQLException
     {
         List<Integer> groupIDs = new ArrayList<Integer>();
 
@@ -255,7 +256,7 @@ public class IPAuthentication implements AuthenticationMethod
     }
 
     public int authenticate(Context context, String username, String password,
-            String realm, HttpServletRequest request)
+            String realm, HttpServletRequest request) throws SQLException
     {
         return BAD_ARGS;
     }

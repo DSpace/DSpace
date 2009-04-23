@@ -56,7 +56,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
-    String uri = (String) request.getAttribute("uri");
+    String handle = (String) request.getAttribute("handle");
     Item item = (Item) request.getAttribute("item");
     request.setAttribute("LanguageSwitch", "hide");
 %>
@@ -68,8 +68,10 @@
                parentlink="/dspace-admin"
                nocache="true">
 
-    <h1><fmt:message key="jsp.tools.confirm-withdraw-item.title"/>: <%= (uri == null ? String.valueOf(item.getID()) : uri) %></h1>
+    <%-- <h1>Withdraw Item: <%= (handle == null ? String.valueOf(item.getID()) : handle) %></h1> --%>
+    <h1><fmt:message key="jsp.tools.confirm-withdraw-item.title"/>: <%= (handle == null ? String.valueOf(item.getID()) : handle) %></h1>
 	
+    <%-- <p>Are you sure this item should be withdrawn from the archive?</p> --%>
 	<p><fmt:message key="jsp.tools.confirm-withdraw-item.question"/></p>
     
     <dspace:item item="<%= item %>" style="full" />

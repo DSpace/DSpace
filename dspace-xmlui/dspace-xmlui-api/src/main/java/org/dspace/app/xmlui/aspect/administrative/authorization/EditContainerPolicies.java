@@ -1,9 +1,9 @@
 /*
  * AuthorizationMain.java
  *
- * Version: $Revision: 1.0 $
+ * Version: $Revision$
  *
- * Date: $Date: 2006/07/13 23:20:54 $
+ * Date: $Date$
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,6 +39,9 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.authorization;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -57,10 +60,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
-import org.dspace.uri.IdentifierService;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
 
 /**
  * @author Alexey Maslov
@@ -126,13 +125,13 @@ public class EditContainerPolicies extends AbstractDSpaceTransformer
 		if (containerType == Constants.COLLECTION)
 	    {
 			Collection col = Collection.find(context, containerID); 
-			main.setHead(T_main_head_collection.parameterize(col.getMetadata("name"), IdentifierService.getCanonicalForm(col),col.getID()));
+			main.setHead(T_main_head_collection.parameterize(col.getMetadata("name"),col.getHandle(),col.getID()));
 			policies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, col);
 	    }
 		else 
 		{
 			Community com = Community.find(context, containerID);
-			main.setHead(T_main_head_community.parameterize(com.getMetadata("name"), IdentifierService.getCanonicalForm(com),com.getID()));
+			main.setHead(T_main_head_community.parameterize(com.getMetadata("name"),com.getHandle(),com.getID()));
 			policies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, com);
 		}
 		

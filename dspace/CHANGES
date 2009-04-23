@@ -1,12 +1,246 @@
+(Claudia Juergen)
+- [DS-188] Misspell exclude.type=indentifier in dstat.cfg
+
+(Ricardo Saraiva)
+- [DS-190] Portuguese (pt_PT) translation Messages.properties JSP-UI v1.5.2
+
+1.5.2 (final)
+(Graham Triggs)
+ - Fixes for critical bugs identified by Findbugs
+
 (Mark Diggory)
+ - [DS-100] XMLUI OpenURL support contributed by the National Evolutionary Synthesis Center (NESCent) and @mire.
+ - [DS-93]  Upgrade XMLUI to Cocoon 2.2
+ - [DS-117] File uploads >=100KB lead to an error in the xmlui
+ - [DS-154] Make a backup of the config dir on Ant update
  - [DS-155] Maven war plugin changes cause war to include libraries as well
+ - [DS-183] XPDF support for filtering PDFs for text extraction/search authored by Larry Stone
+ - [DS-185] bin files in DOS format
+ 
+(Mark Wood)
+ - [DS-2] [2002866] Return 404, not 200, when page Not Found
+ - [DS-150] [2025998] Usage event (statistics) plugin hook
+ - [DS-143] [2620307] 'ant init_configs' copies wrong dspace.cfg
+ - [DS-41] Small JSP cleanups
+
+(Mark Wood / Andrea Bollini)
+- [DS-43] Manakin RSS feed generator cache timeout can't be adjusted - ID: 2593393
+
+(Stuart Lewis)
+ - [DS-4] [2057231] Refactor LDAPServlet to use Stackable Authentication
+ - Enable ldap.login.specialgroup special group for all LDAP users
+ - [DS-5] Fix for SF bug [2164955] DSpace1.5.1(XML) problem with Login to restricted bitstreams
+ - [DS-6] Fix for SF bug [2343281] XHTML Head Dissimination Crosswalk exposes provenance info
+ - [DS-7] Fix for SF bug [1896225] HTML tags not stripped in statistics display
+ - [DS-8] Fix for SF bug [1951859] DSpace Home link style in breadcrumb trail
+ - [DS-9] Fix for SF bug [1730606] Restricted Items metadata exposed via OAI
+ - [DS-10] Patch for SF feature request [1587270] Implicit group for all registered users
+ - [DS-11] Fix for SF bug [2495728] 'My Account' disappears following exports
+ - Update XMLUI Google Analytics code to match latest tracking code
+ - [DS-12] Fix for SF bug [1606439] Exception handling for deleting a metadata field
+ - [DS-13] [2513300] Fix for bug [1774958] Nested folders do not export correctly
+ - [DS-14] Fix for SF bug [2086481] xmlui Administrative log in as another eperson
+ - [DS-152] Fix for SF bug [2155479] Submission verify page handles dc.identifier.* incorrectly
+ - [DS-60] netid.toLowerCase() in different classes and methods - ID: 2458187
+ - Fix for Jira [DS-98] Key jsp.mydspace.request.export.community not set in Messages.properties
+ - [2696133] New export option (migrate) and fix for Jira [DS-59]
+ - [DS-113] Export item buttons
+ - Fix for Jira [DS-127] Item exporter does not export bitsteam descriptions
+ - [DS-182] Speed up SWORD deposits
+
+(Stuart Lewis / Chris Yates / Flavio Botelho / Alex Barbieri / Reuben Pasquini / Paulo Matos)
+ - [DS-16] [2057378] Hierarchical LDAP support
+
+(Paul Needham / Jon Bell / Stuart Lewis)
+ - Inclusion of uketd_dc OAI-PMH crosswalk
+
+(Yin Latt)
+ - [DS-17] SF bug [1931796] DSpace 1.5 Controlled Vocab (edit-metadata.jsp) not working on first box in twobox
+ - [DS-18] SF bug [2137425] DSpace 1.5.1(XMLUI) Wrong dir usage of StatisticsLoader
+
+(Claudia Juergen)
+ - [DS-19] [2041754] Feature Request #1896717 Registration notification missing information about instance
+ - Fix for SF Bug #1775059 Repeated execution of chooser.jsp exhausts db conn pool
+ - [DS-20] Fix for SF Bug #2352146 2 Authentications with LoginPage cause connection exhaust
+ - [DS-21] Fixed hardcoded metadata language qualifier in DescribeStep to use default.language configuration parameter
+ - [DS-22] Fix for SF Bug #2125833 News stored not language dependend (code change in dspace-api-lang googlecode)
+ - [DS-23] Fix for SF Bug #2343849 DSQuery invalid check for empty query string
+ - [DS-24] Fix for SF Bug #1725817 Error in authorization to submit when you add collection.
+   Avoids that groups can be added to themselves.
+ - [DS-25] Fix for SF Bug #1968082 SWORD Service Document fails if Collection is untitled
+ - [DS-26] Fix for SF Bug #2493794 Hardcoded Strings in DSQuery
+ - [DS-28] Fix for SF Bug #1745573 Itemmap-browse.jsp throws Exception on items without date
+ - [DS-27] Fix for SF Bug #1571645 NullPointerException possible in review.jsp
+ - [DS-29] Fix for SF Bug #2413800 Improper display of Umlauts / Encoding of messages_de.xml
+ - [DS-30] SF Patch #2526153 Hardcoded String in jspui browse
+ - [DS-31] Fix for SF Bug #2512868 Double quote problem in some fields of JSPUI
+ - [DS-32] Fix for SF Bug #2411653 Export Item email hardcoded strings in sources
+ - [DS-148] SF Patch #2537799 jspui 1.updated Thai translation 1.4.2 (gone into google code)
+ - [DS-147] SF Patch #2540683 jspui Thai translation for 1.5.1 (gone into google code) 
+ - [DS-146] SF patch [2560974] for SF feature request [2560839] Make sitemap directory configurable
+ - [DS-145] SF patch [2615647] Greek translation for xmlui version 1.5.1 submitted to Google code
+ - [DS-144] SF patch [2612341] Patch for SF Feature Request [2609564] group delete confirm
+ - [DS-142] SF patch [2612034] Remove Edit/Delete Button for Special Groups
+ - [DS-141] SF patch [2636514] multilingual input-forms reenabled
+ - Added blanks between label and text in subscription email.
+ 
+(Claudia Juergen / Andrea Bollini)
+ - [DS-46] Bug 1617889 Years < 1000 do not display in simple item view - ID: 2524083 
+ 
+(Elliot Metsger)
+ - [DS-33] Patch for SF bug #2016130 checksum checker can not retrieve very large bitstream
+
+(Tim Donohue)
+ - [DS-34] [2433852] Add File Format Descriptions to XMLUI 1.5.x
+ - [DS-35] [2462293] Enable Google Sitemaps for XMLUI
+ - Fixed small bug in XMLUI's org.dspace.app.xmlui.cocoon.DSpaceMETSGenerator which caused Repository-wide METS file to fail to generate.
+ - [DS-36] [2477820] DSpace 1.5 XMLUI - Enable METS <amdSec> using crosswalks
+ - [DS-153] Fix for SF bug [2541285] Submission Forms don't preserve order of values
+ - [DS-151] Fix for SF bug [2543413] XMLUI Submission forms display validation errors on other fields during add/remove
+ - [DS-149] Fix for SF bug [2557654] Search with "%" causes NullPointerException in XMLUI
+ - Fix for Jira bug [DS-86] XMLUI Feedback form does not include any protection from spamming
+ - Fix for Jira [DS-87] XMLUI file download links break in Google search results if file 'sequence' number changes.
+ - Fix for Jira [DS-95] XMLUI: Visiting an item page with a trailing slash returns a 404 message
+ - Fix for Jira [DS-96] XMLUI Wing-Framework 'Radio' class doesn't support adding radio buttons which are unselected by default.
+ - Fix for Jira [DS-97] XMLUI does not come with a robots.txt out-of-the-box. It also does not provide suggestions for loading global static content.
+ - [1712125] Allow dsrun and dsrun.bat to use JAVA_OPTS
+ - Fix for Jira [DS-130] XMLUI Browse by Author doesn't work for names with special characters (for example: é, è, ö, etc.)
+ - Fix for Jira [DS-132] XMLUI overall UTF-8 encoding is inconsistent and forms do not use UTF-8 (also resolves [DS-112])
+ - Fix for Jira [DS-120] Cocoon 2.2 "hijacks" the dspace.log file
+ - Fix for Jira [DS-85] XMLUI Cocoon logs should not be stored under [xmlui-webapp]/WEB-INF/logs/
+
+(Kim Shepherd)
+ - [DS-39] [2385187] Fix for toDate method in DCDate
+
+(Andrea Bollini /Kim Shepherd) 
+ - [DS-47] Add support for rendering DOI links in JSPUI (1.4, 1.5) - ID: 2521493
  
 (Andrea Bollini)
-- S.F. Patch 2645776 for Bug 2645754 SubmissionController is not thread safe
-- [DS-1] Controlled vocab:he URL http://localhost:8080/jspui/subject-search gives internal error and a stack trace in dspace.log
+ - [DS-40] S.F. Patch 2645776 for Bug 2645754 SubmissionController is not thread safe
+ - [DS-1] Controlled vocab:he URL http://localhost:8080/jspui/subject-search gives internal error and a stack trace in dspace.log
+ - [DS-62] Not right encoding for license and extracted texts - ID: 2234532
+ - [DS-84] Improve API for "IgnoreAuthorization" blocks - ID: 1687783
+ - [DS-58] Double quote problem in some fields of JSPUI (continued) - ID: 2528065
+ - [DS-78] Italian translation xmlui - ID: 1984513 (gone into google code)
+ - [DS-88] Anonymous group don't works as subgroup - ID: 1688445
+ - [DS-61] IP Authentication only works on logged in users - ID: 2088431
+ - [DS-90] Workflow doesn't skipped if the wf group contains empty subgroups
+ - [DS-64] xmlui selection of authentication method - ID: 2086673
+ - [DS-83] Hardcoded behaviour of Initial question step in the submission
+ - [DS-101] Impossible to complete Registration in JSPUI
+ - [DS-107] DIDL Crosswalk thrown NPE
+ - [DS-102] Submission without file possible with the skip upload functionality disabled
+ - [DS-103] Use of the Progress bar button don't save the current page modification
+ - [DS-104] Cancel/save button during edit of a workflow item doesn't work
+ - [DS-105] Initial Questions button in the progress bar doesn't work in workflow
+ - [DS-106] Save & exit button doesn't properly work in workflow
+ - [DS-126] Request to [dspace-base-url]/bitstream throw NPE
+ - [DS-67] Impossible retry/resume after upload a file with internal format
+ - [DS-66] bitstream format registry, setting bitstream internal - ID: 1896055
+ - [DS-115] metadata not showed in verify step
+ - [DS-122] Problems with repeatable metadata
+ - [DS-116] File description not correct
+ - [DS-92] Bitstream access rights inheritenc, editing in_archive items - ID: 1993036
+ - [DS-81] Subscription not sent correctly - ID: 2667590
+ - [DS-99] Non-admin user and admin menu options (1.5.1 XMUI only) - ID: 2353606
+ - [DS-157] Ukrainian for DSpace 1.5.2 - JSPUI only (gone into google code)
+ - [DS-186] NPE during edit of eperson in XMLUI
+ 
+(Paulo Jobim)
+ - [DS-138] SF Patch [2655052] Authors re-ordered when item edited (xmlui)
 
-(Peter Coetzee)
-- S.F Patch 2031532 DAO Singletons
+(Larry Stone)
+ - SF Patch [2621423] Add method to instrument Context's cache usage
+
+(Bruc Liong / Xiang Kevin Li / Stuart Hicks)
+- [DS-48] shibboleth+dspace1.5.1 patch - ID: 2412723
+
+1.5.1 final
+===========
+
+(Scott Philips)
+- (Scott Phillips) Fixed bug where users could not finish registering nor reset 
+  their password because the authentication method signatures were changed.
+- Jay Paz (SF#1898241) Additional fixes to patch to enable reuse of methods.
+- Added the ability to manage sessions with site wide alerts to prevent users from authenticating.
+- Fixes a bug where the ability to edit an item durring workflow step 2 is not displayed.
+- Jay Paz (SF#1898241) Add item Export from jspui and xmlui.
+- Added easy support for google analytics statistics
+- Added the ability for super admins to login as other users. 
+- Added an activity viewer to the Control Panel
+
+(Mark Diggory) 
+- Fix for SF Bug #2082236 Subscription notification (sub-daily) no emails sent
+- [2102580] William Hays: Duplicate Handle exception when replacing bitstreams
+- [2102617] Sands Fish: X509Authentication fails to assign appropriate specialgroups
+- (Sands Fish) Add "Select Primary Bitstream" functionality to submission workflow
+- Guard against Community/Collection metadata having only whitespace characters 
+  and eliminate cases where null pointer exceptions would be thrown
+- Improve DSIndexer logic in both branches to support removal of items from index 
+  when withdrawn from repository.
+- (Sands Fish) Provides fix for AuthenticationUtil where users ID's are not properly compared.
+- Fix NullPointerException cause by nullified Context object in LNI map item to new collection.
+- Block Basic Authentication &quot;details&quot; from being exposed in dspace logs.
+- (Bill Hays) Close InputStreamReaders explicitly to release any file handles back to OS.
+- correct linking on pages when xmlui is the ROOT webapplication
+- correct issue with sitemap redirection of mydspace uri.
+- Add serlet-api to overlay wars to reduce compile time errors when adding classes
+- Correct issues in feed generation
+- XMLUI Adjust Advanced Search to use search properties from dspace.cfg.
+- Correct bug in Body.toSAX where startElement is called instead of end element.
+- Correct issue with libraries being excluded from wars
+
+(Claudia Juergen)
+- Fix for SF bug #2090761 Statistics wrong use of dspace.dir for log location
+- Fix for SF bug #2081930 xmlui hardcoded strings in EditGroupForm.java
+- Fix for SF bug #2080319 jspui hardcoded strings in browse
+- Fix for SF bug #2078305 xmlui hardcoded strings used in UI in xmlui-api
+- Fix for SF bug #2078324 xmlui hardcoded strings used in UI in General-Handler.xsl
+- SF patch #2076066 Review in jspui submission non-dc metadata
+- SF Bug #1983859  added Foreign Lucene Analyzers to poms
+- SF Bug #1989916 - missing LDAP authentication key
+
+(Stuart Lewis)
+- [1947036] Patch for SF Bug1896960 SWORD authentication and LDAP + [1989874] LDAPAuthentication
+  pluggable method broken for current users
+- Added copying of registration email template to 1.4 to 1.5 upgrade instructions
+- Fix for SF bug #2055941 LDAP authentication fails for new users in SWORD and Manakin
+
+(Zuki Ebetsu / Stuart Lewis)
+- [1990660] SWORD Service Document are malformed / Corrected Atom publishing MIME types
+
+(Stuart Lewis / Claudia Juergen)
+- Updated installation and configuration documents for new statistics script, and removed references to Perl
+
+(Tim Donohue)
+- Fix for SF bug #2095402 - Non-interactive Submission Steps don't work in JSPUI 1.5
+- Fix for SF bug #2013921 - Movement in Submission Workflow Causes Skipped Steps
+- Fix for SF bug #2015988 - Configurable Submission bug in SubmissionController
+- Fix for SF bug #2034372 - Resorting Search Results in JSPUI always gives no results
+- Updates to Community/Collection Item Counts (i.e. strengths) for XMLUI.
+- 1.5 upgrade instructions were missing Metadata Registry updates necessary to support SWORD.
+
+(Graham Triggs)
+- Fix various problems with resources potentially not being freed, and other minor fixes suggested by FindBugs
+- Replace URLEncoder with StringEscapeUtils for better fix of escaping the hidden query field
+- Fix #2034372 - Resorting in JSPUI gives no results
+- Fix #1714851 - set eperson.subscription.onlynew in dspace.cfg to only include items that are new to the repository
+- Fix issue where the browse and search indexes will not be updated correctly if you move an Item
+- Fix problem with SWORD not accepting multiple concurrent submissions
+- Fix #1963060 Authors listed in reverse order
+- Fix #1970852 - XMLUI: Browse by Issue Date "Type in Year" doesn't work
+- Statistics viewer for XMLUI, based on existing DStat. Note that this generates 
+  the view from the analysis files (.dat), does not require HTML report generation.
+- Fixed incorrect downloading of bitstream on withdrawn item 
+- Add JSPUI compatible log messages to XMLUI transformers
+- Clean up use of ThreadLocal
+- Improved cleanup of database resources when web
+  application is unloaded
+- Fix bug #1931799 - duplicate &quot;FROM metadatavalue&quot
+- Fixed Oracle bugs with ILIKE operators and LIMIT/OFFSET clauses
+
+1.5 final
+=========
 
 (Mark Diggory)
 - New options for ItemImporter to support bitstream permissions and descriptions.
@@ -23,9 +257,7 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 - Added IP Authentication (SF patch #1566820)
 
 (Richard Jones)
-- S.F. Patch 1670093 More stable metadata and schema registry import
-- Option to generate community and collection "strength" as a batch job
-- S.F. Patch 1659868 Improved database level debugging
+- S.F. Patch 1670093 More stable metadata and schema registry import 
 - Option to generate community and collection "strength" as a batch job
 - S.F. Patch 1659868 Improved database level debugging
 
@@ -36,7 +268,7 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
   (S.F. Patches 1702233 and 1672065)
 
 (Flavio Botelho)
-- S.F. Patch 1764069 Replace "String" with "Integer" in PreparedStatement
+- S.F. Patch 1764069 Replace "String" with "Integer" in PreparedStatement 
   Parameters where appropriate.
 - SF Patch 1743188 Patch for Request #1145499 - Move Items
 
@@ -89,6 +321,7 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 (Chris Yates)
 - SF Patch #1724330 Removes "null" being displayed in community-home.jsp
 - SF Patch #1763535 Alert DSpace administrator of new user registration
+- SF Patch #1759438 Multilingualism Language Switch - DSpace Header
 - SF Patch #1888652 Statistics Rewritten In Java
 
 (Robert Tansley / Stuart Lewis)

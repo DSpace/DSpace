@@ -51,10 +51,9 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
-import org.dspace.content.dao.CollectionDAOFactory;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.SubscriptionManager;
+import org.dspace.eperson.Subscribe;
 
 /**
  * Servlet for constructing the components of the "My DSpace" page
@@ -90,7 +89,7 @@ public class SubscribeServlet extends DSpaceServlet
         if (submit.equals("submit_clear"))
         {
             // unsubscribe user from everything
-            SubscriptionManager.unsubscribe(context, e, null);
+            Subscribe.unsubscribe(context, e, null);
 
             // Show the list of subscriptions
             showSubscriptions(context, request, response, true);
@@ -100,12 +99,12 @@ public class SubscribeServlet extends DSpaceServlet
         else if (submit.equals("submit_unsubscribe"))
         {
             int collID = UIUtil.getIntParameter(request, "collection");
-            Collection c = CollectionDAOFactory.getInstance(context).retrieve(collID);
+            Collection c = Collection.find(context, collID);
 
             // Sanity check - ignore duff values
             if (c != null)
             {
-                SubscriptionManager.unsubscribe(context, e, c);
+                Subscribe.unsubscribe(context, e, c);
             }
 
             // Show the list of subscriptions
@@ -140,7 +139,7 @@ public class SubscribeServlet extends DSpaceServlet
             throws ServletException, IOException, SQLException
     {
         // Subscribed collections
-        Collection[] subs = SubscriptionManager.getSubscriptions(context, context
+        Collection[] subs = Subscribe.getSubscriptions(context, context
                 .getCurrentUser());
 
         request.setAttribute("subscriptions", subs);

@@ -56,9 +56,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
-import org.dspace.content.dao.MetadataFieldDAO;
-import org.dspace.content.dao.MetadataFieldDAOFactory;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 
 /**
  * Servlet for editing the Dublin Core registry
@@ -96,9 +95,6 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        MetadataFieldDAO dao =
-            MetadataFieldDAOFactory.getInstance(context);
-
         String button = UIUtil.getSubmitButton(request, "submit");
         int schemaID = getSchemaID(request);
 
@@ -116,41 +112,29 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
                 return;
             }
 
-            int id = UIUtil.getIntParameter(request, "dc_type_id");
-            String element = request.getParameter("element");
-            String qualifier = request.getParameter("qualifier");
-            String scopeNote = request.getParameter("scope_note");
-
-            // Let's see if this field already exists
-            MetadataField dc = dao.retrieve(schemaID, element, qualifier);
-
-//            try
-//            {
-            if (dc == null)
+            try
             {
                 // Update the metadata for a DC type
-                dc = dao.retrieve(id);
+                MetadataField dc = MetadataField.find(context, UIUtil
+                        .getIntParameter(request, "dc_type_id"));
+            dc.setElement(request.getParameter("element"));
 
-                dc.setElement(element);
-
-                if (qualifier.equals(""))
-                {
-                    qualifier = null;
-                }
-
-                dc.setQualifier(qualifier);
-                dc.setScopeNote(scopeNote);
-                dao.update(dc);
-                showTypes(context, request, response, schemaID);
-                context.complete();
+            String qual = request.getParameter("qualifier");
+            if (qual.equals(""))
+            {
+                qual = null;
             }
-//            catch (NonUniqueMetadataException e)
-            else
+
+            dc.setQualifier(qual);
+            dc.setScopeNote(request.getParameter("scope_note"));
+                dc.update(context);
+                showTypes(context, request, response, schemaID);
+            context.complete();
+        }
+            catch (NonUniqueMetadataException e)
             {
                 context.abort();
-//                log.error(e);
-                log.error("metadata field " + element + "." + qualifier +
-                        " already exists in schema " + schemaID);
+                log.error(e);
             }
         }
         else if (button.equals("submit_add"))
@@ -164,40 +148,30 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
                 return;
             }
 
-            String element = request.getParameter("element");
-            String qualifier = request.getParameter("qualifier");
-            String scopeNote = request.getParameter("scope_note");
-
-            // Let's see if this field already exists
-            MetadataField dc = dao.retrieve(schemaID, element, qualifier);
-
             // Add a new DC type - simply add to the list, and let the user
             // edit with the main form
-//            try
-            if (dc == null)
+            try
             {
-                dc = dao.create();
+                MetadataField dc = new MetadataField();
                 dc.setSchemaID(schemaID);
-                dc.setElement(element);
+                dc.setElement(request.getParameter("element"));
 
-                if (qualifier.equals(""))
+                String qual = request.getParameter("qualifier");
+                if (qual.equals(""))
                 {
-                    qualifier = null;
+                    qual = null;
                 }
 
-                dc.setQualifier(qualifier);
-                dc.setScopeNote(scopeNote);
-                dao.update(dc);
+                dc.setQualifier(qual);
+                dc.setScopeNote(request.getParameter("scope_note"));
+                dc.create(context);
                 showTypes(context, request, response, schemaID);
-                context.complete();
-            }
-//            catch (NonUniqueMetadataException e)
-            else
+            context.complete();
+        }
+            catch (NonUniqueMetadataException e)
             {
                 // Record the exception as a warning
-//                log.warn(e);
-                log.warn("metadata field " + element + "." + qualifier +
-                        " already exists in schema " + schemaID);
+                log.warn(e);
 
                 // Show the page again but with an error message to inform the
                 // user that the metadata field was not created and why
@@ -221,8 +195,18 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
             // User confirms deletion of type
             MetadataField dc = MetadataField.find(context, UIUtil
                     .getIntParameter(request, "dc_type_id"));
-            dc.delete(context);
-            showTypes(context, request, response, schemaID);
+            try
+            {
+                dc.delete(context);
+                request.setAttribute("failed", new Boolean(false));
+                showTypes(context, request, response, schemaID);
+            } catch (Exception e)
+            {
+                request.setAttribute("type", dc);
+                request.setAttribute("failed", true);
+                JSPManager.showJSP(request, response,
+                        "/dspace-admin/confirm-delete-mdfield.jsp");
+            }
             context.complete();
         }
         else if (button.equals("submit_move"))
@@ -230,8 +214,8 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
             // User requests that one or more metadata elements be moved to a
             // new metadata schema. Note that we change the default schema ID to
             // be the destination schema.
-//            try
-//            {
+            try
+            {
                 schemaID = Integer.parseInt(request
                         .getParameter("dc_dest_schema_id"));
                 String[] param = request.getParameterValues("dc_field_id");
@@ -244,64 +228,35 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
                 }
                 else
                 {
-                    boolean error = false;
-
                     for (int ii = 0; ii < param.length; ii++)
                     {
                         int fieldID = Integer.parseInt(param[ii]);
-                        MetadataField field = dao.retrieve(fieldID);
-                        MetadataField existenceTest = dao.retrieve(schemaID,
-                                field.getElement(), field.getQualifier());
-
-                        if (existenceTest != null)
-                        {
-                            error = true;
-                            log.warn("metadata field " + field.getElement() +
-                                    "." + field.getQualifier() +
-                                    " already exists in schema " + schemaID);
-                            break;
-                        }
-                        else
-                        {
-                            field.setSchemaID(schemaID);
-                            field.update(context);
-                        }
+                        MetadataField field = MetadataField.find(context,
+                                fieldID);
+                        field.setSchemaID(schemaID);
+                        field.update(context);
 
                     }
-
-                    if (error)
-                    {
-                        // Record the exception as a warning
-//                        log.warn(e);
-
-                        // Show the page again but with an error message to inform the
-                        // user that the metadata field could not be moved
-                        request.setAttribute("error", labels.getString(clazz
-                                + ".movefailed"));
-                        showTypes(context, request, response, schemaID);
-                        context.abort();
-                    }
-
-                    context.complete();
+            context.complete();
                      
                     // Send the user to the metadata schema in which they just moved
                     // the metadata fields
                     response.sendRedirect(request.getContextPath()
                             + "/dspace-admin/metadata-schema-registry?dc_schema_id=" + schemaID);
                 }
-//            }
-//            catch (NonUniqueMetadataException e)
-//            {
-//                // Record the exception as a warning
-//                log.warn(e);
-//
-//                // Show the page again but with an error message to inform the
-//                // user that the metadata field could not be moved
-//                request.setAttribute("error", labels.getString(clazz
-//                        + ".movefailed"));
-//                showTypes(context, request, response, schemaID);
-//                context.abort();
-//            }
+            }
+            catch (NonUniqueMetadataException e)
+            {
+                // Record the exception as a warning
+                log.warn(e);
+
+                // Show the page again but with an error message to inform the
+                // user that the metadata field could not be moved
+                request.setAttribute("error", labels.getString(clazz
+                        + ".movefailed"));
+                showTypes(context, request, response, schemaID);
+                context.abort();
+            }
         }
         else
         {
