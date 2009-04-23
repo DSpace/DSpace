@@ -2,10 +2,13 @@
 =====
 
 (Claudia Juergen)
-- [DS-188] Misspell exclude.type=indentifier in dstat.cfg
+ - [DS-188] Misspell exclude.type=indentifier in dstat.cfg
 
 (Ricardo Saraiva)
-- [DS-190] Portuguese (pt_PT) translation Messages.properties JSP-UI v1.5.2
+ - [DS-190] Portuguese (pt_PT) translation Messages.properties JSP-UI v1.5.2
+
+(Stuart Lewis)
+ - [DS-194] Give METS ingester configuration option to make use of collection templates
 
 
 1.5.2 final

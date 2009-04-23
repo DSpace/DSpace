@@ -108,6 +108,10 @@ public abstract class AbstractMETSIngester
     private static final boolean preserveManifest =
         ConfigurationManager.getBooleanProperty("mets.submission.preserveManifest", false);
 
+    // value of mets.submission.useCollectionTemplate config key
+    private static final boolean useTemplate =
+        ConfigurationManager.getBooleanProperty("mets.submission.useCollectionTemplate", false);
+
     /**
      * An instance of MdrefManager holds the state needed to
      * retrieve the contents (or bitstream corresponding to) an
@@ -199,7 +203,7 @@ public abstract class AbstractMETSIngester
              *  match the URL references in <Flocat> and <mdRef> elements.
              */
             METSManifest manifest = null;
-            wi = WorkspaceItem.create(context, collection, false);
+            wi = WorkspaceItem.create(context, collection, useTemplate);
             Item item = wi.getItem();
             Bundle contentBundle = item.createBundle(Constants.CONTENT_BUNDLE_NAME);
             Bundle mdBundle = null;
