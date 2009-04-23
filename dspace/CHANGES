@@ -1,10 +1,16 @@
+1.6.0
+=====
+
 (Claudia Juergen)
 - [DS-188] Misspell exclude.type=indentifier in dstat.cfg
 
 (Ricardo Saraiva)
 - [DS-190] Portuguese (pt_PT) translation Messages.properties JSP-UI v1.5.2
 
-1.5.2 (final)
+
+1.5.2 final
+===========
+
 (Graham Triggs)
  - Fixes for critical bugs identified by Findbugs
 
