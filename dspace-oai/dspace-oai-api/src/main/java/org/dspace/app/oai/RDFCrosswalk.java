@@ -140,6 +140,12 @@ public class RDFCrosswalk extends Crosswalk
                 // Escape XML chars <, > and &
                 String value = allDC[i].value;
 
+                // Check for null values
+                if (value == null)
+                {
+                    value = "";
+                }
+
                 // First do &'s - need to be careful not to replace the
                 // & in "&amp;" again!
                 int c = -1;

@@ -10,6 +10,9 @@
 (Stuart Lewis)
  - [DS-194] Give METS ingester configuration option to make use of collection templates
 
+(Larry Stone)
+ - [DS-193] OAI RDF crosswalk fails when DC value is null
+
 
 1.5.2 final
 ===========
