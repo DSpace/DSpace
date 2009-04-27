@@ -9,6 +9,7 @@
 
 (Stuart Lewis)
  - [DS-194] Give METS ingester configuration option to make use of collection templates
+ - [DS-196] METS exposed via OAI-PMH includes descritpion.provenance information
 
 (Larry Stone)
  - [DS-193] OAI RDF crosswalk fails when DC value is null

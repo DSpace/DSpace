@@ -683,10 +683,14 @@ public class METSExport
                     value = dc[i].value.replaceAll("\\$", "\\\\\\$");
                 }
 
-                // Replace '%s' with DC value (with entities encoded)
-                modsXML.append(modsMapping.replaceAll("%s", Utils
-                        .addEntities(value)));
-                modsXML.append("\n"); // For readability
+                if (!(("description.provenance".equals(propName)) &&
+                    ((ConfigurationManager.getBooleanProperty("oai.mets.hide-provenance", false)))))
+                {
+                    // Replace '%s' with DC value (with entities encoded)
+                    modsXML.append(modsMapping.replaceAll("%s", Utils
+                            .addEntities(value)));
+                    modsXML.append("\n"); // For readability
+                }
             }
         }
 
