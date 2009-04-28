@@ -9,6 +9,7 @@
 
 (Stuart Lewis)
  - [DS-194] Give METS ingester configuration option to make use of collection templates
+ - [DS-195] Allow the primary bitstream to be set in the item importer / exporter
  - [DS-196] METS exposed via OAI-PMH includes descritpion.provenance information
 
 (Larry Stone)

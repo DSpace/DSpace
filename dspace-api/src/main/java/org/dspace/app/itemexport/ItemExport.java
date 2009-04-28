@@ -592,6 +592,11 @@ public class ItemExport
                         description = "";
                     }
 
+                    String primary = "";
+                    if (bundles[j].getPrimaryBitstreamID() == b.getID()) {
+                        primary = "\tprimary:true ";
+                    }
+
                     int myPrefix = 1; // only used with name conflict
 
                     InputStream is = b.retrieve();
@@ -625,11 +630,13 @@ public class ItemExport
                             {
                                 out.println("-r -s " + b.getStoreNumber()
                                         + " -f " + myName +
-                                        "\tbundle:" + bundleName + description);
+                                        "\tbundle:" + bundleName +
+                                        primary + description);
                             }
                             else
                             {
-                                out.println(myName + "\tbundle:" + bundleName + description);
+                                out.println(myName + "\tbundle:" + bundleName +
+                                            primary + description);
                             }
 
                             isDone = true;

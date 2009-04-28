@@ -1046,7 +1046,7 @@ public class ItemImport
                 if (bitstreamEndIndex == -1)
                 {
                     // no extra info
-                    processContentFileEntry(c, i, path, line, null);
+                    processContentFileEntry(c, i, path, line, null, false);
                     System.out.println("\tBitstream: " + line);
                 }
                 else
@@ -1100,19 +1100,30 @@ public class ItemImport
                         descriptionExists = true;
                     }
 
+                    // is this the primary bitstream?
+                    String primaryBitstreamMarker = "\tprimary:true";
+                    boolean primary = false;
+                    String primaryStr = "";
+                    if (line.contains(primaryBitstreamMarker))
+                    {
+                        primary = true;
+                        primaryStr = "\t **Setting as primary bitstream**";
+                    }
+
                     if (bundleExists)
                     {
                         String bundleName = line.substring(bMarkerIndex
                                 + bundleMarker.length(), bEndIndex).trim();
 
-                        processContentFileEntry(c, i, path, bitstreamName, bundleName);
-                        System.out.println("\tBitstream: " + bitstreamName
-                                + "\tBundle: " + bundleName);
+                        processContentFileEntry(c, i, path, bitstreamName, bundleName, primary);
+                        System.out.println("\tBitstream: " + bitstreamName +
+                                           "\tBundle: " + bundleName +
+                                           primaryStr);
                     }
                     else
                     {
-                        processContentFileEntry(c, i, path, bitstreamName, null);
-                        System.out.println("\tBitstream: " + bitstreamName);
+                        processContentFileEntry(c, i, path, bitstreamName, null, primary);
+                        System.out.println("\tBitstream: " + bitstreamName + primaryStr);
                     }
 
                     if (permissionsExist || descriptionExists)
@@ -1158,7 +1169,7 @@ public class ItemImport
      * @throws AuthorizeException
      */
     private void processContentFileEntry(Context c, Item i, String path,
-            String fileName, String bundleName) throws SQLException,
+            String fileName, String bundleName, boolean primary) throws SQLException,
             IOException, AuthorizeException
     {
         String fullpath = path + File.separatorChar + fileName;
@@ -1211,6 +1222,13 @@ public class ItemImport
             // file format!
             BitstreamFormat bf = FormatIdentifier.guessFormat(c, bs);
             bs.setFormat(bf);
+
+            // Is this a the primary bitstream?
+            if (primary)
+            {
+                targetBundle.setPrimaryBitstreamID(bs.getID());
+                targetBundle.update();
+            }
 
             bs.update();
         }
