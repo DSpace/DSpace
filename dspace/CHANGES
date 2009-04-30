@@ -1,6 +1,9 @@
 1.6.0
 =====
 
+(Kim Shepherd)
+ - [DS-156] File description not available in XMLUI
+
 (Claudia Juergen)
  - [DS-188] Misspell exclude.type=indentifier in dstat.cfg
 
@@ -10,7 +13,7 @@
 (Stuart Lewis)
  - [DS-194] Give METS ingester configuration option to make use of collection templates
  - [DS-195] Allow the primary bitstream to be set in the item importer / exporter
- - [DS-196] METS exposed via OAI-PMH includes descritpion.provenance information
+ - [DS-196] METS exposed via OAI-PMH includes description.provenance information
 
 (Larry Stone)
  - [DS-193] OAI RDF crosswalk fails when DC value is null

@@ -90,7 +90,11 @@
                 <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-size</i18n:text></th>
                 <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-format</i18n:text></th>
                 <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-view</i18n:text></th>
-            </tr>
+                <!-- Display header for 'Description' only if at least one bitstream contains a description -->
+                <xsl:if test="mets:file/mets:FLocat/@xlink:label != ''">
+                    <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-description</i18n:text></th>
+                </xsl:if>
+		    </tr>
             <xsl:choose>
                 <!-- If one exists and it's of text/html MIME type, only display the primary bitstream -->
                 <xsl:when test="mets:file[@ID=$primaryBitstream]/@MIMETYPE='text/html'">
@@ -201,6 +205,13 @@
                     </xsl:otherwise>
                 </xsl:choose>                        
             </td>
+	    <!-- Display the contents of 'Description' as long as at least one bitstream contains a description -->
+	    <xsl:if test="$context/mets:fileSec/mets:fileGrp/mets:file/mets:FLocat/@xlink:label != ''">
+	        <td>
+	            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
+	        </td>
+	    </xsl:if>
+
         </tr>
     </xsl:template>
     

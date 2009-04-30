@@ -1648,6 +1648,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-size">Size</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-format">Format</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-view">View</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-files-description">Description</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-viewOpen">View/<wbr/>Open</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-no-files">There are no files associated with this item.</message>
 
