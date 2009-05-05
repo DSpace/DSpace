@@ -45,6 +45,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 
 import org.purl.sword.base.Deposit;
+import org.purl.sword.base.SWORDErrorException;
+import org.purl.sword.base.ErrorCodes;
 import org.apache.log4j.Logger;
 
 /**
@@ -74,14 +76,14 @@ public class SWORDIngesterFactory
 	 * @throws DSpaceSWORDException
 	 */
 	public static SWORDIngester getInstance(Context context, Deposit deposit, DSpaceObject dso)
-		throws DSpaceSWORDException
-	{
+            throws DSpaceSWORDException, SWORDErrorException
+    {
 		if (dso instanceof Collection)
 		{
 			SWORDIngester ingester = (SWORDIngester) PluginManager.getNamedPlugin(SWORDIngester.class, deposit.getPackaging());
 			if (ingester == null)
 			{
-				throw new DSpaceSWORDException("No ingester configured for this package type");
+				throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT, "No ingester configured for this package type");
 			}
 			return ingester;
 		}
