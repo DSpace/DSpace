@@ -377,7 +377,8 @@ public class UploadStep extends AbstractSubmissionStep
         uploadSection.setHead(T_head);
         
         //Review all uploaded files
-        Bundle[] bundles = submission.getItem().getBundles("ORIGINAL");
+	Item item = submission.getItem();
+        Bundle[] bundles = item.getBundles("ORIGINAL");
         Bitstream[] bitstreams = new Bitstream[0];
         if (bundles.length > 0)
         {
@@ -388,9 +389,9 @@ public class UploadStep extends AbstractSubmissionStep
         {
             BitstreamFormat bitstreamFormat = bitstream.getFormat();
             
-            int id = bitstream.getID();
+            int id = item.getID();
             String name = bitstream.getName();
-            String url = contextPath+"/retrieve/"+id+"/"+name;
+            String url = contextPath + "/bitstream/item/" + id  + "/" +name;
             String format = bitstreamFormat.getShortDescription();
             Message support = ReviewStep.T_unknown;
             if (bitstreamFormat.getSupportLevel() == BitstreamFormat.KNOWN)
