@@ -38,9 +38,9 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-lni</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace-lni</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/branches/dspace-1_5_x/dspace-lni</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/branches/dspace-1_5_x/dspace-lni</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/branches/dspace-1_5_x/dspace-lni</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/branches/dspace-1_5_x/dspace-lni</url>
    </scm>
 
    <modules>

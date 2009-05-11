@@ -41,9 +41,9 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/oai</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/oai</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/branches/dspace-1_5_x/dspace/modules/oai</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/branches/dspace-1_5_x/dspace/modules/oai</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/branches/dspace-1_5_x/dspace/modules/oai</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/branches/dspace-1_5_x/dspace/modules/oai</url>
    </scm>
 
    <build>
