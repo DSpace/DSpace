@@ -40,9 +40,9 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-oai/dspace-oai-webapp</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-oai/dspace-oai-webapp</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-oai/dspace-oai-webapp</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-oai/dspace-oai-webapp</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-oai/dspace-oai-webapp</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-oai/dspace-oai-webapp</url>
    </scm>
    
    <build>

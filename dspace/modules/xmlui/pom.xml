@@ -33,9 +33,9 @@
    </repositories>
 
    <scm>
-      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/xmlui</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/xmlui</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/xmlui</url>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/xmlui</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/xmlui</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/xmlui</url>
    </scm>
 
    <build>

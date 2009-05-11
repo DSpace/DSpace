@@ -33,9 +33,9 @@
    </repositories>
 
    <scm>
-      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-lni/dspace-lni-client</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-lni/dspace-lni-client</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-lni/dspace-lni-client</url>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-lni/dspace-lni-client</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-lni/dspace-lni-client</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-lni/dspace-lni-client</url>
    </scm>
 
    <profiles>

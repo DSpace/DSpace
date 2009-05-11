@@ -42,9 +42,9 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-sword/dspace-sword-api</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-sword/dspace-sword-api</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-sword/dspace-sword-api</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword/dspace-sword-api</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword/dspace-sword-api</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword/dspace-sword-api</url>
    </scm>
 
    <dependencies>

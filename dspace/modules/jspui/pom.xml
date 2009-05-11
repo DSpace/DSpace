@@ -89,9 +89,9 @@
 	</repositories>
 
 	<scm>
-		<connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/jspui</connection>
-		<developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/jspui</developerConnection>
-		<url>http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace/modules/jspui</url>
+		<connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/jspui</connection>
+		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/jspui</developerConnection>
+		<url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/jspui</url>
 	</scm>
 
 	<build>

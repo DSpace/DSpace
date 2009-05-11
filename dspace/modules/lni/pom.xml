@@ -32,9 +32,9 @@
    </repositories>
 
    <scm>
-      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/lni</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/lni</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/lni</url>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/lni</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/lni</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/lni</url>
    </scm>
 
    <build>

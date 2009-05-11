@@ -34,9 +34,9 @@
    </repositories>
 
    <scm>
-      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui/dspace-xmlui-webapp</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace-xmlui/dspace-xmlui-webapp</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/trunk/dspace-xmlui/dspace-xmlui-webapp</url>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-webapp</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-webapp</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-webapp</url>
    </scm>
 
    <build>
