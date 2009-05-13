@@ -581,6 +581,13 @@
          <timezone>+1</timezone>
       </developer>
       <developer>
+         <name>Ben Bosman</name>
+         <email>benbosman at users.sourceforge.net</email>
+          <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
          <name>Mark Diggory</name>
          <email>mdiggory at mit.edu</email>
          <url>http://www.linkedin.com/in/mdiggory</url>
@@ -653,6 +660,13 @@
          <roles>
             <role>commiter</role>
          </roles>
+      </developer>
+      <developer>
+          <name>Kim Shepherd</name>
+          <email>kshepherd at users.sourceforge.net</email>
+          <roles>
+              <role>commiter</role>
+          </roles>
       </developer>
       <developer>
          <name>Robert Tansley</name>
