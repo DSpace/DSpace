@@ -482,9 +482,9 @@ cribeStep&lt;/xmlui-binding&gt; &lt;workflow-editable&gt;true&lt;/workflow-edita
                         <para><emphasis role="bold">submit</emphasis> : the field will only be visible in the initial submission, and not in the workflow stages.</para>
                       </listitem>
                     </itemizedlist>
- For example:</para>
+ In addition, you can decide which type of restriction apply: read-only or full hidden the field (default behaviour) using the <literal>otherwise</literal> attribute of the <literal>visibility</literal> XML element. For example:</para>
                   <para>
-                    <literal>&lt;visibility&gt;workflow&lt;/visibility&gt;</literal>
+                    <literal>&lt;visibility otherwise="readonly"&gt;workflow&lt;/visibility&gt;</literal>
                   </para>
                   <para> Note that it is considered a configuration error to limit a field&apos;s scope while also requiring it - an exception will be generated when this combination is detected.</para>
                 </listitem>

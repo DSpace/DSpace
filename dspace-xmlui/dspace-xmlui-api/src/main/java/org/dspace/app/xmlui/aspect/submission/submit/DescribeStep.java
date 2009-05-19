@@ -115,22 +115,7 @@ public class DescribeStep extends AbstractSubmissionStep
     protected static final Message T_report_no= 
         message("xmlui.Submission.submit.DescribeStep.report_no");
 	
-	
-	/** 
-	 * The scope of the input sets, this restricts hidden metadata fields from 
-	 * view by the end user during submission. 
-	 */
-	private static String SUBMISSION_SCOPE = "submit";
-	
-	/** 
-     * The scope of the input sets, this restricts hidden metadata fields from 
-     * view during workflow processing. 
-     */
-    private static String WORKFLOW_SCOPE = "workflow";
-    
-  
-    
-    /**
+	/**
      * A shared resource of the inputs reader. The 'inputs' are the 
      * questions we ask the user to describe an item during the 
      * submission process. The reader is a utility class to read 
@@ -205,10 +190,13 @@ public class DescribeStep extends AbstractSubmissionStep
 		// Iterate over all inputs and add it to the form.
 		for(DCInput dcInput : inputs)
 		{
-			// If the input is invisible in this scope, then skip it.
-			if (!dcInput.isVisible(submissionInfo.isInWorkflow() ? WORKFLOW_SCOPE : SUBMISSION_SCOPE))
+		    String scope = submissionInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
+		    boolean readonly = dcInput.isReadOnly(scope);
+		    
+		    // If the input is invisible in this scope, then skip it.
+			if (!dcInput.isVisible(scope) && !readonly)
 				continue;
-
+			
 			String schema = dcInput.getSchema();
 			String element = dcInput.getElement();
 			String qualifier = dcInput.getQualifier();
@@ -220,21 +208,21 @@ public class DescribeStep extends AbstractSubmissionStep
 			String inputType = dcInput.getInputType();
 			if (inputType.equals("name")) 
 			{
-				renderNameField(form, fieldName, dcInput, dcValues);
+				renderNameField(form, fieldName, dcInput, dcValues, readonly);
 			} 
 			else if (inputType.equals("date"))
 			{
-				renderDateField(form, fieldName, dcInput, dcValues);
+				renderDateField(form, fieldName, dcInput, dcValues, readonly);
 			}
 			else if (inputType.equals("series"))
 			{
-				renderSeriesField(form, fieldName, dcInput, dcValues);
+				renderSeriesField(form, fieldName, dcInput, dcValues, readonly);
 			}
 			else if (inputType.equals("twobox"))
 			{
 				// We don't have a twobox field, instead it's just a
 				// one box field that the theme can render in two columns.
-				renderOneboxField(form, fieldName, dcInput, dcValues);
+				renderOneboxField(form, fieldName, dcInput, dcValues, readonly);
 			}
 			else if (inputType.equals("qualdrop_value"))
 			{
@@ -253,23 +241,23 @@ public class DescribeStep extends AbstractSubmissionStep
 					} 
 				}
 				
-				renderQualdropField(form, fieldName, dcInput, filtered.toArray(new DCValue[filtered.size()]));
+				renderQualdropField(form, fieldName, dcInput, filtered.toArray(new DCValue[filtered.size()]), readonly);
 			}
 			else if (inputType.equals("textarea"))
 			{
-				renderTextArea(form, fieldName, dcInput, dcValues);
+				renderTextArea(form, fieldName, dcInput, dcValues, readonly);
 			}
 			else if (inputType.equals("dropdown"))
 			{
-				renderDropdownField(form, fieldName, dcInput, dcValues);
+				renderDropdownField(form, fieldName, dcInput, dcValues, readonly);
 			}
 			else if (inputType.equals("list"))
 			{
-				renderSelectFromListField(form, fieldName, dcInput, dcValues);
+				renderSelectFromListField(form, fieldName, dcInput, dcValues, readonly);
 			}
 			else if (inputType.equals("onebox"))
 			{
-				renderOneboxField(form, fieldName, dcInput, dcValues);
+				renderOneboxField(form, fieldName, dcInput, dcValues, readonly);
 			}
 			else
 			{
@@ -325,7 +313,8 @@ public class DescribeStep extends AbstractSubmissionStep
         for (DCInput input : inputs)
         {
             // If the input is invisible in this scope, then skip it.
-            if (!input.isVisible(submissionInfo.isInWorkflow() ? WORKFLOW_SCOPE : SUBMISSION_SCOPE))
+            String scope = submissionInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
+            if (!input.isVisible(scope) && !input.isReadOnly(scope))
                 continue;
 
             String inputType = input.getInputType();
@@ -398,7 +387,7 @@ public class DescribeStep extends AbstractSubmissionStep
 	 * @param dcValues
 	 * 			The field's pre-existing values.
 	 */
-	private void renderNameField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues) throws WingException
+	private void renderNameField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
 	{
 		// The name field is a composite field containing two text fields, one 
 		// for first name the other for last name.
@@ -413,14 +402,21 @@ public class DescribeStep extends AbstractSubmissionStep
 			fullName.setRequired();
 		if (isFieldInError(fieldName))
 			fullName.addError(T_required_field);
-		if (dcInput.isRepeatable())
+		if (dcInput.isRepeatable() && !readonly)
 			fullName.enableAddOperation();
-		if (dcInput.isRepeatable() || dcValues.length > 1)
+		if ((dcInput.isRepeatable() || dcValues.length > 1)  && !readonly)
 			fullName.enableDeleteOperation();
 
 		// Setup the first and last name
 		lastName.setLabel(T_last_name_help);
 		firstName.setLabel(T_first_name_help);
+		
+		if (readonly)
+		{
+		    lastName.setDisabled();
+		    firstName.setDisabled();
+		    fullName.setDisabled();
+		}
 		
 		// Setup the field's values
 		if (dcInput.isRepeatable() || dcValues.length > 1)
@@ -457,7 +453,7 @@ public class DescribeStep extends AbstractSubmissionStep
 	 * @param dcValues
 	 * 			The field's pre-existing values.
 	 */
-	private void renderDateField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues) throws WingException
+	private void renderDateField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
 	{
 		// The date field consists of three primitive fields: a text field 
 		// for the year, followed by a select box of the months, follewed 
@@ -474,11 +470,18 @@ public class DescribeStep extends AbstractSubmissionStep
 			fullDate.setRequired();
 		if (isFieldInError(fieldName))
 			fullDate.addError(T_required_field);
-		if (dcInput.isRepeatable())
+		if (dcInput.isRepeatable() && !readonly)
 			fullDate.enableAddOperation();
-		if (dcInput.isRepeatable() || dcValues.length > 1)
+		if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
 			fullDate.enableDeleteOperation();
 
+		if (readonly)
+		{
+		    year.setDisabled();
+		    month.setDisabled();
+		    day.setDisabled();
+		}
+		
 		// Setup the year field
 		year.setLabel(T_year);
 		year.setSize(4,4);
@@ -541,7 +544,7 @@ public class DescribeStep extends AbstractSubmissionStep
 	 * @param dcValues
 	 * 			The field's pre-existing values.
 	 */
-	private void renderSeriesField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues) throws WingException
+	private void renderSeriesField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
 	{
 		// The seiries field consists of two parts, a series name (text field) 
 		// and report or paper number (also a text field).
@@ -556,14 +559,21 @@ public class DescribeStep extends AbstractSubmissionStep
 			fullSeries.setRequired();
 		if (isFieldInError(fieldName))
 			fullSeries.addError(T_required_field);
-		if (dcInput.isRepeatable())
+		if (dcInput.isRepeatable() && !readonly)
 			fullSeries.enableAddOperation();
-		if (dcInput.isRepeatable() || dcValues.length > 1)
+		if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
 			fullSeries.enableDeleteOperation();
 
 		series.setLabel(T_series_name);
 		number.setLabel(T_report_no);
 
+		if (readonly)
+		{
+		    fullSeries.setDisabled();
+		    series.setDisabled();
+		    number.setDisabled();
+		}
+		
 		// Setup the field's values
 		if (dcInput.isRepeatable() || dcValues.length > 1)
 		{
@@ -602,7 +612,7 @@ public class DescribeStep extends AbstractSubmissionStep
 	 * @param dcValues
 	 * 			The field's pre-existing values.
 	 */
-	private void renderQualdropField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues) throws WingException
+	private void renderQualdropField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
 	{
 		Composite qualdrop = form.addItem().addComposite(fieldName,"submit-qualdrop");
 		Select qual = qualdrop.addSelect(fieldName+"_qualifier");
@@ -615,11 +625,18 @@ public class DescribeStep extends AbstractSubmissionStep
 			qualdrop.setRequired();
 		if (isFieldInError(fieldName))
 			qualdrop.addError(T_required_field);
-		if (dcInput.isRepeatable())
+		if (dcInput.isRepeatable() && !readonly)
 			qualdrop.enableAddOperation();
 		// Update delete based upon the filtered values.
-		if (dcInput.isRepeatable() || dcValues.length > 1)
+		if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
 			qualdrop.enableDeleteOperation();
+		
+		if (readonly)
+		{
+		    qualdrop.setDisabled();
+		    qual.setDisabled();
+		    value.setDisabled();
+		}
 		
 		// Setup the possible options
 		@SuppressWarnings("unchecked") // This cast is correct
@@ -661,7 +678,7 @@ public class DescribeStep extends AbstractSubmissionStep
 	 * @param dcValues
 	 * 			The field's pre-existing values.
 	 */
-	private void renderTextArea(List form, String fieldName, DCInput dcInput, DCValue[] dcValues) throws WingException
+	private void renderTextArea(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
 	{
 		// Plain old Textarea
 		TextArea textArea = form.addItem().addTextArea(fieldName,"submit-textarea");
@@ -673,11 +690,16 @@ public class DescribeStep extends AbstractSubmissionStep
 			textArea.setRequired();
 		if (isFieldInError(fieldName))
 			textArea.addError(T_required_field);
-		if (dcInput.isRepeatable())
+		if (dcInput.isRepeatable() && !readonly)
 			textArea.enableAddOperation();
-		if (dcInput.isRepeatable() || dcValues.length > 1)
+		if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
 			textArea.enableDeleteOperation();
 
+		if (readonly)
+		{
+		    textArea.setDisabled();
+		}
+		
 		// Setup the field's values
 		if (dcInput.isRepeatable() || dcValues.length > 1)
 		{
@@ -705,7 +727,7 @@ public class DescribeStep extends AbstractSubmissionStep
 	 * @param dcValues
 	 * 			The field's pre-existing values.
 	 */
-	private void renderDropdownField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues) throws WingException
+	private void renderDropdownField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
 	{
 		// Plain old select list.
 		Select select = form.addItem().addSelect(fieldName,"submit-select");
@@ -723,6 +745,11 @@ public class DescribeStep extends AbstractSubmissionStep
 			// widget instead of DRI's version.
 			select.setMultiple();
 			select.setSize(6);
+		}
+		
+		if (readonly)
+		{
+		    select.setDisabled();
 		}
 		
 		// Setup the possible options
@@ -760,7 +787,7 @@ public class DescribeStep extends AbstractSubmissionStep
 	 * @param dcValues
 	 * 			The field's pre-existing values.
 	 */
-	private void renderSelectFromListField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues) throws WingException
+	private void renderSelectFromListField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
 	{
 		Field listField = null;
 		
@@ -772,6 +799,11 @@ public class DescribeStep extends AbstractSubmissionStep
 		else //otherwise this is a list of radio buttons
 		{
 			listField = form.addItem().addRadio(fieldName);
+		}
+		
+		if (readonly)
+		{
+		    listField.setDisabled();
 		}
 		
 		//	Setup the field
@@ -826,7 +858,7 @@ public class DescribeStep extends AbstractSubmissionStep
 	 * @param dcValues
 	 * 			The field's pre-existing values.
 	 */
-	private void renderOneboxField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues) throws WingException
+	private void renderOneboxField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
 	{
 		// Both onebox and twobox consist a free form text field 
 		// that the user may enter any value. The difference between 
@@ -843,11 +875,16 @@ public class DescribeStep extends AbstractSubmissionStep
 			text.setRequired();
 		if (isFieldInError(fieldName))
 			text.addError(T_required_field);
-		if (dcInput.isRepeatable())
+		if (dcInput.isRepeatable() && !readonly)
 			text.enableAddOperation();
-		if (dcInput.isRepeatable() || dcValues.length > 1)
+		if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
 			text.enableDeleteOperation();
 
+		if (readonly)
+		{
+		    text.setDisabled();
+		}
+		
 		// Setup the field's values
 		if (dcInput.isRepeatable() || dcValues.length > 1)
 		{

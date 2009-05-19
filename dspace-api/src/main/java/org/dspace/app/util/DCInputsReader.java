@@ -434,6 +434,11 @@ public class DCInputsReader
     				String closedVocabularyString = getAttribute(nd, "closed");
     			    field.put("closedVocabulary", closedVocabularyString);
     			}
+    			else if (tagName.equals("visibility"))
+    			{
+    			    String readOnlyString = getAttribute(nd, "otherwise");
+                    field.put("readonly", readOnlyString);
+    			}
     		}
     	}
     	String missing = null;

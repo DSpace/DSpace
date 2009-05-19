@@ -160,6 +160,12 @@ public class DescribeStep extends AbstractProcessingStep
         // clear out all item metadata defined on this page
         for (int i = 0; i < inputs.length; i++)
         {
+            if (!inputs[i]
+                    .isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE
+                            : DCInput.SUBMISSION_SCOPE))
+            {
+                continue;
+            }
             String qualifier = inputs[i].getQualifier();
             if (qualifier == null
                     && inputs[i].getInputType().equals("qualdrop_value"))
@@ -176,6 +182,12 @@ public class DescribeStep extends AbstractProcessingStep
         boolean moreInput = false;
         for (int j = 0; j < inputs.length; j++)
         {
+            if (!inputs[j]
+                        .isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE
+                                : DCInput.SUBMISSION_SCOPE))
+            {
+                continue;
+            }
             String element = inputs[j].getElement();
             String qualifier = inputs[j].getQualifier();
             String schema = inputs[j].getSchema();
@@ -487,8 +499,8 @@ public class DescribeStep extends AbstractProcessingStep
                 firsts.add(firstNames);
         }
 
-        // Remove existing values
-        item.clearMetadata(schema, element, qualifier, Item.ANY);
+        // Remove existing values, already done in doProcessing see also bug DS-203
+        // item.clearMetadata(schema, element, qualifier, Item.ANY);
 
         // Put the names in the correct form
         for (int i = 0; i < lasts.size(); i++)
@@ -600,8 +612,8 @@ public class DescribeStep extends AbstractProcessingStep
                 vals.add(value.trim());
         }
 
-        // Remove existing values
-        item.clearMetadata(schema, element, qualifier, Item.ANY);
+        // Remove existing values, already done in doProcessing see also bug DS-203
+        // item.clearMetadata(schema, element, qualifier, Item.ANY);
 
         // Put the names in the correct form
         for (int i = 0; i < vals.size(); i++)
@@ -653,7 +665,8 @@ public class DescribeStep extends AbstractProcessingStep
 
         d.setDateLocal(year, month, day, -1, -1, -1);
 
-        item.clearMetadata(schema, element, qualifier, Item.ANY);
+        // already done in doProcessing see also bug DS-203
+        // item.clearMetadata(schema, element, qualifier, Item.ANY);
 
         if (year > 0)
         {
@@ -744,8 +757,8 @@ public class DescribeStep extends AbstractProcessingStep
             }
         }
 
-        // Remove existing values
-        item.clearMetadata(schema, element, qualifier, Item.ANY);
+        // Remove existing values, already done in doProcessing see also bug DS-203
+        // item.clearMetadata(schema, element, qualifier, Item.ANY);
 
         // Put the names in the correct form
         for (int i = 0; i < series.size(); i++)

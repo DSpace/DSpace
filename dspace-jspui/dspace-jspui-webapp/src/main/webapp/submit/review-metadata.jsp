@@ -120,6 +120,11 @@
 	                                           ip.isPublishedBefore());  
        for (int z = 0; z < inputs.length; z++)
        { 
+          String scope = subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
+          if (!inputs[z].isVisible(scope) && !inputs[z].isReadOnly(scope))
+          {
+              continue;
+          }
           String inputType = inputs[z].getInputType();
           String pairsName = inputs[z].getPairsType();
           String value;
@@ -213,7 +218,8 @@
 <%-- ====================================================== --%>
 <%--             DESCRIBE ITEM ELEMENTS                     --%>
 <%-- ====================================================== --%>
-            <table width="100%">
+            
+<%@page import="org.dspace.workflow.WorkflowItem"%><table width="100%">
                <tr>
                    <td width="100%">
                    <table width="700px">

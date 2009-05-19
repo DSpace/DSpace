@@ -23,6 +23,8 @@
 (Mark Diggory / Stuart Lewis)
  - [DS-201] handle.jar upgraded to version 6.2
 
+(Andrea Bollini)
+- [DS-206] Input form visibility restriction doesn't work properly
 
 1.5.2 final
 ===========

@@ -92,13 +92,13 @@
     // that pops up a window that to display a controlled vocabulary. 
     // It should be called from the doOneBox and doTwoBox methods. 
     // It must be extended to work with doTextArea.
-    String doControlledVocabulary(String fieldName, PageContext pageContext, String vocabulary) 
+    String doControlledVocabulary(String fieldName, PageContext pageContext, String vocabulary, boolean readonly) 
     {
     	String link = "";
     	boolean enabled = ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable");
     	boolean useWithCurrentField = vocabulary != null && ! "".equals(vocabulary);
     	
-        if (enabled && useWithCurrentField) 
+        if (enabled && useWithCurrentField && !readonly) 
         {
 			// Deal with the issue of _0 being removed from fieldnames in the configurable submission system
 			if (fieldName.endsWith("_0"))
@@ -134,7 +134,7 @@
 
     void doPersonalName(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label, PageContext pageContext) 
+      boolean readonly, int fieldCountIncr, String label, PageContext pageContext) 
       throws java.io.IOException 
     {
 
@@ -191,14 +191,24 @@
 	 
          sb.append("<td><input type=\"text\" name=\"")
            .append(last.toString())
-           .append("\" size=\"23\" value=\"")
+           .append("\" size=\"23\" ");
+         if (readonly)
+         {
+             sb.append("disabled=\"disabled\" ");
+         }
+         sb.append("value=\"")
            .append(dpn.getLastName().replaceAll("\"", "&quot;")) // Encode "
 	   	   .append("\"/></td>\n<td><input type=\"text\" name=\"")
 	   	   .append(first.toString())
-           .append("\" size=\"23\" value=\"")
-           .append(dpn.getFirstNames()).append("\"/></td>\n");
+           .append("\" size=\"23\" ");
+         if (readonly)
+         {
+             sb.append("disabled=\"disabled\" ");
+         }
+         sb.append("value=\"")
+         .append(dpn.getFirstNames()).append("\"/></td>\n");
 
-	 if (repeatable && i < defaults.length) 
+	 if (repeatable && !readonly && i < defaults.length) 
 	 {
 	    name.setLength(0);
 	    name.append(dpn.getLastName())
@@ -214,7 +224,7 @@
 		  .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
 		  .append("\"/> </td></tr>");
 	 } 
-	 else if (repeatable && i == fieldCount - 1) 
+	 else if (repeatable && !readonly && i == fieldCount - 1) 
 	 {
 	    // put a 'more' button next to the last space
 	    sb.append("<td><input type=\"submit\" name=\"submit_")
@@ -236,7 +246,7 @@
 
     void doDate(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label, PageContext pageContext, HttpServletRequest request) 
+      boolean readonly, int fieldCountIncr, String label, PageContext pageContext, HttpServletRequest request) 
       throws java.io.IOException 
     {
 
@@ -269,7 +279,13 @@
 	    .append(fieldName)
 	    .append("_month");
          if (repeatable && i>0)
+         {
             sb.append('_').append(i);
+         }
+         if (readonly)
+         {
+             sb.append("\" disabled=\"disabled");
+         }
          sb.append("\"><option value=\"-1\"")
             .append((dateIssued.getMonth() == -1 ? " selected=\"selected\"" : ""))
 //	    .append(">(No month)</option>");
@@ -295,6 +311,10 @@
 	    .append("_day");
          if (repeatable && i>0)
             sb.append("_").append(i);
+         if (readonly)
+         {
+             sb.append("\" disabled=\"disabled");
+         }
          sb.append("\" size=\"2\" maxlength=\"2\" value=\"")
             .append((dateIssued.getDay() > 0 ? 
 	             String.valueOf(dateIssued.getDay()) : "" ))
@@ -306,12 +326,16 @@
 	    .append("_year");
          if (repeatable && i>0)
             sb.append("_").append(i);
+         if (readonly)
+         {
+             sb.append("\" disabled=\"disabled");
+         }
          sb.append("\" size=\"4\" maxlength=\"4\" value=\"")
             .append((dateIssued.getYear() > 0 ? 
 	         String.valueOf(dateIssued.getYear()) : "" ))
 	    .append("\"/></td>\n");
     
-	 if (repeatable && i < defaults.length) 
+	 if (repeatable && !readonly && i < defaults.length) 
 	 {
 	    // put a remove button next to filled in values
 	    sb.append("<td><input type=\"submit\" name=\"submit_")
@@ -323,7 +347,7 @@
 		  .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
 		  .append("\"/> </td></tr>");
 	 } 
-	 else if (repeatable && i == fieldCount - 1) 
+	 else if (repeatable && !readonly && i == fieldCount - 1) 
 	 {
 	    // put a 'more' button next to the last space
 	    sb.append("<td><input type=\"submit\" name=\"submit_")
@@ -345,7 +369,7 @@
 
     void doSeriesNumber(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label, PageContext pageContext) 
+      boolean readonly, int fieldCountIncr, String label, PageContext pageContext) 
       throws java.io.IOException 
     {
 
@@ -392,7 +416,10 @@
 	   .append("_series");
          if (repeatable && i!= fieldCount)
            sb.append("_").append(i+1);
-
+         if (readonly)
+         {
+             sb.append("\" disabled=\"disabled");
+         }
          sb.append("\" size=\"23\" value=\"")
            .append(sn.getSeries().replaceAll("\"", "&quot;"))
 	   .append("\"/></td>\n<td><input type=\"text\" name=\"")
@@ -400,11 +427,15 @@
 	   .append("_number");
          if (repeatable && i!= fieldCount)
            sb.append("_").append(i+1);
+         if (readonly)
+         {
+             sb.append("\" disabled=\"disabled");
+         }
          sb.append("\" size=\"23\" value=\"")
            .append(sn.getNumber().replaceAll("\"", "&quot;"))
 	   .append("\"/></td>\n");
 
-	 if (repeatable && i < defaults.length) 
+	 if (repeatable && !readonly && i < defaults.length) 
 	 {
 	    // put a remove button next to filled in values
 	    sb.append("<td><input type=\"submit\" name=\"submit_")
@@ -416,7 +447,7 @@
    	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
    	      .append("\"/> </td></tr>");
 	 } 
-	 else if (repeatable && i == fieldCount - 1) 
+	 else if (repeatable && !readonly && i == fieldCount - 1) 
 	 {
 	    // put a 'more' button next to the last space
 	    sb.append("<td><input type=\"submit\" name=\"submit_")
@@ -437,7 +468,7 @@
     }
 
     void doTextArea(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String schema, String element, String qualifier, boolean repeatable,
+      String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean readonly,
       int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary) 
       throws java.io.IOException 
     {
@@ -469,14 +500,14 @@
          if (repeatable && i!= fieldCount)
            sb.append("_").append(i+1);
          sb.append("\" rows=\"4\" cols=\"45\"")
-           .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
+           .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" disabled=\"disabled\" ":"")
            .append(" >")
            .append(val)
 	   .append("</textarea>")
-	   .append(doControlledVocabulary(fieldName + (repeatable?"_" + i:""), pageContext, vocabulary))
+	   .append(doControlledVocabulary(fieldName + (repeatable?"_" + i:""), pageContext, vocabulary, readonly))
 	   .append("</td>\n");
 
-	 if (repeatable && i < defaults.length) 
+	 if (repeatable && !readonly && i < defaults.length) 
 	 {
 	    // put a remove button next to filled in values
 	    sb.append("<td><input type=\"submit\" name=\"submit_")
@@ -488,7 +519,7 @@
    	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
    	      .append("\"/> </td></tr>");
 	 } 
-	 else if (repeatable && i == fieldCount - 1) 
+	 else if (repeatable && !readonly && i == fieldCount - 1) 
 	 {
 	    // put a 'more' button next to the last space
 	    sb.append("<td><input type=\"submit\" name=\"submit_")
@@ -509,7 +540,7 @@
     }
 
     void doOneBox(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String schema, String element, String qualifier, boolean repeatable,
+      String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean readonly,
       int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary) 
       throws java.io.IOException 
     {
@@ -543,13 +574,13 @@
          
          sb.append("\" size=\"50\" value=\"")
            .append(val +"\"")
-           .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
+           .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
 	   	.append("/>")
-	   .append(doControlledVocabulary(fieldName + (repeatable&& i!= fieldCount?"_" + (i+1):""), pageContext, vocabulary))
+	   .append(doControlledVocabulary(fieldName + (repeatable&& i!= fieldCount?"_" + (i+1):""), pageContext, vocabulary, readonly))
 	   .append("</td>\n");
 	   
 
-	 if (repeatable && i < defaults.length) 
+	 if (repeatable && !readonly && i < defaults.length) 
 	 {
 	    // put a remove button next to filled in values
 	    sb.append("<td><input type=\"submit\" name=\"submit_")
@@ -561,7 +592,7 @@
    	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
    	      .append("\"/> </td></tr>");
 	 } 
-	 else if (repeatable && i == fieldCount - 1) 
+	 else if (repeatable && !readonly && i == fieldCount - 1) 
 	 {
 	    // put a 'more' button next to the last space
 	    sb.append("<td><input type=\"submit\" name=\"submit_")
@@ -582,7 +613,7 @@
     }
 
     void doTwoBox(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String schema, String element, String qualifier, boolean repeatable,
+      String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean readonly,
       int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary) 
       throws java.io.IOException 
     {
@@ -644,25 +675,29 @@
              .append("\" size=\"15\" value=\"")
              .append(defaults[i].value.replaceAll("\"", "&quot;"))
              .append("\"")
-       	     .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
-             .append("/>&nbsp;<input type=\"submit\" name=\"submit_")
-	     .append(fieldName)
-	     .append("_remove_")
-	     .append(i)
-	     .append("\" value=\"")
-	     .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
-	     .append("\"/>")
-         .append(doControlledVocabulary(fieldParam, pageContext, vocabulary))
-	     .append("</td>\n");
+       	     .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
+             .append("/>");
+          if (!readonly)
+          {
+		       sb.append("&nbsp;<input type=\"submit\" name=\"submit_")
+			     .append(fieldName)
+			     .append("_remove_")
+			     .append(i)
+			     .append("\" value=\"")
+			     .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
+			     .append("\"/>");
+          }
+          sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly))
+	     	.append("</td>\n");
          }
          else 
 	 	 {
            sb.append("<td align=\"left\"><input type=\"text\" name=\"")
              .append(fieldParam)
              .append("\" size=\"15\"")
-             .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
+             .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
              .append("/>")
-             .append(doControlledVocabulary(fieldParam, pageContext, vocabulary))
+             .append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly))
              .append("</td>\n");             
 	 	}
 	 
@@ -686,16 +721,21 @@
 	             .append("\" size=\"15\" value=\"")
 	             .append(defaults[i].value.replaceAll("\"", "&quot;"))
 		         .append("\"")
-		         .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
-		         .append("/>&nbsp;<input type=\"submit\" name=\"submit_")
-		     .append(fieldName)
-		     .append("_remove_")
-		     .append(i)
-		     .append("\" value=\"")
-		     .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
-		     .append("\"/>")
-	         .append(doControlledVocabulary(fieldParam, pageContext, vocabulary))
-		     .append("</td></tr>\n");
+		         .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
+		         .append("/>");
+	           if (!readonly)
+	           {		           
+			       sb.append("&nbsp;<input type=\"submit\" name=\"submit_")
+				     .append(fieldName)
+				     .append("_remove_")
+				     .append(i)
+				     .append("\" value=\"")
+				     .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove2"))
+				     .append("\"/>");
+	           }
+	         	
+	           sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly))
+		     	 .append("</td></tr>\n");
 		 }
 		 else 
 		 {
@@ -703,12 +743,12 @@
 	             .append(fieldParam)
 	             //.append("\" size=\"15\"/></td>");
 	             .append("\" size=\"15\"")
-	             .append(hasVocabulary(vocabulary)&&closedVocabulary?" readonly=\"readonly\" ":"")
+	             .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" disabled=\"disabled\" ":"")
 	             .append("/>")
-	             .append(doControlledVocabulary(fieldParam, pageContext, vocabulary))
+	             .append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly))
 	             .append("</td>\n");             
 	
-		   if (i+1 >= fieldCount) 
+		   if (i+1 >= fieldCount && !readonly) 
 		   {
 		     sb.append("<td><input type=\"submit\" name=\"submit_")
 		       .append(fieldName)
@@ -731,7 +771,7 @@
 
     void doQualdropValue(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, DCInputSet inputs, boolean repeatable,
-      int fieldCountIncr, List qualMap, String label, PageContext pageContext) 
+      boolean readonly, int fieldCountIncr, List qualMap, String label, PageContext pageContext) 
       throws java.io.IOException 
     {
 		DCValue[] unfiltered = item.getMetadata(schema, element, Item.ANY, Item.ANY);
@@ -785,6 +825,10 @@
 	   .append("_qualifier");
          if (repeatable && j!= fieldCount) 
            sb.append("_").append(j+1);
+         if (readonly)
+         {
+             sb.append("\" disabled=\"disabled");
+         }
          sb.append("\">");
          for (int i = 0; i < qualMap.size(); i+=2)
          {
@@ -805,11 +849,15 @@
 	   .append("_value");
          if (repeatable && j!= fieldCount)
            sb.append("_").append(j+1);
+         if (readonly)
+         {
+             sb.append("\" disabled=\"disabled");
+         }
          sb.append("\" size=\"34\" value=\"")
            .append(currentVal.replaceAll("\"", "&quot;"))
 	   .append("\"/></td>\n");
 
-	 if (repeatable && j < defaults.length) 
+	 if (repeatable && !readonly && j < defaults.length) 
 	 {
 	    // put a remove button next to filled in values
 	    sb.append("<td><input type=\"submit\" name=\"submit_")
@@ -821,7 +869,7 @@
    	      .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
    	      .append("\"/> </td></tr>");
 	 } 
-	 else if (repeatable && j == fieldCount - 1) 
+	 else if (repeatable && !readonly && j == fieldCount - 1) 
 	 {
 	    // put a 'more' button next to the last space
 	    sb.append("<td><input type=\"submit\" name=\"submit_")
@@ -843,7 +891,7 @@
 
     void doDropDown(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      List valueList, String label) 
+      boolean readonly, List valueList, String label) 
       throws java.io.IOException 
     {
       DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
@@ -862,6 +910,10 @@
 	.append("\"");
       if (repeatable)
 	sb.append(" size=\"6\"  multiple=\"multiple\"");
+      if (readonly)
+      {
+          sb.append(" disabled=\"disabled\"");
+      }
       sb.append(">");
 
       for (int i = 0; i < valueList.size(); i += 2)
@@ -890,7 +942,7 @@
     /** Display Checkboxes or Radio buttons, depending on if repeatable! **/
     void doList(javax.servlet.jsp.JspWriter out, Item item,
             String fieldName, String schema, String element, String qualifier, boolean repeatable,
-            List valueList, String label) 
+            boolean readonly, List valueList, String label) 
             throws java.io.IOException 
           {
         	DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
@@ -940,7 +992,10 @@
       	 	      sb.append("checkbox"); 
       	 	   else
       	 	      sb.append("radio");
-      	 	   
+	      	   if (readonly)
+	           {
+	               sb.append("\" disabled=\"disabled");
+	           }
       	 	   sb.append("\" name=\"")
       	 	     .append(fieldName)
       	 	     .append("\"")
@@ -1037,10 +1092,18 @@
                                                 si.getSubmissionItem().isPublishedBefore() );
      for (int z = 0; z < inputs.length; z++) 
      {
+       boolean readonly = false;
        // ignore inputs invisible in this scope
        if (!inputs[z].isVisible(scope))
        {
-           continue;
+           if (inputs[z].isReadOnly(scope))
+           {
+            	readonly = true;   
+           }
+           else
+           {
+               continue;
+           }
        }
        String dcElement = inputs[z].getElement();
        String dcQualifier = inputs[z].getQualifier();
@@ -1088,7 +1151,7 @@
 
        repeatable = inputs[z].getRepeatable();
        fieldCountIncr = 0;
-       if (repeatable) 
+       if (repeatable && !readonly) 
        { 
          fieldCountIncr = 1;
          if (si.getMoreBoxesFor() != null && si.getMoreBoxesFor().equals(fieldName)) 
@@ -1104,53 +1167,53 @@
        if (inputType.equals("name")) 
        {
            doPersonalName(out, item, fieldName, dcSchema, dcElement, dcQualifier,
-	     				  repeatable, fieldCountIncr, label, pageContext);
+	     				  repeatable, readonly, fieldCountIncr, label, pageContext);
        } 
        else if (inputType.equals("date")) 
        {
            doDate(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	     		  repeatable, fieldCountIncr, label, pageContext, request);
+	     		  repeatable, readonly, fieldCountIncr, label, pageContext, request);
        } 
        else if (inputType.equals("series")) 
        {
            doSeriesNumber(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	                      repeatable, fieldCountIncr, label, pageContext);
+	                      repeatable, readonly, fieldCountIncr, label, pageContext);
        } 
        else if (inputType.equals("qualdrop_value")) 
        {
            doQualdropValue(out, item, fieldName, dcSchema, dcElement, inputSet, repeatable,
-                           fieldCountIncr, inputs[z].getPairs(), label, pageContext);
+                   		   readonly, fieldCountIncr, inputs[z].getPairs(), label, pageContext);
        } 
        else if (inputType.equals("textarea")) 
        {
 	   	   doTextArea(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	     			  repeatable, fieldCountIncr, label, pageContext, vocabulary,
+	     			  repeatable, readonly, fieldCountIncr, label, pageContext, vocabulary,
 	     			  closedVocabulary);
        } 
        else if (inputType.equals("dropdown")) 
        {
 	   		doDropDown(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	     			   repeatable, inputs[z].getPairs(), label);
+	     			   repeatable, readonly, inputs[z].getPairs(), label);
        } 
        else if (inputType.equals("twobox")) 
        {
 	   		doTwoBox(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	     			 repeatable, fieldCountIncr, label, pageContext, vocabulary, 
+	     			 repeatable, readonly, fieldCountIncr, label, pageContext, vocabulary, 
 	     			 closedVocabulary);
        }
        else if (inputType.equals("list")) 
        {
           doList(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-           		repeatable, inputs[z].getPairs(), label);
+           		repeatable, readonly, inputs[z].getPairs(), label);
        }
        else 
        {
 	   		doOneBox(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	     			 repeatable, fieldCountIncr, label, pageContext, vocabulary, 
+	     			 repeatable, readonly, fieldCountIncr, label, pageContext, vocabulary, 
 	     			 closedVocabulary);
        }
        
-       if (hasVocabulary(vocabulary))
+       if (hasVocabulary(vocabulary) &&  !readonly)
        {
 %>
 
