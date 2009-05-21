@@ -16,6 +16,7 @@
  - [DS-195] Allow the primary bitstream to be set in the item importer / exporter
  - [DS-196] METS exposed via OAI-PMH includes description.provenance information
  - [DS-200] SWORD module requires the X-Packaging header
+ - [DS-212] NPE thrown during Harvest of non-items when visibility restriction is enabled
 
 (Larry Stone)
  - [DS-193] OAI RDF crosswalk fails when DC value is null
