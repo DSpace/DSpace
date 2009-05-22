@@ -274,38 +274,11 @@ public class CollectionDepositor extends Depositor
 	 */
 	public void undoDeposit(DepositResult result) throws DSpaceSWORDException
 	{
-		try
-		{
-			SWORDContext sc = swordService.getSwordContext();
+	    SWORDContext sc = swordService.getSwordContext();
 
-			// obtain the item's owning collection (there can be only one)
-			// and ask it to remove the item.  Although we're going to abort
-			// the context, so that this nevers gets written to the db,
-			// it will get rid of the files on the disk
-			Item item = result.getItem();
-			Collection collection = item.getOwningCollection();
-			collection.removeItem(item);
-
-			swordService.message("Removing temporary files from disk");
-
-			// abort the context, so no database changes are written
-			sc.abort();
-			swordService.message("Database changes aborted");
-		}
-		catch (IOException e)
-		{
-			log.error("caught exception: ", e);
-			throw new DSpaceSWORDException(e);
-		}
-		catch (AuthorizeException e)
-		{
-			log.error("authentication problem; caught exception: ", e);
-			throw new DSpaceSWORDException(e);
-		}
-		catch (SQLException e)
-		{
-			log.error("caught exception: ", e);
-			throw new DSpaceSWORDException(e);
-		}
+        // abort the context, so no database changes are written
+        // uploaded files will be deleted by the cleanup script
+        sc.abort();
+        swordService.message("Database changes aborted");
 	}
 }

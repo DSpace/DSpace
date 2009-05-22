@@ -26,6 +26,7 @@
 
 (Andrea Bollini)
 - [DS-206] Input form visibility restriction doesn't work properly
+- [DS-199] SWORD module doesn't accept X-No-Op header (dry run)
 
 1.5.2 final
 ===========
