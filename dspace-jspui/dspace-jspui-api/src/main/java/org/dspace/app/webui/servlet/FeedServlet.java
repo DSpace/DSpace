@@ -61,6 +61,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
@@ -81,6 +82,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.Harvest;
+import org.dspace.eperson.Group;
 
 import com.sun.syndication.feed.rss.Channel;
 import com.sun.syndication.feed.rss.Description;
@@ -121,6 +123,8 @@ public class FeedServlet extends DSpaceServlet
     private static int cacheAge = 0;
     // supported syndication formats
     private static List formats = null;
+    // Whether to include private items or not
+    private static boolean includeAll = true;
     
     // localized resource bundle
     private static ResourceBundle labels = null;
@@ -163,6 +167,7 @@ public class FeedServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
 	{
+        includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", true);
         String path = request.getPathInfo();
         String feedType = null;
         String handle = null;
@@ -277,9 +282,8 @@ public class FeedServlet extends DSpaceServlet
         
         // this invocation should return a non-empty list if even 1 item has changed
         try {
-            boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", true);
-        	return (Harvest.harvest(context, dso, startDate, endDate,
-        		                0, 1, false, false, false, includeAll).size() > 0);
+            return (Harvest.harvest(context, dso, startDate, endDate,
+        		                0, 1, !includeAll, false, false, includeAll).size() > 0);
         }
         catch (ParseException pe)
         {
@@ -424,11 +428,30 @@ public class FeedServlet extends DSpaceServlet
     		BrowseInfo bi = be.browseMini(scope);
     		Item[] results = bi.getItemResults(context);
     		List items = new ArrayList();
-    		for (int i = 0; i < results.length; i++)
-    		{
-    			items.add(itemFromDSpaceItem(context, results[i]));
-    		}
-    		
+
+
+            for (int i = 0; i < results.length; i++)
+            {
+                if (!includeAll)
+                {
+                    // Check to see if we can include this item
+                    Group[] authorizedGroups = AuthorizeManager.getAuthorizedGroups(context, results[i], Constants.READ);
+                    boolean added = false;
+                    for (int count = 0; count < authorizedGroups.length; count++)
+                    {
+                        if ((authorizedGroups[count].getID() == 0) && (!added))
+                        {
+                            items.add(itemFromDSpaceItem(context, results[i]));
+                            added = true;
+                        }
+                    }
+                }
+                else
+                {
+                    items.add(itemFromDSpaceItem(context, results[i]));
+                }
+            }
+
     		channel.setItems(items);
 
             // If the description is null, replace it with an empty string
