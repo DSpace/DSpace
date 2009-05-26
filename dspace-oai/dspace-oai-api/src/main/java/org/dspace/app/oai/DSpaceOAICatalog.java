@@ -237,10 +237,14 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Get the relevant OAIItemInfo objects to make headers
             DSpaceObject scope = resolveSet(context, set);
             boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.oai", true);
+            // Warning: In large repositories, setting harvest.includerestricted.oai to false may cause
+            // performance problems as all items will need to have their authorization permissions checked,
+            // but because we haven't implemented resumption tokens in ListIdentifiers, ALL items will
+            // need checking whenever a ListIdentifers request is made.
             List itemInfos = Harvest.harvest(context, scope, from, until, 0, 0, // Everything
                                                                                 // for
                                                                                 // now
-                    false, true, true, includeAll);
+                    !includeAll, true, true, includeAll);
 
             // No Item objects, but we need to know collections they're in and
             // withdrawn items
