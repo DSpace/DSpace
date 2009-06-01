@@ -327,7 +327,7 @@ function doUpdateProfile()
                 } 
             }
         }
-        else if (cocoon.request.get("subscriptions_add"))
+        else if (cocoon.request.get("submit_subscriptions_add"))
         {
             // Add the a new subscription
             var collection = Collection.find(getDSContext(),cocoon.request.get("subscriptions"));
@@ -337,7 +337,7 @@ function doUpdateProfile()
                 getDSContext().commit();
             }
         }
-        else if (cocoon.request.get("subscriptions_delete"))
+        else if (cocoon.request.get("submit_subscriptions_delete"))
         {
             // Remove any selected subscriptions
             var names = cocoon.request.getParameterValues("subscriptions_selected");

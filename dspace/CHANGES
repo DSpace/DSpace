@@ -28,6 +28,10 @@
 - [DS-206] Input form visibility restriction doesn't work properly
 - [DS-199] SWORD module doesn't accept X-No-Op header (dry run)
 
+(Tim Donohue)
+- [DS-218] Cannot add/remove email subscriptions from Profile page in XMLUI
+
+
 1.5.2 final
 ===========
 
