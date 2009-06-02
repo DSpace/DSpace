@@ -17,6 +17,7 @@
  - [DS-196] METS exposed via OAI-PMH includes description.provenance information
  - [DS-200] SWORD module requires the X-Packaging header
  - [DS-212] NPE thrown during Harvest of non-items when visibility restriction is enabled
+ - [DS-221] XMLUI 'current activity' recognises Google Chrome as Safari
 
 (Larry Stone)
  - [DS-193] OAI RDF crosswalk fails when DC value is null

@@ -321,7 +321,12 @@ public class CurrentActivityAction extends AbstractAction
     			return "Opera";
     		
     		if (userAgent.contains("Safari/"))
+    		{
+    		    if (userAgent.contains("Chrome"))
+    		    	    return "Chrome";
+    		
     			return "Safari";
+    		}
     		
     		if (userAgent.contains("Konqueror/"))
     			return "Konqueror";
