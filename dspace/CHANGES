@@ -28,6 +28,7 @@
 (Andrea Bollini)
 - [DS-206] Input form visibility restriction doesn't work properly
 - [DS-199] SWORD module doesn't accept X-No-Op header (dry run)
+- [DS-223] Submission process show previous button in JSPUI also if the step is the first "visible" step
 
 (Tim Donohue)
 - [DS-218] Cannot add/remove email subscriptions from Profile page in XMLUI
