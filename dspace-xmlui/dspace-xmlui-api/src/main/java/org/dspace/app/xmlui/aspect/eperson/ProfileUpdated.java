@@ -93,7 +93,7 @@ public class ProfileUpdated extends AbstractDSpaceTransformer
 
     updated.addPara(T_para1);
 
-    updated.addPara().addXref(contextPath, T_go_home);
+    updated.addPara().addXref(contextPath + "/", T_go_home);
   }
 
 }
