@@ -928,7 +928,7 @@
 	 sb.append("<option ")
 	   .append(j < defaults.length ? " selected=\"selected\" " : "")
 	   .append("value=\"")
-	   .append(value)
+	   .append(value.replaceAll("\"", "&quot;"))
 	   .append("\">")
 	   .append(display)
 	   .append("</option>");
@@ -1001,7 +1001,7 @@
       	 	     .append("\"")
       	 	     .append(j < defaults.length ? " checked=\"checked\" " : "")
       	 	     .append(" value=\"")
-	   			 .append(value)
+	   			 .append(value.replaceAll("\"", "&quot;"))
 	   			 .append("\">");    
       	 	   
       	 	   //print display name immediately after input

@@ -29,6 +29,7 @@
 - [DS-206] Input form visibility restriction doesn't work properly
 - [DS-199] SWORD module doesn't accept X-No-Op header (dry run)
 - [DS-223] Submission process show previous button in JSPUI also if the step is the first "visible" step
+- [DS-227] Values with double apos doesn't work in dropdown and list input type
 
 (Tim Donohue)
 - [DS-218] Cannot add/remove email subscriptions from Profile page in XMLUI
