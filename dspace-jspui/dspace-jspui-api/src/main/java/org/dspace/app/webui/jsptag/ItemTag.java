@@ -475,83 +475,86 @@ public class ItemTag extends TagSupport
 
                 for (int j = 0; j < values.length; j++)
                 {
-                    if (j > 0)
+                    if (values[j] != null && values[j].value != null)
                     {
-                        out.print("<br />");
-                    }
-
-                    if (isLink)
-                    {
-                        out.print("<a href=\"" + values[j].value + "\">"
-                                + Utils.addEntities(values[j].value) + "</a>");
-                    }
-                    else if (isDate)
-                    {
-                        DCDate dd = new DCDate(values[j].value);
-
-                        // Parse the date
-                        out.print(UIUtil.displayDate(dd, false, false, (HttpServletRequest)pageContext.getRequest()));
-                    }
-                    else if (isResolver)
-                    {
-                        String value = values[j].value;
-                        if (value.startsWith("http://")
-                                || value.startsWith("https://")
-                                || value.startsWith("ftp://")
-                                || value.startsWith("ftps://"))
+                        if (j > 0)
                         {
-                            // Already a URL, print as if it was a regular link
-                            out.print("<a href=\"" + value + "\">"
-                                    + Utils.addEntities(value) + "</a>");
+                            out.print("<br />");
+                        }
+
+                        if (isLink)
+                        {
+                            out.print("<a href=\"" + values[j].value + "\">"
+                                    + Utils.addEntities(values[j].value) + "</a>");
+                        }
+                        else if (isDate)
+                        {
+                            DCDate dd = new DCDate(values[j].value);
+
+                            // Parse the date
+                            out.print(UIUtil.displayDate(dd, false, false, (HttpServletRequest)pageContext.getRequest()));
+                        }
+                        else if (isResolver)
+                        {
+                            String value = values[j].value;
+                            if (value.startsWith("http://")
+                                    || value.startsWith("https://")
+                                    || value.startsWith("ftp://")
+                                    || value.startsWith("ftps://"))
+                            {
+                                // Already a URL, print as if it was a regular link
+                                out.print("<a href=\"" + value + "\">"
+                                        + Utils.addEntities(value) + "</a>");
+                            }
+                            else
+                            {
+                                String foundUrn = null;
+                                if (!style.equals("resolver"))
+                                {
+                                    foundUrn = style;
+                                }
+                                else
+                                {
+                                    for (String checkUrn : urn2baseurl.keySet())
+                                    {
+                                        if (value.startsWith(checkUrn))
+                                        {
+                                            foundUrn = checkUrn;
+                                        }
+                                    }
+                                }
+
+                                if (foundUrn != null)
+                                {
+
+                                    if (value.startsWith(foundUrn + ":"))
+                                    {
+                                        value = value.substring(foundUrn.length()+1);
+                                    }
+
+                                    String url = urn2baseurl.get(foundUrn);
+                                    out.print("<a href=\"" + url
+                                            + value + "\">"
+                                            + Utils.addEntities(values[j].value)
+                                            + "</a>");
+                                }
+                                else
+                                {
+                                    out.print(value);
+                                }
+                            }
+
+                        }
+                        else if (browseIndex != null)
+                        {
+                            out.print("<a href=\"" + request.getContextPath() + "/browse?type=" + browseIndex + "&amp;value="
+                                        + URLEncoder.encode(values[j].value, "UTF-8") + "\">" + Utils.addEntities(values[j].value)
+                                        + "</a>");
                         }
                         else
                         {
-                            String foundUrn = null;
-                            if (!style.equals("resolver"))
-                            {
-                                foundUrn = style;
-                            }
-                            else
-                            {
-                                for (String checkUrn : urn2baseurl.keySet())
-                                {
-                                    if (value.startsWith(checkUrn))
-                                    {
-                                        foundUrn = checkUrn;
-                                    }
-                                }
-                            }
-
-                            if (foundUrn != null)
-                            {
-
-                                if (value.startsWith(foundUrn + ":"))
-                                {
-                                    value = value.substring(foundUrn.length()+1);
-                                }
-
-                                String url = urn2baseurl.get(foundUrn);
-                                out.print("<a href=\"" + url
-                                        + value + "\">"
-                                        + Utils.addEntities(values[j].value)
-                                        + "</a>");
-                            }
-                            else
-                            {
-                                out.print(value);
-                            }
+                            out.print(Utils.addEntities(values[j].value));
                         }
-
-                    }
-                    else if (browseIndex != null)
-                    {
-                    	out.print("<a href=\"" + request.getContextPath() + "/browse?type=" + browseIndex + "&amp;value="
-                    				+ URLEncoder.encode(values[j].value, "UTF-8") + "\">" + Utils.addEntities(values[j].value)
-                    				+ "</a>");
-                    }
-                    else
-                    {
-                        out.print(Utils.addEntities(values[j].value));
                     }
                 }
 
