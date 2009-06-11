@@ -34,6 +34,9 @@
 (Tim Donohue)
 - [DS-218] Cannot add/remove email subscriptions from Profile page in XMLUI
 
+(Ben Bosman)
+- [DS-226] confirmation page of edit profile has an invalid link
+
 
 1.5.2 final
 ===========
