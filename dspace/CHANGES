@@ -7,6 +7,7 @@
 
 (Claudia Juergen)
  - [DS-188] Misspell exclude.type=indentifier in dstat.cfg
+ - [DS-231] Missig file (just some obsolete use of index-all in the current documentation, corrected the docs)
 
 (Ricardo Saraiva)
  - [DS-190] Portuguese (pt_PT) translation Messages.properties JSP-UI v1.5.2

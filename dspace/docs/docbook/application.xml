@@ -1050,7 +1050,7 @@ Transforming DSpace Content"/>MediaFilters: Transforming DSpace Content</title>
           <para><emphasis role="bold">No-Index mode</emphasis> : <literal>[dspace]/bin/filter-media -n</literal></para>
           <itemizedlist>
             <listitem>
-              <para> Suppress index creation - by default, a new search index is created for full-text searching. This option suppresses index creation if you intend to run <literal>index-all</literal> elsewhere.</para>
+              <para> Suppress index creation - by default, a new search index is created for full-text searching. This option suppresses index creation if you intend to run <literal>index-update</literal> elsewhere.</para>
             </listitem>
           </itemizedlist>
         </listitem>

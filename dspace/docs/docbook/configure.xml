@@ -501,7 +501,7 @@ search.index.11 = id:dc.identifier.*
           </listitem>
         </itemizedlist>
         <para>So in the example above, search.indexes1, 2 and 6 are configured as the <literal>author</literal> search field. The <literal>author</literal> index is created by Lucene indexing all <literal>contributor</literal>, <literal>creator</literal> and <literal>description.statementofresponsibility</literal> medatata fields.</para>
-        <para>After changing the configuration, run <literal>index-all</literal> to recreate the indexes.</para>
+        <para>After changing the configuration, run <literal>index-init</literal> to recreate the indexes.</para>
         <para><emphasis role="bold">NOTE:</emphasis> While the indexes are created, this only affects the search results and has no effect on the search components of the user interface. To add new search capability (e.g. to add a new search category to the Advanced Search) requires local customisation to the user interface.</para>
       </section>
       <section remap="h3">
