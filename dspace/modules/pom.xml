@@ -1,0 +1,46 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.dspace</groupId>
+	<artifactId>modules</artifactId>
+	<packaging>pom</packaging>
+	<name>DSpace Addon Modules</name>
+	<url>http://www.dspace.org</url>
+	<description>DSpace Addon Modules</description>
+
+	<parent>
+		<groupId>org.dspace</groupId>
+		<artifactId>dspace-parent</artifactId>
+		<version>1.5.2</version>
+	</parent>
+
+	<repositories>
+		<repository>
+			<id>maven.dspace.org-snapshot</id>
+			<name>DSpace Maven Snapshot Repository</name>
+			<url>http://maven.dspace.org/snapshot</url>
+			<releases>
+				<enabled>false</enabled>
+				<checksumPolicy>fail</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<checksumPolicy>fail</checksumPolicy>
+			</snapshots>
+		</repository>
+	</repositories>
+
+   <scm>
+      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2/dspace/modules</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2/dspace/modules</url>
+   </scm>
+   
+	<modules>
+		<module>xmlui</module>
+		<module>lni</module>
+		<module>oai</module>
+		<module>jspui</module>
+		<module>sword</module>
+	</modules>
+	
+</project>
