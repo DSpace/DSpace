@@ -182,7 +182,7 @@ Common usage:
     <!-- Update an installation (except database)                      -->
     <!-- ============================================================= -->
 
-    <target name="update" depends="update_configs,update_code,update_webapps" description="Update installed code and web applications (without clobbering data/config)">
+    <target name="update" depends="update_code,update_webapps" description="Update installed code and web applications (without clobbering data/config)">
     </target>
 
     <!-- ============================================================= -->
@@ -372,55 +372,19 @@ Common usage:
 
     <target name="update_code" description="Update installed code (without clobbering data/config)">
 
-        <move todir="${dspace.dir}/bin.bak-${build.date}" failonerror="no">
-            <fileset dir="${dspace.dir}/bin">
-                <include name="**/*" />
-            </fileset>
-        </move>
-
         <copy todir="${dspace.dir}/bin" preservelastmodified="true">
             <fileset dir="bin" />
         </copy>
 
         <chmod dir="${dspace.dir}/bin" perm="u+x" includes="**/*" />
 
-        <move todir="${dspace.dir}/lib.bak-${build.date}" failonerror="no">
-            <fileset dir="${dspace.dir}/lib">
-                <include name="**/*" />
-            </fileset>
-        </move>
-
         <copy todir="${dspace.dir}/lib" preservelastmodified="true">
             <fileset dir="lib" />
         </copy>
 
-        <move todir="${dspace.dir}/etc.bak-${build.date}" failonerror="no">
-            <fileset dir="${dspace.dir}/etc">
-                <include name="**/*" />
-            </fileset>
-        </move>
-
         <copy todir="${dspace.dir}/etc" preservelastmodified="true">
             <fileset dir="etc" />
         </copy>
-
-        <echo>
-====================================================================
- ${dspace.dir}/bin was backed up to
-                        
- ${dspace.dir}/bin.bak-${build.date}
-            
- ${dspace.dir}/lib was backed up to
-            
- ${dspace.dir}/lib.bak-${build.date}
-
- ${dspace.dir}/etc was backed up to
-            
- ${dspace.dir}/etc.bak-${build.date}
-            
- Please review these directories and delete if no longer needed.
-====================================================================
-        </echo>
 
     </target>
 
@@ -430,12 +394,6 @@ Common usage:
     <!-- ============================================================= -->
 
     <target name="update_webapps" description="Update Web Applications (without clobbering data/config)">
-
-        <move todir="${dspace.dir}/webapps.bak-${build.date}" failonerror="no">
-            <fileset dir="${dspace.dir}/webapps">
-                <include name="**/*" />
-            </fileset>
-        </move>
 
         <copy todir="${dspace.dir}/webapps" preservelastmodified="true" failonerror="no">
             <fileset dir="webapps">
@@ -451,16 +409,6 @@ Common usage:
                 <expandproperties />
             </filterchain>
         </copy>
-
-        <echo>
-====================================================================
- ${dspace.dir}/webapps was backed up to
-                    
- ${dspace.dir}/webapps.bak-${build.date}
-                    
- Please review this directory and delete it if its no longer needed.
-====================================================================
-        </echo>
 
         <antcall target="build_webapps_wars" />
 
