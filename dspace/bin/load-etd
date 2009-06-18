@@ -32,7 +32,7 @@ chomp($bindir = `dirname $0`);
 push @cmd, "-Detdloader.marcfile=$marcfile" if (defined $marcfile);
 push @cmd, "-Detdloader.singleitem=$item" if (defined $item);
 push @cmd, "-Detdloader.csvfile=$csvfile" if (defined $csvfile);
-push @cmd, "edu.umd.lims.dspace.app.EtdLoader";
+push @cmd, "edu.umd.lib.dspace.app.EtdLoader";
 
 #print (join ' ',@cmd) . "\n";
 system(@cmd);

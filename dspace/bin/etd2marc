@@ -3,5 +3,5 @@
 # Get the DSPACE/bin directory
 BINDIR=`dirname $0`
 
-$BINDIR/dsrun edu.umd.lims.dspace.app.Etd2Marc $*
+$BINDIR/dsrun edu.umd.lib.dspace.app.Etd2Marc $*
 

@@ -8,4 +8,4 @@ BINDIR=`dirname $0`
 
 $BINDIR/dsrun \
   -Dlog4j.defaultInitOverride=true \
-  edu.umd.lims.dspace.app.cleanup.DeleteItems
+  edu.umd.lib.dspace.app.cleanup.DeleteItems
