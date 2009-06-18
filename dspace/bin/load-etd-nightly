@@ -1,0 +1,82 @@
+#!/bin/csh
+
+# load-etd-nightly
+# 
+# Check for new upload files in the incoming directory and load
+# them into dspace.
+#
+
+# Get command-line arguments
+if ($#argv != 1) then
+    echo "Usage: $0 <dir>"
+    echo "    <dir>:    Directory containing Proquest ETD files"
+    exit 0
+endif
+
+set datadir = `cd $argv[1]; pwd`
+set bindir  = `dirname $0`
+set incomingdir = $datadir/incoming
+set processeddir = $datadir/processed
+set marcdir = $datadir/marc
+set marcfile = `date '+%Y%m%d'`.dat
+set csvdir = $datadir/csv
+set csvfile = `date '+%Y%m%d'`.csv
+set transfermarc = `$bindir/dsrun org.dspace.core.ConfigurationManager -property etdloader.transfermarc`;
+
+# Check for incoming files
+ls $incomingdir/etdadmin_upload_*.zip >& /dev/null
+if ($status == 0) then
+  echo Files found in $incomingdir
+
+  touch $marcdir/$marcfile
+  touch $csvdir/$csvfile
+
+  foreach upload ($incomingdir/etdadmin_upload_*.zip)
+     set zipfile = `basename $upload`
+
+     # Load the files from this archive  
+     echo 
+     echo ======================================================================
+     echo Loading archive file: $incomingdir/$zipfile  
+     $bindir/load-etd -i $incomingdir/$zipfile -o $marcdir/$marcfile -c $csvdir/$csvfile
+
+     # Move archive to the processed directory
+     echo
+     echo ' ' Moving $zipfile to $processeddir
+     mv $incomingdir/$zipfile $processeddir
+
+     # Transfer to Heckman
+     echo Transfering proquest file to HFGroup
+     $bindir/etd-to-heckman $processeddir $zipfile 
+  end
+
+  @ count = `/lims/bin/fmarc -i $marcdir/$marcfile`
+
+  # Marc processing
+  if ($count > 0) then
+    if ($transfermarc == "true") then
+      echo 
+      echo ======================================================================
+      echo Transfering marc file
+      cd $marcdir
+      $bindir/etd2marc-transfer $marcfile
+      
+      echo
+      echo Sending email notification
+      $bindir/etd2marc-mail $count $marcfile
+    else
+      echo Upload of the marc file is not enabled
+    endif
+  endif
+
+  # email csv file
+  if ($count > 0) then
+     $bindir/etd-csv-mail $count $csvdir/$csvfile
+  endif
+endif
+
+
+
+
+
+

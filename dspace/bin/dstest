@@ -2,13 +2,13 @@
 
 ###########################################################################
 #
-# import
+# dsrun
 #
-# Version: $Revision: 3705 $
+# Version: $Revision: 1.6 $
 #
-# Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+# Date: $Date: 2003/04/07 14:41:43 $
 #
-# Copyright (c) 2007, Hewlett-Packard Company and Massachusetts
+# Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
 # Institute of Technology.  All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -41,10 +41,30 @@
 # DAMAGE.
 #
 ###########################################################################
+#
+# This is a simple shell script for running a command-line DSpace tool.
+# It sets the CLASSPATH appropriately before invoking Java.
 
-# Shell script for running the item importer.
+USAGE="dsrun <classname> [arg1 [arg2 ...]]"
 
-# Get the DSPACE/bin directory
+# Check we have at least one command-line argument
+if [ "$#" = "0" ]; then
+    echo $USAGE
+    exit 1
+fi
+
+# Assume we're in the bin subdirectory of the DSpace installation directory
 BINDIR=`dirname $0`
+DSPACEDIR=`cd "$BINDIR/.." ; pwd`
 
-$BINDIR/dsrun org.dspace.app.itemimport.ItemImport $@
+# Get the JARs in $DSPACEDIR/jsp/WEB-INF/lib, separated by ':'
+JARS=`echo $DSPACEDIR/lib/*.jar | sed 's/ /\:/g'`
+
+# Class path for DSpace will be:
+#   Any existing classpath
+#   The JARs (WEB-INF/lib/*.jar)
+#   The WEB-INF/classes directory
+FULLPATH=$DSPACEDIR/src/build/classes:$CLASSPATH:$JARS:$DSPACEDIR/config
+
+# Now invoke Java
+java -Xmx256m -classpath $FULLPATH "$@"

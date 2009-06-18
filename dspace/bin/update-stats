@@ -1,0 +1,4 @@
+#!/bin/sh
+
+BINDIR=`dirname $0`
+$BINDIR/dsrun edu.umd.lims.dspace.app.UpdateStats

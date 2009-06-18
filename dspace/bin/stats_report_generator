@@ -1,0 +1,127 @@
+#!/usr/local/bin/perl -w
+
+use Cwd;
+
+# Cumulate Monthly Statistics
+
+# Get monthly snapshot
+
+@monthlist = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+
+chomp(my $binpath = `dirname $0`);
+chdir "$binpath/.." || die "$!\n";
+$dspace_dir = cwd();
+
+$statspath = "${dspace_dir}/stats";
+$dispstatspath = "${dspace_dir}/jsp/stats";
+$info = $binpath."/dspace-umdinfo.pl";
+$logreader = $binpath."/UMlog-reporter";
+$temp_file = "/tmp/dspace_log";
+$epeople_table = $statspath."/epeople_table";
+$views_table = $statspath."/views_table";
+$psql_queries = $binpath."/stats_queries.txt";
+
+
+sub execute {
+    my($cmd) = $_[0];
+   
+    print "$cmd\n";
+    system($cmd);
+}
+
+($year,$month) = split(/ /,`/bin/date +"%Y %m"`);
+chomp $month;
+
+###################################################
+# Collect the snapshot provided by dspace-umdinfo.pl
+
+
+$month = ($month == 1 ? 12 : $month-1);
+$year -= 1 if ($month == 12);
+$textmonth = ($month < 10 ? "0".$month : $month);
+$newreport = "/".$year.$textmonth."_stats"."."."txt";
+$newreport = $statspath.$newreport;
+
+&execute ("$info > $newreport");
+
+#########################################################
+# Run the DSpace log cumulator
+
+if ($month == 1 || $month == 3 || $month == 5 || $month == 7 || $month == 8
+|| $month == 10 || $month == 12) {$lastday = 31;}
+if ($month == 4 || $month == 6 || $month == 9 || $month == 11) {$lastday = 30;}
+
+# I'm not doing leap years...feel free to add in
+
+if ($month == 2) {$lastday = 28}
+
+&execute ("$logreader --startdate=$year-$textmonth-01 --enddate=$year-$textmonth-$lastday > $temp_file");
+
+##########################################################
+# Pull wanted numbers from file
+
+
+open (LOGFILE, "$temp_file");
+
+while (<LOGFILE>) {
+
+	chomp;
+	if (/create_eperson/) {$_ =~ s/^.*\((.*)\).*$/$1/;
+	$create_eperson = $_;}
+	if (/create_um_eperson/) {$_ =~ s/^.*\((.*)\).*$/$1/;
+	$create_um_eperson = $_;}
+	if (/view_item/) {$_ =~ s/^.*\((.*)\).*$/$1/;
+	$view_item = $_;}
+	if (/view_bitstream/) {$_ =~ s/^.*\((.*)\).*$/$1/;
+	$view_bitstream = $_;}
+        if (/^search/) {$_ =~ s/^.*\((.*)\).*$/$1/;
+	$search = $_;}
+}
+
+close (LOGFILE);
+
+
+############################################################
+# Add to rolling cumulatives
+
+$monthindex = $month - 1;
+$monthname = $monthlist[$monthindex];
+
+open (EPEOPLE, ">>$epeople_table");
+
+print EPEOPLE "$monthname $year\t$create_eperson\t$create_um_eperson\n";
+
+close (EPEOPLE);
+
+open (VIEWS, ">>$views_table");
+
+print VIEWS "$monthname $year\t$view_item\t\t$view_bitstream\t\t$search\n";
+
+close (VIEWS);
+
+
+###############################################################
+# Add rolling cumulatives to report.
+
+&execute("echo '\n\n' >> $newreport");
+&execute("cat $views_table >> $newreport");
+&execute("echo '\n\n' >> $newreport");
+&execute("cat $epeople_table >> $newreport");
+&execute("echo '\n\n' >> $newreport");
+
+&execute("/usr/local/pgsql/bin/psql -U dspace -d dspace -p 8001 < $psql_queries >> $newreport");
+
+
+###############################################################
+# Copy log file to stats directory, cp stats report to jsp directory
+# for display
+
+
+$logfile_name = $statspath."/".$year.$textmonth."_log"."."."txt";
+$current_disp_stats = $dispstatspath."/current_stats.txt";
+
+&execute("cp -p $temp_file $logfile_name");
+&execute("cp -p $newreport $dispstatspath");
+&execute("cp -p $newreport $current_disp_stats");
+
+exit;

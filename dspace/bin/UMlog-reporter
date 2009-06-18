@@ -4,9 +4,9 @@
 #
 # log-reporter
 #
-# Version: $Revision: 3705 $
+# Version: $Revision: 1.4 $
 #
-# Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+# Date: $Date: 2002/11/11 16:35:30 $
 #
 # Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
 # Institute of Technology.  All rights reserved.
@@ -48,21 +48,10 @@
 #
 # Sample uses:
 # 
-#   reporter.pl --startdate "2 weeks ago sunday" \
-#               --enddate "last saturday"
-#
-#   ...generates a summary suitable for email (w/subject: line)
-#   for all of the last calendar week.
-#
-#
-#   reporter.pl --date yesterday --nosubject
-#
-#   ...generates a summary without email header for log records
-#   from previous day only
-
+# UMlog-reporter --startdate=2004-07-01 --enddate=2004-07-31
 
 use Getopt::Long;
-use Date::Manip qw(ParseDate UnixDate);
+#use Date::Manip qw(ParseDate UnixDate);
 use File::Basename;
 use strict;
 
@@ -89,37 +78,37 @@ if (defined $help)
                 
 
 # Set both start/end to date if specified
-if (defined $date)
-{
-        $startdate = $date;
-        $enddate = $date;
-}
+#if (defined $date)
+#{
+#        $startdate = $date;
+#        $enddate = $date;
+#}
 
 # Make the dates comparable
-if (defined $startdate) 
-{
-        $startdate = ParseDate($startdate);
-        if (!$startdate)
-        {
-                usage();
-                exit(1);
-        }
+#if (defined $startdate) 
+#{
+#        $startdate = ParseDate($startdate);
+#        if (!$startdate)
+#        {
+#                usage();
+#                exit(1);
+#        }
 
-        my ($year, $month, $day) = UnixDate($startdate, "%Y", "%m", "%d" );
-        $startdate = "$year-$month-$day";
-}
+#        my ($year, $month, $day) = UnixDate($startdate, "%Y", "%m", "%d" );
+#        $startdate = "2004-12-01";
+#}
 
-if (defined $enddate)
-{
-        $enddate = ParseDate($enddate);
-        if (!$enddate)
-        {
-                usage();
-                exit(1);
-        }
-        my ($year, $month, $day) = UnixDate($enddate, "%Y", "%m", "%d" );
-        $enddate = "$year-$month-$day";
-}
+#if (defined $enddate)
+#{
+#        $enddate = ParseDate($enddate);
+#        if (!$enddate)
+#        {
+#                usage();
+#                exit(1);
+#        }
+#        my ($year, $month, $day) = UnixDate($enddate, "%Y", "%m", "%d" );
+#        $enddate = "2004-12-07";
+#}
 
 
 # Get DSpace bin directory
@@ -158,20 +147,21 @@ foreach $logfile (<$logdir/dspace.log*>)
                 #                                                                +             +              +
                 #                   date            time                level    +     user    +    action    +
                 #           --------------------- +++++++++++++++++++++ -----   +++   ------- ++++  ------- ++++
-                if ($_ !~ /^(\d\d\d\d-\d\d\-\d\d) \d\d:\d\d:\d\d,\d\d\d (\w+)\s+\S+ @ ([^:]+):[^:]+:([^:]+):(.*)/)
+                if ($_ !~ /^(\d\d\d\d)-(\d\d)-(\d\d) \d\d:\d\d:\d\d,\d\d\d (\w+)\s+\S+ @ ([^:]+):[^:]+:([^:]+):(.*)/)
                 {
                         # FIXME: throw away bad input lines for now
                         next;
                 }
 
-                my $logdate = ParseDate($1);
-                my $level = $2;
-                my $user = $3;
-                my $action = $4;
-                my $params = $5;
+                my $year = $1;
+		my $month = $2;
+	 	my $date = $3;
+                my $level = $4;
+                my $user = $5;
+                my $action = $6;
+                my $params = $7;
 
-                my ($year, $month, $day) = UnixDate($logdate, "%Y", "%m", "%d");
-                $logdate = "$year-$month-$day";
+                my $logdate = "$year-$month-$date";
 
                 # skip if the log record is too old
                 if (defined $startdate)
@@ -287,6 +277,14 @@ else
                 $summary .= "to $enddate";
         }
         
+        if ((!defined $startdate) &&
+            (!defined $enddate))
+        {
+                # give the logfile name just in case, but chop off the path
+                my ($log_filename, $path, $suffix) = fileparse($logfile);                
+                $summary .= "$log_filename";
+        }
+
         # appropriate whitespace
         if (defined $no_subject)
         {
@@ -392,8 +390,9 @@ exit(0);
 # standard usage message
 sub usage
 {
-        print "Usage: reporter.pl [--date DATE] " .
-                "[--startdate STARTDATE] [--enddate ENDDATE]\n";
+        print "Usage: UMlog-reporter " .
+                "--startdate YYYY-MM-DD  --enddate YYYY-MM-DD\n\n".
+		"Use leading zero's in MM and DD\n";
             
 
 }

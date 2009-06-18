@@ -1,0 +1,46 @@
+#!/usr/local/bin/perl
+
+#####################################################################
+# Copyright 2006, The University of Maryland.  All rights reserved.
+# 
+# Program:   edt2marc-mail
+# 
+# Author:    Ben Wallberg
+# 
+# Purpose:   mail notification of new etd marc records
+#
+# Usage:     See PrintUsageAndExit()
+#
+# Comments:  
+#
+# Revision History:
+# 
+#   2006/04/21: Ben
+#     - initial version.
+# 
+#####################################################################
+
+use Getopt::Std;
+use Mail::Sendmail;
+
+$count = $ARGV[0];
+$file = $ARGV[1];
+
+# Get directories
+chomp($bindir = `dirname $0`);
+chomp($confdir = `cd $bindir/../load; pwd`);
+
+
+%mail = ();
+chomp($mail{To} = `$bindir/dsrun org.dspace.core.ConfigurationManager -property mail.etdmarc.recipient`);
+chomp($mail{From} = `$bindir/dsrun org.dspace.core.ConfigurationManager -property mail.from.address`);
+chomp($mail{Smtp} = `$bindir/dsrun org.dspace.core.ConfigurationManager -property mail.server`);
+$mail{Subject} = "ETD MARC records are available";
+$mail{Message} = "$count ETD MARC records are available in $file";
+
+if (! (sendmail %mail)) {
+    die "Error sending email notice:\n" . $Mail::Sendmail::error;
+}
+
+exit 0;
+

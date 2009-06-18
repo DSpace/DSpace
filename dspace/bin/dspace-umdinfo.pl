@@ -2,11 +2,16 @@
 
 ###########################################################################
 #
-# dspace-info.pl
+# dspace-umdinfo.pl
 #
-# Version: $Revision: 3705 $
+# Version: $Revision: 1.5 $
 #
-# Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+# Date: $Date: 2004/05/04 17:29:21 $
+# 
+#  Local Revisions:
+#
+#  2005/08/12 - gbp
+#	-Commented out 'Collections/Communities with logos' display
 #
 # Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
 # Institute of Technology.  All rights reserved.
@@ -59,9 +64,14 @@ use Cwd;
 ##################################################
 
 # where is DSpace installed?
-chomp($binpath = `dirname $0`);
+chomp(my $binpath = `dirname $0`);
 chdir "$binpath/.." || die "$!\n";
 my $dspace_dir = cwd();
+
+# pgsql port
+
+my $port = `${dspace_dir}/bin/dsrun org.dspace.core.ConfigurationManager -property db.port`;
+chomp $port;
 
 #where is the DATA for the database tables stored?
 my $database_dir = "${dspace_dir}/pgsql";
@@ -70,6 +80,7 @@ my $database_dir = "${dspace_dir}/pgsql";
 
 my $assetstore_dir = GetConfigParameter( "assetstore.dir" );
 my $search_dir     = GetConfigParameter( "search.dir"     );
+my $history_dir    = GetConfigParameter( "history.dir"    );
 my $logs_dir       = GetConfigParameter( "log.dir"        );
 
 # directories in this array are to be checked for ownership by
@@ -107,6 +118,7 @@ my $workspaceitem_count = CountRows( "workspaceitem" );
 
 my $assetstore_size = DirectorySize( $assetstore_dir );
 my $search_size     = DirectorySize( $search_dir     );
+my $history_size    = DirectorySize( $history_dir    );
 my $logs_size       = DirectorySize( $logs_dir       );
 my $database_size   = DirectorySize( $database_dir   );
 
@@ -132,6 +144,8 @@ my $subscriber_count             = $#subscribers + 1;
 
 # how big is each collection? ############
 my @collection_sizes             = FindCollectionSizes();
+
+my @top_bitstream_views          = FindTopBitstreamViews();
 
 ############################################
 # display report ###########################
@@ -210,31 +224,32 @@ if( $deleted_bitstreams[0] > 0 )
     SizeReport  ("Size of deleted bitstreams:", $deleted_bitstreams[1]);
     print "\n";
 }
-if( $#communities_without_logos >= 0 )
-{
-    my $count = $#communities_without_logos + 1;
 
-    print "  Communities without Logos:  $count\n";
-    foreach( @communities_without_logos )
-    {
-        my ($id, $name) = split /\|/;
-        print "\t$id\t$name\n";
-    } 
-    print "\n";
-}
+#if( $#communities_without_logos >= 0 )
+#{
+#    my $count = $#communities_without_logos + 1;
+#
+#    print "  Communities without Logos:  $count\n";
+#    foreach( @communities_without_logos )
+#    {
+#        my ($id, $name) = split /\|/;
+#        print "\t$id\t$name\n";
+#    } 
+#    print "\n";
+#}
 
-if( $#collections_without_logos >= 0 )
-{
-    my $count = $#collections_without_logos + 1;
-
-    print "  Collections without Logos:  $count\n";
-    foreach( @collections_without_logos )
-    {
-        my ($id, $name) = split /\|/;
-        print "\t$id\t$name\n";
-    } 
-    print "\n";
-}
+#if( $#collections_without_logos >= 0 )
+#{
+#    my $count = $#collections_without_logos + 1;
+#
+#    print "  Collections without Logos:  $count\n";
+#    foreach( @collections_without_logos )
+#    {
+#        my ($id, $name) = split /\|/;
+#        print "\t$id\t$name\n";
+#    } 
+#    print "\n";
+#}
 
 if( $#empty_groups >= 0 )
 {
@@ -274,6 +289,15 @@ find( \&CheckOwnership, @dspace_ownership_dirs );
 # (big deal in asset store)
 
 find( \&CheckZeroLength, @zerolength_dirs );
+
+
+print "Top 50 Bitstream Views:\n";
+foreach( @top_bitstream_views )
+{
+    my ($handle,$name,$views) = split /\|/;
+    printf "\t%6d\t%-10s\t%s\n", $views, $handle, $name;
+}
+print "\n";
 
 
 ################################################
@@ -350,7 +374,7 @@ sub DirectorySize
 sub FindCollectionSizes
 {
     my $arg =
-        "SELECT c1.name, SUM(bs.size_bytes) FROM " .
+        "SELECT c1.name, SUM(bs.size) FROM " .
             "collection c1, collection2item c2i1, item2bundle i2b1, " .
             "bundle2bitstream b2b1, bitstream bs " .
         "WHERE " .
@@ -420,10 +444,17 @@ sub FindDeletedBitstreams
     my $arg = "SELECT COUNT(*) from bitstream where deleted=true";
     my @deleted_count = ExecuteSQL( $arg );
 
-    $arg = "SELECT SUM(size_bytes) from bitstream where deleted=true";
+    $arg = "SELECT SUM(size) from bitstream where deleted=true";
     my @deleted_size = ExecuteSQL( $arg );
 
     return ($deleted_count[0], $deleted_size[0]);
+}
+
+sub FindTopBitstreamViews
+{
+    my $arg = "SELECT handle, name, views FROM bitstream b, bundle2bitstream bb,item2bundle ib, handle h WHERE b.bitstream_id = bb.bitstream_id AND bb.bundle_id = ib.bundle_id AND ib.item_id = h.resource_id AND h.resource_type_id=2 ORDER BY views DESC LIMIT 50";
+
+    return ExecuteSQL( $arg );
 }
 
 # given a string, pad it right to the correct width
@@ -465,7 +496,7 @@ sub ExecuteSQL
     my $arg = shift;
 
     # do the SQL statement
-    open SQLOUT, "psql -d dspace -A -c '$arg' -p 8001 | ";
+    open SQLOUT, "/usr/local/pgsql/bin/psql -U dspace -d dspace -A -c '$arg' -p $port | ";
 
     # slurp up the results
     my @results = <SQLOUT>;

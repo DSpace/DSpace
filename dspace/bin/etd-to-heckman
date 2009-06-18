@@ -1,0 +1,68 @@
+#!/usr/local/bin/perl
+
+#####################################################################
+#
+# Program:   edt-to-heckman
+# 
+# Author:    Ben Wallberg
+# 
+# Purpose:   upload proquest files to HFGroup and send mail notification
+#
+# Usage:     etd-to-heckman <dir> <zipfile>
+#
+# Comments:  
+#
+#####################################################################
+
+use Getopt::Std;
+use Mail::Sendmail;
+use Net::FTP;
+
+$dir  = $ARGV[0];
+$file = $ARGV[1];
+
+# Get directories
+chomp($bindir = `dirname $0`);
+
+# Get config
+chomp($host = `$bindir/dsrun org.dspace.core.ConfigurationManager -property heckman.host`);
+chomp($user = `$bindir/dsrun org.dspace.core.ConfigurationManager -property heckman.user`);
+chomp($passwd = `$bindir/dsrun org.dspace.core.ConfigurationManager -property heckman.passwd`);
+chomp($remdir = `$bindir/dsrun org.dspace.core.ConfigurationManager -property heckman.dir`);
+
+if (!$host && !$user) {
+    die "Upload to HFGroup is not enabled\n";
+}
+
+# Transfer the file
+$ftp = Net::FTP->new($host, Debug => 1);
+if (! $ftp->login($user,$passwd)) {
+    print STDERR "Error: login failed\n";
+    exit 1;
+}
+$ftp->binary;
+
+if (! $ftp->cwd("$remdir")) {
+	 print STDERR "Error: unable to cd to '$remdir'\n";
+	 exit 1;
+}
+
+if (! $ftp->put("$dir/$file", $file)) {
+    print STDERR "Error: transfer failed\n";
+    exit 1;
+}
+
+# Send mail notification
+%mail = ();
+chomp($mail{To} = `$bindir/dsrun org.dspace.core.ConfigurationManager -property heckman.recipient`);
+chomp($mail{From} = `$bindir/dsrun org.dspace.core.ConfigurationManager -property mail.from.address`);
+chomp($mail{Smtp} = `$bindir/dsrun org.dspace.core.ConfigurationManager -property mail.server`);
+$mail{Subject} = "University of Maryland ETD records are available";
+$mail{Message} = "University of Maryland ETD records are available in $file";
+
+if (! (sendmail %mail)) {
+    die "Error sending email notice:\n" . $Mail::Sendmail::error;
+}
+
+exit 0;
+
