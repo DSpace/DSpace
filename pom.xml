@@ -88,10 +88,7 @@
          <modules>
             <module>dspace-api</module>
             <module>dspace-jspui</module>
-            <module>dspace-xmlui</module>
-            <module>dspace-lni</module>
             <module>dspace-oai</module>
-            <module>dspace-sword</module>
             <module>dspace</module>
          </modules>
       </profile>
@@ -109,10 +106,7 @@
          <modules>
             <module>dspace-api</module>
             <module>dspace-jspui</module>
-            <module>dspace-xmlui</module>
-            <module>dspace-lni</module>
             <module>dspace-oai</module>
-            <module>dspace-sword</module>
          </modules>
       </profile>
       
@@ -193,17 +187,6 @@
             <artifactId>dspace-api</artifactId>
             <version>${project.version}</version>
          </dependency>
-          <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-api</artifactId>
-              <version>${project.version}</version>
-          </dependency>
-          <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-webapp</artifactId>
-              <version>${project.version}</version>
-              <type>war</type>
-          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-api</artifactId>
@@ -226,49 +209,11 @@
             <version>${project.version}</version>
             <type>war</type>
          </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-lni-core</artifactId>
-            <version>${project.version}</version>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-lni-client</artifactId>
-            <version>${project.version}</version>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-lni-webapp</artifactId>
-            <version>${project.version}</version>
-            <type>war</type>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-api</artifactId>
-            <version>${project.version}</version>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-webapp</artifactId>
-            <version>${project.version}</version>
-            <type>war</type>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-wing</artifactId>
-            <version>${project.version}</version>
-         </dependency>
          <!-- DSpace Localization Packages -->
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api-lang</artifactId>
             <version>[1.5.0.0,1.6.0.0)</version>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-lang</artifactId>
-            <version>[1.5.0.0,1.6.0.0)</version>
-            <type>war</type>
          </dependency>
          <!-- DSpace third Party Dependencies -->
          <dependency>
