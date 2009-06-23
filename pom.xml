@@ -494,6 +494,16 @@
             <artifactId>ojdbc14</artifactId>
             <version>10.2.0.2.0</version>
          </dependency>
+         <dependency>
+            <groupId>edu.umd.lib</groupId>
+            <artifactId>lims-util</artifactId>
+            <version>0.1</version>
+         </dependency>
+         <dependency>
+            <groupId>org.marc4j</groupId>
+            <artifactId>marc4j</artifactId>
+            <version>2.0</version>
+         </dependency>
       </dependencies>
    </dependencyManagement>
 

@@ -514,6 +514,39 @@
                </execution>
             </executions>
          </plugin>
+         <plugin>
+            <artifactId>maven-install-plugin</artifactId>
+            <executions>
+               <execution>
+                  <id>lims-util</id>
+                  <phase>process-resources</phase>
+                  <goals>
+                     <goal>install-file</goal>
+                  </goals>   
+                  <configuration>
+                    <groupId>edu.umd.lib</groupId>
+                    <artifactId>lims-util</artifactId>
+                    <version>0.1</version>
+                    <packaging>jar</packaging>
+                    <file>lib/lims-util-0.1.jar</file>
+                  </configuration>
+               </execution>
+               <execution>
+                  <id>marc4j</id>
+                  <phase>process-resources</phase>
+                  <goals>
+                     <goal>install-file</goal>
+                  </goals>   
+                  <configuration>
+                    <groupId>org.marc4j</groupId>
+                    <artifactId>marc4j</artifactId>
+                    <version>2.0</version>
+                    <packaging>jar</packaging>
+                    <file>lib/marc4j-2.0.jar</file>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
       </plugins>
    </build>
 
