@@ -36,8 +36,11 @@
    </scm>
    
 	<modules>
+		<module>xmlui</module>
+		<module>lni</module>
 		<module>oai</module>
 		<module>jspui</module>
+		<module>sword</module>
 	</modules>
 	
 </project>
