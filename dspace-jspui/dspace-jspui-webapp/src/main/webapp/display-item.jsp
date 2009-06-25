@@ -61,9 +61,7 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Collection" %>
-<%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
@@ -140,6 +138,10 @@
                     <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                     <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_MIGRATE_ARCHIVE %>" />
                     <input type="submit" name="submit" value="<fmt:message key="jsp.mydspace.request.export.migrateitem"/>" />
+                </form>
+                <form method="post" action="<%= request.getContextPath() %>/dspace-admin/metadataexport">
+                    <input type="hidden" name="handle" value="<%= item.getHandle() %>" />
+                    <input type="submit" name="submit" value="<fmt:message key="jsp.general.metadataexport.button"/>" />
                 </form>
             </td>
             <td class="evenRowEvenCol" align="center">

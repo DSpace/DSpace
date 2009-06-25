@@ -279,6 +279,16 @@
   </servlet>
 
   <servlet>
+    <servlet-name>metadataexport</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.MetadataExportServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>metadataimport</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.MetadataImportServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>metadata-field-registry</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.MetadataFieldRegistryServlet</servlet-class>
   </servlet>
@@ -544,6 +554,16 @@
   <servlet-mapping>
     <servlet-name>logout</servlet-name>
     <url-pattern>/logout</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>metadataexport</servlet-name>
+    <url-pattern>/dspace-admin/metadataexport</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>metadataimport</servlet-name>
+    <url-pattern>/dspace-admin/metadataimport</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

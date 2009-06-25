@@ -353,6 +353,14 @@
               </form>
             </td>
           </tr>
+          <tr>
+            <td headers="t1" class="standard" align="center">
+               <form method="post" action="<%=request.getContextPath()%>/dspace-admin/metadataexport">
+                 <input type="hidden" name="handle" value="<%= community.getHandle() %>" />
+                 <input type="submit" value="<fmt:message key="jsp.general.metadataexport.button"/>" />
+               </form>
+             </td>
+          </tr>
 			<% } %>
             <tr>
               <td headers="t1" class="standard" align="center">
