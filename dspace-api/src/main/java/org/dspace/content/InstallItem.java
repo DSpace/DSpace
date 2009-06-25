@@ -144,6 +144,12 @@ public class InstallItem
         // set owning collection
         item.setOwningCollection(is.getCollection());
 
+	// add additional mapped collections
+	Collection collections[] = is.getMapCollections();
+	for (int i=0; i < collections.length; i++) {
+	    collections[i].addItem(item);
+	}
+
         // set in_archive=true
         item.setArchived(true);
 

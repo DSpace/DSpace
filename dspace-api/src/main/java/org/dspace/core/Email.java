@@ -232,6 +232,11 @@ public class Email
         attachments.add(new FileAttachment(f, name));
     }
 
+    public void addAttachment(MimeBodyPart attachment)
+    {
+        attachments.add(attachment);
+    }
+
     public void setCharset(String cs)
     {
         charset = cs;
@@ -341,13 +346,19 @@ public class Email
 
             for (Iterator iter = attachments.iterator(); iter.hasNext();)
             {
-                FileAttachment f = (FileAttachment) iter.next();
-                // add the file
-                messageBodyPart = new MimeBodyPart();
-                messageBodyPart.setDataHandler(new DataHandler(
-                        new FileDataSource(f.file)));
-                messageBodyPart.setFileName(f.name);
-                multipart.addBodyPart(messageBodyPart);
+                Object attachment = iter.next();
+
+                if (attachment instanceof MimeBodyPart) {
+                    multipart.addBodyPart((MimeBodyPart)attachment);
+                } else {
+                    FileAttachment f = (FileAttachment) attachment;
+                    // add the file
+                    messageBodyPart = new MimeBodyPart();
+                    messageBodyPart.setDataHandler(new DataHandler(
+                            new FileDataSource(f.file)));
+                    messageBodyPart.setFileName(f.name);
+                    multipart.addBodyPart(messageBodyPart);
+                }
             }
             message.setContent(multipart);
         }

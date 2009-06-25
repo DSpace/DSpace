@@ -1431,6 +1431,21 @@ public class Item extends DSpaceObject
      */
     public void update() throws SQLException, AuthorizeException
     {
+	update(true);
+    }
+
+
+    /**
+     * Update the item "in archive" flag and Dublin Core metadata in the
+     * database
+     * 
+     * @param bLastModified update last_modified column?
+     *
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    public void update(boolean bLastModified) throws SQLException, AuthorizeException
+    {
         // Check authorisation
         // only do write authorization if user is not an editor
         if (!canEdit())
@@ -1442,7 +1457,9 @@ public class Item extends DSpaceObject
                 + getID()));
 
         // Set the last modified date
+	if (bLastModified) {
         itemRow.setColumn("last_modified", new Date());
+	}
 
         // Set sequence IDs for bitstreams in item
         int sequence = 0;
@@ -2261,4 +2278,70 @@ public class Item extends DSpaceObject
         DCValue t[] = getMetadata("dc", "title", null, Item.ANY);
         return (t.length >= 1) ? t[0].value : null;
     }
+
+    /**
+     * Get the value of a metadata field
+     * 
+     * @param field
+     *            the name of the metadata field to get
+     * 
+     * @return the value of the metadata field
+     * 
+     * @exception IllegalArgumentException
+     *                if the requested metadata field doesn't exist
+     */
+    public String getStringMetadata(String field)
+    {
+        return itemRow.getStringColumn(field);
+    }
+
+    /**
+     * Get the value of an int  metadata field
+     *
+     * @param  field   the name of the metadata field to get
+     *
+     * @return  the value of the metadata field
+     *
+     * @exception IllegalArgumentException   if the requested metadata
+     *            field doesn't exist
+     */
+    public int getIntMetadata(String field)
+    {
+        return itemRow.getIntColumn(field);
+    }
+
+
+    /**
+     * Set a metadata value
+     * 
+     * @param field
+     *            the name of the metadata field to get
+     * @param value
+     *            value to set the field to
+     * 
+     * @exception IllegalArgumentException
+     *                if the requested metadata field doesn't exist
+     */
+    public void setMetadata(String field, String value)
+    {
+        itemRow.setColumn(field, value);
+    }
+
+    /**
+     * Set a metadata value
+     * 
+     * @param field
+     *            the name of the metadata field to get
+     * @param value
+     *            value to set the field to
+     * 
+     * @exception IllegalArgumentException
+     *                if the requested metadata field doesn't exist
+     */
+    public void setMetadata(String field, int value)
+    {
+        itemRow.setColumn(field, value);
+    }
+
 }
+

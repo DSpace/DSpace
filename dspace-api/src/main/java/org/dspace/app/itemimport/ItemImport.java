@@ -48,6 +48,9 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,6 +77,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.DCValue;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
@@ -82,6 +86,7 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.core.Email;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -112,7 +117,10 @@ import org.xml.sax.SAXException;
 public class ItemImport
 {
     static boolean useWorkflow = false;
-
+    static boolean checkTitle = false;
+    static Connection connection = null;
+    static PreparedStatement st = null;
+  
     static boolean isTest = false;
 
     static boolean isResume = false;
@@ -167,6 +175,7 @@ public class ItemImport
                 "resume a failed import (add only)");
 
         options.addOption("h", "help", false, "help");
+        options.addOption("z", "title-check", false, "check for duplicate titles (if yes, send notification)");
 
         CommandLine line = parser.parse(options, argv);
 
@@ -243,6 +252,7 @@ public class ItemImport
         {
             collections = line.getOptionValues('c');
         }
+        if( line.hasOption( 'z' ) ) { checkTitle = true; }
 
         if (line.hasOption('R'))
         {
@@ -335,6 +345,12 @@ public class ItemImport
         // create a context
         Context c = new Context();
 
+	// open the database connection
+	if (checkTitle) {
+	    connection = c.getDBConnection();
+	    st = connection.prepareStatement("select count(distinct item_id) from itemsbytitle where sort_title=?");
+	}
+ 
         // find the EPerson, assign to context
         EPerson myEPerson = null;
 
@@ -429,6 +445,11 @@ public class ItemImport
                 myloader.deleteItems(c, mapfile);
             }
 
+ 	    // complete database session
+	    if (checkTitle) {
+		st.close();
+	    }
+ 
             // complete all transactions
             c.complete();
         }
@@ -654,7 +675,7 @@ public class ItemImport
             // start up a workflow
             if (!isTest)
             {
-                WorkflowManager.startWithoutNotify(c, wi);
+                WorkflowManager.start(c, wi);
 
                 // send ID to the mapfile
                 mapOutput = itemname + " " + myitem.getID();
@@ -705,8 +726,66 @@ public class ItemImport
 
         c.commit();
 
+	// check for duplicate titles
+	if (checkTitle && !isTest) {
+	    checkTitle(c, myitem, mycollections);
+	}
+ 
         return myitem;
     }
+
+    // check for duplicate titles
+    private void checkTitle(Context c, Item item, Collection[] collections)
+	throws Exception
+    {
+	// Get the list of collections
+	StringBuffer sbCollections = new StringBuffer();
+	for (int j=0; j < collections.length; j++) {
+	    if (sbCollections.length() > 0) {
+		sbCollections.append(", ");
+	    }
+	    sbCollections.append(collections[j].getMetadata("name"));
+	}
+
+	// Get the title(s)
+	DCValue dc[] = item.getDC("title", null, Item.ANY);
+
+	// Process each title
+	for (int i=0; i < dc.length; i++) {
+	    String title = "TODO: normalized title"; //Browse.getNormalizedTitle(dc[i].value, dc[i].language);
+
+	    st.setString(1, title);
+	    ResultSet rs = st.executeQuery();
+	    if (rs.next()) {
+		int count = rs.getInt(1);
+		
+		if (count > 1) {
+		    System.out.println("Duplicate title: " + title);
+					  
+		    // Send an email notice
+		    
+		    // Get the email recipient
+		    String email = ConfigurationManager.getProperty("mail.duplicate_title");
+		    if (email == null) {
+			email = ConfigurationManager.getProperty("mail.admin");
+		    }
+		    
+		    if (email != null) {
+			// Send the email
+			Email bean = ConfigurationManager.getEmail("duplicate_title");
+			bean.addRecipient(email);
+			bean.addArgument(title);
+			bean.addArgument(""+item.getID());
+			bean.addArgument(HandleManager.findHandle(c, item));
+			bean.addArgument(sbCollections.toString());
+			bean.send();
+		    }
+		}
+		rs.close();
+	    }
+	}
+    }
+
 
     // remove, given the actual item
     private void deleteItem(Context c, Item myitem) throws Exception
@@ -863,6 +942,11 @@ public class ItemImport
 
         System.out.println("\tSchema: " + schema + " Element: " + element + " Qualifier: " + qualifier
                 + " Value: " + value);
+
+		  if (value == null)
+		  {
+				value = "";
+		  }
 
         if (qualifier.equals("none") || "".equals(qualifier))
         {

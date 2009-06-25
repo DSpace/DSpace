@@ -44,10 +44,12 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -57,6 +59,7 @@ import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.eperson.Group;
 
 /**
  * Class representing bitstreams stored in the DSpace system.
@@ -201,6 +204,8 @@ public class Bitstream extends DSpaceObject
         bitstream.setFormat(null);
 
         context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID, null));
+
+	bitstream.bRow.setColumn("views", 0);
 
         return bitstream;
     }
@@ -642,4 +647,108 @@ public class Bitstream extends DSpaceObject
     public int getStoreNumber() {
         return bRow.getIntColumn("store_number");
     }
+
+  /**
+   * Is this bitstream under an ETD embargo?
+   *
+   */
+  
+  public ResourcePolicy getETDEmbargo() throws SQLException {
+    List lPolicies = AuthorizeManager.getPolicies(bContext, this);
+
+    for (Iterator iPolicies = lPolicies.iterator(); iPolicies.hasNext(); ) {
+      ResourcePolicy policy = (ResourcePolicy)iPolicies.next();
+
+	  int groupID = policy.getGroupID();
+	  if (groupID != -1) {
+
+		Group group = Group.find(bContext, groupID);
+		if (group != null) {
+		  
+		  if (group.getName().equals("ETD Embargo")) {
+			
+			return policy;
+		  }
+		}
+      }
+    }
+
+	return null;
+  }
+
+  public boolean isETDEmbargo() throws SQLException {
+
+	ResourcePolicy policy = getETDEmbargo();
+
+	if (policy != null && policy.isDateValid()) {
+	  return true;
+	} else {
+	  return false;
+	}
+  }
+
+    /**
+     * Get the value of a metadata field
+     * 
+     * @param field
+     *            the name of the metadata field to get
+     * 
+     * @return the value of the metadata field
+     * 
+     * @exception IllegalArgumentException
+     *                if the requested metadata field doesn't exist
+     */
+    public String getMetadata(String field)
+    {
+        return bRow.getStringColumn(field);
+    }
+
+    /**
+     * Get the value of an int  metadata field
+     *
+     * @param  field   the name of the metadata field to get
+     *
+     * @return  the value of the metadata field
+     *
+     * @exception IllegalArgumentException   if the requested metadata
+     *            field doesn't exist
+     */
+    public int getIntMetadata(String field)
+    {
+        return bRow.getIntColumn(field);
+    }
+
+
+    /**
+     * Set a metadata value
+     * 
+     * @param field
+     *            the name of the metadata field to get
+     * @param value
+     *            value to set the field to
+     * 
+     * @exception IllegalArgumentException
+     *                if the requested metadata field doesn't exist
+     */
+    public void setMetadata(String field, String value)
+    {
+        bRow.setColumn(field, value);
+    }
+
+    /**
+     * Set a metadata value
+     * 
+     * @param field
+     *            the name of the metadata field to get
+     * @param value
+     *            value to set the field to
+     * 
+     * @exception IllegalArgumentException
+     *                if the requested metadata field doesn't exist
+     */
+    public void setMetadata(String field, int value)
+    {
+        bRow.setColumn(field, value);
+    }
+
 }

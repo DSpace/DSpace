@@ -1240,6 +1240,53 @@ public class Collection extends DSpaceObject
     }
 
     /**
+     * Get the communities this collection appears in.  Gets only
+     * the immediate parent communities, not all ancestors, which is
+     * unlike Community.getParents()
+     * 
+     * @return array of <code>Community</code> objects
+     * @throws SQLException
+     */
+    public Community[] getParents() throws SQLException
+    {
+        // Get the bundle table rows
+        TableRowIterator tri = DatabaseManager
+                .query(
+                        ourContext,
+                        "community",
+                        "SELECT community.* FROM community, community2collection WHERE "
+                                + "community.community_id=community2collection.community_id "
+                                + "AND community2collection.collection_id="
+                                + getID());
+
+        // Build a list of Community objects
+        List communities = new ArrayList();
+
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+
+            // First check the cache
+            Community owner = (Community) ourContext.fromCache(Community.class,
+                    row.getIntColumn("community_id"));
+
+            if (owner == null)
+            {
+                owner = new Community(ourContext, row);
+            }
+
+            communities.add(owner);
+        }
+        // close the TableRowIterator to free up resources
+        tri.close();
+
+        Community[] communityArray = new Community[communities.size()];
+        communityArray = (Community[]) communities.toArray(communityArray);
+
+        return communityArray;
+    }
+
+    /**
      * Return <code>true</code> if <code>other</code> is the same Collection
      * as this object, <code>false</code> otherwise
      * 

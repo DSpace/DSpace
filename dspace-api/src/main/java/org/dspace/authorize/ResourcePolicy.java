@@ -58,6 +58,13 @@ import org.dspace.storage.rdbms.TableRow;
  */
 public class ResourcePolicy
 {
+  /**
+   * Revision History
+   *
+   *   2006/09/21: Ben
+   *     - fix bug in isDateValid()
+   */
+
     /** Our context */
     private Context myContext;
 

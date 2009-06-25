@@ -387,6 +387,10 @@ public class WorkflowItem implements InProgressSubmission
         // delete any pending tasks
         WorkflowManager.deleteTasks(ourContext, this);
 
+        // delete additional mapped collections
+        DatabaseManager.updateQuery(ourContext,
+                "DELETE FROM collection2workflowitem WHERE workflow_id=" + getID());
+
         // FIXME - auth?
         DatabaseManager.delete(ourContext, wfRow);
     }
@@ -436,4 +440,53 @@ public class WorkflowItem implements InProgressSubmission
     {
         wfRow.setColumn("published_before", b);
     }
+
+    /**
+     * Get the additional collections to map the item to.
+     * 
+     * @return array of collections
+     * @throws SQLException
+     */
+    public Collection[] getMapCollections() throws SQLException
+    {
+	String myQuery = 
+	    "SELECT collection.collection_id FROM collection, collection2workflowitem WHERE "
+	    + "collection.collection_id=collection2workflowitem.collection_id AND "
+	    + "collection2workflowitem.workflow_id=" + getID()
+	    ;
+
+	TableRowIterator rows = DatabaseManager.query(ourContext, "collection",
+						      myQuery);
+
+        List collectionRows = rows.toList();
+
+        Collection[] collections = new Collection[collectionRows.size()];
+
+        for (int i = 0; i < collectionRows.size(); i++)
+        {
+            TableRow row = (TableRow) collectionRows.get(i);
+
+	    collections[i] = Collection.find(ourContext, row.getIntColumn("collection_id"));
+
+        }
+
+	return collections;
+    }
+
+    /**
+     * Add an additional collection to map the item to.
+     * 
+     * @throws SQLException
+     */
+    public void addMapCollection(Collection collection) throws SQLException
+    {
+	// Create mapping
+        TableRow row = DatabaseManager.create(ourContext, "collection2workflowitem");
+
+        row.setColumn("collection_id", collection.getID());
+        row.setColumn("workflow_id", getID());
+
+        DatabaseManager.update(ourContext, row);
+    }
+
 }

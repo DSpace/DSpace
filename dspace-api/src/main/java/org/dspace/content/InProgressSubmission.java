@@ -142,4 +142,7 @@ public interface InProgressSubmission
      *            <code>true</code> if it has been published before
      */
     void setPublishedBefore(boolean b);
+
+    void addMapCollection(Collection collection) throws SQLException;
+    Collection[] getMapCollections() throws SQLException;
 }

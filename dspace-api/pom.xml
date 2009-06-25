@@ -175,6 +175,14 @@
          <groupId>com.ibm.icu</groupId>
          <artifactId>icu4j</artifactId>
       </dependency>
+      <dependency>
+         <groupId>edu.umd.lib</groupId>
+         <artifactId>lims-util</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.marc4j</groupId>
+         <artifactId>marc4j</artifactId>
+      </dependency>
    </dependencies>
 
 </project>

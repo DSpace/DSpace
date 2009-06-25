@@ -441,7 +441,6 @@ public class Context
         catch (SQLException se)
         {
             log.error(se.getMessage());
-            se.printStackTrace();
         }
         finally
         {
@@ -452,7 +451,7 @@ public class Context
             }
             catch (Exception ex)
             {
-                ex.printStackTrace();
+                log.error(ex.getMessage());
             }
             connection = null;
             events = null;

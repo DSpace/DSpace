@@ -63,6 +63,8 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
+import javax.servlet.jsp.JspWriter;
+
 /**
  * Class representing a community
  * <P>
@@ -324,6 +326,53 @@ public class Community extends DSpaceObject
     }
 
     /**
+     * Get a list of top level communities in the system which belong to a 
+     * particular group.  These are alphabetically
+     * sorted by community name.
+     *
+     * @param  context  DSpace context object
+     *
+     * @return  the communities in the system
+     */
+    public static Community[] findByCommunityGroupTop(Context context, CommunityGroup group)
+        throws SQLException
+    {
+        // get all communities that are not children
+        TableRowIterator tri = DatabaseManager.query(context,
+            "community",
+            "SELECT * FROM community WHERE NOT community_id IN " +
+            "(SELECT child_comm_id FROM community2community) " +
+            "AND group_id=" + group.getID() + " " +
+            "ORDER BY name" );        
+
+        List communities = new ArrayList();
+
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+
+            // First check the cache
+            Community fromCache = (Community) context.fromCache(
+                Community.class, row.getIntColumn("community_id"));
+
+            if (fromCache != null)
+            {
+                communities.add(fromCache);
+            }
+            else
+            {
+                communities.add(new Community(context, row));
+            }
+        }
+
+        Community[] communityArray = new Community[communities.size()];
+        communityArray = (Community[]) communities.toArray(communityArray);
+
+        return communityArray;
+    }
+
+
+    /**
      * Get the internal ID of this collection
      * 
      * @return the internal identifier
@@ -365,6 +414,22 @@ public class Community extends DSpaceObject
     	String metadata = communityRow.getStringColumn(field);
     	return (metadata == null) ? "" : metadata;
     }
+
+    /**
+     * Get the value of an int  metadata field
+     *
+     * @param  field   the name of the metadata field to get
+     *
+     * @return  the value of the metadata field
+     *
+     * @exception IllegalArgumentException   if the requested metadata
+     *            field doesn't exist
+     */
+    public int getIntMetadata(String field)
+    {
+        return communityRow.getIntColumn(field);
+    }
+
 
     /**
      * Set a metadata value
@@ -563,6 +628,55 @@ public class Community extends DSpaceObject
     }
 
     /**
+     * Get the collections not in this community.
+     * 
+     * @return array of Collection objects
+     */
+    public Collection[] getCollectionsUnmapped() throws SQLException
+    {
+        List collections = new ArrayList();
+
+        // Get the table rows
+        TableRowIterator tri = DatabaseManager
+                .query(
+                        ourContext,
+                        "collection",
+                        "SELECT collection.* FROM collection WHERE "
+                        + "collection_id NOT IN "
+                        + "  (SELECT collection.collection_id FROM collection, community2collection WHERE "
+                        + "   community2collection.collection_id=collection.collection_id "
+                        + "   AND community2collection.community_id="
+                        + getID() + ") ORDER BY collection.name");
+
+        // Make Collection objects
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+
+            // First check the cache
+            Collection fromCache = (Collection) ourContext.fromCache(
+                    Collection.class, row.getIntColumn("collection_id"));
+
+            if (fromCache != null)
+            {
+                collections.add(fromCache);
+            }
+            else
+            {
+                collections.add(new Collection(ourContext, row));
+            }
+        }
+        // close the TableRowIterator to free up resources
+        tri.close();
+
+        // Put them in an array
+        Collection[] collectionArray = new Collection[collections.size()];
+        collectionArray = (Collection[]) collections.toArray(collectionArray);
+
+        return collectionArray;
+    }
+
+    /**
      * Get the immediate sub-communities of this community. Throws an
      * SQLException because creating a community object won't load in all
      * collections.
@@ -717,6 +831,18 @@ public class Community extends DSpaceObject
     public void addCollection(Collection c) throws SQLException,
             AuthorizeException
     {
+      addCollection(c, null);
+    }
+
+    /**
+     * Add an exisiting collection to the community
+     * 
+     * @param c
+     *            collection to add
+      @param request request object to send reindex updates
+     */
+  public void addCollection(Collection c, JspWriter out) throws SQLException, AuthorizeException
+    {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
@@ -822,6 +948,18 @@ public class Community extends DSpaceObject
      *            collection to remove
      */
     public void removeCollection(Collection c) throws SQLException,
+            AuthorizeException, IOException
+    {
+      removeCollection(c, null); 
+    }
+
+    /**
+     * Remove a collection. Any items then orphaned are deleted.
+     * 
+     * @param c
+     *            collection to remove
+     */
+    public void removeCollection(Collection c, JspWriter out) throws SQLException,
             AuthorizeException, IOException
     {
         // Check authorisation
@@ -1093,5 +1231,20 @@ public class Community extends DSpaceObject
         	total += comms[j].countItems();
         }
         return total;
+    }
+
+
+    /**
+     * Set a metadata value
+     *
+     * @param  field   the name of the metadata field to get
+     * @param  value   value to set the field to
+     *
+     * @exception IllegalArgumentException   if the requested metadata
+     *            field doesn't exist
+     */
+    public void setMetadata(String field, int value)
+    {
+        communityRow.setColumn(field, value);
     }
 }

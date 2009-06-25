@@ -81,6 +81,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 
 /**
  * Executes SQL queries.
@@ -93,6 +94,7 @@ public class DatabaseManager
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(DatabaseManager.class);
+    private static Logger logdbcp = Logger.getLogger(DatabaseManager.class.getName()+".dbcp");
 
     /** True if initialization has been done */
     private static boolean initialized = false;
@@ -117,6 +119,11 @@ public class DatabaseManager
      * String; the value is an array of ColumnInfo objects.
      */
     private static Map info = new HashMap();
+
+    /**
+     * dbcp connection pool.
+     */
+    private static GenericObjectPool connectionPool = null;
 
     /**
      * Protected Constructor to prevent instantiation except by derived classes.
@@ -547,8 +554,22 @@ public class DatabaseManager
     {
         initialize();
 
-        return DriverManager
+
+        Connection c = DriverManager
                 .getConnection("jdbc:apache:commons:dbcp:" + poolName);
+
+        // logging
+        if (logdbcp.isDebugEnabled()) {
+            String strAddr = c.toString();
+            //strAddr = strAddr.substring(strAddr.indexOf('@')+1);
+            logdbcp.debug(LogManager.getHeader(null,
+                                               "getConnection",
+                                               "object=" + strAddr +
+                                               ", active=" + connectionPool.getNumActive() + 
+                                               ", idle=" + connectionPool.getNumIdle()));
+    }
+
+        return c;
     }
 
     /**
@@ -563,6 +584,24 @@ public class DatabaseManager
         {
             if (c != null)
             {
+		// logging
+		if (logdbcp.isDebugEnabled()) {
+		    String strAddr = ((Object)c).toString();
+		    if (strAddr == null) {
+			strAddr = "??";
+		    }
+		    //int i = strAddr.indexOf('@');
+		    //if (i > -1) {
+		    //	  strAddr = strAddr.substring(i+1);
+		    //}
+		    logdbcp.debug(LogManager.getHeader(null,
+						       "freeConnection",
+						       "object=" + strAddr +
+						       ", active=" + connectionPool.getNumActive() + 
+						       ", idle=" + connectionPool.getNumIdle() +
+						       ", isClosed=" + c.isClosed()));
+		}
+        
                 c.close();
             }
         }
@@ -1048,10 +1087,7 @@ public class DatabaseManager
         }
         finally
         {
-            if (connection != null)
-            {
-                connection.close();
-            }
+            freeConnection(connection);
 
             if (statement != null)
             {
@@ -1462,7 +1498,7 @@ public class DatabaseManager
 
             if (connection != null)
             {
-                try { connection.close(); } catch (SQLException sqle) { }
+                try { freeConnection(connection); } catch (Exception sqle) { }
             }
         }
     }
@@ -1532,7 +1568,7 @@ public class DatabaseManager
             boolean useStatementPool = ConfigurationManager.getBooleanProperty("db.statementpool",true);
 
             // Create object pool
-            ObjectPool connectionPool = new GenericObjectPool(null, // PoolableObjectFactory
+            connectionPool = new GenericObjectPool(null, // PoolableObjectFactory
                     // - set below
                     maxConnections, // max connections
                     GenericObjectPool.WHEN_EXHAUSTED_BLOCK, maxWait, // don't

@@ -194,6 +194,11 @@ public class WorkflowManager
         wfi.setMultipleTitles(wsi.hasMultipleTitles());
         wfi.setPublishedBefore(wsi.isPublishedBefore());
 
+	Collection collections[] = wsi.getMapCollections();
+	for (int i=0; i < collections.length; i++) {
+	    wfi.addMapCollection(collections[i]);
+	}
+
         // remove the WorkspaceItem
         wsi.deleteWrapper();
 
@@ -745,6 +750,12 @@ public class WorkflowManager
         wi.setMultipleFiles(wfi.hasMultipleFiles());
         wi.setMultipleTitles(wfi.hasMultipleTitles());
         wi.setPublishedBefore(wfi.isPublishedBefore());
+
+	Collection collections[] = wfi.getMapCollections();
+	for (int i=0; i < collections.length; i++) {
+	    wi.addMapCollection(collections[i]);
+	}
+
         wi.update();
 
         //myitem.update();
@@ -752,9 +763,8 @@ public class WorkflowManager
                 "workflow_item_id=" + wfi.getID() + "workspace_item_id="
                         + wi.getID()));
 
-        // Now remove the workflow object manually from the database
-        DatabaseManager.updateQuery(c,
-                "DELETE FROM WorkflowItem WHERE workflow_id=" + wfi.getID());
+        // Now remove the workflow object
+	wfi.deleteWrapper();
 
         return wi;
     }
@@ -891,6 +901,22 @@ public class WorkflowManager
                             
                             break;
                     }
+
+		    StringBuffer sb = new StringBuffer();
+		    sb.append(coll.getMetadata("name"));
+		    Collection collections[] = wi.getMapCollections();
+		    if (collections.length > 0) {
+		      sb.append(" (");
+		      for (int j=0; j < collections.length; j++) {
+		        if (j > 0) {
+		          sb.append(", ");
+		        }
+		        sb.append(collections[j].getMetadata("name"));
+		      }
+		      sb.append(")");
+		    }
+                    email.addArgument(sb.toString());
+                    
                     email.addArgument(message);
                     email.addArgument(getMyDSpaceLink());
                     email.addRecipient(epa[i].getEmail());

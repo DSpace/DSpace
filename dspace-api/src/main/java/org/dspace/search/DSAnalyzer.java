@@ -50,6 +50,8 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardFilter;
 import org.dspace.core.ConfigurationManager;
 
+import edu.umd.lims.dspace.search.StripDiacriticSynonymFilter;
+
 /**
  * Custom Lucene Analyzer that combines the standard filter, lowercase filter,
  * stemming and stopword filters.
@@ -88,6 +90,7 @@ public class DSAnalyzer extends Analyzer
     {
         TokenStream result = new DSTokenizer(reader);
 
+        result = new StripDiacriticSynonymFilter(result);
         result = new StandardFilter(result);
         result = new LowerCaseFilter(result);
         result = new StopFilter(result, stopSet);
