@@ -541,12 +541,16 @@ public class Collection extends DSpaceObject
     public Group createWorkflowGroup(int step) throws SQLException,
             AuthorizeException
     {
-        // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+        // Check authorisation - Must be an Admin to create Submitters Group
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADMIN);
 
         if (workflowGroup[step - 1] == null)
         {
+            //turn off authorization so that Collection Admins can create Collection Workflow Groups
+            ourContext.turnOffAuthorisationSystem();
             Group g = Group.create(ourContext);
+            ourContext.restoreAuthSystemState();
+
             g.setName("COLLECTION_" + getID() + "_WORKFLOW_STEP_" + step);
             g.update();
             setWorkflowGroup(step, g);
@@ -609,12 +613,16 @@ public class Collection extends DSpaceObject
      */
     public Group createSubmitters() throws SQLException, AuthorizeException
     {
-        // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+        // Check authorisation - Must be an Admin to create Submitters Group
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADMIN);
 
         if (submitters == null)
         {
+            //turn off authorization so that Collection Admins can create Collection Submitters
+            ourContext.turnOffAuthorisationSystem();
             submitters = Group.create(ourContext);
+            ourContext.restoreAuthSystemState();
+
             submitters.setName("COLLECTION_" + getID() + "_SUBMIT");
             submitters.update();
         }
@@ -636,8 +644,8 @@ public class Collection extends DSpaceObject
      */
     public void removeSubmitters() throws SQLException, AuthorizeException
     {
-    	// Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+    	// Check authorisation - Must be an Admin to delete Submitters Group
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADMIN);
 
         // just return if there is no administrative group.
         if (submitters == null)
@@ -678,18 +686,22 @@ public class Collection extends DSpaceObject
      */
     public Group createAdministrators() throws SQLException, AuthorizeException
     {
-        // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+        // Check authorisation - Must be an Admin to create more Admins
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADMIN);
 
         if (admins == null)
         {
+            //turn off authorization so that Community Admins can create Collection Admins
+            ourContext.turnOffAuthorisationSystem();
             admins = Group.create(ourContext);
+            ourContext.restoreAuthSystemState();
+            
             admins.setName("COLLECTION_" + getID() + "_ADMIN");
             admins.update();
         }
 
         AuthorizeManager.addPolicy(ourContext, this,
-                Constants.COLLECTION_ADMIN, admins);
+                Constants.ADMIN, admins);
 
         // register this as the admin group
         collectionRow.setColumn("admin", admins.getID());
@@ -713,8 +725,8 @@ public class Collection extends DSpaceObject
      */
     public void removeAdministrators() throws SQLException, AuthorizeException
     {
-    	// Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+        // Check authorisation - Must be an Admin to delete Admin Group
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADMIN);
 
         // just return if there is no administrative group.
         if (admins == null)
@@ -1021,7 +1033,7 @@ public class Collection extends DSpaceObject
         }
 
         AuthorizeManager.authorizeAnyOf(ourContext, this, new int[] {
-                Constants.WRITE, Constants.COLLECTION_ADMIN });
+                Constants.WRITE, Constants.ADMIN });
     }
 
     /**

@@ -86,14 +86,17 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 	private static final Message T_label_auth = message("xmlui.administrative.item.EditItemStatusForm.label_auth");
 	private static final Message T_label_withdraw = message("xmlui.administrative.item.EditItemStatusForm.label_withdraw");
 	private static final Message T_label_reinstate = message("xmlui.administrative.item.EditItemStatusForm.label_reinstate");
+    private static final Message T_label_move = message("xmlui.administrative.item.EditItemStatusForm.label_move");
 	private static final Message T_label_delete = message("xmlui.administrative.item.EditItemStatusForm.label_delete");
 	private static final Message T_submit_authorizations = message("xmlui.administrative.item.EditItemStatusForm.submit_authorizations");
 	private static final Message T_submit_withdraw = message("xmlui.administrative.item.EditItemStatusForm.submit_withdraw");
 	private static final Message T_submit_reinstate = message("xmlui.administrative.item.EditItemStatusForm.submit_reinstate");
+    private static final Message T_submit_move = message("xmlui.administrative.item.EditItemStatusForm.submit_move");
 	private static final Message T_submit_delete = message("xmlui.administrative.item.EditItemStatusForm.submit_delete");
 	private static final Message T_na = message("xmlui.administrative.item.EditItemStatusForm.na");
 	
 	private static final Message T_sysadmins_only = message("xmlui.administrative.item.EditItemStatusForm.sysadmins_only");
+	private static final Message T_collectionadmins_only = message("xmlui.administrative.item.EditItemStatusForm.collection_admins_only");
 	
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -172,14 +175,17 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		if(!item.isWithdrawn())
 		{
 			itemInfo.addLabel(T_label_withdraw);
-			itemInfo.addItem().addButton("submit_withdraw").setValue(T_submit_withdraw);
+			addAdministratorOnlyButton(itemInfo.addItem(), "submit_withdraw", T_submit_withdraw);
 		}
 		else
 		{	
 			itemInfo.addLabel(T_label_reinstate);
-			itemInfo.addItem().addButton("submit_reinstate").setValue(T_submit_reinstate);
+			addAdministratorOnlyButton(itemInfo.addItem(), "submit_reinstate", T_submit_reinstate);
 		}
 		
+        itemInfo.addLabel(T_label_move);
+        addCollectionAdminOnlyButton(itemInfo.addItem(), item.getOwningCollection(), "submit_move", T_submit_move);
+        
 		itemInfo.addLabel(T_label_delete);
 		addAdministratorOnlyButton(itemInfo.addItem(), "submit_delete", T_submit_delete);
 		
@@ -201,6 +207,20 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
     		// Only admins can create or delete
     		button.setDisabled();
     		item.addHighlight("fade").addContent(T_sysadmins_only);
+    	}
+	}
+    
+    private void addCollectionAdminOnlyButton(org.dspace.app.xmlui.wing.element.Item item, Collection collection, String buttonName, Message buttonLabel) throws WingException, SQLException
+	{
+    	Button button = item.addButton(buttonName);
+    	button.setValue(buttonLabel);
+        
+        
+    	if (!AuthorizeManager.isAdmin(context, collection))
+    	{
+    		// Only admins can create or delete
+    		button.setDisabled();
+    		item.addHighlight("fade").addContent(T_collectionadmins_only);
     	}
 	}
 	

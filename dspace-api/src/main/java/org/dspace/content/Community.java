@@ -94,6 +94,9 @@ public class Community extends DSpaceObject
     /** Flag set when metadata is modified, for events */
     private boolean modifiedMetadata;
 
+    /** The default group of administrators */
+    private Group admins;
+
     /**
      * Construct a community object from a database row.
      * 
@@ -125,6 +128,9 @@ public class Community extends DSpaceObject
         context.cache(this, row.getIntColumn("community_id"));
 
         modified = modifiedMetadata = false;
+
+        admins = groupFromColumn("admin");
+
         clearDetails();
     }
 
@@ -505,6 +511,78 @@ public class Community extends DSpaceObject
             modifiedMetadata = false;
             clearDetails();
         }
+    }
+
+    /**
+     * Create a default administrators group if one does not already exist.
+     * Returns either the newly created group or the previously existing one.
+     * Note that other groups may also be administrators.
+     * 
+     * @return the default group of editors associated with this community
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    public Group createAdministrators() throws SQLException, AuthorizeException
+    {
+        // Check authorisation - Must be an Admin to create more Admins
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADMIN);
+
+        if (admins == null)
+        {
+            //turn off authorization so that Community Admins can create Sub-Community Admins
+            ourContext.turnOffAuthorisationSystem();
+            admins = Group.create(ourContext);
+            ourContext.restoreAuthSystemState();
+            
+            admins.setName("COMMUNITY_" + getID() + "_ADMIN");
+            admins.update();
+        }
+
+        AuthorizeManager.addPolicy(ourContext, this, Constants.ADMIN, admins);
+        
+        // register this as the admin group
+        communityRow.setColumn("admin", admins.getID());
+        
+        modified = true;
+        return admins;
+    }
+    
+    /**
+     * Remove the administrators group, if no group has already been created 
+     * then return without error. This will merely dereference the current 
+     * administrators group from the community so that it may be deleted 
+     * without violating database constraints.
+     */
+    public void removeAdministrators() throws SQLException, AuthorizeException
+    {
+        // Check authorisation - Must be an Admin to delete Admin group
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADMIN);
+
+        // just return if there is no administrative group.
+        if (admins == null)
+            return; 
+
+        // Remove the link to the community table.
+        communityRow.setColumnNull("admin");
+        admins = null;
+       
+        modified = true;
+    }
+
+    /**
+     * Get the default group of administrators, if there is one. Note that the
+     * authorization system may allow others to be administrators for the
+     * community.
+     * <P>
+     * The default group of administrators for community 100 is the one called
+     * <code>community_100_admin</code>.
+     * 
+     * @return group of administrators, or <code>null</code> if there is no
+     *         default group.
+     */
+    public Group getAdministrators()
+    {
+        return admins;
     }
 
     /**
@@ -999,6 +1077,14 @@ public class Community extends DSpaceObject
         
         // Delete community row
         DatabaseManager.delete(ourContext, communityRow);
+
+        // Remove administrators group - must happen after deleting community
+        Group g = getAdministrators();
+
+        if (g != null)
+        {
+            g.delete();
+        }
     }
 
     /**
@@ -1019,6 +1105,25 @@ public class Community extends DSpaceObject
         }
 
         return (getID() == ((Community) other).getID());
+    }
+
+    /**
+     * Utility method for reading in a group from a group ID in a column. If the
+     * column is null, null is returned.
+     * 
+     * @param col
+     *            the column name to read
+     * @return the group referred to by that column, or null
+     * @throws SQLException
+     */
+    private Group groupFromColumn(String col) throws SQLException
+    {
+        if (communityRow.isColumnNull(col))
+        {
+            return null;
+        }
+
+        return Group.find(ourContext, communityRow.getIntColumn(col));
     }
 
     /**

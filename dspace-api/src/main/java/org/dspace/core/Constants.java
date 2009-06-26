@@ -148,11 +148,15 @@ public class Constants
     public static final int DEFAULT_ITEM_READ = 10;
 
     /**
-     * collection admin -- metadata, logo, item metadata, submitters, withdraw
-     * items, etc.
+     * @deprecated As of DSpace 1.6, replaced by Constants.ADMIN
      */
     public static final int COLLECTION_ADMIN = 11;
 
+    /**
+     * Administrative actions - System Admin, Community Admin, Collection Admin
+     */
+    public static final int ADMIN = 11;
+    
     /** Position of front page news item -- top box */
     public static final int NEWS_TOP = 0;
 
@@ -165,7 +169,7 @@ public class Constants
     public static final String[] actionText = { "READ", "WRITE",
             "OBSOLETE (DELETE)", "ADD", "REMOVE", "WORKFLOW_STEP_1",
             "WORKFLOW_STEP_2", "WORKFLOW_STEP_3", "WORKFLOW_ABORT",
-            "DEFAULT_BITSTREAM_READ", "DEFAULT_ITEM_READ", "COLLECTION_ADMIN" };
+            "DEFAULT_BITSTREAM_READ", "DEFAULT_ITEM_READ", "ADMIN" };
 
     /**
      * constants for the relevance array generating dynamicallis is simple: just
@@ -201,7 +205,7 @@ public class Constants
             0, // 8 - WORKFLOW_ABORT
             RCOLLECTION, // 9 - DEFAULT_BITSTREAM_READ
             RCOLLECTION, // 10 - DEFAULT_ITEM_READ
-            RCOLLECTION // 11 - COLLECTION_ADMIN
+            RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY // 11 - ADMIN
     };
 
     public static final String DEFAULT_ENCODING = "UTF-8";

@@ -706,7 +706,106 @@ public class FlowContainerUtils
 		return result;
 	}
 	
+	/**
+     * Look up the id of a group authorized for one of the given roles. If no group is currently 
+     * authorized to perform this role then a new group will be created and assigned the role.
+     * 
+     * @param context The current DSpace context.
+     * @param collectionID The collection id.
+     * @param roleName ADMIN.
+     * @return The id of the group associated with that particular role, or -1 if the role was not found.
+     */
+    public static int getCommunityRole(Context context, int communityID, String roleName) throws SQLException, AuthorizeException, IOException
+    {
+        Community community = Community.find(context, communityID);
 	
+        // Determine the group based upon which role we are looking for.
+        Group role = null;
+        if (ROLE_ADMIN.equals(roleName))
+        {
+            role = community.getAdministrators();
+            if (role == null)
+                role = community.createAdministrators();
+        } 
+	
+        // In case we needed to create a group, save our changes
+        community.update();
+        context.commit();
+        
+        // If the role name was valid then role should be non null,
+        if (role != null)
+            return role.getID();
+        
+        return -1;
+    }
+
+	/**
+     * Delete one of a community's roles
+     * 
+     * @param context The current DSpace context.
+     * @param communityID The community id.
+     * @param roleName ADMIN.
+     * @param groupID The id of the group associated with this role.
+     * @return A process result's object.
+     */
+    public static FlowResult processDeleteCommunityRole(Context context, int communityID, String roleName, int groupID) throws SQLException, UIException, IOException, AuthorizeException
+    {
+        FlowResult result = new FlowResult();
+        
+        Community community = Community.find(context, communityID);
+        Group role = Group.find(context, groupID);
+        
+        // First, unregister the role
+        if (ROLE_ADMIN.equals(roleName))
+        {
+            community.removeAdministrators();
+        }
+        
+        // Second, remove all authorizations for this role by searching for all policies that this 
+        // group has on the collection and remove them otherwise the delete will fail because 
+        // there are dependencies.
+        @SuppressWarnings("unchecked") // the cast is correct
+        List<ResourcePolicy> policies = AuthorizeManager.getPolicies(context, community);
+        for (ResourcePolicy policy : policies)
+        {
+            if (policy.getGroupID() == groupID)
+                policy.delete();
+        }
+        
+        // Finally, delete the role's actual group.
+        community.update();
+        role.delete();
+        context.commit();
+    
+        result.setContinue(true);
+        result.setOutcome(true);
+        result.setMessage(new Message("default","The role was successfully deleted."));
+        return result;
+    }
+    
+    /**
+     * Delete a collection's template item (which is not a member of the collection).
+     * 
+     * @param context
+     * @param collectionID
+     * @return
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    public static FlowResult processDeleteTemplateItem(Context context, int collectionID) throws SQLException, AuthorizeException, IOException
+    {
+        FlowResult result = new FlowResult();
+        
+        Collection collection = Collection.find(context, collectionID);
+        
+        collection.removeTemplateItem();
+        context.commit();
+        
+        result.setContinue(true);
+        result.setOutcome(true);
+        return result;
+    }
 	
 	/**
 	 * Check whether this metadata value is a proper XML fragment. If the value is not 

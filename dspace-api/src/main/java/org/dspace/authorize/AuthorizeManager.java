@@ -39,10 +39,14 @@ package org.dspace.authorize;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -279,9 +283,9 @@ public class AuthorizeManager
         {
             userid = e.getID();
 
-            // perform isadmin check since user
-            // is user part of admin group?
-            if (isAdmin(c))
+            // perform isAdmin check to see
+            // if user is an Admin on this object
+            if (isAdmin(c,o))
             {
                 return true;
             }
@@ -315,8 +319,205 @@ public class AuthorizeManager
     // admin check methods
     ///////////////////////////////////////////////
 
+
+	/**
+     * Check to see if the current user is an Administrator of a given
+     * object within DSpace. Always return <code>true</code> if the
+     * user is a System Admin
+     *
+     * @param c
+     *            current context
+     * @param o
+     *            current DSpace Object
+     *
+     * @return <code>true</code> if user has administrative privileges
+     *        on the given DSpace object
+     */
+    public static boolean isAdmin(Context c, DSpaceObject o) throws SQLException {
+		if (isAdmin(c))
+		{
+			return true;
+		}
+
+        //
+        // First, check all Resource Policies directly on this object
+        //
+		List<ResourcePolicy> policies = getPoliciesActionFilter(c, o, Constants.ADMIN);
+        int userid = c.getCurrentUser().getID();
+        
+        for (ResourcePolicy rp : policies)
+        {
+            // check policies for date validity
+            if (rp.isDateValid())
+            {
+                if ((rp.getEPersonID() != -1) && (rp.getEPersonID() == userid))
+                {
+                    return true; // match
+                }
+
+                if ((rp.getGroupID() != -1)
+                        && (Group.isMember(c, rp.getGroupID())))
+                {
+                    // group was set, and eperson is a member
+                    // of that group
+                    return true;
+                }
+            }
+        }
+
+		//
+        // If user doesn't have specific Admin permissions on this object,
+        // check the *parent* objects of this object.  This allows Admin
+        // permissions to be inherited automatically (e.g. Admin on Community
+        // is also an Admin of all Collections/Items in that Community)
+		switch (o.getType()) {
+			case Constants.BITSTREAM:
+			{
+				Bitstream bitstream = (Bitstream) o;
+				Bundle[] bundles = bitstream.getBundles();
+				if (bundles != null && (bundles.length > 0 && bundles[0] != null))
+				{
+					return isAdmin(c,bundles[0]);
+				}
+				else
+				{
+					// is the bitstream a logo for a community or a collection?
+					TableRow qResult = DatabaseManager.querySingle(c,
+						       "SELECT collection_id FROM collection " +
+						       "WHERE logo_bitstream_id = ?",o.getID());
+					if (qResult != null) 
+					{
+						Collection collection = Collection.find(c,qResult.getIntColumn("collection_id"));
+						return isAdmin(c,collection);
+					}
+					else
+					{   
+						// is the group releated to a community?
+						qResult = DatabaseManager.querySingle(c,
+								"SELECT community_id FROM community " +
+								"WHERE logo_bitstream_id = ?",o.getID());
+			
+						if (qResult != null)
+						{
+							Community community = Community.find(c,qResult.getIntColumn("community_id"));
+							return isAdmin(c,community);
+						}
+						else
+						{
+							return false;
+						}
+					}									
+				}
+			}
+			
+			case Constants.BUNDLE:
+			{
+                Bundle bundle = (Bundle) o;
+				Item[] items = bundle.getItems();
+               
+				if (items != null && (items.length > 0 && items[0] != null))
+				{
+					return isAdmin(c,items[0]);
+				}
+				else
+				{
+					return false;
+				}
+			}
+			
+			case Constants.ITEM:
+			{
+				Item item = (Item) o;
+				Collection ownCollection = item.getOwningCollection();
+				if (ownCollection != null)
+				{
+					return isAdmin(c,ownCollection);
+				}
+				else
+				{
+					// is a template item?
+					TableRow qResult = DatabaseManager.querySingle(c,
+						       "SELECT collection_id FROM collection " +
+						       "WHERE template_item_id = ?",o.getID());
+					if (qResult != null) 
+					{
+						Collection collection = Collection.find(c,qResult.getIntColumn("collection_id"));
+						return isAdmin(c,collection);
+					}					
+					return false;
+				}
+			}
+			
+			case Constants.COLLECTION:
+			{			
+				Collection collection = (Collection) o;
+				Community[] communities = collection.getCommunities();
+				if (communities != null && (communities.length > 0 && communities[0] != null))
+				{
+					return isAdmin(c,communities[0]);
+				}
+				else
+				{
+					return false;
+				}			
+			}
+			
+			case Constants.COMMUNITY:
+			{			
+				Community community = (Community) o;
+				Community pCommunity = community.getParentCommunity();
+				if (pCommunity != null)
+				{
+					return isAdmin(c,pCommunity);
+				}
+				else
+				{
+					return false;
+				}			
+			}
+				
+			case Constants.GROUP:
+			{
+				// is the group releated to a collection?
+				TableRow qResult = DatabaseManager.querySingle(c,
+								       "SELECT collection_id FROM collection " +
+								       "WHERE workflow_step_1 = ? OR " +
+								       		" workflow_step_2 = ? OR " +
+								       		" workflow_step_3 = ? OR " +
+								       		" submitter =  ? OR " +
+								       		" admin = ?",o.getID(),o.getID(),o.getID(),o.getID(),o.getID());
+				if (qResult != null) 
+				{
+					Collection collection = Collection.find(c,qResult.getIntColumn("collection_id"));
+					return isAdmin(c,collection);
+				}
+				else
+				{   // is the group releated to a community?
+					qResult = DatabaseManager.querySingle(c,
+						       "SELECT community_id FROM community " +
+						       "WHERE admin = ?",o.getID());
+					
+					if (qResult != null)
+					{
+						Community community = Community.find(c,qResult.getIntColumn("community_id"));
+						return isAdmin(c,community);
+					}
+					else
+					{
+						return false;
+					}
+				}
+				
+			}
+		}
+		
+	
+		return false;
+	}
+
+   
     /**
-     * Check to see if the current user is an admin. Always return
+     * Check to see if the current user is a System Admin. Always return
      * <code>true</code> if c.ignoreAuthorization is set. Anonymous users
      * can't be Admins (EPerson set to NULL)
      * 
@@ -567,7 +768,16 @@ public class AuthorizeManager
         // find all policies for the source object
         List<ResourcePolicy> policies = getPolicies(c, src);
 
-        addPolicies(c, policies, dest);
+        //Only inherit non-ADMIN policies (since ADMIN policies are automatically inherited)
+        List<ResourcePolicy> nonAdminPolicies = new ArrayList<ResourcePolicy>();
+        for (ResourcePolicy rp : policies)
+        {
+        	if (rp.getAction() != Constants.ADMIN)
+        	{
+        		nonAdminPolicies.add(rp);
+            }
+        }
+        addPolicies(c, nonAdminPolicies, dest);
     }
 
     /**

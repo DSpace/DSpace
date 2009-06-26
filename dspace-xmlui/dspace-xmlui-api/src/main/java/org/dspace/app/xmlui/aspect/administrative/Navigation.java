@@ -226,8 +226,10 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         if(availableExports!=null && availableExports.size()>0){
             account.addItem().addXref(contextPath+"/admin/export", T_account_export);
         }
-        
-        
+
+        //Check if a system administrator
+        boolean isSystemAdmin = AuthorizeManager.isAdmin(this.context);
+
         // Context Administrative options
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
     	if (dso instanceof Item)
@@ -238,7 +240,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     		{
             	context.setHead(T_context_head);
             	context.addItem().addXref(contextPath+"/admin/item?itemID="+item.getID(), T_context_edit_item);
-            	context.addItem().addXref(contextPath+"/admin/export?itemID="+item.getID(), T_context_export_item );
+            	if (AuthorizeManager.isAdmin(this.context, dso))
+                    context.addItem().addXref(contextPath+"/admin/export?itemID="+item.getID(), T_context_export_item );
     		}
     	}
     	else if (dso instanceof Collection)
@@ -247,12 +250,13 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     		
     		
     		// can they admin this collection?
-            if (AuthorizeManager.authorizeActionBoolean(this.context, collection, Constants.COLLECTION_ADMIN))
+            if (AuthorizeManager.authorizeActionBoolean(this.context, collection, Constants.ADMIN))
             {
             	context.setHead(T_context_head);
             	context.addItemXref(contextPath+"/admin/collection?collectionID=" + collection.getID(), T_context_edit_collection);            	
             	context.addItemXref(contextPath+"/admin/mapper?collectionID="+collection.getID(), T_context_item_mapper); 
-            	context.addItem().addXref(contextPath+"/admin/export?collectionID="+collection.getID(), T_context_export_collection );
+            	if (AuthorizeManager.isAdmin(this.context, dso))
+                    context.addItem().addXref(contextPath+"/admin/export?collectionID="+collection.getID(), T_context_export_collection );
             }
     	}
     	else if (dso instanceof Community)
@@ -264,7 +268,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             {
             	context.setHead(T_context_head);
             	context.addItemXref(contextPath+"/admin/community?communityID=" + community.getID(), T_context_edit_community); 
-            	context.addItem().addXref(contextPath+"/admin/export?communityID="+community.getID(), T_context_export_community );
+            	if (AuthorizeManager.isAdmin(this.context, dso))
+                    context.addItem().addXref(contextPath+"/admin/export?communityID="+community.getID(), T_context_export_community );
             }
             
             // can they add to this community?
@@ -274,8 +279,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             	context.addItemXref(contextPath+"/admin/collection?createNew&communityID=" + community.getID(), T_context_create_collection);         	
             }
             
-            // Only administrators can create communities
-            if (AuthorizeManager.isAdmin(this.context))
+            // Only System & Community administrators can create sub-communities
+            if (isSystemAdmin || AuthorizeManager.authorizeActionBoolean(this.context, community, Constants.ADMIN))
             {
             	context.setHead(T_context_head);
             	context.addItemXref(contextPath+"/admin/community?createNew&communityID=" + community.getID(), T_context_create_subcommunity);  	
@@ -284,7 +289,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     	
     	if ("community-list".equals(this.sitemapURI))
     	{
-    		if (AuthorizeManager.isAdmin(this.context))
+            // Only System administrators can create top-level communities
+    		if (isSystemAdmin)
             {
             	context.setHead(T_context_head);
     			context.addItemXref(contextPath+"/admin/community?createNew", T_context_create_community);    			
@@ -293,7 +299,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         
         
         // System Administrator options!
-        if (AuthorizeManager.isAdmin(this.context))
+        if (isSystemAdmin)
         {
 	        admin.setHead(T_administrative_head);
 	                
@@ -339,7 +345,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     		
     		
     		// can they admin this collection?
-            if (AuthorizeManager.authorizeActionBoolean(this.context, collection, Constants.COLLECTION_ADMIN))
+            if (AuthorizeManager.authorizeActionBoolean(this.context, collection, Constants.ADMIN))
             {            	
             	context.addItemXref(contextPath+"/admin/collection?collectionID=" + collection.getID(), T_context_edit_collection);
             	context.addItemXref(contextPath+"/admin/mapper?collectionID="+collection.getID(), T_context_item_mapper);            	

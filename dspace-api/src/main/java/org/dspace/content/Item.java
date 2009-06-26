@@ -1709,7 +1709,7 @@ public class Item extends DSpaceObject
         // Check permission. User either has to have REMOVE on owning collection
         // or be COLLECTION_EDITOR of owning collection
         if (AuthorizeManager.authorizeActionBoolean(ourContext,
-                getOwningCollection(), Constants.COLLECTION_ADMIN)
+                getOwningCollection(), Constants.ADMIN)
                 || AuthorizeManager.authorizeActionBoolean(ourContext,
                         getOwningCollection(), Constants.REMOVE))
         {
@@ -2247,7 +2247,7 @@ public class Item extends DSpaceObject
 
         // is this person an COLLECTION_EDITOR for the owning collection?
         if (AuthorizeManager.authorizeActionBoolean(ourContext,
-                getOwningCollection(), Constants.COLLECTION_ADMIN))
+                getOwningCollection(), Constants.ADMIN))
         {
             return true;
         }

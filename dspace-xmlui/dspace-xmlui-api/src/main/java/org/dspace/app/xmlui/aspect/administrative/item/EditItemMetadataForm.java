@@ -61,6 +61,7 @@ import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.TextArea;
+import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -81,6 +82,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
 	private static final Message T_submit_update = message("xmlui.general.update");
 	private static final Message T_submit_return = message("xmlui.general.return");
 	private static final Message T_item_trail = message("xmlui.administrative.item.general.item_trail");
+    private static final Message T_template_head = message("xmlui.administrative.item.general.template_head");
 	private static final Message T_option_head = message("xmlui.administrative.item.general.option_head");
 	private static final Message T_option_status = message("xmlui.administrative.item.general.option_status");
 	private static final Message T_option_bitstreams = message("xmlui.administrative.item.general.option_bitstreams");
@@ -134,20 +136,39 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
 		Request request = ObjectModelHelper.getRequest(objectModel);
 		String previousFieldID = request.getParameter("field");
 
+        // Metadata editing is the only type of editing available for a template item.
+        boolean editingTemplateItem = false;
+        int templateCollectionID = parameters.getParameterAsInteger("templateCollectionID",-1);
+        Collection templateCollection = templateCollectionID == -1 ? null : Collection.find(context, templateCollectionID);
+        if (templateCollection != null)
+        {
+            Item templateItem = templateCollection.getTemplateItem();
+            if (templateItem != null && templateItem.getID() == itemID)
+                editingTemplateItem = true;
+        }
 
 		// DIVISION: main 
 		Division main = body.addInteractiveDivision("edit-item-status", contextPath+"/admin/item", Division.METHOD_POST,"primary administrative item");
+		if (editingTemplateItem)
+        {
+		    main.setHead(T_template_head.parameterize(templateCollection.getName()));
+		} 
+        else
+        {
 		main.setHead(T_option_head);
+		}
 
 		
 		
 		// LIST: options
-		List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
-		options.addItem().addXref(baseURL+"&submit_status",T_option_status);
-		options.addItem().addXref(baseURL+"&submit_bitstreams",T_option_bitstreams);
-		options.addItem().addHighlight("bold").addXref(baseURL+"&submit_metadata",T_option_metadata);
-		options.addItem().addXref(baseURL + "&view_item", T_option_view);
-
+		if (!editingTemplateItem)
+        {
+		  List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
+		  options.addItem().addXref(baseURL+"&submit_status",T_option_status);
+		  options.addItem().addXref(baseURL+"&submit_bitstreams",T_option_bitstreams);
+		  options.addItem().addHighlight("bold").addXref(baseURL+"&submit_metadata",T_option_metadata);
+		  options.addItem().addXref(baseURL + "&view_item", T_option_view);
+		}
 
 		// LIST: add new metadata
 		List addForm = main.addList("addItemMetadata",List.TYPE_FORM);

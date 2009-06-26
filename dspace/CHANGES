@@ -36,6 +36,9 @@
 (Tim Donohue)
 - [DS-218] Cannot add/remove email subscriptions from Profile page in XMLUI
 
+(Tim Donohue / Andrea Bollini)
+- [DS-228] Community Admin XMLUI: Delegated Admins Patch
+
 (Ben Bosman)
 - [DS-226] confirmation page of edit profile has an invalid link
 
