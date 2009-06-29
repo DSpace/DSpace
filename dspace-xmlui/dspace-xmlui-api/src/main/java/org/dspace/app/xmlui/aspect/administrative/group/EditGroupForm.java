@@ -60,6 +60,7 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -91,6 +92,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	
 	private static final Message T_collection_para = 
 		message("xmlui.administrative.group.EditGroupForm.collection_para");
+
+    private static final Message T_community_para = 
+        message("xmlui.administrative.group.EditGroupForm.community_para");
 
 	private static final Message T_label_name = 
 		message("xmlui.administrative.group.EditGroupForm.label_name");
@@ -228,18 +232,21 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 			group = Group.find(context,groupID);
 			
 		
-		// Find the collection if applicable
+		// Find the collection or community if applicable
 		Collection collection = null;
+		Community community = null;
 		if (group != null)
 		{
 			int collectionID = FlowGroupUtils.getCollectionId(group.getName());
-			if(collectionID > -1)
+			if (collectionID > -1)
 				collection = Collection.find(context, collectionID);
-			// If the collectionID was not found then reset the id back to -1. This 
-			// happens when collections are deleted.
-			if (collection == null)
-				collectionID = -1;
-		}	
+			else
+			{
+			    int communityID = FlowGroupUtils.getCommunityId(group.getName());
+			    if (communityID > -1)
+			        community = Community.find(context, communityID);
+		    }
+		}
 		
 		// Get list of member groups
 		String memberGroupIDsString = parameters.getParameter("memberGroupIDs",null);
@@ -295,17 +302,22 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	    	para.addContent(T_collection_para);
 	    	para.addXref(contextPath+"/handle/"+collection.getHandle(), collection.getMetadata("name"));
 	    }
+	    else if(community != null)
+        {
+            Para para = main.addPara();
+            para.addContent(T_community_para);
+            para.addXref(contextPath+"/handle/"+community.getHandle(), community.getMetadata("name"));
+        }
 	   
-
 	    // DIVISION: group-actions
 	    Division actions = main.addDivision("group-edit-actions");
 	    Para groupName = actions.addPara();
         groupName.addContent(T_label_name);
         Text groupText = groupName.addText("group_name");
         groupText.setValue(currentName);
-        if(collection != null)
+        if(collection != null || community != null)
         {
-        	// If this group is associated with a collection then it is special,
+        	// If this group is associated with a collection or community then it is special,
         	// thus they shouldn't be able to update it.
         	groupText.setDisabled();
         	groupText.setHelp(T_label_instructions);

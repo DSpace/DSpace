@@ -67,11 +67,14 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 	/** Language Strings */
 	private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 	
+    private static final Message T_community_trail = message("xmlui.administrative.community.general.community_trail");
+    private static final Message T_options_metadata = message("xmlui.administrative.community.general.options_metadata");  
+    private static final Message T_options_roles = message("xmlui.administrative.community.general.options_roles");
+
 	private static final Message T_title = message("xmlui.administrative.community.EditCommunityMetadataForm.title");
 	private static final Message T_trail = message("xmlui.administrative.community.EditCommunityMetadataForm.trail");
 
 	private static final Message T_main_head = message("xmlui.administrative.community.EditCommunityMetadataForm.main_head");
-	private static final Message T_edit_authorizations = message("xmlui.administrative.community.EditCommunityMetadataForm.edit_authorizations");
 
 	private static final Message T_label_name = message("xmlui.administrative.community.EditCommunityMetadataForm.label_name");
 	private static final Message T_label_short_description = message("xmlui.administrative.community.EditCommunityMetadataForm.label_short_description");
@@ -92,6 +95,7 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
+        pageMeta.addTrail().addContent(T_community_trail);
         pageMeta.addTrail().addContent(T_trail);
     }
 	
@@ -100,6 +104,8 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 		int communityID = parameters.getParameterAsInteger("communityID", -1);
 		Community thisCommunity = Community.find(context, communityID);
 
+		String baseURL = contextPath + "/admin/community?administrative-continue=" + knot.getId();
+
 	    String short_description_error = FlowContainerUtils.checkXMLFragment(thisCommunity.getMetadata("short_description"));
 	    String introductory_text_error = FlowContainerUtils.checkXMLFragment(thisCommunity.getMetadata("introductory_text"));
 	    String copyright_text_error = FlowContainerUtils.checkXMLFragment(thisCommunity.getMetadata("copyright_text"));
@@ -107,13 +113,11 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 	    
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("community-metadata-edit",contextPath+"/admin/community",Division.METHOD_MULTIPART,"primary administrative community");
-	    main.setHead(T_main_head.parameterize(thisCommunity.getHandle()));
+	    main.setHead(T_main_head.parameterize(thisCommunity.getName()));
 	    
-	    if (AuthorizeManager.isAdmin(context))
-	    {
-	    	// Provide link to general authorizations if the user is a super admin.
-	    	main.addPara().addXref(contextPath + "/admin/community?administrative-continue=" + knot.getId() + "&submit_authorizations", T_edit_authorizations);
-	    }
+        List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
+        options.addItem().addHighlight("bold").addXref(baseURL+"&submit_metadata",T_options_metadata);
+        options.addItem().addXref(baseURL+"&submit_roles",T_options_roles);
 	    
 	    // The grand list of metadata options
 	    List metadataList = main.addList("metadataList", "form");
@@ -171,7 +175,11 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 	    
 	    Para buttonList = main.addPara();
 	    buttonList.addButton("submit_save").setValue(T_submit_update);
-	    buttonList.addButton("submit_delete").setValue(T_submit_delete);
+        //Only System Admins can Delete Communities
+        if (AuthorizeManager.isAdmin(context))
+        {
+	         buttonList.addButton("submit_delete").setValue(T_submit_delete);
+        }
 	    buttonList.addButton("submit_return").setValue(T_submit_return);
 	    
     	main.addHidden("administrative-continue").setValue(knot.getId());

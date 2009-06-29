@@ -167,12 +167,12 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	    if (admins != null) 
 	    {
 		    tableRow.addCell().addXref(baseURL + "&submit_edit_admin", admins.getName());
-		    addAdministratorOnlyButton(tableRow.addCell(),"submit_delete_admin",T_delete);
+            tableRow.addCell().addButton("submit_delete_admin").setValue(T_delete);
 	    }
 	    else 
 	    {
 	    	tableRow.addCell().addContent(T_no_role);
-	    	addAdministratorOnlyButton(tableRow.addCell(),"submit_create_admin",T_create);
+            tableRow.addCell().addButton("submit_create_admin").setValue(T_create);
 	    }
 	    // help and directions row
 	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
@@ -189,12 +189,12 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	    if (wfStep1 != null) 
 	    {
 	    	tableRow.addCell().addXref(baseURL + "&submit_edit_wf_step1", wfStep1.getName());
-		    addAdministratorOnlyButton(tableRow.addCell(),"submit_delete_wf_step1",T_delete);
+            tableRow.addCell().addButton("submit_delete_wf_step1").setValue(T_delete);
 	    }
 	    else 
 	    {
 	    	tableRow.addCell().addContent(T_no_role);
-		    addAdministratorOnlyButton(tableRow.addCell(),"submit_create_wf_step1",T_create);
+            tableRow.addCell().addButton("submit_create_wf_step1").setValue(T_create);
 	    }
 	    // help and directions row
 	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
@@ -208,12 +208,12 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	    if (wfStep2 != null) 
 	    {
 	    	tableRow.addCell().addXref(baseURL + "&submit_edit_wf_step2", wfStep2.getName());
-		    addAdministratorOnlyButton(tableRow.addCell(),"submit_delete_wf_step2",T_delete);
+            tableRow.addCell().addButton("submit_delete_wf_step2").setValue(T_delete);
 	    }
 	    else 
 	    {
 	    	tableRow.addCell().addContent(T_no_role);
-	    	addAdministratorOnlyButton(tableRow.addCell(),"submit_create_wf_step2",T_create);
+            tableRow.addCell().addButton("submit_create_wf_step2").setValue(T_create);
 	    }
 	    // help and directions row
 	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
@@ -227,12 +227,12 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	    if (wfStep3 != null) 
 	    {
 	    	tableRow.addCell().addXref(baseURL + "&submit_edit_wf_step3", wfStep3.getName());
-		    addAdministratorOnlyButton(tableRow.addCell(),"submit_delete_wf_step3",T_delete);
+            tableRow.addCell().addButton("submit_delete_wf_step3").setValue(T_delete);
 	    }
 	    else 
 	    {
 	    	tableRow.addCell().addContent(T_no_role);
-	    	addAdministratorOnlyButton(tableRow.addCell(),"submit_create_wf_step3",T_create);
+            tableRow.addCell().addButton("submit_create_wf_step3").setValue(T_create);
 	    }
 	    // help and directions row
 	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
@@ -247,12 +247,12 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	    if (submitters != null) 
 	    {
 	    	tableRow.addCell().addXref(baseURL + "&submit_edit_submit", submitters.getName());
-	    	addAdministratorOnlyButton(tableRow.addCell(),"submit_delete_submit",T_delete);
+            tableRow.addCell().addButton("submit_delete_submit").setValue(T_delete);
 	    }
 	    else 
 	    {
 	    	tableRow.addCell().addContent(T_no_role);
-	    	addAdministratorOnlyButton(tableRow.addCell(),"submit_create_submit",T_create);
+            tableRow.addCell().addButton("submit_create_submit").setValue(T_create);
 	    }
 	    // help and directions row
 	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
@@ -305,7 +305,7 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
     	
     }
 	
-	
+
 	private void addAdministratorOnlyButton(Cell cell, String buttonName, Message buttonLabel) throws WingException, SQLException
 	{
     	Button button = cell.addButton(buttonName);

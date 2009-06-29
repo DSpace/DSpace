@@ -212,31 +212,23 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    item = metadataList.addItem();
 	    
 	    if (thisCollection.getTemplateItem() == null)
-	    	addAdministratorOnlyButton(item, "submit_create_template", T_submit_create_template);
+	    	item.addButton("submit_create_template").setValue(T_submit_create_template);
 	    else 
 	    {
 	    	item.addButton("submit_edit_template").setValue(T_submit_edit_template);
-	    	addAdministratorOnlyButton(item, "submit_delete_template", T_submit_delete_template);
+	    	item.addButton("submit_delete_template").setValue(T_submit_delete_template);
 	    }
 	    
 		Para buttonList = main.addPara();
 	    buttonList.addButton("submit_save").setValue(T_submit_save);
+        //Only System Admins can Delete Collections
 	    if (AuthorizeManager.isAdmin(context))
+        {
 	    	buttonList.addButton("submit_delete").setValue(T_submit_delete);
+        }
 	    buttonList.addButton("submit_return").setValue(T_submit_return);
 	    
     	main.addHidden("administrative-continue").setValue(knot.getId());
     }
 	
-	private void addAdministratorOnlyButton(Item item, String buttonName, Message buttonLabel) throws WingException, SQLException
-	{
-    	Button button = item.addButton(buttonName);
-    	button.setValue(buttonLabel);
-    	if (!AuthorizeManager.isAdmin(context))
-    	{
-    		// Only admins can create or delete
-    		button.setDisabled();
-    		item.addHighlight("fade").addContent(T_sysadmins_only);
-    	}
-	}
 }
