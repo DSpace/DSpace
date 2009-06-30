@@ -78,6 +78,7 @@ to administer DSpace.
 			<map:transformer name="AddBitstreamForm" src="org.dspace.app.xmlui.aspect.administrative.item.AddBitstreamForm"/>
 			<map:transformer name="EditBitstreamForm" src="org.dspace.app.xmlui.aspect.administrative.item.EditBitstreamForm"/>
 			<map:transformer name="DeleteBitstreamsConfirm" src="org.dspace.app.xmlui.aspect.administrative.item.DeleteBitstreamsConfirm"/>
+			<map:transformer name="MoveItemForm" src="org.dspace.app.xmlui.aspect.administrative.item.MoveItemForm"/>
 			
 			<map:transformer name="MapperMain" src="org.dspace.app.xmlui.aspect.administrative.mapper.MapperMain"/>
 			<map:transformer name="BrowseItemForm" src="org.dspace.app.xmlui.aspect.administrative.mapper.BrowseItemForm"/>
@@ -90,6 +91,8 @@ to administer DSpace.
 			<map:transformer name="CreateCollectionForm" src="org.dspace.app.xmlui.aspect.administrative.collection.CreateCollectionForm"/>
 			
 			<map:transformer name="EditCommunityMetadataForm" src="org.dspace.app.xmlui.aspect.administrative.community.EditCommunityMetadataForm"/>
+	    <map:transformer name="AssignCommunityRoles" src="org.dspace.app.xmlui.aspect.administrative.community.AssignCommunityRoles"/>
+			<map:transformer name="DeleteCommunityRoleConfirm" src="org.dspace.app.xmlui.aspect.administrative.community.DeleteCommunityRoleConfirm"/>
 			<map:transformer name="DeleteCommunityConfirm" src="org.dspace.app.xmlui.aspect.administrative.community.DeleteCommunityConfirm"/>
 			<map:transformer name="CreateCommunityForm" src="org.dspace.app.xmlui.aspect.administrative.community.CreateCommunityForm"/>
 			
@@ -517,6 +520,7 @@ to administer DSpace.
 		        		<map:match pattern="admin/item/metadata">
 		        			<map:transform type="EditItemMetadataForm">
 		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+		        				<map:parameter name="templateCollectionID" value="{flow-attribute:templateCollectionID}"/>
 		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
 		        			</map:transform>
 		        		</map:match>
@@ -585,6 +589,16 @@ to administer DSpace.
 		        			</map:transform>
 		        		</map:match>
 		        		
+		        		<!--
+		        			Move the item to another collection
+		        			-->
+		        		<map:match pattern="admin/item/move">
+		        			<map:transform type="MoveItemForm">
+		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+		        			</map:transform>
+		        		</map:match>
+
 		        	<!-- Item Mapper -->
 		        	
 		        		<map:match pattern="admin/mapper/main">
@@ -652,12 +666,28 @@ to administer DSpace.
 					<!-- Community edit pages -->
 						
 						<!-- Main metadata edit form, accessible by the community admin -->
-						<map:match pattern="admin/community/editMetadata">
+                <map:match pattern="admin/community/editMetadata">
 		        			<map:transform type="EditCommunityMetadataForm">
 		        				<map:parameter name="communityID" value="{flow-attribute:communityID}"/>
 		        			</map:transform>
 		        		</map:match>
 		        		
+		        		<!-- Community Authorization options -->
+                <map:match pattern="admin/community/assignRoles">
+                    <map:transform type="AssignCommunityRoles">
+                        <map:parameter name="communityID" value="{flow-attribute:communityID}"/>
+                    </map:transform>
+                </map:match>
+
+		        		<!-- Confirmation screen for deleting one of the standard authorization groups -->
+		        		<map:match pattern="admin/community/deleteRole">
+		        			<map:transform type="DeleteCommunityRoleConfirm">
+		        				<map:parameter name="communityID" value="{flow-attribute:communityID}"/>
+		        				<map:parameter name="role" value="{flow-attribute:role}"/>
+		        				<map:parameter name="groupID" value="{flow-attribute:groupID}"/>
+		        			</map:transform>
+		        		</map:match>
+
 		        		<!-- Confirmation screen for deleting a community -->
 		        		<map:match pattern="admin/community/delete">
 		        			<map:transform type="DeleteCommunityConfirm">
