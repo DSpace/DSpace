@@ -136,6 +136,7 @@ public class ItemExport
         options.addOption("m", "migrate", false, "export for migration (remove handle and metadata that will be re-created in new system)");
         options.addOption("n", "number", true,
                 "sequence number to begin exporting items with");
+        options.addOption("z", "zip", true, "export as zip file (specify filename e.g. export.zip)");
         options.addOption("h", "help", false, "help");
 
         CommandLine line = parser.parse(options, argv);
@@ -194,6 +195,14 @@ public class ItemExport
         if (line.hasOption('m')) // number
         {
             migrate = true;
+        }
+
+        boolean zip = false;
+        String zipFileName = "";
+        if (line.hasOption('z'))
+        {
+            zip = true;
+            zipFileName = line.getOptionValue('z');
         }
 
         // now validate the args
@@ -279,25 +288,42 @@ public class ItemExport
             }
         }
 
-        if (myItem != null)
+        if (zip)
         {
-            // it's only a single item
-            exportItem(c, myItem, destDirName, seqStart, migrate);
+            ItemIterator items;
+            if (myItem != null)
+            {
+                items = new ItemIterator(c, new ArrayList(myItem.getID()));
+            }
+            else
+            {
+                System.out.println("Exporting from collection: " + myIDString);
+                items = mycollection.getItems();
+            }
+            exportAsZip(c, items, destDirName, zipFileName, seqStart, migrate);
         }
         else
         {
-            System.out.println("Exporting from collection: " + myIDString);
-
-            // it's a collection, so do a bunch of items
-            ItemIterator i = mycollection.getItems();
-            try
+            if (myItem != null)
             {
-                exportItem(c, i, destDirName, seqStart, migrate);
+                // it's only a single item
+                exportItem(c, myItem, destDirName, seqStart, migrate);
             }
-            finally
+            else
             {
-                if (i != null)
-                    i.close();
+                System.out.println("Exporting from collection: " + myIDString);
+
+                // it's a collection, so do a bunch of items
+                ItemIterator i = mycollection.getItems();
+                try
+                {
+                    exportItem(c, i, destDirName, seqStart, migrate);
+                }
+                finally
+                {
+                    if (i != null)
+                        i.close();
+                }
             }
         }
 
@@ -495,7 +521,10 @@ public class ItemExport
             }
 
             // When migrating, only keep date.issued if it is different to date.accessioned
-            if ((migrate) && (!dateIssued.equals(dateAccessioned)))
+            if ((migrate) &&
+                (dateIssued != null) &&
+                (dateAccessioned != null) &&
+                (!dateIssued.equals(dateAccessioned)))
             {
                 utf8 = ("  <dcvalue element=\"date\" "
                         + "qualifier=\"issued\">"
@@ -661,6 +690,44 @@ public class ItemExport
         {
             throw new Exception("Cannot create contents in " + destDir);
         }
+    }
+
+    /**
+     * Method to perform an export and save it as a zip file.
+     *
+     * @param context The DSpace Context
+     * @param items The items to export
+     * @param destDirName The directory to save the export in
+     * @param zipFileName The name to save the zip file as
+     * @param seqStart The first number in the sequence
+     * @param migrate Whether to use the migrate option or not
+     * @throws Exception
+     */
+    public static void exportAsZip(Context context, ItemIterator items,
+                                   String destDirName, String zipFileName,
+                                   int seqStart, boolean migrate) throws Exception
+    {
+        String workDir = getExportWorkDirectory() +
+                         System.getProperty("file.separator") +
+                         zipFileName;
+
+        File wkDir = new File(workDir);
+        if (!wkDir.exists())
+        {
+            wkDir.mkdirs();
+        }
+
+        File dnDir = new File(destDirName);
+        if (!dnDir.exists())
+        {
+            dnDir.mkdirs();
+        }
+
+        // export the items using normal export method
+        exportItem(context, items, workDir, seqStart, migrate);
+
+        // now zip up the export directory created above
+        zip(workDir, destDirName + System.getProperty("file.separator") + zipFileName);
     }
 
     /**
@@ -1301,6 +1368,10 @@ public class ItemExport
             zipFiles(cpFile, strSource, tempFileName, cpZipOutputStream);
             cpZipOutputStream.finish();
             cpZipOutputStream.close();
+
+            // Fix issue on Windows with stale file handles open before trying to delete them
+            System.gc();
+
             deleteDirectory(cpFile);
             targetFile.renameTo(new File(target));
         }

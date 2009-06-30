@@ -37,22 +37,11 @@
  */
 package org.dspace.app.itemimport;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.*;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipEntry;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -151,6 +140,7 @@ public class ItemImport
         options.addOption("d", "delete", false,
                 "delete items listed in mapfile");
         options.addOption("s", "source", true, "source of items (directory)");
+        options.addOption("z", "zip", true, "name of zip file");
         options.addOption("c", "collection", true,
                 "destination collection(s) Handle or database ID");
         options.addOption("m", "mapfile", true, "mapfile items in mapfile");
@@ -180,7 +170,9 @@ public class ItemImport
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("ItemImport\n", options);
             System.out
-                    .println("\nadding items:    ItemImport -a -e eperson -c collection -s sourcedir -m mapfile");
+                   .println("\nadding items:    ItemImport -a -e eperson -c collection -s sourcedir -m mapfile");
+            System.out
+                    .println("\nadding items from zip file:    ItemImport -a -e eperson -c collection -s sourcedir -z filename.zip -m mapfile");
             System.out
                     .println("replacing items: ItemImport -r -e eperson -c collection -s sourcedir -m mapfile");
             System.out
@@ -247,6 +239,15 @@ public class ItemImport
             isResume = true;
             System.out
                     .println("**Resume import** - attempting to import items not already imported");
+        }
+
+        boolean zip = false;
+        String zipfilename = "";
+        String ziptempdir = ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir");
+        if (line.hasOption('z'))
+        {
+            zip = true;
+            zipfilename = sourcedir + System.getProperty("file.separator") + line.getOptionValue('z');
         }
 
         // now validate
@@ -326,6 +327,36 @@ public class ItemImport
             System.out
                     .println("Either delete it or use --resume if attempting to resume an aborted import.");
             System.exit(1);
+        }
+
+        // does the zip file exist and can we write to the temp directory
+        if (zip)
+        {
+            File zipfile = new File(sourcedir);
+            if (!zipfile.canRead())
+            {
+                System.out.println("Zip file '" + sourcedir + "' does not exist, or is not readable.");
+                System.exit(1);
+            }
+
+            if (ziptempdir == null)
+            {
+                System.out.println("Unable to unzip import file as the key 'org.dspace.app.itemexport.work.dir' is not set in dspace.cfg");
+                System.exit(1);
+            }
+            zipfile = new File(ziptempdir);
+            if (!zipfile.isDirectory())
+            {
+                System.out.println("'" + ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir") +
+                                   "' as defined by the key 'org.dspace.app.itemexport.work.dir' in dspace.cfg " +
+                                   "is not a valid directory");
+                System.exit(1);
+            }
+            File tempdir = new File(ziptempdir);
+            tempdir.mkdirs();
+            sourcedir = ziptempdir + System.getProperty("file.separator") + line.getOptionValue("z");
+            ziptempdir = ziptempdir + System.getProperty("file.separator") +
+                         line.getOptionValue("z") + System.getProperty("file.separator");
         }
 
         ItemImport myloader = new ItemImport();
@@ -412,6 +443,48 @@ public class ItemImport
 
         try
         {
+            // If this is a zip archive, unzip it first
+            if (zip)
+            {
+                ZipFile zf = new ZipFile(zipfilename);
+                ZipEntry entry;
+                Enumeration entries = zf.entries();
+                while (entries.hasMoreElements())
+                {
+                    entry = (ZipEntry)entries.nextElement();
+                    if (entry.isDirectory())
+                    {
+                        new File(ziptempdir + entry.getName()).mkdir();
+                    }
+                    else
+                    {
+                        System.out.println("Extracting file: " + entry.getName());
+                        int index = entry.getName().lastIndexOf('/');
+                        if (index == -1)
+                        {
+                            // Was it created on Windows instead?
+                            index = entry.getName().lastIndexOf('\\');
+                        }
+                        if (index > 0)
+                        {
+                            File dir = new File(ziptempdir + entry.getName().substring(0, index));
+                            dir.mkdirs();
+                        }
+                        byte[] buffer = new byte[1024];
+                        int len;
+                        InputStream in = zf.getInputStream(entry);
+                        BufferedOutputStream out = new BufferedOutputStream(
+                            new FileOutputStream(ziptempdir + entry.getName()));
+                        while((len = in.read(buffer)) >= 0)
+                        {
+                            out.write(buffer, 0, len);
+                        }
+                        in.close();
+                        out.close();
+                    }
+                }
+            }
+
             c.setIgnoreAuthorization(true);
 
             if (command.equals("add"))
@@ -444,6 +517,21 @@ public class ItemImport
             e.printStackTrace();
             System.out.println(e);
             status = 1;
+        }
+
+        // Delete the unzipped file
+        try
+        {
+            if (zip)
+            {
+                System.gc();
+                System.out.println("Deleting temporary zip directory: " + ziptempdir);
+                ItemImport.deleteDirectory(new File(ziptempdir));
+            }
+        }
+        catch (Exception ex)
+        {
+            System.out.println("Unable to delete temporary zip archive location: " + ziptempdir);
         }
 
         if (mapOut != null)
@@ -1576,5 +1664,32 @@ public class ItemImport
                 .newDocumentBuilder();
 
         return builder.parse(new File(filename));
+    }
+
+    /**
+     * Delete a directory and its child files and directories
+     * @param path The directory to delete
+     * @return Whether the deletion was successful or not
+     */
+    private static boolean deleteDirectory(File path)
+    {
+        if (path.exists())
+        {
+            File[] files = path.listFiles();
+            for (int i = 0; i < files.length; i++)
+            {
+                if (files[i].isDirectory())
+                {
+                    deleteDirectory(files[i]);
+                }
+                else
+                {
+                    files[i].delete();
+                }
+            }
+        }
+
+        boolean pathDeleted = path.delete();
+        return (pathDeleted);
     }
 }

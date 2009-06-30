@@ -18,7 +18,9 @@
  - [DS-195] Allow the primary bitstream to be set in the item importer / exporter
  - [DS-196] METS exposed via OAI-PMH includes description.provenance information
  - [DS-200] SWORD module requires the X-Packaging header
+ - [DS-204] New -zip option for item exporter and importer
  - [DS-212] NPE thrown during Harvest of non-items when visibility restriction is enabled
+ - [DS-216] Migrating items that use additional metadata schemas causes an NPE
  - [DS-221] XMLUI 'current activity' recognises Google Chrome as Safari
 
 (Larry Stone)
