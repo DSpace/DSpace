@@ -52,7 +52,7 @@
 <dspace:layout locbar="link"
                parentlink="/mydspace"
                parenttitlekey="jsp.mydspace"
-               title="jsp.mydspace.task-complete.title">
+               titlekey="jsp.mydspace.task-complete.title">
 
 <%-- <h1>Thank You</h1> --%>
 <h1><fmt:message key="jsp.mydspace.task-complete.title"/></h1>
