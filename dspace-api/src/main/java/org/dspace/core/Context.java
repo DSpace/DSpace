@@ -215,7 +215,7 @@ public class Context
         {
             Thread currThread = Thread.currentThread();
             StackTraceElement[] stackTrace = currThread.getStackTrace();
-            String caller = stackTrace[3].getClassName();
+            String caller = stackTrace[stackTrace.length - 1].getClassName();
 
             authStateClassCallHistory.push(caller);
         }
@@ -250,7 +250,7 @@ public class Context
         {
             Thread currThread = Thread.currentThread();
             StackTraceElement[] stackTrace = currThread.getStackTrace();
-            String caller = stackTrace[3].getClassName();
+            String caller = stackTrace[stackTrace.length - 1].getClassName();
 
             String previousCaller = (String) authStateClassCallHistory.pop();
 
