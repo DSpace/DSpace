@@ -62,6 +62,11 @@ import org.dspace.eperson.Group;
  * <P>
  * e.g. {@code authentication.ip.MIT = 18., 192.25.0.0/255.255.0.0}
  * <P>
+ * Negative matches can be included by prepending the range with a '-'. For example if you want
+ * to include all of a class B network except for users of a contained class c network, you could use:
+ * <P>
+ * 111.222,-111.222.333.
+ * <p>
  * For supported IP ranges see {@link org.dspace.authenticate.IPMatcher}.
  * 
  * @version $Revision$
@@ -74,6 +79,9 @@ public class IPAuthentication implements AuthenticationMethod
 
     /** All the IP matchers */
     private List<IPMatcher> ipMatchers;
+
+    /** All the negative IP matchers */
+    private List<IPMatcher> ipNegativeMatchers;
 
     /**
      * Maps IPMatchers to group names when we don't know group DB ID yet. When
@@ -92,6 +100,7 @@ public class IPAuthentication implements AuthenticationMethod
     public IPAuthentication()
     {
         ipMatchers = new ArrayList<IPMatcher>();
+        ipNegativeMatchers = new ArrayList<IPMatcher>();
         ipMatcherGroupIDs = new HashMap<IPMatcher, Integer>();
         ipMatcherGroupNames = new HashMap<IPMatcher, String>();
 
@@ -130,17 +139,26 @@ public class IPAuthentication implements AuthenticationMethod
     {
         String[] ranges = ipRanges.split("\\s*,\\s*");
 
-        for (int i = 0; i < ranges.length; i++)
+        for (String entry : ranges)
         {
             try
             {
-                IPMatcher ipm = new IPMatcher(ranges[i]);
-                ipMatchers.add(ipm);
+                IPMatcher ipm;
+                if (entry.startsWith("-"))
+                {
+                    ipm = new IPMatcher(entry.substring(1));
+                    ipNegativeMatchers.add(ipm);
+                }
+                else
+                {
+                    ipm = new IPMatcher(entry);
+                    ipMatchers.add(ipm);
+                }
                 ipMatcherGroupNames.put(ipm, groupName);
 
                 if (log.isDebugEnabled())
                 {
-                    log.debug("Configured " + ranges[i] + " for special group "
+                    log.debug("Configured " + entry + " for special group "
                             + groupName);
                 }
             }
@@ -181,10 +199,8 @@ public class IPAuthentication implements AuthenticationMethod
 
         String addr = request.getRemoteAddr();
 
-        for (int i = 0; i < ipMatchers.size(); i++)
+        for (IPMatcher ipm : ipMatchers)
         {
-            IPMatcher ipm = ipMatchers.get(i);
-
             try
             {
                 if (ipm.match(addr))
@@ -229,6 +245,54 @@ public class IPAuthentication implements AuthenticationMethod
             }
         }
 
+        // Now remove any negative matches
+        for (IPMatcher ipm : ipNegativeMatchers)
+        {
+            try
+            {
+                if (ipm.match(addr))
+                {
+                    // Do we know group ID?
+                    Integer g = ipMatcherGroupIDs.get(ipm);
+                    if (g != null)
+                    {
+                        groupIDs.remove(g);
+                    }
+                    else
+                    {
+                        // See if we have a group name
+                        String groupName = ipMatcherGroupNames.get(ipm);
+
+                        if (groupName != null)
+                        {
+                            Group group = Group.findByName(context, groupName);
+                            if (group != null)
+                            {
+                                // Add ID so we won't have to do lookup again
+                                ipMatcherGroupIDs.put(ipm, new Integer(group
+                                        .getID()));
+                                ipMatcherGroupNames.remove(ipm);
+
+                                groupIDs.remove(new Integer(group.getID()));
+                            }
+                            else
+                            {
+                                log.warn(LogManager.getHeader(context,
+                                        "configuration_error", "unknown_group="
+                                                + groupName));
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IPMatcherException ipme)
+            {
+                log.warn(LogManager.getHeader(context, "configuration_error",
+                        "bad_ip=" + addr), ipme);
+            }
+        }
+
+
         int[] results = new int[groupIDs.size()];
         for (int i = 0; i < groupIDs.size(); i++)
         {
@@ -243,7 +307,7 @@ public class IPAuthentication implements AuthenticationMethod
             {
                 if (i > 0)
                     gsb.append(",");
-                gsb.append(results[i]);
+                    gsb.append(results[i]);
             }
 
             log.debug(LogManager.getHeader(context, "authenticated",

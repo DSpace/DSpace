@@ -21,6 +21,7 @@
  - [DS-204] New -zip option for item exporter and importer
  - [DS-209] Context.java turnOffAuthorisationSystem() can throw a NPE
  - [DS-212] NPE thrown during Harvest of non-items when visibility restriction is enabled
+ - [DS-213] IPAuthentication extended to allow negative matching
  - [DS-216] Migrating items that use additional metadata schemas causes an NPE
  - [DS-221] XMLUI 'current activity' recognises Google Chrome as Safari
 
@@ -39,7 +40,6 @@
 (Tim Donohue)
  - [DS-218] Cannot add/remove email subscriptions from Profile page in XMLUI
  - [DS-238] Move item function in xmlui
-
 
 (Tim Donohue / Andrea Bollini)
  - [DS-228] Community Admin XMLUI: Delegated Admins Patch

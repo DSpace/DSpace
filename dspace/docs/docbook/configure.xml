@@ -1953,6 +1953,7 @@ plugin.sequence.org.dspace.authenticate.AuthenticationMethod =
 	netmask
  
 </screen>
+          <para>Negative metches can be set by prepending the entry with a '-'. For example if you want to include all of a class B network except for users of a contained class c network, you could use: 111.222,-111.222.333.</para>
           <para><emphasis role="bold">Note:</emphasis> if the Groupname contains blanks you must escape the, e.g. Department\ of\ Statistics</para>
         </section>
         <section remap="h4">
