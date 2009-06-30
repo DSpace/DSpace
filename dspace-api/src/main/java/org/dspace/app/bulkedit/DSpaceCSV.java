@@ -73,7 +73,7 @@ public class DSpaceCSV
     protected static String fieldSeparator;
 
     /** The field separator in an escaped form for using in regexs */
-    protected static String escpaedFieldSeparator;
+    protected static String escapedFieldSeparator;
 
 
     /**
@@ -126,7 +126,7 @@ public class DSpaceCSV
 
         // Read the heading line
         String head = input.readLine();
-        String[] headingElements = head.split(fieldSeparator);
+        String[] headingElements = head.split(escapedFieldSeparator);
         for (String element : headingElements)
         {
             // Remove surrounding quotes if there are any
@@ -224,7 +224,7 @@ public class DSpaceCSV
         // Now store the escaped version
         Pattern spchars = Pattern.compile("([\\\\*+\\[\\](){}\\$.?\\^|])");
         Matcher match = spchars.matcher(fieldSeparator);
-        escpaedFieldSeparator = match.replaceAll("\\\\$1");
+        escapedFieldSeparator = match.replaceAll("\\\\$1");
     }
 
     /**
@@ -295,7 +295,7 @@ public class DSpaceCSV
         }
         
         // Split up on field separator
-        String[] parts = line.split(fieldSeparator);
+        String[] parts = line.split(escapedFieldSeparator);
         ArrayList<String> bits = new ArrayList<String>();
         bits.addAll(Arrays.asList(parts));
 
@@ -390,8 +390,6 @@ public class DSpaceCSV
                     if ((element != null) && (!"".equals(element)))
                     {
                         csvLine.add(headings.get(i - 1), element);
-                        System.out.println(i + ":" + headings.size() + ":" + headings.get(i - 1) + ":" + element + ":");
-
                     }
                 }
             }
