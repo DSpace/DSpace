@@ -546,7 +546,7 @@ public class FlowItemUtils
 
 		//Step 1:
 		// Update the bitstream's description
-		if (description != null && description.length() > 0)
+		if (description != null)
 		{
 			bitstream.setDescription(description);
 		}
