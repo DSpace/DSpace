@@ -298,6 +298,8 @@ public class DSpaceValidity implements SourceValidity
             
             validityKey.append("Item:");
             validityKey.append(item.getHandle());            
+            validityKey.append(item.getOwningCollection());
+            validityKey.append(item.getLastModified());
             // Include all metadata values in the validity key.
             DCValue[] dcvs = item.getDC(Item.ANY,Item.ANY,Item.ANY);
             for (DCValue dcv : dcvs)
