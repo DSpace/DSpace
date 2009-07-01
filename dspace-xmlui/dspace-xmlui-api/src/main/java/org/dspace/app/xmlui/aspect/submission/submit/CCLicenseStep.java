@@ -56,6 +56,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.license.CreativeCommons;
+import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -149,7 +150,13 @@ public class CCLicenseStep extends AbstractSubmissionStep
 	    offsiteDiv.addHidden("submission-continue").setValue(knot.getId()); 
 	    offsiteDiv.addHidden("partner").setValue("dspace");
 	    offsiteDiv.addHidden("exit_url").setValue(exitURL);
-	    
+
+        String jurisdiction = ConfigurationManager.getProperty("webui.submit.cc-jurisdiction");
+        if ((jurisdiction != null) && (!"".equals(jurisdiction)))
+        {
+            offsiteDiv.addHidden("jurisdiction").setValue(jurisdiction.trim());
+        }
+
 	    Para ccPara = offsiteDiv.addPara("creative-commons-button","creative-commons-button");
 	    ccPara.addButton("submit_to_creative_commons").setValue(T_submit_to_creative_commons);
 	
