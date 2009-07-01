@@ -2,8 +2,10 @@
 =====
 
 (Kim Shepherd)
- - [DS-156] File description not available in XMLUI
  - [DS-118] File preview link during submission leads to page not found
+ - [DS-156] File description not available in XMLUI
+ - [DS-198] File descriptions can not be removed/cleared in XMLUI
+ - [DS-240] Item validityKey not complete
 
 (Claudia Juergen)
  - [DS-188] Misspell exclude.type=indentifier in dstat.cfg
