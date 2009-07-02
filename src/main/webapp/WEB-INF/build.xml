@@ -1,0 +1,21 @@
+<project name="testproject" default="test" basedir=".">
+    
+	<property name="solr.home" location=""/>
+
+	<target name="test">
+        <copy file="WEB-INF/conf/admin-extra.html" todir="${solr.home}/conf"/>
+		<copy file="WEB-INF/conf/elevate.xml" todir="${solr.home}/conf"/>
+		<copy file="WEB-INF/conf/protwords.txt" todir="${solr.home}/conf"/>
+		<copy file="WEB-INF/conf/schema.xml" todir="${solr.home}/conf"/>
+		<copy file="WEB-INF/conf/scripts.conf" todir="${solr.home}/conf"/>
+		<copy file="WEB-INF/conf/solrconfig.xml" todir="${solr.home}/conf"/>
+		<copy file="WEB-INF/conf/spellings.txt" todir="${solr.home}/conf"/>
+		<copy file="WEB-INF/conf/stopwords.txt" todir="${solr.home}/conf"/>
+		<copy file="WEB-INF/conf/synonyms.txt" todir="${solr.home}/conf"/>
+		<copy file="WEB-INF/conf/xslt/example_atom.xsl" todir="${solr.home}/conf"/>
+		<copy file="WEB-INF/conf/xslt/example_rss.xsl" todir="${solr.home}/conf"/>
+		<copy file="WEB-INF/conf/xslt/example.xsl" todir="${solr.home}/conf"/>
+		<copy file="WEB-INF/conf/xslt/luke.xsl" todir="${solr.home}/conf"/>
+    </target>
+	
+</project>

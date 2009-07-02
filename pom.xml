@@ -1,0 +1,161 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.dspace</groupId>
+	<artifactId>dspace-solr</artifactId>
+	<packaging>war</packaging>
+	<name>DSpace Solr Service</name>
+	<version>1.0-SNAPSHOT</version>
+	<description>A bare bones deployment of Solr for use in DSpace applications</description>
+
+	<repositories>
+	       <repository>
+            <id>dspace-snapshot</id>
+            <name>DSpace Snapshot Repository</name>
+            <url>http://maven.dspace.org/snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+                <checksumPolicy>fail</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+    
+     <distributionManagement>
+        <repository>
+            <id>maven.dspace.org/release</id>
+            <name>DSpace Maven Repository</name>
+            <url>scp://maven.dspace.org/var/maven/release
+            </url>
+        </repository>
+        <snapshotRepository>
+            <id>maven.dspace.org/snapshot</id>
+            <name>DSpace Maven Repository</name>
+            <url>scp://maven.dspace.org/var/maven/snapshot
+            </url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+        <site>
+            <id>website</id>
+            <url> scp://projects.dspace.org/var/www/projects.dspace.org/htdocs</url>
+        </site>
+    </distributionManagement>
+    
+	<build>
+		<plugins>
+		 <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+               <source>1.5</source>
+               <target>1.5</target>
+            </configuration>
+         </plugin>
+		    <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<configuration>
+							<primaryArtifact>false</primaryArtifact>
+							<classifier>classes</classifier>
+							<includes>
+								<include>**</include>
+							</includes>
+						</configuration>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>webapp</id>
+						<configuration>
+							<primaryArtifact>true</primaryArtifact>
+							<archiveClasses>true</archiveClasses>
+							<!-- Maven 2.1 <attachClasses>true</attachClasses>
+							<classesClassifier>classes</classesClassifier> -->
+							<webResources>
+								<resource>
+									<filtering>true</filtering>
+									<directory>${basedir}/src/main/webapp</directory>
+									<includes>
+										<include>WEB-INF/web.xml</include>
+									</includes>
+								</resource>
+							</webResources>
+						</configuration>
+						<goals>
+							<goal>war</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+					
+					<execution>
+						<id>skinny</id>
+						<configuration>
+							<primaryArtifact>false</primaryArtifact>
+							<classifier>skinny</classifier>
+							<archiveClasses>true</archiveClasses>
+							<warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
+							<webResources>
+								<resource>
+									<filtering>true</filtering>
+									<directory>${basedir}/src/main/webapp</directory>
+									<includes>
+										<include>WEB-INF/web.xml</include>
+									</includes>
+								</resource>
+							</webResources>
+						</configuration>
+						<goals>
+							<goal>war</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+					
+				</executions>
+			</plugin>
+		</plugins>
+
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-common</artifactId>
+			<version>1.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-core</artifactId>
+			<version>1.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.ant</groupId>
+			<artifactId>ant</artifactId>
+			<version>1.7.1</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>2.1</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+</project>
