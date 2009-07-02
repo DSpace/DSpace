@@ -1,11 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.dspace</groupId>
 	<artifactId>dspace-solr</artifactId>
 	<packaging>war</packaging>
 	<name>DSpace Solr Service</name>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<description>A bare bones deployment of Solr for use in DSpace applications</description>
 
 	<repositories>
@@ -31,9 +30,9 @@
 		releases snapshots into the snapshot repository below.
 	-->
 	<scm>
-		<connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-solr/trunk</connection>
-		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk</developerConnection>
-		<url>http://scm.dspace.org/svn/repo/modules/dspace-solr/trunk</url>
+		<connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-1.0</connection>
+		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-1.0</developerConnection>
+		<url>http://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-1.0</url>
 	</scm>
 
 	<distributionManagement>
@@ -52,7 +51,7 @@
 		</snapshotRepository>
 		<site>
 			<id>website</id>
-			<url> scp://projects.dspace.org/var/www/projects.dspace.org/htdocs</url>
+			<url> scp://projects.dspace.org/var/www/projects.dspace.org/htdocs/${artifactId}</url>
 		</site>
 	</distributionManagement>
 
