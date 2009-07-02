@@ -477,6 +477,16 @@ public class UIUtil extends Util
                 }
 
                 email.addArgument(stackTrace);
+                EPerson user = c.getCurrentUser();
+                if (user != null)
+                {
+                    email.addArgument(user.getFullName() + " (" + user.getEmail() + ")");
+                }
+                else
+                {
+                    email.addArgument("Anonymous");
+                }
+                email.addArgument(request.getRemoteAddr());
                 email.send();
             }
         }
