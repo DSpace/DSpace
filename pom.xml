@@ -9,52 +9,63 @@
 	<description>A bare bones deployment of Solr for use in DSpace applications</description>
 
 	<repositories>
-	       <repository>
-            <id>dspace-snapshot</id>
-            <name>DSpace Snapshot Repository</name>
-            <url>http://maven.dspace.org/snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>fail</checksumPolicy>
-            </snapshots>
-        </repository>
-    </repositories>
-    
-     <distributionManagement>
-        <repository>
-            <id>maven.dspace.org/release</id>
-            <name>DSpace Maven Repository</name>
-            <url>scp://maven.dspace.org/var/maven/release
+		<repository>
+			<id>dspace-snapshot</id>
+			<name>DSpace Snapshot Repository</name>
+			<url>http://maven.dspace.org/snapshot</url>
+			<releases>
+				<enabled>false</enabled>
+				<checksumPolicy>fail</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
+				<checksumPolicy>fail</checksumPolicy>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<!--
+		The Subversion repository location is used by Continuum to update
+		against when changes have occured, this spawns a new build cycle and
+		releases snapshots into the snapshot repository below.
+	-->
+	<scm>
+		<connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-solr/trunk</connection>
+		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk</developerConnection>
+		<url>http://scm.dspace.org/svn/repo/modules/dspace-solr/trunk</url>
+	</scm>
+
+	<distributionManagement>
+		<repository>
+			<id>maven.dspace.org/release</id>
+			<name>DSpace Maven Repository</name>
+			<url>scp://maven.dspace.org/var/maven/release
             </url>
-        </repository>
-        <snapshotRepository>
-            <id>maven.dspace.org/snapshot</id>
-            <name>DSpace Maven Repository</name>
-            <url>scp://maven.dspace.org/var/maven/snapshot
+		</repository>
+		<snapshotRepository>
+			<id>maven.dspace.org/snapshot</id>
+			<name>DSpace Maven Repository</name>
+			<url>scp://maven.dspace.org/var/maven/snapshot
             </url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-        <site>
-            <id>website</id>
-            <url> scp://projects.dspace.org/var/www/projects.dspace.org/htdocs</url>
-        </site>
-    </distributionManagement>
-    
+			<uniqueVersion>false</uniqueVersion>
+		</snapshotRepository>
+		<site>
+			<id>website</id>
+			<url> scp://projects.dspace.org/var/www/projects.dspace.org/htdocs</url>
+		</site>
+	</distributionManagement>
+
 	<build>
 		<plugins>
-		 <plugin>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-               <source>1.5</source>
-               <target>1.5</target>
-            </configuration>
-         </plugin>
-		    <plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<executions>
@@ -82,8 +93,10 @@
 						<configuration>
 							<primaryArtifact>true</primaryArtifact>
 							<archiveClasses>true</archiveClasses>
-							<!-- Maven 2.1 <attachClasses>true</attachClasses>
-							<classesClassifier>classes</classesClassifier> -->
+							<!--
+								Maven 2.1 <attachClasses>true</attachClasses>
+								<classesClassifier>classes</classesClassifier>
+							-->
 							<webResources>
 								<resource>
 									<filtering>true</filtering>
@@ -99,7 +112,7 @@
 						</goals>
 						<phase>package</phase>
 					</execution>
-					
+
 					<execution>
 						<id>skinny</id>
 						<configuration>
@@ -122,7 +135,7 @@
 						</goals>
 						<phase>package</phase>
 					</execution>
-					
+
 				</executions>
 			</plugin>
 		</plugins>
