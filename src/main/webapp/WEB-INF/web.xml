@@ -4,6 +4,7 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	id="WebApp_ID" version="2.5">
 	<display-name>dspace-solr</display-name>
+
 	<!--
 		Uncomment if you are trying to use a Resin version before 3.0.19.
 		Their XML implementation isn't entirely compatible with Xerces. Below
