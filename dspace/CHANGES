@@ -3,6 +3,7 @@
 
 (Kim Shepherd)
  - [DS-118] File preview link during submission leads to page not found
+ - [DS-121] XMLUI Feedback form breaks with multiple hostnames
  - [DS-156] File description not available in XMLUI
  - [DS-198] File descriptions can not be removed/cleared in XMLUI
  - [DS-240] Item validityKey not complete

@@ -82,9 +82,25 @@ public class SendFeedbackAction extends AbstractAction
         // Obtain information from request
         // The page where the user came from
         String fromPage = request.getHeader("Referer");
-
         // Prevent spammers and splogbots from poisoning the feedback page
         String host = ConfigurationManager.getProperty("dspace.hostname");
+        String allowedReferrersString = ConfigurationManager.getProperty("mail.allowed.referrers");
+
+        String[] allowedReferrersSplit = null;
+        boolean validReferral = false;
+
+        if((allowedReferrersString != null) && (allowedReferrersString.length() > 0))
+        {
+            allowedReferrersSplit = allowedReferrersString.trim().split("\\s*,\\s*");
+            for(int i = 0; i < allowedReferrersSplit.length; i++)
+            {
+                if(fromPage.indexOf(allowedReferrersSplit[i]) != -1)
+                {
+                    validReferral = true;
+		    break;
+                }
+            }
+        }
 
         String basicHost = "";
         if (host.equals("localhost") || host.equals("127.0.0.1")
@@ -98,7 +114,7 @@ public class SendFeedbackAction extends AbstractAction
             basicHost = host.substring(host.substring(0, lastDot).lastIndexOf("."));
         }
 
-        if (fromPage == null || fromPage.indexOf(basicHost) == -1)
+        if ((fromPage == null) || ((fromPage.indexOf(basicHost) == -1) && (validReferral == false)))
         {
             throw new AuthorizeException();
         }
