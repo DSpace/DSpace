@@ -86,11 +86,10 @@ public class MetadataExportServlet extends DSpaceServlet
     {
         // Get the handle requested for the export
         String handle = request.getParameter("handle");
-        log.info(LogManager.getHeader(context, "metadataexport", "exporting_handle:" + handle));
-        ItemIterator toExport = null;
         MetadataExport exporter = null;
         if (handle != null)
         {
+            log.info(LogManager.getHeader(context, "metadataexport", "exporting_handle:" + handle));
             DSpaceObject thing = HandleManager.resolveToObject(context, handle);
             if (thing != null)
             {
@@ -103,7 +102,7 @@ public class MetadataExportServlet extends DSpaceServlet
                 else if (thing.getType() == Constants.COLLECTION)
                 {
                     Collection collection = (Collection)thing;
-                    toExport = collection.getAllItems();
+                    ItemIterator toExport = collection.getAllItems();
                     exporter = new MetadataExport(context, toExport);
                 }
                 else if (thing.getType() == Constants.COMMUNITY)
@@ -116,11 +115,13 @@ public class MetadataExportServlet extends DSpaceServlet
 
                 // Return the csv file
                 response.setContentType("text/csv; charset=UTF-8");
-                response.setHeader("Content-Disposition", "attachment; filename=" + handle.replaceAll("/", "-") + ".csv");
+                String filename = handle.replaceAll("/", "-") + ".csv";
+                response.setHeader("Content-Disposition", "attachment; filename=" + filename);
                 PrintWriter out = response.getWriter();
                 out.write(csv.toString());
                 out.flush();
                 out.close();
+                log.info(LogManager.getHeader(context, "metadataexport", "exported_file:" + filename));                
                 return;
             }
         }
