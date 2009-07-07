@@ -35,6 +35,17 @@
 		<url>http://scm.dspace.org/svn/repo/modules/dspace-solr/trunk</url>
 	</scm>
 
+	<licenses>
+      <license>
+         <name>DSpace Sourcecode License</name>
+         <url>LICENSE</url>
+         <distribution>repo</distribution>
+         <comments>
+            A BSD compatable OSS license for the DSpace codebase.
+         </comments>
+      </license>
+   </licenses>
+
 	<distributionManagement>
 		<repository>
 			<id>maven.dspace.org/release</id>
@@ -54,6 +65,51 @@
 			<url> scp://projects.dspace.org/var/www/projects.dspace.org/htdocs/${artifactId}</url>
 		</site>
 	</distributionManagement>
+
+	<developers>
+		<developer>
+			<name>Ben Bosman</name>
+			<email>ben at atmire.com</email>
+			<url>http://www.atmire.com</url>
+			<organization>@MIRE</organization>
+			<organizationUrl>http://www.atmire.com</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<name>Mark Diggory</name>
+			<email>mdiggory at atmire.com</email>
+			<url>http://www.atmire.com</url>
+			<organization>@MIRE</organization>
+			<organizationUrl>http://www.atmire.com</organizationUrl>
+			<timezone>-5</timezone>
+		</developer>
+		<developer>
+			<name>Lieven Droogmans</name>
+			<email>lieven at atmire.com</email>
+			<url>http://www.atmire.com</url>
+			<organization>@MIRE</organization>
+			<organizationUrl>http://www.atmire.com</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<name>Art Lowel</name>
+			<email>art at atmire.com</email>
+			<url>http://www.atmire.com</url>
+			<organization>@MIRE</organization>
+			<organizationUrl>http://www.atmire.com</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<name>Kevin Van de velde</name>
+			<email>kevin at atmire.com</email>
+			<url>http://www.atmire.com</url>
+			<organization>@MIRE</organization>
+			<organizationUrl>http://www.atmire.com</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+   
+    <contributors/>
 
 	<build>
 		<plugins>
@@ -140,6 +196,8 @@
 		</plugins>
 
 	</build>
+   
+   
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.solr</groupId>
