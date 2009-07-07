@@ -338,7 +338,7 @@ public class Community extends DSpaceObject
         throws SQLException
     {
         // get all communities that are not children
-        TableRowIterator tri = DatabaseManager.query(context,
+        TableRowIterator tri = DatabaseManager.queryTable(context,
             "community",
             "SELECT * FROM community WHERE NOT community_id IN " +
             "(SELECT child_comm_id FROM community2community) " +
