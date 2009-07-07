@@ -22,6 +22,7 @@
 <link rel="shortcut icon" href="favicon.ico" type="image/ico"></link>
 <title>Welcome to Solr</title>
 <script language="Javascript">
+
 // derived from http://www.degraeve.com/reference/simple-ajax-example.php
 function xmlhttpPost(strURL) {
     var xmlHttpReq = false;
@@ -81,27 +82,40 @@ function updatepage(str){
 <h1>Welcome to Solr!</h1>
 <a href="."><img border="0" align="right" height="61" width="142" src="admin/solr-head.gif" alt="Solr"/></a>
 
+<h1>Solr Ajax Example</h1>
+<form name="f1" onsubmit='xmlhttpPost(this.core.value + "/select"); return false;'><p>
 <% 
   org.apache.solr.core.CoreContainer cores = (org.apache.solr.core.CoreContainer)request.getAttribute("org.apache.solr.CoreContainer");
   if( cores != null
    && cores.getCores().size() > 0 // HACK! check that we have valid names...
+   && cores.getCores().iterator().next().getName().length() != 0 ) { %>
+   core: <select name="core">
+   <% for( org.apache.solr.core.SolrCore core : cores.getCores() ) {%>
+  		<option><%= core.getName() %></option>
+   <% }%>
+   </select>
+<%} else { %>
+  <input type="hidden" name="core" value=""/>  
+<% } %>
+ query: <input name="query" type="text">  <input value="Go" type="submit"></p>
+
+<div id="result"></div>
+
+<p/><pre>Raw JSON String: <div id="raw"></div></pre>
+
+</form>
+
+
+<% 
+  //org.apache.solr.core.CoreContainer cores = (org.apache.solr.core.CoreContainer)request.getAttribute("org.apache.solr.CoreContainer");
+  if( cores != null
+   && cores.getCores().size() > 0 // HACK! check that we have valid names...
    && cores.getCores().iterator().next().getName().length() != 0 ) { 
     for( org.apache.solr.core.SolrCore core : cores.getCores() ) {%>
-<a href="<%= core.getName() %>/admin/">Admin <%= core.getName() %></a><br/>
+	<a href="<%= core.getName() %>/admin/">Admin <%= core.getName() %></a><br/>
 <% }} else { %>
 <a href="admin/">Solr Admin</a>
 <% } %>
-
-
-<h1>Solr Ajax Example</h1>
-
-<form name="f1" onsubmit='xmlhttpPost("select"); return false;'>
-  <p>query: <input name="query" type="text">  
-  <input value="Go" type="submit"></p>
-  
-<div id="result"></div>
-<p/><pre>Raw JSON String: <div id="raw"></div></pre>
-</form>
 
 </body>
 </html>

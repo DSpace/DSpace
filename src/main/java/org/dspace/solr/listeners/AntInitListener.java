@@ -54,13 +54,13 @@ public class AntInitListener implements ServletContextListener
             }
             
             File home = new File(solrHome);
-            File conf = new File(home, "conf");
-            File solrconfig = new File(conf, "solrconfig.xml");
             
-            if (!solrconfig.exists())
+            home.mkdirs();
+            
+            File conf = new File(home, "solr.xml");
+            
+            if (!conf.exists())
             {
-                conf.mkdirs();
-
                 Project p = new Project();
                 p.setBasedir(sce.getServletContext().getRealPath(""));
                 p.setUserProperty("ant.file", sce.getServletContext().getRealPath("/WEB-INF/build.xml"));

@@ -1,7 +1,16 @@
 <project name="testproject" default="test" basedir=".">
-    
-	<property name="solr.home" location=""/>
 
+	<property name="solr.home" location="" />
+
+	<target name="test">
+		<copy file="WEB-INF/solr/solr.xml" todir="${solr.home}" />
+		<copy file="WEB-INF/solr/search/conf/schema.xml" todir="${solr.home}/search/conf" />
+		<copy file="WEB-INF/solr/search/conf/solrconfig.xml" todir="${solr.home}/search/conf" />
+		<copy file="WEB-INF/solr/statistics/conf/schema.xml" todir="${solr.home}/statistics/conf" />
+		<copy file="WEB-INF/solr/statistics/conf/solrconfig.xml" todir="${solr.home}/statistics/conf" />
+		
+	</target>
+	<!--
 	<target name="test">
         <copy file="WEB-INF/conf/admin-extra.html" todir="${solr.home}/conf"/>
 		<copy file="WEB-INF/conf/elevate.xml" todir="${solr.home}/conf"/>
@@ -17,5 +26,5 @@
 		<copy file="WEB-INF/conf/xslt/example.xsl" todir="${solr.home}/conf"/>
 		<copy file="WEB-INF/conf/xslt/luke.xsl" todir="${solr.home}/conf"/>
     </target>
-	
+	-->
 </project>
