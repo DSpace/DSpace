@@ -41,9 +41,11 @@ package org.dspace.app.webui.servlet.admin;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.text.SimpleDateFormat;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -504,6 +506,8 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                     .getIntParameter(request, "collection_id");
             int community_id = UIUtil.getIntParameter(request, "community_id");
             int item_id = UIUtil.getIntParameter(request, "item_id");
+	    String startDate = request.getParameter("start_date");
+	    String endDate = request.getParameter("end_date");
 
             Item item = null;
             Collection collection = null;
@@ -584,6 +588,29 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                 // modify the policy
                 policy.setAction(action_id);
                 policy.setGroup(group);
+
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+		try {
+		  if (startDate == null || startDate.equals("")) {
+		    policy.setStartDate(null);
+		  } else {
+		    Date d = format.parse(startDate);
+		    policy.setStartDate(d);
+		  }
+		}
+		catch (Exception e) {}
+
+		try {
+		  if (endDate == null || endDate.equals("")) {
+		    policy.setEndDate(null);
+		  } else {
+		    Date d = format.parse(endDate);
+		    policy.setEndDate(d);
+		  }
+		}
+		catch (Exception e) {}
+
                 policy.update();
 
                 // show edit form!

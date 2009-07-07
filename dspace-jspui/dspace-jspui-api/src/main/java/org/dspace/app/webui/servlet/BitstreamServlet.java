@@ -47,6 +47,8 @@ import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import java.net.SocketException;
+
 import javax.mail.internet.MimeUtility;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -237,7 +239,24 @@ public class BitstreamServlet extends DSpaceServlet
         }
         
         // Pipe the bits
-        InputStream is = bitstream.retrieve();
+	     InputStream is = null;
+	     try {
+            is = bitstream.retrieve();
+	     }
+	     catch (AuthorizeException e) {
+            // Clear the response, including headers (eg, Content-Length)
+            response.reset();
+
+            if (bitstream.isETDEmbargo()) {
+                request.setAttribute("date", bitstream.getETDEmbargo().getEndDate());
+                JSPManager.showJSP(request, response, "/error/authorize-etd-embargo.jsp");
+                return;
+            }
+
+            else {
+                throw e;
+            }
+        }
      
 		// Set the response MIME type
         response.setContentType(bitstream.getFormat().getMIMEType());
@@ -251,9 +270,16 @@ public class BitstreamServlet extends DSpaceServlet
 			setBitstreamDisposition(bitstream.getName(), request, response);
 		}
 
-        Utils.bufferedCopy(is, response.getOutputStream());
-        is.close();
-        response.getOutputStream().flush();
+      try {
+          Utils.bufferedCopy(is, response.getOutputStream());
+          response.getOutputStream().flush();
+      }
+      catch (SocketException e) {
+          log.warn(e.getMessage());
+          response.reset();
+          return;
+      }
+      is.close();
     }
 	
 	/**

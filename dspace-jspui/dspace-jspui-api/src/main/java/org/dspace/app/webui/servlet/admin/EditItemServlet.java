@@ -669,6 +669,8 @@ public class EditItemServlet extends DSpaceServlet
         Item item = Item.find(context, UIUtil.getIntParameter(wrapper,
                 "item_id"));
 
+	String bundleName = wrapper.getParameter("bundle");
+
         File temp = wrapper.getFile("file");
 
         // Read the temp file as logo
@@ -678,12 +680,12 @@ public class EditItemServlet extends DSpaceServlet
         checkEditAuthorization(context, item);
 
         // do we already have an ORIGINAL bundle?
-        Bundle[] bundles = item.getBundles("ORIGINAL");
+        Bundle[] bundles = item.getBundles(bundleName);
 
         if (bundles.length < 1)
         {
             // set bundle's name to ORIGINAL
-            b = item.createSingleBitstream(is, "ORIGINAL");
+            b = item.createSingleBitstream(is, bundleName);
             
             // set the permission as defined in the owning collection
             Collection owningCollection = item.getOwningCollection();

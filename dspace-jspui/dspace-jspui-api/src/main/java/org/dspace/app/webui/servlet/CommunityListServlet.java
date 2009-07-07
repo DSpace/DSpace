@@ -54,6 +54,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.CommunityGroup;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
@@ -74,13 +75,21 @@ public class CommunityListServlet extends DSpaceServlet
     {
         log.info(LogManager.getHeader(context, "view_community_list", ""));
 
+        // This will map group IDs to top level communities
+        Map topcommMap = new HashMap();
+
         // This will map community IDs to arrays of collections
         Map colMap = new HashMap();
 
         // This will map communityIDs to arrays of sub-communities
         Map commMap = new HashMap();
 
-        Community[] communities = Community.findAllTop(context);
+        CommunityGroup[] groups = CommunityGroup.findAll(context);
+        for (int k=0; k < groups.length; k++) {
+            Integer groupID = new Integer(groups[k].getID());
+
+            Community[] communities = groups[k].getCommunities();
+            topcommMap.put(groupID, communities);
 
         for (int com = 0; com < communities.length; com++)
         {
@@ -93,6 +102,8 @@ public class CommunityListServlet extends DSpaceServlet
             // Find subcommunties in community
             Community[] comms = communities[com].getSubcommunities();
             commMap.put(comID, comms);
+                
+        }
         }
 
         // can they admin communities?
@@ -102,7 +113,8 @@ public class CommunityListServlet extends DSpaceServlet
             request.setAttribute("admin_button", new Boolean(true));
         }
 
-        request.setAttribute("communities", communities);
+        request.setAttribute("groups", groups);
+        request.setAttribute("communities.map", topcommMap);
         request.setAttribute("collections.map", colMap);
         request.setAttribute("subcommunities.map", commMap);
         JSPManager.showJSP(request, response, "/community-list.jsp");

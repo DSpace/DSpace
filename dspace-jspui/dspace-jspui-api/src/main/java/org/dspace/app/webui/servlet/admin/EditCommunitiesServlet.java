@@ -61,6 +61,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.CommunityGroup;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -145,6 +146,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
          * get null if we try and find something with ID -1, we'll just try and
          * find both here to save hassle later on
          */
+        CommunityGroup[] groups = CommunityGroup.findAll(context);
         Community community = Community.find(context, UIUtil.getIntParameter(
                 request, "community_id"));
         Community parentCommunity = Community.find(context, UIUtil
@@ -153,6 +155,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
                 .getIntParameter(request, "collection_id"));
 
         // Just about every JSP will need the values we received
+        request.setAttribute("groups", groups);
         request.setAttribute("community", community);
         request.setAttribute("parent", parentCommunity);
         request.setAttribute("collection", collection);
@@ -380,6 +383,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
         }
 
         community.setMetadata("name", request.getParameter("name"));
+        int group_id = (new Integer(request.getParameter("group"))).intValue();
+        community.setMetadata("group_id", group_id);
         community.setMetadata("short_description", request
                 .getParameter("short_description"));
 
@@ -766,6 +771,9 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
             // Show community edit page
             request.setAttribute("community", community);
+            CommunityGroup[] groups = CommunityGroup.findAll(context);
+            request.setAttribute("groups", groups);
+
             JSPManager.showJSP(request, response, "/tools/edit-community.jsp");
         }
         else

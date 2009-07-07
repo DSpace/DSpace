@@ -61,6 +61,18 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Hashtable;
 
+import org.apache.log4j.Logger;
+import org.dspace.app.webui.util.Authenticate;
+import org.dspace.app.webui.util.JSPManager;
+import org.dspace.app.webui.util.UIUtil;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Context;
+import org.dspace.core.Email;
+import org.dspace.core.LogManager;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.eperson.AccountManager;
+import org.dspace.eperson.EPerson;
+
 /**
  * Servlet for handling user registration and forgotten passwords.
  * <P>
@@ -526,6 +538,9 @@ public class RegisterServlet extends DSpaceServlet
             // Update user record
             eperson.update();
 
+            // Send an email that the user has registered
+            notifyRegistration(context, eperson, "self registered");
+
             request.setAttribute("eperson", eperson);
 
             JSPManager.showJSP(request, response, "/register/registered.jsp");
@@ -614,6 +629,46 @@ public class RegisterServlet extends DSpaceServlet
             request.setAttribute("eperson", eperson);
 
             JSPManager.showJSP(request, response, "/register/new-password.jsp");
+        }
+    }
+
+
+    /**
+     * Send an email that a user has successfully registered.
+     *
+     * @param context   current DSpace context
+     * @param eperson   newly registered user  
+     * @param type      type of registration; to be included in the email subject
+     */
+    public static void notifyRegistration(Context context, EPerson eperson, String type)
+    {
+        // Get the email recipient
+        String email = ConfigurationManager.getProperty("mail.registered");
+        if (email == null) {
+            email = ConfigurationManager.getProperty("mail.admin");
+        }
+
+        if (email != null) {
+            try {
+                // Send the email
+                Email bean = ConfigurationManager.getEmail("registered");
+                bean.addRecipient(email);
+                bean.addArgument(eperson.getFullName());
+                bean.addArgument(eperson.getEmail());
+                bean.addArgument(eperson.getMetadata("phone"));
+		bean.addArgument(type);
+                bean.send();
+                log.info(LogManager.getHeader(context,
+                                              "registered_notification",
+                                              "to " + email + " about " +
+					      eperson.getEmail()));
+            }
+            catch (Exception e) {
+                log.info(LogManager.getHeader(context,
+                                              "error_emailing",
+                                              "email=" + email),
+                         e);
+            }
         }
     }
 }
