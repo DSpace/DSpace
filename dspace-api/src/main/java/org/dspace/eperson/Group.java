@@ -119,7 +119,6 @@ public class Group extends DSpaceObject
     /**
      * Populate Group with eperson and group objects
      * 
-     * @param context
      * @throws SQLException
      */
     public void loadData()
@@ -473,10 +472,18 @@ public class Group extends DSpaceObject
         }
         // Also need to get all "Special Groups" user is a member of!
         // Otherwise, you're ignoring the user's membership to these groups!
-        Group[] specialGroups = c.getSpecialGroups();
-        for(int j=0; j<specialGroups.length;j++)
-            groupIDs.add(new Integer(specialGroups[j].getID()));
-        
+        // However, we only do this is we are looking up the special groups
+        // of the current user, as we cannot look up the special groups
+        // of a user who is not logged in.
+        if (c.getCurrentUser().getID() == e.getID())
+        {
+            Group[] specialGroups = c.getSpecialGroups();
+            for(Group special : specialGroups)
+            {
+                groupIDs.add(new Integer(special.getID()));
+            }
+        }
+
         // all the users are members of the anonymous group 
         groupIDs.add(new Integer(0));
         
