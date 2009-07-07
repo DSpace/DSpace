@@ -62,8 +62,21 @@ import org.dspace.core.*;
  */
 public class MetadataImportServlet extends DSpaceServlet
 {
+    /** Upload limit */
+    private int limit;
+
     /** log4j category */
     private static Logger log = Logger.getLogger(MetadataImportServlet.class);
+
+    /**
+     * Initalise the servlet
+     */
+    public void init()
+    {
+        // Set the lmimt to the number of items that may be changed in one go, default to 20
+        limit = ConfigurationManager.getIntProperty("bulkedit.gui-item-limit", 20);
+        log.debug("Setting bulk edit limit to " + limit + " items");
+    }
 
     /**
      * Respond to a post request for metadata bulk importing via csv
@@ -83,6 +96,7 @@ public class MetadataImportServlet extends DSpaceServlet
     {
         // First, see if we have a multipart request (uploading a metadata file)
         String contentType = request.getContentType();
+        HttpSession session = request.getSession(true);        
         if ((contentType != null) && (contentType.indexOf("multipart/form-data") != -1))
         {
             // Process the file uploaded
@@ -98,6 +112,20 @@ public class MetadataImportServlet extends DSpaceServlet
                 {
                     request.setAttribute("changes", changes);
                     request.setAttribute("changed", false);
+
+                    // Is the user allowed to make this many changes?
+                    if (changes.size() <= limit)
+                    {
+                        request.setAttribute("allow", true);
+                    }
+                    else
+                    {
+                        request.setAttribute("allow", false);
+                        session.removeAttribute("csv");
+                        log.info(LogManager.getHeader(context, "metadataimport", "too many changes: " +
+                                                      changes.size() + " (" + limit + " allowed)"));
+                    }
+
                     JSPManager.showJSP(request, response, "/dspace-admin/metadataimport-showchanges.jsp");
                 }
                 else
@@ -116,7 +144,6 @@ public class MetadataImportServlet extends DSpaceServlet
         else if ("confirm".equals(request.getParameter("type")))
         {
             // Get the csv lines from the session
-            HttpSession session = request.getSession(true);
             DSpaceCSV csv = (DSpaceCSV)session.getAttribute("csv");
 
             // Make the changes
@@ -134,6 +161,7 @@ public class MetadataImportServlet extends DSpaceServlet
 
                 request.setAttribute("changes", changes);
                 request.setAttribute("changed", true);
+                request.setAttribute("allow", true);
                 JSPManager.showJSP(request, response, "/dspace-admin/metadataimport-showchanges.jsp");
             }
             catch (Exception e)
@@ -146,7 +174,6 @@ public class MetadataImportServlet extends DSpaceServlet
         else if ("cancel".equals(request.getParameter("type")))
         {
             // Blank out the session data
-            HttpSession session = request.getSession(true);
             session.removeAttribute("csv");
 
             request.setAttribute("message", "Changes cancelled. No items have been modified.");
@@ -160,6 +187,21 @@ public class MetadataImportServlet extends DSpaceServlet
         }
     }
 
+    /**
+     * GET request is only ever used to show the upload form
+     * 
+     * @param context
+     *            a DSpace Context object
+     * @param request
+     *            the HTTP request
+     * @param response
+     *            the HTTP response
+     *
+     * @throws ServletException
+     * @throws IOException
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -168,7 +210,14 @@ public class MetadataImportServlet extends DSpaceServlet
         JSPManager.showJSP(request, response, "/dspace-admin/metadataimport.jsp");
     }
 
-
+    /**
+     * Process the uploaded file.
+     *
+     * @param context The DSpace Context
+     * @param request The request object
+     * @return The response object
+     * @throws Exception Thrown if an error occurs
+     */
     private ArrayList<BulkEditChange> processUpload(Context context,
                                                     HttpServletRequest request) throws Exception
     {

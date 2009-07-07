@@ -50,8 +50,14 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
+    // Get the changes
     ArrayList<BulkEditChange> changes = (ArrayList<BulkEditChange>)request.getAttribute("changes");
+
+    // Are these changes to be made, or that have been made
     boolean changed = ((Boolean)request.getAttribute("changed")).booleanValue();
+
+    // If changes are allowed to be made
+    boolean allow = ((Boolean)request.getAttribute("allow")).booleanValue();
 %>
 
 <dspace:layout titlekey="jsp.dspace-admin.metadataimport.title"
@@ -62,6 +68,15 @@
                nocache="true">
 
     <h1><fmt:message key="jsp.dspace-admin.metadataimport.title"/></h1>
+<%
+    // Warn the user if they are not allowed to make the changes
+    if (!allow)
+    {
+        %>
+            <p><strong><fmt:message key="jsp.dspace-admin.metadataimport.toomany"/></strong></p>
+        <%
+    }
+%>
 
     <table class="miscTable">
 
@@ -75,7 +90,7 @@
                 ArrayList<DCValue> removes = change.getRemoves();
                 ArrayList<Collection> newCollections = change.getNewOwningCollections();
                 ArrayList<Collection> oldCollections = change.getOldOwningCollections();
-                boolean isAChange = false;
+                boolean first = false;
                 if ((adds.size() > 0) || (removes.size() > 0) ||
                     (newCollections.size() > 0) || (oldCollections.size() > 0))
                 {
@@ -83,14 +98,14 @@
                     if (!change.isNewItem())
                     {
                         Item i = change.getItem();
-                        %><tr><th class="oddRowOddCol"><fmt:message key="jsp.dspace-admin.metadataimport.changesforitem"/>: <%= i.getID() %> (<%= i.getHandle() %>)</th><th></th><th></th></tr><%
+                        %><tr><th bgcolor="white"><fmt:message key="jsp.dspace-admin.metadataimport.changesforitem"/>: <%= i.getID() %> (<%= i.getHandle() %>)</th><%
                     }
                     else
                     {
-                        %><tr><th bgcolor="4E9258"><fmt:message key="jsp.dspace-admin.metadataimport.newitem"/>:</th><th></th><th></th></tr><%
+                        %><tr><th bgcolor="white"><fmt:message key="jsp.dspace-admin.metadataimport.newitem"/>:</th><%
                     }
                     changeCounter++;
-                    isAChange = true;
+                    first = true;
                 }
 
                 // Show new collections
@@ -98,13 +113,21 @@
                 {
                     String cHandle = c.getHandle();
                     String cName = c.getName();
-                    if (!changed)
+                    if (!first)
                     {
-                        %><tr><td></td><td bgcolor="4E9258"><fmt:message key="jsp.dspace-admin.metadataimport.addtocollection"/></td><td bgcolor="4E9258">(<%= cHandle %>): <%= cName %></td></tr><%
+                        %><tr><td bgcolor="white"></td><%
                     }
                     else
                     {
-                        %><tr><td></td><td bgcolor="4E9258"><fmt:message key="jsp.dspace-admin.metadataimport.addedtocollection"/></td><td bgcolor="4E9258">(<%= cHandle %>): <%= cName %></td></tr><%
+                        first = false;
+                    }
+                    if (!changed)
+                    {
+                        %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.addtocollection"/></td><td bgcolor="4E9258" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
+                    }
+                    else
+                    {
+                        %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.addedtocollection"/></td><td bgcolor="4E9258" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
                     }
                 }
 
@@ -113,13 +136,21 @@
                 {
                     String cHandle = c.getHandle();
                     String cName = c.getName();
-                    if (!changed)
+                    if (!first)
                     {
-                        %><tr><td></td><td bgcolor="98AFC7"><fmt:message key="jsp.dspace-admin.metadataimport.removefromcollection"/></td><td bgcolor="98AFC7">(<%= cHandle %>): <%= cName %></td></tr><%
+                        %><tr><td bgcolor="white"></td><%
                     }
                     else
                     {
-                        %><tr><td></td><td bgcolor="98AFC7"><fmt:message key="jsp.dspace-admin.metadataimport.removedfromcollection"/></td><td bgcolor="98AFC7">(<%= cHandle %>): <%= cName %></td></tr><%
+                        first = false;
+                    }
+                    if (!changed)
+                    {
+                        %><td bgcolor="#98AFC7" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.removefromcollection"/></td><td bgcolor="98AFC7" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
+                    }
+                    else
+                    {
+                        %><td bgcolor="#98AFC7" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.removedfromcollection"/></td><td bgcolor="98AFC7" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
                     }
                 }
 
@@ -135,13 +166,21 @@
                     {
                         md += "[" + dcv.language + "]";
                     }
-                    if (!changed)
+                    if (!first)
                     {
-                        %><tr><td></td><td bgcolor="4E9258"><fmt:message key="jsp.dspace-admin.metadataimport.add"/> (<%= md %>)</td><td bgcolor="4E9258"><%= dcv.value %></td></tr><%
+                        %><tr><td bgcolor="white"></td><%
                     }
                     else
                     {
-                        %><tr><td></td><td bgcolor="4E9258"><fmt:message key="jsp.dspace-admin.metadataimport.added"/> (<%= md %>)</td><td bgcolor="4E9258"><%= dcv.value %></td></tr><%
+                        first = false;
+                    }
+                    if (!changed)
+                    {
+                        %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.add"/> (<%= md %>)</td><td bgcolor="4E9258" style="font-size:10pt"><%= dcv.value %></td></tr><%
+                    }
+                    else
+                    {
+                        %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.added"/> (<%= md %>)</td><td bgcolor="4E9258" style="font-size:10pt"><%= dcv.value %></td></tr><%
                     }
                 }
 
@@ -157,13 +196,21 @@
                     {
                         md += "[" + dcv.language + "]";
                     }
-                    if (!changed)
+                    if (!first)
                     {
-                        %><tr><td></td><td bgcolor="98AFC7"><fmt:message key="jsp.dspace-admin.metadataimport.remove"/> (<%= md %>)</td><td bgcolor="98AFC7"><%= dcv.value %></td></tr><%
+                        %><tr><td bgcolor="white"></td><%
                     }
                     else
                     {
-                        %><tr><td></td><td bgcolor="98AFC7"><fmt:message key="jsp.dspace-admin.metadataimport.removed"/> (<%= md %>)</td><td bgcolor="98AFC7"><%= dcv.value %></td></tr><%
+                        first = false;
+                    }
+                    if (!changed)
+                    {
+                        %><td bgcolor="#98AFC7" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.remove"/> (<%= md %>)</td><td bgcolor="98AFC7" style="font-size:10pt"><%= dcv.value %></td></tr><%
+                    }
+                    else
+                    {
+                        %><td bgcolor="#98AFC7" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.removed"/> (<%= md %>)</td><td bgcolor="98AFC7" style="font-size:10pt"><%= dcv.value %></td></tr><%
                     }
                 }
             }
@@ -172,7 +219,7 @@
         </table>
         
         <%
-            if (!changed)
+            if ((!changed) && (allow))
             {
         %>
         <p align="center">
