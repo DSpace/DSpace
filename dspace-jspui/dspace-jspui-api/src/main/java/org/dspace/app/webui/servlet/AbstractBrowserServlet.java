@@ -49,6 +49,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
@@ -337,8 +338,14 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             // now start up a browse engine and get it to do the work for us
             BrowseEngine be = new BrowseEngine(context);
             BrowseInfo binfo = be.browse(scope);
-
+            
             request.setAttribute("browse.info", binfo);
+
+            if (AuthorizeManager.isAdmin(context))
+            {
+                // Set a variable to create admin buttons
+                request.setAttribute("admin_button", new Boolean(true));
+            }
 
             if (binfo.hasResults())
             {

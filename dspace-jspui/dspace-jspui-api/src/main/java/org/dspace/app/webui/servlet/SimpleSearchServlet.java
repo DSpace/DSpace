@@ -426,13 +426,22 @@ public class SimpleSearchServlet extends DSpaceServlet
         }
     }
 
+    /**
+     * Export the search results as a csv file
+     *
+     * @param context The DSpace context
+     * @param response The request object
+     * @param items The result items
+     * @throws IOException
+     * @throws ServletException
+     */
     protected void exportMetadata(Context context, HttpServletResponse response, Item[] items)
             throws IOException, ServletException
     {
         // Log the attempt
         log.info(LogManager.getHeader(context, "metadataexport", "exporting_search"));
 
-        // Export a browse view
+        // Export a search view
         ArrayList iids = new ArrayList();
         for (Item item : items)
         {

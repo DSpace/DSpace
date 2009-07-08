@@ -40,19 +40,24 @@
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.webui.util.JSPManager;
+import org.dspace.app.webui.util.UIUtil;
+import org.dspace.app.bulkedit.MetadataExport;
+import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.BrowseException;
-import org.dspace.browse.BrowserScope;
+import org.dspace.browse.*;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
+import org.dspace.content.ItemIterator;
+import org.apache.log4j.Logger;
 
 /**
  * Servlet for browsing through indices, as they are defined in 
@@ -76,6 +81,10 @@ import org.dspace.core.Context;
  */
 public class BrowserServlet extends AbstractBrowserServlet
 {
+
+    /** log4j category */
+    private static Logger log = Logger.getLogger(AbstractBrowserServlet.class);
+
     /**
      * Do the usual DSpace GET method.  You will notice that browse does not currently
      * respond to POST requests.
@@ -91,9 +100,17 @@ public class BrowserServlet extends AbstractBrowserServlet
         {
             throw new ServletException("There is no browse index for the request");
         }
-        
-        // execute browse request
-        processBrowse(context, scope, request, response);
+
+        // Is this a request to export the metadata, or a normal browse request?
+        if ("submit_export_metadata".equals(UIUtil.getSubmitButton(request, "submit")))
+        {
+            exportMetadata(context, request, response, scope);
+        }
+        else
+        {
+            // execute browse request
+            processBrowse(context, scope, request, response);
+        }
     }
 
     
@@ -172,5 +189,59 @@ public class BrowserServlet extends AbstractBrowserServlet
     {
         
         JSPManager.showJSP(request, response, "/browse/full.jsp");
+    }
+
+    /**
+     * Export the metadata from a browse
+     *
+     * @param context The DSpace context
+     * @param request The request object
+     * @param response The response object
+     * @param scope The browse scope
+     * @throws IOException
+     * @throws ServletException
+     */
+    protected void exportMetadata(Context context, HttpServletRequest request,
+                                  HttpServletResponse response, BrowserScope scope)
+            throws IOException, ServletException
+    {
+        try
+        {
+            // Log the attempt
+            log.info(LogManager.getHeader(context, "metadataexport", "exporting_browse"));
+
+            // Ensure we export all results
+            scope.setOffset(0);
+            scope.setResultsPerPage(Integer.MAX_VALUE);
+
+            // Export a browse view
+            BrowseEngine be = new BrowseEngine(context);
+            BrowseInfo binfo = be.browse(scope);
+            ArrayList iids = new ArrayList();
+            for (BrowseItem bi : binfo.getBrowseItemResults())
+            {
+                iids.add(bi.getID());
+            }
+            ItemIterator ii = new ItemIterator(context, iids);
+            MetadataExport exporter = new MetadataExport(context, ii);
+
+            // Perform the export
+            DSpaceCSV csv = exporter.export();
+
+            // Return the csv file
+            response.setContentType("text/csv; charset=UTF-8");
+            response.setHeader("Content-Disposition", "attachment; filename=browse-result.csv");
+            PrintWriter out = response.getWriter();
+            out.write(csv.toString());
+            out.flush();
+            out.close();
+            log.info(LogManager.getHeader(context, "metadataexport", "exported_file:browse-results.csv"));
+            return;
+        }
+        catch (BrowseException be)
+        {
+            // Not sure what happended here!
+            JSPManager.showIntegrityError(request, response);
+        }
     }
 }

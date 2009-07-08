@@ -55,8 +55,6 @@
 <%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="java.net.URLEncoder" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="java.util.Iterator" %>
 <%@ page import="org.dspace.content.DCDate" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
@@ -180,6 +178,10 @@
 		typeKey = "browse.type.item." + bi.getSortOption().getName();
 	else
 		typeKey = "browse.type.item." + bix.getSortOption().getName();
+
+    // Admin user or not
+    Boolean admin_b = (Boolean)request.getAttribute("admin_button");
+    boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
 %>
 
 <%-- OK, so here we start to develop the various components we will use in the UI --%>
@@ -428,6 +430,14 @@
 		</select>
 		
 		<input type="submit" name="submit_browse" value="<fmt:message key="jsp.general.update"/>"/>
+
+<%
+    if (admin_button)
+    {
+        %><input type="submit" name="submit_export_metadata" value="<fmt:message key="jsp.general.metadataexport.button"/>" /><%
+    }
+%>
+
 	</form>
 	</div>
 
@@ -516,7 +526,6 @@
 	<%-- 
 	<!-- <%= bi.toString() %> -->
 	--%>
- 
 
 </dspace:layout>
 
