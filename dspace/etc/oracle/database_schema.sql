@@ -305,10 +305,12 @@ CREATE TABLE Community
   introductory_text CLOB,
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
   copyright_text    CLOB,
-  side_bar_text     VARCHAR2(2000)
+  side_bar_text     VARCHAR2(2000),
+  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )      
 );
 
 CREATE INDEX community_logo_fk_idx ON Community(logo_bitstream_id);
+CREATE INDEX community_admin_fk_idx ON Community(admin);
 
 -------------------------------------------------------
 -- Collection table

@@ -339,10 +339,12 @@ CREATE TABLE Community
   introductory_text TEXT,
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
   copyright_text    TEXT,
-  side_bar_text     TEXT
+  side_bar_text     TEXT,
+  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )
 );
 
 CREATE INDEX community_logo_fk_idx ON Community(logo_bitstream_id);
+CREATE INDEX community_admin_fk_idx ON Community(admin);
 
 -------------------------------------------------------
 -- Collection table
@@ -363,7 +365,7 @@ CREATE TABLE Collection
   workflow_step_2   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_3   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   submitter         INTEGER REFERENCES EPersonGroup( eperson_group_id ),
-  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id)
+  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )
 );
 
 CREATE INDEX collection_logo_fk_idx ON Collection(logo_bitstream_id);
