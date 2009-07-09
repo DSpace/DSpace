@@ -34,6 +34,7 @@
 
 (Larry Stone)
  - [DS-193] OAI RDF crosswalk fails when DC value is null
+ - [DS-249] sub-daily utility script does not pass arguments to Java
 
 (Mark Diggory / Stuart Lewis)
  - [DS-201] handle.jar upgraded to version 6.2
