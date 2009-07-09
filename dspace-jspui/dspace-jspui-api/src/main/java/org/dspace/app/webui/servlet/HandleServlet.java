@@ -40,6 +40,7 @@
 package org.dspace.app.webui.servlet;
 
 import org.apache.log4j.Logger;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.dspace.app.statistics.AbstractUsageEvent;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
@@ -149,7 +150,7 @@ public class HandleServlet extends DSpaceServlet
         {
             log.info(LogManager
                     .getHeader(context, "invalid_id", "path=" + path));
-            JSPManager.showInvalidIDError(request, response, path, -1);
+            JSPManager.showInvalidIDError(request, response, StringEscapeUtils.escapeHtml(path), -1);
 
             return;
         }
@@ -265,7 +266,7 @@ public class HandleServlet extends DSpaceServlet
             log.info(LogManager.getHeader(context,
                     "Handle not an item, collection or community", "handle="
                             + handle));
-            JSPManager.showInvalidIDError(request, response, path, -1);
+            JSPManager.showInvalidIDError(request, response, StringEscapeUtils.escapeHtml(path), -1);
 
             return;
         }
@@ -679,8 +680,7 @@ public class HandleServlet extends DSpaceServlet
     /**
      * Utility method to obtain the titles for the Items in the given list.
      * 
-     * @param List
-     *            of Items
+     * @param items List of Items
      * @return array of corresponding titles
      */
     private String[] getItemTitles(List items)

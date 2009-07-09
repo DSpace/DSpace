@@ -30,6 +30,7 @@
  - [DS-219] Internal Server error - include login details of user
  - [DS-221] XMLUI 'current activity' recognises Google Chrome as Safari
  - [DS-242] Special groups shown for logged in user rather than for user being examined
+ - [DS-250] Invalid identifers are not escaped
 
 (Larry Stone)
  - [DS-193] OAI RDF crosswalk fails when DC value is null
