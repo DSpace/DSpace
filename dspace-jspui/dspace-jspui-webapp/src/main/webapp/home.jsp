@@ -88,15 +88,12 @@
 
 <dspace:layout locbar="nolink" titlekey="jsp.home.title" feedData="<%= feedData %>" style="default">
 
-    <table class="standard" width="95%" align="center">
-        <tr>
-            <td class="standard">
-                <dspace:include page="/components/news.jsp" />  
-            </td>
-        </tr>
-    </table>
-  
-    <br>
+    <h1>Welcome to the repository for University of Maryland research.</h1>
+
+    <p><strong>Any UM Faculty member can make digital works
+    permanently accessible and available across the Internet with
+    DRUM.</strong><a href="/drum/help/about_submitting.jsp">  Find out
+    more about depositing your work.</a></p>
 
     <table class="standard" width="95%" align="center">
         <tr>
