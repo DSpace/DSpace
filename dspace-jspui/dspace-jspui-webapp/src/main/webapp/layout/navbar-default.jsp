@@ -113,17 +113,6 @@
 <%-- Search Box --%>
 <form method="get" action="<%= request.getContextPath() %>/simple-search">
 
-<%
-    if (user != null)
-    {
-%>
-  <p class="loggedIn"><fmt:message key="jsp.layout.navbar-default.loggedin">
-      <fmt:param><%= navbarEmail %></fmt:param>
-  </fmt:message>
-    (<a href="<%= request.getContextPath() %>/logout"><fmt:message key="jsp.layout.navbar-default.logout"/></a>)</p>
-<%
-    }
-%>
   <table width="100%" class="searchBox">
     <tr>
       <td>
@@ -134,7 +123,7 @@
           <tr>
             <td class="searchBoxLabelSmall" valign="middle" nowrap="nowrap">
               <%-- <input type="text" name="query" id="tequery" size="10"/><input type=image border="0" src="<%= request.getContextPath() %>/image/search-go.gif" name="submit" alt="Go" value="Go"/> --%>
-              <input type="text" name="query" id="tequery" size="8"/><input type="submit" name="submit" value="<fmt:message key="jsp.layout.navbar-default.go"/>" />
+              <input type="text" name="query" id="tequery" size="10"/><input type="image" border="0" value="<fmt:message key="jsp.layout.navbar-default.go"/>" alt="<fmt:message key="jsp.layout.navbar-default.go"/>" name="submit" src="<%= request.getContextPath() %>/image/search-go.gif"/>
               <br/><a href="<%= request.getContextPath() %>/advanced-search"><fmt:message key="jsp.layout.navbar-default.advanced"/></a>
 <%
 			if (ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable"))
@@ -153,7 +142,7 @@
 </form>
 
 <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
-<table width="100%" border="0" cellspacing="2" cellpadding="2">
+<table class="navigationBarTable" width="100%" border="0" cellspacing="2" cellpadding="2">
   <tr class="navigationBarItem">
     <td>
       <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/index.jsp") ? "arrow-highlight" : "arrow") %>.gif" width="7" height="13"/>
@@ -163,25 +152,6 @@
       <a href="<%= request.getContextPath() %>/"><fmt:message key="jsp.layout.navbar-default.home"/></a>
     </td>
   </tr>
-
-  <%-- Add a link to the admin interface, if the user is logged in  --%>
-  <%-- and is an administrator.                                     --%>
-
-  <%
-    if (AuthorizeManager.isAdmin(context)) 
-    {
-  %>
-  <tr class="navigationBarItem">
-    <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/admin/index.jsp") ? "arrow-highlight" : "arrow") %>.gif" width="7" height="13">
-    </td>
-    <td nowrap class="navigationBarItem">
-      <a href="<%= request.getContextPath() %>/dspace-admin">Admin</a>
-    </td>
-  </tr>
-  <%
-    }
-  %>
 
   <tr>
     <td colspan="2">&nbsp;</td>
@@ -197,15 +167,6 @@
     </td>
     <td nowrap="nowrap" class="navigationBarItem">
       <a href="<%= request.getContextPath() %>/community-list"><fmt:message key="jsp.layout.navbar-default.communities-collections"/></a>
-    </td>
-  </tr>
-
-  <tr class="navigationBarItem">
-    <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/browse-title" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="7" height="13">
-    </td>
-    <td nowrap class="navigationBarItem">
-      <a href="<%= request.getContextPath() %>/browse-title">Titles</a>
     </td>
   </tr>
 
@@ -252,7 +213,7 @@
 
       <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/subscribe" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="7" height="13"/>
+      <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="7" height="13"/>
     </td>
       	<td nowrap class="navigationBarItem"><A HREF="<%= request.getContextPath() %>/logout">Logout</A></td>
       </tr>
@@ -322,7 +283,7 @@
 %>  
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/profile" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16"/>
+      <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="7" height="13"/>
     </td>
     <td nowrap="nowrap" class="navigationBarItem">
       <a href="<%= request.getContextPath() %>/dspace-admin"><fmt:message key="jsp.administer"/></a>
