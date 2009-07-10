@@ -73,9 +73,23 @@
 	<p><fmt:message key="jsp.tools.upload-bitstream.info"/></p>
     
     <form method="post" enctype="multipart/form-data" action="">
-        <p align="center">
-            <input type="file" size="40" name="file"/>
-        </p>
+        <P align="center">
+            <table class="miscTable">
+                <tr><td class="oddRowOddCol">
+                    <select name="bundle">
+                      <option value="ORIGINAL">Public display (ORIGINAL)</option>
+                      <option value="LICENSE">License Information (LICENSE)</option>
+                      <option value="THUMBNAIL">Image Thumbnail (THUMBNAIL)</option>
+                      <option value="TEXT">Full Text Index (TEXT)</option>
+                      <option value="PRESERVATION">Preservation (PRESERVATION)</option>
+                    </select>
+		</td></tr>
+                <tr><td class="evenRowOddCol">
+                    <input type="file" size="40" name="file">
+		</td></tr>
+            </table>
+        </P>
+>>>>>>> .merge-right.r130
         
         <input type="hidden" name="item_id" value="<%= item.getID() %>"/>
 

@@ -109,7 +109,7 @@
 <%
     // Only show password update section if the user doesn't use
     // certificates
-    if ((eperson.getRequireCertificate() == false) && (ldap_eperson == false))
+    if ((eperson.getRequireCertificate() == false) && (ldap_eperson == false) && eperson.canLogIn() == true)
     {
 %>
         <%-- <p><strong>Optionally</strong>, you can choose a new password and enter it into the box below, and confirm it by typing it

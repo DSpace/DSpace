@@ -53,6 +53,7 @@
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.Community" %>
+<%@ page import="org.dspace.content.CommunityGroup" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.core.Utils" %>
 
@@ -70,6 +71,7 @@
     String intro = "";
     String copy = "";
     String side = "";
+    int group = 0;
 
     Bitstream logo = null;
     
@@ -80,6 +82,18 @@
         intro = community.getMetadata("introductory_text");
         copy = community.getMetadata("copyright_text");
         side = community.getMetadata("side_bar_text");
+        group = community.getIntMetadata("group_id");
+        
+        if (copy == null)
+        {
+            copy = "";
+        }
+        
+        if (side == null)
+        {
+            side = "";
+        }
+
         logo = community.getLogo();
     }
 %>
@@ -140,6 +154,27 @@
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label1"/></td>
                 <td><input type="text" name="name" value="<%= Utils.addEntities(name) %>" size="50" /></td>
+            </tr>
+            <tr>
+                <td class="submitFormLabel">Group:</td>
+                <td>
+                    <select name="group">
+<%
+                        CommunityGroup groups[] = (CommunityGroup[]) request.getAttribute("groups");
+                        for (int k = 0; k < groups.length; k++) 
+                        {
+%>
+                        <option 
+                            value="<%=groups[k].getID()%>"
+                            <%=(groups[k].getID() == group) ? "selected=\"y\"" : ""%>
+                        >
+                            <%=groups[k].getShortName()%>
+                        </option>
+<%
+                        }
+%>
+                    </select>
+                </td>
             </tr>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label2"/></td>

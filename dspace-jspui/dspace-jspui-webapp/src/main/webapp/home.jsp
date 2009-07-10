@@ -42,7 +42,9 @@
   - Home page JSP
   -
   - Attributes:
-  -    communities - Community[] all communities in DSpace
+  -    groups      - CommunityGroup[] all groups
+  -    communities.map - Map where a key is a group ID (Integer) and
+  -                      the value is the arrary communities in that group
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -54,16 +56,19 @@
 <%@ page import="java.io.File" %>
 <%@ page import="java.util.Enumeration"%>
 <%@ page import="java.util.Locale"%>
+<%@ page import="java.util.Map" %>
 <%@ page import="javax.servlet.jsp.jstl.core.*" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="org.dspace.core.I18nUtil" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Community" %>
+<%@ page import="org.dspace.content.CommunityGroup" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.browse.ItemCounter" %>
 
 <%
-    Community[] communities = (Community[]) request.getAttribute("communities");
+    CommunityGroup[] groups = (CommunityGroup[]) request.getAttribute("groups");
+    Map communityMap = (Map) request.getAttribute("communities.map");
 
     Locale[] supportedLocales = I18nUtil.getSupportedLocales();
     Locale sessionLocale = UIUtil.getSessionLocale(request);
@@ -81,73 +86,65 @@
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
 %>
 
-<dspace:layout locbar="nolink" titlekey="jsp.home.title" feedData="<%= feedData %>">
+<dspace:layout locbar="nolink" titlekey="jsp.home.title" feedData="<%= feedData %>" style="default">
 
-    <table  width="95%" align="center">
-      <tr align="right">
-        <td align="right">						
-<% if (supportedLocales != null && supportedLocales.length > 1)
-{
-%>
-        <form method="get" name="repost" action="">
-          <input type ="hidden" name ="locale"/>
-        </form>
-<%
-for (int i = supportedLocales.length-1; i >= 0; i--)
-{
-%>
-        <a class ="langChangeOn"
-                  onclick="javascript:document.repost.locale.value='<%=supportedLocales[i].toString()%>';
-                  document.repost.submit();">
-                 <%= supportedLocales[i].getDisplayLanguage(supportedLocales[i])%>
-        </a> &nbsp;
-<%
-}
-}
-%>
-        </td>
-      </tr>
-      <tr>
-            <td class="oddRowEvenCol"><%= topNews %></td>
+    <table class="standard" width="95%" align="center">
+        <tr>
+            <td class="standard">
+                <dspace:include page="/components/news.jsp" />  
+            </td>
         </tr>
     </table>
-    <br/>
-    <form action="<%= request.getContextPath() %>/simple-search" method="get">
-        <table class="miscTable" width="95%" align="center">
-            <tr>
-                <td class="oddRowEvenCol">
-                  <h3><fmt:message key="jsp.home.search1"/></h3>
-                      <p><label for="tquery"><fmt:message key="jsp.home.search2"/></label></p>
-                      <p><input type="text" name="query" size="20" id="tquery" />&nbsp;
-                         <input type="submit" name="submit" value="<fmt:message key="jsp.general.search.button"/>" /></p>
-                </td>
-            </tr>
-        </table>
-    </form>
-    <table class="miscTable" width="95%" align="center">
+  
+    <br>
+
+    <table class="standard" width="95%" align="center">
         <tr>
-            <td class="oddRowEvenCol">
-               <h3><fmt:message key="jsp.home.com1"/></h3>
-                <p><fmt:message key="jsp.home.com2"/></p>
+            <td class="standard">
+                <dspace:include page="/components/home-links.jsp" />
+            </td>
+        </tr>
+    </table>
+
+    <br>
+
+    <table class="standard" width="95%" align="center">
+        <tr>
+            <td class="standard">
+              <h2>The following communities of digital works are available:</h2>
+
+            </td>
+        </tr>
+    </table>
+
+    <br>
 
 
 <%
- if (communities.length != 0)
- {
-%>
-    <table border="0" cellpadding="2">
-<% 	                 
-
-    for (int i = 0; i < communities.length; i++)
+    for (int k = 0; k < groups.length; k++) 
     {
-%>                  <tr>
+%>
+    <table class="standard" width="95%" align="center">
+        <tr>
+            <td class="standard">
+                <p><b><%=groups[k].getName()%></b></p> 
+                <table border=0 cellpadding=8>
+<%
+                    Community[] communities = 
+		       (Community[]) communityMap.get(
+		         new Integer(groups[k].getID()));
+
+                    for (int i = 0; i < communities.length; i++)
+                    {
+%>                 
+		    <tr>
                         <td class="standard">
-                            <a href="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></a>
+                            <A HREF="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %> </A>
 <%
         if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
         {
 %>
-            [<%= ic.getCount(communities[i]) %>]
+            [<%= communities[i].countItems() %>]
 <%
         }
 
@@ -155,53 +152,22 @@ for (int i = supportedLocales.length-1; i >= 0; i--)
                         </td>
                     </tr>
 <%
+                    }
+%>
+
+                </table>
+
+            </tr>
+        </td>
+    </table>
+    <br>
+<%
     }
 %>
-    </table>
-<%                
- }
-%>  
 
-            </td>
-        </tr>
-    </table>
-    <dspace:sidebar>
-    <%= sideNews %>
-    <%
-    if(feedEnabled)
-    {
-	%>
-	    <center>
-	    <h4><fmt:message key="jsp.home.feeds"/></h4>
-	<%
-	    	String[] fmts = feedData.substring(feedData.indexOf(':')+1).split(",");
-	    	String icon = null;
-	    	int width = 0;
-	    	for (int j = 0; j < fmts.length; j++)
-	    	{
-	    		if ("rss_1.0".equals(fmts[j]))
-	    		{
-	    		   icon = "rss1.gif";
-	    		   width = 80;
-	    		}
-	    		else if ("rss_2.0".equals(fmts[j]))
-	    		{
-	    		   icon = "rss2.gif";
-	    		   width = 80;
-	    		}
-	    		else
-	    	    {
-	    	       icon = "rss.gif";
-	    	       width = 36;
-	    	    }
-	%>
-	    <a href="<%= request.getContextPath() %>/feed/<%= fmts[j] %>/site"><img src="<%= request.getContextPath() %>/image/<%= icon %>" alt="RSS Feed" width="<%= width %>" height="15" vspace="3" border="0" /></a>
-	<%
-	    	}
-	%>
-	    </center>
-	<%
-	    }
-	%>
-    </dspace:sidebar>
+
+
+<dspace:sidebar>
+<%= sideNews %>
+</dspace:sidebar>
 </dspace:layout>

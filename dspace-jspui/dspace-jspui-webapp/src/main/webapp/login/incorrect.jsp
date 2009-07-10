@@ -59,20 +59,24 @@
 
     <table border="0" width="90%">
        <tr>
-            <td align="left">
-                <%-- <h1>Log In to DSpace</h1> --%>
-                <h1><fmt:message key="jsp.login.incorrect.heading"/></h1>
-            </td>
             <td align="right" class="standard">
                 <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#login\"%>"><fmt:message key="jsp.help"/></dspace:popup>
             </td>
         </tr>
     </table>
 
-    <%-- <p align="center"><strong>The e-mail address and password you supplied were not valid.  Please try again, or have you <a href="<%= request.getContextPath() %>/forgot">forgotten your password</a>?</strong></p> --%>
-    <p align="center"><strong><fmt:message key="jsp.login.incorrect.text">
-        <fmt:param><%= request.getContextPath() %>/forgot</fmt:param>
-    </fmt:message></strong></p>
+    <table class="miscTable" align=center width="70%">
+        <tr>
+            <td>
+                <h1><fmt:message key="jsp.login.incorrect.heading"/></h1>
+            </td>
+        </tr>
+        <tr>
+        <td class="evenRowEvenCol">
+          <P align=center><strong>The e-mail address and password you supplied were not valid.  Please try again, or have you <A HREF="<%= request.getContextPath() %>/forgot">forgotten your password</A>?</strong></P>
 
     <dspace:include page="/components/login-form.jsp" />
+        </td>
+        </tr>
+    </table>
 </dspace:layout>

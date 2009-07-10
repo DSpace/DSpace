@@ -140,6 +140,8 @@
             <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
             <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.authorize-item-edit.eperson"/></strong></th>
             <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.group"/></strong></th>
+            <th class="oddRowOddCol">Start</th>
+            <th class="oddRowEvenCol">End</th>
             <th class="oddRowOddCol">&nbsp;</th>
         </tr>
 <%
@@ -160,6 +162,12 @@
             </td>
             <td class="<%= row %>RowEvenCol">
                     <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>  
+            </td>
+            <td class="<%= row %>RowOddCol">
+                    <%= (rp.getStartDate() == null ? "&nbsp;" : rp.getStartDate().toString() ) %>  
+            </td>
+            <td class="<%= row %>RowEvenCol">
+                    <%= (rp.getEndDate() == null ? "&nbsp;" : rp.getEndDate().toString() ) %>  
             </td>
             <td class="<%= row %>RowOddCol">
                  <form method="post" action=""> 
@@ -204,6 +212,8 @@
             <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
             <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.general.eperson" /></strong></th>
             <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.group"/></strong></th>
+            <th class="oddRowOddCol">Start</th>
+            <th class="oddRowEvenCol">End</th>
             <th class="oddRowOddCol">&nbsp;</th>
         </tr>
 
@@ -225,6 +235,12 @@
             </td>
             <td class="<%= row %>RowEvenCol">
                     <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>  
+            </td>
+            <td class="<%= row %>RowOddCol">
+                    <%= (rp.getStartDate() == null ? "&nbsp;" : rp.getStartDate().toString() ) %>  
+            </td>
+            <td class="<%= row %>RowEvenCol">
+            <%= (rp.getEndDate() == null ? "&nbsp;" : rp.getEndDate().toString() ) %>  
             </td>
             <td class="<%= row %>RowOddCol">
                 <form method="post" action="">
@@ -271,6 +287,8 @@
                 <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
                 <th class="oddRowOddCol"><strong><fmt:message key="jsp.dspace-admin.authorize-item-edit.eperson" /></strong></th>
                 <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.group"/></strong></th>
+                <th class="oddRowOddCol">Start</th>
+                <th class="oddRowEvenCol">End</th>
                 <th class="oddRowOddCol">&nbsp;</th>
             </tr>
 <%
@@ -291,6 +309,12 @@
             </td>
             <td class="<%= row %>RowEvenCol">
                     <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>  
+            </td>
+            <td class="<%= row %>RowOddCol">
+                    <%= (rp.getStartDate() == null ? "&nbsp;" : rp.getStartDate().toString() ) %>  
+            </td>
+            <td class="<%= row %>RowEvenCol">
+                    <%= (rp.getEndDate() == null ? "&nbsp;" : rp.getEndDate().toString() ) %>  
             </td>
             <td class="<%= row %>RowOddCol">
                 <form method="post" action="">

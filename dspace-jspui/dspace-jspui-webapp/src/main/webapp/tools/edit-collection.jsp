@@ -66,6 +66,8 @@
     Community community = (Community) request.getAttribute("community");
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
+    Boolean padmin_b = (Boolean)request.getAttribute("padmin_button");
+    boolean padmin_button = (padmin_b == null ? false : padmin_b.booleanValue());
     
     String name = "";
     String shortDesc = "";
@@ -131,7 +133,7 @@
         <fmt:param><%= collection.getHandle() %></fmt:param>
         </fmt:message>
     </h1>
-    <% if(admin_button ) { %>
+    <% if(padmin_button) { %>
       <center>
         <table width="70%">
           <tr>
@@ -225,7 +227,7 @@
             <tr><td>&nbsp;</td></tr>
             <tr><td colspan="2"><center><h3><fmt:message key="jsp.tools.edit-collection.form.label9"/></h3></center></td></tr>
 
-<% if(admin_button ) { %>
+<% if(admin_button || padmin_button) { %>
 <%-- ===========================================================
      Collection Submitters
      =========================================================== --%>
@@ -267,7 +269,8 @@
 <%  } %>
 
             <tr><td>&nbsp;</td></tr>
-
+<%  } 
+ if (padmin_button) { %>
 <%-- ===========================================================
      Collection Administrators
      =========================================================== --%>
@@ -298,7 +301,7 @@
 <%  } %>                    
                 </td>
             </tr>   
-<% if(admin_button ) { %>
+<% if(admin_button || padmin_button) { %>
 <%-- ===========================================================
      Edit collection's policies
      =========================================================== --%>

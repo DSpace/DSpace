@@ -300,3 +300,15 @@ function isBrowser(b,v) {
 
 
 
+
+// Toggle display of the Others login option on password-login
+function toggleOtherLoginDisplay()
+{
+  e = document.getElementById('otherLogin');
+
+  if (e.style.display == 'none') {
+    e.style.display = 'block';
+  } else {
+    e.style.display = 'none';
+  }
+}

@@ -103,18 +103,20 @@
         <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
         <table class="pageBanner" width="100%" border="0" cellpadding="0" cellspacing="0">
 
-            <%-- DSpace logo --%>
+            <%-- UM logo --%>
             <tr>
-                <td>
-                    <a href="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/dspace-blue.gif" alt="<fmt:message key="jsp.layout.header-default.alt"/>" width="198" height="79" border="0"/></a></td>
+                <td valign="bottom" width="160">
+                    <a href="http://www.lib.umd.edu/"><img src="<%= request.getContextPath() %>/image/logo-top.gif" alt="<fmt:message key="jsp.layout.header-default.alt"/>" width="84" height="49" border="0"/></a></td>
                     <td class="tagLine" width="99%"> <%-- Make as wide as possible. cellpadding repeated for broken NS 4.x --%>
-                    <a class="tagLineText" target="_blank" href="http://www.dspace.org/"><fmt:message key="jsp.layout.header-default.about"/></a>
+                    <a class="tagLineText" target="_blank" href="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/drum2.gif" alt="<fmt:message key="jsp.title"/>" width="120" height="49" border="0"></a>
                 </td>
                 <td nowrap="nowrap" valign="middle">
+                    &nbsp;
                 </td>
             </tr>
-            <tr class="stripe"> <%-- Blue stripe --%>
-                <td colspan="3">&nbsp;</td>
+            <tr class="colorbar"> 
+                <td valign="top" colspan="3"><img src="<%= request.getContextPath() %>/image/logo-bottom.gif" alt="<fmt:message key="jsp.layout.header-default.alt"/>" width="83" height="20" border="0"></td>
+		<td colspan="2">Digital Repository at the University of Maryland</td>
             </tr>
         </table>
 
@@ -148,7 +150,7 @@
             <%-- HACK: width specified here for non-CSS compliant Netscape 4.x --%>
             <%-- HACK: Width shouldn't really be 100%, but omitting this means --%>
             <%--       navigation bar gets far too wide on certain pages --%>
-            <td class="pageContents" width="100%">
+            <td class="pageContents">
 
                 <%-- Location bar --%>
 <%

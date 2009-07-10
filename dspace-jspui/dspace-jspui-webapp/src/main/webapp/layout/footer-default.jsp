@@ -79,15 +79,10 @@
                 <td colspan="<%= overallColSpan %>" class="pageFootnote">
                     <table class="pageFooterBar" width="100%">
                         <tr>
-                            <td>
-                                <a href="http://validator.w3.org/check?uri=referer"><img
-                                    src="<%= request.getContextPath() %>/image/valid-xhtml10.png"
-                                    alt="Valid XHTML 1.0!" height="31" width="88" /></a>
-                            </td>
                             <td class="pageFootnote">
                                 <fmt:message key="jsp.layout.footer-default.text"/>&nbsp;-
-                                <a target="_blank" href="<%= request.getContextPath() %>/feedback"><fmt:message key="jsp.layout.footer-default.feedback"/></a>
-                                <a href="<%= request.getContextPath() %>/htmlmap"></a>
+                                 <br>
+                                 <a href="<%=request.getContextPath()%>/all.jsp">All Contents</a>
                             </td>
                             <td nowrap="nowrap" valign="middle"> <%-- nowrap, valign for broken NS 4.x --%>
                             </td>

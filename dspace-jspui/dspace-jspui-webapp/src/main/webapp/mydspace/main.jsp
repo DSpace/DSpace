@@ -39,7 +39,7 @@
   --%>
 
 <%--
-  - Main My DSpace page
+  - Main My DRUM page
   -
   -
   - Attributes:
@@ -116,6 +116,16 @@
                  <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#mydspace\"%>"><fmt:message key="jsp.help"/></dspace:popup>
             </td>
         </tr>
+            <td>
+                <p>University of Maryland faculty can deposit research works to DRUM.Find out more about <a href="help/about_submitting.jsp">depositing works</a> and <a href="help/submit_policy.jsp">submission policies</a>. Faculty can also request the creation of a new community.  Please review the <a href="help/new_community_policy.jsp"> policy on creating new communities</a>.</p>
+<!--
+                <p><strong>Please note</strong> While we are improving the My DRUM login, it will take 1-2 business days to set up deposit service for new users. The first time you log into My DRUM you will not be able to deposit works immediately. We will notify you via email when you have been given deposit privileges. Once your deposit privileges have been set up you can go to My DRUM and deposit works immediately with no further delays.</p>
+-->
+
+                <p>For assistance or questions, please contact drum-help@umd.edu or call 
+4-1328.</p>
+           </td>
+         </tr>
     </table>
 
 <%-- Task list:  Only display if the user has any tasks --%>
@@ -232,6 +242,23 @@
                     <td headers="t7" class="<%= row %>RowEvenCol"><%= Utils.addEntities(title) %></td>
                     <td headers="t8" class="<%= row %>RowOddCol"><%= pooled[i].getCollection().getMetadata("name") %></td>
                     <td headers="t9" class="<%= row %>RowEvenCol"><a href="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></a></td>
+                <td class="<%= row %>RowEvenCol"><%= Utils.addEntities(title) %></td>
+                <td class="<%= row %>RowOddCol">
+                  <%= pooled[i].getCollection().getMetadata("name") %>
+                  <%-- additional mapped collections --%>
+<%		  
+                  Collection collections[] = pooled[i].getMapCollections();
+                  for (int j = 0; j < collections.length; j++) {
+%>		  
+                     <br/>
+                     <font size="-2">
+                        <%= collections[j].getMetadata("name") %>
+                     </font>
+<%		  
+                  }
+%>
+                </td>
+                <td class="<%= row %>RowEvenCol"><A HREF="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></A></td>
                     <td class="<%= row %>RowOddCol">
                         <form action="<%= request.getContextPath() %>/mydspace" method="post">
                             <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>" />
@@ -314,6 +341,18 @@
                     <input type="hidden" name="workspace_id" value="<%= workspaceItems[i].getID() %>"/>
                     <input type="submit" name="submit_open" value="<fmt:message key="jsp.mydspace.general.open" />"/>
                 </form>
+                    <%-- additional mapped collections --%>
+<%
+                    Collection collections[] = workspaceItems[i].getMapCollections();
+                    for (int j = 0; j < collections.length; j++) {
+%>
+                       <br/>
+                       <font size="-2">
+                          <%= collections[j].getMetadata("name") %>
+                       </font>
+<%
+                    }
+%>
             </td>
             <td headers="t10" class="<%= row %>RowEvenCol">
                 <a href="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></a>
@@ -414,6 +453,18 @@
                        <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>" />
                        <input type="hidden" name="workflow_id" value="<%= workflowItems[i].getID() %>" />
                    </form>   
+                    <%-- additional mapped collections --%>
+<%
+                    Collection collections[] = workflowItems[i].getMapCollections();
+                    for (int j = 0; j < collections.length; j++) {
+%>
+                       <br/>
+                       <font size="-2">
+                          <%= collections[j].getMetadata("name") %>
+                       </font>
+<%
+                    }
+%>
                 </td>
             </tr>
 <%

@@ -120,16 +120,10 @@
 <%
     }
     
-    // Don't display last column ("Remove") in workflow mode
-    if (!subInfo.isInWorkflow())
-    {
         // Whether it's an odd or even column depends on whether we're showing checksums
         String column = (showChecksums ? "Even" : "Odd");
 %>
                 <th id="t7" class="oddRow<%= column %>Col">&nbsp;</th>
-<%
-    }
-%>
             </tr>
 
 <%
@@ -193,18 +187,12 @@
 <%
         }
 
-        // Don't display "remove" button in workflow mode
-        if (!subInfo.isInWorkflow())
-        {
             // Whether it's an odd or even column depends on whether we're showing checksums
-            String column = (showChecksums ? "Even" : "Odd");
+            column = (showChecksums ? "Even" : "Odd");
 %>
                 <td headers="t7" class="<%= row %>Row<%= column %>Col">
                     <input type="submit" name="submit_remove_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button2"/>" />
                 </td>
-<%
-        }
-%>
             </tr>
 <%
         row = (row.equals("even") ? "odd" : "even");
@@ -218,10 +206,6 @@
 
 <%-- Show information about how to verify correct upload, but not in workflow
      mode! --%>
-<%
-    if (!subInfo.isInWorkflow())
-    {
-%>
         <p class="uploadHelp"><fmt:message key="jsp.submit.upload-file-list.info3"/></p>
         <ul class="uploadHelp">
             <li class="uploadHelp"><fmt:message key="jsp.submit.upload-file-list.info4"/></li>
@@ -243,24 +227,13 @@
 %>
         </ul>
         <br />
-<%
-    }
-%>    
 
         <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
         <%= SubmissionController.getSubmissionParameters(context, request) %>
 
 <%-- HACK: Center used to align table; CSS and align="center" ignored by some browsers --%>
         <center>
-<%
-    // Don't allow files to be added in workflow mode
-    if (!subInfo.isInWorkflow())
-    {
-%>
             <p><input type="submit" name="submit_more" value="<fmt:message key="jsp.submit.upload-file-list.button4"/>" /></p>
-<%
-    }
-%>
             <table border="0" width="80%">
                 <tr>
                     <td width="100%">&nbsp;</td>

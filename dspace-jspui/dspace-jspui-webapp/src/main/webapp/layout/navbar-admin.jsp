@@ -58,6 +58,13 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%
+    labels.add("Resource Stats");
+    links.add("/dspace-admin/resource.jsp");
+
+    labels.add("Statistics");
+    links.add("/dspace-admin/statistics.jsp");
+
+
     // Get the current page, minus query string
     String currentPage = UIUtil.getOriginalURL(request);    
     int c = currentPage.indexOf( '?' );
@@ -72,7 +79,7 @@
 
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/tools/edit-communities") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/tools/edit-communities") ? "arrow-highlight" : "arrow") %>.gif" width="7" height="13"/>
     </td>
     <td nowrap="nowrap" class="navigationBarItem">
       <a href="<%= request.getContextPath() %>/tools/edit-communities"><fmt:message key="jsp.layout.navbar-admin.communities-collections"/></a>
@@ -201,7 +208,7 @@
   
   <tr class="navigationBarItem">
      <td>
-         <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="16" height="16"/>
+         <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="7" height="13"/>
      </td>
      <td nowrap="nowrap" class="navigationBarItem">
          <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\")%>"><fmt:message key="jsp.layout.navbar-admin.help"/></dspace:popup>
@@ -210,7 +217,7 @@
 
  <tr class="navigationBarItem">
      <td>
-         <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="16" height="16"/>
+         <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="7" height="13"/>
      </td>
      <td nowrap="nowrap" class="navigationBarItem">
          <a href="<%= request.getContextPath() %>/logout"><fmt:message key="jsp.layout.navbar-admin.logout"/></a>

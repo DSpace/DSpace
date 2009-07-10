@@ -149,6 +149,21 @@
                 </select>
             </td>
         </tr>
+        <%
+        if (resourceType == org.dspace.core.Constants.BITSTREAM) {
+          String startDate = (policy.getStartDate()==null ? "" : policy.getStartDate().toString());
+          String endDate = (policy.getEndDate()==null ? "" : policy.getEndDate().toString());
+          %>
+          <tr><td>Start:</td>
+               <td><input name="start_date" size="10" value="<%= startDate %>"/></td>
+          </tr>
+        
+          <tr><td>Stop:</td>
+               <td><input name="end_date" size="10" value="<%= endDate %>"/></td>
+          </tr>
+          <%
+        }
+        %>
     </table>
 
     <% if( newpolicy != null ) { %> <input name="newpolicy" type="hidden" value="<%=newpolicy%>"/> <% } %>

@@ -45,8 +45,8 @@
   - Advanced policy tool - a bit dangerous, but powerful
   -
   - Attributes:
-  -  collections - Collection [] all DSpace collections
-  -  groups      - Group      [] all DSpace groups for select box
+  -  collections - Collection [] all DRUM collections
+  -  groups      - Group      [] all DRUM groups for select box
   - Returns:
   -  submit_advanced_clear - erase all policies for set of objects
   -  submit_advanced_add   - add a policy to a set of objects

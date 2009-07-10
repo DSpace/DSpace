@@ -63,6 +63,7 @@
 <%@ page import="org.dspace.browse.ItemCounter" %>
 <%@ page import="org.dspace.content.*" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.handle.HandleManager" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 
@@ -101,10 +102,29 @@
     }
     
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
+
+    String handle = community.getHandle();
+
 %>
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 <dspace:layout locbar="commLink" title="<%= name %>" feedData="<%= feedData %>">
+
+<%
+    if (handle != null)
+    {
+%>
+    <table align="center" class="miscTable">
+        <tr>
+            <td class="evenRowEvenCol" align="center">
+                <strong>Please use this identifier to cite or link to this community:
+                <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>
+            </td>
+        </tr>
+    </table>
+<%
+    }
+%>
 
   <table border="0" cellpadding="5" width="100%">
     <tr>
@@ -163,6 +183,9 @@
             <tr>
               <td class="standard" align="center">
                 <small><label for="tquery"><strong><fmt:message key="jsp.general.searchfor"/>&nbsp;</strong></label></small><input type="text" name="query" id="tquery" />&nbsp;<input type="submit" name="submit_search" value="<fmt:message key="jsp.general.go"/>" /> 
+                <span>
+                  <dspace:popup page="/help/index.html#search">Search Help</dspace:popup>
+                </span>
 			  </td>
             </tr>
             </table>
@@ -331,6 +354,10 @@
                     <%--<input type="submit" name="submit" value="Create Sub-community" />--%>
                     <input type="submit" name="submit" value="<fmt:message key="jsp.community-home.create2.button"/>" />
                  </form>
+               <form method="POST" action="<%=request.getContextPath()%>/tools/mapcollections">
+                 <input type="hidden" name="community_id" value="<%= community.getID() %>">
+                 <input type="submit" value="Add/Remove Collections">
+               </form>
              <% } %>
               </td>
             </tr>

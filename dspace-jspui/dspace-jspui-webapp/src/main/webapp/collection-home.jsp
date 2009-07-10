@@ -66,6 +66,7 @@
 <%@ page import="org.dspace.content.*"%>
 <%@ page import="org.dspace.core.ConfigurationManager"%>
 <%@ page import="org.dspace.eperson.Group"     %>
+<%@ page import="org.dspace.handle.HandleManager" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 
@@ -124,14 +125,33 @@
     }
     
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
+
+    String handle = collection.getHandle();
+
 %>
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 <dspace:layout locbar="commLink" title="<%= name %>" feedData="<%= feedData %>">
 
+<%
+    if (handle != null)
+    {
+%>
+    <table align="center" class="miscTable">
+        <tr>
+            <td class="evenRowEvenCol" align="center">
+                <strong>Please use this identifier to cite or link to this collection:
+                <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>
+            </td>
+        </tr>
+    </table>
+<%
+    }
+%>
+
   <table border="0" cellpadding="5" width="100%">
     <tr>
-      <td width="100%">
+      <td width="100%" align="center">
         <h1><%= name %>
 <%
             if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
@@ -171,6 +191,9 @@
               <td class="standard" align="center">
 				<label for="tquery"><small><fmt:message key="jsp.general.searchfor"/>&nbsp;</small></label><input type="text" name="query" id="tquery"/>&nbsp;
 				<input type="submit" name="submit_search" value="<fmt:message key="jsp.general.go"/>" />
+                <span>
+                  <dspace:popup page="/help/index.html#search">Search Help</dspace:popup>
+                </span>
               </td>
             </tr>
           </table>

@@ -67,6 +67,8 @@
     Collection[] collections =
         (Collection[]) request.getAttribute("collections");
 
+    Collection collection = (Collection) request.getAttribute("collection");
+
 	//check if we need to display the "no collection selected" error
     Boolean noCollection = (Boolean) request.getAttribute("no.collection");
 
@@ -89,6 +91,12 @@
       <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#choosecollection\"%>"><fmt:message key="jsp.morehelp"/> </dspace:popup> 
 	</div>
 
+    <p>Select the collection you wish to submit an item to from the list
+    below, then click "Next".  
+    <dspace:popup page="/help/index.html#choosecollection">(More Help...)</dspace:popup></p>
+
+    <p>If you hold appointments with more than one department, you may use the CTRL key to select more than one collection.</p>
+
     <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
 <%-- HACK: a <center> tag seems to be the only way to convince certain --%>
 <%--       browsers to center the table. --%>
@@ -110,13 +118,17 @@
                     <%-- <td class="submitFormLabel"><label for="tcollection">Collection</label></td> --%>
 					<td class="submitFormLabel"><label for="tcollection"><fmt:message key="jsp.submit.select-collection.collection"/></label></td>
                     <td>
-                        <select name="collection" id="tcollection">
-                        	<option value="-1"></option>
+                        <select name="mapcollections" size="<%= collections.length < 3 ? (new Integer(collections.length)).toString() : "3"%>" multiple="true">
 <%
         for (int i = 0; i < collections.length; i++)
         {
 %>
-                            <option value="<%= collections[i].getID() %>"><%= collections[i].getMetadata("name") %></option>
+                            <option 
+                              value="<%= collections[i].getID() %>"
+                              <%= (collection != null && collections[i].equals(collection)) ? "selected=\"true\"" : ""%>
+                            >
+                              <%= collections[i].getMetadata("name")%>
+                            </option>
 <%
         }
 %>

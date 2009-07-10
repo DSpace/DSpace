@@ -54,6 +54,9 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.Map" %>
+
 <%@ page import="java.sql.SQLException" %>
 <%@ page import="java.util.Locale"%>
 
@@ -66,6 +69,7 @@
 <%@ page import="org.dspace.app.webui.util.JSPManager" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.Community" %>
+<%@ page import="org.dspace.content.CommunityGroup" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.core.LogManager" %>
 
@@ -80,10 +84,20 @@
         // Obtain a context so that the location bar can display log in status
         context = UIUtil.obtainContext(request);
         
-        // Home page shows community list
-        Community[] communities = Community.findAllTop(context);
-        request.setAttribute("communities", communities);
-        
+        // Home page shows community list in groups
+        Map topcommMap = new HashMap();
+        CommunityGroup[] groups = CommunityGroup.findAll(context);
+        for (int k=0; k < groups.length; k++) {
+           Integer groupID = new Integer(groups[k].getID());
+
+           // Find Communities in group
+           Community[] communities = groups[k].getCommunities();
+           topcommMap.put(groupID, communities);
+        }
+
+        request.setAttribute("groups", groups);
+        request.setAttribute("communities.map", topcommMap);
+
         // Show home page JSP
         JSPManager.showJSP(request, response, "/home.jsp");
     }

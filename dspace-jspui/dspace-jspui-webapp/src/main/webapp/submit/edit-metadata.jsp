@@ -85,6 +85,8 @@
     request.setAttribute("LanguageSwitch", "hide");
 %>
 <%!
+    String strRequired = " <span class=\"submitFormWarnMark\">*</span>";
+
     // required by Controlled Vocabulary  add-on
 	String contextPath;
 
@@ -134,7 +136,7 @@
 
     void doPersonalName(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label, PageContext pageContext) 
+      int fieldCountIncr, String label, boolean isRequired, PageContext pageContext) 
       throws java.io.IOException 
     {
 
@@ -180,6 +182,7 @@
 	 if (i == 0) 
 	    sb.append("<tr><td class=\"submitFormLabel\">")
 	      .append(label)
+	      .append(isRequired ? strRequired : "")
 	      .append("</td>");
 	 else
 	    sb.append("<tr><td>&nbsp;</td>");
@@ -236,7 +239,7 @@
 
     void doDate(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label, PageContext pageContext, HttpServletRequest request) 
+      int fieldCountIncr, String label, boolean isRequired, PageContext pageContext, HttpServletRequest request) 
       throws java.io.IOException 
     {
 
@@ -253,6 +256,7 @@
 	 if (i == 0) 
 	    sb.append("<tr><td class=\"submitFormLabel\">")
 	      .append(label)
+	      .append(isRequired ? strRequired : "")
 	      .append("</td>");
 	 else
 	    sb.append("<tr><td>&nbsp;</td>");
@@ -345,7 +349,7 @@
 
     void doSeriesNumber(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label, PageContext pageContext) 
+      int fieldCountIncr, String label, boolean isRequired, PageContext pageContext) 
       throws java.io.IOException 
     {
 
@@ -378,6 +382,7 @@
 	 if (i == 0) 
 	    sb.append("<tr><td class=\"submitFormLabel\">")
 	      .append(label)
+	      .append(isRequired ? strRequired : "")
 	      .append("</td>");
 	 else
 	    sb.append("<tr><td>&nbsp;</td>");
@@ -438,7 +443,7 @@
 
     void doTextArea(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary) 
+      int fieldCountIncr, String label, boolean isRequired, PageContext pageContext, String vocabulary, boolean closedVocabulary) 
       throws java.io.IOException 
     {
 
@@ -455,6 +460,7 @@
 	 if (i == 0) 
 	    sb.append("<tr><td class=\"submitFormLabel\">")
 	      .append(label)
+	      .append(isRequired ? strRequired : "")
 	      .append("</td>");
 	 else
 	    sb.append("<tr><td>&nbsp;</td>");
@@ -510,7 +516,7 @@
 
     void doOneBox(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary) 
+      int fieldCountIncr, String label, boolean isRequired, PageContext pageContext, String vocabulary, boolean closedVocabulary) 
       throws java.io.IOException 
     {
 
@@ -527,6 +533,7 @@
 	 if (i == 0) 
 	    sb.append("<tr><td class=\"submitFormLabel\">")
 	      .append(label)
+	      .append(isRequired ? strRequired : "")
 	      .append("</td>");
 	 else
 	    sb.append("<tr><td>&nbsp;</td>");
@@ -583,7 +590,7 @@
 
     void doTwoBox(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary) 
+      int fieldCountIncr, String label, boolean isRequired, PageContext pageContext, String vocabulary, boolean closedVocabulary) 
       throws java.io.IOException 
     {
       DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
@@ -619,6 +626,7 @@
 		 {	 
 		    sb.append("<tr><td class=\"submitFormLabel\">")
 		      .append(label)
+	      .append(isRequired ? strRequired : "")
 		      .append("</td>");
 		 }
 		 else
@@ -731,7 +739,7 @@
 
     void doQualdropValue(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, DCInputSet inputs, boolean repeatable,
-      int fieldCountIncr, List qualMap, String label, PageContext pageContext) 
+      int fieldCountIncr, List qualMap, String label, boolean isRequired, PageContext pageContext) 
       throws java.io.IOException 
     {
 		DCValue[] unfiltered = item.getMetadata(schema, element, Item.ANY, Item.ANY);
@@ -775,6 +783,7 @@
 	 if (j == 0) 
 	    sb.append("<tr><td class=\"submitFormLabel\">")
               .append(label)
+	      .append(isRequired ? strRequired : "")
 	      .append("</td>");
 	 else
             sb.append("<tr><td>&nbsp;</td>");
@@ -843,7 +852,7 @@
 
     void doDropDown(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
-      List valueList, String label) 
+      List valueList, String label, boolean isRequired) 
       throws java.io.IOException 
     {
       DCValue[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
@@ -854,6 +863,7 @@
 
       sb.append("<tr><td class=\"submitFormLabel\">")
 	.append(label)
+        .append(isRequired ? strRequired : "")
 	.append("</td>");
 
       sb.append("<td colspan=\"2\">")
@@ -1026,6 +1036,7 @@
 <%
      }
 %>
+     <p>Required items are marked with <span class="submitFormWarnMark">*</span></p> 
 
      <%-- HACK: a <center> tag seems to be the only way to convince certain --%>
      <%--       browsers to center the table. --%>
@@ -1104,38 +1115,39 @@
        if (inputType.equals("name")) 
        {
            doPersonalName(out, item, fieldName, dcSchema, dcElement, dcQualifier,
-	     				  repeatable, fieldCountIncr, label, pageContext);
+	     				  repeatable, fieldCountIncr, label, inputs[z].isRequired(), pageContext);
        } 
        else if (inputType.equals("date")) 
        {
            doDate(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	     		  repeatable, fieldCountIncr, label, pageContext, request);
+	     		  repeatable, fieldCountIncr, label, inputs[z].isRequired, pageContext, request);
        } 
        else if (inputType.equals("series")) 
        {
            doSeriesNumber(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	                      repeatable, fieldCountIncr, label, pageContext);
+	                      repeatable, fieldCountIncr, label, inputs[z].isRequired(), pageContext);
        } 
        else if (inputType.equals("qualdrop_value")) 
        {
            doQualdropValue(out, item, fieldName, dcSchema, dcElement, inputSet, repeatable,
-                           fieldCountIncr, inputs[z].getPairs(), label, pageContext);
+                           fieldCountIncr, inputs[z].getPairs(), label, inputs[z].isRequired(), pageContext);
        } 
        else if (inputType.equals("textarea")) 
        {
 	   	   doTextArea(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	     			  repeatable, fieldCountIncr, label, pageContext, vocabulary,
+	     			  repeatable, fieldCountIncr, label, inputs[z].isRequired(), pageContext, vocabulary,
 	     			  closedVocabulary);
        } 
        else if (inputType.equals("dropdown")) 
        {
 	   		doDropDown(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	     			   repeatable, inputs[z].getPairs(), label);
+	     			   repeatable, inputs[z].getPairs(), label,
+				   inputs[z].isRequired());
        } 
        else if (inputType.equals("twobox")) 
        {
 	   		doTwoBox(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	     			 repeatable, fieldCountIncr, label, pageContext, vocabulary, 
+	     			 repeatable, fieldCountIncr, label, inputs[z].isRequired(), pageContext, vocabulary, 
 	     			 closedVocabulary);
        }
        else if (inputType.equals("list")) 
@@ -1146,7 +1158,7 @@
        else 
        {
 	   		doOneBox(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	     			 repeatable, fieldCountIncr, label, pageContext, vocabulary, 
+	     			 repeatable, fieldCountIncr, label, inputs[z].isRequired(), pageContext, vocabulary, 
 	     			 closedVocabulary);
        }
        

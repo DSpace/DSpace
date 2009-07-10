@@ -52,14 +52,19 @@
 <%@ page import="java.util.List" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.authorize.AuthorizeManager" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Community" %>
+<%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.browse.BrowseInfo" %>
 <%@ page import="java.util.Map" %>
 <%
+    // Get the DSpace Context
+    Context context = UIUtil.obtainContext((HttpServletRequest)request);
+
     // Is anyone logged in?
     EPerson user = (EPerson) request.getAttribute("dspace.current.user");
 
@@ -151,13 +156,32 @@
 <table width="100%" border="0" cellspacing="2" cellpadding="2">
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/index.jsp") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/index.jsp") ? "arrow-highlight" : "arrow") %>.gif" width="7" height="13"/>
     </td>
 
     <td nowrap="nowrap" class="navigationBarItem">
       <a href="<%= request.getContextPath() %>/"><fmt:message key="jsp.layout.navbar-default.home"/></a>
     </td>
   </tr>
+
+  <%-- Add a link to the admin interface, if the user is logged in  --%>
+  <%-- and is an administrator.                                     --%>
+
+  <%
+    if (AuthorizeManager.isAdmin(context)) 
+    {
+  %>
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/admin/index.jsp") ? "arrow-highlight" : "arrow") %>.gif" width="7" height="13">
+    </td>
+    <td nowrap class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/dspace-admin">Admin</a>
+    </td>
+  </tr>
+  <%
+    }
+  %>
 
   <tr>
     <td colspan="2">&nbsp;</td>
@@ -169,13 +193,21 @@
 
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/community-list" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16"/>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/community-list" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="7" height="13"/>
     </td>
     <td nowrap="nowrap" class="navigationBarItem">
       <a href="<%= request.getContextPath() %>/community-list"><fmt:message key="jsp.layout.navbar-default.communities-collections"/></a>
     </td>
   </tr>
 
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/browse-title" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="7" height="13">
+    </td>
+    <td nowrap class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/browse-title">Titles</a>
+    </td>
+  </tr>
 
 <%-- Insert the dynamic browse indices here --%>
 
@@ -187,7 +219,7 @@
 	%>
 		<tr class="navigationBarItem">
     		<td>
-      			<img alt="" src="<%= request.getContextPath() %>/image/<%= ( browseCurrent.equals(bix.getName()) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16"/>
+      			<img alt="" src="<%= request.getContextPath() %>/image/<%= ( browseCurrent.equals(bix.getName()) ? "arrow-highlight" : "arrow" ) %>.gif" width="7" height="13"/>
     		</td>
     		<td nowrap="nowrap" class="navigationBarItem">
       			<a href="<%= request.getContextPath() %>/browse?type=<%= bix.getName() %>"><fmt:message key="<%= key %>"/></a>
@@ -207,33 +239,82 @@
     <td nowrap="nowrap" colspan="2" class="navigationBarSublabel"><fmt:message key="jsp.layout.navbar-default.sign"/></td>
   </tr>
 
+  <%
+    // Logged in
+    if (user != null) {
+  %>
   <tr class="navigationBarItem">
+      	<td nowrap="" colspan="2" class="loggedIn">
+          Logged&nbsp;in&nbsp;as<br/> 
+          <%= navbarEmail %>
+      	</td>
+      </tr>
+
+      <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/subscribe" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16"/>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/subscribe" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="7" height="13"/>
     </td>
-    <td nowrap="nowrap" class="navigationBarItem">
-      <a href="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.layout.navbar-default.receive"/></a>
+      	<td nowrap class="navigationBarItem"><A HREF="<%= request.getContextPath() %>/logout">Logout</A></td>
+      </tr>
+
+      <tr class="navigationBarItem">
+      	<td>
+      	  <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/mydspace" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="7" height="13">
+      	</td>
+      	<td nowrap class="navigationBarItem">
+      	  <a href="<%= request.getContextPath() %>/mydspace">Submissions</a>
     </td>
   </tr>
 
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/mydspace" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16"/>
+      	  <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/subscribe" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="7" height="13">
     </td>
-    <td nowrap="nowrap" class="navigationBarItem">
-      <a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.layout.navbar-default.users"/></a><br/>
-      <fmt:message key="jsp.layout.navbar-default.users-authorized" />
+      	<td nowrap class="navigationBarItem">
+      	  <a href="<%= request.getContextPath() %>/subscribe">Subscriptions</a>
+    </td>
+  </tr>
+      
+      <tr class="navigationBarItem">
+      	<td>
+      	  <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/profile" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="7" height="13">
+      	</td>
+      	<td nowrap class="navigationBarItem">
+      	  <a href="<%= request.getContextPath() %>/profile">Profile</a>
+      	</td>
+      </tr>
+
+  <%
+    // Not logged in
+    } else {
+  %> 
+  <tr class="navigationBarItem">
+    <td>
+      	  <img alt="" src="<%= request.getContextPath() %>/image/arrow.gif" width="7" height="13">
+    </td>
+      	<td nowrap class="navigationBarItem">
+      	  <a href="<%= request.getContextPath() %>/mydspace">Login</a> for
     </td>
   </tr>
 
-  <tr class="navigationBarItem">
-    <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/profile" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16"/>
-    </td>
-    <td nowrap="nowrap" class="navigationBarItem">
-      <a href="<%= request.getContextPath() %>/profile"><fmt:message key="jsp.layout.navbar-default.edit"/></a>
-    </td>
-  </tr>
+      <tr class="navigationBarItem">
+      	<td>&nbsp;</td>
+      	<td nowrap class="navigationBarItem">Submissions</td>
+      </tr>
+
+      <tr class="navigationBarItem">
+      	<td>&nbsp;</td>
+      	<td nowrap class="navigationBarItem">Subscriptions</td>
+      </tr>
+
+      <tr class="navigationBarItem">
+      	<td>&nbsp;</td>
+      	<td nowrap class="navigationBarItem">Profile</td>
+      </tr>
+
+  <%
+    }
+  %> 
 
 <%
   if (isAdmin)
@@ -257,7 +338,7 @@
 
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/help" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16"/>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/help" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="7" height="13"/>
     </td>
     <td nowrap="nowrap" class="navigationBarItem">
             <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\")%>"><fmt:message key="jsp.layout.navbar-default.help"/></dspace:popup>
@@ -266,10 +347,19 @@
 
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/about" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="16" height="16"/>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/about" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="7" height="13"/>
     </td>
     <td nowrap="nowrap" class="navigationBarItem">
-      <a href="http://www.dspace.org/"><fmt:message key="jsp.layout.navbar-default.about"/></a>
+      <a href="<%= request.getContextPath() %>/help/about_drum.jsp"><fmt:message key="jsp.layout.navbar-default.about"/></a>
     </td>
   </tr>
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= ( currentPage.endsWith( "/help" ) ? "arrow-highlight" : "arrow" ) %>.gif" width="7" height="13">
+    </td>
+    <td nowrap class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/help/DRUM_stats.jsp">About Download<br/>Statistics</a>
+    </td>
+  </tr>
+
 </table>

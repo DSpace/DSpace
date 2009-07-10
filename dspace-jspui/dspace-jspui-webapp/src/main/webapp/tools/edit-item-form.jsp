@@ -343,6 +343,7 @@
         <table class="miscTable" summary="Bitstream data table">
             <tr>
 	  <%-- <th class="oddRowEvenCol"><strong>Primary<br>Bitstream</strong></th>
+                <th class="oddRowOddCol"><strong>Bundle</strong></th>
                 <th class="oddRowOddCol"><strong>Name</strong></th>
                 <th class="oddRowEvenCol"><strong>Source</strong></th>
                 <th class="oddRowOddCol"><strong>Description</strong></th>
@@ -383,6 +384,9 @@
 		<% } else { %>
 		     <td headers="t11"> </td>
 		<% } %>
+                <td headers="t12" class="<%= row %>RowOddCol">
+                    <input type="text" name="bitstream_bundle_<%= key %>" value="<%= bundles[i].getName() %>"/>
+                </td>
                 <td headers="t12" class="<%= row %>RowOddCol">
                     <input type="text" name="bitstream_name_<%= key %>" value="<%= (bitstreams[j].getName() == null ? "" : Utils.addEntities(bitstreams[j].getName())) %>"/>
                 </td>
