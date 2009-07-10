@@ -143,7 +143,7 @@ OL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
               vertical-align: middle }
 
 .tagLine { vertical-align: bottom;
-           padding: 10px;
+           padding: 0;
            border: 0;
            margin: 0;
            background: #ffffff;

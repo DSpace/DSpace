@@ -107,7 +107,7 @@
             <tr>
                 <td valign="bottom" width="160">
                     <a href="http://www.lib.umd.edu/"><img src="<%= request.getContextPath() %>/image/logo-top.gif" alt="<fmt:message key="jsp.layout.header-default.alt"/>" width="84" height="49" border="0"/></a></td>
-                    <td class="tagLine" width="99%"> <%-- Make as wide as possible. cellpadding repeated for broken NS 4.x --%>
+                    <td class="tagLine">
                     <a class="tagLineText" target="_blank" href="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/drum2.gif" alt="<fmt:message key="jsp.title"/>" width="120" height="49" border="0"></a>
                 </td>
                 <td nowrap="nowrap" valign="middle">
@@ -115,7 +115,7 @@
                 </td>
             </tr>
             <tr class="colorbar"> 
-                <td valign="top" colspan="3"><img src="<%= request.getContextPath() %>/image/logo-bottom.gif" alt="<fmt:message key="jsp.layout.header-default.alt"/>" width="83" height="20" border="0"></td>
+                <td valign="top" colspan="1"><img src="<%= request.getContextPath() %>/image/logo-bottom.gif" alt="<fmt:message key="jsp.layout.header-default.alt"/>" width="83" height="20" border="0"></td>
 		<td colspan="2">Digital Repository at the University of Maryland</td>
             </tr>
         </table>
