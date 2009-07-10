@@ -180,6 +180,15 @@
   
   <tr class="navigationBarItem">
     <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.contains("/dspace-admin/statistics") ? "arrow-highlight" : "arrow") %>.gif" width="7" height="13"/>
+    </td>
+    <td nowrap="nowrap" class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/dspace-admin/statistics.jsp">Statistics (Custom)</a>
+    </td>
+  </tr>
+  
+  <tr class="navigationBarItem">
+    <td>
       <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/statistics") ? "arrow-highlight" : "arrow") %>.gif" width="7" height="13"/>
     </td>
     <td nowrap="nowrap" class="navigationBarItem">
