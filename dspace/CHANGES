@@ -35,6 +35,7 @@
 (Larry Stone)
  - [DS-193] OAI RDF crosswalk fails when DC value is null
  - [DS-249] sub-daily utility script does not pass arguments to Java
+ - [DS-252] Interpolate variables in the Subject: line of email templates as well
 
 (Mark Diggory / Stuart Lewis)
  - [DS-201] handle.jar upgraded to version 6.2

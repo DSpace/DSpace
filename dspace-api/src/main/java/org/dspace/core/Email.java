@@ -316,7 +316,19 @@ public class Email
 
         message.setSentDate(date);
         message.setFrom(new InternetAddress(from));
-        message.setSubject(subject);
+
+        // Set the subject of the email (may contain parameters)
+        String fullSubject = MessageFormat.format(subject, args);
+        if (charset != null)
+        {
+            message.setSubject(fullSubject, charset);
+        }
+        else
+        {
+            message.setSubject(fullSubject);
+        }
+        
+        // Add attachments
         if (attachments.isEmpty())
         {
             // If a character set has been specified, or a default exists
