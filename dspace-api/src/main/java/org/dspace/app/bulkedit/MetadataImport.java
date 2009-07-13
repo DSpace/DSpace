@@ -185,21 +185,28 @@ public class MetadataImport
                     }
 
                     // Check it has an owning collection
-                    if (line.get("collection") == null)
+                    ArrayList<String> collections = line.get("collection");
+                    if (collections == null)
                     {
                         throw new MetadataImportException("New items must have a 'collection' assiged in the form of a handle");
                     }
                     
                     // Check collections are really collections
-                    ArrayList<String> collections = line.get("collection");
                     ArrayList<Collection> check = new ArrayList<Collection>();
-                    for (int i = 0; i < collections.size(); i++)
+                    Collection collection;
+                    for (String handle : collections)
                     {
-                        String handle = collections.get(i);
-                        Collection collection;
                         try
                         {
+                            // Resolve the handle to the collection
                             collection = (Collection)HandleManager.resolveToObject(c, handle);
+
+                            // Check it resolved OK
+                            if (collection == null)
+                            {
+                                throw new MetadataImportException("'" + handle + "' is not a Collection! You must specify a valid collection for new items");
+                            }
+
                             // Check for duplicate
                             if (check.contains(collection))
                             {
@@ -217,9 +224,8 @@ public class MetadataImport
                     }
 
                     // Record the addition to collections
-                    for (int i = 0; i < collections.size(); i++)
+                    for (String handle : collections)
                     {
-                        String handle = collections.get(i);
                         Collection extra = (Collection)HandleManager.resolveToObject(c, handle);
                         whatHasChanged.registerNewOwningCollection(extra);
                     }
@@ -229,7 +235,7 @@ public class MetadataImport
                     {
                         // Create the item
                         String collectionHandle = line.get("collection").get(0);
-                        Collection collection = (Collection)HandleManager.resolveToObject(c, collectionHandle);
+                        collection = (Collection)HandleManager.resolveToObject(c, collectionHandle);
                         WorkspaceItem wsItem = WorkspaceItem.create(c, collection, useTemplate);
                         Item item = wsItem.getItem();
 
@@ -458,7 +464,8 @@ public class MetadataImport
      *
      * @throws SQLException if there is a problem accessing a Collection from the database, from its handle
      * @throws AuthorizeException if there is an authorization problem with permissions
-     * @throws IOException Can be thrown when moving items in communities 
+     * @throws IOException Can be thrown when moving items in communities
+     * @throws MetadataImportException If something goes wrong to be reported back to the user
      */
     private void compare(Item item,
                          ArrayList<String> collections,
@@ -795,8 +802,6 @@ public class MetadataImport
 	 * main method to run the metadata exporter
 	 *
 	 * @param argv the command line arguments given
-     *
-     * @throws Exception Thrown if something goes wrong with the import
 	 */
     public static void main(String[] argv)
     {
@@ -882,7 +887,7 @@ public class MetadataImport
         {
             if (line.hasOption('e'))
             {
-                EPerson eperson = null;
+                EPerson eperson;
                 String e = line.getOptionValue('e');
                 if (e.indexOf('@') != -1)
                 {
