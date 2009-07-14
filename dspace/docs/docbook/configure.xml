@@ -35,8 +35,9 @@ property.name = property value
 property.name = word1 ${other.property.name} more words
 property2.name = ${dspace.dir}/rest/of/path
 </screen>
-        <para> Whenever you edit dspace.cfg in [dspace-source]/dspace/config/, you should then run &apos;ant init_configs&apos; in the directory [dspace-source]/dspace/target/dspace-1.5.2-build.dir so that any changes you may have made are reflected in the configuration files of other applications, for example Apache. You may then need to restart those applications, depending on what you changed. <table frame="none">
-            <title>dspace.cfg Main Properties (Not Complete)</title>
+        <para> Whenever you edit dspace.cfg in [dspace-source]/dspace/config/, you should then run &apos;ant init_configs&apos; in the directory [dspace-source]/dspace/target/dspace-1.5.2-build.dir so that any changes you may have made are reflected in the configuration files of other applications, for example Apache. You may then need to restart those applications, depending on what you changed. </para>
+		<para>
+            <table frame="none"><title>dspace.cfg Main Properties (Not Complete)</title>
             <tgroup cols="3">
               <colspec colname="c1" colwidth="33*"/>
               <colspec colname="c2" colwidth="33*"/>
@@ -140,12 +141,15 @@ property2.name = ${dspace.dir}/rest/of/path
                 <row>
                   <entry>
                     <para>
-                      <literal>plugin.sequence.org.dspace .authenticate.AuthenticationMethod</literal>
+                      <literal>plugin.sequence.org.dspace.authenticate.AuthenticationMethod</literal>
                     </para>
                   </entry>
                   <entry>
                     <para>
-                      <literal>org.dspace.eperson .X509Authentication, org.dspace.authenticate .PasswordAuthentication</literal>
+                      <literal>org.dspace.authenticate.LDAPHierarchicalAuthentication,\</literal>
+                    </para>
+					<para>
+                      <literal>org.dspace.authenticate.PasswordAuthentication</literal>
                     </para>
                   </entry>
                   <entry>
@@ -460,7 +464,8 @@ stack"/>authentication stack. Authentication methods are called on in the order 
               </tbody>
             </tgroup>
           </table>
- Property values can include other, previously defined values, by enclosing the property name in ${...}. For example, if your dspace.cfg contains: -</para>
+</para>		  
+ <para>Property values can include other, previously defined values, by enclosing the property name in ${...}. For example, if your dspace.cfg contains: -</para>
         <screen>
   dspace.dir = /dspace
   dspace.history = ${dspace.dir}/history
@@ -679,53 +684,41 @@ itemmap.author.index = author
         <para>Media or Format Filters are classes used to generate derivative or alternative versions of content or bitstreams within DSpace. For example, the PDF Media Filter will extract textual content from PDF bitstreams, the JPEG Media Filter can create thumbnails from image bitstreams.</para>
         <para>Media Filters are configured as <link linkend="docbook-business.html-plugin">Named Plugins</link>, with each filter also having a separate configuration setting (in <literal>dspace.cfg</literal>) indicating which formats it can process. The default configuration is shown below.</para>
         <screen>
-        #### Media Filter / Format Filter plugins (through
-	PluginManager) ####
+#### Media Filter / Format Filter plugins (through PluginManager) ####
+# Media/Format Filters help to full-text index content or
+# perform automated format conversions
 
-        #Names of the enabled MediaFilter or FormatFilter plugins
-        filter.plugins = PDF Text Extractor, HTML Text Extractor, \
-                                                Word Text Extractor,
-	JPEG Thumbnail
-        # to enable branded preview: remove last line above, and
-	uncomment 2 lines below
-        #                                       Word Text Extractor,
-	JPEG Thumbnail, \
-        #                                       Branded Preview JPEG
+#Names of the enabled MediaFilter or FormatFilter plugins
+      filter.plugins = PDF Text Extractor, HTML Text Extractor, \
+                       Word Text Extractor, JPEG Thumbnail
+# [To enable branded preview:] remove last line above, and uncomment
+# 2 lines below
+#                                     Word Text Extractor, JPEG Thumbnail, \
+#                                       Branded Preview JPEG
 
-        #Assign &apos;human-understandable&apos; names to each filter
-        plugin.named.org.dspace.app.mediafilter.FormatFilter = \
-                org.dspace.app.mediafilter.PDFFilter = PDF Text
-	Extractor, \
-                org.dspace.app.mediafilter.HTMLFilter = HTML Text
-	Extractor, \
-                org.dspace.app.mediafilter.WordFilter = Word Text
-	Extractor, \
-                org.dspace.app.mediafilter.JPEGFilter = JPEG
-	Thumbnail, \
-                org.dspace.app.mediafilter.BrandedPreviewJPEGFilter =
-	Branded Preview JPEG
+# Assign &apos;human-understandable&apos; names to each filter
+   plugin.named.org.dspace.app.mediafilter.FormatFilter = \
+    org.dspace.app.mediafilter.PDFFilter = PDF Text Extractor, \
+    org.dspace.app.mediafilter.HTMLFilter = HTML Text Extractor, \
+    org.dspace.app.mediafilter.WordFilter = Word Text Extractor, \
+    org.dspace.app.mediafilter.JPEGFilter = JPEG Thumbnail, \
+    org.dspace.app.mediafilter.BrandedPreviewJPEGFilter = Branded Preview JPEG
 
-        #Configure each filter&apos;s input format(s)
-        filter.org.dspace.app.mediafilter.PDFFilter.inputFormats =
-	Adobe PDF
-        filter.org.dspace.app.mediafilter.HTMLFilter.inputFormats =
-	HTML, Text
-        filter.org.dspace.app.mediafilter.WordFilter.inputFormats =
-	Microsoft Word
-        filter.org.dspace.app.mediafilter.JPEGFilter.inputFormats =
-	GIF, JPEG, image/png
-       
-	filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormat
-s = GIF, JPEG, image/png
+# Configure each filter&apos;s input format(s)
+  filter.org.dspace.app.mediafilter.PDFFilter.inputFormats = Adobe PDF
+  filter.org.dspace.app.mediafilter.HTMLFilter.inputFormats = HTML, Text
+  filter.org.dspace.app.mediafilter.WordFilter.inputFormats = Microsoft Word
+  filter.org.dspace.app.mediafilter.JPEGFilter.inputFormats = GIF, JPEG, image/png
+  filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormats = GIF, \
+  				JPEG, image/png
 </screen>
-          <para>The enabled Media/Format Filters are named in the <literal>filter.plugins</literal> field above.</para>
+        <para>The enabled Media/Format Filters are named in the <literal>filter.plugins</literal> field above.</para>
         <para>Names are assigned to each filter using the <literal>plugin.named.org.dspace.app.mediafilter.FormatFilter</literal> field (e.g. by default the <literal>PDFFilter</literal> is named &quot;PDF Text Extractor&quot;).</para>
         <para>Finally the appropriate <literal>filter.&lt;class path&gt;.inputFormats</literal> defines the vaild input formats which each filter can be applied to. These format names <emphasis role="bold">must match</emphasis> the <literal>short description</literal> field of the <link linkend="docbook-appendix.html-bitstreamformatregistry">Bitstream Format Registry</link>.</para>
         <para>You can also implement more dynamic or configurable Media/Format Filters which extend <ulink url="business.html#selfnamedplugin">
             <literal>SelfNamedPlugin</literal>
           </ulink>
-. More information is provide below in <anchor id="docbook-configure.html--newfilter" xreflabel="Creating
-a new Media/Format Filter"/>Creating a new Media/Format Filter</para>
+. More information is provide below in <anchor id="docbook-configure.html--newfilter" xreflabel="Creating a new Media/Format Filter"/>Creating a new Media/Format Filter</para>
       </section>
       <section remap="h3">
         <title><anchor id="docbook-configure.html-general-email" xreflabel="Wording of E-mail
