@@ -363,7 +363,7 @@ public class DSpaceCSV
             }
             catch (NumberFormatException nfe)
             {
-                System.err.println("Invalid item identifer: " + id);
+                System.err.println("Invalid item identifier: " + id);
                 System.err.println("Please check your CSV file for informaton. " +
                                    "Item id must be numeric, or a '+' to add a new item");
                 throw(nfe);

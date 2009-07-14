@@ -265,7 +265,7 @@ authentication.shib.role.Librarian = Administrator
 </screen><para>
 In configuration sections such as webui.itemdisplay.default, values can
 be changed from (e.g.) metadata.dc.identifier.doi to
-metadata.doi.dc.identifer.doi
+metadata.doi.dc.identifier.doi
 </para>
 			</listitem>
             <listitem>

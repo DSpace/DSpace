@@ -240,7 +240,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Warning: In large repositories, setting harvest.includerestricted.oai to false may cause
             // performance problems as all items will need to have their authorization permissions checked,
             // but because we haven't implemented resumption tokens in ListIdentifiers, ALL items will
-            // need checking whenever a ListIdentifers request is made.
+            // need checking whenever a ListIdentifiers request is made.
             List itemInfos = Harvest.harvest(context, scope, from, until, 0, 0, // Everything
                                                                                 // for
                                                                                 // now
