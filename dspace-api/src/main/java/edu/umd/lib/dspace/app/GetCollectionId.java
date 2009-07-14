@@ -1,4 +1,4 @@
-package edu.umd.lims.dspace.app;
+package edu.umd.lib.dspace.app;
 
 import java.io.InputStreamReader;
 import java.io.BufferedReader;

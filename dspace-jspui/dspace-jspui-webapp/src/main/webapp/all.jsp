@@ -26,7 +26,7 @@
 <%
   Context context = null;
   try {
-    String strKey = "edu.umd.lims.dspace.cache-all";
+    String strKey = "edu.umd.lib.dspace.cache-all";
     StringBuffer sbComm = null;
     StringBuffer sbColl = null;
     StringBuffer sbItem = null;

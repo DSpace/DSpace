@@ -3,7 +3,7 @@
  * 
  */
 
-package edu.umd.lims.dspace.search;
+package edu.umd.lib.dspace.search;
 
 import java.io.IOException;
 

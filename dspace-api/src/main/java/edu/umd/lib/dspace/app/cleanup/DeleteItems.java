@@ -3,7 +3,7 @@
  * 
  */
 
-package edu.umd.lims.dspace.app.cleanup;
+package edu.umd.lib.dspace.app.cleanup;
 
 import java.util.Arrays;
 import java.util.ArrayList;

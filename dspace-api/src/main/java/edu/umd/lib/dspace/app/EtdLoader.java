@@ -3,7 +3,7 @@
  * 
  */
 
-package edu.umd.lims.dspace.app;
+package edu.umd.lib.dspace.app;
 
 import java.util.Arrays;
 import java.util.ArrayList;

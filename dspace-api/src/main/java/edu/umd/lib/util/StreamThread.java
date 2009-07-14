@@ -3,7 +3,7 @@
  * 
  */
 
-package edu.umd.lims.util;
+package edu.umd.lib.util;
 
 import java.io.InputStream;
 import java.io.OutputStream;

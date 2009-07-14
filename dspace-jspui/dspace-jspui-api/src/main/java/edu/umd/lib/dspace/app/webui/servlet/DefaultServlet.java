@@ -1,4 +1,4 @@
-package edu.umd.lims.dspace.app.webui.servlet;
+package edu.umd.lib.dspace.app.webui.servlet;
 
 import java.io.IOException;
 

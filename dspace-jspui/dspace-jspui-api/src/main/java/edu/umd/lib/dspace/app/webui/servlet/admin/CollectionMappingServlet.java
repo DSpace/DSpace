@@ -2,7 +2,7 @@
  * Copyright (c) 2007 The University of Maryland. All Rights Reserved.
  */
 
-package edu.umd.lims.dspace.app.webui.servlet.admin;
+package edu.umd.lib.dspace.app.webui.servlet.admin;
 
 import java.io.IOException;
 import java.sql.SQLException;

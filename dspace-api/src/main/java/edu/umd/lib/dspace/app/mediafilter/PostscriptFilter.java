@@ -3,7 +3,7 @@
  * 
  */
 
-package edu.umd.lims.dspace.app.mediafilter;
+package edu.umd.lib.dspace.app.mediafilter;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -12,7 +12,7 @@ import java.io.OutputStream;
 
 import org.dspace.app.mediafilter.MediaFilter;
 
-import edu.umd.lims.util.StreamThread;
+import edu.umd.lib.util.StreamThread;
 
 /*
  * 

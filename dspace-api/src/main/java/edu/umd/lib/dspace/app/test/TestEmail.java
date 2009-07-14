@@ -1,4 +1,4 @@
-package edu.umd.lims.dspace.app.test;
+package edu.umd.lib.dspace.app.test;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +15,7 @@ import javax.mail.internet.MimeBodyPart;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Email;
 
-import edu.umd.lims.activation.SimpleDataSource;
+import edu.umd.lib.activation.SimpleDataSource;
 
 public class TestEmail {
 

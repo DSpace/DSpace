@@ -50,7 +50,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardFilter;
 import org.dspace.core.ConfigurationManager;
 
-import edu.umd.lims.dspace.search.StripDiacriticSynonymFilter;
+import edu.umd.lib.dspace.search.StripDiacriticSynonymFilter;
 
 /**
  * Custom Lucene Analyzer that combines the standard filter, lowercase filter,

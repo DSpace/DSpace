@@ -1,4 +1,4 @@
-package edu.umd.lims.activation;
+package edu.umd.lib.activation;
 
 import java.io.IOException;
 import java.io.InputStream;
