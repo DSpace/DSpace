@@ -685,7 +685,7 @@ archive_directory/
     item_000/
         dublin_core.xml -- qualified Dublin Core metadata
         contents        -- text file containing one line per filename
-        file_1.doc      -- files to be added as bitstreams to the
+        file_1.doc      -- files to be added as bitstreams to the item
         file_2.pdf
     item_001/
         dublin_core.xml
@@ -709,8 +709,8 @@ archive_directory/
 &lt;dublin_core&gt;
     &lt;dcvalue element=&quot;title&quot; qualifier=&quot;none&quot;&gt;A Tale of Two Cities&lt;/dcvalue&gt;
     &lt;dcvalue element=&quot;date&quot; qualifier=&quot;issued&quot;&gt;1990&lt;/dcvalue&gt;
-    &lt;dcvalue element=&quot;title&quot; qualifier=&quot;alternate&quot; language=&quot;fr&quot;
-	&quot;&gt;J&apos;aime les Printemps&lt;/dcvalue&gt;
+    &lt;dcvalue element=&quot;title&quot; qualifier=&quot;alternate&quot; language=&quot;fr&quot;&gt;
+                    J&apos;aime les Printemps&lt;/dcvalue&gt;
 &lt;/dublin_core&gt;
 
 </screen>
@@ -722,7 +722,7 @@ archive_directory/
         license
 </screen>
         
-        <para> Please notice that the <emphasis>license</emphasis> is optional, and if you wish to have one included, you can place the file in the .../item_001/ director, for example.</para>           
+        <para> Please notice that the <emphasis>license</emphasis> is optional, and if you wish to have one included, you can place the file in the .../item_001/ directory, for example.</para>           
         <para>The bitstream name may optionally be followed by the sequence:</para>
         <para>
           <literal>\tbundle:bundlename</literal>
