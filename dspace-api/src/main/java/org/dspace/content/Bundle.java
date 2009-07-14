@@ -493,18 +493,19 @@ public class Bundle extends DSpaceObject
             {
                 // We've found the bitstream to remove
                 li.remove();
-                
-                // In the event that the bitstream to remove is actually
-                // the primary bitstream, be sure to unset the primary
-                // bitstream.
-                if (b.getID() == getPrimaryBitstreamID()) {
-                	unsetPrimaryBitstreamID();
-                }
             }
         }
 
         ourContext.addEvent(new Event(Event.REMOVE, Constants.BUNDLE, getID(), Constants.BITSTREAM, b.getID(), String.valueOf(b.getSequenceID())));
-
+        
+        // In the event that the bitstream to remove is actually
+        // the primary bitstream, be sure to unset the primary
+        // bitstream.
+        if (b.getID() == getPrimaryBitstreamID()) 
+        {
+            unsetPrimaryBitstreamID();
+        }
+        
         // Delete the mapping row
         DatabaseManager.updateQuery(ourContext,
                 "DELETE FROM bundle2bitstream WHERE bundle_id= ? "+

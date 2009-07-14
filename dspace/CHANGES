@@ -10,6 +10,7 @@
 
 (Claudia Juergen)
  - [DS-188] Misspell exclude.type=indentifier in dstat.cfg
+ - [DS-197] Deleting a primary bitstream does not clear the primary_bitstream_id on the bundle table
  - [DS-231] Missig file (just some obsolete use of index-all in the current documentation, corrected the docs)
  - [DS-248] Missing admin column in community table in database-schema.sql and update - community admin patch
  
