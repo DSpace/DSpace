@@ -683,9 +683,10 @@ wget -O - http://alum.mit.edu/jarandom/my-thesis.pdf | \
         <screen>
 archive_directory/
     item_000/
-        dublin_core.xml -- qualified Dublin Core metadata
-        contents        -- text file containing one line per filename
-        file_1.doc      -- files to be added as bitstreams to the item
+        dublin_core.xml         -- qualified Dublin Core metadata for metadata fields belonging to the dc schema
+        metadata_[prefix].xml   -- metadata in another schema, the prefix is the name of the schema as registered with the metadata registry 
+        contents                -- text file containing one line per filename
+        file_1.doc              -- files to be added as bitstreams to the item
         file_2.pdf
     item_001/
         dublin_core.xml
@@ -693,7 +694,7 @@ archive_directory/
         file_1.png
         ...
 </screen>
-        <para>The <literal>dublin_core.xml</literal> file has the following format, where each Dublin Core element has it&apos;s own entry within a <literal>&lt;dcvalue&gt;</literal> tagset. There are currently three tag attributes available in the <literal>&lt;dcvalue&gt;</literal> tagset:</para>
+        <para>The <literal>dublin_core.xml</literal> or <literal>metadata_[prefix].xml</literal>file has the following format, where each metadata element has it&apos;s own entry within a <literal>&lt;dcvalue&gt;</literal> tagset. There are currently three tag attributes available in the <literal>&lt;dcvalue&gt;</literal> tagset:</para>
         <itemizedlist>
           <listitem>
             <para><literal>&lt;element&gt;</literal>  - the Dublin Core element</para>
@@ -715,6 +716,7 @@ archive_directory/
 
 </screen>
         <para>(Note the optional language tag attribute which notifies the system that the optional title is in French.)</para>
+        <para>Every metadata field used, must be registered via the metadata registry of the DSpace instance first.</para>
         <para>The <literal>contents</literal> file simply enumerates, one file per line, the bitstream file names. See the following example:</para>
         <screen>
         file_1.doc
