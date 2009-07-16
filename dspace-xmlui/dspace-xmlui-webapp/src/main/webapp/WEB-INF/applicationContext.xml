@@ -17,8 +17,8 @@
     <!-- Activate Avalon Bridge -->
     <avalon:bridge />
 
-    <bean id="dspace.org.myApplication" class="org.apache.cocoon.sitemap.SitemapServlet">
-        <servlet:context mount-path="" context-path="/" />
+    <bean id="dspace.org.myApplication" class="org.apache.cocoon.servlet.SitemapServlet">
+        <servlet:context mount-path="" context-path="" />
     </bean>
 
 </beans>
