@@ -37,12 +37,10 @@
  */
 package org.dspace.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.dspace.core.PluginManager;
-import org.dspace.kernel.ServiceManager;
+import org.dspace.servicemanager.config.DSpaceConfigurationService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.EventService;
+import org.dspace.services.events.SystemEventService;
 
 /**
  * This is the DSpace helper services access object, it allows access to all
@@ -59,97 +57,21 @@ import org.dspace.kernel.ServiceManager;
  */
 public class DSpace
 {
+	
+	private static EventService eventService = new SystemEventService();
+	
+	private static ConfigurationService configService = new DSpaceConfigurationService();
 
-    private static ServiceManager manager = new ServiceManager()
-    {
-
-        @SuppressWarnings("unchecked")
-        public <T> T getServiceByName(String name, Class<T> type)
-        {
-            return (T) PluginManager.getNamedPlugin(type, name);
-        }
-
-        @SuppressWarnings("unchecked")
-        public <T> List<T> getServicesByType(Class<T> type)
-        {
-            List<T> services = new ArrayList<T>();
-            for (Object o : PluginManager.getPluginSequence(type))
-            {
-                services.add((T) o);
-            }
-            return services;
-        }
-
-        public List<String> getServicesNames()
-        {
-            // TODO Need an implementation in PluginManager
-            throw new java.lang.RuntimeException("Method not implemented");
-        }
-
-        public boolean isServiceExists(String name)
-        {
-            // TODO Need an implementation in PluginManager
-            throw new java.lang.RuntimeException("Method not implemented");
-        }
-
-        public void pushConfig(Map<String, String> settings)
-        {
-            // TODO Need an implementation in PluginManager
-            throw new java.lang.RuntimeException("Method not implemented");
-        }
-
-        public void registerService(String name, Object service)
-        {
-            // TODO Need an implementation in PluginManager
-            throw new java.lang.RuntimeException("Method not implemented");
-        }
-
-        public <T> T registerServiceClass(String name, Class<T> type)
-        {
-            // TODO Need an implementation in PluginManager
-            throw new java.lang.RuntimeException("Method not implemented");
-        }
-
-        public void unregisterService(String name)
-        {
-            // TODO Need an implementation in PluginManager
-            throw new java.lang.RuntimeException("Method not implemented");
-        }
-
-    };
-
-    /**
-     * Construct a DSpace helper object which uses the default kernel
-     * 
-     * @throws IllegalStateException
-     *             if the kernel is not already running
-     */
     public DSpace()
     {
 
     }
 
-    /**
-     * 
-     * @return the Service Manager
-     */
-    public ServiceManager getServiceManager()
-    {
-        if (manager == null)
-        {
-            throw new IllegalStateException("DSpace kernel cannot be null");
-        }
-        return manager;
+    public ConfigurationService getConfigurationService() {
+        return configService;
     }
 
-    /**
-     * @param <T>
-     * @param type
-     * @return a Singleton Instance of the Service
-     */
-    public <T> T getSingletonService(Class<T> type)
-    {
-        return getServiceManager().getServiceByName(type.getName(), type);
+    public EventService getEventService() {
+        return eventService;
     }
-
 }
