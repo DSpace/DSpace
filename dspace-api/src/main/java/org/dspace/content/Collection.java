@@ -725,8 +725,20 @@ public class Collection extends DSpaceObject
      */
     public void removeAdministrators() throws SQLException, AuthorizeException
     {
-        // Check authorisation - Must be an Admin to delete Admin Group
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADMIN);
+        // Check authorisation - Must be an Admin of the parent community to delete Admin Group
+        Community[] parentCommunities = getCommunities();
+        if (parentCommunities != null && parentCommunities.length > 0)
+        {
+            AuthorizeManager.authorizeAction(ourContext, this.getCommunities()[0], Constants.ADMIN);
+        }
+        else if (!AuthorizeManager.isAdmin(ourContext))
+        {
+            // this should never happen, a collection should always have at least one parent community!
+            // anyway...
+            throw new AuthorizeException(
+                    "Only system admin can remove the admin group of a collection outside any community",
+                    this, Constants.ADMIN); 
+        }
 
         // just return if there is no administrative group.
         if (admins == null)

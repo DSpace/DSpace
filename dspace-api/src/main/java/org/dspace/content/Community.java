@@ -555,8 +555,18 @@ public class Community extends DSpaceObject
      */
     public void removeAdministrators() throws SQLException, AuthorizeException
     {
-        // Check authorisation - Must be an Admin to delete Admin group
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADMIN);
+        // Check authorisation - Must be an Admin of the parent community (or system admin) to delete Admin group
+        Community parentCommunity = getParentCommunity();
+        if (parentCommunity != null)
+        {
+            AuthorizeManager.authorizeAction(ourContext, parentCommunity, Constants.ADMIN);
+        }
+        else if (!AuthorizeManager.isAdmin(ourContext))
+        {
+            throw new AuthorizeException(
+                    "Only system admin can remove the admin group of a top community",
+                    this, Constants.ADMIN); 
+        }
 
         // just return if there is no administrative group.
         if (admins == null)
