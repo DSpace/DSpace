@@ -36,9 +36,6 @@
                 <para><literal>dspace/</literal>  - Directory which contains all build and configuration information for DSpace </para>
                 <itemizedlist>
                   <listitem>
-                    <para><literal>build.xml</literal>  - The Build file for Ant -- used to preform a fresh_install, upgrade, or deploy new changes.</para>
-                  </listitem>
-                  <listitem>
                     <para><literal>CHANGES</literal>  - Detailed list of code changes between versions.</para>
                   </listitem>
                   <listitem>
@@ -87,15 +84,9 @@
                         <para><literal>emails/</literal>  - Text and layout templates for emails sent out by the system.</para>
                       </listitem>
                       <listitem>
-                        <para><literal>language-packs/</literal>  - Contains &quot;dictionary files&quot; -- Java properties files that contain user interface text in different languages</para>
-                      </listitem>
-                      <listitem>
                         <para><literal>registries/</literal>  - <emphasis role="bold">Initial</emphasis> contents of the bitstream format registry and Dublin Core element/qualifier registry. These are only used on initial system setup, after which they are maintained in the database.</para>
                       </listitem>
-                      <listitem>
-                        <para><literal>templates/</literal>  - Configuration files for libraries and external applications (e.g. Apache, Tomcat) are kept and edited here. They can refer to properties in the main DSpace configuration - have a look at a couple. When they&apos;re updated, a command line tool fills out these files with appropriate values from dspace.cfg, and copies them to their appropriate location (hence &quot;templates&quot;.)</para>
-                      </listitem>
-                    </itemizedlist>
+                     </itemizedlist>
                   </listitem>
                   <listitem>
                     <para><literal>docs/</literal>  - DSpace system documentation. The technical documentation for functionality, installation, configuration, etc.</para>
@@ -115,7 +106,7 @@
                         <para><literal>jspui</literal>  - Contains all customizations for the JSP User Interface. </para>
                         <itemizedlist>
                           <listitem>
-                            <para><literal>src/main/resources/</literal>  - The overlay for JSPUI Resources. This is the location to place any custom Messages.properties files.</para>
+                            <para><literal>src/main/resources/</literal>  - The overlay for JSPUI <emphasis>Resources.</emphasis> This is the location to place any custom Messages.properties files.  <emphasis>(Previously this file had been stored at: <literal>[dspace-source]/config/language-packs/Messages.properties</literal></emphasis></para>
                           </listitem>
                           <listitem>
                             <para><literal>src/main/webapp/</literal>  - The overlay for JSPUI Web Application. This is the location to place any custom JSPs to be used by DSpace.</para>
@@ -138,10 +129,10 @@
                             <para><literal>src/main/webapp/</literal>  - The overlay for XMLUI Web Application. This is the location to place custom Themes or Configurations. </para>
                             <itemizedlist>
                               <listitem>
-                                <para><literal>i18n/</literal>  - The location to place a custom version of the XMLUI&apos;s messages.xml</para>
+                                <para revisionflag="changed"><literal>i18n/</literal>  - The location to place a custom version of the XMLUI&apos;s messages.xml (You have to manually create this folder)</para>
                               </listitem>
                               <listitem>
-                                <para><literal>themes/</literal>  - The location to place custom Themes for the XMLUI</para>
+                                <para><literal>themes/</literal>  - The location to place custom Themes for the XMLUI (You have to manually create this folder).</para>
                               </listitem>
                             </itemizedlist>
                           </listitem>
