@@ -510,6 +510,11 @@
             <version>6.0.20</version>
             <scope>provided</scope>
          </dependency>
+         <dependency>
+            <groupId>cas</groupId>
+            <artifactId>casclient</artifactId>
+            <version>2.1.1</version>
+         </dependency>
       </dependencies>
    </dependencyManagement>
 

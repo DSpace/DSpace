@@ -183,6 +183,10 @@
          <groupId>org.marc4j</groupId>
          <artifactId>marc4j</artifactId>
       </dependency>
+      <dependency>
+         <groupId>cas</groupId>
+         <artifactId>casclient</artifactId>
+      </dependency>
    </dependencies>
 
 </project>
