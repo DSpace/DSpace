@@ -182,7 +182,7 @@
             <td>
                 <xsl:choose>
                     <xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/
-                        mets:file[@GROUP_ID=current()/@GROUP_ID]">
+                        mets:file[@GROUPID=current()/@GROUPID]">
                         <a class="image-link">
                             <xsl:attribute name="href">
                                 <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
@@ -190,7 +190,7 @@
                             <img alt="Thumbnail">
                                 <xsl:attribute name="src">
                                     <xsl:value-of select="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/
-                                        mets:file[@GROUP_ID=current()/@GROUP_ID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                                        mets:file[@GROUPID=current()/@GROUPID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
                                 </xsl:attribute>
                             </img>
                         </a>
