@@ -1,0 +1,69 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dspace</groupId>
+    <artifactId>dspace-services-utils</artifactId>
+    <name>DSpace Utilities</name>
+    <description>The core utilities for DSpace</description>
+    <url>http://projects.dspace.org</url>
+    <inceptionYear>2008</inceptionYear>
+    <parent>
+        <artifactId>dspace-services</artifactId>
+        <groupId>org.dspace</groupId>
+        <version>2.0.0-SNAPSHOT</version><!--dspace2.version-->
+    </parent>
+    <organization>
+        <name>The DSpace Foundation</name>
+        <url>http://www.dspace.org</url>
+    </organization>
+    <packaging>jar</packaging>
+
+    <!--
+        The Subversion repository location is used by Continuum to
+        update against when changes have occured, this spawns a new
+        build cycle and releases snapshots into the snapshot repository
+        below.
+    -->
+    <scm>
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-services/trunk/utils</connection>
+        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-services/trunk/utils</developerConnection>
+        <url>http://scm.dspace.org/svn/repo/modules/dspace-services/trunk/utils</url>
+    </scm>
+
+    <repositories>
+        <repository>
+            <id>dspace-snapshot</id>
+            <name>DSpace Snapshot Repository</name>
+            <url>http://maven.dspace.org/snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+                <checksumPolicy>fail</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.4</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

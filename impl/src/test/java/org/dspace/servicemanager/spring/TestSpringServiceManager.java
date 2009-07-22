@@ -1,0 +1,224 @@
+/**
+ * $Id: TestSpringServiceManager.java 3498 2009-02-25 19:08:10Z azeckoski $
+ * $URL: https://scm.dspace.org/svn/repo/dspace2/core/trunk/impl/src/test/java/org/dspace/servicemanager/spring/TestSpringServiceManager.java $
+ * TestSpringServiceManager.java - DSpace2 - Oct 5, 2008 11:17:11 PM - azeckoski
+ **************************************************************************
+ * Copyright (c) 2008 Aaron Zeckoski
+ * Licensed under the Apache License, Version 2.0
+ * 
+ * A copy of the Apache License has been included in this 
+ * distribution and is available at: http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ * Aaron Zeckoski (azeckoski @ gmail.com) (aaronz @ vt.edu) (aaron @ caret.cam.ac.uk)
+ */
+
+package org.dspace.servicemanager.spring;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.List;
+
+import org.dspace.servicemanager.MockServiceManagerSystem;
+import org.dspace.servicemanager.SampleAnnotationBean;
+import org.dspace.servicemanager.ServiceConfig;
+import org.dspace.servicemanager.config.DSpaceConfigurationService;
+import org.dspace.servicemanager.example.ConcreteExample;
+import org.dspace.services.ConfigurationService;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+
+/**
+ * Testing the spring based service manager
+ * 
+ * @author Aaron Zeckoski (azeckoski @ gmail.com)
+ */
+public class TestSpringServiceManager {
+
+    public static String SPRING_TEST_CONFIG_FILE = "spring/spring-test-services.xml";
+
+    SpringServiceManager ssm;
+    DSpaceConfigurationService configurationService;
+
+    @Before
+    public void init() {
+        configurationService = new DSpaceConfigurationService();
+        configurationService.loadConfig("testName@" + SampleAnnotationBean.class.getName(), "beckyz");
+        configurationService.loadConfig("fakeParam@fakeBean", "beckyz");
+
+        ssm = new SpringServiceManager(new MockServiceManagerSystem(ssm), configurationService, true, true, SPRING_TEST_CONFIG_FILE);
+    }
+
+    @After
+    public void shutdown() {
+        if (ssm != null) {
+            ssm.shutdown();
+        }
+        ssm = null;
+    }
+
+    /**
+     * Test method for {@link org.dspace.servicemanager.spring.SpringServiceManager#startup(java.util.List, ConfigurationService)}.
+     */
+    @Test
+    public void testStartup() {
+        // testing we can start this up with null config
+        configurationService.clear();
+        ssm.startup();
+    }
+
+    @Test
+    public void testStartupWithConfig() {
+        // testing we can start this up a real config
+        ssm.startup();
+    }
+
+    /**
+     * Test method for {@link org.dspace.servicemanager.spring.SpringServiceManager#shutdown()}.
+     */
+    @Test
+    public void testShutdown() {
+        ssm.startup();
+        ssm.shutdown();
+    }
+
+    /**
+     * Test method for {@link org.dspace.servicemanager.spring.SpringServiceManager#getServiceByName(java.lang.String, java.lang.Class)}.
+     */
+    @Test
+    public void testGetServiceByName() {
+        configurationService.clear(); // no config
+        ssm.startup();
+
+        ConcreteExample concrete = ssm.getServiceByName(ConcreteExample.class.getName(), ConcreteExample.class);
+        assertNotNull(concrete);
+        assertEquals("azeckoski", concrete.getName());
+
+        SampleAnnotationBean sab = ssm.getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
+        assertNotNull(sab);
+        assertEquals(null, sab.getSampleValue());
+    }
+
+    @Test
+    public void testGetServiceByNameConfig() {
+        ssm.startup();
+
+        ConcreteExample concrete = ssm.getServiceByName(ConcreteExample.class.getName(), ConcreteExample.class);
+        assertNotNull(concrete);
+        assertEquals("azeckoski", concrete.getName());
+
+        SampleAnnotationBean sab = ssm.getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
+        assertNotNull(sab);
+        assertEquals("beckyz", sab.getSampleValue());
+
+        SpringAnnotationBean spr = ssm.getServiceByName(SpringAnnotationBean.class.getName(), SpringAnnotationBean.class);
+        assertNotNull(spr);
+        assertEquals("azeckoski", spr.getConcreteName());
+        assertEquals("aaronz", spr.getExampleName());
+        assertEquals(null, spr.getSampleValue());
+    }
+
+    /**
+     * Test method for {@link org.dspace.servicemanager.spring.SpringServiceManager#getServicesByType(java.lang.Class)}.
+     */
+    @Test
+    public void testGetServicesByType() {
+        ssm.startup();
+
+        List<ConcreteExample> l = ssm.getServicesByType(ConcreteExample.class);
+        assertNotNull(l);
+        assertEquals(1, l.size());
+        assertEquals("azeckoski", l.get(0).getName());
+
+        List<SampleAnnotationBean> l2 = ssm.getServicesByType(SampleAnnotationBean.class);
+        assertNotNull(l2);
+        assertEquals(1, l2.size());
+
+        List<ServiceConfig> l3 = ssm.getServicesByType(ServiceConfig.class);
+        assertNotNull(l3);
+        assertEquals(0, l3.size());
+    }
+
+    /**
+     * Test method for {@link org.dspace.servicemanager.spring.SpringServiceManager#registerServiceClass(java.lang.String, java.lang.Class)}.
+     */
+    @Test
+    public void testRegisterServiceClass() {
+        ssm.startup();
+
+        SampleAnnotationBean sab = ssm.registerServiceClass("newAnnote", SampleAnnotationBean.class);
+        assertNotNull(sab);
+
+        List<SampleAnnotationBean> l = ssm.getServicesByType(SampleAnnotationBean.class);
+        assertNotNull(l);
+        assertEquals(2, l.size());
+
+        try {
+            ssm.registerService("fakey", (Class<?>)null);
+            fail("should have thrown exception");
+        } catch (IllegalArgumentException e) {
+            assertNotNull(e.getMessage());
+        }
+    }
+
+    /**
+     * Test method for {@link org.dspace.servicemanager.spring.SpringServiceManager#registerService(java.lang.String, java.lang.Object)}.
+     */
+    @Test
+    public void testRegisterService() {
+        ssm.startup();
+
+        String name = "myNewService";
+        ssm.registerService(name, "AZ");
+        String service = ssm.getServiceByName(name, String.class);
+        assertNotNull(service);
+        assertEquals("AZ", service);
+
+        try {
+            ssm.registerService("fakey", (Object)null);
+            fail("should have thrown exception");
+        } catch (IllegalArgumentException e) {
+            assertNotNull(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testUnregisterService() {
+        ssm.startup();
+
+        String name = "myNewService";
+        ssm.registerService(name, "AZ");
+        String service = ssm.getServiceByName(name, String.class);
+        assertNotNull(service);
+        assertEquals("AZ", service);
+
+        ssm.unregisterService(name);
+    }
+
+    @Test
+    public void testGetServicesNames() {
+        ssm.startup();
+
+        List<String> names = ssm.getServicesNames();
+        assertNotNull(names);
+        assertTrue(names.size() >= 3);
+    }
+
+    @Test
+    public void testIsServiceExists() {
+        ssm.startup();
+
+        String name = ConcreteExample.class.getName();
+        boolean exists = ssm.isServiceExists(name);
+        assertTrue(exists);
+
+        exists = ssm.isServiceExists("XXXXXXXXXXXXXXX");
+        assertFalse(exists);
+    }
+
+}
