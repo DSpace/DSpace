@@ -15,6 +15,7 @@
 package org.dspace.kernel;
 
 import java.lang.management.ManagementFactory;
+import java.util.UUID;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -36,6 +37,7 @@ public class DSpaceKernelManager {
      */
     private DSpaceKernel kernel;
 
+    
     /**
      * A lock on the kernel to handle multiple threads getting the first item.
      */
@@ -88,13 +90,18 @@ public class DSpaceKernelManager {
     }
 
     /**
+     * Static initialized random default Kernel name
+     */
+    private static String defaultKernelName = UUID.randomUUID().toString();
+    
+    /**
      * @param name the name for the kernel
      * @return a proper mbean name based on the given name
      */
     public static String checkName(String name) {
         String mbeanName = name;
         if (name == null || "".equals(name)) {
-            mbeanName = DSpaceKernel.MBEAN_NAME;
+            mbeanName = DSpaceKernel.MBEAN_PREFIX + defaultKernelName + DSpaceKernel.MBEAN_SUFFIX;
         } else {
             if (! name.startsWith(DSpaceKernel.MBEAN_PREFIX)) {
                 mbeanName = DSpaceKernel.MBEAN_PREFIX + name + DSpaceKernel.MBEAN_SUFFIX;
