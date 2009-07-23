@@ -79,7 +79,20 @@ public class ContextUtil
      */
     public static Context obtainContext(Map objectModel) throws SQLException
     {
-        Request request = ObjectModelHelper.getRequest(objectModel);
+        return obtainContext(ObjectModelHelper.getRequest(objectModel));
+    }
+    
+    /**
+     * Obtain a new context object. If a context object has already been created
+     * for this HTTP request, it is re-used, otherwise it is created.
+     * 
+     * @param request
+     *            the cocoon or servlet request object
+     * 
+     * @return a context object
+     */
+    public static Context obtainContext(HttpServletRequest request) throws SQLException
+    {
         Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
 
         if (context == null)
@@ -91,13 +104,10 @@ public class ContextUtil
             context.setExtraLogInfo("session_id="
                     + request.getSession().getId());
 
-            // Check if we've all ready been authenticated.
-            final HttpServletRequest httpRequest = (HttpServletRequest) objectModel
-                    .get(HttpEnvironment.HTTP_REQUEST_OBJECT);
-            AuthenticationUtil.resumeLogin(context, httpRequest);
+            AuthenticationUtil.resumeLogin(context, request);
 
             // Set any special groups - invoke the authentication mgr.
-            int[] groupIDs = AuthenticationManager.getSpecialGroups(context, httpRequest);
+            int[] groupIDs = AuthenticationManager.getSpecialGroups(context, request);
 
             for (int i = 0; i < groupIDs.length; i++)
             {
@@ -115,6 +125,7 @@ public class ContextUtil
         return context;
     }
 
+    
     /**
      * Check if a context exists for this request, if so complete the context.
      * 
