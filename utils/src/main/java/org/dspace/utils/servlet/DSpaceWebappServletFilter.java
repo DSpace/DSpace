@@ -83,7 +83,7 @@ public class DSpaceWebappServletFilter implements Filter {
             res = (HttpServletResponse) response;
         }
         // now do some DSpace stuff
-        try {
+        //try {
             DSpaceKernel kernel = getKernel();
             // place the incoming request into the request cache
             CachingService cachingService = kernel.getServiceManager().getServiceByName(CachingService.class.getName(), CachingService.class);
@@ -120,8 +120,9 @@ public class DSpaceWebappServletFilter implements Filter {
             } catch (Exception e) {
                 // failure occurred in the request so we destroy it
                 requestService.endRequest(e);
-                throw e; // rethrow the exception
+                throw new ServletException(e); // rethrow the exception
             }
+            /*
         } catch (Exception e) {
             String message = "Failure in the DSpaceWebappServletFilter: " + e.getMessage();
             System.err.println(message);
@@ -129,8 +130,8 @@ public class DSpaceWebappServletFilter implements Filter {
                 res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
             } else {
                 throw new ServletException(message, e);
-            }
-        }
+            }*/
+        //}
     }
 
     /**
