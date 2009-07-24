@@ -54,46 +54,15 @@
 
     <table border="0" width="90%">
         <tr>
+            <td align="left">
+		<%-- <h1>Log In to DSpace</h1> --%>
+                <h1><fmt:message key="jsp.login.password.heading"/></h1>
+            </td>
             <td align="right" class="standard">
                 <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#login\"%>"><fmt:message key="jsp.help"/></dspace:popup>
             </td>
         </tr>
     </table>
 
-    <table class="miscTable" align=center width="70%">
-        <tr>
-            <td>
-                <h1><fmt:message key="jsp.login.password.heading"/></h1>
-            </td>
-        </tr>
-        <tr>
-        <td class="evenRowEvenCol">
-
-            <form 
-               method="POST" 
-               action="<%= request.getContextPath() %>/password-login" 
-               id="umLogin"
-            >
-              <input type="hidden" name="login_submit" value="Log In">
-            </form>
-
-    
-            <p>Choose login for:</p>
-
-            <ul>
-              <li><a href="#" onclick="document.getElementById('umLogin').submit(); return false">UM campus community</a> <span class="explain">(you will need your UM Directory ID and Password)</span><br>
-                <br>
-</li>
-              <li>
-                <a href="#" onclick="toggleOtherLoginDisplay(); return false">Others</a>
-
-                <div id="otherLogin" style="display:none">
     <dspace:include page="/components/login-form.jsp" />
-                </div>
-              </li>
-            </ul>            
-          </td>
-        </tr>
-
-    </table>
 </dspace:layout>
