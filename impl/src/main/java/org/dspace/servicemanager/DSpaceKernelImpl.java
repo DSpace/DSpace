@@ -124,6 +124,10 @@ public class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, CommonLifec
      * @see org.dspace.kernel.CommonLifecycle#start()
      */
     public void start() {
+		start(null);
+	}
+    
+    public void start(String dspaceHome) {
         // this starts up the entire core system
         if (running) {
             //log.warn("Kernel ("+this+") is already started");
@@ -135,7 +139,7 @@ public class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, CommonLifec
             long startTime = System.currentTimeMillis();
 
             // create the configuration service and get the configuration
-            DSpaceConfigurationService dsConfigService = new DSpaceConfigurationService();
+            DSpaceConfigurationService dsConfigService = new DSpaceConfigurationService(dspaceHome);
             configurationService = dsConfigService;
 
             // startup the service manager

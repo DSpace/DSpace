@@ -38,11 +38,16 @@
 
 package org.dspace.servicemanager.servlet;
 
+import java.io.File;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
+import org.dspace.servicemanager.config.DSpaceConfigurationService;
 
 
 /**
@@ -67,6 +72,32 @@ public class DSpaceKernelServletContextListener implements ServletContextListene
 
     private transient DSpaceKernelImpl kernelImpl;
 
+    /*
+     * Initially look for JNDI Resource called java:/comp/env/dspace.dir
+     * otherwise, look for "dspace.dir" initial context param 
+     */
+    private String getProvidedHome(ServletContextEvent arg0){
+    	String providedHome = null;
+    	try {
+			Context ctx = new InitialContext();
+			providedHome = (String) ctx.lookup("java:/comp/env/" + DSpaceConfigurationService.DSPACE_HOME);
+		} catch (Exception e) {
+			// do nothing
+		}
+		
+		if (providedHome == null)
+		{
+			String dspaceHome = arg0.getServletContext().getInitParameter(DSpaceConfigurationService.DSPACE_HOME);
+			if(dspaceHome != null && !dspaceHome.equals("") && 
+					!dspaceHome.equals("${" + DSpaceConfigurationService.DSPACE_HOME + "}")){
+				File test = new File(dspaceHome);
+				if(test.exists() && new File(test,DSpaceConfigurationService.DSPACE_CONFIG_PATH).exists())
+					providedHome = dspaceHome;
+			}
+		}
+		return providedHome;
+    }
+    
     /* (non-Javadoc)
      * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
      */
@@ -76,7 +107,7 @@ public class DSpaceKernelServletContextListener implements ServletContextListene
         try {
             this.kernelImpl = DSpaceKernelInit.getKernel(null);
             if (! this.kernelImpl.isRunning()) {
-                this.kernelImpl.start(); // init the kernel
+            	this.kernelImpl.start(getProvidedHome(arg0)); // init the kernel
             }
         } catch (Exception e) {
             // failed to start so destroy it and log and throw an exception

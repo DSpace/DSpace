@@ -48,20 +48,25 @@ public class DSpaceConfigurationService implements ConfigurationService {
     private static final Logger log = LoggerFactory.getLogger(DSpaceConfigurationService.class);
 
     public static final String DSPACE = "dspace";
-    public static final String DOT_PROPERTIES = ".properties";
+    public static final String DOT_PROPERTIES = ".cfg";
     public static final String DSPACE_PREFIX = "dspace.";
-    public static final String DSPACE_HOME = DSPACE + ".home";
+    public static final String DSPACE_HOME = DSPACE + ".dir";
     public static final String DEFAULT_CONFIGURATION_FILE_NAME = "dspace-defaults.properties";
     public static final String DEFAULT_DSPACE_CONFIG_PATH = "config/" + DEFAULT_CONFIGURATION_FILE_NAME;
-
+    public static final String DSPACE_CONFIG_PATH = "config/" + DSPACE + DOT_PROPERTIES;
+    
     protected transient Map<String, Map<String, ServiceConfig>> serviceNameConfigs;
     
     public DSpaceConfigurationService() {
         // init and load up current config settings
-        loadInitialConfig();
+        loadInitialConfig(null);
     }
 
-    /* (non-Javadoc)
+    public DSpaceConfigurationService(String providedHome) {
+		loadInitialConfig(providedHome);
+	}
+
+	/* (non-Javadoc)
      * @see org.dspace.services.ConfigurationService#getAllProperties()
      */
     public Map<String, String> getAllProperties() {
@@ -298,7 +303,7 @@ public class DSpaceConfigurationService implements ConfigurationService {
      * Loads up the default initial configuration from the dspace config files in the file home
      * and on the classpath
      */
-    public void loadInitialConfig() {
+    public void loadInitialConfig(String providedHome) {
         Map<String, String> configMap = new ArrayOrderedMap<String, String>();
         // load default settings
         try {
@@ -312,6 +317,12 @@ public class DSpaceConfigurationService implements ConfigurationService {
 
         // now we load the settings from properties files
         String homePath = System.getProperty(DSPACE_HOME);
+        
+		// now we load from the provided parameter if its not null
+        if (providedHome != null && homePath == null) {
+			homePath = providedHome;
+		}
+        
         if (homePath == null) {
             String catalina = getCatalina();
             if (catalina != null) {
@@ -326,7 +337,7 @@ public class DSpaceConfigurationService implements ConfigurationService {
         }
 
         // make sure it's set properly
-        System.setProperty(DSPACE_HOME, homePath);
+        //System.setProperty(DSPACE_HOME, homePath);
         configMap.put(DSPACE_HOME, homePath);
 
         // LOAD the internal defaults
@@ -359,10 +370,10 @@ public class DSpaceConfigurationService implements ConfigurationService {
         // Collect values from all the properties files: the later ones loaded override settings from prior.
 
         // read all the known files from the home path that are properties files
-        pushPropsToMap(configMap, readPropertyFile(homePath + DSPACE + DOT_PROPERTIES));
+        pushPropsToMap(configMap, readPropertyFile(homePath + File.separatorChar + DSPACE_CONFIG_PATH));
         pushPropsToMap(configMap, readPropertyFile(homePath + "local" + DOT_PROPERTIES));
 
-        // attempt to load from the current classloader also
+        // attempt to load from the current classloader also (works for commandline config sitting on classpath
         pushPropsToMap(configMap, readPropertyResource(DSPACE + DOT_PROPERTIES));
         pushPropsToMap(configMap, readPropertyResource("local" + DOT_PROPERTIES));
         pushPropsToMap(configMap, readPropertyResource("webapp" + DOT_PROPERTIES));
@@ -464,6 +475,11 @@ public class DSpaceConfigurationService implements ConfigurationService {
                 is = new FileInputStream(f);
                 props.load(is);
                 log.info("Loaded "+props.size()+" config properties from file: " + f);
+            }
+            else
+            {
+            	log.info("Failed to load config properties from file ("+filePathName+"): Does not exist");
+                	
             }
         } catch (Exception e) {
             log.warn("Failed to load config properties from file ("+filePathName+"): " + e.getMessage(), e);
