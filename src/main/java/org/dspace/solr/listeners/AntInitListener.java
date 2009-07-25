@@ -53,6 +53,9 @@ public class AntInitListener implements ServletContextListener
             	solrHome = new File("./solr").getAbsolutePath();//System.getProperty("user.dir");
             }
             
+
+        	log.info("installing solr into:" + solrHome);
+        	
             File home = new File(solrHome);
             
             home.mkdirs();
