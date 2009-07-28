@@ -9,6 +9,7 @@
  - [DS-240] Item validityKey not complete
 
 (Claudia Juergen)
+ - [DS-114] Links not working due to trailing white space in dspace.url
  - [DS-188] Misspell exclude.type=indentifier in dstat.cfg
  - [DS-197] Deleting a primary bitstream does not clear the primary_bitstream_id on the bundle table
  - [DS-231] Missig file (just some obsolete use of index-all in the current documentation, corrected the docs)

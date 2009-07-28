@@ -132,8 +132,13 @@ public class ConfigurationManager
         {
             loadConfig(null);
         }
-
-        return properties.getProperty(property);
+        String propertyValue = properties.getProperty(property);
+        
+        if (propertyValue != null)
+        {
+            propertyValue = propertyValue.trim();
+        }
+        return propertyValue;
     }
 
     /**
