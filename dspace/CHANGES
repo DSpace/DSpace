@@ -16,6 +16,7 @@
  - [DS-231] Missig file (just some obsolete use of index-all in the current documentation, corrected the docs)
  - [DS-248] Missing admin column in community table in database-schema.sql and update - community admin patch
  - Item Importer - documented the use of non-dc metadata during item import
+ - [DS-269] Oracle JDBC connection string wrong in dspace.cfg - ID: 2722093
  
 (Ricardo Saraiva)
  - [DS-190] Portuguese (pt_PT) translation Messages.properties JSP-UI v1.5.2
