@@ -108,7 +108,7 @@
                 <td valign="bottom" width="160">
                     <a href="http://www.lib.umd.edu/"><img src="<%= request.getContextPath() %>/image/logo-top.gif" alt="<fmt:message key="jsp.layout.header-default.alt"/>" width="84" height="49" border="0"/></a></td>
                     <td class="tagLine">
-                    <a class="tagLineText" target="_blank" href="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/drum2.gif" alt="<fmt:message key="jsp.title"/>" width="120" height="49" border="0"></a>
+                    <a class="tagLineText" href="<%= request.getContextPath() %>/"><img src="<%= request.getContextPath() %>/image/drum2.gif" alt="<fmt:message key="jsp.title"/>" width="120" height="49" border="0"></a>
                 </td>
                 <td nowrap="nowrap" valign="middle">
                     &nbsp;
