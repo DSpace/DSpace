@@ -12,6 +12,7 @@
  - [DS-114] Links not working due to trailing white space in dspace.url
  - [DS-188] Misspell exclude.type=indentifier in dstat.cfg
  - [DS-197] Deleting a primary bitstream does not clear the primary_bitstream_id on the bundle table
+ - [DS-222] Email alerts due to internal errors are not sent, if context is missing
  - [DS-231] Missig file (just some obsolete use of index-all in the current documentation, corrected the docs)
  - [DS-248] Missing admin column in community table in database-schema.sql and update - community admin patch
  - Item Importer - documented the use of non-dc metadata during item import

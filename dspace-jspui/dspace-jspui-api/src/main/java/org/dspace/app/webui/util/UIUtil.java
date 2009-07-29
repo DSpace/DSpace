@@ -444,6 +444,8 @@ public class UIUtil extends Util
     {
         String logInfo = UIUtil.getRequestLogInfo(request);
         Context c = (Context) request.getAttribute("dspace.context");
+        Locale locale = getSessionLocale(request);
+        EPerson user = null;
 
         try
         {
@@ -452,8 +454,7 @@ public class UIUtil extends Util
 
             if (recipient != null)
             {
-                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "internal_error"));
-
+                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(locale, "internal_error"));
                 email.addRecipient(recipient);
                 email.addArgument(ConfigurationManager
                         .getProperty("dspace.url"));
@@ -477,7 +478,15 @@ public class UIUtil extends Util
                 }
 
                 email.addArgument(stackTrace);
-                EPerson user = c.getCurrentUser();
+                try
+                {
+                    user = c.getCurrentUser();
+                }
+                catch (Exception e)
+                {
+                    log.warn("No context, the database might be down or the connection pool exhausted.");
+                }
+                
                 if (user != null)
                 {
                     email.addArgument(user.getFullName() + " (" + user.getEmail() + ")");
