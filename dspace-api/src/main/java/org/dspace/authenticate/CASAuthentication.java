@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 
+import edu.umd.lib.dspace.authenticate.Ldap;
+
 // we use the Java CAS client
 import edu.yale.its.tp.cas.client.*;
 
@@ -151,11 +153,11 @@ public class CASAuthentication
                     else if (!eperson.canLogIn())
                         return BAD_ARGS;
 
-                // Logged in OK.
-
-                context.setCurrentUser(eperson);
-                log.info(LogManager.getHeader(context, "authenticate", "type=CAS"));
-                return SUCCESS;
+                    // Logged in OK.
+                    
+                    context.setCurrentUser(eperson);
+                    log.info(LogManager.getHeader(context, "authenticate", "type=CAS"));
+                    return SUCCESS;
                 }
 
                 // the user does not exist in DSpace so create an eperson
@@ -163,29 +165,24 @@ public class CASAuthentication
                 {
                     if (canSelfRegister(context, request, netid) )
                     {
-                        // TEMPORARILY turn off authorisation
-                        // Register the new user automatically
-                        context.setIgnoreAuthorization(true);
-                        eperson = EPerson.create(context);
-                        // use netid only but this implies that user has to manually update their profile
-                        eperson.setNetid(netid);
+                        Ldap ldap = new Ldap(context);
+                        if (ldap.checkUid(netid))
+                        {
+                            ldap.close();
 
-                        // if you wish to automatically extract further user details: email, first_name and last_name
-                        //  enter your method here: e.g. query LDAP or RDBMS etc.
-                        /* e.g.
-                        registerUser(netid);
-                        eperson.setEmail(email);
-                        eperson.setFirstName(firstName);
-                        eperson.setLastName(lastName);
-                        */
+                            eperson = ldap.registerEPerson(netid);
 
-                        eperson.setCanLogIn(true);
-                        AuthenticationManager.initEPerson(context, request, eperson);
-                        eperson.update();
-                        context.commit();
-                        context.setIgnoreAuthorization(false);
-                        context.setCurrentUser(eperson);
-                        return SUCCESS;
+                            context.setIgnoreAuthorization(false);
+                            context.setCurrentUser(eperson);
+                            return SUCCESS;
+                        } 
+                        else 
+                        {			
+                            // No auto-registration for valid netid
+                            log.warn(LogManager.getHeader(context, "authenticate",
+                                                          "type=netid, error during auto-register, " + netid + " not found in directory"));
+                            return NO_SUCH_USER;
+                        }
                     }
                     else
                     {

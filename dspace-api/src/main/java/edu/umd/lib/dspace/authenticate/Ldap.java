@@ -419,7 +419,7 @@ public class Ldap {
    * Register this ldap user as an EPerson
    */
 
-  public EPerson registerEPerson(String email) throws Exception {
+  public EPerson registerEPerson(String uid) throws Exception {
     // Save the current dspace user
     EPerson user = context.getCurrentUser();
 
@@ -443,11 +443,12 @@ public class Ldap {
       if (strPhone == null)
         strPhone = "??";
 
-      eperson.setEmail(email);
+      eperson.setNetid(uid);
+      eperson.setEmail(uid + "@umd.edu");
       eperson.setFirstName(strFirstName);
       eperson.setLastName(strLastName);
       eperson.setMetadata("phone", strPhone);
-      eperson.setCanLogIn(false);
+      eperson.setCanLogIn(true);
       eperson.setRequireCertificate(false);
 
       eperson.update();
