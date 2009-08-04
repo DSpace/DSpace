@@ -132,6 +132,17 @@ public class CASAuthentication
                     throw new ServletException("Ticket '" + ticket + "' is not valid");
                 }
 
+                // Check directory
+                Ldap ldap = new Ldap(context);
+                if (ldap.checkUid(netid)) {
+                    ldap.close();
+                } else {
+                    throw new ServletException("Unknown directory id " + netid);
+                }
+
+                // Save the ldap object in the session
+                request.getSession().setAttribute("dspace.current.user.ldap", ldap);
+
                 // Locate the eperson in DSpace
                 EPerson eperson = null;
                 try
@@ -165,24 +176,11 @@ public class CASAuthentication
                 {
                     if (canSelfRegister(context, request, netid) )
                     {
-                        Ldap ldap = new Ldap(context);
-                        if (ldap.checkUid(netid))
-                        {
-                            ldap.close();
+                        eperson = ldap.registerEPerson(netid);
 
-                            eperson = ldap.registerEPerson(netid);
-
-                            context.setIgnoreAuthorization(false);
-                            context.setCurrentUser(eperson);
-                            return SUCCESS;
-                        } 
-                        else 
-                        {			
-                            // No auto-registration for valid netid
-                            log.warn(LogManager.getHeader(context, "authenticate",
-                                                          "type=netid, error during auto-register, " + netid + " not found in directory"));
-                            return NO_SUCH_USER;
-                        }
+                        context.setIgnoreAuthorization(false);
+                        context.setCurrentUser(eperson);
+                        return SUCCESS;
                     }
                     else
                     {
