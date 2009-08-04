@@ -283,7 +283,8 @@ public class CASAuthentication
     {
        // Determine CAS server URL
        final String authServer = ConfigurationManager.getProperty("cas.server.url");
-       final String service = request.getRequestURL().toString();
+       final String origUrl = (String) request.getSession().getAttribute("interrupted.request.url");
+       final String service = (origUrl != null ? origUrl : request.getRequestURL().toString());
        log.info("CAS server:  " + authServer);
 
        // Redirect to CAS server

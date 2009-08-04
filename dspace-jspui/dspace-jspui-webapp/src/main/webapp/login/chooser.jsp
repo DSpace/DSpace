@@ -47,6 +47,8 @@
 
 <%@ page import="java.util.Iterator" %>
 
+<%@ page import="java.net.URL" %>
+
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="java.sql.SQLException" %>
@@ -57,6 +59,7 @@
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.authenticate.AuthenticationManager" %>
 <%@ page import="org.dspace.authenticate.AuthenticationMethod" %>
+<%@ page import="org.dspace.authenticate.CASAuthentication" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.core.LogManager" %>
 
@@ -82,51 +85,53 @@
     <table class="miscTable" align="center" width="70%">
       <tr>
         <td class="evenRowEvenCol">
-          <h2><fmt:message key="jsp.login.chooser.chooseyour"/></h2>
-          <ul>
-<%
-    Iterator ai = AuthenticationManager.authenticationMethodIterator();
-    AuthenticationMethod am;
-    Context context = null;
-    try
-    {
-    	context = UIUtil.obtainContext(request);
-    	int count = 0;
-    	String url = null;
-    	while (ai.hasNext())
-    	{
-        am = (AuthenticationMethod)ai.next();
-        if ((url = am.loginPageURL(context, request, response)) != null)
-        {
-%>
-            <li><p><strong><a href="<%= url %>">
-		<%-- This kludge is necessary because fmt:message won't
-                     evaluate its attributes, so we can't use it on java expr --%>
-                <%= javax.servlet.jsp.jstl.fmt.LocaleSupport.getLocalizedMessage(pageContext, am.loginPageTitle(context)) %>
-                        </a></strong></p></li>
-<%
-        }
-        }
-    }
-    catch(SQLException se)
-    {
-    	// Database error occurred.
-        Logger log = Logger.getLogger("org.dspace.jsp");
-        log.warn(LogManager.getHeader(context,
-                "database_error",
-                se.toString()), se);
 
-        // Also email an alert
-        UIUtil.sendAlert(request, se);
-        JSPManager.showInternalError(request, response);
-    }
-    finally 
+<%
+    // Get the CAS url
+    String casurl = null;
+    String query = null;
+    Context context = UIUtil.obtainContext(request);
+
+    Iterator ai = AuthenticationManager.authenticationMethodIterator();
+    while (ai.hasNext())
     {
-    	context.abort();
+      AuthenticationMethod am = (AuthenticationMethod)ai.next();
+      if (am instanceof CASAuthentication) {
+        String[] parts = am.loginPageURL(context, request, response).split("\\?");
+        casurl = parts[0];
+        query = parts[1];
+      }
     }
-  
 %>
-          </ul>
+
+          <form 
+             method="GET" 
+             action="<%= casurl.toString() %>" 
+             id="umLogin"
+          />
+<%
+            String keyvals[] = query.split("&");
+            for (int i=0; i < keyvals.length; i++) {
+              String keyval[] = keyvals[i].split("=");
+              %> <input type="hidden" name="<%= keyval[0] %>" value="<%= keyval[1] %>"> <%
+            }
+%>
+          </form>
+      
+          <p><fmt:message key="jsp.login.chooser.chooseyour"/></p>
+
+          <ul>
+            <li><a href="#" onclick="document.getElementById('umLogin').submit(); return false">UM campus community</a> <span class="explain">(you will need your UM Directory ID and Password)</span><br>
+              <br>
+            </li>
+            <li>
+              <a href="#" onclick="toggleOtherLoginDisplay(); return false">Others</a>
+      
+              <div id="otherLogin" style="display:none">
+                <dspace:include page="/components/login-form.jsp" />
+              </div>
+            </li>
+          </ul>            
         </td>
       </tr>
     </table>
