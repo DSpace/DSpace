@@ -97,9 +97,19 @@
     {
       AuthenticationMethod am = (AuthenticationMethod)ai.next();
       if (am instanceof CASAuthentication) {
-        String[] parts = am.loginPageURL(context, request, response).split("\\?");
-        casurl = parts[0];
-        query = parts[1];
+        if (request.getSession().getAttribute("cas.session.gateway") == null) {
+          // We haven't tried a CAS gateway request yet, try one now
+          request.getSession().setAttribute("cas.session.gateway", "true");
+
+          String gatewayUrl = am.loginPageURL(context, request, response) + "&gateway=true";
+          response.sendRedirect(response.encodeRedirectURL(gatewayUrl));
+          return;
+
+        } else {
+          String[] parts = am.loginPageURL(context, request, response).split("\\?");
+          casurl = parts[0];
+          query = parts[1];
+        }
       }
     }
 %>
