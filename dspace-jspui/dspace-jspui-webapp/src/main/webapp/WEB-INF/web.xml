@@ -196,6 +196,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>units</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.UnitEditServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>edit-epeople</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.EPersonAdminServlet</servlet-class>
   </servlet>
@@ -519,6 +524,11 @@
   <servlet-mapping>
     <servlet-name>groups</servlet-name>
     <url-pattern>/tools/group-edit</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>units</servlet-name>
+    <url-pattern>/tools/unit-edit</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

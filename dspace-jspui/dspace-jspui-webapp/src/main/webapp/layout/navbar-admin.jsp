@@ -196,10 +196,15 @@
     </td>
   </tr>
   
-  <tr>
-     <td colspan="2">&nbsp;</td>
+  <tr class="navigationBarItem">
+    <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/tools/unit-edit") ? "arrow-highlight" : "arrow") %>.gif" width="7" height="13"/>
+    </td>
+    <td nowrap="nowrap" class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/tools/unit-edit"><fmt:message key="jsp.layout.navbar-admin.units"/></a>
+    </td>
   </tr>
-
+  
 <%
 	// get the browse indices
 	BrowseInfo binfo = (BrowseInfo) request.getAttribute("browse.info");
