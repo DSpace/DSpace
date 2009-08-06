@@ -167,3 +167,17 @@ CREATE INDEX mrc_result_fk_idx ON most_recent_checksum( result );
 
 CREATE INDEX ch_result_fk_idx ON checksum_history( result );
 
+
+------------------------------------------------------------------
+-- Jump 1.2 -> 1.5 for UM, update eperson records
+------------------------------------------------------------------
+
+UPDATE
+  eperson
+SET
+  netid = substring(email for position('@umd.edu' in email)-1),
+  can_log_in=true
+WHERE
+  netid is null
+  and email like '%@umd.edu'
+;
