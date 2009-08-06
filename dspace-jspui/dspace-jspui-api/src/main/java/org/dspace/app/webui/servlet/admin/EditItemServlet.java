@@ -45,6 +45,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -275,12 +276,36 @@ public class EditItemServlet extends DSpaceServlet
             break;
 
         case START_MOVE_ITEM:
-        	if (AuthorizeManager.isAdmin(context))
+        	if (AuthorizeManager.isAdmin(context,item))
         	{
 	        	// Display move collection page with fields of collections and communities
-	        	Collection[] notLinkedCollections = item.getCollectionsNotLinked();
-	        	Collection[] linkedCollections = item.getCollections();
-	            	
+	        	Collection[] allNotLinkedCollections = item.getCollectionsNotLinked();
+	        	Collection[] allLinkedCollections = item.getCollections();
+	            
+	        	// get only the collection where the current user has the right permission
+	        	List<Collection> authNotLinkedCollections = new ArrayList<Collection>();
+	        	for (Collection c : allNotLinkedCollections)
+	        	{
+	        	    if (AuthorizeManager.authorizeActionBoolean(context, c, Constants.ADD))
+	        	    {
+	        	        authNotLinkedCollections.add(c);
+	        	    }
+	        	}
+
+                List<Collection> authLinkedCollections = new ArrayList<Collection>();
+                for (Collection c : allLinkedCollections)
+                {
+                    if (AuthorizeManager.authorizeActionBoolean(context, c, Constants.REMOVE))
+                    {
+                        authLinkedCollections.add(c);
+                    }
+                }
+	        	
+                Collection[] notLinkedCollections = new Collection[authNotLinkedCollections.size()];
+                notLinkedCollections = authNotLinkedCollections.toArray(notLinkedCollections);
+                Collection[] linkedCollections = new Collection[authLinkedCollections.size()];
+                linkedCollections = authLinkedCollections.toArray(linkedCollections);
+                
 	        	request.setAttribute("linkedCollections", linkedCollections);
 	        	request.setAttribute("notLinkedCollections", notLinkedCollections);
 	            	            
@@ -293,7 +318,7 @@ public class EditItemServlet extends DSpaceServlet
         	break;
             	        
         case CONFIRM_MOVE_ITEM:
-        	if (AuthorizeManager.isAdmin(context))
+        	if (AuthorizeManager.isAdmin(context,item))
         	{
 	        	Collection fromCollection = Collection.find(context, UIUtil.getIntParameter(request, "collection_from_id"));
 	        	Collection toCollection = Collection.find(context, UIUtil.getIntParameter(request, "collection_to_id"));
@@ -401,6 +426,7 @@ public class EditItemServlet extends DSpaceServlet
             }
         }
 
+        request.setAttribute("admin_button", AuthorizeManager.authorizeActionBoolean(context, item, Constants.ADMIN));
         request.setAttribute("item", item);
         request.setAttribute("handle", handle);
         request.setAttribute("collections", collections);

@@ -67,6 +67,10 @@
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
     
+    // Is the logged in user a sys admin
+    Boolean admin = (Boolean)request.getAttribute("is.admin");
+    boolean isAdmin = (admin == null ? false : admin.booleanValue());
+    
     String name = "";
     String shortDesc = "";
     String intro = "";
@@ -298,7 +302,7 @@
 <%  } %>                    
                 </td>
             </tr>   
-<% if(admin_button ) { %>
+<% if(isAdmin) { %>
 <%-- ===========================================================
      Edit collection's policies
      =========================================================== --%>

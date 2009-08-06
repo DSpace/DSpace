@@ -939,9 +939,7 @@ public class Community extends DSpaceObject
                 //he started the removal process and he will end it too.
                 //also add right to remove from the collection to remove it's
                 // items.
-                AuthorizeManager.addPolicy(ourContext, c, Constants.DELETE,
-                        ourContext.getCurrentUser());
-                AuthorizeManager.addPolicy(ourContext, c, Constants.REMOVE,
+                AuthorizeManager.addPolicy(ourContext, c, Constants.ADMIN,
                         ourContext.getCurrentUser());
 
                 // Orphan; delete it

@@ -59,7 +59,9 @@
 
 <%  Collection collection = (Collection) request.getAttribute("collection"); %>
 
-<%  Boolean admin_b = (Boolean)request.getAttribute("admin_button");
+<%  Boolean sysadmin_b = (Boolean)request.getAttribute("sysadmin_button");
+	boolean sysadmin_button = (sysadmin_b == null ? false : sysadmin_b.booleanValue());
+	Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue()); %>
     
 <dspace:layout locbar="off"
@@ -80,14 +82,19 @@
                         <table border="0">
                             <tr>
                                 <td valign="top">
-                                <% if(!admin_button ) { %> <input type="hidden" name="public_read" value="true"/>
+                                <% if(!sysadmin_button ) { %> <input type="hidden" name="public_read" value="true"/>
                                 <input type="checkbox" name="public_read" value="true" disabled="disabled" checked="checked"/>
                                 <% } else { %>
                                 <input type="checkbox" name="public_read" value="true" checked="checked"/>
                                 <% } %>
                                 </td>
                                 <%-- <td class="submitFormLabel" nowrap>New items should be publicly readable</td> --%>
-                                <td class="submitFormLabel" nowrap="nowrap"><fmt:message key="jsp.dspace-admin.wizard-questions.check1"/></td>
+                                <td class="submitFormLabel" nowrap="nowrap">
+                                	<fmt:message key="jsp.dspace-admin.wizard-questions.check1"/>
+									<% if(!sysadmin_button ) { %> 
+										<fmt:message key="jsp.dspace-admin.wizard-questions.check1-disabled"/>
+									<% } %>
+								</td>
                             </tr>
                         </table>
                     </td>

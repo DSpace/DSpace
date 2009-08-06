@@ -174,10 +174,15 @@ public class CollectionWizardServlet extends DSpaceServlet
             // Create the collection
             Collection newCollection = c.createCollection();
             request.setAttribute("collection", newCollection);
+            if (AuthorizeManager.isAdmin(context,c))
+            {
+                // set a variable to show all locale admin buttons
+                request.setAttribute("admin_button", new Boolean(true));
+            }
             if (AuthorizeManager.isAdmin(context))
             {
                 // set a variable to show all buttons
-                request.setAttribute("admin_button", new Boolean(true));
+                request.setAttribute("sysadmin_button", new Boolean(true));
             }
             JSPManager.showJSP(request, response,
                     "/dspace-admin/wizard-questions.jsp");
@@ -253,8 +258,9 @@ public class CollectionWizardServlet extends DSpaceServlet
         Group anonymousGroup = Group.find(context, 0);
 
         // "Public read" checkbox. Only need to do anything
-        // if it's not checked.
-        if (!UIUtil.getBoolParameter(request, "public_read"))
+        // if it's not checked (only system admin can uncheck this!).
+        if (!UIUtil.getBoolParameter(request, "public_read")
+                && AuthorizeManager.isAdmin(context))
         {
             // Remove anonymous default policies for new items
             AuthorizeManager.removePoliciesActionFilter(context, collection,
@@ -515,6 +521,8 @@ public class CollectionWizardServlet extends DSpaceServlet
             // Identify the format
             BitstreamFormat bf = FormatIdentifier.guessFormat(context, logoBS);
             logoBS.setFormat(bf);
+            AuthorizeManager.addPolicy(context, logoBS, Constants.WRITE, context
+                    .getCurrentUser());
             logoBS.update();
 
             // Remove temp file
@@ -710,7 +718,7 @@ public class CollectionWizardServlet extends DSpaceServlet
                 Community[] communities = collection.getCommunities();
                 request.setAttribute("community", communities[0]);
 
-                if (AuthorizeManager.isAdmin(context))
+                if (AuthorizeManager.isAdmin(context, collection))
                 {
                     // set a variable to show all buttons
                     request.setAttribute("admin_button", new Boolean(true));

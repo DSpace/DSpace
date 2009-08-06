@@ -61,6 +61,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -168,7 +169,9 @@ public class EditCommunitiesServlet extends DSpaceServlet
             return;
         }
 
-        if (AuthorizeManager.isAdmin(context))
+        if ((collection != null && AuthorizeManager.isAdmin(context, collection))
+                || (collection == null && community != null && AuthorizeManager.isAdmin(context, community))
+                || (collection == null && parentCommunity != null && AuthorizeManager.isAdmin(context, parentCommunity))) 
         {
             // set a variable to show all buttons
             request.setAttribute("admin_button", new Boolean(true));
@@ -309,8 +312,15 @@ public class EditCommunitiesServlet extends DSpaceServlet
         // community home page, enhanced with admin controls. If no community,
         // or no parent community, just fall back to the community-list page
         Community community = (Community) request.getAttribute("community");
-
-        if (community != null)
+        Collection collection = (Collection) request.getAttribute("collection");
+        
+        if (collection != null)
+        {
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/handle/" + collection.getHandle()));
+        }
+        else if (community != null)
         {
             response.sendRedirect(response.encodeRedirectURL(request
                     .getContextPath()
@@ -440,6 +450,25 @@ public class EditCommunitiesServlet extends DSpaceServlet
                     + "/dspace-admin/authorize?community_id="
                     + community.getID() + "&submit_community_select=1"));
         }
+        else if (button.equals("submit_admins_create"))
+        {
+            // Create new group
+            Group newGroup = community.createAdministrators();
+            community.update();
+
+            // Forward to group edit page
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/tools/group-edit?group_id=" + newGroup.getID()));
+        }
+        else if (button.equals("submit_admins_edit"))
+        {
+            // Edit 'community administrators' group
+            Group g = community.getAdministrators();
+            response.sendRedirect(response.encodeRedirectURL(request
+                    .getContextPath()
+                    + "/tools/group-edit?group_id=" + g.getID()));
+        }
         else
         {
             // Button at bottom clicked - show main control page
@@ -561,7 +590,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
         {
             // Create new group
             Group newGroup = collection.createAdministrators();
-
+            collection.update();
+            
             // Forward to group edit page
             response.sendRedirect(response.encodeRedirectURL(request
                     .getContextPath()
@@ -582,7 +612,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
         {
             // Create new group
             Group newGroup = collection.createSubmitters();
-
+            collection.update();
+            
             // Forward to group edit page
             response.sendRedirect(response.encodeRedirectURL(request
                     .getContextPath()
@@ -754,19 +785,16 @@ public class EditCommunitiesServlet extends DSpaceServlet
                 .getCurrentUser());
         logoBS.update();
 
-        if (AuthorizeManager.isAdmin(context))
-        {
-            // set a variable to show all buttons
-            request.setAttribute("admin_button", new Boolean(true));
-        }
-
+        String jsp;
+        DSpaceObject dso;
         if (collection == null)
         {
             community.update();
 
             // Show community edit page
             request.setAttribute("community", community);
-            JSPManager.showJSP(request, response, "/tools/edit-community.jsp");
+            dso = community;
+            jsp = "/tools/edit-community.jsp";
         }
         else
         {
@@ -775,8 +803,17 @@ public class EditCommunitiesServlet extends DSpaceServlet
             // Show collection edit page
             request.setAttribute("collection", collection);
             request.setAttribute("community", community);
-            JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
+            dso = collection;
+            jsp = "/tools/edit-collection.jsp";
         }
+        
+        if (AuthorizeManager.isAdmin(context, dso))
+        {
+            // set a variable to show all buttons
+            request.setAttribute("admin_button", new Boolean(true));
+        }
+        
+        JSPManager.showJSP(request, response, jsp);
 
         // Remove temp file
         temp.delete();

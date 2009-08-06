@@ -53,6 +53,7 @@
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.Community" %>
+<%@ page import="org.dspace.eperson.Group" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.core.Utils" %>
 
@@ -64,12 +65,16 @@
     int parentID = UIUtil.getIntParameter(request, "parent_community_id");
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
+    // Is the logged in user a sys admin
+    Boolean admin = (Boolean)request.getAttribute("is.admin");
+    boolean isAdmin = (admin == null ? false : admin.booleanValue());
     
     String name = "";
     String shortDesc = "";
     String intro = "";
     String copy = "";
     String side = "";
+    Group admins = null;
 
     Bitstream logo = null;
     
@@ -81,6 +86,7 @@
         copy = community.getMetadata("copyright_text");
         side = community.getMetadata("side_bar_text");
         logo = community.getLogo();
+        admins = community.getAdministrators();
     }
 %>
 
@@ -189,6 +195,26 @@
                 </td>
             </tr>
     <% if(admin_button ) { %>
+ <%-- ===========================================================
+     Community Administrators
+     =========================================================== --%>
+            <tr>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-community.form.label8"/></td>
+                <td>
+			<%  if (admins == null) {%>
+                    <input type="submit" name="submit_admins_create" value="<fmt:message key="jsp.tools.edit-community.form.button.create"/>" />
+			<%  } else { %>
+                    <input type="submit" name="submit_admins_edit" value="<fmt:message key="jsp.tools.edit-community.form.button.edit"/>" />
+			<%  } %>                    
+                </td>
+            </tr>   
+    
+	<% }
+    	
+    if (isAdmin) { 
+    
+    %>
+
 <%-- ===========================================================
      Edit community's policies
      =========================================================== --%>

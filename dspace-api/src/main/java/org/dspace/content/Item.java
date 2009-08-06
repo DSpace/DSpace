@@ -2125,6 +2125,14 @@ public class Item extends DSpaceObject
      */
     public void move (Collection from, Collection to) throws SQLException, AuthorizeException, IOException 
     {
+        // Check authorisation on the item before that the move occur
+        // otherwise we will need edit permission on the "target collection" to archive our goal   
+        // only do write authorization if user is not an editor
+        if (!canEdit())
+        {
+            AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+        }
+        
         // Move the Item from one Collection to the other
         to.addItem(this);
         from.removeItem(this);
@@ -2133,7 +2141,9 @@ public class Item extends DSpaceObject
         if (isOwningCollection(from))
     	{
     		setOwningCollection(to);
+    		ourContext.turnOffAuthorisationSystem();
     		update();
+    		ourContext.restoreAuthSystemState();
     	}
         else
         {

@@ -90,6 +90,10 @@
     // Is the logged in user an admin
     Boolean admin = (Boolean)request.getAttribute("is.admin");
     boolean isAdmin = (admin == null ? false : admin.booleanValue());
+    
+    // Is the logged in user an admin of the item
+    Boolean itemAdmin = (Boolean)request.getAttribute("admin_button");
+    boolean isItemAdmin = (itemAdmin == null ? false : itemAdmin.booleanValue());
 %>
 
 
@@ -151,7 +155,7 @@
 						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.delete-w-confirm.button"/>"/>
                     </form>
 <%
-  if (isAdmin)
+  if (isItemAdmin)
   {
 %>                     <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
                         <input type="hidden" name="item_id" value="<%= item.getID() %>" />
@@ -195,6 +199,10 @@
 <%  } %>
                 </td>
             </tr>
+<%
+  if (isAdmin)
+  {
+%>    
 <%-- ===========================================================
      Edit item's policies
      =========================================================== --%>
@@ -210,12 +218,13 @@
                     </form>
                 </td>
             </tr>
-
+<%
+  }
+%>
         </table>
     </center>
 
 <%
-
 
     if (item.isWithdrawn())
     {
