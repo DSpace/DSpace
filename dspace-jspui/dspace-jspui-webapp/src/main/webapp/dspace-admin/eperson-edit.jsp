@@ -66,13 +66,19 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="java.util.Locale"%>
+<%@ page import="java.util.Iterator"%>
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.core.I18nUtil" %>
 <%@ page import="org.dspace.eperson.EPerson, org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.eperson.Group"   %>
+<%@ page import="org.dspace.eperson.Unit"   %>
 <%@ page import="org.dspace.core.Utils" %>
+
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
+
+<%@ page import="edu.umd.lib.dspace.authenticate.Ldap" %>
 
 <%
     EPerson eperson = (EPerson) request.getAttribute("eperson");
@@ -83,6 +89,7 @@
 		groupMemberships = (Group []) request.getAttribute("group.memberships");
 	}
 
+    Ldap   ldap      = (Ldap) request.getAttribute("eperson.ldap");
     String email     = eperson.getEmail();
     String firstName = eperson.getFirstName();
     String lastName  = eperson.getLastName();
@@ -150,14 +157,12 @@
             </td>
         </tr>
 
-        <% if (ldap_enabled) { %>
 	<tr>
-            <td>LDAP NetID:</td>
+            <td>NetID:</td>
             <td>
                 <input name="netid" size="24" value="<%=netid == null ? "" : Utils.addEntities(netid) %>" />
             </td>
         </tr>
-        <% } %>
 
         <tr>
             <%-- <td>Phone:</td> --%>
@@ -247,6 +252,41 @@
 	%>
     	<li><%=myLink%></li>
 	<%  } %>
+    </ul>
+<% } %>  
+
+<%
+  if ((ldap != null)) {
+%>
+    <h3>UM Directory Information</h3>
+    <ul>
+      <li>Name: <%= ldap.getLastName() %>, <%= ldap.getFirstName() %></li>
+      <li>Email: <%= ldap.getEmail() %></li>
+      <li>Phone: <%= ldap.getPhone() %></li>
+      <li>Faculty: <%= ldap.isFaculty() %></li>
+      <li>UM Appt: <tt><%= ldap.getAttributeAll("umappointment") %></tt></li>
+<%
+      for (Iterator i = ldap.getUnits().iterator(); i.hasNext(); ) {
+        String strUnit = (String) i.next();
+        
+        out.write("<li>Unit: ");
+
+        Unit unit = Unit.findByName(UIUtil.obtainContext(request), strUnit);
+        if (unit == null) {
+          out.write(strUnit);
+        } else {
+          out.write("<a href=\"");
+          out.write(request.getContextPath());
+          out.write("/tools/unit-edit?submit_edit&unit_id=");
+          out.write(""+unit.getID());
+          out.write("\">");
+          out.write(strUnit);
+          out.write("</a>");
+        }                                                 
+
+        out.write("</li>");
+      }
+%>
     </ul>
 <% } %>  
 
