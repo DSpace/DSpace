@@ -8,6 +8,9 @@ package edu.umd.lib.dspace.authenticate;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -33,6 +36,7 @@ import org.dspace.core.LogManager;
 
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.Unit;
 
 
 /*********************************************************************
@@ -364,6 +368,29 @@ public class Ldap {
   throws NamingException
   {
     return getAttributeAll("ou");
+  }
+
+
+  /************************************************************* getGroups */
+  /**
+   * Groups mapped by the Units.
+   */
+
+  public List getGroups() throws NamingException, java.sql.SQLException 
+  {
+    HashSet ret = new HashSet();
+
+    for (Iterator i = getUnits().iterator(); i.hasNext(); ) {
+      String strUnit = (String) i.next();
+
+      Unit unit = Unit.findByName(context, strUnit);
+
+      if (unit != null) {
+        ret.addAll(Arrays.asList(unit.getGroups()));
+      }
+    }
+
+    return new ArrayList(ret);
   }
 
 

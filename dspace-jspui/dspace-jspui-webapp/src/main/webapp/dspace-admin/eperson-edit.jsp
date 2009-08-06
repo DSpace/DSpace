@@ -286,8 +286,19 @@
 
         out.write("</li>");
       }
+
+      for (Iterator i = ldap.getGroups().iterator(); i.hasNext(); ) {
+        Group group = (Group) i.next();
+%>
+        <li>Group:
+          <a href="<%= request.getContextPath() %>/tools/group-edit?submit_edit&group_id=<%= group.getID() %>"><%= group.getName() %></a>
+        </li>
+<%
+      }                                                 
 %>
     </ul>
-<% } %>  
+<% 
+  } 
+%>  
 
 </dspace:layout>
