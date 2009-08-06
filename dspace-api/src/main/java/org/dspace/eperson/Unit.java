@@ -670,4 +670,55 @@ public class Unit extends DSpaceObject {
 
     }
 
+
+    /**
+     * Get the units a groups maps to
+     * 
+     * @return array of <code>Unit</code>
+     * @throws SQLException
+     */
+    public static Unit[] getUnits(Context myContext, Group g) throws SQLException
+    {
+        // Get the unit table rows
+        TableRowIterator tri = DatabaseManager.queryTable(myContext, "unit",
+                "SELECT unit.* FROM unit, epersongroup2unit WHERE " + 
+                "unit.unit_id=epersongroup2unit.unit_id AND " +
+                "epersongroup2unit.eperson_group_id= ? ",
+                 g.getID());
+
+        // Build a list of Unit objects
+        List<Unit> units = new ArrayList<Unit>();
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow r = tri.next();
+
+                // First check the cache
+                Unit fromCache = (Unit) myContext.fromCache(Unit.class, r
+                        .getIntColumn("unit_id"));
+
+                if (fromCache != null)
+                {
+                    units.add(fromCache);
+                }
+                else
+                {
+                    units.add(new Unit(myContext, r));
+                }
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
+
+        Unit[] unitArray = (Unit[]) units.toArray(new Unit[0]);
+
+        return unitArray;
+    }
+
+
 }
