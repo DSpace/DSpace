@@ -18,11 +18,13 @@
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
+<%@ page import="org.dspace.eperson.Group"   %>
 <%@ page import="org.dspace.eperson.Unit"   %>
 <%@ page import="org.dspace.core.Utils" %>
 
 <%
     Unit unit = (Unit) request.getAttribute("unit");
+    Group[] groups  = (Group[]) request.getAttribute("groups");
     request.setAttribute("LanguageSwitch", "hide");
 %>
 
@@ -45,15 +47,22 @@
   </table>
 
   <center>
-    <form name="unit" method="post" action="">
+    <form name="epersongroup" method="post" action="">
 	<p><label for="tunit_name"><fmt:message key="jsp.tools.unit-edit.name"/></label><input name="unit_name" id="tunit_name" value="<%= Utils.addEntities(unit.getName()) %>" size="50"/></p>
    	    <h3><fmt:message key="jsp.tools.unit-edit.heading"/></h3>
 
         <input type="hidden" name="unit_id" value="<%=unit.getID()%>"/>
+        <table>
+          <tr>
+            <td align="center"><strong><fmt:message key="jsp.tools.unit-edit.group"/></strong><br/>
+              <dspace:selectgroup multiple="true" selected="<%= groups %>"/>
+            </td>
+          </tr>
+        </table>
 
         <br/>
 
-        <p><input type="submit" name="submit_unit_update" value="<fmt:message key="jsp.tools.unit-edit.update.button"/>"/></p>
+        <p><input type="submit" name="submit_unit_update" value="<fmt:message key="jsp.tools.unit-edit.update.button"/>"  onclick="javascript:finishGroups();"/></p>
    </form>
   </center>
 </dspace:layout>

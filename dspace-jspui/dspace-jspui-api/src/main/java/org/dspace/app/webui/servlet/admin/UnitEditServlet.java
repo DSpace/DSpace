@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -69,6 +70,7 @@ public class UnitEditServlet extends DSpaceServlet
             if (submit_edit && !submit_unit_update && !submit_unit_delete)
             {
                 request.setAttribute("unit", unit);
+                request.setAttribute("groups", unit.getGroups());
 
                 JSPManager.showJSP(request, response, "/tools/unit-edit.jsp");
             }
@@ -83,7 +85,46 @@ public class UnitEditServlet extends DSpaceServlet
                     unit.update();
                 }
 
+                int[] group_ids = UIUtil.getIntParameters(request, "group_ids");
+
+                // get set of old groups
+                HashSet groupsOld = new HashSet(Arrays.asList(unit.getGroups()));
+
+                if (group_ids != null)
+                {
+                  // get set of new groups
+                  HashSet groupsNew = new HashSet();
+
+                  for (int x = 0; x < group_ids.length; x++) {
+                    groupsNew.add(Group.find(c, group_ids[x]));
+                  }
+                    
+                  // add new groups
+                  HashSet groupsNewOnly = (HashSet)groupsNew.clone();
+                  groupsNewOnly.removeAll(groupsOld);
+                    
+                  for (Iterator i = groupsNewOnly.iterator(); i.hasNext(); ) {
+                    unit.addGroup((Group)i.next());
+                  }
+
+                  // remove old groups
+                  HashSet groupsOldOnly = (HashSet)groupsOld.clone();
+                  groupsOldOnly.removeAll(groupsNew);
+                    
+                  for (Iterator i = groupsOldOnly.iterator(); i.hasNext(); ) {
+                    unit.removeGroup((Group)i.next());
+                  }
+                }
+                else
+                {
+                  // no groups submitted, remove all groups
+                  for (Iterator i = groupsOld.iterator(); i.hasNext(); ) {
+                    unit.removeGroup((Group)i.next());
+                  }
+                }
+
                 request.setAttribute("unit", unit);
+                request.setAttribute("groups", unit.getGroups());
 
                 JSPManager.showJSP(request, response, "/tools/unit-edit.jsp");
                 c.complete();
@@ -129,6 +170,7 @@ public class UnitEditServlet extends DSpaceServlet
                 unit.update();
 
                 request.setAttribute("unit", unit);
+                request.setAttribute("groups", unit.getGroups());
 
                 JSPManager.showJSP(request, response, "/tools/unit-edit.jsp");
                 c.complete();
