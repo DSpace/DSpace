@@ -59,6 +59,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.Unit;
 
 /**
  * Servlet for editing groups
@@ -108,6 +109,7 @@ public class GroupEditServlet extends DSpaceServlet
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
                 request.setAttribute("membergroups", group.getMemberGroups());
+                request.setAttribute("units", Unit.getUnits(c, group));
 
                 JSPManager.showJSP(request, response, "/tools/group-edit.jsp");
             }
@@ -249,6 +251,7 @@ public class GroupEditServlet extends DSpaceServlet
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
                 request.setAttribute("membergroups", group.getMemberGroups());
+                request.setAttribute("units", Unit.getUnits(c, group));
 
                 JSPManager.showJSP(request, response, "/tools/group-edit.jsp");
                 c.complete();
@@ -280,6 +283,7 @@ public class GroupEditServlet extends DSpaceServlet
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
                 request.setAttribute("membergroups", group.getMemberGroups());
+                request.setAttribute("units", Unit.getUnits(c, group));
 
                 JSPManager.showJSP(request, response, "/tools/group-edit.jsp");
             }
@@ -301,6 +305,7 @@ public class GroupEditServlet extends DSpaceServlet
                 request.setAttribute("group", group);
                 request.setAttribute("members", group.getMembers());
                 request.setAttribute("membergroups", group.getMemberGroups());
+                request.setAttribute("units", Unit.getUnits(c, group));
 
                 JSPManager.showJSP(request, response, "/tools/group-edit.jsp");
                 c.complete();

@@ -61,6 +61,7 @@
 
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.eperson.Group"   %>
+<%@ page import="org.dspace.eperson.Unit"   %>
 <%@ page import="org.dspace.core.Utils" %>
 
 <%
@@ -69,6 +70,7 @@
     
 	Group   [] groups  = (Group   []) request.getAttribute("membergroups");
 	request.setAttribute("LanguageSwitch", "hide");
+    Unit [] units = (Unit []) request.getAttribute("units");
 %>
 
 <dspace:layout titlekey="jsp.tools.group-edit.title"
@@ -111,4 +113,46 @@
         <p><input type="submit" name="submit_group_update" value="<fmt:message key="jsp.tools.group-edit.update.button"/>" onclick="javascript:finishEPerson();finishGroups();"/></p>
    </form>
   </center>
+
+<%
+if (units.length > 0) {
+%>
+
+  <hr/>
+
+    <h3>Units</h3>
+
+    <table class="miscTable" align="center" summary="Unit data display table">
+        <tr>
+            <th class="oddRowOddCol"><strong><fmt:message key="jsp.tools.unit-list.id" /></strong></th>
+	    <th class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.unit-list.name"/></strong></th>
+            <th class="oddRowOddCol">&nbsp;</th>
+        </tr>
+
+<%
+    String row = "even";
+    for (int i = 0; i < units.length; i++)
+    {
+%>
+            <tr>
+                <td class="<%= row %>RowOddCol"><%= units[i].getID() %></td>
+                <td class="<%= row %>RowEvenCol">
+                    <%= units[i].getName() %>
+                </td>
+                <td class="<%= row %>RowOddCol">
+                    <form method="post" action="<%= request.getContextPath() %>/tools/unit-edit">
+                        <input type="hidden" name="unit_id" value="<%= units[i].getID() %>"/>
+  		        <input type="submit" name="submit_edit" value="<fmt:message key="jsp.tools.general.edit"/>" />
+                   </form>
+                </td>
+            </tr>
+<%
+        row = (row.equals("odd") ? "even" : "odd");
+    }
+%>
+    </table>
+<%
+}
+%>
+
 </dspace:layout>
