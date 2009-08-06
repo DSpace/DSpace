@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.io.IOException;
@@ -56,6 +57,9 @@ public class Unit extends DSpaceObject {
     /** Flag set when metadata is modified, for events */
     private boolean modifiedMetadata;
 
+    /** The groups in this bundle */
+    private List<Group> groups;
+
     /**
      * Construct a Unit from a given context and tablerow
      * 
@@ -66,6 +70,42 @@ public class Unit extends DSpaceObject {
     {
         myContext = context;
         myRow = row;
+        groups = new ArrayList<Group>();
+
+        // Get groups
+        TableRowIterator tri = DatabaseManager.queryTable(
+                myContext, "epersongroup",
+                "SELECT epersongroup.* FROM epersongroup, epersongroup2unit WHERE "
+                        + "epersongroup2unit.eperson_group_id=epersongroup.eperson_group_id AND "
+                        + "epersongroup2unit.unit_id= ? ",
+                myRow.getIntColumn("unit_id"));
+
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow r = (TableRow) tri.next();
+
+                // First check the cache
+                Group fromCache = (Group) context.fromCache(
+                        Group.class, r.getIntColumn("eperson_group_id"));
+
+                if (fromCache != null)
+                {
+                    groups.add(fromCache);
+                }
+                else
+                {
+                    groups.add(new Group(myContext, r));
+                }
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("unit_id"));
@@ -444,10 +484,16 @@ public class Unit extends DSpaceObject {
      */
     public void delete() throws SQLException
     {
-        // FIXME: authorizations
-
         // Remove from cache
         myContext.removeCached(this, getID());
+
+        // Remove groups
+        Group[] gs = getGroups();
+
+        for (int i = 0; i < gs.length; i++)
+        {
+            removeGroup(gs[i]);
+        }
 
         // Remove ourself
         DatabaseManager.delete(myContext, myRow);
@@ -503,6 +549,125 @@ public class Unit extends DSpaceObject {
     public String getHandle()
     {
         return null;
+    }
+
+    /**
+     * Get the groups this unit maps to
+     * 
+     * @return array of <code>Group</code> s this unit maps to
+     * @throws SQLException
+     */
+    public Group[] getGroups() throws SQLException
+    {
+        // Get the group table rows
+        TableRowIterator tri = DatabaseManager.queryTable(myContext, "epersongroup",
+                "SELECT epersongroup.* FROM epersongroup, epersongroup2unit WHERE " + 
+                "epersongroup.eperson_group_id=epersongroup2unit.eperson_group_id AND " +
+                "epersongroup2unit.unit_id= ? ",
+                 myRow.getIntColumn("unit_id"));
+
+        // Build a list of Group objects
+        List<Group> groups = new ArrayList<Group>();
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow r = tri.next();
+
+                // First check the cache
+                Group fromCache = (Group) myContext.fromCache(Group.class, r
+                        .getIntColumn("eperson_group_id"));
+
+                if (fromCache != null)
+                {
+                    groups.add(fromCache);
+                }
+                else
+                {
+                    groups.add(new Group(myContext, r));
+                }
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
+
+        Group[] groupArray = new Group[groups.size()];
+        groupArray = (Group[]) groups.toArray(groupArray);
+
+        return groupArray;
+    }
+
+
+    /**
+     * Add an existing group to this unit
+     * 
+     * @param b
+     *            the group to add
+     */
+    public void addGroup(Group b) throws SQLException
+    {
+        log.info(LogManager.getHeader(myContext, "add_group", "unit_id="
+                + getID() + ",eperson_group_id=" + b.getID()));
+
+        // First check that the group isn't already in the list
+        for (int i = 0; i < groups.size(); i++)
+        {
+            Group existing = (Group) groups.get(i);
+
+            if (b.getID() == existing.getID())
+            {
+                // Group is already there; no change
+                return;
+            }
+        }
+
+        // Add the group object
+        groups.add(b);
+
+        // Add the mapping row to the database
+        TableRow mappingRow = DatabaseManager.create(myContext,
+                "epersongroup2unit");
+        mappingRow.setColumn("unit_id", getID());
+        mappingRow.setColumn("eperson_group_id", b.getID());
+        DatabaseManager.update(myContext, mappingRow);
+    }
+
+
+    /**
+     * Remove a group from this unit
+     * 
+     * @param b
+     *            the group to remove
+     */
+    public void removeGroup(Group b) throws SQLException
+    {
+        log.info(LogManager.getHeader(myContext, "remove_group",
+                "unit_id=" + getID() + ",eperson_group_id=" + b.getID()));
+
+        // Remove from internal list of groups
+        ListIterator li = groups.listIterator();
+
+        while (li.hasNext())
+        {
+            Group existing = (Group) li.next();
+
+            if (b.getID() == existing.getID())
+            {
+                // We've found the group to remove
+                li.remove();
+            }
+        }
+
+        // Delete the mapping row
+        DatabaseManager.updateQuery(myContext,
+                "DELETE FROM epersongroup2unit WHERE unit_id= ? "+
+                "AND eperson_group_id= ? ", 
+                getID(), b.getID());
+
     }
 
 }
