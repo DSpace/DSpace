@@ -115,44 +115,32 @@
   </center>
 
 <%
-if (units.length > 0) {
+  if (units.length > 0) {
 %>
 
-  <hr/>
+    <table width="95%">
+      <tr>
+        <td align="left">
 
-    <h3>Units</h3>
+          <h3>Units mapped to this Group</h3>
 
-    <table class="miscTable" align="center" summary="Unit data display table">
-        <tr>
-            <th class="oddRowOddCol"><strong><fmt:message key="jsp.tools.unit-list.id" /></strong></th>
-	    <th class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.unit-list.name"/></strong></th>
-            <th class="oddRowOddCol">&nbsp;</th>
-        </tr>
-
+          <ul>
 <%
-    String row = "even";
-    for (int i = 0; i < units.length; i++)
-    {
+            String row = "even";
+            for (int i = 0; i < units.length; i++) {
 %>
-            <tr>
-                <td class="<%= row %>RowOddCol"><%= units[i].getID() %></td>
-                <td class="<%= row %>RowEvenCol">
-                    <%= units[i].getName() %>
-                </td>
-                <td class="<%= row %>RowOddCol">
-                    <form method="post" action="<%= request.getContextPath() %>/tools/unit-edit">
-                        <input type="hidden" name="unit_id" value="<%= units[i].getID() %>"/>
-  		        <input type="submit" name="submit_edit" value="<fmt:message key="jsp.tools.general.edit"/>" />
-                   </form>
-                </td>
-            </tr>
+              <li>
+                <a href="<%= request.getContextPath() %>/tools/unit-edit?submit_edit&unit_id=<%= units[i].getID() %>"><%= units[i].getName() %></a>
+              </li>
 <%
-        row = (row.equals("odd") ? "even" : "odd");
-    }
+            }
 %>
+          </ul>
+        </td>
+      </tr>
     </table>
 <%
-}
+  }
 %>
 
 </dspace:layout>
