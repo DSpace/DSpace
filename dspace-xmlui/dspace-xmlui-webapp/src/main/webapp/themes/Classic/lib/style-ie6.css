@@ -1,4 +1,4 @@
-﻿/*
+﻿﻿/*
   style.css
 
   Version: $Revision$
@@ -104,7 +104,7 @@ p.pagination-info {
 ul.pagination-links {
 	position: relative;
 	text-align: center;
-	top: -28px;
+	/*top: -28px;*/
 	width: 500px;
 }
 
