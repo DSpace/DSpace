@@ -72,7 +72,7 @@
     boolean passwordProblem = (attr != null && attr.booleanValue());
 
     boolean ldap_enabled = ConfigurationManager.getBooleanProperty("ldap.enable");
-    boolean ldap_eperson = (ldap_enabled && (eperson.getNetid() != null) && (eperson.getNetid().equals("") == false));
+    boolean ldap_eperson = ((eperson.getNetid() != null) && (eperson.getNetid().equals("") == false));
 %>
 
 <dspace:layout titlekey="jsp.register.edit-profile.title" nocache="true">
