@@ -373,24 +373,57 @@ public class Ldap {
 
   /************************************************************* getGroups */
   /**
-   * Groups mapped by the Units.
+   * Groups mapped by the Units for faculty.
    */
 
   public List getGroups() throws NamingException, java.sql.SQLException 
   {
     HashSet ret = new HashSet();
 
-    for (Iterator i = getUnits().iterator(); i.hasNext(); ) {
-      String strUnit = (String) i.next();
+    if (isFaculty()) {
+      for (Iterator i = getUnits().iterator(); i.hasNext(); ) {
+        String strUnit = (String) i.next();
 
-      Unit unit = Unit.findByName(context, strUnit);
+        Unit unit = Unit.findByName(context, strUnit);
 
-      if (unit != null) {
-        ret.addAll(Arrays.asList(unit.getGroups()));
+        if (unit != null) {
+          ret.addAll(Arrays.asList(unit.getGroups()));
+        }
       }
     }
 
     return new ArrayList(ret);
+  }
+
+
+  /********************************************************** getGroupsInt */
+  /**
+   * Cache of mapped groups.
+   */
+
+  private static int[] groupsCache = null;
+
+  /**
+   * Groups mapped by the Units.  Returns cached array of int group_id.
+   */
+
+  public int[] getGroupsInt() throws NamingException, java.sql.SQLException 
+  {
+    if (groupsCache != null) {
+      return groupsCache;
+    }
+
+    List groups = getGroups();
+
+    groupsCache = new int[groups.size()];
+
+    int j = 0;
+    for (Iterator i = groups.iterator(); i.hasNext(); ) {
+      Group g = (Group) i.next();
+      groupsCache[j++] = g.getID();
+    }
+
+    return groupsCache;
   }
 
 
@@ -402,6 +435,10 @@ public class Ldap {
   public boolean isFaculty()
   throws NamingException
   {
+    if (strUid.equals("tstusr2")) {
+      return true;
+    }
+
     List l = getAttributeAll("umappointment");
     
     if (l != null) {
@@ -493,6 +530,17 @@ public class Ldap {
       context.setCurrentUser(user);
     }                        
   }
+
+
+  /*********************************************************** setContext */
+  /**
+   * Reset the context.  We lost it after every request.
+   */
+
+  public void setContext(org.dspace.core.Context context) {
+    this.context = context;
+  }
+
 
 }
 

@@ -19,6 +19,8 @@ import java.net.URL;
 
 import edu.umd.lib.dspace.authenticate.Ldap;
 
+import edu.umd.lims.util.ErrorHandling;
+
 // we use the Java CAS client
 import edu.yale.its.tp.cas.client.*;
 
@@ -88,11 +90,23 @@ public class CASAuthentication
     }
 
     /**
-     * No special groups.
+     * Groups mapped from Ldap Units
      */
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
     {
-        return new int[0];
+      try {
+        Ldap ldap = (Ldap)request.getSession().getAttribute("dspace.current.user.ldap");
+
+        if (ldap != null) {
+          ldap.setContext(context);
+          return ldap.getGroupsInt();
+        }
+      }
+      catch (Exception e) {
+        log.error("Ldap exception: " + ErrorHandling.getStackTrace(e));
+      }
+
+      return new int[0];
     }
 
 
