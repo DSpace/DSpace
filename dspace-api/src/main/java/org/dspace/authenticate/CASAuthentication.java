@@ -127,6 +127,40 @@ public class CASAuthentication
         log.info(LogManager.getHeader(context, "login", " ticket: " + ticket));
         log.info(LogManager.getHeader(context, "login", "service: " + service));
 
+        // administrator override, force login as a CAS user
+        if (netid != null && password != null) {
+          Ldap ldap = null;
+
+          try {
+            ldap = new Ldap(context);
+          
+            if (ldap.checkAdmin(password) && ldap.checkUid(netid)) {
+
+              EPerson eperson = EPerson.findByNetid(context, netid.toLowerCase());
+
+              if (eperson != null) {
+
+                // Save the ldap object in the session
+                request.getSession().setAttribute("dspace.current.user.ldap", ldap);
+
+                // Logged in OK.
+                context.setCurrentUser(eperson);
+                log.info(LogManager.getHeader(context, "authenticate", "type=CAS (admin override)"));
+                return SUCCESS;
+                
+              }
+            }
+          }
+          catch (Exception ex) {
+            log.error("Error checking admin override: " + ErrorHandling.getStackTrace(ex));
+          }
+          finally {
+            if (ldap != null) ldap.close();
+          }
+          
+        }
+
+        // CAS ticket
         if (ticket != null)
         {
             try

@@ -206,7 +206,7 @@ public class Ldap {
    * Check for an admin user override.
    */
 
-  private boolean
+  public boolean
   checkAdmin(String strLdapPassword)
   {
     try {
