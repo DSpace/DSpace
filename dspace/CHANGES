@@ -58,6 +58,7 @@
 (Tim Donohue)
  - [DS-218] Cannot add/remove email subscriptions from Profile page in XMLUI
  - [DS-238] Move item function in xmlui
+ - [DS-281] Invalid Link to "Go to DSpace Home" on Page Not Found (XMLUI)
 
 (Tim Donohue / Andrea Bollini)
  - [DS-228] Community Admin XMLUI: Delegated Admins Patch

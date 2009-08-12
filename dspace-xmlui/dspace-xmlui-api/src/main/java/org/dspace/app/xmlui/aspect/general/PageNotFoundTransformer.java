@@ -201,7 +201,7 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
             
             notFound.addPara(T_para1); 
             
-            notFound.addPara().addXref(contextPath,T_go_home);
+            notFound.addPara().addXref(contextPath + "/",T_go_home);
 
 	    HttpServletResponse response = (HttpServletResponse)objectModel
 		.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
