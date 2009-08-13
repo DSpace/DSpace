@@ -300,5 +300,6 @@ public class Authenticate
         request.removeAttribute("is.admin");
         request.removeAttribute("dspace.current.user");
         session.removeAttribute("dspace.current.user.id");
+        session.removeAttribute("dspace.current.user.ldap");
     }
 }

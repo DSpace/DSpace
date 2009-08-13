@@ -50,6 +50,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
@@ -70,9 +71,16 @@ public class LogoutServlet extends DSpaceServlet
     {
         log.info(LogManager.getHeader(context, "logout", ""));
 
+        boolean cas = (request.getSession().getAttribute("dspace.current.user.ldap") != null);
+
         Authenticate.loggedOut(context, request);
 
-        // Display logged out message
-        JSPManager.showJSP(request, response, "/login/logged-out.jsp");
+        if (cas) {
+            // CAS login, logout of CAS
+            response.sendRedirect(ConfigurationManager.getProperty("cas.logout.url"));
+        } else {
+            // Display logged out message
+            JSPManager.showJSP(request, response, "/login/logged-out.jsp");
+        }
     }
 }
