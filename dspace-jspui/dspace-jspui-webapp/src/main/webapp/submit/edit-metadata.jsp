@@ -1120,7 +1120,7 @@
        else if (inputType.equals("date")) 
        {
            doDate(out, item, fieldName, dcSchema, dcElement, dcQualifier, 
-	     		  repeatable, fieldCountIncr, label, inputs[z].isRequired, pageContext, request);
+	     		  repeatable, fieldCountIncr, label, inputs[z].isRequired(), pageContext, request);
        } 
        else if (inputType.equals("series")) 
        {
