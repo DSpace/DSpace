@@ -42,6 +42,7 @@ package org.dspace.app.webui.util;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Locale;
@@ -156,6 +157,26 @@ public class UIUtil extends Util
         c.setCurrentLocale(sessionLocale);
 
         return c;
+    }
+
+    /**
+     * Add a string message for display in the footer of a jsp page.
+     * 
+     * @param request
+     *            the request object.
+     * @param message
+     * @return void
+     */
+    public static void addMessage(HttpServletRequest request, String message)
+    {
+      ArrayList messages = (ArrayList) request.getAttribute("dspace.layout.messages");
+
+      if (messages == null) {
+        messages = new ArrayList();
+        request.setAttribute("dspace.layout.messages", messages);
+      }
+
+      messages.add(message);
     }
 
     /**

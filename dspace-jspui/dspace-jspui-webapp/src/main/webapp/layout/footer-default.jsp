@@ -43,8 +43,12 @@
   --%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
+
+<%@ page import="java.util.Iterator" %>
+<%@ page import="java.util.List" %>
 
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
@@ -78,6 +82,35 @@
              <tr class="pageFooterBar">
                 <td colspan="<%= overallColSpan %>" class="pageFootnote">
                     <table class="pageFooterBar" width="100%">
+<%
+    List messages = request.getAttribute("dspace.layout.messages");
+    if (messages != null)
+    {
+%>
+                        <tr>
+                            <td class="pageFootnote">
+                              <table class="miscTable" width="100%">
+<%
+                                  boolean even = true;
+                                  for (Iterator i = ((List) messages.iterator(); i.hasNext(); ) {
+                                    String tdclass = (even ? "evenRowEvenCol" : "oddRowEvenCol");
+%>
+                                    <tr>
+                                      <td class="<%= tdclass %>"><%= i.next() %></td>
+                                    </tr>
+<%
+                                    even = !even;
+                                  }
+%>
+
+                              </table>
+                            </td>
+                            <td nowrap="nowrap" valign="middle"> <%-- nowrap, valign for broken NS 4.x --%>
+                            </td>
+                        </tr>
+<%
+    }
+%>
                         <tr>
                             <td class="pageFootnote">
                                 <fmt:message key="jsp.layout.footer-default.text"/>&nbsp;-
