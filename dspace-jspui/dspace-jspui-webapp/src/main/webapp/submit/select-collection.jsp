@@ -91,10 +91,6 @@
       <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#choosecollection\"%>"><fmt:message key="jsp.morehelp"/> </dspace:popup> 
 	</div>
 
-    <p>Select the collection you wish to submit an item to from the list
-    below, then click "Next".  
-    <dspace:popup page="/help/index.html#choosecollection">(More Help...)</dspace:popup></p>
-
     <p>If you hold appointments with more than one department, you may use the CTRL key to select more than one collection.</p>
 
     <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
