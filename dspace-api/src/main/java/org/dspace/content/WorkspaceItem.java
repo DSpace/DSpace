@@ -646,14 +646,14 @@ public class WorkspaceItem implements InProgressSubmission
      */
     public Collection[] getMapCollections() throws SQLException
     {
-	String myQuery = 
-	    "SELECT collection.collection_id FROM collection, collection2workspaceitem WHERE "
-	    + "collection.collection_id=collection2workspaceitem.collection_id AND "
-	    + "collection2workspaceitem.workspace_item_id=" + getID()
-	    ;
+        String myQuery = 
+            "SELECT collection.collection_id FROM collection, collection2workspaceitem WHERE "
+            + "collection.collection_id=collection2workspaceitem.collection_id AND "
+            + "collection2workspaceitem.workspace_item_id=?"
+            ;
 
-	TableRowIterator rows = DatabaseManager.query(ourContext, "collection",
-						      myQuery);
+        TableRowIterator rows = DatabaseManager.queryTable(ourContext, "collection",
+                                                           myQuery, getID());
 
         List collectionRows = rows.toList();
 
@@ -663,11 +663,11 @@ public class WorkspaceItem implements InProgressSubmission
         {
             TableRow row = (TableRow) collectionRows.get(i);
 
-	    collections[i] = Collection.find(ourContext, row.getIntColumn("collection_id"));
+            collections[i] = Collection.find(ourContext, row.getIntColumn("collection_id"));
 
         }
 
-	return collections;
+        return collections;
     }
 
     /**
@@ -677,7 +677,7 @@ public class WorkspaceItem implements InProgressSubmission
      */
     public void addMapCollection(Collection collection) throws SQLException
     {
-	// Create mapping
+        // Create mapping
         TableRow row = DatabaseManager.create(ourContext, "collection2workspaceitem");
 
         row.setColumn("collection_id", collection.getID());

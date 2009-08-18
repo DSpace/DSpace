@@ -449,14 +449,14 @@ public class WorkflowItem implements InProgressSubmission
      */
     public Collection[] getMapCollections() throws SQLException
     {
-	String myQuery = 
-	    "SELECT collection.collection_id FROM collection, collection2workflowitem WHERE "
-	    + "collection.collection_id=collection2workflowitem.collection_id AND "
-	    + "collection2workflowitem.workflow_id=" + getID()
-	    ;
+        String myQuery = 
+            "SELECT collection.collection_id FROM collection, collection2workflowitem WHERE "
+            + "collection.collection_id=collection2workflowitem.collection_id AND "
+            + "collection2workflowitem.workflow_id=?"
+            ;
 
-	TableRowIterator rows = DatabaseManager.query(ourContext, "collection",
-						      myQuery);
+        TableRowIterator rows = DatabaseManager.queryTable(ourContext, "collection",
+                                                           myQuery, getID());
 
         List collectionRows = rows.toList();
 
@@ -466,11 +466,11 @@ public class WorkflowItem implements InProgressSubmission
         {
             TableRow row = (TableRow) collectionRows.get(i);
 
-	    collections[i] = Collection.find(ourContext, row.getIntColumn("collection_id"));
+            collections[i] = Collection.find(ourContext, row.getIntColumn("collection_id"));
 
         }
 
-	return collections;
+        return collections;
     }
 
     /**
@@ -480,7 +480,7 @@ public class WorkflowItem implements InProgressSubmission
      */
     public void addMapCollection(Collection collection) throws SQLException
     {
-	// Create mapping
+        // Create mapping
         TableRow row = DatabaseManager.create(ourContext, "collection2workflowitem");
 
         row.setColumn("collection_id", collection.getID());
