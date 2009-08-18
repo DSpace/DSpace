@@ -178,10 +178,6 @@ public class DCInputSet
     	{
     		return false;
     	}
-    	if (rowName.equals("date.issued") && ! addPublishedBefore )
-    	{
-    		return false;
-    	}
     	if (rowName.equals("publisher.null") && ! addPublishedBefore )
     	{
     		return false;
