@@ -213,6 +213,7 @@
             <th id="t7" class="oddRowEvenCol"><fmt:message key="jsp.mydspace.main.item"/></th>
             <th id="t8" class="oddRowOddCol"><fmt:message key="jsp.mydspace.main.subto"/></th>
             <th id="t9" class="oddRowEvenCol"><fmt:message key="jsp.mydspace.main.subby"/></th>
+            <th id="t9" class="oddRowEvenCol"><fmt:message key="jsp.mydspace.main.take.button"/></th>
         </tr>
 <%
         // even or odd row:  Starts even since header row is odd (1).  Toggled
@@ -240,11 +241,7 @@
 %>
                     </td>
                     <td headers="t7" class="<%= row %>RowEvenCol"><%= Utils.addEntities(title) %></td>
-                    <td headers="t8" class="<%= row %>RowOddCol"><%= pooled[i].getCollection().getMetadata("name") %></td>
-                    <td headers="t9" class="<%= row %>RowEvenCol"><a href="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></a></td>
-                <td class="<%= row %>RowEvenCol"><%= Utils.addEntities(title) %></td>
-                <td class="<%= row %>RowOddCol">
-                  <%= pooled[i].getCollection().getMetadata("name") %>
+                    <td headers="t8" class="<%= row %>RowOddCol"><%= pooled[i].getCollection().getMetadata("name") %>
                   <%-- additional mapped collections --%>
 <%		  
                   Collection collections[] = pooled[i].getMapCollections();
@@ -257,8 +254,8 @@
 <%		  
                   }
 %>
-                </td>
-                <td class="<%= row %>RowEvenCol"><A HREF="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></A></td>
+                    </td>
+                    <td headers="t9" class="<%= row %>RowEvenCol"><a href="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></a></td>
                     <td class="<%= row %>RowOddCol">
                         <form action="<%= request.getContextPath() %>/mydspace" method="post">
                             <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>" />
