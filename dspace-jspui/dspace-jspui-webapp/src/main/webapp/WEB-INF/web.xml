@@ -53,6 +53,11 @@
   <display-name>DSpace Web UI</display-name>
 
 
+  <session-config>
+    <session-timeout>720</session-timeout>
+  </session-config>
+
+
   <!-- Configuration Information -->
 
   <context-param>

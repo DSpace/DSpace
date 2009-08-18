@@ -341,24 +341,25 @@
                     <input type="hidden" name="workspace_id" value="<%= workspaceItems[i].getID() %>"/>
                     <input type="submit" name="submit_open" value="<fmt:message key="jsp.mydspace.general.open" />"/>
                 </form>
-                    <%-- additional mapped collections --%>
-<%
-                    Collection collections[] = workspaceItems[i].getMapCollections();
-                    for (int j = 0; j < collections.length; j++) {
-%>
-                       <br/>
-                       <font size="-2">
-                          <%= collections[j].getMetadata("name") %>
-                       </font>
-<%
-                    }
-%>
             </td>
             <td headers="t10" class="<%= row %>RowEvenCol">
                 <a href="mailto:<%= submitter.getEmail() %>"><%= submitter.getFullName() %></a>
             </td>
             <td headers="t11" class="<%= row %>RowOddCol"><%= Utils.addEntities(title) %></td>
-            <td headers="t12" class="<%= row %>RowEvenCol"><%= workspaceItems[i].getCollection().getMetadata("name") %></td>
+            <td headers="t12" class="<%= row %>RowEvenCol"><%= workspaceItems[i].getCollection().getMetadata("name") %>
+              <%-- additional mapped collections --%>
+<%
+              Collection collections[] = workspaceItems[i].getMapCollections();
+              for (int j = 0; j < collections.length; j++) {
+%>
+                 <br/>
+                 <font size="-2">
+                    <%= collections[j].getMetadata("name") %>
+                 </font>
+<%
+              }
+%>
+            </td>
             <td headers="t13" class="<%= row %>RowOddCol">
                 <form action="<%= request.getContextPath() %>/mydspace" method="post">
                     <input type="hidden" name="step" value="<%= MyDSpaceServlet.MAIN_PAGE %>"/>

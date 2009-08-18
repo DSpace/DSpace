@@ -118,38 +118,46 @@ public class SelectCollectionStep extends AbstractProcessingStep
             AuthorizeException
     {
         // First we find the collection which was selected
-        int id = Util.getIntParameter(request, "collection");
+        int id[] = Util.getIntParameters(request, "mapcollections");
 
         // if the user didn't select a collection,
         // send him/her back to "select a collection" page
-        if (id < 0)
+        if (id == null)
         {
             return STATUS_NO_COLLECTION;
         }
 
-        // try to load the collection
-        Collection col = Collection.find(context, id);
+        // try to load the collections
+        Collection col[] = new Collection[id.length];
 
-        // Show an error if the collection is invalid
-        if (col == null)
-        {
-            return STATUS_INVALID_COLLECTION;
+        for (int i=0; i < id.length; i++) {
+            col[i] = Collection.find(context, id[i]);
+
+            // Show an error if the collection is invalid
+            if (col[i] == null)
+                {
+                    return STATUS_INVALID_COLLECTION;
+                }
         }
-        else
-        {
-            // create our new Workspace Item
-            WorkspaceItem wi = WorkspaceItem.create(context, col, true);
 
-            // update Submission Information with this Workspace Item
-            subInfo.setSubmissionItem(wi);
+        // create our new Workspace Item
+        // the first collection is the main collection
+        WorkspaceItem wi = WorkspaceItem.create(context, col[0], true);
 
-            // commit changes to database
-            context.commit();
-
-            // need to reload current submission process config,
-            // since it is based on the Collection selected
-            subInfo.reloadSubmissionConfig(request);
+        // the subsequent collections are mapped
+        for (int i=1; i < col.length; i++) {
+            wi.addMapCollection(col[i]);
         }
+
+        // update Submission Information with this Workspace Item
+        subInfo.setSubmissionItem(wi);
+
+        // commit changes to database
+        context.commit();
+
+        // need to reload current submission process config,
+        // since it is based on the Collection selected
+        subInfo.reloadSubmissionConfig(request);
 
         // no errors occurred
         return STATUS_COMPLETE;

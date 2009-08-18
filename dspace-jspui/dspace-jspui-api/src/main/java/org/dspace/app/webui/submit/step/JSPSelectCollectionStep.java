@@ -42,6 +42,8 @@ package org.dspace.app.webui.submit.step;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import java.util.Arrays;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -136,12 +138,16 @@ public class JSPSelectCollectionStep extends JSPStep
          * With no parameters, this servlet prepares for display of the Select
          * Collection JSP.
          */
-        String collectionID = request.getParameter("collection");
-        Collection col = null;
+        String collectionID[] = request.getParameterValues("mapcollections");
+        Collection col[] = null;
 
         if (collectionID != null)
         {
-            col = Collection.find(context, Integer.parseInt(collectionID));
+            col = new Collection[collectionID.length];
+
+            for (int i=0; i < collectionID.length; i++) {
+                col[i] = Collection.find(context, Integer.parseInt(collectionID[i]));
+            }
         }
 
         // if we already have a valid collection, then we can forward directly
@@ -150,7 +156,7 @@ public class JSPSelectCollectionStep extends JSPStep
         {
             log
                     .debug("Select Collection page skipped, since a Collection ID was already found.  Collection ID="
-                            + collectionID);
+                           + Arrays.asList(collectionID));
         }
         else
         {
@@ -175,7 +181,7 @@ public class JSPSelectCollectionStep extends JSPStep
             // This is a special case, where the user came back to this
             // page after not selecting a collection. This will display
             // the "Please select a collection" message to the user
-            if (collectionID != null && Integer.parseInt(collectionID) == -1)
+            if (collectionID != null && Integer.parseInt(collectionID[0]) == -1)
             {
                 // specify "no collection" error message should be displayed
                 request.setAttribute("no.collection", new Boolean(true));
