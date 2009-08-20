@@ -89,7 +89,6 @@
 		</td></tr>
             </table>
         </P>
->>>>>>> .merge-right.r130
         
         <input type="hidden" name="item_id" value="<%= item.getID() %>"/>
 
