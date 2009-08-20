@@ -146,6 +146,11 @@
   <!-- Servlets -->
 
   <servlet>
+    <servlet-name>mapcollections</servlet-name>
+    <servlet-class>edu.umd.lib.dspace.app.webui.servlet.admin.CollectionMappingServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>authorize</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.AuthorizeAdminServlet</servlet-class>
   </servlet>
@@ -420,6 +425,11 @@
  
 
   <!-- Servlet Mappings -->
+
+  <servlet-mapping>
+    <servlet-name>mapcollections</servlet-name>
+    <url-pattern>/tools/mapcollections</url-pattern>
+  </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>authorize</servlet-name>

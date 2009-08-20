@@ -50,6 +50,8 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.IndexBrowse;
 import org.dspace.browse.ItemCounter;
 import org.dspace.browse.ItemCountException;
 import org.dspace.core.Constants;
@@ -638,15 +640,16 @@ public class Community extends DSpaceObject
 
         // Get the table rows
         TableRowIterator tri = DatabaseManager
-                .query(
+                .queryTable(
                         ourContext,
                         "collection",
                         "SELECT collection.* FROM collection WHERE "
                         + "collection_id NOT IN "
                         + "  (SELECT collection.collection_id FROM collection, community2collection WHERE "
                         + "   community2collection.collection_id=collection.collection_id "
-                        + "   AND community2collection.community_id="
-                        + getID() + ") ORDER BY collection.name");
+                        + "   AND community2collection.community_id=?)"
+                        + "ORDER BY collection.name",
+                        getID());
 
         // Make Collection objects
         while (tri.hasNext())
@@ -877,6 +880,38 @@ public class Community extends DSpaceObject
             if (tri != null)
                 tri.close();
         }
+
+        // Update browse indexes for all items in the collection
+        for (ItemIterator ii = c.getItems(); ii.hasNext(); ) {
+          Item i = ii.next();
+
+          String message = "Updated browse index";
+          try {
+            // Update browse indices
+            ourContext.turnOffAuthorisationSystem();
+            IndexBrowse ib = new IndexBrowse(ourContext);
+            ib.indexItem(i);
+            ourContext.restoreAuthSystemState();
+          }
+          catch (BrowseException e) {
+            message = e.getMessage();
+          }
+
+	  if (out != null) {
+	    try {
+	      String strHandle = HandleManager.findHandle(ourContext, i);
+	      out.write(message + ": " + strHandle + "<br/>");
+	      for (int x=0; x < 1024; x++) {
+		out.write(" ");
+	      }
+	      out.write("\n");
+	      out.flush();
+	    } 
+	    catch (IOException e) {
+	    }
+	  }
+
+        }
     }
 
     /**
@@ -1005,6 +1040,38 @@ public class Community extends DSpaceObject
             // close the TableRowIterator to free up resources
             if (tri != null)
                 tri.close();
+        }
+
+        // Update browse indexes for all items in the collection
+        for (ItemIterator ii = c.getItems(); ii.hasNext(); ) {
+          Item i = ii.next();
+
+          String message = "Updated browse index";
+          try {
+            // Update browse indices
+            ourContext.turnOffAuthorisationSystem();
+            IndexBrowse ib = new IndexBrowse(ourContext);
+            ib.indexItem(i);
+            ourContext.restoreAuthSystemState();
+          }
+          catch (BrowseException e) {
+            message = e.getMessage();
+          }
+
+	  if (out != null) {
+	    try {
+	      String strHandle = HandleManager.findHandle(ourContext, i);
+	      out.write(message + ": " + strHandle + "<br/>");
+	      for (int x=0; x < 1024; x++) {
+		out.write(" ");
+	      }
+	      out.write("\n");
+	      out.flush();
+	    } 
+	    catch (IOException e) {
+	    }
+	  }
+
         }
     }
 

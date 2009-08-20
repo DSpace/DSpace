@@ -1251,13 +1251,13 @@ public class Collection extends DSpaceObject
     {
         // Get the bundle table rows
         TableRowIterator tri = DatabaseManager
-                .query(
+                .queryTable(
                         ourContext,
                         "community",
                         "SELECT community.* FROM community, community2collection WHERE "
-                                + "community.community_id=community2collection.community_id "
-                                + "AND community2collection.collection_id="
-                                + getID());
+                        + "community.community_id=community2collection.community_id "
+                        + "AND community2collection.collection_id=?",
+                        getID());
 
         // Build a list of Community objects
         List communities = new ArrayList();
