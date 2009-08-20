@@ -95,16 +95,6 @@ import org.dspace.core.ConfigurationManager;
    write marc to output file
  </pre>
 
- <pre>
- Revision History:
-
-   2006/06/14: Ben
-     - send the log file on the command line
-
-   2006/03/23: Ben
-     - initial version
- </pre>
-
  @author  Ben Wallberg
 
 *********************************************************************/

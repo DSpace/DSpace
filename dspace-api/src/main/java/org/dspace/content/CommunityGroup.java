@@ -13,21 +13,6 @@ import org.dspace.core.Context;
  */
 public class CommunityGroup
 {
-    /**
-     * <pre>
-     * Revision History
-     *   2005/09/26: Gary
-     *     - changed name of "UM Faculty..." group 
-     *
-     *   2005/09/26: Ben
-     *     - remove 'Managed by Libraries'; vestiges are in place 
-     *       but findAll does not return it
-     *
-     *   2004/10/21: Ben
-     *     - initial version
-     * </pre>
-     */
-
     private static final int FACULTY   = 0;
     private static final int LIBRARIES = 1;
     private static final int UM        = 2;

@@ -10,16 +10,6 @@ import org.dspace.core.Context;
 
 public class GetCollectionId
 {
-    /**
-     * <pre>
-     * Revision History:
-     *
-     *   2005/07/13: Ben
-     *     - initial version
-     *
-     * </pre>
-     */
-
   public static void
   main(String[] args)
     throws Exception

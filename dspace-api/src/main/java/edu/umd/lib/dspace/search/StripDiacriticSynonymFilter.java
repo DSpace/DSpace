@@ -21,13 +21,6 @@ import com.ibm.icu.impl.NormalizerImpl;
  If a term contains diacritics make a synonym for the term with the
  diacritics stripped.
 
- <pre>
- Revision History:
-
-   2006/01/11: Ben
-     - initial version
- </pre>
-
  @author  Ben Wallberg
 
 *********************************************************************/
