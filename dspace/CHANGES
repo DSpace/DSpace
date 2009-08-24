@@ -1,6 +1,9 @@
 1.6.0
 =====
 
+(Alexey Maslov)
+ - [DS-289] OAI-PMH + OAI-ORE harvesting support
+
 (Kim Shepherd)
  - [DS-118] File preview link during submission leads to page not found
  - [DS-121] XMLUI Feedback form breaks with multiple hostnames
