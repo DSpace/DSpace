@@ -1470,6 +1470,72 @@
 	<message key="xmlui.administrative.collection.CreateCollectionForm.trail">Create Collection</message>
 	<message key="xmlui.administrative.collection.CreateCollectionForm.main_head">Enter Metadata for a New Collection of {0}</message>
 	<message key="xmlui.administrative.collection.CreateCollectionForm.submit_save">Create</message>
+		
+	<!-- General to the harvesting options under collection -->
+	<message key="xmlui.administrative.collection.GeneralCollectionHarvestingForm.title">Collection Harvesting Settings</message>
+	<message key="xmlui.administrative.collection.GeneralCollectionHarvestingForm.trail">Harvesting</message>
+	<message key="xmlui.administrative.collection.GeneralCollectionHarvestingForm.options_harvest">Content Source</message>
+	<message key="xmlui.administrative.collection.GeneralCollectionHarvestingForm.label_source">Content source</message>
+	<message key="xmlui.administrative.collection.GeneralCollectionHarvestingForm.source_normal">This is a standard DSpace collection</message>
+	<message key="xmlui.administrative.collection.GeneralCollectionHarvestingForm.source_harvested">This collection harvests its content from an external source</message>
+	<message key="xmlui.administrative.collection.GeneralCollectionHarvestingForm.submit_save">Save</message>
+	
+	<!-- org.dspace.app.xmlui.administrative.collection.SetupCollectionHarvestingForm.java -->
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.main_settings_head">Harvested Collection Location</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.options_head">Harvesting Options</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_oai_provider">OAI Provider</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_setid">OAI Set id</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_metadata_format">Metadata Format</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.help_oaiurl">The url of the target repository's OAI provider service</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.error_oaiurl">You must provide a set id of the target collection.</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.help_oaisetid">The persistent identifier used by the OAI provider to desginate the target collection</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.error_oaisetid">You must provide a set id of the target collection.</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_harvest_level">Content being harvested</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_harvest_level">Content being harvested</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.option_md_only">Harvest metadata only.</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.option_md_and_ref">Harvest metadata and references to bitstreams (requires ORE support).</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.option_md_and_bs">Harvest metadata and bitstreams (requires ORE support).</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.submit_test">Test Settings</message>
+	
+	<!-- org.dspace.app.xmlui.administrative.collection.EditCollectionHarvestingForm.java -->
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.main_settings_head">Harvested Collection Location</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.label_oai_provider">OAI Provider</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.label_setid">OAI Set id</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.label_metadata_format">Metadata format</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.label_harvest_level">Content being harvested</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.label_harvest_result">Last Harvest Result</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_result_new">This collection has not yet been harvested.</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.label_harvest_status">Current harvest status</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_ready">Collection ready for harvest</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_busy">Collection is currently being harvested</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_queued">Collection is in queue for harvest</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_oai_error">OAI error occured during last harvest</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_unknown_error">Unexpected error occured during last harvest</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.option_md_only">Harvest metadata only.</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.option_md_and_ref">Harvest metadata and references to bitstreams.</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.option_md_and_bs">Harvest metadata and bitstreams (full replication).</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.submit_change_settings">Change Settings</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.submit_import_now">Import Now</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.submit_reimport_collection">Reset and Reimport Collection</message>
+
+	<message key="xmlui.administrative.ControlPanel.option_harvest">Harvesting</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_scheduler_head">Harvest Scheduler Controls</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_label_status">Status</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_label_actions">Actions</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_submit_start">Start Harvester</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_submit_reset">Reset Harvest Status</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_submit_resume">Resume</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_submit_pause">Pause</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_submit_stop">Stop</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_label_collections">Collections set up for harvesting</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_label_active">Active harvests</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_label_queued">Queued harvests</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_label_oai_errors">OAI errors</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_label_internal_errors">Internal errors</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_head_generator_settings">Generator Settings</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_label_oai_url">OAI-PMH URL</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_label_oai_source">ORE source</message>
+	<message key="xmlui.administrative.ControlPanel.harvest_head_harvester_settings">Harvester Settings</message>	
 
 	<!-- General tags for community management -->
 	<message key="xmlui.administrative.community.general.community_trail">Communities</message>

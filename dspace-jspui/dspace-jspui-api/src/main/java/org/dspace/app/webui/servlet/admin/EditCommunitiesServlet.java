@@ -64,6 +64,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
+import org.dspace.harvest.HarvestedCollection;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -203,7 +204,11 @@ public class EditCommunitiesServlet extends DSpaceServlet
             break;
 
         case START_EDIT_COLLECTION:
-
+        	
+        	HarvestedCollection hc = HarvestedCollection.find(context, UIUtil.
+            		getIntParameter(request, "collection_id"));
+        	request.setAttribute("harvestInstance", hc);
+        	
             // Display the relevant "edit collection" page
             JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
 
@@ -551,6 +556,40 @@ public class EditCommunitiesServlet extends DSpaceServlet
         collection.setMetadata("side_bar_text", side);
         collection.setMetadata("license", license);
         collection.setMetadata("provenance_description", provenance);
+        
+        
+        
+        
+        // Set the harvesting settings
+        
+        HarvestedCollection hc = HarvestedCollection.find(context, collection.getID());
+		String contentSource = request.getParameter("source");
+
+		// First, if this is not a harvested collection (anymore), set the harvest type to 0; wipe harvest settings  
+		if (contentSource.equals("source_normal")) 
+		{
+			if (hc != null) 
+				hc.delete();
+		}
+		else 
+		{
+			// create a new harvest instance if all the settings check out
+			if (hc == null) {
+				hc = HarvestedCollection.create(context, collection.getID());
+			}
+			
+			String oaiProvider = request.getParameter("oai_provider");
+			String oaiSetId = request.getParameter("oai_setid");
+			String metadataKey = request.getParameter("metadata_format");
+			String harvestType = request.getParameter("harvest_level");
+
+			hc.setHarvestParams(Integer.parseInt(harvestType), oaiProvider, oaiSetId, metadataKey);
+			hc.setHarvestStatus(HarvestedCollection.STATUS_READY);
+			
+			hc.update();
+		}
+        
+        
 
         // Which button was pressed?
         String button = UIUtil.getSubmitButton(request, "submit");

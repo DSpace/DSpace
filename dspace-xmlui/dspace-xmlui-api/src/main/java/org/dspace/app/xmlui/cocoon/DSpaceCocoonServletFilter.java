@@ -58,6 +58,7 @@ import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.harvest.OAIHarvester;
 
 /**
  * This is a wrapper servlet around the cocoon servlet that prefroms two functions, 1) it 
@@ -212,6 +213,16 @@ public class DSpaceCocoonServletFilter implements Filter
     				"DSpace configuration directory. \n\n",t);
     	}
    
+		if (ConfigurationManager.getBooleanProperty("harvester.autoStart")) 
+    	{
+    		try {
+    			OAIHarvester.startNewScheduler();
+    		}
+    		catch (Throwable t)
+    		{
+    			//ignore
+    		}
+    	}
     	
     }
     

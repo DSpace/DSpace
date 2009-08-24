@@ -85,6 +85,9 @@ to administer DSpace.
 			<map:transformer name="SearchItemForm" src="org.dspace.app.xmlui.aspect.administrative.mapper.SearchItemForm"/>
 			
 			<map:transformer name="EditCollectionMetadataForm" src="org.dspace.app.xmlui.aspect.administrative.collection.EditCollectionMetadataForm"/>
+			<map:transformer name="ToggleCollectionHarvestingForm" src="org.dspace.app.xmlui.aspect.administrative.collection.ToggleCollectionHarvestingForm"/>
+			<map:transformer name="SetupCollectionHarvestingForm" src="org.dspace.app.xmlui.aspect.administrative.collection.SetupCollectionHarvestingForm"/>
+			<map:transformer name="EditCollectionHarvestingForm" src="org.dspace.app.xmlui.aspect.administrative.collection.EditCollectionHarvestingForm"/>
 			<map:transformer name="AssignCollectionRoles" src="org.dspace.app.xmlui.aspect.administrative.collection.AssignCollectionRoles"/>
 			<map:transformer name="DeleteCollectionRoleConfirm" src="org.dspace.app.xmlui.aspect.administrative.collection.DeleteCollectionRoleConfirm"/>
 			<map:transformer name="DeleteCollectionConfirm" src="org.dspace.app.xmlui.aspect.administrative.collection.DeleteCollectionConfirm"/>
@@ -635,6 +638,37 @@ to administer DSpace.
 		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
 		        			</map:transform>
 		        		</map:match>
+		        		
+		        		<!-- Harvesting options setup form, used for collections that are being edited or set up 
+		        			for the first time -->
+		        		<map:match pattern="admin/collection/setupHarvesting">
+		        			<map:transform type="SetupCollectionHarvestingForm">
+		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        				<map:parameter name="oaiProviderValue" value="{flow-attribute:oaiProviderValue}"/>
+		        				<map:parameter name="oaiSetIdValue" value="{flow-attribute:oaiSetIdValue}"/>
+		        				<map:parameter name="metadataFormatValue" value="{flow-attribute:metadataFormatValue}"/>
+		        				<map:parameter name="harvestLevelValue" value="{flow-attribute:harvestLevelValue}"/>
+		        			</map:transform>
+		        		</map:match> 
+		        		
+		        		<!-- Harvesting options setup form, used for collections that are being edited or set up 
+		        			for the first time -->
+		        		<map:match pattern="admin/collection/editHarvesting">
+		        			<map:transform type="EditCollectionHarvestingForm">
+		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!-- Initial toggle -->
+		        		<map:match pattern="admin/collection/toggleHarvesting">
+		        			<map:transform type="ToggleCollectionHarvestingForm">
+		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		 
 		        		
 		        		<!-- Confirmation screen for deleteing one of the standard authorization groups -->
 		        		<map:match pattern="admin/collection/deleteRole">

@@ -47,6 +47,7 @@ importClass(Packages.org.dspace.content.Bundle);
 importClass(Packages.org.dspace.content.Item);
 importClass(Packages.org.dspace.content.Collection);
 importClass(Packages.org.dspace.content.Community);
+importClass(Packages.org.dspace.harvest.HarvestedCollection);
 importClass(Packages.org.dspace.eperson.EPerson);
 importClass(Packages.org.dspace.eperson.Group);
 
@@ -2217,6 +2218,11 @@ function doEditCollection(collectionID,newCollectionP)
 			// go assign colection roles
 			doAssignCollectionRoles(collectionID);
 		}
+		else if (cocoon.request.get("submit_harvesting"))
+		{
+			// edit collection harvesting settings
+			doEditCollectionHarvesting(collectionID);
+		}
 		else
 		{
 			// This case should never happen but to prevent an infinite loop
@@ -2243,7 +2249,8 @@ function doEditCollectionMetadata(collectionID)
 		assertEditCollection(collectionID);
 		result=null;
 		
-		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") || cocoon.request.get("submit_roles"))
+		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") || 
+			cocoon.request.get("submit_roles") || cocoon.request.get("submit_harvesting"))
 		{
 			// return to the editCollection function which will determine where to go next.
 			return null;	
@@ -2299,7 +2306,8 @@ function doAssignCollectionRoles(collectionID)
 		result = null;
 		
 		
-		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") || cocoon.request.get("submit_roles"))
+		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") || 
+			cocoon.request.get("submit_roles") || cocoon.request.get("submit_harvesting"))
 		{
 			// return to the editCollection function which will determine where to go next.
 			return null;	
@@ -2390,6 +2398,110 @@ function doAssignCollectionRoles(collectionID)
 			
 	}while(true);
 }
+
+
+
+/**
+ * Set up various harvesting options.
+ * From here the user can also move on to edit roles and edit metadata screen. 
+ */ 
+function doSetupCollectionHarvesting(collectionID)
+{
+	assertEditCollection(collectionID);
+	
+	var result = null;
+	var oaiProviderValue = null;
+	var oaiSetIdValue = null;
+	var metadataFormatValue = null;
+	var harvestLevelValue = null;
+	
+	do {
+		sendPageAndWait("admin/collection/setupHarvesting",{"collectionID":collectionID,"oaiProviderValue":oaiProviderValue,"oaiSetIdValue":oaiSetIdValue,"metadataFormatValue":metadataFormatValue,"harvestLevelValue":harvestLevelValue},result);
+		result = null;
+		oaiProviderValue = cocoon.request.get("oai_provider");
+		oaiSetIdValue = cocoon.request.get("oai_setid");
+		metadataFormatValue = cocoon.request.get("metadata_format");
+		harvestLevelValue = cocoon.request.get("harvest_level");
+		
+		assertEditCollection(collectionID);
+				
+		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") || 
+			cocoon.request.get("submit_roles") || cocoon.request.get("submit_harvesting"))
+		{
+			// return to the editCollection function which will determine where to go next.
+			return null;	
+		}
+		else if (cocoon.request.get("submit_save")) 
+		{
+			// Save updates
+			result = FlowContainerUtils.processSetupCollectionHarvesting(getDSContext(), collectionID, cocoon.request);
+		}
+		else if (cocoon.request.get("submit_test")) 
+		{
+			// Ping the OAI server and verify that the address/set/metadata combo is present there
+			// Can get this either in a single GetRecords OAI request or via two separate ones: ListSets and ListMetadataFormats
+			result = FlowContainerUtils.testOAISettings(getDSContext(), cocoon.request);
+		}
+				
+	} while (!result.getContinue());
+}
+
+
+/**
+ * Edit existing harvesting options.
+ * From here the user can also move on to edit roles and edit metadata screen. 
+ */ 
+function doEditCollectionHarvesting(collectionID)
+{
+	assertEditCollection(collectionID);
+	
+	var result = null;
+	do 
+	{
+		// If this collection's havresting is not set up properly, redirect to the setup screen
+		if (HarvestedCollection.find(getDSContext(), collectionID) == null) {
+			sendPageAndWait("admin/collection/toggleHarvesting",{"collectionID":collectionID},result);
+		}
+		else if (!HarvestedCollection.isHarvestable(getDSContext(), collectionID)) {
+			doSetupCollectionHarvesting(collectionID);
+		}
+		else {
+			sendPageAndWait("admin/collection/editHarvesting",{"collectionID":collectionID},result);
+		}
+		
+		result = null;
+		assertEditCollection(collectionID);
+				
+		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") || 
+			cocoon.request.get("submit_roles") || cocoon.request.get("submit_harvesting"))
+		{
+			// return to the editCollection function which will determine where to go next.
+			return null;	
+		}
+		else if (cocoon.request.get("submit_save")) 
+		{
+			// Save updates
+			result = FlowContainerUtils.processSetupCollectionHarvesting(getDSContext(), collectionID, cocoon.request);
+		}
+		else if (cocoon.request.get("submit_import_now")) 
+		{
+			// Test the settings and run the import immediately
+			result = FlowContainerUtils.processRunCollectionHarvest(getDSContext(), collectionID, cocoon.request);
+		}
+		else if (cocoon.request.get("submit_reimport")) 
+		{
+			// Test the settings and run the import immediately
+			result = FlowContainerUtils.processReimportCollection(getDSContext(), collectionID, cocoon.request);
+		}
+		else if (cocoon.request.get("submit_change")) 
+		{
+			doSetupCollectionHarvesting(collectionID);
+		}
+	} while (true);
+}
+
+
+
 
 /**
  * Delete a specified collection role. Under the current implementation, the only roles this applies to

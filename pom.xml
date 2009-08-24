@@ -494,6 +494,11 @@
             <artifactId>ojdbc14</artifactId>
             <version>10.2.0.2.0</version>
          </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>oclc-harvester2</artifactId>
+            <version>0.1.12</version>
+         </dependency>
       </dependencies>
    </dependencyManagement>
 

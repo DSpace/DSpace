@@ -42,7 +42,12 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.servlet.multipart.Part;
@@ -51,14 +56,24 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.IndexBrowse;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.harvest.HarvestedCollection;
 import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
+import org.dspace.harvest.OAIHarvester;
+import org.dspace.harvest.OAIHarvester.HarvestScheduler;
+import org.dspace.harvest.OAIHarvester.HarvestingException;
+import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.xml.sax.SAXException;
 
 /**
  * Utility methods to processes actions on Communities and Collections. 
@@ -164,6 +179,203 @@ public class FlowContainerUtils
 		return result;
 	}
 	
+	/**
+	 * Process the collection harvesting options form.
+	 * 
+	 * @param context The current DSpace context.
+	 * @param collectionID The collection id.
+	 * @param request the Cocoon request object
+	 * @return A process result's object.
+	 */
+	public static FlowResult processSetupCollectionHarvesting(Context context, int collectionID, Request request) throws SQLException, IOException, AuthorizeException
+	{
+		FlowResult result = new FlowResult();
+		HarvestedCollection hc = HarvestedCollection.find(context, collectionID);
+
+		String contentSource = request.getParameter("source");
+
+		// First, if this is not a harvested collection (anymore), set the harvest type to 0; possibly also wipe harvest settings  
+		if (contentSource.equals("source_normal")) 
+		{
+			if (hc != null) 
+				hc.delete();
+			
+			result.setContinue(true);
+		}
+		else 
+		{
+			FlowResult subResult = testOAISettings(context, request);
+			
+			// create a new harvest instance if all the settings check out
+			if (hc == null) {
+				hc = HarvestedCollection.create(context, collectionID);
+			}
+			
+			// if the supplied options all check out, set the harvesting parameters on the collection
+			if (subResult.getErrors().isEmpty()) {
+				String oaiProvider = request.getParameter("oai_provider");
+				String oaiSetId = request.getParameter("oai_setid");
+				String metadataKey = request.getParameter("metadata_format");
+				String harvestType = request.getParameter("harvest_level");
+				
+				hc.setHarvestParams(Integer.parseInt(harvestType), oaiProvider, oaiSetId, metadataKey);
+				hc.setHarvestStatus(HarvestedCollection.STATUS_READY);
+			}
+			else {
+				result.setErrors(subResult.getErrors());
+				result.setContinue(false);
+				return result;
+			}
+			
+			hc.update();
+		}
+		        
+        // Save everything
+        context.commit();
+        
+        // No notice...
+        //result.setMessage(new Message("default","Harvesting options successfully modified."));
+        result.setOutcome(true);
+        result.setContinue(true);
+		
+		return result;
+	}
+	
+	
+	/**
+	 * Use the collection's harvest settings to immediately perform a harvest cycle.
+	 * 
+	 * @param context The current DSpace context.
+	 * @param collectionID The collection id.
+	 * @param request the Cocoon request object
+	 * @return A process result's object.
+	 * @throws TransformerException 
+	 * @throws SAXException 
+	 * @throws ParserConfigurationException 
+	 * @throws CrosswalkException 
+	 */
+	public static FlowResult processRunCollectionHarvest(Context context, int collectionID, Request request) throws SQLException, IOException, AuthorizeException, CrosswalkException, ParserConfigurationException, SAXException, TransformerException
+	{
+		FlowResult result = new FlowResult();
+		OAIHarvester harvester;
+		List<String> testErrors = new ArrayList<String>();
+		Collection collection = Collection.find(context, collectionID);
+		HarvestedCollection hc = HarvestedCollection.find(context, collectionID);
+
+		//TODO: is there a cleaner way to do this?
+		try {
+			if (HarvestScheduler.status != HarvestScheduler.HARVESTER_STATUS_STOPPED) {
+				synchronized(HarvestScheduler.lock) {
+					HarvestScheduler.interrupt = HarvestScheduler.HARVESTER_INTERRUPT_INSERT_THREAD;
+					HarvestScheduler.interruptValue = collection.getID();
+					HarvestScheduler.lock.notify();
+				}
+			}
+			else {
+				harvester = new OAIHarvester(context, collection, hc);
+				harvester.runHarvest();
+			}
+		}
+		catch (Exception e) {
+			testErrors.add(e.getMessage());
+			result.setErrors(testErrors);
+			result.setContinue(false);
+			return result;
+		}
+		
+        result.setContinue(true);
+		
+		return result;
+	}
+	
+	
+	/**
+	 * Purge the collection of all items, then run a fresh harvest cycle.
+	 * 
+	 * @param context The current DSpace context.
+	 * @param collectionID The collection id.
+	 * @param request the Cocoon request object
+	 * @return A process result's object.
+	 * @throws TransformerException 
+	 * @throws SAXException 
+	 * @throws ParserConfigurationException 
+	 * @throws CrosswalkException 
+	 * @throws BrowseException 
+	 */
+	public static FlowResult processReimportCollection(Context context, int collectionID, Request request) throws SQLException, IOException, AuthorizeException, CrosswalkException, ParserConfigurationException, SAXException, TransformerException, BrowseException 
+	{
+		FlowResult result = new FlowResult();
+		Collection collection = Collection.find(context, collectionID);
+		HarvestedCollection hc = HarvestedCollection.find(context, collectionID);
+		
+		ItemIterator it = collection.getAllItems();
+		//IndexBrowse ib = new IndexBrowse(context);
+		while (it.hasNext()) {
+			Item item = it.next();
+			//System.out.println("Deleting: " + item.getHandle());
+			//ib.itemRemoved(item);
+			collection.removeItem(item);
+		}
+		hc.setHarvestResult(null,"");
+		hc.update();
+		collection.update();
+		context.commit();
+		
+		result = processRunCollectionHarvest(context, collectionID, request);		
+		
+		return result;		
+	}
+	
+	
+	/**
+	 * Test the supplied OAI settings. 
+	 * 
+	 * @param context
+	 * @param request
+	 * @return
+	 */
+	public static FlowResult testOAISettings(Context context, Request request)  
+	{
+		FlowResult result  = new FlowResult();
+		
+		String oaiProvider = request.getParameter("oai_provider");
+		String oaiSetId = request.getParameter("oai_setid");
+		String metadataKey = request.getParameter("metadata_format");
+		String harvestType = request.getParameter("harvest_level");
+		int harvestTypeInt = 0;
+		
+		if (oaiProvider == null || oaiProvider.length() == 0)
+			result.addError("oai_provider");
+		if (oaiSetId == null || oaiSetId.length() == 0)
+			result.addError("oai_setid");
+		if (metadataKey == null || metadataKey.length() == 0)
+			result.addError("metadata_format");
+		if (harvestType == null || harvestType.length() == 0)
+			result.addError("harvest_level");
+		else
+			harvestTypeInt = Integer.parseInt(harvestType);
+			
+		
+		if (result.getErrors() == null) {
+			List<String> testErrors = OAIHarvester.verifyOAIharvester(oaiProvider, oaiSetId, metadataKey, (harvestTypeInt>1));
+			result.setErrors(testErrors);
+		}
+		
+		if (result.getErrors() == null || result.getErrors().isEmpty()) {
+			result.setOutcome(true);
+			// On a successful test we still want to stay in the loop, not continue out of it
+			//result.setContinue(true);
+			result.setMessage(new Message("default","Harvesting settings are valid."));
+		}
+		else {
+			result.setOutcome(false);
+			result.setContinue(false);
+			// don't really need a message when the errors are highlighted already
+			//result.setMessage(new Message("default","Harvesting is not properly configured."));
+		}
+
+		return result;
+	}
 	
 	/**
 	 * Look up the id of the template item for a given collection.
