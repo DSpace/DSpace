@@ -202,7 +202,7 @@ public class MetadataExport
 
         options.addOption("i", "id", true, "ID or handle of thing to export (item, collection, or community)");
         options.addOption("f", "file", true, "destination where you want file written");
-        options.addOption("a", "all", false, "include all metadata fields that are not normally changed (e.g. handle, provenance)");
+        options.addOption("a", "all", false, "include all metadata fields that are not normally changed (e.g. provenance)");
         options.addOption("h", "help", false, "help");
 
         CommandLine line = null;
