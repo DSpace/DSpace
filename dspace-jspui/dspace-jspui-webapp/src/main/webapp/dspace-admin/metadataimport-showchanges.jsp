@@ -52,7 +52,8 @@
 <%
     // Get the changes
     ArrayList<BulkEditChange> changes = (ArrayList<BulkEditChange>)request.getAttribute("changes");
-
+    String changeCount = "" + changes.size();
+    
     // Are these changes to be made, or that have been made
     boolean changed = ((Boolean)request.getAttribute("changed")).booleanValue();
 
@@ -74,6 +75,16 @@
     {
         %>
             <p><strong><fmt:message key="jsp.dspace-admin.metadataimport.toomany"/></strong></p>
+        <%
+    }
+
+    // Tell the user the import has finished (if applicable)
+    if (changed)
+    {
+        %>
+            <p><strong><fmt:message key="jsp.dspace-admin.metadataimport.finished">
+                <fmt:param value="<%= changeCount %>" />
+            </fmt:message></strong></p>
         <%
     }
 %>
