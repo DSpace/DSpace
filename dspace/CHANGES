@@ -39,6 +39,7 @@
  - [DS-221] XMLUI 'current activity' recognises Google Chrome as Safari
  - [DS-242] Special groups shown for logged in user rather than for user being examined
  - [DS-250] Invalid identifiers are not escaped
+ - [DS-256] Item Export ignores metadata language qualifier
  - [DS-290] [dspace]/exports is not created during fresh install
 
 (Larry Stone)

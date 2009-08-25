@@ -480,9 +480,8 @@ public class ItemExport
             String dateIssued = null;
             String dateAccessioned = null;
 
-            for (int j = 0; j < dcorevalues.length; j++)
+            for (DCValue dcv : dcorevalues)
             {
-                DCValue dcv = dcorevalues[j];
                 String qualifier = dcv.qualifier;
 
                 if (qualifier == null)
@@ -490,8 +489,20 @@ public class ItemExport
                     qualifier = "none";
                 }
 
+                String language = dcv.language;
+
+                if (language != null)
+                {
+                    language = " language=\"" + language + "\"";
+                }
+                else
+                {
+                    language = "";
+                }
+
                 utf8 = ("  <dcvalue element=\"" + dcv.element + "\" "
-                        + "qualifier=\"" + qualifier + "\">"
+                        + "qualifier=\"" + qualifier + "\""
+                        + language + ">"
                         + Utils.addEntities(dcv.value) + "</dcvalue>\n")
                         .getBytes("UTF-8");
 
