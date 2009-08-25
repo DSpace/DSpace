@@ -448,7 +448,7 @@ public class SimpleSearchServlet extends DSpaceServlet
             iids.add(item.getID());
         }
         ItemIterator ii = new ItemIterator(context, iids);
-        MetadataExport exporter = new MetadataExport(context, ii);
+        MetadataExport exporter = new MetadataExport(context, ii, false);
 
         // Perform the export
         DSpaceCSV csv = exporter.export();

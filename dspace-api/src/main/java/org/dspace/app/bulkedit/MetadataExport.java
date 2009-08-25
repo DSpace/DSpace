@@ -56,19 +56,30 @@ import java.sql.SQLException;
 public class MetadataExport
 {
     /** The Context */
-    Context c;
+    private Context c;
 
     /** The items to export */
-    ItemIterator toExport;
+    private ItemIterator toExport;
+
+    /** Whether to export all metadata, or just normally edited metadata */
+    private boolean exportAll;
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(MetadataExport.class);
 
-    public MetadataExport(Context c, ItemIterator toExport)
+    /**
+     * Set up a new metadata export
+     *
+     * @param c The Context
+     * @param toExport The ItemIterator of items to export
+     * @param exportAll whether to export all metadata or not (include handle, provenance etc)
+     */
+    public MetadataExport(Context c, ItemIterator toExport, boolean exportAll)
     {
         // Store the export settings
         this.c = c;
         this.toExport = toExport;
+        this.exportAll = exportAll;
     }
 
     /**
@@ -76,14 +87,16 @@ public class MetadataExport
      *
      * @param c The Context
      * @param toExport The Community to export
+     * @param exportAll whether to export all metadata or not (include handle, provenance etc)
      */
-    public MetadataExport(Context c, Community toExport)
+    public MetadataExport(Context c, Community toExport, boolean exportAll)
     {
         try
         {
             // Try to export the community
             this.c = c;
             this.toExport = new ItemIterator(c, buildFromCommunity(toExport, new ArrayList(), 0));
+            this.exportAll = exportAll;
         }
         catch (SQLException sqle)
         {
@@ -144,7 +157,7 @@ public class MetadataExport
         try
         {
             // Process each item
-            DSpaceCSV csv = new DSpaceCSV();
+            DSpaceCSV csv = new DSpaceCSV(exportAll);
             while (toExport.hasNext())
             {
                 csv.addItem(toExport.next());
@@ -189,6 +202,7 @@ public class MetadataExport
 
         options.addOption("i", "id", true, "ID or handle of thing to export (item, collection, or community)");
         options.addOption("f", "file", true, "destination where you want file written");
+        options.addOption("a", "all", false, "include all metadata fields that are not normally changed (e.g. handle, provenance)");
         options.addOption("h", "help", false, "help");
 
         CommandLine line = null;
@@ -201,6 +215,7 @@ public class MetadataExport
         {
             System.err.println("Error with commands.");
             printHelp(options, 1);
+            System.exit(0);
         }
 
         if (line.hasOption('h'))
@@ -224,11 +239,14 @@ public class MetadataExport
         ItemIterator toExport = null;
         MetadataExport exporter = null;
 
+        // Export everything?
+        boolean exportAll = line.hasOption('a');
+
         // Check we have an item OK
         if (!line.hasOption('i'))
         {
             System.out.println("Exporting whole repository WARNING: May take some time!");
-            exporter = new MetadataExport(c, Item.findAll(c));
+            exporter = new MetadataExport(c, Item.findAll(c), exportAll);
         }
         else
         {
@@ -245,19 +263,19 @@ public class MetadataExport
                 System.out.println("Exporting item '" + dso.getName() + "' (" + handle + ")");
                 ArrayList item = new ArrayList();
                 item.add(dso.getID());
-                exporter = new MetadataExport(c, new ItemIterator(c, item));
+                exporter = new MetadataExport(c, new ItemIterator(c, item), exportAll);
             }
             else if (dso.getType() == Constants.COLLECTION)
             {
                 System.out.println("Exporting collection '" + dso.getName() + "' (" + handle + ")");
                 Collection collection = (Collection)dso;
                 toExport = collection.getAllItems();
-                exporter = new MetadataExport(c, toExport);
+                exporter = new MetadataExport(c, toExport, exportAll);
             }
             else if (dso.getType() == Constants.COMMUNITY)
             {
                 System.out.println("Exporting community '" + dso.getName() + "' (" + handle + ")");
-                exporter = new MetadataExport(c, (Community)dso);
+                exporter = new MetadataExport(c, (Community)dso, exportAll);
             }
             else
             {

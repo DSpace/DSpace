@@ -97,17 +97,17 @@ public class MetadataExportServlet extends DSpaceServlet
                 {
                     ArrayList item = new ArrayList();
                     item.add(thing.getID());
-                    exporter = new MetadataExport(context, new ItemIterator(context, item));
+                    exporter = new MetadataExport(context, new ItemIterator(context, item), false);
                 }
                 else if (thing.getType() == Constants.COLLECTION)
                 {
                     Collection collection = (Collection)thing;
                     ItemIterator toExport = collection.getAllItems();
-                    exporter = new MetadataExport(context, toExport);
+                    exporter = new MetadataExport(context, toExport, false);
                 }
                 else if (thing.getType() == Constants.COMMUNITY)
                 {
-                    exporter = new MetadataExport(context, (Community)thing);
+                    exporter = new MetadataExport(context, (Community)thing, false);
                 }
 
                 // Perform the export

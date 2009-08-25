@@ -75,26 +75,25 @@ public class DSpaceCSV
     /** The field separator in an escaped form for using in regexs */
     protected static String escapedFieldSeparator;
 
+    /** Whether to export all metadata such as handles and provenance information */
+    private boolean exportAll;
+
+    /** A list of metadata elements to ignore */
+    private Hashtable ignore;
+
 
     /**
      * Create a new instance of a CSV line holder
+     *
+     * @param exportAll Whether to export all metadata such as handles and provenance information
      */
-    public DSpaceCSV()
+    public DSpaceCSV(boolean exportAll)
     {
-        // Set the value separator
-        setValueSeparator();
+        // Initalise the class
+        init();
 
-        // Set the field separator
-        setFieldSeparator();
-
-        // Create the headings
-        headings = new ArrayList<String>();
-
-        // Create the blank list of items
-        lines = new ArrayList<DSpaceCSVLine>();
-
-        // Initalise the counter
-        counter = 0;
+        // Stoee the exportAll setting
+        this.exportAll = exportAll;
     }
 
     /**
@@ -106,20 +105,8 @@ public class DSpaceCSV
      */
     public DSpaceCSV(File f) throws Exception
     {
-        // Set the value separator
-        setValueSeparator();
-
-        // Set the field separator
-        setFieldSeparator();
-
-        // Create the headings
-        headings = new ArrayList<String>();
-
-        // Create the blank list of items
-        lines = new ArrayList<DSpaceCSVLine>();
-
-        // Initalise the counter
-        counter = 0;
+        // Initalise the class
+        init();
 
         // Open the CSV file
         BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(f),"UTF8"));
@@ -153,6 +140,45 @@ public class DSpaceCSV
 
             // Parse the item metadata
             addItem(line);
+        }
+    }
+
+    /**
+     * Initalise this class with values from dspace.cfg
+     */
+    private void init()
+    {
+        // Set the value separator
+        setValueSeparator();
+        
+        // Set the field separator
+        setFieldSeparator();
+
+        // Create the headings
+        headings = new ArrayList<String>();
+
+        // Create the blank list of items
+        lines = new ArrayList<DSpaceCSVLine>();
+
+        // Initalise the counter
+        counter = 0;
+
+        // Set the metadata fields to ignore
+        ignore = new Hashtable();
+        String toIgnore = ConfigurationManager.getProperty("bulkedit.ignore-on-export");
+        if ((toIgnore == null) || ("".equals(toIgnore.trim())))
+        {
+            // Set a default value
+            toIgnore = "dc.date.accession, dc.date.available, " +
+                       "dc.description.provenance";
+        }
+        String[] toIgnoreArray = toIgnore.split(",");
+        for (String toIgnoreString : toIgnoreArray)
+        {
+            if (!"".equals(toIgnoreString.trim()))
+            {
+                ignore.put(toIgnoreString.trim(), toIgnoreString.trim());
+            }
         }
     }
 
@@ -267,10 +293,13 @@ public class DSpaceCSV
             }
 
             // Store the item
-            line.add(key, value.value);
-            if (!headings.contains(key))
+            if (exportAll || okToExport(value))
             {
-                headings.add(key);
+                line.add(key, value.value);
+                if (!headings.contains(key))
+                {
+                    headings.add(key);
+                }
             }
         }
         lines.add(line);
@@ -453,6 +482,37 @@ public class DSpaceCSV
         }
         out.flush();
         out.close();
+    }
+
+    /**
+     * Is it Ok to export this value? When exportAll is set to false, we don't export
+     * some of the metadata elements.
+     *
+     * The list can be configured via the key bulkedit.ignore-on-export in dspace.cfg
+     *
+     * @param md The DCValue to examine
+     * @return Whether or not it is OK to export this element
+     */
+    private boolean okToExport(DCValue md)
+    {
+        // First check the metadata format, and K all non DC elements
+        if (!"dc".equals(md.schema))
+        {
+            return true;
+        }
+
+        // Now compare with the list to ignore
+        String key = md.schema + "." + md.element;
+        if (md.qualifier != null)
+        {
+            key += "." + md.qualifier;
+        }
+        if (ignore.get(key) != null) {
+            return false;
+        }
+
+        // Must be OK, so don't ignore
+        return true;
     }
 
     /**
