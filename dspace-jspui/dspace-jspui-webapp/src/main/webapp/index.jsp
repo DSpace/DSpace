@@ -74,6 +74,13 @@
 <%@ page import="org.dspace.core.LogManager" %>
 
 <%
+    // go to canonical home address
+    String path = request.getRequestURI().substring(request.getContextPath().length());
+    if (path.equals("/index.jsp")) {
+        response.sendRedirect(request.getContextPath() + "/");
+        return;
+    }
+
     Context context = null;
     
     Locale sessionLocale = UIUtil.getSessionLocale(request);
