@@ -43,6 +43,9 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.StringTokenizer;
@@ -627,7 +630,7 @@ public class ItemTag extends TagSupport
 
                 out
                         .print("</td><td headers=\"s2\" class=\"metadataFieldValue\">");
-                out.print(Utils.addEntities(values[i].value));
+                out.print(getDisplay(values[i].value));
                 out
                         .print("</td><td headers=\"s3\" class=\"metadataFieldValue\">");
 
@@ -657,6 +660,42 @@ public class ItemTag extends TagSupport
             showLicence();
         }
     }
+
+    /**
+     * Make a displayable version of the field value.  html
+     * encode the data and wrap http urls with an html anchor.
+     */
+
+    static Pattern pUrl = Pattern.compile("(.*?)(http://[^\\s]*)(.*)", Pattern.DOTALL);
+
+    public static String getDisplay(String strOriginal) {
+	StringBuffer sbRet = new StringBuffer();
+
+	// Keep track of remaining text
+	String strRemaining = strOriginal;
+
+	// Look for the next url
+	Matcher m = pUrl.matcher(strRemaining);
+	while(m.matches()) {
+	    // Before the url
+	    sbRet.append(Utils.addEntities(m.group(1)));
+
+	    // url with anchor
+	    sbRet.append("<a href=\"");
+	    sbRet.append(m.group(2));
+	    sbRet.append("\">");
+	    sbRet.append(Utils.addEntities(m.group(2)));
+	    sbRet.append("</a>");
+
+	    strRemaining = m.group(3);
+	    m = pUrl.matcher(strRemaining);
+	}	    
+
+	sbRet.append(Utils.addEntities(strRemaining));
+
+	return sbRet.toString();
+    }
+
 
     /**
      * List links to collections if information is available
@@ -884,6 +923,13 @@ public class ItemTag extends TagSupport
                                         .print("</td><td headers=\"t2\" class=\"standard\">");
 
             						String desc = bitstreams[k].getDescription();
+                     
+                              if (bitstreams[k].isETDEmbargo()) {
+                                  desc = 
+                                      "RESTRICTED ACCESS" + 
+                                      (desc==null ? "" : "; " + desc);
+                              }
+
             						out.print((desc != null) ? desc : "");
             					}
 
