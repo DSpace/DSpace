@@ -27,7 +27,7 @@ public static String escape(String s) {
 
 Context context = UIUtil.obtainContext(request);
 
-TableRowIterator tri = DatabaseManager.query(context, null, sql);
+TableRowIterator tri = DatabaseManager.query(context, sql);
 
 String r = "even";
 
