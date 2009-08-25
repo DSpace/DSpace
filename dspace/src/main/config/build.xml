@@ -533,6 +533,10 @@ Common usage:
 
         <mkdir dir="${dspace.dir}/webapps" />
 
+        <mkdir dir="${dspace.dir}/exports" />
+
+        <mkdir dir="${dspace.dir}/exports/download" />
+
         <mkdir dir="${assetstore.dir}" />
 
         <mkdir dir="${handle.dir}" />
