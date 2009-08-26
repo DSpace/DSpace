@@ -2,12 +2,14 @@ $Date$
 
 Installation instructions are included in this release package under
 
-docs/install.html
+ - html/docs/install.html
+or
+ - pdf/DSpace-Manual.pdf
 
 Documentation for the most recent stable release may be viewed online at
 dspace.org:
 
-http://dspace.org/technology/system-docs/
+ - http://dspace.org/technology/system-docs/
 
 Installation instructions for other version may be different, so you
 are encouraged to obtain the corresponding documentation package from
@@ -18,10 +20,10 @@ Please also read the KNOWN_BUGS file.
 Please refer any further problems to the dspace-tech@lists.sourceforge.net 
 mailing list. 
 
-http://sourceforge.net/mail/?group_id=19984
+ - http://sourceforge.net/mail/?group_id=19984
 
 Detailed Issue Tracking for DSpace is done on our JIRA Issue Tracker
 
-http://jira.dspace.org/
+ - http://jira.dspace.org/
 
 Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
