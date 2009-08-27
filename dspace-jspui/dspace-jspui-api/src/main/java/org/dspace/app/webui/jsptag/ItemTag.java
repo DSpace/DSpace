@@ -771,18 +771,6 @@ public class ItemTag extends TagSupport
         		Bundle[] bunds = item.getBundles("ORIGINAL");
         		Bundle[] thumbs = item.getBundles("THUMBNAIL");
 
-        		// if item contains multiple bitstreams, display bitstream
-        		// description
-        		boolean multiFile = false;
-        		Bundle[] allBundles = item.getBundles();
-
-        		for (int i = 0, filecount = 0; (i < allBundles.length)
-                    	&& !multiFile; i++)
-        		{
-        			filecount += allBundles[i].getBitstreams().length;
-        			multiFile = (filecount > 1);
-        		}
-
         		// check if primary bitstream is html
         		if (bunds[0] != null)
         		{
@@ -805,16 +793,13 @@ public class ItemTag extends TagSupport
                                     "org.dspace.app.webui.jsptag.ItemTag.file")
                             + "</th>");
 
-        		if (multiFile)
-        		{
 
-        			out
-                        .println("<th id=\"t2\" class=\"standard\">"
-                                + LocaleSupport
-                                        .getLocalizedMessage(pageContext,
-                                                "org.dspace.app.webui.jsptag.ItemTag.description")
-                                + "</th>");
-        		}
+                        out
+                          .println("<th id=\"t2\" class=\"standard\">"
+                                   + LocaleSupport
+                                   .getLocalizedMessage(pageContext,
+                                                        "org.dspace.app.webui.jsptag.ItemTag.description")
+                                   + "</th>");
 
         		out.println("<th id=\"t3\" class=\"standard\">"
                     + LocaleSupport.getLocalizedMessage(pageContext,
@@ -849,13 +834,10 @@ public class ItemTag extends TagSupport
                     out.print("</a>");
                     
                     
-            		if (multiFile)
-            		{
-            			out.print("</td><td headers=\"t2\" class=\"standard\">");
+                    out.print("</td><td headers=\"t2\" class=\"standard\">");
 
-            			String desc = primaryBitstream.getDescription();
-            			out.print((desc != null) ? desc : "");
-            		}
+                    String desc = primaryBitstream.getDescription();
+                    out.print((desc != null) ? desc : "");
 
             		out.print("</td><td headers=\"t3\" class=\"standard\">");
                     out.print(UIUtil.formatFileSize(primaryBitstream.getSize()));
@@ -917,8 +899,6 @@ public class ItemTag extends TagSupport
                                 out.print("</a>");
                                 
 
-            					if (multiFile)
-            					{
             						out
                                         .print("</td><td headers=\"t2\" class=\"standard\">");
 
@@ -931,7 +911,6 @@ public class ItemTag extends TagSupport
                               }
 
             						out.print((desc != null) ? desc : "");
-            					}
 
             					out
                                     .print("</td><td headers=\"t3\" class=\"standard\">");
