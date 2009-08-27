@@ -190,6 +190,14 @@ public class JSPSelectCollectionStep extends JSPStep
             // save collections to request for JSP
             request.setAttribute("collections", collections);
 
+            // pass along the collection from the "Submit to This Collection" link
+            if (request.getParameter("collection") != null) {
+              Collection c = Collection.find(context, Integer.parseInt(request.getParameter("collection")));
+              if (c != null) {
+                request.setAttribute("collection", c);
+              }
+            }
+
             // we need to load the select collection JSP
             JSPStepManager.showJSP(request, response, subInfo, SELECT_COLLECTION_JSP);
         }

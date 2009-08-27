@@ -231,7 +231,7 @@
 <%  if (submit_button)
     { %>
         <center>
-          <form action="<%= request.getContextPath() %>/submit" method="post">
+          <form action="<%= request.getContextPath() %>/submit" method="get">
             <input type="hidden" name="collection" value="<%= collection.getID() %>" />
 			<input type="submit" name="submit" value="<fmt:message key="jsp.collection-home.submit.button"/>" />
           </form>
