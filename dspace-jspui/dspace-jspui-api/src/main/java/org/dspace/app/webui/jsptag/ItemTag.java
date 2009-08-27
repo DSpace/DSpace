@@ -807,6 +807,9 @@ public class ItemTag extends TagSupport
                     + "</th><th id=\"t4\" class=\"standard\">"
                     + LocaleSupport.getLocalizedMessage(pageContext,
                             "org.dspace.app.webui.jsptag.ItemTag.fileformat")
+                    + "</th><th id=\"t4\" class=\"standard\">"
+                    + LocaleSupport.getLocalizedMessage(pageContext,
+                            "org.dspace.app.webui.jsptag.ItemTag.views")
                     + "</th></tr>");
 
             	// if primary bitstream is html, display a link for only that one to
@@ -920,6 +923,9 @@ public class ItemTag extends TagSupport
             					out.print(bitstreams[k].getFormatDescription());
             					out
                                     .print("</td><td class=\"standard\" align=\"center\">");
+
+                                                out.print(bitstreams[k].getIntMetadata("views"));
+                                                out.print("</td><td class=\"standard\" align=\"center\">");
 
             					// is there a thumbnail bundle?
             					if ((thumbs.length > 0) && showThumbs)
