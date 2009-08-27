@@ -113,7 +113,7 @@
                 <tr>
 					<td class="submitFormLabel"><label for="tcollection"><fmt:message key="jsp.submit.select-collection.collection"/></label></td>
                     <td>
-                        <select name="mapcollections" size="<%= collections.length < 3 ? (new Integer(collections.length)).toString() : "3"%>" multiple="true">
+                        <select name="mapcollections" size="<%= collections.length < 10 ? (new Integer(collections.length)).toString() : "10"%>" multiple="true">
 <%
         for (int i = 0; i < collections.length; i++)
         {
