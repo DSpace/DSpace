@@ -554,7 +554,7 @@ public class ItemTag extends TagSupport
                     }
                     else
                     {
-                        out.print(Utils.addEntities(values[j].value));
+                        out.print(getDisplay(values[j].value));
                     }
                 }
 
