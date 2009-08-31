@@ -25,6 +25,7 @@
  - [DS-190] Portuguese (pt_PT) translation Messages.properties JSP-UI v1.5.2
 
 (Stuart Lewis)
+ - [DS-44] Monthly statistics skip first and last of month - SF ID: 2541435
  - [DS-161] Bulk metadata editing
  - [DS-194] Give METS ingester configuration option to make use of collection templates
  - [DS-195] Allow the primary bitstream to be set in the item importer / exporter
