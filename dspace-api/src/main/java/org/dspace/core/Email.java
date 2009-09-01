@@ -44,6 +44,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.security.Security;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
@@ -260,6 +261,12 @@ public class Email
         String server = ConfigurationManager.getProperty("mail.server");
         String from = ConfigurationManager.getProperty("mail.from.address");
 
+        // Optionally enable an SSL protected connection
+        if (ConfigurationManager.getBooleanProperty("mail.ssl.enable"))
+        {
+            Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+        }
+        
         // Set up properties for mail session
         Properties props = System.getProperties();
         props.put("mail.smtp.host", server);
@@ -295,6 +302,20 @@ public class Email
         else
         {
             session = Session.getDefaultInstance(props);
+        }
+
+        // Set extra configuration properties
+        String extras = ConfigurationManager.getProperty("mail.extraproperties");
+        if ((extras != null) && (!"".equals(extras.trim())))
+        {
+            String arguments[] = extras.split(",");
+            String key, value;
+            for (String argument : arguments)
+            {
+                key = argument.substring(0, argument.indexOf('=')).trim();
+                value = argument.substring(argument.indexOf('=') + 1).trim();
+                props.put(key, value);
+            }
         }
 
         // Create message
