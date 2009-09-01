@@ -65,7 +65,8 @@ CREATE SEQUENCE history_seq;
 CREATE SEQUENCE historystate_seq;
 CREATE SEQUENCE communities2item_seq;
 CREATE SEQUENCE epersongroup2workspaceitem_seq;
-CREATE SEQUENCE metadataschemaregistry_seq;
+CREATE SEQUENCE metadataschemaregistry_seq START WITH 2;
+-- 1 is reserved for Dublin Core
 CREATE SEQUENCE metadatafieldregistry_seq;
 CREATE SEQUENCE metadatavalue_seq;
 CREATE SEQUENCE group2group_seq;

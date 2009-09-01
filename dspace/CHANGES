@@ -45,6 +45,7 @@
  - [DS-290] [dspace]/exports is not created during fresh install
 
 (Larry Stone)
+ - [DS-191] metadataschemaregistry_seq is not initialized correctly under Oracle
  - [DS-193] OAI RDF crosswalk fails when DC value is null
  - [DS-249] sub-daily utility script does not pass arguments to Java
  - [DS-252] Interpolate variables in the Subject: line of email templates as well
