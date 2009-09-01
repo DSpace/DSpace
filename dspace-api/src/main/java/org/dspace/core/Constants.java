@@ -48,8 +48,9 @@ package org.dspace.core;
  */
 public class Constants
 {
-    /** Type of bitstream objects */
+    /** Type of locally defined objects */
     public static final int UNIT = 666;
+    public static final int ETDUNIT = 667;
 
     /** Type of bitstream objects */
     public static final int BITSTREAM = 0;
