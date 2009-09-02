@@ -87,6 +87,9 @@
 (Van Ly)
  - [DS-291] README update for top level of dspace 1.6.0 package directory
 
+(Graham Triggs)
+ - [DS-299] Allow long values to be specified for the max upload request (> 2GB uploads)
+
 1.5.2 final
 ===========
 
