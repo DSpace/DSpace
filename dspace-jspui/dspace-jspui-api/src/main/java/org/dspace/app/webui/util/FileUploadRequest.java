@@ -98,7 +98,7 @@ public class FileUploadRequest extends HttpServletRequestWrapper
         original = req;
 
         tempDir = ConfigurationManager.getProperty("upload.temp.dir");
-        int maxSize = ConfigurationManager.getIntProperty("upload.max");
+        long maxSize = ConfigurationManager.getLongProperty("upload.max");
 
         // Create a factory for disk-based file items
         DiskFileItemFactory factory = new DiskFileItemFactory();
