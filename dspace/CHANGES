@@ -90,6 +90,9 @@
 (Graham Triggs)
  - [DS-299] Allow long values to be specified for the max upload request (> 2GB uploads)
 
+(Mark Wood)
+ - [DS-52] Factor out common webapp installation - ID: 2042160
+
 1.5.2 final
 ===========
 
