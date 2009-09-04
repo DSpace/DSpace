@@ -435,21 +435,6 @@ Common usage:
             </fileset>
         </move>
 
-        <copy todir="${dspace.dir}/webapps" preservelastmodified="true" failonerror="no">
-            <fileset dir="webapps">
-                <exclude name="**/web.xml" />
-            </fileset>
-        </copy>
-
-        <copy todir="${dspace.dir}/webapps" preservelastmodified="false" failonerror="no">
-            <fileset dir="webapps">
-                <include name="**/web.xml" />
-            </fileset>
-            <filterchain>
-                <expandproperties />
-            </filterchain>
-        </copy>
-
         <echo>
 ====================================================================
  ${dspace.dir}/webapps was backed up to
@@ -460,7 +445,7 @@ Common usage:
 ====================================================================
         </echo>
 
-        <antcall target="build_webapps_wars" />
+        <antcall target="copy_webapps" />
 
         <echo>
 ====================================================================
@@ -485,6 +470,32 @@ Common usage:
  * Start up your Web servlet container again.
 ====================================================================
         </echo>
+
+    </target>
+
+
+    <!-- ============================================================= -->
+	<!-- Copy Web Applications to Runtime Location -->
+    <!-- ============================================================= -->
+
+    <target name="copy_webapps">
+
+        <copy todir="${dspace.dir}/webapps" preservelastmodified="true" failonerror="no">
+            <fileset dir="webapps">
+                <exclude name="**/web.xml" />
+            </fileset>
+        </copy>
+
+        <copy todir="${dspace.dir}/webapps" preservelastmodified="false" failonerror="no">
+            <fileset dir="webapps">
+                <include name="**/web.xml" />
+            </fileset>
+            <filterchain>
+                <expandproperties />
+            </filterchain>
+        </copy>
+
+        <antcall target="build_webapps_wars"/>
 
     </target>
 
@@ -692,22 +703,7 @@ Common usage:
             <fileset dir="${dspace.dir}/webapps" includes="**/*" />
         </delete>
 
-        <copy todir="${dspace.dir}/webapps" preservelastmodified="true" failonerror="no">
-            <fileset dir="webapps">
-                <exclude name="**/web.xml" />
-            </fileset>
-        </copy>
-
-        <copy todir="${dspace.dir}/webapps" preservelastmodified="false" failonerror="no">
-            <fileset dir="webapps">
-                <include name="**/web.xml" />
-            </fileset>
-            <filterchain>
-                <expandproperties />
-            </filterchain>
-        </copy>
-
-        <antcall target="build_webapps_wars" />
+        <antcall target="copy_webapps" />
 
         <java classname="org.dspace.browse.IndexBrowse" classpathref="class.path" fork="yes" failonerror="yes">
             <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
