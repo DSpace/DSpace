@@ -260,9 +260,9 @@ public class Item extends DSpaceObject
 
         // Call update to give the item a last modified date. OK this isn't
         // amazingly efficient but creates don't happen that often.
-        context.setIgnoreAuthorization(true);
+        context.turnOffAuthorisationSystem();
         i.update();
-        context.setIgnoreAuthorization(false);
+        context.restoreAuthSystemState();
 
         context.addEvent(new Event(Event.CREATE, Constants.ITEM, i.getID(), null));
 
