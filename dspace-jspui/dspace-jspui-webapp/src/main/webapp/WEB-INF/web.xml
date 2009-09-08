@@ -151,6 +151,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>collection-select-list</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.GroupListServlet</servlet-class>
+  </servlet>
+  
+  <servlet>
     <servlet-name>authorize</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.AuthorizeAdminServlet</servlet-class>
   </servlet>
@@ -208,6 +213,11 @@
   <servlet>
     <servlet-name>units</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.UnitEditServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>etdunits</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.admin.EtdUnitEditServlet</servlet-class>
   </servlet>
 
   <servlet>
@@ -544,6 +554,11 @@
   <servlet-mapping>
     <servlet-name>units</servlet-name>
     <url-pattern>/tools/unit-edit</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>etdunits</servlet-name>
+    <url-pattern>/tools/etdunit-edit</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

@@ -162,6 +162,15 @@
 
   <tr class="navigationBarItem">
     <td>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/tools/etdunit-edit") ? "arrow-highlight" : "arrow") %>.gif" width="7" height="13"/>
+    </td>
+    <td nowrap="nowrap" class="navigationBarItem">
+      <a href="<%= request.getContextPath() %>/tools/etdunit-edit"><fmt:message key="jsp.layout.navbar-admin.etdunits"/></a>
+    </td>
+  </tr>
+  
+  <tr class="navigationBarItem">
+    <td>
       <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/supervise") ? "arrow-highlight" : "arrow") %>.gif" width="7" height="13"/>
     </td>
     <td nowrap="nowrap" class="navigationBarItem">
