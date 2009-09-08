@@ -564,7 +564,7 @@ public class EtdUnit extends DSpaceObject {
         TableRowIterator tri = DatabaseManager.queryTable(myContext, "collection",
                 "SELECT collection.* FROM collection, collection2etdunit WHERE " + 
                 "collection.collection_id=collection2etdunit.collection_id AND " +
-                "collection2etdunit.etdunit_id= ? ",
+                "collection2etdunit.etdunit_id= ? ORDER BY name",
                  myRow.getIntColumn("etdunit_id"));
 
         // Build a list of Collection objects

@@ -60,9 +60,7 @@
         <table>
           <tr>
             <td align="center"><strong><fmt:message key="jsp.tools.etdunit-edit.collection"/></strong><br/>
-<%-- 
-             <dspace:collectionlist collections="<%= Collection.findAll(context)%>"/>
---%>
+             <dspace:selectcollection multiple="true" selected="<%= collections %>"/>
             </td>
           </tr>
         </table>
