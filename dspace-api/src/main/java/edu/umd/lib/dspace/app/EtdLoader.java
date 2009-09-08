@@ -197,7 +197,7 @@ public class EtdLoader
       String strZipFile    = props.getProperty("etdloader.zipfile", null);
       String strSingleItem = props.getProperty("etdloader.singleitem", null);
       String strMarcFile   = props.getProperty("etdloader.marcfile", null);
-		String strCsvFile    = props.getProperty("etdloader.csvfile", null);
+      String strCsvFile    = props.getProperty("etdloader.csvfile", null);
 
       // dspace dir
       String strDspace     = ConfigurationManager.getProperty("dspace.dir");
@@ -216,47 +216,47 @@ public class EtdLoader
 
       // open the marc output file
       if (strMarcFile != null) {
-	FileOutputStream fos = new FileOutputStream(new File(strMarcFile), true);
-	marcwriter = new MarcStreamWriter(fos, "UTF-8");
+        FileOutputStream fos = new FileOutputStream(new File(strMarcFile), true);
+        marcwriter = new MarcStreamWriter(fos, "UTF-8");
       }
 
       // open the csv output file
       if (strCsvFile != null) {
-	FileOutputStream fos = new FileOutputStream(strCsvFile, true);
-	OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
-	csvwriter = new PrintWriter(osw);
+        FileOutputStream fos = new FileOutputStream(strCsvFile, true);
+        OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+        csvwriter = new PrintWriter(osw);
       }
 
       // Get DSpace values
       Context context = new Context();
 
       if (strCollection == null) {
-	throw new Exception("etdloader.collection not set");
+        throw new Exception("etdloader.collection not set");
       }
       etdcollection = Collection.find(context, Integer.parseInt(strCollection));
       if (etdcollection == null) {
-	throw new Exception("Unable to find etdloader.collection: " + strCollection);
+        throw new Exception("Unable to find etdloader.collection: " + strCollection);
       }
 
       if (strEPerson == null) {
-	throw new Exception("etdloader.eperson not set");
+        throw new Exception("etdloader.eperson not set");
       }
       etdeperson = EPerson.findByEmail(context, strEPerson);
       if (etdeperson == null) {
-	throw new Exception("Unable to find etdloader.eperson: " + strEPerson);
+        throw new Exception("Unable to find etdloader.eperson: " + strEPerson);
       }
 
       // Get the list of all collections
       mAllCollections = new HashMap();
       Collection c[] = Collection.findAll(context);
       for (int i=0; i < c.length; i++) {
-	String strName = c[i].getMetadata("name");
-	if (mAllCollections.containsKey(strName)) {
-	  System.err.println("Error: duplicate collection names: " + strName);
-	  System.exit(1);
-	}
+        String strName = c[i].getMetadata("name");
+        if (mAllCollections.containsKey(strName)) {
+          System.err.println("Error: duplicate collection names: " + strName);
+          System.exit(1);
+        }
 	
-	mAllCollections.put(strName, c[i]);
+        mAllCollections.put(strName, c[i]);
       }
 
       context.complete();
@@ -270,13 +270,13 @@ public class EtdLoader
 
       // Process each entry
       for (Iterator i = map.keySet().iterator(); i.hasNext(); ) {
-	String strItem = (String)i.next();
+        String strItem = (String)i.next();
 
-	lRead++;
+        lRead++;
 
-	if (strSingleItem == null || strSingleItem.equals(strItem)) {
-	  loadItem(zip, strItem, (List)map.get(strItem));
-	}
+        if (strSingleItem == null || strSingleItem.equals(strItem)) {
+          loadItem(zip, strItem, (List)map.get(strItem));
+        }
       }
     }
 
@@ -287,17 +287,17 @@ public class EtdLoader
 
     finally {
       if (marcwriter != null) {
-	try { marcwriter.close(); } catch (Exception e) {}
+        try { marcwriter.close(); } catch (Exception e) {}
       }
 
       if (csvwriter != null) {
-	try { csvwriter.close(); } catch (Exception e) {}
+        try { csvwriter.close(); } catch (Exception e) {}
       }
 
       log.info("=====================================\n" +
-	       "Records read:    " + lRead + "\n" +
-	       "Records written: " + lWritten + "\n" +
-	       "Embargoes:       " + lEmbargo);
+               "Records read:    " + lRead + "\n" +
+               "Records written: " + lWritten + "\n" +
+               "Embargoes:       " + lEmbargo);
     }
 
     System.exit(0);
@@ -375,7 +375,7 @@ public class EtdLoader
       n = getXPath("@language").selectSingleNode(ndc);
       String language = ((n == null || n.getText().equals("none"))? null : n.getText());
       if (language == null) {
-	language = ConfigurationManager.getProperty("default.language");
+        language = ConfigurationManager.getProperty("default.language");
       }
 
       item.addDC(element, qualifier, language, value);
@@ -400,14 +400,14 @@ public class EtdLoader
     if (anongroup == null) {
       anongroup = Group.findByName(context, "Anonymous");
       if (anongroup == null) {
-	throw new Exception("Unable to find Anonymous group");
+        throw new Exception("Unable to find Anonymous group");
       }
     }
 
     if (etdgroup == null) {
       etdgroup = Group.findByName(context, "ETD Embargo");
       if (etdgroup == null) {
-	throw new Exception("Unable to find ETD Embargo group");
+        throw new Exception("Unable to find ETD Embargo group");
       }
     }
       
@@ -490,28 +490,28 @@ public class EtdLoader
       ResultSet rs = st.executeQuery();
 
       if (rs.next()) {
-	int count = rs.getInt(1);
+        int count = rs.getInt(1);
 
-	if (count > 1) {
-	  log.info("Duplicate title: " + title);
+        if (count > 1) {
+          log.info("Duplicate title: " + title);
 					  
-	  // Get the email recipient
-	  String email = ConfigurationManager.getProperty("mail.duplicate_title");
-	  if (email == null) {
-	    email = ConfigurationManager.getProperty("mail.admin");
-	  }
+          // Get the email recipient
+          String email = ConfigurationManager.getProperty("mail.duplicate_title");
+          if (email == null) {
+            email = ConfigurationManager.getProperty("mail.admin");
+          }
 		    
-	  if (email != null) {
-	    // Send the email
-	    Email bean = ConfigurationManager.getEmail("duplicate_title");
-	    bean.addRecipient(email);
-	    bean.addArgument(title);
-	    bean.addArgument(""+item.getID());
-	    bean.addArgument(HandleManager.findHandle(c, item));
-	    bean.addArgument(sbCollections.toString());
-	    bean.send();
-	  }
-	}
+          if (email != null) {
+            // Send the email
+            Email bean = ConfigurationManager.getEmail("duplicate_title");
+            bean.addRecipient(email);
+            bean.addArgument(title);
+            bean.addArgument(""+item.getID());
+            bean.addArgument(HandleManager.findHandle(c, item));
+            bean.addArgument(sbCollections.toString());
+            bean.send();
+          }
+        }
       }
       rs.close();
     }
@@ -571,11 +571,11 @@ public class EtdLoader
       DCValue title[] = item.getDC("title", null, Item.ANY);
 
       for (int i=0; i < title.length; i++) {
-	if (i > 0) {
-	  sb.append("; ");
-	}
+        if (i > 0) {
+          sb.append("; ");
+        }
 
-	sb.append(title[i].value.replaceAll("\"","\"\""));
+        sb.append(title[i].value.replaceAll("\"","\"\""));
       }
 
       sb.append("\",\"");
@@ -584,11 +584,11 @@ public class EtdLoader
       DCValue author[] = item.getDC("contributor", "author", Item.ANY);
 
       for (int i=0; i < author.length; i++) {
-	if (i > 0) {
-	  sb.append("; ");
-	}
+        if (i > 0) {
+          sb.append("; ");
+        }
 
-	sb.append(author[i].value.replaceAll("\"","\"\""));
+        sb.append(author[i].value.replaceAll("\"","\"\""));
       }
 
       sb.append("\",\"");
@@ -625,9 +625,9 @@ public class EtdLoader
 
       Collection coll = (Collection)mAllCollections.get(n.getText());
       if (coll == null) {
-	log.error("Unable to lookup mapped collection: " + n.getText());
+        log.error("Unable to lookup mapped collection: " + n.getText());
       } else {
-	sCollections.add(coll);
+        sCollections.add(coll);
       }
     }
     
@@ -648,9 +648,9 @@ public class EtdLoader
     if (n != null) {
       Node n2 = getXPath("@remove").selectSingleNode(n);
       if (n2 != null) {
-	strEmbargo = n2.getText();
+        strEmbargo = n2.getText();
       } else {
-	strEmbargo = "never";
+        strEmbargo = "never";
       }
     }
 
@@ -676,7 +676,7 @@ public class EtdLoader
 
       int n = strFileName.lastIndexOf('.');
       if (n > -1) {
-	h.add(strFileName.substring(n+1).trim().toLowerCase());
+        h.add(strFileName.substring(n+1).trim().toLowerCase());
       }
     }
 
@@ -694,7 +694,7 @@ public class EtdLoader
   }
 
 
-/************************************************************* getXPath */
+  /************************************************************* getXPath */
   /**
    * Get a compiled XPath object for the expression.  Cache.
    */
@@ -704,12 +704,12 @@ public class EtdLoader
     XPath xpath = null;
 
     if (mXPath.containsKey(strXPath)) {
-        xpath = (XPath)mXPath.get(strXPath);
+      xpath = (XPath)mXPath.get(strXPath);
 
     } else {
-        xpath = df.createXPath(strXPath);
-        xpath.setNamespaceURIs(namespace);
-        mXPath.put(strXPath, xpath);
+      xpath = df.createXPath(strXPath);
+      xpath.setNamespaceURIs(namespace);
+      mXPath.put(strXPath, xpath);
     }
 
     return xpath;
@@ -723,8 +723,8 @@ public class EtdLoader
 
   public static void loadItem(ZipFile zip, String strItem, List files) {
     log.info("=====================================\n" +
-	     "Loading item " + strItem + 
-	     ": " + ((files.size() / 2) - 1) + " bitstream(s)");
+             "Loading item " + strItem + 
+             ": " + ((files.size() / 2) - 1) + " bitstream(s)");
 
     Context context = null;
 
@@ -738,7 +738,7 @@ public class EtdLoader
       ZipEntry ze = (ZipEntry)files.get(1);
       Document meta = reader.read(new InputSource(zip.getInputStream(ze)));
       if (log.isDebugEnabled()) {
-	log.debug("ETD metadata:\n" + toString(meta));
+        log.debug("ETD metadata:\n" + toString(meta));
       }
 
       // Map to additional collections
@@ -753,8 +753,8 @@ public class EtdLoader
 
       // Add mapped collections
       for (Iterator i = sCollections.iterator(); i.hasNext(); ) {
-	Collection coll = (Collection)i.next();
-	wi.addMapCollection(coll);
+        Collection coll = (Collection)i.next();
+        wi.addMapCollection(coll);
       }
 
       // Add bitstreams
@@ -766,8 +766,8 @@ public class EtdLoader
       // Add embargo
       String strEmbargo = getEmbargo(meta);
       if (strEmbargo != null) {
-	addEmbargo(context, item, strEmbargo);
-	lEmbargo++;
+        addEmbargo(context, item, strEmbargo);
+        lEmbargo++;
       }
 
       // Get the handle
@@ -786,7 +786,7 @@ public class EtdLoader
 
       // Report missing collections
       if (sCollections.size() == 0) {
-	reportCollections(context, item);
+        reportCollections(context, item);
       }
 
       // Create marc record for upload to TSD
@@ -798,15 +798,15 @@ public class EtdLoader
 
     catch (Exception e) {
       log.error("Error loading item " + strItem + ": " +
-		ErrorHandling.getStackTrace(e));
+                ErrorHandling.getStackTrace(e));
       if (context != null) {
-	context.abort();
+        context.abort();
       }
     }
 
     finally {
       if (context != null) {
-	try { context.complete(); } catch (Exception e) {}
+        try { context.complete(); } catch (Exception e) {}
       }
     }
   }
@@ -841,7 +841,7 @@ public class EtdLoader
 
       // skip directories
       if (ze.isDirectory()) {
-	continue;
+        continue;
       }
 
       // split into path components
@@ -857,18 +857,18 @@ public class EtdLoader
           strItem = m.group(1);
 
           log.debug("item number is " + strItem);
-	}
+        }
 
-	// Put the file in the right position
-	if (strFileName.endsWith("_DATA.xml")) {
-	  lmap.set(0, strFileName);
-	  lmap.set(1, ze);
-	} 
+        // Put the file in the right position
+        if (strFileName.endsWith("_DATA.xml")) {
+          lmap.set(0, strFileName);
+          lmap.set(1, ze);
+        } 
 
         else if (strFileName.endsWith(".pdf")) {
-	  lmap.set(2, strFileName);
-	  lmap.set(3, ze);
-	}
+          lmap.set(2, strFileName);
+          lmap.set(3, ze);
+        }
       }
 
       else {
