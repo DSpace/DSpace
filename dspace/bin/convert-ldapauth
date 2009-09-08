@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 # Convert old ldap auth file format to new xml format
 
 print "<maps>\r\n";
