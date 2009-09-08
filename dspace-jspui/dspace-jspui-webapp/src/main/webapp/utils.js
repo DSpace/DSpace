@@ -46,6 +46,57 @@
 var popupWindow;
 
 // =========================================================
+//  Methods for collection popup window
+// =========================================================
+
+// Add to list of collections on this page -- invoked by eperson popup window
+function addCollection(id, name)
+{
+    var newplace = window.document.collection.collection_ids.options.length;
+
+	if (newplace > 0 && window.document.collection.collection_ids.options[0].value == "")
+    {
+        newplace = 0;
+    }
+
+    // First we check to see if collection is already there
+    for (var i = 0; i < window.document.collection.collection_ids.options.length; i++)
+    {
+        // is it in the list already
+        if (window.document.collection.collection_ids.options[i].value == id)
+        {
+            newplace = -1;
+        }
+
+        // are we trying to add the new collection to the new collection on an Edit Collection page (recursive)
+        if (window.document.collection.collection_id)
+        {
+            if (window.document.collection.collection_id.value == id)
+            {
+                newplace = -1;
+            }
+        }
+    }
+
+    if (newplace > -1)
+    {
+        window.document.collection.collection_ids.options[newplace] = new Option(name + " (" + id + ")", id);
+    }
+}
+
+// This needs to be invoked in the 'onClick' javascript event for buttons
+// on pages with a dspace:selecteperson element in them
+function finishCollections()
+{
+    selectAll(window.document.collection.collection_ids);
+
+    if (popupWindow != null)
+    {
+		popupWindow.close();
+    }
+}
+
+// =========================================================
 //  Methods for e-person popup window
 // =========================================================
 

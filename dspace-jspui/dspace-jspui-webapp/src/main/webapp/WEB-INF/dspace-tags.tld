@@ -326,19 +326,6 @@
   </tag>
 
   <tag>
-    <name>collectionlist</name>
-    <tagclass>org.dspace.app.webui.jsptag.CollectionListTag</tagclass>
-    <info>
-      Tag for displaying a list of collections.
-    </info>
-    <attribute>
-      <name>collections</name>
-      <required>true</required>
-      <rtexprvalue>true</rtexprvalue>
-    </attribute>
-  </tag>
-
-  <tag>
     <name>popup</name>
     <tagclass>org.dspace.app.webui.jsptag.PopupTag</tagclass>
     <info>
@@ -408,6 +395,36 @@
       window is close:
 
       onclick="javascript:finishGroup();"
+    </info>
+    <attribute>
+      <name>multiple</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>selected</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
+    <name>selectcollection</name>
+    <tagclass>edu.umd.lib.dspace.app.webui.jsptag.SelectCollectionTag</tagclass>
+    <info>
+      Tag for producing a Collection select widget in a form.  Somewhat
+      analogous to the HTML SELECT element.  An input
+      field is produced with a button which pops up a window from which
+      collections can be selected.  Selected collections are added to the field
+      in the form.  If the selector is for multiple collections, a 'remove
+      selected from list' button is also added.
+
+      On any form that has a selectcollection tag (only one allowed per page),
+      you need to include the following Javascript code on all of the submit
+      buttons, to ensure that the collection IDs are posted and that the popup
+      window is close:
+
+      onclick="javascript:finishCollections();"
     </info>
     <attribute>
       <name>multiple</name>

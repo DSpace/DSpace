@@ -152,7 +152,7 @@
 
   <servlet>
     <servlet-name>collection-select-list</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.admin.GroupListServlet</servlet-class>
+    <servlet-class>edu.umd.lib.dspace.app.webui.servlet.admin.CollectionListServlet</servlet-class>
   </servlet>
   
   <servlet>
@@ -441,6 +441,11 @@
     <url-pattern>/tools/mapcollections</url-pattern>
   </servlet-mapping>
 
+  <servlet-mapping>
+    <servlet-name>collection-select-list</servlet-name>
+    <url-pattern>/tools/collection-select-list</url-pattern>
+  </servlet-mapping>
+  
   <servlet-mapping>
     <servlet-name>authorize</servlet-name>
     <url-pattern>/dspace-admin/authorize</url-pattern>
