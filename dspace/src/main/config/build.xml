@@ -209,16 +209,13 @@ Common usage:
         Copy files that are different in target to *.old suffix
         -->
         <copy todir="${dspace.dir}/config" preservelastmodified="true" overwrite="true">
-            <intersect>
                 <fileset dir="${dspace.dir}/config">
+                   <and>
                     <different targetdir="config-temp" ignoreFileTimes="true" />
-                    <type type="file" />
-                </fileset>
-                <fileset dir="${dspace.dir}/config">
                     <present present="both" targetdir="config-temp" />
+                   </and>
                     <type type="file" />                                        
                 </fileset>
-            </intersect>            
             <globmapper from="*" to="*-${build.date}.old" />
         </copy>
 

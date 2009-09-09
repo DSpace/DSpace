@@ -52,6 +52,7 @@
  - [DS-262] Bug in DS-118, new patch included
  - [DS-275] License files not listed on Item Summary page
  - [DS-276] Patch to fix spelling error in Exception page
+ - [DS-280] build.xml fails for ant versions below 1.7
 
 (Mark Diggory / Stuart Lewis)
  - [DS-201] handle.jar upgraded to version 6.2
