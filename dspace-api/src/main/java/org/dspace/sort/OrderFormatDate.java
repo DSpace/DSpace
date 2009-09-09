@@ -50,14 +50,23 @@ public class OrderFormatDate implements OrderFormatDelegate
 {
     public String makeSortString(String value, String language)
     {
+        int padding = 0;
         int endYearIdx = value.indexOf("-");
-        int length = value.length();
-        if (length < 4 || (endYearIdx >= 0 && endYearIdx < 4))
+
+        if (endYearIdx >= 0 && endYearIdx < 4)
+        {
+            padding = 4 - endYearIdx;
+        }
+        else if (value.length() < 4)
+        {
+            padding = 4 - value.length();
+        }
+
+        if (padding > 0)
         {
             // padding the value from left with 0 so that 87 -> 0087, 687-11-24
             // -> 0687-11-24
-            return String.format("%1$0"
-                    + (length > 4 ? 4 - endYearIdx : 4 - length) + "d", 0)
+            return String.format("%1$0" + padding + "d", 0)
                     + value;
         }
         else
