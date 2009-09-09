@@ -670,7 +670,7 @@
 
         
         <!-- Generate the license information from the file section -->
-        <xsl:apply-templates select="mets:fileSec/mets:fileGrp[@USE='CC-LICENSE' or @USE='LICENSE']" mode="itemSummaryView"/>
+        <xsl:apply-templates select="mets:fileSec/mets:fileGrp[@USE='CC-LICENSE' or @USE='LICENSE']"/>
         
     </xsl:template>
     
