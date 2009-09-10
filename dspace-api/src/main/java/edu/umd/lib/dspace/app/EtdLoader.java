@@ -95,12 +95,14 @@ import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
+import org.dspace.content.EtdUnit;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
@@ -113,6 +115,14 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 
 import org.dspace.handle.HandleManager;
+
+import org.dspace.browse.BrowseEngine;
+import org.dspace.browse.BrowseIndex;
+import org.dspace.browse.BrowseInfo;
+import org.dspace.browse.BrowseItem;
+import org.dspace.browse.BrowserScope;
+
+import org.dspace.sort.OrderFormat;
 
 
 // Marc4J
@@ -161,7 +171,6 @@ public class EtdLoader
 
   static SAXReader reader = new SAXReader();
   static Transformer tDC = null;
-  static Transformer tCollections = null;
   static Transformer tMeta2Marc = null;
 
   static Map namespace = new HashMap();
@@ -176,8 +185,6 @@ public class EtdLoader
 
   static MarcStreamWriter marcwriter = null;
   static PrintWriter csvwriter = null;
-
-  static Map mAllCollections = null;
 
   static Pattern pZipEntry = Pattern.compile(".*_umd_0117._(\\d+)(.pdf|_DATA.xml)");
 
@@ -210,9 +217,8 @@ public class EtdLoader
 
       // the transformers
       TransformerFactory tFactory = TransformerFactory.newInstance();
-      tDC = tFactory.newTransformer(new StreamSource(new File(strDspace + "/load/etd2dc.xsl")));        
-      tCollections = tFactory.newTransformer(new StreamSource(new File(strDspace + "/load/etd-collections.xsl")));        
-      tMeta2Marc = tFactory.newTransformer(new StreamSource(new File(strDspace + "/load/etd2marc.xsl")));        
+      tDC = tFactory.newTransformer(new StreamSource(new File(strDspace + "/config/load/etd2dc.xsl")));        
+      tMeta2Marc = tFactory.newTransformer(new StreamSource(new File(strDspace + "/config/load/etd2marc.xsl")));        
 
       // open the marc output file
       if (strMarcFile != null) {
@@ -244,19 +250,6 @@ public class EtdLoader
       etdeperson = EPerson.findByEmail(context, strEPerson);
       if (etdeperson == null) {
         throw new Exception("Unable to find etdloader.eperson: " + strEPerson);
-      }
-
-      // Get the list of all collections
-      mAllCollections = new HashMap();
-      Collection c[] = Collection.findAll(context);
-      for (int i=0; i < c.length; i++) {
-        String strName = c[i].getMetadata("name");
-        if (mAllCollections.containsKey(strName)) {
-          System.err.println("Error: duplicate collection names: " + strName);
-          System.exit(1);
-        }
-	
-        mAllCollections.put(strName, c[i]);
       }
 
       context.complete();
@@ -459,51 +452,59 @@ public class EtdLoader
 
   private static void checkTitle(Context c, Item item, Set sCollections) throws Exception {
 
-    String strSql = 
-      "select" 
-      + " count(distinct item_id)"
-      + " from itemsbytitle"
-      + " where sort_title=?"
-      ;
-
-    PreparedStatement st= c.getDBConnection().prepareStatement(strSql);
-
-    // Get the list of collections
-    StringBuffer sbCollections = new StringBuffer();
-    sbCollections.append(etdcollection.getMetadata("name"));
-    for (Iterator ic = sCollections.iterator(); ic.hasNext(); ) {
-      Collection coll = (Collection)ic.next();
-      sbCollections.append(", ");
-      sbCollections.append(coll.getMetadata("name"));
-    }
-
     // Get the title(s)
     DCValue dc[] = item.getDC("title", null, Item.ANY);
-
+    
     // Process each title
     for (int i=0; i < dc.length; i++) {
-      String title = "TODO: normalized title"; //Browse.getNormalizedTitle(dc[i].value, dc[i].language);
+
+      // Get normalized title
+      String title = OrderFormat.makeSortString(dc[i].value, dc[i].language, OrderFormat.TITLE);
+
       log.debug("checking for duplicate title: " + title);
       
-      st.clearParameters();
-      st.setString(1, title);
-      ResultSet rs = st.executeQuery();
+      // Execute browse, with one result
+      BrowseIndex bi = BrowseIndex.getBrowseIndex("title");
 
-      if (rs.next()) {
-        int count = rs.getInt(1);
+      BrowserScope scope = new BrowserScope(c);
+      scope.setBrowseIndex(bi);
+      scope.setResultsPerPage(1);
+      scope.setStartsWith(title);
 
-        if (count > 1) {
+      BrowseEngine be = new BrowseEngine(c);
+      BrowseInfo binfo = be.browse(scope);
+
+      // Process results
+      List l = binfo.getResults();
+      if (l.size() == 1) {
+
+        BrowseItem bitem = (BrowseItem)l.get(0);
+
+        // Get normalized title for browse item
+        String btitle = OrderFormat.makeSortString(bitem.getName(), null, OrderFormat.TITLE);
+
+        // Check for the match
+        if (title.equals(btitle)) {
           log.info("Duplicate title: " + title);
-					  
+        				  
+          // Get the list of collections for the loaded item
+          StringBuffer sbCollections = new StringBuffer();
+          sbCollections.append(etdcollection.getMetadata("name"));
+          for (Iterator ic = sCollections.iterator(); ic.hasNext(); ) {
+            Collection coll = (Collection)ic.next();
+            sbCollections.append(", ");
+            sbCollections.append(coll.getMetadata("name"));
+          }
+    
           // Get the email recipient
           String email = ConfigurationManager.getProperty("mail.duplicate_title");
           if (email == null) {
             email = ConfigurationManager.getProperty("mail.admin");
           }
-		    
+        	    
           if (email != null) {
             // Send the email
-            Email bean = ConfigurationManager.getEmail("duplicate_title");
+            Email bean = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(I18nUtil.getDefaultLocale(), "duplicate_title"));
             bean.addRecipient(email);
             bean.addArgument(title);
             bean.addArgument(""+item.getID());
@@ -513,9 +514,7 @@ public class EtdLoader
           }
         }
       }
-      rs.close();
     }
-    st.close();
   }
 
 
@@ -612,22 +611,25 @@ public class EtdLoader
   public static Set getCollections(Context context, Document meta) throws Exception {
     Set sCollections = new HashSet();
 
-    DocumentSource source = new DocumentSource(meta);
-    DocumentResult result = new DocumentResult();
+    log.debug("Looking for mapped collections");
 
-    tCollections.transform(source, result);
-
-    Document colls = result.getDocument();
-
-    List l = getXPath("/collections/collection").selectNodes(colls);
+    List l = getXPath("/DISS_submission/DISS_description/DISS_institution/DISS_inst_contact").selectNodes(meta);
     for (Iterator i = l.iterator(); i.hasNext(); ) {
-      Node n = (Node)i.next();
 
-      Collection coll = (Collection)mAllCollections.get(n.getText());
-      if (coll == null) {
-        log.error("Unable to lookup mapped collection: " + n.getText());
+      Node n = (Node)i.next();
+      String strDepartment = n.getText().trim().replaceAll(" +", " ");
+    
+      log.debug("Found DISS_inst_contact: " + strDepartment);
+
+      EtdUnit etdunit = EtdUnit.findByName(context, strDepartment);
+
+      if (etdunit == null) {
+        log.error("Unable to lookup mapped collection: " + strDepartment);
+
       } else {
-        sCollections.add(coll);
+        for (Iterator j = Arrays.asList(etdunit.getCollections()).iterator(); j.hasNext(); ) {
+          sCollections.add(j.next());
+        }
       }
     }
     
@@ -902,7 +904,7 @@ public class EtdLoader
 		    
     if (email != null) {
       // Send the email
-      Email bean = ConfigurationManager.getEmail("etd_collections");
+      Email bean = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(I18nUtil.getDefaultLocale(), "etd_collections"));
       bean.addRecipient(email);
       bean.addArgument(strTitle);
       bean.addArgument(""+item.getID());

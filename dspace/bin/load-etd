@@ -26,7 +26,7 @@ GetCmdLine();
 chomp($bindir = `dirname $0`);
 
 @cmd = ("$bindir/dsrun",
-	"-Dlog4j.defaultInitOverride=true",
+   "-Ddspace.log.init.disable=true",
 	"-Detdloader.zipfile=$zipfile"
 );
 push @cmd, "-Detdloader.marcfile=$marcfile" if (defined $marcfile);
