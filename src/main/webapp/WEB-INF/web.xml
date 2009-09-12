@@ -20,13 +20,13 @@
 	<!--
 		People who want to hardcode their "Solr Home" directly into the WAR
 		File can set the JNDI property here... 
-	
+	-->
 	<env-entry>
 		<env-entry-name>solr/home</env-entry-name>
 		<env-entry-type>java.lang.String</env-entry-type>
-		<env-entry-value>solr</env-entry-value>
+		<env-entry-value>/dspace-services/solr</env-entry-value>
 	</env-entry>
-	-->
+	
 
    <!-- 
    <context-param>
@@ -84,9 +84,25 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
-	<listener>
-		<listener-class>org.dspace.solr.listeners.AntInitListener</listener-class>
-	</listener>
+  <!-- Servlet Context Listener ======================================= -->
+
+    <!--
+    - Declare Spring context listener which sets up the Spring Application Context
+    - containing all Cocoon components (and user defined beans as well).
+    -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <!--
+    - Declare Spring request listener which sets up the required RequestAttributes
+    - to support Springs and Cocoon custom bean scopes like the request scope or the
+    - session scope.
+    -->
+    <listener>
+        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+    </listener>
+  
 	<!-- Otherwise it will continue to the old servlets -->
 
 	<servlet>

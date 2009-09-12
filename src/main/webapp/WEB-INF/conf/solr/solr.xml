@@ -17,24 +17,18 @@
 -->
 
 <!--
- This is a stripped down config file used for a simple example...  
- It is *not* a good example to work from. 
--->
-<config>
-  <updateHandler class="solr.DirectUpdateHandler2" />
-
-  <requestDispatcher handleSelect="true" >
-    <requestParsers enableRemoteStreaming="false" multipartUploadLimitInKB="2048" />
-  </requestDispatcher>
+ All (relative) paths are relative to the installation path
   
-  <requestHandler name="standard" class="solr.StandardRequestHandler" default="true" />
-  <requestHandler name="/update" class="solr.XmlUpdateRequestHandler" />
-  <requestHandler name="/admin/" class="org.apache.solr.handler.admin.AdminHandlers" />
-      
-  <!-- config for the admin interface --> 
-  <admin>
-    <defaultQuery>solr</defaultQuery>
-  </admin>
+  persistent: Save changes made via the API to this file
+  sharedLib: path to a lib directory that will be shared across all cores
+-->
+<solr persistent="false">
 
-</config>
-
+  <!--
+  adminPath: RequestHandler path to manage cores.  
+    If 'null' (or absent), cores will not be manageable via REST
+  -->
+  <cores adminPath="/admin/cores">
+    <core name="statistics" instanceDir="statistics" />
+  </cores>
+</solr>

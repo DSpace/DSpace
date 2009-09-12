@@ -147,11 +147,14 @@
 						<id>webapp</id>
 						<configuration>
 							<primaryArtifact>true</primaryArtifact>
+                     
 							<archiveClasses>true</archiveClasses>
-							<!--
-								Maven 2.1 <attachClasses>true</attachClasses>
-								<classesClassifier>classes</classesClassifier>
-							-->
+                            <attachClasses>true</attachClasses>
+                            <classesClassifier>classes</classesClassifier>
+                            
+                            <warSourceExcludes>WEB-INF/classes/**</warSourceExcludes>
+                            <packagingExcludes>WEB-INF/classes/**</packagingExcludes>
+							
 							<webResources>
 								<resource>
 									<filtering>true</filtering>
@@ -160,6 +163,7 @@
 										<include>WEB-INF/web.xml</include>
 									</includes>
 								</resource>
+                                
 							</webResources>
 						</configuration>
 						<goals>
@@ -172,9 +176,14 @@
 						<id>skinny</id>
 						<configuration>
 							<primaryArtifact>false</primaryArtifact>
+                     
 							<classifier>skinny</classifier>
 							<archiveClasses>true</archiveClasses>
-							<warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
+                            <attachClasses>true</attachClasses>
+                            <classesClassifier>classes</classesClassifier>
+                            
+							<warSourceExcludes>WEB-INF/lib/**,WEB-INF/classes/**</warSourceExcludes>
+                            <packagingExcludes>WEB-INF/lib/**,WEB-INF/classes/**</packagingExcludes>
 							<webResources>
 								<resource>
 									<filtering>true</filtering>
@@ -225,6 +234,46 @@
 			<artifactId>jsp-api</artifactId>
 			<version>2.1</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>1.7.0</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity-tools</artifactId>
+			<version>2.0-beta3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.5.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.5.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>2.5.6</version>
 		</dependency>
 	</dependencies>
 
