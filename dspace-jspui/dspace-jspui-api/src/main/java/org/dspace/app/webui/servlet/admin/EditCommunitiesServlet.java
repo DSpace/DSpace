@@ -724,11 +724,9 @@ public class EditCommunitiesServlet extends DSpaceServlet
             collection.createTemplateItem();
 
             // Forward to edit page for new template item
-            Item i = collection.getTemplateItem();
-            i.setOwningCollection(collection);
+            Item i = collection.getTemplateItem();            
 
-            // have to update to avoid ref. integrity error
-            i.update();
+            // save the changes
             collection.update();
             context.complete();
             response.sendRedirect(response.encodeRedirectURL(request

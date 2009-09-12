@@ -65,6 +65,7 @@
  - [DS-259] Community/collection admin should not to be able to delete their admin group
  - [DS-261] Community Admin JSPUI: porting of the DS-228 patch
  - [DS-271] Make the OAI DC crosswalk configurable
+ - [DS-260] Template item some times has owningCollection filled and some times not
 
 (Tim Donohue)
  - [DS-218] Cannot add/remove email subscriptions from Profile page in XMLUI

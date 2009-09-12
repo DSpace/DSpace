@@ -87,3 +87,11 @@ CREATE TABLE harvested_item
 );
 
 CREATE INDEX harvested_item_fk_idx ON harvested_item(item_id);
+
+
+-------------------------------------------------------------------------
+-- DS-260 Cleanup of Owning collection column for template item created 
+-- with the JSPUI after the collection creation
+-------------------------------------------------------------------------
+UPDATE item SET owning_collection = null WHERE item_id IN 
+	(SELECT template_item_id FROM collection WHERE template_item_id IS NOT null);
