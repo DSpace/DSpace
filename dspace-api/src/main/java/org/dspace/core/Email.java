@@ -37,6 +37,8 @@
  */
 package org.dspace.core;
 
+import org.apache.log4j.Logger;
+
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -153,7 +155,9 @@ public class Email
 
     /** The character set this message will be sent in */
     private String charset;
-    
+
+    private static final Logger log = Logger.getLogger(Email.class);
+
     /**
      * Create a new email message.
      */
@@ -260,6 +264,12 @@ public class Email
         // Get the mail configuration properties
         String server = ConfigurationManager.getProperty("mail.server");
         String from = ConfigurationManager.getProperty("mail.from.address");
+        boolean disabled = ConfigurationManager.getBooleanProperty("mail.server.disabled", false);
+
+        if (disabled) {
+            log.info("message not sent due to mail.server.disabled: " + subject);
+            return;
+        }
 
         // Optionally enable an SSL protected connection
         if (ConfigurationManager.getBooleanProperty("mail.ssl.enable"))
