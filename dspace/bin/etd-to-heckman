@@ -25,12 +25,13 @@ $file = $ARGV[1];
 chomp($bindir = `dirname $0`);
 
 # Get config
+chomp($upload = `$bindir/dsrun org.dspace.core.ConfigurationManager -property heckman.upload`);
 chomp($host = `$bindir/dsrun org.dspace.core.ConfigurationManager -property heckman.host`);
 chomp($user = `$bindir/dsrun org.dspace.core.ConfigurationManager -property heckman.user`);
 chomp($passwd = `$bindir/dsrun org.dspace.core.ConfigurationManager -property heckman.passwd`);
 chomp($remdir = `$bindir/dsrun org.dspace.core.ConfigurationManager -property heckman.dir`);
 
-if (!$host && !$user) {
+if ($upload ne "true") {
     die "Upload to HFGroup is not enabled\n";
 }
 

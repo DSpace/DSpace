@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+
+# only send mail if there's anything on stdin
+
+$mail=0;
+while(<STDIN>) {
+    if (! $mail) {
+	$mail = 1;
+	open(PROC, "|-", "/bin/mail", @ARGV) || die;
+    }
+    print PROC;
+}
+if ($mail) {
+    close PROC;
+}

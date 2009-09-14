@@ -31,6 +31,8 @@ if ($status == 0) then
   touch $marcdir/$marcfile
   touch $csvdir/$csvfile
 
+  @ count = 0
+
   foreach upload ($incomingdir/etdadmin_upload_*.zip)
      set zipfile = `basename $upload`
 
@@ -45,12 +47,12 @@ if ($status == 0) then
      echo ' ' Moving $zipfile to $processeddir
      mv $incomingdir/$zipfile $processeddir
 
+     @ count = $count + 1
+
      # Transfer to Heckman
      echo Transfering proquest file to HFGroup
      $bindir/etd-to-heckman $processeddir $zipfile 
   end
-
-  @ count = `/lims/bin/fmarc -i $marcdir/$marcfile`
 
   # Marc processing
   if ($count > 0) then

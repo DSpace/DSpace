@@ -28,7 +28,6 @@ $file = $ARGV[1];
 
 # Get directories
 chomp($bindir = `dirname $0`);
-chomp($confdir = `cd $bindir/../load; pwd`);
 
 
 %mail = ();
