@@ -539,6 +539,10 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         }
     }
 
+    protected QueryResults getQueryResults() {
+        return queryResults;
+    }
+
     /**
      * Determine if the scope of the search should fixed or is changeable by the
      * user. 
