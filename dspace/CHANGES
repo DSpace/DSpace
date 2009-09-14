@@ -50,6 +50,7 @@
  - [DS-249] sub-daily utility script does not pass arguments to Java
  - [DS-252] Interpolate variables in the Subject: line of email templates as well
  - [DS-262] Bug in DS-118, new patch included
+ - [DS-274] Typo in XSL breaks rendering of dri:xref with class
  - [DS-275] License files not listed on Item Summary page
  - [DS-276] Patch to fix spelling error in Exception page
  - [DS-280] build.xml fails for ant versions below 1.7
