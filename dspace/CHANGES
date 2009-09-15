@@ -43,6 +43,7 @@
  - [DS-250] Invalid identifiers are not escaped
  - [DS-256] Item Export ignores metadata language qualifier
  - [DS-290] [dspace]/exports is not created during fresh install
+ - [DS-303] Export migrate option incorrectly removes non-handle identifier.uris
 
 (Larry Stone)
  - [DS-191] metadataschemaregistry_seq is not initialized correctly under Oracle
