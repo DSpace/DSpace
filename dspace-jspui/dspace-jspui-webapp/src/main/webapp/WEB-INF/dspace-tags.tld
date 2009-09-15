@@ -326,7 +326,20 @@
   </tag>
 
   <tag>
-    <name>popup</name>
+    <name>collectionlist</name>
+    <tagclass>org.dspace.app.webui.jsptag.CollectionListTag</tagclass>
+    <info>
+      Tag for displaying a list of collections.
+    </info>
+    <attribute>
+      <name>collections</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
+     <name>popup</name>
     <tagclass>org.dspace.app.webui.jsptag.PopupTag</tagclass>
     <info>
       Tag for producing a popup window link.  Takes advantage of Javascript
