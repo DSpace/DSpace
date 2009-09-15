@@ -339,7 +339,7 @@
   </tag>
 
   <tag>
-     <name>popup</name>
+    <name>popup</name>
     <tagclass>org.dspace.app.webui.jsptag.PopupTag</tagclass>
     <info>
       Tag for producing a popup window link.  Takes advantage of Javascript
