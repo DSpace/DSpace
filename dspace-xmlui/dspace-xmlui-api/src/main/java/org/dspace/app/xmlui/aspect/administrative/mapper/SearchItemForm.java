@@ -141,11 +141,28 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 			String url = contextPath+"/handle/"+item.getHandle();
 			
 			Row row = table.addRow();
-			
-			CheckBox select = row.addCell().addCheckBox("itemID");
-			select.setLabel("Select");
-			select.addOption(itemID);
-			
+
+            boolean canBeMapped = true;
+            Collection[] collections = item.getCollections();
+            for (Collection c : collections)
+            {
+                if (c.getID() == collectionID)
+                {
+                    canBeMapped = false;
+                }
+            }
+
+            if (canBeMapped)
+            {
+                CheckBox select = row.addCell().addCheckBox("itemID");
+                select.setLabel("Select");
+                select.addOption(itemID);
+            }
+            else
+            {
+                row.addCell().addContent("");
+            }
+
 			row.addCellContent(owning);
 			row.addCell().addXref(url,author);
 			row.addCell().addXref(url,title);
