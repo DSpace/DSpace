@@ -79,6 +79,7 @@
  - [DS-228] Community Admin XMLUI: Delegated Admins Patch
 
 (Ben Bosman)
+ - [DS-310] UTF-8 encoding in community and collection text
  - [DS-307] Offer access in AbstractSearch to QueryResults for subclasses
  - [DS-306] Option to disable mailserver
  - [DS-226] confirmation page of edit profile has an invalid link

@@ -41,6 +41,7 @@
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -1033,9 +1034,15 @@ public class FlowContainerUtils
 		value = escapeXMLEntities(value);
 		
 		// Try and parse the XML into a mini-dom
-    	String xml = "<fragment>"+value+"</fragment>";
+    	String xml = "<?xml version='1.0' encoding='UTF-8'?><fragment>"+value+"</fragment>";
  	   
- 	   	ByteArrayInputStream inputStream = new ByteArrayInputStream(xml.getBytes());
+ 	   	ByteArrayInputStream inputStream = null;
+        try {
+            inputStream = new ByteArrayInputStream(xml.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            inputStream = new ByteArrayInputStream(xml.getBytes()); //not supposed to happen, but never hurts
+
+        }
  	   
  	    SAXBuilder builder = new SAXBuilder();
 		try 
