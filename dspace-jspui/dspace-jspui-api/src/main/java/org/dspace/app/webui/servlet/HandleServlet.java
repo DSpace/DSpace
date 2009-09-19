@@ -59,6 +59,7 @@ import org.dspace.handle.HandleManager;
 import org.dspace.plugin.CollectionHomeProcessor;
 import org.dspace.plugin.CommunityHomeProcessor;
 import org.jdom.Element;
+import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
 
 import javax.servlet.ServletException;
@@ -347,6 +348,7 @@ public class HandleServlet extends DSpaceServlet
             StringWriter sw = new StringWriter();
 
             XMLOutputter xmlo = new XMLOutputter();
+            xmlo.output(new Text("\n"), sw);
             for (int i = 0; i < l.size(); i++)
             {
                 Element e = (Element) l.get(i);
@@ -355,6 +357,7 @@ public class HandleServlet extends DSpaceServlet
                 // work for Manakin as well as the JSP-based UI.
                 e.setNamespace(null);
                 xmlo.output(e, sw);
+                xmlo.output(new Text("\n"), sw);
             }
             headMetadata = sw.toString();
         }

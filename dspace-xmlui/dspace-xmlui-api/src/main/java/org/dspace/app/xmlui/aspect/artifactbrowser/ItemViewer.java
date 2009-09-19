@@ -77,6 +77,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
 import org.dspace.core.PluginManager;
 import org.jdom.Element;
+import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
 import org.xml.sax.SAXException;
 
@@ -201,6 +202,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             StringWriter sw = new StringWriter();
 
             XMLOutputter xmlo = new XMLOutputter();
+            xmlo.output(new Text("\n"), sw);
             for (int i = 0; i < l.size(); i++)
             {
                 Element e = (Element) l.get(i);
@@ -209,6 +211,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
                 // work for Manakin as well as the JSP-based UI.
                 e.setNamespace(null);
                 xmlo.output(e, sw);
+                xmlo.output(new Text("\n"), sw);
             }
             pageMeta.addMetadata("xhtml_head_item").addContent(sw.toString());
         }
