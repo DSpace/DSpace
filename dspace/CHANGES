@@ -45,6 +45,7 @@
  - [DS-279] XMLUI Item Mapper will map the same item more than one time
  - [DS-290] [dspace]/exports is not created during fresh install
  - [DS-303] Export migrate option incorrectly removes non-handle identifier.uris
+ - [DS-316] Make SWORD app:accepts configurable
 
 (Larry Stone)
  - [DS-191] metadataschemaregistry_seq is not initialized correctly under Oracle

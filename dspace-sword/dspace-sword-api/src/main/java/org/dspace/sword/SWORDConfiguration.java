@@ -92,6 +92,9 @@ public class SWORDConfiguration
 	/** item bundle in which sword deposits are stored */
 	private String swordBundle = "SWORD";
 
+    /** Accepted formats */
+    private List<String> swordaccepts;
+
 	/**
 	 * Initialise the sword configuration.  It is at this stage that the
 	 * object will interrogate the DSpace Configuration for details
@@ -117,6 +120,18 @@ public class SWORDConfiguration
 		{
 			this.swordBundle = bundle;
 		}
+
+        // Get the accepted formats
+        String acceptsProperty = ConfigurationManager.getProperty("sword.accepts");
+        swordaccepts = new ArrayList<String>();
+        if (acceptsProperty == null)
+        {
+            acceptsProperty = "application/zip";
+        }
+        for (String element : acceptsProperty.split(","))
+        {
+            swordaccepts.add(element.trim());
+        }
 	}
 
 	/**
@@ -247,8 +262,10 @@ public class SWORDConfiguration
 			List<String> accepts = new ArrayList<String>();
 			if (dso instanceof Collection)
 			{
-				// at the moment collections only accept zip files
-				accepts.add("application/zip");
+				for (String format : swordaccepts)
+                {
+                    accepts.add(format);
+                }
 			}
 			else if (dso instanceof Item)
 			{
@@ -265,6 +282,22 @@ public class SWORDConfiguration
 		{
 			throw new DSpaceSWORDException(e);
 		}
+	}
+
+    /**
+	 * Get the list of mime types that a Collection will accept as packages
+	 *
+	 * @return the list of mime types
+	 * @throws DSpaceSWORDException
+	 */
+	public List<String> getCollectionAccepts() throws DSpaceSWORDException
+	{
+        List<String> accepts = new ArrayList<String>();
+        for (String format : swordaccepts)
+        {
+            accepts.add(format);
+        }
+        return accepts;
 	}
 
 	/**
