@@ -339,12 +339,7 @@
         <%-- <h2>Bitstreams</h2> --%>
 		<h2><fmt:message key="jsp.tools.edit-item-form.heading"/></h2>
 
-        <%-- <p><strong>Note: Changes to the bitstreams will not be automatically reflected in the
-        Dublin Core metadata above (e.g. <code>format.extent</code>, <code>format.mimetype</code>).
-        You will need to update this by hand.</strong></p> --%>
-		<p><strong><fmt:message key="jsp.tools.edit-item-form.note1"/></strong></p>
-
-        <%-- <p>Also note that if the "user format description" field isn't empty, the format will
+        <%-- <p>Note that if the "user format description" field isn't empty, the format will
         always be set to "Unknown", so clear the user format description before changing the
         format field.</p> --%>
 		<p><fmt:message key="jsp.tools.edit-item-form.note3"/></p>
