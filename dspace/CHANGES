@@ -48,6 +48,7 @@
  - [DS-315] Enhance readability of embedded metadata in html head
  - [DS-316] Make SWORD app:accepts configurable
  - [DS-318] JSPUI: Left over text in edit item about format
+ - [DS-319] Replace '/dspace/bin/dsrun org.dspace.browse.ItemCounter' with /dspace/bin/itemcounter
 
 (Larry Stone)
  - [DS-191] metadataschemaregistry_seq is not initialized correctly under Oracle
