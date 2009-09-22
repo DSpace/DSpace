@@ -43,6 +43,7 @@ import java.sql.SQLException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.embargo.EmbargoManager;
 import org.dspace.handle.HandleManager;
 
 /**
@@ -87,18 +88,28 @@ public class InstallItem
     {
         Item item = is.getItem();
         String handle;
+        
+        // this is really just to flush out fatal embargo metadata
+        // problems before we set inArchive.
+        DCDate liftDate = EmbargoManager.getEmbargoDate(c, item);
 
         // create accession date
         DCDate now = DCDate.getCurrent();
         item.addDC("date", "accessioned", null, now.toString());
-        item.addDC("date", "available", null, now.toString());
+        
+        // add date available if not under embargo, otherwise it will
+        // be set when the embargo is lifted.
+        if (liftDate == null)
+            item.addDC("date", "available", null, now.toString());
 
         // create issue date if not present
         DCValue[] currentDateIssued = item.getDC("date", "issued", Item.ANY);
 
         if (currentDateIssued.length == 0)
         {
-            item.addDC("date", "issued", null, now.toString());
+            DCDate issued = new DCDate();
+            issued.setDateLocal(now.getYear(),now.getMonth(),now.getDay(),-1,-1,-1);
+            item.addDC("date", "issued", null, issued.toString());
         }
 
         // if no previous handle supplied, create one
@@ -154,6 +165,10 @@ public class InstallItem
         // remove the item's policies and replace them with
         // the defaults from the collection
         item.inheritCollectionDefaultPolicies(is.getCollection());
+        
+        // set embargo lift date and take away read access if indicated.
+        if (liftDate != null)
+            EmbargoManager.setEmbargo(c, item, liftDate);
 
         return item;
     }

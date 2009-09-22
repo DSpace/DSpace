@@ -2269,4 +2269,45 @@ public class Item extends DSpaceObject
         DCValue t[] = getMetadata("dc", "title", null, Item.ANY);
         return (t.length >= 1) ? t[0].value : null;
     }
+    
+    /**
+     * Returns an iterator of Items possessing the passed metadata field, or only
+     * those matching the passed value, if value is not Item.ANY
+     * 
+     * @param context DSpace context object
+     * @param schema metdata field schema
+     * @param element metdata field element
+     * @param qualifier metdata field qualifier
+     * @param value field value or Item.ANY to match any value
+     * @return an iterator over the items matching that authority value
+     * @throws SQLException, AuthorizeException, IOException
+     *
+     */
+    public static ItemIterator findByMetadataField(Context context,
+    	       String schema, String element, String qualifier, String value)
+          throws SQLException, AuthorizeException, IOException
+    {
+        MetadataSchema mds = MetadataSchema.find(context, schema);
+        if (mds == null)
+            throw new IllegalArgumentException("No such metadata schema: "+schema);
+        MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, qualifier);
+        if (mdf == null)
+            throw new IllegalArgumentException(
+            "No such metadata field: schema="+schema+", element="+element+", qualifier="+qualifier);
+        
+        String query = "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' "+
+                       "AND item.item_id = metadatavalue.item_id AND metadata_field_id = ?";
+        TableRowIterator rows = null;
+        if (Item.ANY.equals(value))
+        {
+        	rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID());
+        }
+        else
+        {
+        	query += " AND metadatavalue.text_value = ?";
+        	rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID(), value);
+        }
+        return new ItemIterator(context, rows);
+     }
+
 }
