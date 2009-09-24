@@ -271,12 +271,6 @@ public class Email
             return;
         }
 
-        // Optionally enable an SSL protected connection
-        if (ConfigurationManager.getBooleanProperty("mail.ssl.enable"))
-        {
-            Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
-        }
-        
         // Set up properties for mail session
         Properties props = System.getProperties();
         props.put("mail.smtp.host", server);
