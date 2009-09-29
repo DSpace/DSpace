@@ -110,12 +110,26 @@ public class CompleteStep extends AbstractProcessingStep
                         + subInfo.getSubmissionItem().getID()));
 
         // Start the workflow for this Submission
+        boolean success = false;
+        try
+        {
         WorkflowManager.start(context, (WorkspaceItem) subInfo
                 .getSubmissionItem());
-
+            success = true;
+        }
+        catch (Exception e)
+        {
+            log.error("Caught exception in submission step: ",e);
+            throw new ServletException(e);
+        }
+        finally
+        {
         // commit changes to database
+            if (success)
         context.commit();
-
+            else
+                context.getDBConnection().rollback();
+        }
         return STATUS_COMPLETE;
     }
 

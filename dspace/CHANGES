@@ -53,6 +53,7 @@
  - [DS-328] SWORD service documents do not include atom:generator element
 
 (Larry Stone)
+ - [DS-255] Protect submission from being lost if exception occurs in CompleteStep
  - [DS-254] Fix response for authorization failure on Bitstream when user is logged-in
  - [DS-232] Parse personal names correctly if there is no space after the last name
  - [DS-191] metadataschemaregistry_seq is not initialized correctly under Oracle
