@@ -50,8 +50,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.webui.util.OpenSearch;
-import org.dspace.app.webui.util.UIUtil;
+import org.dspace.app.util.OpenSearch;
+import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -133,9 +133,9 @@ public class OpenSearchServlet extends DSpaceServlet
         
         // then the rest - we are processing the query
         String query = request.getParameter("query");
-        int start = UIUtil.getIntParameter(request, "start");
-        int rpp = UIUtil.getIntParameter(request, "rpp");
-        int sort = UIUtil.getIntParameter(request, "sort_by");
+        int start = Util.getIntParameter(request, "start");
+        int rpp = Util.getIntParameter(request, "rpp");
+        int sort = Util.getIntParameter(request, "sort_by");
         
         QueryArgs qArgs = new QueryArgs();       
         // can't start earlier than 0 in the results!
