@@ -90,17 +90,17 @@ public class DCPersonName
                 commaIndex = rawValue.length();
             }
 
-            lastName = rawValue.substring(0, commaIndex);
+            lastName = rawValue.substring(0, commaIndex).trim();
 
             // Just in case the first name is blank
-            if (rawValue.length() > (commaIndex + 2))
+            if (rawValue.length() > (commaIndex + 1))
             {
-                firstNames = rawValue.substring(commaIndex + 2);
+                firstNames = rawValue.substring(commaIndex + 1).trim();
             }
             else
             {
                 // Since we have a name, we don't want to
-                // leave the last name as null
+                // leave the first name as null
                 firstNames = "";
             }
         }
