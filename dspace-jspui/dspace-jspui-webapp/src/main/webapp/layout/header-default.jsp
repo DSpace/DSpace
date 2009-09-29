@@ -61,6 +61,9 @@
 
     String siteName = ConfigurationManager.getProperty("dspace.name");
     String feedRef = (String)request.getAttribute("dspace.layout.feedref");
+    boolean osLink = ConfigurationManager.getBooleanProperty("websvc.opensearch.autolink");
+    String osCtx = ConfigurationManager.getProperty("websvc.opensearch.svccontext");
+    String osName = ConfigurationManager.getProperty("websvc.opensearch.shortname");
     List parts = (List)request.getAttribute("dspace.layout.linkparts");
     String extraHeadData = (String)request.getAttribute("dspace.layout.head");
 %>
@@ -83,6 +86,13 @@
         <link rel="alternate" type="application/<%= (String)parts.get(i) %>" title="<%= (String)parts.get(i+1) %>" href="<%= request.getContextPath() %>/feed/<%= (String)parts.get(i+2) %>/<%= feedRef %>"/>
 <%
         }
+    }
+    
+    if (osLink)
+    {
+%>
+        <link rel="search" type="application/opensearchdescription+xml" href="<%= request.getContextPath() %>/<%= osCtx %>description.xml" title="<%= osName %>"/>
+<%
     }
 
     if (extraHeadData != null)

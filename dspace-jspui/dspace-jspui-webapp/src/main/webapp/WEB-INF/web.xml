@@ -307,6 +307,11 @@
     <servlet-name>openURL</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.OpenURLServlet</servlet-class>
   </servlet>
+  
+  <servlet>
+    <servlet-name>open-search</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.OpenSearchServlet</servlet-class>
+  </servlet>
 
   <servlet>
     <servlet-name>password-login</servlet-name>
@@ -584,6 +589,11 @@
   <servlet-mapping>
     <servlet-name>openURL</servlet-name>
     <url-pattern>/openURL</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>open-search</servlet-name>
+    <url-pattern>/open-search</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
