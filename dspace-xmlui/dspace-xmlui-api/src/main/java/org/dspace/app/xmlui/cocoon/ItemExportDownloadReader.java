@@ -130,7 +130,7 @@ public class ItemExportDownloadReader extends AbstractReader implements Recyclab
             // Is there a User logged in and does the user have access to read it?
             if (!ItemExport.canDownload(context, fileName))
             {
-            	if(this.request.getSession().getAttribute("dspace.current.user.id")!=null){
+                if(context.getCurrentUser()!=null){
             		// A user is logged in, but they are not authorized to read this bitstream, 
             		// instead of asking them to login again we'll point them to a friendly error 
             		// message that tells them the bitstream is restricted.
