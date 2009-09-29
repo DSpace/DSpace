@@ -210,6 +210,15 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         	pageMeta.addMetadata("google","analytics").addContent(analyticsKey);
         }
         
+        // add metadata for OpenSearch auto-discovery links if enabled
+        if (ConfigurationManager.getBooleanProperty("websvc.opensearch.autolink"))
+        {
+            pageMeta.addMetadata("opensearch", "shortName").addContent(
+        			ConfigurationManager.getProperty("websvc.opensearch.shortname"));
+            pageMeta.addMetadata("opensearch", "context").addContent(
+            		ConfigurationManager.getProperty("websvc.opensearch.svccontext"));
+        }
+        
         // Add metadata for quick searches:
         pageMeta.addMetadata("search", "simpleURL").addContent(
                 contextPath + "/search");
