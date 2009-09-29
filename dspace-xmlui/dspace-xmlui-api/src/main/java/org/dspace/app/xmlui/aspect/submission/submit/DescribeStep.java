@@ -505,9 +505,9 @@ public class DescribeStep extends AbstractSubmissionStep
 			{
 				DCDate dcDate = new DCDate(dcValue.value);
 
-				year.addInstance().setValue(String.valueOf(dcDate.getYear()));
-				month.addInstance().setOptionSelected(dcDate.getMonth());
-				day.addInstance().setValue(String.valueOf(dcDate.getDay()));
+                                year.addInstance().setValue(String.valueOf(dcDate.getYearGMT()));
+                                month.addInstance().setOptionSelected(dcDate.getMonthGMT());
+                                day.addInstance().setValue(String.valueOf(dcDate.getDayGMT()));
 				fullDate.addInstance().setValue(dcDate.toString());
 			}
 		}
@@ -515,15 +515,15 @@ public class DescribeStep extends AbstractSubmissionStep
 		{
 			DCDate dcDate = new DCDate(dcValues[0].value);
 
-			year.setValue(String.valueOf(dcDate.getYear()));
-			month.setOptionSelected(dcDate.getMonth());
+                        year.setValue(String.valueOf(dcDate.getYearGMT()));
+                        month.setOptionSelected(dcDate.getMonthGMT());
 			
 			// Check if the day field is not specified, if so then just 
 			// put a blank value in instead of the wiered looking -1.
-			if (dcDate.getDay() == -1)
+                        if (dcDate.getDayGMT() == -1)
 				day.setValue("");
 			else
-				day.setValue(String.valueOf(dcDate.getDay()));
+                                day.setValue(String.valueOf(dcDate.getDayGMT()));
 		}
 	}
 	
