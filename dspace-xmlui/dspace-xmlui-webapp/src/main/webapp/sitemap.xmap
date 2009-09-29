@@ -48,11 +48,27 @@
 			<map:generator name="DSpaceFeedGenerator" src="org.dspace.app.xmlui.cocoon.DSpaceFeedGenerator"/>
 			<map:generator name="DSpaceMETSGenerator" src="org.dspace.app.xmlui.cocoon.DSpaceMETSGenerator"/>
 			<map:generator name="DSpaceOREGenerator" src="org.dspace.app.xmlui.cocoon.DSpaceOREGenerator"/>
+			<map:generator name="OpenSearchGenerator" src="org.dspace.app.xmlui.cocoon.OpenSearchGenerator"/>
 			<map:generator name="notifying" src="org.apache.cocoon.sitemap.NotifyingGenerator"/>
 			<map:generator name="exception" src="org.apache.cocoon.generation.ExceptionGenerator"/>
 		</map:generators>
 		<map:serializers default="xml">
 			<map:serializer logger="sitemap.serializer.xml" mime-type="text/xml; charset=utf-8" name="xml"
+				src="org.apache.cocoon.serialization.XMLSerializer">
+				<indent>yes</indent>
+				<encoding>UTF-8</encoding>
+			</map:serializer>
+			<map:serializer name="rss" logger="sitemap.serializer.rss" mime-type="application/rss+xml; charset=utf-8"
+				src="org.apache.cocoon.serialization.XMLSerializer">
+				<indent>yes</indent>
+				<encoding>UTF-8</encoding>
+			</map:serializer>
+			<map:serializer name="atom" logger="sitemap.serializer.atom" mime-type="application/atom+xml; charset=utf-8"
+				src="org.apache.cocoon.serialization.XMLSerializer">
+				<indent>yes</indent>
+				<encoding>UTF-8</encoding>
+			</map:serializer>
+			<map:serializer name="opensearch" logger="sitemap.serializer.opensearch" mime-type="application/opensearchdescription+xml; charset=utf-8"
 				src="org.apache.cocoon.serialization.XMLSerializer">
 				<indent>yes</indent>
 				<encoding>UTF-8</encoding>
@@ -353,6 +369,36 @@
 					</map:transform>
 				</map:act>
 				<map:serialize type="xml"/>
+			</map:match>
+			
+			<!-- OpenSearch results for whole repo or community/collection -->
+			<map:match pattern="open-search/**">
+			  <map:match pattern="open-search/description.xml">
+			    <map:generate type="OpenSearchGenerator"/>
+			      <map:parameter name="type" value="description"/>
+			    </map:generate>
+			    <map:serialize type="opensearch"/>
+			  </map:match>
+			  <map:match pattern="open-search/**">
+			    <map:generate type="OpenSearchGenerator"/>
+			    <map:act type="locale">
+				  <map:transform type="i18n">
+					  <map:parameter name="locale" value="{locale}"/>						
+				  </map:transform>
+			    </map:act>
+			    <map:select type="request-parameter">
+			      <map:parameter name="parameter-name" value="format"/>
+			      <map:when test="rss">
+			        <map:serialize type="rss"/>
+			      </map:when>
+			      <map:when test="atom">
+			        <map:serialize type="atom"/>
+			      </map:when>
+			      <map:otherwise>
+			        <map:serialize type="html"/>
+			      </map:otherwise>
+			    </map:select>
+			  </map:match>  
 			</map:match>
 			
       <!-- HTML Sitemaps and Sitemaps.org Sitemaps for whole repo -->
