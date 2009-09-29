@@ -374,7 +374,7 @@
 			<!-- OpenSearch results for whole repo or community/collection -->
 			<map:match pattern="open-search/**">
 			  <map:match pattern="open-search/description.xml">
-			    <map:generate type="OpenSearchGenerator"/>
+			    <map:generate type="OpenSearchGenerator">
 			      <map:parameter name="type" value="description"/>
 			    </map:generate>
 			    <map:serialize type="opensearch"/>
