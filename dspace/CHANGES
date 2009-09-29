@@ -50,6 +50,7 @@
  - [DS-318] JSPUI: Left over text in edit item about format
  - [DS-319] Replace '/dspace/bin/dsrun org.dspace.browse.ItemCounter' with /dspace/bin/itemcounter
  - [DS-327] SWORD temp upload directory missing trailling slash
+ - [DS-328] SWORD service documents do not include atom:generator element
 
 (Larry Stone)
  - [DS-191] metadataschemaregistry_seq is not initialized correctly under Oracle

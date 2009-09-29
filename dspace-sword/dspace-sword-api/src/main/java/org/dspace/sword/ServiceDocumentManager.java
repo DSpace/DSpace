@@ -41,6 +41,7 @@ import org.purl.sword.base.ServiceDocument;
 import org.purl.sword.base.SWORDErrorException;
 import org.purl.sword.base.Service;
 import org.purl.sword.base.Workspace;
+import org.purl.sword.atom.Generator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.content.Community;
@@ -110,6 +111,9 @@ public class ServiceDocumentManager
 
 		// set the max upload size
 		service.setMaxUploadSize(swordConfig.getMaxUploadSize());
+
+        // Set the generator
+        this.addGenerator(service);
 
 		//
 		if (url == null || urlManager.isBaseServiceDocumentUrl(url))
@@ -192,4 +196,23 @@ public class ServiceDocumentManager
 		ServiceDocument sd = new ServiceDocument(service);
 		return sd;
 	}
+
+    /**
+     * Add the generator field content
+     *
+     * @param service The service document to add the generator to
+     */
+    private void addGenerator(Service service)
+    {
+        boolean identify = ConfigurationManager.getBooleanProperty("sword.identify-version", false);
+        SWORDUrlManager urlManager = swordService.getUrlManager();
+        String softwareUri = urlManager.getGeneratorUrl();
+        if (identify)
+        {
+            Generator generator = new Generator();
+            generator.setUri(softwareUri);
+            generator.setVersion(SWORDProperties.VERSION);
+            service.setGenerator(generator);
+        }
+    }
 }
