@@ -51,9 +51,30 @@ import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
+/**
+ * This class is an addition to the AuthorizeManager that perform authorization
+ * check on not crud (ADD, WRITE, etc.) actions.
+ * 
+ * @author bollini
+ * 
+ */
 public class AuthorizeUtil
 {
 
+    /**
+     * Is allowed manage (create, remove, edit) bitstream's policies in the
+     * current context?
+     * 
+     * @param context
+     *            the DSpace Context Object
+     * @param bitstream
+     *            the bitstream that the policy refer to
+     * @throws AuthorizeException
+     *             if the current context (current user) is not allowed to
+     *             manage the bitstream's policies
+     * @throws SQLException
+     *             if a db error occur
+     */
     public static void authorizeManageBitstreamPolicy(Context context,
             Bitstream bitstream) throws AuthorizeException, SQLException
     {
@@ -61,6 +82,20 @@ public class AuthorizeUtil
         authorizeManageBundlePolicy(context, bundle);
     }
 
+    /**
+     * Is allowed manage (create, remove, edit) bundle's policies in the
+     * current context?
+     * 
+     * @param context
+     *            the DSpace Context Object
+     * @param bundle
+     *            the bundle that the policy refer to
+     * @throws AuthorizeException
+     *             if the current context (current user) is not allowed to
+     *             manage the bundle's policies
+     * @throws SQLException
+     *             if a db error occur
+     */
     public static void authorizeManageBundlePolicy(Context context,
             Bundle bundle) throws AuthorizeException, SQLException
     {
@@ -68,6 +103,20 @@ public class AuthorizeUtil
         authorizeManageItemPolicy(context, item);
     }
 
+    /**
+     * Is allowed manage (create, remove, edit) item's policies in the
+     * current context?
+     * 
+     * @param context
+     *            the DSpace Context Object
+     * @param item
+     *            the item that the policy refer to
+     * @throws AuthorizeException
+     *             if the current context (current user) is not allowed to
+     *             manage the item's policies
+     * @throws SQLException
+     *             if a db error occur
+     */
     public static void authorizeManageItemPolicy(Context context, Item item)
             throws AuthorizeException, SQLException
     {
@@ -93,6 +142,20 @@ public class AuthorizeUtil
         }
     }
 
+    /**
+     * Is allowed manage (create, remove, edit) collection's policies in the
+     * current context?
+     * 
+     * @param context
+     *            the DSpace Context Object
+     * @param collection
+     *            the collection that the policy refer to
+     * @throws AuthorizeException
+     *             if the current context (current user) is not allowed to
+     *             manage the collection's policies
+     * @throws SQLException
+     *             if a db error occur
+     */
     public static void authorizeManageCollectionPolicy(Context context,
             Collection collection) throws AuthorizeException, SQLException
     {
@@ -114,6 +177,20 @@ public class AuthorizeUtil
         }
     }
 
+    /**
+     * Is allowed manage (create, remove, edit) community's policies in the
+     * current context?
+     * 
+     * @param context
+     *            the DSpace Context Object
+     * @param community
+     *            the community that the policy refer to
+     * @throws AuthorizeException
+     *             if the current context (current user) is not allowed to
+     *             manage the community's policies
+     * @throws SQLException
+     *             if a db error occur
+     */
     public static void authorizeManageCommunityPolicy(Context context,
             Community community) throws AuthorizeException, SQLException
     {
@@ -129,6 +206,16 @@ public class AuthorizeUtil
         }
     }
 
+    /**
+     * Throw an AuthorizeException if the current user is not a System Admin
+     * 
+     * @param context
+     *            the DSpace Context Object
+     * @throws AuthorizeException
+     *             if the current user is not a System Admin
+     * @throws SQLException
+     *             if a db error occur
+     */
     public static void requireAdminRole(Context context)
             throws AuthorizeException, SQLException
     {
@@ -139,6 +226,20 @@ public class AuthorizeUtil
         }
     }
 
+    /**
+     * Is the current user allowed to manage (add, remove, replace) the item's
+     * CC License
+     * 
+     * @param context
+     *            the DSpace Context Object
+     * @param item
+     *            the item that the CC License refer to
+     * @throws AuthorizeException
+     *             if the current user is not allowed to
+     *             manage the item's CC License
+     * @throws SQLException
+     *             if a db error occur
+     */
     public static void authorizeManageCCLicense(Context context, Item item)
             throws AuthorizeException, SQLException
     {
@@ -171,6 +272,20 @@ public class AuthorizeUtil
         }
     }
 
+    /**
+     * Is the current user allowed to manage (create, remove, edit) the
+     * collection's template item?
+     * 
+     * @param context
+     *            the DSpace Context Object
+     * @param collection
+     *            the collection
+     * @throws AuthorizeException
+     *             if the current user is not allowed to manage the collection's
+     *             template item
+     * @throws SQLException
+     *             if a db error occur
+     */
     public static void authorizeManageTemplateItem(Context context,
             Collection collection) throws AuthorizeException, SQLException
     {
@@ -199,6 +314,20 @@ public class AuthorizeUtil
         }
     }
 
+    /**
+     * Can the current user manage (create, remove, edit) the submitters group of
+     * the collection?
+     * 
+     * @param context
+     *            the DSpace Context Object
+     * @param collection
+     *            the collection
+     * @throws AuthorizeException
+     *             if the current user is not allowed to manage the collection's
+     *             submitters group
+     * @throws SQLException
+     *             if a db error occur
+     */
     public static void authorizeManageSubmittersGroup(Context context,
             Collection collection) throws AuthorizeException, SQLException
     {
@@ -220,6 +349,20 @@ public class AuthorizeUtil
         }
     }
 
+    /**
+     * Can the current user manage (create, remove, edit) the workflow groups of
+     * the collection?
+     * 
+     * @param context
+     *            the DSpace Context Object
+     * @param collection
+     *            the collection
+     * @throws AuthorizeException
+     *             if the current user is not allowed to manage the collection's
+     *             workflow groups
+     * @throws SQLException
+     *             if a db error occur
+     */
     public static void authorizeManageWorkflowsGroup(Context context,
             Collection collection) throws AuthorizeException, SQLException
     {
@@ -241,6 +384,22 @@ public class AuthorizeUtil
         }
     }
 
+    /**
+     * Can the current user create/edit the admins group of the collection?
+     * please note that the remove action need a separate check
+     * 
+     * @see #authorizeRemoveAdminGroup(Context, Collection)
+     * 
+     * @param context
+     *            the DSpace Context Object
+     * @param collection
+     *            the collection
+     * @throws AuthorizeException
+     *             if the current user is not allowed to create/edit the
+     *             collection's admins group
+     * @throws SQLException
+     *             if a db error occur
+     */
     public static void authorizeManageAdminGroup(Context context,
             Collection collection) throws AuthorizeException, SQLException
     {
@@ -262,6 +421,22 @@ public class AuthorizeUtil
         }
     }
 
+    /**
+     * Can the current user remove the admins group of the collection?
+     * please note that the create/edit actions need separate check
+     * 
+     * @see #authorizeManageAdminGroup(Context, Collection)
+     * 
+     * @param context
+     *            the DSpace Context Object
+     * @param collection
+     *            the collection
+     * @throws AuthorizeException
+     *             if the current user is not allowed to remove the
+     *             collection's admins group
+     * @throws SQLException
+     *             if a db error occur
+     */
     public static void authorizeRemoveAdminGroup(Context context,
             Collection collection) throws AuthorizeException, SQLException
     {
@@ -280,6 +455,22 @@ public class AuthorizeUtil
         }
     }
 
+    /**
+     * Can the current user create/edit the admins group of the community?
+     * please note that the remove action need a separate check
+     * 
+     * @see #authorizeRemoveAdminGroup(Context, Collection)
+     * 
+     * @param context
+     *            the DSpace Context Object
+     * @param community
+     *            the community
+     * @throws AuthorizeException
+     *             if the current user is not allowed to create/edit the
+     *             community's admins group
+     * @throws SQLException
+     *             if a db error occur
+     */
     public static void authorizeManageAdminGroup(Context context,
             Community community) throws AuthorizeException, SQLException
     {
@@ -295,6 +486,22 @@ public class AuthorizeUtil
         }
     }
 
+    /**
+     * Can the current user remove the admins group of the community?
+     * please note that the create/edit actions need separate check
+     * 
+     * @see #authorizeManageAdminGroup(Context, Community)
+     * 
+     * @param context
+     *            the DSpace Context Object
+     * @param community
+     *            the community
+     * @throws AuthorizeException
+     *             if the current user is not allowed to remove the
+     *             collection's admins group
+     * @throws SQLException
+     *             if a db error occur
+     */
     public static void authorizeRemoveAdminGroup(Context context,
             Community community) throws SQLException, AuthorizeException
     {
@@ -312,6 +519,19 @@ public class AuthorizeUtil
         }
     }
 
+    /**
+     * Can the current user remove or edit the supplied policy?
+     * 
+     * @param context
+     *            the DSpace Context Object
+     * @param rp
+     *            a resource policy
+     * @throws AuthorizeException
+     *             if the current context (current user) is not allowed to
+     *             remove/edit the policy
+     * @throws SQLException
+     *             if a db error occur
+     */
     public static void authorizeManagePolicy(Context c, ResourcePolicy rp)
             throws SQLException, AuthorizeException
     {
@@ -343,6 +563,19 @@ public class AuthorizeUtil
         }
     }
 
+    /**
+     * Can the current user withdraw the item?
+     * 
+     * @param context
+     *            the DSpace Context Object
+     * @param item
+     *            the item
+     * @throws SQLException
+     *             if a db error occur
+     * @throws AuthorizeException
+     *             if the current user is not allowed to perform the item
+     *             withdraw
+     */
     public static void authorizeWithdrawItem(Context context, Item item)
             throws SQLException, AuthorizeException
     {
@@ -373,6 +606,19 @@ public class AuthorizeUtil
         }
     }
 
+    /**
+    * Can the current user reistate the item?
+    * 
+    * @param context
+    *            the DSpace Context Object
+    * @param item
+    *            the item
+    * @throws SQLException
+    *             if a db error occur
+    * @throws AuthorizeException
+    *             if the current user is not allowed to perform the item
+    *             reistate
+    */
     public static void authorizeReinstateItem(Context context, Item item)
             throws SQLException, AuthorizeException
     {
