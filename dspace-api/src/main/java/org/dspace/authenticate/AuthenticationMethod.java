@@ -160,26 +160,26 @@ public interface AuthenticationMethod {
     public boolean isImplicit();
 
     /**
-     * Get list of extra groups that user implicitly belongs to.
-     * Returns IDs of any EPerson-groups that the user authenticated by
-     * this request is <em>implicitly</em> a member of -- e.g.
-     * a group that depends on the client network-address.
+     * Get list of extra groups that user implicitly belongs to. Note that this
+     * method will be invoked regardless of the authentication status of the
+     * user (logged-in or not) e.g. a group that depends on the client
+     * network-address.
      * <p>
      * It might make sense to implement this method by itself in a separate
-     * authentication method that just adds special groups, if the
-     * code doesn't belong with any existing auth method.
-     * The stackable authentication system was designed expressly to
-     * separate functions into "stacked" methods to keep your
-     * site-specific code  modular and tidy.
-     *
+     * authentication method that just adds special groups, if the code doesn't
+     * belong with any existing auth method. The stackable authentication system
+     * was designed expressly to separate functions into "stacked" methods to
+     * keep your site-specific code modular and tidy.
+     * 
      * @param context
-     *  A valid DSpace context.
-     *
+     *            A valid DSpace context.
+     * 
      * @param request
-     *  The request that started this operation, or null if not applicable.
-     *
-     * @return array of EPerson-group IDs, possibly 0-length, but
-     * never <code>null</code>.
+     *            The request that started this operation, or null if not
+     *            applicable.
+     * 
+     * @return array of EPerson-group IDs, possibly 0-length, but never
+     *         <code>null</code>.
      */
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
         throws SQLException;

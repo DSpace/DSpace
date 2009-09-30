@@ -203,6 +203,8 @@ public class ShibAuthentication implements AuthenticationMethod
         {
             // the person exists, just return ok
             context.setCurrentUser(eperson);
+            request.getSession().setAttribute("shib.authenticated",
+                    new Boolean("true"));
         }
 
         return AuthenticationMethod.SUCCESS;
@@ -215,7 +217,13 @@ public class ShibAuthentication implements AuthenticationMethod
      */
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
     {
-
+        // no user logged in or user not logged from shibboleth
+        if (context.getCurrentUser() == null
+                || request.getSession().getAttribute("shib.authenticated") == null)
+        {
+            return new int[0];
+        }
+                
         if (request.getSession().getAttribute("shib.specialgroup") != null)
         {
             return (int[]) request.getSession().getAttribute(
