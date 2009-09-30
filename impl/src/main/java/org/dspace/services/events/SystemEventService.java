@@ -171,7 +171,7 @@ public class SystemEventService implements EventService, ShutdownService {
      * @param event a validated event
      */
     private void fireClusterEvent(Event event) {
-        log.warn("fireClusterEvent is not implemented yet, no support for cluster events yet, could not fire event to the cluster: " + event);
+        log.debug("fireClusterEvent is not implemented yet, no support for cluster events yet, could not fire event to the cluster: " + event);
     }
 
     /**
@@ -181,7 +181,7 @@ public class SystemEventService implements EventService, ShutdownService {
      * @param event a validated event
      */
     private void fireExternalEvent(Event event) {
-        log.warn("fireExternalEvent is not implemented yet, no support for external events yet, could not fire event to external listeners: " + event);
+        log.debug("fireExternalEvent is not implemented yet, no support for external events yet, could not fire event to external listeners: " + event);
     }
 
     /**
