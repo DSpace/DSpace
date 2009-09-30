@@ -324,10 +324,10 @@ public class SystemEventService implements EventService, ShutdownService {
         public void onEnd(String requestId, Session session, boolean succeeded, Exception failure) {
             if (succeeded) {
                 int fired = fireQueuedEvents();
-                log.info("Fired "+fired+" events at the end of the request ("+requestId+")");
+                log.debug("Fired "+fired+" events at the end of the request ("+requestId+")");
             } else {
                 int cleared = clearQueuedEvents();
-                log.info("Cleared/cancelled "+cleared+" events at the end of the failed request ("+requestId+")");
+                log.debug("Cleared/cancelled "+cleared+" events at the end of the failed request ("+requestId+")");
             }
         }
 

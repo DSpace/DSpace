@@ -213,7 +213,7 @@ public class SessionRequestServiceImpl implements SessionService, RequestService
             }
         } else {
             // request not found, just log a warning
-            log.warn("Attempting to end a request when none currently exists");
+            log.debug("Attempting to end a request when none currently exists");
         }
         return requestId;
     }

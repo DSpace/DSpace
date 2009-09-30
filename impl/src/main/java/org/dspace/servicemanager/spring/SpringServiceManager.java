@@ -85,7 +85,7 @@ public class SpringServiceManager implements ServiceManagerSystem {
         this.configPaths = configPaths;
     }
 
-    public static final String configPath = "spring/applicationContext.xml";
+    public static final String configPath = "spring/spring-dspace-applicationContext.xml";
     public static final String corePath = "spring/spring-dspace-core-services.xml";
     /**
      * Spring does not actually allow us to add in new singletons which have bean definitions so we
