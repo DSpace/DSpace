@@ -234,7 +234,6 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
     	if (dso instanceof Item)
     	{
-    		
     		Item item = (Item) dso;
     		if (item.canEdit())
     		{
@@ -248,9 +247,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     	{
     		Collection collection = (Collection) dso;
     		
-    		
     		// can they admin this collection?
-            if (AuthorizeManager.authorizeActionBoolean(this.context, collection, Constants.ADMIN))
+            if (collection.canEditBoolean(true))
             {
             	context.setHead(T_context_head);
             	context.addItemXref(contextPath+"/admin/collection?collectionID=" + collection.getID(), T_context_edit_collection);            	
@@ -276,14 +274,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             if (AuthorizeManager.authorizeActionBoolean(this.context, community,Constants.ADD))
             {
             	context.setHead(T_context_head);
-            	context.addItemXref(contextPath+"/admin/collection?createNew&communityID=" + community.getID(), T_context_create_collection);         	
-            }
-            
-            // Only System & Community administrators can create sub-communities
-            if (isSystemAdmin || AuthorizeManager.authorizeActionBoolean(this.context, community, Constants.ADMIN))
-            {
-            	context.setHead(T_context_head);
-            	context.addItemXref(contextPath+"/admin/community?createNew&communityID=" + community.getID(), T_context_create_subcommunity);  	
+            	context.addItemXref(contextPath+"/admin/collection?createNew&communityID=" + community.getID(), T_context_create_collection);
+                context.addItemXref(contextPath+"/admin/community?createNew&communityID=" + community.getID(), T_context_create_subcommunity);      
             }
     	}
     	

@@ -111,7 +111,7 @@
     </tr>
   </table>
       
-    <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">
+    <form action="<%= request.getContextPath() %>/tools/authorize" method="post">
 
     <table class="miscTable" align="center" summary="Edit Policy Form">
         <tr>     

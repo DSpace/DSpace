@@ -234,7 +234,7 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 		// PARA: actions
 		Para actions = main.addPara("editItemActionsP","editItemActionsP" );
         // Only System Administrators can delete bitstreams
-		if (AuthorizeManager.isAdmin(context))
+		if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.REMOVE))
 			actions.addButton("submit_delete").setValue(T_submit_delete);
 		else
 		{

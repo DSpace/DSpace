@@ -41,6 +41,7 @@ package org.dspace.app.xmlui.aspect.administrative.community;
 
 import java.sql.SQLException;
 
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -142,25 +143,54 @@ public class AssignCommunityRoles extends AbstractDSpaceTransformer
 	    tableRow.addCell(Cell.ROLE_HEADER).addContent(T_label_admins);
 	    if (admins != null) 
 	    {
-		    tableRow.addCell().addXref(baseURL + "&submit_edit_admin", admins.getName());
-		    tableRow.addCell().addButton("submit_delete_admin").setValue(T_delete);
+	        try
+	        {
+    	        AuthorizeUtil.authorizeManageAdminGroup(context, thisCommunity);
+    	        tableRow.addCell().addXref(baseURL + "&submit_edit_admin", admins.getName());
+	        }
+	        catch (AuthorizeException authex) {
+	            // add a notice, the user is not authorized to create/edit community's admin group
+	            tableRow.addCell().addContent(T_sysadmins_only);
+	        }
+	        try
+	        {
+	            AuthorizeUtil.authorizeRemoveAdminGroup(context, thisCommunity);
+	            tableRow.addCell().addButton("submit_delete_admin").setValue(T_delete);
+	        }
+	        catch (AuthorizeException authex)
+	        {
+	            // nothing to add, the user is not allowed to delete the group
+	        }
 	    }
 	    else 
 	    {
 	    	tableRow.addCell().addContent(T_no_role);
-	    	tableRow.addCell().addButton("submit_create_admin").setValue(T_create);
+	    	Cell commAdminCell = tableRow.addCell();
+	    	try
+            {
+                AuthorizeUtil.authorizeManageAdminGroup(context, thisCommunity);
+                commAdminCell.addButton("submit_create_admin").setValue(T_create);
+            }
+            catch (AuthorizeException authex) 
+            {
+                // add a notice, the user is not authorized to create/edit community's admin group
+                addAdministratorOnlyButton(commAdminCell, "submit_create_admin", T_create);
+            }   
 	    }
 	    // help and directions row
 	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
 	    tableRow.addCell();
 	    tableRow.addCell(1,2).addHighlight("fade offset").addContent(T_help_admins);
 	    
-	    
-	    if (AuthorizeManager.isAdmin(context))
+	    try
 	    {
+	        AuthorizeUtil.authorizeManageCommunityPolicy(context, thisCommunity);
 		    // add one last link to edit the raw authorizations
 		    Cell authCell =rolesTable.addRow().addCell(1,3);
 		    authCell.addXref(baseURL + "&submit_authorizations", T_edit_authorizations);
+	    }
+	    catch (AuthorizeException authex) {
+	        // nothing to add, the user is not authorized to manage community's policies
 	    }
 
 	    Para buttonList = main.addPara();

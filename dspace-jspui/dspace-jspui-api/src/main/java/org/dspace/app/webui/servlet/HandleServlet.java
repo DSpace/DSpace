@@ -546,7 +546,7 @@ public class HandleServlet extends DSpaceServlet
                 subscribed = Subscribe.isSubscribed(context, e, collection);
 
                 // is the user a COLLECTION_EDITOR?
-                if (collection.canEditBoolean())
+                if (collection.canEditBoolean(true))
                 {
                     // set a variable to create an edit button
                     request.setAttribute("editor_button", new Boolean(true));

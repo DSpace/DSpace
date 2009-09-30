@@ -126,6 +126,76 @@ public class DatabaseManager
     }
     
     /**
+     * Set the constraint check to deferred (commit time)
+     * 
+     * @param context
+     *            The context object
+     * @param constraintName
+     *            the constraint name to deferred
+     * @throws SQLException
+     */
+    public static void setConstraintDeferred(Context context,
+            String constraintName) throws SQLException
+    {
+        Statement statement = null;
+        try
+        {
+            statement = context.getDBConnection().createStatement();
+            statement
+                    .execute("SET CONSTRAINTS " + constraintName + " DEFERRED");
+            statement.close();
+        }
+        finally
+        {
+            if (statement != null)
+            {
+                try
+                {
+                    statement.close();
+                }
+                catch (SQLException sqle)
+                {
+                }
+            }
+        }
+    }
+
+    /**
+     * Set the constraint check to immediate (every query)
+     * 
+     * @param context
+     *            The context object
+     * @param constraintName
+     *            the constraint name to check immediately after every query
+     * @throws SQLException
+     */
+    public static void setConstraintImmediate(Context context,
+            String constraintName) throws SQLException
+    {
+        Statement statement = null;
+        try
+        {
+            statement = context.getDBConnection().createStatement();
+            statement.execute("SET CONSTRAINTS " + constraintName
+                    + " IMMEDIATE");
+            statement.close();
+        }
+        finally
+        {
+            if (statement != null)
+            {
+                try
+                {
+                    statement.close();
+                }
+                catch (SQLException sqle)
+                {
+                }
+            }
+        }
+    }
+    
+    /**
      * Return an iterator with the results of the query. The table parameter
      * indicates the type of result. If table is null, the column names are read
      * from the ResultSetMetaData.

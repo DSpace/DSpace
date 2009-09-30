@@ -86,14 +86,31 @@
 
     // Is anyone logged in?
     EPerson user = (EPerson) request.getAttribute("dspace.current.user");
-
-    // Is the logged in user an admin
-    Boolean admin = (Boolean)request.getAttribute("is.admin");
-    boolean isAdmin = (admin == null ? false : admin.booleanValue());
     
     // Is the logged in user an admin of the item
     Boolean itemAdmin = (Boolean)request.getAttribute("admin_button");
     boolean isItemAdmin = (itemAdmin == null ? false : itemAdmin.booleanValue());
+    
+    Boolean policy = (Boolean)request.getAttribute("policy_button");
+    boolean bPolicy = (policy == null ? false : policy.booleanValue());
+    
+    Boolean delete = (Boolean)request.getAttribute("delete_button");
+    boolean bDelete = (delete == null ? false : delete.booleanValue());
+
+    Boolean createBits = (Boolean)request.getAttribute("create_bitstream_button");
+    boolean bCreateBits = (createBits == null ? false : createBits.booleanValue());
+
+    Boolean removeBits = (Boolean)request.getAttribute("remove_bitstream_button");
+    boolean bRemoveBits = (removeBits == null ? false : removeBits.booleanValue());
+
+    Boolean ccLicense = (Boolean)request.getAttribute("cclicense_button");
+    boolean bccLicense = (ccLicense == null ? false : ccLicense.booleanValue());
+    
+    Boolean withdraw = (Boolean)request.getAttribute("withdraw_button");
+    boolean bWithdraw = (withdraw == null ? false : withdraw.booleanValue());
+    
+    Boolean reinstate = (Boolean)request.getAttribute("reinstate_button");
+    boolean bReinstate = (reinstate == null ? false : reinstate.booleanValue());
 %>
 
 
@@ -123,7 +140,7 @@
                 <td class="standard"><%= item.getID() %></td>
                 <td class="standard" width="100%" align="right" rowspan="5">
 <%
-    if (!item.isWithdrawn())
+    if (!item.isWithdrawn() && bWithdraw)
     {
 %>
                     <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
@@ -134,7 +151,7 @@
                     </form>
 <%
     }
-    else
+    else if (item.isWithdrawn() && bReinstate)
     {
 %>
                     <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
@@ -148,6 +165,10 @@
 %>
 
                     <br/>
+<%
+  if (bDelete)
+  {
+%>
                     <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
                         <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                         <input type="hidden" name="action" value="<%= EditItemServlet.START_DELETE %>" />
@@ -155,6 +176,8 @@
 						<input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-item-form.delete-w-confirm.button"/>"/>
                     </form>
 <%
+  }
+
   if (isItemAdmin)
   {
 %>                     <form method="post" action="<%= request.getContextPath() %>/tools/edit-item">
@@ -200,7 +223,7 @@
                 </td>
             </tr>
 <%
-  if (isAdmin)
+  if (bPolicy)
   {
 %>    
 <%-- ===========================================================
@@ -210,7 +233,7 @@
                 <%-- <td class="submitFormLabel">Item's Authorizations:</td> --%>
 				<td class="submitFormLabel"><fmt:message key="jsp.tools.edit-item-form.item"/></td>
                 <td>
-                    <form method="post" action="<%= request.getContextPath() %>/dspace-admin/authorize">
+                    <form method="post" action="<%= request.getContextPath() %>/tools/authorize">
                         <input type="hidden" name="handle" value="<%= ConfigurationManager.getProperty("handle.prefix") %>" />
                         <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                         <%-- <input type="submit" name="submit_item_select" value="Edit..."> --%>
@@ -404,7 +427,10 @@
                 </td>
                 <td headers="t17" class="<%= row %>RowEvenCol">
                     <%-- <a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>">View</a>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="Remove"> --%>
-					<a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>"><fmt:message key="jsp.tools.general.view"/></a>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="<fmt:message key="jsp.tools.general.remove"/>" />
+					<a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>"><fmt:message key="jsp.tools.general.view"/></a>&nbsp;
+					<% if (bRemoveBits) { %>
+					<input type="submit" name="submit_delete_bitstream_<%= key %>" value="<fmt:message key="jsp.tools.general.remove"/>" />
+					<% } %>
                 </td>
             </tr>
 <%
@@ -421,10 +447,13 @@
             <table width="70%" align="center">
                 <tr>
                   <td>
-						<input type="submit" name="submit_addbitstream" value="<fmt:message key="jsp.tools.edit-item-form.addbit.button"/>"/>
 		<%
+			if (bCreateBits) {
+		%>
+						<input type="submit" name="submit_addbitstream" value="<fmt:message key="jsp.tools.edit-item-form.addbit.button"/>"/>
+		<%  }
 
-			if (ConfigurationManager.getBooleanProperty("webui.submit.enable-cc"))
+			if (ConfigurationManager.getBooleanProperty("webui.submit.enable-cc") && bccLicense)
 			{
 				String s;
 				Bundle[] ccBundle = item.getBundles("CC-LICENSE");

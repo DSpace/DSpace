@@ -385,7 +385,8 @@ CREATE TABLE Community2Community
 (
   id             INTEGER PRIMARY KEY,
   parent_comm_id INTEGER REFERENCES Community(community_id),
-  child_comm_id  INTEGER REFERENCES Community(community_id)
+  child_comm_id  INTEGER,
+  CONSTRAINT com2com_child_fk FOREIGN KEY (child_comm_id) REFERENCES Community(community_id) DEFERRABLE
 );
 
 CREATE INDEX com2com_parent_fk_idx ON Community2Community(parent_comm_id);
@@ -398,7 +399,8 @@ CREATE TABLE Community2Collection
 (
   id             INTEGER PRIMARY KEY,
   community_id   INTEGER REFERENCES Community(community_id),
-  collection_id  INTEGER REFERENCES Collection(collection_id)
+  collection_id  INTEGER,
+  CONSTRAINT comm2coll_collection_fk FOREIGN KEY (collection_id) REFERENCES Collection(collection_id) DEFERRABLE
 );
 
 -- Index on community ID
@@ -413,7 +415,8 @@ CREATE TABLE Collection2Item
 (
   id            INTEGER PRIMARY KEY,
   collection_id INTEGER REFERENCES Collection(collection_id),
-  item_id       INTEGER REFERENCES Item(item_id)
+  item_id       INTEGER,
+  CONSTRAINT coll2item_item_fk FOREIGN KEY (item_id) REFERENCES Item(item_id) DEFERRABLE
 );
 
 -- index by collection_id

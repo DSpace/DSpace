@@ -45,6 +45,8 @@ import java.util.List;
 import java.util.MissingResourceException;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
@@ -525,7 +527,7 @@ public class Community extends DSpaceObject
     public Group createAdministrators() throws SQLException, AuthorizeException
     {
         // Check authorisation - Must be an Admin to create more Admins
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.ADMIN);
+        AuthorizeUtil.authorizeManageAdminGroup(ourContext, this);
 
         if (admins == null)
         {
@@ -556,17 +558,7 @@ public class Community extends DSpaceObject
     public void removeAdministrators() throws SQLException, AuthorizeException
     {
         // Check authorisation - Must be an Admin of the parent community (or system admin) to delete Admin group
-        Community parentCommunity = getParentCommunity();
-        if (parentCommunity != null)
-        {
-            AuthorizeManager.authorizeAction(ourContext, parentCommunity, Constants.ADMIN);
-        }
-        else if (!AuthorizeManager.isAdmin(ourContext))
-        {
-            throw new AuthorizeException(
-                    "Only system admin can remove the admin group of a top community",
-                    this, Constants.ADMIN); 
-        }
+        AuthorizeUtil.authorizeRemoveAdminGroup(ourContext, this);
 
         // just return if there is no administrative group.
         if (admins == null)
@@ -913,45 +905,29 @@ public class Community extends DSpaceObject
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
+        // will be the collection an orphan?
+        TableRow trow = DatabaseManager.querySingle(ourContext,
+                "SELECT COUNT(DISTINCT community_id) AS num FROM community2collection WHERE collection_id= ? ",
+                c.getID());
+        DatabaseManager.setConstraintDeferred(ourContext, "comm2coll_collection_fk");
+        
+        if (trow.getLongColumn("num") == 1)
+        {
+            // Orphan; delete it            
+            c.delete();
+        }
+        
         log.info(LogManager.getHeader(ourContext, "remove_collection",
                 "community_id=" + getID() + ",collection_id=" + c.getID()));
-
+        
         // Remove any mappings
         DatabaseManager.updateQuery(ourContext,
                 "DELETE FROM community2collection WHERE community_id= ? "+
                 "AND collection_id= ? ", getID(), c.getID());
 
+        DatabaseManager.setConstraintImmediate(ourContext, "comm2coll_collection_fk");
+        
         ourContext.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, getID(), Constants.COLLECTION, c.getID(), c.getHandle()));
-
-        // Is the community an orphan?
-        TableRowIterator tri = DatabaseManager.query(ourContext,
-                "SELECT * FROM community2collection WHERE collection_id= ? ",
-                c.getID());
-
-        try
-        {
-            if (!tri.hasNext())
-            {
-                //make the right to remove the collection explicit because the
-                // implicit relation
-                //has been removed. This only has to concern the currentUser
-                // because
-                //he started the removal process and he will end it too.
-                //also add right to remove from the collection to remove it's
-                // items.
-                AuthorizeManager.addPolicy(ourContext, c, Constants.ADMIN,
-                        ourContext.getCurrentUser());
-
-                // Orphan; delete it
-                c.delete();
-            }
-        }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-                tri.close();
-        }
     }
 
     /**
@@ -966,47 +942,29 @@ public class Community extends DSpaceObject
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
+        // will be the subcommunity an orphan?
+        TableRow trow = DatabaseManager.querySingle(ourContext,
+                "SELECT COUNT(DISTINCT parent_comm_id) AS num FROM community2community WHERE child_comm_id= ? ",
+                c.getID());
+
+        DatabaseManager.setConstraintDeferred(ourContext, "com2com_child_fk");
+        if (trow.getLongColumn("num") == 1)
+        {
+            // Orphan; delete it
+            c.rawDelete();
+        }
+
         log.info(LogManager.getHeader(ourContext, "remove_subcommunity",
                 "parent_comm_id=" + getID() + ",child_comm_id=" + c.getID()));
-
+        
         // Remove any mappings
         DatabaseManager.updateQuery(ourContext,
                 "DELETE FROM community2community WHERE parent_comm_id= ? " +
                 " AND child_comm_id= ? ", getID(),c.getID());
 
         ourContext.addEvent(new Event(Event.REMOVE, Constants.COMMUNITY, getID(), Constants.COMMUNITY, c.getID(), c.getHandle()));
-
-        // Is the subcommunity an orphan?
-        TableRowIterator tri = DatabaseManager.query(ourContext,
-                "SELECT * FROM community2community WHERE child_comm_id= ? ",
-                c.getID());
-
-        try
-        {
-            if (!tri.hasNext())
-            {
-                //make the right to remove the sub explicit because the implicit
-                // relation
-                //has been removed. This only has to concern the currentUser
-                // because
-                //he started the removal process and he will end it too.
-                //also add right to remove from the subcommunity to remove it's
-                // children.
-                AuthorizeManager.addPolicy(ourContext, c, Constants.DELETE,
-                        ourContext.getCurrentUser());
-                AuthorizeManager.addPolicy(ourContext, c, Constants.REMOVE,
-                        ourContext.getCurrentUser());
-
-                // Orphan; delete it
-                c.delete();
-            }
-        }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-                tri.close();
-        }
+        
+        DatabaseManager.setConstraintImmediate(ourContext, "com2com_child_fk");
     }
 
     /**
@@ -1030,7 +988,7 @@ public class Community extends DSpaceObject
         }
 
         // If not a top-level community, have parent remove me; this
-        // will call delete() after removing the linkage
+        // will call rawDelete() before removing the linkage
         Community parent = getParentCommunity();
 
         if (parent != null)
@@ -1040,6 +998,14 @@ public class Community extends DSpaceObject
             return;
         }
 
+        rawDelete();        
+    }
+    
+    /**
+     * Internal method to remove the community and all its childs from the database without aware of eventually parent  
+     */
+    private void rawDelete() throws SQLException, AuthorizeException, IOException
+    {
         log.info(LogManager.getHeader(ourContext, "delete_community",
                 "community_id=" + getID()));
 
@@ -1073,14 +1039,14 @@ public class Community extends DSpaceObject
         // get rid of the content count cache if it exists
         try
         {
-        	ItemCounter ic = new ItemCounter(ourContext);
-        	ic.remove(this);
+            ItemCounter ic = new ItemCounter(ourContext);
+            ic.remove(this);
         }
         catch (ItemCountException e)
         {
-        	// FIXME: upside down exception handling due to lack of good
-        	// exception framework
-        	throw new RuntimeException(e.getMessage(),e);
+            // FIXME: upside down exception handling due to lack of good
+            // exception framework
+            throw new RuntimeException(e.getMessage(),e);
         }
         
         // Delete community row
@@ -1204,5 +1170,49 @@ public class Community extends DSpaceObject
         	total += comms[j].countItems();
         }
         return total;
+    }
+    
+    public DSpaceObject getAdminObject(int action) throws SQLException
+    {
+        DSpaceObject adminObject = null;
+        switch (action)
+        {
+        case Constants.REMOVE:
+            if (AuthorizeConfiguration.canCommunityAdminPerformSubelementDeletion())
+            {
+                adminObject = this;
+            }
+            break;
+
+        case Constants.DELETE:
+            if (AuthorizeConfiguration.canCommunityAdminPerformSubelementDeletion())
+            {
+                adminObject = getParentCommunity();
+            }
+            break;
+        case Constants.ADD:
+            if (AuthorizeConfiguration.canCommunityAdminPerformSubelementCreation())
+            {
+                adminObject = this;
+            }
+            break;
+        default:
+            adminObject = this;
+            break;
+        }
+        return adminObject;
+    }
+    
+    public DSpaceObject getParentObject() throws SQLException
+    {
+        Community pCommunity = getParentCommunity();
+        if (pCommunity != null)
+        {
+            return pCommunity;
+        }
+        else
+        {
+            return null;
+        }       
     }
 }

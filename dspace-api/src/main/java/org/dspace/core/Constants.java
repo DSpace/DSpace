@@ -205,7 +205,7 @@ public class Constants
             0, // 8 - WORKFLOW_ABORT
             RCOLLECTION, // 9 - DEFAULT_BITSTREAM_READ
             RCOLLECTION, // 10 - DEFAULT_ITEM_READ
-            RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY // 11 - ADMIN
+            RITEM | RCOLLECTION | RCOMMUNITY // 11 - ADMIN
     };
 
     public static final String DEFAULT_ENCODING = "UTF-8";

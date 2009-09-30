@@ -377,25 +377,10 @@ function assertAdminCommunity(communityID) {
  * Assert that the currently authenticated eperson can edit the given group. If they can
  * not then this method will never return.
  */
-function assertEditGroup(groupName)
+function assertEditGroup(groupID)
 {
     // Check authorizations
-	var collectionID = FlowGroupUtils.getCollectionId(groupName);
-  var communityID = FlowGroupUtils.getCommunityId(groupName);
-	if (collectionID >= 0)
-	{
-		// This group is associated with a collection, check that group's permission
-		assertEditCollection(collectionID);
-	}
-  else if (communityID >= 0)
-  {
-    assertEditCommunity(communityID);
-	}
-  else
-	{
-		// Otherwise they need to be a super admin.
-		assertAdministrator();
-	}
+	assertAuthorized(Constants.GROUP, groupID, Constants.WRITE);
 }
 
 /** 
@@ -921,7 +906,7 @@ function doEditGroup(groupID)
 	var memberEPeopleIDs = FlowGroupUtils.getEPeopleMembers(getDSContext(),groupID);
 	var memberGroupIDs   = FlowGroupUtils.getGroupMembers(getDSContext(),groupID);
 	
-	assertEditGroup(groupName);
+	assertEditGroup(groupID);
 	
 	var highlightEPersonID;
 	var highlightGroupID;
@@ -931,7 +916,7 @@ function doEditGroup(groupID)
     var result = null;
     do {
         sendPageAndWait("admin/group/edit",{"groupID":groupID,"groupName":groupName,"memberGroupIDs":memberGroupIDs.join(','),"memberEPeopleIDs":memberEPeopleIDs.join(','),"highlightEPersonID":highlightEPersonID,"highlightGroupID":highlightGroupID,"query":escape(query),"page":page,"type":type},result);
-        assertEditGroup(groupName);
+        assertEditGroup(groupID);
 
 		result = null;
         highlightEPersonID = null;
@@ -990,8 +975,6 @@ function doEditGroup(groupID)
         else if (cocoon.request.get("submit_edit_group") && cocoon.request.get("groupID"))
         {
             // Jump to another group.
-            assertAdministrator();
-            
             var newGroupID = cocoon.request.get("groupID");
             result = doEditGroup(newGroupID); // ahhh recursion!
             
@@ -1469,7 +1452,7 @@ function doEditItemStatus(itemID)
 		}
 		else if (cocoon.request.get("submit_delete"))
 		{
-			assertAdministrator();
+			assertAuthorized(Constants.ITEM, itemID, Constants.DELETE);
 			
 			// Confirm the item's deletion
 			result = doDeleteItem(itemID);
@@ -1497,7 +1480,8 @@ function doEditItemStatus(itemID)
 		else if (cocoon.request.get("submit_authorization"))
 		{
 			// Edit the authorizations for this
-			assertAdministrator();
+			// authorization check performed by the doAuthorize methods in FlowAuthorizationUtils
+			// assertAdministrator();
 			
 			doAuthorizeItem(itemID);
 		}
@@ -1585,14 +1569,14 @@ function doEditItemMetadata(itemID, templateCollectionID)
  */
 function doDeleteItem(itemID)
 {
-	assertAdministrator();
+	assertAuthorized(Constants.ITEM, itemID, Constants.DELETE);
 	
 	sendPageAndWait("admin/item/delete",{"itemID":itemID});
 	
 	if (cocoon.request.get("submit_confirm"))
 	{
 		// It's been confirmed, delete the item.
-		assertAdministrator();
+		assertAuthorized(Constants.ITEM, itemID, Constants.DELETE);
 		var result = FlowItemUtils.processDeleteItem(getDSContext(),itemID);
 		
 		if (result.getContinue()) {
@@ -1611,14 +1595,16 @@ function doDeleteItem(itemID)
  */
 function doWithdrawItem(itemID)
 {
-	assertAdministrator();
+	// authorization check performed directly by the dspace-api 
+	// assertAdministrator();
 	
 	sendPageAndWait("admin/item/withdraw",{"itemID":itemID});
 	
 	if (cocoon.request.get("submit_confirm"))
 	{
 		// Actualy withdraw the item
-    assertAdministrator();
+		// authorization check performed directly by the dspace-api 
+		// assertAdministrator();
 		var result = FlowItemUtils.processWithdrawItem(getDSContext(),itemID);
 		return result;
 	}
@@ -1630,14 +1616,16 @@ function doWithdrawItem(itemID)
  */
 function doReinstateItem(itemID)
 {
-	assertAdministrator();
+	// authorization check performed directly by the dspace-api 
+	// assertAdministrator();
     
 	sendPageAndWait("admin/item/reinstate",{"itemID":itemID});
 
 	if (cocoon.request.get("submit_confirm"))
 	{
 		// Actually reinstate the item
-	  assertAdministrator();
+		// authorization check performed directly by the dspace-api 
+		// assertAdministrator();
 		
 		var result = FlowItemUtils.processReinstateItem(getDSContext(),itemID);
 		return result;
@@ -1855,7 +1843,8 @@ function doMapItemBrowse(collectionID)
  */ 
 function doManageAuthorizations()
 {
-	assertAdministrator();
+	// authorization check moved to FlowAuthorizationUtils
+	// assertAdministrator();
 	
     var result = null;
     var query = "";
@@ -1863,7 +1852,8 @@ function doManageAuthorizations()
     do {
         sendPageAndWait("admin/authorize/main",{"query":escape(query)},result);
         
-        assertAdministrator();
+        // authorization check moved to FlowAuthorizationUtils
+    	// assertAdministrator();
         
         result = null;
         
@@ -1930,15 +1920,17 @@ function doAuthorizeCommunity(communityID)
  */
 function doAuthorizeContainer(containerType, containerID)
 {
-   //must be an ADMIN on the container to change its authorizations
-	 assertAuthorized(containerType, containerID, Constants.ADMIN);
+	// authorization check moved to FlowAuthorizationUtils
+    // must be an ADMIN on the container to change its authorizations
+	// assertAuthorized(containerType, containerID, Constants.ADMIN);
 	
     var result;    
     var highlightID;
     
     do {
         sendPageAndWait("admin/authorize/container",{"containerType":containerType,"containerID":containerID,"highlightID":highlightID},result);
-        assertAuthorized(containerType, containerID, Constants.ADMIN);
+        // authorization check moved to FlowAuthorizationUtils
+    	// assertAuthorized(containerType, containerID, Constants.ADMIN);
         result = null;
         
         // Cancel out the operation
@@ -1979,14 +1971,16 @@ function doAuthorizeContainer(containerType, containerID)
  */
 function doAuthorizeItem(itemID)
 {
-	assertAdministrator();
+	// authorization check moved to FlowAuthorizationUtils
+	// assertAdministrator();
 	
     var result;
     var highlightID;
         
     do {
         sendPageAndWait("admin/authorize/item",{"itemID":itemID,"highlightID":highlightID},result);
-        assertAdministrator();
+        // authorization check moved to FlowAuthorizationUtils
+    	// assertAdministrator();
         result = null;
         
         var bundleID = extractSubmitSuffix("submit_add_bundle_");
@@ -2088,7 +2082,8 @@ function doAdvancedAuthorization()
  */
 function doEditPolicy(objectType,objectID,policyID)
 {
-	assertAdministrator();
+	// authorize check moved to FlowAuthorizationUtils.processEditPolicy
+	// assertAdministrator();
 	
     var result;
     var query= "-1";
@@ -2101,7 +2096,8 @@ function doEditPolicy(objectType,objectID,policyID)
     	 * policy ID, the group search query (if a search was performed), the ID of the currenly associated group, the
     	 * current action and the currently viewed page (if a search returned more than one page of results) */ 
         sendPageAndWait("admin/authorize/edit",{"objectType":objectType,"objectID":objectID,"policyID":policyID,"query":escape(query),"groupID":groupID,"actionID":actionID,"page":page},result);
-        assertAdministrator();
+        // authorize check moved to FlowAuthorizationUtils.processEditPolicy
+    	// assertAdministrator();
         result = null;
         
         // Figure out which button was pressed on the group search results page
@@ -2166,13 +2162,15 @@ function doEditPolicy(objectType,objectID,policyID)
  */
 function doDeletePolicies(policyIDs)
 {
-	assertAdministrator();
+	// authorization check moved to FlowAuthorizationUtils
+	// assertAdministrator();
     sendPageAndWait("admin/authorize/delete",{"policyIDs":policyIDs.join(',')});
     
     if (cocoon.request.get("submit_confirm"))
     {
         // The user has confirmed, actualy delete these policies
-        assertAdministrator();
+    	// authorization check moved to FlowAuthorizationUtils
+    	// assertAdministrator();
         
         var result = FlowAuthorizationUtils.processDeletePolicies(getDSContext(),policyIDs);
         return result;
@@ -2316,7 +2314,7 @@ function doAssignCollectionRoles(collectionID)
 		else if (cocoon.request.get("submit_authorizations")) 
 		{
 			// general authorizations
-			assertAdminCollection(collectionID);
+			// assertAdminCollection(collectionID);
 			result = doAuthorizeCollection(collectionID);
 		}
 		
@@ -2407,7 +2405,7 @@ function doAssignCollectionRoles(collectionID)
  */ 
 function doSetupCollectionHarvesting(collectionID)
 {
-	assertEditCollection(collectionID);
+	assertAdminCollection(collectionID);
 	
 	var result = null;
 	var oaiProviderValue = null;
@@ -2423,7 +2421,7 @@ function doSetupCollectionHarvesting(collectionID)
 		metadataFormatValue = cocoon.request.get("metadata_format");
 		harvestLevelValue = cocoon.request.get("harvest_level");
 		
-		assertEditCollection(collectionID);
+		assertAdminCollection(collectionID);
 				
 		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") || 
 			cocoon.request.get("submit_roles") || cocoon.request.get("submit_harvesting"))
@@ -2453,7 +2451,7 @@ function doSetupCollectionHarvesting(collectionID)
  */ 
 function doEditCollectionHarvesting(collectionID)
 {
-	assertEditCollection(collectionID);
+	assertAdminCollection(collectionID);
 	
 	var result = null;
 	do 
@@ -2470,7 +2468,7 @@ function doEditCollectionHarvesting(collectionID)
 		}
 		
 		result = null;
-		assertEditCollection(collectionID);
+		assertAdminCollection(collectionID);
 				
 		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") || 
 			cocoon.request.get("submit_roles") || cocoon.request.get("submit_harvesting"))
@@ -2544,10 +2542,10 @@ function doDeleteCollectionRole(collectionID,role)
  */
 function doDeleteCollection(collectionID) 
 {
-	assertAdministrator();	
+	assertAuthorized(Constants.COLLECTION, collectionID, Constants.DELETE);	
 	
 	sendPageAndWait("admin/collection/delete",{"collectionID":collectionID});
-    assertAdministrator();
+	assertAuthorized(Constants.COLLECTION, collectionID, Constants.DELETE);
 	
 	if (cocoon.request.get("submit_confirm")) 
 	{
@@ -2668,7 +2666,7 @@ function doEditCommunity(communityID)
 		}
 		else if (cocoon.request.get("submit_delete")) 
 		{
-			assertAdministrator();
+			assertAuthorized(Constants.COMMUNITY, communityID, Constants.DELETE);
 			result = doDeleteCommunity(communityID);
 		}
 		else if (cocoon.request.get("submit_delete_logo")) 
@@ -2677,7 +2675,8 @@ function doEditCommunity(communityID)
 		}
 		if (cocoon.request.get("submit_authorizations")) 
 		{
-			assertAdministrator();
+			// authorization check moved to FlowAuthorizationUtils
+		    // assertAdministrator();
 			result = doAuthorizeCommunity(communityID);
 		}
 
@@ -2692,10 +2691,10 @@ function doEditCommunity(communityID)
  * Delete an entire community, asking for a confirmation first
  */
 function doDeleteCommunity(communityID) {
-	assertAdministrator();
+	assertAuthorized(Constants.COMMUNITY, communityID, Constants.DELETE);
 	
 	sendPageAndWait("admin/community/delete",{"communityID":communityID});
-	assertAdministrator();
+	assertAuthorized(Constants.COMMUNITY, communityID, Constants.DELETE);
 	
 	if (cocoon.request.get("submit_confirm")) 
 	{		
@@ -2731,8 +2730,8 @@ function doAssignCommunityRoles(communityID)
 		
 		   else if (cocoon.request.get("submit_authorizations"))
 		   {
-			   // general authorizations
-			   assertAdministrator();
+			   // authorization check moved to FlowAuthorizationUtils
+			   // assertAdministrator();
 			   result = doAuthorizeCommunity(communityID);
 		   }
 		
@@ -2756,11 +2755,13 @@ function doAssignCommunityRoles(communityID)
  */
 function doDeleteCommunityRole(communityID,role) 
 {
-	assertAdminCommunity(communityID);
-  var groupID = FlowContainerUtils.getCommunityRole(getDSContext(), communityID, role);
+	// authorization check performed directly by the dspace-api
+	// assertAdminCommunity(communityID);
+    var groupID = FlowContainerUtils.getCommunityRole(getDSContext(), communityID, role);
 	
 	sendPageAndWait("admin/community/deleteRole",{"communityID":communityID,"role":role,"groupID":groupID});
- 	assertAdminCommunity(communityID);
+	// authorization check performed directly by the dspace-api
+	// assertAdminCommunity(communityID);
 	
   if (cocoon.request.get("submit_confirm"))
 	{

@@ -135,10 +135,10 @@
   
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/dspace-admin/authorize") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/tools/authorize") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
     </td>
     <td nowrap="nowrap" class="navigationBarItem">
-      <a href="<%= request.getContextPath() %>/dspace-admin/authorize"><fmt:message key="jsp.layout.navbar-admin.authorization"/></a>
+      <a href="<%= request.getContextPath() %>/tools/authorize"><fmt:message key="jsp.layout.navbar-admin.authorization"/></a>
     </td>
   </tr>
   

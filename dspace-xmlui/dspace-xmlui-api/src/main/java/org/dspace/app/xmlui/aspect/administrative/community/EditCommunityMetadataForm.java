@@ -41,6 +41,7 @@ package org.dspace.app.xmlui.aspect.administrative.community;
 
 import java.sql.SQLException;
 
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.app.xmlui.aspect.administrative.FlowContainerUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -56,6 +57,7 @@ import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Community;
+import org.dspace.core.Constants;
 
 /**
  * Presents the user (in this case an administrator over the community) with the
@@ -175,8 +177,8 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
 	    
 	    Para buttonList = main.addPara();
 	    buttonList.addButton("submit_save").setValue(T_submit_update);
-        //Only System Admins can Delete Communities
-        if (AuthorizeManager.isAdmin(context))
+
+	    if (AuthorizeManager.authorizeActionBoolean(context, thisCommunity, Constants.DELETE))
         {
 	         buttonList.addButton("submit_delete").setValue(T_submit_delete);
         }

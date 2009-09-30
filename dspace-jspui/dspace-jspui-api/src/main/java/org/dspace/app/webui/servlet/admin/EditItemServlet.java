@@ -59,10 +59,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
+import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
@@ -392,9 +394,16 @@ public class EditItemServlet extends DSpaceServlet
     {
         if ( request.getParameter("cc_license_url") != null )
         {
-        	// set or replace existing CC license
+            // check authorization
+            AuthorizeUtil.authorizeManageCCLicense(context, item);
+            
+            // turn off auth system to allow replace also to user that can't
+            // remove/add bitstream to the item
+            context.turnOffAuthorisationSystem();
+        	// set or replace existing CC license            
         	CreativeCommons.setLicense( context, item,
                    request.getParameter("cc_license_url") );
+        	context.restoreAuthSystemState();
         	context.commit();
         }
   
@@ -427,6 +436,82 @@ public class EditItemServlet extends DSpaceServlet
         }
 
         request.setAttribute("admin_button", AuthorizeManager.authorizeActionBoolean(context, item, Constants.ADMIN));
+        try
+        {
+            AuthorizeUtil.authorizeManageItemPolicy(context, item);
+            request.setAttribute("policy_button", new Boolean(true));
+        }
+        catch (AuthorizeException authex)
+        {
+            request.setAttribute("policy_button", new Boolean(false));
+        }
+        
+        if (AuthorizeManager.authorizeActionBoolean(context, item
+                .getParentObject(), Constants.REMOVE))
+        {            
+            request.setAttribute("delete_button", new Boolean(true));
+        }
+        else
+        {
+            request.setAttribute("delete_button", new Boolean(false));
+        }
+        
+        try
+        {
+            AuthorizeManager.authorizeAction(context, item, Constants.ADD);
+            request.setAttribute("create_bitstream_button", new Boolean(true));
+        }
+        catch (AuthorizeException authex)
+        {
+            request.setAttribute("create_bitstream_button", new Boolean(false));
+        }
+        
+        try
+        {
+            AuthorizeManager.authorizeAction(context, item, Constants.REMOVE);
+            request.setAttribute("remove_bitstream_button", new Boolean(true));
+        }
+        catch (AuthorizeException authex)
+        {
+            request.setAttribute("remove_bitstream_button", new Boolean(false));
+        }
+        
+        try
+        {
+            AuthorizeUtil.authorizeManageCCLicense(context, item);     
+            request.setAttribute("cclicense_button", new Boolean(true));
+        }
+        catch (AuthorizeException authex)
+        {
+            request.setAttribute("cclicense_button", new Boolean(false));
+        }
+        
+        if (!item.isWithdrawn())
+        {
+            try
+            {
+                AuthorizeUtil.authorizeWithdrawItem(context, item);     
+                request.setAttribute("withdraw_button", new Boolean(true));
+            }
+            catch (AuthorizeException authex)
+            {
+                request.setAttribute("withdraw_button", new Boolean(false));
+            }
+        }
+        else
+        {
+            try
+            {
+                AuthorizeUtil.authorizeReinstateItem(context, item);     
+                request.setAttribute("reinstate_button", new Boolean(true));
+            }
+            catch (AuthorizeException authex)
+            {
+                request.setAttribute("reinstate_button", new Boolean(false));
+            } 
+        }
+        
+        
         request.setAttribute("item", item);
         request.setAttribute("handle", handle);
         request.setAttribute("collections", collections);
@@ -532,9 +617,7 @@ public class EditItemServlet extends DSpaceServlet
                     item.addMetadata(schema, element, qualifier, language, value);
                 }
             }
-            // only process bitstreams if admin
-            else if (p.startsWith("bitstream_name")
-                    && AuthorizeManager.isAdmin(context))
+            else if (p.startsWith("bitstream_name"))
             {
                 // We have bitstream metadata
                 // First, get the bundle and bitstream ID

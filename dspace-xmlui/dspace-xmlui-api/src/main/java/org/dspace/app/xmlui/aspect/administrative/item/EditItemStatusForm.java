@@ -41,6 +41,7 @@ package org.dspace.app.xmlui.aspect.administrative.item;
 
 import java.sql.SQLException;
 
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -49,10 +50,12 @@ import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 
 /**
  * Display basic meta-meta information about the item and allow the user to change 
@@ -95,7 +98,7 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 	private static final Message T_submit_delete = message("xmlui.administrative.item.EditItemStatusForm.submit_delete");
 	private static final Message T_na = message("xmlui.administrative.item.EditItemStatusForm.na");
 	
-	private static final Message T_sysadmins_only = message("xmlui.administrative.item.EditItemStatusForm.sysadmins_only");
+	private static final Message T_not_allowed = message("xmlui.administrative.item.EditItemStatusForm.not_allowed");
 	private static final Message T_collectionadmins_only = message("xmlui.administrative.item.EditItemStatusForm.collection_admins_only");
 	
 	
@@ -170,24 +173,55 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		}
 		
 		itemInfo.addLabel(T_label_auth);
-		addAdministratorOnlyButton(itemInfo.addItem(), "submit_authorization", T_submit_authorizations);
+		try
+		{
+		    AuthorizeUtil.authorizeManageItemPolicy(context, item);
+		    itemInfo.addItem().addButton("submit_authorization").setValue(T_submit_authorizations);
+		}
+		catch (AuthorizeException authex) 
+		{
+		    addNotAllowedButton(itemInfo.addItem(), "submit_authorization", T_submit_authorizations);
+        }
 	
 		if(!item.isWithdrawn())
 		{
 			itemInfo.addLabel(T_label_withdraw);
-			addAdministratorOnlyButton(itemInfo.addItem(), "submit_withdraw", T_submit_withdraw);
+			try
+	        {
+	            AuthorizeUtil.authorizeWithdrawItem(context, item);
+	            itemInfo.addItem().addButton("submit_withdraw").setValue(T_submit_withdraw);
+	        }
+	        catch (AuthorizeException authex) 
+	        {
+	            addNotAllowedButton(itemInfo.addItem(), "submit_withdraw", T_submit_withdraw);
+	        }
 		}
 		else
 		{	
 			itemInfo.addLabel(T_label_reinstate);
-			addAdministratorOnlyButton(itemInfo.addItem(), "submit_reinstate", T_submit_reinstate);
+			try
+            {
+                AuthorizeUtil.authorizeReinstateItem(context, item);
+                itemInfo.addItem().addButton("submit_reinstate").setValue(T_submit_reinstate);
+            }
+            catch (AuthorizeException authex) 
+            {
+                addNotAllowedButton(itemInfo.addItem(), "submit_reinstate", T_submit_reinstate);
+            }
 		}
 		
         itemInfo.addLabel(T_label_move);
         addCollectionAdminOnlyButton(itemInfo.addItem(), item.getOwningCollection(), "submit_move", T_submit_move);
         
 		itemInfo.addLabel(T_label_delete);
-		addAdministratorOnlyButton(itemInfo.addItem(), "submit_delete", T_submit_delete);
+		if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.DELETE))
+		{
+		    itemInfo.addItem().addButton("submit_delete").setValue(T_submit_delete);
+		}
+		else
+		{
+		    addNotAllowedButton(itemInfo.addItem(), "submit_delete", T_submit_delete);
+		}
 		
 		
 		
@@ -197,17 +231,21 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		
 		main.addHidden("administrative-continue").setValue(knot.getId());
 	}
-	
-	private void addAdministratorOnlyButton(org.dspace.app.xmlui.wing.element.Item item, String buttonName, Message buttonLabel) throws WingException, SQLException
+
+	/**
+	 * Add a disabled button with a "not allowed" notice
+	 * @param item
+	 * @param buttonName
+	 * @param buttonLabel
+	 * @throws WingException
+	 * @throws SQLException
+	 */
+	private void addNotAllowedButton(org.dspace.app.xmlui.wing.element.Item item, String buttonName, Message buttonLabel) throws WingException, SQLException
 	{
     	Button button = item.addButton(buttonName);
     	button.setValue(buttonLabel);
-    	if (!AuthorizeManager.isAdmin(context))
-    	{
-    		// Only admins can create or delete
-    		button.setDisabled();
-    		item.addHighlight("fade").addContent(T_sysadmins_only);
-    	}
+		button.setDisabled();
+		item.addHighlight("fade").addContent(T_not_allowed);
 	}
     
     private void addCollectionAdminOnlyButton(org.dspace.app.xmlui.wing.element.Item item, Collection collection, String buttonName, Message buttonLabel) throws WingException, SQLException

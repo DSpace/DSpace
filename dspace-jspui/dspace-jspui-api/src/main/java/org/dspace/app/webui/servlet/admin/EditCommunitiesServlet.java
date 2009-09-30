@@ -51,6 +51,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
@@ -170,19 +171,12 @@ public class EditCommunitiesServlet extends DSpaceServlet
             return;
         }
 
-        if ((collection != null && AuthorizeManager.isAdmin(context, collection))
-                || (collection == null && community != null && AuthorizeManager.isAdmin(context, community))
-                || (collection == null && parentCommunity != null && AuthorizeManager.isAdmin(context, parentCommunity))) 
-        {
-            // set a variable to show all buttons
-            request.setAttribute("admin_button", new Boolean(true));
-        }
-
         // Now proceed according to "action" parameter
         switch (action)
         {
         case START_EDIT_COMMUNITY:
-
+            storeAuthorizeAttributeCommunityEdit(context, request, community);
+            
             // Display the relevant "edit community" page
             JSPManager.showJSP(request, response, "/tools/edit-community.jsp");
 
@@ -197,6 +191,9 @@ public class EditCommunitiesServlet extends DSpaceServlet
             break;
 
         case START_CREATE_COMMUNITY:
+            // no authorize attribute will be given to the jsp so a "clean" creation form
+            // will be always supplied, advanced setting on policies and admin group creation
+            // will be possible after to have completed the community creation
 
             // Display edit community page with empty fields + create button
             JSPManager.showJSP(request, response, "/tools/edit-community.jsp");
@@ -208,6 +205,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
         	HarvestedCollection hc = HarvestedCollection.find(context, UIUtil.
             		getIntParameter(request, "collection_id"));
         	request.setAttribute("harvestInstance", hc);
+        	
+        	storeAuthorizeAttributeCollectionEdit(context, request, collection);
         	
             // Display the relevant "edit collection" page
             JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
@@ -281,7 +280,9 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
             // Delete the collection
             community.removeCollection(collection);
-
+            // remove the collection object from the request, so that the user
+            // will be redirected on the community home page
+            request.removeAttribute("collection");
             // Show main control page
             showControls(context, request, response);
 
@@ -297,6 +298,140 @@ public class EditCommunitiesServlet extends DSpaceServlet
                     .getRequestLogInfo(request)));
             JSPManager.showIntegrityError(request, response);
         }
+    }
+
+    /**
+     * Store in the request attribute to teach to the jsp which button are
+     * needed/allowed for the community edit form
+     * 
+     * @param context
+     * @param request
+     * @param community
+     * @throws SQLException
+     */
+    private void storeAuthorizeAttributeCommunityEdit(Context context,
+            HttpServletRequest request, Community community) throws SQLException
+    {
+        try 
+        {
+            AuthorizeUtil.authorizeManageAdminGroup(context, community);                
+            request.setAttribute("admin_create_button", new Boolean(true));
+        }
+        catch (AuthorizeException authex) {
+            request.setAttribute("admin_create_button", new Boolean(false));
+        }
+        
+        try 
+        {
+            AuthorizeUtil.authorizeRemoveAdminGroup(context, community);                
+            request.setAttribute("admin_remove_button", new Boolean(true));
+        }
+        catch (AuthorizeException authex) {
+            request.setAttribute("admin_remove_button", new Boolean(false));
+        }
+        
+        if (AuthorizeManager.authorizeActionBoolean(context, community, Constants.DELETE))
+        {
+            request.setAttribute("delete_button", new Boolean(true));
+        }
+        else
+        {
+            request.setAttribute("delete_button", new Boolean(false));
+        }
+        
+        try 
+        {
+            AuthorizeUtil.authorizeManageCommunityPolicy(context, community);                
+            request.setAttribute("policy_button", new Boolean(true));
+        }
+        catch (AuthorizeException authex) {
+            request.setAttribute("policy_button", new Boolean(false));
+        }        
+    }
+    
+    /**
+     * Store in the request attribute to teach to the jsp which button are
+     * needed/allowed for the collection edit form
+     * 
+     * @param context
+     * @param request
+     * @param community
+     * @throws SQLException
+     */
+    static void storeAuthorizeAttributeCollectionEdit(Context context,
+            HttpServletRequest request, Collection collection) throws SQLException
+    {
+        if (AuthorizeManager.isAdmin(context, collection))
+        {
+            request.setAttribute("admin_collection", new Boolean(true));
+        }
+        else
+        {
+            request.setAttribute("admin_collection", new Boolean(false));
+        }
+        
+        try 
+        {
+            AuthorizeUtil.authorizeManageAdminGroup(context, collection);                
+            request.setAttribute("admin_create_button", new Boolean(true));
+        }
+        catch (AuthorizeException authex) {
+            request.setAttribute("admin_create_button", new Boolean(false));
+        }
+        
+        try 
+        {
+            AuthorizeUtil.authorizeRemoveAdminGroup(context, collection);                
+            request.setAttribute("admin_remove_button", new Boolean(true));
+        }
+        catch (AuthorizeException authex) {
+            request.setAttribute("admin_remove_button", new Boolean(false));
+        }
+        
+        try 
+        {
+            AuthorizeUtil.authorizeManageSubmittersGroup(context, collection);                
+            request.setAttribute("submitters_button", new Boolean(true));
+        }
+        catch (AuthorizeException authex) {
+            request.setAttribute("submitters_button", new Boolean(false));
+        }
+        
+        try 
+        {
+            AuthorizeUtil.authorizeManageWorkflowsGroup(context, collection);                
+            request.setAttribute("workflows_button", new Boolean(true));
+        }
+        catch (AuthorizeException authex) {
+            request.setAttribute("workflows_button", new Boolean(false));
+        }
+        
+        try 
+        {
+            AuthorizeUtil.authorizeManageTemplateItem(context, collection);                
+            request.setAttribute("template_button", new Boolean(true));
+        }
+        catch (AuthorizeException authex) {
+            request.setAttribute("template_button", new Boolean(false));
+        }
+        
+        if (AuthorizeManager.authorizeActionBoolean(context, collection.getParentObject(), Constants.REMOVE))
+        {
+            request.setAttribute("delete_button", new Boolean(true));
+        }
+        else
+        {
+            request.setAttribute("delete_button", new Boolean(false));
+        }
+        
+        try 
+        {
+            AuthorizeUtil.authorizeManageCollectionPolicy(context, collection);                
+            request.setAttribute("policy_button", new Boolean(true));
+        }
+        catch (AuthorizeException authex) {
+            request.setAttribute("policy_button", new Boolean(false));
+        }        
     }
 
     /**
@@ -394,6 +529,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
             request.setAttribute("community", community);
         }
 
+        storeAuthorizeAttributeCommunityEdit(context, request, community);
+        
         community.setMetadata("name", request.getParameter("name"));
         community.setMetadata("short_description", request
                 .getParameter("short_description"));
@@ -452,7 +589,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             // Forward to policy edit page
             response.sendRedirect(response.encodeRedirectURL(request
                     .getContextPath()
-                    + "/dspace-admin/authorize?community_id="
+                    + "/tools/authorize?community_id="
                     + community.getID() + "&submit_community_select=1"));
         }
         else if (button.equals("submit_admins_create"))
@@ -466,6 +603,15 @@ public class EditCommunitiesServlet extends DSpaceServlet
                     .getContextPath()
                     + "/tools/group-edit?group_id=" + newGroup.getID()));
         }
+        else if (button.equals("submit_admins_remove"))
+        {
+            Group g = community.getAdministrators(); 
+            community.removeAdministrators();
+            community.update();
+            g.delete();
+            // Show edit page again - attributes set in doDSPost()
+            JSPManager.showJSP(request, response, "/tools/edit-community.jsp");
+        }   
         else if (button.equals("submit_admins_edit"))
         {
             // Edit 'community administrators' group
@@ -510,6 +656,8 @@ public class EditCommunitiesServlet extends DSpaceServlet
             collection = community.createCollection();
             request.setAttribute("collection", collection);
         }
+        
+        storeAuthorizeAttributeCollectionEdit(context, request, collection);
 
         // Update the basic metadata
         collection.setMetadata("name", request.getParameter("name"));
@@ -674,7 +822,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             // Forward to policy edit page
             response.sendRedirect(response.encodeRedirectURL(request
                     .getContextPath()
-                    + "/dspace-admin/authorize?collection_id="
+                    + "/tools/authorize?collection_id="
                     + collection.getID() + "&submit_collection_select=1"));
         }
         else if (button.startsWith("submit_wf_edit_"))
@@ -830,6 +978,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
 
             // Show community edit page
             request.setAttribute("community", community);
+            storeAuthorizeAttributeCommunityEdit(context, request, community);
             dso = community;
             jsp = "/tools/edit-community.jsp";
         }
@@ -840,6 +989,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             // Show collection edit page
             request.setAttribute("collection", collection);
             request.setAttribute("community", community);
+            storeAuthorizeAttributeCollectionEdit(context, request, collection);
             dso = collection;
             jsp = "/tools/edit-collection.jsp";
         }

@@ -1346,7 +1346,7 @@
 	<message key="xmlui.administrative.item.EditItemStatusForm.na">n/a</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.sysadmins_only">(system administrators only)</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.collection_admins_only">(collection administrators only)</message>
-
+	<message key="xmlui.administrative.item.EditItemStatusForm.not_allowed">(you are not allowed to performe this action)</message>
 
 	<!-- org.dspace.app.xmlui.administrative.item.ViewItem -->
 	<message key="xmlui.administrative.item.ViewItem.title">View Item</message>
@@ -1421,12 +1421,14 @@
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.role_group">Associated group</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.role_buttons">  </message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_admins">Administrators</message>
+	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_wf">Workflow steps</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_wf_step1">Accept/Reject Step</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_wf_step2">Accept/Reject/Edit Metadata Step</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_wf_step3">Edit Metadata Step</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_submitters">Submitters</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_default_read">Default read access</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.sysadmins_only"><nobr>(system administrators only)</nobr></message>
+	<message key="xmlui.administrative.collection.AssignCollectionRoles.not_allowed"><nobr>(you are not allowed to configure this)</nobr></message>
 
 	<!-- org.dspace.app.xmlui.administrative.collection.DeleteCollectionConfirm.java -->
 	<message key="xmlui.administrative.collection.DeleteCollectionConfirm.title">Confirm Deletion</message>

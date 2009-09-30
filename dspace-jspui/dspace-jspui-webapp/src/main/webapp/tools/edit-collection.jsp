@@ -67,8 +67,30 @@
 <%
     Collection collection = (Collection) request.getAttribute("collection");
     Community community = (Community) request.getAttribute("community");
-    Boolean admin_b = (Boolean)request.getAttribute("admin_button");
-    boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
+
+    Boolean adminCollection = (Boolean)request.getAttribute("admin_collection");
+    boolean bAdminCollection = (adminCollection == null ? false : adminCollection.booleanValue());
+    
+    Boolean adminCreateGroup = (Boolean)request.getAttribute("admin_create_button");
+    boolean bAdminCreateGroup = (adminCreateGroup == null ? false : adminCreateGroup.booleanValue());
+
+    Boolean adminRemoveGroup = (Boolean)request.getAttribute("admin_remove_button");
+    boolean bAdminRemoveGroup = (adminRemoveGroup == null ? false : adminRemoveGroup.booleanValue());
+    
+    Boolean workflowsButton = (Boolean)request.getAttribute("workflows_button");
+    boolean bWorkflowsButton = (workflowsButton == null ? false : workflowsButton.booleanValue());
+    
+    Boolean submittersButton = (Boolean)request.getAttribute("submitters_button");
+    boolean bSubmittersButton = (submittersButton == null ? false : submittersButton.booleanValue());
+    
+    Boolean templateButton = (Boolean)request.getAttribute("template_button");
+    boolean bTemplateButton = (templateButton == null ? false : templateButton.booleanValue());
+
+    Boolean policyButton = (Boolean)request.getAttribute("policy_button");
+    boolean bPolicyButton = (policyButton == null ? false : policyButton.booleanValue());
+    
+    Boolean deleteButton = (Boolean)request.getAttribute("delete_button");
+    boolean bDeleteButton = (deleteButton == null ? false : deleteButton.booleanValue());
     
     // Is the logged in user a sys admin
     Boolean admin = (Boolean)request.getAttribute("is.admin");
@@ -158,17 +180,21 @@
         <fmt:param><%= collection.getHandle() %></fmt:param>
         </fmt:message>
     </h1>
-    <% if(admin_button ) { %>
+    
       <center>
         <table width="70%">
           <tr>
             <td class="standard">
+<% if(bDeleteButton) { %>
               <form method="post" action="">
                 <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_DELETE_COLLECTION %>" />
                 <input type="hidden" name="community_id" value="<%= community.getID() %>" />
                 <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
                 <input type="submit" name="submit" value="<fmt:message key="jsp.tools.edit-collection.button.delete"/>" />
               </form>
+<% } else { %>
+			&nbsp;
+<% } %>
             </td>
             <td align="right" class="standard">
                <dspace:popup page="/help/site-admin.html#editcollection"><fmt:message key="jsp.help"/></dspace:popup>
@@ -176,7 +202,7 @@
           </tr>
         </table>
       </center>
-    <% } %>
+    
 <% } %>
 
     <form method="post" action="<%= request.getContextPath() %>/tools/edit-communities">
@@ -250,9 +276,12 @@
             </tr>
             
             <tr><td>&nbsp;</td></tr>
+<% if(bSubmittersButton || bWorkflowsButton || bAdminCreateGroup || (admins != null && bAdminRemoveGroup)) { %>
             <tr><td colspan="2"><center><h3><fmt:message key="jsp.tools.edit-collection.form.label9"/></h3></center></td></tr>
 
-<% if(admin_button ) { %>
+<% }
+	
+   if(bSubmittersButton) { %>
 <%-- ===========================================================
      Collection Submitters
      =========================================================== --%>
@@ -267,7 +296,9 @@
 <%  } %>                    
                 </td>
             </tr>   
-            
+<%  } %>            
+
+<% if(bWorkflowsButton) { %>
 <%-- ===========================================================
      Workflow groups
      =========================================================== --%>
@@ -292,24 +323,36 @@
                 </td>
             </tr>
 <%  } %>
-
+<%  } %>        
             <tr><td>&nbsp;</td></tr>
-
+<% if(bAdminCreateGroup || (admins != null && bAdminRemoveGroup)) { %>
 <%-- ===========================================================
      Collection Administrators
      =========================================================== --%>
             <tr>
                 <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label12"/></td>
                 <td>
-<%  if (admins == null) {%>
+<%  if (admins == null) {
+		if (bAdminCreateGroup) {
+%>
                     <input type="submit" name="submit_admins_create" value="<fmt:message key="jsp.tools.edit-collection.form.button.create"/>" />
-<%  } else { %>
+<%  	} 
+	} 
+	else { 
+		if (bAdminCreateGroup) {
+	%>
                     <input type="submit" name="submit_admins_edit" value="<fmt:message key="jsp.tools.edit-collection.form.button.edit"/>" />
+	<%  }
+		if (bAdminRemoveGroup) { 
+		%>
                     <input type="submit" name="submit_admins_delete" value="<fmt:message key="jsp.tools.edit-collection.form.button.delete"/>" />
-<%  } %>                    
+<%  	}
+	}	%>                    
                 </td>
             </tr>   
-<%  } %>
+<% } %>
+
+<% if(bTemplateButton) { %>
 <%-- ===========================================================
      Item template
      =========================================================== --%>
@@ -324,8 +367,10 @@
                     <input type="submit" name="submit_delete_template" value="<fmt:message key="jsp.tools.edit-collection.form.button.delete"/>" />
 <%  } %>                    
                 </td>
-            </tr>   
-<% if(isAdmin) { %>
+            </tr>
+<%  } %>
+   
+<% if(bPolicyButton) { %>
 <%-- ===========================================================
      Edit collection's policies
      =========================================================== --%>
@@ -345,7 +390,7 @@
 
             
 
-<% if(admin_button ) { %>
+<% if(bAdminCollection) { %>
 <%-- ===========================================================
      Harvesting Settings
      =========================================================== --%>

@@ -428,7 +428,7 @@
 
   <servlet-mapping>
     <servlet-name>authorize</servlet-name>
-    <url-pattern>/dspace-admin/authorize</url-pattern>
+    <url-pattern>/tools/authorize</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

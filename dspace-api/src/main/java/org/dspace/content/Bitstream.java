@@ -640,4 +640,51 @@ public class Bitstream extends DSpaceObject
     public int getStoreNumber() {
         return bRow.getIntColumn("store_number");
     }
+    
+    public DSpaceObject getParentObject() throws SQLException
+    {
+        Bundle[] bundles = getBundles();
+        if (bundles != null && (bundles.length > 0 && bundles[0] != null))
+        {
+            // the ADMIN action is not allowed on Bundle object so skip to the item
+            Item[] items = bundles[0].getItems();
+            if (items != null && items.length > 0)
+            {
+                return items[0];
+            }
+            else
+            {
+                return null;
+            }
+        }
+        else
+        {
+            // is the bitstream a logo for a community or a collection?
+            TableRow qResult = DatabaseManager.querySingle(bContext,
+                       "SELECT collection_id FROM collection " +
+                       "WHERE logo_bitstream_id = ?",getID());
+            if (qResult != null) 
+            {
+                Collection collection = Collection.find(bContext,qResult.getIntColumn("collection_id"));
+                return collection;
+            }
+            else
+            {   
+                // is the bitstream related to a community?
+                qResult = DatabaseManager.querySingle(bContext,
+                        "SELECT community_id FROM community " +
+                        "WHERE logo_bitstream_id = ?",getID());
+    
+                if (qResult != null)
+                {
+                    Community community = Community.find(bContext,qResult.getIntColumn("community_id"));
+                    return community;
+                }
+                else
+                {
+                    return null;
+                }
+            }                                   
+        }
+    }
 }

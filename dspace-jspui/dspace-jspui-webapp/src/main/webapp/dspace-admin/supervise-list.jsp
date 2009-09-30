@@ -119,7 +119,7 @@
     <tr>
         <td class="<%= row %>RowOddCol">
             <%-- form to navigate to the item policies --%>
-            <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">
+            <form action="<%= request.getContextPath() %>/tools/authorize" method="post">
                 <input type="hidden" name="item_id" value="<%=supervisedItems[i].getItem().getID() %>"/>
                 <input type="submit" name="submit_item_select" value="<fmt:message key="jsp.dspace-admin.supervise-list.policies.button"/>"/>
             </form>

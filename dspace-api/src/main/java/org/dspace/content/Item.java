@@ -50,6 +50,8 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
@@ -1696,6 +1698,10 @@ public class Item extends DSpaceObject
     {
         String timestamp = DCDate.getCurrent().toString();
 
+        // Check permission. User either has to have REMOVE on owning collection
+        // or be COLLECTION_EDITOR of owning collection
+        AuthorizeUtil.authorizeWithdrawItem(ourContext, this);
+        
         // Build some provenance data while we're at it.
         String collectionProv = "";
         Collection[] colls = getCollections();
@@ -1704,21 +1710,6 @@ public class Item extends DSpaceObject
         {
             collectionProv = collectionProv + colls[i].getMetadata("name")
                     + " (ID: " + colls[i].getID() + ")\n";
-        }
-
-        // Check permission. User either has to have REMOVE on owning collection
-        // or be COLLECTION_EDITOR of owning collection
-        if (AuthorizeManager.authorizeActionBoolean(ourContext,
-                getOwningCollection(), Constants.ADMIN)
-                || AuthorizeManager.authorizeActionBoolean(ourContext,
-                        getOwningCollection(), Constants.REMOVE))
-        {
-            // authorized
-        }
-        else
-        {
-            throw new AuthorizeException(
-                    "To withdraw item must be COLLECTION_ADMIN or have REMOVE authorization on owning Collection");
         }
 
         // Set withdrawn flag. timestamp will be set; last_modified in update()
@@ -1768,14 +1759,15 @@ public class Item extends DSpaceObject
         String collectionProv = "";
         Collection[] colls = getCollections();
 
+        // check authorization
+        AuthorizeUtil.authorizeReinstateItem(ourContext, this);
+        
         for (int i = 0; i < colls.length; i++)
         {
             collectionProv = collectionProv + colls[i].getMetadata("name")
                     + " (ID: " + colls[i].getID() + ")\n";
-            AuthorizeManager.authorizeAction(ourContext, colls[i],
-                    Constants.ADD);
         }
-
+        
         // Clear withdrawn flag
         itemRow.setColumn("withdrawn", false);
 
@@ -2250,26 +2242,20 @@ public class Item extends DSpaceObject
         }
 
         // is this person an COLLECTION_EDITOR for the owning collection?
-        if (getOwningCollection().canEditBoolean())
-        {
-            return true;
-        }
-
-        // is this person an COLLECTION_EDITOR for the owning collection?
-        if (AuthorizeManager.authorizeActionBoolean(ourContext,
-                getOwningCollection(), Constants.ADMIN))
+        if (getOwningCollection().canEditBoolean(false))
         {
             return true;
         }
 
         return false;
     }
+    
     public String getName()
     {
         DCValue t[] = getMetadata("dc", "title", null, Item.ANY);
         return (t.length >= 1) ? t[0].value : null;
     }
-    
+        
     /**
      * Returns an iterator of Items possessing the passed metadata field, or only
      * those matching the passed value, if value is not Item.ANY
@@ -2309,5 +2295,140 @@ public class Item extends DSpaceObject
         }
         return new ItemIterator(context, rows);
      }
-
+    
+    public DSpaceObject getAdminObject(int action) throws SQLException
+    {
+        DSpaceObject adminObject = null;
+        Collection collection = getOwningCollection();
+        Community community = null;
+        if (collection != null)
+        {
+            Community[] communities = collection.getCommunities();
+            if (communities != null && communities.length > 0)
+            {
+                community = communities[0];
+            }
+        }
+        else
+        {
+            // is a template item?
+            TableRow qResult = DatabaseManager.querySingle(ourContext,
+                       "SELECT collection_id FROM collection " +
+                       "WHERE template_item_id = ?",getID());
+            if (qResult != null) 
+            {
+                collection = Collection.find(ourContext, qResult.getIntColumn("collection_id"));
+                Community[] communities = collection.getCommunities();
+                if (communities != null && communities.length > 0)
+                {
+                    community = communities[0];
+                }
+            }
+        }
+        
+        switch (action)
+        {
+            case Constants.ADD:
+                // ADD a cc license is less general then add a bitstream but we can't/wan't
+                // add complex logic here to know if the ADD action on the item is required by a cc or
+                // a generic bitstream so simply we ignore it.. UI need to enforce the requirements.
+                if (AuthorizeConfiguration.canItemAdminPerformBitstreamCreation())
+                {
+                    adminObject = this;
+                }
+                else if (AuthorizeConfiguration.canCollectionAdminPerformBitstreamCreation())
+                {
+                    adminObject = collection;
+                }
+                else if (AuthorizeConfiguration.canCommunityAdminPerformBitstreamCreation())
+                {
+                    adminObject = community;
+                }
+                break;
+            case Constants.REMOVE:
+                // see comments on ADD action, same things...
+                if (AuthorizeConfiguration.canItemAdminPerformBitstreamDeletion())
+                {
+                    adminObject = this;
+                }
+                else if (AuthorizeConfiguration.canCollectionAdminPerformBitstreamDeletion())
+                {
+                    adminObject = collection;
+                }
+                else if (AuthorizeConfiguration.canCommunityAdminPerformBitstreamDeletion())
+                {
+                    adminObject = community;
+                }
+                break;    
+            case Constants.DELETE:
+                if (getOwningCollection() != null)
+                {
+                    if (AuthorizeConfiguration.canCollectionAdminPerformItemDeletion())
+                    {
+                        adminObject = collection;
+                    }
+                    else if (AuthorizeConfiguration.canCommunityAdminPerformItemDeletion())
+                    {
+                        adminObject = community;
+                    }
+                }
+                else
+                {
+                    if (AuthorizeConfiguration.canCollectionAdminManageTemplateItem())
+                    {
+                        adminObject = collection;
+                    }
+                    else if (AuthorizeConfiguration.canCommunityAdminManageCollectionTemplateItem())
+                    {
+                        adminObject = community;
+                    }
+                }
+                break;
+            case Constants.WRITE:
+                // if it is a template item we need to check the
+                // collection/community admin configuration
+                if (getOwningCollection() == null)
+                {
+                    if (AuthorizeConfiguration.canCollectionAdminManageTemplateItem())
+                    {
+                        adminObject = collection;
+                    }
+                    else if (AuthorizeConfiguration.canCommunityAdminManageCollectionTemplateItem())
+                    {
+                        adminObject = community;
+                    }
+                }
+                else
+                {
+                    adminObject = this;
+                }
+                break;
+            default:
+                adminObject = this;
+                break;
+            }
+        return adminObject;
+    }
+    
+    public DSpaceObject getParentObject() throws SQLException
+    {
+        Collection ownCollection = getOwningCollection();
+        if (ownCollection != null)
+        {
+            return ownCollection;
+        }
+        else
+        {
+            // is a template item?
+            TableRow qResult = DatabaseManager.querySingle(ourContext,
+                       "SELECT collection_id FROM collection " +
+                       "WHERE template_item_id = ?",getID());
+            if (qResult != null) 
+            {
+                Collection collection = Collection.find(ourContext,qResult.getIntColumn("collection_id"));
+                return collection;
+            }                   
+            return null;
+        }
+    }
 }

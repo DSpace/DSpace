@@ -41,6 +41,7 @@ package org.dspace.app.xmlui.aspect.administrative.collection;
 
 import java.sql.SQLException;
 
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.app.xmlui.aspect.administrative.FlowContainerUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -104,6 +105,7 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	private static final Message T_role_buttons = message("xmlui.administrative.collection.AssignCollectionRoles.role_buttons");
 
 	private static final Message T_label_admins = message("xmlui.administrative.collection.AssignCollectionRoles.label_admins");
+	private static final Message T_label_wf = message("xmlui.administrative.collection.AssignCollectionRoles.label_wf");
 	private static final Message T_label_wf_step1 = message("xmlui.administrative.collection.AssignCollectionRoles.label_wf_step1");
 	private static final Message T_label_wf_step2 = message("xmlui.administrative.collection.AssignCollectionRoles.label_wf_step2");
 	private static final Message T_label_wf_step3 = message("xmlui.administrative.collection.AssignCollectionRoles.label_wf_step3");
@@ -111,6 +113,7 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	private static final Message T_label_default_read = message("xmlui.administrative.collection.AssignCollectionRoles.label_default_read");
 	
 	private static final Message T_sysadmins_only = message("xmlui.administrative.collection.AssignCollectionRoles.sysadmins_only");
+	private static final Message T_not_allowed = message("xmlui.administrative.collection.AssignCollectionRoles.not_allowed");
 
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -168,13 +171,37 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	    tableRow.addCell(Cell.ROLE_HEADER).addContent(T_label_admins);
 	    if (admins != null) 
 	    {
-		    tableRow.addCell().addXref(baseURL + "&submit_edit_admin", admins.getName());
-            tableRow.addCell().addButton("submit_delete_admin").setValue(T_delete);
+	        try
+            {
+                AuthorizeUtil.authorizeManageAdminGroup(context, thisCollection);
+                tableRow.addCell().addXref(baseURL + "&submit_edit_admin", admins.getName());
+            }
+	        catch (AuthorizeException authex) {
+                // add a notice, the user is not authorized to create/edit collection's admin group
+                tableRow.addCell().addContent(T_not_allowed);
+            }
+            try
+            {
+                AuthorizeUtil.authorizeRemoveAdminGroup(context, thisCollection);
+                tableRow.addCell().addButton("submit_delete_admin").setValue(T_delete);
+            }
+            catch (AuthorizeException authex)
+            {
+                // nothing to add, the user is not allowed to delete the group
+            }
 	    }
 	    else 
 	    {
 	    	tableRow.addCell().addContent(T_no_role);
-            tableRow.addCell().addButton("submit_create_admin").setValue(T_create);
+	    	try
+            {
+                AuthorizeUtil.authorizeManageAdminGroup(context, thisCollection);
+                tableRow.addCell().addButton("submit_create_admin").setValue(T_create);
+            }
+            catch (AuthorizeException authex) {
+                // add a notice, the user is not authorized to create/edit collection's admin group
+                tableRow.addCell().addContent(T_not_allowed);
+            }
 	    }
 	    // help and directions row
 	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
@@ -186,75 +213,93 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	     * Workflow steps 1-3 
 	     */
 	    // data row
-	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
-	    tableRow.addCell(Cell.ROLE_HEADER).addContent(T_label_wf_step1);
-	    if (wfStep1 != null) 
-	    {
-	    	tableRow.addCell().addXref(baseURL + "&submit_edit_wf_step1", wfStep1.getName());
-            tableRow.addCell().addButton("submit_delete_wf_step1").setValue(T_delete);
-	    }
-	    else 
-	    {
-	    	tableRow.addCell().addContent(T_no_role);
-            tableRow.addCell().addButton("submit_create_wf_step1").setValue(T_create);
-	    }
-	    // help and directions row
-	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
-	    tableRow.addCell();
-	    tableRow.addCell(1,2).addHighlight("fade offset").addContent(T_help_wf_step1);
-	    
-	    
-	    // data row
-	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
-	    tableRow.addCell(Cell.ROLE_HEADER).addContent(T_label_wf_step2);
-	    if (wfStep2 != null) 
-	    {
-	    	tableRow.addCell().addXref(baseURL + "&submit_edit_wf_step2", wfStep2.getName());
-            tableRow.addCell().addButton("submit_delete_wf_step2").setValue(T_delete);
-	    }
-	    else 
-	    {
-	    	tableRow.addCell().addContent(T_no_role);
-            tableRow.addCell().addButton("submit_create_wf_step2").setValue(T_create);
-	    }
-	    // help and directions row
-	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
-	    tableRow.addCell();
-	    tableRow.addCell(1,2).addHighlight("fade offset").addContent(T_help_wf_step2);
-	    
-	    
-	    // data row
-	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
-	    tableRow.addCell(Cell.ROLE_HEADER).addContent(T_label_wf_step3);
-	    if (wfStep3 != null) 
-	    {
-	    	tableRow.addCell().addXref(baseURL + "&submit_edit_wf_step3", wfStep3.getName());
-            tableRow.addCell().addButton("submit_delete_wf_step3").setValue(T_delete);
-	    }
-	    else 
-	    {
-	    	tableRow.addCell().addContent(T_no_role);
-            tableRow.addCell().addButton("submit_create_wf_step3").setValue(T_create);
-	    }
-	    // help and directions row
-	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
-	    tableRow.addCell();
-	    tableRow.addCell(1,2).addHighlight("fade offset").addContent(T_help_wf_step3);
+	    try
+        {
+            AuthorizeUtil.authorizeManageWorkflowsGroup(context, thisCollection);
+    	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
+    	    tableRow.addCell(Cell.ROLE_HEADER).addContent(T_label_wf_step1);
+    	    if (wfStep1 != null) 
+    	    {
+    	    	tableRow.addCell().addXref(baseURL + "&submit_edit_wf_step1", wfStep1.getName());
+                tableRow.addCell().addButton("submit_delete_wf_step1").setValue(T_delete);
+    	    }
+    	    else 
+    	    {
+    	    	tableRow.addCell().addContent(T_no_role);
+                tableRow.addCell().addButton("submit_create_wf_step1").setValue(T_create);
+    	    }
+    	    // help and directions row
+    	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
+    	    tableRow.addCell();
+    	    tableRow.addCell(1,2).addHighlight("fade offset").addContent(T_help_wf_step1);
+    	    
+    	    
+    	    // data row
+    	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
+    	    tableRow.addCell(Cell.ROLE_HEADER).addContent(T_label_wf_step2);
+    	    if (wfStep2 != null) 
+    	    {
+    	    	tableRow.addCell().addXref(baseURL + "&submit_edit_wf_step2", wfStep2.getName());
+                tableRow.addCell().addButton("submit_delete_wf_step2").setValue(T_delete);
+    	    }
+    	    else 
+    	    {
+    	    	tableRow.addCell().addContent(T_no_role);
+                tableRow.addCell().addButton("submit_create_wf_step2").setValue(T_create);
+    	    }
+    	    // help and directions row
+    	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
+    	    tableRow.addCell();
+    	    tableRow.addCell(1,2).addHighlight("fade offset").addContent(T_help_wf_step2);
+    	    
+    	    
+    	    // data row
+    	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
+    	    tableRow.addCell(Cell.ROLE_HEADER).addContent(T_label_wf_step3);
+    	    if (wfStep3 != null) 
+    	    {
+    	    	tableRow.addCell().addXref(baseURL + "&submit_edit_wf_step3", wfStep3.getName());
+                tableRow.addCell().addButton("submit_delete_wf_step3").setValue(T_delete);
+    	    }
+    	    else 
+    	    {
+    	    	tableRow.addCell().addContent(T_no_role);
+                tableRow.addCell().addButton("submit_create_wf_step3").setValue(T_create);
+    	    }
+    	    // help and directions row
+    	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
+    	    tableRow.addCell();
+    	    tableRow.addCell(1,2).addHighlight("fade offset").addContent(T_help_wf_step3);
+        }
+	    catch (AuthorizeException authex) {
+            // add a notice, the user is not allowed to manage workflow group
+	        tableRow = rolesTable.addRow(Row.ROLE_DATA);
+            tableRow.addCell(Cell.ROLE_HEADER).addContent(T_label_wf);
+            tableRow.addCell().addContent(T_not_allowed);
+        }
 	    	
 	    /*
 	     * The collection submitters 
 	     */
 	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
 	    tableRow.addCell(Cell.ROLE_HEADER).addContent(T_label_submitters);
-	    if (submitters != null) 
+	    try
 	    {
-	    	tableRow.addCell().addXref(baseURL + "&submit_edit_submit", submitters.getName());
-            tableRow.addCell().addButton("submit_delete_submit").setValue(T_delete);
+	        AuthorizeUtil.authorizeManageSubmittersGroup(context, thisCollection);
+    	    if (submitters != null) 
+    	    {
+    	    	tableRow.addCell().addXref(baseURL + "&submit_edit_submit", submitters.getName());
+                tableRow.addCell().addButton("submit_delete_submit").setValue(T_delete);
+    	    }
+    	    else 
+    	    {
+    	    	tableRow.addCell().addContent(T_no_role);
+                tableRow.addCell().addButton("submit_create_submit").setValue(T_create);
+    	    }
 	    }
-	    else 
+	    catch (AuthorizeException authex)
 	    {
-	    	tableRow.addCell().addContent(T_no_role);
-            tableRow.addCell().addButton("submit_create_submit").setValue(T_create);
+	        tableRow.addCell().addContent(T_not_allowed);
 	    }
 	    // help and directions row
 	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
@@ -290,13 +335,16 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	    tableRow.addCell();
 	    tableRow.addCell(1,2).addHighlight("fade offset").addContent(T_help_default_read);
 	    
-	    
-	    if (AuthorizeManager.isAdmin(context))
+	    try
 	    {
+	        AuthorizeUtil.authorizeManageCollectionPolicy(context, thisCollection);
 		    // add one last link to edit the raw authorizations
 		    Cell authCell =rolesTable.addRow().addCell(1,3);
 		    authCell.addXref(baseURL + "&submit_authorizations", T_edit_authorization);
 	    }
+	    catch (AuthorizeException authex) {
+            // nothing to add, the user is not authorized to edit collection's policies
+        }
 
 	    Para buttonList = main.addPara();
 	    buttonList.addButton("submit_return").setValue(T_submit_return);

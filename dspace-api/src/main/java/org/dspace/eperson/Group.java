@@ -48,8 +48,12 @@ import java.util.Set;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -1324,5 +1328,92 @@ public class Group extends DSpaceObject
         }
 
         return myChildren;
+    }
+    
+    public DSpaceObject getParentObject() throws SQLException
+    {
+        // could a collection/community admin manage related groups?
+        // check before the configuration options could give a performance gain
+        // if all group management are disallowed
+        if (AuthorizeConfiguration.canCollectionAdminManageAdminGroup()
+                || AuthorizeConfiguration.canCollectionAdminManageSubmitters()
+                || AuthorizeConfiguration.canCollectionAdminManageWorkflows()
+                || AuthorizeConfiguration.canCommunityAdminManageAdminGroup()
+                || AuthorizeConfiguration
+                        .canCommunityAdminManageCollectionAdminGroup()
+                || AuthorizeConfiguration
+                        .canCommunityAdminManageCollectionSubmitters()
+                || AuthorizeConfiguration
+                        .canCommunityAdminManageCollectionWorkflows())
+        {
+            // is this a collection related group?
+            TableRow qResult = DatabaseManager
+                    .querySingle(
+                            myContext,
+                            "SELECT collection_id, workflow_step_1, workflow_step_2, " +
+                            " workflow_step_3, submitter, admin FROM collection "
+                                    + " WHERE workflow_step_1 = ? OR "
+                                    + " workflow_step_2 = ? OR "
+                                    + " workflow_step_3 = ? OR "
+                                    + " submitter =  ? OR " + " admin = ?",
+                            getID(), getID(), getID(), getID(), getID());
+            if (qResult != null)
+            {
+                Collection collection = Collection.find(myContext, qResult
+                        .getIntColumn("collection_id"));
+                
+                if ((qResult.getIntColumn("workflow_step_1") == getID() ||
+                        qResult.getIntColumn("workflow_step_2") == getID() ||
+                        qResult.getIntColumn("workflow_step_3") == getID()))
+                {
+                    if (AuthorizeConfiguration.canCollectionAdminManageWorkflows())
+                    {
+                        return collection;
+                    }
+                    else if (AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows())
+                    {
+                        return collection.getParentObject();
+                    }
+                }
+                if (qResult.getIntColumn("submitter") == getID())
+                {
+                    if (AuthorizeConfiguration.canCollectionAdminManageSubmitters())
+                    {
+                        return collection;
+                    }
+                    else if (AuthorizeConfiguration.canCommunityAdminManageCollectionSubmitters())
+                    {
+                        return collection.getParentObject();
+                    }
+                }
+                if (qResult.getIntColumn("admin") == getID())
+                {
+                    if (AuthorizeConfiguration.canCollectionAdminManageAdminGroup())
+                    {
+                        return collection;
+                    }
+                    else if (AuthorizeConfiguration.canCommunityAdminManageCollectionAdminGroup())
+                    {
+                        return collection.getParentObject();
+                    }
+                }
+            }
+            // is the group releated to a community and community admin allowed
+            // to manage it?
+            else if (AuthorizeConfiguration.canCommunityAdminManageAdminGroup())
+            {
+                qResult = DatabaseManager.querySingle(myContext,
+                        "SELECT community_id FROM community "
+                                + "WHERE admin = ?", getID());
+
+                if (qResult != null)
+                {
+                    Community community = Community.find(myContext, qResult
+                            .getIntColumn("community_id"));
+                    return community;
+                }
+            }
+        }
+        return null;
     }
 }

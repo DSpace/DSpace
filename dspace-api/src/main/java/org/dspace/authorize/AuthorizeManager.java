@@ -133,6 +133,30 @@ public class AuthorizeManager
     public static void authorizeAction(Context c, DSpaceObject o, int action)
             throws AuthorizeException, SQLException
     {
+        authorizeAction(c, o, action, true);
+    }
+
+    /**
+     * Checks that the context's current user can perform the given action on
+     * the given object. Throws an exception if the user is not authorized,
+     * otherwise the method call does nothing.
+     * 
+     * @param c
+     *            context
+     * @param o
+     *            a DSpaceObject
+     * @param useInheritance
+     *            flag to say if ADMIN action on the current object or parent
+     *            object can be used
+     * @param action
+     *            action to perform from <code>org.dspace.core.Constants</code>
+     * 
+     * @throws AuthorizeException
+     *             if the user is denied
+     */
+    public static void authorizeAction(Context c, DSpaceObject o, int action, boolean useInheritance)
+            throws AuthorizeException, SQLException
+    {
         if (o == null)
         {
             // action can be -1 due to a null entry
@@ -164,7 +188,7 @@ public class AuthorizeManager
                             + actionText + " by user " + userid);
         }
 
-        if (!authorize(c, o, action, c.getCurrentUser()))
+        if (!authorize(c, o, action, c.getCurrentUser(), useInheritance))
         {
             // denied, assemble and throw exception
             int otype = o.getType();
@@ -219,6 +243,30 @@ public class AuthorizeManager
     public static boolean authorizeActionBoolean(Context c, DSpaceObject o,
             int a) throws SQLException
     {
+        return authorizeActionBoolean(c, o, a, true);
+    }
+    
+    /**
+     * same authorize, returns boolean for those who don't want to deal with
+     * catching exceptions.
+     * 
+     * @param c
+     *            DSpace context, containing current user
+     * @param o
+     *            DSpaceObject
+     * @param a
+     *            action being attempted, from
+     *            <code>org.dspace.core.Constants</code>
+     * @param useInheritance
+     *            flag to say if ADMIN action on the current object or parent
+     *            object can be used            
+     * 
+     * @return <code>true</code> if the current user in the context is
+     *         authorized to perform the given action on the given object
+     */
+    public static boolean authorizeActionBoolean(Context c, DSpaceObject o,
+            int a, boolean useInheritance) throws SQLException
+    {
         boolean isAuthorized = true;
 
         if (o == null)
@@ -228,7 +276,7 @@ public class AuthorizeManager
 
         try
         {
-            authorizeAction(c, o, a);
+            authorizeAction(c, o, a, useInheritance);
         }
         catch (AuthorizeException e)
         {
@@ -253,12 +301,15 @@ public class AuthorizeManager
      *            <code>org.dspace.core.Constants</code>
      * @param e
      *            user attempting action
+     * @param useInheritance
+     *            flag to say if ADMIN action on the current object or parent
+     *            object can be used
      * @return <code>true</code> if user is authorized to perform the given
      *         action, <code>false</code> otherwise
      * @throws SQLException
      */
     private static boolean authorize(Context c, DSpaceObject o, int action,
-            EPerson e) throws SQLException
+            EPerson e, boolean useInheritance) throws SQLException
     {
         int userid;
 
@@ -285,7 +336,9 @@ public class AuthorizeManager
 
             // perform isAdmin check to see
             // if user is an Admin on this object
-            if (isAdmin(c,o))
+            DSpaceObject testObject = useInheritance?o.getAdminObject(action):null;
+            
+            if (isAdmin(c, testObject))
             {
                 return true;
             }
@@ -319,24 +372,30 @@ public class AuthorizeManager
     // admin check methods
     ///////////////////////////////////////////////
 
-
-	/**
-     * Check to see if the current user is an Administrator of a given
-     * object within DSpace. Always return <code>true</code> if the
-     * user is a System Admin
-     *
+    /**
+     * Check to see if the current user is an Administrator of a given object
+     * within DSpace. Always return <code>true</code> if the user is a System
+     * Admin
+     * 
      * @param c
      *            current context
      * @param o
-     *            current DSpace Object
-     *
-     * @return <code>true</code> if user has administrative privileges
-     *        on the given DSpace object
+     *            current DSpace Object, if <code>null</code> the call will be
+     *            equivalent to a call to the <code>isAdmin(Context c)</code>
+     *            method
+     * 
+     * @return <code>true</code> if user has administrative privileges on the
+     *         given DSpace object
      */
     public static boolean isAdmin(Context c, DSpaceObject o) throws SQLException {
 		if (isAdmin(c))
 		{
 			return true;
+		}
+		
+		if (o == null)
+		{
+		    return false;
 		}
 
         //
@@ -365,152 +424,15 @@ public class AuthorizeManager
             }
         }
 
-		//
         // If user doesn't have specific Admin permissions on this object,
         // check the *parent* objects of this object.  This allows Admin
         // permissions to be inherited automatically (e.g. Admin on Community
         // is also an Admin of all Collections/Items in that Community)
-		switch (o.getType()) {
-			case Constants.BITSTREAM:
-			{
-				Bitstream bitstream = (Bitstream) o;
-				Bundle[] bundles = bitstream.getBundles();
-				if (bundles != null && (bundles.length > 0 && bundles[0] != null))
-				{
-					return isAdmin(c,bundles[0]);
-				}
-				else
-				{
-					// is the bitstream a logo for a community or a collection?
-					TableRow qResult = DatabaseManager.querySingle(c,
-						       "SELECT collection_id FROM collection " +
-						       "WHERE logo_bitstream_id = ?",o.getID());
-					if (qResult != null) 
-					{
-						Collection collection = Collection.find(c,qResult.getIntColumn("collection_id"));
-						return isAdmin(c,collection);
-					}
-					else
-					{   
-						// is the group releated to a community?
-						qResult = DatabaseManager.querySingle(c,
-								"SELECT community_id FROM community " +
-								"WHERE logo_bitstream_id = ?",o.getID());
-			
-						if (qResult != null)
-						{
-							Community community = Community.find(c,qResult.getIntColumn("community_id"));
-							return isAdmin(c,community);
-						}
-						else
-						{
-							return false;
-						}
-					}									
-				}
-			}
-			
-			case Constants.BUNDLE:
-			{
-                Bundle bundle = (Bundle) o;
-				Item[] items = bundle.getItems();
-               
-				if (items != null && (items.length > 0 && items[0] != null))
-				{
-					return isAdmin(c,items[0]);
-				}
-				else
-				{
-					return false;
-				}
-			}
-			
-			case Constants.ITEM:
-			{
-				Item item = (Item) o;
-				Collection ownCollection = item.getOwningCollection();
-				if (ownCollection != null)
-				{
-					return isAdmin(c,ownCollection);
-				}
-				else
-				{
-					// is a template item?
-					TableRow qResult = DatabaseManager.querySingle(c,
-						       "SELECT collection_id FROM collection " +
-						       "WHERE template_item_id = ?",o.getID());
-					if (qResult != null) 
-					{
-						Collection collection = Collection.find(c,qResult.getIntColumn("collection_id"));
-						return isAdmin(c,collection);
-					}					
-					return false;
-				}
-			}
-			
-			case Constants.COLLECTION:
-			{			
-				Collection collection = (Collection) o;
-				Community[] communities = collection.getCommunities();
-				if (communities != null && (communities.length > 0 && communities[0] != null))
-				{
-					return isAdmin(c,communities[0]);
-				}
-				else
-				{
-					return false;
-				}			
-			}
-			
-			case Constants.COMMUNITY:
-			{			
-				Community community = (Community) o;
-				Community pCommunity = community.getParentCommunity();
-				if (pCommunity != null)
-				{
-					return isAdmin(c,pCommunity);
-				}
-				else
-				{
-					return false;
-				}			
-			}
-				
-			case Constants.GROUP:
-			{
-				// is the group releated to a collection?
-				TableRow qResult = DatabaseManager.querySingle(c,
-								       "SELECT collection_id FROM collection " +
-								       "WHERE workflow_step_1 = ? OR " +
-								       		" workflow_step_2 = ? OR " +
-								       		" workflow_step_3 = ? OR " +
-								       		" submitter =  ? OR " +
-								       		" admin = ?",o.getID(),o.getID(),o.getID(),o.getID(),o.getID());
-				if (qResult != null) 
-				{
-					Collection collection = Collection.find(c,qResult.getIntColumn("collection_id"));
-					return isAdmin(c,collection);
-				}
-				else
-				{   // is the group releated to a community?
-					qResult = DatabaseManager.querySingle(c,
-						       "SELECT community_id FROM community " +
-						       "WHERE admin = ?",o.getID());
-					
-					if (qResult != null)
-					{
-						Community community = Community.find(c,qResult.getIntColumn("community_id"));
-						return isAdmin(c,community);
-					}
-					else
-					{
-						return false;
-					}
-				}
-				
-			}
-		}
-		
+        DSpaceObject parent = o.getParentObject();
+        if (parent != null)
+        {
+            return isAdmin(c, parent);
+        }
 	
 		return false;
 	}

@@ -52,6 +52,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
@@ -174,16 +175,49 @@ public class CollectionWizardServlet extends DSpaceServlet
             // Create the collection
             Collection newCollection = c.createCollection();
             request.setAttribute("collection", newCollection);
-            if (AuthorizeManager.isAdmin(context,c))
-            {
-                // set a variable to show all locale admin buttons
-                request.setAttribute("admin_button", new Boolean(true));
-            }
+
             if (AuthorizeManager.isAdmin(context))
             {
                 // set a variable to show all buttons
                 request.setAttribute("sysadmin_button", new Boolean(true));
             }
+            
+            try 
+            {
+                AuthorizeUtil.authorizeManageAdminGroup(context, newCollection);                
+                request.setAttribute("admin_create_button", new Boolean(true));
+            }
+            catch (AuthorizeException authex) {
+                request.setAttribute("admin_create_button", new Boolean(false));
+            }
+            
+            try 
+            {
+                AuthorizeUtil.authorizeManageSubmittersGroup(context, newCollection);                
+                request.setAttribute("submitters_button", new Boolean(true));
+            }
+            catch (AuthorizeException authex) {
+                request.setAttribute("submitters_button", new Boolean(false));
+            }
+            
+            try 
+            {
+                AuthorizeUtil.authorizeManageWorkflowsGroup(context, newCollection);                
+                request.setAttribute("workflows_button", new Boolean(true));
+            }
+            catch (AuthorizeException authex) {
+                request.setAttribute("workflows_button", new Boolean(false));
+            }
+            
+            try 
+            {
+                AuthorizeUtil.authorizeManageTemplateItem(context, newCollection);                
+                request.setAttribute("template_button", new Boolean(true));
+            }
+            catch (AuthorizeException authex) {
+                request.setAttribute("template_button", new Boolean(false));
+            }
+            
             JSPManager.showJSP(request, response,
                     "/dspace-admin/wizard-questions.jsp");
             context.complete();
@@ -718,11 +752,7 @@ public class CollectionWizardServlet extends DSpaceServlet
                 Community[] communities = collection.getCommunities();
                 request.setAttribute("community", communities[0]);
 
-                if (AuthorizeManager.isAdmin(context, collection))
-                {
-                    // set a variable to show all buttons
-                    request.setAttribute("admin_button", new Boolean(true));
-                }
+                EditCommunitiesServlet.storeAuthorizeAttributeCollectionEdit(context, request, collection);
             }
 
             JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");

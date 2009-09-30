@@ -141,4 +141,50 @@ public abstract class DSpaceObject
         }
         return null;
     }
+
+    /**
+     * Return the dspace object where an ADMIN action right is sufficient to
+     * grant the initial authorize check.
+     * <p>
+     * Default behaviour is ADMIN right on the object grant right on all other
+     * action on the object itself. Subclass should override this method as
+     * need.
+     * 
+     * @param action
+     *            ID of action being attempted, from
+     *            <code>org.dspace.core.Constants</code>. The ADMIN action is
+     *            not a valid parameter for this method, an
+     *            IllegalArgumentException should be thrown
+     * @return the dspace object, if any, where an ADMIN action is sufficient to
+     *         grant the original action
+     * @throws SQLException
+     * @throws IllegalArgumentException
+     *             if the ADMIN action is supplied as parameter of the method
+     *             call
+     */
+    public DSpaceObject getAdminObject(int action) throws SQLException
+    {
+        if (action == Constants.ADMIN)
+        {
+            throw new IllegalArgumentException("Illegal call to the DSpaceObject.getAdminObject method");
+        }
+        return this;
+    }
+
+    /**
+     * Return the dspace object that "own" the current object in the hierarchy.
+     * Note that this method has a meaning slightly different from the
+     * getAdminObject because it is independent of the action but it is in a way
+     * related to it. It defines the "first" dspace object <b>OTHER</b> then the
+     * current one, where allowed ADMIN actions imply allowed ADMIN actions on
+     * the object self.
+     * 
+     * @return the dspace object that "own" the current object in
+     *         the hierarchy
+     * @throws SQLException
+     */
+    public DSpaceObject getParentObject() throws SQLException
+    {
+        return null;
+    }
 }
