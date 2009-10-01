@@ -138,6 +138,13 @@
     			<xsl:value-of select="epdcx:valueString"/>
     		</dim:field>
     	</xsl:if>
+
+        <!-- bibliographic citation element: dc.identifier.citation -->
+        <xsl:if test="./@epdcx:propertyURI='http://purl.org/eprint/terms/bibliographicCitation'">
+            <dim:field mdschema="dc" element="identifier" qualifier="citation">
+                <xsl:value-of select="epdcx:valueString"/>
+            </dim:field>
+        </xsl:if>
     	
     </xsl:template>
     
