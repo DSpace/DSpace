@@ -252,6 +252,12 @@ public class Authenticate
     {
         HttpSession session = request.getSession();
 
+        // For security reasons after login, give the user a new session
+        if ((!session.isNew()) && (session.getAttribute("dspace.current.user.id") == null)) {
+            session.invalidate();
+            session=request.getSession();
+        }
+
         context.setCurrentUser(eperson);
         
         boolean isAdmin = false;
@@ -300,5 +306,6 @@ public class Authenticate
         request.removeAttribute("is.admin");
         request.removeAttribute("dspace.current.user");
         session.removeAttribute("dspace.current.user.id");
+        session.invalidate();
     }
 }

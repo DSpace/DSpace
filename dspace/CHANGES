@@ -114,6 +114,9 @@
 (Mark Wood)
  - [DS-52] Factor out common webapp installation - ID: 2042160
 
+(Ekaterina Pechekhonova)
+ - [DS-330] Create new session on login / invalidate sessions on logout
+
 1.5.2 final
 ===========
 
