@@ -103,17 +103,6 @@
             </snapshots>
         </repository>
         <repository>
-            <id>codehaus</id>
-            <name>CodeHaus Repository</name>
-            <url>http://repository.codehaus.org/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-        <repository>
             <id>dspace-snapshot</id>
             <name>DSpace Snapshot Repository</name>
             <url>http://maven.dspace.org/snapshot</url>
@@ -171,58 +160,9 @@
                 <type>jar</type>
             </dependency>
             <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-jdbc</artifactId>
-                <version>2.5.6</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-web</artifactId>
-                <version>2.5.6</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-aop</artifactId>
-                <version>2.5.6</version>
-                <type>jar</type>
-            </dependency>
-
-            <dependency>
                 <groupId>org.azeckoski</groupId>
                 <artifactId>reflectutils</artifactId>
                 <version>0.9.10</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.sakaiproject</groupId>
-                <artifactId>generic-dao</artifactId>
-                <version>0.9.16</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.sakaiproject.entitybus</groupId>
-                <artifactId>entitybus-api</artifactId>
-                <version>1.0.2</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.sakaiproject.entitybus</groupId>
-                <artifactId>entitybus-utils</artifactId>
-                <version>1.0.2</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.sakaiproject.entitybus</groupId>
-                <artifactId>entitybus-impl</artifactId>
-                <version>1.0.2</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.sakaiproject.entitybus</groupId>
-                <artifactId>entitybus-rest</artifactId>
-                <version>1.0.2</version>
                 <type>jar</type>
             </dependency>
             <dependency>
@@ -260,56 +200,6 @@
                 <artifactId>jetty-servlet-tester</artifactId>
                 <version>6.1.14</version>
             </dependency>
-            <dependency>
-                <groupId>c3p0</groupId>
-                <artifactId>c3p0</artifactId>
-                <version>0.9.1.2</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.derby</groupId>
-                <artifactId>derby</artifactId>
-                <version>10.4.2.0</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>hsqldb</groupId>
-                <artifactId>hsqldb</artifactId>
-                <version>1.8.0.7</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>com.h2database</groupId>
-                <artifactId>h2</artifactId>
-                <version>1.1.107</version>
-                <type>jar</type>
-            </dependency>
-            <!-- JCR/jackrabbit -->
-            <dependency>
-                <groupId>javax.jcr</groupId>
-                <artifactId>jcr</artifactId>
-                <version>1.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.jackrabbit</groupId>
-                <artifactId>jackrabbit-core</artifactId>
-                <version>1.4.8</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.jackrabbit</groupId>
-                <artifactId>jackrabbit-api</artifactId>
-                <version>1.4</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.jackrabbit</groupId>
-                <artifactId>jackrabbit-jcr-commons</artifactId>
-                <version>1.4</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.jackrabbit</groupId>
-                <artifactId>jackrabbit-jcr-commons</artifactId>
-                <version>1.4</version>
-            </dependency>
             <!-- logging -->
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -344,58 +234,10 @@
                 <type>jar</type>
                 <scope>provided</scope>
             </dependency>
-
-
-
-            <dependency>
-                <groupId>commons-cli</groupId>
-                <artifactId>commons-cli</artifactId>
-                <version>1.0</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-                <version>1.3</version>
-            </dependency>
             <dependency>
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
                 <version>3.2</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-dbcp</groupId>
-                <artifactId>commons-dbcp</artifactId>
-                <version>1.2.2</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-discovery</groupId>
-                <artifactId>commons-discovery</artifactId>
-                <version>0.2</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-fileupload</groupId>
-                <artifactId>commons-fileupload</artifactId>
-                <version>1.2</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>1.2</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-lang</groupId>
-                <artifactId>commons-lang</artifactId>
-                <version>2.2</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-pool</groupId>
-                <artifactId>commons-pool</artifactId>
-                <version>1.4</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-validator</groupId>
-                <artifactId>commons-validator</artifactId>
-                <version>1.3.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
