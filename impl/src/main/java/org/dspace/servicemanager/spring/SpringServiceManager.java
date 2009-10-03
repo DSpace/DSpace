@@ -3,13 +3,13 @@
  * $URL: https://scm.dspace.org/svn/repo/dspace2/core/trunk/impl/src/main/java/org/dspace/servicemanager/spring/SpringServiceManager.java $
  * SpringServiceManager.java - DSpace2 - Oct 5, 2008 8:26:59 PM - azeckoski
  **************************************************************************
- * Copyright (c) 2008 Aaron Zeckoski
- * Licensed under the Apache License, Version 2.0
+ * Copyright (c) 2002-2009, The Duraspace Foundation.  All rights reserved.
+ * Licensed under the Duraspace Foundation License.
  * 
- * A copy of the Apache License has been included in this 
- * distribution and is available at: http://www.apache.org/licenses/LICENSE-2.0.txt
+ * A copy of the Duraspace License has been included in this
+ * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
  *
- * Aaron Zeckoski (azeckoski @ gmail.com) (aaronz @ vt.edu) (aaron @ caret.cam.ac.uk)
+ * 
  */
 
 package org.dspace.servicemanager.spring;

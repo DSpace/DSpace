@@ -3,13 +3,13 @@
  * $URL: https://scm.dspace.org/svn/repo/dspace2/core/trunk/utils/src/main/java/org/dspace/utils/servicemanager/RequestExecutor.java $
  * RequestExecutor.java - DSpace2 - Nov 14, 2008 1:41:49 PM - azeckoski
  **************************************************************************
- * Copyright (c) 2008 Aaron Zeckoski
- * Licensed under the Apache License, Version 2.0
+ * Copyright (c) 2002-2009, The Duraspace Foundation.  All rights reserved.
+ * Licensed under the Duraspace Foundation License.
  * 
- * A copy of the Apache License has been included in this 
- * distribution and is available at: http://www.apache.org/licenses/LICENSE-2.0.txt
+ * A copy of the Duraspace License has been included in this
+ * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
  *
- * Aaron Zeckoski (azeckoski @ gmail.com) (aaronz @ vt.edu) (aaron @ caret.cam.ac.uk)
+ * 
  */
 
 package org.dspace.utils.servicemanager;

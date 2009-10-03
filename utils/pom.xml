@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-services-utils</artifactId>
-    <name>DSpace Utilities</name>
-    <description>The core utilities for DSpace</description>
+    <name>DSpace Services Utilities</name>
+    <description>The core services utilities for DSpace</description>
     <url>http://projects.dspace.org</url>
     <inceptionYear>2008</inceptionYear>
     <parent>

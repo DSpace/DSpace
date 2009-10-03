@@ -5,14 +5,14 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-services</artifactId>
     <packaging>pom</packaging>
-    <name>DSpace Parent Project</name>
+    <name>DSpace Services Modules</name>
     <url>http://projects.dspace.org</url>
     <organization>
         <name>The DSpace Foundation</name>
         <url>http://www.dspace.org</url>
     </organization>
     <version>2.0.0-SNAPSHOT</version><!-- dspace2.version -->
-
+    
     <build>
         <plugins>
             <!-- java 1.5 or higher -->
@@ -34,6 +34,7 @@
                         </manifest>
                     </archive>
                 </configuration>
+                
                 <executions>
                     <execution>
                         <goals>
@@ -243,9 +244,8 @@
     </dependencyManagement>
     <licenses>
         <license>
-            <name>DSpace Sourcecode License</name>
+            <name>The Duraspace Foundation License.</name>
             <url>LICENSE.txt</url>
-            <distribution>repo</distribution>
             <comments> A BSD compatable OSS license for the DSpace codebase.</comments>
         </license>
     </licenses>

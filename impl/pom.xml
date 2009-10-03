@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-services-impl</artifactId>
-    <name>DSpace Core IMPL</name>
+    <name>DSpace Services Implementation</name>
     <description>The implementation of the DSpace 2 services</description>
     <url>http://projects.dspace.org</url>
     <inceptionYear>Monday, September 1, 2008</inceptionYear>

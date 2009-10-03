@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-services-api</artifactId>
-    <name>DSpace Core API</name>
+    <name>DSpace Services API</name>
     <description>The core services API for DSpace</description>
     <url>http://projects.dspace.org</url>
     <inceptionYear>Monday, September 1, 2008</inceptionYear>
