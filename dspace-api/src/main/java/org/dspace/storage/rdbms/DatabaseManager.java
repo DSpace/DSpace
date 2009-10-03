@@ -110,7 +110,7 @@ public class DatabaseManager
      * type attacks because we are unable to determine where the input came from. Instead
      * we could pass in static integer constants which are then mapped to their sql name. 
      */
-    private static final Pattern DB_SAFE_NAME = Pattern.compile("^[a-zA-Z_1-9]+$");
+    private static final Pattern DB_SAFE_NAME = Pattern.compile("^[a-zA-Z_1-9.]+$");
 
     /**
      * A map of database column information. The key is the table name, a
@@ -1190,6 +1190,10 @@ public class DatabaseManager
             {
                 row.setColumn(name, results.getLong(i));
             }
+            else if (jdbctype == Types.DOUBLE)
+            {
+                row.setColumn(name, results.getDouble(i));
+            }
             else if (jdbctype == Types.CLOB && "oracle".equals(dbName))
             {
                 // Support CLOBs in place of TEXT columns in Oracle
@@ -1484,6 +1488,17 @@ public class DatabaseManager
         try
         {
             String schema = ConfigurationManager.getProperty("db.schema");
+            String catalog = null;
+            
+            int dotIndex = table.indexOf("."); 
+            if (dotIndex > 0)
+            {
+                catalog = table.substring(0, dotIndex);
+                table = table.substring(dotIndex + 1, table.length());
+                log.warn("catalog: " + catalog);
+                log.warn("table: " + table);
+            }
+            
             connection = getConnection();
 
             DatabaseMetaData metadata = connection.getMetaData();
@@ -1492,14 +1507,15 @@ public class DatabaseManager
             int max = metadata.getMaxTableNameLength();
             String tname = (table.length() >= max) ? table
                     .substring(0, max - 1) : table;
-
-            pkcolumns = metadata.getPrimaryKeys(null, schema, tname);
+            
+            pkcolumns = metadata.getPrimaryKeys(catalog, schema, tname);
+            
             Set pks = new HashSet();
 
             while (pkcolumns.next())
                 pks.add(pkcolumns.getString(4));
 
-            columns = metadata.getColumns(null, schema, tname, null);
+            columns = metadata.getColumns(catalog, schema, tname, null);
 
             while (columns.next())
             {
