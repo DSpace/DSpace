@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app id="WebApp_9" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
 <!--
  - web.xml
@@ -45,32 +47,50 @@
   - The is the servlet deployment descriptor for Tomcat 4.0 for the DSpace
   - Web user interface
   -
-  - '@@dspace.dir@@' will be replaced with the directory where DSpace is installed
+  - 'dspace.dir' will be replaced with the directory where DSpace is installed
   -->
-
-<web-app>
-
+  
   <display-name>DSpace Web UI</display-name>
 
 
   <!-- Configuration Information -->
 
   <context-param>
-    <param-name>dspace-config</param-name>
-    <param-value>${dspace.dir}/config/dspace.cfg</param-value>
     <description>
       The location of the main DSpace configuration file
     </description>
+    <param-name>dspace-config</param-name>
+    <param-value>${dspace.dir}/config/dspace.cfg</param-value>
   </context-param>
 
+  <!-- new ConfigurationService initialization for dspace.dir -->
+  <context-param>
+    <description>
+      The location of the main DSpace configuration file
+    </description>
+    <param-name>dspace.dir</param-name>
+    <param-value>${dspace.dir}</param-value>
+  </context-param>
+  
   <context-param>
     <param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
     <param-value>Messages</param-value>
   </context-param>
-
+  
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>/WEB-INF/spring/*.xml</param-value>
+  </context-param>
+  
 
   <!-- Filters -->
-
+  
+  <!-- session/request filter (from util), handles setting up requests and sessions correctly -->
+  <filter>
+    <filter-name>dspace.request</filter-name>
+    <filter-class>org.dspace.utils.servlet.DSpaceWebappServletFilter</filter-class>
+  </filter>
+    
   <filter>
     <filter-name>admin-only</filter-name>
     <filter-class>org.dspace.app.webui.filter.AdminOnlyFilter</filter-class>
@@ -81,9 +101,15 @@
     <filter-class>org.dspace.app.webui.filter.RegisteredOnlyFilter</filter-class>
   </filter>
 
-
   <!-- Filter mappings -->
-  
+  <filter-mapping>
+        <filter-name>dspace.request</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+  </filter-mapping>
+    
   <filter-mapping>
     <filter-name>admin-only</filter-name>
     <url-pattern>/dspace-admin/*</url-pattern>
@@ -124,6 +150,13 @@
     <url-pattern>/view-workspaceitem</url-pattern>
   </filter-mapping>
 
+ 
+
+  <!-- kernel start listener (from impl), starts up the kernel for standalong webapps -->
+  <listener>
+     <listener-class>org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener</listener-class>
+  </listener>
+  
   <!-- Listener to clean up Commons-FileUpload -->
   <listener>
      <listener-class>
@@ -138,6 +171,11 @@
      </listener-class>
   </listener>
 
+  <!-- Load Spring applicationContext -->
+  <listener>
+      <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  
   <!-- Servlets -->
 
   <servlet>
@@ -710,7 +748,7 @@
     <location>/internal-error</location>
   </error-page>
 
-
+  <jsp-config>
   <!-- JSTL Format tag, for i18n -->
   <taglib>
     <taglib-uri>http://java.sun.com/jsp/jstl/fmt</taglib-uri>
@@ -722,5 +760,8 @@
     <taglib-uri>http://www.dspace.org/dspace-tags.tld</taglib-uri>
     <taglib-location>/WEB-INF/dspace-tags.tld</taglib-location>
   </taglib>
+  
+  </jsp-config>
+  
 
 </web-app>

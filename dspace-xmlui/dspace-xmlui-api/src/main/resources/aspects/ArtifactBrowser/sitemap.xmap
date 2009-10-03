@@ -76,7 +76,8 @@ and searching the repository.
 		
 		
 		<map:actions>
-			<map:action name="SendFeedbackAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.SendFeedbackAction"/>
+			<map:action name="SendFeedbackAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.SendFeedbackAction"/>            
+		    <map:action name="UsageLoggerAction" src="org.dspace.app.xmlui.cocoon.UsageLoggerAction"/>
 		</map:actions>
 
 
@@ -215,14 +216,26 @@ and searching the repository.
 				<map:match pattern="handle/*/*">
 					<map:match type="HandleAuthorizedMatcher" pattern="READ">
 						<map:match type="HandleTypeMatcher" pattern="community">
+							<map:act type="UsageLoggerAction">
+					    		<map:parameter name="type" value="community"/>
+					    		<map:parameter name="eventType" value="view"/>
+					    	</map:act>
 							<map:transform type="CommunityViewer"/>
 							<map:serialize type="xml"/>
 						</map:match>
 						<map:match type="HandleTypeMatcher" pattern="collection">
+							<map:act type="UsageLoggerAction">
+					    		<map:parameter name="type" value="collection"/>
+					    		<map:parameter name="eventType" value="view"/>
+					    	</map:act>
 							<map:transform type="CollectionViewer"/>
 							<map:serialize type="xml"/>
 						</map:match>
 						<map:match type="HandleTypeMatcher" pattern="item">
+							<map:act type="UsageLoggerAction">
+					    		<map:parameter name="type" value="item"/>
+					    		<map:parameter name="eventType" value="view"/>
+					    	</map:act>
 							<map:transform type="ItemViewer"/>
 							<map:serialize type="xml"/>
 						</map:match>

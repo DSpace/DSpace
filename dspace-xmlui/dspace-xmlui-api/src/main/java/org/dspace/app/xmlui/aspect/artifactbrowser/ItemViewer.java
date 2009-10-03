@@ -54,11 +54,12 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
+import org.dspace.app.statistics.UsageEvent;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.utils.UsageEvent;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -76,6 +77,7 @@ import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
 import org.dspace.core.PluginManager;
+import org.dspace.utils.DSpace;
 import org.jdom.Element;
 import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
@@ -233,9 +235,6 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         if (!(dso instanceof Item))
             return;
         Item item = (Item) dso;
-
-        new UsageEvent().fire((Request) ObjectModelHelper.getRequest(objectModel),
-                context, UsageEvent.VIEW, Constants.ITEM, item.getID());
         
         // Build the item viewer division.
         Division division = body.addDivision("item-view","primary");

@@ -49,9 +49,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.statistics.AbstractUsageEvent;
+import org.dspace.app.statistics.UsageEvent;
 import org.dspace.app.webui.util.JSPManager;
-import org.dspace.app.webui.util.UsageEvent;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -62,6 +61,8 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
 import org.dspace.handle.HandleManager;
+import org.dspace.services.model.Event;
+import org.dspace.utils.DSpace;
 
 /**
  * Servlet for HTML bitstream support.
@@ -239,8 +240,16 @@ public class HTMLServlet extends DSpaceServlet
         {
             log.info(LogManager.getHeader(context, "view_html", "handle="
                     + handle + ",bitstream_id=" + bitstream.getID()));
-            new UsageEvent().fire(request, context, AbstractUsageEvent.VIEW,
-					Constants.BITSTREAM, bitstream.getID());
+            
+            new DSpace().getEventService().fireEvent(
+            		new UsageEvent(
+            				UsageEvent.Action.VIEW,
+            				request, 
+            				context, 
+            				bitstream));
+            
+            //new UsageEvent().fire(request, context, AbstractUsageEvent.VIEW,
+			//		Constants.BITSTREAM, bitstream.getID());
 
             // Set the response MIME type
             response.setContentType(bitstream.getFormat().getMIMEType());

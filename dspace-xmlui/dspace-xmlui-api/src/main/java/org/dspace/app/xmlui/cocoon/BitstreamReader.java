@@ -62,7 +62,7 @@ import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.environment.http.HttpResponse;
 import org.apache.cocoon.reading.AbstractReader;
 import org.apache.cocoon.util.ByteRange;
-import org.dspace.app.xmlui.utils.UsageEvent;
+import org.dspace.app.statistics.UsageEvent;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -75,6 +75,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
+import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
 import org.apache.log4j.Logger;
@@ -344,9 +345,16 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             // Log that the bitstream has been viewed.
             log.info(LogManager.getHeader(context, "view_bitstream", "bitstream_id=" + bitstream.getID()));
             
+            new DSpace().getEventService().fireEvent(
+    				new UsageEvent(
+    						UsageEvent.Action.VIEW,
+    						ObjectModelHelper.getRequest(objectModel),
+    						ContextUtil.obtainContext(ObjectModelHelper.getRequest(objectModel)),
+    						bitstream));
+            
             // Fire a view event for this bitstream
-            new UsageEvent().fire((Request) ObjectModelHelper.getRequest(objectModel), 
-                    context, UsageEvent.VIEW, Constants.BITSTREAM, bitstream.getID());
+            //new UsageEvent().fire((Request) ObjectModelHelper.getRequest(objectModel), 
+            //        context, UsageEvent.VIEW, Constants.BITSTREAM, bitstream.getID());
         }
         catch (SQLException sqle)
         {

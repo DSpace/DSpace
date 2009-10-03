@@ -39,37 +39,46 @@
  */
 package org.dspace.app.webui.servlet;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringEscapeUtils;
-import org.dspace.app.statistics.AbstractUsageEvent;
+import org.apache.log4j.Logger;
+import org.dspace.app.statistics.UsageEvent;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.app.webui.util.UsageEvent;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.*;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DCValue;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
-import org.dspace.core.*;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
+import org.dspace.core.PluginManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Subscribe;
 import org.dspace.handle.HandleManager;
 import org.dspace.plugin.CollectionHomeProcessor;
 import org.dspace.plugin.CommunityHomeProcessor;
+import org.dspace.utils.DSpace;
 import org.jdom.Element;
 import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Servlet for handling requests within a community or collection. The Handle is
@@ -161,10 +170,13 @@ public class HandleServlet extends DSpaceServlet
         {
             Item item = (Item) dso;
 
-            UsageEvent ue = new UsageEvent();
-            ue.fire(request, context, AbstractUsageEvent.VIEW, Constants.ITEM,
-                    dso.getID());
-
+            new DSpace().getEventService().fireEvent(
+            		new UsageEvent(
+            				UsageEvent.Action.VIEW,
+            				request, 
+            				context, 
+            				dso));
+            
             // Only use last-modified if this is an anonymous access
             // - caching content that may be generated under authorisation
             //   is a security problem
@@ -198,9 +210,16 @@ public class HandleServlet extends DSpaceServlet
         {
             Collection c = (Collection) dso;
 
-            UsageEvent ue = new UsageEvent();
-            ue.fire(request, context, AbstractUsageEvent.VIEW,
-                    Constants.COLLECTION, dso.getID());
+            new DSpace().getEventService().fireEvent(
+            		new UsageEvent(
+            				UsageEvent.Action.VIEW,
+            				request, 
+            				context, 
+            				dso));
+            
+            //UsageEvent ue = new UsageEvent();
+            //ue.fire(request, context, AbstractUsageEvent.VIEW,
+            //        Constants.COLLECTION, dso.getID());
 
             // Store collection location in request
             request.setAttribute("dspace.collection", c);
@@ -237,9 +256,16 @@ public class HandleServlet extends DSpaceServlet
         {
             Community c = (Community) dso;
 
-            UsageEvent ue = new UsageEvent();
-            ue.fire(request, context, AbstractUsageEvent.VIEW,
-                    Constants.COMMUNITY, dso.getID());
+            new DSpace().getEventService().fireEvent(
+            		new UsageEvent(
+            				UsageEvent.Action.VIEW,
+            				request, 
+            				context, 
+            				dso));
+            
+            //UsageEvent ue = new UsageEvent();
+            //ue.fire(request, context, AbstractUsageEvent.VIEW,
+            //        Constants.COMMUNITY, dso.getID());
 
             // Store collection location in request
             request.setAttribute("dspace.community", c);

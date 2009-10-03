@@ -1,9 +1,7 @@
 /*
- * UsageEventXmlLogger.java
+ * Version: $Revision: $
  *
- * Version: $Revision$
- *
- * Date: $Date$
+ * Date: $Date: $
  *
  * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
@@ -49,41 +47,43 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 import org.dspace.core.ConfigurationManager;
+import org.dspace.services.model.Event;
 
 /**
- * Serialize AbstractUsageEvent data to a file as XML. Requires configuration:
- * in dspace.cfg specify the path to the file as the value of
- * {@code usageEvent.xmlLogger.file}.
+ * Serialize AbstractUsageEvent data to a file as Tab deliminated. Requires
+ * configuration:  in dspace.cfg specify the path to the file as the value of
+ * {@code usageEvent.tabFileLogger.file}.
  * 
  * @author Mark H. Wood
- * @version $Revision$
+ * @author Mark Diggory
+ * @version $Revision: 3734 $
  */
-public class UsageEventXMLLogger extends AbstractUsageEvent
+public class TabFileUsageEventListener extends AbstractUsageEventListener
 {
+	
     /** log4j category */
     private static Logger errorLog = Logger
-            .getLogger(UsageEventXMLLogger.class);
+            .getLogger(TabFileUsageEventListener.class);
 
     /** File on which to write event records */
-    private static PrintWriter log = null;
+    static PrintWriter log = null;
 
-    public UsageEventXMLLogger()
+    public TabFileUsageEventListener()
     {
-        super();
 
         if (null == log)
         {
             boolean appending;
 
             String logPath = ConfigurationManager
-                    .getProperty("usageEvent.xmlLogger.file");
+                    .getProperty("usageEvent.tabFileLogger.file");
             if (null == logPath)
             {
                 errorLog
-                        .error("UsageEventXMLLogger unconfigured, will not log events");
+                        .error("UsageEventTabFileLogger unconfigured, will not log events");
                 return;
             }
-            
+
             String logDir = null;
             if (!new File(logPath).isAbsolute())
                 logDir = ConfigurationManager.getProperty("log.dir");
@@ -99,44 +99,43 @@ public class UsageEventXMLLogger extends AbstractUsageEvent
             {
                 errorLog
                         .error(
-                                "UsageEventXMLLogger cannot open file, will not log events",
+                                "UsageEventTabFileLogger cannot open file, will not log events",
                                 e);
                 return;
             }
 
             if (!appending)
             {
-                log.println("<?xml version='1.0' ?>");
-                log.println("<usagelog>");
+                log.println("date event objectType objectId sessionId sourceAddress eperson");
             }
+            
         }
     }
+    
+    public void receiveEvent(Event event) {
+		System.out.println("got: " + event.toString());
+		if(event instanceof UsageEvent)
+		{
+			UsageEvent ue = (UsageEvent)event;
 
-    /**
-     * Serialize to a file
-     */
-    public void fire()
-    {
-        if (null == log)
-            return;
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "yyyyMMdd'T'HHmmssSSS");
-
-        log.print(" <event time='" + dateFormat.format(new Date()) + "'");
-        log.print(" type='" + new Integer(eventType) + "'");
-        log.print(" objectType='" + new Integer(objectType) + "'");
-        log.print(" objectID='" + new Integer(objectID) + "'");
-        log.print(">");
-
-        log.print("<session>" + sessionID + "</session>");
-
-        log.print("<source>" + sourceAddress + "</source>");
-
-        String epersonName = (null == eperson ? "" : eperson.getEmail());
-        log.print("<eperson>" + epersonName + "</eperson>");
-
-        log.println("</event>");
-        log.flush();
-    }
+			if (null == log)
+	            return;
+	
+	        SimpleDateFormat dateFormat = new SimpleDateFormat(
+	                "yyyyMMdd'T'HHmmssSSS");
+	
+	        String string = dateFormat.format(new Date());
+	        string += "\t" + ue.getName(); // event type
+	        string += "\t" + ue.getObject().getType();
+	        string += "\t" + ue.getObject().getID();
+	        string += "\t" + ue.getRequest().getSession().getId();
+	        string += "\t" + ue.getRequest().getRequestURI();
+	
+	        String epersonName = (null == ue.getContext().getCurrentUser() ? "anonymous" : ue.getContext().getCurrentUser().getEmail());
+	        string += "\t" + epersonName;
+	
+	        log.println(string);
+	        log.flush();
+		}
+	}
 }

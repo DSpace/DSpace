@@ -49,12 +49,13 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
+import org.dspace.app.statistics.UsageEvent;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.cocoon.DSpaceFeedGenerator;
+import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.utils.UsageEvent;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -72,6 +73,7 @@ import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
+import org.dspace.utils.DSpace;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -274,10 +276,6 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         Community community = (Community) dso;
         Community[] subCommunities = community.getSubcommunities();
         Collection[] collections = community.getCollections();
-        
-        new UsageEvent().fire((Request) ObjectModelHelper
-                .getRequest(objectModel), context, UsageEvent.VIEW,
-                Constants.ITEM, community.getID());
 
         // Build the community viewer division.
         Division home = body.addDivision("community-home", "primary repository community");
