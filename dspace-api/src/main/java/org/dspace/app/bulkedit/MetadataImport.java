@@ -548,7 +548,16 @@ public class MetadataImport
                     }
                 }
             }
-        }       
+        }
+
+        // Now check the owning_collection (item table) is the same as
+        // the first collection given in the CSV file entry
+        if ((change) && (!collections.get(0).equals(item.getOwningCollection().getHandle())))
+        {
+            Collection owner = (Collection)HandleManager.resolveToObject(c, collections.get(0));
+            item.setOwningCollection(Collection.find(c, owner.getID()));
+            item.update();
+        }
     }
 
     /**
