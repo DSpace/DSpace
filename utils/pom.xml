@@ -24,9 +24,9 @@
         below.
     -->
     <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-services/tags/dspace-services-2.0.0/utils</connection>
-        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-services/tags/dspace-services-2.0.0/utils</developerConnection>
-        <url>http://scm.dspace.org/svn/repo/modules/dspace-services/tags/dspace-services-2.0.0/utils</url>
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-services/trunk/utils</connection>
+        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-services/trunk/utils</developerConnection>
+        <url>http://scm.dspace.org/svn/repo/modules/dspace-services/trunk/utils</url>
     </scm>
 
     <repositories>

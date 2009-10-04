@@ -224,9 +224,9 @@
         below.
     -->
     <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-services/tags/dspace-services-2.0.0</connection>
-        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-services/tags/dspace-services-2.0.0</developerConnection>
-        <url>http://scm.dspace.org/svn/repo/modules/dspace-services/tags/dspace-services-2.0.0</url>
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-services/trunk</connection>
+        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-services/trunk</developerConnection>
+        <url>http://scm.dspace.org/svn/repo/modules/dspace-services/trunk</url>
     </scm>
     <!--
         Distribution Management is currently used by the Continuum
