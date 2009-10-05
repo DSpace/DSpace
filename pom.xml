@@ -4,7 +4,7 @@
 	<artifactId>dspace-solr</artifactId>
 	<packaging>war</packaging>
 	<name>DSpace Solr Service</name>
-	<version>2.0.0-SNAPSHOT</version>
+	<version>2.0.0-alpha</version>
 	<description>A bare bones deployment of Solr for use in DSpace applications</description>
 
 	<repositories>
@@ -30,9 +30,9 @@
 		releases snapshots into the snapshot repository below.
 	-->
 	<scm>
-		<connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-solr/trunk</connection>
-		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk</developerConnection>
-		<url>http://scm.dspace.org/svn/repo/modules/dspace-solr/trunk</url>
+		<connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-2.0.0-alpha</connection>
+		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-2.0.0-alpha</developerConnection>
+		<url>http://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-2.0.0-alpha</url>
 	</scm>
 
 	<licenses>
@@ -114,7 +114,7 @@
 		</developer>
 	</developers>
    
-    <contributors/>
+    <contributors />
 
 	<build>
 		<plugins>
