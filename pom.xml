@@ -4,7 +4,7 @@
 	<artifactId>dspace-solr</artifactId>
 	<packaging>war</packaging>
 	<name>DSpace Solr Service</name>
-	<version>1.1-SNAPSHOT</version>
+	<version>2.0.0-SNAPSHOT</version>
 	<description>A bare bones deployment of Solr for use in DSpace applications</description>
 
 	<repositories>
@@ -65,6 +65,11 @@
 			<url> scp://projects.dspace.org/var/www/projects.dspace.org/htdocs/${artifactId}</url>
 		</site>
 	</distributionManagement>
+	<parent>
+		<artifactId>dspace-pom</artifactId>
+		<groupId>org.dspace</groupId>
+		<version>1</version>
+	</parent>
 
 	<developers>
 		<developer>
@@ -269,11 +274,6 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>1.5.8</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
-			<version>2.5.6</version>
 		</dependency>
 	</dependencies>
 
