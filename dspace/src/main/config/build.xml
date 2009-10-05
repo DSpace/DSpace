@@ -399,6 +399,10 @@ Common usage:
             <fileset dir="etc" />
         </copy>
 
+    	<copy todir="${dspace.dir}/solr" preservelastmodified="true">
+    	     <fileset dir="solr"/>
+    	</copy>
+    	
         <echo>
 ====================================================================
  ${dspace.dir}/bin was backed up to
@@ -524,6 +528,9 @@ Common usage:
             <fileset dir="${dspace.dir}/webapps/sword/" />
         </war>
 
+    	<war destfile="${dspace.dir}/webapps/solr.war">
+    	            <fileset dir="${dspace.dir}/webapps/solr/" />
+    	</war>
     </target>
 
 
@@ -557,6 +564,8 @@ Common usage:
 
         <mkdir dir="${report.dir}" />
 
+    	<mkdir dir="${dspace.dir}/solr" />
+    	
     </target>
 
 
@@ -696,6 +705,14 @@ Common usage:
             <fileset dir="etc" />
         </copy>
 
+    	<delete failonerror="no">
+    	            <fileset dir="${dspace.dir}/etc" includes="**/*" />
+    	        </delete>
+
+    	<copy todir="${dspace.dir}/solr" preservelastmodified="true">
+    	    <fileset dir="solr" />
+    	</copy>
+    	
         <delete failonerror="no">
             <fileset dir="${dspace.dir}/webapps" includes="**/*" />
         </delete>

@@ -22,7 +22,8 @@
 				<include>config/**</include>
 				<include>docs/**</include>
 				<include>etc/**</include>
-				<include>build.xml</include>
+				<include>solr/**</include>
+                <include>build.xml</include>
 				<include>LICENSE*</include>
 				<include>CHANGES</include>
 				<include>KNOWN_BUGS</include>
