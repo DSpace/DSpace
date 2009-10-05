@@ -41,6 +41,7 @@
 		<module>oai</module>
 		<module>jspui</module>
 		<module>sword</module>
+		<module>solr</module>
 	</modules>
 	
 </project>
