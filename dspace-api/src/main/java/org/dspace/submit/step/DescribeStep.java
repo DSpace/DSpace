@@ -70,14 +70,14 @@ import org.dspace.submit.AbstractProcessingStep;
  * DSpace.
  * <P>
  * This class performs all the behind-the-scenes processing that
- * this particular step requires.  This class's methods are utilized 
+ * this particular step requires.  This class's methods are utilized
  * by both the JSP-UI and the Manakin XML-UI
  * <P>
- * 
+ *
  * @see org.dspace.app.util.SubmissionConfig
  * @see org.dspace.app.util.SubmissionStepConfig
  * @see org.dspace.submit.AbstractProcessingStep
- * 
+ *
  * @author Tim Donohue
  * @version $Revision$
  */
@@ -92,7 +92,7 @@ public class DescribeStep extends AbstractProcessingStep
     /***************************************************************************
      * STATUS / ERROR FLAGS (returned by doProcessing() if an error occurs or
      * additional user interaction may be required)
-     * 
+     *
      * (Do NOT use status of 0, since it corresponds to STATUS_COMPLETE flag
      * defined in the JSPStepManager class)
      **************************************************************************/
@@ -124,7 +124,7 @@ public class DescribeStep extends AbstractProcessingStep
      * <P>
      * NOTE: If this step is a non-interactive step (i.e. requires no UI), then
      * it should perform *all* of its processing in this method!
-     * 
+     *
      * @param context
      *            current DSpace context
      * @param request
@@ -274,6 +274,11 @@ public class DescribeStep extends AbstractProcessingStep
                 subInfo.setJumpToField(fieldName);
                 moreInput = true;
             }
+            // was XMLUI's "remove" button pushed?
+            else if (buttonPressed.equals("submit_" + fieldName + "_delete"))
+            {
+                subInfo.setJumpToField(fieldName);
+            }
         }
 
         // Step 3:
@@ -336,12 +341,12 @@ public class DescribeStep extends AbstractProcessingStep
      * Steps which are non-interactive (i.e. they do not display an interface to
      * the user) should return a value of 1, so that they are only processed
      * once!
-     * 
+     *
      * @param request
      *            The HTTP Request
      * @param subInfo
      *            The current submission information object
-     * 
+     *
      * @return the number of pages in this step
      */
     public int getNumberOfPages(HttpServletRequest request,
@@ -367,7 +372,7 @@ public class DescribeStep extends AbstractProcessingStep
     }
 
     /**
-     * 
+     *
      * @return the current DCInputsReader
      */
     public static DCInputsReader getInputsReader() throws ServletException
@@ -385,7 +390,7 @@ public class DescribeStep extends AbstractProcessingStep
     /**
      * @param filename
      *        file to get the input reader for
-     * @return the current DCInputsReader 
+     * @return the current DCInputsReader
      */
     public static DCInputsReader getInputsReader(String filename) throws ServletException
     {
@@ -403,7 +408,7 @@ public class DescribeStep extends AbstractProcessingStep
        language = ConfigurationManager.getProperty("default.language");
        if (language == null || language == "")
        {
-    	   language = "en";
+           language = "en";
        }
        return language;
     }
@@ -419,28 +424,28 @@ public class DescribeStep extends AbstractProcessingStep
      * Some fields are repeatable in the form. If this is the case, and the
      * field is "dc.contributor.author", the names in the request will be from
      * the fields as follows:
-     * 
+     *
      * dc_contributor_author_last -> last name of first author
      * dc_contributor_author_first -> first name(s) of first author
      * dc_contributor_author_last_1 -> last name of second author
      * dc_contributor_author_first_1 -> first name(s) of second author
-     * 
+     *
      * and so on. If the field is unqualified:
-     * 
+     *
      * dc_contributor_last -> last name of first contributor
      * dc_contributor_first -> first name(s) of first contributor
-     * 
+     *
      * If the parameter "submit_dc_contributor_author_remove_n" is set, that
      * value is removed.
-     * 
+     *
      * Otherwise the parameters are of the form:
-     * 
+     *
      * dc_contributor_author_last dc_contributor_author_first
-     * 
+     *
      * The values will be put in separate DCValues, in the form "last name,
      * first name(s)", ordered as they appear in the list. These will replace
      * any existing values.
-     * 
+     *
      * @param request
      *            the request object
      * @param item
@@ -544,20 +549,20 @@ public class DescribeStep extends AbstractProcessingStep
     /**
      * Fill out an item's metadata values from a plain standard text field. If
      * the field isn't repeatable, the input field name is called:
-     * 
+     *
      * element_qualifier
-     * 
+     *
      * or for an unqualified element:
-     * 
+     *
      * element
-     * 
+     *
      * Repeated elements are appended with an underscore then an integer. e.g.:
-     * 
+     *
      * dc_title_alternative dc_title_alternative_1
-     * 
+     *
      * The values will be put in separate DCValues, ordered as they appear in
      * the list. These will replace any existing values.
-     * 
+     *
      * @param request
      *            the request object
      * @param item
@@ -631,12 +636,12 @@ public class DescribeStep extends AbstractProcessingStep
     /**
      * Fill out a metadata date field with the value from a form. The date is
      * taken from the three parameters:
-     * 
+     *
      * element_qualifier_year element_qualifier_month element_qualifier_day
-     * 
+     *
      * The granularity is determined by the values that are actually set. If the
      * year isn't set (or is invalid)
-     * 
+     *
      * @param request
      *            the request object
      * @param item
@@ -680,22 +685,22 @@ public class DescribeStep extends AbstractProcessingStep
      * form. Some fields are repeatable in the form. If this is the case, and
      * the field is "relation.ispartof", the names in the request will be from
      * the fields as follows:
-     * 
+     *
      * dc_relation_ispartof_series dc_relation_ispartof_number
      * dc_relation_ispartof_series_1 dc_relation_ispartof_number_1
-     * 
+     *
      * and so on. If the field is unqualified:
-     * 
+     *
      * dc_relation_series dc_relation_number
-     * 
+     *
      * Otherwise the parameters are of the form:
-     * 
+     *
      * dc_relation_ispartof_series dc_relation_ispartof_number
-     * 
+     *
      * The values will be put in separate DCValues, in the form "last name,
      * first name(s)", ordered as they appear in the list. These will replace
      * any existing values.
-     * 
+     *
      * @param request
      *            the request object
      * @param item
@@ -782,7 +787,7 @@ public class DescribeStep extends AbstractProcessingStep
      * <P>
      * This method can also handle "composite fields" (metadata fields which may
      * require multiple params, etc. a first name and last name).
-     * 
+     *
      * @param request
      *            the HTTP request containing the form information
      * @param metadataField
@@ -790,7 +795,7 @@ public class DescribeStep extends AbstractProcessingStep
      * @param param
      *            the repeated parameter on the page (used to fill out the
      *            metadataField)
-     * 
+     *
      * @return a List of Strings
      */
     protected List getRepeatedParameter(HttpServletRequest request,
@@ -857,7 +862,7 @@ public class DescribeStep extends AbstractProcessingStep
 
     /**
      * Return the HTML / DRI field name for the given input.
-     * 
+     *
      * @param input
      * @return
      */
