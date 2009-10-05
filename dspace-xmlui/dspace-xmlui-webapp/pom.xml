@@ -69,11 +69,11 @@
    </build>
 
    <profiles>
-      <!-- 
+      <!--
          when activated a dspace.config configuration
-         file location passed on the commandline 
-         (-Ddspace.config=...) can be passed through 
-         to be used as a filter source by projects for 
+         file location passed on the commandline
+         (-Ddspace.config=...) can be passed through
+         to be used as a filter source by projects for
          tasks such as updating the ${dspace.dir} in
          web.xml etc.
       -->
@@ -128,6 +128,12 @@
          <artifactId>dspace-xmlui-api</artifactId>
       </dependency>
 
+      <!-- Shared JS code for Choice/Authority control -->
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-ui-shared</artifactId>
+         <type>war</type>
+      </dependency>
    </dependencies>
 
 </project>

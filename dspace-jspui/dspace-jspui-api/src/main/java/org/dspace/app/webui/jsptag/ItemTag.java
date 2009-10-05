@@ -65,6 +65,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
@@ -547,10 +548,24 @@ public class ItemTag extends TagSupport
                         }
                         else if (browseIndex != null)
                         {
-                            out.print("<a href=\"" + request.getContextPath() + "/browse?type=" + browseIndex + "&amp;value="
-                                        + URLEncoder.encode(values[j].value, "UTF-8") + "\">" + Utils.addEntities(values[j].value)
-                                        + "</a>");
-                        }
+	                        String argument, value;
+	                        if ( values[j].authority != null &&
+	                                            values[j].confidence >= MetadataAuthorityManager.getManager()
+	                                                .getMinConfidence( values[j].schema,  values[j].element,  values[j].qualifier))
+	                        {
+	                            argument = "authority";
+	                            value = values[j].authority;
+	                        }
+	                        else
+	                        {
+	                            argument = "value";
+	                            value = values[j].value;
+	                        }
+	                    	out.print("<a class=\"" + ("authority".equals(argument)?"authority ":"") + browseIndex + "\""
+	                                                + "href=\"" + request.getContextPath() + "/browse?type=" + browseIndex + "&amp;" + argument + "="
+	                    				+ URLEncoder.encode(value, "UTF-8") + "\">" + Utils.addEntities(values[j].value)
+	                    				+ "</a>");
+	                    }
                         else
                         {
                             out.print(Utils.addEntities(values[j].value));

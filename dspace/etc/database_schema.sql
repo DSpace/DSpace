@@ -6,22 +6,22 @@
 -- Date:    $Date$
 --
 -- Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
--- 
+--
 -- Redistribution and use in source and binary forms, with or without
 -- modification, are permitted provided that the following conditions are
 -- met:
--- 
+--
 -- - Redistributions of source code must retain the above copyright
 -- notice, this list of conditions and the following disclaimer.
--- 
+--
 -- - Redistributions in binary form must reproduce the above copyright
 -- notice, this list of conditions and the following disclaimer in the
 -- documentation and/or other materials provided with the distribution.
--- 
+--
 -- - Neither the name of the DSpace Foundation nor the names of its
 -- contributors may be used to endorse or promote products derived from
 -- this software without specific prior written permission.
--- 
+--
 -- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 -- ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 -- LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -175,7 +175,7 @@ CREATE TABLE EPerson
   self_registered     BOOL,
   last_active         TIMESTAMP,
   sub_frequency       INTEGER,
-  phone	              VARCHAR(32),
+  phone               VARCHAR(32),
   netid               VARCHAR(64),
   language            VARCHAR(64)
 );
@@ -248,8 +248,8 @@ CREATE INDEX item_submitter_fk_idx ON Item(submitter_id);
 CREATE TABLE Bundle
 (
   bundle_id          INTEGER PRIMARY KEY,
-  name               VARCHAR(16),  -- ORIGINAL | THUMBNAIL | TEXT 
-  primary_bitstream_id	INTEGER REFERENCES Bitstream(bitstream_id)
+  name               VARCHAR(16),  -- ORIGINAL | THUMBNAIL | TEXT
+  primary_bitstream_id  INTEGER REFERENCES Bitstream(bitstream_id)
 );
 
 CREATE INDEX bundle_primary_fk_idx ON Bundle(primary_bitstream_id);
@@ -310,7 +310,9 @@ CREATE TABLE MetadataValue
   metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
   text_value         TEXT,
   text_lang          VARCHAR(24),
-  place              INTEGER
+  place              INTEGER,
+  authority          VARCHAR(100),
+  confidence         INTEGER DEFAULT -1
 );
 
 -- Create a dcvalue view for backwards compatibilty
@@ -441,7 +443,7 @@ CREATE TABLE ResourcePolicy
 
 -- index by resource_type,resource_id - all queries by
 -- authorization manager are select type=x, id=y, action=z
-CREATE INDEX resourcepolicy_type_id_idx ON ResourcePolicy(resource_type_id,resource_id); 
+CREATE INDEX resourcepolicy_type_id_idx ON ResourcePolicy(resource_type_id,resource_id);
 
 CREATE INDEX rp_eperson_fk_idx ON ResourcePolicy(eperson_id);
 CREATE INDEX rp_epersongroup_fk_idx ON ResourcePolicy(epersongroup_id);
@@ -526,9 +528,9 @@ CREATE INDEX workflow_owner_fk_idx ON WorkflowItem(owner);
 -------------------------------------------------------
 CREATE TABLE TasklistItem
 (
-  tasklist_id	INTEGER PRIMARY KEY,
-  eperson_id	INTEGER REFERENCES EPerson(eperson_id),
-  workflow_id	INTEGER REFERENCES WorkflowItem(workflow_id)
+  tasklist_id   INTEGER PRIMARY KEY,
+  eperson_id    INTEGER REFERENCES EPerson(eperson_id),
+  workflow_id   INTEGER REFERENCES WorkflowItem(workflow_id)
 );
 
 CREATE INDEX tasklist_eperson_fk_idx ON TasklistItem(eperson_id);
@@ -542,7 +544,7 @@ CREATE TABLE RegistrationData
   registrationdata_id   INTEGER PRIMARY KEY,
   email                 VARCHAR(64) UNIQUE,
   token                 VARCHAR(48),
-  expires		TIMESTAMP
+  expires               TIMESTAMP
 );
 
 
@@ -564,7 +566,7 @@ CREATE INDEX subs_collection_fk_idx ON Subscription(collection_id);
 -- EPersonGroup2WorkspaceItem table
 -------------------------------------------------------------------------------
 
-CREATE TABLE epersongroup2workspaceitem 
+CREATE TABLE epersongroup2workspaceitem
 (
   id integer DEFAULT nextval('epersongroup2workspaceitem_seq'),
   eperson_group_id integer REFERENCES EPersonGroup(eperson_group_id),
@@ -598,7 +600,7 @@ CREATE INDEX Comm2Item_community_fk_idx ON Communities2Item( community_id );
 -- Community2Item view
 ------------------------------------------------------
 CREATE VIEW Community2Item as
-SELECT Community2Collection.community_id, Collection2Item.item_id 
+SELECT Community2Collection.community_id, Collection2Item.item_id
 FROM Community2Collection, Collection2Item
 WHERE Collection2Item.collection_id   = Community2Collection.collection_id
 ;
@@ -608,13 +610,13 @@ WHERE Collection2Item.collection_id   = Community2Collection.collection_id
 -------------------------------------------------------------------------
 
 CREATE TABLE collection_item_count (
-	collection_id INTEGER PRIMARY KEY REFERENCES collection(collection_id),
-	count INTEGER
+        collection_id INTEGER PRIMARY KEY REFERENCES collection(collection_id),
+        count INTEGER
 );
 
 CREATE TABLE community_item_count (
-	community_id INTEGER PRIMARY KEY REFERENCES community(community_id),
-	count INTEGER
+        community_id INTEGER PRIMARY KEY REFERENCES community(community_id),
+        count INTEGER
 );
 
 -------------------------------------------------------
@@ -645,7 +647,7 @@ CREATE TABLE checksum_results
 -- that row will be updated every time the checksum is
 -- re-calculated.
 
-CREATE TABLE most_recent_checksum 
+CREATE TABLE most_recent_checksum
 (
     bitstream_id INTEGER PRIMARY KEY REFERENCES bitstream(bitstream_id),
     to_be_processed BOOLEAN NOT NULL,
@@ -663,9 +665,9 @@ CREATE INDEX mrc_result_fk_idx ON most_recent_checksum( result );
 -- A row will be inserted into this table every
 -- time a checksum is re-calculated.
 
-CREATE TABLE checksum_history 
+CREATE TABLE checksum_history
 (
-    check_id BIGSERIAL PRIMARY KEY,  
+    check_id BIGSERIAL PRIMARY KEY,
     bitstream_id INTEGER,
     process_start_date TIMESTAMP,
     process_end_date TIMESTAMP,
@@ -678,68 +680,68 @@ CREATE INDEX ch_result_fk_idx ON checksum_history( result );
 
 
 -- this will insert into the result code
--- the initial results that should be 
+-- the initial results that should be
 -- possible
 
 insert into checksum_results
 values
-( 
+(
     'INVALID_HISTORY',
-    'Install of the cheksum checking code do not consider this history as valid' 
+    'Install of the cheksum checking code do not consider this history as valid'
 );
 
 insert into checksum_results
 values
-( 
+(
     'BITSTREAM_NOT_FOUND',
-    'The bitstream could not be found' 
+    'The bitstream could not be found'
 );
 
 insert into checksum_results
 values
-( 
+(
     'CHECKSUM_MATCH',
-    'Current checksum matched previous checksum' 
+    'Current checksum matched previous checksum'
 );
 
 insert into checksum_results
 values
 (
     'CHECKSUM_NO_MATCH',
-    'Current checksum does not match previous checksum' 
+    'Current checksum does not match previous checksum'
 );
 
 insert into checksum_results
 values
-( 
+(
     'CHECKSUM_PREV_NOT_FOUND',
-    'Previous checksum was not found: no comparison possible' 
+    'Previous checksum was not found: no comparison possible'
 );
 
 insert into checksum_results
 values
-( 
+(
     'BITSTREAM_INFO_NOT_FOUND',
-    'Bitstream info not found' 
+    'Bitstream info not found'
 );
 
 insert into checksum_results
 values
-( 
+(
     'CHECKSUM_ALGORITHM_INVALID',
-    'Invalid checksum algorithm' 
+    'Invalid checksum algorithm'
 );
 insert into checksum_results
 values
-( 
+(
     'BITSTREAM_NOT_PROCESSED',
-    'Bitstream marked to_be_processed=false' 
+    'Bitstream marked to_be_processed=false'
 );
 insert into checksum_results
 values
-( 
+(
     'BITSTREAM_MARKED_DELETED',
-    'Bitstream marked deleted in bitstream table' 
+    'Bitstream marked deleted in bitstream table'
 );
 
 
@@ -776,6 +778,7 @@ CREATE TABLE harvested_item
 );
 
 CREATE INDEX harvested_item_fk_idx ON harvested_item(item_id);
+
 
 
 

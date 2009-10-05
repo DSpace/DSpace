@@ -51,6 +51,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
+import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.aspect.submission.FlowUtils;
@@ -61,7 +62,10 @@ import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Composite;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.Field;
+import org.dspace.app.xmlui.wing.element.Instance;
 import org.dspace.app.xmlui.wing.element.List;
+import org.dspace.app.xmlui.wing.element.PageMeta;
+import org.dspace.app.xmlui.wing.element.Params;
 import org.dspace.app.xmlui.wing.element.Radio;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
@@ -74,7 +78,10 @@ import org.dspace.content.DCPersonName;
 import org.dspace.content.DCSeriesNumber;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-
+import org.dspace.content.authority.MetadataAuthorityManager;
+import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.content.authority.Choice;
+import org.dspace.content.authority.Choices;
 
 import org.xml.sax.SAXException;
 
@@ -128,7 +135,7 @@ public class DescribeStep extends AbstractSubmissionStep
      * Ensure that the inputs reader has been initialized, this method may be
      * called multiple times with no ill-effect.
      */
-    private static void initializeInputsReader() throws ServletException
+    private static void initializeInputsReader() throws DCInputsReaderException
     {
         if (INPUTS_READER == null)
             INPUTS_READER = new DCInputsReader();
@@ -155,12 +162,22 @@ public class DescribeStep extends AbstractSubmissionStep
                 this.requireStep = true;
                 
                 //Ensure that the InputsReader is initialized.
-                initializeInputsReader();
+                try
+                {
+                    initializeInputsReader();
+                }
+                catch (DCInputsReaderException e)
+                {
+                    throw new ServletException(e);
+                }
         }
         
         public void addPageMeta(PageMeta pageMeta) throws SAXException, WingException,
         UIException, SQLException, IOException, AuthorizeException
         {
+            int collectionID = submission.getCollection().getID();
+            pageMeta.addMetadata("choice", "collection").addContent(String.valueOf(collectionID));
+
             String jumpTo = submissionInfo.getJumpToField();
             if (jumpTo != null)
                 pageMeta.addMetadata("page","jumpTo").addContent(jumpTo);
@@ -181,7 +198,7 @@ public class DescribeStep extends AbstractSubmissionStep
                         inputSet = getInputsReader().getInputs(submission.getCollection().getHandle());
                         inputs = inputSet.getPageRows(getPage()-1, submission.hasMultipleTitles(), submission.isPublishedBefore());
                 }
-                catch (ServletException se)
+                catch (DCInputsReaderException se)
                 {
                         throw new UIException(se);
                 }
@@ -212,9 +229,18 @@ public class DescribeStep extends AbstractSubmissionStep
                         DCValue[] dcValues = item.getMetadata(schema, element, qualifier, Item.ANY);
 
                         String fieldName = FlowUtils.getFieldName(dcInput);
-
                         String inputType = dcInput.getInputType();
-                        if (inputType.equals("name"))
+
+                        // if this field is configured as choice control and its
+                        // presentation format is SELECT, render it as select field:
+                        String fieldKey = MetadataAuthorityManager.makeFieldKey(schema, element, qualifier);
+                        ChoiceAuthorityManager cmgr = ChoiceAuthorityManager.getManager();
+                        if (cmgr.isChoicesConfigured(fieldKey) &&
+                            Params.PRESENTATION_SELECT.equals(cmgr.getPresentation(fieldKey)))
+                        {
+                                renderChoiceSelectField(form, fieldName, collection, dcInput, dcValues, readonly);
+                        }
+                        else if (inputType.equals("name"))
                         {
                                 renderNameField(form, fieldName, dcInput, dcValues, readonly);
                         }
@@ -311,11 +337,12 @@ public class DescribeStep extends AbstractSubmissionStep
         {
             inputSet = getInputsReader().getInputs(submission.getCollection().getHandle());
         }
-        catch (ServletException se)
+        catch (DCInputsReaderException se)
         {
             throw new UIException(se);
         }
         
+        MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
         DCInput[] inputs = inputSet.getPageRows(getPage()-1, submission.hasMultipleTitles(), submission.isPublishedBefore());
 
         for (DCInput input : inputs)
@@ -369,7 +396,18 @@ public class DescribeStep extends AbstractSubmissionStep
                     //Only display this field if we have a value to display
                     if (displayValue!=null && displayValue.length()>0)
                     {
+
                         describeSection.addLabel(input.getLabel());
+                        if (mam.isAuthorityControlled(value.schema, value.element, value.qualifier))
+                        {
+                            String confidence = (value.authority != null && value.authority.length() > 0) ?
+                                Choices.getConfidenceText(value.confidence).toLowerCase() :
+                                "blank";
+                            org.dspace.app.xmlui.wing.element.Item authItem =
+                                describeSection.addItem("submit-review-field-with-authority", "ds-authority-confidence cf-"+confidence);
+                            authItem.addContent(displayValue);
+                        }
+                        else
                         describeSection.addItem(displayValue);
                     }
                 } // For each DCValue
@@ -414,6 +452,19 @@ public class DescribeStep extends AbstractSubmissionStep
                         fullName.enableAddOperation();
                 if ((dcInput.isRepeatable() || dcValues.length > 1)  && !readonly)
                         fullName.enableDeleteOperation();
+                String fieldKey = MetadataAuthorityManager.makeFieldKey(dcInput.getSchema(), dcInput.getElement(), dcInput.getQualifier());
+                boolean isAuthorityControlled = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
+                if (isAuthorityControlled)
+                {
+                    fullName.setAuthorityControlled();
+                    fullName.setAuthorityRequired(MetadataAuthorityManager.getManager().isAuthorityRequired(fieldKey));
+                }
+                if (ChoiceAuthorityManager.getManager().isChoicesConfigured(fieldKey))
+                {
+                    fullName.setChoices(fieldKey);
+                    fullName.setChoicesPresentation(ChoiceAuthorityManager.getManager().getPresentation(fieldKey));
+                    fullName.setChoicesClosed(ChoiceAuthorityManager.getManager().isClosed(fieldKey));
+                }
 
                 // Setup the first and last name
                 lastName.setLabel(T_last_name_help);
@@ -435,8 +486,16 @@ public class DescribeStep extends AbstractSubmissionStep
                 
                                 lastName.addInstance().setValue(dpn.getLastName());
                                 firstName.addInstance().setValue(dpn.getFirstNames());
-                                fullName.addInstance().setValue(dcValue.value);
+                                Instance fi = fullName.addInstance();
+                                fi.setValue(dcValue.value);
+                                if (isAuthorityControlled)
+                                {
+                                    if (dcValue.authority == null || dcValue.authority.equals(""))
+                                        fi.setAuthorityValue("", "blank");
+                                    else
+                                        fi.setAuthorityValue(dcValue.authority, Choices.getConfidenceText(dcValue.confidence));
                         }
+                }
                 }
                 else if (dcValues.length == 1)
                 {
@@ -444,7 +503,14 @@ public class DescribeStep extends AbstractSubmissionStep
                 
                         lastName.setValue(dpn.getLastName());
                         firstName.setValue(dpn.getFirstNames());
+                        if (isAuthorityControlled)
+                        {
+                            if (dcValues[0].authority == null || dcValues[0].authority.equals(""))
+                                lastName.setAuthorityValue("", "blank");
+                            else
+                                lastName.setAuthorityValue(dcValues[0].authority, Choices.getConfidenceText(dcValues[0].confidence));
                 }
+        }
         }
         
         /**
@@ -694,6 +760,19 @@ public class DescribeStep extends AbstractSubmissionStep
                 // Setup the text area
                 textArea.setLabel(dcInput.getLabel());
                 textArea.setHelp(cleanHints(dcInput.getHints()));
+                String fieldKey = MetadataAuthorityManager.makeFieldKey(dcInput.getSchema(), dcInput.getElement(), dcInput.getQualifier());
+                boolean isAuth = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
+                if (isAuth)
+                {
+                    textArea.setAuthorityControlled();
+                    textArea.setAuthorityRequired(MetadataAuthorityManager.getManager().isAuthorityRequired(fieldKey));
+                }
+                if (ChoiceAuthorityManager.getManager().isChoicesConfigured(fieldKey))
+                {
+                    textArea.setChoices(fieldKey);
+                    textArea.setChoicesPresentation(ChoiceAuthorityManager.getManager().getPresentation(fieldKey));
+                    textArea.setChoicesClosed(ChoiceAuthorityManager.getManager().isClosed(fieldKey));
+                }
                 if (dcInput.isRequired())
                         textArea.setRequired();
                 if (isFieldInError(fieldName))
@@ -713,15 +792,90 @@ public class DescribeStep extends AbstractSubmissionStep
                 {
                         for (DCValue dcValue : dcValues)
                         {
-                                textArea.addInstance().setValue(dcValue.value);
+                                Instance ti = textArea.addInstance();
+                                ti.setValue(dcValue.value);
+                                if (isAuth)
+                                {
+                                    if (dcValue.authority == null || dcValue.authority.equals(""))
+                                        ti.setAuthorityValue("", "blank");
+                                    else
+                                        ti.setAuthorityValue(dcValue.authority, Choices.getConfidenceText(dcValue.confidence));
                         }
+                }
                 }
                 else if (dcValues.length == 1)
                 {
                         textArea.setValue(dcValues[0].value);
+                        if (isAuth)
+                        {
+                            if (dcValues[0].authority == null || dcValues[0].authority.equals(""))
+                                textArea.setAuthorityValue("", "blank");
+                            else
+                                textArea.setAuthorityValue(dcValues[0].authority, Choices.getConfidenceText(dcValues[0].confidence));
                 }
         }
+        }
         
+        /**
+         * Render a dropdown field for a choice-controlled input of the
+         * 'select' presentation  to the DRI document. The dropdown field
+         * consists of an HTML select box.
+         *
+         * @param form
+         *                      The form list to add the field too
+         * @param fieldName
+         *                      The field's name.
+         * @param dcInput
+         *                      The field's input deffinition
+         * @param dcValues
+         *                      The field's pre-existing values.
+         */
+        private void renderChoiceSelectField(List form, String fieldName, Collection coll, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
+        {
+                String fieldKey = MetadataAuthorityManager.makeFieldKey(dcInput.getSchema(), dcInput.getElement(), dcInput.getQualifier());
+                if (MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey))
+                    throw new WingException("Field "+fieldKey+" has choice presentation of type \""+Params.PRESENTATION_SELECT+"\", it may NOT be authority-controlled.");
+
+                // Plain old select list.
+                Select select = form.addItem().addSelect(fieldName,"submit-select");
+
+                //Setup the select field
+                select.setLabel(dcInput.getLabel());
+                select.setHelp(cleanHints(dcInput.getHints()));
+                if (dcInput.isRequired())
+                        select.setRequired();
+                if (isFieldInError(fieldName))
+                        select.addError(T_required_field);
+                if (dcInput.isRepeatable() || dcValues.length > 1)
+                {
+                        // Use the multiple functionality from the HTML
+                        // widget instead of DRI's version.
+                        select.setMultiple();
+                        select.setSize(6);
+                }
+                else
+                        select.setSize(1);
+
+                if (readonly)
+                {
+                    select.setDisabled();
+                }
+
+                Choices cs = ChoiceAuthorityManager.getManager().getMatches(fieldKey, "", coll.getID(), 0, 0, null);
+                if (dcValues.length == 0)
+                    select.addOption(true, "", "");
+                for (Choice c : cs.values)
+                {
+                    select.addOption(c.value, c.label);
+                }
+
+                // Setup the field's pre-selected values
+                for (DCValue dcValue : dcValues)
+                {
+                        select.setOptionSelected(dcValue.value);
+                }
+        }
+
         /**
          * Render a dropdown field to the DRI document. The dropdown field consists
          * of an HTML select box.
@@ -879,6 +1033,20 @@ public class DescribeStep extends AbstractSubmissionStep
                 // Setup the select field
                 text.setLabel(dcInput.getLabel());
                 text.setHelp(cleanHints(dcInput.getHints()));
+                String fieldKey = MetadataAuthorityManager.makeFieldKey(dcInput.getSchema(), dcInput.getElement(), dcInput.getQualifier());
+                boolean isAuth = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
+                if (isAuth)
+                {
+                    text.setAuthorityControlled();
+                    text.setAuthorityRequired(MetadataAuthorityManager.getManager().isAuthorityRequired(fieldKey));
+                }
+                if (ChoiceAuthorityManager.getManager().isChoicesConfigured(fieldKey))
+                {
+                    text.setChoices(fieldKey);
+                    text.setChoicesPresentation(ChoiceAuthorityManager.getManager().getPresentation(fieldKey));
+                    text.setChoicesClosed(ChoiceAuthorityManager.getManager().isClosed(fieldKey));
+                }
+
                 if (dcInput.isRequired())
                         text.setRequired();
                 if (isFieldInError(fieldName))
@@ -898,13 +1066,28 @@ public class DescribeStep extends AbstractSubmissionStep
                 {
                         for (DCValue dcValue : dcValues)
                         {
-                                text.addInstance().setValue(dcValue.value);
+                                Instance ti = text.addInstance();
+                                ti.setValue(dcValue.value);
+                                if (isAuth)
+                                {
+                                    if (dcValue.authority == null || dcValue.authority.equals(""))
+                                        ti.setAuthorityValue("", "blank");
+                                    else
+                                        ti.setAuthorityValue(dcValue.authority, Choices.getConfidenceText(dcValue.confidence));
                         }
+                }
                 }
                 else if (dcValues.length == 1)
                 {
                         text.setValue(dcValues[0].value);
+                        if (isAuth)
+                        {
+                            if (dcValues[0].authority == null || dcValues[0].authority.equals(""))
+                                text.setAuthorityValue("", "blank");
+                            else
+                                text.setAuthorityValue(dcValues[0].authority, Choices.getConfidenceText(dcValues[0].confidence));
                 }
+        }
         }
         
         

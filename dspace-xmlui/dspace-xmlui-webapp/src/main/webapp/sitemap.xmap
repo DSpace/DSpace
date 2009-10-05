@@ -51,6 +51,8 @@
 			<map:generator name="OpenSearchGenerator" src="org.dspace.app.xmlui.cocoon.OpenSearchGenerator"/>
 			<map:generator name="notifying" src="org.apache.cocoon.sitemap.NotifyingGenerator"/>
 			<map:generator name="exception" src="org.apache.cocoon.generation.ExceptionGenerator"/>
+                        <map:generator name="AJAXMenuGenerator"
+                             src="org.dspace.app.xmlui.cocoon.AJAXMenuGenerator"/>
 		</map:generators>
 		<map:serializers default="xml">
 			<map:serializer logger="sitemap.serializer.xml" mime-type="text/xml; charset=utf-8" name="xml"
@@ -298,6 +300,25 @@
 			
 		</map:pipeline>
 		
+                <!-- new AJAX menu (choices) responses for metadata authority control -->
+                <map:pipeline type="noncaching">
+                  <map:match pattern="choices/*">
+                      <map:act type="locale"/>
+                      <!-- XXX bug: how do we get this locale into a parameter? -->
+                        <map:generate type="AJAXMenuGenerator">
+                          <map:parameter name="field" value="{1}"/>
+                          <map:parameter name="query" value="{request-param:query}"/>
+                          <map:parameter name="collection" value="{request-param:collection}"/>
+                          <map:parameter name="start" value="{request-param:start}"/>
+                          <map:parameter name="limit" value="{request-param:limit}"/>
+                          <map:parameter name="format" value="{request-param:format}"/>
+                          <map:parameter name="locale" value="{request-param:locale}"/>
+                        </map:generate>
+                        <map:serialize type="xml"/>
+                     <!-- </map:match>
+                         -->
+                  </map:match>
+                </map:pipeline>
 		
 		
 		

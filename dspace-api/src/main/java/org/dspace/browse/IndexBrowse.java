@@ -54,6 +54,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.Context;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
@@ -437,13 +439,53 @@ public class IndexBrowse
                                     }
                                     else
                                     {
+                                        if (bis[i].isAuthorityIndex() && 
+                                                (values[x].authority == null ||  values[x].confidence < MetadataAuthorityManager
+                                                    .getManager().getMinConfidence(values[x].schema, values[x].element, values[x].qualifier)))
+                                        {
+                                            // if we have an authority index only authored metadata will go here!
+                                            break;
+                                        }
+
+                                        // is there any valid (with appropriate confidence) authority key?
+                                        if (values[x].authority != null
+                                                && values[x].confidence >= MetadataAuthorityManager
+                                                    .getManager().getMinConfidence(values[x].schema, values[x].element, values[x].qualifier))
+                                        {
+                                            boolean isValueVariants = false;
+                                            List<String> variants = ChoiceAuthorityManager.getManager()
+                                                                        .getVariants(values[x].schema, values[x].element, values[x].qualifier,
+                                                                                        values[x].authority, values[x].language);
+                                            if (variants != null)
+                                            {
+                                                for (String var : variants)
+                                                {
+                                                    String nVal = OrderFormat.makeSortString(var, values[x].language, bis[i].getDataType());
+                                                    distIDSet.add(dao.getDistinctID(bis[i].getDistinctTableName(), var, values[x].authority, nVal));
+                                                    if (var.equals(values[x].value))
+                                                    {
+                                                        isValueVariants = true;
+                                                    }
+                                                }
+                                            }
+
+                                            if (!isValueVariants)
+                                            {
+                                                // get the normalised version of the value
+                                                String nVal = OrderFormat.makeSortString(values[x].value, values[x].language, bis[i].getDataType());
+                                                distIDSet.add(dao.getDistinctID(bis[i].getDistinctTableName(), values[x].value, values[x].authority, nVal));
+                                            }
+                                        }
+                                        else // put it in the browse index as if it hasn't have an authority key
+                                        {
                                         // get the normalised version of the value
                                         String nVal = OrderFormat.makeSortString(values[x].value, values[x].language, bis[i].getDataType());
-                                        distIDSet.add(dao.getDistinctID(bis[i].getDistinctTableName(), values[x].value, nVal));
+                                            distIDSet.add(dao.getDistinctID(bis[i].getDistinctTableName(), values[x].value, null, nVal));
                                     }
                                 }
                             }
                         }
+                    }
                     }
 
                     // Do we have any mappings?

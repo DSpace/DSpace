@@ -152,7 +152,7 @@ public interface BrowseCreateDAO
 	 * @return			the database id of the distinct record
 	 * @throws BrowseException
 	 */
-	public int getDistinctID(String table, String value, String sortValue) throws BrowseException;
+	public int getDistinctID(String table, String value, String authority, String sortValue) throws BrowseException;
 	
 	/**
 	 * Insert the given value and sort value into the distinct index table.  This
@@ -174,7 +174,7 @@ public interface BrowseCreateDAO
 	 * @return			the database id of the created record
 	 * @throws BrowseException
 	 */
-	public int insertDistinctRecord(String table, String value, String sortValue) throws BrowseException;
+	public int insertDistinctRecord(String table, String value, String authority, String sortValue) throws BrowseException;
 
     /**
      * Update a mapping between an item id and a distinct metadata field such as an author,

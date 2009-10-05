@@ -108,6 +108,8 @@ public class BrowserScope
     /** the number of items to offset into the result ie. 0 = 1st record */
     private int offset = 0;
 
+    private String authority = null;
+
     /**
      * Construct a new BrowserScope using the given Context
      *
@@ -642,5 +644,13 @@ public class BrowserScope
             return true;
         }
         return false;
+    }
+
+    public String getAuthorityValue() {
+        return authority;
+    }
+
+    public void setAuthorityValue(String value) {
+        authority = value;
     }
 }

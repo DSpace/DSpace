@@ -101,6 +101,9 @@ public class BrowseInfo
     /** the value browsed upon */
     private String value;
 
+    /** the authority key browsed upon */
+    private String authority;
+
     /** is this a "starts_with" browse? */
     private boolean startsWith = false;
 
@@ -226,6 +229,20 @@ public class BrowseInfo
 	public boolean hasValue()
     {
     	if (this.value != null)
+    	{
+    		return true;
+    	}
+    	return false;
+    }
+
+	/**
+	 * Is there an authority key associated with this browse
+	 *
+	 * @return	true if  an authority key, false if not
+	 */
+	public boolean hasAuthority()
+    {
+    	if (this.authority != null)
     	{
     		return true;
     	}
@@ -435,6 +452,22 @@ public class BrowseInfo
 	}
 
 	/**
+	 * @return Returns the authority key.
+	 */
+	public String getAuthority()
+	{
+		return authority;
+	}
+
+	/**
+	 * @param value The authority key to set.
+	 */
+	public void setAuthority(String authority)
+	{
+		this.authority = authority;
+	}
+
+	/**
 	 * is this a top level (0) browse?  Examples of this are a full item
 	 * browse or a single browse.  Other browse types are considered
 	 * second level (1)
@@ -466,8 +499,9 @@ public class BrowseInfo
 	}
 
     /**
-     * The results of the Browse. Each member of the list is either a String
-     * (for the authors browse) or an {@link org.dspace.content.Item}(for the
+     * The results of the Browse. Each member of the list is either a String array
+     * (for the authors browse: first element the value, second element the authority key)
+     * or an {@link org.dspace.content.Item}(for the
      * other browses).
      *
      * @return Result list. This list cannot be modified.
@@ -478,13 +512,14 @@ public class BrowseInfo
     }
 
     /**
-     * Return the results of the Browse as a String array.
+     * Return the results of the Browse as an array of String array.
+     * The first element (i.e. index 0) is the value, the second is the authority key
      *
      * @return The results of the Browse as a String array.
      */
-    public String[] getStringResults()
+    public String[][] getStringResults()
     {
-        return (String[]) results.toArray(new String[results.size()]);
+        return (String[][]) results.toArray(new String[results.size()][2]);
     }
 
     /**

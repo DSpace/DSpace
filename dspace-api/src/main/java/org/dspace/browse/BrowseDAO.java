@@ -412,4 +412,8 @@ public interface BrowseDAO
      * @return  the name of the table
      */
     public String getContainerTable();
+
+    public void setAuthorityValue(String value);
+
+    public String getAuthorityValue();
 }

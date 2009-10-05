@@ -210,9 +210,9 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                 else
                 {
                     // Add the metadata to the validity
-                    for (String singleEntry : browseInfo.getStringResults())
+                    for (String[] singleEntry : browseInfo.getStringResults())
                     {
-                        validity.add(singleEntry);
+                        validity.add(singleEntry[0]+"#"+singleEntry[1]);
                     }
                 }
             }
@@ -310,16 +310,24 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                     message("xmlui.ArtifactBrowser.ConfigurableBrowse." + type + ".column_heading"));
 
             // Iterate each result
-            for (String singleEntry : browseInfo.getStringResults())
+            for (String[] singleEntry : browseInfo.getStringResults())
             {
                 // Create a Map of the query parameters for the link
                 Map<String, String> queryParams = new HashMap<String, String>();
                 queryParams.put(BrowseParams.TYPE, URLEncode(type));
-                queryParams.put(BrowseParams.FILTER_VALUE, URLEncode(singleEntry));
-
+                if (singleEntry[1] != null)
+                {
+                    queryParams.put(BrowseParams.FILTER_VALUE[1], URLEncode(
+                        singleEntry[1]));
+                }
+                else
+                {
+                    queryParams.put(BrowseParams.FILTER_VALUE[0], URLEncode(
+                        singleEntry[0]));
+                }
                 // Create an entry in the table, and a linked entry
                 Cell cell = singleTable.addRow().addCell();
-                cell.addXref(super.generateURL(WITHDRAWN_URL_BASE, queryParams), singleEntry);
+                cell.addXref(super.generateURL(WITHDRAWN_URL_BASE, queryParams), singleEntry[0]);
             }
         }
     }
@@ -623,7 +631,16 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             params.scope.setResultsPerPage(RequestUtils.getIntParameter(request,
                     BrowseParams.RESULTS_PER_PAGE));
             params.scope.setStartsWith(request.getParameter(BrowseParams.STARTS_WITH));
-            params.scope.setFilterValue(request.getParameter(BrowseParams.FILTER_VALUE));
+            String filterValue = request.getParameter(BrowseParams.FILTER_VALUE[0]);
+            if (filterValue == null)
+            {
+                filterValue = request.getParameter(BrowseParams.FILTER_VALUE[1]);
+            }
+            else
+            {
+                params.scope.setAuthorityValue(filterValue);
+            }
+            params.scope.setFilterValue(filterValue);
             params.scope.setJumpToValue(request.getParameter(BrowseParams.JUMPTO_VALUE));
             params.scope.setJumpToValueLang(request.getParameter(BrowseParams.JUMPTO_VALUE_LANG));
             params.scope.setFilterValueLang(request.getParameter(BrowseParams.FILTER_VALUE_LANG));
@@ -863,7 +880,7 @@ class BrowseParams
 
     final static String STARTS_WITH = "starts_with";
 
-    final static String FILTER_VALUE = "value";
+    final static String[] FILTER_VALUE = new String[]{"value","authority"};
 
     final static String FILTER_VALUE_LANG = "value_lang";
 
@@ -877,7 +894,9 @@ class BrowseParams
 
         if (scope.getFilterValue() != null)
         {
-            paramMap.put(BrowseParams.FILTER_VALUE, AbstractDSpaceTransformer.URLEncode(
+            paramMap.put(scope.getAuthorityValue() != null?
+                    BrowseParams.FILTER_VALUE[1]:BrowseParams.FILTER_VALUE[0],
+                    AbstractDSpaceTransformer.URLEncode(
                     scope.getFilterValue()));
         }
 

@@ -252,9 +252,19 @@ public class BrowseEngine
                 value = OrderFormat.makeSortString(value, scope.getFilterValueLang(),
                             scope.getBrowseIndex().getDataType());
 
+                dao.setAuthorityValue(scope.getAuthorityValue());
+
                 // set the values in the Browse Query
-                dao.setFilterValueField("sort_value");
-                dao.setFilterValue(value);
+                if (scope.isSecondLevel())
+                {
+                    dao.setFilterValueField("value");
+                    dao.setFilterValue(rawValue);    
+                }
+                else
+                {
+	                dao.setFilterValueField("sort_value");
+	                dao.setFilterValue(value);
+                }
                 dao.setFilterValuePartial(scope.getFilterValuePartial());
 
                 // to apply the filtering, we need the distinct and map tables for the index
@@ -380,6 +390,9 @@ public class BrowseEngine
 
             // set the browse value if there is one
             browseInfo.setValue(rawValue);
+
+            // set the browse authority key if there is one
+            browseInfo.setAuthority(scope.getAuthorityValue());
 
             // set the focus value if there is one
             browseInfo.setFocus(rawFocusValue);

@@ -37,10 +37,12 @@
  */
 package org.dspace.content;
 
+import org.dspace.content.authority.Choices;
+
 /**
  * Simple data structure-like class representing a Dublin Core value. It has an
  * element, qualifier, value and language.
- * 
+ *
  * @author Robert Tansley
  * @author Martin Hald
  * @version $Revision$
@@ -62,4 +64,10 @@ public class DCValue
 
     /** The schema name of the metadata element */
     public String schema;
+
+    /** Authority control key */
+    public String authority = null;
+
+    /** Authority control confidence  */
+    public int confidence = Choices.CF_UNSET;
 }

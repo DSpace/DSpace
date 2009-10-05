@@ -120,6 +120,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             String startsWith = request.getParameter("starts_with");
             String valueFocus = request.getParameter("vfocus");
             String valueFocusLang = request.getParameter("vfocus_lang");
+            String authority = request.getParameter("authority");
             int focus = UIUtil.getIntParameter(request, "focus");
             int offset = UIUtil.getIntParameter(request, "offset");
             int resultsperpage = UIUtil.getIntParameter(request, "rpp");
@@ -229,7 +230,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
 
             // determine which level of the browse we are at: 0 for top, 1 for second
             int level = 0;
-            if (value != null)
+            if (value != null || authority != null)
             {
                 level = 1;
             }
@@ -281,7 +282,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             BrowserScope scope = new BrowserScope(context);
             scope.setBrowseIndex(bi);
             scope.setOrder(order);
-            scope.setFilterValue(value);
+            scope.setFilterValue(value != null?value:authority);
             scope.setFilterValueLang(valueLang);
             scope.setJumpToItem(focus);
             scope.setJumpToValue(valueFocus);
@@ -292,6 +293,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             scope.setSortBy(sortBy);
             scope.setBrowseLevel(level);
             scope.setEtAl(etAl);
+            scope.setAuthorityValue(authority);
 
             // assign the scope of either Community or Collection if necessary
             if (community != null)

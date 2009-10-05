@@ -5,8 +5,7 @@
  *
  * Date: $Date$
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -50,7 +48,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 
 /**
  * This class represents field values.
- * 
+ *
  * @author Scott Phillips
  */
 
@@ -68,6 +66,9 @@ public class Value extends RichTextContainer
     /** The name of the checked attribute */
     public static final String A_CHECKED = "checked";
     
+    /** The name of the confidence attribute */
+    public static final String A_CONFIDENCE = "confidence";
+    
     
     /** The possible value types */
     public static final String TYPE_RAW = "raw";
@@ -76,9 +77,12 @@ public class Value extends RichTextContainer
 
     public static final String TYPE_OPTION = "option";
 
+    /** value of the metadata authority code associated with a raw value */
+    public static final String TYPE_AUTHORITY = "authority";
+
     /** All the possible value types collected into one array. */
     public static final String[] TYPES = { TYPE_RAW, TYPE_INTERPRETED,
-            TYPE_OPTION};
+            TYPE_OPTION, TYPE_AUTHORITY};
 
     /** The type of this value element */
     private String type;
@@ -89,9 +93,12 @@ public class Value extends RichTextContainer
     /** The checked attribute */
     private boolean checked;
 
+    /** The confidence attribute, for authority values; must be symbolic value in org.dspace.content.authority.Choices  */
+    private String confidence = null;
+
     /**
      * Construct a new field value, when used in a multiple value context
-     * 
+     *
      * @param context
      *            (Required) The context this element is contained in
      * @param type
@@ -116,16 +123,17 @@ public class Value extends RichTextContainer
 
     /**
      * Construct a new field value, when used in a multiple value context
-     * 
+     *
      * @param context
      *            (Required) The context this element is contained in
      * @param type
      *            (may be null) Determine the value's type, raw, default or
      *            interpreted. If the value is null, then raw is used.
-     * @param option
-     *            (May be null) The option's return value that is selected.
+     * @param optionOrConfidence
+     *            (May be null) when type is TYPE_AUTHORITY, this is the
+     *            symbolic confidence value, otherwise it is the option value.
      */
-    protected Value(WingContext context, String type, String option) throws WingException
+    protected Value(WingContext context, String type, String optionOrConfidence) throws WingException
     {
         super(context);
 
@@ -138,12 +146,15 @@ public class Value extends RichTextContainer
                 "The 'type' parameter must be one of these values: 'raw', 'interpreted', or 'option'.");
 
         this.type = type;
-        this.option = option;
+        if (type.equals(TYPE_AUTHORITY))
+            this.confidence = optionOrConfidence;
+        else
+            this.option = optionOrConfidence;
     }
 
     /**
      * Construct a new field value, when used in a multiple value context
-     * 
+     *
      * @param context
      *            (Required) The context this element is contained in
      * @param type
@@ -168,7 +179,7 @@ public class Value extends RichTextContainer
         this.type = type;
         this.checked = checked;
     }
-    
+
     /**
      * @return the type of this value.
      */
@@ -180,7 +191,7 @@ public class Value extends RichTextContainer
     /**
      * Translate this element and all contained elements into SAX events. The
      * events should be routed to the contentHandler found in the WingContext.
-     * 
+     *
      * @param contentHandler
      *            (Required) The registered contentHandler where SAX events
      *            should be routed too.
@@ -203,7 +214,8 @@ public class Value extends RichTextContainer
             attributes.put(A_OPTION, this.option);
         if (this.checked)
             attributes.put(A_CHECKED, this.checked);
-        
+        if (this.type.equals(TYPE_AUTHORITY))
+            attributes.put(A_CONFIDENCE, this.confidence);
         
         startElement(contentHandler, namespaces, E_VALUE, attributes);
         super.toSAX(contentHandler, lexicalHandler, namespaces);

@@ -223,7 +223,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             String create = "CREATE TABLE " + map + " (" +
                             "map_id integer primary key, " +
                             "item_id integer references item(item_id), " +
-                            "distinct_id integer references " + table + "(id)" +
+                            "distinct_id integer references " + table + "(distinct_id)" +
                             ");";
             
             if (execute)
@@ -320,6 +320,8 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
         {
             String create = "CREATE TABLE " + table + " (" +
                             "id integer primary key, " + 
+                            "distinct_id integer UNIQUE, " +
+                            "authority VARCHAR(100), " +
                             "value " + getValueColumnDefinition() + ", " +
                             "sort_value " + getSortColumnDefinition() +
                             ");";
@@ -510,7 +512,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#getDistinctID(java.lang.String, java.lang.String, java.lang.String)
      */
-    public int getDistinctID(String table, String value, String sortValue)
+    public int getDistinctID(String table, String value, String authority, String sortValue)
         throws BrowseException
     {
         TableRowIterator tri = null;
@@ -522,27 +524,50 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
         
         try
         {
-            Object[] params = { value };
-            String select = null;
+            Object[] params;
+            String select;
+			if (authority != null)
+			{
+				params = new Object[]{ value, authority };
+			}
+			else
+			{
+				params = new Object[]{ value };
+			}
 
             if (ConfigurationManager.getBooleanProperty("webui.browse.metadata.case-insensitive", false))
             {
-                select = "SELECT id FROM " + table + " WHERE UPPER(value) = UPPER(?)";
+				if (authority != null)
+	            {	             
+	                select = "SELECT distinct_id FROM " + table + " WHERE UPPER(value) = UPPER(?) and authority = ?";
+	            }
+	            else
+	            {	                
+	                select = "SELECT distinct_id FROM " + table + " WHERE UPPER(value) = UPPER(?) and authority IS NULL";
+	            }
             }
             else
             {
                 select = "SELECT id FROM " + table + " WHERE value = ?";
+				if (authority != null)
+	            {	             
+	                select = "SELECT distinct_id FROM " + table + " WHERE value = ? and authority = ?";
+	            }
+	            else
+	            {	                
+	                select = "SELECT distinct_id FROM " + table + " WHERE value = ? and authority IS NULL";
+	            }
             }
 
             tri = DatabaseManager.query(context, select, params);
             int distinctID = -1;
             if (!tri.hasNext())
             {
-                distinctID = insertDistinctRecord(table, value, sortValue);
+                distinctID = insertDistinctRecord(table, value, authority, sortValue);
             }
             else
             {
-                distinctID = tri.next().getIntColumn("id");
+                distinctID = tri.next().getIntColumn("distinct_id");
             }
 
             if (log.isDebugEnabled())
@@ -640,17 +665,22 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#insertDistinctRecord(java.lang.String, java.lang.String, java.lang.String)
      */
-    public int insertDistinctRecord(String table, String value, String sortValue)
+    public int insertDistinctRecord(String table, String value, String authority, String sortValue)
         throws BrowseException
     {
-        log.debug("insertDistinctRecord: table=" + table + ",value=" + value+ ",sortValue=" + sortValue);
+        log.debug("insertDistinctRecord: table=" + table + ",value=" + value+ ",authority=" + authority+",sortValue=" + sortValue);
         try
         {
             TableRow dr = DatabaseManager.create(context, table);
+            if (authority != null)
+            {
+                dr.setColumn("authority", utils.truncateValue(authority,100));
+            }
             dr.setColumn("value", utils.truncateValue(value));
             dr.setColumn("sort_value", utils.truncateSortValue(sortValue));
-            DatabaseManager.update(context, dr);
             int distinctID = dr.getIntColumn("id");
+            dr.setColumn("distinct_id", distinctID);
+            DatabaseManager.update(context, dr);
             
             log.debug("insertDistinctRecord: return=" + distinctID);
             return distinctID;

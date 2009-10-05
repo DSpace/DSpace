@@ -203,15 +203,15 @@
     <servlet-class>org.dspace.app.webui.servlet.ItemExportArchiveServlet</servlet-class>
   </servlet>
 
-	<servlet>
-		<servlet-name>browse</servlet-name>
-		<servlet-class>org.dspace.app.webui.servlet.BrowserServlet</servlet-class>
-	</servlet>
+        <servlet>
+                <servlet-name>browse</servlet-name>
+                <servlet-class>org.dspace.app.webui.servlet.BrowserServlet</servlet-class>
+        </servlet>
 
-	<servlet>
-		<servlet-name>browsewithdrawn</servlet-name>
-		<servlet-class>org.dspace.app.webui.servlet.admin.WithdrawnBrowserServlet</servlet-class>
-	</servlet>
+        <servlet>
+                <servlet-name>browsewithdrawn</servlet-name>
+                <servlet-class>org.dspace.app.webui.servlet.admin.WithdrawnBrowserServlet</servlet-class>
+        </servlet>
 
   <servlet>
     <servlet-name>collection-wizard</servlet-name>
@@ -447,9 +447,13 @@
   <servlet>
     <servlet-name>subject-search</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.ControlledVocabularySearchServlet</servlet-class>
-  </servlet>  
+  </servlet>
 
- 
+  <servlet>
+      <servlet-name>AuthorityChooseServlet</servlet-name>
+      <servlet-class>org.dspace.app.webui.servlet.AuthorityChooseServlet</servlet-class>
+  </servlet>
+
   <!-- shibbolized dspace -->
   <servlet>
     <servlet-name>shibboleth-login</servlet-name>
@@ -484,15 +488,15 @@
     <url-pattern>/exportdownload/*</url-pattern>
   </servlet-mapping>
 
-	<servlet-mapping>
-		<servlet-name>browse</servlet-name>
-		<url-pattern>/browse</url-pattern>
-	</servlet-mapping>
+        <servlet-mapping>
+                <servlet-name>browse</servlet-name>
+                <url-pattern>/browse</url-pattern>
+        </servlet-mapping>
 
-	<servlet-mapping>
-		<servlet-name>browsewithdrawn</servlet-name>
-		<url-pattern>/dspace-admin/withdrawn</url-pattern>
-	</servlet-mapping>
+        <servlet-mapping>
+                <servlet-name>browsewithdrawn</servlet-name>
+                <url-pattern>/dspace-admin/withdrawn</url-pattern>
+        </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>community-list</servlet-name>
@@ -717,13 +721,17 @@
   <servlet-mapping>
     <servlet-name>controlledvocabulary</servlet-name>
     <url-pattern>/controlledvocabulary</url-pattern>
-  </servlet-mapping>  
+  </servlet-mapping>
   
   <servlet-mapping>
     <servlet-name>subject-search</servlet-name>
     <url-pattern>/subject-search</url-pattern>
-  </servlet-mapping> 
+  </servlet-mapping>
 
+  <servlet-mapping>
+      <servlet-name>AuthorityChooseServlet</servlet-name>
+      <url-pattern>/choices/*</url-pattern>
+  </servlet-mapping>
 
   <!-- Icon MIME type -->
   <mime-mapping>

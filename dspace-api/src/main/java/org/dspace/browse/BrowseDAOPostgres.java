@@ -97,6 +97,8 @@ public class BrowseDAOPostgres implements BrowseDAO
     /** value to restrict browse to (e.g. author name) */
     private String value = null;
 
+    private String authority = null;
+
     /** exact or partial matching of the value */
     private boolean valuePartial = false;
 
@@ -431,8 +433,9 @@ public class BrowseDAOPostgres implements BrowseDAO
             while (tri.hasNext())
             {
                 TableRow row = tri.next();
-                String stringResult = row.getStringColumn("value");
-                results.add(stringResult);
+                String valueResult = row.getStringColumn("value");
+                String authorityResult = row.getStringColumn("authority");
+                results.add(new String[]{valueResult,authorityResult});
             }
 
             return results;
@@ -909,9 +912,13 @@ public class BrowseDAOPostgres implements BrowseDAO
     {
         if (tableMap != null && tableDis != null)
         {
-            queryBuf.append(tableMap).append(".distinct_id=").append(tableDis).append(".id");
+            queryBuf.append(tableMap).append(".distinct_id=").append(tableDis).append(".distinct_id");
             queryBuf.append(" AND ");
-            queryBuf.append(tableDis).append(".sort_value");
+            if (authority == null)
+            {
+                queryBuf.append(tableDis).append(".authority IS NULL");
+            queryBuf.append(" AND ");
+                queryBuf.append(tableDis).append(".").append(valueField);
 
             if (valuePartial)
             {
@@ -938,6 +945,12 @@ public class BrowseDAOPostgres implements BrowseDAO
                 {
                     params.add(utils.truncateValue(value));
                 }
+            }
+        }
+            else
+            {
+                queryBuf.append(tableDis).append(".authority=?");
+                params.add(utils.truncateValue(authority,100));
             }
         }
 
@@ -1084,7 +1097,7 @@ public class BrowseDAOPostgres implements BrowseDAO
         queryBuf.append(table);
         if (containerTable != null || (value != null && valueField != null && tableDis != null && tableMap != null))
         {
-            queryBuf.append(", (SELECT ");
+            queryBuf.append(", (SELECT " + (containerTable != null ? "" : "DISTINCT "));
             queryBuf.append(containerTable != null ? containerTable : tableMap).append(".item_id");
             queryBuf.append(" FROM ");
             buildFocusedSelectTables(queryBuf);
@@ -1382,5 +1395,13 @@ public class BrowseDAOPostgres implements BrowseDAO
         }
 
         return queryParams.toArray();
+    }
+
+    public void setAuthorityValue(String value) {
+        authority = value;
+    }
+
+    public String getAuthorityValue() {
+        return authority;
     }
 }

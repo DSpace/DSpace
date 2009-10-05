@@ -50,6 +50,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
@@ -116,8 +118,20 @@ public class XSLTIngestionCrosswalk
         String element = field.getAttributeValue("element");
         String qualifier = field.getAttributeValue("qualifier");
         String lang = field.getAttributeValue("lang");
+        String authority = field.getAttributeValue("authority");
+        String sconf = field.getAttributeValue("confidence");
 
-        item.addMetadata(schema, element, qualifier, lang, field.getText());
+        if ((authority != null && authority.length() > 0) ||
+            (sconf != null && sconf.length() > 0))
+        {
+            int confidence = (sconf != null && sconf.length() > 0) ?
+                    Choices.getConfidenceValue(sconf) : Choices.CF_UNSET;
+            item.addMetadata(schema, element, qualifier, lang, field.getText(), authority, confidence);
+        }
+        else
+        {
+            item.addMetadata(schema, element, qualifier, lang, field.getText());
+        }
     }
 
     /**

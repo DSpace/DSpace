@@ -49,6 +49,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.jdom.Document;
@@ -252,6 +253,11 @@ public class XSLTDisseminationCrosswalk
                 field.setAttribute("lang", dc[i].language);
             if (dc[i].value != null)
                 field.setText(dc[i].value);
+            if (dc[i].authority != null)
+            {
+                field.setAttribute("authority", dc[i].authority);
+                field.setAttribute("confidence", Choices.getConfidenceText(dc[i].confidence));
+            }
             dim.addContent(field);
         }
         return dim;

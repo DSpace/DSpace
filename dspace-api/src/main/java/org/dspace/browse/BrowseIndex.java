@@ -602,7 +602,17 @@ public class BrowseIndex
      */
     public boolean isMetadataIndex()
     {
-        return "metadata".equals(displayType);
+        return displayType  != null && displayType.startsWith("metadata");
+    }
+    
+    /**
+     * Is the browse index authority value?
+     *
+     * @return true if authority, false if not
+     */
+    public boolean isAuthorityIndex()
+    {
+        return "metadataAuthority".equals(displayType);
     }
     
     /**

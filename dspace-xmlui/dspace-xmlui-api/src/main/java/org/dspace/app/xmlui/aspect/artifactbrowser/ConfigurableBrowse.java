@@ -5,8 +5,7 @@
  *
  * Date: $Date$
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -85,6 +83,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -217,9 +216,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 else
                 {
                     // Add the metadata to the validity
-                    for (String singleEntry : browseInfo.getStringResults())
+                    for (String[] singleEntry : browseInfo.getStringResults())
                     {
-                        validity.add(singleEntry);
+                        validity.add(singleEntry[0]+"#"+singleEntry[1]);
                     }
                 }
 
@@ -310,19 +309,29 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             
             // Add the column heading
             singleTable.addRow(Row.ROLE_HEADER).addCell().addContent(
-                    message("xmlui.ArtifactBrowser.ConfigurableBrowse." + type + ".column_heading"));
+                    message("xmlui.ArtifactBrowser.ConfigurableBrowse." + type + ".column_heading"));          
 
             // Iterate each result
-            for (String singleEntry : browseInfo.getStringResults())
+            for (String[] singleEntry : browseInfo.getStringResults())
             {
                 // Create a Map of the query parameters for the link
                 Map<String, String> queryParams = new HashMap<String, String>();
                 queryParams.put(BrowseParams.TYPE, URLEncode(type));
-                queryParams.put(BrowseParams.FILTER_VALUE, URLEncode(singleEntry));
+                if (singleEntry[1] != null)
+                {
+                    queryParams.put(BrowseParams.FILTER_VALUE[1], URLEncode(
+                        singleEntry[1]));
+                }
+                else
+                {
+                    queryParams.put(BrowseParams.FILTER_VALUE[0], URLEncode(
+                        singleEntry[0]));
+                }
 
                 // Create an entry in the table, and a linked entry
                 Cell cell = singleTable.addRow().addCell();
-                cell.addXref(super.generateURL(BROWSE_URL_BASE, queryParams), singleEntry);
+                cell.addXref(super.generateURL(BROWSE_URL_BASE, queryParams),                    
+                      singleEntry[0]);
             }
         }
     }
@@ -667,7 +676,14 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             params.scope.setResultsPerPage(RequestUtils.getIntParameter(request,
                     BrowseParams.RESULTS_PER_PAGE));
             params.scope.setStartsWith(URLDecode(request.getParameter(BrowseParams.STARTS_WITH)));
-            params.scope.setFilterValue(URLDecode(request.getParameter(BrowseParams.FILTER_VALUE)));
+            String filterValue = request.getParameter(BrowseParams.FILTER_VALUE[0]);
+            if (filterValue == null)
+            {
+                filterValue = request.getParameter(BrowseParams.FILTER_VALUE[1]);
+                params.scope.setAuthorityValue(filterValue);
+            }
+            
+            params.scope.setFilterValue(filterValue);
             params.scope.setJumpToValue(URLDecode(request.getParameter(BrowseParams.JUMPTO_VALUE)));
             params.scope.setJumpToValueLang(URLDecode(request.getParameter(BrowseParams.JUMPTO_VALUE_LANG)));
             params.scope.setFilterValueLang(URLDecode(request.getParameter(BrowseParams.FILTER_VALUE_LANG)));
@@ -805,7 +821,18 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             // For a second level browse (ie. items for author),
             // get the value we are focussing on (ie. author).
             // (empty string if none).
-            String value = (info.hasValue() ? "\"" + info.getValue() + "\"" : "");
+            String value = "";
+            if (info.hasValue())
+            {
+                if (bix.isAuthorityIndex())
+                {
+                    ChoiceAuthorityManager cm = ChoiceAuthorityManager.getManager();
+                    String fk = cm.makeFieldKey(bix.getMetadata(0));
+                    value = "\""+cm.getLabel(fk, info.getValue(), null)+"\"";
+                }
+                else
+                    value = "\"" + info.getValue() + "\"";
+            }
 
             // Get the name of any scoping element (collection / community)
             String scopeName = "";
@@ -907,7 +934,7 @@ class BrowseParams
 
     final static String STARTS_WITH = "starts_with";
 
-    final static String FILTER_VALUE = "value";
+    final static String[] FILTER_VALUE = new String[]{"value","authority"};
 
     final static String FILTER_VALUE_LANG = "value_lang";
 
@@ -924,7 +951,9 @@ class BrowseParams
 
         if (scope.getFilterValue() != null)
         {
-            paramMap.put(BrowseParams.FILTER_VALUE, AbstractDSpaceTransformer.URLEncode(
+            paramMap.put(scope.getAuthorityValue() != null?
+                    BrowseParams.FILTER_VALUE[1]:BrowseParams.FILTER_VALUE[0],
+                    AbstractDSpaceTransformer.URLEncode(
                     scope.getFilterValue()));
         }
 
@@ -984,4 +1013,3 @@ class BrowseParams
         }
     }
 };
-

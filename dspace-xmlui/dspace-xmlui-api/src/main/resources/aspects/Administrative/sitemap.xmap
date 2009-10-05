@@ -112,6 +112,7 @@ to administer DSpace.
 			<map:transformer name="ControlPanel" src="org.dspace.app.xmlui.aspect.administrative.ControlPanel" />
             <map:transformer name="WithdrawnItems" src="org.dspace.app.xmlui.aspect.administrative.WithdrawnItems" />
             <map:transformer name="ItemExport" src="org.dspace.app.xmlui.aspect.administrative.ItemExport"/>
+                        <map:transformer name="ChoiceLookup" src="org.dspace.app.xmlui.aspect.general.ChoiceLookupTransformer"/>
 		</map:transformers>
 		
 		<map:matchers default="wildcard">
@@ -884,6 +885,34 @@ to administer DSpace.
                     </map:otherwise>
                 </map:select>
             </map:match>
+
+            <!-- choice value lookup popup  -->
+            <map:match pattern="admin/lookup">
+              <map:transform type="ChoiceLookup">
+                <map:parameter name="field" value="{request-param:field}"/>
+                <map:parameter name="formID" value="{request-param:formID}"/>
+                <map:parameter name="value" value="{request-param:value}"/>
+                <map:parameter name="valueInput" value="{request-param:valueInput}"/>
+                <map:parameter name="authorityInput" value="{request-param:authorityInput}"/>
+                <map:parameter name="isName" value="{request-param:isName}"/>
+                <map:parameter name="isRepeating" value="{request-param:isRepeating}"/>
+                <map:parameter name="confIndicatorID" value="{request-param:confIndicatorID}"/>
+                <map:parameter name="start" value="{request-param:start}"/>
+                <map:parameter name="limit" value="{request-param:limit}"/>
+                <map:parameter name="collection" value="{request-param:collection}"/>
+              </map:transform>
+            </map:match>
+
+                  <map:match pattern="admin/**">
+                    <map:transform type="IncludePageMeta">
+                      <!-- javascript libraries and utils for the choice and authority-control -->
+                      <map:parameter name="javascript.static#1" value="static/js/scriptaculous/prototype.js"/>
+                      <map:parameter name="javascript.static#2" value="static/js/scriptaculous/effects.js"/>
+                      <map:parameter name="javascript.static#3" value="static/js/scriptaculous/builder.js"/>
+                      <map:parameter name="javascript.static#4" value="static/js/scriptaculous/controls.js"/>
+                      <map:parameter name="javascript.static#5" value="static/js/choice-support.js"/>
+                    </map:transform>
+                  </map:match>
 
 			<map:serialize type="xml"/>
 		</map:pipeline>

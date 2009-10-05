@@ -1,7 +1,7 @@
 --
 -- database_schema_15-16.sql
 --
--- Version: $$
+-- Version: $Revision$
 --
 -- Date:    $Date: 2009-04-23 22:26:59 -0500 (Thu, 23 Apr 2009) $
 --
@@ -49,6 +49,12 @@
 ALTER TABLE community ADD admin INTEGER REFERENCES epersongroup ( eperson_group_id );
 CREATE INDEX community_admin_fk_idx ON Community(admin);
 
+-------------------------------------------------------------------------
+-- DS-236 schema changes for Authority Control of Metadata Values
+-------------------------------------------------------------------------
+ALTER TABLE MetadataValue ADD  authority VARCHAR(100);
+ALTER TABLE MetadataValue ADD confidence INTEGER DEFAULT -1;
+
 ------------------------------------------------------------------
 -- New tables /sequences for the harvester functionality (DS-289)
 ------------------------------------------------------------------
@@ -90,11 +96,11 @@ CREATE INDEX harvested_item_fk_idx ON harvested_item(item_id);
 
 
 -------------------------------------------------------------------------
--- DS-260 Cleanup of Owning collection column for template item created 
+-- DS-260 Cleanup of Owning collection column for template item created
 -- with the JSPUI after the collection creation
 -------------------------------------------------------------------------
-UPDATE item SET owning_collection = null WHERE item_id IN 
-	(SELECT template_item_id FROM collection WHERE template_item_id IS NOT null);
+UPDATE item SET owning_collection = null WHERE item_id IN
+        (SELECT template_item_id FROM collection WHERE template_item_id IS NOT null);
 
 ALTER TABLE community2collection DROP CONSTRAINT community2collection_collection_id_fkey;
 ALTER TABLE community2collection ADD CONSTRAINT comm2coll_collection_fk FOREIGN KEY (collection_id) REFERENCES collection DEFERRABLE;

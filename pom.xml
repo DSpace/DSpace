@@ -14,20 +14,20 @@
 
    <build>
       <plugins>
-         <!-- 
+         <!--
             Java 1.5 is our officially endorsed build target
-            platform.  
+            platform.
          -->
          <plugin>
-			<artifactId>maven-release-plugin</artifactId>
-			<configuration>
-				<!--
-					During release:perform, enable the "addons" profile
-				-->
-				<releaseProfiles>addons</releaseProfiles>
-				<goals>deploy</goals>
-			</configuration>
-		 </plugin>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <configuration>
+                                <!--
+                                        During release:perform, enable the "addons" profile
+                                -->
+                                <releaseProfiles>addons</releaseProfiles>
+                                <goals>deploy</goals>
+                        </configuration>
+                 </plugin>
          <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
@@ -72,7 +72,7 @@
 
    <profiles>
    
-      <!-- 
+      <!--
          ========================================================
          These are admiistrative profiles used by release manager
          To complete release tasks.
@@ -87,6 +87,7 @@
          </activation>
          <modules>
             <module>dspace-api</module>
+            <module>dspace-ui-shared</module>
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
@@ -97,9 +98,9 @@
       </profile>
       
       
-      <!-- 
+      <!--
          Use 'mvn deploy -Paddons' while doing Continuous Integration
-         and deploying addons to the Maven repository. 
+         and deploying addons to the Maven repository.
        -->
       <profile>
          <id>addons</id>
@@ -116,8 +117,8 @@
          </modules>
       </profile>
       
-      <!-- 
-         Use 'mvn package -Pdistributions' to create distributions 
+      <!--
+         Use 'mvn package -Pdistributions' to create distributions
          to upload to S.F.
        -->
       <profile>
@@ -193,7 +194,7 @@
       </repository>
    </repositories>
 
-   <!-- 
+   <!--
       Distribution management provides a means to control which
       versions of dependency jars are used for compilation
       and packaging into the distribution.  Rather than placing
@@ -207,6 +208,12 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
             <version>1.6.0-SNAPSHOT</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-ui-shared</artifactId>
+            <version>1.6.0-SNAPSHOT</version>
+            <type>war</type>
          </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
@@ -315,7 +322,7 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers</artifactId>
             <version>2.3.0</version>
-         </dependency>         
+         </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
@@ -532,6 +539,11 @@
             <groupId>org.dspace</groupId>
             <artifactId>oclc-harvester2</artifactId>
             <version>0.1.12</version>
+         </dependency>
+         <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
          </dependency>
       </dependencies>
    </dependencyManagement>
@@ -771,7 +783,7 @@
       </contributor>
    </contributors>
 
-   <!-- 
+   <!--
       The Subversion repository location is used by Continuum to update against
       when changes have occured, this spawns a new build cycle and releases snapshots
       into the snapshot repository below.
@@ -782,9 +794,9 @@
       <url>http://scm.dspace.org/svn/repo/dspace/trunk</url>
    </scm>
 
-   <!-- 
+   <!--
       Distribution Management is currently used by the Continuum server
-      to update snapshots it generates. This will also be used on 
+      to update snapshots it generates. This will also be used on
       release to deploy release versions to the repository by the
       release manager.
    -->

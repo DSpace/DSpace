@@ -49,6 +49,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import org.dspace.app.util.DCInputsReader;
+import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.webui.submit.JSPStep;
 import org.dspace.app.webui.submit.JSPStepManager;
@@ -65,7 +66,7 @@ import org.dspace.submit.step.InitialQuestionsStep;
  * <P>
  * This JSPStep class works with the SubmissionController servlet
  * for the JSP-UI
- * 
+ *
  * The following methods are called in this order:
  * <ul>
  * <li>Call doPreProcessing() method</li>
@@ -82,11 +83,11 @@ import org.dspace.submit.step.InitialQuestionsStep;
  * <li>Once all pages are complete, control is forwarded back to the
  * SubmissionController, and the next step is called.</li>
  * </ul>
- * 
+ *
  * @see org.dspace.app.webui.servlet.SubmissionController
  * @see org.dspace.app.webui.submit.JSPStep
  * @see org.dspace.submit.step.InitialQuestionsStep
- * 
+ *
  * @author Tim Donohue
  * @version $Revision$
  */
@@ -120,7 +121,7 @@ public class JSPInitialQuestionsStep extends JSPStep
      * If this step doesn't require user interaction OR you are solely using
      * Manakin for your user interface, then this method may be left EMPTY,
      * since all step processing should occur in the doProcessing() method.
-     * 
+     *
      * @param context
      *            current DSpace context
      * @param request
@@ -152,7 +153,7 @@ public class JSPInitialQuestionsStep extends JSPStep
      * If this step doesn't require user interaction OR you are solely using
      * Manakin for your user interface, then this method may be left EMPTY,
      * since all step processing should occur in the doProcessing() method.
-     * 
+     *
      * @param context
      *            current DSpace context
      * @param request
@@ -214,7 +215,7 @@ public class JSPInitialQuestionsStep extends JSPStep
 
     /**
      * Show the page which displays all the Initial Questions to the user
-     * 
+     *
      * @param context
      *            current DSpace context
      * @param request
@@ -223,7 +224,7 @@ public class JSPInitialQuestionsStep extends JSPStep
      *            the response object
      * @param subInfo
      *            the SubmissionInfo object
-     * 
+     *
      */
     private void showInitialQuestions(Context context,
             HttpServletRequest request, HttpServletResponse response,
@@ -233,12 +234,19 @@ public class JSPInitialQuestionsStep extends JSPStep
         // determine collection
         Collection c = subInfo.getSubmissionItem().getCollection();
 
-        // read configurable submissions forms data
-        DCInputsReader inputsReader = new DCInputsReader();
-
-        // load the proper submission inputs to be used by the JSP
-        request.setAttribute("submission.inputs", inputsReader.getInputs(c
-                .getHandle()));
+        try
+        {
+            // read configurable submissions forms data
+            DCInputsReader inputsReader = new DCInputsReader();
+             
+            // load the proper submission inputs to be used by the JSP
+            request.setAttribute("submission.inputs", inputsReader.getInputs(c
+                    .getHandle()));
+        }
+        catch (DCInputsReaderException e)
+        {
+            throw new ServletException(e);
+        }
 
         // forward to initial questions JSP
         JSPStepManager.showJSP(request, response, subInfo, INITIAL_QUESTIONS_JSP);
@@ -247,7 +255,7 @@ public class JSPInitialQuestionsStep extends JSPStep
     /**
      * Show the page which warns the user that by changing the answer to one of
      * these questions, some previous data may be deleted.
-     * 
+     *
      * @param context
      *            current DSpace context
      * @param request
@@ -293,7 +301,7 @@ public class JSPInitialQuestionsStep extends JSPStep
      * This Review JSP is loaded by the 'Verify' Step, in order to dynamically
      * generate a submission verification page consisting of the information
      * gathered in all the enabled submission steps.
-     * 
+     *
      * @param context
      *            current DSpace context
      * @param request

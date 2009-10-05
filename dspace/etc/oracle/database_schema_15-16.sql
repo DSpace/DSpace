@@ -50,6 +50,13 @@ ALTER TABLE community ADD admin INTEGER REFERENCES epersongroup ( eperson_group_
 CREATE INDEX community_admin_fk_idx ON Community(admin);
 
 -------------------------------------------------------------------------
+-- DS-236 schema changes for Authority Control of Metadata Values
+-------------------------------------------------------------------------
+ALTER TABLE MetadataValue
+  ADD ( authority VARCHAR(100),
+        confidence INTEGER DEFAULT 1);
+
+-------------------------------------------------------------------------
 -- DS-260 Cleanup of Owning collection column for template item created
 -- with the JSPUI after the collection creation
 -------------------------------------------------------------------------

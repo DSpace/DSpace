@@ -5,8 +5,7 @@
  *
  * Date: $Date$
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -53,8 +51,8 @@ import org.xml.sax.helpers.NamespaceSupport;
 
 /**
  * Instance represents multiple value instances of a field.
- * 
- * 
+ *
+ *
  * @author Scott Phillips
  */
 
@@ -65,7 +63,7 @@ public class Instance extends Container
 
     /**
      * Construct a new field value, when used in a multiple value context
-     * 
+     *
      * @param context
      *            (Required) The context this element is contained in
      */
@@ -81,7 +79,7 @@ public class Instance extends Container
 
     /**
      * Set the raw value of the field removing any previous raw values.
-     * 
+     *
      * @param characters
      *            (May be null) Field value as a string
      */
@@ -95,7 +93,7 @@ public class Instance extends Container
 
     /**
      * Set the raw value of the field removing any previous raw values.
-     * 
+     *
      * @param characters
      *            (May be null) Field value as a string
      */
@@ -107,7 +105,7 @@ public class Instance extends Container
 
     /**
      * Set the raw value of the field removing any previous raw values.
-     * 
+     *
      * @param message
      *            (Required) A key into the i18n catalogue for translation into
      *            the user's preferred language.
@@ -122,7 +120,7 @@ public class Instance extends Container
      * Set the raw value of the field removing any previous raw values. This
      * will set the field as either checked or unchecked. This should only be
      * used on checkbox or radio button fields.
-     * 
+     *
      * @param checked
      *            (Required) Whether the checkbox is checked or not.
      */
@@ -134,8 +132,32 @@ public class Instance extends Container
     }
     
     /**
+     * Set the authority value of the field removing any previous authority values.
+     * Initialized to an empty value.
+     */
+    public Value setAuthorityValue() throws WingException
+    {
+        return setAuthorityValue("", "UNSET");
+    }
+
+    /**
+     * Set the authority value of the field removing any previous authority values.
+     *
+     * @param characters
+     *            (May be null) Field value as a string
+     */
+    public Value setAuthorityValue(String characters, String confidence) throws WingException
+    {
+        this.removeValueOfType(Value.TYPE_AUTHORITY);
+        Value value = new Value(context, Value.TYPE_AUTHORITY, confidence);
+        value.addContent(characters);
+        contents.add(value);
+        return value;
+    }
+
+    /**
      * Set the given option as selected.
-     * 
+     *
      * @param returnValue
      *            (Required) The return value of the option to be selected.
      */
@@ -147,7 +169,7 @@ public class Instance extends Container
 
     /**
      * Set the given option as selected.
-     * 
+     *
      * @param returnValue
      *            (Required) The return value of the option to be selected.
      */
@@ -163,7 +185,7 @@ public class Instance extends Container
     /**
      * Set the interpreted value of the field removing any previous interpreted
      * values.
-     * 
+     *
      * @param characters
      *            (May be null) Field value as a string
      */
@@ -178,7 +200,7 @@ public class Instance extends Container
     /**
      * Set the interpreted value of the field removing any previous interpreted
      * values.
-     * 
+     *
      * @param characters
      *            (May be null) Field value as a string
      */
@@ -191,7 +213,7 @@ public class Instance extends Container
     /**
      * Set the interpreted value of the field removing any previous interpreted
      * values.
-     * 
+     *
      * @param message
      *            (Required) A key into the i18n catalogue for translation into
      *            the user's preferred language.
@@ -208,9 +230,9 @@ public class Instance extends Container
     /** ******************************************************************** */
     
     /**
-     * Add an option value, there may be many of these. These values refrence 
+     * Add an option value, there may be many of these. These values refrence
      * an option all ready added to the field.
-     * 
+     *
      * @param option
      *            (Required) The return value of the selected option.
      */
@@ -219,13 +241,13 @@ public class Instance extends Container
         Value value = new Value(context, Value.TYPE_OPTION, option);
         contents.add(value);
         return value;
-    } 
+    }
     
     /**
      * Set the checkbox (or radio) value of this field. This is a parameter
      * wheather the field is selected or not along with the return string that
      * should be used with this parameter.
-     * 
+     *
      * @param checked
      *            (Required) determine if the value is selected or not.
      * @param characters
@@ -243,7 +265,7 @@ public class Instance extends Container
     /**
      * Translate this element and all contained elements into SAX events. The
      * events should be routed to the contentHandler found in the WingContext.
-     * 
+     *
      * @param contentHandler
      *            (Required) The registered contentHandler where SAX events
      *            should be routed too.
@@ -274,7 +296,7 @@ public class Instance extends Container
     
     /**
      * Private function to remove all values of a particular type.
-     * 
+     *
      * @param removeType
      *            The type to be removed.
      */

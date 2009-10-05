@@ -55,6 +55,7 @@ import java.util.Vector;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 
+import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
@@ -79,6 +80,8 @@ import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -999,11 +1002,61 @@ public class DSIndexer
                         }
                         else
                         {
-                            // TODO: use a delegate to allow custom 'types' to be used to reformat the field
-                            doc.add( new Field(indexConfigArr[i].indexName,
-                                               mydc[j].value,
-                                               Field.Store.NO,
-                                               Field.Index.TOKENIZED));
+                            List<String> variants = null;
+                            if (mydc[j].authority != null && mydc[j].confidence >= MetadataAuthorityManager.getManager()
+                                    .getMinConfidence(mydc[j].schema, mydc[j].element, mydc[j].qualifier))
+                            {
+                                variants = ChoiceAuthorityManager.getManager()
+                                            .getVariants(mydc[j].schema, mydc[j].element, mydc[j].qualifier,
+                                                mydc[j].authority, mydc[j].language);
+
+                                doc.add( new Field(indexConfigArr[i].indexName+"_authority",
+                                   mydc[j].authority,
+                                   Field.Store.NO,
+                                   Field.Index.UN_TOKENIZED));
+                            
+                                boolean valueAlreadyIndexed = false;
+                                if (variants != null)
+                                {
+                                    for (String var : variants)
+                                    {
+                                        // TODO: use a delegate to allow custom 'types' to be used to reformat the field
+                                        doc.add( new Field(indexConfigArr[i].indexName,
+                                                           var,
+                                                           Field.Store.NO,
+                                                           Field.Index.TOKENIZED));
+                                        if (var.equals(mydc[j].value))
+                                        {
+                                            valueAlreadyIndexed = true;
+                                        }
+                                        else
+                                        {   // add to default index too...
+                                            // (only variants, main value is already take)
+                                             doc.add( new Field("default",
+                                                       var,
+                                                       Field.Store.NO,
+                                                       Field.Index.TOKENIZED));
+                                        }
+                                    }
+                                }
+
+                                if (!valueAlreadyIndexed)
+                                {
+                                    // TODO: use a delegate to allow custom 'types' to be used to reformat the field
+                                    doc.add( new Field(indexConfigArr[i].indexName,
+                                                       mydc[j].value,
+                                                       Field.Store.NO,
+                                                       Field.Index.TOKENIZED));
+                                }
+                            }
+                            else
+                            {
+	                            // TODO: use a delegate to allow custom 'types' to be used to reformat the field
+	                            doc.add( new Field(indexConfigArr[i].indexName,
+	                                               mydc[j].value,
+	                                               Field.Store.NO,
+	                                               Field.Index.TOKENIZED));
+                        	}
                         }
                         
                         doc.add( new Field("default", mydc[j].value, Field.Store.NO, Field.Index.TOKENIZED));

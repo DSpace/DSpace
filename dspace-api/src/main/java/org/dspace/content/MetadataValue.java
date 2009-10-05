@@ -79,6 +79,12 @@ public class MetadataValue
     /** The position of the record. */
     public int place = 1;
 
+    /** Authority key, if any */
+    public String authority = null;
+
+    /** Authority confidence value -- see Choices class for values */
+    public int confidence = 0;
+
     /** log4j logger */
     private static Logger log = Logger.getLogger(MetadataValue.class);
 
@@ -100,6 +106,8 @@ public class MetadataValue
             value = row.getStringColumn("text_value");
             language = row.getStringColumn("text_lang");
             place = row.getIntColumn("place");
+            authority = row.getStringColumn("authority");
+            confidence = row.getIntColumn("confidence");
             this.row = row;
         }
     }
@@ -232,6 +240,46 @@ public class MetadataValue
     }
 
     /**
+     * Get the metadata authority
+     *
+     * @return metadata authority
+     */
+    public String getAuthority ()
+    {
+        return authority ;
+    }
+
+    /**
+     * Set the metadata authority
+     *
+     * @param value new metadata authority
+     */
+    public void setAuthority (String value)
+    {
+        this.authority  = value;
+    }
+
+    /**
+     * Get the metadata confidence
+     *
+     * @return metadata confidence
+     */
+    public int getConfidence()
+    {
+        return confidence;
+    }
+
+    /**
+     * Set the metadata confidence
+     *
+     * @param value new metadata confidence
+     */
+    public void setConfidence(int value)
+    {
+        this.confidence = value;
+    }
+
+    /**
      * Creates a new metadata value.
      *
      * @param context
@@ -248,6 +296,8 @@ public class MetadataValue
         row.setColumn("text_value", value);
         row.setColumn("text_lang", language);
         row.setColumn("place", place);
+        row.setColumn("authority", authority);
+        row.setColumn("confidence", confidence);
         DatabaseManager.insert(context, row);
 
         // Remember the new row number
@@ -352,6 +402,8 @@ public class MetadataValue
         row.setColumn("text_value", value);
         row.setColumn("text_lang", language);
         row.setColumn("place", place);
+        row.setColumn("authority", authority);
+        row.setColumn("confidence", confidence);
         DatabaseManager.update(context, row);
 
         log.info(LogManager.getHeader(context, "update_metadatavalue",

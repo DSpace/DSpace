@@ -9,9 +9,9 @@
       build, install and upgrade and dspace instance.
    </description>
    <url>http://projects.dspace.org/dspace</url>
-   <!-- 
-      A Parent POM that Maven inherits DSpace Default 
-      POM atrributes from. 
+   <!--
+      A Parent POM that Maven inherits DSpace Default
+      POM atrributes from.
    -->
    <parent>
       <groupId>org.dspace</groupId>
@@ -35,25 +35,25 @@
       </repository>
    </repositories>
 
-   <!-- 
-   	The Subversion repository location is used by Continuum to update against
-   	when changes have occured, this spawns a new build cycle and releases snapshots
-   	into the snapshot repository below.
+   <!--
+        The Subversion repository location is used by Continuum to update against
+        when changes have occured, this spawns a new build cycle and releases snapshots
+        into the snapshot repository below.
    -->
    <scm>
-   	<connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace</connection>
-   	<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace</developerConnection>
-   	<url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace</url>
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace</connection>
+        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace</developerConnection>
+        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace</url>
    </scm>
 
    <profiles>
 
-      <!-- 
+      <!--
          This profile is used by all children such that
          when activated a dspace.config configuration
-         file location passed on the commandline 
-         (-Ddspace.config=...) can be passed through 
-         to be used as a filter source by projects for 
+         file location passed on the commandline
+         (-Ddspace.config=...) can be passed through
+         to be used as a filter source by projects for
          tasks such as updating the ${dspace.dir} in
          web.xml etc.
          
@@ -74,14 +74,14 @@
       </profile>
 
 
-      <!-- 
+      <!--
          These profiles activate the inclusion of various modules into
          the DSpace Build process. They activate automatically if the
          source module is in the local file system, correctly located
          relative to this file.
       -->
 
-      <!-- 
+      <!--
          Builds central API for DSpace
       -->
       <profile>
@@ -96,7 +96,7 @@
          </modules>
       </profile>
 
-      <!-- 
+      <!--
          Builds OAI Gateway WAR for DSpace
       -->
       <profile>
@@ -111,7 +111,7 @@
          </modules>
       </profile>
 
-      <!-- 
+      <!--
          Builds OAI Gateway WAR for DSpace
       -->
       <profile>
@@ -126,7 +126,7 @@
          </modules>
       </profile>
       
-      <!-- 
+      <!--
          Builds OAI Gateway WAR for DSpace
       -->
       <profile>
@@ -141,7 +141,19 @@
          </modules>
       </profile>
 
-      <!-- 
+      <profile>
+         <id>dspace-ui-shared</id>
+         <activation>
+            <file>
+               <exists>../dspace-ui-shared/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-ui-shared</module>
+         </modules>
+      </profile>
+
+      <!--
          Builds JSPUI WAR for DSpace
       -->
       <profile>
@@ -157,7 +169,7 @@
          </modules>
       </profile>
       
-      <!-- 
+      <!--
          Builds JSPUI WAR for DSpace
       -->
       <profile>
@@ -173,7 +185,7 @@
          </modules>
       </profile>
             
-      <!-- 
+      <!--
          Builds JSPUI WAR for DSpace
       -->
       <profile>
@@ -237,7 +249,7 @@
          </modules>
       </profile>
 
-      <!-- 
+      <!--
          Builds each separate XMLUI module for the XMLUI war (for development/Eclipse)
       -->
       <profile>
@@ -288,7 +300,7 @@
          </modules>
       </profile>
       
-      <!-- 
+      <!--
          Builds XMLUI WAR for DSpace
       -->
       <profile>
@@ -303,7 +315,7 @@
          </modules>
       </profile>
 
-      <!-- 
+      <!--
          Builds each separate LNI module for the LNI war (for development/Eclipse)
       -->
       <profile>
@@ -342,7 +354,7 @@
          </modules>
       </profile>
 
-      <!-- 
+      <!--
          Builds LNI WAR for DSpace
       -->
       <profile>
@@ -357,7 +369,7 @@
          </modules>
       </profile>
       
-      <!-- 
+      <!--
          Builds Language Packs for DSpace
       -->
       <profile>
@@ -372,7 +384,7 @@
          </modules>
       </profile>
 
-      <!-- 
+      <!--
          These profiles setup properties and build configuration
          appropriate to the database that DSpace will be installed
          against.
@@ -380,7 +392,7 @@
          They are activated by using the profile id - ie. -Ppostgres,
          or defining db.name - ie. -Ddb.name=oracle
       -->
-      <!-- 
+      <!--
          Default profile for Postgres database configuration
          Use -Ppostgres to activate.
       -->
@@ -419,7 +431,7 @@
       </profile>
 
 
-      <!-- 
+      <!--
          Default profile for Oracle database configuration
          Use -Poracle or -Ddb.name=oracle to activate.
       -->
@@ -460,7 +472,7 @@
          </dependencies>
       </profile>
 
-      <!--  
+      <!--
          Using xpdf filters requires the inclusion
          Of Sun dependencies these are not redistributable
          and you will need to install them locally in your
@@ -487,13 +499,13 @@
    
    </profiles>
    
-   <!-- 
+   <!--
       Builds Overlay Modules for DSpace
    -->
    <modules>
       <module>modules</module>
    </modules>
-	
+        
    <build>
       <plugins>
          <!--  overall project assembly -->
@@ -510,22 +522,22 @@
                   <phase>package</phase>
                   <goals>
                      <goal>directory-single</goal>
-                  </goals>   
+                  </goals>
                </execution>
             </executions>
          </plugin>
       </plugins>
    </build>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-api-lang</artifactId>
-		</dependency>
+        <dependencies>
+                <dependency>
+                        <groupId>org.dspace</groupId>
+                        <artifactId>dspace-api</artifactId>
+                </dependency>
+                <dependency>
+                        <groupId>org.dspace</groupId>
+                        <artifactId>dspace-api-lang</artifactId>
+                </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services-impl</artifactId>
@@ -539,6 +551,7 @@
             <artifactId>servlet-api</artifactId>
          </dependency>
          
-	</dependencies>
-	
+        </dependencies>
+        
 </project>
+
