@@ -126,7 +126,8 @@ Common usage:
         <echo message="" />
         <echo message="update          --> Update ${dspace.dir} config, etc, lib and web applications without " />
         <echo message="                    touching your data" />
-    	<echo message="update_configs  --> Update your configs directory with new configuration files"/>        
+    	<echo message="update_configs  --> Update your configs directory with new configuration files"/> 
+    	<echo message="update_geolite  --> Dowload and install GeoCity database into ${dspace.dir}/config" />
         <echo message="update_code     --> Update compiled code (bin, lib, and etc directories)" />
         <echo message="update_webapps  --> Update web applications" />
         <echo message="" />
@@ -189,9 +190,7 @@ Common usage:
     <!-- and should be hand updated afterward                .          -->
     <!-- ============================================================= -->
     <target name="update_configs" depends="overwrite_configs" description="Updates the Configuration Directory">
-
-    
-    
+    	<antcall target="init_geolite" />
     </target>
         
     <target name="overwrite_configs" description="Overwrites a configuration directory." if="overwrite" depends="copy_configs_keep">
@@ -588,6 +587,7 @@ Common usage:
 
         <copy file="${config}" tofile="${dspace.dir}/config/dspace.cfg" preservelastmodified="true" />
 
+    	
     </target>
 
 
@@ -718,7 +718,9 @@ Common usage:
         </delete>
 
         <antcall target="copy_webapps" />
-
+        	
+    	<antcall target="init_geolite" />
+    	
         <java classname="org.dspace.browse.IndexBrowse" classpathref="class.path" fork="yes" failonerror="yes">
             <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
             <sysproperty key="dspace.log.init.disable" value="true" />
@@ -761,6 +763,26 @@ Common usage:
 ====================================================================
         </echo>
 
+    </target>
+
+	<!-- installes GeoCity resolution database -->
+    <target name="update_geolite">
+        <echo>Downloading: http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz</echo>
+        <get src="http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz" dest="${dspace.dir}/config/GeoLiteCity.dat.gz" verbose="true" />
+        <gunzip src="${dspace.dir}/config/GeoLiteCity.dat.gz" dest="${dspace.dir}/config/GeoLiteCity.dat" />
+        <delete file="${dspace.dir}/config/GeoLiteCity.dat.gz" />
+    </target>
+
+    <target name="check_geolite">
+        <condition property="need.geolite">
+            <not>
+                <available file="${dspace.dir}/config/GeoLiteCity.dat" />
+            </not>
+        </condition>
+    </target>
+
+    <target name="init_geolite" depends="check_geolite" if="need.geolite">
+        <antcall target="update_geolite" />
     </target>
 
 </project>
