@@ -68,7 +68,7 @@
 	<parent>
 		<artifactId>dspace-pom</artifactId>
 		<groupId>org.dspace</groupId>
-		<version>1</version>
+		<version>2</version>
 	</parent>
 
 	<developers>
@@ -207,6 +207,31 @@
 
 				</executions>
 			</plugin>
+            
+            <plugin>
+                <groupId>com.google.code.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <version>1.4.0</version>
+                <configuration>
+                    <header>http://scm.dspace.org/svn/repo/licenses/LICENSE_HEADER</header>
+                    <excludes>
+                        <exclude>src/main/webapp/**</exclude>
+                        <exclude>target/**</exclude>
+                        <exclude>m2-target/**</exclude>
+                        <exclude>**/*.properties</exclude>
+                    </excludes>
+                    <properties />
+                    <encoding>UTF-8</encoding>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
 		</plugins>
 
 	</build>
