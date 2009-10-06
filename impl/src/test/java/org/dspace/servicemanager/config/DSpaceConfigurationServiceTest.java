@@ -1,17 +1,13 @@
 /**
- * $Id: DSpaceConfigurationServiceTest.java 3525 2009-03-05 16:52:10Z azeckoski $
- * $URL: https://scm.dspace.org/svn/repo/dspace2/core/trunk/impl/src/test/java/org/dspace/servicemanager/config/DSpaceConfigurationServiceTest.java $
- * DSpaceConfigurationServiceTest.java - DSpace2 - Oct 8, 2008 3:01:39 PM - azeckoski
- **************************************************************************
- * Copyright (c) 2002-2009, The Duraspace Foundation.  All rights reserved.
- * Licensed under the Duraspace Foundation License.
- * 
- * A copy of the Duraspace License has been included in this
- * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+ * $Id$
+ * $URL$
+ * *************************************************************************
+ * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
+ * Licensed under the DuraSpace Foundation License.
  *
- * 
+ * A copy of the DuraSpace License has been included in this
+ * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
  */
-
 package org.dspace.servicemanager.config;
 
 import static org.junit.Assert.*;

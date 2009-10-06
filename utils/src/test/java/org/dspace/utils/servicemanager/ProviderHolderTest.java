@@ -1,17 +1,13 @@
 /**
- * $Id: ProviderHolderTest.java 3477 2009-02-16 15:29:24Z azeckoski $
- * $URL: https://scm.dspace.org/svn/repo/dspace2/core/trunk/utils/src/test/java/org/dspace/utils/servicemanager/ProviderHolderTest.java $
- * ProviderHolderTest.java - DS2 - Feb 16, 2009 1:33:04 PM - azeckoski
- **************************************************************************
- * Copyright (c) 2002-2009, The Duraspace Foundation.  All rights reserved.
- * Licensed under the Duraspace Foundation License.
- * 
- * A copy of the Duraspace License has been included in this
- * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+ * $Id$
+ * $URL$
+ * *************************************************************************
+ * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
+ * Licensed under the DuraSpace Foundation License.
  *
- * 
+ * A copy of the DuraSpace License has been included in this
+ * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
  */
-
 package org.dspace.utils.servicemanager;
 
 import static org.junit.Assert.*;
