@@ -45,7 +45,9 @@ import java.util.regex.Pattern;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 
+import org.dspace.app.util.MetadataExposure;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.IConverter;
@@ -219,8 +221,13 @@ public class OAIDCCrosswalk extends Crosswalk
                         dcValues = item.getMetadata(mdString);
                     }
 
+                    try
+                    {
                     for (DCValue dcValue : dcValues)
                     {
+                            if (!MetadataExposure.isHidden(((HarvestedItemInfo) nativeItem).context,
+                                                          dcValue.schema, dcValue.element, dcValue.qualifier))
+                            {
                         String value;
                         if (converter != null)
                         {
@@ -270,6 +277,12 @@ public class OAIDCCrosswalk extends Crosswalk
                                     .append(">");
                         }
                     }
+                }
+            }
+                    catch (SQLException e)
+                    {
+                        throw new CannotDisseminateFormatException(e.toString());
+        }
                 }
             }
         }

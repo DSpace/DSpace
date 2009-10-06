@@ -172,7 +172,7 @@ public class DSpaceMETSGenerator extends AbstractGenerator
          	
          	// Handles can be either items or containers.
          	if (dso instanceof Item)
-         		adapter = new ItemAdapter((Item) dso, contextPath);
+                        adapter = new ItemAdapter(context, (Item) dso, contextPath);
          	else if (dso instanceof Collection || dso instanceof Community)
          		adapter = new ContainerAdapter(context, dso, contextPath);
          }
@@ -190,7 +190,7 @@ public class DSpaceMETSGenerator extends AbstractGenerator
          		{
          			Item item = Item.find(context,id);
          			if (item != null)
-         				adapter = new ItemAdapter(item,contextPath);
+                                        adapter = new ItemAdapter(context,item,contextPath);
          		}
          		else if ("collection".equals(type))
          		{

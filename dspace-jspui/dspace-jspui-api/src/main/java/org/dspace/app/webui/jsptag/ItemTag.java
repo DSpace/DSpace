@@ -56,6 +56,7 @@ import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.MetadataExposure;
 import org.dspace.app.webui.util.StyleSelection;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.browse.BrowseException;
@@ -68,6 +69,7 @@ import org.dspace.content.Item;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.core.PluginManager;
@@ -380,10 +382,11 @@ public class ItemTag extends TagSupport
     /**
      * Render an item in the given style
      */
-    private void render() throws IOException
+    private void render() throws IOException, SQLException
     {
         JspWriter out = pageContext.getOut();
         HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
+        Context context = UIUtil.obtainContext(request);
         
         String configLine = styleSelection.getConfigurationForStyle(style);
 
@@ -449,6 +452,11 @@ public class ItemTag extends TagSupport
             {
                 qualifier = eq[2];
             }
+
+            // check for hidden field, even if it's configured..
+            if (MetadataExposure.isHidden(context, schema, element, qualifier))
+                continue;
+
             // FIXME: Still need to fix for metadata language?
             DCValue[] values = item.getMetadata(schema, element, qualifier, Item.ANY);
             
@@ -595,9 +603,11 @@ public class ItemTag extends TagSupport
     /**
      * Render full item record
      */
-    private void renderFull() throws IOException
+    private void renderFull() throws IOException, SQLException
     {
         JspWriter out = pageContext.getOut();
+        HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
+        Context context = UIUtil.obtainContext(request);
 
         // Get all the metadata
         DCValue[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
@@ -621,20 +631,9 @@ public class ItemTag extends TagSupport
 
         for (int i = 0; i < values.length; i++)
         {
-            boolean hidden = false;
-
-            // Mask description.provenance
-            if (values[i].element.equals("description")
-                    && ((values[i].qualifier != null) && values[i].qualifier
-                            .equals("provenance")))
+            if (!MetadataExposure.isHidden(context, values[i].schema, values[i].element, values[i].qualifier))
             {
-                hidden = true;
-            }
-
-            if (!hidden)
-            {
-                out
-                        .print("<tr><td headers=\"s1\" class=\"metadataFieldLabel\">");
+                out.print("<tr><td headers=\"s1\" class=\"metadataFieldLabel\">");
                 out.print(values[i].schema);
                 out.print("." + values[i].element);
 
@@ -643,11 +642,9 @@ public class ItemTag extends TagSupport
                     out.print("." + values[i].qualifier);
                 }
 
-                out
-                        .print("</td><td headers=\"s2\" class=\"metadataFieldValue\">");
+                out.print("</td><td headers=\"s2\" class=\"metadataFieldValue\">");
                 out.print(Utils.addEntities(values[i].value));
-                out
-                        .print("</td><td headers=\"s3\" class=\"metadataFieldValue\">");
+                out.print("</td><td headers=\"s3\" class=\"metadataFieldValue\">");
 
                 if (values[i].language == null)
                 {

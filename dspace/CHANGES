@@ -55,6 +55,7 @@
  - [DS-333] Adjust SWORD ingest crosswalk to store bibliographic citation
 
 (Larry Stone)
+ - [DS-288] Configurable option to hide metadata fields in public UIs and OAI-PMH
  - [DS-236] Authority control for metadata fields and Choice Authority plugin framework
  - [DS-128] Fix repositioning on submission pages after add button is clicked (XMLUI)
  - [DS-255] Protect submission from being lost if exception occurs in CompleteStep

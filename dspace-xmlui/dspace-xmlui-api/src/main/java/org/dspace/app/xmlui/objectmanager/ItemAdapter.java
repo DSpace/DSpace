@@ -39,6 +39,7 @@
  */
 package org.dspace.app.xmlui.objectmanager;
 
+import org.dspace.app.util.MetadataExposure;
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
@@ -51,6 +52,7 @@ import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.SAXOutputter;
@@ -109,6 +111,9 @@ public class ItemAdapter extends AbstractAdapter
         administrative metadata sections */
     private HashMap<String,StringBuffer> fileAmdSecIDs = new HashMap<String,StringBuffer>();
 
+    // DSpace DB context
+    private Context context;
+
     /**
      * Construct a new ItemAdapter
      *
@@ -117,10 +122,11 @@ public class ItemAdapter extends AbstractAdapter
      * @param contextPath
      *            The contextpath for this webapplication.
      */
-    public ItemAdapter(Item item,String contextPath)
+    public ItemAdapter(Context context, Item item,String contextPath)
     {
         super(contextPath);
         this.item = item;
+        this.context = context;
     }
 
     /** Return the item */
@@ -274,6 +280,8 @@ public class ItemAdapter extends AbstractAdapter
                 DCValue[] dcvs = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
                 for (DCValue dcv : dcvs)
                 {
+                        if (!MetadataExposure.isHidden(context, dcv.schema, dcv.element, dcv.qualifier))
+                        {
                         // ///////////////////////////////
                         // Field element for each metadata field.
                         attributes = new AttributeMap();
@@ -291,6 +299,7 @@ public class ItemAdapter extends AbstractAdapter
                         startElement(DIM,"field",attributes);
                         sendCharacters(dcv.value);
                         endElement(DIM,"field");
+                }
                 }
                         
                 // ///////////////////////////////
