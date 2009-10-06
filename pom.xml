@@ -35,17 +35,6 @@
 		<url>http://scm.dspace.org/svn/repo/modules/dspace-solr/trunk</url>
 	</scm>
 
-	<licenses>
-      <license>
-         <name>DSpace Sourcecode License</name>
-         <url>LICENSE</url>
-         <distribution>repo</distribution>
-         <comments>
-            A BSD compatable OSS license for the DSpace codebase.
-         </comments>
-      </license>
-   </licenses>
-
 	<distributionManagement>
 		<repository>
 			<id>maven.dspace.org/release</id>
