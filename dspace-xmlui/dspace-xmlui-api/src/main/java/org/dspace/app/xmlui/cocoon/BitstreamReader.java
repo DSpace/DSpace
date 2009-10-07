@@ -342,19 +342,16 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             	// In-case there is no bitstream name...
             	bitstreamName = "bitstream";
             }
-            // Log that the bitstream has been viewed.
-            log.info(LogManager.getHeader(context, "view_bitstream", "bitstream_id=" + bitstream.getID()));
             
+            // Log that the bitstream has been viewed, this is none-cached and the complexity
+            // of adding it to the sitemap for every possible bitstre uri is not very tractable
             new DSpace().getEventService().fireEvent(
     				new UsageEvent(
     						UsageEvent.Action.VIEW,
     						ObjectModelHelper.getRequest(objectModel),
     						ContextUtil.obtainContext(ObjectModelHelper.getRequest(objectModel)),
     						bitstream));
-            
-            // Fire a view event for this bitstream
-            //new UsageEvent().fire((Request) ObjectModelHelper.getRequest(objectModel), 
-            //        context, UsageEvent.VIEW, Constants.BITSTREAM, bitstream.getID());
+
         }
         catch (SQLException sqle)
         {
