@@ -73,6 +73,8 @@
 
 (Mark Diggory / Stuart Lewis)
  - [DS-201] handle.jar upgraded to version 6.2
+
+(Mark Diggory)
  - [DS-335] DatabaseManager additions from Minho statistics addon.
  - [DS-247] Addition of DSpace Services to DSpace 1.6
 
