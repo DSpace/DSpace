@@ -13,13 +13,15 @@ chdir "$binpath/.." || die "$!\n";
 $dspace_dir = cwd();
 
 $statspath = "${dspace_dir}/stats";
-$dispstatspath = "${dspace_dir}/jsp/stats";
+$dispstatspath = "${dspace_dir}/webapps/jspui/stats";
+$configpath = "${dspace_dir}/config";
 $info = $binpath."/dspace-umdinfo.pl";
 $logreader = $binpath."/UMlog-reporter";
 $temp_file = "/tmp/dspace_log";
 $epeople_table = $statspath."/epeople_table";
 $views_table = $statspath."/views_table";
-$psql_queries = $binpath."/stats_queries.txt";
+$psql_queries = $configpath."/stats/queries.txt";
+chomp($port = `${dspace_dir}/bin/dsrun org.dspace.core.ConfigurationManager -property db.port`);
 
 
 sub execute {
@@ -109,7 +111,7 @@ close (VIEWS);
 &execute("cat $epeople_table >> $newreport");
 &execute("echo '\n\n' >> $newreport");
 
-&execute("/usr/local/pgsql/bin/psql -U dspace -d dspace -p 8001 < $psql_queries >> $newreport");
+&execute("/usr/bin/psql -U dspace -d dspace -p ${port} < $psql_queries >> $newreport");
 
 
 ###############################################################

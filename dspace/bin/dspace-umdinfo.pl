@@ -116,7 +116,6 @@ my $workspaceitem_count = CountRows( "workspaceitem" );
 
 # find sizes of dspace directories ##########
 
-my $assetstore_size = DirectorySize( $assetstore_dir );
 my $search_size     = DirectorySize( $search_dir     );
 my $history_size    = DirectorySize( $history_dir    );
 my $logs_size       = DirectorySize( $logs_dir       );
@@ -156,7 +155,6 @@ print "DSpace site statistics for site: '" . GetConfigParameter("dspace.name") .
 print "Date: " . localtime() . "\n";
 print "\n"; 
 print "Size of Important Directories:\n";
-SizeReport("Asset store:",      $assetstore_size);
 SizeReport("Database:",         $database_size  );
 SizeReport("Search Directory:", $search_size    );
 SizeReport("History Directory:",$history_size   );
@@ -341,18 +339,8 @@ sub GetConfigParameter
     my $dirname = shift;
     my $return_value = "";
 
-    open CONFIG, "grep $dirname $dspace_dir/config/dspace.cfg |";
-
-    my $result = <CONFIG>;
-
-#    chomp $result;
-
-    if( $result =~ m/^.+\s*=\s*(.*)\s*$/ )
-    {
-       $return_value = $1;
-    }
-
-    close CONFIG;
+    $return_value = `${dspace_dir}/bin/dsrun org.dspace.core.ConfigurationManager -property ${dirname}`;
+    chomp $return_value;
 
     return $return_value;
 }
@@ -362,7 +350,7 @@ sub GetConfigParameter
 sub DirectorySize
 {
     my $directory = shift;
-   
+
     my $sum = 0;
 
     find sub { $sum += -s }, $directory;
@@ -374,7 +362,7 @@ sub DirectorySize
 sub FindCollectionSizes
 {
     my $arg =
-        "SELECT c1.name, SUM(bs.size) FROM " .
+        "SELECT c1.name, SUM(bs.size_bytes) FROM " .
             "collection c1, collection2item c2i1, item2bundle i2b1, " .
             "bundle2bitstream b2b1, bitstream bs " .
         "WHERE " .
@@ -444,7 +432,7 @@ sub FindDeletedBitstreams
     my $arg = "SELECT COUNT(*) from bitstream where deleted=true";
     my @deleted_count = ExecuteSQL( $arg );
 
-    $arg = "SELECT SUM(size) from bitstream where deleted=true";
+    $arg = "SELECT SUM(size_bytes) from bitstream where deleted=true";
     my @deleted_size = ExecuteSQL( $arg );
 
     return ($deleted_count[0], $deleted_size[0]);
@@ -496,7 +484,7 @@ sub ExecuteSQL
     my $arg = shift;
 
     # do the SQL statement
-    open SQLOUT, "/usr/local/pgsql/bin/psql -U dspace -d dspace -A -c '$arg' -p $port | ";
+    open SQLOUT, "/usr/bin/psql -U dspace -d dspace -A -c '$arg' -p $port | ";
 
     # slurp up the results
     my @results = <SQLOUT>;
