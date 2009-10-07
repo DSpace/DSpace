@@ -158,9 +158,6 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 	            // Ignore all errors and just invalidate the cache.
 	        }
 
-            // add log message that we are viewing the item
-            // done here, as the serialization may not occur if the cache is valid
-            log.info(LogManager.getHeader(context, "view_item", "handle=" + (dso == null ? "" : dso.getHandle())));
     	}
     	return this.validity;
     }

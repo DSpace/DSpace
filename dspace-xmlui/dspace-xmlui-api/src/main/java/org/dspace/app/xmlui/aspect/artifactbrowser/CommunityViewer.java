@@ -211,7 +211,6 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	            // Ignore all errors and invalidate the cache.
 	        }
 
-            log.info(LogManager.getHeader(context, "view_community", "community_id=" + (community == null ? "" : community.getID())));
     	}
         return this.validity;
     }

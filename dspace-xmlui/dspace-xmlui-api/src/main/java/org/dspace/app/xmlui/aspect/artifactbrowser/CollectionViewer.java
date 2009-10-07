@@ -195,7 +195,6 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 	            // Just ignore all errors and return an invalid cache.
 	        }
 
-            log.info(LogManager.getHeader(context, "view_collection", "collection_id=" + (collection == null ? "" : collection.getID())));
     	}
     	return this.validity;
     }
