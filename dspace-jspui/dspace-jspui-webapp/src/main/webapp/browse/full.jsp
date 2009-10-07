@@ -364,11 +364,12 @@
 		<fmt:message key="browse.full.rpp"/>
 		<select name="rpp">
 <%
-	for (int i = 5; i <= 100 ; i += 5)
+        int rppvals[] = {10, 20, 50, 100};
+	for (int i = 0; i < rppvals.length ; i++)
 	{
-		String selected = (i == rpp ? "selected=\"selected\"" : "");
+		String selected = (rppvals[i] == rpp ? "selected=\"selected\"" : "");
 %>	
-			<option value="<%= i %>" <%= selected %>><%= i %></option>
+			<option value="<%= rppvals[i] %>" <%= selected %>><%= rppvals[i] %></option>
 <%
 	}
 %>
