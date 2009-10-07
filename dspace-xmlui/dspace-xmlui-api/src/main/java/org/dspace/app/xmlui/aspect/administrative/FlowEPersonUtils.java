@@ -101,10 +101,10 @@ public class FlowEPersonUtils {
 		result.setContinue(false); // default to no continue
 		
 		// Get all our request parameters
-		String email = request.getParameter("email_address");
-		String first = request.getParameter("first_name");
-		String last  = request.getParameter("last_name");
-		String phone = request.getParameter("phone");
+		String email = request.getParameter("email_address").trim();
+		String first = request.getParameter("first_name").trim();
+		String last  = request.getParameter("last_name").trim();
+		String phone = request.getParameter("phone").trim();
 		boolean login = (request.getParameter("can_log_in") != null) ? true : false;
 		boolean certificate = (request.getParameter("certificate") != null) ? true : false;
 		
