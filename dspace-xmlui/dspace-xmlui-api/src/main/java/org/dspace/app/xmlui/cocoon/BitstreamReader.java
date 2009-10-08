@@ -67,6 +67,7 @@ import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
@@ -150,11 +151,12 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     /**
      * When should a bitstream expire in milliseconds. This should be set to
      * some low value just to prevent someone hiting DSpace repeatily from
-     * killing the server. Note: 60000 milliseconds are in a second.
+     * killing the server. Note: 1000 milliseconds are in a second.
      *
      * Format: minutes * seconds * milliseconds
+     *  60 * 60 * 1000 == 1 hour
      */
-    protected static final int expires = 60 * 60 * 60000;
+    protected static final int expires = 60 * 60 * 1000;
 
     /** The Cocoon response */
     protected Response response;
@@ -174,6 +176,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     /** The bitstream's name */
     protected String bitstreamName;
     
+    /** True if bitstream is readable by anonymous users */
+    protected boolean isAnonymouslyReadable;
+
     /** Item containing the Bitstream */
     private Item item = null;
 
@@ -333,6 +338,19 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             this.bitstreamSize = bitstream.getSize();
             this.bitstreamMimeType = bitstream.getFormat().getMIMEType();
             this.bitstreamName = bitstream.getName();
+            if (context.getCurrentUser() == null)
+            {
+                this.isAnonymouslyReadable = true;
+            }
+            else
+            {
+                this.isAnonymouslyReadable = false;
+                for (ResourcePolicy rp : AuthorizeManager.getPoliciesActionFilter(context, bitstream, Constants.READ))
+                {
+                    if (rp.getGroupID() == 0)
+                        this.isAnonymouslyReadable = true;
+                }
+            }
 
             // Trim any path information from the bitstream
             if (bitstreamName != null && bitstreamName.length() >0 )
@@ -529,8 +547,11 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         byte[] buffer = new byte[BUFFER_SIZE];
         int length = -1;
 
-        response.setDateHeader("Expires", System.currentTimeMillis()
-                + expires);
+        // Only encourage caching if this is not a restricted resource, i.e.
+        // if it is accessed anonymously or is readable by Anonymous:
+        if (isAnonymouslyReadable)
+            response.setDateHeader("Expires", System.currentTimeMillis()
+                    + expires);
         
         // If this is a large bitstream then tell the browser it should treat it as a download.
         int threshold = ConfigurationManager.getIntProperty("xmlui.content_disposition_threshold");
