@@ -54,7 +54,7 @@ CREATE INDEX community_admin_fk_idx ON Community(admin);
 -------------------------------------------------------------------------
 ALTER TABLE MetadataValue
   ADD ( authority VARCHAR(100),
-        confidence INTEGER DEFAULT 1);
+        confidence INTEGER DEFAULT -1);
 
 -------------------------------------------------------------------------
 -- DS-260 Cleanup of Owning collection column for template item created
