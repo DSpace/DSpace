@@ -13,8 +13,18 @@
       <para>Most of the functionality that DSpace uses can be offered by any standard SQL database that supports transactions. Presently, the browse indices use some features specific to <ulink url="http://www.postgresql.org/">PostgreSQL</ulink> and <ulink url="http://www.oracle.com/database/">Oracle</ulink>, so some modification to the code would be needed before DSpace would function fully with an alternative database back-end.</para>
       <para>The <literal>org.dspace.storage.rdbms</literal> package provides access to an SQL database in a somewhat simpler form than using JDBC directly. The main class is <literal>DatabaseManager</literal>, which executes SQL queries and returns <literal>TableRow</literal> or <literal>TableRowIterator</literal> objects. The <literal>InitializeDatabase</literal> class is used to load SQL into the database via JDBC, for example to set up the schema.</para>
       <para>All calls to the <literal>Database Manager</literal> require a <link linkend="docbook-business.html-core">DSpace <literal>Context</literal> object</link>. Example use of the database manager API is given in the <literal>org.dspace.storage.rdbms</literal> package Javadoc.</para>
-      <para>The database schema used by DSpace (for PostgreSQL) is stored in <literal>[dspace-source]/dspace/etc/database_schema.sql</literal> in the source distribution. It is stored in the form of SQL that can be fed straight into the DBMS to construct the database. The schema SQL file also directly creates two e-person groups in the database that are required for the system to function properly.</para>
-      <para>Also in <literal>[dspace-source]/dspace/etc</literal> are various SQL files called <literal>database_schema_1x_1y</literal>. These contain the necessary SQL commands to update a live DSpace database from version 1.<literal>x</literal> to 1.<literal>y</literal>. Note that this might not be the only part of an upgrade process: see <link linkend="docbook-update.html">Updating a DSpace Installation</link> for details.</para>
+
+      <para>The database schema used by DSpace is created by SQL statements stored in a directory specific to each supported RDBMS platform:
+        <itemizedlist>
+          <listitem>
+            <para>PostgreSQL schemas are in <literal>[dspace-source]/dspace/etc/postgres/</literal></para>
+          </listitem>
+          <listitem>
+            <para>Oracle schemas are in <literal>[dspace-source]/dspace/etc/oracle/</literal></para>
+          </listitem>
+        </itemizedlist>
+      The SQL (DDL) statements to create the tables for the current release, starting with an empty database, aer in <literal>database_schema.sql</literal>. The schema SQL file also creates the two required e-person groups (<literal>Anonymous</literal> and <literal>Administrator</literal>) that are required for the system to function properly.</para>
+      <para>Also in <literal>[dspace-source]/dspace/etc/[database]</literal> are various SQL files called <literal>database_schema_1x_1y</literal>. These contain the necessary SQL commands to update a live DSpace database from version 1.<literal>x</literal> to 1.<literal>y</literal>. Note that this might not be the only part of an upgrade process: see <link linkend="docbook-update.html">Updating a DSpace Installation</link> for details.</para>
       <para>The DSpace database code uses an SQL function <literal>getnextid</literal> to assign primary keys to newly created rows. This SQL function must be safe to use if several JVMs are accessing the database at once; for example, the Web UI might be creating new rows in the database at the same time as the batch item importer. The PostgreSQL-specific implementation of the method uses <literal>SEQUENCES</literal> for each table in order to create new IDs. If an alternative database backend were to be used, the implementation of <literal>getnextid</literal> could be updated to operate with that specific DBMS.</para>
       <para>The <literal>etc</literal> directory in the source distribution contains two further SQL files. <literal>clean-database.sql</literal> contains the SQL necessary to completely clean out the database, so use with caution! The Ant target <literal>clean_database</literal> can be used to execute this. <literal>update-sequences.sql</literal> contains SQL to reset the primary key generation sequences to appropriate values. You&apos;d need to do this if, for example, you&apos;re restoring a backup database dump which creates rows with specific primary keys already defined. In such a case, the sequences would allocate primary keys that were already used.</para>
       <para>Versions of the <literal>*.sql*</literal> files for Oracle are stored in <literal>[dspace-source]/dspace/etc/oracle</literal>. These need to be copied over their PostgreSQL counterparts in <literal>[dspace-source]/dspace/etc</literal> prior to installation.</para>
@@ -24,7 +34,7 @@
         <screen>
 # clean up the database nightly
 40 2 * * * /usr/local/pgsql/bin/vacuumdb --analyze dspace &gt; /dev/null
-	2&gt;&amp;1
+        2&gt;&amp;1
 </screen>
         <para>The DSpace database can be backed up and restored using usual methods, for example with <literal>pg_dump</literal> and <literal>psql</literal>. However when restoring a database, you will need to perform these additional steps:</para>
         <itemizedlist>
@@ -40,7 +50,7 @@ DELETE FROM epersongroup;
             <para> After restoring a backup, you will need to reset the primary key generation sequences so that they do not produce already-used primary keys. Do this by executing the SQL in <literal>[dspace-source]/dspace/etc/update-sequences.sql</literal>, for example with:</para>
             <screen>
 psql -U dspace -f <emphasis>
-	[dspace-source]</emphasis>/dspace/etc/update-sequences.sql
+        [dspace-source]</emphasis>/dspace/etc/update-sequences.sql
 </screen>
           </listitem>
         </itemizedlist>
@@ -251,5 +261,3 @@ srb.parentdir.1 = mysrbdspaceassetstore
       </section>
     </section>
   </chapter>
-
-

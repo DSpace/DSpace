@@ -4,7 +4,7 @@
     <para>This section describes how to update a DSpace installation from one version to the next. Details of the differences between the functionality of each version are given in the <link linkend="docbook-history.html">Version History</link> section.</para>
     <section remap="h2">
       <title><anchor id="docbook-update.html-15_152" xreflabel="Updating From 1.5 or 1.5.1 to 1.5.2"/>Updating From 1.5 or 1.5.1 to 1.5.2</title>
-      <para>This section needs review</para>    
+      <para>This section needs review</para>
       <para>The changes in DSpace 1.5.2 do not include any database schema upgrades, and the upgrade should be straightforward. </para>
       <para>In the notes below <literal>[dspace]</literal> refers to the install directory for your existing DSpace installation, and <literal>[dspace-source]</literal> to the source directory for DSpace 1.5. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</para>
       <orderedlist>
@@ -55,12 +55,12 @@ ant -Dconfig=[dspace]/config/dspace.cfg update
 cd [dspace-source]/dspace/target/dspace-1.5-build.dir/
 ant -Dconfig=[dspace]/config/dspace.cfg update_configs
 </screen>
-		<para>You must then verify that you've merged and differenced in the <literal>[dspace]/config/**/*.new</literal> files into your configuration.</para>
-		<para>Some of the new parameters you should look out for in dspace.cfg include: </para>
+                <para>You must then verify that you've merged and differenced in the <literal>[dspace]/config/**/*.new</literal> files into your configuration.</para>
+                <para>Some of the new parameters you should look out for in dspace.cfg include: </para>
           <itemizedlist>
             <listitem>
-		<para>New option to restrict the expose of private items. The following needs to be added to dspace.cfg:</para>
-		<screen>
+                <para>New option to restrict the expose of private items. The following needs to be added to dspace.cfg:</para>
+                <screen>
 #### Restricted item visibility settings ###
 # By default RSS feeds, OAI-PMH and subscription emails will include ALL items
 # regardless of permissions set on them.
@@ -71,10 +71,10 @@ ant -Dconfig=[dspace]/config/dspace.cfg update_configs
 #harvest.includerestricted.oai = true
 #harvest.includerestricted.subscription = true
 </screen>
-			</listitem>
+                        </listitem>
             <listitem>
             <para>  Special groups for LDAP and password authentication. </para>
-			<screen>
+                        <screen>
 ##### Password users group #####
 
 # If required, a group name can be given here, and all users who log in
@@ -90,10 +90,10 @@ ant -Dconfig=[dspace]/config/dspace.cfg update_configs
 # if you want a group made up of all internal authenticated users.
 #ldap.login.specialgroup = group-name
 </screen>
-			</listitem>
+                        </listitem>
             <listitem>
             <para>new option for case insensitivity in browse tables. </para>
-			<screen>
+                        <screen>
 # By default, the display of metadata in the browse indexes is case sensitive
 # So, you will get separate entries for the terms
 #
@@ -112,7 +112,7 @@ ant -Dconfig=[dspace]/config/dspace.cfg update_configs
 #
 # webui.browse.metadata.case-insensitive = true
 </screen>
-			</listitem>
+                        </listitem>
             <listitem>
             <para>New usage event handler for collecting statistics:</para>
             <screen>
@@ -121,7 +121,7 @@ ant -Dconfig=[dspace]/config/dspace.cfg update_configs
 # plugin.single.org.dspace.app.statistics.AbstractUsageEvent = \
 #   org.dspace.app.statistics.PassiveUsageEvent
 </screen>
-			</listitem>
+                        </listitem>
             <listitem>
             <para>The location where sitemaps are stored is now configurable.</para>
             <screen>
@@ -129,13 +129,13 @@ ant -Dconfig=[dspace]/config/dspace.cfg update_configs
 # the directory where the generated sitemaps are stored
 sitemap.dir = ${dspace.dir}/sitemaps
 </screen>
-			</listitem>
+                        </listitem>
             <listitem>
             <para>MARC 21 ordering should now be used as default. Unless you have it set already, or you have it set to a different value, the following should be set:</para>
             <screen>
 plugin.named.org.dspace.sort.OrderFormatDelegate = org.dspace.sort.OrderFormatTitleMarc21=title
 </screen>
-			</listitem>
+                        </listitem>
             <listitem>
             <para>Hierarchical LDAP support.</para>
             <screen>
@@ -159,7 +159,7 @@ plugin.named.org.dspace.sort.OrderFormatDelegate = org.dspace.sort.OrderFormatTi
 # one level scope : 1
 # subtree scope : 2
 #ldap.search_scope = 2
-	 
+         
 # The full DN and password of a user allowed to connect to the LDAP server
 # and search for the DN of the user trying to log in.  If these are not specified,
 # the initial bind will be performed anonymously.
@@ -173,7 +173,7 @@ plugin.named.org.dspace.sort.OrderFormatDelegate = org.dspace.sort.OrderFormatTi
 # to be 'user@example.com
 #ldap.netid_email_domain = @example.com
 </screen>
-			</listitem>
+                        </listitem>
             <listitem>
             <para>Shibboleth authentication support.</para>
             <screen>
@@ -181,7 +181,7 @@ plugin.named.org.dspace.sort.OrderFormatDelegate = org.dspace.sort.OrderFormatTi
 # Check https://mams.melcoe.mq.edu.au/zope/mams/pubs/Installation/dspace15/view
 # for installation detail.
 #
-#	org.dspace.authenticate.ShibAuthentication
+#       org.dspace.authenticate.ShibAuthentication
 #
 # DSpace requires email as user's credential. There are 2 ways of providing
 # email to DSpace:
@@ -198,7 +198,7 @@ authentication.shib.email-header = MAIL
 
 # optional. Specify the header that carries user's first name
 # this is going to be used for creation of new-user
-authentication.shib.firstname-header = SHIB-EP-GIVENNAME 
+authentication.shib.firstname-header = SHIB-EP-GIVENNAME
 
 # optional. Specify the header that carries user's last name
 # this is used for creation of new user
@@ -242,7 +242,7 @@ authentication.shib.autoregister = true
 authentication.shib.role.Senior\ Researcher = Researcher, Staff
 authentication.shib.role.Librarian = Administrator
 </screen>
-			</listitem>
+                        </listitem>
             <listitem>
             <para>DOI and handle identifiers can now be rendered in the JSPUI.</para>
             <screen>
@@ -267,7 +267,7 @@ In configuration sections such as webui.itemdisplay.default, values can
 be changed from (e.g.) metadata.dc.identifier.doi to
 metadata.doi.dc.identifier.doi
 </para>
-			</listitem>
+                        </listitem>
             <listitem>
             <para>The whole of the SWORD configuration has changed. The SWORD section must be removed and replaced with</para>
             <screen>
@@ -470,7 +470,7 @@ plugin.named.org.dspace.sword.SWORDIngester = \
 http://purl.org/net/sword-types/METSDSpaceSIP \
   org.dspace.sword.SimpleFileIngester = SimpleFileIngester
 </screen>
-			</listitem>
+                        </listitem>
             </itemizedlist>
         </listitem>
         <listitem>
@@ -532,7 +532,7 @@ plugin.sequence.org.dspace.authenticate.AuthenticationMethod = \
 # Specify which strategy use for select the style for an item
 plugin.single.org.dspace.app.webui.util.StyleSelection = \
                       
-	org.dspace.app.webui.util.CollectionStyleSelection
+        org.dspace.app.webui.util.CollectionStyleSelection
 
 
 ###### Browse Configuration ######
@@ -551,7 +551,7 @@ webui.browse.index.4 = subject:metadata:dc.subject.*:text
 webui.itemlist.sort-option.1 = title:dc.title:title
 webui.itemlist.sort-option.2 = dateissued:dc.date.issued:date
 webui.itemlist.sort-option.3 =
-	dateaccessioned:dc.date.accessioned:date
+        dateaccessioned:dc.date.accessioned:date
 
 # Recent submissions
 recent.submissions.count = 5
@@ -575,20 +575,20 @@ webui.content_disposition_threshold = 8388608
 #### Event System Configuration ####
 #
 # default synchronous dispatcher (same behavior as traditional
-	DSpace)
+        DSpace)
 event.dispatcher.default.class = org.dspace.event.BasicDispatcher
 event.dispatcher.default.consumers = search, browse, eperson
 
 # consumer to maintain the search index
 event.consumer.search.class = org.dspace.search.SearchConsumer
 event.consumer.search.filters =
-	Item|Collection|Community|Bundle+Create|Modify|Modify_Metadata|Delete:
+        Item|Collection|Community|Bundle+Create|Modify|Modify_Metadata|Delete:
 Bundle+Add|Remove
 
 # consumer to maintain the browse index
 event.consumer.browse.class = org.dspace.browse.BrowseConsumer
 event.consumer.browse.filters =
-	Item+Create|Modify|Modify_Metadata:Collection+Add|Remove
+        Item+Create|Modify|Modify_Metadata:Collection+Add|Remove
 
 # consumer related to EPerson changes
 event.consumer.eperson.class = org.dspace.eperson.EPersonConsumer
@@ -599,46 +599,46 @@ event.consumer.eperson.filters = EPerson+Create
           <para><emphasis role="bold">Add <literal>xmlui.xconf</literal> Manakin configuration</emphasis> The new Manakin user interface available with DSpace 1.5 requires an extra configuration file that you will need to manually copy it over to your configuration directory.</para>
           <screen>
 cp [dspace-source]/dspace/config/xmlui.xconf
-	[dspace]/config/xmlui.xconf
+        [dspace]/config/xmlui.xconf
 </screen>
         </listitem>
         <listitem>
           <para><emphasis role="bold">Add <literal>item-submission.xml</literal> and <literal>item-submission.dtd</literal> configurable submission configuration</emphasis> The new configurable submission system that enables an administrator to re-arrange, or add/remove item submission steps requires this configuration file. You need to manually copy it over to your configuration directory.</para>
           <screen>
 cp [dspace-source]/dspace/config/item-submission.xml
-	[dspace]/config/item-submission.xml
+        [dspace]/config/item-submission.xml
 
 cp [dspace-source]/dspace/config/item-submission.dtd
-	[dspace]/config/item-submission.dtd
+        [dspace]/config/item-submission.dtd
 </screen>
         </listitem>
         <listitem>
           <para><emphasis role="bold">Add new <literal>input-forms.xml</literal> and <literal>input-forms.dtd</literal> configurable submission configuration</emphasis> The input-forms.xml now has an included dtd reference to support validation. You&apos;ll need to merge in your changes to both file/and or copy them into place.</para>
           <screen>
 cp [dspace-source]/dspace/config/input-forms.xml
-	[dspace]/config/input-forms.xml
+        [dspace]/config/input-forms.xml
 
 cp [dspace-source]/dspace/config/input-forms.dtd
-	[dspace]/config/inputforms.dtd
+        [dspace]/config/inputforms.dtd
 </screen>
         </listitem>
         <listitem>
           <para><emphasis role="bold">Add <literal>sword-swap-ingest.xsl</literal> and <literal>xhtml-head-item.properties</literal> crosswalk files</emphasis> New crosswalk files are required to support SWORD and the inclusion of metadata into the head of items.</para>
           <screen>
 cp [dspace-source]/dspace/config/crosswalks/sword-swap-ingest.xsl
-	[dspace]/config/crosswalks/sword-swap-ingest.xsl
+        [dspace]/config/crosswalks/sword-swap-ingest.xsl
 
 
 cp
-	[dspace-source]/dspace/config/crosswalks/xhtml-head-item.properties
-	[dspace]/config/crosswalks/xhtml-head-item.properties
+        [dspace-source]/dspace/config/crosswalks/xhtml-head-item.properties
+        [dspace]/config/crosswalks/xhtml-head-item.properties
 </screen>
         </listitem>
         <listitem>
           <para><emphasis role="bold">Add <literal>registration_notify</literal> email files</emphasis> A new configuration option (<literal>registration.notify = you@your-email.com</literal>) can be set to send a notification email whenever a new user registers to use your DSpace. The email template for this email needs to be copied.</para>
           <screen>
 cp [dspace-source]/dspace/config/emails/registration_notify
-	[dspace]/config/emails/registration_notify
+        [dspace]/config/emails/registration_notify
  
 </screen>
         </listitem>
@@ -648,7 +648,7 @@ cp [dspace-source]/dspace/config/emails/registration_notify
             <listitem>
               <para> For PostgreSQL </para>
               <para>
-                <literal>psql -U [dspace-user] -f [dspace-source]/dspace/etc/database_schema_14-15.sql [database-name]</literal>
+                <literal>psql -U [dspace-user] -f [dspace-source]/dspace/etc/postgres/database_schema_14-15.sql [database-name]</literal>
               </para>
             </listitem>
             <listitem>
@@ -671,10 +671,10 @@ ant -Dconfig=[dspace]/config/dspace.cfg update
           <para><emphasis role="bold">Update the Metadata Registry</emphasis> New Metadata Registry updates are required to support SWORD.</para>
           <screen>
 cp [dspace-source]/dspace/config/registries/sword-metadata.xml
-	[dspace]/config/registries/sword-metadata.xml;
+        [dspace]/config/registries/sword-metadata.xml;
 
 [dspace]/bin/dsrun org.dspace.administer.MetadataImporter -f
-	[dspace]/config/registries/sword-metadata.xml
+        [dspace]/config/registries/sword-metadata.xml
 </screen>
         </listitem>
         <listitem>
@@ -750,19 +750,19 @@ cp postgresql.jar <emphasis> [dspace-1.4.x-source]</emphasis>/lib
 #### Multi-file HTML document/site settings #####
 #
 # When serving up composite HTML items, how deep can the request be
-	for us to
+        for us to
 # serve up a file with the same name?
 #
 # e.g. if we receive a request for &quot;foo/bar/index.html&quot;
 # and we have a bitstream called just &quot;index.html&quot;
 # we will serve up that bitstream for the request if
-	webui.html.max-depth-guess
+        webui.html.max-depth-guess
 # is 2 or greater.  If webui.html.max-depth-guess is 1 or less, we
-	would not
+        would not
 # serve that bitstream, as the depth of the file is greater.
 #
 # If webui.html.max-depth-guess is zero, the request filename and
-	path must
+        path must
 # always exactly match the bitstream name.  Default value is 3.
 #
 webui.html.max-depth-guess = 3
@@ -782,7 +782,7 @@ ant -Dconfig=<emphasis> [dspace]</emphasis>/config/dspace.cfg update
           <para> Copy the <literal>.war</literal> Web application files in <literal>[dspace-1.4.x-source]/build</literal> to the <literal>webapps</literal> sub-directory of your servlet container (e.g. Tomcat). e.g.:</para>
           <screen>
 cp <emphasis> [dspace-1.4.x-source]</emphasis>/build/*.war <emphasis>
-	[tomcat]</emphasis>/webapps
+        [tomcat]</emphasis>/webapps
 </screen>
           <para>If you&apos;re using Tomcat, you need to delete the directories corresponding to the old <literal>.war</literal> files. For example, if <literal>dspace.war</literal> is installed in <literal>[tomcat]/webapps/dspace.war</literal>, you should delete the <literal>[tomcat]/webapps/dspace</literal> directory. Otherwise, Tomcat will continue to use the old code in that directory.</para>
         </listitem>
@@ -854,22 +854,22 @@ plugin.sequence.org.dspace.eperson.AuthenticationMethod = \
 
 plugin.sequence.org.dspace.app.mediafilter.MediaFilter = \
     org.dspace.app.mediafilter.PDFFilter,
-	org.dspace.app.mediafilter.HTMLFilter, \
+        org.dspace.app.mediafilter.HTMLFilter, \
     org.dspace.app.mediafilter.WordFilter,
-	org.dspace.app.mediafilter.JPEGFilter
+        org.dspace.app.mediafilter.JPEGFilter
 # to enable branded preview: remove last line above, and uncomment 2
-	lines below
+        lines below
 #   org.dspace.app.mediafilter.WordFilter,
-	org.dspace.app.mediafilter.JPEGFilter, \
+        org.dspace.app.mediafilter.JPEGFilter, \
 #   org.dspace.app.mediafilter.BrandedPreviewJPEGFilter
 
 filter.org.dspace.app.mediafilter.PDFFilter.inputFormats = Adobe PDF
 filter.org.dspace.app.mediafilter.HTMLFilter.inputFormats = HTML,
-	Text
+        Text
 filter.org.dspace.app.mediafilter.WordFilter.inputFormats = Microsoft
-	Word
+        Word
 filter.org.dspace.app.mediafilter.JPEGFilter.inputFormats = GIF,
-	JPEG, image/png
+        JPEG, image/png
 filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormat
 s = GIF, JPEG, image/png
 
@@ -897,7 +897,7 @@ webui.preview.brand.fontpoint = 12
 plugin.single.org.dspace.checker.BitstreamDispatcher=org.dspace.checke
 r.SimpleDispatcher
 # Standard interface implementations. You shouldn&apos;t need to tinker
-	with these.
+        with these.
 plugin.single.org.dspace.checker.ReporterDAO=org.dspace.checker.Report
 erDAOImpl
 
@@ -966,7 +966,7 @@ ant -Dconfig=<emphasis> [dspace]</emphasis>/config/dspace.cfg update
           <para> Copy the <literal>.war</literal> Web application files in <literal>[dspace-1.4-source]/build</literal> to the <literal>webapps</literal> sub-directory of your servlet container (e.g. Tomcat). e.g.:</para>
           <screen>
 cp <emphasis> [dspace-1.4-source]</emphasis>/build/*.war <emphasis>
-	[tomcat]</emphasis>/webapps
+        [tomcat]</emphasis>/webapps
 </screen>
           <para>If you&apos;re using Tomcat, you need to delete the directories corresponding to the old <literal>.war</literal> files. For example, if <literal>dspace.war</literal> is installed in <literal>[tomcat]/webapps/dspace.war</literal>, you should delete the <literal>[tomcat]/webapps/dspace</literal> directory. Otherwise, Tomcat will continue to use the old code in that directory.</para>
         </listitem>
@@ -1006,7 +1006,7 @@ ant -Dconfig=<emphasis> [dspace]</emphasis>/config/dspace.cfg update
           <para> Copy the <literal>.war</literal> Web application files in <literal>[dspace-1.3.2-source]/build</literal> to the <literal>webapps</literal> sub-directory of your servlet container (e.g. Tomcat). e.g.:</para>
           <screen>
 cp <emphasis> [dspace-1.3.2-source]</emphasis>/build/*.war <emphasis>
-	[tomcat]</emphasis>/webapps
+        [tomcat]</emphasis>/webapps
 </screen>
           <para>If you&apos;re using Tomcat, you need to delete the directories corresponding to the old <literal>.war</literal> files. For example, if <literal>dspace.war</literal> is installed in <literal>[tomcat]/webapps/dspace.war</literal>, you should delete the <literal>[tomcat]/webapps/dspace</literal> directory. Otherwise, Tomcat will continue to use the old code in that directory.</para>
         </listitem>
@@ -1052,9 +1052,9 @@ cp <emphasis> [dspace-1.3.2-source]</emphasis>/build/*.war <emphasis>
 ###### Statistical Report Configuration Settings ######
 
 # should the stats be publicly available?  should be set to false if
-	you only
+        you only
 # want administrators to access the stats, or you do not intend to
-	generate
+        generate
 # any
 report.public = false
 
@@ -1154,7 +1154,7 @@ ant -Dconfig=<emphasis> [dspace]</emphasis>/config/dspace.cfg update
           <para> Copy the <literal>.war</literal> Web application files in <literal>[dspace-1.2.2-source]/build</literal> to the <literal>webapps</literal> sub-directory of your servlet container (e.g. Tomcat). e.g.:</para>
           <screen>
 cp <emphasis> [dspace-1.2.2-source]</emphasis>/build/*.war <emphasis>
-	[tomcat]</emphasis>/webapps
+        [tomcat]</emphasis>/webapps
 </screen>
           <para>If you&apos;re using Tomcat, you need to delete the directories corresponding to the old <literal>.war</literal> files. For example, if <literal>dspace.war</literal> is installed in <literal>[tomcat]/webapps/dspace.war</literal>, you should delete the <literal>[tomcat]/webapps/dspace</literal> directory. Otherwise, Tomcat will continue to use the old code in that directory.</para>
         </listitem>
@@ -1191,13 +1191,13 @@ cp postgresql.jar <emphasis> [dspace-1.2.1-source]</emphasis>/lib
           <para> You need to add a few new parameters to your <literal>[dspace]/dspace.cfg</literal> for browse/search and item thumbnails display, and for configurable DC metadata fields to be indexed.</para>
           <screen>
 # whether to display thumbnails on browse and search results pages
-	(1.2+)
+        (1.2+)
 webui.browse.thumbnail.show = false
 
 # max dimensions of the browse/search thumbs. Must be &lt;=
-	thumbnail.maxwidth
+        thumbnail.maxwidth
 # and thumbnail.maxheight. Only need to be set if required to be
-	smaller than
+        smaller than
 # dimension of thumbnails generated by mediafilter (1.2+)
 #webui.browse.thumbnail.maxheight = 80
 #webui.browse.thumbnail.maxwidth = 80
@@ -1206,9 +1206,9 @@ webui.browse.thumbnail.show = false
 webui.item.thumbnail.show = true
 
 # where should clicking on a thumbnail from browse/search take the
-	user
+        user
 # Only values currently supported are &quot;item&quot; and
-	&quot;bitstream&quot;
+        &quot;bitstream&quot;
 #webui.browse.thumbnail.linkbehaviour = item
 
 
@@ -1244,7 +1244,7 @@ ant -Dconfig=<emphasis> [dspace]</emphasis>/config/dspace.cfg update
           <para> Copy the <literal>.war</literal> Web application files in <literal>[dspace-1.2.1-source]/build</literal> to the <literal>webapps</literal> sub-directory of your servlet container (e.g. Tomcat). e.g.:</para>
           <screen>
 cp <emphasis> [dspace-1.2.1-source]</emphasis>/build/*.war <emphasis>
-	[tomcat]</emphasis>/webapps
+        [tomcat]</emphasis>/webapps
 </screen>
           <para>If you&apos;re using Tomcat, you need to delete the directories corresponding to the old <literal>.war</literal> files. For example, if <literal>dspace.war</literal> is installed in <literal>[tomcat]/webapps/dspace.war</literal>, you should delete the <literal>[tomcat]/webapps/dspace</literal> directory. Otherwise, Tomcat will continue to use the old code in that directory.</para>
         </listitem>
@@ -1270,7 +1270,7 @@ cp <emphasis> [dspace-1.2.1-source]</emphasis>/build/*.war <emphasis>
           <screen>
 cd <emphasis> [dspace]</emphasis>/lib
 cp activation.jar servlet.jar mail.jar <emphasis>
-	[dspace-1.2-source]</emphasis>/lib
+        [dspace-1.2-source]</emphasis>/lib
 </screen>
         </listitem>
         <listitem>
@@ -1305,7 +1305,7 @@ thumbnail.maxheight 80
           <para>Also, to avoid future confusion, you might like to <emphasis role="bold">remove</emphasis> the following property, which is no longer required:</para>
           <screen>
 config.template.oai-web.xml = <emphasis>
-	[dspace]</emphasis>/oai/WEB-INF/web.xml
+        [dspace]</emphasis>/oai/WEB-INF/web.xml
 </screen>
         </listitem>
         <listitem>
@@ -1314,9 +1314,9 @@ config.template.oai-web.xml = <emphasis>
           <para>Also, if you&apos;re using the same version of Tomcat as before, you need to <emphasis role="bold">remove the lines from Tomcat&apos;s conf/server.xml file that enable symbolic links for DSpace.</emphasis> These are the <literal>&lt;Context&gt;</literal> elements you added to get DSpace 1.1.1 working, looking something like this:</para>
           <screen>
 &lt;Context path=&quot;/dspace&quot; docBase=&quot;dspace&quot; debug=&quot;0&quot; reloadable=&quot;true&quot;
-	crossContext=&quot;true&quot;&gt;
+        crossContext=&quot;true&quot;&gt;
   &lt;Resources className=&quot;org.apache.naming.resources.FileDirContext&quot;
-	allowLinking=&quot;true&quot; /&gt;
+        allowLinking=&quot;true&quot; /&gt;
 &lt;/Context&gt;
 </screen>
           <para>Be sure to remove the &lt;Context&gt; elements for both the Web UI and the OAI Web applications.</para>
@@ -1331,9 +1331,9 @@ ant -Dconfig=<emphasis> [dspace]</emphasis>/config/dspace.cfg update
           <para> Copy the new config files in <literal>config</literal> to your installation, e.g.:</para>
           <screen>
 cp <emphasis> [dspace-1.2-source]</emphasis>/config/news-* <emphasis>
-	[dspace-1.2-source]</emphasis>/config/mediafilter.cfg <emphasis>
-	[dspace-1.2-source]</emphasis>/config/dc2mods.cfg <emphasis>
-	[dspace]</emphasis>/config
+        [dspace-1.2-source]</emphasis>/config/mediafilter.cfg <emphasis>
+        [dspace-1.2-source]</emphasis>/config/dc2mods.cfg <emphasis>
+        [dspace]</emphasis>/config
 </screen>
         </listitem>
         <listitem>
@@ -1341,14 +1341,14 @@ cp <emphasis> [dspace-1.2-source]</emphasis>/config/news-* <emphasis>
           <para>To apply the changes, go to the source directory, and run:</para>
           <screen>
 psql -f etc/database_schema_11-12.sql [DSpace database name] -h
-	localhost
+        localhost
 </screen>
         </listitem>
         <listitem>
           <para> A tool supplied with the DSpace 1.2 codebase will then update the actual data in the relational database. Run it using:</para>
           <screen>
 <emphasis> [dspace]</emphasis>/bin/dsrun
-	org.dspace.administer.Upgrade11To12
+        org.dspace.administer.Upgrade11To12
 </screen>
         </listitem>
         <listitem>
@@ -1362,7 +1362,7 @@ psql -f etc/database_schema_11-12.sql [DSpace database name] -h
           <para>Copy the <literal>.war</literal> Web application files in <literal>[dspace-1.2-source]/build</literal> to the <literal>webapps</literal> sub-directory of your servlet container (e.g. Tomcat). e.g.:</para>
           <screen>
 cp <emphasis> [dspace-1.2-source]</emphasis>/build/*.war <emphasis>
-	[tomcat]</emphasis>/webapps
+        [tomcat]</emphasis>/webapps
 </screen>
         </listitem>
         <listitem>
@@ -1472,14 +1472,14 @@ CREATE INDEX last_modified_idx ON Item(last_modified);
 CREATE INDEX eperson_email_idx ON EPerson(email);
 CREATE INDEX item2bundle_item_idx on Item2Bundle(item_id);
 REATE INDEX bundle2bitstream_bundle_idx ON
-	Bundle2Bitstream(bundle_id);
+        Bundle2Bitstream(bundle_id);
 CREATE INDEX dcvalue_item_idx on DCValue(item_id);
 CREATE INDEX collection2item_collection_idx ON
-	Collection2Item(collection_id);
+        Collection2Item(collection_id);
 CREATE INDEX resourcepolicy_type_id_idx ON ResourcePolicy
-	(resource_type_id,resource_id);
+        (resource_type_id,resource_id);
 CREATE INDEX epersongroup2eperson_group_idx on
-	EPersonGroup2EPerson(eperson_group_id);
+        EPersonGroup2EPerson(eperson_group_id);
 CREATE INDEX handle_handle_idx ON Handle(handle);
 CREATE INDEX sort_author_idx on ItemsByAuthor(sort_author);
 CREATE INDEX sort_title_idx on ItemsByTitle(sort_title);
@@ -1489,23 +1489,23 @@ DROP VIEW CollectionItemsByDateAccessioned;
 
 DROP VIEW CommunityItemsByDateAccessioned;
 CREATE VIEW CommunityItemsByDateAccession as SELECT
-	Community2Item.community_id, ItemsByDateAccessioned.*  FROM
-	ItemsByDateAccessioned, Community2Item WHERE
-	ItemsByDateAccessioned.item_id = Community2Item.item_id;
+        Community2Item.community_id, ItemsByDateAccessioned.*  FROM
+        ItemsByDateAccessioned, Community2Item WHERE
+        ItemsByDateAccessioned.item_id = Community2Item.item_id;
 CREATE VIEW CollectionItemsByDateAccession AS SELECT
-	collection2item.collection_id,
-	itemsbydateaccessioned.items_by_date_accessioned_id,
-	itemsbydateaccessioned.item_id,
-	itemsbydateaccessioned.date_accessioned FROM itemsbydateaccessioned,
-	collection2item WHERE (itemsbydateaccessioned.item_id =
-	collection2item.item_id);
+        collection2item.collection_id,
+        itemsbydateaccessioned.items_by_date_accessioned_id,
+        itemsbydateaccessioned.item_id,
+        itemsbydateaccessioned.date_accessioned FROM itemsbydateaccessioned,
+        collection2item WHERE (itemsbydateaccessioned.item_id =
+        collection2item.item_id);
 </screen>
         </listitem>
         <listitem>
           <para> Fix your JSPs for Unicode. If you&apos;ve modified the site &apos;skin&apos; (<literal>jsp/local/layout/header-default.jsp</literal>) you&apos;ll need to add the Unicode header, i.e.:</para>
           <screen>
 &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html;
-	charset=UTF-8&quot;&gt;
+        charset=UTF-8&quot;&gt;
 </screen>
           <para>to the &lt;HEAD&gt; element. If you have any locally-edited JSPs, you need to add this page directive to the top of all of them:</para>
           <screen>
@@ -1518,7 +1518,7 @@ CREATE VIEW CollectionItemsByDateAccession AS SELECT
           <screen>
 cd <emphasis> [dspace]</emphasis>/lib
 cp *.policy activation.jar servlet.jar mail.jar <emphasis>
-	[dspace-1.1-source]</emphasis>/lib
+        [dspace-1.1-source]</emphasis>/lib
 </screen>
         </listitem>
         <listitem>
@@ -1534,14 +1534,14 @@ ant -Dconfig=<emphasis> [dspace]</emphasis>/config/dspace.cfg update
           <para> Update the database tables using the upgrader tool, which sets up the new &gt;<literal>last_modified</literal> date in the item table:</para>
           <screen>
 Run <emphasis> [dspace]</emphasis>/bin/dsrun
-	org.dspace.administer.Upgrade101To11
+        org.dspace.administer.Upgrade101To11
 </screen>
         </listitem>
         <listitem>
           <para> Run the collection default authorisation policy tool:</para>
           <screen>
 <emphasis> [dspace]</emphasis>/bin/dsrun
-	org.dspace.authorize.FixDefaultPolicies
+        org.dspace.authorize.FixDefaultPolicies
 </screen>
         </listitem>
         <listitem>
@@ -1570,5 +1570,3 @@ JAVA_OPTS=&quot;-Xmx512M -Xms64M -Dfile.encoding=UTF-8&quot;
       </orderedlist>
     </section>
   </chapter>
-
-

@@ -58,6 +58,7 @@
  - [DS-333] Adjust SWORD ingest crosswalk to store bibliographic citation
 
 (Larry Stone)
+ - [DS-297] Move PostgreSQL-specific SQL into etc/postgres for greater clarity
  - [DS-338] Disable cache advice (Expires header) on Bitstream download that requires authorization (XMLUI)
  - [DS-285] Respond to If-Modified-Since request header in XMLUI, also provide Last-Modified response header for Bitstreams
  - [DS-288] Configurable option to hide metadata fields in public UIs and OAI-PMH

@@ -93,13 +93,13 @@ URIEncoding=&quot;UTF-8&quot;
 &lt;!-- Define a non-SSL HTTP/1.1 Connector on port 8080 --&gt;
 &lt;Connector port=&quot;8080&quot;
            maxThreads=&quot;150&quot; minSpareThreads=&quot;25&quot;
-	maxSpareThreads=&quot;75&quot;
+        maxSpareThreads=&quot;75&quot;
            enableLookups=&quot;false&quot; redirectPort=&quot;8443&quot;
-	acceptCount=&quot;100&quot;
+        acceptCount=&quot;100&quot;
            connectionTimeout=&quot;20000&quot;
-	disableUploadTimeout=&quot;true&quot;
+        disableUploadTimeout=&quot;true&quot;
            <emphasis role="bold"> URIEncoding=&quot;UTF-8&quot;</emphasis>
-	/&gt;
+        /&gt;
 </screen>
              <para> You may change the port from 8080 by editing it in the file above, and by setting the variable CONNECTOR_PORT in tomcat.conf</para>
           </listitem>
@@ -309,14 +309,6 @@ db.url    = jdbc:oracle:thin:@//host:port/dspace
 db.driver = oracle.jdbc.OracleDriver
 </screen>
               </listitem>
-              <listitem>
-                <para> Go to <literal>[dspace-source]/dspace/etc/oracle</literal> and copy the contents to their parent directory, overwriting the versions in the parent:</para>
-                <screen>
-cd [dspace-source]/dspace/etc/oracle
-cp * ..
-</screen>
-                <para>You now have Oracle-specific <literal>.sql</literal> files in your <literal>etc</literal> directory, and your dspace.cfg is modified to point to your Oracle database.</para>
-              </listitem>
             </orderedlist>
             </listitem>
           <listitem>
@@ -363,7 +355,7 @@ mvn -Ddb.name=oracle package
             <para> As the <literal>dspace</literal> UNIX user, initialize the DSpace database and install DSpace to <literal>[dspace]</literal>:</para>
             <screen>
 cd <emphasis>
-	[dspace-source]</emphasis>/dspace/target/dspace-[version].dir/
+        [dspace-source]</emphasis>/dspace/target/dspace-[version].dir/
 ant fresh_install
 </screen>
             <para><emphasis role="bold">Note:</emphasis> to see a complete list of build targets, run</para>
@@ -377,20 +369,20 @@ ant help
             <screen>
 &lt;!-- DEFINE A CONTEXT PATH FOR DSpace JSP User Interface  --&gt;
 &lt;Context path=&quot;/jspui&quot; docBase=&quot;[dspace]\webapps\jspui&quot; debug=&quot;0&quot;
-	reloadable=&quot;true&quot; cachingAllowed=&quot;false&quot;
-	allowLinking=&quot;true&quot;/&gt;
+        reloadable=&quot;true&quot; cachingAllowed=&quot;false&quot;
+        allowLinking=&quot;true&quot;/&gt;
         
 &lt;!-- DEFINE A CONTEXT PATH FOR DSpace OAI User Interface  --&gt;
 &lt;Context path=&quot;/oai&quot; docBase=&quot;[dspace]\webapps\oai&quot; debug=&quot;0&quot;
-	reloadable=&quot;true&quot; cachingAllowed=&quot;false&quot;
-	allowLinking=&quot;true&quot;/&gt;
+        reloadable=&quot;true&quot; cachingAllowed=&quot;false&quot;
+        allowLinking=&quot;true&quot;/&gt;
 </screen>
             <para>Alternatively, you could copy only the DSpace Web application(s) you wish to use from <literal>[dspace]/webapps</literal> to the appropriate directory in your Tomcat/Jetty/Resin installation. For example:</para>
             <screen>
 cp -r <emphasis> [dspace]</emphasis>/webapps/jspui <emphasis>
-	[tomcat]</emphasis>/webapps
+        [tomcat]</emphasis>/webapps
 cp -r <emphasis> [dspace]</emphasis>/webapps/oai <emphasis>
-	[tomcat]</emphasis>/webapps
+        [tomcat]</emphasis>/webapps
 </screen>
           </listitem>
           <listitem>
@@ -438,7 +430,7 @@ crontab -e
 0 3 * * * <emphasis> [dspace]</emphasis>/bin/checker -lp
 # Mail the results to the sysadmin at 04:00
 0 4 * * * <emphasis> [dspace]</emphasis>/bin/dsrun org.dspace.checker.DailyReportEmailer
-	-c
+        -c
 </screen>
         <para>Naturally you should change the frequencies to suit your environment.</para>
         <para>PostgreSQL also benefits from regular &apos;vacuuming&apos;, which optimizes the indices and clears out any deleted data. Become the <literal>postgres</literal> UNIX user, run <literal>crontab -e</literal> and add (for example):</para>
@@ -481,24 +473,24 @@ crontab -e
                   <para> Create a Java keystore for your server with the password <literal>changeit</literal>, and install your server certificate under the alias <literal>&quot;tomcat&quot;</literal>. This assumes the certificate was put in the file <literal>server.pem</literal>:</para>
                   <screen>
  $JAVA_HOME/bin/keytool -import -noprompt -v -storepass changeit
-	-keystore $CATALINA_BASE/conf/keystore -alias tomcat -file
-	myserver.pem
+        -keystore $CATALINA_BASE/conf/keystore -alias tomcat -file
+        myserver.pem
 </screen>
                 </listitem>
                 <listitem>
                   <para> Install the CA (Certifying Authority) certificate for the CA that granted your server cert, if necessary. This assumes the server CA certificate is in <literal>ca.pem</literal>:</para>
                   <screen>
  $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit
-	-trustcacerts -keystore $CATALINA_BASE/conf/keystore -alias ServerCA
-	-file ca.pem
+        -trustcacerts -keystore $CATALINA_BASE/conf/keystore -alias ServerCA
+        -file ca.pem
 </screen>
                 </listitem>
                 <listitem>
                   <para> Optional -- ONLY if you need to accept client certificates for the X.509 certificate stackable authentication module See the <link linkend="docbook-configure.html-authenticate">configuration section</link> for instructions on enabling the X.509 authentication method. Load the keystore with the CA (certifying authority) certificates for the authorities of any clients whose certificates you wish to accept. For example, assuming the client CA certificate is in <literal>client1.pem</literal>:</para>
                   <screen>
  $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit
-	-trustcacerts -keystore $CATALINA_BASE/conf/keystore  -alias client1
-	-file client1.pem
+        -trustcacerts -keystore $CATALINA_BASE/conf/keystore  -alias client1
+        -file client1.pem
 </screen>
                 </listitem>
                 <listitem>
@@ -506,25 +498,25 @@ crontab -e
                   <screen>
     &lt;Connector port=&quot;8443&quot;
                maxThreads=&quot;150&quot; minSpareThreads=&quot;25&quot;
-	maxSpareThreads=&quot;75&quot;
+        maxSpareThreads=&quot;75&quot;
                enableLookups=&quot;false&quot;
-	disableUploadTimeout=&quot;true&quot;
+        disableUploadTimeout=&quot;true&quot;
                  acceptCount=&quot;100&quot; debug=&quot;0&quot;
                  <emphasis role="bold"> scheme=&quot;https&quot; secure=&quot;true&quot; sslProtocol=&quot;TLS&quot;
-	keystoreFile=&quot;conf/keystore&quot; keystorePass=&quot;changeit&quot; clientAuth=&quot;true&quot;</emphasis>
-	<emphasis> - ONLY if using client X.509 certs for authentication!</emphasis> <emphasis role="bold">
-	truststoreFile=&quot;conf/keystore&quot; trustedstorePass=&quot;changeit&quot;</emphasis>
-	/&gt;
+        keystoreFile=&quot;conf/keystore&quot; keystorePass=&quot;changeit&quot; clientAuth=&quot;true&quot;</emphasis>
+        <emphasis> - ONLY if using client X.509 certs for authentication!</emphasis> <emphasis role="bold">
+        truststoreFile=&quot;conf/keystore&quot; trustedstorePass=&quot;changeit&quot;</emphasis>
+        /&gt;
 </screen>
                   <para> Also, check that the default Connector is set up to redirect &quot;secure&quot; requests to the same port as your SSL connector, e.g.: </para>
                   <screen>
 &lt;Connector port=&quot;8080&quot;
                  maxThreads=&quot;150&quot; minSpareThreads=&quot;25&quot;
-	maxSpareThreads=&quot;75&quot;
+        maxSpareThreads=&quot;75&quot;
                  enableLookups=&quot;false&quot; <emphasis role="bold">
-	redirectPort=&quot;8443&quot;</emphasis>
+        redirectPort=&quot;8443&quot;</emphasis>
                  acceptCount=&quot;100&quot; debug=&quot;0&quot;
-	/&gt;
+        /&gt;
 </screen>
                 </listitem>
               </orderedlist>
@@ -543,11 +535,11 @@ crontab -e
                       <para> Create a new key pair under the alias name <literal>&quot;tomcat&quot;</literal>. When generating your key, give the Distinguished Name fields the appropriate values for your server and institution. CN should be the fully-qualified domain name of your server host. Here is an example:</para>
                       <screen>
 $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
-	1024 \
+        1024 \
   -keystore $CATALINA_BASE/conf/keystore -storepass changeit
-	-validity 365 \
+        -validity 365 \
   -dname &apos;CN=dspace.myuni.edu, OU=MIT Libraries, O=Massachusetts
-	Institute of Technology, L=Cambridge, S=MA, C=US&apos;
+        Institute of Technology, L=Cambridge, S=MA, C=US&apos;
       
 </screen>
                     </listitem>
@@ -555,7 +547,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
                       <para> Then, create a <emphasis>CSR</emphasis> (Certificate Signing Request) and send it to your Certifying Authority. They will send you back a signed Server Certificate. This example command creates a CSR in the file <literal>tomcat.csr</literal></para>
                       <screen>
  $JAVA_HOME/bin/keytool -keystore $CATALINA_BASE/conf/keystore
-	-storepass changeit \
+        -storepass changeit \
    -certreq -alias tomcat -v -file tomcat.csr
 </screen>
                     </listitem>
@@ -563,7 +555,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
                       <para> Before importing the signed certificate, you must have the CA&apos;s certificate in your keystore as a <emphasis>trusted certificate</emphasis>. Get their certificate, and import it with a command like this (for the example <literal>mitCA.pem</literal>):</para>
                       <screen>
  $JAVA_HOME/bin/keytool -keystore $CATALINA_BASE/conf/keystore
-	-storepass changeit \
+        -storepass changeit \
      -import -alias mitCA -trustcacerts -file mitCA.pem
 </screen>
                     </listitem>
@@ -571,7 +563,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
                       <para> Finally, when you get the signed certificate from your CA, import it into the keystore with a command like the following example: (cert is in the file <literal>signed-cert.pem</literal>)</para>
                       <screen>
  $JAVA_HOME/bin/keytool -keystore $CATALINA_BASE/conf/keystore
-	-storepass changeit \
+        -storepass changeit \
      -import -alias tomcat -trustcacerts -file signed-cert.pem
 </screen>
                       <para> Since you now have a signed server certificate in your keystore, you can, obviously, skip the next steps of installing a signed server certificate and the server CA&apos;s certificate.</para>
@@ -582,7 +574,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
                   <para> Create a Java keystore for your server with the password <literal>changeit</literal>, and install your server certificate under the alias <literal>&quot;tomcat&quot;</literal>. This assumes the certificate was put in the file <literal>server.pem</literal>:</para>
                   <screen>
  $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keystore
-	$CATALINA_BASE/conf/keystore -storepass changeit
+        $CATALINA_BASE/conf/keystore -storepass changeit
 </screen>
                   <para>When answering the questions to identify the certificate, be sure to respond to &quot;First and last name&quot; with the fully-qualified domain name of your server (e.g. <literal>test-dspace.myuni.edu</literal>). The other questions are not important.</para>
                 </listitem>
@@ -590,8 +582,8 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
                   <para> Optional -- ONLY if you need to accept client certificates for the X.509 certificate stackable authentication module See the <link linkend="docbook-configure.html-authenticate">configuration section</link> for instructions on enabling the X.509 authentication method. Load the keystore with the CA (certifying authority) certificates for the authorities of any clients whose certificates you wish to accept. For example, assuming the client CA certificate is in <literal>client1.pem</literal>:</para>
                   <screen>
  $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit
-	-trustcacerts -keystore $CATALINA_BASE/conf/keystore  -alias client1
-	-file client1.pem
+        -trustcacerts -keystore $CATALINA_BASE/conf/keystore  -alias client1
+        -file client1.pem
 </screen>
                 </listitem>
                 <listitem>
@@ -610,11 +602,11 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
  add these configuration options to the appropriate <emphasis>httpd</emphasis> configuration file, e.g. <literal>ssl.conf</literal>, and be sure they are in force for the virtual host and namespace locations dedicated to DSpace:</para>
           <screen>
         ##  SSLVerifyClient can be &quot;optional&quot; or
-	&quot;require&quot;
+        &quot;require&quot;
         SSLVerifyClient optional
         SSLVerifyDepth  10
         SSLCACertificateFile  <emphasis>
-	path-to-your-client-CA-certificate</emphasis>
+        path-to-your-client-CA-certificate</emphasis>
         SSLOptions StdEnvVars ExportCertData
    
 </screen>
@@ -648,7 +640,7 @@ java -cp /hs/bin/handle.jar net.handle.server.SimpleSetup /hs/svr_1
             <para> as directed in the <ulink url="http://hdl.handle.net/4263537/4093">Handle Server Administration Guide</ulink>, you should run </para>
             <screen>
 <emphasis> [dspace]</emphasis>/bin/dsrun net.handle.server.SimpleSetup <emphasis>
-	[dspace]</emphasis>/handle-server
+        [dspace]</emphasis>/handle-server
 </screen>
             <para> ensuring that <literal>[dspace]/handle-server</literal> matches whatever you have in <literal>dspace.cfg</literal> for the <literal>handle.dir</literal> property.</para>
           </listitem>
@@ -657,7 +649,7 @@ java -cp /hs/bin/handle.jar net.handle.server.SimpleSetup /hs/svr_1
             <screen>
 &quot;storage_type&quot; = &quot;CUSTOM&quot;
 &quot;storage_class&quot; =
-	&quot;org.dspace.handle.HandlePlugin&quot;
+        &quot;org.dspace.handle.HandlePlugin&quot;
 </screen>
             <para>This tells the Handle server to get information about individual Handles from the DSpace code.</para>
           </listitem>
@@ -815,13 +807,13 @@ ant help
                 <screen>
 &lt;!-- DEFINE A CONTEXT PATH FOR DSpace JSP User Interface  --&gt;
 &lt;Context path=&quot;/jspui&quot; docBase=&quot;[dspace]\webapps\jspui&quot; debug=&quot;0&quot;
-	reloadable=&quot;true&quot; cachingAllowed=&quot;false&quot;
-	allowLinking=&quot;true&quot;/&gt;
+        reloadable=&quot;true&quot; cachingAllowed=&quot;false&quot;
+        allowLinking=&quot;true&quot;/&gt;
         
 &lt;!-- DEFINE A CONTEXT PATH FOR DSpace OAI User Interface  --&gt;
 &lt;Context path=&quot;/oai&quot; docBase=&quot;[dspace]\webapps\oai&quot; debug=&quot;0&quot;
-	reloadable=&quot;true&quot; cachingAllowed=&quot;false&quot;
-	allowLinking=&quot;true&quot;/&gt;
+        reloadable=&quot;true&quot; cachingAllowed=&quot;false&quot;
+        allowLinking=&quot;true&quot;/&gt;
 </screen>
               </listitem>
             </itemizedlist>
@@ -854,15 +846,15 @@ ant help
           <listitem>
             <para> There are two common errors that occur. If your error looks like this--</para>
             <screen>
-[java] 2004-03-25 15:17:07,730 INFO 
-	org.dspace.storage.rdbms.InitializeDatabase @ Initializing Database
+[java] 2004-03-25 15:17:07,730 INFO
+        org.dspace.storage.rdbms.InitializeDatabase @ Initializing Database
 [java] 2004-03-25 15:17:08,816 FATAL
-	org.dspace.storage.rdbms.InitializeDatabase @ Caught exception:
+        org.dspace.storage.rdbms.InitializeDatabase @ Caught exception:
 [java] org.postgresql.util.PSQLException: Connection refused. Check
-	that the hostname and port are correct and that the postmaster is
-	accepting TCP/IP connections.
+        that the hostname and port are correct and that the postmaster is
+        accepting TCP/IP connections.
 [java]     at
-	org.postgresql.jdbc1.AbstractJdbc1Connection.openConnection(AbstractJd
+        org.postgresql.jdbc1.AbstractJdbc1Connection.openConnection(AbstractJd
 bc1Connection.java:204)
 [java]     at org.postgresql.Driver.connect(Driver.java:139)
 </screen>
@@ -874,17 +866,17 @@ psql -U dspace -W -h localhost
             <para>Enter the <literal>dspace</literal><emphasis>database</emphasis> password, and you should be dropped into the psql tool with a <literal>dspace=&gt;</literal> prompt.</para>
             <para>Another common error looks like this:</para>
             <screen>
-[java] 2004-03-25 16:37:16,757 INFO 
-	org.dspace.storage.rdbms.InitializeDatabase @ Initializing Database
-[java] 2004-03-25 16:37:17,139 WARN 
-	org.dspace.storage.rdbms.DatabaseManager @ Exception initializing DB
-	pool
+[java] 2004-03-25 16:37:16,757 INFO
+        org.dspace.storage.rdbms.InitializeDatabase @ Initializing Database
+[java] 2004-03-25 16:37:17,139 WARN
+        org.dspace.storage.rdbms.DatabaseManager @ Exception initializing DB
+        pool
 [java] java.lang.ClassNotFoundException: org.postgresql.Driver
 [java]     at java.net.URLClassLoader$1.run(URLClassLoader.java:198)
 [java]     at java.security.AccessController.doPrivileged(Native
-	Method)
+        Method)
 [java]     at
-	java.net.URLClassLoader.findClass(URLClassLoader.java:186)
+        java.net.URLClassLoader.findClass(URLClassLoader.java:186)
 </screen>
             <para>This means that the PostgreSQL JDBC driver is not present in <literal>[dspace-source]/lib</literal>. <link linkend="docbook-install.html-pgdriver">See above.</link></para>
           </listitem>
@@ -909,12 +901,12 @@ ps -ef | grep postgres
             <para>You might see some processes like this</para>
             <screen>
 dspace 16325  1997  0  Feb 14  ?         0:00 postgres: dspace dspace
-	127.0.0.1 idle in transaction
+        127.0.0.1 idle in transaction
 </screen>
             <para>This is normal--DSpace maintains a &apos;pool&apos; of open database connections, which are re-used to avoid the overhead of constantly opening and closing connections. If they&apos;re &apos;idle&apos; it&apos;s OK; they&apos;re waiting to be used. However sometimes, if something went wrong, they might be stuck in the middle of a query, which seems to prevent other connections from operating, e.g.:</para>
             <screen>
 dspace 16325  1997  0  Feb 14  ?         0:00 postgres: dspace dspace
-	127.0.0.1 SELECT
+        127.0.0.1 SELECT
 </screen>
             <para>This means the connection is in the middle of a <literal>SELECT</literal> operation, and if you&apos;re not using DSpace right that instant, it&apos;s probably a &apos;zombie&apos; connection. If this is the case, try <literal>kill</literal>ing the process, and stopping and restarting Tomcat.</para>
           </listitem>

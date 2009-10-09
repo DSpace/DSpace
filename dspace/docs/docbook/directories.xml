@@ -92,8 +92,12 @@
                     <para><literal>docs/</literal>  - DSpace system documentation. The technical documentation for functionality, installation, configuration, etc.</para>
                   </listitem>
                   <listitem>
-                    <para><literal>etc/</literal>  - Miscelleanous configuration need to install DSpace that isn&apos;t really to do with system configuration - e.g. the PostgreSQL database schema, and a couple of configuration files that are used during the build process but not by the live system. Also contains the deployment descriptors (<literal>web.xml</literal> files) for the Web UI and OAI-PMH support <literal>.war</literal> files. </para>
+                    <para><literal>etc/</literal>  -
+This directory contains administrative files needed for the install process and by developers, mostly database initialization and upgrade scripts. Any <literal>.xml</literal> files in <literal>etc/</literal> are common to all supported database systems.</para>
                     <itemizedlist>
+                      <listitem>
+                        <para><literal>postgres/</literal>  - Versions of the database schema and updater SQL scripts for PostgreSQL.</para>
+                      </listitem>
                       <listitem>
                         <para><literal>oracle/</literal>  - Versions of the database schema and updater SQL scripts for Oracle.</para>
                       </listitem>
@@ -417,5 +421,3 @@ Manakin)"/>Contents of XMLUI Web Application (aka Manakin)</title>
       </table>
     </section>
   </chapter>
-
-
