@@ -19,15 +19,13 @@
             platform.
          -->
          <plugin>
-                        <artifactId>maven-release-plugin</artifactId>
-                        <configuration>
-                                <!--
-                                        During release:perform, enable the "addons" profile
-                                -->
-                                <releaseProfiles>addons</releaseProfiles>
-                                <goals>deploy</goals>
-                        </configuration>
-                 </plugin>
+            <artifactId>maven-release-plugin</artifactId>
+            <configuration>
+                <!-- During release:perform, enable the "addons" profile -->
+                <releaseProfiles>addons</releaseProfiles>
+                <goals>deploy</goals>
+            </configuration>
+         </plugin>
          <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
@@ -55,6 +53,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
             <configuration>
+               <failOnMissingWebXml>false</failOnMissingWebXml>
                <archive>
                   <manifest>
                      <addDefaultImplementationEntries>
