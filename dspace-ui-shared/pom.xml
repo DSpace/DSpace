@@ -4,12 +4,12 @@
    <artifactId>dspace-ui-shared</artifactId>
    <packaging>war</packaging>
    <name>DSpace UI :: Shared JS code</name>
-   <description>Some JS artifacts shared betwee DSpace JSPUI and XMLUI</description>
+   <description>Some JS artifacts shared between DSpace JSPUI and XMLUI</description>
    <url>http://projects.dspace.org/dspace-ui-shared</url>
 
    <!--
       A Parent POM that Maven inherits DSpace Defaults
-      POM atrributes from.
+      POM attributes from.
    -->
    <parent>
       <groupId>org.dspace</groupId>
@@ -36,13 +36,13 @@
 
    <!--
       The Subversion repository location is used by Continuum to update against
-      when changes have occured, this spawns a new build cycle and releases snapshots
+      when changes have occurred, this spawns a new build cycle and releases snapshots
       into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-ui-shared</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-ui-shared</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-ui-shared</url>
    </scm>
 
    <!--
