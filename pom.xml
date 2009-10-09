@@ -108,6 +108,7 @@
          </activation>
          <modules>
             <module>dspace-api</module>
+            <module>dspace-ui-shared</module>
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
@@ -632,21 +633,23 @@
       </developer>
       <developer>
          <name>Ben Bosman</name>
-         <email>benbosman at users.sourceforge.net</email>
+         <email>benbosman at atmire.com</email>
+         <organization>@mire NV</organization>
+         <organizationUrl>http://www.atmire.com</organizationUrl>
           <roles>
             <role>commiter</role>
          </roles>
       </developer>
       <developer>
          <name>Mark Diggory</name>
-         <email>mdiggory at mit.edu</email>
-         <url>http://www.linkedin.com/in/mdiggory</url>
-         <organization>MIT Libraries</organization>
-         <organizationUrl>http://libraries.mit.edu</organizationUrl>
+         <email>mdiggory at atmire.com</email>
+         <url>http://purl.org/net/mdiggory/homepage</url>
+         <organization>@mire NV</organization>
+         <organizationUrl>http://www.atmire.com</organizationUrl>
          <roles>
             <role>commiter</role>
          </roles>
-         <timezone>-5</timezone>
+         <timezone>-8</timezone>
       </developer>
       <developer>
          <name>Tim Donohue</name>
@@ -719,6 +722,16 @@
           </roles>
       </developer>
       <developer>
+         <name>Larry Stone</name>
+         <email>lcs at mit.edu</email>
+         <organization>MIT Libraries</organization>
+         <organizationUrl>http://libraries.mit.edu</organizationUrl>
+         <roles>
+            <role>commiter</role>
+         </roles>
+         <timezone>-5</timezone>
+      </developer>
+      <developer>
          <name>Robert Tansley</name>
          <email>rtansley at users.sourceforge.net</email>
          <roles>
@@ -763,16 +776,6 @@
       <contributor>
          <name>Sands Fish</name>
          <email>sands at mit.edu</email>
-         <organization>MIT Libraries</organization>
-         <organizationUrl>http://libraries.mit.edu</organizationUrl>
-         <roles>
-            <role>developer</role>
-         </roles>
-         <timezone>-5</timezone>
-      </contributor>
-      <contributor>
-         <name>Larry Stone</name>
-         <email>lcs at mit.edu</email>
          <organization>MIT Libraries</organization>
          <organizationUrl>http://libraries.mit.edu</organizationUrl>
          <roles>
