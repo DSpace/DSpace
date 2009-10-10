@@ -97,6 +97,21 @@
       </profile>
 
       <!--
+         Builds DSpace Solr Stats for DSpace
+      -->
+      <profile>
+         <id>dspace-stats</id>
+         <activation>
+            <file>
+               <exists>../dspace-stats/pom.xml</exists>
+            </file>
+         </activation>
+         <modules>
+            <module>../dspace-stats</module>
+         </modules>
+      </profile>
+      
+      <!--
          Builds OAI Gateway WAR for DSpace
       -->
       <profile>

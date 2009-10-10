@@ -34,6 +34,13 @@
             <ref bean="dspace.eventService"/>
         </property>
     </bean>
+     
+    <!-- Inject the Default LoggerUsageEventListener into the EventService  -->
+    <bean class="org.dspace.statistics.SolrLoggerUsageEventListener">
+        <property name="eventService" >
+            <ref bean="dspace.eventService"/>
+        </property>
+    </bean>
           
     <!-- 
     Uncomment to enable TabFileUsageEventListener 
