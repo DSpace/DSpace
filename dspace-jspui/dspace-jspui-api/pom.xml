@@ -67,6 +67,10 @@
          <artifactId>dspace-services-utils</artifactId>
       </dependency>
       <dependency>
+      <groupId>org.dspace</groupId>
+        <artifactId>dspace-stats</artifactId>
+      </dependency>
+      <dependency>
          <groupId>commons-validator</groupId>
          <artifactId>commons-validator</artifactId>
       </dependency>
