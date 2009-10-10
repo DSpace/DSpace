@@ -10,11 +10,8 @@
  */
 package org.dspace.statistics.content;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a dspace object based facet for filtering.

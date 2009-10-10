@@ -10,11 +10,8 @@
  */
 package org.dspace.statistics.content;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import java.util.Date;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Represents a date facet for filtering.

@@ -10,8 +10,6 @@
  */
 package org.dspace.statistics.content;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * Represents a simple string facet for filtering.

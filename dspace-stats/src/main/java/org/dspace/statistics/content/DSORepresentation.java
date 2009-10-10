@@ -11,8 +11,6 @@
 package org.dspace.statistics.content;
 
 import org.dspace.core.Constants;
-import org.w3c.dom.Element;
-import org.w3c.dom.Document;
 
 public class DSORepresentation {
     /** The children of our dspaceobject to be shown **/

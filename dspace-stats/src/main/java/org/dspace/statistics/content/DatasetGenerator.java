@@ -10,8 +10,6 @@
  */
 package org.dspace.statistics.content;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * Represents a single facet for filtering.
@@ -27,14 +25,7 @@ public abstract class DatasetGenerator {
     /** The type of generator can either be CATEGORY or SERIE **/
     public int DatasetType;
 
-    /*
-    public static final int CATEGORY = 0;
-
-    public static final int SERIE = 1;
-    */
-
     public boolean includeTotal = false;
-
 
     public int getDatasetType(){
         return DatasetType;
@@ -43,17 +34,7 @@ public abstract class DatasetGenerator {
     public void setDatasetType(int datasetType){
         DatasetType = datasetType;
     }
-
-    /*
-    public boolean isCategory(){
-        return DatasetType == CATEGORY;
-    }
-
-    public boolean isSerie(){
-        return DatasetType == SERIE;
-    }
-    */
-
+    
     public boolean isIncludeTotal() {
         return includeTotal;
     }

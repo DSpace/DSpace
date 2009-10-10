@@ -10,26 +10,16 @@
  */
 package org.dspace.statistics.content;
 
-import org.dspace.core.Context;
-import org.dspace.statistics.Dataset;
-import org.dspace.statistics.content.filter.StatisticsFilter;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.transform.*;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.dom.DOMSource;
-import java.util.List;
-import java.util.ArrayList;
-import java.io.StringWriter;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.solr.client.solrj.SolrServerException;
+import org.dspace.core.Context;
+import org.dspace.statistics.Dataset;
+import org.dspace.statistics.content.filter.StatisticsFilter;
 
 /**
  * Encapsulates all data to render the statistics
@@ -97,69 +87,8 @@ public abstract class StatisticsDisplay {
         return statisticsData.getDataset();
     }
 
-
-
     public Dataset getDataset(Context context) throws SQLException, SolrServerException, IOException, ParseException {
         return statisticsData.createDataset(context);
-    }
-
-
-
-    /**
-     * Method used to create the xml for the dataset of values
-     * @param doc the doc needed to create elements
-     * @param root the root xml node on which to add our xml
-     */
-    public void datasetToXml(Document doc, Node root){
-        Dataset dataset = getDataset();
-        if(dataset != null){
-            Node datasetNode = doc.createElement("dataset");
-            root.appendChild(datasetNode);
-            ////////////////////
-            // Add the labels //
-            ////////////////////
-            //TODO: zien dat de links ook bewaard blijven ?
-            //First add the row labels
-            List<String> rowLabels = dataset.getRowLabels();
-            if(0 < rowLabels.size()){
-                Element rowsNode = doc.createElement("rows");
-                datasetNode.appendChild(rowsNode);
-                for (String rowLabel : rowLabels) {
-                    //Create a new row element
-                    Element rowNode = doc.createElement("row");
-                    rowsNode.appendChild(rowNode);
-                    rowNode.setAttribute("label", rowLabel);
-                }
-            }
-            //Second add the column labels
-            List<String> colLabels = dataset.getColLabels();
-            if(0 < colLabels.size()){
-                Element colsNode = doc.createElement("columns");
-                datasetNode.appendChild(colsNode);
-                for (String colLabel : colLabels) {
-                    //Create a new col element
-                    Element colNode = doc.createElement("column");
-                    colsNode.appendChild(colNode);
-                    colNode.setAttribute("label", colLabel);
-                }
-            }
-            ////////////////////
-            // Add the values //
-            ////////////////////
-            Node dataNode = doc.createElement("data");
-            datasetNode.appendChild(dataNode);
-
-            float[][] matrix = dataset.getMatrix();
-            for (float[] row : matrix) {
-                Element rowNode = doc.createElement("row");
-                dataNode.appendChild(rowNode);
-                for (float value : row) {
-                    Element cellNode = doc.createElement("cell");
-                    rowNode.appendChild(cellNode);
-                    cellNode.appendChild(doc.createTextNode(String.valueOf(value)));
-                }
-            }
-        }
     }
 
     public void addCss(String style){
