@@ -1,10 +1,10 @@
 package org.dspace.app.xmlui.cocoon;
 
-import org.dspace.app.statistics.UsageEvent;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Bitstream;

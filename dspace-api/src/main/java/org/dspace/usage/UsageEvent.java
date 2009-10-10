@@ -34,7 +34,7 @@
  * DAMAGE.
  */
 
-package org.dspace.app.statistics;
+package org.dspace.usage;
 
 import javax.servlet.http.HttpServletRequest;
 

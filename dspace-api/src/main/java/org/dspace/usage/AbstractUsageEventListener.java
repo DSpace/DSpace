@@ -34,25 +34,46 @@
  * DAMAGE.
  */
 
-package org.dspace.app.statistics;
+package org.dspace.usage;
 
-import org.dspace.services.model.Event;
+import org.dspace.services.EventService;
+import org.dspace.services.model.EventListener;
 
 /**
- * A null implementation of AbstractUsageEvent to absorb events harmlessly and
- * cheaply.
+ * AbstractUsageEventListener is used as the base class for listening events running
+ * in the EventService.
  * 
- * @author Mark H. Wood
  * @author Mark Diggory (mdiggory at atmire.com)
- * @version $Revision: 3734 $
+ * @version $Revision: $
  */
-public class PassiveUsageEventListener extends AbstractUsageEventListener
-{
-	/**
-     * Do nothing and return. Effectively, the event is discarded.
-     */
-	public void receiveEvent(Event event) {
-		return;
+public abstract class AbstractUsageEventListener implements EventListener {
+
+	public AbstractUsageEventListener() {
+		super();
 	}
 
+	/**
+	 * Empty String[] flags to have Listener 
+	 * consume any event name prefixes.
+	 */
+	public String[] getEventNamePrefixes() {
+		return new String[0];
+	}
+
+	/**
+	 * Currently consumes events generated for
+	 * all resources.
+	 */
+	public String getResourcePrefix() {
+		return null;
+	}
+
+	public void setEventService(EventService service) throws Exception {
+		if(service != null)
+			service.registerEventListener(this);
+		else
+			throw new RuntimeException("EventService handed to Listener cannot be null");
+	
+	}
+	
 }

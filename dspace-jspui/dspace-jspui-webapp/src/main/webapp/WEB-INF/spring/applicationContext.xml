@@ -13,7 +13,7 @@
     <bean id="dspace.eventService" factory-bean="dspace" factory-method="getEventService"/>
 
     <!-- Inject the Default LoggerUsageEventListener into the EventService  -->
-    <bean class="org.dspace.app.statistics.LoggerUsageEventListener">
+    <bean class="org.dspace.usage.LoggerUsageEventListener">
     	<property name="eventService" >
     		<ref bean="dspace.eventService"/>
     	</property>

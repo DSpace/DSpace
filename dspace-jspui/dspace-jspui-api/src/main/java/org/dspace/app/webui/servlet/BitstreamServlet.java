@@ -54,7 +54,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.statistics.UsageEvent;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -68,6 +67,7 @@ import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
 import org.dspace.handle.HandleManager;
 import org.dspace.services.model.Event;
+import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 
 /**

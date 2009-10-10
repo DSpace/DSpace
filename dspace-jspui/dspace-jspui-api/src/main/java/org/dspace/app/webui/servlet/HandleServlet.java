@@ -51,7 +51,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.statistics.UsageEvent;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -75,6 +74,7 @@ import org.dspace.eperson.Subscribe;
 import org.dspace.handle.HandleManager;
 import org.dspace.plugin.CollectionHomeProcessor;
 import org.dspace.plugin.CommunityHomeProcessor;
+import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.jdom.Element;
 import org.jdom.Text;
