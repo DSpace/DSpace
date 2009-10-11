@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!--
+
+    $Id: sitemap.xmap 4401 2009-10-07 08:30:07Z mdiggory $
+    $URL: https://scm.dspace.org/svn/repo/modules/dspace-stats/trunk/dspace-xmlui-stats/src/main/resources/aspects/Statistics/sitemap.xmap $
+    *************************************************************************
+    Copyright (c) 2002-2009, DuraSpace.  All rights reserved
+    Licensed under the DuraSpace Foundation License.
+
+    A copy of the DuraSpace License has been included in this
+    distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+
+-->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+	<map:components>
+		<map:transformers>
+			<map:transformer name="StatisticsTransformer" src="org.dspace.app.xmlui.aspect.statistics.StatisticsTransformer"/>
+        </map:transformers>
+		<map:matchers default="wildcard">
+			<map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
+			<map:matcher name="HandleAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.general.HandleAuthorizedMatcher"/>
+		</map:matchers>
+	</map:components>
+    
+	<map:pipelines>
+		<map:pipeline>
+
+			<map:generate/>
+
+            <!-- Handle specific features -->
+			<map:match pattern="handle/*/**">
+				<!-- Community, Collection, and Item Viewers -->
+				<map:match pattern="handle/*/*">
+					<map:match type="HandleAuthorizedMatcher" pattern="READ">
+						<map:match type="HandleTypeMatcher" pattern="community">
+                            <map:transform type="StatisticsTransformer"/>
+                        </map:match>
+						<map:match type="HandleTypeMatcher" pattern="collection">
+                            <map:transform type="StatisticsTransformer"/>
+                        </map:match>
+						<map:match type="HandleTypeMatcher" pattern="item">
+							<map:transform type="StatisticsTransformer"/>
+                        </map:match>
+					</map:match>
+				</map:match>
+            </map:match> <!-- End match handle/*/** -->
+
+            <map:match pattern="">
+                <map:transform type="StatisticsTransformer"/>
+            </map:match>
+
+			<map:serialize type="xml"/>
+
+		</map:pipeline>
+	</map:pipelines>
+</map:sitemap>

@@ -63,7 +63,7 @@
         <aspect name="Administration" path="resource://aspects/Administrative/" />
         <aspect name="E-Person" path="resource://aspects/EPerson/" />
         <aspect name="Submission and Workflow" path="resource://aspects/Submission/" />
-
+	<aspect name="Statistics" path="resource://aspects/Statistics/" />
         <!-- 
             This aspect tests the various possible DRI features, 
             it helps a theme developer create themes 
