@@ -58,6 +58,14 @@
     </command>
 
     <command>
+        <name>harvest</name>
+        <description>Manage the OAI-PMH harvesting of external collections</description>
+        <step>
+            <class>org.dspace.app.harvest.Harvest</class>
+        </step>
+    </command>
+
+    <command>
         <name>import</name>
         <description>Import items into DSpace</description>
         <step>
