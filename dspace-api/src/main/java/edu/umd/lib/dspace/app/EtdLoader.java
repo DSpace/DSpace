@@ -468,23 +468,22 @@ public class EtdLoader
 
       BrowserScope scope = new BrowserScope(c);
       scope.setBrowseIndex(bi);
-      scope.setResultsPerPage(1);
+      scope.setResultsPerPage(2);
       scope.setStartsWith(title);
 
       BrowseEngine be = new BrowseEngine(c);
       BrowseInfo binfo = be.browse(scope);
 
       // Process results
-      List l = binfo.getResults();
-      if (l.size() == 1) {
+      for (Iterator j = binfo.getResults().iterator(); j.hasNext(); ) {
 
-        BrowseItem bitem = (BrowseItem)l.get(0);
+        BrowseItem bitem = (BrowseItem)j.next();
 
         // Get normalized title for browse item
         String btitle = OrderFormat.makeSortString(bitem.getName(), null, OrderFormat.TITLE);
 
         // Check for the match
-        if (title.equals(btitle)) {
+        if (title.equals(btitle) && item.getID() != bitem.getID()) {
           log.info("Duplicate title: " + title);
         				  
           // Get the list of collections for the loaded item
@@ -512,6 +511,8 @@ public class EtdLoader
             bean.addArgument(sbCollections.toString());
             bean.send();
           }
+
+          return;
         }
       }
     }
