@@ -88,9 +88,5 @@
      
     <p><a href="<%= request.getContextPath() %>/community-list"><fmt:message key="jsp.community-list.title"/></a></p>
      
-    <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
-        <input type="hidden" name="collection" value="<%= collection.getID() %>"/>
-	    <input type="submit" name="submit" value="<fmt:message key="jsp.collection-home.submit.button"/>"/>
-    </form>
      
 </dspace:layout>
