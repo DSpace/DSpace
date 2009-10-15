@@ -318,7 +318,7 @@ function clearEPeople()
 			<td headers="t1" class="<%= row %>RowOddCol">
 			    <input type="button" value="<%
 	if (multiple) { %><fmt:message key="jsp.tools.general.add"/><% }
-	else {          %><fmt:message key="jsp.tools.general.select"/><% } %>" onclick="javascript:<%= clearList %>addEPerson(<%= e.getID() %>, '<%= e.getEmail() %>', '<%= Utils.addEntities(fullname) %>');<%= closeWindow %>"/></td>
+	else {          %><fmt:message key="jsp.tools.general.select"/><% } %>" onclick="javascript:<%= clearList %>addEPerson(<%= e.getID() %>, '<%= e.getEmail().replaceAll("'", "\\\\'") %>', '<%= Utils.addEntities(fullname) %>');<%= closeWindow %>"/></td>
 			<td headers="t2" class="<%= row %>RowEvenCol"><%= e.getID() %></td>
 			<td headers="t3" class="<%= row %>RowOddCol"><%= e.getEmail() %></td>
             <td headers="t4" class="<%= row %>RowEvenCol">
