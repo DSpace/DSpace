@@ -64,10 +64,20 @@ import org.dspace.core.PluginManager;
  *  # default is false.
  *  authority.required.<FIELD> = true | false
  *
+ *  # default value of minimum confidence level for ALL fields - must be
+ *  # symbolic confidence level, see org.dspace.content.authority.Choices
+ *  authority.minconfidence = uncertain
+ *
+ *  # minimum confidence level for this field
+ *  authority.minconfidence.SCHEMA.ELEMENT.QUALIFIER = SYMBOL
+ *    e.g.
+ *  authority.minconfidence.dc.contributor.author = accepted
+ *
  * NOTE: There is *expected* to be a "choices" (see ChoiceAuthorityManager)
  * configuration for each authority-controlled field.
  *
  * @see ChoiceAuthorityManager
+ * @see Choices
  * @author Larry Stone
  */
 public class MetadataAuthorityManager
@@ -87,6 +97,9 @@ public class MetadataAuthorityManager
      * value for a field with authority
      */
     private Map<String, Integer> minConfidence = new HashMap<String, Integer>();
+
+    /** fallback default value unless authority.minconfidence = X is configured. */
+    private int defaultMinConfidence = Choices.CF_ACCEPTED;
 
     private MetadataAuthorityManager()
     {
@@ -122,13 +135,37 @@ public class MetadataAuthorityManager
                 boolean req = ConfigurationManager.getBooleanProperty("authority.required."+field, false);
                 controlled.put(fkey, Boolean.valueOf(ctl));
                 isAuthorityRequired.put(fkey, Boolean.valueOf(req));
-                if (ConfigurationManager.getProperty("authority.minconfidence."+field) != null)
-                {
-                    minConfidence.put(fkey, ConfigurationManager.getIntProperty("authority.minconfidence." + field));
-                }
+
+                // get minConfidence level for this field if any
+                int mci = readConfidence("authority.minconfidence."+field);
+                if (mci >= Choices.CF_UNSET)
+                    minConfidence.put(fkey, new Integer(mci));
                 log.debug("Authority Control: For schema="+schema+", elt="+element+", qual="+qualifier+", controlled="+ctl+", required="+req);
             }
         }
+
+        // get default min confidence if any:
+        int dmc = readConfidence("authority.minconfidence");
+        if (dmc >= Choices.CF_UNSET)
+            defaultMinConfidence = dmc;
+    }
+
+    private int readConfidence(String key)
+    {
+        String mc = ConfigurationManager.getProperty(key);
+        if (mc != null)
+        {
+            int mci = Choices.getConfidenceValue(mc.trim(), Choices.CF_UNSET-1);
+            if (mci == Choices.CF_UNSET-1)
+                {
+                log.warn("IGNORING bad value in DSpace Configuration, key="+key+", value="+mc+", must be a valid Authority Confidence keyword.");
+                }
+            else
+            {
+                return mci;
+            }
+        }
+        return Choices.CF_UNSET-1;
     }
 
     // factory method
@@ -183,9 +220,10 @@ public class MetadataAuthorityManager
      * for the given metadata.
      * @return the minimal valid level of confidence for the given metadata
      */
-    public int getMinConfidence(String schema, String element, String qualifier) {
+    public int getMinConfidence(String schema, String element, String qualifier)
+    {
         Integer result = minConfidence.get(makeFieldKey(schema, element, qualifier));
-        return result == null?Choices.CF_ACCEPTED:result.intValue();
+        return result == null ? defaultMinConfidence : result.intValue();
     }
 
     /**

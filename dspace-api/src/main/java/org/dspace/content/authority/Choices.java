@@ -206,11 +206,25 @@ public class Choices
      */
     public static int getConfidenceValue(String ct)
     {
+        return getConfidenceValue(ct, CF_NOVALUE);
+    }
+
+    /**
+     * Get the value corresponding to a symbolic name of a confidence
+     * value, or the given default if the symbol is unknown.  This
+     * lets an application detect invalid data, e.g. in a configuration file.
+     *
+     * @param ct symbolic name in String
+     * @param dflt the default value to return
+     * @return corresponding value or CF_NOVALUE if not found
+     */
+    public static int getConfidenceValue(String ct, int dflt)
+    {
         for (int i = 0; i < confidenceText.length; ++i)
         {
             if (confidenceText[i].equalsIgnoreCase(ct))
                 return confidenceValue[i];
         }
-        return CF_NOVALUE;
+        return dflt;
     }
 }
