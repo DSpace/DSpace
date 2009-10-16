@@ -97,14 +97,14 @@ public class SendFeedbackAction extends AbstractAction
                 if(fromPage.indexOf(allowedReferrersSplit[i]) != -1)
                 {
                     validReferral = true;
-		    break;
+                    break;
                 }
             }
         }
 
         String basicHost = "";
         if (host.equals("localhost") || host.equals("127.0.0.1")
-        		|| host.equals(InetAddress.getLocalHost().getHostAddress()))
+                        || host.equals(InetAddress.getLocalHost().getHostAddress()))
             basicHost = host;
         else
         {
@@ -116,7 +116,8 @@ public class SendFeedbackAction extends AbstractAction
 
         if ((fromPage == null) || ((fromPage.indexOf(basicHost) == -1) && (validReferral == false)))
         {
-            throw new AuthorizeException();
+            // N.B. must use old message catalog because Cocoon i18n is only available to transformed pages.
+            throw new AuthorizeException(I18nUtil.getMessage("feedback.error.forbidden"));
         }
 
         // User email from context
