@@ -83,7 +83,11 @@ to administer DSpace.
 			<map:transformer name="MapperMain" src="org.dspace.app.xmlui.aspect.administrative.mapper.MapperMain"/>
 			<map:transformer name="BrowseItemForm" src="org.dspace.app.xmlui.aspect.administrative.mapper.BrowseItemForm"/>
 			<map:transformer name="SearchItemForm" src="org.dspace.app.xmlui.aspect.administrative.mapper.SearchItemForm"/>
-			
+
+                        <map:transformer name="MetadataImportMain" src="org.dspace.app.xmlui.aspect.administrative.metadataimport.MetadataImportMain"/>
+                        <map:transformer name="MetadataImportUpload" src="org.dspace.app.xmlui.aspect.administrative.metadataimport.MetadataImportUpload"/>
+                        <map:transformer name="MetadataImportConfirm" src="org.dspace.app.xmlui.aspect.administrative.metadataimport.MetadataImportConfirm"/>
+
 			<map:transformer name="EditCollectionMetadataForm" src="org.dspace.app.xmlui.aspect.administrative.collection.EditCollectionMetadataForm"/>
 			<map:transformer name="ToggleCollectionHarvestingForm" src="org.dspace.app.xmlui.aspect.administrative.collection.ToggleCollectionHarvestingForm"/>
 			<map:transformer name="SetupCollectionHarvestingForm" src="org.dspace.app.xmlui.aspect.administrative.collection.SetupCollectionHarvestingForm"/>
@@ -215,7 +219,22 @@ to administer DSpace.
 							<map:call function="startMapItems"/>
 						</map:match>
 					</map:match>
-					
+
+					<!--
+						This is the general entry / resume point for the
+						batch metadata editor
+					-->
+					<map:match pattern="admin/metadataimport">
+						<map:match type="request" pattern="administrative-continue">
+							<map:call continuation="{1}"/>
+						</map:match>
+                                                
+						<map:call function="startMetadataImport"/>
+						
+					</map:match>
+
+
+
 					<!--
 						These are the general entry / resume points for the
 						editing of communities and collections pages
@@ -623,6 +642,23 @@ to administer DSpace.
 		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
 		        			</map:transform>
 		        		</map:match>
+
+                               <!-- Batch Metadata Editor -->
+
+		        		<map:match pattern="admin/metadataimport/main">
+		        			<map:transform type="MetadataImportMain">
+                                                </map:transform>
+		        		</map:match>
+
+		        		<map:match pattern="admin/metadataimport/upload">
+		        			<map:transform type="MetadataImportUpload">
+		        			</map:transform>
+		        		</map:match>
+
+                                        <map:match pattern="admin/metadataimport/confirm">
+		        			<map:transform type="MetadataImportConfirm">
+		        			</map:transform>
+		        		</map:match>
 		        		
 		        	<!-- Collection edit pages -->
 		        		
@@ -832,6 +868,9 @@ to administer DSpace.
 		    			<map:act type="StartAuthentication"/>
 		    		</map:match>
 		    		<map:match pattern="admin/mapper">
+		    			<map:act type="StartAuthentication"/>
+		    		</map:match>
+                                <map:match pattern="admin/metadataimport">
 		    			<map:act type="StartAuthentication"/>
 		    		</map:match>
 		    		<map:match pattern="admin/collection">

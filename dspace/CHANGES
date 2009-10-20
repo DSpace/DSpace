@@ -10,6 +10,7 @@
  - [DS-156] File description not available in XMLUI
  - [DS-198] File descriptions can not be removed/cleared in XMLUI
  - [DS-240] Item validityKey not complete
+ - [DS-251] Bulk Metadata Editing: XMLUI aspect and forms
 
 (Claudia Juergen)
  - [DS-114] Links not working due to trailing white space in dspace.url
@@ -21,7 +22,7 @@
  - Item Importer - documented the use of non-dc metadata during item import
  - [DS-269] Oracle JDBC connection string wrong in dspace.cfg - ID: 2722093
 
- (Andreas Schwander / Claudia Juergen)
+(Andreas Schwander / Claudia Juergen)
  - [DS-337] A bug related with adding new -EPersons
  
 (Ricardo Saraiva)
@@ -131,6 +132,9 @@
 
 (Ekaterina Pechekhonova)
  - [DS-330] Create new session on login / invalidate sessions on logout
+
+(Richard Rodgers)
+ - [DS-324] Add OpenSearch support
 
 1.5.2 final
 ===========

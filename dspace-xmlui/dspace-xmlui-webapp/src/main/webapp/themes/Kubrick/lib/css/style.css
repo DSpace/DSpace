@@ -216,6 +216,22 @@ td.ds-table-cell.even
 }
 
 
+/* metadata import rows
+ * additions and deletions
+ */
+
+tr.ds-table-row.metadata-addition {
+	background-color: #CCFFCC;
+}
+
+tr.ds-table-row.metadata-deletion {
+	background-color: #CCCCCC;
+}
+
+tr.ds-table-row.metadata-addition td,tr.ds-table-row.metadata-deletion td {
+	border-top: 1px solid black;
+}
+
 
 .artifact-description
 {   
@@ -1777,7 +1793,7 @@ margin:7px 0pt 8px 10px;
 }
 .entry ul li:before, #sidebar ul ul li:before {
 /*locally, this character shows up as a question mark, so we'll use a greater than sign instead for now.*/
-/*content:"È ";*/
+/*content:"ï¿½ ";*/
 content:"> ";
 }
 .entry ol {

@@ -92,7 +92,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_context_create_collection 	= message("xmlui.administrative.Navigation.context_create_collection");
     private static final Message T_context_create_subcommunity 	= message("xmlui.administrative.Navigation.context_create_subcommunity");
     private static final Message T_context_create_community 	= message("xmlui.administrative.Navigation.context_create_community");
-
+    private static final Message T_context_export_metadata      = message("xmlui.administrative.Navigation.context_export_metadata");
+    private static final Message T_administrative_import_metadata       = message("xmlui.administrative.Navigation.administrative_import_metadata");
     private static final Message T_administrative_head 				= message("xmlui.administrative.Navigation.administrative_head");
     private static final Message T_administrative_access_control 	= message("xmlui.administrative.Navigation.administrative_access_control");
     private static final Message T_administrative_people 			= message("xmlui.administrative.Navigation.administrative_people");
@@ -237,11 +238,14 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     		Item item = (Item) dso;
     		if (item.canEdit())
     		{
-            	context.setHead(T_context_head);
-            	context.addItem().addXref(contextPath+"/admin/item?itemID="+item.getID(), T_context_edit_item);
-            	if (AuthorizeManager.isAdmin(this.context, dso))
-                    context.addItem().addXref(contextPath+"/admin/export?itemID="+item.getID(), T_context_export_item );
-    		}
+                    context.setHead(T_context_head);
+                    context.addItem().addXref(contextPath+"/admin/item?itemID="+item.getID(), T_context_edit_item);
+                    if (AuthorizeManager.isAdmin(this.context, dso))
+                    {
+                        context.addItem().addXref(contextPath+"/admin/export?itemID="+item.getID(), T_context_export_item );
+                        context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
+                    }
+                }
     	}
     	else if (dso instanceof Collection)
     	{
@@ -254,7 +258,10 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             	context.addItemXref(contextPath+"/admin/collection?collectionID=" + collection.getID(), T_context_edit_collection);            	
             	context.addItemXref(contextPath+"/admin/mapper?collectionID="+collection.getID(), T_context_item_mapper); 
             	if (AuthorizeManager.isAdmin(this.context, dso))
+                {
                     context.addItem().addXref(contextPath+"/admin/export?collectionID="+collection.getID(), T_context_export_collection );
+                    context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
+                }
             }
     	}
     	else if (dso instanceof Community)
@@ -268,6 +275,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             	context.addItemXref(contextPath+"/admin/community?communityID=" + community.getID(), T_context_edit_community); 
             	if (AuthorizeManager.isAdmin(this.context, dso))
                     context.addItem().addXref(contextPath+"/admin/export?communityID="+community.getID(), T_context_export_community );
+                    context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
             }
             
             // can they add to this community?
@@ -311,6 +319,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             admin.addItemXref(contextPath+"/admin/withdrawn", T_administrative_withdrawn);	        
 	        admin.addItemXref(contextPath+"/admin/panel", T_administrative_control_panel);
             admin.addItemXref(contextPath+"/statistics", T_statistics);
+            admin.addItemXref(contextPath+ "/admin/metadataimport", T_administrative_import_metadata);
         }
     }
     

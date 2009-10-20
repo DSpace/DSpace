@@ -196,6 +196,7 @@
                         </map:reader>
                         <map:reader name="BitstreamReader" src="org.dspace.app.xmlui.cocoon.BitstreamReader"/>
                         <map:reader name="ExportReader" src="org.dspace.app.xmlui.cocoon.ItemExportDownloadReader"/>
+                        <map:reader name="MetadataExportReader" src="org.dspace.app.xmlui.cocoon.MetadataExportReader"/>
             <map:reader name="OpenURLReader" src="org.dspace.app.xmlui.cocoon.OpenURLReader"/>
             <map:reader name="SitemapReader" src="org.dspace.app.xmlui.cocoon.SitemapReader"/>
                 </map:readers>
@@ -373,6 +374,12 @@
                         <map:match pattern="exportdownload/*">
                                 <map:read type="ExportReader">
                                         <map:parameter name="fileName" value="{1}"/>
+                                </map:read>
+                        </map:match>
+
+                        <map:match pattern="csv/handle/*/*">
+                                <map:read type="MetadataExportReader">
+                                    <map:parameter name="handle" value="{1}/{2}" />
                                 </map:read>
                         </map:match>
                         

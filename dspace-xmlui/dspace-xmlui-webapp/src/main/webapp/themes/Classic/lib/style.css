@@ -532,6 +532,21 @@ th.doubleIndent {
 }
 
 
+/* metadata import rows
+ * additions and deletions
+ */
+
+tr.ds-table-row.metadata-addition {
+	background-color: #CCFFCC;
+}
+
+tr.ds-table-row.metadata-deletion {
+	background-color: #CCCCCC;
+}
+
+tr.ds-table-row.metadata-addition td,tr.ds-table-row.metadata-deletion td {
+	border-top: 1px solid black;
+}
 
 
 /*******************************

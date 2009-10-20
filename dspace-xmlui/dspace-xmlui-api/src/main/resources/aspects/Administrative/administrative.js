@@ -60,6 +60,7 @@ importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowItemUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowMapperUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowAuthorizationUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowContainerUtils);
+importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowMetadataImportUtils);
 importClass(Packages.java.lang.System);
 
 /**
@@ -543,6 +544,18 @@ function startMapItems()
     getDSContext().complete();
 	collection = null;
 	cocoon.exit();  
+}
+
+function startMetadataImport()
+{
+   
+        assertAdministrator();
+
+	doMetadataImport();
+
+	cocoon.redirectTo(cocoon.request.getContextPath());
+        getDSContext().complete();
+	cocoon.exit();
 }
 
 /**
@@ -1754,7 +1767,8 @@ function doMapItems(collectionID)
 	assertEditCollection(collectionID);
     var result;
     
-    do {
+    do
+    {
         sendPageAndWait("admin/mapper/main",{"collectionID":collectionID},result);
 		assertEditCollection(collectionID);
         result = null;
@@ -1776,6 +1790,61 @@ function doMapItems(collectionID)
             result = doMapItemBrowse(collectionID);
         }
     } while (true);
+}
+
+/**
+ * Manage batch metadata import
+ * 
+ */
+
+function doMetadataImport()
+{
+    var result;
+    
+    assertAdministrator();
+    do
+    {
+        sendPageAndWait("admin/metadataimport/main",{},result);
+        result = null;
+
+        if (cocoon.request.get("submit_upload"))
+        {
+            result = doMetadataImportUpload();
+            
+        }
+
+    } while (true);
+}
+
+function doMetadataImportUpload()
+{
+    var result = FlowMetadataImportUtils.processUploadCSV(getDSContext(),cocoon.request);
+    
+    assertAdministrator();
+    do
+    {
+        sendPageAndWait("admin/metadataimport/upload",{},result);
+        result = null;
+
+        if (cocoon.request.get("submit_return"))
+        {
+            return null;
+        }
+        else if (cocoon.request.get("submit_confirm"))
+        {
+            
+            result = doMetadataImportConfirm();
+            return result;
+        }
+    } while (true);
+}
+
+function doMetadataImportConfirm()
+{
+    var result = FlowMetadataImportUtils.processMetadataImport(getDSContext(),cocoon.request);
+    assertAdministrator();
+    sendPageAndWait("admin/metadataimport/confirm",{},result);
+    return null;
 }
 
 /**
@@ -1811,7 +1880,7 @@ function doMapItemSearch(collectionID)
  */
 function doMapItemBrowse(collectionID)
 {
-    var result
+    var result;
     
     do {
         sendPageAndWait("admin/mapper/browse",{"collectionID":collectionID});
