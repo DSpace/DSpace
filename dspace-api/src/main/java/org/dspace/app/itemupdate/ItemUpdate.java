@@ -286,7 +286,7 @@ public class ItemUpdate {
 	        	pr("Delete bitstreams ");
 	        	
 	        	String[] filterNames = line.getOptionValues('D');
-	        	if (filterNames.length > 1)
+	        	if ((filterNames != null) && (filterNames.length > 1))
 	        	{
 	        		pr("Error: Only one filter can be a used at a time.");
 	        		System.exit(1);
