@@ -181,7 +181,7 @@ public class EtdLoader
   static Collection etdcollection = null;
   static EPerson etdeperson = null;
 
-  static SimpleDateFormat format = new SimpleDateFormat("MMddyyyy");
+  static SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
 
   static MarcStreamWriter marcwriter = null;
   static PrintWriter csvwriter = null;
