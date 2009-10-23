@@ -128,10 +128,10 @@ do
    available=`grep "element=\"date\" qualifier=\"accessioned\"" $i|cut -f2 -d \>|cut -f1 -d \<`
 
    if [ $issued = $available ]; then
-    $SED "/><\/dcvalue>/d" $i | $SED "/element=\"date\" qualifier=\"accessioned\"/d" | $SED "/element=\"date\" qualifier=\"available\"/d" |$SED "/element=\"date\" qualifier=\"issued\"/d" | $SED "/element=\"identifier\" qualifier=\"uri\"\>http:\/\/hdl/d" | $SED "/element=\"description\" qualifier=\"provenance\"/,/<\/dcvalue>/d" | $SED "/element=\"format\" qualifier=\"extent\"/d" | $SED "/element=\"format\" qualifier=\"mimetype\"/d" | $SED "/bytes, checksum/d" > $i
+    $SED "/><\/dcvalue>/d" $i | $SED "/element=\"date\" qualifier=\"accessioned\"/d" | $SED "/element=\"date\" qualifier=\"available\"/d" |$SED "/element=\"date\" qualifier=\"issued\"/d" | $SED "/element=\"identifier\" qualifier=\"uri\">http:\/\/hdl/d" | $SED "/element=\"description\" qualifier=\"provenance\"/,/<\/dcvalue>/d" | $SED "/element=\"format\" qualifier=\"extent\"/d" | $SED "/element=\"format\" qualifier=\"mimetype\"/d" | $SED "/bytes, checksum/d" > $i
    else
     printf " -- date issued $issued  \n"
-   $SED "/><\/dcvalue>/d" $i | $SED "/element=\"date\" qualifier=\"accessioned\"/d" | $SED "/element=\"date\" qualifier=\"available\"/d" | $SED "/element=\"identifier\" qualifier=\"uri\"\>http:\/\/hdl/d" | $SED "/element=\"description\" qualifier=\"provenance\"/,/<\/dcvalue>/d" | $SED "/element=\"format\" qualifier=\"extent\"/d" | $SED "/element=\"format\" qualifier=\"mimetype\"/d" | $SED "/bytes, checksum/d" > $i
+   $SED "/><\/dcvalue>/d" $i | $SED "/element=\"date\" qualifier=\"accessioned\"/d" | $SED "/element=\"date\" qualifier=\"available\"/d" | $SED "/element=\"identifier\" qualifier=\"uri\">http:\/\/hdl/d" | $SED "/element=\"description\" qualifier=\"provenance\"/,/<\/dcvalue>/d" | $SED "/element=\"format\" qualifier=\"extent\"/d" | $SED "/element=\"format\" qualifier=\"mimetype\"/d" | $SED "/bytes, checksum/d" > $i
    fi
 
    if [ $? -ne 0 ]; then
