@@ -44,6 +44,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -363,6 +364,17 @@ public class Subscribe
             List collections, boolean test) throws IOException, MessagingException,
             SQLException
     {
+        // Check for restricted eperson list
+        String epersonLimit = ConfigurationManager.getProperty("eperson.subscription.limiteperson");
+        if (epersonLimit != null) {
+            List l = Arrays.asList(epersonLimit.split(" *, *"));
+            if (!l.contains(eperson.getEmail())) {
+                return;
+            }
+        }
+
+        log.debug("Checking subscriptions for " + eperson.getEmail());
+
         // Get a resource bundle according to the eperson language preferences
         Locale supportedLocale = I18nUtil.getEPersonLocale(eperson); 
         ResourceBundle labels =  ResourceBundle.getBundle("Messages", supportedLocale);
