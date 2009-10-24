@@ -516,7 +516,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         {
             // Check for if-modified-since header -- ONLY if not authenticated
             long modSince = request.getDateHeader("If-Modified-Since");
-            if (modSince != -1 && item.getLastModified().getTime() < modSince)
+            if (modSince != -1 && item != null && item.getLastModified().getTime() < modSince)
             {
                 // Item has not been modified since requested date,
                 // hence bitstream has not; return 304
@@ -531,7 +531,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         // users in the cache for a response later to anonymous user.
         try
         {
-            if (isSpider || ContextUtil.obtainContext(request).getCurrentUser() == null)
+            if (item != null && (isSpider || ContextUtil.obtainContext(request).getCurrentUser() == null))
             {
                 // TODO:  Currently just borrow the date of the item, since
                 // we don't have last-mod dates for Bitstreams
