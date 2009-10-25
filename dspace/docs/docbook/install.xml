@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <chapter remap="h1">
-    <title><anchor id="docbook-install.html"/>Installation</title>
+    <title><anchor id="docbook-install.html"/>DSpace System Documentation: Installation</title>
     <section remap="h2">
         <title><anchor id="docbook-install.html-prerequisite" xreflabel="Prerequisite Software"/>Prerequisite Software</title>
         <para>The list below describes the third-party components and tools you&apos;ll need to run a DSpace server. These are just guidelines. Since DSpace is built on open source, standards-based tools, there are numerous other possibilities and setups.</para>
@@ -40,25 +40,17 @@
                     </para>
                     <para>PostgreSQL can be downloaded from the following location: <ulink url="http://www.postgresql.org/">http://www.postgresql.org/ </ulink> Its highly recommended that you try to work with Postgres 8.x or greater, however, 7.3 or greater should still work. Unicode (specifically UTF-8) support must be enabled. This is enabled by default in 8.0+. For 7.<emphasis>x</emphasis>, be sure to compile with the following options to the &apos;<literal
                         >configure</literal>&apos; script:</para>
-                    <screen>--enable-multibyte --enable-unicode --with-java</screen>
-                    <para><anchor id="docbook-install.html-enabletcpip"/>Once installed, you need to enable TCP/IP connections (DSpace uses JDBC). For 7.<emphasis>x</emphasis>, edit <literal>postgresql.conf</literal> (usually in <literal>/usr/local/pgsql/data</literal> or <literal>/var/lib/pgsql/data</literal>), and add this line:</para>
-                    <screen>
-tcpip_socket = true
-</screen>
+                    <para><literal>--enable-multibyte --enable-unicode --with-java</literal></para>
+                    <para>Once installed, you need to enable TCP/IP connections (DSpace uses JDBC). For 7.<emphasis>x</emphasis>, edit <literal>postgresql.conf</literal> (usually in <literal>/usr/local/pgsql/data</literal> or <literal>/var/lib/pgsql/data</literal>), and add this line:</para>
+                    <para><literal>tcpip_socket = true</literal></para>
                     <para>For 8.0+, in <literal>postgresql.conf</literal> uncomment the line starting:</para>
-                    <screen>
-listen_addresses = &apos;localhost&apos;
-</screen>
+                    <para><literal>listen_addresses = &apos;localhost&apos;</literal></para>
                     <para>Then tighten up security a bit by editing <literal>pg_hba.conf</literal> and adding this line:</para>
-                    <screen>
-host  dspace  dspace  127.0.0.1  255.255.255.255  md5
-</screen>
+                    <para><literal>host dspace dspace 127.0.0.1 255.255.255.255 md5</literal></para>
                     <para>Then restart PostgreSQL.</para>
                 </listitem>
                 <listitem>
-                    <para>
-                        <emphasis role="bold">Oracle 9 or greater</emphasis>
-                    </para>
+                    <para><emphasis role="bold">Oracle 9 or greater</emphasis></para>
                     <para>Details on acquiring Oracle can be downloaded from the following location: <ulink url="http://www.oracle.com/database/">http://www.oracle.com/database/</ulink></para>
                     <para> You will need to create a database for DSpace. Make sure that the character set is one of the Unicode character sets. DSpace uses UTF-8 natively, and it is suggested that the Oracle database use the same character set. You will also need to create a user account for DSpace (e.g. <literal>dspace</literal>,) and ensure that it has permissions to add and remove tables in the database. Refer to the Quick Installation for more details.</para>
                     <para><emphasis role="bold">NOTE:</emphasis> DSpace uses sequences to generate unique object IDs - beware Oracle sequences, which are said to lose their values when doing a database export/import, say restoring from a backup. Be sure to run the script <literal>etc/update-sequences.sql</literal>.</para>
@@ -71,42 +63,35 @@ host  dspace  dspace  127.0.0.1  255.255.255.255  md5
             <title>Servlet Engine: (Jakarta Tomcat 4.x, Jetty, Caucho Resin or equivalent).</title>
             <itemizedlist>
                 <listitem>
-                    <para>
-                        <emphasis role="bold">Jakarta Tomcat 4.x or later.</emphasis>
-                    </para>
-                    <para> Tomcat can be dowloaded from the following location: <ulink url="http://tomcat.apache.org/whichversion.html">http://tomcat.apache.org</ulink></para>
-                    <para> Note that DSpace will need to run as the same user as Tomcat, so you might want to install and run Tomcat as a user called &apos;<literal>dspace</literal>&apos;. Set the environment variable TOMCAT_USER appropriately.</para>
-                    <para> Modifications in [tomcat]/tomcat.conf</para>
-                    <para> You need to ensure that Tomcat has a) enough memory to run DSpace and b) uses UTF-8 as its default file encoding for international character support. So ensure in your startup scripts (etc) that the following environment variable is set: </para>
-                    <screen>
-JAVA_OPTS=&quot;-Xmx512M -Xms64M -Dfile.encoding=UTF-8&quot;
-</screen>
-                    <para> Modifications in [tomcat]/config/server.xml</para>
-                    <para> You also need to alter Tomcat&apos;s default configuration to support searching and browsing of multi-byte UTF-8 correctly. You need to add a configuration option to the <literal>&lt;Connector&gt;</literal> element in <literal>[tomcat]/config/server.xml</literal>: </para>
-                    <screen>
-URIEncoding=&quot;UTF-8&quot;
-</screen>
+                    <para><emphasis role="bold">Jakarta Tomcat 4.x or later.</emphasis></para>
+                    <para>Tomcat can be dowloaded from the following location: <ulink url="http://tomcat.apache.org/whichversion.html">http://tomcat.apache.org</ulink></para>
+                    <para>Note that DSpace will need to run as the same user as Tomcat, so you might want to install and run Tomcat as a user called &apos;<literal>dspace</literal>&apos;. Set the environment variable TOMCAT_USER appropriately.</para>
+                    <para>You need to ensure that Tomcat has a) enough memory to run DSpace and b) uses UTF-8 as its default file encoding for international character support. So ensure in your startup scripts (etc) that the following environment variable is set: </para>
+                    <para><literal>JAVA_OPTS=&quot;-Xmx512M -Xms64M -Dfile.encoding=UTF-8&quot;</literal></para>
+                    <para><emphasis role="bold">Modifications in <literal>/[tomcat]/conf/server.xml</literal></emphasis> :</para>
+                    <para>You also need to alter Tomcat&apos;s default configuration to support searching and browsing of multi-byte UTF-8 correctly. You need to add a configuration option to the <literal>&lt;Connector&gt;</literal> element in <literal>[tomcat]/config/server.xml</literal>: </para>
+                    <para><literal>URIEncoding=&quot;UTF-8&quot;</literal></para>
                     <para> e.g. if you&apos;re using the default Tomcat config, it should read: </para>
                     <screen>
 &lt;!-- Define a non-SSL HTTP/1.1 Connector on port 8080 --&gt;
 &lt;Connector port=&quot;8080&quot;
-           maxThreads=&quot;150&quot; minSpareThreads=&quot;25&quot;
-        maxSpareThreads=&quot;75&quot;
-           enableLookups=&quot;false&quot; redirectPort=&quot;8443&quot;
-        acceptCount=&quot;100&quot;
-           connectionTimeout=&quot;20000&quot;
-        disableUploadTimeout=&quot;true&quot;
-           <emphasis role="bold"> URIEncoding=&quot;UTF-8&quot;</emphasis>
-        /&gt;
-</screen>
-                    <para> You may change the port from 8080 by editing it in the file above, and by setting the variable CONNECTOR_PORT in tomcat.conf</para>
+              maxThreads=&quot;150&quot;
+              minSpareThreads=&quot;25&quot;
+	          maxSpareThreads=&quot;75&quot;
+              enableLookups=&quot;false&quot;
+              redirectPort=&quot;8443&quot;
+	          acceptCount=&quot;100&quot;
+              connectionTimeout=&quot;20000&quot;
+	          disableUploadTimeout=&quot;true&quot;
+              <emphasis role="bold">URIEncoding=&quot;UTF-8&quot;</emphasis>/&gt;</screen>
+                    <para>You may change the port from 8080 by editing it in the file above, and by setting the variable CONNECTOR_PORT in server.xml</para>
                 </listitem>
                 <listitem>
                     <para>
                         <emphasis role="bold">Jetty or Caucho Resin</emphasis>
                     </para>
-                    <para> DSpace will also run on an equivalent servlet Engine, such as Jetty (<ulink url="http://www.mortbay.org/jetty/index.html">http://www.mortbay.org/jetty/index.html</ulink>) or Caucho Resin (<ulink url="http://www.caucho.com/">http://www.caucho.com/)</ulink>.</para>
-                    <para> Jetty and Resin are configured for correct handling of UTF-8 by default.</para>
+                    <para>DSpace will also run on an equivalent servlet Engine, such as Jetty (<ulink url="http://www.mortbay.org/jetty/index.html">http://www.mortbay.org/jetty/index.html</ulink>) or Caucho Resin (<ulink url="http://www.caucho.com/">http://www.caucho.com/)</ulink>.</para>
+                    <para>Jetty and Resin are configured for correct handling of UTF-8 by default.</para>
                 </listitem>
             </itemizedlist>
         </section>
@@ -122,102 +107,81 @@ URIEncoding=&quot;UTF-8&quot;
             <title><anchor id="docbook-install.html-options" xreflabel="Overview of Install Options"/>Overview of Install Options</title>
             <para>With the advent of a new Apache <ulink url="http://maven.apache.org/"
                 >Maven 2</ulink> based build architecture in DSpace 1.5.x, you now have two options in how you may wish to install and manage your local installation of DSpace. If you&apos;ve used DSpace 1.4.x, please recognize that the initial build proceedure has changed to allow for more customization. You will find the later &apos;Ant based&apos; stages of the installation proceedure familiar. Maven is used to resolve the dependencies of DSpace online from the &apos;Maven Central Repository&apos; server.</para>
-            <para>Its important to note that the strategies are identical in terms of the list of proceedures required to complete the build process, the only difference being that the Source Release includes &quot;more modules&quot; that will be built given their presence in the distribution package.</para>
+            <para>It is important to note that the strategies are identical in terms of the list of proceedures required to complete the build process, the only difference being that the Source Release includes &quot;more modules&quot; that will be built given their presence in the distribution package.</para>
             <itemizedlist>
                 <listitem>
-                    <para><anchor id="docbook-install.html-defaultRelease" xreflabel="Default Release (
-dspace-&lt;version&gt;-release.zip )"/>Default Release ( dspace-&lt;version&gt;-release.zip )<itemizedlist>
+                    <para><anchor id="docbook-install.html-defaultRelease" xreflabel="Default Release (dspace-&lt;version&gt;-release.zip )"/>Default Release (dspace-&lt;version&gt;-release.zip<itemizedlist>
                             <listitem>
-                                <para>
-                                    <emphasis role="bold">This distribution will be adequate for most cases of running a DSpace instance.</emphasis>
-                                    <emphasis role="bold">It is intended to be the quickest way to get DSpace installed and running while still allowing for customization of the themes and branding of your DSpace instance.</emphasis>
-                                </para>
+                                <para>This distribution will be adequate for most cases of running a DSpace instance. It is intended to be the quickest way to get DSpace installed and running while still allowing for customization of the themes and branding of your DSpace instance. </para>
                             </listitem>
                             <listitem>
-                                <para> This method allows you to customize DSpace configurations (in dspace.cfg) or user interfaces, using basic pre-built interface &quot;overlays&quot;.</para>
+                                <para>This method allows you to customize DSpace configurations (in dspace.cfg) or user interfaces, using basic pre-built interface &quot;overlays&quot;.</para>
                             </listitem>
                             <listitem>
-                                <para> It downloads &quot;precompiled&quot; libraries for the core dspace-api, supporting servlets, taglibraries, aspects and themes for the dspace-xmlui, dspace-xmlui and other webservice/applications.</para>
+                                <para>It downloads &quot;precompiled&quot; libraries for the core dspace-api, supporting servlets, taglibraries, aspects and themes for the dspace-xmlui, dspace-xmlui and other webservice/applications.</para>
                             </listitem>
                             <listitem>
-                                <para> This approach exposes the parts of the application that the DSpace commiters would prefer to see customized. All other modules are downloaded from the &apos;Maven Central Repository&apos;</para>
-                            </listitem>
-                        </itemizedlist></para>
-                </listitem>
-            </itemizedlist>
-            <blockquote>
-                <para> The directory structure for this release is the following:</para>
-            </blockquote>
-            <itemizedlist>
-                <listitem>
-                    <para>
-                        <literal>[dspace-source]</literal>
-                        <itemizedlist>
-                            <listitem>
-                                <para><literal>dspace/</literal> - DSpace &apos;build&apos; and configuration module</para>
-                            </listitem>
-                            <listitem>
-                                <para><literal>pom.xml</literal> - DSpace Parent Project definition</para>
-                            </listitem>
-                        </itemizedlist></para>
-                </listitem>
-            </itemizedlist>
-            <itemizedlist>
-                <listitem>
-                    <para><anchor id="docbook-install.html-sourceRelease" xreflabel="Source Release (
-dspace-&lt;version&gt;-src-release.zip )"/>Source Release ( dspace-&lt;version&gt;-src-release.zip )<itemizedlist>
-                            <listitem>
-                                <para>
-                                    <emphasis role="bold">This method is recommended for those who wish to develop DSpace further or alter its underlying capabilities to a greater degree.</emphasis>
-                                </para>
-                            </listitem>
-                            <listitem>
-                                <para> It contains &quot;all&quot; dspace code for the core dspace-api, supporting servlets, taglibraries, aspects and themes for the dspace-xmlui, dspace-xmlui and other webservice/applications.</para>
-                            </listitem>
-                            <listitem>
-                                <para> Provides all the same capabilities as the normal release.</para>
-                            </listitem>
-                        </itemizedlist></para>
-                    <para> The directory structure for this release is more detailed:</para>
-                </listitem>
-                <listitem>
-                    <para>
-                        <itemizedlist>
-                            <listitem>
-                                <para>
-                                    <literal>[dspace-source]</literal>
-                                    <itemizedlist>
+                                <para>This approach exposes the parts of the application that the DSpace commiters would prefer to see customized. All other modules are downloaded from the &apos;Maven Central Repository&apos;</para>
+                                <para>The directory structure for this release is the following:<itemizedlist>
                                         <listitem>
-                                            <para><literal>dspace/</literal> - DSpace &apos;build&apos; and configuration module</para>
-                                        </listitem>
-                                        <listitem>
-                                            <para><literal>dspace-api/</literal> - Java API source module</para>
-                                        </listitem>
-                                        <listitem>
-                                            <para><literal>dspace-jspui/</literal> - JSP-UI source module</para>
-                                        </listitem>
-                                        <listitem>
-                                            <para><literal>dspace-oai/</literal> - OAI-PMH source module</para>
-                                        </listitem>
-                                        <listitem>
-                                            <para><literal>dspace-xmlui/</literal> - XML-UI source module</para>
-                                        </listitem>
-                                        <listitem>
-                                            <para><literal>dspace-lni/</literal> - Lightweight Network Interface source module</para>
-                                        </listitem>
-                                        <listitem>
-                                            <para><literal>dspace-sword/</literal> - SWORD (Simple Web-service Offering Repository Deposit) deposit service source module</para>
-                                        </listitem>
-                                        <listitem>
-                                            <para><literal>pom.xml</literal> - DSpace Parent Project definition</para>
+                                            <para><literal>[dspace-source]</literal><itemizedlist>
+                                                    <listitem>
+                                                        <para><literal>dspace/</literal> - DSpace &apos;build&apos; and configuration module</para>
+                                                    </listitem>
+                                                    <listitem>
+                                                        <para><literal>pom.xml</literal> - DSpace Parent Project definition</para>
+                                                    </listitem>
+                                                </itemizedlist></para>
                                         </listitem>
                                     </itemizedlist></para>
                             </listitem>
-                        </itemizedlist>
-                    </para>
+                        </itemizedlist></para>
+                </listitem>
+                <listitem>
+                    <para>Source Release (dspace-&lt;version&gt;-src-release.zip)<itemizedlist>
+                            <listitem>
+                                <para>This method is recommended for those who wish to develop DSpace further or alter its underlying capabilities to a greater degree.</para>
+                            </listitem>
+                            <listitem>
+                                <para>It contains <emphasis role="bold">all</emphasis> dspace code for the core dspace-api, supporting servlets, taglibraries, aspects and themes for Manakin (dspace-xmlui), and other webservice/applications.</para>
+                            </listitem>
+                            <listitem>
+                                <para>Provides all the same capabilities as the normal release.</para>
+                                <para>The directory structure for this release is more detailed: <itemizedlist>
+                                        <listitem>
+                                            <para><literal>[dspace-source]</literal>
+                                                <itemizedlist>
+                                                    <listitem>
+                                                        <para><literal>dspace/</literal> - DSpace &apos;build&apos; and configuration module</para>
+                                                    </listitem>
+                                                    <listitem>
+                                                        <para><literal>dspace-api/</literal> - Java API source module</para>
+                                                    </listitem>
+                                                    <listitem>
+                                                        <para><literal>dspace-jspui/</literal> - JSP-UI source module</para>
+                                                    </listitem>
+                                                    <listitem>
+                                                        <para><literal>dspace-oai</literal> - OAI-PMH source module</para>
+                                                    </listitem>
+                                                    <listitem>
+                                                        <para><literal>dspace-xmlui</literal> - XML-UI (Manakin) source module</para>
+                                                    </listitem>
+                                                    <listitem>
+                                                        <para><literal>dspace-lni</literal> - Lightweight Network Interface source module</para>
+                                                    </listitem>
+                                                    <listitem>
+                                                        <para><literal>dspace-sword</literal> -- SWORD (Simple Web-serve Offering Repository Deposit) deposit service source module</para>
+                                                    </listitem>
+                                                    <listitem>
+                                                        <para><literal>pom.xml</literal> - DSpace Parent Project definition</para>
+                                                    </listitem>
+                                                </itemizedlist></para>
+                                        </listitem>
+                                    </itemizedlist></para>
+                            </listitem>
+                        </itemizedlist></para>
                 </listitem>
             </itemizedlist>
-            <para>Both approaches provide you with the same control over how DSpace builds itself (especially in terms of adding completely custom/3rd-party DSpace &quot;modules&quot; you wish to use). Both methods allow you the ability to create more complex user interface &quot;overlays&quot; in Maven. An interface &quot;overlay&quot; allows you to only manage your local custom code (in your local CVS or SVN), and automatically download the rest of the interface code from the maven central repository whenever you build DSpace. This reduces the amount of out-of-the-box DSpace interface code maintained in your local CVS / SVN.</para>
         </section>
         <section remap="h3">
             <title><anchor id="docbook-install.html-directories" xreflabel="Overview of DSpace Directories"/>Overview of DSpace Directories</title>
@@ -225,21 +189,14 @@ dspace-&lt;version&gt;-src-release.zip )"/>Source Release ( dspace-&lt;version&g
             <para>DSpace uses three separate directory trees. Although you don&apos;t need to know all the details of them in order to install DSpace, you do need to know they exist and also know how they&apos;re referred to in this document:</para>
             <orderedlist>
                 <listitem>
-                    <para><emphasis role="bold">the installation directory</emphasis> , referred to as <emphasis>
-                            <literal>[dspace]</literal>
-                        </emphasis> . This is the location where DSpace is installed and running off of it is the location that gets defined in the dspace.cfg as &quot;dspace.dir&quot;. It is where all the DSpace configuration files, command line scripts, documentation and webapps will be installed to.</para>
+                    <para><emphasis role="bold">The installation directory</emphasis>, referred to as <emphasis><literal>[dspace]</literal></emphasis> . This is the location where DSpace is installed and running off of it is the location that gets defined in the dspace.cfg as &quot;dspace.dir&quot;. It is where all the DSpace configuration files, command line scripts, documentation and webapps will be installed to.</para>
                 </listitem>
                 <listitem>
-                    <para><emphasis role="bold">the source directory</emphasis> , referred to as <emphasis>
-                            <literal>[dspace-source]</literal>
-                        </emphasis> . This is the location where the DSpace release distribution has been unzipped into. It usually has the name of the archive that you expanded such as <emphasis>dspace-&lt;version&gt;-release</emphasis> or <emphasis>dspace-&lt;version&gt;-src-release</emphasis>. It is the directory where all of your &quot;build&quot; commands will be run.</para>
+                    <para><emphasis role="bold">The source directory</emphasis>, referred to as <emphasis><literal>[dspace-source]</literal></emphasis> . This is the location where the DSpace release distribution has been unzipped into. It usually has the name of the archive that you expanded such as <emphasis>dspace-&lt;version&gt;-release</emphasis> or <emphasis>dspace-&lt;version&gt;-src-release</emphasis>. It is the directory where all of your &quot;build&quot; commands will be run.</para>
                 </listitem>
                 <listitem>
-                    <para><emphasis role="bold">the web deployment directory</emphasis> . This is the directory that contains your DSpace web application(s). In DSpace 1.5.x and above, this corresponds to <emphasis>
-                            <literal>[dspace]/webapps</literal>
-                        </emphasis> by default. However, if you are using Tomcat, you may decide to copy your DSpace web applications from <emphasis>
-                            <literal>[dspace]/webapps/</literal>
-                        </emphasis> to <literal>[tomcat]/webapps/</literal> (with <literal>[tomcat]</literal> being wherever you installed Tomcat--also known as <literal>$CATALINA_HOME</literal>).</para>
+                    <para><emphasis role="bold">The web deployment directory</emphasis>. This is the directory that contains your DSpace web application(s). In DSpace 1.5.x and above, this corresponds to <emphasis><literal>[dspace]/webapps</literal></emphasis> by default. However, if you are using Tomcat, you may decide to copy your DSpace web applications from <emphasis><literal>[dspace]/webapps/</literal></emphasis> to <literal>[tomcat]/webapps/</literal> (with <literal
+                            >[tomcat]</literal> being wherever you installed Tomcat&mdash;also known as <literal>$CATALINA_HOME</literal>).</para>
                 </listitem>
             </orderedlist>
             <para>For details on the contents of these separate directory trees, refer to <link linkend="docbook-directories.html">directories.html</link>. <emphasis>Note that the <literal>[dspace-source]</literal> and <literal>[dspace]</literal> directories are always separate!</emphasis></para>
@@ -249,39 +206,51 @@ dspace-&lt;version&gt;-src-release.zip )"/>Source Release ( dspace-&lt;version&g
             <para> This method gets you up and running with DSpace quickly and easily. It is identical in both the <link linkend="docbook-install.html-defaultRelease">Default Release</link> and <link linkend="docbook-install.html-sourceRelease">Source Release</link> distributions. </para>
             <orderedlist>
                 <listitem>
-                    <para> Create the DSpace user. This needs to be the same user that Tomcat (or Jetty etc) will run as. e.g. as root run:</para>
-                    <screen>
-useradd -m dspace
-</screen>
+                    <para><emphasis role="bold">Create the DSpace user</emphasis>. This needs to be the same user that Tomcat (or Jetty etc) will run as. e.g. as <emphasis role="bold">root</emphasis> run:</para>
+                    <screen>useradd -m dspace</screen>
                 </listitem>
                 <listitem>
-                    <para> Download the <ulink url="http://sourceforge.net/projects/dspace/">latest DSpace release</ulink> and unpack it. Although there are two available releases (<literal>dspace-1.x-release.zip</literal> and <literal>dspace-1.x-src-release.zip</literal>), you only need to choose one. If you want a copy of all underlying Java source code, you should download the <literal>dspace-1.x-src-release.zip</literal> release. </para>
-                    <screen>
-unzip dspace-1.x-release.zip
-</screen>
-                    <para>For ease of reference, we will refer to the location of this unzipped version of the DSpace release as <literal>[dspace-source] in the remainder of these instructions.</literal></para>
+                    <para><emphasis role="bold">Download</emphasis> the <ulink url="http://sourceforge.net/projects/dspace/">latest DSpace release</ulink> There are two version available with each release of DSpace: (<literal>dspace-1.x-release.</literal> and <literal>dspace-1.x-src-release.xxx</literal>); you only need to choose one. If you want a copy of all underlying Java source code, you should download the <literal
+                        >dspace-1.x-src-release.xxx</literal> Within each version, you have a choice of compressed file format. Choose the one that best fits your environment.</para>
                 </listitem>
                 <listitem>
-                    <para> Database Setup</para>
+                    <para><emphasis role="bold">Unpack the DSpace software</emphasis>. After downloading the software, based on the compression file format, choose one of the following methods to unpack your software: <orderedlist>
+                            <listitem>
+                                <para><emphasis role="bold">Zip file</emphasis>. If you downloaded <literal>dspace-1.6-release.zip</literal> do the following:</para>
+                                <screen>unzip dspace-1.6-release.zip</screen>
+                            </listitem>
+                            <listitem>
+                                <para><emphasis role="bold">.gz file</emphasis>. If you downloaded <literal>dspace-1.6-release.tar.gz</literal> do the following:</para>
+                                <screen>gunzip -c dspace-1.6-release.tar.gz | tar -xf -</screen>
+                            </listitem>
+                            <listitem>
+                                <para><emphasis role="bold">.bz2 file</emphasis>. If you downloaded <literal>dspace-1.6-release.tar.bz2</literal>do the following:</para>
+                                <screen>bunzip2 dspace-1.6-release.tar.bz | tar -xf -</screen>
+                            </listitem>
+                        </orderedlist></para>
+                    <para>For ease of reference, we will refer to the location of this unzipped version of the DSpace release as <literal>[dspace-source]</literal> in the remainder of these instructions.</para>
+                    <tip>
+                        <para>After unpacking the file, the user may which to change the ownership of the <literal>dspace-1.6-release</literal> to the &apos;dspace&apos; user. (And you may need to change the group).</para>
+                    </tip>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">Database Setup</emphasis></para>
                     <para>
-                        <emphasis role="bold">Postgres:</emphasis>
+                        <emphasis role="underline">PostgreSQL:</emphasis>
                     </para>
                     <orderedlist>
                         <listitem>
                             <para>
-                                <anchor id="docbook-install.html-pgdriver"/> A PostgreSQL 8.1-404 jdbc3 driver is configure as part of the default DSpace build. You no longer need to copy any postgres jars to get postgres installed.</para>
+                                <anchor id="docbook-install.html-pgdriver"/>A PostgreSQL 8.1-404 jdbc3 driver is configured as part of the default DSpace build. You no longer need to copy any postgreSQL jars to get postgreSQL installed.</para>
                         </listitem>
                         <listitem>
-                            <para> Create a <literal>dspace</literal> database, owned by the <literal>dspace</literal> PostgreSQL user:</para>
-                            <screen>
-createuser -U postgres -d -A -P dspace
-createdb -U dspace -E UNICODE dspace
-</screen>
-                            <para>Enter a password for the DSpace database. (This isn&apos;t the same as the <literal>dspace</literal> user&apos;s UNIX password.)</para>
+                            <para>Create a <literal>dspace</literal> database, owned by the <literal>dspace</literal> PostgreSQL user <emphasis>(you are still logged in at &apos;root&apos;)</emphasis>:</para>
+                            <screen>createuser -U postgres -d -A -P dspace ; createdb -U dspace -E UNICODE dspace</screen>
+                            <para>You will be prompted for a password for the DSpace database. (This isn&apos;t the same as the <literal>dspace</literal> user&apos;s UNIX password.)</para>
                         </listitem>
                     </orderedlist>
                     <para>
-                        <emphasis role="bold">Oracle:</emphasis>
+                        <emphasis role="underline">Oracle:</emphasis>
                     </para>
                     <orderedlist>
                         <listitem>
@@ -292,20 +261,24 @@ createdb -U dspace -E UNICODE dspace
                             </para>
                         </listitem>
                         <listitem>
-                            <para> Create a database for DSpace. Make sure that the character set is one of the Unicode character sets. DSpace uses UTF-8 natively, and it is suggested that the Oracle database use the same character set. Create a user account for DSpace (e.g. <literal>dspace</literal>,) and ensure that it has permissions to add and remove tables in the database.</para>
+                            <para>Create a database for DSpace. Make sure that the character set is one of the Unicode character sets. DSpace uses UTF-8 natively, and it is suggested that the Oracle database use the same character set. Create a user account for DSpace (e.g. <literal>dspace</literal>,) and ensure that it has permissions to add and remove tables in the database.</para>
                         </listitem>
                         <listitem>
-                            <para> Edit the <literal>[dspace-source]/dspace/config/dspace.cfg</literal> database settings:</para>
-                            <screen>
-db.name   = oracle
-db.url    = jdbc:oracle:thin:@//host:port/dspace
-db.driver = oracle.jdbc.OracleDriver
-</screen>
+                            <para>Edit the <literal>[dspace-source]/dspace/config/dspace.cfg</literal> database settings:</para>
+                            <screen>db.name   = oracle
+db.url    = jdbc.oracle.thin:@//host:port/dspace
+db.driver = oracle.jdbc.OracleDriver</screen>
+                        </listitem>
+                        <listitem>
+                            <para>Go to <literal>[dspace-source]/dspace/etc/oracle</literal> and copy the contents to their parent directory, overwriting the versions in the parent:</para>
+                            <screen>cd [dspace-source]/dspace/etc/oracle
+cp * ..</screen>
+                            <para>You now have Oracle-specific <literal>.sql</literal> files in your <literal>etc</literal> directory, and your dspace.cfg is modified to point to your Oracle database.</para>
                         </listitem>
                     </orderedlist>
                 </listitem>
                 <listitem>
-                    <para> Edit <literal>[dspace-source]/dspace/config/dspace.cfg</literal>, in particular you&apos;ll need to set these properties:</para>
+                    <para>Edit <literal>[dspace-source]/dspace/config/dspace.cfg</literal>, in particular you&apos;ll need to set these properties:</para>
                     <para><literal>dspace.dir</literal> -- must be set to the <literal>[dspace]</literal> (installation) directory.</para>
                     <para><literal>dspace.url</literal> -- complete URL of this server&apos;s DSpace home page.</para>
                     <para><literal>dspace.hostname</literal> -- fully-qualified domain name of web server.</para>
@@ -318,74 +291,56 @@ db.driver = oracle.jdbc.OracleDriver
                     <para><literal>alert.recipient</literal> -- mailbox for server errors/alerts (not essential but very useful!)</para>
                     <para><literal>registration.notify</literal> -- mailbox for emails when new users register (optional) </para>
                     <para><emphasis role="bold">NOTE:</emphasis> You can interpolate the value of one configuration variable in the value of another one. For example, to set <literal>feedback.recipient</literal> to the same value as <literal>mail.admin</literal>, the line would look like:</para>
-                    <screen>
-    feedback.recipient = ${mail.admin}
-</screen>
-                    <para> See the <literal>dspace.cfg</literal> file for examples.</para>
+                    <screen>     feedback.recipient = ${mail.admin}</screen>
+                    <para>Refer to <link linkend="docbook-configure.html">5.2. General Configuration</link> for details and examples of the above.</para>
                 </listitem>
                 <listitem>
-                    <para> Create the directory for the DSpace installation (i.e. <literal>[dspace]</literal>). As <emphasis>root</emphasis> (or a user with appropriate permissions), run: </para>
-                    <screen>
-mkdir <emphasis> [dspace]</emphasis>
-chown dspace <emphasis> [dspace]</emphasis>
-</screen>
+                    <para>Create the directory for the DSpace installation (i.e. <literal>[dspace]</literal>). As <emphasis>root</emphasis> (or a user with appropriate permissions), run: </para>
+                    <screen>mkdir <emphasis>[dspace]</emphasis>
+chown dspace <emphasis>[dspace]</emphasis></screen>
                     <para>(Assuming the <literal>dspace</literal> UNIX username.)</para>
                 </listitem>
                 <listitem>
-                    <para> As the <literal>dspace</literal> UNIX user, generate the DSpace installation package in the <literal>[dspace-source]/dspace/target/dspace-[version].dir/</literal> directory:</para>
-                    <screen>
-cd <emphasis> [dspace-source]</emphasis>/dspace/
-
-mvn package
-</screen>
+                    <para>As the <literal>dspace</literal> UNIX user, generate the DSpace installation package in the <literal>[dspace-source]/dspace</literal> directory:</para>
+                    <screen>cd <emphasis>[dspace-source]</emphasis>/dspace/
+mvn package</screen>
                     <para>Note: without any extra arguments, the DSpace installation package is initialized for PostgreSQL.</para>
-                    <para> If you want to use Oracle instead, you should build the DSpace installation package as follows:</para>
-                    <screen>
-mvn -Ddb.name=oracle package
-</screen>
+                    <para><emphasis>If you want to use Oracle instead, you should build the DSpace installation package as follows:</emphasis></para>
+                    <screen>mvn -Ddb.name=oracle package</screen>
                 </listitem>
                 <listitem>
-                    <para> As the <literal>dspace</literal> UNIX user, initialize the DSpace database and install DSpace to <literal>[dspace]</literal>:</para>
-                    <screen>
-cd <emphasis>
-        [dspace-source]</emphasis>/dspace/target/dspace-[version].dir/
-ant fresh_install
-</screen>
-                    <para><emphasis role="bold">Note:</emphasis> to see a complete list of build targets, run</para>
-                    <screen>
-ant help
-</screen>
+                    <para>As the <literal>dspace</literal> UNIX user, initialize the DSpace database and install DSpace to <literal>[dspace]</literal>:</para>
+                    <screen>cd <emphasis>[dspace-source]</emphasis>/dspace/target/dspace-[version]-build.dir
+
+ant fresh_install</screen>
+                    <note>
+                        <para>To see a complete list of build targets, run:</para>
+                        <screen>ant help</screen>
+                    </note>
                     <para>The most likely thing to go wrong here is the database connection. See the <link linkend="docbook-install.html-problems">common problems section</link>.</para>
                 </listitem>
                 <listitem>
                     <para> Tell your Tomcat/Jetty/Resin installation where to find your DSpace web application(s). As an example, in the <literal>&lt;Host&gt;</literal> section of your <literal>[tomcat]/conf/server.xml</literal> you could add lines similar to the following (but replace <literal>[dspace]</literal> with your installation location):</para>
-                    <screen>
-&lt;!-- DEFINE A CONTEXT PATH FOR DSpace JSP User Interface  --&gt;
+                    <screen>&lt;!-- DEFINE A CONTEXT PATH FOR DSpace JSP User Interface  --&gt;
 &lt;Context path=&quot;/jspui&quot; docBase=&quot;[dspace]\webapps\jspui&quot; debug=&quot;0&quot;
-        reloadable=&quot;true&quot; cachingAllowed=&quot;false&quot;
-        allowLinking=&quot;true&quot;/&gt;
+	reloadable=&quot;true&quot; cachingAllowed=&quot;false&quot;
+	allowLinking=&quot;true&quot;/&gt;
         
 &lt;!-- DEFINE A CONTEXT PATH FOR DSpace OAI User Interface  --&gt;
 &lt;Context path=&quot;/oai&quot; docBase=&quot;[dspace]\webapps\oai&quot; debug=&quot;0&quot;
-        reloadable=&quot;true&quot; cachingAllowed=&quot;false&quot;
-        allowLinking=&quot;true&quot;/&gt;
+	reloadable=&quot;true&quot; cachingAllowed=&quot;false&quot;
+	allowLinking=&quot;true&quot;/&gt;
 </screen>
                     <para>Alternatively, you could copy only the DSpace Web application(s) you wish to use from <literal>[dspace]/webapps</literal> to the appropriate directory in your Tomcat/Jetty/Resin installation. For example:</para>
-                    <screen>
-cp -r <emphasis> [dspace]</emphasis>/webapps/jspui <emphasis>
-        [tomcat]</emphasis>/webapps
-cp -r <emphasis> [dspace]</emphasis>/webapps/oai <emphasis>
-        [tomcat]</emphasis>/webapps
-</screen>
+                    <screen>cp -R <emphasis>[dspace]</emphasis>/webapps/jspui <emphasis>[tomcat]</emphasis>/webapps
+cp -R <emphasis>[dspace]</emphasis>/webapps/oai <emphasis>[tomcat]</emphasis>/webapps</screen>
                 </listitem>
                 <listitem>
-                    <para> Create an initial administrator account: </para>
-                    <screen>
-<emphasis> [dspace]</emphasis>/bin/create-administrator
-</screen>
+                    <para>Create an initial administrator account:</para>
+                    <screen><emphasis>[dspace]</emphasis>/bin/create-administrator</screen>
                 </listitem>
                 <listitem>
-                    <para> Now the moment of truth! Start up (or restart) Tomcat/Jetty/Resin. Visit the base URL(s) of your server, depending on which DSpace web applications you want to use. You should see the DSpace home page. Congratulations! </para>
+                    <para>Now the moment of truth! Start up (or restart) Tomcat/Jetty/Resin. Visit the base URL(s) of your server, depending on which DSpace web applications you want to use. You should see the DSpace home page. Congratulations! </para>
                     <para>Base URLs of DSpace Web Applications:</para>
                     <itemizedlist>
                         <listitem>
@@ -410,45 +365,36 @@ cp -r <emphasis> [dspace]</emphasis>/webapps/oai <emphasis>
             <title>&apos;cron&apos; Jobs</title>
             <para>A couple of DSpace features require that a script is run regularly -- the e-mail subscription feature that alerts users of new items being deposited, and the new &apos;media filter&apos; tool, that generates thumbnails of images and extracts the full-text of documents for indexing.</para>
             <para>To set these up, you just need to run the following command as the <literal>dspace</literal> UNIX user:</para>
-            <screen>
-crontab -e
-</screen>
+            <screen>crontab -e</screen>
             <para>Then add the following lines:</para>
-            <screen>
-# Send out subscription e-mails at 01:00 every day
+            <screen># Send out subscription e-mails at 01:00 every day
 0 1 * * * <emphasis> [dspace]</emphasis>/bin/sub-daily
 # Run the media filter at 02:00 every day
 0 2 * * * <emphasis> [dspace]</emphasis>/bin/filter-media
 # Run the checksum checker at 03:00
 0 3 * * * <emphasis> [dspace]</emphasis>/bin/checker -lp
 # Mail the results to the sysadmin at 04:00
-0 4 * * * <emphasis> [dspace]</emphasis>/bin/dsrun org.dspace.checker.DailyReportEmailer
-        -c
+0 4 * * * <emphasis> [dspace]</emphasis>/bin/dsrun org.dspace.checker.DailyReportEmailer -c
 </screen>
             <para>Naturally you should change the frequencies to suit your environment.</para>
             <para>PostgreSQL also benefits from regular &apos;vacuuming&apos;, which optimizes the indices and clears out any deleted data. Become the <literal>postgres</literal> UNIX user, run <literal>crontab -e</literal> and add (for example):</para>
-            <screen>
-# Clean up the database nightly at 4.20am
-20 4 * * * vacuumdb --analyze dspace &gt; /dev/null 2&gt;&amp;1
-</screen>
+            <screen># Clean up the database nightly at 4.20am
+20 4 * * * vacuumdb --analyze dspace &gt; /dev/null 2&gt;&amp;1</screen>
             <para>In order that statistical reports are generated regularly and thus kept up to date you should set up the following cron jobs:</para>
-            <screen>
-# Run stat analyses
+            <screen># Run stat analyses
 0 1 * * * [dspace]/bin/stat-general
 0 1 * * * [dspace]/bin/stat-monthly
 0 2 * * * [dspace]/bin/stat-report-general
-0 2 * * * [dspace]/bin/stat-report-monthly
-</screen>
+0 2 * * * [dspace]/bin/stat-report-monthly</screen>
             <para>Obviously, you should choose execution times which are most useful to you, and you should ensure that the <literal>-report-</literal> scripts run a short while after the analysis scripts to give them time to complete (a run of around 8 months worth of logs can take around 25 seconds to complete); the resulting reports will let you know how long analysis took and you can adjust your cron times accordingly.</para>
-            <para>For information on customising the output of this see <link linkend="docbook-configure.html-statistics">configuring system statistical reports</link>.</para>
         </section>
         <section remap="h3">
             <title>Multilingual Installation</title>
-            <para> In order to deploy a multilingual version of DSpace you have to configure two parameters in <literal>[dspace-source]/config/dspace.cfg:</literal></para>
+            <para>In order to deploy a multilingual version of DSpace you have to configure two parameters in <literal>[dspace-source]/config/dspace.cfg:</literal></para>
             <para><literal>default.locale</literal>, e. g. default.locale = en</para>
             <para><literal>webui.supported locales</literal>, e. g. webui.supported.locales = en, de</para>
-            <para> The Locales might have the form country, country_language, country_language_variant.</para>
-            <para> Accoding to the languages you wish to support, you have to make sure, that all the i18n related files are available see the <link linkend="docbook-configure.html-multilingualui">Multilingual User Interface Configuring MultiLingual Support</link> section for the JSPUI or the Multilingual Support for XMLUI in the configuration documentation. </para>
+            <para>The Locales might have the form country, country_language, country_language_variant.</para>
+            <para>Accoding to the languages you wish to support, you have to make sure, that all the i18n related files are available see the <link linkend="docbook-configure.html-multilingualui">Multilingual User Interface Configuring MultiLingual Support</link> section for the JSPUI or the Multilingual Support for XMLUI in the configuration documentation. </para>
         </section>
         <section remap="h3">
             <title><anchor id="docbook-install.html-https" xreflabel="DSpace over HTTPS"/>DSpace over HTTPS</title>
@@ -464,53 +410,45 @@ crontab -e
                         <orderedlist>
                             <listitem>
                                 <para> Create a Java keystore for your server with the password <literal>changeit</literal>, and install your server certificate under the alias <literal>&quot;tomcat&quot;</literal>. This assumes the certificate was put in the file <literal>server.pem</literal>:</para>
-                                <screen>
- $JAVA_HOME/bin/keytool -import -noprompt -v -storepass changeit
-        -keystore $CATALINA_BASE/conf/keystore -alias tomcat -file
-        myserver.pem
-</screen>
+                                <screen>$JAVA_HOME/bin/keytool -import -noprompt -v -storepass changeit
+	-keystore $CATALINA_BASE/conf/keystore -alias tomcat -file
+	myserver.pem</screen>
                             </listitem>
                             <listitem>
                                 <para> Install the CA (Certifying Authority) certificate for the CA that granted your server cert, if necessary. This assumes the server CA certificate is in <literal>ca.pem</literal>:</para>
-                                <screen>
- $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit
-        -trustcacerts -keystore $CATALINA_BASE/conf/keystore -alias ServerCA
-        -file ca.pem
+                                <screen> $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit
+	-trustcacerts -keystore $CATALINA_BASE/conf/keystore -alias ServerCA
+	-file ca.pem
 </screen>
                             </listitem>
                             <listitem>
-                                <para> Optional -- ONLY if you need to accept client certificates for the X.509 certificate stackable authentication module See the <link linkend="docbook-configure.html-authenticate"
+                                <para>Optional -- ONLY if you need to accept client certificates for the X.509 certificate stackable authentication module See the <link linkend="docbook-configure.html-authenticate"
                                         >configuration section</link> for instructions on enabling the X.509 authentication method. Load the keystore with the CA (certifying authority) certificates for the authorities of any clients whose certificates you wish to accept. For example, assuming the client CA certificate is in <literal>client1.pem</literal>:</para>
-                                <screen>
- $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit
-        -trustcacerts -keystore $CATALINA_BASE/conf/keystore  -alias client1
-        -file client1.pem
+                                <screen>$JAVA_HOME/bin/keytool -import -noprompt -storepass changeit
+	-trustcacerts -keystore $CATALINA_BASE/conf/keystore  -alias client1
+	-file client1.pem
 </screen>
                             </listitem>
                             <listitem>
-                                <para> Now add another Connector tag to your <literal>server.xml</literal> Tomcat configuration file, like the example below. The parts affecting or specific to SSL are shown in bold. (You may wish to change some details such as the port, pathnames, and keystore password)</para>
-                                <screen>
-    &lt;Connector port=&quot;8443&quot;
+                                <para>Now add another Connector tag to your <literal>server.xml</literal> Tomcat configuration file, like the example below. The parts affecting or specific to SSL are shown in bold. (You may wish to change some details such as the port, pathnames, and keystore password)</para>
+                                <screen>     &lt;Connector port=&quot;8443&quot;
                maxThreads=&quot;150&quot; minSpareThreads=&quot;25&quot;
-        maxSpareThreads=&quot;75&quot;
+	           maxSpareThreads=&quot;75&quot;
                enableLookups=&quot;false&quot;
-        disableUploadTimeout=&quot;true&quot;
-                 acceptCount=&quot;100&quot; debug=&quot;0&quot;
-                 <emphasis role="bold"> scheme=&quot;https&quot; secure=&quot;true&quot; sslProtocol=&quot;TLS&quot;
-        keystoreFile=&quot;conf/keystore&quot; keystorePass=&quot;changeit&quot; clientAuth=&quot;true&quot;</emphasis>
-        <emphasis> - ONLY if using client X.509 certs for authentication!</emphasis> <emphasis role="bold">
-        truststoreFile=&quot;conf/keystore&quot; trustedstorePass=&quot;changeit&quot;</emphasis>
-        /&gt;
+	           disableUploadTimeout=&quot;true&quot;
+               acceptCount=&quot;100&quot; debug=&quot;0&quot;
+              <emphasis role="bold">scheme=&quot;https&quot; secure=&quot;true&quot; sslProtocol=&quot;TLS&quot;
+	keystoreFile=&quot;conf/keystore&quot; keystorePass=&quot;changeit&quot; clientAuth=&quot;true&quot;</emphasis>
+	<emphasis> - ONLY if using client X.509 certs for authentication!</emphasis> <emphasis role="bold">
+	truststoreFile=&quot;conf/keystore&quot; trustedstorePass=&quot;changeit&quot;</emphasis> /&gt;
 </screen>
-                                <para> Also, check that the default Connector is set up to redirect &quot;secure&quot; requests to the same port as your SSL connector, e.g.: </para>
-                                <screen>
-&lt;Connector port=&quot;8080&quot;
+                                <para>Also, check that the default Connector is set up to redirect &quot;secure&quot; requests to the same port as your SSL connector, e.g.: </para>
+                                <screen>&lt;Connector port=&quot;8080&quot;
                  maxThreads=&quot;150&quot; minSpareThreads=&quot;25&quot;
-        maxSpareThreads=&quot;75&quot;
+	             maxSpareThreads=&quot;75&quot;
                  enableLookups=&quot;false&quot; <emphasis role="bold">
-        redirectPort=&quot;8443&quot;</emphasis>
-                 acceptCount=&quot;100&quot; debug=&quot;0&quot;
-        /&gt;
+	             redirectPort=&quot;8443&quot;</emphasis>
+                 acceptCount=&quot;100&quot; debug=&quot;0&quot;  	/&gt;
 </screen>
                             </listitem>
                         </orderedlist>
@@ -529,11 +467,11 @@ crontab -e
                                         <para> Create a new key pair under the alias name <literal>&quot;tomcat&quot;</literal>. When generating your key, give the Distinguished Name fields the appropriate values for your server and institution. CN should be the fully-qualified domain name of your server host. Here is an example:</para>
                                         <screen>
 $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
-        1024 \
+	1024 \
   -keystore $CATALINA_BASE/conf/keystore -storepass changeit
-        -validity 365 \
+	-validity 365 \
   -dname &apos;CN=dspace.myuni.edu, OU=MIT Libraries, O=Massachusetts
-        Institute of Technology, L=Cambridge, S=MA, C=US&apos;
+	Institute of Technology, L=Cambridge, S=MA, C=US&apos;
       
 </screen>
                                     </listitem>
@@ -541,7 +479,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
                                         <para> Then, create a <emphasis>CSR</emphasis> (Certificate Signing Request) and send it to your Certifying Authority. They will send you back a signed Server Certificate. This example command creates a CSR in the file <literal>tomcat.csr</literal></para>
                                         <screen>
  $JAVA_HOME/bin/keytool -keystore $CATALINA_BASE/conf/keystore
-        -storepass changeit \
+	-storepass changeit \
    -certreq -alias tomcat -v -file tomcat.csr
 </screen>
                                     </listitem>
@@ -549,7 +487,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
                                         <para> Before importing the signed certificate, you must have the CA&apos;s certificate in your keystore as a <emphasis>trusted certificate</emphasis>. Get their certificate, and import it with a command like this (for the example <literal>mitCA.pem</literal>):</para>
                                         <screen>
  $JAVA_HOME/bin/keytool -keystore $CATALINA_BASE/conf/keystore
-        -storepass changeit \
+	-storepass changeit \
      -import -alias mitCA -trustcacerts -file mitCA.pem
 </screen>
                                     </listitem>
@@ -557,7 +495,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
                                         <para> Finally, when you get the signed certificate from your CA, import it into the keystore with a command like the following example: (cert is in the file <literal>signed-cert.pem</literal>)</para>
                                         <screen>
  $JAVA_HOME/bin/keytool -keystore $CATALINA_BASE/conf/keystore
-        -storepass changeit \
+	-storepass changeit \
      -import -alias tomcat -trustcacerts -file signed-cert.pem
 </screen>
                                         <para> Since you now have a signed server certificate in your keystore, you can, obviously, skip the next steps of installing a signed server certificate and the server CA&apos;s certificate.</para>
@@ -568,7 +506,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
                                 <para> Create a Java keystore for your server with the password <literal>changeit</literal>, and install your server certificate under the alias <literal>&quot;tomcat&quot;</literal>. This assumes the certificate was put in the file <literal>server.pem</literal>:</para>
                                 <screen>
  $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keystore
-        $CATALINA_BASE/conf/keystore -storepass changeit
+	$CATALINA_BASE/conf/keystore -storepass changeit
 </screen>
                                 <para>When answering the questions to identify the certificate, be sure to respond to &quot;First and last name&quot; with the fully-qualified domain name of your server (e.g. <literal>test-dspace.myuni.edu</literal>). The other questions are not important.</para>
                             </listitem>
@@ -577,8 +515,8 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
                                         >configuration section</link> for instructions on enabling the X.509 authentication method. Load the keystore with the CA (certifying authority) certificates for the authorities of any clients whose certificates you wish to accept. For example, assuming the client CA certificate is in <literal>client1.pem</literal>:</para>
                                 <screen>
  $JAVA_HOME/bin/keytool -import -noprompt -storepass changeit
-        -trustcacerts -keystore $CATALINA_BASE/conf/keystore  -alias client1
-        -file client1.pem
+	-trustcacerts -keystore $CATALINA_BASE/conf/keystore  -alias client1
+	-file client1.pem
 </screen>
                             </listitem>
                             <listitem>
@@ -597,11 +535,11 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
                     </emphasis> add these configuration options to the appropriate <emphasis>httpd</emphasis> configuration file, e.g. <literal>ssl.conf</literal>, and be sure they are in force for the virtual host and namespace locations dedicated to DSpace:</para>
                 <screen>
         ##  SSLVerifyClient can be &quot;optional&quot; or
-        &quot;require&quot;
+	&quot;require&quot;
         SSLVerifyClient optional
         SSLVerifyDepth  10
         SSLCACertificateFile  <emphasis>
-        path-to-your-client-CA-certificate</emphasis>
+	path-to-your-client-CA-certificate</emphasis>
         SSLOptions StdEnvVars ExportCertData
    
 </screen>
@@ -624,40 +562,42 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
             </itemizedlist>
             <para>If you want to use the Handle system, you&apos;ll need to set up a Handle server. This is included with DSpace. Note that this is not required in order to evaluate DSpace; you only need one if you are running a production service. You&apos;ll need to obtain a Handle prefix from <ulink url="http://www.handle.net/">the central CNRI Handle site</ulink>.</para>
             <para>A Handle server runs as a separate process that receives TCP requests from other Handle servers, and issues resolution requests to a global server or servers if a Handle entered locally does not correspond to some local content. The Handle protocol is based on TCP, so it will need to be installed on a server that can broadcast and receive TCP on port 2641.</para>
-            <para>The Handle server code is included with the DSpace code in <literal>[dspace-source]/lib/handle.jar</literal>. <emphasis role="bold">Note:</emphasis> The latest version of the <literal>handle.jar</literal> file is not included in the release due to licensing conditions changing between the provided version and later versions. It is recommended you read the <ulink url="http://www.handle.net/upgrade_6-2_DSpace.html"
-                    >new license conditions</ulink> and decide whether you wish to update your installation&apos;s <literal>handle.jar</literal>. If you decide to update, you should replace the existing <literal>handle.jar</literal> in <emphasis>[dspace-source]</emphasis>/lib with the new version and rebuild your war files.</para>
-            <para>A script exists to create a simple Handle configuration - simply run <literal>[dspace]/bin/make-handle-config</literal> after you&apos;ve set the appropriate parameters in <literal>dspace.cfg</literal>. You can also create a Handle configuration directly by following the <ulink url="http://www.handle.net/hs_manual_18jan02/server_manual_2.html">installation instructions on handle.net</ulink>, but with these changes:</para>
-            <itemizedlist>
+            <orderedlist>
                 <listitem>
-                    <para> Instead of running: </para>
-                    <screen>
-java -cp /hs/bin/handle.jar net.handle.server.SimpleSetup /hs/svr_1
+                    <para>To configure your DSpace installation to run the handle server, run the following command:</para>
+                    <screen><emphasis> [dspace]</emphasis>/bin/dsrun net.handle.server.SimpleSetup <emphasis>[dspace]</emphasis>/handle-server
 </screen>
-                    <para> as directed in the <ulink url="http://hdl.handle.net/4263537/4093">Handle Server Administration Guide</ulink>, you should run </para>
-                    <screen>
-<emphasis> [dspace]</emphasis>/bin/dsrun net.handle.server.SimpleSetup <emphasis>
-        [dspace]</emphasis>/handle-server
-</screen>
-                    <para> ensuring that <literal>[dspace]/handle-server</literal> matches whatever you have in <literal>dspace.cfg</literal> for the <literal>handle.dir</literal> property.</para>
+                    <para>Ensure that <literal>[dspace]/handle-server</literal> matches whatever you have in <literal>dspace.cfg</literal> for the <literal>handle.dir</literal> property.</para>
                 </listitem>
                 <listitem>
-                    <para> Edit the resulting <literal>[dspace]/handle-server/config.dct</literal> file to include the following lines in the <literal>&quot;server_config&quot;</literal> clause: </para>
-                    <screen>
-&quot;storage_type&quot; = &quot;CUSTOM&quot;
-&quot;storage_class&quot; =
-        &quot;org.dspace.handle.HandlePlugin&quot;
+                    <para>Edit the resulting <literal>[dspace]/handle-server/config.dct</literal> file to include the following lines in the <literal>&quot;server_config&quot;</literal> clause: </para>
+                    <screen>&quot;storage_type&quot; = &quot;CUSTOM&quot;
+&quot;storage_class&quot; =  &quot;org.dspace.handle.HandlePlugin&quot;
 </screen>
                     <para>This tells the Handle server to get information about individual Handles from the DSpace code.</para>
                 </listitem>
-            </itemizedlist>
-            <para>Whichever approach you take, start the Handle server with <literal>[dspace]/bin/start-handle-server</literal>, as the DSpace user. Once the configuration file has been generated, you will need to go to <ulink url="http://hdl.handle.net/4263537/5014"
-                >http://hdl.handle.net/4263537/5014</ulink> to upload the generated sitebndl.zip file. The upload page will ask you for your contact information. An administrator will then create the naming authority/prefix on the root service (known as the Global Handle Registry), and notify you when this has been completed. You will not be able to continue the handle server installation until you receive further information concerning your naming authority.</para>
+                <listitem>
+                    <para>Once the configuration file has been generated, you will need to go to <ulink url="http://hdl.handle.net/4263537/5014"
+                        >http://hdl.handle.net/4263537/5014</ulink> to upload the generated sitebndl.zip file. The upload page will ask you for your contact information. An administrator will then create the naming authority/prefix on the root service (known as the Global Handle Registry), and notify you when this has been completed. You will not be able to continue the handle server installation until you receive further information concerning your naming authority.</para>
+                </listitem>
+                <listitem>
+                    <para>When CNRI has sent you your naming authority prefix, you will need to edit the <literal>config.dct</literal> file. The file will be found in <literal>/[dspace]/handle-server</literal>. </para>
+                    <para>Look for <literal>&quot;300:0.NA/YOUR_NAMING_AUTHORITY&quot;</literal></para>
+                    <para>Replace <literal>YOUR_NAMING_AUTHORITY</literal> with the assigned naming authority prefix sent to you.</para>
+                </listitem>
+                <listitem>
+                    <para>Now start your handle server (as the dspace user):</para>
+                    <screen>[dspace]/bin/start-handle-server</screen>
+                </listitem>
+            </orderedlist>
             <para>Note that since the DSpace code manages individual Handles, administrative operations such as Handle creation and modification aren&apos;t supported by DSpace&apos;s Handle server.</para>
-            <para>If you need to update the handle prefix on items created before the CNRI registration process you can run the <literal>[dspace]/bin/update-handle-prefix script</literal>. You may need to do this if you loaded items prior to CNRI registration (e.g. setting up a demonstration system prior to migrating it to production). The script takes the current and new prefix as parameters. For example:</para>
-            <para>
-                <literal>[dspace]/bin/update-handle-prefix 123456789 1303</literal>
-            </para>
-            <para>will change any handles currently assigned prefix 123456789 to prefix 1303, so for example handle 123456789/23 will be updated to 1303/23 in the database.</para>
+            <section remap="h4">
+                <title>Updating Existing Handle Prefixes</title>
+                <para>If you need to update the handle prefix on items created before the CNRI registration process you can run the <literal>[dspace]/bin/update-handle-prefix script</literal>. You may need to do this if you loaded items prior to CNRI registration (e.g. setting up a demonstration system prior to migrating it to production). The script takes the current and new prefix as parameters. For example:</para>
+                <screen>[dspace]/bin/update-handle-prefix 123456789 1303
+                </screen>
+                <para>This script will change any handles currently assigned prefix 123456789 to prefix 1303, so for example handle 123456789/23 will be updated to 1303/23 in the database.</para>
+            </section>
         </section>
         <section remap="h3">
             <title><anchor id="docbook-install.html-sitemaps" xreflabel="Google and HTML sitemaps"/>Google and HTML sitemaps</title>
@@ -807,13 +747,13 @@ ant help
                             <screen>
 &lt;!-- DEFINE A CONTEXT PATH FOR DSpace JSP User Interface  --&gt;
 &lt;Context path=&quot;/jspui&quot; docBase=&quot;[dspace]\webapps\jspui&quot; debug=&quot;0&quot;
-        reloadable=&quot;true&quot; cachingAllowed=&quot;false&quot;
-        allowLinking=&quot;true&quot;/&gt;
+	reloadable=&quot;true&quot; cachingAllowed=&quot;false&quot;
+	allowLinking=&quot;true&quot;/&gt;
         
 &lt;!-- DEFINE A CONTEXT PATH FOR DSpace OAI User Interface  --&gt;
 &lt;Context path=&quot;/oai&quot; docBase=&quot;[dspace]\webapps\oai&quot; debug=&quot;0&quot;
-        reloadable=&quot;true&quot; cachingAllowed=&quot;false&quot;
-        allowLinking=&quot;true&quot;/&gt;
+	reloadable=&quot;true&quot; cachingAllowed=&quot;false&quot;
+	allowLinking=&quot;true&quot;/&gt;
 </screen>
                         </listitem>
                     </itemizedlist>
@@ -846,15 +786,15 @@ ant help
                 <listitem>
                     <para> There are two common errors that occur. If your error looks like this--</para>
                     <screen>
-[java] 2004-03-25 15:17:07,730 INFO
-        org.dspace.storage.rdbms.InitializeDatabase @ Initializing Database
+[java] 2004-03-25 15:17:07,730 INFO 
+	org.dspace.storage.rdbms.InitializeDatabase @ Initializing Database
 [java] 2004-03-25 15:17:08,816 FATAL
-        org.dspace.storage.rdbms.InitializeDatabase @ Caught exception:
+	org.dspace.storage.rdbms.InitializeDatabase @ Caught exception:
 [java] org.postgresql.util.PSQLException: Connection refused. Check
-        that the hostname and port are correct and that the postmaster is
-        accepting TCP/IP connections.
+	that the hostname and port are correct and that the postmaster is
+	accepting TCP/IP connections.
 [java]     at
-        org.postgresql.jdbc1.AbstractJdbc1Connection.openConnection(AbstractJd
+	org.postgresql.jdbc1.AbstractJdbc1Connection.openConnection(AbstractJd
 bc1Connection.java:204)
 [java]     at org.postgresql.Driver.connect(Driver.java:139)
 </screen>
@@ -866,17 +806,17 @@ psql -U dspace -W -h localhost
                     <para>Enter the <literal>dspace</literal><emphasis>database</emphasis> password, and you should be dropped into the psql tool with a <literal>dspace=&gt;</literal> prompt.</para>
                     <para>Another common error looks like this:</para>
                     <screen>
-[java] 2004-03-25 16:37:16,757 INFO
-        org.dspace.storage.rdbms.InitializeDatabase @ Initializing Database
-[java] 2004-03-25 16:37:17,139 WARN
-        org.dspace.storage.rdbms.DatabaseManager @ Exception initializing DB
-        pool
+[java] 2004-03-25 16:37:16,757 INFO 
+	org.dspace.storage.rdbms.InitializeDatabase @ Initializing Database
+[java] 2004-03-25 16:37:17,139 WARN 
+	org.dspace.storage.rdbms.DatabaseManager @ Exception initializing DB
+	pool
 [java] java.lang.ClassNotFoundException: org.postgresql.Driver
 [java]     at java.net.URLClassLoader$1.run(URLClassLoader.java:198)
 [java]     at java.security.AccessController.doPrivileged(Native
-        Method)
+	Method)
 [java]     at
-        java.net.URLClassLoader.findClass(URLClassLoader.java:186)
+	java.net.URLClassLoader.findClass(URLClassLoader.java:186)
 </screen>
                     <para>This means that the PostgreSQL JDBC driver is not present in <literal>[dspace-source]/lib</literal>. <link linkend="docbook-install.html-pgdriver">See above.</link></para>
                 </listitem>
@@ -901,12 +841,12 @@ ps -ef | grep postgres
                     <para>You might see some processes like this</para>
                     <screen>
 dspace 16325  1997  0  Feb 14  ?         0:00 postgres: dspace dspace
-        127.0.0.1 idle in transaction
+	127.0.0.1 idle in transaction
 </screen>
                     <para>This is normal--DSpace maintains a &apos;pool&apos; of open database connections, which are re-used to avoid the overhead of constantly opening and closing connections. If they&apos;re &apos;idle&apos; it&apos;s OK; they&apos;re waiting to be used. However sometimes, if something went wrong, they might be stuck in the middle of a query, which seems to prevent other connections from operating, e.g.:</para>
                     <screen>
 dspace 16325  1997  0  Feb 14  ?         0:00 postgres: dspace dspace
-        127.0.0.1 SELECT
+	127.0.0.1 SELECT
 </screen>
                     <para>This means the connection is in the middle of a <literal>SELECT</literal> operation, and if you&apos;re not using DSpace right that instant, it&apos;s probably a &apos;zombie&apos; connection. If this is the case, try <literal>kill</literal>ing the process, and stopping and restarting Tomcat.</para>
                 </listitem>
