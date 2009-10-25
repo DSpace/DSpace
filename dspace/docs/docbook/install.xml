@@ -110,7 +110,7 @@
             <para>It is important to note that the strategies are identical in terms of the list of proceedures required to complete the build process, the only difference being that the Source Release includes &quot;more modules&quot; that will be built given their presence in the distribution package.</para>
             <itemizedlist>
                 <listitem>
-                    <para><anchor id="docbook-install.html-defaultRelease" xreflabel="Default Release (dspace-&lt;version&gt;-release.zip )"/>Default Release (dspace-&lt;version&gt;-release.zip<itemizedlist>
+                    <para><anchor id="docbook-install.html-defaultRelease" xreflabel="Default Release (dspace-&lt;version&gt;-release.zip )"/>Default Release (dspace-&lt;version&gt;-release.zip)<itemizedlist>
                             <listitem>
                                 <para>This distribution will be adequate for most cases of running a DSpace instance. It is intended to be the quickest way to get DSpace installed and running while still allowing for customization of the themes and branding of your DSpace instance. </para>
                             </listitem>
@@ -206,7 +206,7 @@
             <para> This method gets you up and running with DSpace quickly and easily. It is identical in both the <link linkend="docbook-install.html-defaultRelease">Default Release</link> and <link linkend="docbook-install.html-sourceRelease">Source Release</link> distributions. </para>
             <orderedlist>
                 <listitem>
-                    <para><emphasis role="bold">Create the DSpace user</emphasis>. This needs to be the same user that Tomcat (or Jetty etc) will run as. e.g. as <emphasis role="bold">root</emphasis> run:</para>
+                    <para><emphasis role="bold">Create the DSpace user</emphasis>. This needs to be the same user that Tomcat (or Jetty etc.) will run as. e.g. as <emphasis role="bold"><emphasis role="underline">root</emphasis></emphasis> run:</para>
                     <screen>useradd -m dspace</screen>
                 </listitem>
                 <listitem>
@@ -292,7 +292,7 @@ cp * ..</screen>
                     <para><literal>registration.notify</literal> -- mailbox for emails when new users register (optional) </para>
                     <para><emphasis role="bold">NOTE:</emphasis> You can interpolate the value of one configuration variable in the value of another one. For example, to set <literal>feedback.recipient</literal> to the same value as <literal>mail.admin</literal>, the line would look like:</para>
                     <screen>     feedback.recipient = ${mail.admin}</screen>
-                    <para>Refer to <link linkend="docbook-configure.html">5.2. General Configuration</link> for details and examples of the above.</para>
+                    <para>Refer to <link linkend="docbook-configure.html"><emphasis role="underline">5.2. General Configuration</emphasis></link> for details and examples of the above.</para>
                 </listitem>
                 <listitem>
                     <para>Create the directory for the DSpace installation (i.e. <literal>[dspace]</literal>). As <emphasis>root</emphasis> (or a user with appropriate permissions), run: </para>
@@ -317,7 +317,7 @@ ant fresh_install</screen>
                         <para>To see a complete list of build targets, run:</para>
                         <screen>ant help</screen>
                     </note>
-                    <para>The most likely thing to go wrong here is the database connection. See the <link linkend="docbook-install.html-problems">common problems section</link>.</para>
+                    <para>The most likely thing to go wrong here is the database connection. See the <link linkend="docbook-install.html-problems"><emphasis role="underline">3.7 Common Problems Section</emphasis></link>.</para>
                 </listitem>
                 <listitem>
                     <para> Tell your Tomcat/Jetty/Resin installation where to find your DSpace web application(s). As an example, in the <literal>&lt;Host&gt;</literal> section of your <literal>[tomcat]/conf/server.xml</literal> you could add lines similar to the following (but replace <literal>[dspace]</literal> with your installation location):</para>
@@ -572,13 +572,12 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
                 <listitem>
                     <para>Edit the resulting <literal>[dspace]/handle-server/config.dct</literal> file to include the following lines in the <literal>&quot;server_config&quot;</literal> clause: </para>
                     <screen>&quot;storage_type&quot; = &quot;CUSTOM&quot;
-&quot;storage_class&quot; =  &quot;org.dspace.handle.HandlePlugin&quot;
+&quot;storage_class&quot; = &quot;org.dspace.handle.HandlePlugin&quot;
 </screen>
                     <para>This tells the Handle server to get information about individual Handles from the DSpace code.</para>
                 </listitem>
                 <listitem>
-                    <para>Once the configuration file has been generated, you will need to go to <ulink url="http://hdl.handle.net/4263537/5014"
-                        >http://hdl.handle.net/4263537/5014</ulink> to upload the generated sitebndl.zip file. The upload page will ask you for your contact information. An administrator will then create the naming authority/prefix on the root service (known as the Global Handle Registry), and notify you when this has been completed. You will not be able to continue the handle server installation until you receive further information concerning your naming authority.</para>
+                    <para>Once the configuration file has been generated, you will need to go to <ulink url="http://hdl.handle.net/4263537/5014">http://hdl.handle.net/4263537/5014</ulink> to upload the generated sitebndl.zip file. The upload page will ask you for your contact information. An administrator will then create the naming authority/prefix on the root service (known as the Global Handle Registry), and notify you when this has been completed. You will not be able to continue the handle server installation until you receive further information concerning your naming authority.</para>
                 </listitem>
                 <listitem>
                     <para>When CNRI has sent you your naming authority prefix, you will need to edit the <literal>config.dct</literal> file. The file will be found in <literal>/[dspace]/handle-server</literal>. </para>
