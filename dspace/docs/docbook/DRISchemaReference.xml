@@ -1,8 +1,4 @@
 <?xml version='1.0' encoding='UTF-8'?>
-  <chapter>
-    <title id="docbook-DRISchemaReference.html">docbook/DRISchemaReference.html</title>
-    <para> /* Code style */ div.element-example pre { border: 1px dashed black; overflow-x: hidden; background: rgb(240,240,240); margin: 0px; padding: 10px;} </para>
-  </chapter>
   <chapter remap="h1">
     <title>DRI Schema Reference</title>
     <para><emphasis role="bold">D</emphasis>igital <emphasis role="bold">R</emphasis>epository <emphasis role="bold">I</emphasis>nterface (<emphasis role="bold">DRI</emphasis>) is a schema that governs the structure of a Manakin DSpace page when encoded as an XML Document. It determines what elements can be present in the Document and the relationship of those elements to each other. This reference document explains the purpose of DRI, provides a broad architectural overview, and explains common design patterns. The appendix includes a complete reference for elements used in the DRI Schema, a graphical representation of the element hierarchy, and a quick reference table of elements and attributes.</para>
