@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>DSpace: Collection Administrator Help</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="../styles.css.jsp" type="text/css"/>
+  </head>
+
+  <body class="help">
+    <h2>Collection Administrator Help</h2>
+
+    <table>
+      <tr>
+        <td align="left"><h3>Help Contents</h3></td>
+        <td align="right"><a href="#" onclick="window.close()">Close this window</a></td>
+      </tr>
+    </table>
+
+    <ul>
+      <li><a href="#general">General Information</a></li>
+      <li><a href="#submitters">Adding or Removing Authorized Submitters</a></li>
+      <li><a href="#groupeditor">The Group Editor</a></li>
+      <li><a href="#editmetadata">Editing Item Metadata</a></li>
+      <li><a href="#withdraw">Withdrawing an Item</a></li>
+      <li><a href="#itemmap">Including Items from Other Collections (Item Mapping)</a></li>
+    </ul>
+
+    <h3><a name="general"></a>General Information</h3>
+
+    <p>If you are a collection administrator, you will need to log in before the administration controls appear in the DSpace UI.  The easiest way to do this is to go to your 'My DSpace' page.  Then, go to the collection home page for the collection you wish to administer.  On the top-right hand of the page you will see some extra controls.  Additionally, on the pages of those items owned by a collection you administer, you will see an extra 'Edit' button next to the item's Handle.</p>
+
+    <p>Also note that in some of the administration screens, links to additional administration tools may appear.  In some cases you may not be authorized to use those administration tools, so clicking on them will result in an 'authorization required' error message.</p>
+
+    <h3><a name="submitters"></a>Adding or Removing Authorized Submitters</h3>
+
+    <p><strong>Note that you cannot add submitters who do not already have e-person records in the system.  You will need the DSpace central administrators to add e-person records for all potential submitters.</strong></p>
+
+    <p>To add to or remove from the group of submitters authorized to submit to the collection, make sure you're logged in, go to the relevant collection's home page, and click on the 'Edit Submitters' button.  This will take you to the group editor page.</p>
+
+
+    <h3><a name="groupeditor"></a>The Group Editor</h3>
+
+    <p>The group editor allows you to add or remove e-people or even entire groups of e-people from a particular group, for example the group of e-people allowed to submit to a particular collection.</p>
+
+    <p>At the top of the screen is the name of the group.  It is <strong>strongly</strong> recommended that you do not change this; these group names follow a convention and some things might not work as expected if you change it.</p>
+
+    <p>Below that is a list of e-people (full name and e-mail address) in the gourp as well as a list of groups currently in the group.  To remove an e-person from the group, select their name from the "EPerson members" list and click on the 'Remove Selected' button below the list. To remove an entire group from the group, select the name of the group from the "Group Members" list and click on the 'Remove Selected button below the list.</p>
+
+    <p>To select e-people to add to the list, click on the 'Select E-people...' button, and a new pop-up window will appear.  This lets you browse around the list of e-people in the system and add them to the group.  You can sort the list by ID (an internal identifier), e-mail address and last name, by clicking on the heading of the relevant column.  The heading of the current sort column will be displayed in bold and have an arrow indicating how it is sorted.  You can browse around the full list by clicking on the links above and below the list in the pop-up window.</p>
+
+    <p>To add an e-person to the group in the main group editor window, click the 'Add' button to the left of their row.  Note that the pop-up window doesn't disappear at this point, to make it easier to add several e-people at once; however this can make it look like nothing's happened when you click on 'Add'.  However, if you look at the group on the main group editor page, you should see the e-people have been added to the list.</p>
+
+    <p>Adding and removing groups of e-people works the same way as adding and removing individual e-people.  When a group is added to another group, the containing group will consider all of the members of the contained group as members.</p>
+
+    <p>To select groups to add to the "Group Members" list, click on the 'Select Groups...' button and a new pop-up window will appear. This window works the same way as described above for the e-person pop-up window. Click on the 'Add' button to the left of the group name to add the group to the "Group Members" list on the main group editor page.</p>
+
+    <p>When you've finished adding or removing e-people and/or groups to or from the group, click on 'Update Group' on the main group editor page.  (The e-person/group selector pop-up will close automatically, if you haven't closed it yourself beforehand.)</p>
+
+    <h3><a name="editmetadata"></a>Editing Item Metadata</h3>
+
+    <p>To edit an item's metadata (that is, an item that is already in the main archive, and not one that is in the submission workflow), make sure you're logged in, go to that item's display page, and click on the 'Edit' button on the top right.</p>
+
+    <p>To edit an existing Dublin Core value or values, make the necessary edits, and click on the <strong>Update</strong> button when finished.</p>
+
+    <p>If you want to add new Dublin Core metadata fields one at a time.  Select the relevant element and qualifier from the drop-down at the end of the list of DC fields, enter the text value in the box, and click on the <strong>Add</strong> button on the right-hand side.</p>
+
+    <p>This UI does no validation on anything you enter, so be careful; be sure to check DSpace's use of Dublin Core metadata to ensure that fields you enter will be understood by the system correctly.  Minor corrections (such as fixing spelling mistakes and typos) should not be a problem, however.</p>
+
+
+    <h3><a name="withdraw"></a>Withdrawing an Item</h3>
+
+    <p>To withdraw an item, first log in to DSpace, go to the item's display page, then click on the 'Edit' button on the top right.  Then, on the item edit page, click on 'Withdraw...' button on the top right-hand corner of the page.  You'll then see the item record.  If you're sure you want to withdraw the item, click on 'Withdraw' at the bottom of this page.</p>
+
+    <p>Note that withdrawing does not completely remove the item from the archive; it simply removes it from all public view (search and browse indices and so forth).  DSpace does have a function to fully delete an item ('expunge'), used in a similar way to the withdraw tool, but it is strongly recommended you do not use it.</p>
+
+    <p>If you want to 'reinstate' an item that has been previously withdrawn, contact a DSpace site administrator.</p>
+
+
+    <h3><a name="itemmap"></a>Including Items from Other Collections (Item Mapping)</h3>
+
+    <p>Items can appear in more than one collection.  The tool that 'maps' items to collections other than the one that owns it is the "Item Mapper".  To access this tool, log in as administrator or collection administrator and view the collection home page.  In the 'admin tools' box there is a button "Item Mapper" that will run the tool.  With the item mapper you will be able to search for items using author's names, and choose to add them to the collection.  The tool also allows you to browse items mapped to the collection and remove them.</p>
+
+    <p>Note that the item mapped to a collection does not receive new access rights - it retains the authorizations that it inherited from the collection that "owns" it.  And collection admins who do not have read access to an item will not be able to map them to other collections.</p>
+
+  </body>
+</html>

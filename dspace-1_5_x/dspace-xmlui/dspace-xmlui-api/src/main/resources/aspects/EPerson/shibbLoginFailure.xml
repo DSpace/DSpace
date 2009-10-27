@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document version="1.0" xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
+	<body>
+		<div id="file.shibbLoginFailure.div.message" n="shibbLoginFailure" rend="primary">
+			<head><i18n:text catalogue="default">xmlui.eperson.shibbLoginFailure.head</i18n:text></head>
+			<p><i18n:text catalogue="default">xmlui.eperson.shibbLoginFailure.p1</i18n:text></p>
+	  </div>
+	</body>
+	<meta>
+		<pageMeta>
+			<metadata element="title">
+				<i18n:text catalogue="default">xmlui.eperson.shibbLoginFailure.head</i18n:text>
+			</metadata>
+			<trail target="/manakin">
+				<i18n:text catalogue="default">xmlui.general.dspace_home</i18n:text>
+			</trail>
+		</pageMeta>
+	</meta>
+</document>
