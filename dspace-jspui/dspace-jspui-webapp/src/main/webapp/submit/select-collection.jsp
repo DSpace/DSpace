@@ -91,7 +91,7 @@
       <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#choosecollection\"%>"><fmt:message key="jsp.morehelp"/> </dspace:popup> 
 	</div>
 
-    <p>If you hold appointments with more than one department, you may use the CTRL key to select more than one collection.</p>
+    <p>If you wish to deposit your document in more than one collection, press the CTRL key and click on each collection.</p>
 
     <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
 <%-- HACK: a <center> tag seems to be the only way to convince certain --%>
