@@ -1,0 +1,13 @@
+/* Print style sheet for DSpace  */
+body, a {
+    color: black;
+    background: white;
+    }
+
+a {
+    text-decoration: none;
+    }
+
+.navigationBar, .sidebar {
+    display:none;
+    }

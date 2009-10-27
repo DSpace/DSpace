@@ -1,0 +1,64 @@
+<html>
+	<head>
+		<title>org.dspace.checker Package Documentation</title>
+	</head>
+  <body>
+      <p>Provides content fixity checking (using checksums)
+          for bitstreams stored in DSpace software.</p>
+      <p>The main access point to org.dspace.checker is on the command line
+          via {@link org.dspace.app.checker.ChecksumChecker#main(String[])}, 
+          but it is also simple to get programmatic access to ChecksumChecker 
+          if you wish, via a {@link org.dspace.checker.CheckerCommand} object.</p>
+      
+      <p>CheckerCommand is a simple Command object. You initalize it with
+         a strategy for iterating through bitstreams to check (an implementation of 
+         {@link org.dspace.checker.BitstreamDispatcher}), and a object to collect
+         the results (an implementation of @link org.dspace.checker.ChecksumResultsCollector})
+         , and then call {@link org.dspace.checker.CheckerCommand#process()} 
+         to begin the processing. CheckerCommand handles the calculation of bitstream 
+         checksums and iteration between bitstreams.</p>
+      
+            
+      <h2>BitstreamDispatcher</h2>
+      <p>The order in which bitstreams are checked and when a checking run terminates 
+      is controlled  by implementations of BitstreamDispatcher, and you can extend the 
+      functionality of the package by writing your own implementatio of this simple 
+      interface, although the package includes several useful implementations that will 
+      probably suffice in most cases: - </p>
+      
+      <p>Dispatchers that generate bitstream ordering: -
+      <ul>
+        <li>{@link org.dspace.checker.ListDispatcher}</li>
+        <li>{@link org.dspace.checker.SimpleDispatcher}</li>
+      </ul>
+      </p>
+      <p>Dispatchers that modify the behaviour of other Dispatchers: -
+      <ul>
+        <li>{@link org.dspace.checker.LimitedCountDispatcher}</li>
+        <li>{@link org.dspace.checker.LimitedDurationDispatcher}</li>
+      </ul>
+      
+      <h2>ChecksumResultsCollector</h2>
+      <p>The default implementation of ChecksumResultsCollector 
+      ({@link org.dspace.checker.ResultsLogger}) logs checksum checking to the db,
+      but it would be simple to write your own implementation to log to LOG4J logs,
+      text files, JMS queues etc.</p>
+      
+      <h2>Results Pruner</h2>
+      <p>The results pruner is responsible for trimming the archived Checksum logs, 
+      which can grow large otherwise. The retention period of stored check results 
+      can be configured per checksum result code. This allows you, for example, to 
+      retain records for all failures for auditing purposes, whilst discarding the 
+      storage of successful checks. The pruner uses a default configuration from 
+      dspace.cfg, but can take in alternative configurations from other properties
+      files.</p>
+          
+      <h1>Design notes</h1>
+      
+      <p>All interaction between the checker package and the database is abstracted 
+      behind DataAccessObjects. Where practicable dependencies on DSpace code are 
+      minimized, the rationale being that it may be errors in DSpace code that 
+      have caused fixity problems.</p>
+            
+  </body>
+</html>

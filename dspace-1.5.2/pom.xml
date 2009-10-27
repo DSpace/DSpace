@@ -1,0 +1,817 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace</groupId>
+   <artifactId>dspace-parent</artifactId>
+   <packaging>pom</packaging>
+   <version>1.5.2</version>
+   <name>DSpace Parent Project</name>
+   <url>http://projects.dspace.org</url>
+
+   <organization>
+      <name>The DSpace Foundation</name>
+      <url>http://www.dspace.org</url>
+   </organization>
+
+   <build>
+      <plugins>
+         <!-- 
+            Java 1.5 is our officially endorsed build target
+            platform.  
+         -->
+         <plugin>
+			<artifactId>maven-release-plugin</artifactId>
+			<configuration>
+				<!--
+					During release:perform, enable the "addons" profile
+				-->
+				<releaseProfiles>addons</releaseProfiles>
+				<goals>deploy</goals>
+			</configuration>
+		 </plugin>
+         <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+               <source>1.5</source>
+               <target>1.5</target>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+               <archive>
+                  <manifest>
+                     <addDefaultImplementationEntries>
+                        true
+                     </addDefaultImplementationEntries>
+                     <addDefaultSpecificationEntries>
+                        true
+                     </addDefaultSpecificationEntries>
+                  </manifest>
+               </archive>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+               <archive>
+                  <manifest>
+                     <addDefaultImplementationEntries>
+                        true
+                     </addDefaultImplementationEntries>
+                     <addDefaultSpecificationEntries>
+                        true
+                     </addDefaultSpecificationEntries>
+                  </manifest>
+               </archive>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
+
+   <profiles>
+   
+      <!-- 
+         ========================================================
+         These are admiistrative profiles used by release manager
+         To complete release tasks.
+         ========================================================
+         
+         Use 'mvn release:prepare -Pall' for tagging the release.
+      -->
+      <profile>
+         <id>all</id>
+         <activation>
+            <activeByDefault>true</activeByDefault>
+         </activation>
+         <modules>
+            <module>dspace-api</module>
+            <module>dspace-jspui</module>
+            <module>dspace-xmlui</module>
+            <module>dspace-lni</module>
+            <module>dspace-oai</module>
+            <module>dspace-sword</module>
+            <module>dspace</module>
+         </modules>
+      </profile>
+      
+      
+      <!-- 
+         Use 'mvn deploy -Paddons' while doing Continuous Integration
+         and deploying addons to the Maven repository. 
+       -->
+      <profile>
+         <id>addons</id>
+         <activation>
+            <activeByDefault>false</activeByDefault>
+         </activation>
+         <modules>
+            <module>dspace-api</module>
+            <module>dspace-jspui</module>
+            <module>dspace-xmlui</module>
+            <module>dspace-lni</module>
+            <module>dspace-oai</module>
+            <module>dspace-sword</module>
+         </modules>
+      </profile>
+      
+      <!-- 
+         Use 'mvn package -Pdistributions' to create distributions 
+         to upload to S.F.
+       -->
+      <profile>
+         <id>distributions</id>
+         <activation>
+            <activeByDefault>false</activeByDefault>
+         </activation>
+         <build>
+            <plugins>
+               <plugin>
+                  <artifactId>maven-assembly-plugin</artifactId>
+                  <inherited>false</inherited>
+                  <executions>
+                     <execution>
+                        <inherited>false</inherited>
+                        <configuration>
+                           <descriptorRefs>
+                              <descriptorRef>release</descriptorRef>
+                              <descriptorRef>src-release</descriptorRef>
+                           </descriptorRefs>
+                           <tarLongFileMode>gnu</tarLongFileMode>
+                           <finalName>dspace-${pom.version}</finalName>
+                        </configuration>
+                        <phase>package</phase>
+                        <goals>
+                           <goal>single</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+                  <dependencies>
+                     <dependency>
+                        <groupId>org.dspace.maven.plugins</groupId>
+                        <artifactId>dspace-assembly-plugin</artifactId>
+                        <version>1.1</version>
+                     </dependency>
+                  </dependencies>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+
+   </profiles>
+
+   <repositories>
+      <repository>
+         <id>maven.dspace.org-snapshot</id>
+         <name>DSpace Maven Snapshot Repository</name>
+         <url>http://maven.dspace.org/snapshot</url>
+         <releases>
+            <enabled>false</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>daily</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </repository>
+   </repositories>
+
+   <!-- 
+      Distribution management provides a means to control which
+      versions of dependency jars are used for compilation
+      and packaging into the distribution.  Rather than placing
+      a version in your dependencies, look here first to see if
+      its already strongly defined in dspace-pom and dspace-api.
+   -->
+   <dependencyManagement>
+      <dependencies>
+         <!-- DSpace core and endorsed Addons -->
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+            <version>${project.version}</version>
+         </dependency>
+          <dependency>
+              <groupId>org.dspace</groupId>
+              <artifactId>dspace-sword-api</artifactId>
+              <version>${project.version}</version>
+          </dependency>
+          <dependency>
+              <groupId>org.dspace</groupId>
+              <artifactId>dspace-sword-webapp</artifactId>
+              <version>${project.version}</version>
+              <type>war</type>
+          </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-jspui-api</artifactId>
+            <version>${project.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-jspui-webapp</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-oai-api</artifactId>
+            <version>${project.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-oai-webapp</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-lni-core</artifactId>
+            <version>${project.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-lni-client</artifactId>
+            <version>${project.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-lni-webapp</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-xmlui-api</artifactId>
+            <version>${project.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-xmlui-webapp</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-xmlui-wing</artifactId>
+            <version>${project.version}</version>
+         </dependency>
+         <!-- DSpace Localization Packages -->
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api-lang</artifactId>
+            <version>[1.5.0.0,1.6.0.0)</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-xmlui-lang</artifactId>
+            <version>[1.5.0.0,1.6.0.0)</version>
+            <type>war</type>
+         </dependency>
+         <!-- DSpace third Party Dependencies -->
+         <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.7.0</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>2.3.0</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers</artifactId>
+            <version>2.3.0</version>
+         </dependency>         
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>handle</artifactId>
+            <version>5.3.4</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>jargon</artifactId>
+            <version>1.4.25</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>mets</artifactId>
+            <version>1.5.2</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>oaicat</artifactId>
+            <version>1.5.48</version>
+         </dependency>
+         <dependency>
+            <groupId>org.textmining</groupId>
+            <artifactId>tm-extractors</artifactId>
+            <version>0.4</version>
+         </dependency>
+         <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.0</version>
+         </dependency>
+         <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.3</version>
+         </dependency>
+         <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2</version>
+            <!-- <version>3.1</version> xmlui - wing -->
+         </dependency>
+         <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.2.2</version>
+         </dependency>
+         <dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery</artifactId>
+            <version>0.2</version>
+         </dependency>
+         <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.1</version>
+         </dependency>
+         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.4</version>
+         </dependency>
+         <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.2</version>
+            <!-- <version>2.1</version> in xmlui - wing -->
+         </dependency>
+         <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.4</version>
+         </dependency>
+         <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+            <version>1.4</version>
+         </dependency>
+         <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>1.3.1</version>
+         </dependency>
+         <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4</version>
+         </dependency>
+         <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.3</version>
+            <scope>provided</scope>
+         </dependency>
+
+         <dependency>
+            <groupId>jaxen</groupId>
+            <artifactId>jaxen</artifactId>
+            <version>1.1</version>
+            <exclusions>
+               <exclusion>
+                  <artifactId>xom</artifactId>
+                  <groupId>xom</groupId>
+               </exclusion>
+            </exclusions>
+         </dependency>
+         <dependency>
+            <groupId>jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <version>1.0</version>
+         </dependency>
+         <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.14</version>
+         </dependency>
+         <dependency>
+            <groupId>oro</groupId>
+            <artifactId>oro</artifactId>
+            <version>2.0.8</version>
+         </dependency>
+         <dependency>
+            <groupId>pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>0.7.3</version>
+         </dependency>
+         <dependency>
+            <groupId>org.fontbox</groupId>
+            <artifactId>fontbox</artifactId>
+            <version>0.1.0</version>
+         </dependency>
+         <dependency>
+            <groupId>org.jempbox</groupId>
+            <artifactId>jempbox</artifactId>
+            <version>0.2.0</version>
+         </dependency>
+         <dependency>
+            <groupId>poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>2.5.1-final-20040804</version>
+         </dependency>
+         <dependency>
+            <groupId>rome</groupId>
+            <artifactId>rome</artifactId>
+            <version>0.8</version>
+         </dependency>
+         <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>2.7.0</version>
+         </dependency>
+         <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.8.1</version>
+            <!--  <version>2.8.0</version> in xmlui -->
+         </dependency>
+         <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xmlParserAPIs</artifactId>
+            <version>2.0.2</version>
+         </dependency>
+         <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1</version>
+         </dependency>
+
+         <dependency>
+            <groupId>wsdl4j</groupId>
+            <artifactId>wsdl4j</artifactId>
+            <version>1.5.1</version>
+         </dependency>
+         <dependency>
+            <groupId>javax.xml</groupId>
+            <artifactId>jaxrpc-api</artifactId>
+            <version>1.1</version>
+         </dependency>
+         <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>1.3</version>
+         </dependency>
+         <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-ant</artifactId>
+            <version>1.3</version>
+            <scope>compile</scope>
+         </dependency>
+         <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-saaj</artifactId>
+            <version>1.2</version>
+         </dependency>
+         <dependency>
+            <groupId>com.ibm.icu</groupId>
+            <artifactId>icu4j</artifactId>
+            <version>3.4.4</version>
+         </dependency>
+         <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>8.1-408.jdbc3</version>
+         </dependency>
+         <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc14</artifactId>
+            <version>10.2.0.2.0</version>
+         </dependency>
+      </dependencies>
+   </dependencyManagement>
+
+   <licenses>
+      <license>
+         <name>DSpace Sourcecode License</name>
+         <url>LICENSE.txt</url>
+         <distribution>repo</distribution>
+         <comments>
+            A BSD compatable OSS license for the DSpace codebase.
+         </comments>
+      </license>
+   </licenses>
+
+   <issueManagement>
+      <system>JIRA</system>
+      <url>http://jira.dspace.org/jira/browse/DS</url>
+   </issueManagement>
+
+   <mailingLists>
+      <mailingList>
+         <name>DSpace Technical Users List</name>
+         <subscribe>
+            http://lists.sourceforge.net/mailman/listinfo/dspace-tech
+         </subscribe>
+         <unsubscribe>
+            http://lists.sourceforge.net/mailman/listinfo/dspace-tech
+         </unsubscribe>
+         <post>dspace-tech AT lists.sourceforge.net</post>
+         <archive>
+            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-tech
+         </archive>
+      </mailingList>
+      <mailingList>
+         <name>DSpace Developers List</name>
+         <subscribe>
+            http://lists.sourceforge.net/mailman/listinfo/dspace-devel
+         </subscribe>
+         <unsubscribe>
+            http://lists.sourceforge.net/mailman/listinfo/dspace-devel
+         </unsubscribe>
+         <post>dspace-devel AT lists.sourceforge.net</post>
+         <archive>
+            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-devel
+         </archive>
+      </mailingList>
+      <mailingList>
+         <name>DSpace Manakin List</name>
+         <subscribe>
+            http://lists.sourceforge.net/mailman/listinfo/dspace-manakin
+         </subscribe>
+         <unsubscribe>
+            http://lists.sourceforge.net/mailman/listinfo/dspace-manakin
+         </unsubscribe>
+         <post>dspace-manakin AT lists.sourceforge.net</post>
+         <archive>
+            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-manakin
+         </archive>
+      </mailingList>
+      <mailingList>
+         <name>DSpace SCM Commit Change-Log</name>
+         <subscribe>
+            http://lists.sourceforge.net/mailman/listinfo/dspace-changelog
+         </subscribe>
+         <unsubscribe>
+            http://lists.sourceforge.net/mailman/listinfo/dspace-changelog
+         </unsubscribe>
+         <post>noreply AT lists.sourceforge.net</post>
+         <archive>
+            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-changelog
+         </archive>
+      </mailingList>
+   </mailingLists>
+
+   <developers>
+      <developer>
+         <name>Andrea Bollini</name>
+         <email>bollini at users.sourceforge.net</email>
+         <url>http://www.linkedin.com/in/andreabollini</url>
+         <organization>CILEA</organization>
+         <organizationUrl>http://www.cilea.it</organizationUrl>
+         <roles>
+            <role>commiter</role>
+         </roles>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <name>Mark Diggory</name>
+         <email>mdiggory at mit.edu</email>
+         <url>http://www.linkedin.com/in/mdiggory</url>
+         <organization>MIT Libraries</organization>
+         <organizationUrl>http://libraries.mit.edu</organizationUrl>
+         <roles>
+            <role>commiter</role>
+         </roles>
+         <timezone>-5</timezone>
+      </developer>
+      <developer>
+         <name>Tim Donohue</name>
+         <email>tdonohue at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Jim Downing</name>
+         <email>jimdowning at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Richard Jones</name>
+         <email>richard-jones at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Claudia Juergen</name>
+         <email>cjuergen at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Stuart Lewis</name>
+         <email>stuartlewis at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Gabriela Mircea</name>
+         <email>mirceag at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Scott Phillips</name>
+         <email>scottphillips at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Richard Rodgers</name>
+         <email>rrodgers at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>James Rutherford</name>
+         <email>jrutherford at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Robert Tansley</name>
+         <email>rtansley at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Graham Triggs</name>
+         <email>grahamtriggs at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Mark H. Wood</name>
+         <email>mwoodiupui at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
+         <name>Scott Yeadon</name>
+         <email>syeadon at users.sourceforge.net</email>
+         <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+   </developers>
+
+   <contributors>
+      <contributor>
+         <name>Add Your Name Here and submit a patch!</name>
+         <email>contributor at myu.edu</email>
+         <url>http://www.myu.edu/me</url>
+         <organization>My University</organization>
+         <organizationUrl>http://www.myu.edu</organizationUrl>
+         <roles>
+            <role>developer</role>
+         </roles>
+         <timezone>0</timezone>
+      </contributor>
+      <contributor>
+         <name>Sands Fish</name>
+         <email>sands at mit.edu</email>
+         <organization>MIT Libraries</organization>
+         <organizationUrl>http://libraries.mit.edu</organizationUrl>
+         <roles>
+            <role>developer</role>
+         </roles>
+         <timezone>-5</timezone>
+      </contributor>
+      <contributor>
+         <name>Larry Stone</name>
+         <email>lcs at mit.edu</email>
+         <organization>MIT Libraries</organization>
+         <organizationUrl>http://libraries.mit.edu</organizationUrl>
+         <roles>
+            <role>developer</role>
+         </roles>
+         <timezone>-5</timezone>
+      </contributor>
+   </contributors>
+
+   <!-- 
+      The Subversion repository location is used by Continuum to update against
+      when changes have occured, this spawns a new build cycle and releases snapshots
+      into the snapshot repository below.
+   -->
+   <scm>
+      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/tags/dspace-1.5.2</url>
+   </scm>
+
+   <!-- 
+      Distribution Management is currently used by the Continuum server
+      to update snapshots it generates. This will also be used on 
+      release to deploy release versions to the repository by the
+      release manager.
+   -->
+   <distributionManagement>
+      <repository>
+         <id>maven.dspace.org/release</id>
+         <name>DSpace Maven Repository</name>
+         <url>scp://maven.dspace.org/var/maven/release</url>
+      </repository>
+      <snapshotRepository>
+         <id>maven.dspace.org-snapshot</id>
+         <name>DSpace Maven Repository</name>
+         <url>scp://maven.dspace.org/var/maven/snapshot</url>
+      </snapshotRepository>
+      <site>
+         <id>website</id>
+         <url>
+            scp://projects.dspace.org/var/www/projects.dspace.org/htdocs
+         </url>
+      </site>
+   </distributionManagement>
+
+   <reporting>
+      <excludeDefaults>true</excludeDefaults>
+      <plugins>
+         <plugin>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+               <links>
+                  <link>http://projects.dspace.org/dspace/apidocs</link>
+                  <link>
+                     http://projects.dspace.org/dspace-api/apidocs
+                  </link>
+                  <link>
+                     http://projects.dspace.org/dspace-jspui/apidocs
+                  </link>
+                  <link>
+                     http://projects.dspace.org/dspace-oai/apidocs
+                  </link>
+                  <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+                  <link>
+                     http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/
+                  </link>
+                  <link>
+                     http://jakarta.apache.org/commons/dbcp/apidocs/
+                  </link>
+                  <link>
+                     http://jakarta.apache.org/commons/fileupload/apidocs/
+                  </link>
+                  <link>
+                     http://jakarta.apache.org/commons/httpclient/apidocs/
+                  </link>
+                  <link>
+                     http://jakarta.apache.org/commons/logging/api/
+                  </link>
+                  <link>
+                     http://jakarta.apache.org/commons/pool/apidocs/
+                  </link>
+                  <link>http://www.junit.org/junit/javadoc/</link>
+                  <link>http://logging.apache.org/log4j/docs/api/</link>
+                  <link>http://jakarta.apache.org/regexp/apidocs/</link>
+                  <link>http://jakarta.apache.org/velocity/api/</link>
+               </links>
+            </configuration>
+         </plugin>
+         <plugin>
+            <artifactId>maven-jxr-plugin</artifactId>
+            <configuration>
+               <aggregate>true</aggregate>
+            </configuration>
+         </plugin>
+         <plugin>
+            <artifactId>maven-site-plugin</artifactId>
+         </plugin>
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>jdepend-maven-plugin</artifactId>
+            <version>2.0-beta-1</version>
+         </plugin>
+      </plugins>
+   </reporting>
+
+</project>
