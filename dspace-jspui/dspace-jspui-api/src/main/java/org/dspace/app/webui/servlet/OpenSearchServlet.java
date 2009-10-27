@@ -5,7 +5,7 @@
  *
  * Date: $Date: 2005/08/25 17:20:27 $
  *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved. 
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -78,66 +78,69 @@ import org.dspace.sort.SortOption;
  * scope restriction), or the handle of a community or collection, otherwise
  * parameters exactly match those of the SearchServlet.
  * </p>
- * 
+ *
  * @author Richard Rodgers
  *
  */
 public class OpenSearchServlet extends DSpaceServlet
 {
-	private static final long serialVersionUID = 1L;
-	private static String msgKey = "org.dspace.app.webui.servlet.FeedServlet";
-	/** log4j category */
+        private static final long serialVersionUID = 1L;
+        private static String msgKey = "org.dspace.app.webui.servlet.FeedServlet";
+        /** log4j category */
     private static Logger log = Logger.getLogger(OpenSearchServlet.class);
     // locale-sensitive metadata labels
     private Map<String, Map<String, String>> localeLabels = null;
     
     public void init()
     {
-    	localeLabels = new HashMap<String, Map<String, String>>();
+        localeLabels = new HashMap<String, Map<String, String>>();
     }
     
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
-    {	     
+    {
         // dispense with simple service document requests
-    	String scope = request.getParameter("scope");
-    	if (scope !=null && "".equals(scope))
-    	{
-    		scope = null;
-    	}
+        String scope = request.getParameter("scope");
+        if (scope !=null && "".equals(scope))
+        {
+                scope = null;
+        }
         String path = request.getPathInfo();
         if (path != null && path.endsWith("description.xml"))
         {
-        	String svcDescrip = OpenSearch.getDescription(scope);
-        	response.setContentType(OpenSearch.getContentType("opensearchdescription"));
-        	response.setContentLength(svcDescrip.length());
-        	response.getWriter().write(svcDescrip);
-        	return;	
-      	}
+                String svcDescrip = OpenSearch.getDescription(scope);
+                response.setContentType(OpenSearch.getContentType("opensearchdescription"));
+                response.setContentLength(svcDescrip.length());
+                response.getWriter().write(svcDescrip);
+                return;
+        }
         
         // get enough request parameters to decide on action to take
         String format = request.getParameter("format");
         if (format == null || "".equals(format))
         {
-        	// default to atom
-        	format = "atom";
+                // default to atom
+                format = "atom";
         }
         
         // do some sanity checking
         if (! OpenSearch.getFormats().contains(format))
         {
-        	response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-        	return;
-        }        
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+        }
         
         // then the rest - we are processing the query
         String query = request.getParameter("query");
         int start = Util.getIntParameter(request, "start");
         int rpp = Util.getIntParameter(request, "rpp");
         int sort = Util.getIntParameter(request, "sort_by");
+        String order = request.getParameter("order");
+        String sortOrder = (order == null || order.length() == 0 || order.toLowerCase().startsWith("asc")) ?
+                         SortOption.ASCENDING : SortOption.DESCENDING;
         
-        QueryArgs qArgs = new QueryArgs();       
+        QueryArgs qArgs = new QueryArgs();
         // can't start earlier than 0 in the results!
         if (start < 0)
         {
@@ -152,15 +155,16 @@ public class OpenSearchServlet extends DSpaceServlet
         
         if (sort > 0)
         {
-        	try
-        	{
-        		qArgs.setSortOption(SortOption.getSortOption(sort));
-        	}
-        	catch(Exception e)
-        	{
-        		// invalid sort id - do nothing
-        	}
+                try
+                {
+                        qArgs.setSortOption(SortOption.getSortOption(sort));
+                }
+                catch(Exception e)
+                {
+                        // invalid sort id - do nothing
+                }
         }
+        qArgs.setSortOrder(sortOrder);
 
         // Ensure the query is non-null
         if (query == null)
@@ -182,7 +186,7 @@ public class OpenSearchServlet extends DSpaceServlet
         QueryResults qResults = null;
         if (container == null)
         {
-        	qResults = DSQuery.doQuery(context, qArgs);
+                qResults = DSQuery.doQuery(context, qArgs);
         }
         else if (container instanceof Collection)
         {
@@ -214,7 +218,7 @@ public class OpenSearchServlet extends DSpaceServlet
                 + query + "\",results=(" + results.length + ")"));
         
         // format and return results
-        Map<String, String> labelMap = getLabels(request); 
+        Map<String, String> labelMap = getLabels(request);
         String resultStr = OpenSearch.getResultsString(format, query, qResults, container, results, labelMap);
         response.setContentType(OpenSearch.getContentType(format));
         response.setContentLength(resultStr.length());
@@ -228,22 +232,22 @@ public class OpenSearchServlet extends DSpaceServlet
         Map<String, String> labelMap = localeLabels.get(locale.toString());
         if (labelMap == null)
         {
-        	labelMap = getLocaleLabels(locale);
-        	localeLabels.put(locale.toString(), labelMap);
+                labelMap = getLocaleLabels(locale);
+                localeLabels.put(locale.toString(), labelMap);
         }
         return labelMap;
     }
     
     private Map<String, String> getLocaleLabels(Locale locale)
     {
-    	Map<String, String> labelMap = new HashMap<String, String>();
+        Map<String, String> labelMap = new HashMap<String, String>();
         ResourceBundle labels = ResourceBundle.getBundle("Messages", locale);
         labelMap.put("notitle", labels.getString(msgKey + ".notitle"));
         labelMap.put("logo.title", labels.getString(msgKey + ".logo.title"));
         labelMap.put("general-feed.description", labels.getString(msgKey + ".general-feed.description"));
         for (String selector : OpenSearch.getDescriptionSelectors())
         {
-        	labelMap.put("metadata." + selector, labels.getString(msgKey + ".metadata." + selector));
+                labelMap.put("metadata." + selector, labels.getString("metadata." + selector));
         }
         labelMap.put("uitype", "jspui");
         return labelMap;

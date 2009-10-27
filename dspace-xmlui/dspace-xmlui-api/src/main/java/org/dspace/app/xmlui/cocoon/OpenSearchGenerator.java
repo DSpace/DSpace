@@ -89,36 +89,36 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * 
+ *
  * Generate an OpenSearch-compliant search results document for DSpace, either
  * a community or collection or the whole repository.
  *
- * Once thing that has been modified from DSpace's JSP implementation is what 
- * is placed inside an item's description, we've changed it so that the list 
- * of metadata fields is scanned until a value is found and the first one 
- * found is used as the description. This means that we look at the abstract, 
- * description, alternative title, title, etc... to and the first metadata 
+ * Once thing that has been modified from DSpace's JSP implementation is what
+ * is placed inside an item's description, we've changed it so that the list
+ * of metadata fields is scanned until a value is found and the first one
+ * found is used as the description. This means that we look at the abstract,
+ * description, alternative title, title, etc... to and the first metadata
  * value found is used.
  *
  * I18N: Feed's are internationalized, meaning that they may contain references
  * to messages contained in the global messages.xml file using cocoon's i18n
- * schema. However the library used to build the feeds does not understand 
- * this schema to work around this limitation I created a little hack. It 
- * basically works like this, when text that needs to be localized is put into 
- * the feed it is always mangled such that a prefix is added to the messages's 
- * key. Thus if the key were "xmlui.feed.text" then the resulting text placed 
- * into the feed would be "I18N:xmlui.feed.text". After the library is finished 
- * and produced it's final result the output is traversed to find these 
+ * schema. However the library used to build the feeds does not understand
+ * this schema to work around this limitation I created a little hack. It
+ * basically works like this, when text that needs to be localized is put into
+ * the feed it is always mangled such that a prefix is added to the messages's
+ * key. Thus if the key were "xmlui.feed.text" then the resulting text placed
+ * into the feed would be "I18N:xmlui.feed.text". After the library is finished
+ * and produced it's final result the output is traversed to find these
  * occurrences and replace them with proper cocoon i18n elements.
- * 
+ *
  * @author Richard Rodgers
  */
 
-public class OpenSearchGenerator extends AbstractGenerator 
-		implements CacheableProcessingComponent, Recyclable
+public class OpenSearchGenerator extends AbstractGenerator
+                implements CacheableProcessingComponent, Recyclable
 {
     private static final Logger log = Logger.getLogger(OpenSearchGenerator.class);
-	    
+            
     /** The prefix used to differentiate i18n keys */
     private static final String I18N_PREFIX = "I18N:";
     
@@ -131,14 +131,16 @@ public class OpenSearchGenerator extends AbstractGenerator
     /** Cache of this object's validity */
     private ExpiresValidity validity = null;
     
-	/** The results requested format */
-	private String format = null;
+        /** The results requested format */
+        private String format = null;
     /** the search query string */
     private String query = null;
     /** optional search scope (= handle of container) or null */
     private String scope = null;
     /** optional sort specification */
     private int sort = 0;
+    /** sort order, see SortOption **/
+    private String sortOrder = null;
     /** results per page */
     private int rpp = 0;
     /** first result index */
@@ -146,12 +148,12 @@ public class OpenSearchGenerator extends AbstractGenerator
     /** request type */
     private String type = null;
     
-    /** the results document (cached) */ 
+    /** the results document (cached) */
     private Document resultsDoc = null;
     
     static
     {
-    	i18nLabels = getI18NLabels();  	
+        i18nLabels = getI18NLabels();
     }
     
     /**
@@ -160,29 +162,30 @@ public class OpenSearchGenerator extends AbstractGenerator
      */
     public Serializable getKey()
     {
-    	StringBuffer key = new StringBuffer("key:");
-    	if (scope != null) key.append(scope);
-    	key.append(query);
-    	if (format != null) key.append(format);
-    	key.append(sort);
-    	key.append(start);
-    	key.append(rpp);
-    	return HashUtil.hash(key.toString());
+        StringBuffer key = new StringBuffer("key:");
+        if (scope != null) key.append(scope);
+        key.append(query);
+        if (format != null) key.append(format);
+        key.append(sort);
+        key.append(start);
+        key.append(rpp);
+        key.append(sortOrder);
+        return HashUtil.hash(key.toString());
     }
 
     /**
      * Generate the cache validity object.
-     * 
+     *
      */
     public SourceValidity getValidity()
     {
-    	if (this.validity == null)
-    	{
-    		long expiry = System.currentTimeMillis() + 
-    		ConfigurationManager.getIntProperty("websvc.opensearch.validity") * 60 * 60 * 1000;
-    		this.validity = new ExpiresValidity(expiry);
-    	}
-    	return this.validity;
+        if (this.validity == null)
+        {
+                long expiry = System.currentTimeMillis() +
+                ConfigurationManager.getIntProperty("websvc.opensearch.validity") * 60 * 60 * 1000;
+                this.validity = new ExpiresValidity(expiry);
+        }
+        return this.validity;
     }
       
     /**
@@ -196,24 +199,27 @@ public class OpenSearchGenerator extends AbstractGenerator
         
         Request request = ObjectModelHelper.getRequest(objectModel);
         this.query = request.getParameter("query");
-        if (query == null) query = ""; 
+        if (query == null) query = "";
         query = URLDecoder.decode(query, "UTF-8");
         this.format = request.getParameter("format");
         if (format == null || format.length() == 0) format = "atom";
         this.scope = request.getParameter("scope");
         String srt = request.getParameter("sort_by");
         this.sort = (srt == null || srt.length() == 0) ? 0 : Integer.valueOf(srt);
+        String order = request.getParameter("order");
+        this.sortOrder = (order == null || order.length() == 0 || order.toLowerCase().startsWith("asc")) ?
+                         SortOption.ASCENDING : SortOption.DESCENDING;
         String st = request.getParameter("start");
         this.start = (st == null || st.length() == 0) ? 0 : Integer.valueOf(st);
         String pp = request.getParameter("rpp");
         this.rpp = (pp == null || pp.length() == 0) ? 0 : Integer.valueOf(pp);
         try
         {
-        	this.type = par.getParameter("type");
+                this.type = par.getParameter("type");
         }
         catch(ParameterException e)
         {
-        	this.type = "results";
+                this.type = "results";
         }
     }
     
@@ -223,22 +229,22 @@ public class OpenSearchGenerator extends AbstractGenerator
      */
     public void generate() throws IOException, SAXException, ProcessingException
     {
-    	Document retDoc = null;
-       	try
-    	{
-       		if (type != null && type.equals("description"))
-       		{
-       			retDoc = OpenSearch.getDescriptionDoc(scope);
-       		}
-       		else if (resultsDoc != null)
-       		{
-       			// use cached document if available
-       			retDoc = resultsDoc;
-       		}
-       		else
-       		{        
-        		Context context = ContextUtil.obtainContext(objectModel);
-        		QueryArgs qArgs = new QueryArgs();       
+        Document retDoc = null;
+        try
+        {
+                if (type != null && type.equals("description"))
+                {
+                        retDoc = OpenSearch.getDescriptionDoc(scope);
+                }
+                else if (resultsDoc != null)
+                {
+                        // use cached document if available
+                        retDoc = resultsDoc;
+                }
+                else
+                {
+                        Context context = ContextUtil.obtainContext(objectModel);
+                        QueryArgs qArgs = new QueryArgs();
                 // can't start earlier than 0 in the results!
                 if (start < 0)
                 {
@@ -253,22 +259,23 @@ public class OpenSearchGenerator extends AbstractGenerator
                 
                 if (sort > 0)
                 {
-                	try
-                	{
-                		qArgs.setSortOption(SortOption.getSortOption(sort));
-                	}
-                	catch(Exception e)
-                	{
-                		// invalid sort id - do nothing
-                	}
+                        try
+                        {
+                                qArgs.setSortOption(SortOption.getSortOption(sort));
+                        }
+                        catch(Exception e)
+                        {
+                                // invalid sort id - do nothing
+                        }
                 }
+                qArgs.setSortOrder(sortOrder);
 
                 // If there is a scope parameter, attempt to dereference it
                 // failure will only result in its being ignored
                 DSpaceObject container = null;
                 if ((scope != null) && !scope.equals(""))
                 {
-                	container = HandleManager.resolveToObject(context, scope);
+                        container = HandleManager.resolveToObject(context, scope);
                 }
 
                 qArgs.setQuery(query);
@@ -277,7 +284,7 @@ public class OpenSearchGenerator extends AbstractGenerator
                 QueryResults qResults = null;
                 if (container == null)
                 {
-                	qResults = DSQuery.doQuery(context, qArgs);
+                        qResults = DSQuery.doQuery(context, qArgs);
                 }
                 else if (container instanceof Collection)
                 {
@@ -301,32 +308,32 @@ public class OpenSearchGenerator extends AbstractGenerator
                     }
                     results[i] = dso;
                 }
-        		resultsDoc = OpenSearch.getResultsDoc(format, query, qResults,
-        				                              container, results, i18nLabels);
-        		unmangleI18N(resultsDoc);
-        		retDoc = resultsDoc;
-       		}
-	       
-       		if (retDoc != null)
-       		{
-       			DOMStreamer streamer = new DOMStreamer(contentHandler, lexicalHandler);
-       			streamer.stream(retDoc);
-       		}
-		}
-		catch (IOException e) 
+                        resultsDoc = OpenSearch.getResultsDoc(format, query, qResults,
+                                                                      container, results, i18nLabels);
+                        unmangleI18N(resultsDoc);
+                        retDoc = resultsDoc;
+                }
+               
+                if (retDoc != null)
+                {
+                        DOMStreamer streamer = new DOMStreamer(contentHandler, lexicalHandler);
+                        streamer.stream(retDoc);
+                }
+                }
+                catch (IOException e)
         {
             throw new SAXException(e);
         }
-		catch (SQLException sqle) 
-		{
-			throw new SAXException(sqle);
-		}    	
+                catch (SQLException sqle)
+                {
+                        throw new SAXException(sqle);
+                }
     }
     
     /**
      * Returns a map of localizable labels whose values are themselves keys that are
      * unmangled into a true i18n element for later localization.
-     * 
+     *
      * @return A map of mangled labels.
      */
     private static Map<String, String> getI18NLabels()
@@ -341,53 +348,54 @@ public class OpenSearchGenerator extends AbstractGenerator
     }
     
     /**
-     * Scan the document and replace any text nodes that begin 
+     * Scan the document and replace any text nodes that begin
      * with the i18n prefix with an actual i18n element that
      * can be processed by the i18n transformer.
-     * 
+     *
      * @param dom
      */
     private void unmangleI18N(Document dom)
-    {  	
-    	NodeList elementNodes = dom.getElementsByTagName("*");
+    {
+        NodeList elementNodes = dom.getElementsByTagName("*");
         
         for (int i = 0; i < elementNodes.getLength(); i++)
         {
-        	NodeList textNodes = elementNodes.item(i).getChildNodes();        	
-        	for (int j = 0; j < textNodes.getLength(); j++)
-	        {       		
-        		Node oldNode = textNodes.item(j);
-        		// Check to see if the node is a text node, its value is not null, and it starts with the i18n prefix.
-        		if (oldNode.getNodeType() == Node.TEXT_NODE && oldNode.getNodeValue() != null && oldNode.getNodeValue().startsWith(I18N_PREFIX))
-	        	{
-        			Node parent = oldNode.getParentNode();
-        			String key = oldNode.getNodeValue().substring(I18N_PREFIX.length());
-        			
-        			Element newNode = dom.createElementNS(I18N_NAMESPACE, "text");
-        			newNode.setAttribute("key", key);
-        			newNode.setAttribute("catalogue", "default");
+                NodeList textNodes = elementNodes.item(i).getChildNodes();
+                for (int j = 0; j < textNodes.getLength(); j++)
+                {
+                        Node oldNode = textNodes.item(j);
+                        // Check to see if the node is a text node, its value is not null, and it starts with the i18n prefix.
+                        if (oldNode.getNodeType() == Node.TEXT_NODE && oldNode.getNodeValue() != null && oldNode.getNodeValue().startsWith(I18N_PREFIX))
+                        {
+                                Node parent = oldNode.getParentNode();
+                                String key = oldNode.getNodeValue().substring(I18N_PREFIX.length());
+                                
+                                Element newNode = dom.createElementNS(I18N_NAMESPACE, "text");
+                                newNode.setAttribute("key", key);
+                                newNode.setAttribute("catalogue", "default");
 
-        			parent.replaceChild(newNode,oldNode);
-	        	}
-	        }
-        }  	
-    }      
+                                parent.replaceChild(newNode,oldNode);
+                        }
+                }
+        }
+    }
     
-    /** 
+    /**
      * Recycle
      */
     
     public void recycle()
     {
-    	this.format = null;
-    	this.query = null;
-    	this.scope = null;
-    	this.sort = 0;
-    	this.rpp = 0;
-    	this.start = 0;
-    	this.type = null;
-    	this.resultsDoc = null;
-    	this.validity = null;
-    	super.recycle();
+        this.format = null;
+        this.query = null;
+        this.scope = null;
+        this.sort = 0;
+        this.rpp = 0;
+        this.start = 0;
+        this.type = null;
+        this.sortOrder = null;
+        this.resultsDoc = null;
+        this.validity = null;
+        super.recycle();
     }
 }
