@@ -108,48 +108,21 @@ dspace.history = ${dspace.dir}/history
                         </row>
                         <row>
                             <entry>
-                                <literal>dspace.dir</literal>
+                                <screen>dspace.dir
+dspace.url
+dspace.hostname
+dspace.name</screen>
                             </entry>
                             <entry>
                                 <link linkend="docbook-configure.html-general-2">5.2.2</link>
                             </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>dspace.url </literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-general-2">5.2.2</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>dspace.hostname</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-general-2">5.2.2</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>dspace.name </literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-general-2">5.2.2</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>config.template.foo</literal>
-                            </entry>
-                            <entry> ____</entry>
                         </row>
                         <row>
                             <entry spanname="hspan">Database Configurations</entry>
                         </row>
                         <row>
-                            <entry><screen>
-db.name
+                            <entry>
+                                <screen>db.name
 db.url
 db.driver
 db.username
@@ -161,13 +134,14 @@ db.password</screen>
                             <entry spanname="hspan">Advanced Database Configuration</entry>
                         </row>
                         <row>
-                            <entry><screen>
-db.schema
+                            <entry>
+                                <screen>db.schema
 db.maxconnection
 db.maxwait
 db.maxidle
 db.statementpool
-db.poolname</screen></entry>
+db.poolname</screen>
+                            </entry>
                             <entry><link linkend="docbook-configure.html-database">5.2.3</link></entry>
                         </row>
                         <row>
@@ -227,27 +201,69 @@ srb.parentdir.1</screen>
                             <entry spanname="hspan">Handle Configuration</entry>
                         </row>
                         <row>
-                            <entry><screen>
-handle.prefix
-handle.dir</screen></entry>
+                            <entry>
+                                <screen>handle.prefix
+handle.dir</screen>
+                            </entry>
                             <entry>
                                 <link linkend="docbook-configure.html-handle">5.2.7</link>
                             </entry>
+                        </row>
+                        <row>
+                            <entry spanname="hspan">Authorization System Configuration</entry>
+                        </row>
+                        <row>
+                            <entry>
+                                <screen>core.authorization.community-admin.create-subelement
+core.authorization.community-admin.delete-subelement
+core.authorization.community-admin.policies
+core.authorization.community-admin.admin-group
+core.authorization.community-admin.collection.policies
+core.authorization.community-admin.collection.template-item
+core.authorization.community-admin.collection.submitters
+core.authorization.community-admin.collection.workflows
+core.authorization.community-admin.collection.admin-group
+core.authorization.community-admin.item.delete
+core.authorization.community-admin.item.withdraw
+core.authorization.community-admin.item.reinstatiate
+core.authorization.community-admin.item.policies
+core.authorization.community-admin.item.create-bitstream
+core.authorization.community-admin.item.delete-bitstream
+core.authorization.community-admin.item-admin.cc-license
+core.authorization.collection-admin.policies
+core.authorization.collection-admin.template-item
+core.authorization.collection-admin.submitters
+core.authorization.collection-admin.workflows
+core.authorization.collection-admin.admin-group
+core.authorization.collection-admin.item.delete
+core.authorization.collection-admin.item.withdraw
+core.authorization.collection-admin.item.reinstatiate
+core.authorization.collection-admin.item.policies
+core.authorization.collection-admin.item.create-bitstream
+core.authorization.collection-admin.item.delete-bitstream
+core.authorization.collection-admin.item-admin.cc-license
+core.authorization.item-admin.policies
+core.authorization.item-admin.create-bitstream
+core.authorization.item-admin.delete-bitstream
+core.authorization.item-admin.cc-license</screen>
+                            </entry>
+                            <entry><link linkend="docbook-configure.html-authorization">5.2.45</link></entry>
                         </row>
                         <row>
                             <entry spanname="hspan">Stackable Authentication Methods</entry>
                         </row>
                         <row>
                             <entry>
-                                <screen>plugin.sequence.org.dspace.authenticate.AuthenticationMethod</screen></entry>
+                                <screen>plugin.sequence.org.dspace.authenticate.AuthenticationMethod</screen>
+                            </entry>
                             <entry><link linkend="docbook-configure.html-authentication">5.2.8</link> or <link linkend="docbook-configure.html-shibboleth">5.2.9</link></entry>
                         </row>
                         <row>
                             <entry spanname="hspan">LDAP Authentication</entry>
                         </row>
                         <row>
-                            <entry><screen>
-ldap.enable
+                            <entry>
+                                <screen>ldap.enable
 ldap.provider_url
 ldap.id_field
 ldap.object_context
@@ -257,30 +273,31 @@ ldap.surname_field
 ldap.givenname_field
 ldap.phone_field
 webui.ldap.autoregister
-ldap.login.specialgroup</screen></entry>
-                         <entry><link linkend="docbook-configure.html-ldap">5.2.8.5</link></entry>  
+ldap.login.specialgroup</screen>
+                            </entry>
+                            <entry><link linkend="docbook-configure.html-ldap">5.2.8.5</link></entry>
                         </row>
                         <row>
-                         <entry><emphasis>Hierarchical LDAP Settings:</emphasis>
-                         <screen>
-ldap.search_scope
+                            <entry><emphasis>Hierarchical LDAP Settings:</emphasis>
+                                <screen>ldap.search_scope
 ldap.search.user
 ldap.netid_email_domain</screen></entry>
-                        <entry><link linkend="docbook-configure.html-ldap">5.2.8.5</link></entry>
+                            <entry><link linkend="docbook-configure.html-ldap">5.2.8.5</link></entry>
                         </row>
                         <row>
-                            <entry spanname="hspan">Shibboleth Authentication Settings</entry>                         
+                            <entry spanname="hspan">Shibboleth Authentication Settings</entry>
                         </row>
                         <row>
-                            <entry><screen>
-authentication.shib.email-header
+                            <entry>
+                                <screen>authentication.shib.email-header
 authentication.shib.firstname-header
 authentication.shib.lastname-header
 authentication.shib.email-use-tomcat-remote-user
 authentication.shib.autoregister
 authentication.shib.role-header
-authentication.shib.default-roles</screen></entry>
-                        <entry><link linkend="docbook-configure.html-shibboeth">5.2.9</link>-</entry>
+authentication.shib.default-roles</screen>
+                            </entry>
+                            <entry><link linkend="docbook-configure.html-shibboeth">5.2.9</link>-</entry>
                         </row>
                         <row>
                             <entry spanname="hspan">Log Configuration</entry>
@@ -298,48 +315,11 @@ authentication.shib.default-roles</screen></entry>
                         </row>
                         <row>
                             <entry>
-                                <literal>search.dir</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-lucene-search">5.2.11</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>search.max-clauses</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-lucene-search">5.2.11</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>search.analyzer</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-lucene-search">5.2.11</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>search.operator</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-lucene-search">5.2.11</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>search.maxfieldlength</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-lucene-search">5.2.11</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>search.index.</literal>
-                                <emphasis>n</emphasis>
+                                <screen>search.dir
+search.max-clauses
+search.analyzer
+search.operator
+search.maxfieldlengthsearch.index.<emphasis>n</emphasis></screen>
                             </entry>
                             <entry>
                                 <link linkend="docbook-configure.html-lucene-search">5.2.11</link>
@@ -350,15 +330,8 @@ authentication.shib.default-roles</screen></entry>
                         </row>
                         <row>
                             <entry>
-                                <literal>http.proxy.host</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-proxy">5.2.12</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>http.proxy.port</literal>
+                                <screen>http.proxy.host
+http.proxy.port</screen>
                             </entry>
                             <entry>
                                 <link linkend="docbook-configure.html-proxy">5.2.12</link>
@@ -372,77 +345,35 @@ authentication.shib.default-roles</screen></entry>
                             <entry><link linkend="docbook-configure.html-mediafilter">5.2.13</link></entry>
                         </row>
                         <row>
-                            <entry><screen>
-plugin.named.org.dspace.app.mediafilter.FormatFilter
-filter.org.dspace.app.mediafilter.PDFFilter.inputFormats
-filter.org.dspace.app.mediafilter.HTMLFilter.inputFormats
-filter.org.dspace.app.mediafilter.WordFilter.inputFormats
-filter.org.dspace.app.mediafilter.JPEGFilter.inputFormats
-filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormats</screen>
+                            <entry>
+                                <screen>plugin.named.org.dspace.app.mediafilter.FormatFilter
+     filter.org.dspace.app.mediafilter.PDFFilter.inputFormats
+     filter.org.dspace.app.mediafilter.HTMLFilter.inputFormats
+     filter.org.dspace.app.mediafilter.WordFilter.inputFormats
+     filter.org.dspace.app.mediafilter.JPEGFilter.inputFormats
+  filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormats</screen>
                             </entry>
                             <entry><link linkend="docbook-configure.html-mediafilter">5.2.13</link></entry>
                         </row>
                         <row>
-                            <entry><literal>pdffilter.largepdfs</literal></entry>
+                            <entry>
+                                <screen>pdffilter.largepdfs
+pdffilter.skiponmemoryexception</screen>
+                            </entry>
                             <entry><link linkend="docbook-configure.html-mediafilter">5.2.13</link></entry>
-                        </row>
-                        <row>
-                            <entry><literal>pdffilter.skiponmemoryexception</literal></entry>
                         </row>
                         <row>
                             <entry spanname="hspan">Crosswalks (MODS, QDC, XSLT, etc.)</entry>
                         </row>
                         <row>
                             <entry>
-                                <literal>crosswalk.mods.properties.MODS</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configre.html-qdc">5.2.14</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>crosswalk.submission.MODS.stylesheet</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-xslt">5.2.15</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>crosswalk.qdc.namespace.QDC.dc</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-qdc">5.2.16</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>crosswalk.qdc.namespace.QDC.dcterms</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-qdc">5.2.16</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>crosswalk.qdc.schemaLocation.QDC</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-qdc">5.2.16</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>plugin.named.org.dspace.content.crosswalk.IngestionCrosswalk</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-crosswalk">5.2.17</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>plugin.named.org.dspace.content.crosswalk.DisseminationCrosswalk</literal>
+                                <screen>crosswalk.mods.properties.MODS
+crosswalk.submission.MODS.stylesheet
+crosswalk.qdc.namespace.QDC.dc
+crosswalk.qdc.namespace.QDC.dcterms
+crosswalk.qdc.schemaLocation.QDC
+plugin.named.org.dspace.content.crosswalk.IngestionCrosswalk
+plugin.named.org.dspace.content.crosswalk.DisseminationCrosswalk</screen>
                             </entry>
                             <entry>
                                 <link linkend="docbook-configure.html-packager">5.2.18</link>
@@ -453,103 +384,19 @@ filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormats</screen>
                         </row>
                         <row>
                             <entry>
-                                <literal>event.dispatcher.default.class</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-event">5.2.19</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>event.dispatcher.default.consumers</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-event">5.2.19</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>event.dispatcher.noindex.class</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-event">5.2.19</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>event.dispatcher.noindex.consumers</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-event">5.2.19</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>event.consumer.search.class </literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-event">5.2.19</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>event.consumer.search.filters</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-event">5.2.19</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>event.consumer.browse.class</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-event">5.2.19</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>event.consumer.browse.filters</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-event">5.2.19</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>event.consumer.eperson.class</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-event">5.2.19</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>event.consumer.eperson.filters</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-event">5.2.19</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>event.consumer.test.class</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-event">5.2.19</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>event.consumer.test.filters</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-event">5.2.19</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>testConsumer.verbose</literal>
+                                <screen>event.dispatcher.default.class
+event.dispatcher.default.consumers
+event.dispatcher.noindex.class
+event.dispatcher.noindex.consumers
+event.consumer.search.class
+event.consumer.search.filters
+event.consumer.browse.class
+event.consumer.browse.filters
+event.consumer.eperson.class
+event.consumer.eperson.filters
+event.consumer.test.class
+event.consumer.test.filters
+testConsumer.verbose</screen>
                             </entry>
                             <entry>
                                 <link linkend="docbook-configure.html-event">5.2.19</link>
@@ -560,23 +407,9 @@ filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormats</screen>
                         </row>
                         <row>
                             <entry>
-                                <literal>plugin.single.org.dspace.checker.BitsreamDispatcher</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-checksum">5.2.20</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>checker.retention.default</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-checksum">5.2.20</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>checker.retention.CHECKSUM-MATCH</literal>
+                                <screen>plugin.single.org.dspace.checker.BitsreamDispatcher
+checker.retention.default
+checker.retention.CHECKSUM-MATCH</screen>
                             </entry>
                             <entry>
                                 <link linkend="docbook-configure.html-checksum">5.2.20</link>
@@ -587,31 +420,10 @@ filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormats</screen>
                         </row>
                         <row>
                             <entry>
-                                <literal>org.dspace.app.itemexport.work.dir</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-download">5.2.21</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>org.dspace.app.itemexport.download.dir</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-download">5.2.21</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>org.dspace.app.itemexport.life.span.hours</literal>
-                            </entry>
-                            <entry>
-                                <link linkend="docbook-configure.html-download">5.2.21</link>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <literal>org.dspace.app.itemexport.max.size</literal>
+                                <screen>org.dspace.app.itemexport.work.dir
+org.dspace.app.itemexport.download.dir
+org.dspace.app.itemexport.life.span.hours
+org.dspace.app.itemexport.max.size</screen>
                             </entry>
                             <entry>
                                 <link linkend="docbook-configure.html-download">5.2.21</link>
@@ -659,9 +471,10 @@ filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormats</screen>
                             <entry spanname="hspan">WEBUI Configurations [General]</entry>
                         </row>
                         <row>
-                            <entry><screen>
-webui.browse.thumbnail.max.height
-webui.browse.thumbnail.max.width</screen></entry>
+                            <entry>
+                                <screen>webui.browse.thumbnail.max.height
+webui.browse.thumbnail.max.width</screen>
+                            </entry>
                             <entry><link linkend="docbook-configure.html-webui">5.2.25</link></entry>
                         </row>
                         <row>
@@ -669,25 +482,28 @@ webui.browse.thumbnail.max.width</screen></entry>
                             <entry><link linkend="docbook-configure.html-webui">5.2.25</link></entry>
                         </row>
                         <row>
-                            <entry><screen>
-thumbnail.maxwidth
-thumbnail.maxheight</screen></entry>
-                        <entry><link linkend="docbook-configure.html-webui">5.2.25</link></entry>
+                            <entry>
+                                <screen>thumbnail.maxwidth
+thumbnail.maxheight</screen>
+                            </entry>
+                            <entry><link linkend="docbook-configure.html-webui">5.2.25</link></entry>
                         </row>
                         <row>
                             <entry><literal>webui.preview.enabled</literal></entry>
                             <entry><link linkend="docbook-configure.html-webui">5.2.25</link></entry>
                         </row>
                         <row>
-                            <entry><screen>
-webui.preview.maxwidth
-webui.preview.maxheight</screen></entry>
+                            <entry>
+                                <screen>webui.preview.maxwidth
+webui.preview.maxheight</screen>
+                            </entry>
                             <entry><link linkend="docbook-configure.html-webui">5.2.25</link></entry>
                         </row>
                         <row>
-                            <entry><screen>
-webui.preview.brand
-webui.preview.brand.abbrev</screen></entry>
+                            <entry>
+                                <screen>webui.preview.brand
+webui.preview.brand.abbrev</screen>
+                            </entry>
                             <entry><link linkend="docbook-configure.html-webui">5.2.25</link></entry>
                         </row>
                         <row>
@@ -695,9 +511,10 @@ webui.preview.brand.abbrev</screen></entry>
                             <entry><link linkend="docbook-configure.html-webui">5.2.25</link></entry>
                         </row>
                         <row>
-                            <entry><screen>
-webui.preview.brand.font
-webui.preview.brank.fontpoint</screen></entry>
+                            <entry>
+                                <screen>webui.preview.brand.font
+webui.preview.brank.fontpoint</screen>
+                            </entry>
                             <entry><link linkend="docbook-configure.html-webui">5.2.25</link></entry>
                         </row>
                         <row>
@@ -705,9 +522,10 @@ webui.preview.brank.fontpoint</screen></entry>
                             <entry><link linkend="docbook-configure.html-webui">5.2.25</link></entry>
                         </row>
                         <row>
-                            <entry><screen>
-webui.strengths.show
-webui.strengths.cache</screen></entry>
+                            <entry>
+                                <screen>webui.strengths.show
+webui.strengths.cache</screen>
+                            </entry>
                             <entry><link linkend="docbook-configure.html-webui">5.2.25</link></entry>
                         </row>
                         <row>
@@ -726,11 +544,12 @@ webui.strengths.cache</screen></entry>
                             <entry><link linkend="docbook-configure.html-browse-index-normalization">5.2.26.3</link></entry>
                         </row>
                         <row>
-                            <entry><screen>
-webui.browse.value_columns.max
+                            <entry>
+                                <screen>webui.browse.value_columns.max
 webui.browse.sort_columns.max
 webui.browse.value_columns.omission_mark
-plugin.named.org.dspace.sort.OrderFormatDelegate</screen></entry>
+plugin.named.org.dspace.sort.OrderFormatDelegate</screen>
+                            </entry>
                             <entry><link linkend="docbook-configure.html-browse-index-other">5.2.26.4</link></entry>
                         </row>
                         <row>
@@ -755,16 +574,18 @@ plugin.named.org.dspace.sort.OrderFormatDelegate</screen></entry>
                             <entry spanname="hspan">Recent Submission</entry>
                         </row>
                         <row>
-                            <entry><screen>
-recent.submission.sort-option
-recent.submissions.count</screen></entry>
+                            <entry>
+                                <screen>recent.submission.sort-option
+recent.submissions.count</screen>
+                            </entry>
                             <entry><link linkend="docbook-configure.html-recent-subs">5.2.29</link></entry>
                         </row>
                         <row>
                             <entry spanname="hspan">Syndication Feed (RSS) Settings</entry>
                         </row>
-                        <row><entry><screen>
-webui.feed.enable
+                        <row>
+                            <entry>
+                                <screen>webui.feed.enable
 webui.feed.items
 webui.feed.cache.size 
 webui.cache.age
@@ -772,25 +593,28 @@ webui.feed.formats
 webui.feed.localresolve
 webui.feed.item.title
 webui.feed.item.date
-webui.feed.item.description</screen></entry>
+webui.feed.item.description</screen>
+                            </entry>
                             <entry><link linkend="docbook-configure.html-rss_feeds">5.2.30</link></entry>
                         </row>
                         <row>
                             <entry spanname="hspan">Content Inline Disposition Threshold</entry>
                         </row>
                         <row>
-                            <entry><screen>
-webui.content_disposition_threshold
-xmlui.content_disposition_threshold</screen></entry>
+                            <entry>
+                                <screen>webui.content_disposition_threshold
+xmlui.content_disposition_threshold</screen>
+                            </entry>
                             <entry><link linkend="docbook-configure.html-inline">5.2.31</link></entry>
                         </row>
                         <row>
                             <entry spanname="hspan">Multifile HTML Settings</entry>
                         </row>
                         <row>
-                            <entry><screen>
-webui.html.max-depth-guess
-xmlui.html.max-depth-guess</screen></entry>
+                            <entry>
+                                <screen>webui.html.max-depth-guess
+xmlui.html.max-depth-guess</screen>
+                            </entry>
                             <entry><link linkend="docbook-configure.html-html-depth">5.2.32</link></entry>
                         </row>
                         <row>
@@ -825,9 +649,10 @@ xmlui.html.max-depth-guess</screen></entry>
                             <entry><link linkend="docbook-configure-html-sfx">5.2.40</link></entry>
                         </row>
                         <row>
-                            <entry><screen>
-webui.suggest.enable
-webui.suggest.loggedinusers.only</screen></entry>
+                            <entry>
+                                <screen>webui.suggest.enable
+webui.suggest.loggedinusers.only</screen>
+                            </entry>
                             <entry><link linkend="docbook-configure-html-recommend">5.2.41</link></entry>
                         </row>
                         <row>
@@ -842,8 +667,8 @@ webui.suggest.loggedinusers.only</screen></entry>
                             <entry spanname="hspan">JSP Web Interface Settings</entry>
                         </row>
                         <row>
-                            <entry><screen>
-webui.licence_bundle.show
+                            <entry>
+                                <screen>webui.licence_bundle.show
 webui.itemdisplay.default
 webui.resolver.1.urn
 webui.resolver.1.baseurl
@@ -860,14 +685,16 @@ webui.itemlist.browse.&lt;browse name&gt;.columns
 webui.itemlist.*lt;sort or index name&gt;.columns
 webui.itemlist.dateaccessioned.columns
 webui.itemlist.dateaccessioned.widths
-webui.itemlist.tablewidth</screen></entry>
+webui.itemlist.tablewidth</screen>
+                            </entry>
                             <entry><link linkend="docbook-configure.html-jspui-settings">5.2.36</link></entry>
                         </row>
-                        <row><entry spanname="hspan">XMLUI Settings (Manakin)</entry>
+                        <row>
+                            <entry spanname="hspan">XMLUI Settings (Manakin)</entry>
                         </row>
                         <row>
-                            <entry><screen>
-xmlui.supportedlocales
+                            <entry>
+                                <screen>xmlui.supportedlocales
 xmlui.force.ssl
 xmlui.user.registration
 xmlui.user.assumelogon
@@ -880,13 +707,11 @@ xmlui.bitstream.mods
 xmlui.bitstream.mets
 xmlui.google.analytics.key
 xmlui.controlpanel.activity.max
-xmlui.controlpanel.activity.ipheader</screen></entry>
+xmlui.controlpanel.activity.ipheader</screen>
+                            </entry>
                             <entry><link linkend="docbook-configure.html-xmlui">5.2.43</link></entry>
                         </row>
-                        
-                        
-                    </tbody>
-                </tgroup>
+                    </tbody></tgroup>
             </table>
         </section>
         <section remap="h3">
@@ -5536,6 +5361,92 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
                 </section>
             </section>
         </section>
+        <section remap="h3">
+            <title><anchor id="docbook-configure.html-authorization" xreflabel="Authorization system configuration"/>Delegation Administration</title>
+            <subtitle>(Authorization System Configuration)</subtitle>
+                   <informaltable>
+                <?dbhtml table-width="100%"?>
+                <?dbfo table-width="100%"?>
+                <tgroup cols="2">
+                    <colspec colname="c1" colwidth="30*" colsep="1"/>
+                    <colspec colname="c2" colwidth="70*"/>
+                    <spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+                    <tbody>
+                        <row>
+                            <entry align="right">Property:</entry>
+                            <entry><literal>core.authorization.community-admin.create-subelement</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Example Value:</entry>
+                            <entry><literal>core.authorization.community-admin.create-subelement = true</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Informational Note:</entry>
+                            <entry><para>It is now possible to delegate the administration of Communities and Collections without the need of the Administrator Superuser. The delegation uses an "inherited" technique. A community admin will be a collection admin for all the collections within the community and a collection admin will be always an item admin for all the item owned by the collection. All the functions that are allowed to user with WRITE permission on an object will always allowed to be the ADMIN of the
+                object (e.g. community/collection/admin will be always allowed to edit metadata of the object). The default will be &quot;on&quot; for all the configurations.</para>
+                            </entry>
+                        </row>
+                        <row>
+                            <entry align="right">Community Administration: subcommunities and collections</entry>
+                            <entry><screen>core.authorization.community-admin.create-subelement
+core.authorization.community-admin.delete-subelement</screen></entry>
+                        </row>
+                        <row>
+                            <entry align="right">then administers the following keys:</entry>
+                            <entry><screen>core.authorization.community-admin.policies
+core.authorization.community-admin.admin-group</screen></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Collections in the above community:</entry>
+                            <entry><screen>core.authorization.community-admin.collection.policies
+core.authorization.community-admin.collection.template-item
+core.authorization.community-admin.collection.submitters
+core.authorization.community-admin.collection.workflows
+core.authorization.community-admin.collection.admin-group</screen></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Item owned by Collections in the above Community:</entry>
+                            <entry><screen>core.authorization.community-admin.item.delete
+core.authorization.community-admin.item.withdraw
+core.authorization.community-admin.item.reinstatiate
+core.authorization.community-admin.item.policies</screen>
+                            And also these bundles:
+                            <screen>core.authorization.community-admin.item.create-bitstream
+core.authorization.community-admin.item.delete-bitstream
+core.authorization.community-admin.item-admin.cc-license</screen></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Collection Administration:</entry>
+                            <entry><screen>core.authorization.collection-admin.policies
+core.authorization.collection-admin.template-item
+core.authorization.collection-admin.submitters
+core.authorization.collection-admin.workflows
+core.authorization.collection-admin.admin-group</screen>
+ Item owned by the above Collection
+<screen>core.authorization.collection-admin.item.delete
+core.authorization.collection-admin.item.withdraw
+core.authorization.collection-admin.item.reinstatiate
+core.authorization.collection-admin.item.policies</screen>
+ And also these bundles:
+<screen>core.authorization.collection-admin.item.create-bitstream
+core.authorization.collection-admin.item.delete-bitstream
+core.authorization.collection-admin.item-admin.cc-license</screen></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Item Administration:</entry>
+                            <entry><screen>core.authorization.item-admin.policies</screen>
+ And also these bundles:
+<screen>core.authorization.item-admin.create-bitstream
+core.authorization.item-admin.delete-bitstream
+core.authorization.item-admin.cc-license</screen></entry>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </informaltable>
+         <note>
+             <para>Oracle users should consult <emphasis role="underline"><link linkend="docbook-update.html">Chapter 4 Updating a DSpace Installation</link></emphasis> regarding the necessary database changes that need to take place.</para>
+         </note>
+        </section>
         <!-- This is to close the 5.2 section (below) -->
     </section>
     <section remap="h2">
@@ -6187,6 +6098,216 @@ plugin.named.org.dspace.sword.SWORDIngester = \
                         <row>
                             <entry align="right">Informational Note:</entry>
                             <entry>Configure the plugins to process incoming packages. The form of this configuration is as per the Plugin Manager's Named Plugin documentation: <literal>plugin.named.[interface] = [implementation] = [package format identifier] \</literal> . Package ingesters should implement the SWORDIngester interface, and will be loaded when a package of the format specified above in: <literal>sword.accept-packaging.[package format].identifier = [package format identifier]</literal> is received. In the event that this is a simple file deposit, with no package format, then the class named by "SimpleFileIngester" will be loaded and executed where appropriate. This case will only occur when a single file is being deposited into an existing DSpace Item.</entry>
+                        </row>
+                    </tbody></tgroup>
+            </informaltable>
+        </section>
+        <section remap="h3">
+            <title><anchor id="docbook-configure.html-opensearch" xreflabel="OpenSearch Support"/>OpenSearch Support</title>
+            <para>OpenSearch is a small set of conventions and documents for describing and using &quot;serach enginges&quot;, meaning any service that returns a set of results for a query. See extensive description in the <link linkend="docbook-business.html"><emphasis role="underline">Business Layer section</emphasis></link> of the documentation.</para>
+            <para>Please note that for result data formatting, OpenSearch uses Syndication Feed Settings (RSS). So, even if Syndication Feeds <emphasis role="bold">are not</emphasis> enable, they <emphasis role="bold">must</emphasis> be configured to enable OpenSearch. OpenSearch uses all the configuration properties for DSpace RSS to determine the mapping of metadata fields to feed fields. Note that a new field for authors has been added (used in Atom format only).</para>
+            <informaltable>
+                <?dbhtml table-width="100%"?>
+                <?dbfo table-width="100%"?>
+                <tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+                        <row>
+                            <entry align="right">Property:</entry>
+                            <entry><literal>websvc.opensearch.enable</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Example Value:</entry>
+                            <entry><literal>websvc.opensearch.enable = false</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Informational Note:</entry>
+                            <entry>Whether or not OpenSearch is enabled. By default, the feature is disabled. Change the property key to &apos;ture&apos; to enable.</entry>
+                        </row>
+                        <row>
+                            <?dbfo row-height="5mm"?>
+                            <?dbhtml row-height="5mm"?>
+                            <entry spanname="notespan"/>
+                        </row>
+                        <row>
+                            <entry align="right">Property:</entry>
+                            <entry><literal>websvc.opensearch.uicontext</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Example Value:</entry>
+                            <entry><literal>websvc.opensearch.uicontext = simple-search</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Informational Note:</entry>
+                            <entry><literal>Context for HTML request URLs. Change only for non-standard servlet mapping.</literal></entry>
+                        </row>
+                        <row>
+                            <?dbfo row-height="5mm"?>
+                            <?dbhtml row-height="5mm"?>
+                            <entry spanname="notespan"/>
+                        </row>
+                        <row>
+                            <entry align="right">Property:</entry>
+                            <entry><literal>websvc.opensearch.svccontext</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Example Value:</entry>
+                            <entry><literal>websvc.opensearch.svccontext = open-search/</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Informational Note:</entry>
+                            <entry>Context for RSS/Atom request URLs. Change only for non-standard servlet mapping.</entry>
+                        </row>
+                        <row>
+                            <?dbfo row-height="5mm"?>
+                            <?dbhtml row-height="5mm"?>
+                            <entry spanname="notespan"/>
+                        </row>
+                        <row>
+                            <entry align="right">Property:</entry>
+                            <entry><literal>websvc.opensearch.autolink</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Example Value:</entry>
+                            <entry><literal>websvc.opensearch.autolink = true</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Informational Note:</entry>
+                            <entry><literal>Present autodiscovery link in every page head.</literal></entry>
+                        </row>
+                        <row>
+                            <?dbfo row-height="5mm"?>
+                            <?dbhtml row-height="5mm"?>
+                            <entry spanname="notespan"/>
+                        </row>
+                        <row>
+                            <entry align="right">Property:</entry>
+                            <entry><literal>websvc.opensearch.validity</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Example Value:</entry>
+                            <entry><literal>websvc.opensearch.validity = 48</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Informational Note:</entry>
+                            <entry><literal>Number of hours to retain results before recalculating. This applies to the Manakin interface only.</literal></entry>
+                        </row>
+                        <row>
+                            <?dbfo row-height="5mm"?>
+                            <?dbhtml row-height="5mm"?>
+                            <entry spanname="notespan"/>
+                        </row>
+                        <row>
+                            <entry align="right">Property:</entry>
+                            <entry><literal>websvc.opensearch.shortname</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Example Value:</entry>
+                            <entry><literal>websvc.opensearch.shortname = DSpace</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Informational Note:</entry>
+                            <entry>A short name used in browsers for search service. It should be sixteen (16) or fewer characters.</entry>
+                        </row>
+                        <row>
+                            <?dbfo row-height="5mm"?>
+                            <?dbhtml row-height="5mm"?>
+                            <entry spanname="notespan"/>
+                        </row>
+                        <row>
+                            <entry align="right">Property:</entry>
+                            <entry><literal>websvc.opensearch.longname</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Example Value:</entry>
+                            <entry><literal>websvc.opensearch.longname = ${dspace.name}</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Informational Note:</entry>
+                            <entry>A longer name up to 48 characters.</entry>
+                        </row>
+                        <row>
+                            <?dbfo row-height="5mm"?>
+                            <?dbhtml row-height="5mm"?>
+                            <entry spanname="notespan"/>
+                        </row>
+                        <row>
+                            <entry align="right">Property:</entry>
+                            <entry><literal>websvc.opensearch.description</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Example Value:</entry>
+                            <entry><literal>websvc.opensearch.description = ${dspace.name} DSpace repository</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Informational Note:</entry>
+                            <entry><literal>Brief service description</literal></entry>
+                        </row>
+                        <row>
+                            <?dbfo row-height="5mm"?>
+                            <?dbhtml row-height="5mm"?>
+                            <entry spanname="notespan"/>
+                        </row>
+                        <row>
+                            <entry align="right">Property:</entry>
+                            <entry><literal>websvc.opensearch.faviconurl</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Example Value:</entry>
+                            <entry><literal>websvc.opensearch.faviconurl = http://www.dspace.org/images/favicon.ico</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Informational Note:</entry>
+                            <entry>Location of favicon for service, if any. They must by 16 x 16 pixels. You can profide your own local favicon instead of the default.</entry>
+                        </row>
+                        <row>
+                            <?dbfo row-height="5mm"?>
+                            <?dbhtml row-height="5mm"?>
+                            <entry spanname="notespan"/>
+                        </row>
+                        <row>
+                            <entry align="right">Property:</entry>
+                            <entry><literal>websvc.opensearch.samplequery</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Example Value:</entry>
+                            <entry><literal>websvc.opensearch.samplequery = photosynthesis</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Informational Note:</entry>
+                            <entry>Sample query. This should return results. You can replace the sample query with search terms that should actually yield results in your repository.</entry>
+                        </row>
+                        <row>
+                            <?dbfo row-height="5mm"?>
+                            <?dbhtml row-height="5mm"?>
+                            <entry spanname="notespan"/>
+                        </row>
+                        <row>
+                            <entry align="right">Property:</entry>
+                            <entry><literal>websvc.opensearch.tags</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Example Value:</entry>
+                            <entry><literal>websc.opensearch.tags = IR DSpace</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Informational Note:</entry>
+                            <entry>Tags used to describe search service. </entry>
+                        </row>
+                        <row>
+                            <?dbfo row-height="5mm"?>
+                            <?dbhtml row-height="5mm"?>
+                            <entry spanname="notespan"/>
+                        </row>
+                        <row>
+                            <entry align="right">Property:</entry>
+                            <entry><literal>websvc.opensearch.formats</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Example Value:</entry>
+                            <entry><literal>websvc.opensearch.formats = html,atom,rss</literal></entry>
+                        </row>
+                        <row>
+                            <entry align="right">Informational Note:</entry>
+                            <entry>Result formats offered. Use one or more comma-separated from the list: html, atom, rss. Please note that html is requred for autodiscovery in browsers to function, and must be the first in the list if present.</entry>
                         </row>
                     </tbody></tgroup>
             </informaltable>
