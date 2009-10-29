@@ -880,8 +880,6 @@ public class WorkflowManager
                     Locale supportedLocale = I18nUtil.getEPersonLocale(epa[i]);
                     Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_task"));
                     email.addArgument(title);
-                    email.addArgument(coll.getMetadata("name"));
-                    email.addArgument(submitter);
 
                     ResourceBundle messages = ResourceBundle.getBundle("Messages", supportedLocale);
                     switch (wi.getState())
@@ -917,6 +915,7 @@ public class WorkflowManager
 		    }
                     email.addArgument(sb.toString());
                     
+                    email.addArgument(submitter);
                     email.addArgument(message);
                     email.addArgument(getMyDSpaceLink());
                     email.addRecipient(epa[i].getEmail());
