@@ -425,6 +425,7 @@ public class DSpaceCSV
             i++;
         }
         lines.add(csvLine);
+        counter++;
     }
 
     /**
@@ -546,7 +547,8 @@ public class DSpaceCSV
                         "2,Two authors,\"Lewis, Stuart||Bloggs, Joe\",Two people wrote this item",
                         "3,Three authors,\"Lewis, Stuart||Bloggs, Joe||Loaf, Meat\",Three people wrote this item",
                         "4,\"Two line\ntitle\",\"Lewis, Stuart\",abstract",
-                        "5,\"\"\"Embedded quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\""};
+                        "5,\"\"\"Embedded quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\"",
+                        "6,\"\"\"Unbalanced embedded\"\" quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\"",};
 
         // Write the string to a file
         String filename = "test.csv";
