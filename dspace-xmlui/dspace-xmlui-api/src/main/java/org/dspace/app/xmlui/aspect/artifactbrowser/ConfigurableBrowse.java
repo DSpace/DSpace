@@ -364,17 +364,21 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         String type = info.getBrowseIndex().getName();
 
         // Prepare a Map of query parameters required for all links
-        Map<String, String> queryParams = new HashMap<String, String>();
-        queryParams.putAll(params.getCommonParameters());
-        queryParams.putAll(params.getControlParameters());
+        Map<String, String> queryParamsGET = new HashMap<String, String>();
+        queryParamsGET.putAll(params.getCommonParametersEncoded());
+        queryParamsGET.putAll(params.getControlParameters());
+
+        Map<String, String> queryParamsPOST = new HashMap<String, String>();
+        queryParamsPOST.putAll(params.getCommonParameters());
+        queryParamsPOST.putAll(params.getControlParameters());
 
         // Navigation aid (really this is a poor version of pagination)
         Division jump = div.addInteractiveDivision("browse-navigation", BROWSE_URL_BASE,
                 Division.METHOD_POST, "secondary navigation");
 
         // Add all the query parameters as hidden fields on the form
-        for (String key : queryParams.keySet())
-            jump.addHidden(key).setValue(queryParams.get(key));
+        for (String key : queryParamsPOST.keySet())
+            jump.addHidden(key).setValue(queryParamsPOST.get(key));
 
         // If this is a date based browse, render the date navigation
         if (isSortedByDate(info))
@@ -426,13 +430,13 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             // Create a clickable list of the alphabet
             List jumpList = jump.addList("jump-list", List.TYPE_SIMPLE, "alphabet");
             
-            Map<String, String> zeroQuery = new HashMap<String, String>(queryParams);
+            Map<String, String> zeroQuery = new HashMap<String, String>(queryParamsGET);
             zeroQuery.put(BrowseParams.STARTS_WITH, "0");
             jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, zeroQuery), "0-9");
             
             for (char c = 'A'; c <= 'Z'; c++)
             {
-                Map<String, String> cQuery = new HashMap<String, String>(queryParams);
+                Map<String, String> cQuery = new HashMap<String, String>(queryParamsGET);
                 cQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
                 jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, cQuery), Character
                         .toString(c));
@@ -552,7 +556,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             return null;
 
         Map<String, String> parameters = new HashMap<String, String>();
-        parameters.putAll(params.getCommonParameters());
+        parameters.putAll(params.getCommonParametersEncoded());
         parameters.putAll(params.getControlParameters());
 
         if (info.hasPrevPage())
@@ -578,7 +582,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             return null;
 
         Map<String, String> parameters = new HashMap<String, String>();
-        parameters.putAll(params.getCommonParameters());
+        parameters.putAll(params.getCommonParametersEncoded());
         parameters.putAll(params.getControlParameters());
 
         if (info.hasNextPage())
@@ -946,25 +950,35 @@ class BrowseParams
     {
         Map<String, String> paramMap = new HashMap<String, String>();
 
-        paramMap.put(BrowseParams.TYPE, AbstractDSpaceTransformer.URLEncode(
-                scope.getBrowseIndex().getName()));
+        paramMap.put(BrowseParams.TYPE, scope.getBrowseIndex().getName());
 
         if (scope.getFilterValue() != null)
         {
             paramMap.put(scope.getAuthorityValue() != null?
-                    BrowseParams.FILTER_VALUE[1]:BrowseParams.FILTER_VALUE[0],
-                    AbstractDSpaceTransformer.URLEncode(
-                    scope.getFilterValue()));
+                    BrowseParams.FILTER_VALUE[1]:BrowseParams.FILTER_VALUE[0], scope.getFilterValue());
         }
 
         if (scope.getFilterValueLang() != null)
         {
-            paramMap.put(BrowseParams.FILTER_VALUE_LANG, AbstractDSpaceTransformer.URLEncode(
-                    scope.getFilterValueLang()));
+            paramMap.put(BrowseParams.FILTER_VALUE_LANG, scope.getFilterValueLang()); 
         }
 
         return paramMap;
     }
+
+    Map<String, String> getCommonParametersEncoded() throws UIException
+    {
+        Map<String, String> paramMap = getCommonParameters();
+	Map<String, String> encodedParamMap = new HashMap<String, String>();
+
+        for (String key: paramMap.keySet())
+        {
+            encodedParamMap.put(key, AbstractDSpaceTransformer.URLEncode(paramMap.get(key)));
+        }
+
+        return encodedParamMap;
+    }
+
 
     /*
      * Creates a Map of the browse control options (sort by / ordering / results

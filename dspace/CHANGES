@@ -136,8 +136,11 @@
 (Richard Rodgers)
  - [DS-324] Add OpenSearch support
 
- (Toni Prieto)
+(Toni Prieto)
  - [DS-356] Antispam for suggest item feature
+
+(Flavio Botelho)
+ - [DS-246] Fix configurable browse parameter encoding (XMLUI)
 
 1.5.2 final
 ===========
