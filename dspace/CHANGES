@@ -25,6 +25,9 @@
 (Andreas Schwander / Claudia Juergen)
  - [DS-337] A bug related with adding new -EPersons
  
+(Andreas Schwander / Kim Shepherd)
+ - [DS-331] Config property mismatch between dspace.cfg and DSpaceLocaleAction (XMLUI)
+
 (Ricardo Saraiva)
  - [DS-190] Portuguese (pt_PT) translation Messages.properties JSP-UI v1.5.2
 
