@@ -689,10 +689,14 @@
       </developer>
       <developer>
          <name>Stuart Lewis</name>
-         <email>stuartlewis at users.sourceforge.net</email>
+         <email>stuart at stuartlewis.com</email>
+         <url>http://stuartlewis.com/</url>
+         <organization>University of Auckland Library</organization>
+         <organizationUrl>http://www.library.auckland.ac.nz/</organizationUrl>
          <roles>
             <role>commiter</role>
          </roles>
+         <timezone>+12</timezone>
       </developer>
       <developer>
          <name>Gabriela Mircea</name>
@@ -724,10 +728,13 @@
       </developer>
       <developer>
           <name>Kim Shepherd</name>
-          <email>kshepherd at users.sourceforge.net</email>
+          <email>kims at waikato.ac.nz</email>
+          <organization>Library Consortium of New Zealand</organization>
+          <organizationUrl>http://www.lconz.ac.nz/</organizationUrl>
           <roles>
               <role>commiter</role>
           </roles>
+          <timezone>+12</timezone>
       </developer>
       <developer>
          <name>Larry Stone</name>
@@ -752,6 +759,13 @@
          <roles>
             <role>commiter</role>
          </roles>
+      </developer>
+      <developer>
+         <name>Jeffrey Trimble</name>
+         <email></email>
+         <roles>
+           <role>commiter</role>
+        </roles>
       </developer>
       <developer>
          <name>Mark H. Wood</name>
