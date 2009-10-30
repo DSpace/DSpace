@@ -205,6 +205,7 @@ function DSpaceChoicesLoad(form)
     var isClosed = form.elements['paramIsClosed'].value == 'true';
     var contextPath = form.elements['contextPath'].value;
     var fail = form.elements['paramFail'].value;
+    var valueInput = form.elements['paramValueInput'].value;
     var nonAuthority = "";
     if (form.elements['paramNonAuthority'] != null)
         nonAuthority = form.elements['paramNonAuthority'].value;
@@ -213,12 +214,25 @@ function DSpaceChoicesLoad(form)
     if (value.length == 0)
     {
         var of = window.opener.document.getElementById(formID);
-        var valueInput = form.elements['paramValueInput'].value;
         if (isName)
             value = makePersonName(of.elements[dspace_makeFieldInput(valueInput,'_last')].value,
                                    of.elements[dspace_makeFieldInput(valueInput,'_first')].value);
         else
             value = of.elements[valueInput].value;
+
+        // if this is a repeating input, clear the source value so that e.g.
+        // clicking "Next" on a submit-describe page will not *add* the proposed
+        // lookup text as a metadata value:
+        if (isRepeating)
+        {
+            if (isName)
+            {
+                of.elements[dspace_makeFieldInput(valueInput,'_last')].value = null;
+                of.elements[dspace_makeFieldInput(valueInput,'_first')].value = null;
+            }
+            else
+                of.elements[valueInput].value = null;
+        }
     }
 
     // start spinner
