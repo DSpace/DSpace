@@ -129,6 +129,7 @@
 (Graham Triggs)
  - [DS-299] Allow long values to be specified for the max upload request (> 2GB uploads)
  - [DS-344] Fix problem where apostrophe in email address would stop EPerson being selected
+ - [DS-359] Add alternate file appender for log4j
 
 (Mark Wood)
  - [DS-52] Factor out common webapp installation - ID: 2042160
