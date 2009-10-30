@@ -1,0 +1,571 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<chapter remap="h1">
+    <title><anchor id="docbook-sys_admin.html"/>DSpace System Documentation: System Administration</title>
+    <para>This chapter will document the Dspace System Administration for the Dspace Administrator.  It will have details on how individual components work, how they are configured (if need be) and how to run the compoents..</para>
+   
+  <section remap="h2">
+		<title><anchor id="docbook-sys_admin.html-structbuilder" xreflabel="Community and
+Collection Structure Importer"/>Community and Collection Structure Importer</title>
+		<para>This command-line tool gives you the ability to import a community and collection structure directly from a source XML file. It is executed as follows:</para>
+		<para>
+			<literal>[dspace]/bin/structure-builder -f [source xml] -o [output xml file] -e [administrator email]</literal>
+		</para>
+		<para>This will examine the contents of <literal>[source xml]</literal>, import the structure into DSpace while logged in as the supplied administrator, and then output the same structure to the output file, but including the handle for each imported community and collection as an attribute.</para>
+		<para>The source xml document needs to be in the following format:</para>
+		<screen>
+&lt;import_structure&gt;
+        &lt;community&gt;
+                &lt;name&gt;Community Name&lt;/name&gt;
+                &lt;description&gt;Descriptive text&lt;/description&gt;
+                &lt;intro&gt;Introductory text&lt;/intro&gt;
+                &lt;copyright&gt;Special copyright notice&lt;/copyright&gt;
+                &lt;sidebar&gt;Sidebar text&lt;/sidebar&gt;
+                    &lt;community&gt;
+                		&lt;name&gt;Sub Community Name&lt;/name&gt;
+                		&lt;community&gt; ...[ad infinitum]... 
+                		&lt;/community&gt;
+                	&lt;/community&gt;
+                			&lt;collection&gt;
+                        		&lt;name&gt;Collection Name&lt;/name&gt;
+                        		&lt;description&gt;Descriptive text&lt;/description&gt;
+                        		&lt;intro&gt;Introductory text&lt;/intro&gt;
+                        		&lt;copyright&gt;Special copyright notice&lt;/copyright&gt;
+                        		&lt;sidebar&gt;Sidebar text&lt;/sidebar&gt;
+                        		&lt;license&gt;Special licence&lt;/license&gt;
+                        		&lt;provenance&gt;Provenance information&lt;/provenance&gt;
+                			&lt;/collection&gt;
+         &lt;/community&gt;
+&lt;/import_structure&gt;
+</screen>
+		<para>The resulting output document will be as follows:</para>
+		<screen>
+&lt;import_structure&gt;
+        &lt;community identifier=&quot;123456789/1&quot;&gt;
+                &lt;name&gt;Community Name&lt;/name&gt;
+                &lt;description&gt;Descriptive
+	text&lt;/description&gt;
+                &lt;intro&gt;Introductory text&lt;/intro&gt;
+                &lt;copyright&gt;Special copyright
+	notice&lt;/copyright&gt;
+                &lt;sidebar&gt;Sidebar text&lt;/sidebar&gt;
+                &lt;community identifier=&quot;123456789/2&quot;&gt;
+                        &lt;name&gt;Sub Community Name&lt;/name&gt;
+                        &lt;community identifier=&quot;123456789/3&quot;&gt; ...[ad
+	infinitum]... &lt;/community&gt;
+                &lt;/community&gt;
+                &lt;collection identifier=&quot;123456789/4&quot;&gt;
+                        &lt;name&gt;Collection Name&lt;/name&gt;
+                        &lt;description&gt;Descriptive
+	text&lt;/description&gt;
+                        &lt;intro&gt;Introductory text&lt;/intro&gt;
+                        &lt;copyright&gt;Special copyright
+	notice&lt;/copyright&gt;
+                        &lt;sidebar&gt;Sidebar text&lt;/sidebar&gt;
+                        &lt;license&gt;Special
+	licence&lt;/license&gt;
+                        &lt;provenance&gt;Provenance
+	information&lt;/provenance&gt;
+                &lt;/collection&gt;
+        &lt;/community&gt;
+&lt;/import_structure&gt;
+</screen>
+		<section remap="h3">
+			<title>Limitation</title>
+			<itemizedlist>
+				<listitem>
+					<para> Currently this does not export community and collection structures, although it should only be a small modification to make it do so</para>
+				</listitem>
+			</itemizedlist>
+			<!-- end Struct Builder -->
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-sys_admin.html-packager" xreflabel="Package Importer and
+Exporter"/>Package Importer and Exporter</title>
+		<para>This command-line tool gives you access to the Packager plugins. It can <emphasis>ingest</emphasis> a package to create a new DSpace Item, or <emphasis>disseminate</emphasis> an Item as a package.</para>
+		<para>To see all the options, invoke it as:</para>
+		<screen>
+<emphasis> [dspace]</emphasis>/bin/packager --help
+</screen>
+		<para> This mode also displays a list of the names of package ingesters and disseminators that are available.</para>
+		<section remap="h3">
+			<title>Ingesting</title>
+			<para>To ingest a package from a file, give the command:</para>
+			<screen>
+<emphasis> [dspace]</emphasis>/bin/packager -e <emphasis> user</emphasis> -c <emphasis> handle</emphasis> -t <emphasis> packager</emphasis> <emphasis>
+	path</emphasis>
+</screen>
+			<para> Where <emphasis>user</emphasis> is the e-mail address of the E-Person under whose authority this runs; <emphasis>handle</emphasis> is the Handle of the collection into which the Item is added, <emphasis>packager</emphasis> is the plugin name of the package ingester to use, and <emphasis>path</emphasis> is the path to the file to ingest (or <literal>&quot;-&quot;</literal> to read from the standard input).</para>
+			<para> Here is an example that loads a PDF file with internal metadata as a package:</para>
+			<screen>
+/dspace/bin/packager -e florey@mit.edu -c 1721.2/13  -t pdf
+	thesis.pdf
+</screen>
+			<para>This example takes the result of retrieving a URL and ingests it:</para>
+			<screen>
+wget -O - http://alum.mit.edu/jarandom/my-thesis.pdf | \
+/dspace/bin/packager -e florey@mit.edu -c 1721.2/13  -t pdf -
+</screen>
+		</section>
+		<section remap="h3">
+			<title>Disseminating</title>
+			<para>To disseminate an Item as a package, give the command:</para>
+			<screen>
+<emphasis> [dspace]</emphasis>/bin/packager -e <emphasis> user</emphasis> -d -i <emphasis> handle</emphasis> -t   <emphasis> packager</emphasis> <emphasis>
+	path</emphasis>
+</screen>
+			<para> Where <emphasis>user</emphasis> is the e-mail address of the E-Person under whose authority this runs; <emphasis>handle</emphasis> is the Handle of the Item to disseminate; <emphasis>packager</emphasis> is the plugin name of the package disseminator to use; and <emphasis>path</emphasis> is the path to the file to create (or <literal>&quot;-&quot;</literal> to write to the standard output). This example writes an Item out as a METS package in the file &quot;454.zip&quot;: <screen>
+/dspace/bin/packager -e florey@mit.edu -d -i 1721.2/454 -t METS
+	454.zip
+</screen></para>
+		</section>
+		<section remap="h3">
+			<title>METS packages</title>
+			<para>DSpace 1.4 includes a package disseminator and matching ingester for the DSpace METS SIP (Submission Information Package) format. They were created to help end users prepare sets of digital resources and metadata for submission to the archive using well-defined standards such as <ulink url="http://www.loc.gov/standards/mets/">METS</ulink>, <ulink url="http://www.loc.gov/standards/mods/">MODS</ulink>, <ulink url="http://www.loc.gov/standards/premis/"
+					>and PREMIS</ulink>. The plugin name is <literal>METS</literal> by default, and it uses MODS for descriptive metadata.</para>
+			<para>The DSpace METS SIP profile is available at: <ulink url="http://www.dspace.org/standards/METS/SIP/profilev1p0/metsipv1p0.pdf">
+					<literal>http://www.dspace.org/standards/METS/SIP/profilev1p0/metsipv1p0.pdf</literal>
+				</ulink> .</para>
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-sys_admin.html-itemimporter" xreflabel="Item Importer and Exporter"/>Item Importer and Exporter</title>
+		<para>DSpace has a set of command line tools for importing and exporting items in batches, using the DSpace simple archive format. The tools are not terribly robust, but are useful and are easily modified. They also give a good demonstration of how to implement your own item importer if desired.</para>
+		<section remap="h3">
+			<title>DSpace simple archive format</title>
+			<para>The basic concept behind the DSpace&apos;s simple archive format is to create an archive, which is directory full of items, with a subdirectory per item. Each item directory contains a file for the item&apos;s descriptive metadata, and the files that make up the item.</para>
+			<screen>
+archive_directory/
+    item_000/
+        dublin_core.xml         -- qualified Dublin Core metadata for metadata fields belonging to the dc schema
+        metadata_[prefix].xml   -- metadata in another schema, the prefix is the name of the schema as registered with the metadata registry 
+        contents                -- text file containing one line per filename
+        file_1.doc              -- files to be added as bitstreams to the item
+        file_2.pdf
+    item_001/
+        dublin_core.xml
+        contents
+        file_1.png
+        ...
+</screen>
+			<para>The <literal>dublin_core.xml</literal> or <literal>metadata_[prefix].xml</literal>file has the following format, where each metadata element has it&apos;s own entry within a <literal>&lt;dcvalue&gt;</literal> tagset. There are currently three tag attributes available in the <literal>&lt;dcvalue&gt;</literal> tagset:</para>
+			<itemizedlist>
+				<listitem>
+					<para><literal>&lt;element&gt;</literal> - the Dublin Core element</para>
+				</listitem>
+				<listitem>
+					<para><literal>&lt;qualifier&gt;</literal> - the element&apos;s qualifier</para>
+				</listitem>
+				<listitem>
+					<para><literal>&lt;language&gt;</literal> - (optional)ISO language code for element</para>
+				</listitem>
+			</itemizedlist>
+			<screen>
+&lt;dublin_core&gt;
+    &lt;dcvalue element=&quot;title&quot; qualifier=&quot;none&quot;&gt;A Tale of Two Cities&lt;/dcvalue&gt;
+    &lt;dcvalue element=&quot;date&quot; qualifier=&quot;issued&quot;&gt;1990&lt;/dcvalue&gt;
+    &lt;dcvalue element=&quot;title&quot; qualifier=&quot;alternate&quot; language=&quot;fr&quot;&gt;
+                    J&apos;aime les Printemps&lt;/dcvalue&gt;
+&lt;/dublin_core&gt;
+
+</screen>
+			<para>(Note the optional language tag attribute which notifies the system that the optional title is in French.)</para>
+			<para>Every metadata field used, must be registered via the metadata registry of the DSpace instance first.</para>
+			<para>The <literal>contents</literal> file simply enumerates, one file per line, the bitstream file names. See the following example:</para>
+			<screen>
+        file_1.doc
+        file_2.pdf
+        license
+</screen>
+			<para> Please notice that the <emphasis>license</emphasis> is optional, and if you wish to have one included, you can place the file in the .../item_001/ directory, for example.</para>
+			<para>The bitstream name may optionally be followed by the sequence:</para>
+			<para>
+				<literal>\tbundle:bundlename</literal>
+			</para>
+			<para> where &apos;\t&apos; is the tab character and &apos;bundlename&apos; is replaced by the name of the bundle to which the bitstream should be added. If no bundle is specified, the bitstream will be added to the &apos;ORIGINAL&apos; bundle.</para>
+		</section>
+		<section remap="h3">
+			<title><anchor id="docbook-sys_admin.html-importingitems" xreflabel="Importing
+Items"/>Importing Items</title>
+			<para><emphasis role="bold">Note:</emphasis> Before running the item importer over items previously exported from a DSpace instance, please first refer to <link linkend="docbook-sys_admin.html-transferitem">Transferring Items Between DSpace Instances</link>.</para>
+			<para>The item importer is in <literal>org.dspace.app.itemimport.ItemImport</literal>, and is run with the <literal>import</literal> utility in the <literal>dspace/bin</literal> directory. Running it with -h gets the current command-line arguments. Another very important flag is the --test flag, which you can use with any command to simulate all of the actions it will perform without actually making any changes to your DSpace instance - very useful for validating your item directories before doing an import. In the importer&apos;s arguments you can use either the user&apos;s database ID or email address and the eperson ID, and the collection&apos;s database ID or handle as arguments. Currently with the importer you can add, remove, and replace items in a collection. If you specify more than one collection argument then the items will be imported to multiple collections, and the first collection specified becomes the &quot;owning&quot; collection. If there is an error and the import is aborted, there is a --resume flag that you can try to resume the import where you left off after you fix the error.</para>
+			<para>To add items to a collection with an EPerson as the submitter, type:</para>
+			<screen>
+[dspace]/bin/import --add --eperson=joe@user.com 
+	--collection=collectionID --source=items_dir --mapfile=mapfile
+</screen>
+			<para>(or by using the short form)</para>
+			<screen>
+[dspace]/bin/import -a -e joe@user.com  -c collectionID -s items_dir
+	-m mapfile
+</screen>
+			<para>which would then cycle through the archive directory&apos;s items, import them, and then generate a map file which stores the mapping of item directories to item handles. Save this map file! Using the map file you can then &apos;unimport&apos; with the command:</para>
+			<screen>
+[dspace]/bin/import --delete --mapfile=mapfile
+</screen>
+			<para>The imported items listed in the map file would then be deleted. If you wish to replace previously imported items, you can give the command:</para>
+			<screen>
+[dspace]/bin/import --replace --eperson=joe@user.com
+	--collection=collectID --source=items_dir --mapfile=mapfile
+</screen>
+			<para>Replacing items uses the map file to replace the old items and still retain their handles.</para>
+			<para>The importer usually bypasses any workflow assigned to a collection, but adding the --workflow option will route the imported items through the workflow system.</para>
+			<para>The importer also has a --test flag that will simulate the entire import process without actually doing the import. This is extremely useful for verifying your import files before doing the import step.</para>
+		</section>
+		<section remap="h3">
+			<title><anchor id="docbook-sys_admin.html-exportingitems"/>Exporting Items</title>
+			<para>The item exporter can export a single item or a collection of items, and creates a DSpace simple archive for each item to be exported. To export a collection&apos;s items you type:</para>
+			<screen>
+[dspace]/bin/export --type=COLLECTION --id=collID --dest=dest_dir
+	--number=seq_num
+</screen>
+			<para>The keyword <literal>COLLECTION</literal> means that you intend to export an entire collection. The ID can either be the database ID or the handle. The exporter will begin numbering the simple archives with the sequence number that you supply. To export a single item use the keyword <literal>ITEM</literal> and give the item ID as an argument:</para>
+			<screen>
+[dspace]/bin/export --type=ITEM --id=itemID --dest=dest_dir
+	--number=seq_num
+</screen>
+			<para>Each exported item will have an additional file in its directory, named &apos;handle&apos;. This will contain the handle that was assigned to the item, and this file will be read by the importer so that items exported and then imported to another machine will retain the item&apos;s original handle.</para>
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-sys_admin.html-transferitem" xreflabel="Transferring Items
+Between DSpace Instances"/>Transferring Items Between DSpace Instances</title>
+		<para>Where items are to be moved between DSpace instances (for example from a test DSpace into a production DSpace) the item exporter and item importer can be used in conjunction with a script to assist in this process.</para>
+		<para>After running the item exporter each <literal>dublin_core.xml</literal> file will contain metadata that was automatically added by DSpace. These fields are as follows:</para>
+		<itemizedlist>
+			<listitem>
+				<para> date.accessioned</para>
+			</listitem>
+			<listitem>
+				<para> date.available</para>
+			</listitem>
+			<listitem>
+				<para> date.issued</para>
+			</listitem>
+			<listitem>
+				<para> description.provenance</para>
+			</listitem>
+			<listitem>
+				<para> format.extent</para>
+			</listitem>
+			<listitem>
+				<para> format.mimetype</para>
+			</listitem>
+			<listitem>
+				<para> identifier.uri</para>
+			</listitem>
+		</itemizedlist>
+		<para>In order to avoid duplication of this metadata, run</para>
+		<para>
+			<literal>dspace_migrate &lt;exported item directory&gt;</literal>
+		</para>
+		<para>prior to running the item importer. This will remove the above metadata items, except for date.issued - if the item has been published or publicly distributed before and identifier.uri - if it is not the handle, from the <literal>dublin_core.xml</literal> file and remove all <literal>handle</literal> files. It will then be safe to run the item exporter. Use</para>
+		<para>
+			<literal>dspace_migrate --help</literal>
+		</para>
+		<para>for instructions on use of the script.</para>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-sys_admin.html-registration" xreflabel="Registering (Not Importing) Bitstreams"/>Registering (Not Importing) Bitstreams</title>
+		<para>Registration is an alternate means of incorporating items, their metadata, and their bitstreams into DSpace by taking advantage of the bitstreams already being in storage accessible to DSpace. An example might be that there is a repository for existing digital assets. Rather than using the normal <link linkend="docbook-functional.html-ingest">interactive ingest process</link> or the <link linkend="docbook-functional.html-importexport">batch import</link> to furnish DSpace the metadata and to upload bitstreams, registration provides DSpace the metadata and the location of the bitstreams. DSpace uses a variation of the import tool to accomplish registration.</para>
+		<section remap="h3">
+			<title>Accessible Storage</title>
+			<para>To register an item its bitstreams must reside on storage accessible to DSpace and therefore referenced by an asset store number in <literal>dspace.cfg</literal>. The configuration file <literal>dspace.cfg</literal> establishes one or more asset stores through the use of an integer asset store number. This number relates to a directory in the DSpace host&apos;s file system or a set of SRB account parameters. This asset store number is described in <link
+					linkend="docbook-configure.html-dspace-cfg">The <literal>dspace.cfg</literal> Configuration Properties File</link> section and in the <literal>dspace.cfg</literal> file itself. The asset store number(s) used for registered items should generally not be the value of the <literal>assetstore.incoming</literal> property since it is unlikely that that you will want to mix the bitstreams of normally ingested and imported items and registered items.</para>
+		</section>
+		<section remap="h3">
+			<title>Registering Items Using the Item Importer</title>
+			<para>DSpace uses the same import tool that is used for batch import except that several variations are employed to support registration. The discussion that follows assumes familiarity with the import tool.</para>
+			<para>The archive format for registration does not include the actual content files (bitstreams) being registered. The format is however a directory full of items to be registered, with a subdirectory per item. Each item directory contains a file for the item&apos;s descriptive metadata (<literal>dublin_core.xml</literal>) and a file listing the item&apos;s content files (<literal>contents</literal>), but not the actual content files themselves.</para>
+			<para>The <literal>dublin_core.xml</literal> file for item registration is exactly the same as for regular item import.</para>
+			<para>The <literal>contents</literal> file, like that for regular item import, lists the item&apos;s content files, one content file per line, but each line has the one of the following formats:</para>
+			<screen>
+-r -s n -f filepath
+-r -s n -f filepath\tbundle:bundlename
+-r -s n -f filepath\tbundle:bundlename\tpermissions: -[r|w] &apos;group
+	name&apos;
+-r -s n -f filepath\tbundle:bundlename\tpermissions: -[r|w] &apos;group
+	name&apos;\tdescription: some text
+</screen>
+			<para>where</para>
+			<itemizedlist>
+				<listitem>
+					<para><literal>-r</literal> indicates this is a file to be registered</para>
+				</listitem>
+				<listitem>
+					<para><literal>-s n</literal> indicates the asset store number (<literal>n</literal>)</para>
+				</listitem>
+				<listitem>
+					<para><literal>-f filepath</literal> indicates the path and name of the content file to be registered (filepath)</para>
+				</listitem>
+				<listitem>
+					<para><literal>\t</literal> is a tab character</para>
+				</listitem>
+				<listitem>
+					<para><literal>bundle:bundlename</literal> is an optional bundle name</para>
+				</listitem>
+				<listitem>
+					<para><literal>permissions: -[r|w] &apos;group name&apos;</literal> is an optional read or write permission that can be attached to the bitstream</para>
+				</listitem>
+				<listitem>
+					<para><literal>description: some text</literal> is an optional description field to add to the file</para>
+				</listitem>
+			</itemizedlist>
+			<para>The bundle, that is everything after the filepath, is optional and is normally not used.</para>
+			<para>The command line for registration is just like the one for regular import:</para>
+			<screen>
+dsrun org.dspace.app.itemimport.ItemImport --add
+	--eperson=joe@user.com  --collection=collectionID --source=items_dir
+	--mapfile=mapfile
+</screen>
+			<para>(or by using the short form)</para>
+			<screen>
+dsrun org.dspace.app.itemimport.ItemImport -a -e joe@user.com  -c
+	collectionID -s items_dir -m mapfile
+</screen>
+			<para>The <literal>--workflow</literal> and <literal>--test</literal> flags will function as described in <link linkend="docbook-sys_admin.html-importingitems">Importing Items</link>.</para>
+			<para>The <literal>--delete</literal> flag will function as described in <link linkend="docbook-sys_admin.html-importingitems">Importing Items</link> but the registered content files will not be removed from storage. See <link linkend="docbook-sys_admin.html-deletingregistereditems">Deleting Registered Items</link>.</para>
+			<para>The <literal>--replace</literal> flag will function as described in <link linkend="docbook-sys_admin.html-importingitems">Importing Items</link> but care should be taken to consider different cases and implications. With old items and new items being registered or ingested normally, there are four combinations or cases to consider. Foremost, an old registered item deleted from DSpace using <literal>--replace</literal> will not be removed from the storage. See <link
+					linkend="docbook-sys_admin.html-deletingregistereditems">Deleting Registered Items</link>. where is resides. A new item added to DSpace using <literal>--replace</literal> will be ingested normally or will be registered depending on whether or not it is marked in the <literal>contents</literal> files with the -r.</para>
+		</section>
+		<section remap="h3">
+			<title>Internal Identification and Retrieval of Registered Items</title>
+			<para>Once an item has been registered, superficially it is indistinguishable from items ingested interactively or by batch import. But internally there are some differences:</para>
+			<para>First, the randomly generated internal ID is not used because DSpace does not control the file path and name of the bitstream. Instead, the file path and name are that specified in the <literal>contents</literal> file.</para>
+			<para>Second, the <literal>store_number</literal> column of the bitstream database row contains the asset store number specified in the <literal>contents</literal> file.</para>
+			<para>Third, the <literal>internal_id</literal> column of the bitstream database row contains a leading flag (<literal>-R</literal>) followed by the registered file path and name. For example, <literal>-Rfilepath</literal> where <literal>filepath</literal> is the file path and name relative to the asset store corresponding to the asset store number. The asset store could be traditional storage in the DSpace server&apos;s file system or an SRB account.</para>
+			<para>Fourth, an MD5 checksum is calculated by reading the registered file if it is in local storage. If the registerd file is in remote storage (say, SRB) a checksum is calulated on just the file name! This is an efficiency choice since registering a large number of large files that are in SRB would consume substantial network resources and time. A future option could be to have an SRB proxy process calculate MD5s and store them in SRB&apos;s metadata catalog (MCAT) for rapid retrieval. SRB offers such an option but it&apos;s not yet in production release.</para>
+			<para>Registered items and their bitstreams can be retrieved transparently just like normally ingested items.</para>
+		</section>
+		<section remap="h3">
+			<title>Exporting Registered Items</title>
+			<para>Registered items may be exported as described in <link linkend="docbook-sys_admin.html-exportingitems"
+				>Exporting Items</link>. If so, the export directory will contain actual copies of the files being exported but the lines in the contents file will flag the files as registered. This means that if DSpace items are &quot;round tripped&quot; (see Transferring Items Between DSpace Instances) using the exporter and importer, the registered files in the export directory will again registered in DSpace instead of being uploaded and ingested normally.</para>
+		</section>
+		<section remap="h3">
+			<title>METS Export of Registered Items</title>
+			<para>The <link linkend="docbook-sys_admin.html-mets">METS Export Tool</link> can also be used but note the cautions described in that section and note that MD5 values for items in remote storage are actually MD5 values on just the file name.</para>
+		</section>
+		<section remap="h3">
+			<title><anchor id="docbook-sys_admin.html-deletingregistereditems"/>Deleting Registered Items</title>
+			<para>If a registered item is deleted from DSpace, either interactively or by using the <literal>--delete</literal> or <literal>--replace</literal> flags described in <link linkend="docbook-sys_admin.html-importingitems">Importing Items</link>, the item will disappear from DSpace but it&apos;s registered content files will remain in place just as they were prior to registration. Bitstreams not registered but added by DSpace as part of registration, such as <literal
+					>license.txt</literal> files, will be deleted.</para>
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-sys_admin.html-mets" xreflabel="METS Tools"/>METS Tools</title>
+		<para>The experimental (incomplete) METS export tool writes DSpace items to a filesystem with the metadata held in a more standard format based on METS.</para>
+		<section remap="h3">
+			<title>The Export Tool</title>
+			<para>This tool is obsolete, and does not export a complete AIP. It's use is strongly deprecated.</para>
+			<para>The METS export tool is invoked via the command line like this:</para>
+			<screen>
+<emphasis> [dspace]</emphasis>/bin/dsrun org.dspace.app.mets.METSExport
+	--help
+</screen>
+			<para>The tool can export an individual item, the items within a given collection, or everything in the DSpace instance. To export an individual item, use:</para>
+			<screen>
+<emphasis> [dspace]</emphasis>/bin/dsrun org.dspace.app.mets.METSExport --item <emphasis>
+	[handle]</emphasis>
+</screen>
+			<para>To export the items in collection <literal>hdl:123.456/789</literal>, use:</para>
+			<screen>
+<emphasis> [dspace]</emphasis>/bin/dsrun org.dspace.app.mets.METSExport --collection
+	hdl:123.456/789
+</screen>
+			<para>To export all the items DSpace, use:</para>
+			<screen>
+<emphasis> [dspace]</emphasis>/bin/dsrun org.dspace.app.mets.METSExport
+	--all
+</screen>
+			<para>With any of the above forms, you can specify the base directory into which the items will be exported, using <literal>--destination [directory]</literal>. If this parameter is omitted, the current directory is used.</para>
+		</section>
+		<section remap="h3">
+			<title>The AIP Format</title>
+			<para>Note that this tool is deprecated, and the output format is not a true AIP</para>
+			<para>Each exported item is written to a separate directory, created under the base directory specified in the command-line arguments, or in the current directory if <literal>--destination</literal> is omitted. The name of each directory is the Handle, URL-encoded so that the directory name is &apos;legal&apos;.</para>
+			<para>Within each item directory is a <literal>mets.xml</literal> file which contains the METS-encoded metadata for the item. Bitstreams in the item are also stored in the directory. Their filenames are their MD5 checksums, firstly for easy integrity checking, and also to avoid any problems with &apos;special characters&apos; in the filenames that were legal on the original filing system they came from but are illegal in the server filing system. The <literal>mets.xml</literal> file includes XLink pointers to these bitstream files.</para>
+			<para>An example AIP might look like this:</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						<literal>hdl%3A123456789%2F8/</literal>
+						<itemizedlist>
+							<listitem>
+								<para><literal>mets.xml</literal> -- METS metadata</para>
+							</listitem>
+							<listitem>
+								<para><literal>184BE84F293342</literal> -- bitstream</para>
+							</listitem>
+							<listitem>
+								<para>
+									<literal>3F9AD0389CB821</literal>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<literal>135FB82113C32D</literal>
+								</para>
+							</listitem>
+						</itemizedlist></para>
+				</listitem>
+			</itemizedlist>
+			<para>The contents of the METS in the <literal>mets.xml</literal> file are as follows:</para>
+			<itemizedlist>
+				<listitem>
+					<para> A <literal>dmdSec</literal> (descriptive metadata section) containing the item&apos;s metadata in <ulink url="http://www.loc.gov/standards/mods/">Metadata Object Description Schema (MODS)</ulink> XML. The Dublin Core descriptive metadata is mapped to MODS since there is no official qualified Dublin Core XML schema in existence as of yet, and the Library Application Profile of DC that DSpace uses includes some qualifiers that are not part of the <ulink
+							url="http://dublincore.org/documents/dcmi-terms/">DCMI Metadata Terms</ulink>.</para>
+				</listitem>
+				<listitem>
+					<para> An <literal>amdSec</literal> (administrative metadata section), which contains the a rights metadata element, which in turn contains the base64-encoded deposit license (the license the submitter granted as part of the submission process).</para>
+				</listitem>
+				<listitem>
+					<para> A <literal>fileSec</literal> containing a list of the bitstreams in the item. Each bundle constitutes a <literal>fileGrp</literal>. Each bitstream is represented by a <literal>file</literal> element, which contains an <literal>FLocat</literal> element with a simple XLink to the bitstream in the same directory as the <literal>mets.xml</literal> file. The <literal>file</literal> attributes consist of most of the basic technical metadata for the bitstream. Additionally, for those bitstreams that are thumbnails or text extracted from another bitstream in the item, those &apos;derived&apos; bitstreams have the same <literal>GROUPID</literal> as the bitstream they were derived from, in order that clients understand that there is a relationship.</para>
+					<para>The <literal>OWNERID</literal> of each <literal>file</literal> is the <link linkend="docbook-functional.html-bitstream_ids">&apos;persistent&apos; bitstream identifier</link> assigned by the DSpace instance. The <literal>ID</literal> and <literal
+							>GROUPID</literal> attributes consist of the item&apos;s Handle, together with the bitstream&apos;s sequence ID, which underscores used in place of dots and slashes. For example, a bitstream with sequence ID 24, in the item <literal>hdl:123.456/789</literal> will have the <literal>ID</literal><literal>123_456_789_24</literal>. This is because <literal>ID</literal> and <literal>GROUPID</literal> attributes must be of type <literal>xsd:id</literal>.</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title>Limitations</title>
+			<itemizedlist>
+				<listitem>
+					<para> No corresponding import tool yet</para>
+				</listitem>
+				<listitem>
+					<para> No <literal>structmap</literal> section</para>
+				</listitem>
+				<listitem>
+					<para> Some technical metadata not written, e.g. the primary bitstream in a bundle, original filenames or descriptions.</para>
+				</listitem>
+				<listitem>
+					<para> Only the MIME type is stored, not the (finer grained) bitstream format.</para>
+				</listitem>
+				<listitem>
+					<para> Dublin Core to MODS mapping is very simple, probably needs verification</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-sys_admin.html-mediafilters" xreflabel="MediaFilters:
+Transforming DSpace Content"/>MediaFilters: Transforming DSpace Content</title>
+		<para>DSpace can apply filters to content/bitstreams, creating new content. Filters are included that extract text for <emphasis role="bold">full-text searching</emphasis>, and create <emphasis role="bold">thumbnails</emphasis> for items that contain images. The media filters are controlled by the <literal>MediaFilterManager</literal> which traverses the asset store, invoking the <literal>MediaFilter</literal> or <literal
+				>FormatFilter</literal> classes on bitstreams. The media filter plugin configuration <literal>filter.plugins</literal> in <literal>dspace.cfg</literal> contains a list of all enabled media/format filter plugins (see <link linkend="docbook-configure.html-mediafilters">Configuring Media Filters</link> for more information). The media filter system is intended to be run from the command line (or regularly as a cron task):</para>
+		<screen>
+[dspace]/bin/filter-media
+</screen>
+		<para>With no options, this traverses the asset store, applying media filters to bitstreams, and skipping bitstreams that have already been filtered.</para>
+		<para>
+			<emphasis role="bold">Available Command-Line Options:</emphasis>
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para><emphasis role="bold">Help</emphasis> : <literal>[dspace]/bin/filter-media -h</literal></para>
+				<itemizedlist>
+					<listitem>
+						<para> Display help message describing all command-line options.</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Force mode</emphasis> : <literal>[dspace]/bin/filter-media -f</literal></para>
+				<itemizedlist>
+					<listitem>
+						<para> Apply filters to ALL bitstreams, even if they&apos;ve already been filtered. If they&apos;ve already been filtered, the previously filtered content is overwritten.</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Identifier mode</emphasis> : <literal>[dspace]/bin/filter-media -i 123456789/2</literal></para>
+				<itemizedlist>
+					<listitem>
+						<para> Restrict processing to the community, collection, or item named by the identifier - by default, all bitstreams of all items in the repository are processed. The identifier must be a Handle, not a DB key. This option may be combined with any other option.</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Maximum mode</emphasis> : <literal>[dspace]/bin/filter-media -m 1000</literal></para>
+				<itemizedlist>
+					<listitem>
+						<para> Suspend operation after the specified maximum number of items have been processed - by default, no limit exists. This option may be combined with any other option.</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">No-Index mode</emphasis> : <literal>[dspace]/bin/filter-media -n</literal></para>
+				<itemizedlist>
+					<listitem>
+						<para> Suppress index creation - by default, a new search index is created for full-text searching. This option suppresses index creation if you intend to run <literal>index-update</literal> elsewhere.</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Plugin mode</emphasis> : <literal>[dspace]/bin/filter-media -p &quot;PDF Text Extractor&quot;,&quot;Word Text Extractor&quot;</literal></para>
+				<itemizedlist>
+					<listitem>
+						<para> Apply ONLY the filter plugin(s) listed (separated by commas). By default all named filters listed in the <literal>filter.plugins</literal> field of <literal>dspace.cfg</literal> are applied. This option may be combined with any other option. <emphasis>WARNING:</emphasis> multiple plugin names must be separated by a comma (i.e. &apos;,&apos;) and NOT a comma followed by a space (i.e. &apos;, &apos;).</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Skip mode</emphasis> : <literal>[dspace]/bin/filter-media -s 123456789/9,123456789/100</literal></para>
+				<itemizedlist>
+					<listitem>
+						<para> SKIP the listed identifiers (separated by commas) during processing. The identifiers must be Handles (not DB Keys). They may refer to items, collections or communities which should be skipped. This option may be combined with any other option. <emphasis>WARNING:</emphasis> multiple identifiers must be separated by a comma (i.e. <literal>&apos;,&apos;</literal>) and NOT a comma followed by a space (i.e. <literal>&apos;, &apos;</literal>).</para>
+					</listitem>
+					<listitem>
+						<para> NOTE: If you have a large number of identifiers to skip, you may maintain this comma-separated list within a separate file (e.g. <literal>filter-skiplist.txt</literal>). Use the following format to call the program. <emphasis>Please note the use of the "grave" or "tick" (<literal>`</literal>) symbol and do not use the single quotation. </emphasis></para>
+						<itemizedlist>
+							<listitem>
+								<para>
+									<literal>[dspace]/bin/filter-media -s `less filter-skiplist.txt`</literal>
+								</para>
+							</listitem>
+						</itemizedlist>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Verbose mode</emphasis> : <literal>[dspace]/bin/filter-media -v</literal></para>
+				<itemizedlist>
+					<listitem>
+						<para> Verbose mode - print all extracted text and other filter details to STDOUT.</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+		</itemizedlist>
+		<para>Adding your own filters is done by creating a class which <literal>implements</literal> the <literal>org.dspace.app.mediafilter.FormatFilter</literal> interface. See the <link linkend="docbook-configure.html-newfilter"
+			>Creating a new Media Filter</link> topic and comments in the source file FormatFilter.java for more information. In theory filters could be implemented in any programming language (C, Perl, etc.) However, they need to be invoked by the Java code in the Media Filter class that you create.</para>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-sys_admin.html-filiator" xreflabel="Sub-Community Management"/>Sub-Community Management</title>
+		<para>DSpace provides an administrative tool - &apos;CommunityFiliator&apos; - for managing community sub-structure. Normally this structure seldom changes, but prior to the 1.2 release sub-communities were not supported, so this tool could be used to place existing pre-1.2 communities into a hierarchy. It has two operations, either establishing a community to sub-community relationship, or dis-establishing an existing relationship.</para>
+		<para>The familiar parent/child metaphor can be used to explain how it works. Every community in DSpace can be either a &apos;parent&apos; community - meaning it has at least one sub-community, or a &apos;child&apos; community - meaning it is a sub-community of another community, or both or neither. In these terms, an &apos;orphan&apos; is a community that lacks a parent (although it can be a parent); &apos;orphans&apos; are referred to as &apos;top-level&apos; communities in the DSpace user-interface, since there is no parent community &apos;above&apos; them. The first operation - establishing a parent/child relationship - can take place between any community and an orphan. The second operation - removing a parent/child relationship - will make the child an orphan.</para>
+		<para>Using the dsrun utility in the dspace/bin directory, the establish operation looks like this:</para>
+		<screen>
+dsrun org.dspace.administer.CommunityFiliator --set --parent=parentID
+	--child=childID
+</screen>
+		<para>(or using the short form)</para>
+		<screen>
+dsrun org.dspace.administer.CommunityFiliator -s -p parentID -c
+	childID
+</screen>
+		<para>where &apos;-s&apos; or &apos;--set&apos; means establish a relationship whereby the community identified by the &apos;-p&apos; parameter becomes the parent of the community identified by the &apos;-c&apos; parameter. Both the &apos;parentID&apos; and &apos;childID&apos; values may be handles or database IDs.</para>
+		<para>The reverse operation looks like this:</para>
+		<screen>
+dsrun org.dspace.administer.CommunityFiliator --remove
+	--parent=parentID --child=childID
+</screen>
+		<para>(or using the short form)</para>
+		<screen>
+dsrun org.dspace.administer.CommunityFiliator -r -p parentID -c
+	childID
+</screen>
+		<para>where &apos;-r&apos; or &apos;--remove&apos; means dis-establish the current relationship in which the community identified by &apos;parentID&apos; is the parent of the community identified by &apos;childID&apos;. The outcome will be that the &apos;childID&apos; community will become an orphan, i.e. a top-level community.</para>
+		<para>If the required constraints of operation are violated, an error message will appear explaining the problem, and no change will be made. An example in a removal operation, where the stated child community does not have the stated parent community as its parent: &quot;Error, child community not a child of parent community&quot;.</para>
+		<para>It is possible to effect arbitrary changes to the community hierarchy by chaining the basic operations together. For example, to move a child community from one parent to another, simply perform a &apos;remove&apos; from its current parent (which will leave it an orphan), followed by a &apos;set&apos; to its new parent.</para>
+		<para>It is important to understand that when any operation is performed, all the sub-structure of the child community follows it. Thus, if a child has itself children (sub-communities), or collections, they will all move with it to its new &apos;location&apos; in the community tree.</para>
+	</section>
+ </chapter>
