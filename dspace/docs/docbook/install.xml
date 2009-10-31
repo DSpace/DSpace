@@ -2,6 +2,32 @@
 <chapter remap="h1">
     <title><anchor id="docbook-install.html"/>DSpace System Documentation: Installation</title>
     <section remap="h2">
+        <title><anchor id="docbook-install.html-impatient" xreflabel="Impatient Install"/>For the Impatient</title>
+        <para>Since some users might want to get their test version up and running as fast as possible, offered below is an <emphasis role="italic">unsupported</emphasis> outline of getting space to run quickly.</para>
+        <warning>
+            <para>Only experienced unix admins should even attempt the following without going to Section 1.3.</para>
+        </warning>
+        <para>
+            <screen>
+useradd -m dspace
+gunzip -c dspace-1.x-src-release.tar.gz | tar -xf -
+createuser -U postgres -d -A -P dspace
+created -U dspace -E UNICODE dspace
+cd [dspace-source]/dspace/config
+vi dspace.cfg
+mkdir <emphasis>[dspace]</emphasis>
+chown dspace [dspace]
+su - dspace
+cd [dspace-source]/dspace
+mvn package
+cd [dspace-source]/dspace/target/dspace-&lt;version&gt;-build.dir
+ant fresh_install
+cp -r [dspace]/webapps/* [tomcat]/webapps
+/etc/init.d/tomcat start
+[dspace]/bin/create-administrator</screen>
+        </para>
+    </section>
+    <section remap="h2">
         <title><anchor id="docbook-install.html-prerequisite" xreflabel="Prerequisite Software"/>Prerequisite Software</title>
         <para>The list below describes the third-party components and tools you&apos;ll need to run a DSpace server. These are just guidelines. Since DSpace is built on open source, standards-based tools, there are numerous other possibilities and setups.</para>
         <para>Also, please note that the configuration and installation guidelines relating to a particular tool below are here for convenience. You should refer to the documentation for each individual component for complete and up-to-date details. Many of the tools are updated on a frequent basis, and the guidelines below may become out of date.</para>
@@ -577,7 +603,8 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
                     <para>This tells the Handle server to get information about individual Handles from the DSpace code.</para>
                 </listitem>
                 <listitem>
-                    <para>Once the configuration file has been generated, you will need to go to <ulink url="http://hdl.handle.net/4263537/5014">http://hdl.handle.net/4263537/5014</ulink> to upload the generated sitebndl.zip file. The upload page will ask you for your contact information. An administrator will then create the naming authority/prefix on the root service (known as the Global Handle Registry), and notify you when this has been completed. You will not be able to continue the handle server installation until you receive further information concerning your naming authority.</para>
+                    <para>Once the configuration file has been generated, you will need to go to <ulink url="http://hdl.handle.net/4263537/5014"
+                        >http://hdl.handle.net/4263537/5014</ulink> to upload the generated sitebndl.zip file. The upload page will ask you for your contact information. An administrator will then create the naming authority/prefix on the root service (known as the Global Handle Registry), and notify you when this has been completed. You will not be able to continue the handle server installation until you receive further information concerning your naming authority.</para>
                 </listitem>
                 <listitem>
                     <para>When CNRI has sent you your naming authority prefix, you will need to edit the <literal>config.dct</literal> file. The file will be found in <literal>/[dspace]/handle-server</literal>. </para>
