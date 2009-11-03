@@ -107,6 +107,7 @@ function doRegister()
                 // The user attempted to register with an email address that all ready exists then they clicked
                 // the "I forgot my password" button. In this case, we send them a forgot password token.
                 AccountManager.sendForgotPasswordInfo(getDSContext(),email);
+                getDSContext().commit();
 
                 cocoon.sendPage("forgot/verify", {"email":email});
                 return;
@@ -130,6 +131,7 @@ function doRegister()
                 {
                     // May throw the AddressException or a varity of SMTP errors.
                     AccountManager.sendRegistrationInfo(getDSContext(),email);
+                    getDSContext().commit();
                 } 
                 catch (error) 
                 {
@@ -191,6 +193,7 @@ function doRegister()
         // Log the newly created user in.
         AuthenticationUtil.logIn(getObjectModel(),eperson);
         AccountManager.deleteToken(getDSContext(), token);
+        getDSContext().commit();
         
         cocoon.sendPage("register/finished");
         return;
@@ -232,6 +235,7 @@ function doForgotPassword()
             // An Eperson was found for the given email, so use the forgot password 
             // mechanism. This may throw a AddressException if the email is ill-formed.
             AccountManager.sendForgotPasswordInfo(getDSContext(),email);
+            getDSContext().commit();
         } while (errors.length > 0)
         
         cocoon.sendPage("forgot/verify", {"email":email});
@@ -275,6 +279,7 @@ function doForgotPassword()
         // Log the user in and remove the token.
         AuthenticationUtil.logIn(getObjectModel(),eperson);
         AccountManager.deleteToken(getDSContext(), token);
+        getDSContext().commit();
 
         cocoon.sendPage("forgot/finished");
     }

@@ -130,19 +130,31 @@ public class ContextUtil
      * @param request
      *            The request object 
      */
-    public static void closeContext(HttpServletRequest request) throws ServletException
+    public static void completeContext(HttpServletRequest request) throws ServletException
     {
     	Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
 
     	if (context != null && context.isValid())
     	{
-    		try {
-    			context.complete();
-    		} catch (SQLException sqle) {
-    			throw new ServletException("Unable to close DSpace context.",sqle);
-    		}
+   			try
+			{
+				context.complete();
+			}
+			catch (SQLException e)
+			{
+				throw new ServletException(e);
+			}
     	}
-
     }
+
+	public static void abortContext(HttpServletRequest request)
+	{
+    	Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
+
+    	if (context != null && context.isValid())
+    	{
+   			context.abort();
+    	}
+	}
 
 }

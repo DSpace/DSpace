@@ -520,6 +520,8 @@ public class FlowItemUtils
 			bitstream.update();
 			item.update();
 			
+			context.commit();
+			
 			result.setContinue(true);
 	        result.setOutcome(true);
 	        result.setMessage(T_bitstream_added); 
@@ -660,6 +662,8 @@ public class FlowItemUtils
 		}
 		
 		item.update();
+		
+		context.commit();
 		
 		result.setContinue(true);
 		result.setOutcome(true);
