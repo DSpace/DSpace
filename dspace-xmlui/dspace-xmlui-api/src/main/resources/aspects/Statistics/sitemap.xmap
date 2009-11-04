@@ -15,6 +15,7 @@
 	<map:components>
 		<map:transformers>
 			<map:transformer name="StatisticsTransformer" src="org.dspace.app.xmlui.aspect.statistics.StatisticsTransformer"/>
+			<map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.statistics.Navigation"/>
         </map:transformers>
 		<map:matchers default="wildcard">
 			<map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
@@ -27,23 +28,15 @@
 
 			<map:generate/>
 
-            <!-- Handle specific features -->
-			<map:match pattern="handle/*/**">
-				<!-- Community, Collection, and Item Viewers -->
-				<map:match pattern="handle/*/*">
-					<map:match type="HandleAuthorizedMatcher" pattern="READ">
-						<map:match type="HandleTypeMatcher" pattern="community">
-                            <map:transform type="StatisticsTransformer"/>
-                        </map:match>
-						<map:match type="HandleTypeMatcher" pattern="collection">
-                            <map:transform type="StatisticsTransformer"/>
-                        </map:match>
-						<map:match type="HandleTypeMatcher" pattern="item">
-							<map:transform type="StatisticsTransformer"/>
-                        </map:match>
-					</map:match>
-				</map:match>
-            </map:match> <!-- End match handle/*/** -->
+            <map:transform type="Navigation"/>
+
+            <!--Match our statistics-->
+            <map:match pattern="handle/*/*/statistics">
+                <map:transform type="StatisticsTransformer">
+                    <!--Pass along our handle-->
+                    <map:parameter name="handle" value="{1}/{2}" />       
+                </map:transform>
+            </map:match>
 
             <map:match pattern="">
                 <map:transform type="StatisticsTransformer"/>
