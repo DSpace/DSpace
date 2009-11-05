@@ -97,6 +97,8 @@ public class MediaFilterManager
 
     public static boolean isVerbose = false; // default to not verbose
 
+    public static boolean isQuiet = false; // default is noisy
+
     public static boolean isForce = false; // default to not forced
     
     public static String identifier = null; // object scope limiter
@@ -131,6 +133,8 @@ public class MediaFilterManager
         
         options.addOption("v", "verbose", false,
                 "print all extracted text and other details to STDOUT");
+        options.addOption("q", "quiet", false,
+                "do not print anything except in the event of errors.");
         options.addOption("f", "force", false,
                 "force all bitstreams to be processed");
         options.addOption("n", "noindex", false,
@@ -189,6 +193,8 @@ public class MediaFilterManager
         {
             isVerbose = true;
         }
+
+        isQuiet = line.hasOption('q');
 
         if (line.hasOption('n'))
         {
@@ -382,6 +388,7 @@ public class MediaFilterManager
             // update search index?
             if (updateIndex)
             {
+                if (!isQuiet)
                 System.out.println("Updating search index:");
                 DSIndexer.updateIndex(c);
             }
@@ -657,6 +664,7 @@ public class MediaFilterManager
         // if exists and overwrite = false, exit
         if (!overWrite && (existingBitstream != null))
         {
+            if (!isQuiet)
             System.out.println("SKIPPED: bitstream " + source.getID()
                     + " (item: " + item.getHandle() + ") because '" + newName + "' already exists");
 
@@ -666,6 +674,7 @@ public class MediaFilterManager
         InputStream destStream = formatFilter.getDestinationStream(source.retrieve());
         if (destStream == null)
         {
+            if (!isQuiet)
             System.out.println("SKIPPED: bitstream " + source.getID()
                     + " (item: " + item.getHandle() + ") because filtering was unsuccessful");
 
@@ -709,6 +718,7 @@ public class MediaFilterManager
             targetBundle.removeBitstream(existingBitstream);
         }
 
+        if (!isQuiet)
         System.out.println("FILTERED: bitstream " + source.getID()
                 + " (item: " + item.getHandle() + ") and created '" + newName + "'");
 
@@ -746,6 +756,7 @@ public class MediaFilterManager
     {
         if(skipList!=null && skipList.contains(identifier))
         {
+            if (!isQuiet)
             System.out.println("SKIP-LIST: skipped bitstreams within identifier " + identifier);
             return true;
         }    
