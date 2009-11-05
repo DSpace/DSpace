@@ -91,7 +91,7 @@ dspace.history = ${dspace.dir}/history
 			<para>Below is a brief "Properties" table for the <literal>dspace.cfg</literal> file and the documented details are referenced. Please refer to those sections for the complete details of the parameter</para>
 			<table frame="all">
 				<title>The <literal>dspace.cfg</literal> Main Properties</title>
-				<?dbhtml table-width="75%" ?>
+				<?dbhtml table-width="100%" ?>
 				<?dbfo table-width="100%"?>
 				<tgroup cols="2" align="left"><colspec colname="c1" colwidth="90*"/><colspec colname="c2" colwidth="10*"/><spanspec spanname="hspan" namest="c1" nameend="c2" align="center"/><thead>
 						<row>
@@ -432,6 +432,17 @@ org.dspace.app.itemexport.max.size</screen>
 								<link linkend="docbook-configure.html-download">5.2.21</link>
 							</entry>
 						</row>
+						<row>
+							<entry spanname="hspan">Bulk Metadata Editing</entry>
+						</row>
+						<row><entry>
+								<screen>bulkedit.valueseparator
+bulkedit.fieldseparator
+bulkedit.gui-item-limit
+bulkedit.ignore-on-export</screen>
+							</entry><etnry>
+								<link linkend="docbook-configure.html-bulkedits">5.2.46</link>
+							</etnry></row>
 						<row>
 							<entry spanname="hspan">Subscription Email Option</entry>
 						</row>
@@ -1230,7 +1241,7 @@ mypassword</screen>
 						</row>
 						<row>
 							<entry align="right">Informational Note:</entry>
-							<entry>A comma separated list of hostnames that are allowed to refer browsers to email forms.  Default behaviour is to accept referrals only from dspace.hostname</entry>
+							<entry>A comma separated list of hostnames that are allowed to refer browsers to email forms. Default behaviour is to accept referrals only from dspace.hostname</entry>
 						</row>
 						<row>
 							<?dbfo row-height="5mm"?>
@@ -1243,13 +1254,15 @@ mypassword</screen>
 						</row>
 						<row>
 							<entry align="right">Example Value:</entry>
-							<entry><screen>mail.extraproperties = mail.smtp.socketFactory.port=465, \
+							<entry>
+								<screen>mail.extraproperties = mail.smtp.socketFactory.port=465, \
 	                   mail.smtp.socketFactory.class=javax.net.ssl.SSLSocketFactory, \
-	                   mail.smtp.socketFactory.fallback=false</screen></entry>
+	                   mail.smtp.socketFactory.fallback=false</screen>
+							</entry>
 						</row>
 						<row>
 							<entry align="right">Informational Note:</entry>
-							<entry>If you need to pass extra settings to the Java mail library. Comma separated, equals sign between the key and the value.  By default, commented out.</entry>
+							<entry>If you need to pass extra settings to the Java mail library. Comma separated, equals sign between the key and the value. By default, commented out.</entry>
 						</row>
 						<row>
 							<?dbfo row-height="5mm"?>
@@ -1266,9 +1279,9 @@ mypassword</screen>
 						</row>
 						<row>
 							<entry align="right">Informational Note:</entry>
-							<entry>An option is added to disable the mailserver. By default, this property is set to false.  By setting  value to &apos;true&apos;, DSpace will not send out emails. It will instead log the subject of the email which should have been sent.  This is especially useful for development and test environments where production data is used when testing functionality.</entry>
+							<entry>An option is added to disable the mailserver. By default, this property is set to false. By setting value to &apos;true&apos;, DSpace will not send out emails. It will instead log the subject of the email which should have been sent. This is especially useful for development and test environments where production data is used when testing functionality.</entry>
 						</row>
-				</tbody></tgroup>
+					</tbody></tgroup>
 			</informaltable>
 			<section remap="h4">
 				<title><anchor id="docbook-configure.html-email-wording" xreflabel="Wording of E-mail Messages"/>Wording of E-mail Messages</title>
@@ -5495,6 +5508,83 @@ core.authorization.item-admin.cc-license</screen></entry>
 			<note>
 				<para>Oracle users should consult <emphasis role="underline"><link linkend="docbook-update.html">Chapter 4 Updating a DSpace Installation</link></emphasis> regarding the necessary database changes that need to take place.</para>
 			</note>
+		</section>
+		<section remap="h3">
+			<title><anchor id="docbook-configure.html-bulkedits" xreflabel="Bulk Metadata Editing"/>Bult Metadata Editing</title>
+			<para>The following configurations allow the adminstrator extract from the DSpace database a set of records for editing by a metadata expert. It provide an easier way of editing large collections.</para>
+			<informaltable>
+				<?dbhtml table-width="100%"?>
+				<?dbfo table-width="100%"?>
+				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+						<row>
+							<entry align="right">Property:</entry>
+							<entry><literal>bulkedit.valueseparator</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Example Value:</entry>
+							<entry><literal/>bulkedit.valueseparator = ||</entry>
+						</row>
+						<row>
+							<entry align="right">Informational note</entry>
+							<entry>The delimiter used to separate values within a single field. For example, this will place the double pipe between multiple authors appearing in one record (Smith, William || Johannsen, Susan). This applies to any metadata field that appears more than once in a record. The user can change this to another character. </entry>
+						</row>
+						<row>
+							<?dbfo row-height="5mm"?>
+							<?dbhtml row-height="5mm"?>
+							<entry spanname="notespan"/>
+						</row>
+						<row>
+							<entry align="right">Property:</entry>
+							<entry><literal>bulkedit.fieldseparator</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Example Value:</entry>
+							<entry><literal>bulkedit.fieldseparator = ,</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Informational note</entry>
+							<entry>The delimiter used to serarate fields (defaults to a comma for CSV). Again, the user could change it something like &apos;$&apos;. If you wish to use a tab, semicolon, or hash (#) sign as the delimiter, set the value to be <literal>tab</literal>, <literal>semicolon</literal> or <literal>hash</literal>. <screen>bulkedit.fieldseparator = tab</screen></entry>
+						</row>
+						<row>
+							<?dbfo row-height="5mm"?>
+							<?dbhtml row-height="5mm"?>
+							<entry spanname="notespan"/>
+						</row>
+						<row>
+							<entry align="right">Property:</entry>
+							<entry><literal>bulkedit.gui-item-limit</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Example Value:</entry>
+							<entry><literal>bulkedit.gui-item-limit = 20</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Informational note</entry>
+							<entry>When using the WEBUI, this sets the limit of the number of items allowed to be edited in one processing.   There is no limit when using the CLI.</entry>
+						</row>
+						<row>
+							<?dbfo row-height="5mm"?>
+							<?dbhtml row-height="5mm"?>
+							<entry spanname="notespan"/>
+						</row>
+						<row>
+							<entry align="right">Property:</entry>
+							<entry><literal>bulkedit.ignore-on-export</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Example Value:</entry>
+							<entry>
+								<screen>bulkedit.ignore-on-export = dc.date.accessioned,
+                   	     dc.date.available, \
+                            dc.date.updated, dc.description.provenance</screen>
+							</entry>
+						</row>
+						<row>
+							<entry align="right">Informational note</entry>
+							<entry>Metadata elements to exclude when exporting via the user interfaces, or when using the command line version and not using the -a (all) option.</entry>
+						</row>
+					</tbody></tgroup>
+			</informaltable>
 		</section>
 		<!-- This is to close the 5.2 section (below) -->
 	</section>
