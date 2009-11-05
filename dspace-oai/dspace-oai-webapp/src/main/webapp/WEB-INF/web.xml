@@ -86,6 +86,6 @@
 
   <servlet-mapping>
     <servlet-name>oai-handler</servlet-name>
-    <url-pattern>/request</url-pattern>
+    <url-pattern>/</url-pattern>
   </servlet-mapping>
 </web-app>
