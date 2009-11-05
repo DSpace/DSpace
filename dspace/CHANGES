@@ -62,6 +62,7 @@
  - [DS-333] Adjust SWORD ingest crosswalk to store bibliographic citation
 
 (Larry Stone)
+ - [DS-349] Admins can choose Internal BitstreamFormats in XMLUI
  - [DS-347] Add --quiet option to filter-media (MediaFilterManager) to disable progress messages
  - [DS-297] Move PostgreSQL-specific SQL into etc/postgres for greater clarity
  - [DS-338] Disable cache advice (Expires header) on Bitstream download that requires authorization (XMLUI)

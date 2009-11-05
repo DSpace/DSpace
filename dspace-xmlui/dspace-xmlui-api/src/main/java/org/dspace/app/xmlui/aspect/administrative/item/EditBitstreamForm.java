@@ -53,6 +53,7 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -107,9 +108,12 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 		int bitstreamID = parameters.getParameterAsInteger("bitstreamID",-1);
 
 		// Get the bitstream and all the various formats
+                // Administrator is allowed to see internal formats too.
 		Bitstream bitstream = Bitstream.find(context, bitstreamID);
 		BitstreamFormat currentFormat = bitstream.getFormat();
-		BitstreamFormat[] bitstreamFormats = BitstreamFormat.findNonInternal(context);
+                BitstreamFormat[] bitstreamFormats = AuthorizeManager.isAdmin(context) ?
+                    BitstreamFormat.findAll(context) :
+                    BitstreamFormat.findNonInternal(context);
 		
 		boolean primaryBitstream = false;
 		Bundle[] bundles = bitstream.getBundles();
@@ -156,15 +160,21 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 		Select format = edit.addItem().addSelect("formatID");
 		format.setLabel(T_format_label);
 
+                // load the options menu, skipping the "Unknown" format since "Not on list" takes its place
+                int unknownFormatID = BitstreamFormat.findUnknown(context).getID();
 		format.addOption(-1,T_format_default);
 		for (BitstreamFormat bitstreamFormat : bitstreamFormats)
 		{
+                        if (bitstreamFormat.getID() == unknownFormatID)
+                            continue;
 			String supportLevel = "Unknown";
 			if (bitstreamFormat.getSupportLevel() == BitstreamFormat.KNOWN)
 				supportLevel = "known";
 			else if (bitstreamFormat.getSupportLevel() == BitstreamFormat.SUPPORTED)
 				supportLevel = "Supported";
 			String name = bitstreamFormat.getShortDescription()+" ("+supportLevel+")";
+                        if (bitstreamFormat.isInternal())
+                            name += " (Internal)";
 			int id = bitstreamFormat.getID();
 
 			format.addOption(id,name);
