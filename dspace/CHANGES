@@ -150,6 +150,9 @@
  - [DS-320] java.util.NoSuchElementException: Timeout waiting for idle object
  - [DS-353] Missing commits in XMLUI server-side javascript code.
 
+(Hardik Mishra)
+- [DS-370] E Mail Sent On Item Export Error Message
+
 1.5.2 final
 ===========
 
