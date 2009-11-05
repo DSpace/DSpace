@@ -58,7 +58,7 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
             <para>Ant can be downloaded from the following location: <ulink url="http://ant.apache.org/">http://ant.apache.org</ulink></para>
         </section>
         <section remap="h3">
-            <title>Relational Database: (PostgreSQL or Oracle).</title>
+            <title><anchor id="docbook-install.xml-postgresql" xreflabel="Postresgrql"/>Relational Database: (PostgreSQL or Oracle).</title>
             <itemizedlist>
                 <listitem>
                     <para>
@@ -295,13 +295,7 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 db.url    = jdbc.oracle.thin:@//host:port/dspace
 db.driver = oracle.jdbc.OracleDriver</screen>
                         </listitem>
-                        <listitem>
-                            <para>Go to <literal>[dspace-source]/dspace/etc/oracle</literal> and copy the contents to their parent directory, overwriting the versions in the parent:</para>
-                            <screen>cd [dspace-source]/dspace/etc/oracle
-cp * ..</screen>
-                            <para>You now have Oracle-specific <literal>.sql</literal> files in your <literal>etc</literal> directory, and your dspace.cfg is modified to point to your Oracle database.</para>
-                        </listitem>
-                    </orderedlist>
+                        </orderedlist>
                 </listitem>
                 <listitem>
                     <para>Edit <literal>[dspace-source]/dspace/config/dspace.cfg</literal>, in particular you&apos;ll need to set these properties:</para>
@@ -811,39 +805,34 @@ ant help
                 <term>Database errors occur when you run <literal>ant fresh_install</literal></term>
                 <listitem>
                     <para> There are two common errors that occur. If your error looks like this--</para>
-                    <screen>
-[java] 2004-03-25 15:17:07,730 INFO 
-	org.dspace.storage.rdbms.InitializeDatabase @ Initializing Database
+                    <screen>[java] 2004-03-25 15:17:07,730 INFO 
+	    org.dspace.storage.rdbms.InitializeDatabase @ Initializing Database
 [java] 2004-03-25 15:17:08,816 FATAL
-	org.dspace.storage.rdbms.InitializeDatabase @ Caught exception:
+	    org.dspace.storage.rdbms.InitializeDatabase @ Caught exception:
 [java] org.postgresql.util.PSQLException: Connection refused. Check
-	that the hostname and port are correct and that the postmaster is
-	accepting TCP/IP connections.
+	    that the hostname and port are correct and that the postmaster is
+	    accepting TCP/IP connections.
 [java]     at
-	org.postgresql.jdbc1.AbstractJdbc1Connection.openConnection(AbstractJd
+	    org.postgresql.jdbc1.AbstractJdbc1Connection.openConnection(AbstractJd
 bc1Connection.java:204)
-[java]     at org.postgresql.Driver.connect(Driver.java:139)
-</screen>
-                    <para>it usually means you haven&apos;t yet added the relevant configuration parameter to your PostgreSQL configuration <link linkend="docbook-install.html-enabletcpip">(see above)</link>, or perhaps you haven&apos;t restarted PostgreSQL after making the change. Also, make sure that the <literal>db.username</literal> and <literal>db.password</literal> properties are correctly set in <literal>[dspace-source]/config/dspace.cfg</literal>.</para>
+[java]     at org.postgresql.Driver.connect(Driver.java:139)</screen>
+                    <para>it usually means you haven&apos;t yet added the relevant configuration parameter to your PostgreSQL configuration <link linkend="docbook-install.xml-postgresql">(see above)</link>, or perhaps you haven&apos;t restarted PostgreSQL after making the change. Also, make sure that the <literal>db.username</literal> and <literal>db.password</literal> properties are correctly set in <literal>[dspace-source]/config/dspace.cfg</literal>.</para>
                     <para>An easy way to check that your DB is working OK over TCP/IP is to try this on the command line:</para>
                     <screen>
-psql -U dspace -W -h localhost
-</screen>
+psql -U dspace -W -h localhost</screen>
                     <para>Enter the <literal>dspace</literal><emphasis>database</emphasis> password, and you should be dropped into the psql tool with a <literal>dspace=&gt;</literal> prompt.</para>
                     <para>Another common error looks like this:</para>
-                    <screen>
-[java] 2004-03-25 16:37:16,757 INFO 
-	org.dspace.storage.rdbms.InitializeDatabase @ Initializing Database
+                    <screen>[java] 2004-03-25 16:37:16,757 INFO 
+	    org.dspace.storage.rdbms.InitializeDatabase @ Initializing Database
 [java] 2004-03-25 16:37:17,139 WARN 
-	org.dspace.storage.rdbms.DatabaseManager @ Exception initializing DB
-	pool
+	    org.dspace.storage.rdbms.DatabaseManager @ Exception initializing DB
+	    pool
 [java] java.lang.ClassNotFoundException: org.postgresql.Driver
 [java]     at java.net.URLClassLoader$1.run(URLClassLoader.java:198)
 [java]     at java.security.AccessController.doPrivileged(Native
-	Method)
+	   Method)
 [java]     at
-	java.net.URLClassLoader.findClass(URLClassLoader.java:186)
-</screen>
+	   java.net.URLClassLoader.findClass(URLClassLoader.java:186)</screen>
                     <para>This means that the PostgreSQL JDBC driver is not present in <literal>[dspace-source]/lib</literal>. <link linkend="docbook-install.html-pgdriver">See above.</link></para>
                 </listitem>
             </varlistentry>
@@ -852,8 +841,7 @@ psql -U dspace -W -h localhost
                 <listitem>
                     <para> If you&apos;re trying to tweak Tomcat&apos;s configuration but nothing seems to make a difference to the error you&apos;re seeing, you might find that Tomcat hasn&apos;t been shutting down properly, perhaps because it&apos;s waiting for a stale connection to close gracefully which won&apos;t happen. To see if this is the case, try:</para>
                     <screen>
-ps -ef | grep java
-</screen>
+ps -ef | grep java</screen>
                     <para>and look for Tomcat&apos;s Java processes. If they stay arround after running Tomcat&apos;s <literal>shutdown.sh</literal> script, trying <literal>kill</literal>ing them (with <literal>-9</literal> if necessary), then starting Tomcat again.</para>
                 </listitem>
             </varlistentry>
@@ -861,19 +849,13 @@ ps -ef | grep java
                 <term>Database connections don&apos;t work, or accessing DSpace takes forever</term>
                 <listitem>
                     <para> If you find that when you try to access a DSpace Web page and your browser sits there connecting, or if the database connections fail, you might find that a &apos;zombie&apos; database connection is hanging around preventing normal operation. To see if this is the case, try:</para>
-                    <screen>
-ps -ef | grep postgres
-</screen>
+                    <screen>ps -ef | grep postgres</screen>
                     <para>You might see some processes like this</para>
-                    <screen>
-dspace 16325  1997  0  Feb 14  ?         0:00 postgres: dspace dspace
-	127.0.0.1 idle in transaction
-</screen>
+                    <screen>dspace 16325  1997  0  Feb 14  ?         0:00 postgres: dspace dspace
+	    127.0.0.1 idle in transaction</screen>
                     <para>This is normal--DSpace maintains a &apos;pool&apos; of open database connections, which are re-used to avoid the overhead of constantly opening and closing connections. If they&apos;re &apos;idle&apos; it&apos;s OK; they&apos;re waiting to be used. However sometimes, if something went wrong, they might be stuck in the middle of a query, which seems to prevent other connections from operating, e.g.:</para>
-                    <screen>
-dspace 16325  1997  0  Feb 14  ?         0:00 postgres: dspace dspace
-	127.0.0.1 SELECT
-</screen>
+                    <screen>dspace 16325  1997  0  Feb 14  ?         0:00 postgres: dspace dspace
+	    127.0.0.1 SELECT</screen>
                     <para>This means the connection is in the middle of a <literal>SELECT</literal> operation, and if you&apos;re not using DSpace right that instant, it&apos;s probably a &apos;zombie&apos; connection. If this is the case, try <literal>kill</literal>ing the process, and stopping and restarting Tomcat.</para>
                 </listitem>
             </varlistentry>
