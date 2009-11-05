@@ -122,6 +122,14 @@
     </command>
 
     <command>
+        <name>make-handle-config</name>
+        <description>Run the handle server simple setup command</description>
+        <step>
+            <class>net.handle.server.SimpleSetup</class>
+        </step>
+    </command>
+
+    <command>
         <name>metadata-export</name>
         <description>Export metadata for batch editing</description>
         <step>
