@@ -1,0 +1,260 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+  <title>DSpace System Documentation: Storage Layer</title>
+  <link rel="StyleSheet" href="style.css" type="text/css">
+  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+</head>
+
+<body>
+  <h1>DSpace System Documentation: Storage Layer</h1>
+
+  <p><a href="index.html">Back to contents</a></P>
+  <P><a href="architecture.html">Back to architecture overview</a></p>
+
+  <h2><a name="rdbms" id="rdbms">RDBMS</a></h2>
+
+  <p>DSpace uses a relational database to store all information about the organization of content, metadata about the content, information about e-people and authorization, and the state of currently-running workflows. The DSpace system also uses the relational database in order to maintain indices that users can browse.</p>
+
+  <p><A HREF="image/db-schema.gif">Graphical visualization of the relational database</A></P>
+
+  <p>Most of the functionality that DSpace uses can be offered by any standard SQL database that supports transactions.  Presently, the browse indices use some features specific to <a href="http://www.postgresql.org/">PostgreSQL</a> and <a href="http://www.oracle.com/database/">Oracle</A>, so some modification to the code would be needed before DSpace would function fully with an alternative database back-end.</p>
+
+  <p>The <code>org.dspace.storage.rdbms</code> package provides access to an SQL database in a somewhat simpler form than using JDBC directly. The main class is <code>DatabaseManager</code>, which executes SQL queries and returns <code>TableRow</code> or <code>TableRowIterator</code> objects. The <code>InitializeDatabase</code> class is used to load SQL into the database via JDBC, for example to set up the schema.</p>
+
+  <p>All calls to the <code>Database Manager</code> require a <a href="business.html#core">DSpace <code>Context</code> object</a>. Example use of the database manager API is given in the <code>org.dspace.storage.rdbms</code> package Javadoc.</p>
+
+  <p>The database schema used by DSpace (for PostgreSQL) is stored in <code><i>[dspace-source]</i>/dspace/etc/database_schema.sql</code> in the source distribution. It is stored in the form of SQL that can be fed straight into the DBMS to construct the database. The schema SQL file also directly creates two e-person groups in the database that are required for the system to function properly.</p>
+
+  <P>Also in <code><i>[dspace-source]</i>/dspace/etc</code> are various SQL files called <code>database_schema_1x_1y</code>.  These contain the necessary SQL commands to update a live DSpace database from version 1.<code>x</code> to 1.<code>y</code>.  Note that this might not be the only part of an upgrade process:  see <a href="update.html">Updating a DSpace Installation</a> for details.</P>
+
+  <p>The DSpace database code uses an SQL function <code>getnextid</code> to assign primary keys to newly created rows. This SQL function must be safe to use if several JVMs are accessing the database at once; for example, the Web UI might be creating new rows in the database at the same time as the batch item importer. The PostgreSQL-specific implementation of the method uses <code>SEQUENCES</code> for each table in order to create new IDs. If an alternative database backend were to be used, the implementation of <code>getnextid</code> could be updated to operate with that specific DBMS.</p>
+
+  <p>The <code>etc</code> directory in the source distribution contains two further SQL files. <code>clean-database.sql</code> contains the SQL necessary to completely clean out the database, so use with caution! The Ant target <code>clean_database</code> can be used to execute this. <code>update-sequences.sql</code> contains SQL to reset the primary key generation sequences to appropriate values. You'd need to do this if, for example, you're restoring a backup database dump which creates rows with specific primary keys already defined. In such a case, the sequences would allocate primary keys that were already used.</p>
+
+  <P>Versions of the <code>*.sql*</code> files for Oracle are stored in <code><i>[dspace-source]</i>/dspace/etc/oracle</code>.  These need to be copied over their PostgreSQL counterparts in <code><i>[dspace-source]</i>/dspace/etc</code> prior to installation.</P>
+
+  <h3>Maintenance and Backup</h3>
+
+  <p>When using PostgreSQL, it's a good idea to perform regular 'vacuuming' of the database to optimize performance. This is performed by the <code>vacuumdb</code> command which can be executed via a 'cron' job, for example by putting this in the system <code>crontab</code>:</p>
+  <pre>
+# clean up the database nightly
+40 2 * * * /usr/local/pgsql/bin/vacuumdb --analyze dspace &gt; /dev/null 2&gt;&amp;1
+</pre>
+
+  <p>The DSpace database can be backed up and restored using usual methods, for example with <code>pg_dump</code> and <code>psql</code>. However when restoring a database, you will need to perform these additional steps:</p>
+
+  <ul>
+    <li>
+      <p>The <code>fresh_install</code> target loads up the initial contents of the Dublin Core type and bitstream format registries, as well as two entries in the <code>epersongroup</code> table for the system anonymous and administrator groups. Before you restore a raw backup of your database you will need to remove these, since they will already exist in your backup, possibly having been modified. For example, use:</p>
+      <pre>
+DELETE FROM dctyperegistry;
+DELETE FROM bitstreamformatregistry;
+DELETE FROM epersongroup;
+</pre>
+    </li>
+
+    <li>
+      <p>After restoring a backup, you will need to reset the primary key generation sequences so that they do not produce already-used primary keys. Do this by executing the SQL in <code><i>[dspace-source]</i>/dspace/etc/update-sequences.sql</code>, for example with:</p>
+      <pre>
+psql -U dspace -f <i>[dspace-source]</i>/dspace/etc/update-sequences.sql
+</pre>
+    </li>
+  </ul>
+
+  <p>Future updates of DSpace may involve minor changes to the database schema. Specific instructions on how to update the schema whilst keeping live data will be included. The current schema also contains a few currently unused database columns, to be used for extra functionality in future releases. These unused columns have been added in advance to minimize the effort required to upgrade.</p>
+
+  <h3>Configuring the RDBMS Component</h3>
+
+  <p>The database manager is configured with the following properties in <code>dspace.cfg</code>:</p>
+
+  <table>
+    <tbody>
+      <tr>
+        <td><code>db.url</code></td>
+
+        <td>The JDBC URL to use for accessing the database. This should not point to a connection pool, since DSpace already implements a connection pool.</td>
+      </tr>
+
+      <tr>
+        <td><code>db.driver</code></td>
+
+        <td>JDBC driver class name. Since presently, DSpace uses PostgreSQL-specific features, this should be <code>org.postgresql.Driver</code>.</td>
+      </tr>
+
+      <tr>
+        <td><code>db.username</code></td>
+
+        <td>Username to use when accessing the database.</td>
+      </tr>
+
+      <tr>
+        <td><code>db.password</code></td>
+
+        <td>Corresponding password ot use when accessing the database.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2><a name="bitstreams" id="bitstreams">Bitstream Store</a></h2>
+
+  <p>DSpace offers two means for storing content. The first is in the file system on the server. The second is using <a href="http://www.sdsc.edu/srb">SRB (Storage Resource Broker)</a>. Both are achieved using a simple, lightweight API.</p>
+
+  <p>SRB is purely an option but may be used in lieu of the server's file system or in addition to the file system. Without going into a full description, SRB is a very robust, sophisticated storage manager that offers essentially unlimited storage and straightforward means to replicate (in simple terms, backup) the content on other local or remote storage resources.</p>
+
+  <p>The terms "store", "retrieve", "in the system", "storage", and so forth, used below can refer to storage in the file system on the server ("traditional") or in SRB.</p>
+
+  <p>The <code>BitstreamStorageManager</code> provides low-level access to bitstreams stored in the system. In general, it should not be used directly; instead, use the <code>Bitstream</code> object in the <a href="business.html#content">content management API</a> since that encapsulated authorization and other metadata to do with a bitstream that are not maintained by the <code>BitstreamStorageManager</code>.</p>
+
+  <p>The bitstream storage manager provides three methods that store, retrieve and delete bitstreams. Bitstreams are referred to by their 'ID'; that is the primary key <code>bitstream_id</code> column of the corresponding row in the database.</p>
+
+  <p>As of DSpace version 1.1, there can be multiple bitstream stores. Each of these bitstream stores can be traditional storage or SRB storage. This means that the potential storage of a DSpace system is not bound by the maximum size of a single disk or file system and also that traditional and SRB storage can be combined in one DSpace installation. Both traditional and SRB storage are specified by <a href="configure.html">configuration parameters</a>. Also see Configuring the Bitstream Store below.</p>
+
+  <p>Stores are numbered, starting with zero, then counting upwards. Each bitstream entry in the database has a store number, used to retrieve the bitstream when required.</p>
+
+  <p>At the moment, the store in which new bitstreams are placed is decided using a configuration parameter, and there is no provision for moving bitstreams between stores. Administrative tools for manipulating bitstreams and stores will be provided in future releases. Right now you can move a whole store (e.g. you could move store number 1 from <code>/localdisk/store</code> to <code>/fs/anotherdisk/store</code> but it would still have to be store number 1 and have the exact same contents.</p>
+
+  <p>Bitstreams also have an 38-digit internal ID, different from the primary key ID of the bitstream table row. This is not visible or used outside of the bitstream storage manager. It is used to determine the exact location (relative to the relevant store directory) that the bitstream is stored in traditional or SRB storage. The first three pairs of digits are the directory path that the bitstream is stored under. The bitstream is stored in a file with the internal ID as the filename.</p>
+
+  <p>For example, a bitstream with the internal ID <code>12345678901234567890123456789012345678</code> is stored in the directory:</p>
+  <pre>
+(assetstore dir)/12/34/56/12345678901234567890123456789012345678
+</pre>
+
+  <p>The reasons for storing files this way are:</p>
+
+  <ul>
+    <li>
+      <p>Using a randomly-generated 38-digit number means that the 'number space' is less cluttered than simply using the primary keys, which are allocated sequentially and are thus close together. This means that the bitstreams in the store are distributed around the directory structure, improving access efficiency.</p>
+    </li>
+
+    <li>
+      <p>The internal ID is used as the filename partly to avoid requiring an extra lookup of the filename of the bitstream, and partly because bitstreams may be received from a variety of operating systems. The original name of a bitstream may be an illegal UNIX filename.</p>
+    </li>
+  </ul>
+
+  <p>When storing a bitstream, the <code>BitstreamStorageManager</code> DOES set the following fields in the corresponding database table row:</p>
+
+  <ul>
+    <li><code>bitstream_id</code></li>
+
+    <li><code>size</code></li>
+
+    <li><code>checksum</code></li>
+
+    <li><code>checksum_algorithm</code></li>
+
+    <li><code>internal_id</code></li>
+
+    <li><code>deleted</code></li>
+
+    <li><code>store_number</code></li>
+  </ul>
+
+  <p>The remaining fields are the responsibility of the <code>Bitstream</code> content management API class.</p>
+
+  <p>The bitstream storage manager is fully transaction-safe. In order to implement transaction-safety, the following algorithm is used to store bitstreams:</p>
+
+  <ol>
+    <li>A database connection is created, separately from the currently active connection in the <a href="business.html#core">current DSpace context</a>.</li>
+
+    <li>An unique internal identifier (separate from the database primary key) is generated.</li>
+
+    <li>The bitstream DB table row is created using this new connection, with the <code>deleted</code> column set to <code>true</code>.</li>
+
+    <li>The new connection is <code>commit</code>ted, so the 'deleted' bitstream row is written to the database</li>
+
+    <li>The bitstream itself is stored in a file in the configured 'asset store directory', with a directory path and filename derived from the internal ID</li>
+
+    <li>The <code>deleted</code> flag in the bitstream row is set to <code>false</code>. This will occur (or not) as part of the current DSpace <code>Context</code>.</li>
+  </ol>
+
+  <p>This means that should anything go wrong before, during or after the bitstream storage, only one of the following can be true:</p>
+
+  <ul>
+    <li>No bitstream table row was created, and no file was stored</li>
+
+    <li>A bitstream table row with <code>deleted=true</code> was created, no file was stored</li>
+
+    <li>A bitstream table row with <code>deleted=true</code> was created, and a file was stored</li>
+  </ul>
+
+  <p>None of these affect the integrity of the data in the database or bitstream store.</p>
+
+  <p>Similarly, when a bitstream is deleted for some reason, its <code>deleted</code> flag is set to true as part of the overall transaction, and the corresponding file in storage is <em>not</em> deleted.</p>
+
+  <p>The above techniques mean that the bitstream storage manager is transaction-safe. Over time, the bitstream database table and file store may contain a number of 'deleted' bitstreams. The <code>cleanup</code> method of <code>BitstreamStorageManager</code> goes through these deleted rows, and actually deletes them along with any corresponding files left in the storage. It only removes 'deleted' bitstreams that are more than one hour old, just in case cleanup is happening in the middle of a storage operation.</p>
+
+  <p>This cleanup can be invoked from the command line via the <code>Cleanup</code> class, which can in turn be easily executed from a shell on the server machine using <code>/dspace/bin/cleanup</code>. You might like to have this run regularly by <code>cron</code>, though since DSpace is read-lots, write-not-so-much it doesn't need to be run very often.</p>
+
+  <h3>Backup</h3>
+
+  <p>The bitstreams (files) in traditional storage may be backed up very easily by simply 'tarring' or 'zipping' the <code>assetstore</code> directory (or whichever directory is configured in <code>dspace.cfg</code>). Restoring is as simple as extracting the backed-up compressed file in the appropriate location.</p>
+
+  <p>Similar means could be used for SRB, but SRB offers many more options for managing backup.</p>
+
+  <p>It is important to note that since the bitstream storage manager holds the bitstreams in storage, and information about them in the database, that a database backup and a backup of the files in the bitstream store must be made at the same time; the bitstream data in the database must correspond to the stored files.</p>
+
+  <p>Of course, it isn't really ideal to 'freeze' the system while backing up to ensure that the database and files match up. Since DSpace uses the bitstream data in the database as the authoritative record, it's best to back up the database before the files. This is because it's better to have a bitstream in storage but not the database (effectively non-existent to DSpace) than a bitstream record in the database but not storage, since people would be able to find the bitstream but not actually get the contents.</p>
+
+  <h3>Configuring the Bitstream Store</h3>
+
+  <P>Both traditional and SRB bitstream stores are configured in <code>dspace.cfg</code>.</P>
+
+  <h4>Configuring Traditonal Storage</h4>
+
+  <P>Bitstream stores in the file system on the server are configured like this:</P>
+
+  <pre>
+assetstore.dir = <i>[dspace]</i>/assetstore
+</pre>
+
+  <p>(Remember that <i>[dspace]</i> is a placeholder for the actual name of your DSpace install directory).</p>
+
+  <p>The above example specifies a single asset store.</p>
+  <pre>
+assetstore.dir = <i>[dspace]</i>/assetstore_0
+assetstore.dir.1 = /mnt/other_filesystem/assetstore_1
+</pre>
+
+  <p>The above example specifies two asset stores. assetstore.dir specifies the asset store number 0 (zero); after that use assetstore.dir.1, assetstore.dir.2 and so on. The particular asset store a bitstream is stored in is held in the database, so don't move bitstreams between asset stores, and don't renumber them.</p>
+
+  <p>By default, newly created bitstreams are put in asset store 0 (i.e. the one specified by the assetstore.dir property.) This allows backwards compatibility with pre-DSpace 1.1 configurations. To change this, for example when asset store 0 is getting full, add a line to <code>dspace.cfg</code> like:</p>
+  <pre>
+assetstore.incoming = 1
+</pre>
+
+  <p>Then restart DSpace (Tomcat). New bitstreams will be written to the asset store specified by <code>assetstore.dir.1</code>, which is <code>/mnt/other_filesystem/assetstore_1</code> in the above example.</p>
+
+  <h4>Configuring SRB Storage</h4>
+
+  <P>The same framework is used to configure SRB storage. That is, the asset store number (0..n) can reference a file system directory as above or it can reference a <span style="font-weight: bold;">set</span> of SRB account parameters. But any particular asset store number can reference one or the other but not both. This way traditional and SRB storage can both be used but with different asset store numbers. The same cautions mentioned above apply to SRB asset stores as well: The particular asset store a bitstream is stored in is held in the database, so don't move bitstreams between asset stores, and don't renumber them.</P>
+
+  <P>For example, let's say asset store number 1 will refer to SRB. The there will be a set of SRB account parameters like this:</P>
+  <pre>
+srb.host.1 = mysrbmcathost.myu.edu
+srb.port.1 = 5544
+srb.mcatzone.1 = mysrbzone
+srb.mdasdomainname.1 = mysrbdomain
+srb.defaultstorageresource.1 = mydefaultsrbresource
+srb.username.1 = mysrbuser
+srb.password.1 = mysrbpassword
+srb.homedirectory.1 = /mysrbzone/home/mysrbuser.mysrbdomain
+srb.parentdir.1 = mysrbdspaceassetstore
+</pre>
+
+  <P>Several of the terms, such as <code>mcatzone</code>, have meaning only in the SRB context and will be familiar to SRB users. The last, <code>srb.parentdir.n</code>, can be used to used for addition (SRB) upper directory structure within an SRB account. This property value could be blank as well.</P>
+
+  <P>(If asset store 0 would refer to SRB it would be <code>srb.host =</code> ..., <code>srb.port =</code> ..., and so on (<code>.0</code> omitted) to be consistent with the traditional storage configuration above.)</P>
+
+  <P>The similar use of <code>assetstore.incoming</code> to reference asset store 0 (default) or 1..n (explicit property) means that new bitstreams will be written to traditional or SRB storage determined by whether a file system directory on the server is referenced or a set of SRB account parameters are referenced.</P>
+
+  <P>There are comments in dspace.cfg that further elaborate the configuration of traditional and SRB storage.</P>
+
+  <hr>
+
+  <address>
+    Copyright &copy; 2002-2008 The DSpace Foundation
+  </address>
+</body>
+</html>

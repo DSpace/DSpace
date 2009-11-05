@@ -1,0 +1,106 @@
+#!/usr/bin/perl
+
+#####################################################################
+# Copyright 2006, The University of Maryland.  All rights reserved.
+# 
+# Program:   load-etd
+# 
+# Author:    Ben Wallberg
+# 
+# Purpose:   Load ProQuest ETD into DSpace.
+#
+# Usage:     See PrintUsageAndExit()
+#
+# Comments:  Adapted from load-diss
+#
+#####################################################################
+
+use Getopt::Std;
+
+#
+# Check the command-line parameters
+#
+GetCmdLine();
+
+# Get directories
+chomp($bindir = `dirname $0`);
+
+@cmd = ("$bindir/dsrun",
+   "-Ddspace.log.init.disable=true",
+	"-Detdloader.zipfile=$zipfile"
+);
+push @cmd, "-Detdloader.marcfile=$marcfile" if (defined $marcfile);
+push @cmd, "-Detdloader.singleitem=$item" if (defined $item);
+push @cmd, "-Detdloader.csvfile=$csvfile" if (defined $csvfile);
+push @cmd, "edu.umd.lib.dspace.app.EtdLoader";
+
+#print (join ' ',@cmd) . "\n";
+system(@cmd);
+
+$exit_status = $? >> 8;
+die "Error loading" if ($exit_status != 0);
+
+exit 0;
+
+
+########################################################## GetCmdLine
+# Process the command line options.
+#####################################################################
+
+sub GetCmdLine {
+
+    if ($#ARGV < 0 || ($#ARGV == 0 && $ARGV[0] eq "-h")) {
+        PrintUsageAndExit();
+    }
+
+    if ( ! getopts('i:o:r:c:')) {
+        print "Error in option processing\n\n";
+        PrintUsageAndExit();
+    }
+
+    if (! defined $opt_i) {
+        PrintUsageAndExit("Error: <zipfile> is a required parameter");
+    }
+    $zipfile = $opt_i;
+
+    if (defined $opt_o) {
+	$marcfile = $opt_o;
+    }
+
+    if (defined $opt_r) {
+	$item = $opt_r;
+    }
+
+    if (defined $opt_c) {
+	$csvfile = $opt_c;
+    }
+
+}
+
+
+################################################### PrintUsageAndExit
+# Print the program usage and exit.
+#####################################################################
+
+sub PrintUsageAndExit {
+
+    if (@_) {
+        foreach $msg (@_) {
+            print "$msg\n";
+        }
+        print "\n";
+    }
+        
+    print <<'EOS';
+Usage: load-etd -i <zipfile> [-o <marcfile>] [-r <item>] [-c <csvfile>]
+    <zipfile>:  zip file containing items to load
+    <marcfile>: output marc file
+    <item>:     process a single item, not the entire zip file
+    <csvfile>:  CSV output file with author,title,handle of each item
+EOS
+
+    exit 1;
+}
+
+
+

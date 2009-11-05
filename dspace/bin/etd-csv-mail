@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+
+#####################################################################
+# 
+# Mail csv file containing newly loaded items
+#
+#####################################################################
+
+use MIME::QuotedPrint;
+use MIME::Base64;
+use Mail::Sendmail 0.75; # doesn't work with v. 0.74!
+
+$count = $ARGV[0];
+$file = $ARGV[1];
+
+chomp($date = `/bin/date +'%Y%m%d'`);
+
+# Get directories
+chomp($bindir = `dirname $0`);
+
+# Build headers
+%mail = ();
+chomp($mail{To} = `$bindir/dsrun org.dspace.core.ConfigurationManager -property mail.etd.recipient`);
+chomp($mail{From} = `$bindir/dsrun org.dspace.core.ConfigurationManager -property mail.from.address`);
+$mail{Subject} = "ETD records for $date";
+
+# Build the body
+$message = encode_qp("$count ETD records loaded on $date");
+
+$boundary = "====" . time() . "====";
+$mail{'Content-Type'} = "multipart/mixed; boundary=\"$boundary\"";
+
+open (F, $file) or die "Cannot read $file: $!";
+binmode F; undef $/;
+$mail{Body} = encode_base64(<F>);
+close F;
+
+$boundary = '--'.$boundary;
+
+$mail{Body} = <<END_OF_BODY;
+$boundary
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+$message
+$boundary
+Content-Type: text/csv; name="etd-${date}.csv"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="etd-${date}.csv"
+
+$mail{Body}
+$boundary--
+END_OF_BODY
+
+# Send the email
+if (! (sendmail %mail)) {
+    die "Error sending email notice:\n" . $Mail::Sendmail::error;
+}
+
+exit 0;
+

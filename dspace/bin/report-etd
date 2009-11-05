@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Get the DSPACE/bin directory
+BINDIR=`dirname $0`
+
+$BINDIR/dsrun edu.umd.lib.dspace.app.EtdReport $*
+

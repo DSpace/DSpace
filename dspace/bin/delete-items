@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Delete items; handles are read from stdin
+
+
+# Get the DSPACE/bin directory
+BINDIR=`dirname $0`
+
+$BINDIR/dsrun \
+  -Dlog4j.defaultInitOverride=true \
+  edu.umd.lib.dspace.app.cleanup.DeleteItems

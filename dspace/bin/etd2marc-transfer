@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Get the DSPACE/bin directory
+BINDIR=`dirname $0`
+
+AUTH=${BINDIR}/../config/etd2marc-transfer
+
+/usr/bin/smbclient '//libdoc.umd.edu/department$' -A ${AUTH} -D 'Special Project\ETD MARC records' -c "put $1"
+
+
