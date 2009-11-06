@@ -63,13 +63,16 @@ import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpRequest;
 import org.apache.cocoon.generation.AbstractGenerator;
 import org.apache.cocoon.util.HashUtil;
+
 import org.apache.cocoon.xml.dom.DOMStreamer;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.ExpiresValidity;
 import org.apache.log4j.Logger;
 
 import org.dspace.app.util.OpenSearch;
+import org.dspace.app.util.SyndicationFeed;
 import org.dspace.app.xmlui.utils.ContextUtil;
+import org.dspace.app.xmlui.utils.FeedUtils;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
@@ -119,15 +122,6 @@ public class OpenSearchGenerator extends AbstractGenerator
 {
     private static final Logger log = Logger.getLogger(OpenSearchGenerator.class);
             
-    /** The prefix used to differentiate i18n keys */
-    private static final String I18N_PREFIX = "I18N:";
-    
-    /** Cocoon's i18n namespace */
-    private static final String I18N_NAMESPACE = "http://apache.org/cocoon/i18n/2.1";
-    
-    // i18n-sensitive metadata labels
-    private static Map<String, String> i18nLabels = null;
-    
     /** Cache of this object's validity */
     private ExpiresValidity validity = null;
     
@@ -150,11 +144,6 @@ public class OpenSearchGenerator extends AbstractGenerator
     
     /** the results document (cached) */
     private Document resultsDoc = null;
-    
-    static
-    {
-        i18nLabels = getI18NLabels();
-    }
     
     /**
      * Generate the unique caching key.
@@ -245,6 +234,7 @@ public class OpenSearchGenerator extends AbstractGenerator
                 {
                         Context context = ContextUtil.obtainContext(objectModel);
                         QueryArgs qArgs = new QueryArgs();
+
                 // can't start earlier than 0 in the results!
                 if (start < 0)
                 {
@@ -256,6 +246,7 @@ public class OpenSearchGenerator extends AbstractGenerator
                 {
                     qArgs.setPageSize(rpp);
                 }
+                        qArgs.setSortOrder(sortOrder);
                 
                 if (sort > 0)
                 {
@@ -309,8 +300,8 @@ public class OpenSearchGenerator extends AbstractGenerator
                     results[i] = dso;
                 }
                         resultsDoc = OpenSearch.getResultsDoc(format, query, qResults,
-                                                                      container, results, i18nLabels);
-                        unmangleI18N(resultsDoc);
+                                                                      container, results, FeedUtils.i18nLabels);
+                        FeedUtils.unmangleI18N(resultsDoc);
                         retDoc = resultsDoc;
                 }
                
@@ -328,56 +319,6 @@ public class OpenSearchGenerator extends AbstractGenerator
                 {
                         throw new SAXException(sqle);
                 }
-    }
-    
-    /**
-     * Returns a map of localizable labels whose values are themselves keys that are
-     * unmangled into a true i18n element for later localization.
-     *
-     * @return A map of mangled labels.
-     */
-    private static Map<String, String> getI18NLabels()
-    {
-        Map<String, String> labelMap = new HashMap<String, String>();
-        String base = I18N_PREFIX + "xmlui.";
-        labelMap.put("notitle", base + "feed.untitled");
-        labelMap.put("logo.title", base + "feed.logo_title");
-        labelMap.put("general-feed.description", base + "feed.general_description");
-        labelMap.put("uitype", "xmlui");
-        return labelMap;
-    }
-    
-    /**
-     * Scan the document and replace any text nodes that begin
-     * with the i18n prefix with an actual i18n element that
-     * can be processed by the i18n transformer.
-     *
-     * @param dom
-     */
-    private void unmangleI18N(Document dom)
-    {
-        NodeList elementNodes = dom.getElementsByTagName("*");
-        
-        for (int i = 0; i < elementNodes.getLength(); i++)
-        {
-                NodeList textNodes = elementNodes.item(i).getChildNodes();
-                for (int j = 0; j < textNodes.getLength(); j++)
-                {
-                        Node oldNode = textNodes.item(j);
-                        // Check to see if the node is a text node, its value is not null, and it starts with the i18n prefix.
-                        if (oldNode.getNodeType() == Node.TEXT_NODE && oldNode.getNodeValue() != null && oldNode.getNodeValue().startsWith(I18N_PREFIX))
-                        {
-                                Node parent = oldNode.getParentNode();
-                                String key = oldNode.getNodeValue().substring(I18N_PREFIX.length());
-                                
-                                Element newNode = dom.createElementNS(I18N_NAMESPACE, "text");
-                                newNode.setAttribute("key", key);
-                                newNode.setAttribute("catalogue", "default");
-
-                                parent.replaceChild(newNode,oldNode);
-                        }
-                }
-        }
     }
     
     /**

@@ -49,8 +49,20 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.TransformerException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 import org.apache.log4j.Logger;
 import org.dspace.app.util.OpenSearch;
+import org.dspace.app.util.SyndicationFeed;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -152,6 +164,7 @@ public class OpenSearchServlet extends DSpaceServlet
         {
             qArgs.setPageSize(rpp);
         }
+        qArgs.setSortOrder(sortOrder);
         
         if (sort > 0)
         {
@@ -219,10 +232,18 @@ public class OpenSearchServlet extends DSpaceServlet
         
         // format and return results
         Map<String, String> labelMap = getLabels(request);
-        String resultStr = OpenSearch.getResultsString(format, query, qResults, container, results, labelMap);
+        Document resultsDoc = OpenSearch.getResultsDoc(format, query, qResults, container, results, labelMap);
+        try
+        {
+            Transformer xf = TransformerFactory.newInstance().newTransformer();
         response.setContentType(OpenSearch.getContentType(format));
-        response.setContentLength(resultStr.length());
-        response.getWriter().write(resultStr);
+            xf.transform(new DOMSource(resultsDoc), new StreamResult(response.getWriter()));
+    }
+        catch (TransformerException e)
+        {
+            log.error(e);
+            throw new ServletException(e.toString());
+        }
     }
     
     private Map<String, String> getLabels(HttpServletRequest request)
@@ -242,14 +263,15 @@ public class OpenSearchServlet extends DSpaceServlet
     {
         Map<String, String> labelMap = new HashMap<String, String>();
         ResourceBundle labels = ResourceBundle.getBundle("Messages", locale);
-        labelMap.put("notitle", labels.getString(msgKey + ".notitle"));
-        labelMap.put("logo.title", labels.getString(msgKey + ".logo.title"));
-        labelMap.put("general-feed.description", labels.getString(msgKey + ".general-feed.description"));
-        for (String selector : OpenSearch.getDescriptionSelectors())
+
+        labelMap.put(SyndicationFeed.MSG_UNTITLED, labels.getString(msgKey + ".notitle"));
+        labelMap.put(SyndicationFeed.MSG_LOGO_TITLE, labels.getString(msgKey + ".logo.title"));
+        labelMap.put(SyndicationFeed.MSG_FEED_DESCRIPTION, labels.getString(msgKey + ".general-feed.description"));
+        labelMap.put(SyndicationFeed.MSG_UITYPE, SyndicationFeed.UITYPE_JSPUI);
+        for (String selector : SyndicationFeed.getDescriptionSelectors())
         {
-                labelMap.put("metadata." + selector, labels.getString("metadata." + selector));
+            labelMap.put("metadata." + selector, labels.getString(SyndicationFeed.MSG_METADATA + selector));
         }
-        labelMap.put("uitype", "jspui");
         return labelMap;
     }
 }
