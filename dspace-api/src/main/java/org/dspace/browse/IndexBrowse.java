@@ -427,7 +427,8 @@ public class IndexBrowse
                             // if we have values to index on, then do so
                             if (values != null && values.length > 0)
                             {
-                                int minConfidence = MetadataAuthorityManager.getManager().getMinConfidence(values[0].schema, values[0].element, values[0].qualifier);
+                                int minConfidence = MetadataAuthorityManager.getManager()
+                                        .getMinConfidence(values[0].schema, values[0].element, values[0].qualifier);
 
                                 for (int x = 0; x < values.length; x++)
                                 {
@@ -439,11 +440,19 @@ public class IndexBrowse
                                                 values[x].element +
                                                 (values[x].qualifier == null ? "" : "." + values[x].qualifier));
                                     }
-                                    else if (bis[i].isAuthorityIndex())
+                                    else
+                                    {                                        
+                                        if (bis[i].isAuthorityIndex() && 
+                                                (values[x].authority == null || values[x].confidence < minConfidence))
                                         {
-                                        // Skip unless we have an authority index only authored metadata will go here!
+                                            // if we have an authority index only authored metadata will go here!
+                                            log.debug("Skipping item="+item.getID()+", field="+values[x].schema+"."+values[x].element+"."+values[x].qualifier+", value="+values[x].value+", authority="+values[x].authority+", confidence="+values[x].confidence+" (BAD AUTHORITY)");
+                                            break;
+                                        }
+                                        
                                         // is there any valid (with appropriate confidence) authority key?
-                                        if (values[x].authority != null && values[x].confidence >= minConfidence)
+                                        if (values[x].authority != null
+                                                && values[x].confidence >= minConfidence)
                                         {
                                             boolean isValueVariants = false;
                                             List<String> variants = ChoiceAuthorityManager.getManager()
@@ -469,11 +478,6 @@ public class IndexBrowse
                                                 distIDSet.add(dao.getDistinctID(bis[i].getDistinctTableName(), values[x].value, values[x].authority, nVal));
                                             }
                                         }
-                                        else
-                                        {
-                                            log.debug("Skipping item="+item.getID()+", field="+values[x].schema+"."+values[x].element+"."+values[x].qualifier+", value="+values[x].value+", authority="+values[x].authority+", confidence="+values[x].confidence+" (BAD AUTHORITY)");
-                                        }
-                                    }
                                         else // put it in the browse index as if it hasn't have an authority key
                                         {
                                         // get the normalised version of the value
@@ -483,6 +487,7 @@ public class IndexBrowse
                                 }
                             }
                         }
+                    }
                     }
 
                     // Do we have any mappings?
