@@ -101,11 +101,6 @@
 	
 	type = bix.getName();
 	
-	if (bi.hasValue())
-	{
-		value = "\"" + bi.getValue() + "\"";
-	}
-	
 	// next and previous links are of the form:
 	// [handle/<prefix>/<suffix>/]browse?type=<type>&sort_by=<sort_by>&order=<order>[&value=<value>][&rpp=<rpp>][&[focus=<focus>|vfocus=<vfocus>]
 	
@@ -121,12 +116,25 @@
 	}
 	
 	String direction = (bi.isAscending() ? "ASC" : "DESC");
-	String valueString = "";
-	if (bi.hasValue())
+	
+	String argument = null;
+	if (bi.hasAuthority())
+    {
+        value = bi.getAuthority();
+        argument = "authority";
+    }
+	else if (bi.hasValue())
 	{
-		valueString = "&amp;value=" + URLEncoder.encode(bi.getValue());
+		value = bi.getValue();
+	    argument = "value";
 	}
 
+	String valueString = "";
+	if (value!=null)
+	{
+		valueString = "&amp;" + argument + "=" + URLEncoder.encode(value);
+	}
+	
     String sharedLink = linkBase + urlFragment + "?";
 
     if (bix.getName() != null)
@@ -204,7 +212,11 @@
 			<input type="hidden" name="rpp" value="<%= rpp %>"/>
 			<input type="hidden" name="etal" value="<%= bi.getEtAl() %>" />
 <%
-		if (bi.hasValue())
+		if (bi.hasAuthority())
+		{
+		%><input type="hidden" name="authority" value="<%=bi.getAuthority() %>"/><%
+		}
+		else if (bi.hasValue())
 		{
 			%><input type="hidden" name="value" value="<%= bi.getValue() %>"/><%
 		}
@@ -314,7 +326,11 @@
 	<form method="get" action="<%= formaction %>">
 		<input type="hidden" name="type" value="<%= bix.getName() %>"/>
 <%
-		if (bi.hasValue())
+		if (bi.hasAuthority())
+		{
+		%><input type="hidden" name="authority" value="<%=bi.getAuthority() %>"/><%
+		}
+		else if (bi.hasValue())
 		{
 			%><input type="hidden" name="value" value="<%= bi.getValue() %>"/><%
 		}
