@@ -257,7 +257,7 @@ function DSpaceChoicesLoad(form)
         },
         // format is <select><option authority="key" value="val">label</option>...
         onSuccess: function(transport) {
-          var ul = transport.responseXML.firstChild;
+          var ul = transport.responseXML.documentElement;
           var err = ul.getAttributeNode('error');
           if (err != null && err.value == 'true')
               window.alert(fail+" Server indicates error in response.");
