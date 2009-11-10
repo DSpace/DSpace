@@ -386,6 +386,7 @@ function updateInformation(eperson)
 	var lastName = cocoon.request.getParameter("last_name");
 	var firstName = cocoon.request.getParameter("first_name");
 	var phone = cocoon.request.getParameter("phone");
+        var language = cocoon.request.getParameter("language");
 
     // first check that each parameter is filled in before seting anything.	
 	var idx = 0;
@@ -411,6 +412,7 @@ function updateInformation(eperson)
 	eperson.setLastName(lastName);
 	
 	eperson.setMetadata("phone", phone);
+        eperson.setLanguage(language);
 	eperson.update();
 	
     return new Array();
@@ -454,7 +456,3 @@ function updatePassword(eperson)
 	
 	return new Array();
 }
-
-
-
-

@@ -62,6 +62,7 @@
  - [DS-333] Adjust SWORD ingest crosswalk to store bibliographic citation
 
 (Larry Stone)
+ - [DS-294] Add preferred language setting to Edit Profile page in XMLUI
  - [DS-361] Syndication Feeds refactoring, support all RSS/Atom formats for both feed and OpenSearch
  - [DS-369] Follow harvest.includerestricted.rss in XMLUI
  - [DS-349] Admins can choose Internal BitstreamFormats in XMLUI

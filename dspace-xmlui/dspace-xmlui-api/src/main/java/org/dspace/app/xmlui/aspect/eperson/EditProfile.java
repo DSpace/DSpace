@@ -44,6 +44,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.avalon.framework.parameters.Parameters;
@@ -65,29 +67,30 @@ import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Subscribe;
 import org.xml.sax.SAXException;
 
 /**
- * Display a form that allows the user to edit their profile. 
- * There are two cases in which this can be used: 1) when an 
- * existing user is attempting to edit their own profile, and 
+ * Display a form that allows the user to edit their profile.
+ * There are two cases in which this can be used: 1) when an
+ * existing user is attempting to edit their own profile, and
  * 2) when a new user is registering for the first time.
- * 
+ *
  * There are several parameters this transformer accepts:
- * 
+ *
  * email - The email address of the user registering for the first time.
- * 
+ *
  * registering - A boolean value to indicate whether the user is registering for the first time.
- * 
+ *
  * retryInformation - A boolean value to indicate whether there was an error with the user's profile.
- * 
+ *
  * retryPassword - A boolean value to indicate whether there was an error with the user's password.
- * 
+ *
  * allowSetPassword - A boolean value to indicate whether the user is allowed to set their own password.
- * 
+ *
  * @author Scott Phillips
  */
 public class EditProfile extends AbstractDSpaceTransformer
@@ -101,7 +104,7 @@ public class EditProfile extends AbstractDSpaceTransformer
     private static final Message T_title_update =
         message("xmlui.EPerson.EditProfile.title_update");
     
-    private static final Message T_dspace_home = 
+    private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
     
     private static final Message T_trail_new_registration =
@@ -113,37 +116,40 @@ public class EditProfile extends AbstractDSpaceTransformer
     private static final Message T_head_create =
         message("xmlui.EPerson.EditProfile.head_create");
     
-    private static final Message T_head_update = 
+    private static final Message T_head_update =
         message("xmlui.EPerson.EditProfile.head_update");
     
-    private static final Message T_email_address = 
+    private static final Message T_email_address =
         message("xmlui.EPerson.EditProfile.email_address");
     
-    private static final Message T_first_name = 
+    private static final Message T_first_name =
         message("xmlui.EPerson.EditProfile.first_name");
     
-    private static final Message T_error_required = 
+    private static final Message T_error_required =
         message("xmlui.EPerson.EditProfile.error_required");
     
-    private static final Message T_last_name = 
+    private static final Message T_last_name =
         message("xmlui.EPerson.EditProfile.last_name");
     
     private static final Message T_telephone =
         message("xmlui.EPerson.EditProfile.telephone");
     
-    private static final Message T_create_password_instructions = 
+    private static final Message T_language =
+        message("xmlui.EPerson.EditProfile.Language");
+    
+    private static final Message T_create_password_instructions =
         message("xmlui.EPerson.EditProfile.create_password_instructions");
     
-    private static final Message T_update_password_instructions = 
+    private static final Message T_update_password_instructions =
         message("xmlui.EPerson.EditProfile.update_password_instructions");
     
-    private static final Message T_password = 
+    private static final Message T_password =
         message("xmlui.EPerson.EditProfile.password");
     
     private static final Message T_error_invalid_password =
         message("xmlui.EPerson.EditProfile.error_invalid_password");
     
-    private static final Message T_confirm_password = 
+    private static final Message T_confirm_password =
         message("xmlui.EPerson.EditProfile.confirm_password");
     
     private static final Message T_error_unconfirmed_password =
@@ -152,31 +158,40 @@ public class EditProfile extends AbstractDSpaceTransformer
     private static final Message T_submit_update =
         message("xmlui.EPerson.EditProfile.submit_update");
     
-    private static final Message T_submit_create = 
+    private static final Message T_submit_create =
         message("xmlui.EPerson.EditProfile.submit_create");
     
-    private static final Message T_subscriptions = 
+    private static final Message T_subscriptions =
         message("xmlui.EPerson.EditProfile.subscriptions");
 
-    private static final Message T_subscriptions_help = 
+    private static final Message T_subscriptions_help =
         message("xmlui.EPerson.EditProfile.subscriptions_help");
 
-    private static final Message T_email_subscriptions = 
+    private static final Message T_email_subscriptions =
         message("xmlui.EPerson.EditProfile.email_subscriptions");
 
-    private static final Message T_select_collection = 
+    private static final Message T_select_collection =
         message("xmlui.EPerson.EditProfile.select_collection");
  
-    private static final Message T_head_auth = 
+    private static final Message T_head_auth =
         message("xmlui.EPerson.EditProfile.head_auth");
     
     private static final Message T_head_identify =
-    	message("xmlui.EPerson.EditProfile.head_identify");
+        message("xmlui.EPerson.EditProfile.head_identify");
     
     private static final Message T_head_security =
-    	message("xmlui.EPerson.EditProfile.head_security");
+        message("xmlui.EPerson.EditProfile.head_security");
     
-    
+    private static Locale[] supportedLocales = getSupportedLocales();
+    static
+    {
+        Arrays.sort(supportedLocales, new Comparator<Locale>() {
+            public int compare(Locale a, Locale b)
+            {
+                return a.getDisplayName().compareTo(b.getDisplayName());
+            }
+            public boolean equals(Object o) { return false; }});
+    }
     
     /** The email address of the user registering for the first time.*/
     private String email;
@@ -193,7 +208,7 @@ public class EditProfile extends AbstractDSpaceTransformer
     public void setup(SourceResolver resolver, Map objectModel, String src,
             Parameters parameters) throws ProcessingException, SAXException,
             IOException
-    { 
+    {
         super.setup(resolver,objectModel,src,parameters);
         
         this.email = parameters.getParameter("email","unknown");
@@ -211,7 +226,7 @@ public class EditProfile extends AbstractDSpaceTransformer
             this.email = eperson.getEmail();
     }
        
-    public void addPageMeta(PageMeta pageMeta) throws WingException 
+    public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         // Set the page title
         if (registering)
@@ -227,7 +242,7 @@ public class EditProfile extends AbstractDSpaceTransformer
     }
     
     
-   public void addBody(Body body) throws WingException, SQLException 
+   public void addBody(Body body) throws WingException, SQLException
    {
        // Log that we are viewing a profile
        log.info(LogManager.getHeader(context, "view_profile", ""));
@@ -235,17 +250,20 @@ public class EditProfile extends AbstractDSpaceTransformer
        Request request = ObjectModelHelper.getRequest(objectModel);
        
        String defaultFirstName="",defaultLastName="",defaultPhone="";
+       String defaultLanguage=null;
        if (request.getParameter("submit") != null)
        {
            defaultFirstName = request.getParameter("first_name");
            defaultLastName = request.getParameter("last_name");
            defaultPhone = request.getParameter("phone");
+           defaultLanguage = request.getParameter("language");
        }
        else if (eperson != null)
        {
             defaultFirstName = eperson.getFirstName();
             defaultLastName = eperson.getLastName();
             defaultPhone = eperson.getMetadata("phone");
+            defaultLanguage = eperson.getLanguage();
        }
        
        String action = contextPath;
@@ -276,7 +294,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        List form = profile.addList("form",List.TYPE_FORM);
        
        List identity = form.addList("identity",List.TYPE_FORM);
-       identity.setHead(T_head_identify);       
+       identity.setHead(T_head_identify);
        
        // Email
        identity.addLabel(T_email_address);
@@ -292,7 +310,7 @@ public class EditProfile extends AbstractDSpaceTransformer
            firstName.addError(T_error_required);
        }
        if (!registering && !ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
-    	   firstName.setDisabled();
+           firstName.setDisabled();
        
        // Last name
        Text lastName = identity.addItem().addText("last_name");
@@ -304,7 +322,7 @@ public class EditProfile extends AbstractDSpaceTransformer
            lastName.addError(T_error_required);
        }
        if (!registering &&!ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
-    	   lastName.setDisabled();
+           lastName.setDisabled();
        
        // Phone
        Text phone = identity.addItem().addText("phone");
@@ -315,58 +333,77 @@ public class EditProfile extends AbstractDSpaceTransformer
            phone.addError(T_error_required);
        }
        if (!registering && !ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
-    	   phone.setDisabled();
+           phone.setDisabled();
         
+       // Language
+       Select lang = identity.addItem().addSelect("language");
+       lang.setLabel(T_language);
+       if (supportedLocales.length > 0)
+       {
+           for (Locale lc : supportedLocales)
+           {
+               lang.addOption(lc.toString(), lc.getDisplayName());
+           }
+       }
+       else
+       {
+           lang.addOption(I18nUtil.DEFAULTLOCALE.toString(), I18nUtil.DEFAULTLOCALE.getDisplayName());
+       }
+       lang.setOptionSelected((defaultLanguage == null || defaultLanguage.equals("")) ?
+                              I18nUtil.DEFAULTLOCALE.toString() : defaultLanguage);
+       if (!registering && !ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
+           lang.setDisabled();
+
        // Subscriptions
        if (!registering)
        {
-    	   List subscribe = form.addList("subscriptions",List.TYPE_FORM);
-    	   subscribe.setHead(T_subscriptions);
-    	   
-    	   subscribe.addItem(T_subscriptions_help);
-    	   
-    	   Collection[] currentList = Subscribe.getSubscriptions(context, context.getCurrentUser());
-    	   Collection[] possibleList = Collection.findAll(context);
-    	   
-    	   Select subscriptions = subscribe.addItem().addSelect("subscriptions");
-    	   subscriptions.setLabel(T_email_subscriptions);
-    	   subscriptions.setHelp("");
-    	   subscriptions.enableAddOperation();
-    	   subscriptions.enableDeleteOperation();
-    	   
-    	   subscriptions.addOption(-1,T_select_collection);
-    	   for (Collection possible : possibleList)
-    	   {
-    		   String name = possible.getMetadata("name");
-    		   if (name.length() > 50)
-    			   name = name.substring(0, 47) + "...";
-    		   subscriptions.addOption(possible.getID(), name);
-    	   }
-    		   
-    	   for (Collection collection: currentList)
-    		   subscriptions.addInstance().setOptionSelected(collection.getID());
+           List subscribe = form.addList("subscriptions",List.TYPE_FORM);
+           subscribe.setHead(T_subscriptions);
+           
+           subscribe.addItem(T_subscriptions_help);
+           
+           Collection[] currentList = Subscribe.getSubscriptions(context, context.getCurrentUser());
+           Collection[] possibleList = Collection.findAll(context);
+           
+           Select subscriptions = subscribe.addItem().addSelect("subscriptions");
+           subscriptions.setLabel(T_email_subscriptions);
+           subscriptions.setHelp("");
+           subscriptions.enableAddOperation();
+           subscriptions.enableDeleteOperation();
+           
+           subscriptions.addOption(-1,T_select_collection);
+           for (Collection possible : possibleList)
+           {
+                   String name = possible.getMetadata("name");
+                   if (name.length() > 50)
+                           name = name.substring(0, 47) + "...";
+                   subscriptions.addOption(possible.getID(), name);
+           }
+                   
+           for (Collection collection: currentList)
+                   subscriptions.addInstance().setOptionSelected(collection.getID());
        }
        
        
-       if (allowSetPassword) 
+       if (allowSetPassword)
        {
-    	   List security = form.addList("security",List.TYPE_FORM);
+           List security = form.addList("security",List.TYPE_FORM);
            security.setHead(T_head_security);
-    	   
-           if (registering) 
+           
+           if (registering)
            {
-        	   security.addItem().addContent(T_create_password_instructions);
+                   security.addItem().addContent(T_create_password_instructions);
            }
            else
            {
-        	   security.addItem().addContent(T_update_password_instructions);
-           } 
+                   security.addItem().addContent(T_update_password_instructions);
+           }
            
            
            Field password = security.addItem().addPassword("password");
            password.setLabel(T_password);
            if (registering)
-        	   password.setRequired();
+                   password.setRequired();
            if (errors.contains("password"))
            {
                password.addError(T_error_invalid_password);
@@ -375,7 +412,7 @@ public class EditProfile extends AbstractDSpaceTransformer
            Field passwordConfirm = security.addItem().addPassword("password_confirm");
            passwordConfirm.setLabel(T_confirm_password);
            if (registering)
-        	   passwordConfirm.setRequired();
+                   passwordConfirm.setRequired();
            if (errors.contains("password_confirm"))
            {
                passwordConfirm.addError(T_error_unconfirmed_password);
@@ -385,39 +422,61 @@ public class EditProfile extends AbstractDSpaceTransformer
        Button submit = form.addItem().addButton("submit");
        if (registering)
            submit.setValue(T_submit_update);
-       else 
+       else
            submit.setValue(T_submit_create);
        
-       profile.addHidden("eperson-continue").setValue(knot.getId()); 
+       profile.addHidden("eperson-continue").setValue(knot.getId());
        
        
        
        if (!registering)
        {
-       		// Add a list of groups that this user is apart of. 
-			Group[] memberships = Group.allMemberGroups(context, context.getCurrentUser());
-    	   	
-    	   	
-			// Not a member of any groups then don't do anything.
-			if (!(memberships.length > 0))
-				return;
-			
-			List list = profile.addList("memberships");
-			list.setHead(T_head_auth);
-			for (Group group: memberships)
-			{
-				list.addItem(group.getName());
-			}
+                // Add a list of groups that this user is apart of.
+                        Group[] memberships = Group.allMemberGroups(context, context.getCurrentUser());
+                
+                
+                        // Not a member of any groups then don't do anything.
+                        if (!(memberships.length > 0))
+                                return;
+                        
+                        List list = profile.addList("memberships");
+                        list.setHead(T_head_auth);
+                        for (Group group: memberships)
+                        {
+                                list.addItem(group.getName());
+                        }
        }
    }
    
    /**
     * Recycle
     */
-    public void recycle() 
+    public void recycle()
     {
         this.email = null;
         this.errors = null;
         super.recycle();
+    }
+
+    /**
+     * get the available Locales for the User Interface as defined in dspace.cfg
+     * property xmlui.supported.locales
+     * returns an array of Locales or null
+     *
+     * @return an array of supported Locales or null
+     */
+    private static Locale[] getSupportedLocales()
+    {
+        String ll = ConfigurationManager.getProperty("xmlui.supported.locales");
+        if (ll != null)
+        {
+            return I18nUtil.parseLocales(ll);
+        }
+        else
+        {
+            Locale result[] = new Locale[1];
+            result[0] =  I18nUtil.DEFAULTLOCALE;
+            return result;
+        }
     }
 }

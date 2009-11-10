@@ -566,18 +566,15 @@ public class EPerson extends DSpaceObject
      }
      
      /**
-     * Set the EPerson's laguage
+     * Set the EPerson's language.  Value is expected to be a Unix/POSIX
+     * Locale specification of the form {language} or {language}_{territory},
+     * e.g. "en", "en_US", "pt_BR" (the latter is Brazilian Portugese).
      * 
      * @param s
      *            language
      */
      public void setLanguage(String language)
      {
-         if (language != null)
-         {
-             language = language.toLowerCase();
-         }
-
          myRow.setColumn("language", language);
      }
   
