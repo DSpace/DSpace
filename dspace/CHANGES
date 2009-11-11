@@ -60,6 +60,7 @@
  - [DS-327] SWORD temp upload directory missing trailling slash
  - [DS-328] SWORD service documents do not include atom:generator element
  - [DS-333] Adjust SWORD ingest crosswalk to store bibliographic citation
+ - [DS-372] New verbose option for [dspace]/bin/dspace cleanup script
 
 (Larry Stone)
  - [DS-294] Add preferred language setting to Edit Profile page in XMLUI
