@@ -2383,9 +2383,12 @@
     </xsl:template>
     
     <xsl:template match="dri:help" mode="help">
-        <span class="field-help">
-            <xsl:apply-templates />
-        </span>
+        <!--Only create the <span> if there is content in the <dri:help> node-->
+        <xsl:if test="./text() or ./node()">
+            <span class="field-help">
+                <xsl:apply-templates />
+            </span>
+        </xsl:if>
     </xsl:template>
     
     
