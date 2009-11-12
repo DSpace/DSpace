@@ -79,6 +79,7 @@ public class Cleanup
             Options options = new Options();
 
             options.addOption("l", "leave", false, "Leave database records but delete file from assetstore");
+            options.addOption("v", "verbose", false, "Provide verbose output");
             options.addOption("h", "help", false, "Help");
             
             try
@@ -106,7 +107,7 @@ public class Cleanup
                 deleteDbRecords = false;    
             }
            	log.debug("leave db records = " + deleteDbRecords);
-            BitstreamStorageManager.cleanup(deleteDbRecords);
+            BitstreamStorageManager.cleanup(deleteDbRecords, line.hasOption('v'));
             
             System.exit(0);
         }

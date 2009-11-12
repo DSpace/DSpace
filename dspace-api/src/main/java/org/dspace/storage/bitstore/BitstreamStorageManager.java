@@ -385,7 +385,7 @@ public class BitstreamStorageManager
 	 * @return The ID of the registered bitstream
 	 * @exception SQLException
 	 *                If a problem occurs accessing the RDBMS
-	 * @throws IOExeption
+	 * @throws IOException
 	 */
 	public static int register(Context context, int assetstore,
 				String bitstreamPath) throws SQLException, IOException {
@@ -595,7 +595,7 @@ public class BitstreamStorageManager
      * @exception SQLException
      *                If a problem occurs accessing the RDBMS
      */
-    public static void cleanup(boolean deleteDbRecords) throws SQLException, IOException
+    public static void cleanup(boolean deleteDbRecords, boolean verbose) throws SQLException, IOException
     {
         Context context = null;
         BitstreamInfoDAO bitstreamInfoDAO = new BitstreamInfoDAO();
@@ -624,7 +624,9 @@ public class BitstreamStorageManager
                     if (deleteDbRecords)
                     {
                         log.debug("deleting record");
+                        if (verbose) System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
                         bitstreamInfoDAO.deleteBitstreamInfoWithHistory(bid);
+                        if (verbose) System.out.println(" - Deleting bitstream record from database (ID: " + bid + ")");
                         DatabaseManager.delete(context, "Bitstream", bid);
                     }
                     continue;
@@ -641,7 +643,9 @@ public class BitstreamStorageManager
                 if (deleteDbRecords)
                 {
                     log.debug("deleting db record");
+                    if (verbose) System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
                     bitstreamInfoDAO.deleteBitstreamInfoWithHistory(bid);
+                    if (verbose) System.out.println(" - Deleting bitstream record from database (ID: " + bid + ")");
                     DatabaseManager.delete(context, "Bitstream", bid);
                 }
 
@@ -651,12 +655,14 @@ public class BitstreamStorageManager
 
                 boolean success = file.delete();
 
-                if (log.isDebugEnabled())
-                {
-                    log.debug("Deleted bitstream " + bid + " (file "
+                String message = ("Deleted bitstream " + bid + " (file "
                             + file.getAbsolutePath() + ") with result "
                             + success);
+                if (log.isDebugEnabled())
+                {
+                    log.debug(message);
                 }
+                if (verbose) System.out.println(message);
 
                 // if the file was deleted then
                 // try deleting the parents
@@ -677,7 +683,9 @@ public class BitstreamStorageManager
                 commit_counter++;
                 if (commit_counter % 100 == 0)
                 {
-                	context.commit();
+                	System.out.print("Committing changes to the database...");
+                    context.commit();
+                    System.out.println(" Done!");
                 }
             }
 
@@ -688,11 +696,13 @@ public class BitstreamStorageManager
         // time around will be a no-op.
         catch (SQLException sqle)
         {
+            if (verbose) System.err.println("Error: " + sqle.getMessage());
             context.abort();
             throw sqle;
         }
         catch (IOException ioe)
         {
+            if (verbose) System.err.println("Error: " + ioe.getMessage());
             context.abort();
             throw ioe;
         }
