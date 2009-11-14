@@ -3663,9 +3663,9 @@ webui.preview.brand.fontpoint = 12</screen>
 			<section remap="h4">
 				<title><anchor id="docbook-configure.html-browse-index-define" xreflabel="Defining the Indexes"/>Defining the Indexes.</title>
 				<para>DSpace arrives with four default indexes already defined: author, title, date issued, and subjects. Users may also define additional indexes or re-configure the current indexes for different levels of specificity. For example, the default entries that appear in the <literal>dspace.cfg</literal> as default installation:</para>
-				<screen>webui.browse.index.1 = dateissued:item:dateissued
+				<screen>webui.browse.index.1 = dateissued:metadata:dc.date.issued:date:full
 webui.browse.index.2 = author:metadata:dc.contributor.*:text
-webui.browse.index.3 = title:item:title
+webui.browse.index.3 = title:metadata:dc.title:title:full
 webui.browse.index.4 = subject:metadata:dc.subject.*:text
 #webui.browse.index.5 = dateaccessioned:item:dateaccessioned</screen>
 				<para>The format of each entry is <literal>webui.browse.index.&lt;n&gt; = &lt;index name&gt;:&lt;metadata&gt;:&lt;schema prefix&gt;.&lt;element&gt;.&lt;qualifier&gt;:&lt;data-type field&gt;:&lt;sort option&gt;</literal>. Please notice that the punctuation is paramount in typing this property key in the <literal>dspace.cfg</literal> file. The following table explains each element:</para>
@@ -5510,8 +5510,8 @@ core.authorization.item-admin.cc-license</screen></entry>
 			</note>
 		</section>
 		<section remap="h3">
-			<title><anchor id="docbook-configure.html-bulkedits" xreflabel="Bulk Metadata Editing"/>Bult Metadata Editing</title>
-			<para>The following configurations allow the adminstrator extract from the DSpace database a set of records for editing by a metadata expert. It provide an easier way of editing large collections.</para>
+			<title><anchor id="docbook-configure.html-bulkedits" xreflabel="Bulk Metadata Editing"/>Batch Metadata Editing</title>
+			<para>The following configurations allow the adminstrator extract from the DSpace database a set of records for editing by a metadata export. It provides an easier way of editing large collections.</para>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
@@ -5560,7 +5560,7 @@ core.authorization.item-admin.cc-license</screen></entry>
 						</row>
 						<row>
 							<entry align="right">Informational note</entry>
-							<entry>When using the WEBUI, this sets the limit of the number of items allowed to be edited in one processing.   There is no limit when using the CLI.</entry>
+							<entry>When using the WEBUI, this sets the limit of the number of items allowed to be edited in one processing. There is no limit when using the CLI.</entry>
 						</row>
 						<row>
 							<?dbfo row-height="5mm"?>
@@ -5574,8 +5574,8 @@ core.authorization.item-admin.cc-license</screen></entry>
 						<row>
 							<entry align="right">Example Value:</entry>
 							<entry>
-								<screen>bulkedit.ignore-on-export = dc.date.accessioned,
-                   	     dc.date.available, \
+								<screen>bulkedit.ignore-on-export = dc.date.accessioned, \
+                            dc.date.available, \
                             dc.date.updated, dc.description.provenance</screen>
 							</entry>
 						</row>
@@ -5636,7 +5636,7 @@ core.authorization.item-admin.cc-license</screen></entry>
 			<title><anchor id="docbook-configure.html-xpdf" xreflabel="XPDF Filter"/>XPDF Filter </title>
 			<para>These filters handle PDF resources with more sophisticated tools that can produce thumbnail images of PDF and 3D PDF files, and do much faster (and more complete) text extraction as well.</para>
 			<section remap="h4">
-				<title><emphasis role="bold">Installation</emphasis></title>
+				<title>Installation</title>
 				<para>The following instructions are the &quot;quick and dirty&quot; method for installing the XPDF filter. It does not address any issues that may be affectively needed for Maven Modules or and POMs. This method below does not take into account the maintaining the DSpace installation or upgrading.</para>
 				<orderedlist>
 					<listitem>
@@ -5654,9 +5654,7 @@ core.authorization.item-admin.cc-license</screen></entry>
 				</orderedlist>
 			</section>
 			<section remap="h4">
-				<title>
-					<emphasis role="bold">Install XPDF tools</emphasis>
-				</title>
+				<title>Install XPDF Tools</title>
 				<para>First, download the XPDF suite found at:<ulink url="http://www.foolabs.com/xpdf/">http://www.foolabs.com/xpdf</ulink> and install it on your server under /usr/local/bin.</para>
 				<para>The only tools you <emphasis>really</emphasis> need are:</para>
 				<itemizedlist>
@@ -5672,7 +5670,7 @@ core.authorization.item-admin.cc-license</screen></entry>
 				</itemizedlist>
 			</section>
 			<section remap="h4">
-				<title><emphasis role="bold">Installation within DSpace</emphasis></title>
+				<title>Installation within DSpace</title>
 				<para>The user will be using Java&trade; Advanced Imaging Image I/O Tools. </para>
 				<caution>
 					<para>For AIX, Sun support has the following: &quot;JAI has native acceleration for the above but it also works in pure Java mode. So as long as you have an appropriate JDK for AIX (1.3 or later, I believe), you should be able to use it. You can download any of them, extract just the jars, and put those in your $CLASSPATH.&quot;</para>
@@ -5694,8 +5692,7 @@ core.authorization.item-admin.cc-license</screen></entry>
 	</screen>
 				</section>
 				<section remap="h5">
-					<title><emphasis role="bold">Edit DSpace Configuration</emphasis>
-					</title>
+					<title>Edit DSpace Configuration</title>
 					<para>First, be sure there is a value for thumbnail.maxwidth and that it corresponds to the size you want for preview images for the UI, e.g.: (<emphasis>NOTE:</emphasis> this code doesn&apos;t pay any attention to thumbnail.maxheight but it&apos;s best to set it too so the other thumbnail filters make square images.)</para>
 					<screen>
         # maximum width and height of generated thumbnails
@@ -5736,9 +5733,7 @@ core.authorization.item-admin.cc-license</screen></entry>
 	</screen>
 				</section>
 				<section remap="h5">
-					<title>
-						<emphasis role="bold">Build and Install</emphasis>
-					</title>
+					<title>Build and Install</title>
 					<para>Follow the usual DSpace installation/update procedure (<literal>mvn package</literal> and then <literal>ant -Dconfig=</literal><emphasis>etc. ...</emphasis>)</para>
 					<para>These instructions were retrieved from &quot;<ulink url="http://libstaff.mit.edu/facade/index.php/DSpace_PDF_Media_Filters">http://libstaff.mit.edu/facade/index.php/DSpace_PDF_Media_Filters</ulink>&quot;</para>
 				</section>
@@ -6238,6 +6233,23 @@ plugin.named.org.dspace.sword.SWORDIngester = \
 							<entry align="right">Informational Note:</entry>
 							<entry>Configure the plugins to process incoming packages. The form of this configuration is as per the Plugin Manager's Named Plugin documentation: <literal>plugin.named.[interface] = [implementation] = [package format identifier] \</literal> . Package ingesters should implement the SWORDIngester interface, and will be loaded when a package of the format specified above in: <literal>sword.accept-packaging.[package format].identifier = [package format identifier]</literal> is received. In the event that this is a simple file deposit, with no package format, then the class named by "SimpleFileIngester" will be loaded and executed where appropriate. This case will only occur when a single file is being deposited into an existing DSpace Item.</entry>
 						</row>
+						<row>
+							<?dbfo row-height="5mm"?>
+							<?dbhtml row-height="5mm"?>
+							<entry spanname="notespan"/>
+						</row>
+						<row>
+							<entry align="right">Properties:</entry>
+							<entry><literal>sword.accepts</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Example Value:</entry>
+							<entry><literal>sword.accepts = application/zip, foo/bar</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Informational Note:</entry>
+							<entry>A comma separated list of MIME types that SWORD will accept.</entry>
+						</row>
 					</tbody></tgroup>
 			</informaltable>
 		</section>
@@ -6327,7 +6339,7 @@ plugin.named.org.dspace.sword.SWORDIngester = \
 						</row>
 						<row>
 							<entry align="right">Informational Note:</entry>
-							<entry><literal>Number of hours to retain results before recalculating. This applies to the Manakin interface only.</literal></entry>
+							<entry>Number of hours to retain results before recalculating. This applies to the Manakin interface only.</entry>
 						</row>
 						<row>
 							<?dbfo row-height="5mm"?>
@@ -6450,6 +6462,97 @@ plugin.named.org.dspace.sword.SWORDIngester = \
 						</row>
 					</tbody></tgroup>
 			</informaltable>
+		</section>
+		<section remap="h3">
+			<title><anchor id="docbook-configure.htmtl-embargo" xreflabel="Embargo"/>Embargo</title>
+			<para>It is possible now to configure a DSpace instance to have an &quot;Embargo&quot; feature uses for thesis and dissertations.</para>
+			<informaltable>
+				<?dbhtml table-width="100%"?>
+				<?dbfo table-width="100%"?>
+				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+						<row>
+							<entry align="right">Property:</entry>
+							<entry><literal>embargo.field.terms</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Example Value:</entry>
+							<entry><literal>embargo.field.terms = SCHEMA.ELEMENT.QUALIFIER</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Informational Note:</entry>
+							<entry>DC metadata field to hold the user-supplied embargo terms</entry>
+						</row>
+						<row>
+							<?dbfo row-height="5mm"?>
+							<?dbhtml row-height="5mm"?>
+							<entry spanname="notespan"/>
+						</row>
+						<row>
+							<entry align="right">Property:</entry>
+							<entry><literal>embargo.field.lift</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Example Value:</entry>
+							<entry><literal>embargo.field.lift = SCHEMA.ELEMENT.QUALIFIER</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Informational Note:</entry>
+							<entry>DC metadata field to hold computed &quot;lift date&quot; of embargo</entry>
+						</row>
+						<row>
+							<?dbfo row-height="5mm"?>
+							<?dbhtml row-height="5mm"?>
+							<entry spanname="notespan"/>
+						</row>
+						<row>
+							<entry align="right">Property:</entry>
+							<entry><literal>embargo.terms.open</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Example Value:</entry>
+							<entry><literal>embargo.terms.open = forever</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Informational Note:</entry>
+							<entry>The string in terms field to indicate indefinite embargo</entry>
+						</row>
+						<row>
+							<?dbfo row-height="5mm"?>
+							<?dbhtml row-height="5mm"?>
+							<entry spanname="notespan"/>
+						</row>
+						<row>
+							<entry align="right">Property:</entry>
+							<entry><literal>plugin.single.org.dspace.embargo.EmbargoSetter</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Example Value:</entry>
+							<entry><literal>plugin.single.org.dspace.embargo.EmbargoSetter = CLASSNAME</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Informational Note:</entry>
+							<entry>Implementation of embargo setter plugin</entry>
+						</row>
+						<row>
+							<?dbfo row-height="5mm"?>
+							<?dbhtml row-height="5mm"?>
+							<entry spanname="notespan"/>
+						</row>
+						<row>
+							<entry align="right">Property:</entry>
+							<entry><literal>plugin.single.org.dspace.embargo.EmbargoLifter</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Example Value:</entry>
+							<entry><literal>plugin.single.org.dspace.embargo.EmbargoLifter = org.dspace.embargo.DefaultEm</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Informational Note:</entry>
+							<entry>Implementation of embargo lifter plugin</entry>
+						</row>
+					</tbody></tgroup>
+			</informaltable>
+			<para>Remember that you need to replace <literal>SCHEMA.ELEMENT.QUALIFIER</literal> with a real metadata field. Additionally, you need to replace the <literal>CLASSNAME</literal> with a properly impleented plugin.</para>
 		</section>
 		<!-- This is to close the 5.3 section (below) -->
 	</section>
