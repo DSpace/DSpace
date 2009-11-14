@@ -12,7 +12,7 @@
 useradd -m dspace
 gunzip -c dspace-1.x-src-release.tar.gz | tar -xf -
 createuser -U postgres -d -A -P dspace
-created -U dspace -E UNICODE dspace
+createdb -U dspace -E UNICODE dspace
 cd [dspace-source]/dspace/config
 vi dspace.cfg
 mkdir <emphasis>[dspace]</emphasis>
