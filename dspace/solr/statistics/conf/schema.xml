@@ -290,7 +290,7 @@
    <field name="owningColl" type="integer" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="owningItem" type="integer" indexed="true" stored="true" required="false" multiValued="true" /> 
   <field name="dns" type="string" indexed="true" stored="true" required="false"/>
-</fields>
+ </fields>
 
 
  <!-- field for the QueryParser to use when an explicit fieldname is absent -->

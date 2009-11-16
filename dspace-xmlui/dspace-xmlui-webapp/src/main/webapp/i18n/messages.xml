@@ -1727,6 +1727,9 @@
     <message key="xmlui.statistics.visits.total">Total Visits</message>
     <message key="xmlui.statistics.visits.month">Total Visits Per Month</message>
     <message key="xmlui.statistics.visits.views">Views</message>
+    <message key="xmlui.statistics.visits.countries">Top country views</message>
+    <message key="xmlui.statistics.visits.cities">Top cities views</message>
+    <message key="xmlui.statistics.visits.bitstreams">File Visits</message>
     <message key="xmlui.statistics.Navigation.title">Statistics</message>
     <message key="xmlui.statistics.Navigation.view">View Statistics</message>
     <message key="xmlui.statistics.trail">Statistics</message>

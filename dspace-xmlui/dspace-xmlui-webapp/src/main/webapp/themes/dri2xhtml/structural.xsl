@@ -553,12 +553,12 @@
                                     </xsl:attribute>
                                 </input>
                                 <xsl:choose>
-                                                                        <xsl:when test="/dri:document/dri:body//dri:div/dri:referenceSet[@type='detailView' and @n='community-view']">
-                                                                                <i18n:text>xmlui.dri2xhtml.structural.search-in-community</i18n:text>
-                                                                        </xsl:when>
-                                                                        <xsl:otherwise>
-                                                                                <i18n:text>xmlui.dri2xhtml.structural.search-in-collection</i18n:text>
-                                                                        </xsl:otherwise>
+                                    <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='containerType']/text() = 'type:community'">
+                                            <i18n:text>xmlui.dri2xhtml.structural.search-in-community</i18n:text>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                            <i18n:text>xmlui.dri2xhtml.structural.search-in-collection</i18n:text>
+                                    </xsl:otherwise>
                                                                                               
                                 </xsl:choose>
                             </label>

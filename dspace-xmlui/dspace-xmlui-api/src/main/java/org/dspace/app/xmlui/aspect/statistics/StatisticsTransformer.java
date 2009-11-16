@@ -26,11 +26,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.statistics.Dataset;
-import org.dspace.statistics.content.DatasetDSpaceObjectGenerator;
-import org.dspace.statistics.content.DatasetTimeGenerator;
-import org.dspace.statistics.content.StatisticsDataVisits;
-import org.dspace.statistics.content.StatisticsListing;
-import org.dspace.statistics.content.StatisticsTable;
+import org.dspace.statistics.content.*;
 import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
 
@@ -44,6 +40,9 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
     private static final String T_head_visits_total = "xmlui.statistics.visits.total";
     private static final String T_head_visits_month = "xmlui.statistics.visits.month";
     private static final String T_head_visits_views = "xmlui.statistics.visits.views";
+    private static final String T_head_visits_countries = "xmlui.statistics.visits.countries";
+    private static final String T_head_visits_cities = "xmlui.statistics.visits.cities";
+    private static final String T_head_visits_bitstream = "xmlui.statistics.visits.bitstreams";
 
     /**
      * Add a page title and trail links
@@ -55,7 +54,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
             dso = HandleManager.resolveToObject(context, handle);
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-        
+
         if(dso != null)
             HandleUtil.buildHandleTrail(dso,pageMeta,contextPath);
         pageMeta.addTrailLink(contextPath + "/handle" + (dso != null && dso.getHandle() != null ? "/" + dso.getHandle() : "/statistics"), T_statistics_trail);
@@ -172,7 +171,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 		try {
 
 			StatisticsTable statisticsTable = new StatisticsTable(new StatisticsDataVisits(dso));
-			
+
 			statisticsTable.setTitle(T_head_visits_month);
 			statisticsTable.setId("tab1");
 
@@ -192,54 +191,77 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 							+ dso.getID() + " and type " + dso.getType()
 							+ " and handle: " + dso.getHandle(), e);
 		}
-		
-		/**
-		 * 
-		 * FIX ME:  Need to correct rendering of column and row headings.
-		
-		try {
-			StatisticsListing statListing = new StatisticsListing(
-					new StatisticsDataVisits(dso));
 
-			statListing.setTitle("Total Visits By Continent");
-			statListing.setId("list1");
+         if(dso instanceof org.dspace.content.Item){
+             //Make sure our item has at least one bitstream
+             org.dspace.content.Item item = (org.dspace.content.Item) dso;
+            try {
+                if(item.hasUploadedFiles()){
+                    StatisticsListing statsList = new StatisticsListing(new StatisticsDataVisits(dso));
 
-			DatasetTypeGenerator typeGenerator = new DatasetTypeGenerator();
-            typeGenerator.setType("continent");
-            typeGenerator.setMax(10);
-			statListing.addDatasetGenerator(typeGenerator);
-			addDisplayListing(division, statListing);
+                    statsList.setTitle(T_head_visits_bitstream);
+                    statsList.setId("list-bit");
 
-		} catch (Exception e) {
-			log.error(
-					"Error occured while creating statistics for dso with ID: "
-							+ dso.getID() + " and type " + dso.getType()
-							+ " and handle: " + dso.getHandle(), e);
-		}
-		
-		try {
-			StatisticsListing statListing = new StatisticsListing(
-					new StatisticsDataVisits(dso));
+                    DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
+                    dsoAxis.addDsoChild(Constants.BITSTREAM, 10, false, -1);
+                    statsList.addDatasetGenerator(dsoAxis);
 
-			statListing.setTitle("Total Visits By City");
-			statListing.setId("list1");
+                    addDisplayListing(division, statsList);
+                }
+            } catch (Exception e) {
+                log.error(
+                        "Error occured while creating statistics for dso with ID: "
+                                + dso.getID() + " and type " + dso.getType()
+                                + " and handle: " + dso.getHandle(), e);
+            }
+        }
 
-			DatasetTypeGenerator typeGenerator = new DatasetTypeGenerator();
-            typeGenerator.setType("city");
-            typeGenerator.setMax(10);
-			statListing.addDatasetGenerator(typeGenerator);
-			addDisplayListing(division, statListing);
+        try {
+            StatisticsListing statListing = new StatisticsListing(
+                       new StatisticsDataVisits(dso));
 
-		} catch (Exception e) {
-			log.error(
-					"Error occured while creating statistics for dso with ID: "
-							+ dso.getID() + " and type " + dso.getType()
-							+ " and handle: " + dso.getHandle(), e);
-		}
-		
-		*/
-		
-		
+            statListing.setTitle(T_head_visits_countries);
+            statListing.setId("list2");
+
+//            DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
+//            dsoAxis.addDsoChild(dso.getType(), 10, false, -1);
+
+            DatasetTypeGenerator typeAxis = new DatasetTypeGenerator();
+            typeAxis.setType("countryCode");
+            typeAxis.setMax(10);
+            statListing.addDatasetGenerator(typeAxis);
+
+            addDisplayListing(division, statListing);
+        } catch (Exception e) {
+            log.error(
+                    "Error occured while creating statistics for dso with ID: "
+                            + dso.getID() + " and type " + dso.getType()
+                            + " and handle: " + dso.getHandle(), e);
+        }
+
+        try {
+            StatisticsListing statListing = new StatisticsListing(
+                       new StatisticsDataVisits(dso));
+
+            statListing.setTitle(T_head_visits_cities);
+            statListing.setId("list3");
+
+//            DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
+//            dsoAxis.addDsoChild(dso.getType(), 10, false, -1);
+
+            DatasetTypeGenerator typeAxis = new DatasetTypeGenerator();
+            typeAxis.setType("city");
+            typeAxis.setMax(10);
+            statListing.addDatasetGenerator(typeAxis);
+
+            addDisplayListing(division, statListing);
+        } catch (Exception e) {
+            log.error(
+                    "Error occured while creating statistics for dso with ID: "
+                            + dso.getID() + " and type " + dso.getType()
+                            + " and handle: " + dso.getHandle(), e);
+        }
+
 	}
 
 	
@@ -341,16 +363,16 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 			headerRow.addCell("", Cell.ROLE_DATA, "labelcell").addContent(message(T_head_visits_views));
 
 			/** Generate Table Body */
-			for (int row = 0; row < matrix.length; row++) {
+			for (int col = 0; col < matrix[0].length; col++) {
 				Row valListRow = table.addRow();
 
-				Cell catCell = valListRow.addCell(row + "1", Cell.ROLE_DATA,
+				Cell catCell = valListRow.addCell(col + "1", Cell.ROLE_DATA,
 						"labelcell");
-				catCell.addContent(dataset.getRowLabels().get(row));
+				catCell.addContent(dataset.getColLabels().get(col));
 
-				Cell valCell = valListRow.addCell(row + "2", Cell.ROLE_DATA,
+				Cell valCell = valListRow.addCell(col + "2", Cell.ROLE_DATA,
 						"datacell");
-				valCell.addContent(matrix[row][0]);
+				valCell.addContent(matrix[0][col]);
 
 			}
 
