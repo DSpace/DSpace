@@ -401,7 +401,7 @@ public class Ldap {
    * Cache of mapped groups.
    */
 
-  private static int[] groupsCache = null;
+  private int[] groupsCache = null;
 
   /**
    * Groups mapped by the Units.  Returns cached array of int group_id.
