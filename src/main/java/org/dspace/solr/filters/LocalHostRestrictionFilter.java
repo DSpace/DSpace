@@ -52,6 +52,7 @@ public class LocalHostRestrictionFilter implements Filter {
 			if(!(localAddr.equals(remoteAddr) || remoteAddr.equals("127.0.0.1")))
 			{
 				((HttpServletResponse)response).sendError(403);
+		                return;
 			}
 			
 		}
