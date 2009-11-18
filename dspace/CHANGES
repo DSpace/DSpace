@@ -94,6 +94,7 @@
 (Mark Diggory)
  - [DS-335] DatabaseManager additions from Minho statistics addon.
  - [DS-247] Addition of DSpace Services to DSpace 1.6
+ - [DS-335] Minho Statistics Database Manager additions.
 
 (Andrea Bollini)
  - [DS-206] Input form visibility restriction doesn't work properly
