@@ -75,7 +75,7 @@
 
     <command>
         <name>index</name>
-        <description>Initialise the search and browse indexes</description>
+        <description>General index command (requires extra paramters)</description>
         <step>
             <class>org.dspace.browse.IndexBrowse</class>
         </step>

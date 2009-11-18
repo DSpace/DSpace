@@ -209,7 +209,10 @@ public class ScriptLauncher
                             kernelImpl = null;
                         }
                     	
-                        System.err.println("Exception: " + e.getMessage());
+                        // Exceptions from the script are reported as a 'cause'
+                        Throwable cause = e.getCause();
+                        System.err.println("Exception: " + cause.getMessage());
+                        cause.printStackTrace();
                         System.exit(1);
                     }
                     
