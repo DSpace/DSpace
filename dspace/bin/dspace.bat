@@ -38,4 +38,4 @@
 @REM #
 @REM ###########################################################################
 
-@call dsrun.bat org.dspace.app.launcher.ScriptLauncher %1 %2 %3 %4 %5 %6 %7 %8 %9
+@call dsrun.bat org.dspace.app.launcher.ScriptLauncher %*
