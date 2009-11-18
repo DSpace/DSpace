@@ -4,7 +4,7 @@
 	<artifactId>dspace-solr</artifactId>
 	<packaging>war</packaging>
 	<name>DSpace Solr Service</name>
-	<version>2.0.0-beta-SNAPSHOT</version>
+	<version>1.3.0.2-SNAPSHOT</version>
 	<description>A bare bones deployment of Solr for use in DSpace applications</description>
 
 	<repositories>
