@@ -93,7 +93,7 @@ import org.xml.sax.SAXException;
  * Implements all the browse functionality (browse by title, subject, authors,
  * etc.) The types of browse available are configurable by the implementor. See
  * dspace.cfg and documentation for instructions on how to configure.
- * 
+ *
  * @author Graham Triggs
  */
 public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
@@ -177,7 +177,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             {
                 DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
                 if (dso != null)
-                    key += "-" + dso.getHandle();            
+                    key += "-" + dso.getHandle();
 
                 return HashUtil.hash(key);
             }
@@ -309,7 +309,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             
             // Add the column heading
             singleTable.addRow(Row.ROLE_HEADER).addCell().addContent(
-                    message("xmlui.ArtifactBrowser.ConfigurableBrowse." + type + ".column_heading"));          
+                    message("xmlui.ArtifactBrowser.ConfigurableBrowse." + type + ".column_heading"));
 
             // Iterate each result
             for (String[] singleEntry : browseInfo.getStringResults())
@@ -330,7 +330,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
                 // Create an entry in the table, and a linked entry
                 Cell cell = singleTable.addRow().addCell();
-                cell.addXref(super.generateURL(BROWSE_URL_BASE, queryParams),                    
+                cell.addXref(super.generateURL(BROWSE_URL_BASE, queryParams),
                       singleEntry[0]);
             }
         }
@@ -351,7 +351,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     /**
      * Makes the jump-list navigation for the results
-     * 
+     *
      * @param div
      * @param info
      * @param params
@@ -430,15 +430,20 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             // Create a clickable list of the alphabet
             List jumpList = jump.addList("jump-list", List.TYPE_SIMPLE, "alphabet");
             
-            Map<String, String> zeroQuery = new HashMap<String, String>(queryParamsGET);
-            zeroQuery.put(BrowseParams.STARTS_WITH, "0");
-            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, zeroQuery), "0-9");
+            // browse params for each letter are all the query params
+            // WITHOUT the second-stage browse value, and add STARTS_WITH.
+            Map<String, String> letterQuery = new HashMap<String, String>(queryParamsGET);
+            for (String valueKey : BrowseParams.FILTER_VALUE)
+            {
+                letterQuery.remove(valueKey);
+            }
+            letterQuery.put(BrowseParams.STARTS_WITH, "0");
+            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), "0-9");
             
             for (char c = 'A'; c <= 'Z'; c++)
             {
-                Map<String, String> cQuery = new HashMap<String, String>(queryParamsGET);
-                cQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
-                jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, cQuery), Character
+                letterQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
+                jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), Character
                         .toString(c));
             }
 
@@ -453,7 +458,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     /**
      * Add the controls to changing sorting and display options.
-     * 
+     *
      * @param div
      * @param info
      * @param params
@@ -544,7 +549,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     /**
      * The URL query string of of the previous page.
-     * 
+     *
      * Note: the query string does not start with a "?" or "&" those need to be
      * added as appropriate by the caller.
      */
@@ -570,7 +575,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     /**
      * The URL query string of of the next page.
-     * 
+     *
      * Note: the query string does not start with a "?" or "&" those need to be
      * added as appropriate by the caller.
      */
@@ -595,7 +600,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     /**
      * Get the query parameters supplied to the browse.
-     * 
+     *
      * @return
      * @throws SQLException
      * @throws UIException
@@ -742,7 +747,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     /**
      * Get the results of the browse. If the results haven't been generated yet,
      * then this will perform the browse.
-     * 
+     *
      * @return
      * @throws SQLException
      * @throws UIException
@@ -796,7 +801,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     /**
      * Is this a browse on a list of items, or unique metadata values?
-     * 
+     *
      * @param info
      * @return
      */
@@ -960,7 +965,7 @@ class BrowseParams
 
         if (scope.getFilterValueLang() != null)
         {
-            paramMap.put(BrowseParams.FILTER_VALUE_LANG, scope.getFilterValueLang()); 
+            paramMap.put(BrowseParams.FILTER_VALUE_LANG, scope.getFilterValueLang());
         }
 
         return paramMap;
@@ -969,7 +974,7 @@ class BrowseParams
     Map<String, String> getCommonParametersEncoded() throws UIException
     {
         Map<String, String> paramMap = getCommonParameters();
-	Map<String, String> encodedParamMap = new HashMap<String, String>();
+        Map<String, String> encodedParamMap = new HashMap<String, String>();
 
         for (String key: paramMap.keySet())
         {

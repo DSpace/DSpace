@@ -63,6 +63,7 @@
  - [DS-372] New verbose option for [dspace]/bin/dspace cleanup script
 
 (Larry Stone)
+ - [DS-373] Fix "Letter" link URLs in 2nd-stage Browse
  - [DS-294] Add preferred language setting to Edit Profile page in XMLUI
  - [DS-361] Syndication Feeds refactoring, support all RSS/Atom formats for both feed and OpenSearch
  - [DS-369] Follow harvest.includerestricted.rss in XMLUI
