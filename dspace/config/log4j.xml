@@ -53,8 +53,8 @@
 # When /dspace/bin/install-configs is run, this file will be installed in the
 # location specified by the property: config.template.log4j.properties
 -->
-<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
-<log4j:configuration>
+<!DOCTYPE log4j:configuration PUBLIC "log4j.dtd" >
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
 	<!-- Standard DSpace file logger -->
 	<appender name="FILE" class="org.apache.log4j.RollingFileAppender">
 		<param name="File" value="${log.dir}/dspace.log" />
@@ -116,13 +116,30 @@
 		<level value="DEBUG" />
 	</logger>
    
-   <!-- 
+    <!--
       Block passwords from being exposed in Axis logs. (DEBUG exposes passwords in Basic Auth)
     -->
-   <logger name="log4j.logger.org.apache.axis.handlers.http.HTTPAuthHandler">
-      <level value="info"/> 
-   </logger>
-   
+    <logger name="log4j.logger.org.apache.axis.handlers.http.HTTPAuthHandler">
+        <level value="info"/>
+    </logger>
+
+    <!-- # block services logging except on exceptions -->
+    <logger name="org.dspace.kernel">
+		<level value="ERROR" />
+	</logger>
+    <logger name="org.dspace.services">
+        <level value="ERROR" />
+    </logger>
+    <logger name="org.dspace.servicemanager">
+        <level value="ERROR" />
+    </logger>
+    <logger name="org.dspace.providers">
+        <level value="ERROR" />
+    </logger>
+    <logger name="org.dspace.utils">
+        <level value="ERROR" />
+    </logger>
+
 	<!-- Add appenders you want live here -->
 	<root>
 		<level value="all" />
@@ -133,4 +150,5 @@
 		<appender-ref ref="STDERR" />
 		-->
 	</root>
+    
 </log4j:configuration>
