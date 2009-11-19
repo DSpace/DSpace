@@ -113,6 +113,7 @@
  - [DS-238] Move item function in xmlui
  - [DS-281] Invalid Link to "Go to DSpace Home" on Page Not Found (XMLUI)
  - [DS-378] XMLUI Submission Interface messes up in IE7 after an empty <hint> in input_forms.xml
+ - [DS-382] Proposal: Add 'dc.creator' to Author browse index by default
 
 (Tim Donohue / Andrea Bollini)
  - [DS-228] Community Admin XMLUI: Delegated Admins Patch
