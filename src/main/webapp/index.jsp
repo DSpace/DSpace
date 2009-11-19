@@ -80,7 +80,7 @@ function updatepage(str){
 
 <body>
 <h1>Welcome to Solr!</h1>
-<a href="."><img border="0" align="right" height="61" width="142" src="admin/solr-head.gif" alt="Solr"/></a>
+<a href="."><img border="0" align="right" height="78" width="142" src="admin/solr_small.png" alt="Solr"/></a>
 
 <h1>Solr Ajax Example</h1>
 <form name="f1" onsubmit='xmlhttpPost(this.core.value + "/select"); return false;'><p>

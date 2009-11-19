@@ -19,6 +19,9 @@
                  org.apache.lucene.analysis.Token,
                  org.apache.lucene.analysis.TokenStream,
                  org.apache.lucene.index.Payload,
+                 org.apache.lucene.analysis.CharReader,
+                 org.apache.lucene.analysis.CharStream,
+                 org.apache.solr.analysis.CharFilterFactory,
                  org.apache.solr.analysis.TokenFilterFactory,
                  org.apache.solr.analysis.TokenizerChain,
                  org.apache.solr.analysis.TokenizerFactory,
@@ -32,7 +35,7 @@
 <%@ page import="java.util.*"%>
 <%@ page import="java.math.BigInteger" %>
 
-<%-- $Id: analysis.jsp 677047 2008-07-15 21:30:37Z hossman $ --%>
+<%-- $Id: analysis.jsp 824045 2009-10-11 10:04:01Z koji $ --%>
 <%-- $Source: /cvs/main/searching/org.apache.solrolarServer/resources/admin/analysis.jsp,v $ --%>
 <%-- $Name:  $ --%>
 
@@ -146,7 +149,8 @@
     if (qval!="" && highlight) {
       Reader reader = new StringReader(qval);
       Analyzer analyzer =  field.getType().getQueryAnalyzer();
-      TokenStream tstream = analyzer.tokenStream(field.getName(),reader);
+      TokenStream tstream = analyzer.reusableTokenStream(field.getName(),reader);
+      tstream.reset();
       List<Token> tokens = getTokens(tstream);
       matches = new HashSet<Tok>();
       for (Token t : tokens) { matches.add( new Tok(t,0)); }
@@ -171,19 +175,30 @@
 
 <%!
   private static void doAnalyzer(JspWriter out, SchemaField field, String val, boolean queryAnalyser, boolean verbose, Set<Tok> match) throws Exception {
-    Reader reader = new StringReader(val);
 
     FieldType ft = field.getType();
      Analyzer analyzer = queryAnalyser ?
              ft.getQueryAnalyzer() : ft.getAnalyzer();
      if (analyzer instanceof TokenizerChain) {
        TokenizerChain tchain = (TokenizerChain)analyzer;
+       CharFilterFactory[] cfiltfacs = tchain.getCharFilterFactories();
        TokenizerFactory tfac = tchain.getTokenizerFactory();
        TokenFilterFactory[] filtfacs = tchain.getTokenFilterFactories();
 
-       TokenStream tstream = tfac.create(reader);
+       if( cfiltfacs != null ){
+         String source = val;
+         for(CharFilterFactory cfiltfac : cfiltfacs ){
+           CharStream reader = CharReader.get(new StringReader(source));
+           reader = cfiltfac.create(reader);
+           if(verbose){
+             writeHeader(out, cfiltfac.getClass(), cfiltfac.getArgs());
+             source = writeCharStream(out, reader);
+           }
+         }
+       }
+
+       TokenStream tstream = tfac.create(tchain.charStream(new StringReader(val)));
        List<Token> tokens = getTokens(tstream);
-       tstream = tfac.create(reader);
        if (verbose) {
          writeHeader(out, tfac.getClass(), tfac.getArgs());
        }
@@ -208,7 +223,8 @@
        }
 
      } else {
-       TokenStream tstream = analyzer.tokenStream(field.getName(),reader);
+       TokenStream tstream = analyzer.reusableTokenStream(field.getName(),new StringReader(val));
+       tstream.reset();
        List<Token> tokens = getTokens(tstream);
        if (verbose) {
          writeHeader(out, analyzer.getClass(), new HashMap<String,String>());
@@ -451,6 +467,32 @@
     }
     
     out.println("</table>");
+  }
+
+  static String writeCharStream(JspWriter out, CharStream input) throws IOException {
+    out.println("<table width=\"auto\" class=\"analysis\" border=\"1\">");
+    out.println("<tr>");
+
+    out.print("<th NOWRAP>");
+    XML.escapeCharData("text",out);
+    out.println("</th>");
+
+    final int BUFFER_SIZE = 1024;
+    char[] buf = new char[BUFFER_SIZE];
+    int len = 0;
+    StringBuilder sb = new StringBuilder();
+    do {
+      len = input.read( buf, 0, BUFFER_SIZE );
+      if( len > 0 )
+        sb.append(buf, 0, len);
+    } while( len == BUFFER_SIZE );
+    out.print("<td class=\"debugdata\">");
+    XML.escapeCharData(sb.toString(),out);
+    out.println("</td>");
+    
+    out.println("</tr>");
+    out.println("</table>");
+    return sb.toString();
   }
 
 %>

@@ -17,7 +17,6 @@
 --%>
 <%@ page import="org.apache.solr.core.SolrConfig,
                  org.apache.solr.core.SolrCore,
-                 org.apache.solr.common.util.XML,
                  org.apache.solr.common.SolrException"%>
 <%@ page import="org.apache.solr.request.LocalSolrQueryRequest"%>
 <%@ page import="org.apache.solr.request.SolrQueryResponse"%>
@@ -38,25 +37,13 @@
     if (resp.getException() == null) {
 // No need for explicit status in the body, when the standard HTTP
 // response codes already transmit success/failure message
-//      out.println("<status>200</status>");
+      out.println("<status>200</status>");
     }
     else if (resp.getException() != null) {
-// No need for explicit status in the body, when the standard HTTP
-// response codes already transmit success/failure message
-//      out.println("<status>500</status>");
-      out.println("<error>");
-      XML.escapeCharData(SolrException.toStr(resp.getException()), out);
-      out.println("</error>");
-      response.sendError(500);
+     throw resp.getException();
     }
   } catch (Throwable t) {
-// No need for explicit status in the body, when the standard HTTP
-// response codes already transmit success/failure message
-//      out.println("<status>500</status>");
-      out.println("<error>");
-      XML.escapeCharData(SolrException.toStr(t), out);
-      out.println("</error>");
-      response.sendError(500);
+     throw t;
   } finally {
       req.close();
   }

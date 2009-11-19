@@ -15,8 +15,8 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<!-- $Id: registry.xsl 692778 2008-09-07 05:58:25Z shalin $ -->
-<!-- $URL: https://svn.apache.org/repos/asf/lucene/solr/branches/branch-1.3/src/webapp/web/admin/registry.xsl $ -->
+<!-- $Id: registry.xsl 815587 2009-09-16 01:57:15Z gsingers $ -->
+<!-- $URL: https://svn.apache.org/repos/asf/lucene/solr/trunk/src/webapp/web/admin/registry.xsl $ -->
 
 <xsl:stylesheet
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -42,7 +42,7 @@
       </head>
       <body>
         <a href=".">
-	   <img border="0" align="right" height="61" width="142" src="solr-head.gif" alt="SOLR">
+	   <img border="0" align="right" height="78" width="142" src="solr_small.png" alt="SOLR">
 	   </img>
 	</a>
         <h1>SOLR Info (<xsl:value-of select="solr/schema" />)</h1>
@@ -66,6 +66,7 @@
         [<a href="#cache">Cache</a>]
         [<a href="#query">Query</a>]
         [<a href="#update">Update</a>]
+        [<a href="#highlighting">Highlighting</a>]
         [<a href="#other">Other</a>]
       </td>
     </tr>
@@ -248,6 +249,39 @@
           </td>
         </tr>
   </xsl:template>
+  <xsl:template match="solr/solr-info/HIGHLIGHTING">
+    <br />
+    <a name="highlighting"><h2>Highlighting</h2></a>
+    <table>
+        <tr>
+          <td align="right">
+            &#xa0;
+          </td>
+          <td>
+          </td>
+        </tr>
+    <xsl:apply-templates/>
+    </table>
+  </xsl:template>
+  <xsl:template match="solr/solr-info/HIGHLIGHTING/entry">
+      <xsl:for-each select="*">
+        <tr>
+          <td align="right">
+            <strong><xsl:value-of select="name()"/>:&#xa0;</strong>
+          </td>
+          <td>
+            <tt><xsl:value-of select="."/>&#xa0;</tt>
+          </td>
+        </tr>
+      </xsl:for-each>
+        <tr>
+          <td align="right">
+          </td>
+          <td>
+          </td>
+        </tr>
+  </xsl:template>
+
 
   <xsl:template match="solr/solr-info/OTHER">
     <br />

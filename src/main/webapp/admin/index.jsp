@@ -16,18 +16,20 @@
  limitations under the License.
 --%>
 
-<%-- $Id: index.jsp 686780 2008-08-18 15:08:28Z yonik $ --%>
+<%-- $Id: index.jsp 793088 2009-07-10 19:37:30Z hossman $ --%>
 <%-- $Source: /cvs/main/searching/SolrServer/resources/admin/index.jsp,v $ --%>
 <%-- $Name:  $ --%>
 
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Collection" %>
+<%@ page import="org.apache.solr.request.SolrRequestHandler"%>
+<%@ page import="org.apache.solr.handler.ReplicationHandler" %>
 
 <%-- jsp:include page="header.jsp"/ --%>
 <%-- do a verbatim include so we can use the local vars --%>
 <%@include file="header.jsp" %>
-
+<%boolean replicationhandler = !core.getRequestHandlers(ReplicationHandler.class).isEmpty();%>
 <br clear="all">
 <table>
 
@@ -43,7 +45,7 @@
     [<a href="file/?file=<%=core.getConfigResource()%>">Config</a>]
     <% } %>
     [<a href="analysis.jsp?highlight=on">Analysis</a>]
-    [<a href="schema.jsp">Schema Browser</a>]
+    [<a href="schema.jsp">Schema Browser</a>] <%if(replicationhandler){%>[<a href="replication/index.jsp">Replication</a>]<%}%>
     <br>
     [<a href="stats.jsp">Statistics</a>]
     [<a href="registry.jsp">Info</a>]

@@ -5,6 +5,23 @@
 	id="solr" version="2.5">
 	<display-name>solr</display-name>
 
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
 	<!--
 		Uncomment if you are trying to use a Resin version before 3.0.19.
 		Their XML implementation isn't entirely compatible with Xerces. Below
@@ -105,42 +122,48 @@
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 
-	<servlet>
-		<servlet-name>Logging</servlet-name>
-		<servlet-class>org.apache.solr.servlet.LogLevelSelection</servlet-class>
-	</servlet>
+  <servlet>
+    <servlet-name>Logging</servlet-name>
+    <servlet-class>org.apache.solr.servlet.LogLevelSelection</servlet-class>
+  </servlet>
 
-	<!-- @Deprecated -->
-	<servlet>
-		<servlet-name>ping</servlet-name>
-		<jsp-file>/admin/ping.jsp</jsp-file>
-	</servlet>
+  <!-- @Deprecated -->
+  <servlet>
+    <servlet-name>ping</servlet-name>
+    <jsp-file>/admin/ping.jsp</jsp-file>
+  </servlet>
 
-	<servlet-mapping>
-		<servlet-name>SolrServer</servlet-name>
-		<url-pattern>/select/*</url-pattern>
-	</servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>SolrServer</servlet-name>
+    <url-pattern>/select/*</url-pattern>
+  </servlet-mapping>
 
-	<servlet-mapping>
-		<servlet-name>SolrUpdate</servlet-name>
-		<url-pattern>/update/*</url-pattern>
-	</servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>SolrUpdate</servlet-name>
+    <url-pattern>/update/*</url-pattern>
+  </servlet-mapping>
 
-	<servlet-mapping>
-		<servlet-name>Logging</servlet-name>
-		<url-pattern>/admin/logging</url-pattern>
-	</servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Logging</servlet-name>
+    <url-pattern>/admin/logging</url-pattern>
+  </servlet-mapping>
 
-	<!-- @Deprecated -->
-	<servlet-mapping>
-		<servlet-name>ping</servlet-name>
-		<url-pattern>/admin/ping</url-pattern>
-	</servlet-mapping>
+  <!-- @Deprecated -->
+  <servlet-mapping>
+    <servlet-name>ping</servlet-name>
+    <url-pattern>/admin/ping</url-pattern>
+  </servlet-mapping>
 
-	<mime-mapping>
-		<extension>.xsl</extension>
-		<!-- per http://www.w3.org/TR/2006/PR-xslt20-20061121/ -->
-		<mime-type>application/xslt+xml</mime-type>
-	</mime-mapping>
+  <!-- @Deprecated -->
+  <servlet-mapping>
+    <servlet-name>Logging</servlet-name>
+    <url-pattern>/admin/logging.jsp</url-pattern>
+  </servlet-mapping>
+  
+  <mime-mapping>
+    <extension>.xsl</extension>
+    <!-- per http://www.w3.org/TR/2006/PR-xslt20-20061121/ -->
+    <mime-type>application/xslt+xml</mime-type>
+  </mime-mapping>
 
 </web-app>
