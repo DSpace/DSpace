@@ -90,11 +90,19 @@ public class DIMIngestionCrosswalk
     private static Namespace DIM_NS = Namespace.getNamespace("http://www.dspace.org/xmlns/dspace/dim");
 
 	public void ingest(Context context, DSpaceObject dso, List metadata) throws CrosswalkException, IOException, SQLException, AuthorizeException {
-		List<Element> elements = metadata;
+
+            // If this list contains only the root already, just pass it on
+            List<Element> elements = metadata;
+            if (elements.size() == 1) {
+                ingest(context, dso, elements.get(0));
+            }
+            // Otherwise, wrap them up
+            else {
 		Element wrapper = new Element("wrap",elements.get(0).getNamespace());
 		wrapper.addContent(elements);
 		
-		ingest(context,dso,wrapper);
+		ingest(context, dso, wrapper);
+            }
 	}
 
 	public void ingest(Context context, DSpaceObject dso, Element root) throws CrosswalkException, IOException, SQLException, AuthorizeException {
