@@ -25,6 +25,8 @@ import java.util.Map.Entry;
 import org.azeckoski.reflectutils.ReflectUtils;
 import org.azeckoski.reflectutils.refmap.ReferenceMap;
 import org.azeckoski.reflectutils.refmap.ReferenceType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Borrowed from EntityBus since this already will handle the mixins for something correctly and easily,
@@ -33,6 +35,8 @@ import org.azeckoski.reflectutils.refmap.ReferenceType;
  * @author Aaron Zeckoski (aaronz@vt.edu)
  */
 public class ServiceMixinManager {
+
+    private static Logger log = LoggerFactory.getLogger(ServiceMixinManager.class);
 
     /**
      * This is a map from the serviceName only to the service and also 
@@ -229,7 +233,7 @@ public class ServiceMixinManager {
 //                ((RequestAware)service).setRequestGetter(requestGetter);
 //            }
         }
-        System.out.println("INFO Registered service ("+service.getClass().getName()
+        log.info("Registered service ("+service.getClass().getName()
                 +") serviceName ("+serviceName+") with "+count+" mixins");
         return classList;
     }
@@ -283,7 +287,7 @@ public class ServiceMixinManager {
         serviceNameMap.remove(key);
         // do any cleanup that needs to be done when unregistering
         // Nothing here right now
-        System.out.println("INFO Unregistered service mixin ("+mixin.getName()+") for serviceName ("+serviceName+")");
+        log.info("Unregistered service mixin ("+mixin.getName()+") for serviceName ("+serviceName+")");
     }
 
     /**

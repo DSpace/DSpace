@@ -33,6 +33,8 @@ import org.dspace.servicemanager.ServiceMixinManager.ServiceHolder;
 import org.dspace.servicemanager.config.DSpaceConfig;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.servicemanager.spring.SpringServiceManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is the core service manager which ties together the other
@@ -41,6 +43,8 @@ import org.dspace.servicemanager.spring.SpringServiceManager;
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class DSpaceServiceManager implements ServiceManagerSystem {
+
+    private static Logger log = LoggerFactory.getLogger(DSpaceServiceManager.class);
 
     private final DSpaceConfigurationService configurationService;
 
@@ -139,9 +143,9 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
                 try {
                     activator.start(this);
                     activators.add(activator);
-                    System.out.println("Started and registered activator: " + activatorClassName);
+                    log.info("Started and registered activator: " + activatorClassName);
                 } catch (Exception e1) {
-                    System.err.println("ERROR: Failed to start activator ("+activatorClassName+"): " + e1);
+                    log.error("ERROR: Failed to start activator ("+activatorClassName+"): " + e1, e1);
                 }
             }
         }
@@ -157,9 +161,9 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
                 // succeeded creating the activator
                 try {
                     activator.stop(this);
-                    System.out.println("Stopped and unregistered activator: " + activatorClassName);
+                    log.info("Stopped and unregistered activator: " + activatorClassName);
                 } catch (Exception e1) {
-                    System.err.println("ERROR: Failed to stop activator ("+activatorClassName+"): " + e1);
+                    log.error("ERROR: Failed to stop activator ("+activatorClassName+"): " + e1,e1);
                 }
             }
         }
@@ -267,7 +271,7 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
         this.serviceManagers.clear();
         this.serviceMixinManager.clear();
         this.primaryServiceManager = null;
-        System.out.println("Shutdown DSpace core service manager");
+        log.info("Shutdown DSpace core service manager");
     }
 
     public void startup() {
@@ -304,7 +308,7 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
                     this.serviceMixinManager.registerService(entry.getKey(), entry.getValue());
                 }
             }
-            System.out.println("Registered "+this.serviceMixinManager.size()+" service's mixins from loaded core services");
+            log.info("Registered "+this.serviceMixinManager.size()+" service's mixins from loaded core services");
 
             // this kind of thing will be handled by DI utils -AZ
 //            // now start the secondary SMS using the spring bean factory
@@ -319,7 +323,7 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
 //
 //                        // add it to the list of service managers
 //                        serviceManagers.add(eSMS);
-//                        System.out.println("Started up DSpace external service manager: " + serviceManagerClassName);
+//                        log.info("Started up DSpace external service manager: " + serviceManagerClassName);
 //                    } catch (Exception e) {
 //                        // startup failures are deadly
 //                        throw new IllegalStateException("failure starting up service manager " + serviceManagerClassName + ": " + e.getMessage(), e);
@@ -569,9 +573,9 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
             for (ServiceConfig config : configs.values()) {
                 try {
                     reflectUtils.setFieldValue(service, config.getParamName(), config.getValue());
-                    System.out.println("Set param ("+config.getParamName()+") on service bean ("+serviceName+") to: " + config.getValue());
+                    log.info("Set param ("+config.getParamName()+") on service bean ("+serviceName+") to: " + config.getValue());
                 } catch (RuntimeException e) {
-                    System.err.println("Unable to set param ("+config.getParamName()+") on service bean ("+serviceName+"): " + e.getMessage());
+                    log.error("Unable to set param ("+config.getParamName()+") on service bean ("+serviceName+"): " + e.getMessage(), e);
                 }
             }
         }

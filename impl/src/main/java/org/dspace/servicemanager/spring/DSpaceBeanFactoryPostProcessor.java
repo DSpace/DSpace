@@ -24,6 +24,8 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This will allow us to put the configuration into beans as they are being created,
@@ -32,6 +34,8 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class DSpaceBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
+
+    private static Logger log = LoggerFactory.getLogger(DSpaceBeanFactoryPostProcessor.class);
 
     private DSpaceConfigurationService configurationService;
     private ServiceManagerSystem parent;
@@ -67,7 +71,7 @@ public class DSpaceBeanFactoryPostProcessor implements BeanFactoryPostProcessor 
         }
 
         if (testMode) {
-            System.out.println("TEST Spring Service Manager running in test mode, no activators will be started");
+            log.info("Spring Service Manager running in test mode, no activators will be started");
         } else {
             // now register all autowire configured beans
             for (DSpaceConfig config : configs) {
@@ -86,7 +90,7 @@ public class DSpaceBeanFactoryPostProcessor implements BeanFactoryPostProcessor 
                     beanDef.setScope(AbstractBeanDefinition.SCOPE_SINGLETON);
                     registry.registerBeanDefinition(config.getActivatorName(), beanDef);
                 } catch (Exception e) {
-                    System.err.println("Failed to register activator class from config: " + config + " :" + e);
+                    log.error("Failed to register activator class from config: " + config + " :" + e, e);
                 }
             }
         }

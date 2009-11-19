@@ -354,11 +354,11 @@ public class DSpaceConfigurationService implements ConfigurationService {
                     if (key.startsWith(DSPACE_PREFIX)) {
                         String propName = key.substring(DSPACE_PREFIX.length());
                         String propVal = systemProps.getProperty(key);
-                        System.out.println("INFO Loading system property as config: "+propName+"=>"+propVal);
+                        log.info("Loading system property as config: "+propName+"=>"+propVal);
                         configMap.put(propName, propVal);
                     }
                 } catch (RuntimeException e) {
-                    System.err.println("Failed to properly get config value from system property: " + o);
+                    log.error("Failed to properly get config value from system property: " + o, e);
                 }
             }
         }

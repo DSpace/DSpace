@@ -24,6 +24,8 @@ import javax.management.ReflectionException;
 
 import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class simplifies the handling of MBean lookup, registration, etc. of the DSpace Kernel MBean.
@@ -33,6 +35,8 @@ import org.dspace.kernel.DSpaceKernelManager;
  */
 public class DSpaceKernelInit {
 
+    private static Logger log = LoggerFactory.getLogger(DSpaceKernelInit.class);
+    
     private static Object staticLock = new Object();
 
     /**
@@ -51,7 +55,7 @@ public class DSpaceKernelInit {
             }
             if (kernel == null) {
                 DSpaceKernelImpl kernelImpl = new DSpaceKernelImpl(mBeanName);
-                System.out.println("INFO Created new kernel: " + kernelImpl);
+                log.info("Created new kernel: " + kernelImpl);
                 // register the bean
                 String beanName = kernelImpl.getMBeanName();
                 register(beanName, kernelImpl);
@@ -76,7 +80,7 @@ public class DSpaceKernelInit {
                 if (! mbs.isRegistered(name)) {
                     // register the MBean
                     mbs.registerMBean(kernel, name);
-                    System.out.println("INFO Registered new Kernel MBEAN: " + mBeanName + " ["+kernel+"]");
+                    log.info("Registered new Kernel MBEAN: " + mBeanName + " ["+kernel+"]");
                 }
             } catch (MalformedObjectNameException e) {
                 throw new IllegalStateException(e);
@@ -106,7 +110,7 @@ public class DSpaceKernelInit {
                 mbs.unregisterMBean(name);
                 return true;
             } catch (Exception e) {
-                System.out.println("WARN Failed to unregister the MBean: " + mBeanName);
+                log.error("WARN Failed to unregister the MBean: " + mBeanName);
                 return false;
             }
         }

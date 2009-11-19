@@ -21,6 +21,8 @@ import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Takes a list of paths to resources and turns them into different things (file/IS/resource),
@@ -30,6 +32,8 @@ import org.springframework.core.io.Resource;
  * @author Aaron Zeckoski (aaron@caret.cam.ac.uk)
  */
 public class ResourceFinder {
+
+    private static Logger log = LoggerFactory.getLogger(ResourceFinder.class);
 
     public static final String relativePath = DSpaceConfigurationService.DSPACE + "/";
     public static final String environmentPathVariable = DSpaceConfigurationService.DSPACE_HOME;
@@ -43,7 +47,7 @@ public class ResourceFinder {
                     rs.add(r);
                 } catch (IllegalArgumentException e) {
                     // do not add if not found, just skip
-                    System.out.println("WARN: " + e.getMessage() + ", continuing...");
+                    log.error(e.getMessage() + ", continuing...");
                 }
             }
         }

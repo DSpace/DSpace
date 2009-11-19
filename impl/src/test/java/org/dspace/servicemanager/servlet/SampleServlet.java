@@ -23,6 +23,8 @@ import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.RequestService;
 import org.dspace.services.SessionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test servlet for trying out the jetty server
@@ -32,6 +34,8 @@ import org.dspace.services.SessionService;
 public class SampleServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
+
+    private static Logger log = LoggerFactory.getLogger(SampleServlet.class);
 
     private transient SessionService sessionService;
     private transient RequestService requestService;
@@ -56,7 +60,7 @@ public class SampleServlet extends HttpServlet {
             if (requestService == null) {
                 throw new IllegalStateException("Could not get the DSpace RequestService");
             }
-            System.out.println("Servlet initialized");
+            log.info("Servlet initialized");
         } catch (Exception e) {
             throw new IllegalStateException("FAILURE during init of direct servlet: " + e.getMessage(), e);
         }
@@ -80,7 +84,7 @@ public class SampleServlet extends HttpServlet {
         writer.print(XHTML_FOOTER);
         res.setStatus(HttpServletResponse.SC_OK);
 
-        System.out.println("Serviced request:  DSpace");
+        log.info("Serviced request:  DSpace");
     }
 
     protected static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
