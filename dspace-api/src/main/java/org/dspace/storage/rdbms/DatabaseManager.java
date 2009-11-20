@@ -560,11 +560,9 @@ public class DatabaseManager
 
         // logging
         if (logdbcp.isDebugEnabled()) {
-            String strAddr = c.toString();
-            //strAddr = strAddr.substring(strAddr.indexOf('@')+1);
             logdbcp.debug(LogManager.getHeader(null,
                                                "getConnection",
-                                               "object=" + strAddr +
+                                               "object=" + c.hashCode() +
                                                ", active=" + connectionPool.getNumActive() + 
                                                ", idle=" + connectionPool.getNumIdle()));
     }
@@ -586,17 +584,9 @@ public class DatabaseManager
             {
 		// logging
 		if (logdbcp.isDebugEnabled()) {
-		    String strAddr = ((Object)c).toString();
-		    if (strAddr == null) {
-			strAddr = "??";
-		    }
-		    //int i = strAddr.indexOf('@');
-		    //if (i > -1) {
-		    //	  strAddr = strAddr.substring(i+1);
-		    //}
 		    logdbcp.debug(LogManager.getHeader(null,
 						       "freeConnection",
-						       "object=" + strAddr +
+						       "object=" + c.hashCode() +
 						       ", active=" + connectionPool.getNumActive() + 
 						       ", idle=" + connectionPool.getNumIdle() +
 						       ", isClosed=" + c.isClosed()));
