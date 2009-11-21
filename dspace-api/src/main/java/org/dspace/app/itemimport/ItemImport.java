@@ -100,6 +100,8 @@ public class ItemImport
 {
     static boolean useWorkflow = false;
 
+    static boolean useWorkflowSendEmail = false;
+
     static boolean isTest = false;
 
     static boolean isResume = false;
@@ -148,6 +150,8 @@ public class ItemImport
                 "email of eperson doing importing");
         options.addOption("w", "workflow", false,
                 "send submission through collection's workflow");
+        options.addOption("n", "notification", false,
+                        "if sending submissions through the workflow, send notification emails");
         options.addOption("t", "test", false,
                 "test run - do not actually import items");
         options.addOption("p", "template", false, "apply template");
@@ -201,6 +205,10 @@ public class ItemImport
         if (line.hasOption('w'))
         {
             useWorkflow = true;
+            if (line.hasOption('n'))
+            {
+                useWorkflowSendEmail = true;
+            }
         }
 
         if (line.hasOption('t'))
@@ -740,7 +748,15 @@ public class ItemImport
             // start up a workflow
             if (!isTest)
             {
-                WorkflowManager.startWithoutNotify(c, wi);
+                // Should we send a workflow alert email or not?
+                if (useWorkflowSendEmail)
+                {
+                    WorkflowManager.start(c, wi);
+                }
+                else
+                {
+                    WorkflowManager.startWithoutNotify(c, wi);
+                }
 
                 // send ID to the mapfile
                 mapOutput = itemname + " " + myitem.getID();

@@ -61,6 +61,7 @@
  - [DS-328] SWORD service documents do not include atom:generator element
  - [DS-333] Adjust SWORD ingest crosswalk to store bibliographic citation
  - [DS-372] New verbose option for [dspace]/bin/dspace cleanup script
+ - [DS-388] Item importer - new option to enable workflow notification emails
 
 (Larry Stone)
  - [DS-373] Fix "Letter" link URLs in 2nd-stage Browse
