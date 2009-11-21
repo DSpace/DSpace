@@ -53,7 +53,7 @@
 # When /dspace/bin/install-configs is run, this file will be installed in the
 # location specified by the property: config.template.log4j.properties
 -->
-<!DOCTYPE log4j:configuration PUBLIC "log4j.dtd" >
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd" >
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
 	<!-- Standard DSpace file logger -->
 	<appender name="FILE" class="org.apache.log4j.RollingFileAppender">
