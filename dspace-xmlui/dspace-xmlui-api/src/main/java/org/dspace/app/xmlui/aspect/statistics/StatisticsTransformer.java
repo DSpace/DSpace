@@ -48,10 +48,8 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
      * Add a page title and trail links
      */
     public void addPageMeta(PageMeta pageMeta) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
-        String handle = parameters.getParameter("handle", null);
-        DSpaceObject dso = null;
-        if(handle != null)
-            dso = HandleManager.resolveToObject(context, handle);
+        //Try to find our dspace object
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
 
@@ -70,10 +68,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 			UIException, SQLException, IOException, AuthorizeException {
 
         //Try to find our dspace object
-        String handle = parameters.getParameter("handle", null);
-        DSpaceObject dso = null;
-        if(handle != null)
-            dso = HandleManager.resolveToObject(context, handle);
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
 		try
 		{
