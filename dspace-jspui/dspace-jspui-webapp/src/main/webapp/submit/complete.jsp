@@ -90,7 +90,7 @@
      
     <form action="<%= request.getContextPath() %>/submit" method="post" onkeydown="return disableEnterKey(event);">
         <input type="hidden" name="collection" value="<%= collection.getID() %>"/>
-	    <input type="submit" name="submit" value="<fmt:message key="jsp.collection-home.submit.button"/>"/>
+	    <input type="submit" name="submit" value="<fmt:message key="jsp.submit.complete.again"/>"/>
     </form>
      
 </dspace:layout>

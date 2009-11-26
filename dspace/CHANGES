@@ -62,6 +62,8 @@
  - [DS-333] Adjust SWORD ingest crosswalk to store bibliographic citation
  - [DS-372] New verbose option for [dspace]/bin/dspace cleanup script
  - [DS-388] Item importer - new option to enable workflow notification emails
+ - [DS-389] Misleading label: "Submit to This Collection"
+ - [DS-390] Workflow task notification emails not available on deposits via SWORD
 
 (Larry Stone)
  - [DS-373] Fix "Letter" link URLs in 2nd-stage Browse
