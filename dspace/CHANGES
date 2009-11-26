@@ -63,7 +63,6 @@
  - [DS-372] New verbose option for [dspace]/bin/dspace cleanup script
  - [DS-388] Item importer - new option to enable workflow notification emails
  - [DS-389] Misleading label: "Submit to This Collection"
- - [DS-390] Workflow task notification emails not available on deposits via SWORD
 
 (Larry Stone)
  - [DS-373] Fix "Letter" link URLs in 2nd-stage Browse
@@ -163,10 +162,13 @@
  - [DS-353] Missing commits in XMLUI server-side javascript code.
 
 (Hardik Mishra)
-- [DS-370] E Mail Sent On Item Export Error Message
+ - [DS-370] E Mail Sent On Item Export Error Message
 
 (Keller)
-- [DS-375] Dspace 1.5.2 Russian translation
+ - [DS-375] Dspace 1.5.2 Russian translation
+
+(Steven Williams / Ladd Hanson / Stuart Lewis)
+ - [DS-295] CC License being assigned incorrect Mime Type during submission.
 
 1.5.2 final
 ===========

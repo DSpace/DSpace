@@ -156,20 +156,24 @@ public class CreativeCommons
         String license_text = fetchLicenseText(cc_license_url);
         String license_rdf = fetchLicenseRDF(cc_license_url);
         
-        // set the format
-        BitstreamFormat bs_format = BitstreamFormat.findByShortDescription(
+        // set the formats
+        BitstreamFormat bs_url_format = BitstreamFormat.findByShortDescription(
                 context, "License");
+        BitstreamFormat bs_text_format = BitstreamFormat.findByShortDescription(
+                context, "CC License");
+        BitstreamFormat bs_rdf_format = BitstreamFormat.findByShortDescription(
+                context, "RDF XML");
 
         // set the URL bitstream
-        setBitstreamFromBytes(item, bundle, BSN_LICENSE_URL, bs_format,
+        setBitstreamFromBytes(item, bundle, BSN_LICENSE_URL, bs_url_format,
                 cc_license_url.getBytes());
 
         // set the license text bitstream
-        setBitstreamFromBytes(item, bundle, BSN_LICENSE_TEXT, bs_format,
+        setBitstreamFromBytes(item, bundle, BSN_LICENSE_TEXT, bs_text_format,
                 license_text.getBytes());
 
         // set the RDF bitstream
-        setBitstreamFromBytes(item, bundle, BSN_LICENSE_RDF, bs_format,
+        setBitstreamFromBytes(item, bundle, BSN_LICENSE_RDF, bs_rdf_format,
                 license_rdf.getBytes());
     }
 
@@ -179,9 +183,18 @@ public class CreativeCommons
     {
         Bundle bundle = getCcBundle(item);
 
-        // generic "License" format -- change for CC?
-        BitstreamFormat bs_format = BitstreamFormat.findByShortDescription(
-                context, "License");
+        // set the format
+        BitstreamFormat bs_format;
+        if (mimeType.equalsIgnoreCase("text/xml"))
+        {
+            bs_format = BitstreamFormat.findByShortDescription(context, "CC License");
+        }
+        else if (mimeType.equalsIgnoreCase("text/rdf")) {
+            bs_format = BitstreamFormat.findByShortDescription(context, "RDF XML");
+        }
+        else {
+            bs_format = BitstreamFormat.findByShortDescription(context, "License");
+        }
 
         Bitstream bs = bundle.createBitstream(licenseStm);
         bs.setSource(CC_BS_SOURCE);
