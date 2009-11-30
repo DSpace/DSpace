@@ -1,0 +1,160 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+   <!--
+      Licensed to the Apache Software Foundation (ASF) under one or more
+      contributor license agreements. See the NOTICE file distributed
+      with this work for additional information regarding copyright
+      ownership. The ASF licenses this file to you under the Apache
+      License, Version 2.0 (the "License"); you may not use this file
+      except in compliance with the License. You may obtain a copy of
+      the License at http://www.apache.org/licenses/LICENSE-2.0 Unless
+      required by applicable law or agreed to in writing, software
+      distributed under the License is distributed on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied. See the License for the specific language governing
+      permissions and limitations under the License.
+   -->
+
+   <modelVersion>4.0.0</modelVersion>
+
+   <parent>
+      <groupId>org.dspace.dependencies.solr</groupId>
+      <artifactId>dspace-solr-parent</artifactId>
+      <version>1.4.0.1-SNAPSHOT</version>
+   </parent>
+
+   <groupId>org.dspace.dependencies.solr</groupId>
+   <artifactId>dspace-solr-common</artifactId>
+   <name>Apache Solr Core</name>
+   <version>1.4.0.1-SNAPSHOT</version>
+   <description>Apache Solr Core</description>
+   <packaging>jar</packaging>
+
+   <profiles>
+      <profile>
+         <id>patch</id>
+         <activation>
+            <activeByDefault>false</activeByDefault>
+         </activation>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-patch-plugin</artifactId>
+                  <version>1.0</version>
+                  <configuration>
+                     <patches>
+                        <patch>common.patch</patch>
+                     </patches>
+                  </configuration>
+                  <executions>
+                     <execution>
+                        <id>patch</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                           <goal>apply</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+   </profiles>
+
+   <dependencies>
+
+      <!-- Solr -->
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-analyzers</artifactId>
+         <version>2.9.1</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-highlighter</artifactId>
+         <version>2.9.1</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-queries</artifactId>
+         <version>2.9.1</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-snowball</artifactId>
+         <version>2.9.1</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-memory</artifactId>
+         <version>2.9.1</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-misc</artifactId>
+         <version>2.9.1</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-spellchecker</artifactId>
+         <version>2.9.1</version>
+      </dependency>
+
+      <!-- Apache Commons -->
+      <dependency>
+         <groupId>commons-httpclient</groupId>
+         <artifactId>commons-httpclient</artifactId>
+         <version>3.1</version>
+      </dependency>
+      <dependency>
+         <groupId>commons-codec</groupId>
+         <artifactId>commons-codec</artifactId>
+         <version>1.3</version>
+      </dependency>
+      <dependency>
+         <groupId>commons-io</groupId>
+         <artifactId>commons-io</artifactId>
+         <version>1.4</version>
+      </dependency>
+      <dependency>
+         <groupId>commons-fileupload</groupId>
+         <artifactId>commons-fileupload</artifactId>
+         <version>1.2.1</version>
+      </dependency>
+
+      <!-- Solr specific commons csv -->
+      <dependency>
+         <groupId>org.apache.solr</groupId>
+         <artifactId>solr-commons-csv</artifactId>
+         <version>1.4.0</version>
+      </dependency>
+
+      <!--
+         Stax : we could exclude this because already dependancy of
+         solrj
+      -->
+      <dependency>
+         <groupId>woodstox</groupId>
+         <artifactId>wstx-asl</artifactId>
+         <version>3.2.7</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.geronimo.specs</groupId>
+         <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+         <version>1.0.1</version>
+      </dependency>
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-api</artifactId>
+         <version>1.5.5</version>
+      </dependency>
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-jdk14</artifactId>
+         <version>1.5.5</version>
+      </dependency>
+
+   </dependencies>
+</project>
