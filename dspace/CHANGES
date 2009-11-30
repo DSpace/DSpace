@@ -117,6 +117,7 @@
  - [DS-378] XMLUI Submission Interface messes up in IE7 after an empty <hint> in input_forms.xml
  - [DS-382] Proposal: Add 'dc.creator' to Author browse index by default
  - [DS-385] Packager script is unable to import the same METS + DIM package that was exported
+ - [DS-386] Allow user to specify which <dmdSec> is used by the METS Ingester when importing METS from Packager script
 
 (Tim Donohue / Andrea Bollini)
  - [DS-228] Community Admin XMLUI: Delegated Admins Patch

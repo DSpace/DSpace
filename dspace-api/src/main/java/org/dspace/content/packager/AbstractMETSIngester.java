@@ -382,7 +382,7 @@ public abstract class AbstractMETSIngester
             // get mdref'd streams from "callback" object.
             MdrefManager callback = new MdrefManager(mdBundle);
 
-            chooseItemDmd(context, item, manifest, callback, manifest.getItemDmds());
+            chooseItemDmd(context, item, manifest, callback, manifest.getItemDmds(), params);
 
             // crosswalk content bitstreams too.
             for (Iterator ei = fileIdToBitstream.entrySet().iterator();
@@ -550,7 +550,7 @@ public abstract class AbstractMETSIngester
      * descriptive metadata for the item being ingested.  It is
      * responsible for calling the crosswalk, using the manifest's helper
      * i.e. <code>manifest.crosswalkItem(context,item,dmdElement,callback);</code>
-     * (The final argument is a reference to itself since the
+     * (The <code>callback</code> argument is a reference to itself since the
      * class also implements the <code>METSManifest.MdRef</code> interface
      * to fetch package files referenced by mdRef elements.)
      * <p>
@@ -558,12 +558,15 @@ public abstract class AbstractMETSIngester
      * as protected fields from the superclass.
      *
      * @param context the DSpace context
-     * @param dmds array of Elements, each a METS dmdSec that applies to the Item as a whole.
-     *
+     * @param item the DSpace item
+     * @param manifest the METSManifest
+     * @param callback the MdrefManager (manages all external metadata files referenced by METS <code>mdref</code> elements)
+     * @param dmds array of Elements, each a METS <code>dmdSec</code> that applies to the Item as a whole.
+     * @param params any user parameters passed to the Packager script
      */
     abstract public void chooseItemDmd(Context context, Item item,
-                                       METSManifest manifest, MdrefManager cb,
-                                       Element dmds[])
+                                       METSManifest manifest, MdrefManager callback,
+                                       Element dmds[], PackageParameters params)
         throws CrosswalkException,
                AuthorizeException, SQLException, IOException;
 
