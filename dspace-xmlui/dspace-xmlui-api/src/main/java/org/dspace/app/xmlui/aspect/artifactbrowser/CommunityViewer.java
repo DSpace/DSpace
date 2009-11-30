@@ -42,6 +42,8 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -308,9 +310,29 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
                     "community-browse");
             browse.setHead(T_head_browse);
             String url = contextPath + "/handle/" + community.getHandle();
-            browse.addItemXref(url + "/browse?type=title",T_browse_titles);
-            browse.addItemXref(url + "/browse?type=author",T_browse_authors);
-            browse.addItemXref(url + "/browse?type=dateissued",T_browse_dates);
+
+            try
+            {
+                // Get a Map of all the browse tables
+                BrowseIndex[] bis = BrowseIndex.getBrowseIndices();
+                for (BrowseIndex bix : bis)
+                {
+                    // Create a Map of the query parameters for this link
+                    Map<String, String> queryParams = new HashMap<String, String>();
+
+                    queryParams.put("type", bix.getName());
+
+                    // Add a link to this browse
+                    browse.addItemXref(super.generateURL(url + "/browse", queryParams),
+                            message("xmlui.ArtifactBrowser.Navigation.browse_" + bix.getName()));
+                }
+            }
+            catch (BrowseException bex)
+            {
+                browse.addItemXref(url + "/browse?type=title",T_browse_titles);
+                browse.addItemXref(url + "/browse?type=author",T_browse_authors);
+                browse.addItemXref(url + "/browse?type=dateissued",T_browse_dates);
+            }
         }
 
         // Add main reference:
