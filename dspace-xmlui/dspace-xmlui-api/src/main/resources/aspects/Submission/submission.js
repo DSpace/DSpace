@@ -634,7 +634,8 @@ function saveErrorFields(errorFields)
 	}
 	else
 	{	
-		//iterate through the fields	
+        ERROR_FIELDS="";
+		//iterate through the fields
 		var i = errorFields.iterator();
 	
 		//build comma-separated list of error fields
