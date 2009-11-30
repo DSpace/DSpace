@@ -1,0 +1,19 @@
+This is a special build of Apache Solr Based on the following patches...
+
+http://wiki.apache.org/solr/FieldCollapsing
+http://blog.jteam.nl/2009/10/20/result-grouping-field-collapsing-with-solr/
+https://issues.apache.org/jira/browse/SOLR-236
+
+The last patch applied to this release was created on:
+https://issues.apache.org/jira/secure/attachment/12425775/field-collapse-5.patch
+
+Text File  Licensed for inclusion in ASF works      
+field-collapse-5.patch      
+2009-11-22 10:00 PM     
+Martijn van Groningen   
+244 kB
+
+Project has been created under an alternate groupId to 
+be supported within the DSpace communit and distributed 
+within the the org.dspace groupId.
+
