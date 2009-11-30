@@ -31,6 +31,15 @@
    <description>Apache Solr Core</description>
    <packaging>jar</packaging>
 
+   <scm>
+      <connection>
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/common
+    </connection>
+      <developerConnection>
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/common
+    </developerConnection>
+   </scm>
+   
    <profiles>
       <profile>
          <id>patch</id>

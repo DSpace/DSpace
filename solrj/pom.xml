@@ -32,6 +32,15 @@
 	<description>Apache Solr Solrj</description>
 	<packaging>jar</packaging>
 
+    <scm>
+      <connection>
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/solrj
+    </connection>
+      <developerConnection>
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/solrj
+    </developerConnection>
+   </scm>
+   
 	<profiles>
 		<profile>
 			<id>patch</id>

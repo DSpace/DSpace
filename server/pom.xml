@@ -30,6 +30,15 @@
    <version>1.4.0.1-SNAPSHOT</version>
    <description>Apache Solr Server</description>
 
+   <scm>
+      <connection>
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/server
+    </connection>
+      <developerConnection>
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/server
+    </developerConnection>
+   </scm>
+   
    <profiles>
       <profile>
          <id>patch</id>

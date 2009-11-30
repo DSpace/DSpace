@@ -37,41 +37,6 @@
       <url>http://issues.apache.org/jira/browse/SOLR</url>
    </issueManagement>
 
-   <ciManagement>
-      <system>Hudson</system>
-      <url>
-      http://lucene.zones.apache.org:8080/hudson/job/dspace-solr-Nightly/
-    </url>
-   </ciManagement>
-
-   <mailingLists>
-      <mailingList>
-         <name>Solr User List</name>
-         <subscribe>dspace-solr-user-subscribe@lucene.apache.org</subscribe>
-         <unsubscribe>dspace-solr-user-unsubscribe@lucene.apache.org</unsubscribe>
-         <archive>
-        http://mail-archives.apache.org/mod_mbox/dspace-solr-user/
-      </archive>
-      </mailingList>
-      <mailingList>
-         <name>Solr Developer List</name>
-         <subscribe>dspace-solr-dev-subscribe@lucene.apache.org</subscribe>
-         <unsubscribe>dspace-solr-dev-unsubscribe@lucene.apache.org</unsubscribe>
-         <archive>
-        http://mail-archives.apache.org/mod_mbox/dspace-solr-dev/
-      </archive>
-      </mailingList>
-      <mailingList>
-         <name>Solr Commits List</name>
-         <subscribe>dspace-solr-commits-subscribe@lucene.apache.org</subscribe>
-         <unsubscribe>
-        dspace-solr-commits-unsubscribe@lucene.apache.org
-      </unsubscribe>
-         <archive>
-        http://mail-archives.apache.org/mod_mbox/dspace-solr-commits/
-      </archive>
-      </mailingList>
-   </mailingLists>
 
    <inceptionYear>2006</inceptionYear>
 
@@ -84,10 +49,10 @@
 
    <scm>
       <connection>
-      scm:svn:http://svn.apache.org/repos/asf/lucene/solr
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk
     </connection>
       <developerConnection>
-      scm:svn:https://svn.apache.org/repos/asf/lucene/solr
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk
     </developerConnection>
    </scm>
 
