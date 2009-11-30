@@ -49,6 +49,15 @@
     </plugins>
   </build>
 
+  <scm>
+      <connection>
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/contrib/velocity
+    </connection>
+      <developerConnection>
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/contrib/velocity
+    </developerConnection>
+   </scm>
+      
   <dependencies>
      <dependency>
       <groupId>org.dspace.dependencies.solr</groupId>

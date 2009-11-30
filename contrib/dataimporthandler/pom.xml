@@ -35,6 +35,14 @@
 	<description>Apache Solr DataImportHandler</description>
 	<packaging>war</packaging>
 
+   <scm>
+      <connection>
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/contrib/dataimporthandler
+    </connection>
+      <developerConnection>
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/contrib/dataimporthandler
+    </developerConnection>
+   </scm>
 
 	<build>
 		<plugins>

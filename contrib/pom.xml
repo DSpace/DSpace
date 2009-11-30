@@ -18,6 +18,15 @@
   <url>http://lucene.apache.org/solr</url>
   <packaging>pom</packaging>
 
+  <scm>
+      <connection>
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/contrib
+    </connection>
+      <developerConnection>
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/contrib
+    </developerConnection>
+   </scm>
+   
   <modules>
   	<module>clustering</module>
   	<module>dataimporthandler</module>

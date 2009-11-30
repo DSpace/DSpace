@@ -36,6 +36,15 @@
   <description>Apache Solr Content Extraction Library integrates Apache Tika content extraction framework into Solr</description>
   <packaging>jar</packaging>
 
+  <scm>
+      <connection>
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/contrib/extraction
+    </connection>
+      <developerConnection>
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/contrib/extraction
+    </developerConnection>
+   </scm>
+   
   <build>
     <plugins>
       <plugin>

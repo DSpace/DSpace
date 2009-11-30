@@ -49,6 +49,14 @@
     </plugins>
   </build>
 
+  <scm>
+      <connection>
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/contrib/clustering
+    </connection>
+      <developerConnection>
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/contrib/clustering
+    </developerConnection>
+   </scm>
 
   <dependencies>
     <dependency>
