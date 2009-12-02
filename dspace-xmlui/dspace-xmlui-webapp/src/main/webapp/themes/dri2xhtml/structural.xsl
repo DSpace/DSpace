@@ -164,7 +164,15 @@
     <xsl:template name="buildHead">
         <head>
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-            <meta name="Generator" content="DSpace" />
+            <meta name="Generator">
+              <xsl:attribute name="content">
+                <xsl:text>DSpace</xsl:text>
+                <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dspace'][@qualifier='version']">
+                  <xsl:text> </xsl:text>
+                  <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dspace'][@qualifier='version']"/>
+                </xsl:if>
+              </xsl:attribute>
+            </meta>
             <!-- Add stylsheets -->
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='stylesheet']">
                 <link rel="stylesheet" type="text/css">

@@ -51,6 +51,7 @@
 <%@ page import="java.util.Enumeration"%>
 <%@ page import="org.dspace.app.webui.util.JSPManager" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.app.util.Util" %>
 <%@ page import="javax.servlet.jsp.jstl.core.*" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.*" %>
 
@@ -66,6 +67,8 @@
     String osName = ConfigurationManager.getProperty("websvc.opensearch.shortname");
     List parts = (List)request.getAttribute("dspace.layout.linkparts");
     String extraHeadData = (String)request.getAttribute("dspace.layout.head");
+    String dsVersion = Util.getSourceVersion();
+    String generator = dsVersion == null ? "DSpace" : "DSpace "+dsVersion;
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -73,7 +76,7 @@
     <head>
         <title><%= siteName %>: <%= title %></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="Generator" content="DSpace" />
+        <meta name="Generator" content="<%= generator %>" />
         <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css.jsp" type="text/css" />
         <link rel="stylesheet" href="<%= request.getContextPath() %>/print.css" media="print" type="text/css" />
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
