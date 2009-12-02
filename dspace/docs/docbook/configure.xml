@@ -110,6 +110,8 @@ dspace.history = ${dspace.dir}/history
 							<entry>
 								<screen>dspace.dir
 dspace.url
+dspace.baseUrl
+dspace.oai.url
 dspace.hostname
 dspace.name</screen>
 							</entry>
@@ -435,14 +437,15 @@ org.dspace.app.itemexport.max.size</screen>
 						<row>
 							<entry spanname="hspan">Bulk Metadata Editing</entry>
 						</row>
-						<row><entry>
+						<row>
+							<entry>
 								<screen>bulkedit.valueseparator
 bulkedit.fieldseparator
 bulkedit.gui-item-limit
 bulkedit.ignore-on-export</screen>
-							</entry><etnry>
-								<link linkend="docbook-configure.html-bulkedits">5.2.46</link>
-							</etnry></row>
+							</entry>
+							<entry><link linkend="docbook-configure.html-bulkedits">5.2.46</link></entry>
+						</row>
 						<row>
 							<entry spanname="hspan">Subscription Email Option</entry>
 						</row>
@@ -757,21 +760,51 @@ xmlui.controlpanel.activity.ipheader</screen>
 						</row>
 						<row>
 							<entry align="right">Property:</entry>
-							<entry>
-								<literal>dspace.url</literal>
-							</entry>
+							<entry><literal>dspace.baseUrl</literal></entry>
 						</row>
 						<row>
 							<entry align="right">Example Value:</entry>
 							<entry>
-								<screen>http://dspace.myu.edu
-http://dspacetest.myu.edu:8080
-</screen>
+								<literal>http://dspacetest.myu.edu:8080</literal>
 							</entry>
 						</row>
 						<row>
 							<entry align="right">Informational Note:</entry>
 							<entry>Main URL at which DSpace Web UI webapp is deployed. Include any port number, but do not include the trailing '<literal>/</literal>'.</entry>
+						</row>
+						<row>
+							<?dbfo row-height="5mm"?>
+							<?dbhtml row-height="5mm"?>
+							<entry spanname="notespan"/>
+						</row>
+						<row>
+							<entry align="right">Property:</entry>
+							<entry><literal>dspace.url</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Example Value:</entry>
+							<entry><literal>dspace.url = ${dspace.baseUrl}/jspui</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Informational note</entry>
+							<entry>DSpace base URL. Include port number etc., but NOT trailing slash. Change to <literal>/xmlui</literal> if you wish to use the xmlui (Manakin) as the default, or remove &quot;<literal>/jspui</literal>&quot; and set webapp of your choice as the "ROOT" webapp in the servlet engine.</entry>
+						</row>
+						<row>
+							<?dbfo row-height="5mm"?>
+							<?dbhtml row-height="5mm"?>
+							<entry spanname="notespan"/>
+						</row>
+						<row>
+							<entry align="right">Property:</entry>
+							<entry><literal>dspace.oai.url</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Example Value:</entry>
+							<entry><literal>dspace.oai.url = ${dspace.baseUrl}/oai</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Informational note:</entry>
+							<entry>The base URL of the OAI webapp (do not include /request).</entry>
 						</row>
 						<row>
 							<?dbfo row-height="5mm"?>
@@ -855,8 +888,7 @@ http://dspacetest.myu.edu:8080
 						<row>
 							<entry align="right">Example Value:</entry>
 							<entry>
-								<literal>db.url = dbc:postgresql://localhost:5432/dspace</literal>
-							</entry>
+								<literal>db.url = dbc:postgresql://localhost:5432/dspace</literal>-services </entry>
 						</row>
 						<row>
 							<entry align="right">Informational Note:</entry>
@@ -5510,7 +5542,7 @@ core.authorization.item-admin.cc-license</screen></entry>
 			</note>
 		</section>
 		<section remap="h3">
-			<title><anchor id="docbook-configure.html-bulkedits" xreflabel="Bulk Metadata Editing"/>Batch Metadata Editing</title>
+			<title><anchor id="docbook-configure.html-batchedits" xreflabel="Batch Metadata Editing"/>Batch Metadata Editing</title>
 			<para>The following configurations allow the adminstrator extract from the DSpace database a set of records for editing by a metadata export. It provides an easier way of editing large collections.</para>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
@@ -5582,6 +5614,44 @@ core.authorization.item-admin.cc-license</screen></entry>
 						<row>
 							<entry align="right">Informational note</entry>
 							<entry>Metadata elements to exclude when exporting via the user interfaces, or when using the command line version and not using the -a (all) option.</entry>
+						</row>
+					</tbody></tgroup>
+			</informaltable>
+		</section>
+		<section remap="h3">
+			<title><anchor id="docbook-configure.html-hidemetadata" xreflabel="Hiding Metadata"/>Hiding Metadata</title>
+			<para>It is now possible to hide metadata from public consumption that is only avaialable to the Administrator.</para>
+			<informaltable>
+				<?dbhtml table-width="100%"?>
+				<?dbfo table-width="100%"?>
+				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+						<row>
+							<entry align="right">Property:</entry>
+							<entry><literal>metadata.hide.dc.description.provenance</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Example Value:</entry>
+							<entry><literal>metadata.hide.dc.description.provenance = true</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Informational Note:</entry>
+							<entry>
+								<para>Hides the metadata in the property key above except to the administrator. </para>
+								<para>Fields named here are hidden in the following places UNLESS the logged-in user is an Administrator: <orderedlist>
+										<listitem>
+											<para>XMLUI metadata XML view, and Item splash pages (long and short views).</para>
+										</listitem>
+										<listitem>
+											<para>JSPUI Item splash pages</para>
+										</listitem>
+										<listitem>
+											<para>OAI-PMH server, "oai_dc" format. (Note: Other formats are **not** affected.)</para>
+										</listitem>
+									</orderedlist></para>
+								<para>To designate a field as hidden, add a property here in the form:</para>
+								<para><literal>metadata.hide.SCHEMA.ELEMENT.QUALIFIER = true</literal></para>
+								<para>This default configuration hides the dc.description.provenance field, since that usually contains email addresses which ought to be kept private and is mainly of interest to administrators.</para>
+							</entry>
 						</row>
 					</tbody></tgroup>
 			</informaltable>
@@ -6532,11 +6602,6 @@ plugin.named.org.dspace.sword.SWORDIngester = \
 						<row>
 							<entry align="right">Informational Note:</entry>
 							<entry>Implementation of embargo setter plugin</entry>
-						</row>
-						<row>
-							<?dbfo row-height="5mm"?>
-							<?dbhtml row-height="5mm"?>
-							<entry spanname="notespan"/>
 						</row>
 						<row>
 							<entry align="right">Property:</entry>
