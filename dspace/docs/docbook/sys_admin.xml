@@ -908,7 +908,7 @@ Transforming DSpace Content"/>MediaFilters: Transforming DSpace Content</title>
 		<para>It is important to understand that when any operation is performed, all the sub-structure of the child community follows it. Thus, if a child has itself children (sub-communities), or collections, they will all move with it to its new &apos;location&apos; in the community tree.</para>
 	</section>
 	<section remap="h2">
-		<title><anchor id="docbook-sys_admin.thml-bulkedits" xreflabel="Bulk Metadata Editing"/>Batch Metadata Editing</title>
+		<title><anchor id="docbook-sys_admin.html-batchedits" xreflabel="Batch Metadata Editing"/>Batch Metadata Editing</title>
 		<para>DSpace provides a batch metadata editing tool. The batch editing tool is able to produce a comma delimited file in the CVS format. The batch editing tool facilitates the user to perform the following:</para>
 		<itemizedlist>
 			<listitem>
