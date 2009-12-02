@@ -1,68 +1,73 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN' 'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd' [
 
-<!ENTITY art01 SYSTEM "index.xml">
-<!ENTITY art02 SYSTEM "introduction.xml">
+<!ENTITY art01 SYSTEM "introduction.xml">
+<!ENTITY art02 SYSTEM "functional.xml">
 <!ENTITY art03 SYSTEM "install.xml">
 <!ENTITY art04 SYSTEM "update.xml">
 <!ENTITY art05 SYSTEM "configure.xml">
-<!ENTITY art06 SYSTEM "storage.xml">
-<!ENTITY art07 SYSTEM "directories.xml">
-<!ENTITY art08 SYSTEM "architecture.xml">
-<!ENTITY art09 SYSTEM "application.xml">
-<!ENTITY art10 SYSTEM "business.xml">
-<!ENTITY art11 SYSTEM "functional.xml">
-<!ENTITY art12 SYSTEM "submission.xml">
-<!ENTITY art13 SYSTEM "DRISchemaReference.xml">
-<!ENTITY art14 SYSTEM "history.xml">
-<!ENTITY art15 SYSTEM "appendix.xml">
+<!ENTITY art06 SYSTEM "jspui.xml">
+<!ENTITY art07 SYSTEM "xmlui.xml">
+<!ENTITY art08 SYSTEM "sys_admin.xml">
+<!ENTITY art09 SYSTEM "storage.xml">
+<!ENTITY art10 SYSTEM "directories.xml">
+<!ENTITY art11 SYSTEM "architecture.xml">
+<!ENTITY art12 SYSTEM "application.xml">
+<!ENTITY art13 SYSTEM "business.xml">
+<!ENTITY art14 SYSTEM "submission.xml">
+<!ENTITY art15 SYSTEM "DRISchemaReference.xml">
+<!ENTITY art16 SYSTEM "history.xml">
+<!ENTITY appa SYSTEM "appendix.xml">
 ]>
 
 <book>
-  <bookinfo>
-    <title>DSpace 1.5.2 Manual</title>
-    
-    <author>
-      <surname>The DSpace Foundation</surname>
-      <affiliation>
-        <address><email>webmaster@dspace.org</email></address>
-      </affiliation>
-    </author>
-
-    <copyright>
-      <year>2002-2009</year>
-      <holder>
-        <ulink url="http://www.dspace.org/">The DSpace Foundation</ulink>
-      </holder>
-    </copyright>
-    <legalnotice>
-      <para>
-        <ulink url="http://creativecommons.org/licenses/by/3.0/us/">
-        <inlinemediaobject>
-          <imageobject>
-            <imagedata fileref="http://i.creativecommons.org/l/by/3.0/us/88x31.png" format="PNG"/>
-          </imageobject>
-        </inlinemediaobject>
+    <bookinfo>
+        <title>DSpace Manual</title>
+        <subtitle>1.6 Release [Alpha]</subtitle>
+        <author>
+            <surname>The DSpace Foundation</surname>
+            <affiliation>
+                <address><email>webmaster@dspace.org</email></address>
+            </affiliation>
+        </author> <edition>1.6 Alpha Release</edition>
+        <pubdate>2009-11-14 15:03:00 EST</pubdate>
+        <copyright>
+            <year>2002-2009</year>
+            <holder>
+                <ulink url="http://www.dspace.org/">The DSpace Foundation</ulink>
+            </holder>
+        </copyright>
+        <legalnotice>
+            <para>
+                <ulink url="http://creativecommons.org/licenses/by/3.0/us/">
+                    <inlinemediaobject>
+                        <imageobject>
+                            <imagedata fileref="http://i.creativecommons.org/l/by/3.0/us/88x31.png" format="PNG"/>
+                        </imageobject>
+                    </inlinemediaobject>
         Licensed under a Creative Commons Attribution 3.0 United States License
         </ulink>
-      </para>
-    </legalnotice>
-    <abstract>
-      <para></para>
-    </abstract>
-  </bookinfo>
-
-  <preface>
-    <title>Preface</title>
-
-    <para></para>
-  </preface>
-
-<toc/>
-
-<!-- &art01; -->
+            </para>
+        </legalnotice>
+        <revhistory>
+            <revision>
+                <revnumber>Pre-1.6a</revnumber>
+                <date>This text generated: 2009-11-14 15:03:00 EST</date>
+                <authorinitials>JAT</authorinitials>
+                <revmark>&nbsp;</revmark>
+            </revision>
+        </revhistory>
+        <abstract>
+            <para/>
+        </abstract>
+    </bookinfo>
+    <preface>
+        <title>Preface</title> <para/>
+    </preface>
+    <toc/>
+    
+&art01;
 &art02;
-&art11;
 &art03;
 &art04;
 &art05;
@@ -71,9 +76,12 @@
 &art08;
 &art09;
 &art10;
+&art11;
 &art12;
 &art13;
 &art14;
 &art15;
+&art16;
+&appa;
 <index/>
 </book>
