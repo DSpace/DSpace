@@ -635,7 +635,7 @@
   
   <servlet-mapping>
     <servlet-name>open-search</servlet-name>
-    <url-pattern>/open-search</url-pattern>
+    <url-pattern>/open-search/*</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
