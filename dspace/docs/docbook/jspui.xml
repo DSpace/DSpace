@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <chapter remap="h1">
-    <title><anchor id="docbook-jspui.html"/>JPSUI Configuration and Customization</title>
+    <title><anchor id="docbook-jspui.html"/>DSpace System Documentation: JPSUI Configuration and Customization</title>
     <para>The DSpace digital repository supports two user interfaces: one based on JavaServer Pages (JSP) technologies and one based upon the Apache Cocoon framework. This chapter describes those parameters which are specific to the JPSUI interface.</para>
     <section remap="h2">
         <title><anchor id="docbook-jspui.html-configuration"/>Configuration</title>
