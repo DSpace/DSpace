@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <chapter remap="h1">
-  <title><anchor id="docbook-business.html"/>Business Logic Layer</title>
+  <title><anchor id="docbook-business.html"/>DSpace System Documentation: Business Logic Layer</title>
   <subtitle>(<literal>ConfigurationManager</literal>)</subtitle>
   <section remap="h2">
     <title><anchor id="docbook-business.html-core" xreflabel="Core Classes"/>Core Classes</title>
