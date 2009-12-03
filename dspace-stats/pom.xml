@@ -1,17 +1,16 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	
 	<parent>
 		<artifactId>dspace-parent</artifactId>
 		<groupId>org.dspace</groupId>
-		<version>1.6.0-SNAPSHOT</version>
+		<version>1.6.0-rc1</version>
 	</parent>
 	
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.dspace</groupId>
 	<artifactId>dspace-stats</artifactId>
 	<name>DSpace Solr Statistics Logging Client Library</name>
-	<version>1.6.0-SNAPSHOT</version>
+	<version>1.6.0-rc1</version>
 	<description>Library of Shared UsageEvent and EventConsumer Tools for Logging to Solr.</description>
 
 	<repositories>
@@ -37,9 +36,9 @@
 		releases snapshots into the snapshot repository below.
 	-->
 	<scm>
-		<connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-stats</connection>
-		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-stats</developerConnection>
-		<url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-stats</url>
+		<connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.0-rc1/dspace-stats</connection>
+		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.0-rc1/dspace-stats</developerConnection>
+		<url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.0-rc1/dspace-stats</url>
 	</scm>
 
 	<distributionManagement>
@@ -105,7 +104,7 @@
 		</developer>
 	</developers>
    
-    <contributors/>
+    <contributors />
 
 	<dependencies>
 		<dependency>
@@ -116,7 +115,7 @@
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-api</artifactId>
-			<version>1.6.0-SNAPSHOT</version>
+			<version>1.6.0-rc1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.dspace.dependencies</groupId>
