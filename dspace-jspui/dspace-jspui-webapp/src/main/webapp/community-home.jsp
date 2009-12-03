@@ -371,8 +371,9 @@
 	</td>
       </tr>
     </table>
+
     <% } %>
-    
+   
     <%-- Recently Submitted items --%>
 	<h3><fmt:message key="jsp.community-home.recentsub"/></h3>
 <%
@@ -435,6 +436,13 @@
     <%= sidebar %>
 
   </dspace:sidebar>
+
+         <div align="center">
+                   <form method="get" action="<%= request.getContextPath() %>/displaystats">
+                       <input type="hidden" name="handle" value="<%= community.getHandle() %>"/>
+                       <input type="submit" name="submit_simple" value="<fmt:message key="jsp.community-home.display-statistics"/>" />
+                   </form>
+          </div>
 
 
 </dspace:layout>

@@ -11,6 +11,7 @@
  - [DS-198] File descriptions can not be removed/cleared in XMLUI
  - [DS-240] Item validityKey not complete
  - [DS-251] Bulk Metadata Editing: XMLUI aspect and forms
+ - [DS-363] JSPUI statistics views
 
 (Claudia Juergen)
  - [DS-114] Links not working due to trailing white space in dspace.url

@@ -746,6 +746,16 @@ table.miscTable input.ds-authority-value { display: inline; }
 table.authority-statistics {padding: 5px; margin-bottom: 15px;}
 table.authority-statistics table {float: left; text-align: center;}
 
+.statsTable {
+        border: 1px gray solid;
+        width: 85%;
+}
+
+.statsTable td {
+        font-size: 0.8em;
+}
+
+
 div.authority-key-nav-link, div.authority-page-nav-link {margin-top: 20px;}
 
 div#authority-message {

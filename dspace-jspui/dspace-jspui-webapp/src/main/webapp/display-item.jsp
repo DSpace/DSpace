@@ -143,6 +143,7 @@
                     <input type="hidden" name="handle" value="<%= item.getHandle() %>" />
                     <input type="submit" name="submit" value="<fmt:message key="jsp.general.metadataexport.button"/>" />
                 </form>
+
             </td>
             <td class="evenRowEvenCol" align="center">
                 <form method="get" action="<%= request.getContextPath() %>/tools/edit-item">
@@ -230,6 +231,12 @@
     }
 %>
 
+<div align="center"
+    <form method="get" action="<%= request.getContextPath() %>/displaystats">
+        <input type="hidden" name="handle" value="<%= handle %>"/>
+        <input type="submit" name="submit_simple" value="<fmt:message key="jsp.display-item.display-statistics"/>" />
+    </form>
+</div>
 
 <%
     if (workspace_id != null)

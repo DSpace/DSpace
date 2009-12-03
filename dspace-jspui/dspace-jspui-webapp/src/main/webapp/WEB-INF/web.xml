@@ -400,6 +400,11 @@
   </servlet>
 
   <servlet>
+    <servlet-name>displaystats</servlet-name>
+    <servlet-class>org.dspace.app.webui.servlet.DisplayStatisticsServlet</servlet-class>
+  </servlet>
+
+  <servlet>
     <servlet-name>statistics</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.StatisticsServlet</servlet-class>
   </servlet>
@@ -676,6 +681,11 @@
   <servlet-mapping>
     <servlet-name>sitemap</servlet-name>
     <url-pattern>/sitemap</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>displaystats</servlet-name>
+    <url-pattern>/displaystats</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
