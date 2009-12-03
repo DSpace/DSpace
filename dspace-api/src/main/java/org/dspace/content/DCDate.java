@@ -82,6 +82,9 @@ public class DCDate
     // UTC timezone
     private static final TimeZone utcZone = TimeZone.getTimeZone("UTC");
 
+    // local timezone
+    private static final TimeZone localZone = new GregorianCalendar().getTimeZone();
+
     // Full ISO 8601 is e.g. "2009-07-16T13:59:21Z"
     private static final SimpleDateFormat fullIso = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     static { fullIso.setTimeZone(utcZone); }
@@ -182,18 +185,36 @@ public class DCDate
             date = tryParse(fullIso3, fromDC);
         if (date == null)
         {
+            // NOTE: move GMT date to local midnight when granularity is coarse
             date = tryParse(dateIso, fromDC);
-            granularity = DateGran.DAY;
+            if (date != null)
+            {
+                long ldate = date.getTime();
+                date = new Date(ldate - localZone.getOffset(ldate));
+                granularity = DateGran.DAY;
+            }
         }
         if (date == null)
         {
+            // NOTE: move GMT date to local midnight when granularity is coarse
             date = tryParse(yearMonthIso, fromDC);
-            granularity = DateGran.MONTH;
+            if (date != null)
+            {
+                long ldate = date.getTime();
+                date = new Date(ldate - localZone.getOffset(ldate));
+                granularity = DateGran.MONTH;
+            }
         }
         if (date == null)
         {
+            // NOTE: move GMT date to local midnight when granularity is coarse
             date = tryParse(yearIso, fromDC);
-            granularity = DateGran.YEAR;
+            if (date != null)
+            {
+                long ldate = date.getTime();
+                date = new Date(ldate - localZone.getOffset(ldate));
+                granularity = DateGran.YEAR;
+            }
         }
 
         if (date == null)
@@ -249,14 +270,16 @@ public class DCDate
         return toStringInternal();
     }
 
+    // When granularity is "day" or more, show the _local-time_ day because
+    // when the granularity was coarse the local time value was set.
     private synchronized String toStringInternal()
     {
         if (granularity == DateGran.YEAR)
-            return yearIso.format(calendar.getTime());
+            return String.format("%4d", getYear());
         else if (granularity == DateGran.MONTH)
-            return yearMonthIso.format(calendar.getTime());
+            return String.format("%4d-%02d", getYear(), getMonth());
         else if (granularity == DateGran.DAY)
-            return dateIso.format(calendar.getTime());
+            return String.format("%4d-%02d-%02d", getYear(), getMonth(), getDay());
         else
             return fullIso.format(calendar.getTime());
     }
@@ -502,6 +525,8 @@ public class DCDate
     /**
      * Simple test program
      * Usage:  java org.dspace.content.DCdate [DCDate | -l yyyy [mm [dd ..]]] ]
+     *  where "DCDate" is the kind of value that would be in metadata,
+     *  e.g. "2006", "2006-02-03", etc.
      *  (-l form tests local time parsing)
      * Default is to use current time.
      */

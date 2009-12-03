@@ -65,6 +65,7 @@
  - [DS-389] Misleading label: "Submit to This Collection"
 
 (Larry Stone)
+ - [DS-393] Fix DCDate and submission timezone bugs that changed date on page reload
  - [DS-377] Add META tags identifying DSpace source version
  - [DS-373] Fix "Letter" link URLs in 2nd-stage Browse
  - [DS-294] Add preferred language setting to Edit Profile page in XMLUI
