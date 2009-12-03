@@ -12,6 +12,11 @@
       <url>http://www.dspace.org</url>
    </organization>
 
+   <!--Force UTF-8 encoding during build on all platforms-->
+   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+   </properties>
+
    <build>
       <plugins>
          <!--
