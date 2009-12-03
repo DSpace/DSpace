@@ -518,4 +518,55 @@ from/until/setSpec/offset
                 <literal>2003-01-01</literal>, has no &apos;until&apos; date, is for collection hdl:1721.1/1234, and 300 records have already been sent to the harvester. (Actually, if the original OAI-PMH request doesn&apos;t specify a &apos;from&apos; or &apos;until, OAICat fills them out automatically to &apos;0000-00-00T00:00:00Z&apos; and &apos;9999-12-31T23:59:59Z&apos; respectively. This means DSpace resumption tokens will always have from and until dates in them.)</para>
         </section>
     </section>
+	<section remap="h2">
+		<title><anchor id="docbook-application.html-command-launcher" xreflabel="DSpace Command Launcher"/>DSpace Command Launcher</title>
+		<para>Introduced in Release 1.6, the DSpace Command Launcher brings together the various command and scripts into a standard-practice for running CLI runtime programs.</para>
+		<section remap="h3">
+			<title>Older Versions</title>
+		<para>Prior to Release 1.6, there were various scripts written that masked a more manual approach to running CLI programs.  The user had to issue <literal>[dspace]/bin/dsrun</literal> and then java class that ran that program.  With release 1.5, scripts were written to mask the <literal>[dspace]/bin/dsrun</literal> command.  We have left the java class in the System Administration section since it does have value for debugging purposes and for those who wish to learn about DSpace
+		programming or wish to customize the code at any time.</para>
+		</section>
+		<section remap="h3">
+			<title>Command Launcher Structure</title>
+			<para>There are two components to the command launcher:  the dspace script and the launcher.xml.  The DSpace command calls a java class which in turn refers to <literal>launcher.xml</literal> that is stored in the <literal>[dspace]/config</literal> directory</para>
+			<para><literal>launcher.xml</literal> is made of several components:</para>
+			<itemizedlist>
+				<listitem>
+					<para><literal>&lt;command&gt;</literal> begins the stanza for a comand</para>
+				</listitem>
+				<listitem>
+					<para><literal>&lt;name&gt;</literal><emphasis><literal>name of command</literal></emphasis><literal>&lt;/name&gt;</literal>  the name of the command that you would use.</para>
+				</listitem>
+				<listitem>
+					<para><literal>&lt;description&gt;</literal><emphasis><literal>the description of the command</literal></emphasis><literal>&lt;/description&gt;</literal></para>
+				</listitem>
+				<listitem>
+					<para><literal>&lt;step&gt;  &lt;/step&gt;</literal> User arguments are parsed and tested.</para>
+				</listitem>
+				<listitem>
+					<para><literal>&lt;class&gt;</literal><emphasis><literal>&lt;the java class that is being used to run the CLI program&gt;</literal></emphasis><literal>&lt;/class&gt;</literal></para>
+				</listitem>
+			</itemizedlist>
+			<para>Prior to release 1.5 if one wanted to regenerate the browse index, one would have to issue the following commands manually:</para>
+<screen>[dspace]/bin/dsrun org.dspace.browse.IndexBrowse -f -r
+[dspace]/bin/dsrun org.dspace.browse.ItemCounter
+[dspace]/bin/dsrun org.dspace.search.DSIndexer</screen>
+			<para>In release 1.5 a script was written and in release 1.6 the command <literal>[dspace]/bin/dspace index-init</literal> replaces the script.  The stanza from <literal>launcher.xml</literal> show us how one can build more commands if needed:</para>
+<screen>&lt;command&gt;
+        &lt;name&gt;index-update&lt;/name&gt;
+        &lt;description&gt;Update the search and browse indexes&lt;/description&gt;
+        &lt;step passuserargs=&quot;false&quot;&gt;
+            &lt;class&gt;org.dspace.browse.IndexBrowse&lt;/class&gt;
+            &lt;argument&gt;-i&lt;/argument&gt;
+        &lt;/step&gt;
+        &lt;step passuserargs=&quot;false&quot;&gt;
+            &lt;class&gt;org.dspace.browse.ItemCounter&lt;/class&gt;
+        &lt;/step&gt;
+        &lt;step passuserargs=&quot;false&quot;&gt;
+            &lt;class&gt;org.dspace.search.DSIndexer&lt;/class&gt;
+        &lt;/step&gt;
+&lt;/command&gt;</screen>	
+		<para>.</para>			
+		</section>		
+		</section>
 </chapter>
