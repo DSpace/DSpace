@@ -80,7 +80,6 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
                     <para>Details on acquiring Oracle can be downloaded from the following location: <ulink url="http://www.oracle.com/database/">http://www.oracle.com/database/</ulink></para>
                     <para> You will need to create a database for DSpace. Make sure that the character set is one of the Unicode character sets. DSpace uses UTF-8 natively, and it is suggested that the Oracle database use the same character set. You will also need to create a user account for DSpace (e.g. <literal>dspace</literal>,) and ensure that it has permissions to add and remove tables in the database. Refer to the Quick Installation for more details.</para>
                     <para><emphasis role="bold">NOTE:</emphasis> DSpace uses sequences to generate unique object IDs - beware Oracle sequences, which are said to lose their values when doing a database export/import, say restoring from a backup. Be sure to run the script <literal>etc/update-sequences.sql</literal>.</para>
-                    <para><emphasis role="bold">ALSO NOTE:</emphasis> Everything is fully functional, although Oracle limits you to 4k of text in text fields such as item metadata or collection descriptions.</para>
                     <para>For people interested in switching from Postgres to Oracle, I know of no tools that would do this automatically. You will need to recreate the community, collection, and eperson structure in the Oracle system, and then use the item export and import tools to move your content over.</para>
                 </listitem>
             </itemizedlist>
@@ -585,8 +584,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
             <orderedlist>
                 <listitem>
                     <para>To configure your DSpace installation to run the handle server, run the following command:</para>
-                    <screen><emphasis> [dspace]</emphasis>/bin/dsrun net.handle.server.SimpleSetup <emphasis>[dspace]</emphasis>/handle-server
-</screen>
+                	<para><literal>[dspace]/bin/dspace make-handle-config</literal></para>
                     <para>Ensure that <literal>[dspace]/handle-server</literal> matches whatever you have in <literal>dspace.cfg</literal> for the <literal>handle.dir</literal> property.</para>
                 </listitem>
                 <listitem>

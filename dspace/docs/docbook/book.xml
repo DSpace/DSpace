@@ -23,14 +23,14 @@
 <book>
     <bookinfo>
         <title>DSpace Manual</title>
-        <subtitle>1.6 Release [Alpha]</subtitle>
+        <subtitle>Release 1.6 RC1</subtitle>
         <author>
             <surname>The DSpace Foundation</surname>
             <affiliation>
                 <address><email>webmaster@dspace.org</email></address>
             </affiliation>
-        </author> <edition>1.6 Alpha Release</edition>
-        <pubdate>2009-11-14 15:03:00 EST</pubdate>
+        </author> <edition>1.6 RC1</edition>
+        <pubdate>2009-12-02 23:21:00 EST</pubdate>
         <copyright>
             <year>2002-2009</year>
             <holder>
@@ -51,10 +51,10 @@
         </legalnotice>
         <revhistory>
             <revision>
-                <revnumber>Pre-1.6a</revnumber>
-                <date>This text generated: 2009-11-14 15:03:00 EST</date>
+                <revnumber>Version 1.6 RC1 </revnumber>
+                <date>This text generated: 2009-12-03 23:21:00 EST</date>
                 <authorinitials>JAT</authorinitials>
-                <revmark>&nbsp;</revmark>
+                
             </revision>
         </revhistory>
         <abstract>
@@ -63,6 +63,8 @@
     </bookinfo>
     <preface>
         <title>Preface</title> <para/>
+    	<para>The documentation submitted to you, the administrator, is a &quot;Release Candidate&quot; for testing purposes and finding the bugs in the DSpace 1.6 RC1 software.  Users should be aware that the documentation may contain errors and/or missing pieces to the documentation.</para>
+    	<para>Currently, the list of bugs and fixes has not made it into the 1.6-RC1 documentation along with other items that were being finished up in the programming realm as this documentation was being generated.</para>
     </preface>
     <toc/>
     

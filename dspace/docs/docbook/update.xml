@@ -221,10 +221,76 @@ metadata.hide.dc.description.provenance = true
 </screen>
 					</listitem>
 					<listitem>
-						<para>New Authority Control options are available</para>
+						<para>New Choice Control and Authority Control options are available</para>
 						<screen>## example of authority-controlled browse category - see authority control config
 #webui.browse.index.5 = lcAuthor:metadataAuthority:dc.contributor.author:authority
 </screen>
+						<para>And also:</para>
+						<screen>#####  Authority Control Settings  #####
+
+#plugin.named.org.dspace.content.authority.ChoiceAuthority = \
+# org.dspace.content.authority.SampleAuthority = Sample, \
+# org.dspace.content.authority.LCNameAuthority = LCNameAuthority, \
+# org.dspace.content.authority.SHERPARoMEOPublisher = SRPublisher, \
+# org.dspace.content.authority.SHERPARoMEOJournalTitle = SRJournalTitle
+
+## This ChoiceAuthority plugin is automatically configured with every
+## value-pairs element in input-forms.xml, namely:
+##   common_identifiers, common_types, common_iso_languages
+#plugin.selfnamed.org.dspace.content.authority.ChoiceAuthority = \
+# org.dspace.content.authority.DCInputAuthority
+
+## configure LC Names plugin
+#lcname.url = http://alcme.oclc.org/srw/search/lcnaf
+
+## configure SHERPA/RoMEO authority plugin
+#sherpa.romeo.url = http://www.sherpa.ac.uk/romeo/api24.php
+
+##
+## This sets the default lowest confidence level at which a metadata value is included
+## in an authority-controlled browse (and search) index.  It is a symbolic
+## keyword, one of the following values (listed in descending order):
+##   accepted
+##   uncertain
+##   ambiguous
+##   notfound
+##   failed
+##   rejected
+##   novalue
+##   unset
+## See manual or org.dspace.content.authority.Choices source for descriptions.
+authority.minconfidence = ambiguous
+
+## demo: use LC plugin for author
+#choices.plugin.dc.contributor.author =  LCNameAuthority
+#choices.presentation.dc.contributor.author = lookup
+#authority.controlled.dc.contributor.author = true
+##
+## This sets the lowest confidence level at which a metadata value is included
+## in an authority-controlled browse (and search) index.  It is a symbolic
+## keyword from the same set as for the default "authority.minconfidence"
+#authority.minconfidence.dc.contributor.author = accepted
+
+
+## Demo: publisher name lookup through SHERPA/RoMEO:
+#choices.plugin.dc.publisher = SRPublisher
+#choices.presentation.dc.publisher = suggest
+
+## demo: journal title lookup, with ISSN as authority
+#choices.plugin.dc.title.alternative = SRJournalTitle
+#choices.presentation.dc.title.alternative = suggest
+#authority.controlled.dc.title.alternative = true
+
+## demo: use choice authority (without authority-control) to restrict dc.type on EditItemMetadata page
+# choices.plugin.dc.type = common_types
+# choices.presentation.dc.type = select
+
+## demo: same idea for dc.language.iso
+# choices.plugin.dc.language.iso = common_iso_languages
+# choices.presentation.dc.language.iso = select
+
+# Change number of choices shown in the select in Choices lookup popup
+#xmlui.lookup.select.size = 12</screen>
 					</listitem>
 					<listitem>
 						<para>RSS Feeds now support Atom 1.0</para>
@@ -265,7 +331,7 @@ webui.feed.item.date = dc.date.issued
 # Similar to the item display UI, the name of the field for display
 # in the feed will be drawn from the current UI dictionary,
 # using the key:
-# &quot;metadata.&lt;field&gtl;&quot;
+# &quot;metadata.&lt;field&gt;&quot;
 #
 # e.g.   "metadata.dc.title"
 #        "metadata.dc.contributor.author"
@@ -393,87 +459,7 @@ statistics.items.type.1=dcinput
 statistics.items.type.2=date
 statistics.default.start.datepick = 01/01/1977
 
-statistics.item.authorization.admin=true
-
-#####  Authority Control Settings  #####
-
-#plugin.named.org.dspace.content.authority.ChoiceAuthority = \
-# org.dspace.content.authority.SampleAuthority = Sample, \
-# org.dspace.content.authority.LCNameAuthority = LCNameAuthority, \
-# org.dspace.content.authority.SHERPARoMEOPublisher = SRPublisher, \
-# org.dspace.content.authority.SHERPARoMEOJournalTitle = SRJournalTitle
-
-## This ChoiceAuthority plugin is automatically configured with every
-## value-pairs element in input-forms.xml, namely:
-##   common_identifiers, common_types, common_iso_languages
-#plugin.selfnamed.org.dspace.content.authority.ChoiceAuthority = \
-# org.dspace.content.authority.DCInputAuthority
-
-## configure LC Names plugin
-#lcname.url = http://alcme.oclc.org/srw/search/lcnaf
-
-## configure SHERPA/RoMEO authority plugin
-#sherpa.romeo.url = http://www.sherpa.ac.uk/romeo/api24.php
-
-##
-## This sets the default lowest confidence level at which a metadata value is included
-## in an authority-controlled browse (and search) index.  It is a symbolic
-## keyword, one of the following values (listed in descending order):
-##   accepted
-##   uncertain
-##   ambiguous
-##   notfound
-##   failed
-##   rejected
-##   novalue
-##   unset
-## See manual or org.dspace.content.authority.Choices source for descriptions.
-authority.minconfidence = ambiguous
-
-## demo: use LC plugin for author
-#choices.plugin.dc.contributor.author =  LCNameAuthority
-#choices.presentation.dc.contributor.author = lookup
-#authority.controlled.dc.contributor.author = true
-##
-## This sets the lowest confidence level at which a metadata value is included
-## in an authority-controlled browse (and search) index.  It is a symbolic
-## keyword from the same set as for the default "authority.minconfidence"
-#authority.minconfidence.dc.contributor.author = accepted
-
-
-## Demo: publisher name lookup through SHERPA/RoMEO:
-#choices.plugin.dc.publisher = SRPublisher
-#choices.presentation.dc.publisher = suggest
-
-## demo: journal title lookup, with ISSN as authority
-#choices.plugin.dc.title.alternative = SRJournalTitle
-#choices.presentation.dc.title.alternative = suggest
-#authority.controlled.dc.title.alternative = true
-
-## demo: use choice authority (without authority-control) to restrict dc.type on EditItemMetadata page
-# choices.plugin.dc.type = common_types
-# choices.presentation.dc.type = select
-
-## demo: same idea for dc.language.iso
-# choices.plugin.dc.language.iso = common_iso_languages
-# choices.presentation.dc.language.iso = select
-
-# Change number of choices shown in the select in Choices lookup popup
-#xmlui.lookup.select.size = 12
-</screen>
-					</listitem>
-				</itemizedlist>
-			</listitem>
-			<listitem>
-				<para><emphasis role="bold">Update the database</emphasis>. The database schema needs to be updated to accommodate changes to the database. SQL files contain the relevant updates are provided. Please note that if you have made any local customizations to the database schema, you should consult these updates and make sure they will work for you.</para>
-				<itemizedlist>
-					<listitem>
-						<para>For PostgreSQL:</para>
-						<para><literal>psql -U [dspace-user] -f [dspace-source]/dspace/etc/postgres/schema_15_16.sql</literal></para>
-					</listitem>
-					<listitem>
-						<para>For Oracle&#xf8ea;:</para>
-						<para><literal>[dspace-source]/dspace/etc/oracle/database_schema_15-16.sql</literal> contains the commands necessary to upgrade your database schema on Oracle&#xf8ea;.</para>
+statistics.item.authorization.admin=true</screen>
 					</listitem>
 				</itemizedlist>
 			</listitem>
@@ -484,11 +470,45 @@ authority.minconfidence = ambiguous
 				<para><emphasis role="bold">Build DSpace.</emphasis> Run the following commands to compile DSpace.:</para>
 				<screen>cd /[dspace-source]/dspace/
 mv package</screen>
-				<para>You will find the result in <literal>[dspace-source]/dspace/target/dspace-1.6-build.dir</literal> . Inside this directory is the compiled binary distribution of DSpace.</para>
+				<para>You will find the result in <literal>[dspace-source]/dspace/target/dspace-[version]-build.dir</literal> . Inside this directory is the compiled binary distribution of DSpace.</para>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Update the database</emphasis>. The database schema needs to be updated to accommodate changes to the database. SQL files contain the relevant updates are provided. Please note that if you have made any local customizations to the database schema, you should consult these updates and make sure they will work for you.</para>
+				<itemizedlist>
+					<listitem>
+						<para>For PostgreSQL:</para>
+						<para><literal>psql -U [dspace-user] -f [dspace-source]/dspace/etc/postgres/schema_15_16.sql</literal></para>
+					</listitem>
+					<listitem>
+						<para>For Oracle:</para>
+						<para>Execute the upgrade script, e.g. with sqlplus, recording the output:</para>
+						<orderedlist>
+							<listitem>
+								<para>Start SQL*Plus with &quot;<literal>sqlplus [connect args]</literal>&quot;</para>
+							</listitem>
+							<listitem>
+								<para>Record the ouput:</para>
+								<para><literal>SQL> spool &apos;upgrade.lst&apos;</literal></para>
+							</listitem>
+							<listitem>
+								<para>Run the upgrade script</para>
+								<para><literal>SQL> @[dspace-source]/dspace/etc/oracle/database_schema_15_16.sql</literal></para>
+								<para><literal>SQL> spool off</literal></para>
+							</listitem>
+							<listitem>
+								<para>Please note: The final few statements WILL FAIL. That is because you have run some queries and use the results to construct the statements to remove the constraints, manually&mdash;Oracle doesn't have any easy way to automate this (unless you know PL/SQL). So, look for the coment line beginning:</para>
+								<screen>&quot;--You need to remove the already in place constraints&quot;
+and follow the instructions in the actual SQL file.
+Refer to the contents of the spool file &quot;upgrade.lst&quot; for
+the output of the queries you'll need.</screen>
+							</listitem>
+						</orderedlist>
+					</listitem>
+				</itemizedlist>
 			</listitem>
 			<listitem>
 				<para><emphasis role="bold">Update DSpace</emphasis>. Update the DSpace installed directory with the new code and libraries. Issue the following commands:</para>
-				<screen>cd /[dspace-source]/dspace/target/dspace-1.6-build.dir
+				<screen>cd [dspace-source]/dspace/target/dspace-[version]-build.dir
 ant -Dconfig=[dspace]/config/dspace.cfg update</screen>
 			</listitem>
 			<listitem>

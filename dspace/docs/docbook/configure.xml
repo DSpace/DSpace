@@ -41,8 +41,28 @@ dspace.history = ${dspace.dir}/history
 			</tip>
 		</section>
 		<section remap="h3">
-			<title><anchor id="docbook-configure.html-general-reminder" xreflabel="Update Reminder"/>Update Reminder</title>
-			<para>You should remember that after editing your configuration file(s), and you are done and wish to implement the changes, you will need to:</para>
+			<title><anchor id="docbook-configure.html-general-update" xreflabel="Update Reminder"/>Update Reminder</title>
+			<subtitle>Things you should know about editing <literal>dspace.cfg</literal> files.</subtitle>
+			<para>It is important to rememeber that there are <emphasis role="bold"> two <literal>dspace.cfg</literal> files after an installation of DSpace.</emphasis></para>
+			<orderedlist>
+				<listitem>
+					<para>The &quot;source&quot; file that is found in <literal>[dspace-source]/dspace/config/dspace.cfg</literal></para>
+				</listitem>
+				<listitem>
+					<para>The &quot;runtime&quot; file that is found in <literal>[dspace]/config/dspace.cfg</literal></para>
+				</listitem>
+			</orderedlist>
+			<para>The runtime file is supposed to be the <emphasis role="bold">copy</emphasis> of the source file, which is considered the <emphasis>master</emphasis> version. However, the DSpace server and command programs only look at the <emphasis>runtime</emphasis> configuration file, so when you are revising your configuration values, it is tempting to <emphasis>only edit the runtime file</emphasis>. DO NOT do this. Always make the same changes to the source version of <literal
+					>dspace.cfg</literal> in addition to the runtime file. The two files <emphasis>should</emphasis> always be identical, since the source <literal>dspace.cfg</literal> will be the basis of your next upgrade.</para>
+			<para>To keep the two files in synchronization, you can edit your files in <literal>[dspace-source]/dspace/config/</literal> and then you would run the following commands:</para>
+			<screen>
+cd /[dspace-source]/dspace/target/dspace-&lt;version&gt;-build.dir
+ant update_configs
+</screen>
+			<para>This will copy the source <literal>dspace.cfg</literal> (along with other configuration files) into the runtime (<literal>/[dspace]/config</literal>) directory.</para>
+			<note>
+				<para>You should remember that after editing your configuration file(s), and you are done and wish to implement the changes, you will need to:</para>
+			</note>
 			<itemizedlist>
 				<listitem>
 					<para>To run <literal>ant -Dconfig=/[dspace]/config/dspace.cfg update</literal> if you are updating your <literal>dspace.cfg</literal> file and wish to see the changes appear. Follow the usual sequence with copying your webapps.</para>
@@ -4130,155 +4150,211 @@ plugin.sequence.org.dspace.plugin.CollectionHomeProcessor = \
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
 				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
-						<row>
-							<entry align="right">Property:</entry>
-							<entry><literal>webui.feed.enable</literal></entry>
-						</row>
-						<row>
-							<entry align="right">Example Value:</entry>
-							<entry><literal>webui.feed.enable = false</literal></entry>
-						</row>
-						<row>
-							<entry align="right">Informational Note:</entry>
-							<entry>By default, RSS feeds are set to false (off). Change key to &quot;true&quot; to enable.</entry>
-						</row>
-						<row>
-							<?dbfo row-height="5mm"?>
-							<?dbhtml row-height="5mm"?>
-							<entry spanname="notespan"/>
-						</row>
-						<row>
-							<entry align="right">Property:</entry>
-							<entry><literal>webui.feed.items</literal></entry>
-						</row>
-						<row>
-							<entry align="right">Example Value:</entry>
-							<entry><literal>webui.feed.items = 4</literal></entry>
-						</row>
-						<row>
-							<entry align="right">Informational Note:</entry>
-							<entry>Defines the number of DSpace items per feed (the most recent submissions)</entry>
-						</row>
-						<row>
-							<?dbfo row-height="5mm"?>
-							<?dbhtml row-height="5mm"?>
-							<entry spanname="notespan"/>
-						</row>
-						<row>
-							<entry align="right">Property:</entry>
-							<entry><literal>webui.feed.cache.size</literal></entry>
-						</row>
-						<row>
-							<entry align="right">Example Value:</entry>
-							<entry><literal>webui.feed.cache.size = 100</literal></entry>
-						</row>
-						<row>
-							<entry align="right">Informational Note:</entry>
-							<entry>Defines the maximum number of feeds in memory cache. Value of &quot;<literal>0</literal>&quot; will disable caching.</entry>
-						</row>
-						<row>
-							<?dbfo row-height="5mm"?>
-							<?dbhtml row-height="5mm"?>
-							<entry spanname="notespan"/>
-						</row>
-						<row>
-							<entry align="right">Property:</entry>
-							<entry><literal>webui.feed.cache.age</literal></entry>
-						</row>
-						<row>
-							<entry align="right">Example Value:</entry>
-							<entry><literal>webui.feed.cache.age = 48</literal></entry>
-						</row>
-						<row>
-							<entry align="right">Informational Note:</entry>
-							<entry>Defines the number of hours to keep cached feeds before checking currency. The value of &quot;<literal>0</literal>&quot; will force a check with each request.</entry>
-						</row>
-						<row>
-							<?dbfo row-height="5mm"?>
-							<?dbhtml row-height="5mm"?>
-							<entry spanname="notespan"/>
-						</row>
-						<row>
-							<entry align="right">Property:</entry>
-							<entry><literal>webui.feed.formats</literal></entry>
-						</row>
-						<row>
-							<entry align="right">Example Value:</entry>
-							<entry><literal>webui.feed.formats = rss_1.0,rss_2.0</literal></entry>
-						</row>
-						<row>
-							<entry align="right">Informational Note:</entry>
-							<entry>Defines which syndication formats to offer. You can use more than one; use a comma-separated list. The following list are the available values: rss_0.90, rss_0.91, rss_0.92, rss_0.93, rss_0.94, rss_1.0, rss_2.0 .</entry>
-						</row>
-						<row>
-							<?dbfo row-height="5mm"?>
-							<?dbhtml row-height="5mm"?>
-							<entry spanname="notespan"/>
-						</row>
-						<row>
-							<entry align="right">Property:</entry>
-							<entry><literal>webui.feed.localresolve</literal></entry>
-						</row>
-						<row>
-							<entry align="right">Example Value:</entry>
-							<entry><literal>webui.feed.localresolve = false</literal></entry>
-						</row>
-						<row>
-							<entry align="right">Informational Note:</entry>
-							<entry>By default, (set to false), URLs returned by the feed will point at the global handle resolver (e.g. http://hdl.handle.net/123456789/1). If set to <emphasis role="bold"><literal>true</literal></emphasis> the local server URLs are used (e.g. http://myserver.myorg/handle/123456789/1).</entry>
-						</row>
-						<row>
-							<?dbfo row-height="5mm"?>
-							<?dbhtml row-height="5mm"?>
-							<entry spanname="notespan"/>
-						</row>
-						<row>
-							<entry align="right">Property:</entry>
-							<entry>
-								<screen>
-webui.feed.item.title
+					<row>
+						<entry align="right">Property:</entry>
+						<entry><literal>webui.feed.enable</literal></entry>
+					</row>
+					<row>
+						<entry align="right">Example Value:</entry>
+						<entry><literal>webui.feed.enable = false</literal></entry>
+					</row>
+					<row>
+						<entry align="right">Informational Note:</entry>
+						<entry>By default, RSS feeds are set to false (off). Change key to &quot;true&quot; to enable.</entry>
+					</row>
+					<row>
+						<?dbfo row-height="5mm"?>
+						<?dbhtml row-height="5mm"?>
+						<entry spanname="notespan"/>
+					</row>
+					<row>
+						<entry align="right">Property:</entry>
+						<entry><literal>webui.feed.items</literal></entry>
+					</row>
+					<row>
+						<entry align="right">Example Value:</entry>
+						<entry><literal>webui.feed.items = 4</literal></entry>
+					</row>
+					<row>
+						<entry align="right">Informational Note:</entry>
+						<entry>Defines the number of DSpace items per feed (the most recent submissions)</entry>
+					</row>
+					<row>
+						<?dbfo row-height="5mm"?>
+						<?dbhtml row-height="5mm"?>
+						<entry spanname="notespan"/>
+					</row>
+					<row>
+						<entry align="right">Property:</entry>
+						<entry><literal>webui.feed.cache.size</literal></entry>
+					</row>
+					<row>
+						<entry align="right">Example Value:</entry>
+						<entry><literal>webui.feed.cache.size = 100</literal></entry>
+					</row>
+					<row>
+						<entry align="right">Informational Note:</entry>
+						<entry>Defines the maximum number of feeds in memory cache. Value of &quot;<literal>0</literal>&quot; will disable caching.</entry>
+					</row>
+					<row>
+						<?dbfo row-height="5mm"?>
+						<?dbhtml row-height="5mm"?>
+						<entry spanname="notespan"/>
+					</row>
+					<row>
+						<entry align="right">Property:</entry>
+						<entry><literal>webui.feed.cache.age</literal></entry>
+					</row>
+					<row>
+						<entry align="right">Example Value:</entry>
+						<entry><literal>webui.feed.cache.age = 48</literal></entry>
+					</row>
+					<row>
+						<entry align="right">Informational Note:</entry>
+						<entry>Defines the number of hours to keep cached feeds before checking currency. The value of &quot;<literal>0</literal>&quot; will force a check with each request.</entry>
+					</row>
+					<row>
+						<?dbfo row-height="5mm"?>
+						<?dbhtml row-height="5mm"?>
+						<entry spanname="notespan"/>
+					</row>
+					<row>
+						<entry align="right">Property:</entry>
+						<entry><literal>webui.feed.formats</literal></entry>
+					</row>
+					<row>
+						<entry align="right">Example Value:</entry>
+						<entry><literal>webui.feed.formats = rss_1.0,rss_2.0,atom_1.0</literal></entry>
+					</row>
+					<row>
+						<entry align="right">Informational Note:</entry>
+						<entry>Defines which syndication formats to offer. You can use more than one; use a comma-separated list. The following list are the available values: rss_0.90, rss_0.91, rss_0.92, rss_0.93, rss_0.94, rss_1.0, rss_2.0, atom_1.0.</entry>
+					</row>
+					<row>
+						<?dbfo row-height="5mm"?>
+						<?dbhtml row-height="5mm"?>
+						<entry spanname="notespan"/>
+					</row>
+					<row>
+						<entry align="right">Property:</entry>
+						<entry><literal>webui.feed.localresolve</literal></entry>
+					</row>
+					<row>
+						<entry align="right">Example Value:</entry>
+						<entry><literal>webui.feed.localresolve = false</literal></entry>
+					</row>
+					<row>
+						<entry align="right">Informational Note:</entry>
+						<entry>By default, (set to false), URLs returned by the feed will point at the global handle resolver (e.g. http://hdl.handle.net/123456789/1). If set to <emphasis role="bold"><literal>true</literal></emphasis> the local server URLs are used (e.g. http://myserver.myorg/handle/123456789/1).</entry>
+					</row>
+					<row>
+						<?dbfo row-height="5mm"?>
+						<?dbhtml row-height="5mm"?>
+						<entry spanname="notespan"/>
+					</row>
+					<row>
+						<entry align="right">Property:</entry>
+						<entry>
+<screen>webui.feed.item.title
 webui.feed.item.date</screen>
 							</entry>
-						</row>
-						<row>
-							<entry align="right">Example Value:</entry>
+					</row>
+					<row>
+						<entry align="right">Example Value:</entry>
 							<entry>
 								<screen>webui.feed.item.title = dc.title
 webui.feed.item.date = dc.date.issued</screen>
-							</entry>
-						</row>
-						<row>
-							<entry align="right">Informational Note:</entry>
-							<entry>This set of keys customize each single-value field displayed in the feed information for each item. Each of the fields takes a *single* metadata field. The form of the key is <literal>&lt;scheme prefix&gt;.&lt;element&gt;.&lt;qualifier&gt;</literal> In place of the qualifier, one may leave it blank to exclude any qualifiers or use the wildcard &quot;*&quot; to include all qualifiers for a particular element.</entry>
-						</row>
-						<row>
-							<?dbfo row-height="5mm"?>
-							<?dbhtml row-height="5mm"?>
-							<entry spanname="notespan"/>
-						</row>
-						<row>
-							<entry align="right">Property:</entry>
-							<entry><literal>webui.feed.item.description</literal></entry>
-						</row>
-						<row>
-							<entry align="right">Example Value:</entry>
-							<entry><emphasis>(See example below)</emphasis></entry>
-						</row>
-						<row>
-							<entry spanname="notespan">
+						</entry>
+					</row>
+					<row>
+						<entry align="right">Informational Note:</entry>
+						<entry>This set of keys customize each single-value field displayed in the feed information for each item. Each of the fields takes a *single* metadata field. The form of the key is <literal>&lt;scheme prefix&gt;.&lt;element&gt;.&lt;qualifier&gt;</literal> In place of the qualifier, one may leave it blank to exclude any qualifiers or use the wildcard &quot;*&quot; to include all qualifiers for a particular element.</entry>
+					</row>
+					<row>
+						<?dbfo row-height="5mm"?>
+						<?dbhtml row-height="5mm"?>
+						<entry spanname="notespan"/>
+					</row>
+					<row>
+						<entry align="right">Property:</entry>
+						<entry><literal>webui.feed.item.description</literal></entry>
+					</row>
+					<row>
+						<entry align="right">Example Value:</entry>
+						<entry><emphasis>(See example below)</emphasis></entry>
+					</row>
+					<row>
+						<entry spanname="notespan">
 								<screen>webui.feed.item.description = dc.title, dc.contributor.author, \
            dc.contributor.editor, dc.description.abstract, \
            dc.description</screen>
 							</entry>
-						</row>
-						<row>
-							<entry align="right">Informational Note:</entry>
-							<entry>One can customize the metadata fields to show in the feed for each item's description. Elements are displayed in the order they are specified in dspace.cfg. </entry>
-						</row>
+					</row>
+					<row>
+						<entry align="right">Informational Note:</entry>
+						<entry><para>One can customize the metadata fields to show in the feed for each item's description. Elements are displayed in the order they are specified in <literal>dspace.cfg</literal>.</para>
+							<para>Like other property keys, the format of this property key is: <literal>webui.feed.item.description = &lt;scheme prefix&gt;.&lt;element&gt;.&lt;qualifier&gt;</literal>. In place of the qualifier, one may leave it blank to exclude any qualifiers or use the wildcard &quot;*&quot; to include all qualifiers for a particular element. </para>
+						</entry>
+					</row>
+					<row>
+						<?dbfo row-height="5mm"?>
+						<?dbhtml row-height="5mm"?>
+						<entry spanname="notespan"/>
+					</row>
+					<row>
+						<entry align="right">Property:</entry>
+						<entry><literal>webui.feed.item.author</literal></entry>
+					</row>
+					<row>
+						<entry align="right">Example Value:</entry>
+						<entry><literal>webui.feed.item.author = dc.contributor.author</literal></entry>
+					</row>
+					<row>
+						<entry align="right">Informational Note:</entry>
+						<entry>The name of field to use for authors (Atom only); repeatable.</entry>
+					</row>
+					<row>
+						<?dbfo row-height="5mm"?>
+						<?dbhtml row-height="5mm"?>
+						<entry spanname="notespan"/>
+					</row>
+					<row>
+						<entry align="right">Property:</entry>
+						<entry><literal>webui.feed.logo.url</literal></entry>
+					</row>
+					<row>
+						<entry align="right">Example Value:</entry>
+						<entry><literal>webui.feed.logo.url = ${dspace.url}/themes/mysite/images/mysite-logo.png</literal></entry>
+					</row>
+					<row>
+						<entry align="right">Informational Note:</entry>
+						<entry>Customize the image icon included with the site-wide feeds.  This must be an absolute URL</entry>
+					</row>
+					<row>
+						<?dbfo row-height="5mm"?>
+						<?dbhtml row-height="5mm"?>
+						<entry spanname="notespan"/>
+					</row>
+					<row>
+						<entry align="right">Property:</entry>
+						<entry><screen>webui.feed.item.dc.creator
+webui.feed.item.dc.date
+webui.feed.item.dc.description
+						</screen></entry>
+					</row>
+					<row>
+						<entry align="right">Example Value:</entry>
+						<entry><screen>webui.feed.item.dc.creator = dc.contributor.author
+webui.feed.item.dc.date = dc.date.issued
+webui.feed.item.dc.description = dc.description.abstract</screen></entry>
+					</row>
+					<row>
+						<entry align="right">Informational Note:</entry>
+						<entry>These optional properties add <emphasis>structured</emphasis> DC elements as XML elements to the feed description.  They are not the same thing as, for example, <literal>webui.feed.item.description</literal>.  Useful when a program or stylesheet will be transforming a feed and wants separate author, description, date, etc.</entry>
+					</row>
 					</tbody></tgroup>
 			</informaltable>
-			<para>Like other property keys, the format of this property key is: <literal>webui.feed.item.description = &lt;scheme prefix&gt;.&lt;element&gt;.&lt;qualifier&gt;</literal>. In place of the qualifier, one may leave it blank to exclude any qualifiers or use the wildcard &quot;*&quot; to include all qualifiers for a particular element. </para>
-		</section>
+					</section>
 		<section remap="h3">
 			<title><anchor id="docbook-configure.html-inline" xreflabel="Content Inline Disposition Threshold"/>Content Inline Disposition Threshold</title>
 			<para>The following configuration is used to change the disposition behavior of the browser. That is, when the browser will attempt to open the file or download it to the user's specified location. For example, the default size is 8Mb. When an item being viewed is larger than 8MB, the browser will download the file to the desktop (or wherever you have it set to download) and the user will have to open it manually.</para>
@@ -4771,7 +4847,10 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 							</row>
 							<row>
 								<entry align="right">Informational Note:</entry>
-								<entry>The default language for the application is set with this property key. This is a local according to i18n and might consist of country, country_language or country_language_variant. If no default locale is defined, then the server default locale will be used. </entry>
+								<entry>
+									<para>The default language for the application is set with this property key. This is a locale according to i18n and might consist of country, country_language or country_language_variant. If no default locale is defined, then the server default locale will be used. </para>
+									<para>The format of a local specifier is described here: http://java.sun.com/j2se/1.4.2/docs/api/java/util/Locale.html</para>
+								</entry>
 							</row>
 						</tbody></tgroup>
 				</informaltable>

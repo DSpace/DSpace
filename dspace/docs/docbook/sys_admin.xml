@@ -28,7 +28,7 @@
 				</row>
 			</tbody></tgroup>
 	</table>
-	<para>&nbsp;</para>
+	<para><emphasis role="bold">DSpace Command Launcher</emphasis>. With DSpace Release 1.6, the many commands and scripts have been replaced with a simple <literal>[dspace]/bin/dspace &lt;command&gt;</literal> command. See Application Layer chapter for the details of the DSpace Command Launcher.</para>
 	<section remap="h2">
 		<title><anchor id="docbook-sys_admin.html-structbuilder" xreflabel="Community and Collection Structure Importer"/>Community and Collection Structure Importer</title>
 		<para>This CLI tool gives you the ability to import acommunity and collection structure directory froma source XML file.</para>
@@ -283,6 +283,10 @@ archive_directory/
 						<row>
 							<entry><literal>-w</literal> or <literal>--workflow</literal></entry>
 							<entry>Send submission through collection&apos; workflow</entry>
+						</row>
+						<row>
+							<entry><literal>-n</literal> or <literal>--notify</literal></entry>
+							<entry>Kicks off the email alerting of the item(s) has(have) been imported</entry>
 						</row>
 						<row>
 							<entry><literal>-t</literal> or <literal>--test</literal></entry>
@@ -1447,40 +1451,52 @@ checker.retention.CHECKSUM_MATCH = 8w</screen> You can use the table above for y
 		</table>
 		<section>
 			<title>Running the Indexing Programs</title>
-			<para><emphasis role="bold">Complete Index Regeneration</emphasis>. By running <literal>[dspace]/bin/dspace index-init</literal> you will completely regenerate your indexes, tearing down all old tables and reconstructing with the new cofiguration.  Running this is the same as:</para>
+			<para><emphasis role="bold">Complete Index Regeneration</emphasis>. By running <literal>[dspace]/bin/dspace index-init</literal> you will completely regenerate your indexes, tearing down all old tables and reconstructing with the new cofiguration. Running this is the same as:</para>
 			<para><literal>[dspace]/bin/dsrun org.dspace.browse.IndexBrowse -f -r</literal></para>
-			<para><emphasis role="bold">Updating the Indexes</emphasis>.  By running <literal>dspace/bin/dspace index-update</literal> you will reindex your full browse wihtout modifying the table structure.  (This should be your default approach if indexing, for example, via a cron job periodically).  Running this is the same as:</para>
+			<para><emphasis role="bold">Updating the Indexes</emphasis>. By running <literal>dspace/bin/dspace index-update</literal> you will reindex your full browse wihtout modifying the table structure. (This should be your default approach if indexing, for example, via a cron job periodically). Running this is the same as:</para>
 			<para><literal>[dspace]/bin/dsrun org.dspace.browse.IndexBrowse -i</literal></para>
-			<para><emphasis role="bold">Destroy and rebuild.</emphasis>  You can destroy and rebuild the database, but do not do the indexing.  Output the SQL to do this to the screen and a file, as well as executing it against the database, while being verbose.  At the CLI screen:</para>
+			<para><emphasis role="bold">Destroy and rebuild.</emphasis> You can destroy and rebuild the database, but do not do the indexing. Output the SQL to do this to the screen and a file, as well as executing it against the database, while being verbose. At the CLI screen:</para>
 			<para><literal>[dspace]/bin/dsrun org.dspace.browse.IndexBrowse -r -t -p -v -x -o myfile.sql</literal></para>
 		</section>
 		<section>
 			<title>Indexing Customization</title>
-			<para>DSpace provides robust browse indexing.  It is possible to expand upon the default indexes delivered at the time of the installation.  The System Administrator should review <link linkend="docbook-configure.html-browse-index-define">&quot;Defining the Indexes&quot; from the Chapter 5. Configuration</link> to become familiar with the property keys and the definitions used therein before attempting heavy customizations.</para>
+			<para>DSpace provides robust browse indexing. It is possible to expand upon the default indexes delivered at the time of the installation. The System Administrator should review <link linkend="docbook-configure.html-browse-index-define">&quot;Defining the Indexes&quot; from the Chapter 5. Configuration</link> to become familiar with the property keys and the definitions used therein before attempting heavy customizations.</para>
 			<para>Through customization is is possible to:</para>
 			<itemizedlist>
-				<listitem><para>Add new browse indexes besides the four that are delivered upon installation.    Examples:
-				<itemizedlist>
-					<listitem><para>Series</para></listitem>
-					<listitem><para>Specific subject fields (Library of Congress Subject Headings.<emphasis>(It is possible to create a browse index based on a controlled vocabulary or thesauris.)</emphasis></para></listitem>
-					<listitem><para>Other metadata schema fields</para></listitem>
-				</itemizedlist></para></listitem>
-				<listitem><para>Combine metadata fields into one browse</para></listitem>
-				<listitem><para>Combine different metadata schemas in one browse</para></listitem>
-			</itemizedlist>
-			<para><emphasis role="bold">Examples of new browse indexes that are possible.</emphasis> <emphasis>(The system administrator is reminded to read the section on Defining the Indexes in Chapter 5. Configuration.)</emphasis></para>
-			<itemizedlist>
 				<listitem>
-					<para><emphasis role="bold">Add a Series Browse</emphasis>.  You want to add a new browse using a previously unused metadata element. </para>
-					<para><literal>webui.browse.index.6 = series:metadata:dc.relation.ispartofseries:text:single</literal></para>
-					<para>Note:  the index # need to be adjusted to your browse stanza in the <literal>dspace.cfg</literal> file.  Also, you will need to update your <literal>Messages.properties</literal> file.  </para>
+					<para>Add new browse indexes besides the four that are delivered upon installation. Examples: <itemizedlist>
+							<listitem>
+								<para>Series</para>
+							</listitem>
+							<listitem>
+								<para>Specific subject fields (Library of Congress Subject Headings.<emphasis>(It is possible to create a browse index based on a controlled vocabulary or thesauris.)</emphasis></para>
+							</listitem>
+							<listitem>
+								<para>Other metadata schema fields</para>
+							</listitem>
+						</itemizedlist></para>
 				</listitem>
 				<listitem>
-					<para><emphasis role="bold">Combine more than one metadata field into a browse.</emphasis> You may have other title fields used in your repository.  You may only want one or two of them added, not all title fields.  And/or you may want your series to file in there.  </para>
+					<para>Combine metadata fields into one browse</para>
+				</listitem>
+				<listitem>
+					<para>Combine different metadata schemas in one browse</para>
+				</listitem>
+			</itemizedlist>
+			<para><emphasis role="bold">Examples of new browse indexes that are possible.</emphasis>
+				<emphasis>(The system administrator is reminded to read the section on Defining the Indexes in Chapter 5. Configuration.)</emphasis></para>
+			<itemizedlist>
+				<listitem>
+					<para><emphasis role="bold">Add a Series Browse</emphasis>. You want to add a new browse using a previously unused metadata element. </para>
+					<para><literal>webui.browse.index.6 = series:metadata:dc.relation.ispartofseries:text:single</literal></para>
+					<para>Note: the index # need to be adjusted to your browse stanza in the <literal>dspace.cfg</literal> file. Also, you will need to update your <literal>Messages.properties</literal> file. </para>
+				</listitem>
+				<listitem>
+					<para><emphasis role="bold">Combine more than one metadata field into a browse.</emphasis> You may have other title fields used in your repository. You may only want one or two of them added, not all title fields. And/or you may want your series to file in there. </para>
 					<para><literal>webui.browse.index.3 = title:metadata:dc.title,dc:title.uniform,dc:relation.ispartofseries:title:full</literal></para>
 				</listitem>
 				<listitem>
-					<para><emphasis role="bold">Separate subject browse.</emphasis> You may want to have a separate subject browse limited to only one type of subject.  </para>
+					<para><emphasis role="bold">Separate subject browse.</emphasis> You may want to have a separate subject browse limited to only one type of subject. </para>
 					<para><literal>webui.browse.index.7 = lcsubject.metdata:dc.subject.lcsh.text:single</literal></para>
 				</listitem>
 			</itemizedlist>
