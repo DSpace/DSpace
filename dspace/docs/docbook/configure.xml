@@ -5194,7 +5194,7 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 			</itemizedlist>
 		</section>
 		<section remap="h3">
-			<title><anchor id="docbook-configure.html-xmlui" xreflabel="Xmlui"/>XMLUI Specific Configuration</title>
+			<title><anchor id="docbook-xmlui.html-xmlui" xreflabel="Xmlui"/>XMLUI Specific Configuration</title>
 			<para>The DSpace digital repository supports two user interfaces: one based upon JSP technologies and the other based upon the Apache Cocoon framework. This section describes those configurations settings which are specific to the XMLUI interface based upon the Cocoon framework. <emphasis>(Prior to DSpace Release 1.5.1 XMLUI was referred to Manakin. You may still see references to &quot;Manakin&quot;)</emphasis></para>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
