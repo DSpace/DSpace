@@ -39,22 +39,22 @@
                 <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
                     <map:transform type="StatisticsTransformer"/>
                 </map:match>
-            </map:match>
 
-            <map:match type="StatisticsAuthorizedMatcher" pattern="!READ">
-                <map:select type="AuthenticatedSelector">
-                        <map:when test="eperson">
-                                <map:transform type="RestrictedItem"/>
-                                <map:serialize/>
-                        </map:when>
-                        <map:otherwise>
-                                <map:act type="StartAuthentication">
-                                        <map:parameter name="header" value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
-                                        <map:parameter name="message" value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"/>
-                                </map:act>
-                                <map:serialize/>
-                        </map:otherwise>
-                </map:select>
+                <map:match type="StatisticsAuthorizedMatcher" pattern="!READ">
+                    <map:select type="AuthenticatedSelector">
+                            <map:when test="eperson">
+                                    <map:transform type="RestrictedItem"/>
+                                    <map:serialize/>
+                            </map:when>
+                            <map:otherwise>
+                                    <map:act type="StartAuthentication">
+                                            <map:parameter name="header" value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
+                                            <map:parameter name="message" value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"/>
+                                    </map:act>
+                                    <map:serialize/>
+                            </map:otherwise>
+                    </map:select>
+                </map:match>
             </map:match>
 
             <map:match pattern="">
