@@ -290,9 +290,11 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 						</listitem>
 						<listitem>
 							<para>Edit the <literal>[dspace-source]/dspace/config/dspace.cfg</literal> database settings:</para>
-							<screen>db.name   = oracle
+							<screen>
+db.name   = oracle
 db.url    = jdbc.oracle.thin:@//host:port/dspace
-db.driver = oracle.jdbc.OracleDriver</screen>
+db.driver = oracle.jdbc.OracleDriver
+							</screen>
 						</listitem>
 					</orderedlist>
 				</listitem>
