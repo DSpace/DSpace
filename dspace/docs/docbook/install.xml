@@ -359,12 +359,12 @@ ant fresh_install</screen>
 	....</screen>
 				</listitem>
 				<listitem>
-					<para><emphasis role="bold">Administrator Account</emphasis></para>
+					<para> <emphasis role="bold">Administrator Account</emphasis></para>
 					<para>Create an initial administrator account:</para>
 					<screen><emphasis>[dspace]</emphasis>/bin/create-administrator</screen>
 				</listitem>
 				<listitem>
-					<para><emphasis role="bold">Initial Startup!</emphasis></para>
+					<para> <emphasis role="bold">Initial Startup!</emphasis></para>
 					<para>Now the moment of truth! Start up (or restart) Tomcat/Jetty/Resin. Visit the base URL(s) of your server, depending on which DSpace web applications you want to use. You should see the DSpace home page. Congratulations! </para>
 					<para>Base URLs of DSpace Web Applications:</para>
 					<itemizedlist>
@@ -375,7 +375,7 @@ ant fresh_install</screen>
 							<para><emphasis>XML User Interface (aka. Manakin)</emphasis> - (e.g.) http://dspace.myu.edu:8080/xmlui</para>
 						</listitem>
 						<listitem>
-							<para><emphasis>OAI-PMH Interface</emphasis> - (e.g.) http://dspace.myu.edu:8080/oai/request?verb=identify (Should return an XML-based response)</para>
+							<para><emphasis>OAI-PMH Interface</emphasis> - (e.g.) http://dspace.myu.edu:8080/oai/request?verb=Identify (Should return an XML-based response)</para>
 						</listitem>
 					</itemizedlist>
 				</listitem>
