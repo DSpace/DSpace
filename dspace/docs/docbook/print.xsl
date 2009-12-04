@@ -7,6 +7,7 @@
 <xsl:import href="http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl"/> 
 
 <xsl:param name="body.start.indent">0pt</xsl:param>
+<xsl:param name="header.column.widths">1 3 1</xsl:param>
 <xsl:param name="toc.max.depth">4</xsl:param>
 <xsl:param name="toc.section.depth">4</xsl:param>
 <xsl:param name="section.autolabel" select="1"></xsl:param>
