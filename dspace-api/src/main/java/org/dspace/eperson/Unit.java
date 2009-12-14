@@ -175,6 +175,28 @@ public class Unit extends DSpaceObject {
     }
 
     /**
+     * set faculty requirement
+     * 
+     * @param login
+     *            boolean yes/no
+     */
+    public void setFacultyOnly(boolean faculty_only)
+    {
+        myRow.setColumn("faculty_only", faculty_only);
+        modifiedMetadata = true;
+    }
+
+    /**
+     * faculty only?
+     * 
+     * @return boolean, yes/no
+     */
+    public boolean getFacultyOnly()
+    {
+        return myRow.getBooleanColumn("faculty_only");
+    }
+
+    /**
      * find the unit by its ID
      * 
      * @param context
