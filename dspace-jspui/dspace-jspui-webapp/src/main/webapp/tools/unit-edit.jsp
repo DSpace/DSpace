@@ -49,6 +49,10 @@
   <center>
     <form name="epersongroup" method="post" action="">
 	<p><label for="tunit_name"><fmt:message key="jsp.tools.unit-edit.name"/></label><input name="unit_name" id="tunit_name" value="<%= Utils.addEntities(unit.getName()) %>" size="50"/></p>
+        <p>
+          <label for="tfaculty_only">Faculty Only: </label>
+          <input type="checkbox" name="faculty_only" id="tfaculty_only" value="true"<%= unit.getFacultyOnly() ? " checked=\"checked\"" : "" %> />
+        </p>
    	    <h3><fmt:message key="jsp.tools.unit-edit.heading"/></h3>
 
         <input type="hidden" name="unit_id" value="<%=unit.getID()%>"/>

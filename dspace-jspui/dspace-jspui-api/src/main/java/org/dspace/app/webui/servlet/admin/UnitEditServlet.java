@@ -85,6 +85,12 @@ public class UnitEditServlet extends DSpaceServlet
                     unit.update();
                 }
 
+                boolean faculty_only = UIUtil.getBoolParameter(request, "faculty_only");
+                if (faculty_only != unit.getFacultyOnly()) {
+                  unit.setFacultyOnly(faculty_only);
+                  unit.update();
+                }
+
                 int[] group_ids = UIUtil.getIntParameters(request, "group_ids");
 
                 // get set of old groups
@@ -167,6 +173,7 @@ public class UnitEditServlet extends DSpaceServlet
                 unit = Unit.create(c);
 
                 unit.setName("new unit" + unit.getID());
+                unit.setFacultyOnly(true);
                 unit.update();
 
                 request.setAttribute("unit", unit);
