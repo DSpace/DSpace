@@ -380,15 +380,13 @@ public class Ldap {
   {
     HashSet ret = new HashSet();
 
-    if (isFaculty()) {
-      for (Iterator i = getUnits().iterator(); i.hasNext(); ) {
-        String strUnit = (String) i.next();
+    for (Iterator i = getUnits().iterator(); i.hasNext(); ) {
+      String strUnit = (String) i.next();
 
-        Unit unit = Unit.findByName(context, strUnit);
+      Unit unit = Unit.findByName(context, strUnit);
 
-        if (unit != null) {
-          ret.addAll(Arrays.asList(unit.getGroups()));
-        }
+      if (unit != null && (!unit.getFacultyOnly() || isFaculty())) {
+        ret.addAll(Arrays.asList(unit.getGroups()));
       }
     }
 
