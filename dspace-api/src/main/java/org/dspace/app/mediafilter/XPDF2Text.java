@@ -78,10 +78,10 @@ public class XPDF2Text extends MediaFilter
 {
     private static Logger log = Logger.getLogger(XPDF2Text.class);
 
-    // command to get image from PDF; @FILE@, @OUTPUT@ are placeholders
+    // Command to get text from pdf; @infile@, @COMMAND@ are placeholders
     private static final String XPDF_PDFTOTEXT_COMMAND[] =
     {
-        "@COMMAND@", "-q", "@infile@", "-"
+        "@COMMAND@", "-q", "-enc", "UTF-8", "@infile@", "-"
     };
 
 
@@ -134,7 +134,7 @@ public class XPDF2Text extends MediaFilter
 
             String pdfCmd[] = XPDF_PDFTOTEXT_COMMAND.clone();
             pdfCmd[0] = pdftotextPath;
-            pdfCmd[2] = sourceTmp.toString();
+            pdfCmd[4] = sourceTmp.toString();
 
             log.debug("Running command: "+Arrays.deepToString(pdfCmd));
             Process pdfProc = Runtime.getRuntime().exec(pdfCmd);
@@ -145,9 +145,16 @@ public class XPDF2Text extends MediaFilter
             baos.close();
 
             status = pdfProc.waitFor();
-            if (status != 0)
+            String msg = null;
+            if (status == 1)
+                msg = "pdftotext failed opening input: file="+sourceTmp.toString();
+            else if (status == 3)
+                msg = "pdftotext permission failure (perhaps copying of text from this document is not allowed - check PDF file's internal permissions): file="+sourceTmp.toString();
+            else if (status != 0)
+                msg = "pdftotext failed, maybe corrupt PDF? status="+String.valueOf(status);
+
+            if (msg != null)
             {
-                String msg = "pdftotext failed, maybe corrupt PDF? status="+String.valueOf(status);
                 log.error(msg);
                 throw new IOException(msg);
             }
