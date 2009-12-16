@@ -391,24 +391,24 @@ public class EmbargoManager
         }
     }
 
-    // return the schema part of "schema.element.qualifier" metadata field
+    // return the schema part of "schema.element.qualifier" metadata field spec
     private static String getSchemaOf(String field)
     {
         String sa[] = field.split("\\.", 3);
         return sa[0];
     }
 
-    // return the schema part of "schema.element.qualifier" metadata field
+    // return the element part of "schema.element.qualifier" metadata field spec, if any
     private static String getElementOf(String field)
     {
         String sa[] = field.split("\\.", 3);
-        return sa.length > 0 ? sa[1] : null;
+        return sa.length > 1 ? sa[1] : null;
     }
 
-    // return the schema part of "schema.element.qualifier" metadata field
+    // return the qualifier part of "schema.element.qualifier" metadata field spec, if any
     private static String getQualifierOf(String field)
     {
         String sa[] = field.split("\\.", 3);
-        return sa.length > 1 ? sa[2] : null;
+        return sa.length > 2 ? sa[2] : null;
     }
 }
