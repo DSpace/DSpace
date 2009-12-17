@@ -113,6 +113,7 @@
  - [DS-260] Template item some times has owningCollection filled and some times not
  - [DS-309] Shiboleth default roles are applied also to anonymous user and user logged-in with other methods
  - [DS-270] Make delegate admin permissions configurable
+ - [DS-436] SWORD Authenticator doesn't support the special groups infrastructure
 
 (Tim Donohue)
  - [DS-218] Cannot add/remove email subscriptions from Profile page in XMLUI

@@ -195,6 +195,10 @@ public class IPAuthentication implements AuthenticationMethod
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
             throws SQLException
     {
+        if (request == null)
+        {
+            return new int[0];
+        }
         List<Integer> groupIDs = new ArrayList<Integer>();
 
         String addr = request.getRemoteAddr();

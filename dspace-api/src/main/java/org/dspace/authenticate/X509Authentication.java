@@ -496,6 +496,10 @@ public class X509Authentication implements AuthenticationMethod
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
             throws SQLException
     {
+        if (request == null)
+        {
+            return new int[0];
+        }
 
         Boolean authenticated = false;
         HttpSession session = request.getSession(false);

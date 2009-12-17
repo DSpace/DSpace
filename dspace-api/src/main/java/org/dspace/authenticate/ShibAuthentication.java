@@ -71,6 +71,10 @@ public class ShibAuthentication implements AuthenticationMethod
     public int authenticate(Context context, String username, String password,
             String realm, HttpServletRequest request) throws SQLException
     {
+        if (request == null)
+        {
+            return BAD_ARGS;
+        }
         log.info("Shibboleth login started...");
 
         java.util.Enumeration names = request.getHeaderNames();
@@ -218,7 +222,7 @@ public class ShibAuthentication implements AuthenticationMethod
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
     {
         // no user logged in or user not logged from shibboleth
-        if (context.getCurrentUser() == null
+        if (request == null || context.getCurrentUser() == null
                 || request.getSession().getAttribute("shib.authenticated") == null)
         {
             return new int[0];
