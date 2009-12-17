@@ -61,8 +61,6 @@ CREATE SEQUENCE workflowitem_seq;
 CREATE SEQUENCE tasklistitem_seq;
 CREATE SEQUENCE registrationdata_seq;
 CREATE SEQUENCE subscription_seq;
-CREATE SEQUENCE history_seq;
-CREATE SEQUENCE historystate_seq;
 CREATE SEQUENCE communities2item_seq;
 CREATE SEQUENCE epersongroup2workspaceitem_seq;
 CREATE SEQUENCE metadataschemaregistry_seq START WITH 2;
@@ -208,12 +206,10 @@ CREATE INDEX item_submitter_fk_idx ON Item(submitter_id);
 CREATE TABLE Bundle
 (
   bundle_id          INTEGER PRIMARY KEY,
-  mets_bitstream_id  INTEGER REFERENCES Bitstream(bitstream_id),
   name               VARCHAR2(16),  -- ORIGINAL | THUMBNAIL | TEXT
   primary_bitstream_id  INTEGER REFERENCES Bitstream(bitstream_id)
 );
 
-CREATE INDEX bundle_mets_fk_idx ON Bundle(mets_bitstream_id);
 CREATE INDEX bundle_primary_fk_idx ON Bundle(primary_bitstream_id);
 
 -------------------------------------------------------
@@ -271,7 +267,7 @@ CREATE TABLE MetadataValue
   item_id       INTEGER REFERENCES Item(item_id),
   metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
   text_value CLOB,
-  text_lang  VARCHAR(64),
+  text_lang  VARCHAR(24),
   place              INTEGER,
   authority VARCHAR(100),
   confidence INTEGER DEFAULT -1
@@ -309,7 +305,7 @@ CREATE TABLE Community
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
   copyright_text    CLOB,
   side_bar_text     VARCHAR2(2000),
-  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )      
+  admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )
 );
 
 CREATE INDEX community_logo_fk_idx ON Community(logo_bitstream_id);
@@ -473,14 +469,12 @@ CREATE TABLE WorkflowItem
   collection_id  INTEGER REFERENCES Collection(collection_id),
   state          INTEGER,
   owner          INTEGER REFERENCES EPerson(eperson_id),
-
   -- Answers to questions on first page of submit UI
   multiple_titles       NUMBER(1),
   published_before      NUMBER(1),
   multiple_files        NUMBER(1)
   -- Note: stage reached not applicable here - people involved in workflow
   -- can always jump around submission UI
-
 );
 
 CREATE INDEX workflow_coll_fk_idx ON WorkflowItem(collection_id);
@@ -525,27 +519,6 @@ CREATE TABLE Subscription
 CREATE INDEX subs_eperson_fk_idx ON Subscription(eperson_id);
 CREATE INDEX subs_collection_fk_idx ON Subscription(collection_id);
 
-
--------------------------------------------------------
---  History table
--------------------------------------------------------
-CREATE TABLE History
-(
-  history_id           INTEGER PRIMARY KEY,
-  -- When it was stored
-  creation_date        TIMESTAMP,
-  -- A checksum to keep INTEGERizations from being stored more than once
-  checksum             VARCHAR2(32) UNIQUE
-);
-
--------------------------------------------------------
---  HistoryState table
--------------------------------------------------------
-CREATE TABLE HistoryState
-(
-  history_state_id           INTEGER PRIMARY KEY,
-  object_id                  VARCHAR2(64)
-);
 
 -------------------------------------------------------------------------------
 -- EPersonGroup2WorkspaceItem table
