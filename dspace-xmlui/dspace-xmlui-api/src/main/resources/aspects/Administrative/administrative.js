@@ -381,7 +381,15 @@ function assertAdminCommunity(communityID) {
 function assertEditGroup(groupID)
 {
     // Check authorizations
-	assertAuthorized(Constants.GROUP, groupID, Constants.WRITE);
+	if (groupID == -1)
+	{ 
+		// only system admin can create "top level" group
+		assertAdministrator();
+	}
+	else
+	{
+		assertAuthorized(Constants.GROUP, groupID, Constants.WRITE);
+	}
 }
 
 /** 
