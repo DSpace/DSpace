@@ -110,3 +110,15 @@ ALTER TABLE community2community ADD CONSTRAINT com2com_child_fk FOREIGN KEY (chi
 
 ALTER TABLE collection2item DROP CONSTRAINT collection2item_item_id_fkey;
 ALTER TABLE collection2item ADD CONSTRAINT coll2item_item_fk FOREIGN KEY (item_id) REFERENCES item DEFERRABLE;
+
+
+--------------------------------------------------------------------------
+-- DS-295 CC License being assigned incorrect Mime Type during submission.
+--------------------------------------------------------------------------
+UPDATE bitstream SET bitstream_format_id =
+   (SELECT bitstream_format_id FROM bitstreamformatregistry WHERE short_description = 'CC License')
+   WHERE name = 'license_text' AND source = 'org.dspace.license.CreativeCommons';
+
+UPDATE bitstream SET bitstream_format_id =
+   (SELECT bitstream_format_id FROM bitstreamformatregistry WHERE short_description = 'RDF XML')
+   WHERE name = 'license_rdf' AND source = 'org.dspace.license.CreativeCommons';

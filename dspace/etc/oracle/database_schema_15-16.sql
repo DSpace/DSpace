@@ -56,6 +56,17 @@ ALTER TABLE MetadataValue
   ADD ( authority VARCHAR(100),
         confidence INTEGER DEFAULT -1);
 
+--------------------------------------------------------------------------
+-- DS-295 CC License being assigned incorrect Mime Type during submission.
+--------------------------------------------------------------------------
+UPDATE bitstream SET bitstream_format_id =
+   (SELECT bitstream_format_id FROM bitstreamformatregistry WHERE short_description = 'CC License')
+   WHERE name = 'license_text' AND source = 'org.dspace.license.CreativeCommons';
+
+UPDATE bitstream SET bitstream_format_id =
+   (SELECT bitstream_format_id FROM bitstreamformatregistry WHERE short_description = 'RDF XML')
+   WHERE name = 'license_rdf' AND source = 'org.dspace.license.CreativeCommons';
+
 -------------------------------------------------------------------------
 -- DS-260 Cleanup of Owning collection column for template item created
 -- with the JSPUI after the collection creation
