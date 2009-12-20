@@ -162,6 +162,14 @@
     </command>
 
     <command>
+        <name>registry-loader</name>
+        <description>Load entries into a registry</description>
+        <step>
+            <class>org.dspace.administer.RegistryLoader</class>
+        </step>
+    </command>
+
+    <command>
         <name>stat-general</name>
         <description>Compile the general statistics</description>
         <step passuserargs="false">
