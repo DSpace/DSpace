@@ -725,7 +725,7 @@
 	</bitstream-type>
 
     <bitstream-type>
-      <mimetype>application/rdf+xml</mimetype>
+      <mimetype>application/rdf+xml; charset=utf-8</mimetype>
       <short_description>RDF XML</short_description>
       <description>RDF serialized in XML</description>
       <support_level>1</support_level>
