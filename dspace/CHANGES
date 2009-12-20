@@ -65,6 +65,7 @@
  - [DS-372] New verbose option for [dspace]/bin/dspace cleanup script
  - [DS-388] Item importer - new option to enable workflow notification emails
  - [DS-389] Misleading label: "Submit to This Collection"
+ - [DS-424] Export metadata button displayed in JSPUI Administration List of withdrawn items
 
 (Larry Stone)
  - [DS-393] Fix DCDate and submission timezone bugs that changed date on page reload

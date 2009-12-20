@@ -63,10 +63,12 @@
 
     String urlFragment = "browse";
     String layoutNavbar = "default";
+    boolean withdrawn = false;
 	if (request.getAttribute("browseWithdrawn") != null)
 	{
 	    layoutNavbar = "admin";
         urlFragment = "dspace-admin/withdrawn";
+        withdrawn = true;
     }
 
 	// First, get the browse info object
@@ -448,7 +450,7 @@
 		<input type="submit" name="submit_browse" value="<fmt:message key="jsp.general.update"/>"/>
 
 <%
-    if (admin_button)
+    if (admin_button && !withdrawn)
     {
         %><input type="submit" name="submit_export_metadata" value="<fmt:message key="jsp.general.metadataexport.button"/>" /><%
     }
