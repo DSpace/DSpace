@@ -10,10 +10,26 @@
     </command>
 
     <command>
+        <name>checker-emailer</name>
+        <description>Send emails related to the checksum checker</description>
+        <step>
+            <class>org.dspace.checker.DailyReportEmailer</class>
+        </step>
+    </command>
+
+    <command>
         <name>cleanup</name>
         <description>Remove deleted bitstreams from the assetstore</description>
         <step>
             <class>org.dspace.storage.bitstore.Cleanup</class>
+        </step>
+    </command>
+
+    <command>
+        <name>community-filiator</name>
+        <description>Tool to manage community and sub-community relationships</description>
+        <step>
+            <class>org.dspace.administer.CommunityFiliator</class>
         </step>
     </command>
 
