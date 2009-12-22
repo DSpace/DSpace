@@ -50,6 +50,7 @@ import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
+import org.dspace.content.LicenseUtils;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
@@ -198,11 +199,11 @@ public class LicenseStep extends AbstractProcessingStep
             // accepted it previously)
             item.removeDSpaceLicense();
 
-            // FIXME: Probably need to take this from the form at some point
-            String license = subInfo.getSubmissionItem().getCollection()
-                    .getLicense();
+            String license = LicenseUtils.getLicenseText(context
+                    .getCurrentLocale(), subInfo.getSubmissionItem()
+                    .getCollection(), item, submitter);
 
-            item.licenseGranted(license, submitter);
+            LicenseUtils.grantLicense(context, item, license);
 
             // commit changes
             context.commit();

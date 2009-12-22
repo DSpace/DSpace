@@ -766,11 +766,6 @@
 		                <xsl:copy-of select="dim:field[@element='rights'][not(@qualifier)]/node()"/>
 		            </p>
 		        </xsl:if>
-		        <xsl:if test="string-length(dim:field[@element='rights'][@qualifier='license'])&gt;0">
-		            <p class="license-text">
-		                <xsl:copy-of select="dim:field[@element='rights'][@qualifier='license']/node()"/>
-		            </p>
-		        </xsl:if>
         	</div>
         </xsl:if>
     </xsl:template>

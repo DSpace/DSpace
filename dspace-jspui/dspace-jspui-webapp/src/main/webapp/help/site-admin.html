@@ -125,7 +125,20 @@
 
     <p><strong>Copyright Text</strong> is simply text that will appear at the bottom of the collection's home page.</p>
 
-    <p><strong>License</strong> is the <em>deposit license</em> (the license that submitters must grant when they submit an item) for this collection.  This overrides the site default (which is stored in <em>[dspace]</em>/config/default.license and must be edited by a systems adminstrator).  If you leave this field blank, the site default license is used.</p>
+    <p><strong>License</strong> is the <em>deposit license</em> (the license that submitters must grant when they submit an item) for this collection.  This overrides the site default (which is stored in <em>[dspace]</em>/config/default.license and must be edited by a systems adminstrator).  If you leave this field blank, the site default license is used.
+    There are some substitution variables that can be used to create personalized licenses:</p>
+    <ul>
+	    <li><strong>%1$s</strong> will be translated in the "submitter first name"</li> 
+		<li><strong>%2$s</strong> will be translated in the "submitter last name"</li>
+		<li><strong>%3$s</strong> will be translated in the "submitter email" </li>
+		<li><strong>%4$s</strong> will be translated in the current date</li>
+		<li><strong>%5$s</strong> will be translated in the collection info</li> 
+		<li><strong>%6$s</strong> will be translated in the item info </li>
+		<li><strong>%7$s</strong> will be translated in the eperson info</li> 
+    </ul>
+	<p>If you need to embed in the license text the % symbol you need to escape it with a second %, i.e. you need to write %%. 
+	It is recommended to use a dummy submission to check the license change:  <strong>check the resulting license in the Accept/reject Licence step.</strong> 
+    </p>
 
     <p><strong>Provenance</strong> is a free-text field you can put any provenance information in you feel like.  It is not visible to end-users.</p>
 
@@ -419,7 +432,19 @@
     <p>You can use this tool to edit the default license of DSpace</p>
     <p>The default license is used when no collection specific license is defined.</p>
     <p>Note that changing the default license has no effect on allready published items.</p>
-
-
+	<p>Some substitution variables are available to make possible configure a contextual submission license:</p>
+    <ul>
+	    <li><strong>%1$s</strong> will be translated in the "submitter first name"</li> 
+		<li><strong>%2$s</strong> will be translated in the "submitter last name"</li>
+		<li><strong>%3$s</strong> will be translated in the "submitter email" </li>
+		<li><strong>%4$s</strong> will be translated in the current date</li>
+		<li><strong>%5$s</strong> will be translated in the collection info</li> 
+		<li><strong>%6$s</strong> will be translated in the item info </li>
+		<li><strong>%7$s</strong> will be translated in the eperson info</li> 
+    </ul>
+	<p>If you need to embed in the license text the % symbol you need to escape it with a second %, i.e. you need to write %%. 
+	It is recommended to use a dummy submission to check the license change:  <strong>check the resulting license in the Accept/reject Licence step.</strong> 
+    </p>
+	
   </body>
 </html>

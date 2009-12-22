@@ -1444,42 +1444,6 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Store a copy of the license a user granted in this item.
-     *
-     * @param license
-     *            the license the user granted
-     * @param eperson
-     *            the eperson who granted the license
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
-     */
-    public void licenseGranted(String license, EPerson eperson)
-            throws SQLException, IOException, AuthorizeException
-    {
-        // Put together text to store
-        String licenseText = "License granted by " + eperson.getFullName()
-                + " (" + eperson.getEmail() + ") on "
-                + DCDate.getCurrent().toString() + " (GMT):\n\n" + license;
-
-        // Store text as a bitstream
-        byte[] licenseBytes = licenseText.getBytes();
-        ByteArrayInputStream bais = new ByteArrayInputStream(licenseBytes);
-        Bitstream b = createSingleBitstream(bais, "LICENSE");
-
-        // Now set the format and name of the bitstream
-        b.setName("license.txt");
-        b.setSource("Written by org.dspace.content.Item");
-
-        // Find the License format
-        BitstreamFormat bf = BitstreamFormat.findByShortDescription(ourContext,
-                "License");
-        b.setFormat(bf);
-
-        b.update();
-    }
-
-    /**
      * Remove just the DSpace license from an item This is useful to update the
      * current DSpace license, in case the user must accept the DSpace license
      * again (either the item was rejected, or resumed after saving)

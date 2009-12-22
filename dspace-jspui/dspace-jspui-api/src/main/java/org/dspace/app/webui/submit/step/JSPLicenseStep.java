@@ -54,9 +54,11 @@ import org.dspace.app.webui.servlet.SubmissionController;
 import org.dspace.app.webui.submit.JSPStep;
 import org.dspace.app.webui.submit.JSPStepManager;
 import org.dspace.app.webui.util.JSPManager;
+import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.LicenseUtils;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -223,15 +225,11 @@ public class JSPLicenseStep extends JSPStep
             HttpServletResponse response, SubmissionInfo subInfo)
             throws SQLException, ServletException, IOException
     {
-        // determine collection & get license
-        Collection c = subInfo.getSubmissionItem().getCollection();
-        String license = c.getLicenseCollection();
-
-        if ((license == null) || license.equals(""))
-        {
-            // Fallback to site-wide default
-            license = ConfigurationManager.getLicenseText(I18nUtil.getDefaultLicense(context));
-        }
+        String license = LicenseUtils.getLicenseText(
+                context.getCurrentLocale(), subInfo.getSubmissionItem()
+                        .getCollection(),
+                subInfo.getSubmissionItem().getItem(), subInfo
+                        .getSubmissionItem().getSubmitter());
         request.setAttribute("license", license);
 
         JSPStepManager.showJSP(request, response, subInfo, LICENSE_JSP);
