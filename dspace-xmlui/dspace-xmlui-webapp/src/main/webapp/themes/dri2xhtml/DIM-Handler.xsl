@@ -430,8 +430,8 @@
             </xsl:otherwise>
         </xsl:choose>
 
-        <!-- Generate the license information from the file section -->
-        <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CC-LICENSE' or @USE='LICENSE']"/>
+        <!-- Generate the Creative Commons license information from the file section (DSpace deposit license hidden by default)-->
+        <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CC-LICENSE']"/>
 
     </xsl:template>
     
@@ -750,8 +750,8 @@
         </xsl:choose>
 
         
-        <!-- Generate the license information from the file section -->
-        <xsl:apply-templates select="mets:fileSec/mets:fileGrp[@USE='CC-LICENSE' or @USE='LICENSE']"/>
+        <!-- Generate the Creative Commons license information from the file section (DSpace deposit license hidden by default) -->
+        <xsl:apply-templates select="mets:fileSec/mets:fileGrp[@USE='CC-LICENSE']"/>
         
     </xsl:template>
     
@@ -831,7 +831,6 @@
         
         <xsl:if test="string-length(dim:field[@element='rights'][not(@qualifier)])&gt;0 or string-length(dim:field[@element='rights'][@qualifier='license'])&gt;0">
         	<div class="detail-view-rights-and-license">
-        		<h3><i18n:text>xmlui.dri2xhtml.METS-1.0.copyright</i18n:text></h3>
 		        <xsl:if test="string-length(dim:field[@element='rights'][not(@qualifier)])&gt;0">
 		            <p class="copyright-text">
 		                <xsl:copy-of select="dim:field[@element='rights'][not(@qualifier)]/node()"/>
@@ -978,7 +977,6 @@
         
         <xsl:if test="string-length(dim:field[@element='rights'][not(@qualifier)])&gt;0">
         	<div class="detail-view-rights-and-license">
-        		<h3><i18n:text>xmlui.dri2xhtml.METS-1.0.copyright</i18n:text></h3>
 	            <p class="copyright-text">
 	                <xsl:copy-of select="dim:field[@element='rights'][not(@qualifier)]/node()"/>
 	            </p>

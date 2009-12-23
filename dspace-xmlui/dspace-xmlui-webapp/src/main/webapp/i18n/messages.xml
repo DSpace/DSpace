@@ -1838,7 +1838,6 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.community-logo-alt">The community's logo</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.no-logo-alt">No logo</message>		
 	<message key="xmlui.dri2xhtml.METS-1.0.news">News</message>	
-	<message key="xmlui.dri2xhtml.METS-1.0.copyright">Copyright</message>			
 		
 	<!-- Internationalization elements specific to the Qualified Dublin Core metadata handler.
 		DS-METS-1.0-QDC.xsl -->

@@ -136,6 +136,7 @@
  - [DS-382] Proposal: Add 'dc.creator' to Author browse index by default
  - [DS-385] Packager script is unable to import the same METS + DIM package that was exported
  - [DS-386] Allow user to specify which <dmdSec> is used by the METS Ingester when importing METS from Packager script
+ - [DS-398] Submission license displayed on collection and item homepage (XMLUI)
 
 (Tim Donohue / Andrea Bollini)
  - [DS-228] Community Admin XMLUI: Delegated Admins Patch
