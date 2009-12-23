@@ -68,6 +68,7 @@
  - [DS-424] Export metadata button displayed in JSPUI Administration List of withdrawn items
 
 (Larry Stone)
+ - [DS-284] alternate odd and even styles correctly on table rows in Item Summary view
  - [DS-393] Fix DCDate and submission timezone bugs that changed date on page reload
  - [DS-377] Add META tags identifying DSpace source version
  - [DS-373] Fix "Letter" link URLs in 2nd-stage Browse
@@ -80,7 +81,6 @@
  - [DS-338] Disable cache advice (Expires header) on Bitstream download that requires authorization (XMLUI)
  - [DS-285] Respond to If-Modified-Since request header in XMLUI, also provide Last-Modified response header for Bitstreams
  - [DS-288] Configurable option to hide metadata fields in public UIs and OAI-PMH
- - [DS-236] Authority control for metadata fields and Choice Authority plugin framework
  - [DS-128] Fix repositioning on submission pages after add button is clicked (XMLUI)
  - [DS-255] Protect submission from being lost if exception occurs in CompleteStep
  - [DS-254] Fix response for authorization failure on Bitstream when user is logged-in
@@ -94,6 +94,9 @@
  - [DS-275] License files not listed on Item Summary page
  - [DS-276] Patch to fix spelling error in Exception page
  - [DS-280] build.xml fails for ant versions below 1.7
+
+(Larry Stone / Andrea Bollini)
+ - [DS-236] Authority control for metadata fields and Choice Authority plugin framework
 
 (Mark Diggory / Stuart Lewis)
  - [DS-201] handle.jar upgraded to version 6.2
