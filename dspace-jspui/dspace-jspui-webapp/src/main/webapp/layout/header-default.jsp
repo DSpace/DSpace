@@ -145,7 +145,7 @@
         <%-- Page contents --%>
 
         <%-- HACK: width, border, cellspacing, cellpadding: for non-CSS compliant Netscape, Mozilla browsers --%>
-        <table class="centralPane" width="100%" border="0" cellpadding="3" cellspacing="1">
+        <table class="centralPane" width="99%" border="0" cellpadding="3" cellspacing="1">
 
             <%-- HACK: valign: for non-CSS compliant Netscape browser --%>
             <tr valign="top">

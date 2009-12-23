@@ -78,6 +78,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.core.PluginManager;
 import org.dspace.core.Utils;
+import org.dspace.eperson.Group;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.handle.HandleManager;
@@ -110,6 +111,28 @@ public class DisplayStatisticsServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
+
+	// is the statistics data publically viewable?
+	boolean privatereport = ConfigurationManager.getBooleanProperty("statistics.item.authorization.admin");
+
+        // is the user a member of the Administrator (1) group?
+        boolean admin = Group.isMember(context, 1);
+
+        if (!privatereport || admin)
+        {
+            displayStatistics(context, request, response);
+        }
+        else
+        {
+            throw new AuthorizeException();
+        }
+    }
+
+    protected void displayStatistics(Context context, HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
+    {
+
 
         String handle = request.getParameter("handle");
         DSpaceObject dso = HandleManager.resolveToObject(context, handle);

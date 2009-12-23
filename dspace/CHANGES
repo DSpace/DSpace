@@ -12,6 +12,9 @@
  - [DS-240] Item validityKey not complete
  - [DS-251] Bulk Metadata Editing: XMLUI aspect and forms
  - [DS-363] JSPUI statistics views
+ - [DS-406] View Statistics button does not work in item page
+ - [DS-409] JSPUI stats display ignores 'statistics.item.authorization.admin'
+ - [DS-438] JSPUI stats - filenames incorrect
 
 (Claudia Juergen)
  - [DS-114] Links not working due to trailing white space in dspace.url
@@ -29,6 +32,9 @@
  
 (Andreas Schwander / Kim Shepherd)
  - [DS-331] Config property mismatch between dspace.cfg and DSpaceLocaleAction (XMLUI)
+
+(Bram Luyten)
+ - [DS-425] JSPUI cosmetics - horizontal scroll bar
 
 (Ricardo Saraiva)
  - [DS-190] Portuguese (pt_PT) translation Messages.properties JSP-UI v1.5.2

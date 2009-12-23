@@ -137,7 +137,7 @@
 </c:choose>
 <tr class="${rowClass}">
 <td>
-<c:out value="${statsFileDownloads.colLabels[counter.index]}"/>
+<c:out value="${statsFileDownloads.colLabels[rowcounter.index]}"/>
 <td>
 <c:out value="${cell}"/>
 </td>
