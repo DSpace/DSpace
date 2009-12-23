@@ -14,6 +14,7 @@
  - [DS-363] JSPUI statistics views
  - [DS-406] View Statistics button does not work in item page
  - [DS-409] JSPUI stats display ignores 'statistics.item.authorization.admin'
+ - [DS-414] File downloads listed in collections and communities statistics
  - [DS-438] JSPUI stats - filenames incorrect
 
 (Claudia Juergen)

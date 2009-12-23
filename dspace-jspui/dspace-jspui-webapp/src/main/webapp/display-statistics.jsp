@@ -47,6 +47,7 @@
   -    statsFileDownloads - bean containing name, data, column and row labels
   -    statsCountryVisits - bean containing name, data, column and row labels
   -    statsCityVisits - bean containing name, data, column and row labels
+  -    isItem - boolean variable, returns true if the DSO is an Item 
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -57,6 +58,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
+
+<% Boolean isItem = (Boolean)request.getAttribute("isItem"); %>
+
 
 <dspace:layout titlekey="jsp.statistics.title">
 <h1><fmt:message key="jsp.statistics.title"/></h1>
@@ -119,6 +123,8 @@
 </c:forEach>
 </table>
 
+<% if(isItem) { %>
+
 <h2><fmt:message key="jsp.statistics.heading.filedownloads"/></h2>
 <table class="statsTable">
 <tr>
@@ -145,6 +151,8 @@
 </tr>
 </c:forEach>
 </table>
+
+<% } %>
 
 <h2><fmt:message key="jsp.statistics.heading.countryvisits"/></h2>
 <table class="statsTable">

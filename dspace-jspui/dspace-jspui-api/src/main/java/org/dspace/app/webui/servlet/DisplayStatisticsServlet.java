@@ -136,6 +136,7 @@ public class DisplayStatisticsServlet extends DSpaceServlet
 
         String handle = request.getParameter("handle");
         DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+        boolean isItem = false;
 
         StatisticsBean statsVisits = new StatisticsBean();
         StatisticsBean statsMonthlyVisits = new StatisticsBean();
@@ -230,6 +231,7 @@ public class DisplayStatisticsServlet extends DSpaceServlet
 
         if(dso instanceof org.dspace.content.Item)
         {
+            isItem = true;
 
             try
             {
@@ -363,6 +365,7 @@ public class DisplayStatisticsServlet extends DSpaceServlet
         request.setAttribute("statsFileDownloads", statsFileDownloads);
         request.setAttribute("statsCountryVisits",statsCountryVisits);
         request.setAttribute("statsCityVisits", statsCityVisits);
+        request.setAttribute("isItem", isItem);
 
         JSPManager.showJSP(request, response, "display-statistics.jsp");
         
