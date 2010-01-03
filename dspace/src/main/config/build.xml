@@ -749,7 +749,7 @@ Common usage:
 
  * Make an initial administrator account (an e-person) in DSpace:
  
-   ${dspace.dir}/bin/create-administrator
+   ${dspace.dir}/bin/dspace create-administrator
    
  * Start up your servlet container (Tomcat etc.)
 
