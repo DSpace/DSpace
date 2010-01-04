@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<catalogue xml:lang="en" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://apache.org/cocoon/i18n/2.1">
+
+    <!--
+		The format used by all keys is as follows
+
+		xmlui.<Aspect>.<Java Class>.<name>
+
+		There are a few exceptions to this nameing format,
+		1) Some general keys are in the xmlui.general namespace
+		   because they are used very frequently.
+		2) Some general keys which are specific to a particular aspect
+		   may be found at xmlui.<Aspect> without specifiying a
+		   particular java class.
+		-->
+
+
+    <!-- org.dspace.app.xmlui.artifactbrowser.AbstractSearch.java -->
+
+
+    <!-- org.dspace.app.xmlui.artifactbrowser.AdvancedSearch.java -->
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_author_lc">Author</message>
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject_lc">Subject</message>
+
+    <!-- Site Leve Recently Added Content -->
+    <message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Recently Added</message>
+
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_type">Kind</message>
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_publisher">Publisher</message>
+
+
+    <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.ispartof">Parent</message>
+
+    <message key="xmlui.ArtifactBrowser.AbstractSearch.group_by">Group Results By</message>
+    <message key="xmlui.ArtifactBrowser.AbstractSearch.group_by.none">None</message>
+
+
+    <message key="xmlui.ArtifactBrowser.AbstractSearch.group_by.publication_grp">Publication</message>
+
+
+</catalogue>
