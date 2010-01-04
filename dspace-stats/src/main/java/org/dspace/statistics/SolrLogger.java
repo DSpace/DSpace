@@ -262,8 +262,8 @@ public class SolrLogger
             Community comm = (Community) dso;
             while (comm != null && comm.getParentCommunity() != null)
             {
-                doc1.addField("owningComm", comm.getID());
                 comm = comm.getParentCommunity();
+                doc1.addField("owningComm", comm.getID());
             }
         }
         else if (dso instanceof Collection)

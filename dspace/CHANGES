@@ -149,6 +149,7 @@
  - [DS-307] Offer access in AbstractSearch to QueryResults for subclasses
  - [DS-306] Option to disable mailserver
  - [DS-226] confirmation page of edit profile has an invalid link
+ - [DS-247] Update of contribution of @MIRE Solr Based Statistics Engine to DSpace.
 
 (OhioLINK)
  - [DS-225] dc.description.provenance - public display
