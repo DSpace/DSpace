@@ -2,81 +2,72 @@
 <!--
 To run confluence transformation just execute
 
-mvn antrun:run
+mvn package
 
 in this directory.
 
-The pom is not included as a moduek
+The pom is not included as a module to reduce unnecessary compilation time.
 
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-docs</artifactId>
     <name>DSpace Documentation Module</name>
-
     <packaging>pom</packaging>
-
-    <parent>
-        <groupId>org.dspace</groupId>
-        <artifactId>dspace-parent</artifactId>
-        <version>1.6.0-SNAPSHOT</version>
-    </parent>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>xml-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                        <phase>
+                            package
+                        </phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <transformationSets>
+                        <transformationSet>
+                            <dir>docbook</dir>
+                            <outputDir>confluence</outputDir>
+                            <includes>
+                                <include>**/*.xml</include>
+                            </includes>
+                            <excludes>
+                                <exclude>book.xml</exclude>
+                                <exclude>print.xsl</exclude>
+                                <exclude>html.xsl</exclude>
+                            </excludes>
+                            <stylesheet>confluence/docBook2confluence.xsl</stylesheet>
+                            <fileMappers>
+                                <fileMapper
+                                        implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+                                    <targetExtension>.txt</targetExtension>
+                                </fileMapper>
+                            </fileMappers>
+                        </transformationSet>
+                    </transformationSets>
+                    <!--<catalogs>
+                        <catalog>confluence/catalog.xml</catalog>
+                    </catalogs>-->
+                </configuration>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-          <configuration>
-              <tasks>
-                <xslt basedir="${basedir}/docbook"
-                      destdir="${basedir}/confluence"
-                      extension=".txt"
-                      style="${basedir}/confluence/docBook2confluence.xsl">
-                    <outputproperty name="method" value="text"/>
-                    <outputproperty name="standalone" value="yes"/>
-                    <outputproperty name="encoding" value="UTF8"/>
-                    <outputproperty name="indent" value="no"/>
-                    <include name="**/*.xml"/>
-                    <exclude name="**/*book.xml"/>
-                    <exclude name="**/*print.xsl"/>
-                    <exclude name="**/*html.xsl"/>
-                 </xslt>
-
-              </tasks>
-            </configuration>
-        <executions>
-          <execution>
-
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-          <dependencies>
-<dependency>
-<groupId>net.sf.saxon</groupId>
-<artifactId>saxon</artifactId>
-<version>8.7</version>
-</dependency>
-                     <dependency>
-                       <groupId>org.apache.ant</groupId>
-                       <artifactId>ant-trax</artifactId>
-                       <version>1.7.1</version>
-                     </dependency>   
-                     <dependency>
-                       <groupId>org.apache.ant</groupId>
-                       <artifactId>ant-nodeps</artifactId>
-                       <version>1.7.1</version>
-                     </dependency>
-                   </dependencies>
-
-      </plugin>
-      
-    </plugins>
-  </build>
-
+                <dependencies>
+                    <dependency>
+                        <groupId>net.sf.saxon</groupId>
+                        <artifactId>saxon</artifactId>
+                        <version>8.7</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
 </project>

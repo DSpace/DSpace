@@ -1,4 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+                    "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+<!ENTITY mdash "&#x2014;">
+]>
 <chapter remap="h1">
 	<title><anchor id="docbook-configure.html"/>DSpace System Documentation: Configuration</title>
 	<para>There are a numbers of ways in which DSpace may be configured and/or customized. This chapter of the documentation will discuss the configuration of the software and will also reference customizations that may be performed in the chapter following.</para>

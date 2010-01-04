@@ -1,5 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
-  <chapter remap="h1">
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+                    "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+<!ENTITY mdash "&#x2014;">]>
+<chapter remap="h1">
     <title><anchor id="docbook-history.html"/>DSpace System Documentation: Version History</title>
   	<section remap="h2">
   		<title><anchor id="docbook-history.html-version1_6" xreflabel="Changes in DSpace 1.6.0"/>Changes in DSpace 1.6.0</title>

@@ -119,10 +119,9 @@ Rudimentary Case - By - Case DocBook to Confluence transformation.
         <xsl:apply-templates select="*|text()"/>
         <xsl:text>_</xsl:text>
     </xsl:template>
-
-
+    
     <xsl:template match="ulink">
-        <xsl:value-of select="concat('[',@url,'|',.,']')"/>
+        <xsl:value-of select="concat('[',.,'|',@url,'|',.,']')"/>
     </xsl:template>
 
     <xsl:template match="emphasis">

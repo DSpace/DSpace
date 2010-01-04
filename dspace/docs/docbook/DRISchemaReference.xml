@@ -1,5 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
-  <chapter remap="h1">
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+                    "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+<!ENTITY mdash "&#x2014;">
+        ]>
+<chapter remap="h1">
     <title>DSpace System Documentation: DRI Schema Reference</title>
     <para><emphasis role="bold">D</emphasis>igital <emphasis role="bold">R</emphasis>epository <emphasis role="bold">I</emphasis>nterface (<emphasis role="bold">DRI</emphasis>) is a schema that governs the structure of a Manakin DSpace page when encoded as an XML Document. It determines what elements can be present in the Document and the relationship of those elements to each other. This reference document explains the purpose of DRI, provides a broad architectural overview, and explains common design patterns. The appendix includes a complete reference for elements used in the DRI Schema, a graphical representation of the element hierarchy, and a quick reference table of elements and attributes.</para>
     <section remap="h2">

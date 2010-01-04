@@ -1,4 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+                    "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+<!ENTITY mdash "&#x2014;">
+        ]>
 <chapter remap="h1">
 	<title><anchor id="docbook-update.html"/>DSpace System Documentation: Upgrading a DSpace Installation</title>
 	<para>This section describes how to upgrade a DSpace installation from one version to the next. Details of the differences between the functionality of each version are given in the <link linkend="docbook-history.html">Version History</link> section.</para>
