@@ -170,6 +170,46 @@ public class Bitstream extends DSpaceObject
         return new Bitstream(context, row);
     }
 
+    public static Bitstream[] findAll(Context context) throws SQLException
+    {
+        TableRowIterator tri = DatabaseManager.queryTable(context, "bitstream",
+                "SELECT * FROM bitstream");
+
+        List<Bitstream> bitstreams = new ArrayList<Bitstream>();
+
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+
+                // First check the cache
+                Bitstream fromCache = (Bitstream) context.fromCache(
+                        Bitstream.class, row.getIntColumn("bitstream_id"));
+
+                if (fromCache != null)
+                {
+                    bitstreams.add(fromCache);
+                }
+                else
+                {
+                    bitstreams.add(new Bitstream(context, row));
+                }
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
+
+        Bitstream[] bitstreamArray = new Bitstream[bitstreams.size()];
+        bitstreamArray = bitstreams.toArray(bitstreamArray);
+
+        return bitstreamArray;
+    }
+
     /**
      * Create a new bitstream, with a new ID. The checksum and file size are
      * calculated. This method is not public, and does not check authorisation;
