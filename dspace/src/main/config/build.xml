@@ -590,6 +590,19 @@ Common usage:
     	
     </target>
 
+    <!-- ============================================================= -->
+    <!-- Check the connection to the database                          -->
+    <!-- ============================================================= -->
+
+    <!-- Test the connection to the database -->
+    <target name="test_database">
+        <java classname="org.dspace.storage.rdbms.DatabaseManager" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+        </java>
+    </target>
+
 
     <!-- ============================================================= -->
     <!-- Create the database tables                                    -->
@@ -677,7 +690,7 @@ Common usage:
     <!-- Do a fresh system install                                     -->
     <!-- ============================================================= -->
 
-    <target name="fresh_install" depends="init_installation,init_configs,setup_database,load_registries" description="Do a fresh install of the system, overwriting any data">
+    <target name="fresh_install" depends="test_database,init_installation,init_configs,setup_database,load_registries" description="Do a fresh install of the system, overwriting any data">
 
         <delete failonerror="no">
             <fileset dir="${dspace.dir}/bin" includes="**/*" />

@@ -1787,6 +1787,39 @@ public class DatabaseManager
 	    }
 	}
 
+    /**
+     * Main method used to perform tests on the database
+     *
+     * @param args The command line arguments
+     */
+    public static void main(String[] args)
+    {
+        // Get something from dspace.cfg to get the log lines out the way
+        String url = ConfigurationManager.getProperty("db.url");
+
+        // Try to connect to the database
+        System.out.println("\nAttempting to connect to database: ");
+        System.out.println(" - URL: " + url);
+        System.out.println(" - Driver: " + ConfigurationManager.getProperty("db.driver"));
+        System.out.println(" - Username: " + ConfigurationManager.getProperty("db.username"));
+        System.out.println(" - Password: " + ConfigurationManager.getProperty("db.password"));
+        System.out.println(" - Schema: " + ConfigurationManager.getProperty("db.schema"));
+        System.out.println("\nTesting connection...");
+        try
+        {
+            Connection connection = DatabaseManager.getConnection();
+        }
+        catch (SQLException sqle)
+        {
+            System.err.println("\nError: ");
+            System.err.println(" - " + sqle);
+            System.err.println("\nPlease see the DSpace documentation for assistance.\n");
+            System.exit(1);
+        }
+
+        System.out.println("Connected succesfully!\n");
+    }
+
 }
 
 /**

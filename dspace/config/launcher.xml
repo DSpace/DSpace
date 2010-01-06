@@ -248,6 +248,14 @@
     </command>
 
     <command>
+        <name>test-database</name>
+        <description>Test the DSpace database connection is OK</description>
+        <step>
+            <class>org.dspace.storage.rdbms.DatabaseManager</class>
+        </step>
+    </command>
+
+    <command>
         <name>sub-daily</name>
         <description>Send daily subscription notices</description>
         <step>

@@ -74,6 +74,8 @@
  - [DS-389] Misleading label: "Submit to This Collection"
  - [DS-424] Export metadata button displayed in JSPUI Administration List of withdrawn items
  - [DS-442] Enable RSS feeds by default
+ - [DS-445] New Bitstream.findAll() method
+ - [DS-446] New ant step - test_database
 
 (Larry Stone)
  - [DS-284] alternate odd and even styles correctly on table rows in Item Summary view
