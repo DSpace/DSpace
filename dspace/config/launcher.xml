@@ -256,6 +256,14 @@
     </command>
 
     <command>
+        <name>test-email</name>
+        <description>Test the DSpace email server settings OK</description>
+        <step>
+            <class>org.dspace.core.Email</class>
+        </step>
+    </command>
+
+    <command>
         <name>sub-daily</name>
         <description>Send daily subscription notices</description>
         <step>

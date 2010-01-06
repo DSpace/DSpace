@@ -76,6 +76,7 @@
  - [DS-442] Enable RSS feeds by default
  - [DS-445] New Bitstream.findAll() method
  - [DS-446] New ant step - test_database
+ - [DS-447] Email test script
 
 (Larry Stone)
  - [DS-284] alternate odd and even styles correctly on table rows in Item Summary view

@@ -398,6 +398,40 @@ public class Email
     }
 
     /**
+     * Test method to send an email to check email server settings
+     *
+     * @param args Command line options
+     */
+    public static void main(String[] args)
+    {
+        String to = ConfigurationManager.getProperty("mail.admin");
+        String subject = "DSpace test email";
+        String server = ConfigurationManager.getProperty("mail.server");
+        String url = ConfigurationManager.getProperty("dspace.url");
+        Email e = new Email();
+        e.setSubject(subject);
+        e.addRecipient(to);
+        e.content = "This is a test email sent from DSpace: " + url;
+        System.out.println("\nAbout to send test email:");
+        System.out.println(" - To: " + to);
+        System.out.println(" - Subject: " + subject);
+        System.out.println(" - Server: " + server);
+        try
+        {
+            e.send();
+        }
+        catch (MessagingException me)
+        {
+            System.err.println("\nError sending email:");
+            System.err.println(" - Error: " + me);
+            System.err.println("\nPlease see the DSpace documentation for assistance.\n");
+            System.err.println("\n");
+            System.exit(1);
+        }
+        System.out.println("\nEmail sent successfully!\n");
+    }
+
+    /**
      * Utility struct class for handling file attachments.
      * 
      * @author ojd20
