@@ -1,4 +1,4 @@
 #!/bin/sh
 
 BINDIR=`dirname $0`
-$BINDIR/dsrun edu.umd.lib.dspace.app.UpdateStats
+$BINDIR/dsrun -Ddspace.log.init.disable=true edu.umd.lib.dspace.app.UpdateStats
