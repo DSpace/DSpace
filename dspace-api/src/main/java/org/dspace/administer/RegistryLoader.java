@@ -138,6 +138,7 @@ public class RegistryLoader
                 context.abort();
             }
 
+            System.err.println("Error: \n - " + e.getMessage());
             System.exit(1);
         }
     }
