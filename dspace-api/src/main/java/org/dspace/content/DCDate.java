@@ -50,6 +50,8 @@ import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 
+import org.dspace.core.I18nUtil;
+
 // FIXME: Not very robust - assumes dates will always be valid
 
 /**
@@ -555,6 +557,10 @@ public class DCDate
         // display results:
         System.out.println("toString() = \""+d.toString()+"\"");
         System.out.println("toDate().toString() = \""+d.toDate().toString()+"\"");
+        System.out.println("\ndisplayDate(time=F,loc=F) = \""+d.displayDate(false, false, I18nUtil.DEFAULTLOCALE)+"\"");
+        System.out.println("displayDate(time=T,loc=F) = \""+d.displayDate(true, false, I18nUtil.DEFAULTLOCALE)+"\"");
+        System.out.println("displayDate(time=F,loc=T) = \""+d.displayDate(false, true,  I18nUtil.DEFAULTLOCALE)+"\"");
+        System.out.println("displayDate(time=T,loc=T) = \""+d.displayDate(true, true,  I18nUtil.DEFAULTLOCALE)+"\"");
 
         System.out.println("By component:");
         System.out.println("granularity   = "+d.granularity);
@@ -580,5 +586,70 @@ public class DCDate
 
         // month str
         System.out.println("Month Name   = \""+DCDate.getMonthName(d.getMonth(), Locale.getDefault())+"\"");
+    }
+
+    /**
+     * Format a human-readable version of the DCDate, with optional time.
+     * This needs to be in DCDate because it depends on the granularity of
+     * the original time.
+     *
+     * FIXME: This should probably be replaced with a localized DateFormat.
+     *
+     * @param showTime
+     *            if true, display the time with the date
+     * @param isLocalTime
+     *            if true, adjust for local time zone, otherwise GMT
+     * @param locale
+     *            locale of the user
+     *
+     * @return String with the date in a human-readable form.
+     */
+    public String displayDate(boolean showTime, boolean isLocalTime, Locale locale)
+    {
+        // if we are only showing day of a DCDate with time granularity,
+        // create a temporary DCDate with date granularity so getDay() etc work.
+        DCDate dd = this;
+        if (!showTime && granularity == DateGran.TIME)
+        {
+            dd = new DCDate();
+            dd.setDateLocal(getYearGMT(), getMonthGMT(), getDayGMT(), -1, -1, -1);
+        }
+
+        // forcibly truncate month name to 3 chars -- XXX FIXME?
+        String monthName = DCDate.getMonthName(dd.getMonth(), locale);
+        if (monthName.length()  > 2)
+            monthName = monthName.substring(0, 3);
+
+        // display date and time
+        if (showTime && granularity == DateGran.TIME)
+        {
+            if (isLocalTime)
+            {
+                return String.format("%d-%s-%4d %02d:%02d:%02d",
+                                     dd.getDay(), monthName, dd.getYear(),
+                                     dd.getHour(), dd.getMinute(), dd.getSecond());
+            }
+            else
+            {
+                monthName = DCDate.getMonthName(dd.getMonthGMT(), locale);
+                if (monthName.length()  > 2)
+                    monthName = monthName.substring(0, 3);
+                return String.format("%d-%s-%4d %02d:%02d:%02d",
+                                     dd.getDayGMT(), monthName, dd.getYearGMT(),
+                                     dd.getHourGMT(), dd.getMinuteGMT(), dd.getSecondGMT());
+            }
+        }
+        else if (granularity == DateGran.DAY)
+        {
+            return String.format("%d-%s-%4d", dd.getDay(), monthName, dd.getYear());
+        }
+        else if (granularity == DateGran.MONTH)
+        {
+            return String.format("%s-%4d", monthName, dd.getYear());
+        }
+        else
+        {
+            return String.format("%4d", dd.getYear());
+        }
     }
 }

@@ -79,6 +79,7 @@
  - [DS-447] Email test script
 
 (Larry Stone)
+ - [DS-400] Fix DCDate date formatting for display in JSPUI (thanks also to Stuart Lewis for testing and final adjustment)
  - [DS-284] alternate odd and even styles correctly on table rows in Item Summary view
  - [DS-393] Fix DCDate and submission timezone bugs that changed date on page reload
  - [DS-377] Add META tags identifying DSpace source version

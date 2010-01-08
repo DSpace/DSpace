@@ -246,88 +246,8 @@ public class UIUtil extends Util
      */
     public static String displayDate(DCDate d, boolean time, boolean localTime, HttpServletRequest request)
     {
-        StringBuffer sb = new StringBuffer();
-        Locale locale = ((Context)request.getAttribute("dspace.context")).getCurrentLocale();
-        if (locale == null) locale = I18nUtil.DEFAULTLOCALE;
-
-        if (d != null)
-        {
-            int year;
-            int month;
-            int day;
-            int hour;
-            int minute;
-            int second;
-
-            if (localTime)
-            {
-                year = d.getYear();
-                month = d.getMonth();
-                day = d.getDay();
-                hour = d.getHour();
-                minute = d.getMinute();
-                second = d.getSecond();
+        return d.displayDate(time, localTime, getSessionLocale(request));
             }
-            else
-            {
-                year = d.getYearGMT();
-                month = d.getMonthGMT();
-                day = d.getDayGMT();
-                hour = d.getHourGMT();
-                minute = d.getMinuteGMT();
-                second = d.getSecondGMT();
-            }
-
-            if (year > -1)
-            {
-                if (month > -1)
-                {
-                    if (day > -1)
-                    {
-                        sb.append(day + "-");
-                    }
-                    String monthName = DCDate.getMonthName(month, getSessionLocale(request));
-                    int monthLength = monthName.length();
-                    monthLength = monthLength > 2 ? 3 : monthLength;
-                    sb.append(monthName.substring(0, monthLength) + "-");
-                }
-
-                sb.append(year + " ");
-            }
-
-            if (time && (hour > -1))
-            {
-                String hr = String.valueOf(hour);
-
-                while (hr.length() < 2)
-                {
-                    hr = "0" + hr;
-                }
-
-                String mn = String.valueOf(minute);
-
-                while (mn.length() < 2)
-                {
-                    mn = "0" + mn;
-                }
-
-                String sc = String.valueOf(second);
-
-                while (sc.length() < 2)
-                {
-                    sc = "0" + sc;
-                }
-
-                sb.append(hr + ":" + mn + ":" + sc + " ");
-            }
-        }
-        else
-        {
-            sb.append("Unset");
-        }
-
-        return (sb.toString());
-    }
 
     /**
      * Return a string for logging, containing useful information about the
