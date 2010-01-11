@@ -16,6 +16,7 @@ import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.avalon.framework.logger.AbstractLogEnabled;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.DSpaceObject;
@@ -39,7 +40,7 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
     public Map match(String pattern, Map objectModel, Parameters parameters) throws PatternException {
         // Are we checking for *NOT* the action or the action.
         boolean not = false;
-        int action = -1; // the action to check
+        int action = Constants.READ; // the action to check
 
         if (pattern.startsWith("!"))
         {
