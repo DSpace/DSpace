@@ -46,6 +46,7 @@ import javax.naming.directory.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
@@ -431,7 +432,12 @@ public class LDAPHierarchicalAuthentication
 
 					while (answer.hasMoreElements()) {
 						SearchResult sr = answer.next();
-						resultDN = (sr.getName() + "," + ldap_search_context);
+                        if (StringUtils.isEmpty(ldap_search_context)) {
+                            resultDN = sr.getName();
+                        } else {
+                            resultDN = (sr.getName() + "," + ldap_search_context);
+                        }
+
 						String attlist[] = {ldap_email_field, ldap_givenname_field,
 								            ldap_surname_field, ldap_phone_field};
 						Attributes atts = sr.getAttributes();
