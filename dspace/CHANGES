@@ -117,7 +117,8 @@
  - [DS-335] DatabaseManager additions from Minho statistics addon.
  - [DS-247] Contribution of @MIRE Solr Based Statistics Engine to DSpace.
  - [DS-336] DSpace 2.0 Services Support / including fix for System.out lines.
- 
+ - [DS-241] DSpace Assembly Improvement
+  
 (Andrea Bollini)
  - [DS-206] Input form visibility restriction doesn't work properly
  - [DS-199] SWORD module doesn't accept X-No-Op header (dry run)

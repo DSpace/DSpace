@@ -56,17 +56,9 @@
 	<moduleSets>
 		<moduleSet>
 			<includes>
-				<include>*:war:*</include>
+				<include>org.dspace.modules:*:war:*</include>
 			</includes>
-			<excludes>
-				<exclude>org.dspace:dspace-xmlui-webapp</exclude>
-            	<exclude>org.dspace:dspace-xmlui-lang</exclude>
-				<exclude>org.dspace:dspace-lni-webapp</exclude>
-				<exclude>org.dspace:dspace-sword-webapp</exclude>
-				<exclude>org.dspace:dspace-jspui-webapp</exclude>
-				<exclude>org.dspace:dspace-oai-webapp</exclude>
-				<exclude>org.dspace:dspace-ui-shared</exclude>
-			</excludes>
+			
 			<binaries>
 				<includeDependencies>false</includeDependencies>
 				<outputDirectory>webapps/</outputDirectory>
