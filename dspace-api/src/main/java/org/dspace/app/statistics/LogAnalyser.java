@@ -226,7 +226,7 @@ public class LogAnalyser
    private static String fileTemplate = "dspace\\.log.*";
         
    /** the config file from which to configure the analyser */
-   private static String configFile = ConfigurationManager.getProperty("dspace.dir") + 
+   public static String configFile = ConfigurationManager.getProperty("dspace.dir") + 
                             File.separator + "config" + File.separator +
                             "dstat.cfg";
    
@@ -902,6 +902,20 @@ public class LogAnalyser
     public static void readConfig(String configFile)
         throws IOException
     {
+        //instantiate aggregators
+        actionAggregator = new HashMap();
+        searchAggregator = new HashMap();
+        userAggregator = new HashMap();
+        itemAggregator = new HashMap();
+        archiveStats = new HashMap();
+
+        //instantiate lists
+        generalSummary = new ArrayList();
+        excludeWords = new ArrayList();
+        excludeTypes = new ArrayList();
+        excludeChars = new ArrayList();
+        itemTypes = new ArrayList();
+
         // prepare our standard file readers and buffered readers
         FileReader fr = null;
         BufferedReader br = null;

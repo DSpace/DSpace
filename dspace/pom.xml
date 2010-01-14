@@ -561,6 +561,10 @@
             <artifactId>dspace-services-utils</artifactId>
         </dependency>
         <dependency>
+             <groupId>org.dspace</groupId>
+             <artifactId>dspace-stats</artifactId>
+         </dependency>
+         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
         </dependency>
