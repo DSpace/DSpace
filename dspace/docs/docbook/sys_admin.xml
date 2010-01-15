@@ -1,8 +1,4 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
-                    "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
-<!ENTITY mdash "&#x2014;">
-       ]>
 <chapter remap="h1">
 	<title><anchor id="docbook-sys_admin.html"/>DSpace System Documentation: System Administration</title>
 	<para>DSpace operates on several levels: as a Tomcat servlet, cron jobs, and on-demand operations. This section explains many of the on-demand operations. Some of the command operations may be also set up as cron jobs. Many of these operations are performed at the Command Line Interface (CLI) also known as the Unix prompt ($:) Future reference will use the term CLI when the use needs to be at the command line.</para>

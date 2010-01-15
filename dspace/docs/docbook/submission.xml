@@ -1,8 +1,4 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
-                    "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
-<!ENTITY mdash "&#x2014;">
-        ]>
 <chapter remap="h1">
 	<title><anchor id="docbook-submission.html"/>DSpace System Documentation: Customizing and Configuring Submission User Interface</title>
 	<para>This page explains various customization and configuration options that are available within DSpace for the Item Submission user interface.</para>

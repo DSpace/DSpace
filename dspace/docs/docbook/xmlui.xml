@@ -1,8 +1,4 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
-                    "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
-<!ENTITY mdash "&#x2014;">
-        ]>
 <chapter remap="h1">
     <title><anchor id="docbook-xmlui.html"/>DSpace System Documentation: Manakin [XMLUI] Configuration and Customization</title>
     <para>The DSpace digital repository supports two user interfaces: one based on JavaServer Pages (JSP) technologies and one based upon the Apache Cocoon framework. This chapter describes those parameters which are specific to the Manakin (XMLUI) interface based upon the Cocoon framework.</para>
