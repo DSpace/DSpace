@@ -2295,8 +2295,8 @@ authentication.shib.role.Librarian = Administrator</screen>
 						</row>
 						<row>
 							<entry align="right">Informational Note:</entry>
-							<entry>This is where your configure file is located. You may override default log4j configuration by provided your own configurations. Existing alternatives are: <screen>
-log.init.config = ${dspace.dir}/config/log4j.xml
+							<entry>This is where your logging configuration file is located. You may override the default log4j configuration by providing your own. Existing alternatives are: <screen>
+log.init.config = ${dspace.dir}/config/log4j.properties
 log.init.config = ${dspace.dir}/config/log4j-console.properties</screen></entry>
 						</row>
 						<row>
@@ -2305,23 +2305,24 @@ log.init.config = ${dspace.dir}/config/log4j-console.properties</screen></entry>
 							<entry spanname="notespan"/>
 						</row>
 						<row>
-							<entry>Property:</entry>
+							<entry align="right">Property:</entry>
 							<entry>
 								<literal>log.dir</literal>
 							</entry>
 						</row>
 						<row>
-							<entry>Example value:</entry>
+							<entry align="right">Example value:</entry>
 							<entry>
 								<literal>log.dir = ${dspace.dir}/log</literal>
 							</entry>
 						</row>
 						<row>
-							<entry>Informational Note:</entry>
+							<entry align="right">Informational Note:</entry>
 							<entry>This is where to put the logs. (This is used for initial configuration only)</entry>
 						</row>
 					</tbody></tgroup>
 			</informaltable>
+			<para>Previous releases of DSpace provided an example <literal>${dspace.dir}/config/log4j.xml</literal> as an alternative to <literal>log4j.properties</literal>.  This caused some confusion and has been removed.  log4j continues to support both Properties and XML forms of configuration, and you may continue (or begin) to use any form that log4j supports.</para>
 		</section>
 		<section remap="h3">
 			<title><anchor id="docbook-configure.html-lucene-search" xreflabel="Lucene Search"/>Configuring Lucene Search Indexes</title>
