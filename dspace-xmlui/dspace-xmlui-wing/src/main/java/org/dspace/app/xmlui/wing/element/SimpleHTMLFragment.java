@@ -161,9 +161,9 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 			}
 
 		} catch (JDOMException e) {
+                        //If we are here, then a parsing error occurred within the XHTML fragment.  We'll just assume
+                        // that this is not supposed to be XHTML and display the fragment as plain text within <dri:p> tags.
 			startElement(contentHandler, namespaces, Para.E_PARA, null);
-			sendCharacters(contentHandler, "Error unable to parse: "
-					+ e.getMessage());
 			sendCharacters(contentHandler, fragment);
 			endElement(contentHandler, namespaces, Para.E_PARA);
 		} catch (IOException ioe) {

@@ -120,14 +120,12 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 		Collection thisCollection = Collection.find(context, collectionID);
 		
 		String baseURL = contextPath + "/admin/collection?administrative-continue=" + knot.getId();
-		
-		String short_description_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("short_description"));
+
+            //Check that all HTML input fields contain valid XHTML
+            String short_description_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("short_description"));
 	    String introductory_text_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("introductory_text"));
 	    String copyright_text_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("copyright_text"));
 	    String side_bar_text_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("side_bar_text"));
-	    String license_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("license"));
-	    String provenance_description_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("provenance_description"));
-		
 	    
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("collection-metadata-edit",contextPath+"/admin/collection",Division.METHOD_MULTIPART,"primary administrative collection");
@@ -185,16 +183,12 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    TextArea license = metadataList.addItem().addTextArea("license");
 	    license.setValue(thisCollection.getMetadata("license"));
 	    license.setSize(6, 40);
-	    if (license_error != null) 
-	    	license.addError(license_error);
 	    
 	    // provenance description
 	    metadataList.addLabel(T_label_provenance_description);
 	    TextArea provenance_description = metadataList.addItem().addTextArea("provenance_description");
 	    provenance_description.setValue(thisCollection.getMetadata("provenance_description"));
 	    provenance_description.setSize(6, 40);
-	    if (provenance_description_error != null) 
-	    	provenance_description.addError(provenance_description_error);
 	    	    
 	    // the row to upload a new logo 
 	    metadataList.addLabel(T_label_logo);
