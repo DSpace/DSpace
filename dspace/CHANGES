@@ -177,6 +177,7 @@
 
 (Mark Wood)
  - [DS-52] Factor out common webapp installation - ID: 2042160
+ - [DS-455] Remove dspace/config/log4j.xml
 
 (Ekaterina Pechekhonova)
  - [DS-330] Create new session on login / invalidate sessions on logout
@@ -200,6 +201,9 @@
 
 (Steven Williams / Ladd Hanson / Stuart Lewis)
  - [DS-295] CC License being assigned incorrect Mime Type during submission.
+
+(Stuart Lewis / Graham Triggs)
+ - [DS-460] Change logging from RollingFileAppender to DailyFileAppender
 
 1.5.2 final
 ===========
