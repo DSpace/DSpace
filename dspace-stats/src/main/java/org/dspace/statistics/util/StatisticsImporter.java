@@ -1,9 +1,9 @@
 /*
  * StatisticsImporter.java
  *
- * Version: $Revision:$
+ * Version: $Revision$
  *
- * Date: $Date:$
+ * Date: $Date$
  *
  * Copyright (c) 2002-2010, The DSpace Foundation.  All rights reserved.
  *
@@ -403,6 +403,20 @@ public class StatisticsImporter
 	}
 
     /**
+     * Print the help message
+     *
+     * @param options The command line options the user gave
+     * @param exitCode the system exit code to use
+     */
+    private static void printHelp(Options options, int exitCode)
+    {
+        // print the help message
+        HelpFormatter myhelp = new HelpFormatter();
+        myhelp.printHelp("StatisticsImporter\n", options);
+        System.exit(exitCode);
+    }
+
+    /**
      * Main method to run the statistics importer.
      *
      * @param args The command line arguments
@@ -419,13 +433,20 @@ public class StatisticsImporter
         options.addOption("m", "multiple", false, "treat the input file as having a wildcard ending");
         options.addOption("s", "skipdns", false, "skip performing reverse DNS lookups on IP addresses");
         options.addOption("v", "verbose", false, "display verbose output (useful for debugging)");
+        options.addOption("h", "help", false, "help");
 
 		CommandLine line = parser.parse(options, args);
+
+        // Did the user ask to see the help?
+        if (line.hasOption('h'))
+        {
+            printHelp(options, 0);
+        }
 
         if (!line.hasOption('i'))
         {
             System.err.println("You must specify an input file using the -i flag");
-            System.exit(1);
+            printHelp(options, 1);
         }
 
         if (line.hasOption('s'))

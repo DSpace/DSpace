@@ -441,7 +441,7 @@ Common usage:
                     
  ${dspace.dir}/webapps.bak-${build.date}
                     
- Please review this directory and delete it if its no longer needed.
+ Please review this directory and delete it if it's no longer needed.
 ====================================================================
         </echo>
 
