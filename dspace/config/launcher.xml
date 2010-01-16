@@ -206,7 +206,8 @@
         <description>Compile the general statistics</description>
         <step passuserargs="false">
             <class>org.dspace.app.statistics.CreateStatReport</class>
-            <argument>-r stat-general</argument>
+            <argument>-r</argument>
+            <argument>stat-general</argument>
         </step>
     </command>
 
@@ -215,7 +216,8 @@
         <description>Compile the initial statistics</description>
         <step passuserargs="false">
             <class>org.dspace.app.statistics.CreateStatReport</class>
-            <argument>-r stat-initial</argument>
+            <argument>-r</argument>
+            <argument>stat-initial</argument>
         </step>
     </command>
 
@@ -224,7 +226,8 @@
         <description>Compile the monthly statistics</description>
         <step passuserargs="false">
             <class>org.dspace.app.statistics.CreateStatReport</class>
-            <argument>-r stat-monthly</argument>
+            <argument>-r</argument> 
+            <argument>stat-monthly</argument>
         </step>
     </command>
 
@@ -233,7 +236,8 @@
         <description>Create the general statistics report</description>
         <step passuserargs="false">
             <class>org.dspace.app.statistics.CreateStatReport</class>
-            <argument>-r stat-report-general</argument>
+            <argument>-r</argument>>
+            <argument>stat-report-general</argument>
         </step>
     </command>
 
@@ -242,7 +246,8 @@
         <description>Create the general statistics report</description>
         <step passuserargs="false">
             <class>org.dspace.app.statistics.CreateStatReport</class>
-            <argument>-r stat-report-initial</argument>
+            <argument>-r</argument>
+            <argument>stat-report-initial</argument>
         </step>
     </command>
 
@@ -251,7 +256,8 @@
         <description>Create the monthly statistics report</description>
         <step passuserargs="false">
             <class>org.dspace.app.statistics.CreateStatReport</class>
-            <argument>-r stat-report-monthly</argument>
+            <argument>-r</argument>
+            <argument>stat-report-monthly</argument>
         </step>
     </command>
 
