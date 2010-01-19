@@ -359,12 +359,14 @@ ant fresh_install</screen>
 	....</screen>
 				</listitem>
 				<listitem>
-					<para> <emphasis role="bold">Administrator Account</emphasis></para>
+					<para>
+						<emphasis role="bold">Administrator Account</emphasis></para>
 					<para>Create an initial administrator account:</para>
 					<screen><emphasis>[dspace]</emphasis>/bin/create-administrator</screen>
 				</listitem>
 				<listitem>
-					<para> <emphasis role="bold">Initial Startup!</emphasis></para>
+					<para>
+						<emphasis role="bold">Initial Startup!</emphasis></para>
 					<para>Now the moment of truth! Start up (or restart) Tomcat/Jetty/Resin. Visit the base URL(s) of your server, depending on which DSpace web applications you want to use. You should see the DSpace home page. Congratulations! </para>
 					<para>Base URLs of DSpace Web Applications:</para>
 					<itemizedlist>
@@ -659,6 +661,52 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
 0 6 * * * [dspace]/bin/generate-sitemaps
        
 </screen>
+		</section>
+		<section remap="h3">
+			<title><anchor id="docbook-install.html-solr" xreflabel="SOLR Statistics Package"/>DSpace Statisics</title>
+			<para>DSpace uses the Apache Solr application underlaying the statistics. There is no need to download any separate software. All the necessary software is included.</para>
+			<orderedlist>
+				<listitem>
+					<para><emphasis role="bold">DSpace Configuration for Accessing SOLR.</emphasis> In the <literal>dspace.cfg</literal> file review the following fields to make sure they are uncommented:</para>
+					<screen>solr.log.server = ${dspace.baseUrl}/solr/statistics
+solr.spidersfile = ${dspace.dir}/config/spiders.txt
+solr.dbfile = ${dspace.dir}/config/GeoLiteCity.dat
+useProxies = true</screen>
+				</listitem>
+				<listitem>
+					<para><emphasis role="bold">DSpace configuration for fields indexed into Solr Event records for search.</emphasis> In the <literal>dspace.cfg</literal> file, review the following property keys to make sure they are uncommented:</para>
+					<screen>statistics.items.dc.1=dc.identifier
+statistics.items.dc.2=dc.date.accessioned
+statistics.items.type.1=dcinput
+statistics.items.type.2=date
+statistics.default.start.datepick = 01/01/1977</screen>
+				</listitem>
+				<listitem>
+					<para><emphasis role="bold">Configuration Control.</emphasis> In the <literal>dspace.cfg</literal> set the following property key:</para>
+					<para><literal>statistics.item.authorization.admin=true</literal></para>
+					<para>This will require the user to sign on to see that statistics. Setting the statistics to "false" will make them publicly available.</para>
+				</listitem>
+				<listitem>
+					<para>Final steps.</para>
+					<itemizedlist>
+						<listitem>
+							<para>Perform the following step:</para>
+							<screen>
+cd [dspace-source]/dspace
+mvn package
+cd [dspace-source]/dspace/target/dspace-&lt;version&gt;-build.dir
+ant -Dconfig=[dspace]/config/dspace.cfg update
+cp -R [dspace]/webapps/* [TOMCAT]/webapps
+</screen>
+							<para>If you only need to build the statistics, and don't make any changes to other web applications, you can replace the copy step above with:</para>
+							<para><literal>cp -R [dspace]/webapps/solr [TOMCAT]/webapps</literal></para>
+						</listitem>
+						<listitem>
+							<para>Restart your webapps (Tomcat/Jetty/Resin)</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+			</orderedlist>
 		</section>
 	</section>
 	<section remap="h2">
