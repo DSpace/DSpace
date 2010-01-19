@@ -545,6 +545,8 @@ Common usage:
 
         <mkdir dir="${dspace.dir}/lib" />
 
+        <mkdir dir="${dspace.dir}/etc" />
+
         <mkdir dir="${dspace.dir}/webapps" />
 
         <mkdir dir="${dspace.dir}/exports" />
@@ -710,6 +712,9 @@ Common usage:
             <fileset dir="lib" />
         </copy>
 
+        <!-- NB: no regular use is made of etc/ files in an installed
+        - system, so this step is 'deprecated', and will eventually
+        - be removed.  -->
         <delete failonerror="no">
             <fileset dir="${dspace.dir}/etc" includes="**/*" />
         </delete>
@@ -717,10 +722,6 @@ Common usage:
         <copy todir="${dspace.dir}/etc" preservelastmodified="true">
             <fileset dir="etc" />
         </copy>
-
-    	<delete failonerror="no">
-    	            <fileset dir="${dspace.dir}/etc" includes="**/*" />
-    	        </delete>
 
     	<copy todir="${dspace.dir}/solr" preservelastmodified="true">
     	    <fileset dir="solr" />
