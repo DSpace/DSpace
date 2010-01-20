@@ -675,6 +675,9 @@ public class ItemAdapter extends AbstractAdapter
         // Check if the user is requested a specific bundle or
         // the all bundles.
         List<Bundle> bundles = findEnabledBundles();
+
+        // Suppress license?
+        Boolean showLicense = ConfigurationManager.getBooleanProperty("webui.licence_bundle.show");
         
         // Loop over all requested bundles
         for (Bundle bundle : bundles)
@@ -694,6 +697,10 @@ public class ItemAdapter extends AbstractAdapter
             if ("TEXT".equals(bundle.getName()) || "THUMBNAIL".equals(bundle.getName()))
             {
                 isDerivedBundle = true;
+            }
+            if ("LICENSE".equals(bundle.getName() && ! showLicense))
+            {
+                continue;
             }
 
             // ///////////////////
