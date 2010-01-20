@@ -698,7 +698,7 @@ public class ItemAdapter extends AbstractAdapter
             {
                 isDerivedBundle = true;
             }
-            if ("LICENSE".equals(bundle.getName() && ! showLicense))
+            if ("LICENSE".equals(bundle.getName()) && ! showLicense)
             {
                 continue;
             }
