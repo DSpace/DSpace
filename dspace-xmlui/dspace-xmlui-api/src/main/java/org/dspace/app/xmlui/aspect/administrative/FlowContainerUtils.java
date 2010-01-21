@@ -215,7 +215,14 @@ public class FlowContainerUtils
 			// if the supplied options all check out, set the harvesting parameters on the collection
 			if (subResult.getErrors().isEmpty()) {
 				String oaiProvider = request.getParameter("oai_provider");
-				String oaiSetId = request.getParameter("oai_setid");
+				boolean oaiAllSets = "all".equals(request.getParameter("oai-set-setting"));
+                String oaiSetId;
+                if(oaiAllSets)
+                    oaiSetId = "all";
+                else
+                    oaiSetId = request.getParameter("oai_setid");
+
+
 				String metadataKey = request.getParameter("metadata_format");
 				String harvestType = request.getParameter("harvest_level");
 				
@@ -341,6 +348,9 @@ public class FlowContainerUtils
 		
 		String oaiProvider = request.getParameter("oai_provider");
 		String oaiSetId = request.getParameter("oai_setid");
+        oaiSetId = request.getParameter("oai-set-setting");
+        if(!"all".equals(oaiSetId))
+            oaiSetId = request.getParameter("oai_setid");
 		String metadataKey = request.getParameter("metadata_format");
 		String harvestType = request.getParameter("harvest_level");
 		int harvestTypeInt = 0;

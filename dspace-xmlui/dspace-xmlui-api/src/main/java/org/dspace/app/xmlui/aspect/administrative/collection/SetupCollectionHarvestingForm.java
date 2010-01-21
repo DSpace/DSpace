@@ -50,17 +50,7 @@ import org.dspace.app.xmlui.aspect.administrative.FlowContainerUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.Item;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.Option;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
-import org.dspace.app.xmlui.wing.element.Radio;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Text;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
@@ -164,7 +154,9 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer
 		}
 		else {
 			oaiProviderValue = parameters.getParameter("oaiProviderValue", "");
-			oaiSetIdValue = parameters.getParameter("oaiSetIdValue", "");
+			oaiSetIdValue = parameters.getParameter("oaiSetAll", "");
+            if(!"all".equals(oaiSetIdValue))
+			    oaiSetIdValue = parameters.getParameter("oaiSetIdValue", null);
 			metadataFormatValue = parameters.getParameter("metadataFormatValue", "");
 			String harvestLevelString = parameters.getParameter("harvestLevelValue","0");
 			if (harvestLevelString.length() == 0)
@@ -209,9 +201,15 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer
 	    }
 	    
 	    settings.addLabel(T_label_setid);
-	    Text oaiSetId = settings.addItem().addText("oai_setid");
+        Composite oaiSetComp = settings.addItem().addComposite("oai-set-comp");
+        Radio oaiSetSettingRadio = oaiSetComp.addRadio("oai-set-setting");
+        oaiSetSettingRadio.addOption("all".equals(oaiSetIdValue) || oaiSetIdValue == null, "all", "All sets");
+        oaiSetSettingRadio.addOption(!"all".equals(oaiSetIdValue) && oaiSetIdValue != null, "specific", "Specific sets");
+
+        Text oaiSetId = oaiSetComp.addText("oai_setid");
 	    oaiSetId.setSize(40);
-	    oaiSetId.setValue(oaiSetIdValue);
+        if(!"all".equals(oaiSetIdValue) && oaiSetIdValue != null)
+	        oaiSetId.setValue(oaiSetIdValue);
 	    oaiSetId.setHelp(T_help_oaisetid);
 	    if (errorMap.containsKey(OAIHarvester.OAI_SET_ERROR)) {
 	    	oaiSetId.addError(errorMap.get(OAIHarvester.OAI_SET_ERROR));

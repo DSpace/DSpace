@@ -683,6 +683,7 @@ to administer DSpace.
 		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
 		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
 		        				<map:parameter name="oaiProviderValue" value="{flow-attribute:oaiProviderValue}"/>
+		        				<map:parameter name="oaiSetAll" value="{flow-attribute:oaiSetAll}"/>
 		        				<map:parameter name="oaiSetIdValue" value="{flow-attribute:oaiSetIdValue}"/>
 		        				<map:parameter name="metadataFormatValue" value="{flow-attribute:metadataFormatValue}"/>
 		        				<map:parameter name="harvestLevelValue" value="{flow-attribute:harvestLevelValue}"/>

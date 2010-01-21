@@ -265,7 +265,10 @@ public class OAIHarvester {
 		// figure out the relevant parameters
 		String oaiSource = harvestRow.getOaiSource();
 		String oaiSetId = harvestRow.getOaiSetId();
-		
+        //If we have all selected then make sure that we do not include a set filter
+        if("all".equals(oaiSetId))
+            oaiSetId = null;
+
 		Date lastHarvestDate = harvestRow.getHarvestDate();
 		String fromDate = null;
 		if (lastHarvestDate != null)
@@ -919,34 +922,37 @@ public class OAIHarvester {
     	// Now scan the sets and make sure the one supplied is in the list 
     	boolean foundSet = false;
     	try {
-    		ListSets ls = new ListSets(oaiSource);
-    		
-    		// The only error we can really get here is "noSetHierarchy"
-    		if (ls.getErrors() != null && ls.getErrors().getLength() > 0) {
-    			for (int i=0; i<ls.getErrors().getLength(); i++) {
-    				String errorCode = ls.getErrors().item(i).getAttributes().getNamedItem("code").getTextContent();
-					errorSet.add(errorCode);
-    			}
-    		}
-    		else {
-    			// Drilling down to /OAI-PMH/ListSets/set
-    			Document reply = db.build(ls.getDocument());
-    			Element root = reply.getRootElement();
-    			List<Element> sets= root.getChild("ListSets",OAI_NS).getChildren("set",OAI_NS);
-    			    			
-    			for (Element set : sets) 
-    			{
-    				String setSpec = set.getChildText("setSpec", OAI_NS);
-    				if (setSpec.equals(oaiSetId)) { 
-    					foundSet = true;
-    					break;
-    				}
-    			}
-    			
-    			if (!foundSet) {
-    				errorSet.add(OAI_SET_ERROR + ": The OAI server does not have a set with the specified setSpec");
-    			}
-    		}
+            //If we do not want to harvest from one set, then skip this.
+    		if(!"all".equals(oaiSetId)){
+                ListSets ls = new ListSets(oaiSource);
+
+                // The only error we can really get here is "noSetHierarchy"
+                if (ls.getErrors() != null && ls.getErrors().getLength() > 0) {
+                    for (int i=0; i<ls.getErrors().getLength(); i++) {
+                        String errorCode = ls.getErrors().item(i).getAttributes().getNamedItem("code").getTextContent();
+                        errorSet.add(errorCode);
+                    }
+                }
+                else {
+                    // Drilling down to /OAI-PMH/ListSets/set
+                    Document reply = db.build(ls.getDocument());
+                    Element root = reply.getRootElement();
+                    List<Element> sets= root.getChild("ListSets",OAI_NS).getChildren("set",OAI_NS);
+
+                    for (Element set : sets)
+                    {
+                        String setSpec = set.getChildText("setSpec", OAI_NS);
+                        if (setSpec.equals(oaiSetId)) {
+                            foundSet = true;
+                            break;
+                        }
+                    }
+
+                    if (!foundSet) {
+                        errorSet.add(OAI_SET_ERROR + ": The OAI server does not have a set with the specified setSpec");
+                    }
+                }
+            }
     	}
     	catch (Exception ex) {
     		errorSet.add(OAI_ADDRESS_ERROR + ": OAI server could not be reached");

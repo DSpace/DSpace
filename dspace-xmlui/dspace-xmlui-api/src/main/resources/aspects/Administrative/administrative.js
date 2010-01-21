@@ -2486,14 +2486,16 @@ function doSetupCollectionHarvesting(collectionID)
 	
 	var result = null;
 	var oaiProviderValue = null;
+	var oaiSetAll = null;
 	var oaiSetIdValue = null;
 	var metadataFormatValue = null;
 	var harvestLevelValue = null;
 	
 	do {
-		sendPageAndWait("admin/collection/setupHarvesting",{"collectionID":collectionID,"oaiProviderValue":oaiProviderValue,"oaiSetIdValue":oaiSetIdValue,"metadataFormatValue":metadataFormatValue,"harvestLevelValue":harvestLevelValue},result);
+		sendPageAndWait("admin/collection/setupHarvesting",{"collectionID":collectionID,"oaiProviderValue":oaiProviderValue,"oaiSetAll":oaiSetAll,"oaiSetIdValue":oaiSetIdValue,"metadataFormatValue":metadataFormatValue,"harvestLevelValue":harvestLevelValue},result);
 		result = null;
 		oaiProviderValue = cocoon.request.get("oai_provider");
+        oaiSetAll = cocoon.request.get("oai-set-setting");
 		oaiSetIdValue = cocoon.request.get("oai_setid");
 		metadataFormatValue = cocoon.request.get("metadata_format");
 		harvestLevelValue = cocoon.request.get("harvest_level");

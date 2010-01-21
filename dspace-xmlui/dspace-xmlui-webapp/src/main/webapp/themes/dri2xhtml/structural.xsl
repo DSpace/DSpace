@@ -3189,4 +3189,31 @@
     <!-- - - - - - End templates for Choice/Authority control - - - - -  -->
     <!-- =============================================================== -->
 
+
+    <!-- - - - - - template for harvesting - - - - -  -->
+    <xsl:template match="dri:field[@id='aspect.administrative.collection.SetupCollectionHarvestingForm.field.oai-set-comp' and @type='composite']" mode="formComposite" priority="2">
+        <xsl:for-each select="dri:field[@type='radio']">
+            <div class="ds-form-content">
+                <xsl:for-each select="dri:option">
+                    <input type="radio">
+                        <xsl:attribute name="id"><xsl:value-of select="@returnValue"/></xsl:attribute>
+                        <xsl:attribute name="name"><xsl:value-of select="../@n"/></xsl:attribute>
+                        <xsl:attribute name="value"><xsl:value-of select="@returnValue"/></xsl:attribute>
+                        <xsl:if test="../dri:value[@type='option'][@option = current()/@returnValue]">
+                            <xsl:attribute name="checked">checked</xsl:attribute>
+                        </xsl:if>
+                    </input>
+                    <label>
+                        <xsl:attribute name="for"><xsl:value-of select="@returnValue"/></xsl:attribute>
+                        <xsl:value-of select="text()"/>
+                    </label>
+                    <xsl:if test="@returnValue = 'specific'">
+                        <xsl:apply-templates select="../../dri:field[@n='oai_setid']"/>
+                    </xsl:if>
+                    <br/>
+                </xsl:for-each>
+            </div>
+        </xsl:for-each>
+    </xsl:template>
+
 </xsl:stylesheet>
