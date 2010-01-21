@@ -99,14 +99,11 @@ CREATE SEQUENCE workflowitem_seq;
 CREATE SEQUENCE tasklistitem_seq;
 CREATE SEQUENCE registrationdata_seq;
 CREATE SEQUENCE subscription_seq;
-CREATE SEQUENCE history_seq;
-CREATE SEQUENCE historystate_seq;
 CREATE SEQUENCE communities2item_seq;
 CREATE SEQUENCE epersongroup2workspaceitem_seq;
 CREATE SEQUENCE metadataschemaregistry_seq;
 CREATE SEQUENCE metadatafieldregistry_seq;
 CREATE SEQUENCE metadatavalue_seq;
-
 CREATE SEQUENCE group2group_seq;
 CREATE SEQUENCE group2groupcache_seq;
 CREATE SEQUENCE harvested_collection_seq;
@@ -576,10 +573,6 @@ CREATE TABLE epersongroup2workspaceitem
 
 CREATE INDEX epg2wi_group_fk_idx ON epersongroup2workspaceitem(eperson_group_id);
 CREATE INDEX epg2wi_workspace_fk_idx ON epersongroup2workspaceitem(workspace_item_id);
-
-------------------------------------------------------------
--- Browse subsystem tables and views
-------------------------------------------------------------
 
 -------------------------------------------------------
 --  Communities2Item table
