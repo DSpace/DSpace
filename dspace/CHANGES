@@ -146,6 +146,9 @@
  - [DS-398] Submission license displayed on collection and item homepage (XMLUI)
  - [DS-399] Special characters in collection license lead to parse error (XMLUI)
 
+(Tim Donohue / Claudia Juergen)
+ - [DS-423] Ant target 'clean_database' doesn't drop all tables.
+
 (Tim Donohue / Andrea Bollini)
  - [DS-228] Community Admin XMLUI: Delegated Admins Patch
 
