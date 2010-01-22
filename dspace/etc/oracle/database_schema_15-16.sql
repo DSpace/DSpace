@@ -110,3 +110,44 @@ select 'ALTER TABLE '||c1.table_name||' DROP CONSTRAINT '||
 select 'ALTER TABLE community2collection ADD CONSTRAINT comm2coll_collection_fk FOREIGN KEY (collection_id) REFERENCES collection DEFERRABLE;' from dual;
 select 'ALTER TABLE community2community ADD CONSTRAINT com2com_child_fk FOREIGN KEY (child_comm_id) REFERENCES community DEFERRABLE;' from dual;
 select 'ALTER TABLE collection2item ADD CONSTRAINT coll2item_item_fk FOREIGN KEY (item_id) REFERENCES item DEFERRABLE;' from dual;
+
+
+------------------------------------------------------------------
+-- New tables /sequences for the harvester functionality (DS-289)
+------------------------------------------------------------------
+CREATE SEQUENCE harvested_collection_seq;
+CREATE SEQUENCE harvested_item_seq;
+
+-------------------------------------------------------
+-- Create the harvest settings table
+-------------------------------------------------------
+-- Values used by the OAIHarvester to harvest a collection
+-- HarvestInstance is the DAO class for this table
+
+CREATE TABLE harvested_collection
+(
+    collection_id INTEGER REFERENCES collection(collection_id) ON DELETE CASCADE,
+    harvest_type INTEGER,
+    oai_source VARCHAR(256),
+    oai_set_id VARCHAR(256),
+    harvest_message VARCHAR2(512),
+    metadata_config_id VARCHAR(256),
+    harvest_status INTEGER,
+    harvest_start_time TIMESTAMP,
+    last_harvested TIMESTAMP,
+    id INTEGER PRIMARY KEY
+);
+
+CREATE INDEX harvested_collection_fk_idx ON harvested_collection(collection_id);
+
+
+CREATE TABLE harvested_item
+(
+    item_id INTEGER REFERENCES item(item_id) ON DELETE CASCADE,
+    last_harvested TIMESTAMP,
+    oai_id VARCHAR(64),
+    id INTEGER PRIMARY KEY
+);
+
+CREATE INDEX harvested_item_fk_idx ON harvested_item(item_id);
+

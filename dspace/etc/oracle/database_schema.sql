@@ -69,6 +69,8 @@ CREATE SEQUENCE metadatafieldregistry_seq;
 CREATE SEQUENCE metadatavalue_seq;
 CREATE SEQUENCE group2group_seq;
 CREATE SEQUENCE group2groupcache_seq;
+CREATE SEQUENCE harvested_collection_seq;
+CREATE SEQUENCE harvested_item_seq;
 
 -------------------------------------------------------
 -- BitstreamFormatRegistry table
@@ -534,9 +536,6 @@ CREATE TABLE EPersonGroup2WorkspaceItem
 CREATE INDEX epg2wi_group_fk_idx ON epersongroup2workspaceitem(eperson_group_id);
 CREATE INDEX epg2wi_workspace_fk_idx ON epersongroup2workspaceitem(workspace_item_id);
 
-------------------------------------------------------------
--- Browse subsystem tables and views
-------------------------------------------------------------
 
 -------------------------------------------------------
 --  Communities2Item table
@@ -701,3 +700,36 @@ values
     'BITSTREAM_MARKED_DELETED',
     'Bitstream marked deleted in bitstream table'
 );
+
+-------------------------------------------------------
+-- Create the harvest settings table
+-------------------------------------------------------
+-- Values used by the OAIHarvester to harvest a collection
+-- HarvestInstance is the DAO class for this table
+
+CREATE TABLE harvested_collection
+(
+    collection_id INTEGER REFERENCES collection(collection_id) ON DELETE CASCADE,
+    harvest_type INTEGER,
+    oai_source VARCHAR(256),
+    oai_set_id VARCHAR(256),
+    harvest_message VARCHAR2(512),
+    metadata_config_id VARCHAR(256),
+    harvest_status INTEGER,
+    harvest_start_time TIMESTAMP,
+    last_harvested TIMESTAMP,
+    id INTEGER PRIMARY KEY
+);
+
+CREATE INDEX harvested_collection_fk_idx ON harvested_collection(collection_id);
+
+
+CREATE TABLE harvested_item
+(
+    item_id INTEGER REFERENCES item(item_id) ON DELETE CASCADE,
+    last_harvested TIMESTAMP,
+    oai_id VARCHAR(64),
+    id INTEGER PRIMARY KEY
+);
+
+CREATE INDEX harvested_item_fk_idx ON harvested_item(item_id);
