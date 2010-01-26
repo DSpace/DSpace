@@ -59,7 +59,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TimeZone;
 
-import javax.mail.MessagingException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -69,6 +68,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
@@ -86,22 +86,15 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
 import org.dspace.core.PluginManager;
 import org.dspace.core.Utils;
 import org.dspace.eperson.EPerson;
-import org.dspace.event.Consumer;
-import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import ORG.oclc.oai.harvester2.verb.GetRecord;
@@ -585,6 +578,12 @@ public class OAIHarvester {
 		
 		//item.setHarvestDate(new Date());
 		hi.setHarvestDate(new Date());
+
+                 // Add provenance that this item was harvested via OAI
+                String provenanceMsg = "Item created via OAI harvest from source: "
+                                        + this.harvestRow.getOaiSource() + " on " +  new DCDate(hi.getHarvestDate())
+                                        + " (GMT).  Item's OAI Record identifier: " + hi.getOaiID();
+                item.addMetadata("dc", "description", "provenance", "en", provenanceMsg);
 				
 		item.update();
 		hi.update();
