@@ -264,8 +264,13 @@ public class HarvestedCollection
      * @throws SQLException 
      */
     public static Integer findOldestHarvest (Context c) throws SQLException {
-    	TableRowIterator tri = DatabaseManager.queryTable(c, "harvested_collection", 
-    			"select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? order by last_harvested asc limit 1", 0, 0);
+    	String query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? order by last_harvested asc limit 1"; 
+        
+    	if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+    	    query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? and rownum <= 1  order by last_harvested asc"; 
+    	    
+        TableRowIterator tri = DatabaseManager.queryTable(c, "harvested_collection", 
+    			query, 0, 0);
     	TableRow row = tri.next();
     	
     	if (row != null)
@@ -278,8 +283,13 @@ public class HarvestedCollection
      * @throws SQLException 
      */
     public static Integer findNewestHarvest (Context c) throws SQLException {
+        String query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? order by last_harvested desc limit 1"; 
+        
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? and rownum <= 1 order by last_harvested desc";
+        
     	TableRowIterator tri = DatabaseManager.queryTable(c, "harvested_collection", 
-    			"select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? order by last_harvested desc limit 1", 0, 0);
+    			query , 0, 0);
     	TableRow row = tri.next();
 		
     	if (row != null)

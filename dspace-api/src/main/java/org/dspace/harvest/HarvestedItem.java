@@ -111,7 +111,7 @@ public class HarvestedItem
         TableRowIterator tri = null;
         final String selectItemFromOaiId = "SELECT dsi.item_id FROM " + 
         	"(SELECT item.item_id, item.owning_collection FROM item JOIN harvested_item ON item.item_id=harvested_item.item_id WHERE harvested_item.oai_id=?) " + 
-        	"AS dsi JOIN collection ON dsi.owning_collection=collection.collection_id WHERE collection.collection_id=?";
+        	"dsi JOIN collection ON dsi.owning_collection=collection.collection_id WHERE collection.collection_id=?";
         
         try
         {

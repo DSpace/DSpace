@@ -191,6 +191,7 @@
 
 (Toni Prieto)
  - [DS-356] Antispam for suggest item feature
+ - [DS-289 Oracle Patch] OAI-PMH + OAI-ORE harvesting support
 
 (Flavio Botelho)
  - [DS-246] Fix configurable browse parameter encoding (XMLUI)
