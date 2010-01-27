@@ -52,8 +52,8 @@ dspace.history = ${dspace.dir}/history
 					<para>The &quot;runtime&quot; file that is found in <literal>[dspace]/config/dspace.cfg</literal></para>
 				</listitem>
 			</orderedlist>
-			<para>The runtime file is supposed to be the <emphasis role="bold">copy</emphasis> of the source file, which is considered the <emphasis>master</emphasis> version. However, the DSpace server and command programs only look at the <emphasis>runtime</emphasis> configuration file, so when you are revising your configuration values, it is tempting to <emphasis>only edit the runtime file</emphasis>. DO NOT do this. Always make the same changes to the source version of <literal
-					>dspace.cfg</literal> in addition to the runtime file. The two files <emphasis>should</emphasis> always be identical, since the source <literal>dspace.cfg</literal> will be the basis of your next upgrade.</para>
+			<para>The runtime file is supposed to be the <emphasis role="bold"
+					>copy</emphasis> of the source file, which is considered the <emphasis>master</emphasis> version. However, the DSpace server and command programs only look at the <emphasis>runtime</emphasis> configuration file, so when you are revising your configuration values, it is tempting to <emphasis>only edit the runtime file</emphasis>. DO NOT do this. Always make the same changes to the source version of <literal>dspace.cfg</literal> in addition to the runtime file. The two files <emphasis>should</emphasis> always be identical, since the source <literal>dspace.cfg</literal> will be the basis of your next upgrade.</para>
 			<para>To keep the two files in synchronization, you can edit your files in <literal>[dspace-source]/dspace/config/</literal> and then you would run the following commands:</para>
 			<screen>
 cd /[dspace-source]/dspace/target/dspace-&lt;version&gt;-build.dir
@@ -113,7 +113,11 @@ ant update_configs
 				<title>The <literal>dspace.cfg</literal> Main Properties</title>
 				<?dbhtml table-width="100%" ?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2" align="left"><colspec colname="c1" colwidth="90*"/><colspec colname="c2" colwidth="10*"/><spanspec spanname="hspan" namest="c1" nameend="c2" align="center"/><thead>
+				<tgroup cols="2" align="left">
+					<colspec colname="c1" colwidth="90*"/>
+					<colspec colname="c2" colwidth="10*"/>
+					<spanspec spanname="hspan" namest="c1" nameend="c2" align="center"/>
+					<thead>
 						<row>
 							<entry>
 								<emphasis role="bold">Property</emphasis>
@@ -122,7 +126,8 @@ ant update_configs
 								<emphasis role="bold">Ref. Sect.</emphasis>
 							</entry>
 						</row>
-					</thead><tbody>
+					</thead>
+					<tbody>
 						<row>
 							<entry spanname="hspan">General Configurations</entry>
 						</row>
@@ -748,7 +753,8 @@ xmlui.controlpanel.activity.ipheader</screen>
 							</entry>
 							<entry><link linkend="docbook-configure.html-xmlui">5.2.43</link></entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</table>
 		</section>
 		<section remap="h3">
@@ -756,7 +762,11 @@ xmlui.controlpanel.activity.ipheader</screen>
 			<informaltable frame="all">
 				<?dbhtml table-width="75%" ?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="25*"/><colspec colname="c2" colwidth="75*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="25*"/>
+					<colspec colname="c2" colwidth="75*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -868,7 +878,8 @@ xmlui.controlpanel.activity.ipheader</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>Short and sweet site name, used throughout Web UI, e-mails and elsewhere (such as OAI protocol)</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -877,7 +888,11 @@ xmlui.controlpanel.activity.ipheader</screen>
 			<informaltable frame="all">
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="75*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="75*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -1082,7 +1097,8 @@ xmlui.controlpanel.activity.ipheader</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>Specify a name for the connection pool. This is useful if you have multiple applications sharing Tomcat's database connection pool. If nothing is specified, it will default to 'dspacepool'</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -1091,7 +1107,11 @@ xmlui.controlpanel.activity.ipheader</screen>
 			<informaltable frame="all">
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -1333,7 +1353,8 @@ mypassword</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>An option is added to disable the mailserver. By default, this property is set to false. By setting value to &apos;true&apos;, DSpace will not send out emails. It will instead log the subject of the email which should have been sent. This is especially useful for development and test environments where production data is used when testing functionality.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 			<section remap="h4">
 				<title><anchor id="docbook-configure.html-email-wording" xreflabel="Wording of E-mail Messages"/>Wording of E-mail Messages</title>
@@ -1355,7 +1376,11 @@ mypassword</screen>
 			<informaltable frame="all">
 				<?dbhtml table-width="75%" ?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="1.0*" colsep="1"/><colspec colname="c2" colwidth="2.29*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="1.0*" colsep="1"/>
+					<colspec colname="c2" colwidth="2.29*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -1416,7 +1441,8 @@ assetstore.dir.2 = /third/assetstore</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>Specify the number of the store to use for new bitstreams with this property. The default is 0 [zero] which corresponds to the 'assestore.dir' above.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 			<tip>
 				<para>In the examples above, you can see that your storage does not have to be under the <literal>/dspace</literal> directory. For the default installation it needs to reside on the same server (unless you plan to configure SRB (cf. below)). So, if you added storage space to your server, and it has a different logical volume/name/directory, you could have the following as an example:</para>
@@ -1442,7 +1468,11 @@ assetstore.dir.2 = /third/assetstore</screen>
 			<informaltable frame="all">
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -1556,7 +1586,8 @@ assetstore.dir.2 = /third/assetstore</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>Several of the terms, such as <literal>mcatzone</literal>, have meaning only in the SRB context and will be familiar to SRB users. The last, <literal>srb.paratdir.n</literal>, can be used for additional (SRB) upper directory structure within an SRB account. This property value could be blank as well.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 			<para>The 'assetstore.incoming' property is an integer that references where <emphasis role="bold"
 				>new</emphasis> bitstreams will be stored. The default (say the starting reference) is zero. The value will be used to identify the storage where all new bitstreams will be stored until this number is changed. This number is stored in the Bitstream table (store_number column) in the DSpace database, so older bitstreams that may have been stored when 'asset.incoming' had a different value can be found.</para>
@@ -1590,7 +1621,11 @@ assetstore.dir.2 = /third/assetstore</screen>
 			<informaltable frame="all">
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -1628,7 +1663,8 @@ assetstore.dir.2 = /third/assetstore</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>The default files, as shown in the Example Value is where DSpace will install the files used for the Handle Server.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 			<para>For complete information regarding the Handle server, the user should consult <link linkend="docbook-install.html-handles">3.3.4. The Handle Server</link> section of Installing DSpace.</para>
 		</section>
@@ -1639,7 +1675,11 @@ assetstore.dir.2 = /third/assetstore</screen>
 			<informaltable frame="all">
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="20*" colsep="1"/><colspec colname="c2" colwidth="90*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="20*" colsep="1"/>
+					<colspec colname="c2" colwidth="90*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -1653,7 +1693,8 @@ assetstore.dir.2 = /third/assetstore</screen>
           org.dspace.authenticate.PasswordAuthentication</screen>
 							</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 			<para>The configuration property <literal>plugin.sequence.org.dspace.authenticate.AuthenticationMethod</literal> defines the authentication stack. It is a comma-separated list of class names. Each of these classes implements a different <emphasis>authentication method</emphasis>, or way of determining the identity of the user. They are invoked in the order specified until one succeeds.</para>
 			<para>An authentication method is a class that implements the interface <literal>org.dspace.authenticate.AuthenticationMethod</literal>. It <emphasis>authenticates</emphasis> a user by evaluating the <emphasis>credentials</emphasis> (e.g. username and password) he or she presents and checking that they are valid.</para>
@@ -1773,7 +1814,11 @@ assetstore.dir.2 = /third/assetstore</screen>
 				<informaltable>
 					<?dbhtml table-width="100%"?>
 					<?dbfo table-width="100%"?>
-					<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+					<tgroup cols="2">
+						<colspec colname="c1" colwidth="30*" colsep="1"/>
+						<colspec colname="c2" colwidth="70*"/>
+						<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+						<tbody>
 							<row>
 								<entry spanname="notespan">Standard LDAP Configuration</entry>
 							</row>
@@ -2001,7 +2046,8 @@ assetstore.dir.2 = /third/assetstore</screen>
 								<entry align="right">Informational Note:</entry>
 								<entry>If required, a group name can be given here, and all users who log into LDAP will automatically become members of this group. This is useful if you want a group made up of all internal authenticated users. (Remember to log on as the administrator, add this to the "Groups" with read rights). </entry>
 							</row>
-						</tbody></tgroup>
+						</tbody>
+					</tgroup>
 				</informaltable>
 				<para><emphasis role="bold">Hierarchical LDAP Settings.</emphasis># If your users are spread out across a hierarchical tree on your LDAP server, you will need to use the following stackable authentication class:</para>
 				<screen>
@@ -2011,7 +2057,11 @@ plugin.sequence.org.dspace.authenticate.AuthenticationMethod = \
 				<informaltable>
 					<?dbhtml table-width="100%"?>
 					<?dbfo table-width="100%"?>
-					<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+					<tgroup cols="2">
+						<colspec colname="c1" colwidth="30*" colsep="1"/>
+						<colspec colname="c2" colwidth="70*"/>
+						<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+						<tbody>
 							<row>
 								<entry align="right">Property:</entry>
 								<entry>
@@ -2075,7 +2125,8 @@ ldap.search.password = password</screen>
 								<entry>If your LDAP server does not hold an email address for a user, you can use the following field to specify your email domain. This value is appended to the netid in order to make an email address. E.g. a netid of 'user' and <literal>ldap.netid_email_domain</literal> as <literal>@example.com</literal> would set the email of the user to be <literal>user@example.com</literal>
 								</entry>
 							</row>
-						</tbody></tgroup>
+						</tbody>
+					</tgroup>
 				</informaltable>
 			</section>
 		</section>
@@ -2095,7 +2146,11 @@ ldap.search.password = password</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -2267,7 +2322,8 @@ authentication.shib.role.Librarian = Administrator</screen>
 							<?dbhtml row-height="5mm"?>
 							<entry spanname="notespan"/>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -2276,7 +2332,11 @@ authentication.shib.role.Librarian = Administrator</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -2316,9 +2376,10 @@ log.init.config = ${dspace.dir}/config/log4j-console.properties</screen></entry>
 							<entry align="right">Informational Note:</entry>
 							<entry>This is where to put the logs. (This is used for initial configuration only)</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
-			<para>Previous releases of DSpace provided an example <literal>${dspace.dir}/config/log4j.xml</literal> as an alternative to <literal>log4j.properties</literal>.  This caused some confusion and has been removed.  log4j continues to support both Properties and XML forms of configuration, and you may continue (or begin) to use any form that log4j supports.</para>
+			<para>Previous releases of DSpace provided an example <literal>${dspace.dir}/config/log4j.xml</literal> as an alternative to <literal>log4j.properties</literal>. This caused some confusion and has been removed. log4j continues to support both Properties and XML forms of configuration, and you may continue (or begin) to use any form that log4j supports.</para>
 		</section>
 		<section remap="h3">
 			<title><anchor id="docbook-configure.html-lucene-search" xreflabel="Lucene Search"/>Configuring Lucene Search Indexes</title>
@@ -2326,7 +2387,11 @@ log.init.config = ${dspace.dir}/config/log4j-console.properties</screen></entry>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -2472,7 +2537,8 @@ search.analyzer = \
 							<entry align="right">Informational Note</entry>
 							<entry>See the details of this particular entry below.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 			<para>For example, the following entries appear in the default DSpace installation:</para>
 			<screen>
@@ -2493,7 +2559,11 @@ search.index.11 = language:dc.language.iso
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry>
 								<literal>&lt;id&gt;</literal>
@@ -2518,7 +2588,8 @@ search.index.11 = language:dc.language.iso
 							</entry>
 							<entry>is the DSpace metadata field to be indexed.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 			<para>In the example above, <literal>search.index.1</literal> and <literal>search.index.2</literal> and <literal>search.index.3</literal> are configured as the <literal>author</literal> search field. The <literal>author</literal> index is created by Lucene indexing all <literal>dc.contributor.*</literal>, <literal>dc.creator.*</literal> and <literal>description.statementofresponsibility</literal> metadata fields.</para>
 			<para>After changing the configuration run <literal>/[dspace]/bin/index-init</literal> to regenerate the indexes.</para>
@@ -2537,7 +2608,11 @@ search.index.11 = language:dc.language.iso
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -2575,7 +2650,8 @@ search.index.11 = language:dc.language.iso
 							<entry>Informational Note</entry>
 							<entry>Enter the port number for the proxy server.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -2585,7 +2661,11 @@ search.index.11 = language:dc.language.iso
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -2712,7 +2792,8 @@ filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormats = BMP, \
 							<entry align="right">Informational Note:</entry>
 							<entry>If this value is set for "true", PDFs which still result in an "Out of Memory" error from PDFBox are skipped over. These problematic PDFs will never be indexed until memory usage can be decreased in the PDFBox software.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 			<para>Names are assigned to each filter using the <literal>plugin.named.org.dspace.app.mediafilter.FormatFilter</literal> field (e.g. by default the PDFilter is named "PDF Text Extractor".</para>
 			<para>Finally, the appropriate <literal>filter.&lt;class path&gt;.inputFormats</literal> defines the valid input formats which each filter can be applied. These format names <emphasis role="bold">must match</emphasis> the <literal>short description</literal> field of the Bitstream Format Registry.</para>
@@ -2727,7 +2808,11 @@ filter.org.dspace.app.mediafilter.BrandedPreviewJPEGFilter.inputFormats = BMP, \
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Properties:</entry>
 							<entry>
@@ -2746,7 +2831,8 @@ crosswalk.mods.properties.mods = crosswalks/mods.properties</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>This defines a crosswalk named MODS whose configuration comes from the file <literal>[dspace]/config/crosswalks/mods.properties</literal>. (In the above example, the lower-case name was added for OAI-PMH)</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 			<para> The MODS crosswalk properties file is a list of properties describing how DSpace metadata elements are to be turned into elements of the MODS XML output document. The property name is a concatenation of the metadata schema, element name, and optionally the qualifier. For example, the <literal>contributor.author</literal> element in the native Dublin Core schema would be: <literal>dc.contributor.author</literal>. The value of the property is a line containing two segments separated by the vertical bar (<literal>&quot;|&quot;</literal>): The first part is an XML fragment which is copied into the output document. The second is an XPath expression describing where in that fragment to put the value of the metadata element. For example, in this property:</para>
 			<screen>
@@ -2772,7 +2858,11 @@ dc.contributor.author = &lt;mods:name&gt;&lt;mods:role&gt;&lt;mods:roleTerm
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Properties:</entry>
 							<entry>
@@ -2789,7 +2879,8 @@ dc.contributor.author = &lt;mods:name&gt;&lt;mods:role&gt;&lt;mods:roleTerm
 							<entry align="right">Informational Note:</entry>
 							<entry>Configuration XSLT-driven submission crosswalk for MODS</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 			<para>As shown above, there are three (3) parts that make up the properties "key":</para>
 			<para>
@@ -2842,7 +2933,11 @@ dc.contributor.author = &lt;mods:name&gt;&lt;mods:role&gt;&lt;mods:roleTerm
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Properties:</entry>
 							<entry>
@@ -2898,7 +2993,8 @@ dc.contributor.author = &lt;mods:name&gt;&lt;mods:role&gt;&lt;mods:roleTerm
 							<entry align="right">Informational Note:</entry>
 							<entry>Configuration of the QDC Crosswalk dissemination plugin for Qualified DC. <emphasis>(Add lower-case name for OAI-PMH. That is, change QDC to qdc.)</emphasis></entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 			<para>In the property key "<literal>crosswalk.qdc.properties.QDC</literal>" the value of this property is a path to a separate properties file containing the configuration for this crosswalk. The pathname is relative to the DSpace configuration directory <emphasis>
 					<literal>/[dspace]/config</literal>
@@ -2926,7 +3022,11 @@ dc.contributor.author = &lt;mods:name&gt;&lt;mods:role&gt;&lt;mods:roleTerm
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Properties:</entry>
 							<entry>
@@ -3092,7 +3192,8 @@ event.consumer.test.filters = All+All
 							<entry align="right">Informational Note:</entry>
 							<entry>Set this to true to enable testConsumer messages to standard output. <emphasis role="bold">Commented out by default.</emphasis></entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -3101,7 +3202,11 @@ event.consumer.test.filters = All+All
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -3160,7 +3265,8 @@ event.consumer.test.filters = All+All
 							<entry align="right">Informational Note:</entry>
 							<entry>This option specifies the time frame after which a successful “match” will be removed from your DSpace database (defaults to 8 weeks). This means that after 8 weeks, all successful matches are automatically deleted from your database (in order to keep that database table from growing too large).</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -3179,7 +3285,11 @@ event.consumer.test.filters = All+All
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -3259,7 +3369,8 @@ event.consumer.test.filters = All+All
 							<entry align="right">Informational Note</entry>
 							<entry>The maximum size in Megabytes (Mb) that the export should be. This is enforced before the compression. Each bitstream's size in each item being exported is added up, if their cumulative sizes are more than this entry the export is not kicked off.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -3268,7 +3379,11 @@ event.consumer.test.filters = All+All
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -3285,7 +3400,8 @@ event.consumer.test.filters = All+All
 							<entry align="right">Informational Note:</entry>
 							<entry>For backwards compatibility, the subscription emails by default include any modified items. The property key is COMMENTED OUT by default.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -3294,7 +3410,11 @@ event.consumer.test.filters = All+All
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -3332,7 +3452,8 @@ event.consumer.test.filters = All+All
 							<entry align="right">Informational Note:</entry>
 							<entry>Whether or not a file is <emphasis role="bold">required</emphasis> to be uploaded during the "Upload" step in the submission process. The default is true. If set to "false", then the submitter (human being) has the option to skip the uploading of a file.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -3341,7 +3462,11 @@ event.consumer.test.filters = All+All
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -3360,7 +3485,8 @@ event.consumer.test.filters = All+All
 								<literal>Set key to "false" if you are not using CC License. Set key to "true" if you are using CC License.</literal>
 							</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -3370,7 +3496,11 @@ event.consumer.test.filters = All+All
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -3664,7 +3794,8 @@ webui.preview.brand.fontpoint = 12</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>When showing the strengths, should they be counted in real time, or fetched from the cache. Counts fetched in real time will perform an actual count of the database contents every time a page with this feature is requested, which will not scale. If you set the property key is set to cache (&quot;true&quot;) you must run the following command periodically to update the count: <literal>/[dspace]/bin/dsrun org.dspace.browse.ItemCounter</literal>. The default is to count in real time (set to &quot;false&quot;).</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -3673,7 +3804,11 @@ webui.preview.brand.fontpoint = 12</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -3711,7 +3846,8 @@ webui.preview.brand.fontpoint = 12</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>This is an example of how one &quot;Defines the Sort Options&quot;. See <link linkend="docbook-configure.html-browse-index-sort">Defining Sort Options</link> in the following sub-section.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 			<section remap="h4">
 				<title><anchor id="docbook-configure.html-browse-index-define" xreflabel="Defining the Indexes"/>Defining the Indexes.</title>
@@ -3887,7 +4023,11 @@ webui.itemlist.sort-option.3 = dateaccessioned:dc.date.accessioned:date</screen>
 				<informaltable>
 					<?dbhtml table-width="100%"?>
 					<?dbfo table-width="100%"?>
-					<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+					<tgroup cols="2">
+						<colspec colname="c1" colwidth="30*" colsep="1"/>
+						<colspec colname="c2" colwidth="70*"/>
+						<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+						<tbody>
 							<row>
 								<entry align="right">Property:</entry>
 								<entry>
@@ -3904,7 +4044,8 @@ webui.itemlist.sort-option.3 = dateaccessioned:dc.date.accessioned:date</screen>
 								<entry align="right">Informational Note:</entry>
 								<entry>This controls the normalization of the index entry. Uncommenting the option (which is commented out by default) will make the metadata items case-insensitive. This will result in a single entry in the example above. However, the value displayed may be any one of the above&mdash;depending on what representation was present in the first item indexed.</entry>
 							</row>
-						</tbody></tgroup>
+						</tbody>
+					</tgroup>
 				</informaltable>
 				<para>At the present time, you would need to edit your metadata to clean up the index presentation.</para>
 			</section>
@@ -3914,7 +4055,11 @@ webui.itemlist.sort-option.3 = dateaccessioned:dc.date.accessioned:date</screen>
 				<informaltable>
 					<?dbhtml table-width="100%"?>
 					<?dbfo table-width="100%"?>
-					<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+					<tgroup cols="2">
+						<colspec colname="c1" colwidth="30*" colsep="1"/>
+						<colspec colname="c2" colwidth="70*"/>
+						<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+						<tbody>
 							<row>
 								<entry align="right">Property:</entry>
 								<entry><literal>webui.browse.value_columns.max</literal></entry>
@@ -3988,7 +4133,8 @@ text   = org.dspace.sort.OrderFormatText</screen>
 									<para>As of DSpace release 1.5.2, the multi-lingual MARC21 title ordering is configured as default, as shown in the example above. To use the previous title ordering (before release 1.5.2), comment out the configuration in your <literal>dspace.cfg</literal> file.</para>
 								</entry>
 							</row>
-						</tbody></tgroup>
+						</tbody>
+					</tgroup>
 				</informaltable>
 			</section>
 		</section>
@@ -4000,7 +4146,11 @@ text   = org.dspace.sort.OrderFormatText</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>webui.browse.author-field</literal></entry>
@@ -4013,14 +4163,19 @@ text   = org.dspace.sort.OrderFormatText</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>This defines which field is the author/editor, etc. listing. </entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 			<para>Replace <literal>dc.contributor.*</literal> with another field if appropriate. The field should be listed in the configuration for <literal>webui.itemlist.columns</literal>, otherwise you will not see its effect. It must also be defined in <literal>webui.itemlist.columns</literal> as being of the datatype <literal>text</literal> otherwise the functionality will be overridden by the specific data type feature. (This setting is not used by the XMLUI as it is controlled by your theme).</para>
 			<para>Now that we know which field is our author or other multiple metadata value field we can provide the option to truncate the number of values displayed by default. We replace the remaining list of values with &quot;et al&quot; or the language pack specific alternative. Note that this is just for the default, and users will have the option of changing the number displayed when they browse the results. See the following table:</para>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>webui.browse.author-limit</literal></entry>
@@ -4033,7 +4188,8 @@ text   = org.dspace.sort.OrderFormatText</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>Where <literal>&lt;</literal><emphasis>n</emphasis><literal>&gt;</literal> is an integer number of values to be displayed. Use <literal>-1</literal> for unlimited (the default value).</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -4042,7 +4198,11 @@ text   = org.dspace.sort.OrderFormatText</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>webui.browse.link.&lt;</literal><emphasis>n</emphasis><literal>&gt;</literal></entry>
@@ -4055,7 +4215,8 @@ text   = org.dspace.sort.OrderFormatText</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>This is used to configure which fields should link to other browse listings. This should be associated with the name of one of the browse indexes (<literal>webui.browse.index.n</literal>) with a metadata field listed in <literal>webui.itemlist.columns</literal> above. If this condition is not fulfilled, cross-linking will not work. Note also that crosslinking only works for metadata fields not tagged as <literal>title</literal> in <literal>webui.itemlist.columns</literal>.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 			<para>The format of the property key is <literal>webui.browse.link.&lt;n&gt; = &lt;index name&gt;:&lt;display column metadata&gt;</literal> Please notice the punctuation used between the elements.</para>
 			<informaltable>
@@ -4103,7 +4264,11 @@ text   = org.dspace.sort.OrderFormatText</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>recent.submission.sort-option</literal></entry>
@@ -4133,7 +4298,8 @@ text   = org.dspace.sort.OrderFormatText</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>Defines how many recent submissions should be displayed at any one time.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 			<para>There will be the need to set up the processors that the PluginManager will load to actually perform the recent submissions query on the relevant pages. This is already configured by default <literal>dspace.cfg</literal> so there should be no need for the administrator/programmer to worry about this.</para>
 			<screen>
@@ -4150,7 +4316,11 @@ plugin.sequence.org.dspace.plugin.CollectionHomeProcessor = \
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>webui.feed.enable</literal></entry>
@@ -4358,7 +4528,8 @@ webui.feed.item.dc.description = dc.description.abstract</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>These optional properties add <emphasis>structured</emphasis> DC elements as XML elements to the feed description. They are not the same thing as, for example, <literal>webui.feed.item.description</literal>. Useful when a program or stylesheet will be transforming a feed and wants separate author, description, date, etc.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -4367,7 +4538,11 @@ webui.feed.item.dc.description = dc.description.abstract</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>webui.content_disposition_threshold</literal></entry>
@@ -4397,7 +4572,8 @@ webui.feed.item.dc.description = dc.description.abstract</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>The default value is set to 8Mb. This property key applies to the XMLUI (Manakin) interface.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 			<para>Other values are possible: </para>
 			<simplelist>
@@ -4412,7 +4588,11 @@ webui.feed.item.dc.description = dc.description.abstract</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry>
@@ -4433,7 +4613,8 @@ xmlui.html.max-depth-guess = 3</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>When serving up composite HTML items, how deep can the request be for us to serve up a file with the same name? For example, if one receives a request for &quot;<literal>foo/bar/index.html</literal>&quot; and one has a bitstream called just &quot;<literal>index.html</literal>&quot;, DSpace will serve up the former bitstream (foo/bar/index.html) for the request if <literal>webui.html.max-depth-guess</literal> is 2 or greater. If <literal>webui.html.max-depth-guess</literal> is 1 or less, then DSpace would not serve that bitstream, as the depth of the file is greater. If <literal>webui.html.max-depth-guess</literal> is zero, the request filename and path must always exactly match the bitstream name. The default is set to 3.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -4442,7 +4623,11 @@ xmlui.html.max-depth-guess = 3</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>sitemap.dir</literal></entry>
@@ -4475,7 +4660,8 @@ xmlui.html.max-depth-guess = 3</screen>
 								<para>Add the following to the above parameter if you have an application ID with Yahoo: <literal>http://search.yahooapis.com/SiteExplorererService/V1/updateNotification?appid=REPLACE_ME?url=</literal>. (Replace the component <literal>REPLACE_ME</literal> with your application ID). There is no known 'ping' URL for MSN/Live search.</para>
 							</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -4483,7 +4669,11 @@ xmlui.html.max-depth-guess = 3</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>upload.temp.dir</literal></entry>
@@ -4513,7 +4703,8 @@ xmlui.html.max-depth-guess = 3</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>Maximum size of uploaded files in bytes. A negative setting will result in no limit being set. The default is set for 512Mb.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -4521,7 +4712,11 @@ xmlui.html.max-depth-guess = 3</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>report.public</literal></entry>
@@ -4551,7 +4746,8 @@ xmlui.html.max-depth-guess = 3</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>Directory where the live reports are stored.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -4560,7 +4756,11 @@ xmlui.html.max-depth-guess = 3</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>webui.licence_bundle.show</literal></entry>
@@ -4770,8 +4970,7 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 						</row>
 						<row>
 							<entry align="right">Example Value:</entry>
-							<entry><literal>
-								</literal></entry>
+							<entry><literal> </literal></entry>
 						</row>
 						<row>
 							<entry align="right">Informational Note:</entry>
@@ -4832,7 +5031,8 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>You can also set the overall size of the item list table with the following setting. It can lead to faster table rendering when used with the column widths above, but not generally recommended.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -4842,7 +5042,11 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 				<informaltable>
 					<?dbhtml table-width="100%"?>
 					<?dbfo table-width="100%"?>
-					<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+					<tgroup cols="2">
+						<colspec colname="c1" colwidth="30*" colsep="1"/>
+						<colspec colname="c2" colwidth="70*"/>
+						<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+						<tbody>
 							<row>
 								<entry align="right">Property:</entry>
 								<entry><literal>default.locale</literal></entry>
@@ -4858,7 +5062,8 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 									<para>The format of a local specifier is described here: http://java.sun.com/j2se/1.4.2/docs/api/java/util/Locale.html</para>
 								</entry>
 							</row>
-						</tbody></tgroup>
+						</tbody>
+					</tgroup>
 				</informaltable>
 			</section>
 			<section remap="h4">
@@ -4868,7 +5073,11 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 					<informaltable>
 						<?dbhtml table-width="100%"?>
 						<?dbfo table-width="100%"?>
-						<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+						<tgroup cols="2">
+							<colspec colname="c1" colwidth="30*" colsep="1"/>
+							<colspec colname="c2" colwidth="70*"/>
+							<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+							<tbody>
 								<row>
 									<entry align="right">Property:</entry>
 									<entry><literal>webui.supported.locale</literal></entry>
@@ -4881,7 +5090,8 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 									<entry align="right">Informational Note:</entry>
 									<entry>All the locales that are supported by this instance of DSpace. Comma separated list. </entry>
 								</row>
-							</tbody></tgroup>
+							</tbody>
+						</tgroup>
 					</informaltable>
 					<para>The table above, if needed and is used will result in:</para>
 					<itemizedlist>
@@ -5031,7 +5241,11 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>itemmap.author.index</literal></entry>
@@ -5044,7 +5258,8 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>If you change the name of your author browse field, you will also need to update this property key.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -5052,7 +5267,11 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>webui.mydspace.showgroupmembership</literal></entry>
@@ -5065,7 +5284,8 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>To display group membership set to &quot;true&quot;. If omitted, the default behavior is false.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -5074,7 +5294,11 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>sfx.server.url</literal></entry>
@@ -5087,7 +5311,8 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>SFX query is appended to this URL. If this property is commented out or omitted, SFX support is switched off.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="H3">
@@ -5095,7 +5320,11 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>webui.suggest.enable</literal></entry>
@@ -5125,7 +5354,8 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>Enable only if the user is logged in. If this key commented out, the default value is false.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="H3">
@@ -5134,7 +5364,11 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>webui.controlledvocabulary.enable</literal></entry>
@@ -5147,7 +5381,8 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>Enable or disable the controlled vocabulary add-on. WARNING: This feature is not compatible with WAI (it requires javascript to function).</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 			<para>The need for a limited set of keywords is important since it eliminates the ambiguity of a free description system, consequently simplifying the task of finding specific items of information.</para>
 			<para>The controlled vocabulary add-on allows the user to choose from a defined set of keywords organized in an tree (taxonomy) and then use these keywords to describe items while they are being submitted.</para>
@@ -5205,7 +5440,11 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>xmlui.supported.locales</literal></entry>
@@ -5457,7 +5696,8 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>Determine where the control panel's activity viewer recieves an events IP address from. If your DSpace is in a load balanced enviornment or otherwise behind a context-switch then you will need to set the paramater to the HTTP parameter that records the original IP address.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -5468,7 +5708,11 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 				<informaltable>
 					<?dbhtml table-width="100%"?>
 					<?dbfo table-width="100%"?>
-					<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+					<tgroup cols="2">
+						<colspec colname="c1" colwidth="30*" colsep="1"/>
+						<colspec colname="c2" colwidth="70*"/>
+						<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+						<tbody>
 							<row>
 								<entry align="right">Property:</entry>
 								<entry><literal>oai.didl.maxresponse</literal></entry>
@@ -5484,7 +5728,8 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 									<para>Optional: DSpace uses 100 records as the limit for the oai responses. You can alter this by changing <literal>/[dspace-source]/dspace-oai/dspace-oai-api/src/main/java/org/dspace/app/oai/DSpaceOAICatalog.java</literal> to codify the declaration: private final int MAX_RECORDS = 100 to private final int MAX_RECORDS = 30</para>
 								</entry>
 							</row>
-						</tbody></tgroup>
+						</tbody>
+					</tgroup>
 				</informaltable>
 			</section>
 			<section remap="h4">
@@ -5553,7 +5798,11 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>core.authorization.community-admin.create-subelement</literal></entry>
@@ -5620,7 +5869,8 @@ core.authorization.collection-admin.item-admin.cc-license</screen></entry>
 core.authorization.item-admin.delete-bitstream
 core.authorization.item-admin.cc-license</screen></entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 			<note>
 				<para>Oracle users should consult <emphasis role="underline"><link linkend="docbook-update.html">Chapter 4 Updating a DSpace Installation</link></emphasis> regarding the necessary database changes that need to take place.</para>
@@ -5632,7 +5882,11 @@ core.authorization.item-admin.cc-license</screen></entry>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>bulkedit.valueseparator</literal></entry>
@@ -5700,7 +5954,8 @@ core.authorization.item-admin.cc-license</screen></entry>
 							<entry align="right">Informational note</entry>
 							<entry>Metadata elements to exclude when exporting via the user interfaces, or when using the command line version and not using the -a (all) option.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -5709,7 +5964,11 @@ core.authorization.item-admin.cc-license</screen></entry>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>metadata.hide.dc.description.provenance</literal></entry>
@@ -5738,7 +5997,8 @@ core.authorization.item-admin.cc-license</screen></entry>
 								<para>This default configuration hides the dc.description.provenance field, since that usually contains email addresses which ought to be kept private and is mainly of interest to administrators.</para>
 							</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<!-- This is to close the 5.2 section (below) -->
@@ -5748,8 +6008,8 @@ core.authorization.item-admin.cc-license</screen></entry>
 		<para>The following section explains how to configure either optional features or advanced features that are not necessary to make DSpace &quot;out-of-the-box&quot;</para>
 		<section remap="h3">
 			<title><anchor id="docbook-configure.html-general-registries" xreflabel="The Metadata and Bitstream Format Registries"/>The Metadata Format and Bitstream Format Registries</title>
-			<para>The <literal>[dspace]/config/registries</literal> directory contains three XML files. These are used to load the <emphasis>initial</emphasis> contents of the <link linkend="docbook-appendix.html-dublincoreregistry">Dublin Core Metadata registry</link> and <link linkend="docbook-appendix.html-bitstreamformatregistry">Bitstream Format registry</link> and SWORD metadata registry. After the initial loading (performed by <literal
-				>ant fresh_install</literal> above), the registries reside in the database; the XML files are not updated.</para>
+			<para>The <literal>[dspace]/config/registries</literal> directory contains three XML files. These are used to load the <emphasis>initial</emphasis> contents of the <link linkend="docbook-appendix.html-dublincoreregistry">Dublin Core Metadata registry</link> and <link linkend="docbook-appendix.html-bitstreamformatregistry"
+				>Bitstream Format registry</link> and SWORD metadata registry. After the initial loading (performed by <literal>ant fresh_install</literal> above), the registries reside in the database; the XML files are not updated.</para>
 			<para>In order to change the registries, you may adjust the XML files before the first installation of DSpace. On an already running instance it is recommended to change bitstream registries via DSpace admin UI, but the metadata registries can be loaded again at any time from the XML files without difficult. The changes made via admin UI are not reflected in the XML files.</para>
 			<section remap="h4">
 				<title>Metadata Format Registries</title>
@@ -5967,8 +6227,9 @@ ormats = Microsoft Word
 Formats = Microsoft Excel</literal>
 
           </screen>
-				<para>As shown above, each Self-Named Filter class must be listed in the <literal>plugin.selfnamed.org.dspace.app.mediafilter.FormatFilter</literal> item in <literal>dspace.cfg</literal>. In addition, each Self-Named Filter <emphasis role="bold">must</emphasis> define the input formats for <emphasis>each named plugin</emphasis> defined by that filter. In the above example the <literal>MyComplexMediaFilter</literal> class is assumed to have defined two named plugins, <literal
-						>Word2PDF</literal> and <literal>Excel2CSV</literal>. So, these two valid plugin names (&quot;Word2PDF&quot; and &quot;Excel2CSV&quot;) <emphasis role="bold">must</emphasis> be returned by the <literal>getPluginNames()</literal> method of the <literal>MyComplexMediaFilter</literal> class.</para>
+				<para>As shown above, each Self-Named Filter class must be listed in the <literal>plugin.selfnamed.org.dspace.app.mediafilter.FormatFilter</literal> item in <literal>dspace.cfg</literal>. In addition, each Self-Named Filter <emphasis role="bold"
+						>must</emphasis> define the input formats for <emphasis>each named plugin</emphasis> defined by that filter. In the above example the <literal>MyComplexMediaFilter</literal> class is assumed to have defined two named plugins, <literal>Word2PDF</literal> and <literal>Excel2CSV</literal>. So, these two valid plugin names (&quot;Word2PDF&quot; and &quot;Excel2CSV&quot;) <emphasis role="bold"
+						>must</emphasis> be returned by the <literal>getPluginNames()</literal> method of the <literal>MyComplexMediaFilter</literal> class.</para>
 				<para>These named plugins take different input formats as defined above (see the corresponding <literal>inputFormats</literal> setting). <emphasis>WARNING: If you neglect to define the <literal>inputFormats</literal> for a particular named plugin, the <literal>MediaFilterManager</literal> will never call that plugin, since it will never find a bitstream which has a format matching that plugin&apos;s input format(s).</emphasis></para>
 				<para>For a particular Self-Named Filter, you are also welcome to define additional configuration settings in <literal>dspace.cfg</literal>. To continue with our current example, each of our imaginary plugins actually results in a different output format (Word2PDF creates &quot;Adobe PDF&quot;, while Excel2CSV creates &quot;Comma Separated Values&quot;). To allow this complex Media Filter to be even more configurable (especially across institutions, with potential different &quot;Bitstream Format Registries&quot;), you may wish to allow for the output format to be customizable for each named plugin. For example:</para>
 				<screen>
@@ -6041,7 +6302,11 @@ ServerName dspace.myu.edu
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Properties:</entry>
 							<entry><literal>sword.mets-ingester.package-ingester</literal></entry>
@@ -6418,7 +6683,8 @@ plugin.named.org.dspace.sword.SWORDIngester = \
 							<entry align="right">Informational Note:</entry>
 							<entry>A comma separated list of MIME types that SWORD will accept.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -6428,7 +6694,11 @@ plugin.named.org.dspace.sword.SWORDIngester = \
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>websvc.opensearch.enable</literal></entry>
@@ -6628,7 +6898,8 @@ plugin.named.org.dspace.sword.SWORDIngester = \
 							<entry align="right">Informational Note:</entry>
 							<entry>Result formats offered. Use one or more comma-separated from the list: html, atom, rss. Please note that html is requred for autodiscovery in browsers to function, and must be the first in the list if present.</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
 		</section>
 		<section remap="h3">
@@ -6637,7 +6908,11 @@ plugin.named.org.dspace.sword.SWORDIngester = \
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
-				<tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+				<tgroup cols="2">
+					<colspec colname="c1" colwidth="30*" colsep="1"/>
+					<colspec colname="c2" colwidth="70*"/>
+					<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
 							<entry><literal>embargo.field.terms</literal></entry>
@@ -6665,7 +6940,7 @@ plugin.named.org.dspace.sword.SWORDIngester = \
 						</row>
 						<row>
 							<entry align="right">Informational Note:</entry>
-							<entry>DC metadata field to hold computed &quot;lift date&quot; of embargo</entry>
+							<entry>DC metadata field to hold computed &quot;lift date&quot; of embargo.  You may need to create a DC metadata field in your Metadata Format Registry if it does not already exist.</entry>
 						</row>
 						<row>
 							<?dbfo row-height="5mm"?>
@@ -6695,7 +6970,7 @@ plugin.named.org.dspace.sword.SWORDIngester = \
 						</row>
 						<row>
 							<entry align="right">Example Value:</entry>
-							<entry><literal>plugin.single.org.dspace.embargo.EmbargoSetter = CLASSNAME</literal></entry>
+							<entry><literal>plugin.single.org.dspace.embargo.EmbargoSetter = org.dspace.embargo.DefaultEmbargoSetter </literal></entry>
 						</row>
 						<row>
 							<entry align="right">Informational Note:</entry>
@@ -6707,15 +6982,16 @@ plugin.named.org.dspace.sword.SWORDIngester = \
 						</row>
 						<row>
 							<entry align="right">Example Value:</entry>
-							<entry><literal>plugin.single.org.dspace.embargo.EmbargoLifter = org.dspace.embargo.DefaultEm</literal></entry>
+							<entry><literal>plugin.single.org.dspace.embargo.EmbargoLifter = org.dspace.embargo.DefaultEmbargoLifter</literal></entry>
 						</row>
 						<row>
 							<entry align="right">Informational Note:</entry>
 							<entry>Implementation of embargo lifter plugin</entry>
 						</row>
-					</tbody></tgroup>
+					</tbody>
+				</tgroup>
 			</informaltable>
-			<para>Remember that you need to replace <literal>SCHEMA.ELEMENT.QUALIFIER</literal> with a real metadata field. Additionally, you need to replace the <literal>CLASSNAME</literal> with a properly impleented plugin.</para>
+			<para>Remember that you need to replace <literal>SCHEMA.ELEMENT.QUALIFIER</literal> with a real metadata field. Additionally, you need to replace the <literal>CLASSNAME</literal> with a properly implemented plugin.</para>
 		</section>
 		<!-- This is to close the 5.3 section (below) -->
 	</section>
