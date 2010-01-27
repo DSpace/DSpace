@@ -847,7 +847,24 @@ ant help
 	</section>
 	<section remap="h2">
 		<title><anchor id="docbook-install.html-checking" xreflabel="Checking Your Installation"/>Checking Your Installation</title>
-		<para>TODO</para>
+		<para>The administrator needs to check the installation to make sure all components are working.  Here is list of checks to be performed.  In brackets after each item, it the associated component or components that might be the issue needing resolution.</para>
+		<itemizedlist>
+			<listitem>
+				<para>System is up and running.</para>
+				<para><emphasis>User can see the DSpace home page. [Tomcat/Jetty, firewall, IP assignment, DNS]</emphasis></para>
+			</listitem>
+				
+			<listitem>
+				<para>Database is running and working correctly.</para>
+				<para><emphasis>Attempt to create a user, community or collection [PostgreSQL, Oracle]</emphasis></para>
+			</listitem>
+			<listitem>
+				<para>Email subsystem is running.</para>
+				<para>The user can issue the following command to test the email system.  t attempts to send a test email to the email address that is set in dspace.cfg (mail.admin). If it fails, you will get messages informing you as to why, will refer you to the DSpace documentation.</para>
+				<para><literal>[dspace]/bin/test-email</literal></para>
+			</listitem>
+		</itemizedlist>
+		
 	</section>
 	<section remap="h2">
 		<title><anchor id="docbook-install.html-knownbugs" xreflabel="Known Bugs"/>Known Bugs</title>
