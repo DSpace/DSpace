@@ -62,14 +62,20 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 			<itemizedlist>
 				<listitem>
 					<para>
-						<emphasis role="bold">PostgreSQL 7.3 or greater</emphasis>
+						<emphasis role="bold">PostgreSQL 7.3 or 7.4</emphasis>
 					</para>
 					<para>PostgreSQL can be downloaded from the following location: <ulink url="http://www.postgresql.org/">http://www.postgresql.org/ </ulink> Its highly recommended that you try to work with Postgres 8.x or greater, however, 7.3 or greater should still work. Unicode (specifically UTF-8) support must be enabled. This is enabled by default in 8.0+. For 7.<emphasis>x</emphasis>, be sure to compile with the following options to the &apos;<literal
 						>configure</literal>&apos; script:</para>
 					<para><literal>--enable-multibyte --enable-unicode --with-java</literal></para>
 					<para>Once installed, you need to enable TCP/IP connections (DSpace uses JDBC). For 7.<emphasis>x</emphasis>, edit <literal>postgresql.conf</literal> (usually in <literal>/usr/local/pgsql/data</literal> or <literal>/var/lib/pgsql/data</literal>), and add this line:</para>
 					<para><literal>tcpip_socket = true</literal></para>
-					<para>For 8.0+, in <literal>postgresql.conf</literal> uncomment the line starting:</para>
+					<para>Then tighten up security a bit by editing <literal>pg_hba.conf</literal> and adding this line:</para>
+					<para><literal>host dspace dspace 127.0.0.1 255.255.255.255 md5</literal></para>
+					<para>Then restart PostgreSQL.</para>
+				</listitem>
+				<listitem>
+					<para><emphasis role="bold">For 8.0 or later</emphasis></para>
+					<para>Editing <literal>postgresql.conf</literal> uncomment the line starting:</para>
 					<para><literal>listen_addresses = &apos;localhost&apos;</literal></para>
 					<para>Then tighten up security a bit by editing <literal>pg_hba.conf</literal> and adding this line:</para>
 					<para><literal>host dspace dspace 127.0.0.1 255.255.255.255 md5</literal></para>
@@ -292,7 +298,7 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 							<para>Edit the <literal>[dspace-source]/dspace/config/dspace.cfg</literal> database settings:</para>
 							<screen>
 db.name   = oracle
-db.url    = jdbc.oracle.thin:@//host:port/dspace
+db.url    = jdbc:oracle:thin:@//host:port/dspace
 db.driver = oracle.jdbc.OracleDriver
 							</screen>
 						</listitem>
