@@ -25,16 +25,16 @@
         <title>DSpace Manual</title>
         <subtitle>Release 1.6 RC1</subtitle>
         <author>
-            <surname>The DSpace Foundation</surname>
+            <surname>The DuraSpace Foundation</surname>
             <affiliation>
                 <address><email>webmaster@dspace.org</email></address>
             </affiliation>
         </author> <edition>1.6 RC1</edition>
-        <pubdate>2009-12-08 16:02:00 EST</pubdate>
+        <pubdate>2010-01-19  15:07:45 EST</pubdate>
         <copyright>
-            <year>2002-2009</year>
+            <year>2002-2010</year>
             <holder>
-                <ulink url="http://www.dspace.org/">The DSpace Foundation</ulink>
+                <ulink url="http://www.duraspace.org/">The DuraSpace Foundation</ulink>
             </holder>
         </copyright>
         <legalnotice>
@@ -52,7 +52,7 @@
         <revhistory>
             <revision>
                 <revnumber>Version 1.6 RC1 </revnumber>
-                <date>This text generated: 2009-12-08 16:02:00 EST</date>
+                <date>This text generated: 2010-01-19  15:07:45 EST</date>
                 <authorinitials>JAT</authorinitials>
                 
             </revision>
