@@ -692,7 +692,7 @@ Common usage:
     <!-- Do a fresh system install                                     -->
     <!-- ============================================================= -->
 
-    <target name="fresh_install" depends="test_database,init_installation,init_configs,setup_database,load_registries" description="Do a fresh install of the system, overwriting any data">
+    <target name="fresh_install" depends="init_installation,init_configs,test_database,setup_database,load_registries" description="Do a fresh install of the system, overwriting any data">
 
         <delete failonerror="no">
             <fileset dir="${dspace.dir}/bin" includes="**/*" />
