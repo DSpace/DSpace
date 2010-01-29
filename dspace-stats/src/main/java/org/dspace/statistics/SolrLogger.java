@@ -678,8 +678,9 @@ public class SolrLogger
         if (max != -1)
             solrQuery.setFacetLimit(max);
 
-        // We gebruiken filter aangezien dit performanter is dan dit gewoon aan
-        // de query toe te voegen
+        // A filter is used instead of a regular query to improve
+        // performance and ensure the search result ordering will
+        // not be influenced 
         solrQuery.addFilterQuery(getIgnoreSpiders());
         if (filterQuery != null)
             solrQuery.addFilterQuery(filterQuery);
