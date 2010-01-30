@@ -46,14 +46,10 @@ import java.util.Map;
 import java.util.HashMap;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
-import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.cocoon.DSpaceFeedGenerator;
-import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
@@ -74,14 +70,10 @@ import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
-import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.LogManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -132,7 +124,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
     private static final Message T_head_recent_submissions =
         message("xmlui.ArtifactBrowser.CommunityViewer.head_recent_submissions");
     
-    /** How many recient submissions to list */
+    /** How many recent submissions to list */
     private static final int RECENT_SUBMISISONS = 5;
 
     /** The cache of recently submitted items */
@@ -201,7 +193,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	            }
 	
 	            // Recently submitted items
-	            for (BrowseItem item : getRecientlySubmittedIems(community))
+	            for (BrowseItem item : getRecentlySubmittedIems(community))
 	            {
 	                validity.add(item);
 	            }
@@ -374,9 +366,9 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             }
         }// main refrence
 
-        // Reciently submitted items
+        // Recently submitted items
         {
-            java.util.List<BrowseItem> items = getRecientlySubmittedIems(community);
+            java.util.List<BrowseItem> items = getRecentlySubmittedIems(community);
 
             Division lastSubmittedDiv = home
                     .addDivision("community-recent-submission","secondary recent-submission");
@@ -395,9 +387,10 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
      * Get the recently submitted items for the given community.
      * 
      * @param community The community.
+     * @return List of recently submitted items
      */
     @SuppressWarnings("unchecked") 
-    private java.util.List<BrowseItem> getRecientlySubmittedIems(Community community)
+    private java.util.List<BrowseItem> getRecentlySubmittedIems(Community community)
             throws SQLException
     {
         if (recentSubmittedItems != null)
@@ -446,7 +439,6 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         this.validity = null;
         super.recycle();
     }
-    
-    
-    
+
+
 }
