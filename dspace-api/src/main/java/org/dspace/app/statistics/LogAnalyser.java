@@ -421,12 +421,12 @@ public class LogAnalyser
                     {
                         // first find out if we are constraining by date and 
                         // if so apply the restrictions
-                        if (!logLine.afterDate(startDate))
+                        if ((startDate != null) && (!logLine.afterDate(startDate)))
                         {
                             continue;
                         }
                         
-                        if (!logLine.beforeDate(endDate))
+                        if ((endDate !=null) && (!logLine.beforeDate(endDate)))
                         {
                             break;
                         }
