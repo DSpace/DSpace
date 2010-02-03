@@ -690,4 +690,115 @@ Export"/>Import and Export</title>
 			<anchor id="docbook-functional.html-usage" xreflabel="Usage Instrumentation"/>Usage Instrumentation</title>
 		<para>DSpace can report usage events, such as bitstream downloads, to a pluggable event processor. This can be used for developing customized usage statistics, for example. Sample event processor plugins writes event records to a file as tab-separated values or XML.</para>
 	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-functional.html-authority" xreflabel="Choice Management and Authority Control"/>Choice Management and Authority Control</title>
+		<para>This is a configurable framework that lets you define plug-in classes to control the choice of values for a given DSpace metadata fields. It also lets you configure fields to include &quot;authority&quot; values along with the textual metadata value. The chocie-control system includes a user interface in both the Configurable Submission UI and the Admin UI (edit Item pages) that assists the user in choosing metadata values.</para>
+		<section remap="h3">
+			<title><anchor id="docbook-functional.html-authority-intro" xreflabel="Introduction and Motivation"/>Introduction and Motivation</title>
+			<section remap="h4">
+				<title>Definitions</title>
+				<para><emphasis role="bold">Choice Management</emphasis></para>
+				<para>This is a mechanism that generates a list of choices for a value to be entered in a given metadata field. Depending on your implementation, the exact choice list might be determined by a proposed value or query, or it could be a fixed list that is the same for every query. It may also be closed (limited to choices produced internally) or open, allowing the user-supplied query to be included as a choice.</para>
+				<para><emphasis role="bold">Authority Control</emphasis></para>
+				<para>This works in addition to choice management to supply an authority key along with the chosen value, which is also assigned to the Item's metadata field entry. Any authority-controlled field is also inherently choice-controlled.</para>
+			</section>
+			<section remap="h4">
+				<title>About Authority Control</title>
+				<para>The advantages we seek from an authority controlled metadata field are:</para>
+				<orderedlist>
+					<listitem>
+						<para><emphasis role="bold">There is a simple and positive way to test whether two values are identical</emphasis>, by comparing authority keys.</para>
+						<itemizedlist>
+							<listitem>
+								<para>Comparing plain text values can give false positive results e.g. when two different people have a name that is written the same.</para>
+							</listitem>
+							<listitem>
+								<para>It can also give false negative results when the same name is written different ways, e.g. "J. Smith" vs. "John Smith".</para>
+							</listitem>
+						</itemizedlist>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">Help in entering correct metadata values.</emphasis> The submission and admin UIs may call on the authority to check a proposed value and list possible matches to help the user select one.</para>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">Improved interoperability.</emphasis> By sharing a name authority with another application, your DSpace can interoperate more cleanly with other applications.</para>
+						<itemizedlist>
+							<listitem>
+								<para>For example, a DSpace institutional repository sharing a naming authority with the campus social network would let the social network construct a list of all DSpace Items matching the shared author identifier, rather than by error-prone name matching.</para>
+							</listitem>
+							<listitem>
+								<para>When the name authority is shared with a campus directory, DSpace can look up the email address of an author to send automatic email about works of theirs submitted by a third party. That author does not have to be an EPerson.</para>
+							</listitem>
+						</itemizedlist>
+					</listitem>
+					<listitem>
+						<para>Authority keys are normally invisible in the public web UIs. They are only seen by administrators editing metadata. The value of an authority key is not expected to be meaningful to an end-user or site visitor.</para>
+					</listitem>
+				</orderedlist>
+				<para>Authority control is different from the controlled vocabulary of keywords already implemented in the submission UI:</para>
+				<orderedlist>
+					<listitem>
+						<para><emphasis role="bold">Authorities are external to DSpace.</emphasis> The source of authority control is typically an external database or network resource.</para>
+						<itemizedlist>
+							<listitem>
+								<para>Plug-in architecture makes it easy to integrate new authorities without modifying any core code.</para>
+							</listitem>
+						</itemizedlist>
+					</listitem>
+					<listitem>
+						<para>This authority proposal impacts all phases of metadata management.</para>
+						<itemizedlist>
+							<listitem>
+								<para>The keyword vocabularies are only for the submission UI.</para>
+							</listitem>
+							<listitem>
+								<para>Authority control is asserted everywhere metadata values are changed, including unattended/batch submission, LNI and SWORD package submission, and the administrative UI.</para>
+							</listitem>
+						</itemizedlist>
+					</listitem>
+				</orderedlist>
+			</section>
+			<section remap="h4">
+				<title>Some Terminology</title>
+				<informaltable frame="none">
+					<?dbhtml table-width="100%"?>
+					<?dbfo table-width="100%"?>
+					<tgroup cols="2">
+						<colspec colname="c1" colwidth="30*" colsep="1"/>
+						<colspec colname="c2" colwidth="70*"/>
+						<tbody>
+							<row>
+								<entry>
+									<para><emphasis role="bold">Authority</emphasis></para>
+								</entry>
+								<entry>
+									<para>An authority is a source of fixed values for a given domain, each unique value identified by a key.</para>
+								</entry>
+							</row>
+							<row>
+								<entry>.</entry>
+								<entry>
+									<para>For example, the OCLC LC Name Authority Service.</para>
+								</entry>
+							</row>
+							<row>
+								<entry>
+									<para><emphasis role="bold">Authority Record</emphasis></para>
+								</entry>
+								<entry>The information associated with one of the values in an authority; may include alternate spellings and equivalent forms of the value, etc.</entry>
+							</row>
+							<row>
+								<entry>
+									<para><emphasis role="bold">Authority Key</emphasis></para>
+								</entry>
+								<entry>
+									<para>An opaque, hopefully persistent, identifier corresponding to exactly one record in the authority.</para>
+								</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</informaltable>
+			</section>
+		</section>
+	</section>
 </chapter>
