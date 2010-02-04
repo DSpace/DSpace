@@ -188,7 +188,7 @@ public class MetadataImport
                     ArrayList<String> collections = line.get("collection");
                     if (collections == null)
                     {
-                        throw new MetadataImportException("New items must have a 'collection' assiged in the form of a handle");
+                        throw new MetadataImportException("New items must have a 'collection' assigned in the form of a handle");
                     }
                     
                     // Check collections are really collections
@@ -210,7 +210,7 @@ public class MetadataImport
                             // Check for duplicate
                             if (check.contains(collection))
                             {
-                                throw new MetadataImportException("Duplicate collection assignement detected in new item! " + handle);
+                                throw new MetadataImportException("Duplicate collection assignment detected in new item! " + handle);
                             }
                             else
                             {
