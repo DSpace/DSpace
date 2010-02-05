@@ -152,8 +152,14 @@ public class EPerson extends DSpaceObject
     public static EPerson findByEmail(Context context, String email)
             throws SQLException, AuthorizeException
     {
+        if (email == null)
+        {
+            return null;
+        }
+        
+        // All email addresses are stored as lowercase, so ensure that the email address is lowercased for the lookup 
         TableRow row = DatabaseManager.findByUnique(context, "eperson",
-                "email", email);
+                "email", email.toLowerCase());
 
         if (row == null)
         {
