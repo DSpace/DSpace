@@ -301,4 +301,12 @@
         </step>
     </command>
 
+    <command>
+        <name>update-spider-ips</name>
+        <description>Update the list of known search engine IP addresses</description>
+        <step>
+            <class>org.dspace.statistics.util.DownloadSpiderIPs</class>
+        </step>
+    </command>
+
 </commands>

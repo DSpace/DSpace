@@ -10,18 +10,8 @@
  */
 package org.dspace.statistics;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-
+import com.maxmind.geoip.Location;
+import com.maxmind.geoip.LookupService;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -33,21 +23,20 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.MapSolrParams;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DCValue;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.util.DnsLookup;
 import org.dspace.statistics.util.LocationUtils;
 import org.dspace.statistics.util.SpiderDetector;
 
-import com.maxmind.geoip.Location;
-import com.maxmind.geoip.LookupService;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Static SolrLogger used to hold HttpSolrClient connection pool to issue
@@ -55,6 +44,7 @@ import com.maxmind.geoip.LookupService;
  * 
  * @author ben at atmire.com
  * @author kevinvandevelde at atmire.com
+ * @author mdiggory at atmire.com
  */
 public class SolrLogger
 {
@@ -69,8 +59,6 @@ public class SolrLogger
 
     private static final LookupService locationService;
 
-    private static final Vector<String> spiderIps;
-
     private static final boolean useProxies;
 
     private static Map metadataStorageInfo;
@@ -80,7 +68,6 @@ public class SolrLogger
     	log.info("solr.spidersfile:" + ConfigurationManager.getProperty("solr.spidersfile"));
 		log.info("solr.log.server:" + ConfigurationManager.getProperty("solr.log.server"));
 		log.info("solr.dbfile:" + ConfigurationManager.getProperty("solr.dbfile"));
-		log.info("spiders file:" + ConfigurationManager.getProperty("solr.spidersfile"));
     	
         CommonsHttpSolrServer server = null;
         
@@ -99,18 +86,7 @@ public class SolrLogger
         solr = server;
 
         // Read in the file so we don't have to do it all the time
-        Vector<String> spiderIpsLoc;
-        String filePath = ConfigurationManager.getProperty("solr.spidersfile");
-        try
-        {
-            spiderIpsLoc = SpiderDetector.readIpAddresses(new File(filePath));
-        }
-        catch (Exception e)
-        {
-            spiderIpsLoc = new Vector<String>();
-            e.printStackTrace(); // Should never happen
-        }
-        spiderIps = spiderIpsLoc;
+        //spiderIps = SpiderDetector.getSpiderIpAddresses();
 
         LookupService service = null;
         // Get the db file for the location
@@ -154,16 +130,47 @@ public class SolrLogger
         }
     }
 
-    public static void post(DSpaceObject dspaceObject, String ip,
+    public static void post(DSpaceObject dspaceObject, HttpServletRequest request,
             EPerson currentUser)
     {
         if (solr == null || locationService == null)
             return;
+
+        boolean isSpiderBot = SpiderDetector.isSpider(request);
+
         try
         {
+            if(isSpiderBot &&
+                    !ConfigurationManager.getBooleanProperty("solr.statistics.logBots",true))
+            {
+                return;
+            }
+
+
+                        
             SolrInputDocument doc1 = new SolrInputDocument();
             // Save our basic info that we already have
+
+            String ip = request.getRemoteAddr();
+
+	        if(isUseProxies() && request.getHeader("X-Forwarded-For") != null)
+            {
+                /* This header is a comma delimited list */
+	            for(String xfip : request.getHeader("X-Forwarded-For").split(","))
+                {
+                    /* proxy itself will sometime populate this header with the same value in
+                        remote address. ordering in spec is vague, we'll just take the last
+                        not equal to the proxy
+                    */
+                    if(!request.getHeader("X-Forwarded-For").contains(ip))
+                    {
+                        ip = xfip.trim();
+                    }
+                }
+	        }
+
             doc1.addField("ip", ip);
+                        
             doc1.addField("id", dspaceObject.getID());
             doc1.addField("type", dspaceObject.getType());
             // Save the current time
@@ -203,7 +210,12 @@ public class SolrLogger
                 doc1.addField("city", location.city);
                 doc1.addField("latitude", location.latitude);
                 doc1.addField("longitude", location.longitude);
+                doc1.addField("isBot",isSpiderBot);
+
+                if(request.getHeader("User-Agent") != null)
+                    doc1.addField("userAgent", request.getHeader("User-Agent"));
             }
+            
             if (dspaceObject instanceof Item)
             {
                 Item item = (Item) dspaceObject;
@@ -225,6 +237,7 @@ public class SolrLogger
                     }
                 }
             }
+
 
             storeParents(doc1, dspaceObject);
 
@@ -355,6 +368,136 @@ public class SolrLogger
         return currentValsStored;
     }
 
+
+    public static class ResultProcessor
+    {
+
+        public void execute(String query) throws SolrServerException, IOException {
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("q", query);
+            params.put("rows", "10");
+            MapSolrParams solrParams = new MapSolrParams(params);
+            QueryResponse response = solr.query(solrParams);
+            
+            long numbFound = response.getResults().getNumFound();
+
+            // process the first batch
+            process(response.getResults());
+
+            // Run over the rest
+            for (int i = 10; i < numbFound; i += 10)
+            {
+                params.put("start", String.valueOf(i));
+                solrParams = new MapSolrParams(params);
+                response = solr.query(solrParams);
+                process(response.getResults());
+            }
+
+        }
+
+        public void commit() throws IOException, SolrServerException {
+            solr.commit();
+        }
+
+        /**
+         * Override to manage pages of documents
+         * @param docs
+         */
+        public void process(List<SolrDocument> docs) throws IOException, SolrServerException {
+            for(SolrDocument doc : docs){
+                process(doc);
+            }
+        }
+
+        /**
+         * Overide to manage individual documents
+         * @param doc
+         */
+        public void process(SolrDocument doc) throws IOException, SolrServerException {
+
+
+        }
+    }
+
+
+    public static void markRobotsByIP()
+    {
+        for(String ip : SpiderDetector.getSpiderIpAddresses()){
+
+            try {
+
+                /* Result Process to alter record to be identified as a bot */
+                ResultProcessor processor = new ResultProcessor(){
+                    public void process(SolrDocument doc) throws IOException, SolrServerException {
+                        doc.removeFields("isBot");
+                        doc.addField("isBot", true);
+                        SolrInputDocument newInput = ClientUtils.toSolrInputDocument(doc);
+                        solr.add(newInput);
+                    }
+                };
+
+                /* query for ip, exclude results previously set as bots. */
+                processor.execute("ip:"+ip+ "* AND NOT isBot:true");
+
+                solr.commit();
+
+            } catch (Exception e) {
+                log.error(e.getMessage(),e);
+            }
+
+
+        }
+
+    }
+
+    public static void markRobotByUserAgent(String agent){
+        try {
+
+                /* Result Process to alter record to be identified as a bot */
+                ResultProcessor processor = new ResultProcessor(){
+                    public void process(SolrDocument doc) throws IOException, SolrServerException {
+                        doc.removeFields("isBot");
+                        doc.addField("isBot", true);
+                        SolrInputDocument newInput = ClientUtils.toSolrInputDocument(doc);
+                        solr.add(newInput);
+                    }
+                };
+
+                /* query for ip, exclude results previously set as bots. */
+                processor.execute("userAgent:"+agent+ " AND NOT isBot:true");
+
+                solr.commit();
+            } catch (Exception e) {
+                log.error(e.getMessage(),e);
+            }
+    }
+
+    public static void deleteRobotsByIsBotFlag()
+    {
+        try {
+           solr.deleteByQuery("isBot:true");
+        } catch (Exception e) {
+           log.error(e.getMessage(),e);
+        }
+    }
+
+    public static void deleteIP(String ip)
+    {
+        try {
+            solr.deleteByQuery("ip:"+ip + "*");
+        } catch (Exception e) {
+            log.error(e.getMessage(),e);
+        }
+    }
+
+
+    public static void deleteRobotsByIP()
+    {
+        for(String ip : SpiderDetector.getSpiderIpAddresses()){
+            deleteIP(ip);
+        }
+    }
+
     /*
      * //TODO: below are not used public static void
      * update(String query, boolean addField, String fieldName, Object
@@ -372,25 +515,18 @@ public class SolrLogger
         // We need to get our documents
         // QueryResponse queryResponse = solr.query()//query(query, null, -1,
         // null, null, null);
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("q", query);
-        params.put("rows", "10");
-        MapSolrParams solrParams = new MapSolrParams(params);
-        QueryResponse response = solr.query(solrParams);
 
-        long numbFound = response.getResults().getNumFound();
-        List<SolrDocument> docsToUpdate = new ArrayList<SolrDocument>();
-        docsToUpdate.addAll(response.getResults());
+        final List<SolrDocument> docsToUpdate = new ArrayList<SolrDocument>();
 
-        // Run over the rest
-        for (int i = 10; i < numbFound; i += 10)
-        {
-            params.put("start", String.valueOf(i));
-            solrParams = new MapSolrParams(params);
-            response = solr.query(solrParams);
-            docsToUpdate.addAll(response.getResults());
-        }
-        // We have all the docs delete the once we don't need
+        ResultProcessor processor = new ResultProcessor(){
+                public void process(List<SolrDocument> docs) throws IOException, SolrServerException {
+                    docsToUpdate.addAll(docs);
+                }
+            };
+
+        processor.execute(query);
+
+        // We have all the docs delete the ones we don't need
         solr.deleteByQuery(query);
 
         // Add the new (updated onces
@@ -680,8 +816,17 @@ public class SolrLogger
 
         // A filter is used instead of a regular query to improve
         // performance and ensure the search result ordering will
-        // not be influenced 
-        solrQuery.addFilterQuery(getIgnoreSpiders());
+        // not be influenced
+
+        // Choose to filter by the Legacy spider IP list (may get too long to properly filter all IP's
+        if(ConfigurationManager.getBooleanProperty("solr.statistics.query.filter.spiderIp",false))
+            solrQuery.addFilterQuery(getIgnoreSpiderIPs());
+
+        // Choose to filter by isBot field, may be overriden in future
+        // to allow views on stats based on bots.
+        if(ConfigurationManager.getBooleanProperty("solr.statistics.query.filter.isBot",true))
+            solrQuery.addFilterQuery("-isBot:true");
+
         if (filterQuery != null)
             solrQuery.addFilterQuery(filterQuery);
 
@@ -699,20 +844,32 @@ public class SolrLogger
         return response;
     }
 
+
+    /** String of IP and Ranges in IPTable as a Solr Query */
+    private static String filterQuery = null;
+
     /**
-     * Returns in a query string all the ip addresses that should be ignored
-     * 
+     * Returns in a filterQuery string all the ip addresses that should be ignored
+     *
      * @return a string query with ip addresses
      */
-    private static String getIgnoreSpiders()
-    {
-        String query = "";
-        for (int i = 0; i < spiderIps.size(); i++)
-        {
-            String ip = spiderIps.elementAt(i);
+    public static String getIgnoreSpiderIPs() {
+        if (filterQuery == null) {
+            String query = "";
+            boolean first = true;
+            for (String ip : SpiderDetector.getSpiderIpAddresses()) {
+                if (first) {
+                    query += " AND ";
+                    first = false;
+                }
 
-            query += (i != 0 ? " AND " : "") + "NOT(ip: " + ip + ")";
+                query += " NOT(ip: " + ip + ")";
+            }
+            filterQuery = query;
         }
-        return query;
+
+        return filterQuery;
+
     }
+    
 }

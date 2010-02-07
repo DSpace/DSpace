@@ -13,6 +13,7 @@ package org.dspace.statistics;
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.model.Event;
+import org.dspace.statistics.util.SpiderDetector;
 import org.dspace.usage.AbstractUsageEventListener;
 import org.dspace.usage.UsageEvent;
 
@@ -33,21 +34,12 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
 		{
 			try{
 			
-			UsageEvent ue = (UsageEvent)event;
+			    UsageEvent ue = (UsageEvent)event;
 			
-			String ip = null;
-			
-	        if(SolrLogger.isUseProxies())
-	            ip = ue.getRequest().getHeader("X-Forwarded-For");
-	        
-	        if(ip == null || ip.equals(""))
-	            ip = ue.getRequest().getRemoteAddr();
+			    EPerson currentUser = ue.getContext() == null ? null : ue.getContext().getCurrentUser();
 
-	        EPerson currentUser = ue.getContext() == null ? null : ue.getContext().getCurrentUser();
+                SolrLogger.post(ue.getObject(), ue.getRequest(), currentUser);
 
-	        SolrLogger.post(ue.getObject(), ip, currentUser);
-			
-	    	
 			}
 			catch(Exception e)
 			{

@@ -289,7 +289,10 @@
    <field name="owningComm" type="integer" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="owningColl" type="integer" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="owningItem" type="integer" indexed="true" stored="true" required="false" multiValued="true" /> 
-  <field name="dns" type="string" indexed="true" stored="true" required="false"/>
+   <field name="dns" type="string" indexed="true" stored="true" required="false"/>
+   <field name="userAgent" type="string" indexed="true" stored="true" required="false"/>
+   <field name="isBot" type="boolean" indexed="true" stored="true" required="false"/>
+
  </fields>
 
 
