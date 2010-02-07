@@ -346,14 +346,23 @@ public class Util {
      * @return string containing version, e.g. "1.5.2"; ends in "-SNAPSHOT" for development versions.
      */
     public static String getSourceVersion()
-        throws IOException
     {
         if (sourceVersion == null)
         {
-            InputStream cis = Util.class.getResourceAsStream
-                ("/META-INF/maven/org.dspace/dspace-api/pom.properties");
             Properties constants = new Properties();
-            constants.load(cis);
+
+            try
+            {
+                InputStream cis = Util.class.getResourceAsStream
+                    ("/META-INF/maven/org.dspace/dspace-api/pom.properties");
+
+                constants.load(cis);
+            }
+            catch(Exception e)
+            {
+                log.error(e.getMessage(),e);
+            }
+
             sourceVersion = constants.getProperty("version", "none");
         }
         return sourceVersion;
