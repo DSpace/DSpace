@@ -310,8 +310,10 @@ Manakin)"/>Contents of XMLUI Web Application (aka Manakin)</title>
     <section remap="h2">
       <title><anchor id="docbook-directories.html-logfiles" xreflabel="Log Files"/>Log Files</title>
       <para>The first source of potential confusion is the log files. Since DSpace uses a number of third-party tools, problems can occur in a variety of places. Below is a table listing the main log files used in a typical DSpace setup. The locations given are defaults, and might be different for your system depending on where you installed DSpace and the third-party tools. The ordering of the list is roughly the recommended order for searching them for the details about a particular problem or error.</para>
-      <table frame="none">
+      <table frame="all">
         <title>DSpace Log File Locations</title>
+      	<?dbhtml table-width="100%"?>
+		<?dbfo table-width="100%"?>
         <tgroup cols="2">
           <colspec colname="c1" colwidth="50*"/>
           <colspec colname="c2" colwidth="50*"/>
@@ -335,7 +337,7 @@ Manakin)"/>Contents of XMLUI Web Application (aka Manakin)</title>
                 </para>
               </entry>
               <entry>
-                <para>Main DSpace log file. This is where the DSpace code writes a simple log of events and errors that occur within the DSpace code. You can control the verbosity of this by editing the <literal>[dspace-source]/config/templates/log4j.properties</literal> file and then running &quot;ant init_configs&quot;.</para>
+                <para>Main DSpace log file. This is where the DSpace code writes a simple log of events and errors that occur within the DSpace code. You can control the verbosity of this by editing the <literal>[dspace-source]/config/templates/log4j.properties</literal> file and then running &quot;<literal>ant init_configs</literal>&quot;.</para>
               </entry>
             </row>
             <row>
@@ -410,7 +412,7 @@ Manakin)"/>Contents of XMLUI Web Application (aka Manakin)</title>
             </row>
             <row>
               <entry>
-                <para>PostgreSQL log</para>
+                <para><literal>PostgreSQL log</literal></para>
               </entry>
               <entry>
                 <para>PostgreSQL also writes a log file. This one doesn&apos;t seem to have a default location, you probably had to specify it yourself at some point during installation. In general, this log file rarely contains pertinent information--PostgreSQL is pretty stable, you&apos;re more likely to encounter problems with connecting via JDBC, and these problems will be logged in <literal>dspace.log</literal>.</para>
@@ -419,5 +421,41 @@ Manakin)"/>Contents of XMLUI Web Application (aka Manakin)</title>
           </tbody>
         </tgroup>
       </table>
+    	<section remap="h3">
+    	<title>log4j.properties File.</title>
+    		<para>the file <literal>[dspace]/config/log4j.properties</literal> controls how and where log files are created.  There are three sets of configurations in that file, called A1, A2, and A3.  These are used to control the logs for DSpace, the checksum checker, and the XMLUI respectively.   The important settings in this file are:</para>
+    		<table>
+    		<?dbhtml table-width="100%"?>
+			<?dbfo table-width="100%"?>	
+    			<title>log4j.properties Table</title>
+    			<tgroup cols="2">
+		          <colspec colname="c1" colwidth="50*"/>
+		          <colspec colname="c2" colwidth="50*"/>
+		          <tbody>
+		            <row>
+		              <entry><screen>log4j.rootCategory=INFO,A
+log4j.logger.org.dspace=INFO,A1</screen></entry>
+		            	<entry>These lines control what level of logging takes place.  Normally they should be set to INFO, but if you need to see more information in the logs, set them to dEBUG and restart your web server</entry>
+		            </row>
+		          	<row>
+		          		<entry><literal>log4j.appender.A1=org.dspace.app.util.DailyFileAppender</literal></entry>
+		          		<entry>This is the name of the log file creation method used.  The DailyFileAppender creates a new date-stamped file every day or month.</entry>
+		          	</row>
+		    		<row>
+		    			<entry><literal>log4j.appender.A1.File=${log.dir}/dspace.log</literal></entry>
+		    			<entry>This sets the filename and location of where the log file will be stored.  It iwll have a date stamp appended to the file name.</entry>
+		    		</row>
+		          	<row>
+		          		<entry><literal>log4j.appender.A1.DatePattern=yyy-MM-DD</literal></entry>
+		          		<entry>This defines the format for the date stamp that is appended to the log file names.  If you wish to have log files created monthyl instead of daily, change this to <literal>yyyy-MM</literal></entry>
+		          	</row>
+		          	<row>
+		          		<entry><literal>log4j.appender.A1.MaxLogs=0</literal></entry>
+		          		<entry>This defines how many log files will be created. You may wish to define a retention period for log files.  If you set this to 365, logs older than  a year will be deleted. By default this is set to 0 so that no logs are ever deleted. Ensure that you monitor the disk space used by the logs to make sure that you have enough space for them.  It is often important to keep the log files for a long time in case you want to rebuild your statistics.</entry>
+		          	</row>
+		          </tbody>
+    			</tgroup>
+     		</table>
+    	</section>
     </section>
   </chapter>
