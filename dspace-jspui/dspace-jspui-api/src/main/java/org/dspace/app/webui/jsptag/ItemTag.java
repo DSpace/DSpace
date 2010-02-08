@@ -469,7 +469,7 @@ public class ItemTag extends TagSupport
                 {
                     label = I18nUtil.getMessage("metadata."
                             + (style != null ? style + "." : "") + field,
-                            pageContext.getRequest().getLocale());
+                            context);
                 }
                 catch (MissingResourceException e)
                 {

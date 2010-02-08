@@ -16,6 +16,7 @@
  - [DS-409] JSPUI stats display ignores 'statistics.item.authorization.admin'
  - [DS-414] File downloads listed in collections and communities statistics
  - [DS-438] JSPUI stats - filenames incorrect
+ - [DS-418] I18n broken in JSPUI
 
 (Claudia Juergen)
  - [DS-114] Links not working due to trailing white space in dspace.url
