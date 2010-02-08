@@ -433,11 +433,12 @@ public class SolrLogger
                         doc.addField("isBot", true);
                         SolrInputDocument newInput = ClientUtils.toSolrInputDocument(doc);
                         solr.add(newInput);
+                        log.info("Marked " + doc.getFieldValue("ip") + " as bot");
                     }
                 };
 
                 /* query for ip, exclude results previously set as bots. */
-                processor.execute("ip:"+ip+ "* AND NOT isBot:true");
+                processor.execute("ip:"+ip+ "* AND -isBot:true");
 
                 solr.commit();
 
@@ -464,7 +465,7 @@ public class SolrLogger
                 };
 
                 /* query for ip, exclude results previously set as bots. */
-                processor.execute("userAgent:"+agent+ " AND NOT isBot:true");
+                processor.execute("userAgent:"+agent+ " AND -isBot:true");
 
                 solr.commit();
             } catch (Exception e) {
