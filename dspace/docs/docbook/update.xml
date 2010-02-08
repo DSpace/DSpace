@@ -3,7 +3,7 @@
 	<title><anchor id="docbook-update.html"/>DSpace System Documentation: Upgrading a DSpace Installation</title>
 	<para>This section describes how to upgrade a DSpace installation from one version to the next. Details of the differences between the functionality of each version are given in the <link linkend="docbook-history.html">Version History</link> section.</para>
 	<warning>
-		<para>It is always recommended that when performing an upgrade that the user should use a Development or Test instance or server in order to minimize downtime. You should not any problems you have encountered (and also how to resolve them) before attempting to upgrade your production instance or server. It also gives your &quot;practice&quot; at the upgrade. (And practice makes perfect.)</para>
+		<para>It is always recommended that when performing an upgrade that the user should use a Development or Test instance or server in order to minimize downtime. You should note any problems you have encountered (and also how to resolve them) before attempting to upgrade your production instance or server. It also gives you a chance to &quot;practice&quot; at the upgrade. (And practice makes perfect.)</para>
 	</warning>
 	<section remap="h2">
 		<title><anchor id="docbook-update.thml-16_16" xreflabel="Upgrading from 1.5.x to 1.6"/>Upgrading from 1.5.x to 1.6</title>
@@ -39,7 +39,7 @@
 				<para><emphasis role="bold">Update Configuration Files</emphasis>. Some of the parameters have change and some are new. Changes will be noted below:</para>
 				<itemizedlist>
 					<listitem>
-						<para><emphasis role="bold">**CHANGE**</emphasis>The base url and oai urls property keys are set differently </para>
+						<para><emphasis role="bold">**CHANGE**</emphasis> The base url and oai urls property keys are set differently </para>
 						<screen># DSpace host name - should match base URL.  Do not include port number
 dspace.hostname = localhost
 
@@ -56,25 +56,28 @@ dspace.url = ${dspace.baseUrl}/xmlui
 dspace.oai.url = ${dspace.baseUrl}/oai</screen>
 					</listitem>
 					<listitem>
-						<para>New email options:</para>
-						<screen># A comma separated list of hostnames that are allowed to refer browsers to email forms.
-# Default behaviour is to accept referrals only from dspace.hostname
+						<para><emphasis role="bold">**NEW**</emphasis> New email options (Add these at the end of the &quot;Email Settings&quot; sub-section):</para>
+						<screen># A comma separated list of hostnames that are allowed to refer browsers to
+# email forms. Default behaviour is to accept referrals only from
+# dspace.hostname
 #mail.allowed.referrers = localhost
 
-# Pass extra settings to the Java mail library. Comma separated, equals sign between
-# the key and the value.
+# Pass extra settings to the Java mail library. Comma separated, equals sign
+# between the key and the value.
 #mail.extraproperties = mail.smtp.socketFactory.port=465, \
-#                       mail.smtp.socketFactory.class=javax.net.ssl.SSLSocketFactory, \
-#                       mail.smtp.socketFactory.fallback=false
+#                mail.smtp.socketFactory.class=javax.net.ssl.SSLSocketFactory, \
+#                mail.smtp.socketFactory.fallback=false
 
-# An option is added to disable the mailserver. By default, this property is set to false
-# By setting mail.server.disabled = true, DSpace will not send out emails.
-# It will instead log the subject of the email which should have been sent
-# This is especially useful for development and test environments where production data is used when testing functionality.
-#mail.server.disabled = false</screen>
+# An option is added to disable the mailserver. By default, this property is
+# set to false. By setting mail.server.disabled = true, DSpace will not send 
+# out emails. It will instead log the subject of the email which should have 
+# been sent. This is especially useful for development and test environments 
+# where production data is used when testing functionality.
+#mail.server.disabled = false
+</screen>
 					</listitem>
 					<listitem>
-						<para>New Authorization levels and parameters. See Section 5.2.45 in <link linkend="docbook-configure.html-authorization">Configuration</link> for further information.</para>
+						<para><emphasis role="bold">**NEW**</emphasis>New Authorization levels and parameters. See Section 5.2.45 in <link linkend="docbook-configure.html-authorization">Configuration</link> for further information.</para>
 						<screen>##### Authorization system configuration - Delegate ADMIN #####
 
 # COMMUNITY ADMIN configuration
@@ -124,7 +127,7 @@ dspace.oai.url = ${dspace.baseUrl}/oai</screen>
 #core.authorization.item-admin.cc-license = true</screen>
 					</listitem>
 					<listitem>
-						<para>METS ingester has been revised. <emphasis role="bold">**CHANGE**</emphasis></para>
+						<para><emphasis role="bold">**CHANGE**</emphasis> METS ingester has been revised. (Modify In &quot;<literal>Crosswalk and Pacakger Plugin Settings</literal>&quot;)</para>
 						<screen># Option to make use of collection templates when using the METS ingester (default is false)
 mets.submission.useCollectionTemplate = false
 
@@ -151,7 +154,7 @@ plugin.named.org.dspace.content.crosswalk.DisseminationCrosswalk = \
   org.dspace.content.crosswalk.DIMDisseminationCrosswalk = dim</screen>
 					</listitem>
 					<listitem>
-						<para>Event Settings have had the following revision with the addition of &apos;harvester&apos;: <emphasis role="bold">**CHANGE**</emphasis></para>
+						<para><emphasis role="bold">**CHANGE**</emphasis> Event Settings have had the following revision with the addition of &apos;harvester&apos; (modify in &quot;<literal>Event System Configuration</literal>&quot;):</para>
 						<screen>#### Event System Configuration ####
 
 # default synchronous dispatcher (same behavior as traditional DSpace)
@@ -164,7 +167,7 @@ event.consumer.harvester.filters = Item+Delete
 </screen>
 					</listitem>
 					<listitem>
-						<para>New option for the Embargo of Thesis and Disserations.</para>
+						<para><emphasis role="bold">**NEW**</emphasis> New option for the Embargo of Thesis and Dissertations.</para>
 						<screen>#### Embargo Settings ####
 # DC metadata field to hold the user-supplied embargo terms
 embargo.field.terms = SCHEMA.ELEMENT.QUALIFIER
@@ -175,14 +178,18 @@ embargo.field.lift = SCHEMA.ELEMENT.QUALIFIER
 # string in terms field to indicate indefinite embargo
 embargo.terms.open = forever
 
-# implementation of embargo setter plugin - replace with local implementation if applicable
-plugin.single.org.dspace.embargo.EmbargoSetter = org.dspace.embargo.DefaultEmbargoSetter
+# implementation of embargo setter plugin--replace with local implementation if
+# applicable
+plugin.single.org.dspace.embargo.EmbargoSetter = \
+				org.dspace.embargo.DefaultEmbargoSetter
 
-# implementation of embargo lifter plugin - - replace with local implementation if applicable
-plugin.single.org.dspace.embargo.EmbargoLifter = org.dspace.embargo.DefaultEmbargoLifter</screen>
+# implementation of embargo lifter plugin--replace with local implementation if 
+# applicable
+plugin.single.org.dspace.embargo.EmbargoLifter = \
+				org.dspace.embargo.DefaultEmbargoLifter</screen>
 					</listitem>
 					<listitem>
-						<para>New option for using the Batch Editing capabilities. See Section 5.2.46 in <link linkend="docbook-configure.html-batchedits">Configuration</link> and also 8.10 in <link linkend="docbook-sys_admin.html-batchedits">System Administration</link></para>
+						<para><emphasis role="bold">**NEW**</emphasis> New option for using the Batch Editing capabilities. See Section 5.2.46 in <link linkend="docbook-configure.html-batchedits">Configuration</link> and also 8.10 in <link linkend="docbook-sys_admin.html-batchedits">System Administration</link></para>
 						<screen>### Bulk metadata editor settings ###
 # The delimiter used to separate values within a single field (defaults to a double pipe ||)
 # bulkedit.valueseparator = ||
@@ -194,13 +201,13 @@ plugin.single.org.dspace.embargo.EmbargoLifter = org.dspace.embargo.DefaultEmbar
 # (does not apply to the command line version)
 # bulkedit.gui-item-limit = 20
 
-# Metadata elements to exclude when exporting via the user interfaces, or when using the
-# command line version and not using the -a (all) option.
+# Metadata elements to exclude when exporting via the user interfaces, or when 
+# using the command line version and not using the -a (all) option.
 # bulkedit.ignore-on-export = dc.date.accessioned, dc.date.available, \
 #                             dc.date.updated, dc.description.provenance</screen>
 					</listitem>
 					<listitem>
-						<para>Ability to hide metadata fields is now available.</para>
+						<para><emphasis role="bold">**NEW**</emphasis> Ability to hide metadata fields is now available. (Look for &quot;<literal>JSPUI &#38; XMLUI Configurations</literal>&quot; Section)</para>
 						<screen>##### Hide Item Metadata Fields  #####
 # Fields named here are hidden in the following places UNLESS the
 # logged-in user is an Administrator:
@@ -218,8 +225,8 @@ metadata.hide.dc.description.provenance = true
 </screen>
 					</listitem>
 					<listitem>
-						<para>New Choice Control and Authority Control options are available</para>
-						<screen>## example of authority-controlled browse category - see authority control config
+						<para><emphasis role="bold">**NEW**</emphasis>Choice Control and Authority Control options are available (Look for &quot;<literal>JSPUI &#38; XMLUI Configurations</literal>&quot; Section):</para>
+						<screen>## example of authority-controlled browse category--see authority control config
 #webui.browse.index.5 = lcAuthor:metadataAuthority:dc.contributor.author:authority
 </screen>
 						<para>And also:</para>
@@ -290,7 +297,7 @@ authority.minconfidence = ambiguous
 #xmlui.lookup.select.size = 12</screen>
 					</listitem>
 					<listitem>
-						<para>RSS Feeds now support Atom 1.0</para>
+						<para><emphasis role="bold">**REPLACE**</emphasis> RSS Feeds now support Atom 1.0. <emphasis>Replace its previous configuration with the one below:</emphasis></para>
 						<screen>#### Syndication Feed (RSS) Settings ######
 
 # enable syndication feeds - links display on community and collection home pages
@@ -334,8 +341,8 @@ webui.feed.item.date = dc.date.issued
 #        "metadata.dc.contributor.author"
 #        "metadata.dc.date.issued"
 webui.feed.item.description = dc.title, dc.contributor.author, \
-                                                          dc.contributor.editor, dc.description.abstract, \
-                                                          dc.description
+               dc.contributor.editor, dc.description.abstract, \
+               dc.description
 # name of field to use for authors (Atom only) - repeatable
 webui.feed.item.author = dc.contributor.author
 
@@ -355,7 +362,7 @@ webui.feed.item.author = dc.contributor.author
 ## webui.feed.logo.url = ${dspace.url}/themes/mysite/images/mysite-logo.png</screen>
 					</listitem>
 					<listitem>
-						<para>Opensearch Feature is new to DSpace</para>
+						<para><emphasis role="bold">**NEW**</emphasis> Opensearch Feature is new to DSpace</para>
 						<screen>#### OpenSearch Settings ####
 # NB: for result data formatting, OpenSearch uses Syndication Feed Settings
 # so even if Syndication Feeds are not enabled, they must be configured
@@ -388,7 +395,7 @@ websvc.opensearch.tags = IR DSpace
 websvc.opensearch.formats = html,atom,rss</screen>
 					</listitem>
 					<listitem>
-						<para>Exposure of METS metadata can be now hidden.</para>
+						<para><emphasis role="bold">**NEW** </emphasis>Exposure of METS metadata can be now hidden. (See &quot;<literal>OAI-PMH SPECIFIC CONFIGURATIONS</literal>&quot; in the <literal>dspace.cfg</literal> file)</para>
 						<screen># When exposing METS/MODS via OAI-PMH all metadata that can be mapped to MODS
 # is exported. This includes description.provenance which can contain personal
 # email addresses and other information not intended for public consumption. To
@@ -397,13 +404,13 @@ oai.mets.hide-provenance = true
 </screen>
 					</listitem>
 					<listitem>
-						<para>SWORD has added the following to accept MIME/types.</para>
+						<para><emphasis role="bold">**NEW** </emphasis>SWORD has added the following to accept MIME/types. (See &quot;<literal>SWORD Specific Configurations</literal>&quot; Section)</para>
 						<screen># A comma separated list of MIME types that SWORD will accept
 sword.accepts = application/zip
 </screen>
 					</listitem>
 					<listitem>
-						<para>New OAI Harvesting Configuration settings are now available.</para>
+						<para><emphasis role="bold">**NEW** </emphasis>New OAI Harvesting Configuration settings are now available. (See &quot;<literal>OAI Harvesting Configurations</literal>&quot;</para>
 						<screen>#---------------------------------------------------------------#
 #--------------OAI HARVESTING CONFIGURATIONS--------------------#
 #---------------------------------------------------------------#
@@ -418,14 +425,32 @@ harvester.oai.metadataformats.dc = http://www.openarchives.org/OAI/2.0/oai_dc/, 
 harvester.oai.metadataformats.qdc = http://purl.org/dc/terms/, Qualified Dublin Core
 harvester.oai.metadataformats.dim = http://www.dspace.org/xmlns/dspace/dim, DSpace Intermediate Metadata
 
+# This field works in much the same way as harvester.oai.metadataformats.PluginName
+# The {name} must correspond to a declared ingestion crosswalk, while the
+# {namespace} must be supported by the target OAI-PMH provider when harvesting content.
+# harvester.oai.oreSerializationFormat.{name} = {namespace}
+
 # Determines whether the harvester scheduling process should be started
 # automatically when the DSpace webapp is deployed.
 # default: false
 harvester.autoStart=false
 
+# Amount of time subtracted from the from argument of the PMH request to account 
+# for the time taken to negotiate a connection. Measured in seconds. Default value is 120.
+#harvester.timePadding = 120
+
 # How frequently the harvest scheduler checks the remote provider for updates,
 # messured in minutes. The default vaule is 12 hours (or 720 minutes)
 #harvester.harvestFrequency = 720
+
+# The heartbeat is the frequency at which the harvest scheduler queries the local 
+# database to determine if any collections are due for a harvest cycle (based on 
+# the harvestFrequency) value. The scheduler is optimized to then sleep until the 
+# next collection is actually ready to be harvested. The minHeartbeat and 
+# maxHeartbeat are the lower and upper bounds on this timeframe. Measured in seconds. 
+# Default minHeartbeat is 30.  Default maxHeartbeat is 3600.
+#harvester.minHeartbeat = 30
+#harvester.maxHeartbeat = 3600
 
 # How many harvest process threads the scheduler can spool up at once. Default value is 3.
 #harvester.maxThreads = 3
@@ -443,6 +468,36 @@ harvester.autoStart=false
 harvester.unknownField  = add
 harvester.unknownSchema = fail
 
+# The webapp responsible for minting the URIs for ORE Resource Maps.
+# If using oai, the dspace.oai.uri config value must be set.
+# The URIs generated for ORE ReMs follow the following convention for both cases.
+# format: [baseURI]/metadata/handle/[theHandle]/ore.xml
+# Default value is oai
+#ore.authoritative.source = oai
+
+# A harvest process will attempt to scan the metadata of the incoming items
+# (dc.identifier.uri field, to be exact) to see if it looks like a handle.
+# If so, it matches the pattern against the values of this parameter.
+# If there is a match the new item is assigned the handle from the metadata value
+# instead of minting a new one. Default value: hdl.handle.net
+#harvester.acceptedHandleServer = hdl.handle.net, handle.myu.edu
+
+# Pattern to reject as an invalid handle prefix (known test string, for example)
+# when attempting to find the handle of harvested items. If there is a match with
+# this config parameter, a new handle will be minted instead. Default value: 123456789.
+#harvester.rejectedHandlePrefix = 123456789, myTestHandle
+						</screen>
+					</listitem>
+					<listitem>
+						<para><emphasis role="bold">**NEW**</emphasis> SOLR Statistics Configurations.</para>
+						<para>For a little more detailed information regarding the configuration, please refer to <link linkend="docbook-configure.html-statistics"> Section 5.2.35 DSpace Statistics</link>; or, for installation procedures, refer to <link linked="docbook-install.html-statistics"> Section 3.4.6 Dspace Statistcs</link>.</para>
+						<screen>
+#---------------------------------------------------------------#
+#--------------SOLR STATISTICS CONFIGURATIONS-------------------#
+#---------------------------------------------------------------#
+# These configs are only used by the SOLR interface/webapp to   #
+# track usage statistics.                                       #
+#---------------------------------------------------------------#
 
 ##### Usage Logging #####
 solr.log.server = ${dspace.baseUrl}/solr/statistics
@@ -463,15 +518,18 @@ statistics.item.authorization.admin=true</screen>
 			<listitem>
 				<para><emphasis role="bold">Build DSpace.</emphasis> Run the following commands to compile DSpace.:</para>
 				<screen>cd /[dspace-source]/dspace/
-mvn -U package</screen>
+mvn -U clean package</screen>
 				<para>You will find the result in <literal>[dspace-source]/dspace/target/dspace-[version]-build.dir</literal> . Inside this directory is the compiled binary distribution of DSpace.</para>
+				<note>
+					<para>Before rebuilding DSpace, the above command will clean out any previously compiled code (&apos;clean&apos;) and ensure that your local DSpace JAR files are updated from the remote maven respository.</para>
+				</note>
 			</listitem>
 			<listitem>
 				<para><emphasis role="bold">Update the database</emphasis>. The database schema needs to be updated to accommodate changes to the database. SQL files contain the relevant updates are provided. Please note that if you have made any local customizations to the database schema, you should consult these updates and make sure they will work for you.</para>
 				<itemizedlist>
 					<listitem>
 						<para>For PostgreSQL:</para>
-						<para><literal>psql -U [dspace-user] -f [dspace-source]/dspace/etc/postgres/schema_15_16.sql [database name]</literal> (Your database name is by default &apos;dspace&apos;).  Example:</para>
+						<para><literal>psql -U [dspace-user] -f [dspace-source]/dspace/etc/postgres/schema_15_16.sql [database name]</literal> (Your database name is by default &apos;dspace&apos;). Example:</para>
 						<para><emphasis><literal>psql -U dspace -f /dspace-1.6-rc1-src-release/dspace/etc/postgres/schema_15_16.sql dspace</literal></emphasis></para>
 					</listitem>
 					<listitem>
@@ -505,6 +563,13 @@ the output of the queries you'll need.</screen>
 				<para><emphasis role="bold">Update DSpace</emphasis>. Update the DSpace installed directory with the new code and libraries. Issue the following commands:</para>
 				<screen>cd [dspace-source]/dspace/target/dspace-[version]-build.dir
 ant -Dconfig=[dspace]/config/dspace.cfg update</screen>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Rolling Log Aappender Upgrade</emphasis>. You will want to upgrade your logs to the new format to use the SOLR Statistics now included with DSpace. While the commands for this are cound in Chapter 8, here is the steps needed to be performed.</para>
+				<screen>[dspace]/bin/dspace log-converter -i <emphasis>input file name</emphasis> -o <emphasis>output file name</emphasis> -m <emphasis>(if you have more than one</emphasis> dspace.log<emphasis> file)</emphasis>
+[dspace]/bin/dspace log-importer -i <emphasis>input file name (probably the output name from above)</emphasis> -m 
+</screen>
+				<para>The user is highly recommend to see <link linkend="docbook-sys_admin.html-log-converter">DSpace Log Converter</link>.</para>
 			</listitem>
 			<listitem>
 				<para><emphasis role="bold">Generate Browse and Search Indexes</emphasis>. It makes good policy to rebuild your search and browse indexes when upgrading to a new release. Almost every release has database changes and indexes can be affected by this. In the DSpace 1.6 release there is Authority Control features and those will need the indexes to be regenerated. To do this, run the following command from your DSpace install directory (as the dspace user):</para>
@@ -567,8 +632,8 @@ ant -Dconfig=[dspace]/config/dspace.cfg update
 </screen>
 			</listitem>
 			<listitem>
-				<para><emphasis role="bold">Update configuration files</emphasis> This ant target preserves existing files in <literal>[dspace]/config </literal> and will copy any new configuration files in place. If an existing file prevents copying the new file in place, the new file will have the suffix <literal>.new</literal>, for example <literal>[dspace]/local/dspace.cfg.new</literal>. Note: there is also a configuration option <literal
-						>-Doverwrite=true</literal> which will instead copy the conflicting target files to *.old suffixes and overwrite target file then with the new file (essentially the opposite) this is beneficial for developers and those who use the <literal>[dspace-source]/dspace/config</literal> to maintain their changes.</para>
+				<para><emphasis role="bold"
+						>Update configuration files</emphasis> This ant target preserves existing files in <literal>[dspace]/config </literal> and will copy any new configuration files in place. If an existing file prevents copying the new file in place, the new file will have the suffix <literal>.new</literal>, for example <literal>[dspace]/local/dspace.cfg.new</literal>. Note: there is also a configuration option <literal>-Doverwrite=true</literal> which will instead copy the conflicting target files to *.old suffixes and overwrite target file then with the new file (essentially the opposite) this is beneficial for developers and those who use the <literal>[dspace-source]/dspace/config</literal> to maintain their changes.</para>
 				<screen>
 cd [dspace-source]/dspace/target/dspace-1.5-build.dir/
 ant -Dconfig=[dspace]/config/dspace.cfg update_configs
@@ -1199,8 +1264,8 @@ cp [dspace-source]/dspace/config/registries/sword-metadata.xml
 </screen>
 			</listitem>
 			<listitem>
-				<para><emphasis role="bold">Update statistics scripts</emphasis> The statistics scripts have been rewritten for DSpace 1.5. Prior to 1.5 they were written in Perl, but have been rewritten in Java to avoid having to install Perl. First, make a note of the dates you have specified in your statistics scripts for the statistics to run from. You will find these in <literal>[dspace]/bin/stat-initial</literal>, as <literal>$start_year</literal> and <literal
-					>$start_month</literal>. Note down these values.</para>
+				<para><emphasis role="bold"
+					>Update statistics scripts</emphasis> The statistics scripts have been rewritten for DSpace 1.5. Prior to 1.5 they were written in Perl, but have been rewritten in Java to avoid having to install Perl. First, make a note of the dates you have specified in your statistics scripts for the statistics to run from. You will find these in <literal>[dspace]/bin/stat-initial</literal>, as <literal>$start_year</literal> and <literal>$start_month</literal>. Note down these values.</para>
 				<para>Copy the new stats scripts:</para>
 				<screen>
     cp [dspace-source]/dspace/bin/stat* [dspace]/bin/
@@ -1255,8 +1320,8 @@ cp postgresql.jar <emphasis> [dspace-1.4.x-source]</emphasis>/lib
 </screen>
 			</listitem>
 			<listitem>
-				<para><emphasis role="bold">Note:</emphasis> Licensing conditions for the <literal>handle.jar</literal> file have changed. As a result, the latest version of the <literal>handle.jar</literal> file is not included in this distribution. It is recommended you read the <ulink url="http://www.handle.net/upgrade_6-2_DSpace.html">new license conditions</ulink> and decide whether you wish to update your installation&apos;s <literal
-						>handle.jar</literal>. If you decide to update, you should replace the existing <literal>handle.jar</literal> in <emphasis>[dspace-1.4.x-source]</emphasis>/lib with the new version.</para>
+				<para><emphasis role="bold">Note:</emphasis> Licensing conditions for the <literal>handle.jar</literal> file have changed. As a result, the latest version of the <literal>handle.jar</literal> file is not included in this distribution. It is recommended you read the <ulink url="http://www.handle.net/upgrade_6-2_DSpace.html"
+						>new license conditions</ulink> and decide whether you wish to update your installation&apos;s <literal>handle.jar</literal>. If you decide to update, you should replace the existing <literal>handle.jar</literal> in <emphasis>[dspace-1.4.x-source]</emphasis>/lib with the new version.</para>
 			</listitem>
 			<listitem>
 				<para> Take down Tomcat (or whichever servlet container you&apos;re using).</para>
@@ -1337,8 +1402,8 @@ cp postgresql.jar <emphasis> [dspace-1.4.x-source]</emphasis>/lib
 </screen>
 			</listitem>
 			<listitem>
-				<para><emphasis role="bold">Note:</emphasis> Licensing conditions for the <literal>handle.jar</literal> file have changed. As a result, the latest version of the <literal>handle.jar</literal> file is not included in this distribution. It is recommended you read the <ulink url="http://www.handle.net/upgrade_6-2_DSpace.html">new license conditions</ulink> and decide whether you wish to update your installation&apos;s <literal
-						>handle.jar</literal>. If you decide to update, you should replace the existing <literal>handle.jar</literal> in <emphasis>[dspace-1.4.x-source]</emphasis>/lib with the new version.</para>
+				<para><emphasis role="bold">Note:</emphasis> Licensing conditions for the <literal>handle.jar</literal> file have changed. As a result, the latest version of the <literal>handle.jar</literal> file is not included in this distribution. It is recommended you read the <ulink url="http://www.handle.net/upgrade_6-2_DSpace.html"
+						>new license conditions</ulink> and decide whether you wish to update your installation&apos;s <literal>handle.jar</literal>. If you decide to update, you should replace the existing <literal>handle.jar</literal> in <emphasis>[dspace-1.4.x-source]</emphasis>/lib with the new version.</para>
 			</listitem>
 			<listitem>
 				<para> Take down Tomcat (or whichever servlet container you&apos;re using).</para>
