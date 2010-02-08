@@ -43,14 +43,41 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 			</itemizedlist>
 		</section>
 		<section remap="h3">
-			<title>Java JDK 5 or later (standard SDK is fine, you don&apos;t need J2EE)</title>
-			<para>DSpace now required Java 5 or greater because of usage of new language capabilities introduced in 5 that make coding easier and cleaner.</para>
+			<title>Sun Java JDK 5 or later (standard SDK is fine, you don&apos;t need J2EE)</title>
+			<para>DSpace now requires <emphasis role="bold">Sun</emphasis> Java 5 or greater because of usage of new language capabilities introduced in 5 that make coding easier and cleaner.</para>
 			<para>Java 5 or later can be downloaded from the following location: <ulink url="http://java.sun.com/javase/downloads/index.jsp">http://java.sun.com/javase/downloads/index.jsp</ulink></para>
+			<para>
+				<tip>
+					<para>Only Sun's Java has been tested with each release and is known to work correctly. Other flavors of Java may pose problems.</para>
+				</tip>
+			</para>
 		</section>
 		<section remap="h3">
 			<title>Apache Maven 2.0.8 or later (Java build tool)</title>
 			<para>Maven is necessary in the first stage of the build process to assemble the installation package for your DSpace instance. It gives you the flexibility to customize DSpace using the exisitng Maven projects found in the <literal>[dspace-source]/dspace/modules</literal> directory or by adding in your own Maven project to build the installation package for DSpace, and apply any custom interface &quot;overlay&quot; changes.</para>
 			<para>Maven can be downloaded from the the following location: <ulink url="http://maven.apache.org/download.html">http://maven.apache.org/download.html</ulink></para>
+			<section remap="h4">
+				<title>Configuring a Proxy</title>
+				<para>You can configure a proxy to use for some or all of your HTTP requests in Maven 2.0. The username and password are only required if your proxy requires basic authentication (note that later releases may support storing your passwords in a secured keystore&mdash;in the mean time, please ensure your <literal>settings.xml</literal> file (usually <literal>${user.home}/.m2/settings.xml</literal>) is secured with permissions appropriate for your operating system).</para>
+				<para>Example:</para>
+				<screen>&lt;settings&gt; 
+  . 
+  . 
+  &lt;proxies&gt; 
+   &lt;proxy&gt; 
+      &lt;active&gt;true&lt;/active&gt; 
+      &lt;protocol&gt;http&lt;/protocol&gt; 
+      &lt;host&gt;proxy.somewhere.com&lt;/host&gt; 
+      &lt;port&gt;8080&lt;/port&gt; 
+      &lt;username&gt;proxyuser&lt;/username&gt; 
+      &lt;password&gt;somepassword&lt;/password&gt; 
+      &lt;nonProxyHosts&gt;www.google.com|*.somewhere.com&lt;/nonProxyHosts&gt; 
+    &lt;/proxy&gt; 
+  &lt;/proxies&gt; 
+  . 
+  . 
+&lt;/settings&gt; </screen>
+			</section>
 		</section>
 		<section remap="h3">
 			<title>Apache Ant 1.7 or later (Java build tool)</title>
@@ -64,8 +91,8 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 					<para>
 						<emphasis role="bold">PostgreSQL 7.3 or 7.4</emphasis>
 					</para>
-					<para>PostgreSQL can be downloaded from the following location: <ulink url="http://www.postgresql.org/">http://www.postgresql.org/ </ulink> Its highly recommended that you try to work with Postgres 8.x or greater, however, 7.3 or greater should still work. Unicode (specifically UTF-8) support must be enabled. This is enabled by default in 8.0+. For 7.<emphasis>x</emphasis>, be sure to compile with the following options to the &apos;<literal
-						>configure</literal>&apos; script:</para>
+					<para>PostgreSQL can be downloaded from the following location: <ulink url="http://www.postgresql.org/"
+						>http://www.postgresql.org/ </ulink> Its highly recommended that you try to work with Postgres 8.x or greater, however, 7.3 or greater should still work. Unicode (specifically UTF-8) support must be enabled. This is enabled by default in 8.0+. For 7.<emphasis>x</emphasis>, be sure to compile with the following options to the &apos;<literal>configure</literal>&apos; script:</para>
 					<para><literal>--enable-multibyte --enable-unicode --with-java</literal></para>
 					<para>Once installed, you need to enable TCP/IP connections (DSpace uses JDBC). For 7.<emphasis>x</emphasis>, edit <literal>postgresql.conf</literal> (usually in <literal>/usr/local/pgsql/data</literal> or <literal>/var/lib/pgsql/data</literal>), and add this line:</para>
 					<para><literal>tcpip_socket = true</literal></para>
@@ -128,8 +155,7 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 		</section>
 		<section remap="h3">
 			<title>Perl (required for [dspace]/bin/dspace-info.pl)</title>
-			<para>
-			</para>
+			<para> </para>
 		</section>
 	</section>
 	<section remap="h2">
@@ -226,8 +252,8 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 					<para><emphasis role="bold">The source directory</emphasis>, referred to as <emphasis><literal>[dspace-source]</literal></emphasis> . This is the location where the DSpace release distribution has been unzipped into. It usually has the name of the archive that you expanded such as <emphasis>dspace-&lt;version&gt;-release</emphasis> or <emphasis>dspace-&lt;version&gt;-src-release</emphasis>. It is the directory where all of your &quot;build&quot; commands will be run.</para>
 				</listitem>
 				<listitem>
-					<para><emphasis role="bold">The web deployment directory</emphasis>. This is the directory that contains your DSpace web application(s). In DSpace 1.5.x and above, this corresponds to <emphasis><literal>[dspace]/webapps</literal></emphasis> by default. However, if you are using Tomcat, you may decide to copy your DSpace web applications from <emphasis><literal>[dspace]/webapps/</literal></emphasis> to <literal>[tomcat]/webapps/</literal> (with <literal
-							>[tomcat]</literal> being wherever you installed Tomcat&mdash;also known as <literal>$CATALINA_HOME</literal>).</para>
+					<para><emphasis role="bold"
+							>The web deployment directory</emphasis>. This is the directory that contains your DSpace web application(s). In DSpace 1.5.x and above, this corresponds to <emphasis><literal>[dspace]/webapps</literal></emphasis> by default. However, if you are using Tomcat, you may decide to copy your DSpace web applications from <emphasis><literal>[dspace]/webapps/</literal></emphasis> to <literal>[tomcat]/webapps/</literal> (with <literal>[tomcat]</literal> being wherever you installed Tomcat&mdash;also known as <literal>$CATALINA_HOME</literal>).</para>
 				</listitem>
 			</orderedlist>
 			<para>For details on the contents of these separate directory trees, refer to <link linkend="docbook-directories.html">directories.html</link>. <emphasis>Note that the <literal>[dspace-source]</literal> and <literal>[dspace]</literal> directories are always separate!</emphasis></para>
@@ -241,8 +267,8 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 					<screen>useradd -m dspace</screen>
 				</listitem>
 				<listitem>
-					<para><emphasis role="bold">Download</emphasis> the <ulink url="http://sourceforge.net/projects/dspace/">latest DSpace release</ulink> There are two version available with each release of DSpace: (<literal>dspace-1.x-release.</literal> and <literal>dspace-1.x-src-release.xxx</literal>); you only need to choose one. If you want a copy of all underlying Java source code, you should download the <literal
-						>dspace-1.x-src-release.xxx</literal> Within each version, you have a choice of compressed file format. Choose the one that best fits your environment.</para>
+					<para><emphasis role="bold">Download</emphasis> the <ulink url="http://sourceforge.net/projects/dspace/"
+						>latest DSpace release</ulink> There are two version available with each release of DSpace: (<literal>dspace-1.x-release.</literal> and <literal>dspace-1.x-src-release.xxx</literal>); you only need to choose one. If you want a copy of all underlying Java source code, you should download the <literal>dspace-1.x-src-release.xxx</literal> Within each version, you have a choice of compressed file format. Choose the one that best fits your environment.</para>
 				</listitem>
 				<listitem>
 					<para><emphasis role="bold">Unpack the DSpace software</emphasis>. After downloading the software, based on the compression file format, choose one of the following methods to unpack your software: <orderedlist>
@@ -670,7 +696,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
 		</section>
 		<section remap="h3">
 			<title><anchor id="docbook-install.html-solr" xreflabel="SOLR Statistics Package"/>DSpace Statisics</title>
-			<para>DSpace uses the Apache Solr application underlaying the statistics. There is no need to download any separate software. All the necessary software is included.</para>
+			<para>DSpace uses the Apache Solr application underlaying the statistics. There is no need to download any separate software. All the necessary software is included. To understand all of the configuration property keys, the user should refer to<link linkend="docbook-configure.html-statistics"> 5.2.35 DSpace Statistic Configuration</link> for detailed information.</para>
 			<orderedlist>
 				<listitem>
 					<para><emphasis role="bold">DSpace Configuration for Accessing SOLR.</emphasis> In the <literal>dspace.cfg</literal> file review the following fields to make sure they are uncommented:</para>
@@ -847,24 +873,24 @@ ant help
 	</section>
 	<section remap="h2">
 		<title><anchor id="docbook-install.html-checking" xreflabel="Checking Your Installation"/>Checking Your Installation</title>
-		<para>The administrator needs to check the installation to make sure all components are working.  Here is list of checks to be performed.  In brackets after each item, it the associated component or components that might be the issue needing resolution.</para>
+		<para>The administrator needs to check the installation to make sure all components are working. Here is list of checks to be performed. In brackets after each item, it the associated component or components that might be the issue needing resolution.</para>
 		<itemizedlist>
 			<listitem>
 				<para>System is up and running.</para>
 				<para><emphasis>User can see the DSpace home page. [Tomcat/Jetty, firewall, IP assignment, DNS]</emphasis></para>
 			</listitem>
-				
 			<listitem>
 				<para>Database is running and working correctly.</para>
 				<para><emphasis>Attempt to create a user, community or collection [PostgreSQL, Oracle]</emphasis></para>
+				<para><emphasis>Run the test database command to see if other issues are being report:</emphasis></para>
+				<para><literal>[dspace]/bin/dspace test-database</literal></para>
 			</listitem>
 			<listitem>
 				<para>Email subsystem is running.</para>
-				<para>The user can issue the following command to test the email system.  t attempts to send a test email to the email address that is set in dspace.cfg (mail.admin). If it fails, you will get messages informing you as to why, will refer you to the DSpace documentation.</para>
+				<para>The user can issue the following command to test the email system. t attempts to send a test email to the email address that is set in dspace.cfg (mail.admin). If it fails, you will get messages informing you as to why, will refer you to the DSpace documentation.</para>
 				<para><literal>[dspace]/bin/test-email</literal></para>
 			</listitem>
 		</itemizedlist>
-		
 	</section>
 	<section remap="h2">
 		<title><anchor id="docbook-install.html-knownbugs" xreflabel="Known Bugs"/>Known Bugs</title>

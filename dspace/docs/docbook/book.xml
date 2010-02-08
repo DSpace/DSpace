@@ -23,14 +23,14 @@
 <book>
     <bookinfo>
         <title>DSpace Manual</title>
-        <subtitle>Release 1.6 RC1</subtitle>
+        <subtitle>Release 1.6 RC2</subtitle>
         <author>
             <surname>The DuraSpace Foundation</surname>
             <affiliation>
                 <address><email>webmaster@dspace.org</email></address>
             </affiliation>
-        </author> <edition>1.6 RC1</edition>
-        <pubdate>2010-01-19  15:07:45 EST</pubdate>
+        </author> <edition>1.6 RC2</edition>
+        <pubdate>2010-02-07  20:49:04 EST</pubdate>
         <copyright>
             <year>2002-2010</year>
             <holder>
@@ -45,14 +45,14 @@
                             <imagedata fileref="http://i.creativecommons.org/l/by/3.0/us/88x31.png" format="PNG"/>
                         </imageobject>
                     </inlinemediaobject>
-        Licensed under a Creative Commons Attribution 3.0 United States License
         </ulink>
             </para>
+        	<para>Licensed under a Creative Commons Attribution 3.0 United States License</para>
         </legalnotice>
         <revhistory>
             <revision>
-                <revnumber>Version 1.6 RC1 </revnumber>
-                <date>This text generated: 2010-01-19  15:07:45 EST</date>
+                <revnumber>Version 1.6 RC2 </revnumber>
+                <date>This text generated: 2010-02-07  20:49:04 EST</date>
                 <authorinitials>JAT</authorinitials>
                 
             </revision>
@@ -63,8 +63,8 @@
     </bookinfo>
     <preface>
         <title>Preface</title> <para/>
-    	<para>The documentation submitted to you, the administrator, is a &quot;Release Candidate&quot; for testing purposes and finding the bugs in the DSpace 1.6 RC1 software.  Users should be aware that the documentation may contain errors and/or missing pieces to the documentation.</para>
-    	<para>Currently, the list of bugs and fixes has not made it into the 1.6-RC1 documentation along with other items that were being finished up in the programming realm as this documentation was being generated.</para>
+    	<para>The documentation submitted to you, the administrator, is a &quot;Release Candidate&quot; for testing purposes and finding the bugs in the DSpace 1.6 RC2 software.  Users should be aware that the documentation may contain errors and/or missing pieces to the documentation.</para>
+    	<para>Currently, the list of bugs and fixes has not made it into the 1.6-RC2 documentation along with other items that were being finished up in the programming realm as this documentation was being generated.</para>
     </preface>
     <toc/>
     

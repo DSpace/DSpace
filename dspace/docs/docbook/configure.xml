@@ -2328,7 +2328,6 @@ authentication.shib.role.Librarian = Administrator</screen>
 		</section>
 		<section remap="h3">
 			<title><anchor id="docbook-configure.html-logging" xreflabel="Logging"/>Logging Configuration</title>
-			<para>The following settings are currently <emphasis role="bold">not</emphasis> used by XMLUI. XMLUI writes its logs to <literal>[dspace-xmlui]/WEB-INF-logs/</literal> in the actual XMLUI web application.</para>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
@@ -2601,6 +2600,8 @@ search.index.11 = language:dc.language.iso
 					<emphasis> instead</emphasis> of <literal>keyword:dc.subject.*</literal>
 				</para>
 			</tip>
+			<para><emphasis role="bold">Authority Control Note:</emphasis></para>
+			<para>Although DSIndexer automatically builds a separate index for the authority keys of any index that contains authority-controlled metadata fields, the &quot;Advanced Search&quot; UIs does not allow direct access to it. Perhaps it will be added in the future. Fortunately, the OpenSearch API lets you submit a query directly to the Lucene search engine, and this may include the authority-controlled indexes.</para>
 		</section>
 		<section remap="h3">
 			<title><anchor id="docbook-configure.html-proxy" xreflabel="Proxy Settings"/>Proxy Settings</title>
@@ -4137,6 +4138,32 @@ text   = org.dspace.sort.OrderFormatText</screen>
 					</tgroup>
 				</informaltable>
 			</section>
+			<section remap="h4">
+				<title><anchor id="docbook-configure.html-browse-index-authcntrl" xreflabel="Browse Authority Control"/>Browse Index Authority Control Configuration</title>
+				<informaltable>
+					<?dbhtml table-width="100%"?>
+					<?dbfo table-width="100%"?>
+					<tgroup cols="2">
+						<colspec colname="c1" colwidth="30*" colsep="1"/>
+						<colspec colname="c2" colwidth="70*"/>
+						<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+						<tbody>
+							<row>
+								<entry align="right">Property:</entry>
+								<entry><literal>webui.browse.index.</literal><emphasis><literal>n</literal></emphasis></entry>
+							</row>
+							<row>
+								<entry align="right">Example Value:</entry>
+								<entry><literal>webui.browse.index.5 = lcAuthor:metadataAuthority:dc.contributor.author:authority</literal></entry>
+							</row>
+							<row>
+								<entry>Informational Note:</entry>
+								<entry>Yet to be written.</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</informaltable>
+			</section>
 		</section>
 		<section remap="h3">
 			<title><anchor id="docbook-configure.html-author-display" xreflabel="Author Display"/>Author (Multiple metadata value) Display</title>
@@ -4327,11 +4354,11 @@ plugin.sequence.org.dspace.plugin.CollectionHomeProcessor = \
 						</row>
 						<row>
 							<entry align="right">Example Value:</entry>
-							<entry><literal>webui.feed.enable = false</literal></entry>
+							<entry><literal>webui.feed.enable = true</literal></entry>
 						</row>
 						<row>
 							<entry align="right">Informational Note:</entry>
-							<entry>By default, RSS feeds are set to false (off). Change key to &quot;true&quot; to enable.</entry>
+							<entry>By default, RSS feeds are set to true (on). Change key to &quot;false&quot; to disable.</entry>
 						</row>
 						<row>
 							<?dbfo row-height="5mm"?>
@@ -4708,7 +4735,7 @@ xmlui.html.max-depth-guess = 3</screen>
 			</informaltable>
 		</section>
 		<section remap="h3">
-			<title><anchor id="docbook-configure.html-statistics" xreflabel="Statistical Report Setting"/>Statistical Report Configuration Setting</title>
+			<title><anchor id="docbook-configure.html-statistics" xreflabel="DSpace Statistics"/>DSpace Statistics Configuration</title>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
@@ -4719,15 +4746,15 @@ xmlui.html.max-depth-guess = 3</screen>
 					<tbody>
 						<row>
 							<entry align="right">Property:</entry>
-							<entry><literal>report.public</literal></entry>
+							<entry><literal>solr.log.server</literal></entry>
 						</row>
 						<row>
 							<entry align="right">Example Value:</entry>
-							<entry><literal>report.public = false</literal></entry>
+							<entry><literal>solr.log.server = ${dspace.baseUrl}/solr/statistics</literal></entry>
 						</row>
 						<row>
 							<entry align="right">Informational Note:</entry>
-							<entry>Controls whether or not the stats can be publicly available. Set it to false (the default) if you only want administrators to access the stats, or you do not intended to generate any statistics.</entry>
+							<entry>Is used by the SolrLogger Client class to connect tot the Solr server over http and perform updates and queries.</entry>
 						</row>
 						<row>
 							<?dbfo row-height="5mm"?>
@@ -4736,15 +4763,66 @@ xmlui.html.max-depth-guess = 3</screen>
 						</row>
 						<row>
 							<entry align="right">Property:</entry>
-							<entry><literal>report.dir</literal></entry>
+							<entry><literal>solr.spidersfile</literal></entry>
 						</row>
 						<row>
 							<entry align="right">Example Value:</entry>
-							<entry><literal>report.dir = ${dspace.dir}/reports</literal></entry>
+							<entry><literal>solr.spidersfile = ${dspace.dir}/config/spiders.txt</literal></entry>
 						</row>
 						<row>
 							<entry align="right">Informational Note:</entry>
-							<entry>Directory where the live reports are stored.</entry>
+							<entry>Spiders file is utilized by the SolrLogger, this will be populated by running the following command:<literal>dsrun org.dspace.statistics.util.SpiderDetector -i &lt;httpd log file&gt;</literal></entry>
+						</row>
+						<row>
+							<?dbfo row-height="5mm"?>
+							<?dbhtml row-height="5mm"?>
+							<entry spanname="notespan"/>
+						</row>
+						<row>
+							<entry align="right">Property:</entry>
+							<entry><literal>solr.dbfile</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Example Value:</entry>
+							<entry><literal>solr.dbfile = ${dspace.dir}/config/GeoLiteCity.dat</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Informational Note:</entry>
+							<entry>The following referes to the GeoLiteCity database file utilized by the <literal>LocationUtils</literal> to calculate the location of client requests based on IP address. During the Ant build process (both <literal>fresh_install</literal> and <literal>update</literal>) this file will be downloaded from http://www.maxmind.com/app/geolitecity if a new version has been published or it is absent from your <literal>[dspace]/config</literal> directory. </entry>
+						</row>
+						<row>
+							<?dbfo row-height="5mm"?>
+							<?dbhtml row-height="5mm"?>
+							<entry spanname="notespan"/>
+						</row>
+						<row>
+							<entry align="right">Property:</entry>
+							<entry><literal>useProxies</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Example Value:</entry>
+							<entry><literal>useProxies = true</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Informational Note:</entry>
+							<entry>Will cause Statistics logging to look for X-Forward URI to detect clients IP that have accessed it through a Proxy service. Allows detection of client IP when accessing DSpace.</entry>
+						</row>
+						<row>
+							<?dbfo row-height="5mm"?>
+							<?dbhtml row-height="5mm"?>
+							<entry spanname="notespan"/>
+						</row>
+						<row>
+							<entry align="right">Property:</entry>
+							<entry><literal>statistics.item.authorization.admin</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Example Value:</entry>
+							<entry><literal>statistics.item.authorization.admin = true</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Informational Note:</entry>
+							<entry>Enables access control restriction on DSpace Statistics pages, Restrictions are based on access rights to Community, Collection and Item Pages. This will require the user to sign on to see that statistics. Setting the statistics to &quot;false&quot; will make them publicly available.</entry>
 						</row>
 					</tbody>
 				</tgroup>
@@ -5790,6 +5868,307 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 						</listitem>
 					</orderedlist>
 				</section>
+			</section>
+		</section>
+		<section remap="h3">
+			<title><anchor id="docbook-configure.html-oai-ore" xreflabel="OAI-ORE Harvester Configuration"/>OAI-ORE Harvester Configuration</title>
+			<para>This section describes the parameters used in configuring the OAI-ORE harvester.</para>
+			<section remap="h4">
+				<title><anchor id="docbook-configure.html-oai_ore_configure" xreflabel="OAI-ORE Configuration"/>OAI-ORE Configuration</title>
+				<para>There are many possible configuration options for the OAI harvester. Most of them are technical and therefore omitted from the dspace.cfg file itself, using hard-coded deafults instead. However, should you wish to modify those values, including them in <literal>dspace.cfg</literal> will override the system defaults.</para>
+				<informaltable>
+					<?dbhtml table-width="100%"?>
+					<?dbfo table-width="100%"?>
+					<tgroup cols="2">
+						<colspec colname="c1" colwidth="30*" colsep="1"/>
+						<colspec colname="c2" colwidth="70*"/>
+						<spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/>
+						<tbody>
+							<row>
+								<entry align="right">Property:</entry>
+								<entry><literal>harvester.eperson</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Example Value:</entry>
+								<entry><literal>harvester.eperson = admin@myu.edu</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Informational Note:</entry>
+								<entry>The EPerson under whose authorization automatic harvesting will be performed. This field does not have a default value and must be specified in order to use the harvest scheduling system. This will most likely be the DSpace admin account created during installation.</entry>
+							</row>
+							<row>
+								<?dbfo row-height="5mm"?>
+								<?dbhtml row-height="5mm"?>
+								<entry spanname="notespan"/>
+							</row>
+							<row>
+								<entry align="right">Property:</entry>
+								<entry><literal>dspace.oai.url</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Example Value:</entry>
+								<entry><literal>dspace.oai.url = http://myu.edu:8080/oai</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Informational Note:</entry>
+								<entry>The base url of the OAI-PMH disseminator webapp (i.e. do not include the /request on the end). This is necessary in order to mint URIs for ORE Resource Maps. The default value of http://${dspace.hostname}:8080/oai will work for a typical installation, but should be changed if appropriate.</entry>
+							</row>
+							<row>
+								<?dbfo row-height="5mm"?>
+								<?dbhtml row-height="5mm"?>
+								<entry spanname="notespan"/>
+							</row>
+							<row>
+								<entry align="right">Property:</entry>
+								<entry><literal>ore.authoritative.source</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Example Value:</entry>
+								<entry><literal>ore.authoritative.source = oai | xmlui</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Informational Note:</entry>
+								<entry>
+									<para>The webapp responsible for minting the URIs for ORE Resource Maps. If using oai, the dspace.oai.uri config value must be set. The URIs generated for ORE ReMs follow the following convention for both cases.</para>
+									<para><literal>baseURI/metadata/handle/theHandle/ore.xml</literal></para>
+								</entry>
+							</row>
+							<row>
+								<?dbfo row-height="5mm"?>
+								<?dbhtml row-height="5mm"?>
+								<entry spanname="notespan"/>
+							</row>
+							<row>
+								<entry align="right">Property:</entry>
+								<entry><literal>harvester.autoStart</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Example Value:</entry>
+								<entry><literal>harvester.autoStart = false</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Informational Note:</entry>
+								<entry>Determines whether the harvest scheduler process starts up automatically when the XMLUI webapp is redeployed.</entry>
+							</row>
+							<row>
+								<?dbfo row-height="5mm"?>
+								<?dbhtml row-height="5mm"?>
+								<entry spanname="notespan"/>
+							</row>
+							<row>
+								<entry align="right">Property:</entry>
+								<entry><literal>harvester.oai.metadataformats.PluginName</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Example Value:</entry>
+								<entry>
+									<screen>harvester.oai.metadataformats.PluginName = \
+http://www.openarchives.org/OAI/2.0/oai_dc/, Simple Dublin Core</screen>
+								</entry>
+							</row>
+							<row>
+								<entry align="right">Informational Note:</entry>
+								<entry>This field can be repeated and serves as a link between the metadata formats supported by the local repository and those supported by the remote OAI-PMH provider. It follows the form <literal>harvester.oai.metadataformats.PluginName = NamespaceURI,Optional Display Name</literal> . The pluginName designates the metadata schemas that the harvester &quot;knows&quot; the local DSpace repository can support. Consequently, the PluginName must correspond to a previously declared ingestion crosswalk. The namespace value is used during negotiation with the remote OAI-PMH provider, matching it against a list returned by the ListMetadataFormats request, and resolving it to whatever metadataPrefix the remote provider has assigned to that namespace. Finally, the optinal display name is the string that will be displayed to the user when setting up a collection for harvesting. If omitted, the PluginName:NamespaceURI combo will be displayed instead.</entry>
+							</row>
+							<row>
+								<?dbfo row-height="5mm"?>
+								<?dbhtml row-height="5mm"?>
+								<entry spanname="notespan"/>
+							</row>
+							<row>
+								<entry align="right">Property:</entry>
+								<entry><literal>harvester.oai.oreSerializationFormat.OREPrefix</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Example Value:</entry>
+								<entry>
+									<screen>harvester.oai.oreSerializationFormat.OREPrefix = \
+http://www.w3.org/2005/Atom</screen>
+								</entry>
+							</row>
+							<row>
+								<entry align="right">Informational Note:</entry>
+								<entry>This field works in much the same way as <literal>harvester.oai.metadataformats.PluginName</literal> . The <literal>OREPrefix</literal> must correspond to a declared ingestion crosswalk, while the Namespace must be supported by the target OAI-PMH provider when harvesting content.</entry>
+							</row>
+							<row>
+								<?dbfo row-height="5mm"?>
+								<?dbhtml row-height="5mm"?>
+								<entry spanname="notespan"/>
+							</row>
+							<row>
+								<entry align="right">Property:</entry>
+								<entry><literal>harvester.timePadding</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Example Value:</entry>
+								<entry><literal>harvester.timePadding = 120</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Informational Note:</entry>
+								<entry>Amount of time subtracted from the from argument of the PMH request to account for the time taken to negotiate a connection. Measured in seconds. Default value is 120.</entry>
+							</row>
+							<row>
+								<?dbfo row-height="5mm"?>
+								<?dbhtml row-height="5mm"?>
+								<entry spanname="notespan"/>
+							</row>
+							<row>
+								<entry align="right">Property:</entry>
+								<entry><literal>harvester.harvestFrequency</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Example Value:</entry>
+								<entry><literal>harvester.harvestFrequency = 720</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Informational Note:</entry>
+								<entry>How frequently the harvest scheduler checks the remote provider for updates. Should always be longer than <literal>timePadding </literal>. Measured in minutes. Default value is 720.</entry>
+							</row>
+							<row>
+								<?dbfo row-height="5mm"?>
+								<?dbhtml row-height="5mm"?>
+								<entry spanname="notespan"/>
+							</row>
+							<row>
+								<entry align="right">Property:</entry>
+								<entry><literal>harvester.minHeartbeat</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Example Value:</entry>
+								<entry><literal>harvester.minHeartbeat = 30</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Informational Note:</entry>
+								<entry>The heartbeat is the frequency at which the harvest scheduler queries the local database to determine if any collections are due for a harvest cycle (based on the <literal>harvestFrequency</literal>) value. The scheduler is optimized to then sleep until the next collection is actually ready to be harvested. The <literal>minHeartbeat</literal> and <literal>maxHeartbeat</literal> are the lower and upper bounds on this timeframe. Measured in seconds. Default value is 30.</entry>
+							</row>
+							<row>
+								<?dbfo row-height="5mm"?>
+								<?dbhtml row-height="5mm"?>
+								<entry spanname="notespan"/>
+							</row>
+							<row>
+								<entry align="right">Property:</entry>
+								<entry><literal>harvester.maxHeartbeat</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Example Value:</entry>
+								<entry><literal>harvester.maxHeartbeat = 3600</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Informational Note:</entry>
+								<entry>The heartbeat is the frequency at which the harvest scheduler queries the local database to determine if any collections are due for a harvest cycle (based on the <literal>harvestFrequency</literal>) value. The scheduler is optimized to then sleep until the next collection is actually ready to be harvested. The <literal>minHeartbeat</literal> and <literal>maxHeartbeat</literal> are the lower and upper bounds on this timeframe. Measured in seconds. Default value is 3600 (1 hour).</entry>
+							</row>
+							<row>
+								<?dbfo row-height="5mm"?>
+								<?dbhtml row-height="5mm"?>
+								<entry spanname="notespan"/>
+							</row>
+							<row>
+								<entry align="right">Property:</entry>
+								<entry><literal>harvester.maxThreads</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Example Value:</entry>
+								<entry><literal>harvester.maxThreads = 3</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Informational Note:</entry>
+								<entry>How many harvest process threads the scheduler can spool up at once. Default value is 3.</entry>
+							</row>
+							<row>
+								<?dbfo row-height="5mm"?>
+								<?dbhtml row-height="5mm"?>
+								<entry spanname="notespan"/>
+							</row>
+							<row>
+								<entry align="right">Property:</entry>
+								<entry><literal>harvester.threadTimeout</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Example Value:</entry>
+								<entry><literal>harvester.threadTimeout = 24</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Informational Note:</entry>
+								<entry>How much time passess before a harvest thread is terminated. The termination process waits for the current item to complete ingest and saves progress made up to that point. Measured in hours. Default value is 24.</entry>
+							</row>
+							<row>
+								<?dbfo row-height="5mm"?>
+								<?dbhtml row-height="5mm"?>
+								<entry spanname="notespan"/>
+							</row>
+							<row>
+								<entry align="right">Property:</entry>
+								<entry><literal>harvester.unknownField</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Example Value:</entry>
+								<entry><literal>harvester.unkownField = fail | add | ignore</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Informational Note:</entry>
+								<entry>You have three (3) choices. When a harvest process completes for a single item and it has been passed through ingestion crosswalks for ORE and its chosen descriptive metadata format, it might end up with DIM values that have not been defined in the local repository. This setting determines what should be done in the case where those DIM values belong to an already declared schema. <literal>Fail</literal> will terminate the harvesting task and generate an error. <emphasis
+										role="bold"><literal>Ignore</literal></emphasis> will quietly omit the unknown fields. <emphasis role="bold"><literal>Add</literal></emphasis> will add the missing field to the local repository's metadata registry. Default value: <emphasis role="bold"><literal>fail</literal></emphasis>.</entry>
+							</row>
+							<row>
+								<?dbfo row-height="5mm"?>
+								<?dbhtml row-height="5mm"?>
+								<entry spanname="notespan"/>
+							</row>
+							<row>
+								<entry align="right">Property:</entry>
+								<entry><literal>harvester.unknownSchema</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Example Value:</entry>
+								<entry><literal>harvester.unknownSchema = fail | add | ignore</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Informational Note:</entry>
+								<entry>When a harvest process completes for a single item and it has been passed through ingestion crosswalks for ORE and its chosen descriptive metadata format, it might end up with DIM values that have not been defined in the local repository. This setting determines what should be done in the case where those DIM values belong to an unknown schema. <emphasis role="bold"
+										><literal>Fail</literal></emphasis> will terminate the harvesting task and generate an error. <emphasis role="bold"><literal>Ignore</literal></emphasis> will quietly omit the unknown fields. <emphasis role="bold"><literal>Add</literal></emphasis> will add the missing schema to the local repository's metadata registry, using the schema name as the prefix and &quot;unknown&quot; as the namespace. Default value: <emphasis role="bold"
+										><literal>fail</literal></emphasis>.</entry>
+							</row>
+							<row>
+								<?dbfo row-height="5mm"?>
+								<?dbhtml row-height="5mm"?>
+								<entry spanname="notespan"/>
+							</row>
+							<row>
+								<entry align="right">Property:</entry>
+								<entry><literal>harvester.acceptedHandleServer</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Example Value:</entry>
+								<entry>
+									<screen>harvester.acceptedHandleServer = \
+hdl.handle.net, handle.test.edu</screen>
+								</entry>
+							</row>
+							<row>
+								<entry align="right">Informational Note:</entry>
+								<entry>A harvest process will attempt to scan the metadata of the incoming items (identifier.uri field, to be exact) to see if it looks like a handle. If so, it matches the pattern against the values of this parameter. If there is a match the new item is assigned the handle from the metadata value instead of minting a new one. Default value: <literal>hdl.handle.net</literal>.</entry>
+							</row>
+							<row>
+								<?dbfo row-height="5mm"?>
+								<?dbhtml row-height="5mm"?>
+								<entry spanname="notespan"/>
+							</row>
+							<row>
+								<entry align="right">Property:</entry>
+								<entry><literal>harvester.rejectedHandlePrefix</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Example Value:</entry>
+								<entry><literal>harvester.rejectedHandlePrefix = 123456789, myeduHandle</literal></entry>
+							</row>
+							<row>
+								<entry align="right">Informational Note:</entry>
+								<entry>Pattern to reject as an invalid handle prefix (known test string, for example) when attempting to find the handle of harvested items. If there is a match with this config parameter, a new handle will be minted instead. Default value: <literal>123456789</literal>.</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</informaltable>
 			</section>
 		</section>
 		<section remap="h3">
@@ -6940,7 +7319,7 @@ plugin.named.org.dspace.sword.SWORDIngester = \
 						</row>
 						<row>
 							<entry align="right">Informational Note:</entry>
-							<entry>DC metadata field to hold computed &quot;lift date&quot; of embargo.  You may need to create a DC metadata field in your Metadata Format Registry if it does not already exist.</entry>
+							<entry>DC metadata field to hold computed &quot;lift date&quot; of embargo. You may need to create a DC metadata field in your Metadata Format Registry if it does not already exist.</entry>
 						</row>
 						<row>
 							<?dbfo row-height="5mm"?>
