@@ -45,6 +45,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.tools.ant.taskdefs.Get;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
@@ -54,6 +55,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;
 
 import java.io.*;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -91,9 +93,13 @@ public class StatisticsClient
 
 		Options options = new Options();
 
-        options.addOption("m", "mark-bots", false, "Update Marked Robots By IP in Statistics");
-        options.addOption("f", "delete-bots-by-flag", false, "Delete Robots in Statistics By IsBot Field");
-        options.addOption("i", "delete-bots-by-ip", false, "Delete Robots in Statistics By spider ip's");
+        options.addOption("u", "update-spider-files", false,
+                "Update Spider IP Files from internet into " +
+                        ConfigurationManager.getProperty("dspace.dir") + "/config/spiders");
+
+        options.addOption("m", "mark-spiders", false, "Update isBog Flag in Solr");
+        options.addOption("f", "delete-spiders-by-flag", false, "Delete Spiders in Solr By isBot Flag");
+        options.addOption("i", "delete-spiders-by-ip", false, "Delete Spiders in Solr By IP Address");
         options.addOption("h", "help", false, "help");
 
 		CommandLine line = parser.parse(options, args);
@@ -104,7 +110,11 @@ public class StatisticsClient
             printHelp(options, 0);
         }
 
-        if (line.hasOption('m'))
+        if(line.hasOption("u"))
+        {
+            StatisticsClient.updateSpiderFiles();
+        }
+        else if (line.hasOption('m'))
         {
             SolrLogger.markRobotsByIP();
         }
@@ -119,6 +129,54 @@ public class StatisticsClient
         else
         {
             printHelp(options, 0);
+        }
+    }
+
+    /**
+     * Method to update Spiders in config directory.
+     */
+    private static void updateSpiderFiles()
+    {
+	    try
+        {
+            System.out.println("Downloading latest spider IP addresses:");
+
+            // Get the list URLs to download from
+            String urls = ConfigurationManager.getProperty("solr.spiderips.urls");
+            if ((urls == null) || ("".equals(urls)))
+            {
+                System.err.println(" - Missing setting from dspace.cfg: solr.spiderips.urls");
+                System.exit(0);
+            }
+
+            // Get the location of spiders directory
+            File spiders = new File(ConfigurationManager.getProperty("dspace.dir"),"config/spiders");
+
+            if(!spiders.exists())
+                spiders.mkdirs();
+
+            String[] values = urls.split(",");
+            for (String value : values)
+            {
+                value = value.trim();
+                System.out.println(" Downloading: " + value);
+
+                URL url = new URL(value);
+
+                Get get = new Get();
+                get.setDest(new File(spiders, url.getHost() + url.getPath().replace("/","-")));
+                get.setSrc(url);
+                get.setUseTimestamp(true);
+                get.execute();
+
+            }
+
+
+        } catch (Exception e)
+        {
+            System.err.println(" - Error: " + e.getMessage());
+            e.printStackTrace();
+            System.exit(1);
         }
     }
 

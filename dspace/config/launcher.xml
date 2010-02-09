@@ -146,22 +146,6 @@
     </command>
 
     <command>
-        <name>log-converter</name>
-        <description>Convert dspace.log files ready for import into solr statistics</description>
-        <step>
-            <class>org.dspace.statistics.util.ClassicDSpaceLogConverter</class>
-        </step>
-    </command>
-
-    <command>
-        <name>log-importer</name>
-        <description>Import previously converted log files into solr statistics</description>
-        <step>
-            <class>org.dspace.statistics.util.StatisticsImporter</class>
-        </step>
-    </command>
-
-    <command>
         <name>make-handle-config</name>
         <description>Run the handle server simple setup command</description>
         <step>
@@ -262,6 +246,30 @@
     </command>
 
     <command>
+        <name>stats-log-converter</name>
+        <description>Convert dspace.log files ready for import into solr statistics</description>
+        <step>
+            <class>org.dspace.statistics.util.ClassicDSpaceLogConverter</class>
+        </step>
+    </command>
+
+    <command>
+        <name>stats-log-importer</name>
+        <description>Import previously converted log files into solr statistics</description>
+        <step>
+            <class>org.dspace.statistics.util.StatisticsImporter</class>
+        </step>
+    </command>
+
+    <command>
+        <name>stats-util</name>
+        <description>Statistics Client for Maintenance of Solr Statistics Indexes</description>
+        <step>
+            <class>org.dspace.statistics.util.StatisticsClient</class>
+        </step>
+    </command>
+
+    <command>
         <name>structure-builder</name>
         <description>Build DSpace commnity and collection structure</description>
         <step>
@@ -298,14 +306,6 @@
         <description>Update handle records and metadata when moving from one handle to another</description>
         <step>
             <class>org.dspace.handle.UpdateHandlePrefix</class>
-        </step>
-    </command>
-
-    <command>
-        <name>update-spider-ips</name>
-        <description>Update the list of known search engine IP addresses</description>
-        <step>
-            <class>org.dspace.statistics.util.DownloadSpiderIPs</class>
         </step>
     </command>
 
