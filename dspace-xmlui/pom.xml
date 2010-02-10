@@ -12,7 +12,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>1.6.0-SNAPSHOT</version>
+      <version>1.6.0-rc2</version>
    </parent>
 
    <repositories>
@@ -38,9 +38,9 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.0-rc2/dspace-xmlui</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.0-rc2/dspace-xmlui</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.0-rc2/dspace-xmlui</url>
    </scm>
    
    <modules>
