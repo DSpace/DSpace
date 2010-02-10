@@ -727,7 +727,8 @@ webui.itemlist.browse.&lt;browse name&gt;.columns
 webui.itemlist.*lt;sort or index name&gt;.columns
 webui.itemlist.dateaccessioned.columns
 webui.itemlist.dateaccessioned.widths
-webui.itemlist.tablewidth</screen>
+webui.itemlist.tablewidth
+webui.session.invalidate</screen>
 							</entry>
 							<entry><link linkend="docbook-configure.html-jspui-settings">5.2.36</link></entry>
 						</row>
@@ -5109,6 +5110,23 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 							<entry align="right">Informational Note:</entry>
 							<entry>You can also set the overall size of the item list table with the following setting. It can lead to faster table rendering when used with the column widths above, but not generally recommended.</entry>
 						</row>
+						<row>
+							<?dbfo row-height="5mm"?>
+							<?dbhtml row-height="5mm"?>
+							<entry spanname="notespan"/>
+						</row>
+						<row>
+							<entry align="right">Property:</entry>
+							<entry><literal>webui.session.invalidate</literal></entry>
+							</row>
+						<row>
+							<entry align="right">Example Value:</entry>
+							<entry><literal>webui.session.invalidate = true</literal></entry>
+						</row>
+						<row>
+							<entry align="right">Informational Note:</entry>
+							<entry>Enable or disable session invalidation upon login or logout.  This feature is enabled by default to help prevent session hijacking but may cause problems for shibboleth, etc.  If omitted, the default value is &apos;<literal>true</literal>&apos;.  [Only used for JSPUI authentication].</entry>
+						</row>						
 					</tbody>
 				</tgroup>
 			</informaltable>

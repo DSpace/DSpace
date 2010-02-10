@@ -1679,6 +1679,57 @@ checker.retention.CHECKSUM_MATCH = 8w</screen> You can use the table above for y
 		</table>
 	</section>
 	<section remap="h2">
+		<title><anchor id="docbook-sys_admin.html-statistics" xreflabel="Client Statistics"/>Client Statistics</title>
+		<table>
+			<title>Client Statistics Command Table</title>
+			<?dbhtml table-width="100%" ?>
+			<?dbfo table-width="100%"?>
+			<tgroup cols="2" align="left">
+				<colspec colname="c1" colwidth="40*"/>
+				<colspec colname="c2" colwidth="60*"/>
+				<spanspec spanname="hspan" namest="c1" nameend="c2" align="center"/>
+				<tbody>
+					<row>
+						<entry>Command used:</entry>
+						<entry><emphasis><literal>[dspace]</literal></emphasis><literal>/bin/dspace stats-utils</literal></entry>
+					</row>
+					<row>
+						<entry>Java class:</entry>
+						<entry>org.dspace.statistics.util.StatisticsClient</entry>
+					</row>
+					<row>
+						<entry>Arguments (short and long forms):</entry>
+						<entry>Description</entry>
+					</row>
+					<row>
+						<entry><literal>-u</literal> or <literal>--update-spider-files</literal></entry>
+						<entry>Update Spider IP Files from internet into /dspace/config/spiders.  Downloads Spider files identified in <literal>dspace.cfg</literal> under property</entry>
+					</row>
+					<row>
+						<entry><literal>-f</literal> or <literal>--delete-spiders-by-flag</literal></entry>
+						<entry>Delete Spiders in Solr By isBot Flag.  Will prune out all records that have <literal>isBot:true</literal></entry>
+					</row>
+					<row>
+						<entry><literal>-i</literal> or <literal>--delete-spiders-by-ip</literal></entry>
+						<entry>Delete Spiders in Solr By IP Address.  Will prune out all records that have IP's that match spider IPs.</entry>
+					</row>
+					<row>
+						<entry><literal>-m</literal> or <literal>--mark-spiders</literal></entry>
+						<entry>Update isBog Flag in Solr.  Marks any records currently stored in statistics that have IP addresses matched in spiders files</entry>
+					</row>
+					<row>
+						<entry><literal>-h</literal> or <literal>--help</literal></entry>
+						<entry>Calls up this brief help table at CLI.</entry>
+					</row>
+				</tbody>
+			</tgroup>
+		</table>
+		<para>Notes:</para>
+		<para>The usage of these options is open for the user to choose, If they want to keep spider entires in their repository, they can just mark them using &quot;<literal>-m</literal>&quot; and they will be excluded from statistics queries when &quot;<literal>solr.statistics.query.filter.isBot = true</literal>&quot; in the <literal>dspace.cfg</literal>.</para>
+		<para>If they want to keep the spiders out of the solr repository, they can run just use the &quot;<literal>-i</literal>&quot; option and they will be removed immediately.</para>
+		<para>There are guards in place to control what can be defined as an IP range for a bot, in <literal>[dspace]/config/spiders</literal>, spider IP address ranges have to be at least 3 subnet sections in length 123.123.123 and IP Ranges can only be on the smallest subnet [123.123.123.0 - 123.123.123.255].  If not, loading that row will cause exceptions in the dspace logs and exclude that IP entry.</para>
+	</section>
+	<section remap="h2">
 		<title><anchor id="docbook-sys_admin.html-testDB" xreflabel="Test Database"/>Test Database</title>
 		<para>This command can be used at any time to test for Database connectivity. It will assist in troubleshooting PostgreSQL and Oracle connection issues with the datase.</para>
 		<table>
