@@ -78,10 +78,10 @@
    <profiles>
    
       <!--
-         ========================================================
-         These are admiistrative profiles used by release manager
-         To complete release tasks.
-         ========================================================
+         =========================================================
+         These are administrative profiles used by release manager
+         to complete release tasks.
+         =========================================================
          
          Use 'mvn release:prepare -Pall' for tagging the release.
       -->
@@ -203,7 +203,7 @@
    </repositories>
 
    <!--
-      Distribution management provides a means to control which
+      Dependency management provides a means to control which
       versions of dependency jars are used for compilation
       and packaging into the distribution.  Rather than placing
       a version in your dependencies, look here first to see if
@@ -605,16 +605,16 @@
          </archive>
       </mailingList>
       <mailingList>
-         <name>DSpace Manakin List</name>
+         <name>DSpace General Issues List</name>
          <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-manakin
+            http://lists.sourceforge.net/mailman/listinfo/dspace-general
          </subscribe>
          <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-manakin
+            http://lists.sourceforge.net/mailman/listinfo/dspace-general
          </unsubscribe>
-         <post>dspace-manakin AT lists.sourceforge.net</post>
+         <post>dspace-general AT lists.sourceforge.net</post>
          <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-manakin
+            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-general
          </archive>
       </mailingList>
       <mailingList>
@@ -814,8 +814,8 @@
 
    <!--
       The Subversion repository location is used by Continuum to update against
-      when changes have occured, this spawns a new build cycle and releases snapshots
-      into the snapshot repository below.
+      when changes have occurred.  This spawns a new build cycle and releases
+      snapshots into the snapshot repository below.
    -->
    <scm>
       <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk</connection>
