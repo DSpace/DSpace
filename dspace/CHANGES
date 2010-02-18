@@ -17,6 +17,7 @@
  - [DS-414] File downloads listed in collections and communities statistics
  - [DS-438] JSPUI stats - filenames incorrect
  - [DS-418] I18n broken in JSPUI
+ - [DS-474] handle.canonical.prefix undocumented
 
 (Claudia Juergen)
  - [DS-114] Links not working due to trailing white space in dspace.url
