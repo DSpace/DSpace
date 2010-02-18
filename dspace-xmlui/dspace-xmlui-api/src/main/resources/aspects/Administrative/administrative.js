@@ -957,7 +957,7 @@ function doEditGroup(groupID)
         }
        	else if (cocoon.request.get("submit_save"))
        	{
-       		result = FlowGroupUtils.processSaveGroup(getDSContext(),groupID,escape(groupName),memberEPeopleIDs,memberGroupIDs);
+       		result = FlowGroupUtils.processSaveGroup(getDSContext(),groupID,groupName,memberEPeopleIDs,memberGroupIDs);
        		
        		// Incase a group was created, update our id.
        		if (result != null && result.getParameter("groupID"))
