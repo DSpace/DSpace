@@ -155,6 +155,7 @@
  - [DS-228] Community Admin XMLUI: Delegated Admins Patch
 
 (Ben Bosman)
+ - [DS-483] statistics.item.authorization.admin ignored by xmlui
  - [DS-365] support for OAI gateways that do not use sets in harvester
  - [DS-392] Error messages in the submission do not disappear if e.g. one of the two errors are solved
  - [DS-381] community and collection homepage

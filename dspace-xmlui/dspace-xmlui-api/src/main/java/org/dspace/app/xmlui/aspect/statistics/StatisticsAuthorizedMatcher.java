@@ -63,15 +63,20 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
             	return null;
 
             boolean authorized = AuthorizeManager.authorizeActionBoolean(context, dso, action, false);
-            //If we are not authorized check for any other authorizations present
-            if(!authorized && context.getCurrentUser() != null
-                    && ConfigurationManager.getBooleanProperty("statistics.item.authorization.admin"))
+            //If we are authorized check for any other authorization actions present
+            if(authorized && ConfigurationManager.getBooleanProperty("statistics.item.authorization.admin"))
             {
-                //Check for admin
-                authorized = AuthorizeManager.isAdmin(context);
-                if(!authorized)
-                    //Check if we have authorization for the owning colls, comms, ...
-                    authorized = checkParentAuthorization(context, dso);
+                //If we have no user, we cannot be admin
+                if(context.getCurrentUser() == null)
+                    authorized = false;
+
+                if(authorized){
+                    //Check for admin
+                    authorized = AuthorizeManager.isAdmin(context);
+                    if(!authorized)
+                        //Check if we have authorization for the owning colls, comms, ...
+                        authorized = AuthorizeManager.isAdmin(context, dso);
+                }
             }
 
             // XOR
@@ -90,40 +95,5 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
         {
             throw new PatternException("Unable to obtain DSpace Context", sqle);
         }
-    }
-
-    public static boolean checkParentAuthorization(Context context, DSpaceObject dso) throws SQLException {
-        if(dso instanceof Community)
-        {
-            Community comm = (Community) dso;
-            if(AuthorizeManager.isAdmin(context, comm))
-                return true;
-            else if(comm.getParentCommunity() != null)
-                return checkParentAuthorization(context, comm);
-        }else
-        if(dso instanceof Collection)
-        {
-            Collection coll = (Collection) dso;
-            if(AuthorizeManager.isAdmin(context, coll))
-                return true;
-            else{
-                //Check if any of our parent communities has authorization
-                for (int i = 0; i < coll.getCommunities().length; i++) {
-                    Community community = coll.getCommunities()[i];
-                    boolean authorized = checkParentAuthorization(context, community);
-                    if(authorized)
-                        return true;
-                }
-            }
-        }else
-        if(dso instanceof Item){
-            //Check if we have read rights for our owning collections
-            for(Collection coll : ((Item) dso).getCollections()){
-                boolean authorized = checkParentAuthorization(context, coll);
-                if(authorized)
-                    return true;
-            }
-        }
-        return false;
     }
 }

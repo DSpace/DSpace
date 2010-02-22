@@ -32,7 +32,13 @@
 
 			<map:generate/>
 
-            <map:transform type="Navigation"/>
+            <!--Only show the stats link if we have read rights-->
+            <map:match pattern="handle/*/**">
+                <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
+                    <map:transform type="Navigation"/>
+                </map:match>
+            </map:match>
+
 
             <!--Match our statistics-->
             <map:match pattern="handle/*/*/statistics">
