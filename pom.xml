@@ -72,7 +72,7 @@
          <id>maven.dspace.org-snapshot</id>
          <name>DSpace Maven Repository</name>
          <url>scp://maven.dspace.org/var/maven/snapshot</url>
-         <uniqueVersion>false</uniqueVersion>
+         <uniqueVersion>true</uniqueVersion>
       </snapshotRepository>
    </distributionManagement>
 
@@ -122,8 +122,12 @@
                </execution>
             </executions>
          </plugin>
+
+
+
       </plugins>
    </build>
+    
    <dependencies>
       <dependency>
          <groupId>javax.servlet</groupId>

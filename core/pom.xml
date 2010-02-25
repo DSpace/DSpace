@@ -40,37 +40,58 @@
     </developerConnection>
    </scm>
    
-   <profiles>
-      <profile>
-         <id>patch</id>
-         <activation>
-            <activeByDefault>false</activeByDefault>
-         </activation>
-         <build>
-            <plugins>
-               <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-patch-plugin</artifactId>
-                  <version>1.0</version>
+   <build>
+        <plugins>
+        
+                 <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+               <execution>
+                  <phase>generate-sources</phase>
                   <configuration>
-                     <patches>
-                        <patch>core.patch</patch>
-                     </patches>
+                     <tasks>
+                     
+                        <delete dir="{project.build.directory}/generated-sources"/>
+                        <copy
+                           todir="${project.build.directory}/generated-sources/main/java">
+                           <fileset dir="src/main/external-java" />
+                        </copy>
+                     </tasks>
+                     <sourceRoot>
+                        ${project.build.directory}/generated-sources/main/java
+              </sourceRoot>
+                     <testSourceRoot>
+                        ${project.build.directory}/generated-sources/test/java
+              </testSourceRoot>
                   </configuration>
-                  <executions>
-                     <execution>
-                        <id>patch</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                           <goal>apply</goal>
-                        </goals>
-                     </execution>
-                  </executions>
-               </plugin>
-            </plugins>
-         </build>
-      </profile>
-   </profiles>
+                  <goals>
+                     <goal>run</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-patch-plugin</artifactId>
+            <configuration>
+               <patchFile>src/main/patches/core.patch</patchFile>
+               <targetDirectory>${project.build.directory}/generated-sources/main/java</targetDirectory>
+            </configuration>
+            <executions>
+               <execution>
+                  <phase>generate-sources</phase>
+                  <goals>
+                     <goal>apply</goal>
+                  </goals>
+               </execution>
+            </executions>
+
+         </plugin>
+        </plugins>
+   
+   </build>
+   
    <dependencies>
 
       <!-- Solr -->
