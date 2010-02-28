@@ -16,8 +16,7 @@ KNOWN BUGS
 =============================================================================
 
 The following is a list of some of the known bugs in DSpace version 1.6 which
-will likely be fixed in 1.6.1. This list is not exhaustive, and a definitive
-and up to date list of bugs can be found in the JIRA issue tracker:
+will likely be fixed in 1.6.1.
 
  - http://jira.dspace.org/jira/browse/DS-493
    - Url in browser is incorrect after login
@@ -57,3 +56,10 @@ and up to date list of bugs can be found in the JIRA issue tracker:
    - Command line utility org.dspace.app.harvest.Harvest -S throws
      AuthorizeException
    - Affects core DSpace API
+
+
+This list is not exhaustive, but a definitive and up to date list of bugs
+affecting DSpace version 1.6 can be found in the JIRA issue tracker:
+
+ - http://jira.dspace.org/jira/secure/IssueNavigator.jspa?reset=true&&type=1
+    &pid=10020&resolution=-1&fixfor=-2&version=10020
