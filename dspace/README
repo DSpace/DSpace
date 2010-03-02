@@ -1,16 +1,16 @@
-$Date$
-
 Installation instructions are included in this release package under
 
- - html/docs/install.html
+ - docs/html/index.html
 or
- - pdf/DSpace-Manual.pdf
+ - docs/pdf/DSpace-Manual.pdf
 
+DSpace version information can be found in this release package under
+ - CHANGES
 
 Documentation for the most recent stable release may be viewed online at
 dspace.org:
 
- - http://dspace.org/technology/system-docs/
+ - http://dspace.org/current-release/latest-release/
 
 
 Installation instructions for other version may be different, so you
@@ -19,7 +19,7 @@ SourceForge, or to download the latest documentation snapshot from SVN
 
 To obtain files from the SVN repository and build, please see:
 
- - https://scm.dspace.org/svn/repo/dspace/trunk/
+ - https://scm.dspace.org/svn/repo/dspace/tags/
 
 
 Please refer any further problems to the dspace-tech@lists.sourceforge.net
@@ -44,4 +44,4 @@ places to seek help, news articles and lists of other users, please see:
  - http://www.dspace.org/
  
 
-Copyright (c) 2002-2009, DuraSpace.  All rights reserved.
+Copyright (c) 2002-2010, DuraSpace.  All rights reserved.
