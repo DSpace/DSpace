@@ -19,71 +19,100 @@
 <!ENTITY art16 SYSTEM "history.xml">
 <!ENTITY appa SYSTEM "appendix.xml">
 ]>
-
 <book>
-    <bookinfo>
-        <title>DSpace Manual</title>
-        <subtitle>Release 1.6.0</subtitle>
-        <author>
-            <surname>The DuraSpace Foundation</surname>
-            <affiliation>
-                <address><email>webmaster@dspace.org</email></address>
-            </affiliation>
-        </author> <edition>1.6.0</edition>
-        <pubdate>2010-03-01  20:17:16 EST</pubdate>
-        <copyright>
-            <year>2002-2010</year>
-            <holder>
-                <ulink url="http://www.duraspace.org/">The DuraSpace Foundation</ulink>
-            </holder>
-        </copyright>
-        <legalnotice>
-            <para>
-                <ulink url="http://creativecommons.org/licenses/by/3.0/us/">
-                    <inlinemediaobject>
-                        <imageobject>
-                            <imagedata fileref="http://i.creativecommons.org/l/by/3.0/us/88x31.png" format="PNG"/>
-                        </imageobject>
-                    </inlinemediaobject>
-        </ulink>
-            </para>
-        	<para>Licensed under a Creative Commons Attribution 3.0 United States License</para>
-        </legalnotice>
-        <revhistory>
-            <revision>
-                <revnumber>Version 1.6.0 </revnumber>
-                <date>This text generated: 2010-03-01  20:17:16 EST</date>
-                <authorinitials>JAT</authorinitials>
-                
-            </revision>
-        </revhistory>
-        <abstract>
-            <para/>
-        </abstract>
-    </bookinfo>
-    <preface>
-        <title>Preface</title> <para/>
-    	<para>The documentation submitted to you, the administrator, is a &quot;Release Candidate&quot; for testing purposes and finding the bugs in the DSpace 1.6 RC2 software.  Users should be aware that the documentation may contain errors and/or missing pieces to the documentation.</para>
-    	<para>Currently, the list of bugs and fixes has not made it into the 1.6-RC2 documentation along with other items that were being finished up in the programming realm as this documentation was being generated.</para>
-    </preface>
-    <toc/>
-    
-&art01;
-&art02;
-&art03;
-&art04;
-&art05;
-&art06;
-&art07;
-&art08;
-&art09;
-&art10;
-&art11;
-&art12;
-&art13;
-&art14;
-&art15;
-&art16;
-&appa;
-<index/>
+	<bookinfo>
+		<title>DSpace Manual</title>
+		<subtitle>Release 1.6.0</subtitle>
+		<author>
+			<surname>The DuraSpace Foundation</surname>
+			<affiliation>
+				<address><email>webmaster@dspace.org</email></address>
+			</affiliation>
+		</author>
+		<edition>1.6.0</edition>
+		<pubdate>2010-03-02  11:45:00 EST</pubdate>
+		<copyright>
+			<year>2002-2010</year>
+			<holder>
+				<ulink url="http://www.duraspace.org/">The DuraSpace Foundation</ulink>
+			</holder>
+		</copyright>
+		<legalnotice>
+			<para>
+				<ulink url="http://creativecommons.org/licenses/by/3.0/us/">
+					<inlinemediaobject>
+						<imageobject>
+							<imagedata fileref="http://i.creativecommons.org/l/by/3.0/us/88x31.png" format="PNG"/>
+						</imageobject>
+					</inlinemediaobject>
+				</ulink>
+			</para>
+			<para>Licensed under a Creative Commons Attribution 3.0 United States License</para>
+		</legalnotice>
+		<revhistory>
+			<revision>
+				<revnumber>Version 1.6.0 </revnumber>
+				<date>This text generated: 2010-03-02  11:45:00 EST EST</date>
+				<authorinitials>JAT</authorinitials>
+			</revision>
+		</revhistory>
+		<abstract>
+			<para/>
+		</abstract>
+	</bookinfo>
+	<preface>
+		<title>Preface</title>
+		<para/>
+		<para>Welcome to Release 1.6.0. The committers have volunteered many hours to fix, re-write and contribute new software code for this release. New features have been added and documentation has been updated.</para>
+		<para>Some of the new features include (not an exhaustive list):</para>
+		<itemizedlist>
+			<listitem>
+				<para>SOLR Statistics.</para>
+			</listitem>
+			<listitem>
+				<para>Authority Control.</para>
+			</listitem>
+			<listitem>
+				<para>Embargos</para>
+			</listitem>
+			<listitem>
+				<para>Dspace Command Launcher</para>
+			</listitem>
+			<listitem>
+				<para>OpenSearch</para>
+			</listitem>
+			<listitem>
+				<para>Batch Metadata Editing</para>
+			</listitem>
+			<listitem>
+				<para>Configurable OAI-PMH Dublin Core Ouput</para>
+			</listitem>
+			<listitem>
+				<para>Delegated Administration</para>
+			</listitem>
+		</itemizedlist>
+		<para>The following people have contributed to this release of DSpace: @mire, BioMed Central, Andrea Bollini, Ben Bosman, Flavio Botelho, Peter Dietz, Mark Diggory, Tim Donohue, Enovation Solutions, Ladd Hanson, Leonie Hayes, Claudia Juergen, Keller, Fabio Kepler, Yin Yin Latt, Stuart Lewis, Bram Luyten, Van Ly, Alexey Maslov, Gabriela Mircea, Hardik Mishra, Venessa Newton-Wade, OhioLINK, Ekaterina Pechekhonova, Toni Prieto, Richard Rodgers, Ricardo Saraiva, Andreas Schwander, Kim Shepherd, Elin Stangeland, Larry Stone, Graham Triggs, Jeffrey Trimble, Kevin Van de velde, Steve Williams and Mark Wood. Many of them could not do this work without the support (release time and financial) of their institutions that they are associated with. We offer thanks to those institutions for supporting their staff to take time to contribute to the DSpace project.</para>
+		<para>Documentation for this release was overhauled by Jeffrey Trimble, the Documentation Gardener, with many other contributing suggestions, changes, edits, and additions. Special thanks to Bram Luyten for pulling his hair out for re-ordering Chapter 5 to match the order of the <literal>dspace.cfg</literal> file and for the Documentation Gardener who is still picking his own hair up from that re-ordering.</para>
+		<para>Stuart Lewis is the Release Co-ordinator and kept all of the committers inline and fixed things when broken.  Many thanks Stuart.</para>
+		<para>Additional thanks to Tim Donohue from DuraSpace Foundation on keeping all of us focused on the work at hand, and calming us when we got excited and for the general support for the DSpace project.</para>
+	</preface>
+	<toc/>
+	&art01;
+	&art02;
+	&art03;
+	&art04;
+	&art05;
+	&art06;
+	&art07;
+	&art08;
+	&art09;
+	&art10;
+	&art11;
+	&art12;
+	&art13;
+	&art14;
+	&art15;
+	&art16;
+	&appa;
+	<index/>
 </book>
