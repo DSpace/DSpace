@@ -23,14 +23,14 @@
 <book>
     <bookinfo>
         <title>DSpace Manual</title>
-        <subtitle>Release 1.6 RC2</subtitle>
+        <subtitle>Release 1.6.0</subtitle>
         <author>
             <surname>The DuraSpace Foundation</surname>
             <affiliation>
                 <address><email>webmaster@dspace.org</email></address>
             </affiliation>
-        </author> <edition>1.6 RC2</edition>
-        <pubdate>2010-02-09  21:50:16 EST</pubdate>
+        </author> <edition>1.6.0</edition>
+        <pubdate>2010-03-01  20:17:16 EST</pubdate>
         <copyright>
             <year>2002-2010</year>
             <holder>
@@ -51,8 +51,8 @@
         </legalnotice>
         <revhistory>
             <revision>
-                <revnumber>Version 1.6 RC2 </revnumber>
-                <date>This text generated: 2010-02-09  21:50:16 EST</date>
+                <revnumber>Version 1.6.0 </revnumber>
+                <date>This text generated: 2010-03-01  20:17:16 EST</date>
                 <authorinitials>JAT</authorinitials>
                 
             </revision>
