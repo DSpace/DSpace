@@ -25,10 +25,19 @@
   					<para>DS-228 - Community Admin XMLUI: Delegated Admins Patch</para>
   				</listitem>
   				<listitem>
+  					<para>DS-236 - Authority Control, and plug-in choice control for Metadata Fields</para>
+  				</listitem>
+  				<listitem>
   					<para>DS-288 - Hide metadata from full item view</para>
   				</listitem>
   				<listitem>
+  					<para>DS-289 - OAI-PMH + OAI-ORE harvesting support</para>
+  				</listitem>
+  				<listitem>
   					<para>DS-317 - Embargo feature</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-321 - DSpace command launcher</para>
   				</listitem>
   				<listitem>
   					<para>DS-323 - ItemUpdate - new feature to batch update metadata and bitstreams</para>
@@ -48,11 +57,20 @@
   				<listitem>
   					<para>DS-388 - Item importer - new option to enable workflow notification emails</para>
   				</listitem>
+  				<listitem>
+  					<para>DS-430 - Embargo</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-447 - Email test script</para>
+  				</listitem>
   			</itemizedlist>
   		</section>
   		<section>
   			<title>General Improvments</title>
   			<itemizedlist>
+  				<listitem>
+  					<para>DS-52 - Factor out common webapp installation - ID: 2042160</para>
+  				</listitem>
   				<listitem>
   					<para>DS-196 - METS exposed via OAI-PMH includes descritpion.provenance information</para>
   				</listitem>
@@ -73,6 +91,12 @@
   				</listitem>
   				<listitem>
   					<para>DS-238 - Move item function in xmlui</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-241 - DSpace Assembly Improvement</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-243 - UsageEvent adjustments to support Statistics and Reporting Addons</para>
   				</listitem>
   				<listitem>
   					<para>DS-252 - Interpolate variables in the Subject: line of email templates as well</para>
@@ -114,7 +138,16 @@
   					<para>DS-333 - Adjust SWORD ingest crosswalk to store bibliographic citation</para>
   				</listitem>
   				<listitem>
+  					<para>DS-339 - Cleanup Dependenceis and POM files prior to release Upgrade Servlet API to 2.4 across all projects</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-347 - Add --quiet option to MediaFilterManager to disable debug/monitoring output</para>
+  				</listitem>
+  				<listitem>
   					<para>DS-356 - Antispam for suggest item feature</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-361 - Merge + Improvie Generation of Syndication Feeds</para>
   				</listitem>
   				<listitem>
   					<para>DS-372 - New verbose option for [dspace]/bin/dspace cleanup script</para>
@@ -129,7 +162,31 @@
   					<para>DS-389 - Misleading label: &quot;Submit to This Collection&quot; is corrected</para>
   				</listitem>
   				<listitem>
-  					<para>DS-52 - Factor out common webapp installation - ID: 2042160</para>
+  					<para>DS-405 - New 1.6 Statistics settings in dspace.cfg need documentation</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-407 - Install or Upgrade on existing server throws error for &apos;mvn package&apos;</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-410 - Updates to upgrade instructions necessary</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-412 - XPDF MediaFilter: generate UTF-8 text, and improve error reporting</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-425 - JSP UI cosmetics: horizontal scroll bar</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-445 - New bitstream.findAll() method</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-446 - New ant step -test_database</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-460 - Change logging from RollingFileAppender to DailyFileAppender</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-461 - Add information about setting web proxies to maven to install docs</para>
   				</listitem>
   			</itemizedlist>
   		</section>
@@ -146,10 +203,16 @@
   					<para>DS-118 - File preview link during submission leeds to page not found</para>
   				</listitem>
   				<listitem>
+  					<para>DS-121 - XMLUI Feedback form breaks with multiple hostnames</para>
+  				</listitem>
+  				<listitem>
   					<para>DS-128 - Anchor in submission doesn't work</para>
   				</listitem>
   				<listitem>
   					<para>DS-156 - File description not available in XMLUI</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-184 - NPE from Edit Collection, Item Template, Edit Authorizations</para>
   				</listitem>
   				<listitem>
   					<para>DS-191 - metadataschemaregistry_seq is not initialized correctly under Oracle</para>
@@ -182,13 +245,16 @@
   					<para>DS-216 - Migrating items that use additional metadata schemas causes an NPE</para>
   				</listitem>
   				<listitem>
+  					<para>DS-217 - Hardcoded String in the license bitstream</para>
+  				</listitem>
+  				<listitem>
   					<para>DS-218 - Cannot add/remove email subscriptions from Profile page in XMLUI</para>
   				</listitem>
   				<listitem>
   					<para>DS-222 - Email alerts due to internal errors are not sent, if context is missing</para>
   				</listitem>
   				<listitem>
-  					<para>DS-223 - Submission process show previous button in JSPUI also if the step is the first "visible" step</para>
+  					<para>DS-223 - Submission process show previous button in JSPUI also if the step is the first &quot;visible&quot; step</para>
   				</listitem>
   				<listitem>
   					<para>DS-225 - <literal>dc.description.provenance</literal> - public display</para>
@@ -198,6 +264,9 @@
   				</listitem>
   				<listitem>
   					<para>DS-227 - Values with double apos doesn't work in dropdown and list input type</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-229 - <literal>dc.description.provenance</literal> shown in default xmlui 'full item view'</para>
   				</listitem>
   				<listitem>
   					<para>DS-231 - Missig file for index-init</para>
@@ -224,6 +293,9 @@
   					<para>DS-250 - Invalid identifers are not escaped</para>
   				</listitem>
   				<listitem>
+  					<para>DS-253 - NullPointerException in HttpServletResponseBufferingWrapper</para>
+  				</listitem>
+  				<listitem>
   					<para>DS-254 - Bitstream (and item-export) download service does not correctly sense authenticated user</para>
   				</listitem>
   				<listitem>
@@ -240,6 +312,9 @@
   				</listitem>
   				<listitem>
   					<para>DS-262 - Bug in DS-118, new patch included</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-264 - XMLUI misses logging UsageEvent on requests fulfilled from the cache</para>
   				</listitem>
   				<listitem>
   					<para>DS-265 - IndexBrowse dies fatally when confronting badly-formatted date</para>
@@ -260,13 +335,22 @@
   					<para>DS-280 - build.xml fails for ant versions below 1.7 (patch included)</para>
   				</listitem>
   				<listitem>
-  					<para>DS-281 - Invalid Link to "Go to DSpace Home" on Page Not Found</para>
+  					<para>DS-281 - Invalid Link to &quot;Go to DSpace Home&quot; on Page Not Found</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-282 - &quot;Starts with&quot; navigation block should not display when browsing by specific value</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-284 - Some rows if presented in the item summary will be wrongly considered odd or even.</para>
   				</listitem>
   				<listitem>
   					<para>DS-285 - Item and Bitstream pages do not provide Last-Modified HTTP header, nor recognize If-Modified-Since</para>
   				</listitem>
   				<listitem>
   					<para>DS-290 - <literal>[dspace]/exports</literal> is not created during fresh install</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-295 - CC License being assigned incorrect Mime Type during submission.</para>
   				</listitem>
   				<listitem>
   					<para>DS-303 - Export migrate option incorrectly removes non-handle identifier.uris</para>
@@ -296,6 +380,9 @@
   					<para>DS-338 - Bitstream download allows caching of content that requires authorization to read</para>
   				</listitem>
   				<listitem>
+  					<para>DS-340	DSpace services log to the command line</para>
+  				</listitem>
+  				<listitem>
   					<para>DS-344 - Apostrophe in email address prevents EPerson from being selected</para>
   				</listitem>
   				<listitem>
@@ -306,6 +393,9 @@
   				</listitem>
   				<listitem>
   					<para>DS-354 - Make-handle-server configuration fails. New command created using dspace launcher.</para>
+  				</listitem>
+  				<listitem>
+  					<para>DS-365	New DSpace OAI-PMH Harvester doesn't support OAI gateways that do not use &apos;sets&apos;</para>
   				</listitem>
   				<listitem>
   					<para>DS-370 - E Mail Sent On Item Export Error Message</para>
@@ -331,6 +421,92 @@
   				<listitem>
   					<para>DS-393 - The issue date in the submission lowers each time the describe page is being displayed</para>
   				</listitem>
+  				<listitem>
+  					<para>DS-395 - DSpace Objects (communities, collections, items, bitstreams) only accessible to logged in users</para>
+  				</listitem>	 
+ 				<listitem>
+ 					<para>DS-398 - Submission license displayed on collection and item homepage</para>
+ 				</listitem>	 	  
+			 	<listitem>
+			 		<para>DS-399 - Special characters in collection license lead to parse error</para>
+			 	</listitem>		  
+			 	<listitem>
+			 		<para>DS-400 - Webui item browse (date, title or similar) reduces displayed issue date by one day</para>
+			 	</listitem>	  
+			 	<listitem>
+			 		<para>DS-406 - View Statistics button does not work in item page</para>
+			 	</listitem>
+			 	<listitem>
+			 		<para>DS-409 - JSPUI Statistics Display ignores &quot;statistics.item.authorization.admin&quot;</para>
+			 	</listitem>
+			 	<listitem>
+			 		<para>DS-414 - solr statistics file downloads listed in statistics display of communites and collections</para>
+			 	</listitem>	  
+			 	<listitem>
+			 		<para>DS-415 - Create groups via admin UI authorization denied</para>
+			 	</listitem>
+			 	<listitem>
+			 		<para>DS-416 - Solr Statistics not starting on Windows Fresh install</para>
+			 	</listitem>	  
+			 	<listitem>
+			 		<para>DS-417 - 1-day (or passed) embargo dates give error upon submission</para>
+			 	</listitem>	  
+			 	<listitem>
+			 		<para>DS-418 - i18n broken in jspui</para>
+			 	</listitem>	
+			 	<listitem>
+			 		<para>DS-419 - Setting embargo.field.terms to an unqualified field throws uncaught exception on item submission</para>
+			 	</listitem> 
+				<listitem>
+					<para>DS-421 - Setting solr.metadata.item.X property to an unqualified field generates exception in <literal>SolrLogger.post</literal> on item view and prevents Solr from logging the event</para>
+				</listitem>
+  				<listitem>
+  					<para>DS-422 - Directory &quot;etc&quot; missing from Ant target &quot;init_installation&quot;.</para>
+  				</listitem>  
+			 	<listitem>
+			 		<para>DS-423 - Ant target &quot;clean_database&quot; doesn't drop all tables.</para>
+			 	</listitem>
+			 	<listitem>
+			 		<para>DS-424 - Export metadata button displayed in JSPUI Administration List of withdrawn items</para>
+			 	</listitem>
+			 	<listitem>
+			 		<para>DS-427 - Item license per default displayed in item display of the xmlui</para>
+			 	</listitem>
+			 	<listitem>
+			 		<para>DS-428 - Wrong link for bitstreams during submission	 unassigned</para>
+			 	</listitem>	
+			 	<listitem>
+			 		<para>DS-432 - No mention of config/news-xmlui.xml in manual</para>
+			 	</listitem>		  
+			 	<listitem>
+			 		<para>DS-436 - SWORD Authenticator doesn&quot;t support the special groups infrastructure</para>
+			 	</listitem>
+			 	<listitem>
+			 		<para>DS-437 - Oracle DB Schema has artifacts from past releases</para>
+			 	</listitem>	 
+			 	<listitem>
+			 		<para>DS-438 - JSPUI stats - filename incorrect on second and subsequent files</para>
+			 	</listitem>	  
+			 	<listitem>
+			 		<para>DS-459 - OAI PMH is not delivering continuation tokens</para>
+			 	</listitem> 
+			 	<listitem>
+			 		<para>DS-468 - CLONE - Foreign characters broken in group names</para>
+			 	</listitem>
+			 	<listitem>
+			 		<para>DS-472 - &quot;fresh_install&quot; broken on a completely clean system</para>
+			 	</listitem>	 
+			 	<listitem>
+			 		<para>DS-474 - handle.canonical.prefix undocumented</para>
+			 	</listitem>
+			 	<listitem>
+			 		<para>DS-475 - create a new group</para></listitem>		  
+			 	<listitem>
+			 		<para>DS-477 - LDAPHierarchicalAuthentication fails when the LDAP returns mixed case email address</para>
+			 	</listitem>	
+			 	<listitem>
+			 		<para>DS-480 - Exception is thrown when removing the last file after the item is rejected during review.</para>
+			 	</listitem>
   			</itemizedlist>
   		</section>
     <section remap="h2">
