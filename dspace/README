@@ -1,0 +1,47 @@
+Installation instructions are included in this release package under
+
+ - docs/html/index.html
+or
+ - docs/pdf/DSpace-Manual.pdf
+
+DSpace version information can be found in this release package under
+ - CHANGES
+
+Documentation for the most recent stable release may be viewed online at
+dspace.org:
+
+ - http://dspace.org/current-release/latest-release/
+
+
+Installation instructions for other version may be different, so you
+are encouraged to obtain the corresponding documentation package from
+SourceForge, or to download the latest documentation snapshot from SVN
+
+To obtain files from the SVN repository and build, please see:
+
+ - https://scm.dspace.org/svn/repo/dspace/tags/
+
+
+Please refer any further problems to the dspace-tech@lists.sourceforge.net
+mailing list. 
+
+ - http://sourceforge.net/mail/?group_id=19984
+
+
+Detailed Issue Tracking for DSpace is done on our JIRA Issue Tracker
+
+ - http://jira.dspace.org/
+
+
+To contribute to DSpace, please see:
+
+ - http://wiki.dspace.org/index.php/HowToContribute
+
+
+For more details about DSpace, including a list of service providers,
+places to seek help, news articles and lists of other users, please see:
+
+ - http://www.dspace.org/
+ 
+
+Copyright (c) 2002-2010, DuraSpace.  All rights reserved.
