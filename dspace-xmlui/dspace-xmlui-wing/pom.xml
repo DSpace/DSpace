@@ -10,7 +10,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-xmlui</artifactId>
-      <version>1.6.0</version>
+      <version>1.6.1-SNAPSHOT</version>
    </parent>
 
    <repositories>
@@ -31,9 +31,9 @@
    </repositories>
 
    <scm>
-      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.0</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.0/dspace-xmlui/dspace-xmlui-wing</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.0/dspace-xmlui/dspace-xmlui-wing</url>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-wing</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-wing</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-wing</url>
    </scm>
 
    <dependencies>

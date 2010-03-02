@@ -3,7 +3,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-parent</artifactId>
    <packaging>pom</packaging>
-   <version>1.6.0</version>
+   <version>1.6.1-SNAPSHOT</version>
    <name>DSpace Parent Project</name>
    <url>http://projects.dspace.org</url>
 
@@ -215,78 +215,78 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.1-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-ui-shared</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.1-SNAPSHOT</version>
             <type>war</type>
          </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-api</artifactId>
-              <version>1.6.0</version>
+              <version>1.6.1-SNAPSHOT</version>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-webapp</artifactId>
-              <version>1.6.0</version>
+              <version>1.6.1-SNAPSHOT</version>
               <type>war</type>
           </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-api</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.1-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-webapp</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.1-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai-api</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.1-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai-webapp</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.1-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-core</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.1-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-client</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.1-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-webapp</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.1-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-api</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.1-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-webapp</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.1-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-wing</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.1-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
@@ -306,7 +306,7 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-stats</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.1-SNAPSHOT</version>
          </dependency>
          <!-- DSpace Localization Packages -->
          <dependency>
@@ -818,9 +818,9 @@
       snapshots into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.0</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.0</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.0</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/trunk</url>
    </scm>
 
    <!--
