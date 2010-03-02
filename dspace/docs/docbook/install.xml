@@ -701,8 +701,15 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
 				<listitem>
 					<para><emphasis role="bold">DSpace Configuration for Accessing SOLR.</emphasis> In the <literal>dspace.cfg</literal> file review the following fields to make sure they are uncommented:</para>
 					<screen>solr.log.server = ${dspace.baseUrl}/solr/statistics
-solr.spidersfile = ${dspace.dir}/config/spiders.txt
 solr.dbfile = ${dspace.dir}/config/GeoLiteCity.dat
+solr.spiderips.urls = http://iplists.com/google.txt, \
+                      http://iplists.com/inktomi.txt, \
+                      http://iplists.com/lycos.txt, \
+                      http://iplists.com/infoseek.txt, \
+                      http://iplists.com/altavista.txt, \
+                      http://iplists.com/excite.txt, \
+                      http://iplists.com/misc.txt, \
+                      http://iplists.com/non_engines.txt
 useProxies = true</screen>
 				</listitem>
 				<listitem>

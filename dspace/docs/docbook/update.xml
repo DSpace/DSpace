@@ -529,8 +529,8 @@ mvn -U clean package</screen>
 				<itemizedlist>
 					<listitem>
 						<para>For PostgreSQL:</para>
-						<para><literal>psql -U [dspace-user] -f [dspace-source]/dspace/etc/postgres/schema_15_16.sql [database name]</literal> (Your database name is by default &apos;dspace&apos;). Example:</para>
-						<para><emphasis><literal>psql -U dspace -f /dspace-1.6-rc1-src-release/dspace/etc/postgres/schema_15_16.sql dspace</literal></emphasis></para>
+						<para><literal>psql -U [dspace-user] -f [dspace-source]/dspace/etc/postgres/database_schema_15_16.sql [database name]</literal> (Your database name is by default &apos;dspace&apos;). Example:</para>
+						<para><emphasis><literal>psql -U dspace -f /dspace-1.6-rc1-src-release/dspace/etc/postgres/database_schema_15_16.sql dspace</literal></emphasis></para>
 					</listitem>
 					<listitem>
 						<para>For Oracle:</para>
