@@ -15,7 +15,7 @@
 <xsl:param name="section.label.includes.component.label" select="1"></xsl:param>
 <xsl:param name="page.margin.inner">.75in</xsl:param>
 <xsl:param name="page.margin.outer">.75in</xsl:param>
-
+	
 <xsl:param name="admon.graphics" select="1"></xsl:param>
 <xsl:param name="admon.graphics.extension">.png</xsl:param>
 <xsl:param name="admon.graphics.path">/dcbk/image/</xsl:param>
