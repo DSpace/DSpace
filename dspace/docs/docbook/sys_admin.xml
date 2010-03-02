@@ -1677,6 +1677,7 @@ checker.retention.CHECKSUM_MATCH = 8w</screen> You can use the table above for y
 				</tbody>
 			</tgroup>
 		</table>
+		<para>Although the DSpace Log Convertor applies basic spider filtering (googlebot, yahoo slurp, msnbot), it is far from complete. Please refer to Statistics Client (8.15) for spider removal operations, after converting your old logs.</para>
 	</section>
 	<section remap="h2">
 		<title><anchor id="docbook-sys_admin.html-statistics" xreflabel="Client Statistics"/>Client Statistics</title>
