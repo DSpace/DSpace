@@ -15,7 +15,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>1.6.0-SNAPSHOT</version>
+      <version>1.6.0</version>
    </parent>
 
    <repositories>
@@ -40,9 +40,9 @@
       and releases snapshots into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/solr</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/solr</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/solr</url>
+      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.6.0</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.6.0</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.6.0</url>
    </scm>
 
    <build>
