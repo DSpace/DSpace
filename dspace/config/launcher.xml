@@ -50,6 +50,14 @@
     </command>
 
     <command>
+        <name>embargo-lifter</name>
+        <description>Embargo manager tool used to check, list and lift embargoes</description>
+        <step>
+            <class>org.dspace.embargo.EmbargoManager</class>
+        </step>
+    </command>
+
+    <command>
         <name>export</name>
         <description>Export items or collections</description>
         <step>

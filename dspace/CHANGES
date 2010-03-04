@@ -1,5 +1,11 @@
-1.6.0
+1.6.1
 =====
+
+(Stuart Lewis)
+ - [DS-506] embargo-lifter command missing from launcher.xml
+
+1.6.0 final
+===========
 
 (Alexey Maslov)
  - [DS-289] OAI-PMH + OAI-ORE harvesting support
