@@ -1,6 +1,9 @@
 1.6.1
 =====
 
+(Keith Gilbertson)
+ - [DS-508] Attachment spelled as attachement in DailyReportEmailer
+
 (Stuart Lewis)
  - [DS-506] embargo-lifter command missing from launcher.xml
 
