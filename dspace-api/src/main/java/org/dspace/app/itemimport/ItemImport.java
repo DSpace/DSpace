@@ -150,7 +150,7 @@ public class ItemImport
                 "email of eperson doing importing");
         options.addOption("w", "workflow", false,
                 "send submission through collection's workflow");
-        options.addOption("n", "notification", false,
+        options.addOption("n", "notify", false,
                         "if sending submissions through the workflow, send notification emails");
         options.addOption("t", "test", false,
                 "test run - do not actually import items");
