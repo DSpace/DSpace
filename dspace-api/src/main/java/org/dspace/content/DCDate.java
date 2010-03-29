@@ -639,9 +639,9 @@ public class DCDate
                                      dd.getHourGMT(), dd.getMinuteGMT(), dd.getSecondGMT());
             }
         }
-        else if (granularity == DateGran.DAY)
+        else if (granularity == DateGran.YEAR)
         {
-            return String.format("%d-%s-%4d", dd.getDay(), monthName, dd.getYear());
+            return String.format("%4d", dd.getYear());
         }
         else if (granularity == DateGran.MONTH)
         {
@@ -649,7 +649,7 @@ public class DCDate
         }
         else
         {
-            return String.format("%4d", dd.getYear());
+            return String.format("%d-%s-%4d", dd.getDay(), monthName, dd.getYear());
         }
     }
 }

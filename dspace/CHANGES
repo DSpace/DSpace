@@ -10,6 +10,9 @@
 (Stuart Lewis)
  - [DS-506] embargo-lifter command missing from launcher.xml
 
+(Mark Wood)
+ - [DS-469] DCDate.displayDate(false,*) displays only year
+
 1.6.0 final
 ===========
 
