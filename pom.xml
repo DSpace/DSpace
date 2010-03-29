@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.dspace.modules.imscp</groupId>
 	<artifactId>dspace-imscp</artifactId>
     <name>DSpace IMSCP Packager Support</name>
     <description>MIT's Implementation of a Packager to support IMS-CP formated Submission Packages.</description>
-	<version>1.6.0</version>
+	<version>1.6.0.0</version>
 
     <parent>
         <artifactId>dspace-parent</artifactId>
@@ -46,5 +44,11 @@
 		</dependency>
 	</dependencies>
    
+
+  <scm>
+    <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-imscp-1.6.0.0</connection>
+    <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-imscp-1.6.0.0</developerConnection>
+    <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-imscp-1.6.0.0</url>
+  </scm>
 </project>
 
