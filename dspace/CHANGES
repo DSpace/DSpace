@@ -9,6 +9,7 @@
 
 (Stuart Lewis)
  - [DS-506] embargo-lifter command missing from launcher.xml
+ - [DS-526] ItemUpdate - script update
 
 1.6.0 final
 ===========
