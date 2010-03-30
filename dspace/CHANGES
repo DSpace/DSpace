@@ -11,6 +11,9 @@
  - [DS-506] embargo-lifter command missing from launcher.xml
  - [DS-526] ItemUpdate - script update
 
+(Ivan Masar)
+ - [DS-515] Czech localization of 1.5.2 
+
 1.6.0 final
 ===========
 
