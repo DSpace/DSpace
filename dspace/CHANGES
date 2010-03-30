@@ -13,6 +13,9 @@
 
 (Mark Wood)
  - [DS-469] DCDate.displayDate(false,*) displays only year
+ 
+ (Ivan Masar)
+ - [DS-515] Czech localization of 1.5.2
 
 1.6.0 final
 ===========
