@@ -80,7 +80,7 @@ public class DSpaceSWORDServer implements SWORDServer
 	{
 		// gah.  bloody variable scoping.
 		// set up a dummy sword context for the "finally" block
-		SWORDContext sc = new SWORDContext();
+		SWORDContext sc = null;
 
 		try
 		{
@@ -113,7 +113,10 @@ public class DSpaceSWORDServer implements SWORDServer
 		finally
 		{
 			// this is a read operation only, so there's never any need to commit the context
-			sc.abort();
+            if (sc != null)
+            {
+                sc.abort();
+            }
 		}
 	}
 	
@@ -125,7 +128,7 @@ public class DSpaceSWORDServer implements SWORDServer
 	{
 		// gah.  bloody variable scoping.
 		// set up a dummy sword context for the "finally" block
-		SWORDContext sc = new SWORDContext();
+		SWORDContext sc = null;
 
 		try
 		{
@@ -163,7 +166,10 @@ public class DSpaceSWORDServer implements SWORDServer
 		{
 			// if, for some reason, we wind up here with a not null context
 			// then abort it (the above should commit it if everything works fine)
-			sc.abort();
+		    if (sc != null)
+            {
+                sc.abort();
+            }
 		}
 	}
 
@@ -175,7 +181,7 @@ public class DSpaceSWORDServer implements SWORDServer
 	{
 		// gah.  bloody variable scoping.
 		// set up a dummy sword context for the "finally" block
-		SWORDContext sc = new SWORDContext();
+		SWORDContext sc = null;
 
 		try
 		{
@@ -208,7 +214,10 @@ public class DSpaceSWORDServer implements SWORDServer
 		finally
 		{
 			// this is a read operation only, so there's never any need to commit the context
-			sc.abort();
+		    if (sc != null)
+            {
+                sc.abort();
+            }
 		}
 	}
 }
