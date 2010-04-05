@@ -1,5 +1,7 @@
 1.6.1
 =====
+(Andrea Bollini)
+- [DS-513] Connection leak in SWORD authentication process 
 
 (Caryn Neiswender)
  - [DS-518] Duplicate listing of dependencies in dspace-sword/pom.xml
