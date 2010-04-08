@@ -564,7 +564,11 @@ public class AuthenticationUtil
         	
         	// Return the path for which this request belongs too. Only urls
         	// for this path may be resumed.
-        	return interruptedRequest.getServletPath();
+        	if (interruptedRequest.getServletPath() == null || interruptedRequest.getServletPath().length() == 0) {
+                return interruptedRequest.getActualPath();
+            } else {
+        	    return interruptedRequest.getServletPath();
+            }
         }
         
         // No request was interrupted.
