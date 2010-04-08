@@ -19,6 +19,9 @@
  (Ivan Masar)
  - [DS-515] Czech localization of 1.5.2
 
+(Ben Bosman)
+ - [DS-538] restricted items are being returned in OAI GetRecord method while using harvest.includerestricted.oai
+
 1.6.0 final
 ===========
 

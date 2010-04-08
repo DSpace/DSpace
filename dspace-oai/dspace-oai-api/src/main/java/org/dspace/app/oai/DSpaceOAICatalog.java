@@ -52,16 +52,19 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.Harvest;
 import org.dspace.search.HarvestedItemInfo;
+import org.dspace.eperson.Group;
 
 import ORG.oclc.oai.server.catalog.AbstractCatalog;
 import ORG.oclc.oai.server.verb.BadArgumentException;
@@ -368,6 +371,28 @@ public class DSpaceOAICatalog extends AbstractCatalog
                 log.info(LogManager.getHeader(null, "oai_error",
                         "id_does_not_exist"));
                 throw new IdDoesNotExistException(identifier);
+            }
+            
+            boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.oai", true);
+
+            if (!includeAll)
+            {
+                Group[] authorizedGroups = AuthorizeManager.getAuthorizedGroups(context, itemInfo.item, Constants.READ);
+                boolean authorized = false;
+                for (int i = 0; i < authorizedGroups.length; i++)
+                {
+                    if ((authorizedGroups[i].getID() == 0) && (!authorized))
+                    {
+                        authorized = true;
+                    }
+                }
+
+                if (!authorized)
+                {
+                    log.info(LogManager.getHeader(null, "oai_error",
+                            "id_not_accessible"));
+                    throw new IdDoesNotExistException(identifier);
+                }
             }
 
             String schemaURL;
