@@ -18,6 +18,7 @@
 
 (Ben Bosman)
  - [DS-538] restricted items are being returned in OAI GetRecord method while using harvest.includerestricted.oai
+ - [DS-493] Url in browser is incorrect after login
 
 1.6.0 final
 ===========

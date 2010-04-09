@@ -117,6 +117,14 @@ public class RequestInfo
     {
     	return this.servletPath;
     }
+
+    /**
+     * Return the servlet path that this request is for.
+     */
+    public String getActualPath()
+    {
+    	return this.pathInfo + ((queryString == null || queryString.length() == 0) ? "" : "?"+queryString);
+    }
     
     /**
      * Wrap an incoming request to make it look like the request that the
