@@ -8,6 +8,7 @@
 
 (Keith Gilbertson)
  - [DS-508] Attachment spelled as attachement in DailyReportEmailer
+ - [DS-539] Misspelled attribute in MODS/METS output
 
 (Stuart Lewis)
  - [DS-506] embargo-lifter command missing from launcher.xml
