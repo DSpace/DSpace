@@ -552,9 +552,9 @@
                 <xsl:value-of select="mods:note[1]"/>
             </p>
         </xsl:if>
-        <xsl:if test="string-length(mods:accessCondition[@type='useAndReproducation'])&gt;0">
+        <xsl:if test="string-length(mods:accessCondition[@type='useAndReproduction'])&gt;0">
             <p class="copyright-text">
-                <xsl:value-of select="mods:accessCondition[@type='useAndReproducation']"/>
+                <xsl:value-of select="mods:accessCondition[@type='useAndReproduction']"/>
             </p>
         </xsl:if>
         <xsl:if test="string-length(mods:extension/dim:field[@mdschema='dc' and @element='rights.license'])&gt;0">
@@ -583,9 +583,9 @@
                 <xsl:value-of select="mods:note[1]"/>
             </p>
         </xsl:if>
-        <xsl:if test="string-length(mods:accessCondition[@type='useAndReproducation'])&gt;0">
+        <xsl:if test="string-length(mods:accessCondition[@type='useAndReproduction'])&gt;0">
             <p class="copyright-text">
-                <xsl:value-of select="mods:accessCondition[@type='useAndReproducation']"/>
+                <xsl:value-of select="mods:accessCondition[@type='useAndReproduction']"/>
             </p>
         </xsl:if>
     </xsl:template>   
