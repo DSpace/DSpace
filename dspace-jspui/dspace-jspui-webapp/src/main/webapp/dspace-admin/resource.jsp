@@ -112,6 +112,25 @@
     }
   %>
 
+  <tr>
+    <td colspan="3">HttpServletRequest Headers</td>
+  </tr>
+  <% 
+    for (Enumeration e = request.getHeaderNames(); e.hasMoreElements(); ) {
+      String strName = (String)e.nextElement();
+
+      for (Enumeration v = request.getHeaders(strName); v.hasMoreElements(); ) {
+  %>
+  <tr>
+    <td></td>
+    <td><%= strName %></td>
+    <td><%= v.nextElement() %></td>
+  </tr>
+  <%
+     }
+    }
+  %>
+
 </table>
 </dspace:layout>
 

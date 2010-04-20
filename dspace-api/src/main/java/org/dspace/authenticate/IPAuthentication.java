@@ -181,7 +181,14 @@ public class IPAuthentication implements AuthenticationMethod
     {
         List<Integer> groupIDs = new ArrayList<Integer>();
 
-        String addr = request.getRemoteAddr();
+        String addrForward = request.getHeader("x-forwarded-for");
+
+        String addr = (addrForward != null 
+                       ? addrForward 
+                       : request.getRemoteAddr());
+
+        log.debug(LogManager.getHeader(context, "",
+                                       "addrs="+request.getRemoteAddr()+","+addrForward+","+addr));
 
         for (int i = 0; i < ipMatchers.size(); i++)
         {
