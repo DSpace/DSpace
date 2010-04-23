@@ -343,7 +343,6 @@
         <table class="miscTable" summary="Bitstream data table">
             <tr>
 	  <%-- <th class="oddRowEvenCol"><strong>Primary<br>Bitstream</strong></th>
-                <th class="oddRowOddCol"><strong>Bundle</strong></th>
                 <th class="oddRowOddCol"><strong>Name</strong></th>
                 <th class="oddRowEvenCol"><strong>Source</strong></th>
                 <th class="oddRowOddCol"><strong>Description</strong></th>
@@ -351,6 +350,7 @@
                 <th class="oddRowOddCol"><strong>User&nbsp;Format&nbsp;Description</strong></th> --%>
                 
 		        <th id="t11" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem5"/></strong></th>
+		        <th id="t11" class="oddRowEvenCol"><strong>Bundle</strong></th>
                 <th id="t12" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem7"/></strong></th>
                 <th id="t13" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem8"/></strong></th>
                 <th id="t14" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem9"/></strong></th>
