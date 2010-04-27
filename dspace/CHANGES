@@ -1,5 +1,8 @@
 1.6.1
 =====
+(Claudia Jürgen)
+- [DS-558] Error in update sequence script 1.5 to 1.6 Oracle
+
 (Andrea Bollini)
 - [DS-513] Connection leak in SWORD authentication process 
 
