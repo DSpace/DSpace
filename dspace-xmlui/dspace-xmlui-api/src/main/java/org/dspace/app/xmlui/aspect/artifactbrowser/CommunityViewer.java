@@ -125,7 +125,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         message("xmlui.ArtifactBrowser.CommunityViewer.head_recent_submissions");
     
     /** How many recent submissions to list */
-    private static final int RECENT_SUBMISISONS = 5;
+    private static final int RECENT_SUBMISSIONS = 5;
 
     /** The cache of recently submitted items */
     private java.util.List<BrowseItem> recentSubmittedItems;
@@ -397,9 +397,10 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             return recentSubmittedItems;
 
         String source = ConfigurationManager.getProperty("recent.submissions.sort-option");
+        int numRecentSubmissions = ConfigurationManager.getIntProperty("recent.submissions.count", RECENT_SUBMISSIONS);
         BrowserScope scope = new BrowserScope(context);
         scope.setCommunity(community);
-        scope.setResultsPerPage(RECENT_SUBMISISONS);
+        scope.setResultsPerPage(numRecentSubmissions);
         
         // FIXME Exception Handling
         try

@@ -124,7 +124,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
         message("xmlui.ArtifactBrowser.CollectionViewer.head_recent_submissions");
     
     /** How many recent submissions to include in the page */
-    private static final int RECENT_SUBMISISONS = 5;
+    private static final int RECENT_SUBMISSIONS = 5;
 
     /** The cache of recently submitted items */
     private java.util.List<BrowseItem> recentSubmissionItems;
@@ -355,9 +355,10 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             return recentSubmissionItems;
         
         String source = ConfigurationManager.getProperty("recent.submissions.sort-option");
+        int numRecentSubmissions = ConfigurationManager.getIntProperty("recent.submissions.count", RECENT_SUBMISSIONS);
         BrowserScope scope = new BrowserScope(context);
         scope.setCollection(collection);
-        scope.setResultsPerPage(RECENT_SUBMISISONS);
+        scope.setResultsPerPage(numRecentSubmissions);
         
         // FIXME Exception Handling
         try
