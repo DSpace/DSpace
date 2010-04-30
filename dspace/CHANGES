@@ -1,5 +1,9 @@
 1.6.1
 =====
+
+(Kim Shepherd)
+- [DS-547] Value for Recent Submissions is not workin in the XMLUI
+
 (Claudia Jürgen)
 - [DS-558] Error in update sequence script 1.5 to 1.6 Oracle
 
