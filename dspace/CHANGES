@@ -16,6 +16,7 @@
  - [DS-518] Duplicate listing of dependencies in dspace-sword/pom.xml
 
 (Keith Gilbertson)
+ - [DS-123] xmlui browse in empty collection displays "Now showing items 1-0" of 0 - incorrect numbering
  - [DS-508] Attachment spelled as attachement in DailyReportEmailer
  - [DS-539] Misspelled attribute in MODS/METS output
 

@@ -168,6 +168,7 @@
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.choose_year">(Choose year)</message>	
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_year">Or type in a year: </message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_year_help">Browse for items that are from the given year.</message>
+        <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.no_results">Sorry, there are no results for this browse.</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.sort_by"> Sort by: </message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.order"> Order: </message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.rpp"> Results: </message><!-- /Page -->

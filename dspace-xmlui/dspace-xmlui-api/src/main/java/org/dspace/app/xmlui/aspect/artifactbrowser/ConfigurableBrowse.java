@@ -128,6 +128,8 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     private final static Message T_order = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.order");
 
+    private final static Message T_no_results= message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.no_results");
+
     private final static Message T_rpp = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.rpp");
 
     private final static Message T_etal = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.etal");
@@ -282,57 +284,65 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         // This div will hold the browsing results
         Division results = div.addDivision("browse-by-" + type + "-results", "primary");
 
-        // Add the pagination
-        //results.setSimplePagination(itemsTotal, firstItemIndex, lastItemIndex, previousPage, nextPage)
-        results.setSimplePagination(info.getTotal(), browseInfo.getOverallPosition() + 1,
-                browseInfo.getOverallPosition() + browseInfo.getResultCount(), getPreviousPageURL(
-                        params, info), getNextPageURL(params, info));
-
-        // Reference all the browsed items
-        ReferenceSet referenceSet = results.addReferenceSet("browse-by-" + type,
-                ReferenceSet.TYPE_SUMMARY_LIST, type, null);
-
-        // Are we browsing items, or unique metadata?
-        if (isItemBrowse(info))
+        // If there are items to browse, add the pagination
+        int itemsTotal = info.getTotal();
+        if (itemsTotal > 0) 
         {
-            // Add the items to the browse results
-            for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
+            //results.setSimplePagination(itemsTotal, firstItemIndex, lastItemIndex, previousPage, nextPage)
+            results.setSimplePagination(itemsTotal, browseInfo.getOverallPosition() + 1,
+                    browseInfo.getOverallPosition() + browseInfo.getResultCount(), getPreviousPageURL(
+                            params, info), getNextPageURL(params, info));
+
+            // Reference all the browsed items
+            ReferenceSet referenceSet = results.addReferenceSet("browse-by-" + type,
+                    ReferenceSet.TYPE_SUMMARY_LIST, type, null);
+
+            // Are we browsing items, or unique metadata?
+            if (isItemBrowse(info))
             {
-                referenceSet.addReference(item);
+                // Add the items to the browse results
+                for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
+                {
+                    referenceSet.addReference(item);
+                }
+            }
+            else    // browsing a list of unique metadata entries
+            {
+                // Create a table for the results
+                Table singleTable = results.addTable("browse-by-" + type + "-results",
+                        browseInfo.getResultCount() + 1, 1);
+            
+                // Add the column heading
+                singleTable.addRow(Row.ROLE_HEADER).addCell().addContent(
+                        message("xmlui.ArtifactBrowser.ConfigurableBrowse." + type + ".column_heading"));
+
+                // Iterate each result
+                for (String[] singleEntry : browseInfo.getStringResults())
+                {
+                    // Create a Map of the query parameters for the link
+                    Map<String, String> queryParams = new HashMap<String, String>();
+                    queryParams.put(BrowseParams.TYPE, URLEncode(type));
+                    if (singleEntry[1] != null)
+                    {
+                        queryParams.put(BrowseParams.FILTER_VALUE[1], URLEncode(
+                            singleEntry[1]));
+                    }
+                    else
+                    {
+                        queryParams.put(BrowseParams.FILTER_VALUE[0], URLEncode(
+                            singleEntry[0]));
+                    }
+
+                    // Create an entry in the table, and a linked entry
+                    Cell cell = singleTable.addRow().addCell();
+                    cell.addXref(super.generateURL(BROWSE_URL_BASE, queryParams),
+                          singleEntry[0]);
+                }  
             }
         }
-        else    // browsing a list of unique metadata entries
+        else 
         {
-            // Create a table for the results
-            Table singleTable = results.addTable("browse-by-" + type + "-results",
-                    browseInfo.getResultCount() + 1, 1);
-            
-            // Add the column heading
-            singleTable.addRow(Row.ROLE_HEADER).addCell().addContent(
-                    message("xmlui.ArtifactBrowser.ConfigurableBrowse." + type + ".column_heading"));
-
-            // Iterate each result
-            for (String[] singleEntry : browseInfo.getStringResults())
-            {
-                // Create a Map of the query parameters for the link
-                Map<String, String> queryParams = new HashMap<String, String>();
-                queryParams.put(BrowseParams.TYPE, URLEncode(type));
-                if (singleEntry[1] != null)
-                {
-                    queryParams.put(BrowseParams.FILTER_VALUE[1], URLEncode(
-                        singleEntry[1]));
-                }
-                else
-                {
-                    queryParams.put(BrowseParams.FILTER_VALUE[0], URLEncode(
-                        singleEntry[0]));
-                }
-
-                // Create an entry in the table, and a linked entry
-                Cell cell = singleTable.addRow().addCell();
-                cell.addXref(super.generateURL(BROWSE_URL_BASE, queryParams),
-                      singleEntry[0]);
-            }
+            results.addPara(T_no_results);
         }
     }
 
