@@ -289,7 +289,7 @@ public class Harvest
                         itemInfo.item = Item.find(context, itemInfo.itemID);
                     }
 
-                    if ((nonAnon) || (itemInfo.item == null))
+                    if ((nonAnon) || (itemInfo.item == null) || (withdrawn && itemInfo.withdrawn))
                     {
                         infoObjects.add(itemInfo);
                         itemCounter++;
