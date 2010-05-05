@@ -1,6 +1,9 @@
 1.7.0
 =====
 
+(Robin Taylor)
+- [DS-497] Date month and day get default values when user returns to describe form
+
 (Keiji Suzuki)
 - [DS-537] Malformed Japanese option values in the authority lookup window
 

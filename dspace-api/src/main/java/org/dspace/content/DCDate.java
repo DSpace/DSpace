@@ -384,7 +384,7 @@ public class DCDate
      */
     public int getYear()
     {
-        return getLocalCalendar() == null ? -1 : localCalendar.get(Calendar.YEAR);
+        return ((getLocalCalendar() == null) || (!withinGranularity(DateGran.YEAR))) ? -1 : localCalendar.get(Calendar.YEAR);
     }
                     
     /**
@@ -394,7 +394,7 @@ public class DCDate
      */
     public int getMonth()
     {
-        return getLocalCalendar() == null ? -1 : localCalendar.get(Calendar.MONTH) + 1;
+        return ((getLocalCalendar() == null) || (!withinGranularity(DateGran.MONTH))) ? -1 : localCalendar.get(Calendar.MONTH) + 1;
     }
 
     /**
@@ -404,7 +404,7 @@ public class DCDate
      */
     public int getDay()
     {
-        return getLocalCalendar() == null ? -1 : localCalendar.get(Calendar.DAY_OF_MONTH);
+        return ((getLocalCalendar() == null) || (!withinGranularity(DateGran.DAY))) ? -1 : localCalendar.get(Calendar.DAY_OF_MONTH);
     }
 
     /**
@@ -522,6 +522,52 @@ public class DCDate
             return "Unspecified";
         }
 
+    }
+
+    /**
+     * Test if the requested level of granularity is within that of the date.
+     *
+     * @param dg
+     *              The requested level of granularity.
+     * @return
+     *              true or false.
+     *
+     */
+    private boolean withinGranularity(DateGran dg)
+    {
+        if (granularity == DateGran.TIME)
+        {
+            if ((dg == DateGran.TIME) || (dg == DateGran.DAY) || (dg == DateGran.MONTH) || (dg == DateGran.YEAR))
+            {
+                return true;
+            }
+        }
+
+        if (granularity == DateGran.DAY)
+        {
+            if ((dg == DateGran.DAY) || (dg == DateGran.MONTH) || (dg == DateGran.YEAR))
+            {
+                return true;
+            }
+        }
+
+        if (granularity == DateGran.MONTH)
+        {
+            if ((dg == DateGran.MONTH) || (dg == DateGran.YEAR))
+            {
+                return true;
+            }
+        }
+
+        if (granularity == DateGran.YEAR)
+        {
+            if (dg == DateGran.YEAR)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
