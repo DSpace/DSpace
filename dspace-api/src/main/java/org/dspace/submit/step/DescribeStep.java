@@ -516,10 +516,14 @@ public class DescribeStep extends AbstractProcessingStep
                     + "_first");
             lasts = getRepeatedParameter(request, metadataField, metadataField
                     + "_last");
-            auths = getRepeatedParameter(request, metadataField, metadataField
+
+            if(isAuthorityControlled)
+            {
+               auths = getRepeatedParameter(request, metadataField, metadataField
                     + "_authority");
-            confs = getRepeatedParameter(request, metadataField, metadataField
+               confs = getRepeatedParameter(request, metadataField, metadataField
                     + "_confidence");
+           }
 
             // Find out if the relevant "remove" button was pressed
             // TODO: These separate remove buttons are only relevant
@@ -535,8 +539,11 @@ public class DescribeStep extends AbstractProcessingStep
 
                 firsts.remove(valToRemove);
                 lasts.remove(valToRemove);
-                auths.remove(valToRemove);
-                confs.remove(valToRemove);
+                if(isAuthorityControlled)
+                {
+                   auths.remove(valToRemove);
+                   confs.remove(valToRemove);
+                }
             }
         }
         else
@@ -684,6 +691,11 @@ public class DescribeStep extends AbstractProcessingStep
                         .substring(removeButton.length()));
 
                 vals.remove(valToRemove);
+                if(isAuthorityControlled)
+                {
+                   auths.remove(valToRemove);
+                   confs.remove(valToRemove);
+                }
             }
         }
         else
