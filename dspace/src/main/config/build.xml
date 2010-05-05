@@ -549,9 +549,9 @@ Common usage:
 
         <mkdir dir="${dspace.dir}/webapps" />
 
-        <mkdir dir="${dspace.dir}/exports" />
+        <mkdir dir="${org.dspace.app.itemexport.work.dir}" />
 
-        <mkdir dir="${dspace.dir}/exports/download" />
+        <mkdir dir="${org.dspace.app.itemexport.download.dir}" />
 
         <mkdir dir="${assetstore.dir}" />
 
