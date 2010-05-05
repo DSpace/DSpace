@@ -396,7 +396,7 @@
      =========================================================== --%>
      
      		<tr><td>&nbsp;</td></tr>
-            <tr><td colspan="2"><center><h3>Harvesting Settings</h3></center></td></tr>
+            <tr><td colspan="2"><center><h3><fmt:message key="jsp.tools.edit-collection.form.label15"/></h3></center></td></tr>
      
      		<%--
      		oaiProviderValue = hc.getOaiSource();
@@ -411,22 +411,22 @@
 			--%>
      
      		<tr>
-                <td class="submitFormLabel">Content Source</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label16"/></td>
                 <td>
-                	<input type="radio" value="source_normal" <% if (harvestLevelValue == 0) { %> checked="checked" <% } %> name="source">This is a standard DSpace collection</input><br/>
-                	<input type="radio" value="source_harvested" <% if (harvestLevelValue > 0) { %> checked="checked" <% } %> name="source">This collection harvests its content from an external source</input><br/>
+                	<input type="radio" value="source_normal" <% if (harvestLevelValue == 0) { %> checked="checked" <% } %> name="source"><fmt:message key="jsp.tools.edit-collection.form.label17"/></input><br/>
+                	<input type="radio" value="source_harvested" <% if (harvestLevelValue > 0) { %> checked="checked" <% } %> name="source"><fmt:message key="jsp.tools.edit-collection.form.label18"/></input><br/>
                 </td>
             </tr>
             <tr>
-                <td class="submitFormLabel">OAI Provider</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label19"/></td>
                 <td><input type="text" name="oai_provider" value="<%= oaiProviderValue %>" size="50" /></td>
             </tr>
             <tr>
-                <td class="submitFormLabel">OAI Set Id</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label20"/></td>
                 <td><input type="text" name="oai_setid" value="<%= oaiSetIdValue %>" size="50" /></td>
             </tr>   
             <tr>
-                <td class="submitFormLabel">Metadata Format</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label21"/></td>
                 <td>
                 	<select name="metadata_format" >
 	                	<%
@@ -436,21 +436,19 @@
 			            while (pe.hasMoreElements())
 			            {
 			                String key = (String)pe.nextElement();
+							
+							
 			                if (key.startsWith(metaString)) {
 			                	String metadataString = ConfigurationManager.getProperty(key);
 			                	String metadataKey = key.substring(metaString.length());
-			                	String displayName;
-			
-			                	if (metadataString.indexOf(',') != -1)
-			                		displayName = metadataString.substring(metadataString.indexOf(',') + 1);
-			                	else
-			                		displayName = metadataKey + "(" + metadataString + ")";
-			                	
-			                	%>
+								String label = "jsp.tools.edit-collection.form.label21.select." + metadataKey;
+		                	
+	                	%>
 			                	<option value="<%= metadataKey %>" 
 			                	<% if(metadataKey.equalsIgnoreCase(metadataFormatValue)) { %> 
 			                	selected="selected" <% } %> >
-			                	<%= displayName %></option>
+								<fmt:message key="<%=label%>"/>
+								</option>
 			                	<% 
 			                }
 			            }
@@ -459,15 +457,15 @@
                 </td>
             </tr>
             <tr>
-                <td class="submitFormLabel">Content being Harvested</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label22"/></td>
                 <td>
-                	<input type="radio" value="1" <% if (harvestLevelValue != 2 && harvestLevelValue != 3) { %> checked="checked" <% } %> name="harvest_level">Harvest metadata only.</input><br/>
-                	<input type="radio" value="2" <% if (harvestLevelValue == 2) { %> checked="checked" <% } %> name="harvest_level">Harvest metadata and references to bitstreams (requires ORE support).</input><br/>
-                	<input type="radio" value="3" <% if (harvestLevelValue == 3) { %> checked="checked" <% } %> name="harvest_level">Harvest metadata and bitstreams (requires ORE support).</input><br/>
+                	<input type="radio" value="1" <% if (harvestLevelValue != 2 && harvestLevelValue != 3) { %> checked="checked" <% } %> name="harvest_level"><fmt:message key="jsp.tools.edit-collection.form.label23"/></input><br/>
+                	<input type="radio" value="2" <% if (harvestLevelValue == 2) { %> checked="checked" <% } %> name="harvest_level"><fmt:message key="jsp.tools.edit-collection.form.label24"/></input><br/>
+                	<input type="radio" value="3" <% if (harvestLevelValue == 3) { %> checked="checked" <% } %> name="harvest_level"><fmt:message key="jsp.tools.edit-collection.form.label25"/></input><br/>
                 </td>
             </tr>
             <tr>
-                <td class="submitFormLabel">Last Harvest Result</td>
+                <td class="submitFormLabel"><fmt:message key="jsp.tools.edit-collection.form.label26"/></td>
                 <td><%= lastHarvestMsg %></td>
             </tr> 
             <!--
