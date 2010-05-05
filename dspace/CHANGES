@@ -1,7 +1,11 @@
 1.7.0
 =====
+(Peter Dietz)
+- [DS-542] verbose output for stats-log-importer displays spurious city/country from previous committed entry
+
 (Kim Shepherd)
 - [DS-547] Value for Recent Submissions is not workin in the XMLUI
+- [DS-527] Withdrawn items not shown as deleted in OAI
 
 (Claudia Jürgen)
 - [DS-558] Error in update sequence script 1.5 to 1.6 Oracle
