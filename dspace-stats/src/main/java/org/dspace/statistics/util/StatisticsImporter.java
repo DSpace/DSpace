@@ -242,8 +242,6 @@ public class StatisticsImporter
 
                 data += ("ip addr = " + ip);
                 data += (", dns name = " + dns);
-                data += (", country = " + country);
-                data += (", city = " + city);
                 if ((dns.endsWith(".googlebot.com.")) ||
                     (dns.endsWith(".crawl.yahoo.net.")) ||
                     (dns.endsWith(".search.msn.com.")))
@@ -253,7 +251,6 @@ public class StatisticsImporter
                     searchengines++;
                     continue;
                 }
-                if (verbose) System.out.println(data);
 
                 // Get the geo information for the user
                 Location location;
@@ -264,6 +261,11 @@ public class StatisticsImporter
                     countryCode = location.countryCode;
                     longitude = location.longitude;
                     latitude = location.latitude;
+                    if(verbose) {
+                        data += (", country = " + country);
+                        data += (", city = " + city);
+                        System.out.println(data);
+                    }
                     try {
                         continent = LocationUtils.getContinentCode(countryCode);
                     } catch (Exception e) {
