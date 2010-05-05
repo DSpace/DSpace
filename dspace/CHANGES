@@ -5,6 +5,7 @@
 
 (Claudia Jürgen)
 - [DS-558] Error in update sequence script 1.5 to 1.6 Oracle
+- [DS-551] Export directories dspace.cfg and build.xml out of sync
 
 (Serhij Dubyk)
 - [DS-500] Ukrainian for DSpace 1.6.0
