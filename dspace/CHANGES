@@ -1,5 +1,9 @@
 1.7.0
 =====
+
+(Keiji Suzuki)
+- [DS-537] Malformed Japanese option values in the authority lookup window
+
 (Peter Dietz)
 - [DS-542] verbose output for stats-log-importer displays spurious city/country from previous committed entry
 

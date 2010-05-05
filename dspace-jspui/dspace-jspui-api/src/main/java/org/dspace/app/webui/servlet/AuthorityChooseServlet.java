@@ -81,8 +81,8 @@ public class AuthorityChooseServlet extends DSpaceServlet {
 //        };
 //
 //        Choices result = new Choices(testValues,start,testValues.length,Choices.CF_ACCEPTED,false);
-        Writer writer = response.getWriter();
         response.setContentType("text/xml; charset=\"utf-8\"");
+        Writer writer = response.getWriter();
         // borrow xalan's serializer to let us use SAX choice menu generator
         Properties props =
            OutputPropertiesFactory.getDefaultMethodProperties(Method.XML);
