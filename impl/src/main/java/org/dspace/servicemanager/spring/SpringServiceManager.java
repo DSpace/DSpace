@@ -40,6 +40,7 @@ public class SpringServiceManager implements ServiceManagerSystem {
     private static Logger log = LoggerFactory.getLogger(SpringServiceManager.class);
 
     private ClassPathXmlApplicationContext applicationContext;
+    
     /**
      * @return the parent core Spring {@link ApplicationContext}
      */
@@ -82,7 +83,8 @@ public class SpringServiceManager implements ServiceManagerSystem {
     }
 
     public static final String configPath = "spring/spring-dspace-applicationContext.xml";
-    public static final String corePath = "spring/spring-dspace-core-services.xml";
+    public static final String corePath = "classpath*:spring/spring-dspace-core-services.xml";
+
     /**
      * Spring does not actually allow us to add in new singletons which have bean definitions so we
      * have to track the added singleton names ourselves manually
