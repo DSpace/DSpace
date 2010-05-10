@@ -77,18 +77,20 @@ public class MetadataImportConfirm extends AbstractDSpaceTransformer {
 	private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 	private static final Message T_submit_return = message("xmlui.general.return");
 	private static final Message T_trail = message("xmlui.administrative.metadataimport.general.trail");
-        private static final Message T_changes = message("xmlui.administrative.metadataimport.general.changes");
-        private static final Message T_new_item = message("xmlui.administrative.metadataimport.general.new_item");
-        private static final Message T_no_changes = message("xmlui.administrative.metadataimport.general.no_changes");
+    private static final Message T_changes = message("xmlui.administrative.metadataimport.general.changes");
+    private static final Message T_new_item = message("xmlui.administrative.metadataimport.general.new_item");
+    private static final Message T_no_changes = message("xmlui.administrative.metadataimport.general.no_changes");
 	private static final Message T_title = message("xmlui.administrative.metadataimport.general.title");
 	private static final Message T_head1 = message("xmlui.administrative.metadataimport.general.head1");
 
-        private static final Message T_success = message("xmlui.administrative.metadataimport.MetadataImportConfirm.success");
-        private static final Message T_changes_committed = message("xmlui.administrative.metadataimport.MetadataImportConfirm.changes_committed");
-        private static final Message T_item_addition = message("xmlui.administrative.metadataimport.MetadataImportConfirm.item_added");
-        private static final Message T_item_deletion = message("xmlui.administrative.metadataimport.MetadataImportConfirm.item_removed");
-        private static final Message T_collection_addition = message("xmlui.administrative.metadataimport.MetadataImportConfirm.collection_added");
-        private static final Message T_collection_deletion = message("xmlui.administrative.metadataimport.MetadataImportConfirm.collection_removed");
+    private static final Message T_success = message("xmlui.administrative.metadataimport.MetadataImportConfirm.success");
+    private static final Message T_changes_committed = message("xmlui.administrative.metadataimport.MetadataImportConfirm.changes_committed");
+    private static final Message T_item_addition = message("xmlui.administrative.metadataimport.MetadataImportConfirm.item_added");
+    private static final Message T_item_deletion = message("xmlui.administrative.metadataimport.MetadataImportConfirm.item_removed");
+    private static final Message T_collection_newowner = message("xmlui.administrative.metadataimport.MetadataImportConfirm.collection_newowner");
+    private static final Message T_collection_oldowner = message("xmlui.administrative.metadataimport.MetadataImportConfirm.collection_oldowner");
+    private static final Message T_collection_mapped = message("xmlui.administrative.metadataimport.MetadataImportConfirm.collection_mapped");
+    private static final Message T_collection_unmapped = message("xmlui.administrative.metadataimport.MetadataImportConfirm.collection_unmapped");
 
 
 	public void addPageMeta(PageMeta pageMeta) throws WingException  
@@ -105,10 +107,12 @@ public class MetadataImportConfirm extends AbstractDSpaceTransformer {
 		// Get list of changes
 
 		Request request = ObjectModelHelper.getRequest(objectModel);
-                ArrayList<BulkEditChange> changes = null;
+        ArrayList<BulkEditChange> changes = null;
 
-                if(request.getAttribute("changes") != null)
-                        changes = ((ArrayList<BulkEditChange>)request.getAttribute("changes"));
+        if(request.getAttribute("changes") != null)
+        {
+            changes = ((ArrayList<BulkEditChange>)request.getAttribute("changes"));
+        }
 
 		// DIVISION: metadata-import
 		Division div = body.addInteractiveDivision("metadata-import",contextPath + "/admin/metadataimport", Division.METHOD_MULTIPART,"primary administrative");
@@ -129,11 +133,12 @@ public class MetadataImportConfirm extends AbstractDSpaceTransformer {
                         // Get the changes
                         ArrayList<DCValue> adds = change.getAdds();
                         ArrayList<DCValue> removes = change.getRemoves();
-                        ArrayList<Collection> newCollections = change.getNewOwningCollections();
-                        ArrayList<Collection> oldCollections = change.getOldOwningCollections();
+                        ArrayList<Collection> newCollections = change.getNewMappedCollections();
+                        ArrayList<Collection> oldCollections = change.getOldMappedCollections();
 
                         if ((adds.size() > 0) || (removes.size() > 0) ||
-                            (newCollections.size() > 0) || (oldCollections.size() > 0))
+                            (newCollections.size() > 0) || (oldCollections.size() > 0) ||
+                            (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null))
                         {
                             Row headerrow = mdchanges.addRow(Row.ROLE_HEADER);
                             // Show the item
@@ -153,23 +158,51 @@ public class MetadataImportConfirm extends AbstractDSpaceTransformer {
                             changeCounter++;
                         }
 
-                        // Show new collections
+                        // Show new owning collection
+                        if (change.getNewOwningCollection() != null)
+                        {
+                            Collection c = change.getNewOwningCollection();
+                            if (c != null)
+                            {
+                                String cHandle = c.getHandle();
+                                String cName = c.getName();
+                                Row colrow = mdchanges.addRow("addition",Row.ROLE_DATA,"metadata-addition");
+                                colrow.addCellContent(T_collection_newowner);
+                                colrow.addCellContent(cHandle + " (" + cName + ")");
+                            }
+                        }
+
+                        // Show old owning collection
+                        if (change.getOldOwningCollection() != null)
+                        {
+                            Collection c = change.getOldOwningCollection();
+                            if (c != null)
+                            {
+                                String cHandle = c.getHandle();
+                                String cName = c.getName();
+                                Row colrow = mdchanges.addRow("deletion",Row.ROLE_DATA,"metadata-deletion");
+                                colrow.addCellContent(T_collection_oldowner);
+                                colrow.addCellContent(cHandle + " (" + cName + ")");
+                            }
+                        }
+
+                        // Show new mapped collections
                         for (Collection c : newCollections)
                         {
                             String cHandle = c.getHandle();
                             String cName = c.getName();
                             Row colrow = mdchanges.addRow("addition",Row.ROLE_DATA,"metadata-addition");
-                            colrow.addCellContent(T_collection_addition);
+                            colrow.addCellContent(T_collection_mapped);
                             colrow.addCellContent(cHandle + " (" + cName + ")");
                         }
 
-                        // Show old collections
+                        // Show old mapped collections
                         for (Collection c : oldCollections)
                         {
                             String cHandle = c.getHandle();
                             String cName = c.getName();
                             Row colrow = mdchanges.addRow("deletion",Row.ROLE_DATA,"metadata-deletion");
-                            colrow.addCellContent(T_collection_deletion);
+                            colrow.addCellContent(T_collection_unmapped);
                             colrow.addCellContent(cHandle + " (" + cName + ")");
                         }
 

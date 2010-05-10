@@ -66,11 +66,17 @@ public class BulkEditChange
     /** The ArrayList of the complete set of new values (constant + adds) */
     private ArrayList<DCValue> complete;
 
-    /** The Arraylist of old collections the item has been moved from */
-    private ArrayList<Collection> oldOwningCollections;
+    /** The Arraylist of old collections the item used to be mapped to */
+    private ArrayList<Collection> oldMappedCollections;
 
-    /** The Arraylist of new collections the item has been moved into */
-    private ArrayList<Collection> newOwningCollections;
+    /** The Arraylist of new collections the item has been mapped into */
+    private ArrayList<Collection> newMappedCollections;
+
+    /** The old owning collection */
+    private Collection oldOwningCollection;
+
+    /** The new owning collection */
+    private Collection newOwningCollection;
 
     /** Is this a new item */
     private boolean newItem;
@@ -88,14 +94,16 @@ public class BulkEditChange
         item = null;
         newItem = true;
         empty = true;
+        oldOwningCollection = null;
+        newOwningCollection = null;
 
         // Initialise the arrays
         adds = new ArrayList<DCValue>();
         removes = new ArrayList<DCValue>();
         constant = new ArrayList<DCValue>();
         complete = new ArrayList<DCValue>();
-        oldOwningCollections = new ArrayList<Collection>();
-        newOwningCollections = new ArrayList<Collection>();
+        oldMappedCollections = new ArrayList<Collection>();
+        newMappedCollections = new ArrayList<Collection>();
     }
 
     /**
@@ -115,8 +123,8 @@ public class BulkEditChange
         removes = new ArrayList<DCValue>();
         constant = new ArrayList<DCValue>();
         complete = new ArrayList<DCValue>();
-        oldOwningCollections = new ArrayList<Collection>();
-        newOwningCollections = new ArrayList<Collection>();
+        oldMappedCollections = new ArrayList<Collection>();
+        newMappedCollections = new ArrayList<Collection>();
     }
 
     /**
@@ -168,27 +176,74 @@ public class BulkEditChange
     }
 
     /**
-     * Add a new owning Collection
+     * Add a new mapped Collection
      *
-     * @param c The new owning Collection
+     * @param c The new mapped Collection
      */
-    public void registerNewOwningCollection(Collection c)
+    public void registerNewMappedCollection(Collection c)
     {
-        // Add the new owning Collection\
-        newOwningCollections.add(c);
+        // Add the new owning Collection
+        newMappedCollections.add(c);
         empty = false;
     }
 
     /**
-     * Add an old owning Collection
+     * Add an old mapped Collection
      *
-     * @param c The old owning Collection
+     * @param c The old mapped Collection
      */
-    public void registerOldOwningCollection(Collection c)
+    public void registerOldMappedCollection(Collection c)
     {
-        // Add the old owning Collection\
-        oldOwningCollections.add(c);
+        // Add the old owning Collection (if it isn't there already, or is an old collection)
+        boolean found = false;
+
+        if ((this.getOldOwningCollection() != null) &&
+            (this.getOldOwningCollection().getHandle().equals(c.getHandle())))
+        {
+            found = true;
+        }
+
+        for (Collection collection : oldMappedCollections)
+        {
+            if (collection.getHandle().equals(c.getHandle()))
+            {
+                found = true;
+            }
+        }
+
+        if (!found)
+        {
+            oldMappedCollections.add(c);
+            empty = false;
+        }
+    }
+
+    /**
+     * Register a change to the owning collection
+     *
+     * @param oldC The old owning collection
+     * @param newC The new owning collection
+     */
+    public void changeOwningCollection(Collection oldC, Collection newC)
+    {
+        // Store the old owning collection
+        oldOwningCollection = oldC;
+
+        // Store the new owning collection
+        newOwningCollection = newC;
         empty = false;
+    }
+
+    /**
+     * Set the owning collection of an item
+     *
+     * @param newC The new owning collection
+     */
+    public void setOwningCollection(Collection newC)
+    {
+        // Store the new owning collection
+        newOwningCollection = newC;
+        //empty = false;
     }
 
     /**
@@ -247,25 +302,47 @@ public class BulkEditChange
     }
 
     /**
-     * Get the list of new owning Collections
+     * Get the list of new mapped Collections
      *
-     * @return the list of new owning collections
+     * @return the list of new mapped collections
      */
-    public ArrayList<Collection> getNewOwningCollections()
+    public ArrayList<Collection> getNewMappedCollections()
     {
         // Return the array
-        return newOwningCollections;
+        return newMappedCollections;
     }
 
     /**
-     * Get the list of old owning Collections
+     * Get the list of old mapped Collections
      *
-     * @return the list of old owning collections
+     * @return the list of old mapped collections
      */
-    public ArrayList<Collection> getOldOwningCollections()
+    public ArrayList<Collection> getOldMappedCollections()
     {
         // Return the array
-        return oldOwningCollections;
+        return oldMappedCollections;
+    }
+
+    /**
+     * Get the old owning collection
+     *
+     * @return the old owning collection
+     */
+    public Collection getOldOwningCollection()
+    {
+        // Return the old owning collection
+        return oldOwningCollection;
+    }
+
+    /**
+     * Get the new owning collection
+     *
+     * @return the new owning collection
+     */
+    public Collection getNewOwningCollection()
+    {
+        // Return the new owning collection
+        return newOwningCollection;
     }
 
     /**

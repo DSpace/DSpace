@@ -99,11 +99,12 @@
                 // Get the changes
                 ArrayList<DCValue> adds = change.getAdds();
                 ArrayList<DCValue> removes = change.getRemoves();
-                ArrayList<Collection> newCollections = change.getNewOwningCollections();
-                ArrayList<Collection> oldCollections = change.getOldOwningCollections();
+                ArrayList<Collection> newCollections = change.getNewMappedCollections();
+                ArrayList<Collection> oldCollections = change.getOldMappedCollections();
                 boolean first = false;
                 if ((adds.size() > 0) || (removes.size() > 0) ||
-                    (newCollections.size() > 0) || (oldCollections.size() > 0))
+                    (newCollections.size() > 0) || (oldCollections.size() > 0) ||
+                    (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null))
                 {
                     // Show the item
                     if (!change.isNewItem())
@@ -117,6 +118,60 @@
                     }
                     changeCounter++;
                     first = true;
+                }
+
+                // Show new owner collection
+                if (change.getNewOwningCollection() != null)
+                {
+                    Collection c = change.getNewOwningCollection();
+                    if (c != null)
+                    {
+                        String cHandle = c.getHandle();
+                        String cName = c.getName();
+                        if (!first)
+                        {
+                            %><tr><td bgcolor="white"></td><%
+                        }
+                        else
+                        {
+                            first = false;
+                        }
+                        if (!changed)
+                        {
+                            %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.addtoownercollection"/></td><td bgcolor="4E9258" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
+                        }
+                        else
+                        {
+                            %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.addedtoownercollection"/></td><td bgcolor="4E9258" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
+                        }
+                    }
+                }
+
+                // Show old owner collection
+                if (change.getOldOwningCollection() != null)
+                {
+                    Collection c = change.getOldOwningCollection();
+                    if (c != null)
+                    {
+                        String cHandle = c.getHandle();
+                        String cName = c.getName();
+                        if (!first)
+                        {
+                            %><tr><td bgcolor="white"></td><%
+                        }
+                        else
+                        {
+                            first = false;
+                        }
+                        if (!changed)
+                        {
+                            %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.removefromownercollection"/></td><td bgcolor="4E9258" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
+                        }
+                        else
+                        {
+                            %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.removedfromownercollection"/></td><td bgcolor="4E9258" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
+                        }
+                    }
                 }
 
                 // Show new collections

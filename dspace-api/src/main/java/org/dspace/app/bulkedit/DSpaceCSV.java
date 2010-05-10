@@ -265,11 +265,19 @@ public class DSpaceCSV
         // Create the CSV line
         DSpaceCSVLine line = new DSpaceCSVLine(i.getID());
 
-        // Add in owning collections
+        // Add in owning collection
+        String owningCollectionHandle = i.getOwningCollection().getHandle();
+        line.add("collection", owningCollectionHandle);
+
+        // Add in any mapped collections
         Collection[] collections = i.getCollections();
         for (Collection c : collections)
         {
-           line.add("collection", c.getHandle());
+            // Only add if it is not the owning collection
+            if (!c.getHandle().equals(owningCollectionHandle))
+            {
+                line.add("collection", c.getHandle());   
+            }
         }
 
         // Populate it
