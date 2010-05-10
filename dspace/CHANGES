@@ -19,7 +19,7 @@
 - [DS-527] Withdrawn items not shown as deleted in OAI
 - [DS-548] Removing repeatable values in DescribeStep does not properly test for authority control
 
-(Claudia Jürgen)
+(Claudia Jï¿½rgen)
 - [DS-558] Error in update sequence script 1.5 to 1.6 Oracle
 - [DS-551] Export directories dspace.cfg and build.xml out of sync
 - [DS-543] Harvest not internationalized 
@@ -36,6 +36,7 @@
  - [DS-539] Misspelled attribute in MODS/METS output
 
 (Stuart Lewis)
+ - [DS-242] Special groups shown for logged in user rather than for user being examined
  - [DS-506] embargo-lifter command missing from launcher.xml
  - [DS-526] ItemUpdate - script update
 
