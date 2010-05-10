@@ -479,7 +479,7 @@ public class Group extends DSpaceObject
         // However, we only do this is we are looking up the special groups
         // of the current user, as we cannot look up the special groups
         // of a user who is not logged in.
-        if ((c.getCurrentUser() != null) && (c.getCurrentUser().getID() == e.getID()))
+        if ((c.getCurrentUser() == null) || (((c.getCurrentUser() != null) && (c.getCurrentUser().getID() == e.getID()))))
         {
             Group[] specialGroups = c.getSpecialGroups();
             for(Group special : specialGroups)
