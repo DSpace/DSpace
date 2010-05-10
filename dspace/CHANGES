@@ -1,6 +1,9 @@
 1.7.0
 =====
 
+(Yin Yin Latt)
+- [DS-565] Empty description column in Itemview Page - General-Handler.xsl
+
 (Robin Taylor)
 - [DS-497] Date month and day get default values when user returns to describe form
 
