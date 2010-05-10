@@ -1278,6 +1278,8 @@
 	<message key="xmlui.administrative.item.MoveItemForm.collection_help">Select the collection you wish to move this item to.</message>
 	<message key="xmlui.administrative.item.MoveItemForm.collection_default">Select a collection...</message>
 	<message key="xmlui.administrative.item.MoveItemForm.submit_move">Move</message>
+    <message key="xmlui.administrative.item.MoveItemForm.inherit_policies">Inherit policies</message>
+    <message key="xmlui.administrative.item.MoveItemForm.inherit_policies_help">Inherit the default policies of the destination collection</message>
 
 	<!-- org.dspace.app.xmlui.administrative.item.EditBitstreamForm -->
 	<message key="xmlui.administrative.item.EditBitstreamForm.title">Edit Bitstream</message>
@@ -1384,14 +1386,18 @@
         <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.changes_committed">Changes applied to item</message>
         <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.item_added">Added: </message>
         <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.item_removed">Removed: </message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_added">Added to collection</message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_removed">Removed from collection</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_newowner">Added to owning collection</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_oldowner">Removed from owning collection</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_mapped">Mapped to collection</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_unmapped">Unmapped from collection</message>
         
         <!-- org.dspace.app.xmlui.administrative.metadataimport.MetadataImportUpload -->
         <message key="xmlui.administrative.metadataimport.MetadataImportUpload.item_add">Add: </message>
         <message key="xmlui.administrative.metadataimport.MetadataImportUpload.item_remove">Remove: </message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.collection_add">Add to collection</message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.collection_remove">Remove from collection</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.collection_newowner">Add to owning collection</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.collection_oldowner">Remove from owning collection</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.collection_mapped">Map to collection</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.collection_unmapped">Un-map from collection</message>
         <message key="xmlui.administrative.metadataimport.MetadataImportUpload.changes_pending">Changes pending for item</message>
         <message key="xmlui.administrative.metadataimport.MetadataImportUpload.submit_confirm">Apply changes</message>
         <message key="xmlui.administrative.metadataimport.MetadataImportUpload.hint">Pending changes are listed below for review</message>

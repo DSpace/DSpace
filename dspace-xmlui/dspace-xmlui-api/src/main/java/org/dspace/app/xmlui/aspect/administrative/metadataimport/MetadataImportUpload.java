@@ -78,19 +78,19 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
 	private static final Message T_submit_return = message("xmlui.general.return");
 	private static final Message T_trail = message("xmlui.administrative.metadataimport.general.trail");
 	private static final Message T_no_changes = message("xmlui.administrative.metadataimport.general.no_changes");
-        private static final Message T_new_item = message("xmlui.administrative.metadataimport.general.new_item");
+    private static final Message T_new_item = message("xmlui.administrative.metadataimport.general.new_item");
 	private static final Message T_title = message("xmlui.administrative.metadataimport.general.title");
 	private static final Message T_head1 = message("xmlui.administrative.metadataimport.general.head1");
 
 	private static final Message T_para = message("xmlui.administrative.metadataimport.MetadataImportUpload.hint");
-        private static final Message T_submit_confirm = message("xmlui.administrative.metadataimport.MetadataImportUpload.submit_confirm");
+    private static final Message T_submit_confirm = message("xmlui.administrative.metadataimport.MetadataImportUpload.submit_confirm");
 	private static final Message T_changes_pending = message("xmlui.administrative.metadataimport.MetadataImportUpload.changes_pending");
-        private static final Message T_item_addition = message("xmlui.administrative.metadataimport.MetadataImportUpload.item_add");
-        private static final Message T_item_deletion = message("xmlui.administrative.metadataimport.MetadataImportUpload.item_remove");
-        private static final Message T_collection_addition = message("xmlui.administrative.metadataimport.MetadataImportUpload.collection_add");
-        private static final Message T_collection_deletion = message("xmlui.administrative.metadataimport.MetadataImportUpload.collection_remove");
-        
-
+    private static final Message T_item_addition = message("xmlui.administrative.metadataimport.MetadataImportUpload.item_add");
+    private static final Message T_item_deletion = message("xmlui.administrative.metadataimport.MetadataImportUpload.item_remove");
+    private static final Message T_collection_newowner = message("xmlui.administrative.metadataimport.MetadataImportUpload.collection_newowner");
+    private static final Message T_collection_oldowner = message("xmlui.administrative.metadataimport.MetadataImportUpload.collection_oldowner");
+    private static final Message T_collection_mapped = message("xmlui.administrative.metadataimport.MetadataImportUpload.collection_mapped");
+    private static final Message T_collection_unmapped = message("xmlui.administrative.metadataimport.MetadataImportUpload.collection_unmapped");
 
 	public void addPageMeta(PageMeta pageMeta) throws WingException  
 	{
@@ -106,136 +106,164 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
 		// Get list of changes
 
 		Request request = ObjectModelHelper.getRequest(objectModel);
-                ArrayList<BulkEditChange> changes = null;
-                int num_changes = 0;
+        ArrayList<BulkEditChange> changes = null;
+        int num_changes = 0;
 
-                if(request.getAttribute("changes") != null)
-                {
-                    changes = ((ArrayList<BulkEditChange>)request.getAttribute("changes"));
-                    num_changes = changes.size();
-                }
-                        
+        if(request.getAttribute("changes") != null)
+        {
+            changes = ((ArrayList<BulkEditChange>)request.getAttribute("changes"));
+            num_changes = changes.size();
+        }
+
 
 		// DIVISION: metadata-import
 		Division div = body.addInteractiveDivision("metadata-import",contextPath + "/admin/metadataimport", Division.METHOD_MULTIPART,"primary administrative");
 		div.setHead(T_head1);
 	
-                if(num_changes > 0)
+        if(num_changes > 0)
+        {
+
+            div.addPara(T_para);
+
+            Table mdchanges = div.addTable("metadata-changes", num_changes, 2);
+
+            // Display the changes
+            int changeCounter = 0;
+            for (BulkEditChange change : changes)
+            {
+                // Get the changes
+                ArrayList<DCValue> adds = change.getAdds();
+                ArrayList<DCValue> removes = change.getRemoves();
+                ArrayList<Collection> newCollections = change.getNewMappedCollections();
+                ArrayList<Collection> oldCollections = change.getOldMappedCollections();
+
+                if ((adds.size() > 0) || (removes.size() > 0) ||
+                    (newCollections.size() > 0) || (oldCollections.size() > 0))
                 {
-
-                    div.addPara(T_para);
-
-                    Table mdchanges = div.addTable("metadata-changes", num_changes, 2);
-
-                    // Display the changes
-                    int changeCounter = 0;
-                    for (BulkEditChange change : changes)
+                    Row headerrow = mdchanges.addRow(Row.ROLE_HEADER);
+                    // Show the item
+                    if (!change.isNewItem())
                     {
-                        // Get the changes
-                        ArrayList<DCValue> adds = change.getAdds();
-                        ArrayList<DCValue> removes = change.getRemoves();
-                        ArrayList<Collection> newCollections = change.getNewOwningCollections();
-                        ArrayList<Collection> oldCollections = change.getOldOwningCollections();
-                        
-                        if ((adds.size() > 0) || (removes.size() > 0) ||
-                            (newCollections.size() > 0) || (oldCollections.size() > 0))
-                        {
-                            Row headerrow = mdchanges.addRow(Row.ROLE_HEADER);
-                            // Show the item
-                            if (!change.isNewItem())
-                            {
-                                Item i = change.getItem();
-                                Cell cell = headerrow.addCell();
-                                cell.addContent(T_changes_pending);
-                                cell.addContent(" " + i.getID() + "(" + i.getHandle() + ")");
+                        Item i = change.getItem();
+                        Cell cell = headerrow.addCell();
+                        cell.addContent(T_changes_pending);
+                        cell.addContent(" " + i.getID() + "(" + i.getHandle() + ")");
 
-                            }
-                            else
-                            {
-                              headerrow.addCellContent(T_new_item);
-                            }
-                            headerrow.addCell();
-                            changeCounter++;
-                        }
-
-                        // Show new collections
-                        for (Collection c : newCollections)
-                        {
-                            String cHandle = c.getHandle();
-                            String cName = c.getName();
-                            Row colrow = mdchanges.addRow("addition",Row.ROLE_DATA,"metadata-addition");
-                            colrow.addCellContent(T_collection_addition);
-                            colrow.addCellContent(cHandle + " (" + cName + ")");
-                        }
-
-                        // Show old collections
-                        for (Collection c : oldCollections)
-                        {
-                            String cHandle = c.getHandle();
-                            String cName = c.getName();
-                            Row colrow = mdchanges.addRow("deletion",Row.ROLE_DATA,"metadata-deletion");
-                            colrow.addCellContent(T_collection_deletion);
-                            colrow.addCellContent(cHandle + " (" + cName + ")");
-                        }
-
-                        // Show additions
-                        for (DCValue dcv : adds)
-                        {
-                            Row mdrow = mdchanges.addRow("addition",Row.ROLE_DATA,"metadata-addition");
-                            String md = dcv.schema + "." + dcv.element;
-                            if (dcv.qualifier != null)
-                            {
-                                md += "." + dcv.qualifier;
-                            }
-                            if (dcv.language != null)
-                            {
-                                md += "[" + dcv.language + "]";
-                            }
-
-                            Cell cell = mdrow.addCell();
-                            cell.addContent(T_item_addition);
-                            cell.addContent(" (" + md + ")");
-                            mdrow.addCellContent(dcv.value);
-                        }
-
-                        // Show removals
-                        for (DCValue dcv : removes)
-                        {
-                            Row mdrow = mdchanges.addRow("deletion",Row.ROLE_DATA,"metadata-deletion");
-                            String md = dcv.schema + "." + dcv.element;
-                            if (dcv.qualifier != null)
-                            {
-                                md += "." + dcv.qualifier;
-                            }
-                            if (dcv.language != null)
-                            {
-                                md += "[" + dcv.language + "]";
-                            }
-
-                            Cell cell = mdrow.addCell();
-                            cell.addContent(T_item_deletion);
-                            cell.addContent(" (" + md + ")");
-                            mdrow.addCellContent(dcv.value);
-                        }
                     }
-                    Para actions = div.addPara();
-                    Button applychanges = actions.addButton("submit_confirm");
-                    applychanges.setValue(T_submit_confirm);
-                    Button cancel = actions.addButton("submit_return");
-                    cancel.setValue(T_submit_return);
+                    else
+                    {
+                      headerrow.addCellContent(T_new_item);
+                    }
+                    headerrow.addCell();
+                    changeCounter++;
                 }
-                else
+
+                // Show new owning collection
+                if (change.getNewOwningCollection() != null)
                 {
-                    Para nochanges = div.addPara();
-                    nochanges.addContent(T_no_changes);
-                    Para actions = div.addPara();
-                    Button cancel = actions.addButton("submit_return");
-                    cancel.setValue(T_submit_return);
+                    Collection c = change.getNewOwningCollection();
+                    if (c != null)
+                    {
+                        String cHandle = c.getHandle();
+                        String cName = c.getName();
+                        Row colrow = mdchanges.addRow("addition",Row.ROLE_DATA,"metadata-addition");
+                        colrow.addCellContent(T_collection_newowner);
+                        colrow.addCellContent(cHandle + " (" + cName + ")");
+                    }
                 }
-                
-                
-                    
-                div.addHidden("administrative-continue").setValue(knot.getId());
+
+                // Show old owning collection
+                if (change.getOldOwningCollection() != null)
+                {
+                    Collection c = change.getOldOwningCollection();
+                    if (c != null)
+                    {
+                        String cHandle = c.getHandle();
+                        String cName = c.getName();
+                        Row colrow = mdchanges.addRow("deletion",Row.ROLE_DATA,"metadata-deletion");
+                        colrow.addCellContent(T_collection_oldowner);
+                        colrow.addCellContent(cHandle + " (" + cName + ")");
+                    }
+                }
+
+                // Show new mapped collections
+                for (Collection c : newCollections)
+                {
+                    String cHandle = c.getHandle();
+                    String cName = c.getName();
+                    Row colrow = mdchanges.addRow("addition",Row.ROLE_DATA,"metadata-addition");
+                    colrow.addCellContent(T_collection_mapped);
+                    colrow.addCellContent(cHandle + " (" + cName + ")");
+                }
+
+                // Show old mapped collections
+                for (Collection c : oldCollections)
+                {
+                    String cHandle = c.getHandle();
+                    String cName = c.getName();
+                    Row colrow = mdchanges.addRow("deletion",Row.ROLE_DATA,"metadata-deletion");
+                    colrow.addCellContent(T_collection_unmapped);
+                    colrow.addCellContent(cHandle + " (" + cName + ")");
+                }
+
+                // Show additions
+                for (DCValue dcv : adds)
+                {
+                    Row mdrow = mdchanges.addRow("addition",Row.ROLE_DATA,"metadata-addition");
+                    String md = dcv.schema + "." + dcv.element;
+                    if (dcv.qualifier != null)
+                    {
+                        md += "." + dcv.qualifier;
+                    }
+                    if (dcv.language != null)
+                    {
+                        md += "[" + dcv.language + "]";
+                    }
+
+                    Cell cell = mdrow.addCell();
+                    cell.addContent(T_item_addition);
+                    cell.addContent(" (" + md + ")");
+                    mdrow.addCellContent(dcv.value);
+                }
+
+                // Show removals
+                for (DCValue dcv : removes)
+                {
+                    Row mdrow = mdchanges.addRow("deletion",Row.ROLE_DATA,"metadata-deletion");
+                    String md = dcv.schema + "." + dcv.element;
+                    if (dcv.qualifier != null)
+                    {
+                        md += "." + dcv.qualifier;
+                    }
+                    if (dcv.language != null)
+                    {
+                        md += "[" + dcv.language + "]";
+                    }
+
+                    Cell cell = mdrow.addCell();
+                    cell.addContent(T_item_deletion);
+                    cell.addContent(" (" + md + ")");
+                    mdrow.addCellContent(dcv.value);
+                }
+            }
+            Para actions = div.addPara();
+            Button applychanges = actions.addButton("submit_confirm");
+            applychanges.setValue(T_submit_confirm);
+            Button cancel = actions.addButton("submit_return");
+            cancel.setValue(T_submit_return);
+        }
+        else
+        {
+            Para nochanges = div.addPara();
+            nochanges.addContent(T_no_changes);
+            Para actions = div.addPara();
+            Button cancel = actions.addButton("submit_return");
+            cancel.setValue(T_submit_return);
+        }
+
+
+
+        div.addHidden("administrative-continue").setValue(knot.getId());
 	}
 
 }

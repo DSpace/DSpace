@@ -120,6 +120,10 @@ public class MetadataImport
                 {
                     // Get the item
                     Item item = Item.find(c, id);
+                    if (item == null)
+                    {
+                        throw new MetadataImportException("Unknown item ID " + id);
+                    }
                     BulkEditChange whatHasChanged = new BulkEditChange(item);
 
                     // Has it moved collection?
@@ -224,10 +228,19 @@ public class MetadataImport
                     }
 
                     // Record the addition to collections
+                    boolean first = true;
                     for (String handle : collections)
                     {
                         Collection extra = (Collection)HandleManager.resolveToObject(c, handle);
-                        whatHasChanged.registerNewOwningCollection(extra);
+                        if (first)
+                        {
+                            whatHasChanged.setOwningCollection(extra);   
+                        }
+                        else
+                        {
+                            whatHasChanged.registerNewMappedCollection(extra);
+                        }
+                        first = false;
                     }
 
                     // Create the new item?
@@ -454,10 +467,11 @@ public class MetadataImport
     }
 
     /**
-     * Compare changes between an items owning collections and what is in the CSV file
+     * Compare changes between an items owning collection and mapped collections
+     * and what is in the CSV file
      *
      * @param item The item in question
-     * @param collections The collection handles fro mthe CSV file
+     * @param collections The collection handles from the CSV file
      * @param actualCollections The Collections from the actual item
      * @param bechange The bulkedit change object for this item
      * @param change Whether or not to actuate a change
@@ -473,90 +487,138 @@ public class MetadataImport
                          BulkEditChange bechange,
                          boolean change) throws SQLException, AuthorizeException, IOException, MetadataImportException
     {
-        // First, loop through the strings from the CSV
+        // First, check the owning collection (as opposed to mapped collections) is the same of changed
+        String oldOwner = item.getOwningCollection().getHandle();
+        String newOwner = collections.get(0);
+        // Resolve the handle to the collection
+        Collection newCollection = (Collection)HandleManager.resolveToObject(c, newOwner);
+
+        // Check it resolved OK
+        if (newCollection == null)
+        {
+            throw new MetadataImportException("'" + newOwner + "' is not a Collection! You must specify a valid collection ID");
+        }
+
+        if (!oldOwner.equals(newOwner))
+        {
+            // Register the old and new owning collections
+            bechange.changeOwningCollection(item.getOwningCollection(), (Collection)HandleManager.resolveToObject(c, newOwner));
+        }
+
+        // Second, loop through the strings from the CSV of mapped collections
+        boolean first = true;
         for (String csvcollection : collections)
         {
-            // Look for it in the actual list of Collections
-            boolean found = false;
-            for (Collection collection : actualCollections)
+            // Ignore the first collection as this is the owning collection
+            if (!first)
             {
-                // Is it there?
-                if (csvcollection.equals(collection.getHandle()))
+                // Look for it in the actual list of Collections
+                boolean found = false;
+                for (Collection collection : actualCollections)
                 {
-                    found = true;
+                    if (collection.getID() != item.getOwningCollection().getID()) {
+                        // Is it there?
+                        if (csvcollection.equals(collection.getHandle()))
+                        {
+                            found = true;
+                        }
+                    }
                 }
-            }
 
-            // Was it found?
-            if (!found)
-            {
-                // Register than change
+                // Was it found?
                 DSpaceObject dso = HandleManager.resolveToObject(c, csvcollection);
                 if ((dso == null) || (dso.getType() != Constants.COLLECTION))
                 {
                     throw new MetadataImportException("Collection defined for item " + item.getID() +
                                                       " (" + item.getHandle() + ") is not a collection");
                 }
-                else
+                if (!found)
                 {
+                    // Register the new mapped collection
                     Collection col = (Collection)dso;
-                    bechange.registerNewOwningCollection(col);
-
-                    // Execute the change
-                    if (change)
-                    {
-                        // Add the item to the community
-                        col.addItem(item);
-                    }
+                    bechange.registerNewMappedCollection(col);
                 }
             }
+            first = false;
         }
 
-        // Second, loop through the strings from the current item
+        // Third, loop through the strings from the current item
         for (Collection collection : actualCollections)
         {
             // Look for it in the actual list of Collections
             boolean found = false;
+            first = true;
             for (String csvcollection : collections)
             {
-                // Is it there?
-                if (collection.getHandle().equals(csvcollection))
+                // Don't check the owning collection
+                if ((first) && (collection.getID() == item.getOwningCollection().getID()))
                 {
                     found = true;
                 }
+                else
+                {
+                    if (!first)
+                    {
+                        // Is it there?
+                        if (collection.getHandle().equals(csvcollection))
+                        {
+                            found = true;
+                        }
+
+                    }
+                }
+                first = false;
             }
 
             // Was it found?
             if (!found)
             {
-                // Reocrd that it isn't there any more
-                bechange.registerOldOwningCollection(collection);
-
-                // Execute the change
-                if (change)
-                {
-                    // Sanity check it is in another collection
-                    if (item.getCollections().length > 1)
-                    {
-                        collection.removeItem(item);
-                    }
-                    else
-                    {
-                        throw new MetadataImportException("Not removing item " + item.getHandle() +
-                                                          " from collection " + collection.getHandle() +
-                                                          " as it would leave it oprhaned!");
-                    }
-                }
+                // Record that it isn't there any more
+                bechange.registerOldMappedCollection(collection);
             }
         }
 
-        // Now check the owning_collection (item table) is the same as
-        // the first collection given in the CSV file entry
-        if ((change) && (!collections.get(0).equals(item.getOwningCollection().getHandle())))
+        // Process the changes
+        if (change)
         {
-            Collection owner = (Collection)HandleManager.resolveToObject(c, collections.get(0));
-            item.setOwningCollection(Collection.find(c, owner.getID()));
-            item.update();
+            // Remove old mapped collections
+            for (Collection c : bechange.getOldMappedCollections())
+            {
+                c.removeItem(item);
+            }
+
+            // Add to new owned collection
+            if (bechange.getNewOwningCollection() != null)
+            {
+                bechange.getNewOwningCollection().addItem(item);
+                item.setOwningCollection(bechange.getNewOwningCollection());
+                item.update();
+            }
+
+            // Remove from old owned collection (if still a member)
+            if (bechange.getOldOwningCollection() != null)
+            {
+                boolean found = false;
+                for (Collection c : item.getCollections())
+                {
+                    if (c.getID() == bechange.getOldOwningCollection().getID())
+                    {
+                        found = true;
+                    }
+                }
+
+                if (found)
+                {
+                    bechange.getOldOwningCollection().removeItem(item);
+                }
+            }
+
+            // Add to new mapped collections
+            for (Collection c : bechange.getNewMappedCollections())
+            {
+                c.addItem(item);
+            }
+
         }
     }
 
@@ -695,10 +757,11 @@ public class MetadataImport
             // Get the changes
             ArrayList<DCValue> adds = change.getAdds();
             ArrayList<DCValue> removes = change.getRemoves();
-            ArrayList<Collection> newCollections = change.getNewOwningCollections();
-            ArrayList<Collection> oldCollections = change.getOldOwningCollections();
+            ArrayList<Collection> newCollections = change.getNewMappedCollections();
+            ArrayList<Collection> oldCollections = change.getOldMappedCollections();
             if ((adds.size() > 0) || (removes.size() > 0) ||
-                (newCollections.size() > 0) || (oldCollections.size() > 0))
+                (newCollections.size() > 0) || (oldCollections.size() > 0) ||
+                (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null))
             {
                 // Show the item
                 Item i = change.getItem();
@@ -727,34 +790,69 @@ public class MetadataImport
                 changeCounter++;
             }
 
-            // Show new collections
+            if (change.getNewOwningCollection() != null)
+            {
+                Collection c = change.getNewOwningCollection();
+                if (c != null)
+                {
+                    String cHandle = c.getHandle();
+                    String cName = c.getName();
+                    if (!changed)
+                    {
+                        System.out.print(" + New owning collection (" + cHandle + "): ");
+                    }
+                    else
+                    {
+                        System.out.print(" + New owning collection  (" + cHandle + "): ");
+                    }
+                    System.out.println(cName);
+                }
+
+                c = change.getOldOwningCollection();
+                if (c != null)
+                {
+                    String cHandle = c.getHandle();
+                    String cName = c.getName();
+                    if (!changed)
+                    {
+                        System.out.print(" + Old owning collection (" + cHandle + "): ");
+                    }
+                    else
+                    {
+                        System.out.print(" + Old owning collection  (" + cHandle + "): ");
+                    }
+                    System.out.println(cName);
+                }
+            }
+
+            // Show new mapped collections
             for (Collection c : newCollections)
             {
                 String cHandle = c.getHandle();
                 String cName = c.getName();
                 if (!changed)
                 {
-                    System.out.print(" + Add to collection (" + cHandle + "): ");
+                    System.out.print(" + Map to collection (" + cHandle + "): ");
                 }
                 else
                 {
-                    System.out.print(" + Added to collection  (" + cHandle + "): ");
+                    System.out.print(" + Mapped to collection  (" + cHandle + "): ");
                 }
                 System.out.println(cName);
             }
 
-            // Show old collections
+            // Show old mapped collections
             for (Collection c : oldCollections)
             {
                 String cHandle = c.getHandle();
                 String cName = c.getName();
                 if (!changed)
                 {
-                    System.out.print(" + Remove from collection (" + cHandle + "): ");
+                    System.out.print(" + Um-map from collection (" + cHandle + "): ");
                 }
                 else
                 {
-                    System.out.print(" + Removed from collection  (" + cHandle + "): ");
+                    System.out.print(" + Un-mapped from collection  (" + cHandle + "): ");
                 }
                 System.out.println(cName);
             }

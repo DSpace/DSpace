@@ -39,6 +39,7 @@
  - [DS-242] Special groups shown for logged in user rather than for user being examined
  - [DS-506] embargo-lifter command missing from launcher.xml
  - [DS-526] ItemUpdate - script update
+ - [DS-572] Batch metadata editor fails to notice change of item's owning collection
 
 (Ivan Masar)
  - [DS-515] Czech localization of 1.5.2
