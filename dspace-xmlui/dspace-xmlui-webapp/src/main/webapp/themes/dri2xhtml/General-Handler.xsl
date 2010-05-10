@@ -206,7 +206,7 @@
                 </xsl:choose>                        
             </td>
 	    <!-- Display the contents of 'Description' as long as at least one bitstream contains a description -->
-	    <xsl:if test="$context/mets:fileSec/mets:fileGrp/mets:file/mets:FLocat/@xlink:label != ''">
+	    <xsl:if test="$context/mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file/mets:FLocat/@xlink:label != ''">
 	        <td>
 	            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
 	        </td>
