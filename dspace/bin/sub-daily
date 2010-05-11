@@ -46,4 +46,4 @@
 # Get the DSPACE/bin directory
 BINDIR=`dirname $0`
 
-$BINDIR/dsrun org.dspace.eperson.Subscribe $@
+$BINDIR/dspace sub-daily "$@"

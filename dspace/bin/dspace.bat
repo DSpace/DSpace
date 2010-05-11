@@ -38,4 +38,37 @@
 @REM #
 @REM ###########################################################################
 
-@call dsrun.bat org.dspace.app.launcher.ScriptLauncher %*
+@echo off
+
+set CURRENT_DIR=%cd%
+
+REM Guess DSpace directory: CD to directory script is in; CD to parent
+chdir /D "%~p0"
+chdir ..
+
+REM Check we can find dspace.cfg.  Quit with an error if not.
+if exist "config\dspace.cfg" goto okExec
+echo Cannot find %cd%\config\dspace.cfg
+goto end
+
+:okExec
+echo Using DSpace installation in: %cd%
+
+REM Build a CLASSPATH
+set DSPACE_CLASSPATH=%CLASSPATH%;config
+for %%f in (lib\*.jar) DO CALL bin\buildpath.bat %%f
+
+REM If JAVA_OPTS specified, use those options
+REM Otherwise, default Java to using 256MB of memory
+if "%JAVA_OPTS%"=="" set JAVA_OPTS=-Xmx256m
+
+REM Execute Java
+java %JAVA_OPTS% -classpath "%DSPACE_CLASSPATH%" org.dspace.app.launcher.ScriptLauncher %*
+
+REM Clean up DSPACE_CLASSPATH variable
+set DSPACE_CLASSPATH=
+
+:end
+
+REM Back to original dir
+chdir /D %CURRENT_DIR%

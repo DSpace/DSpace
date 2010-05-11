@@ -47,7 +47,7 @@ BINDIR=`dirname $0`
 
 echo "Cleaning the asset store"
 
-$BINDIR/dsrun org.dspace.storage.bitstore.Cleanup "$@"
+$BINDIR/dspace cleanup "$@"
 
 echo "Cleanup completed"
 

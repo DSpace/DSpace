@@ -38,6 +38,7 @@
 (Stuart Lewis)
  - [DS-242] Special groups shown for logged in user rather than for user being examined
  - [DS-506] embargo-lifter command missing from launcher.xml
+ - [DS-516] DSRUN does not start Service Manager
  - [DS-526] ItemUpdate - script update
  - [DS-572] Batch metadata editor fails to notice change of item's owning collection
 

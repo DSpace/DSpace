@@ -45,9 +45,5 @@
 # Get the DSPACE/bin directory
 BINDIR=`dirname $0`
 
-echo "Creating browse index"
-$BINDIR/dsrun org.dspace.browse.IndexBrowse -f -r
-$BINDIR/dsrun org.dspace.browse.ItemCounter
-
-echo "Creating search index"
-$BINDIR/dsrun org.dspace.search.DSIndexer -b
+echo "Creating browse and search indexes"
+$BINDIR/dspace index-init

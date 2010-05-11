@@ -45,4 +45,4 @@
 # Get the DSPACE/bin directory
 BINDIR=`dirname $0`
 
-$BINDIR/dsrun org.dspace.app.packager.Packager $@
+$BINDIR/dspace packager "$@"

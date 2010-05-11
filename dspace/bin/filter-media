@@ -46,4 +46,4 @@
 BINDIR=`dirname $0`
 
 echo "Applying Media Filters"
-$BINDIR/dsrun org.dspace.app.mediafilter.MediaFilterManager $@
+$BINDIR/dspace filter-media "$@"

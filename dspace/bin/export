@@ -45,4 +45,4 @@
 # Get the DSPACE/bin directory
 BINDIR=`dirname $0`
 
-$BINDIR/dsrun org.dspace.app.itemexport.ItemExport $@
+$BINDIR/dspace export "$@"

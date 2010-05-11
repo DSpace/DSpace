@@ -43,7 +43,7 @@
 # This is a simple shell script for running a command-line DSpace tool.
 # It sets the CLASSPATH appropriately before invoking Java.
 
-USAGE="dsrun <classname> [arg1 [arg2 ...]]"
+USAGE="dspace dsrun <classname> [arg1 [arg2 ...]]"
 
 # Check we have at least one command-line argument
 if [ "$#" = "0" ]; then
@@ -51,24 +51,5 @@ if [ "$#" = "0" ]; then
     exit 1
 fi
 
-# Assume we're in the bin subdirectory of the DSpace installation directory
 BINDIR=`dirname $0`
-DSPACEDIR=`cd "$BINDIR/.." ; pwd`
-
-# Get the JARs in $DSPACEDIR/jsp/WEB-INF/lib, separated by ':'
-JARS=`echo $DSPACEDIR/lib/*.jar | sed 's/ /\:/g'`
-
-# Class path for DSpace will be:
-#   Any existing classpath
-#   The JARs (WEB-INF/lib/*.jar)
-#   The WEB-INF/classes directory
-FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config
-
-#Allow user to specify java options through JAVA_OPTS variable
-if [ "$JAVA_OPTS" = "" ]; then
-   #Default Java to use 256MB of memory
-   JAVA_OPTS=-Xmx256m
-fi
-
-# Now invoke Java
-java $JAVA_OPTS -classpath $FULLPATH "$@"
+$BINDIR/dspace dsrun "$@"

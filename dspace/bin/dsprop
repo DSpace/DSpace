@@ -42,15 +42,7 @@
 # This is a simple shell script for running retrieving the value of a dspace
 # property 
 
-USAGE="dsprop <property.name>"
-
-# Check we have at least one command-line argument
-if [ "$#" != "1" ]; then
-    echo $USAGE
-    exit 1
-fi
-
 # Get the DSPACE/bin directory
 BINDIR=`dirname $0`
 
-$BINDIR/dsrun org.dspace.core.ConfigurationManager -property "$1"
+$BINDIR/dspace dsprop -property "$1"
