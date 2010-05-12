@@ -447,7 +447,11 @@ public class DescribeStep extends AbstractSubmissionStep
                 if (dcInput.isRequired())
                         fullName.setRequired();
                 if (isFieldInError(fieldName))
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                        fullName.addError(dcInput.getWarning());
+                    } else {
                         fullName.addError(T_required_field);
+                    }
                 if (dcInput.isRepeatable() && !readonly)
                         fullName.enableAddOperation();
                 if ((dcInput.isRepeatable() || dcValues.length > 1)  && !readonly)
@@ -543,7 +547,11 @@ public class DescribeStep extends AbstractSubmissionStep
                 if (dcInput.isRequired())
                         fullDate.setRequired();
                 if (isFieldInError(fieldName))
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                        fullDate.addError(dcInput.getWarning());
+                    } else {
                         fullDate.addError(T_required_field);
+                    }
                 if (dcInput.isRepeatable() && !readonly)
                         fullDate.enableAddOperation();
                 if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
@@ -632,7 +640,11 @@ public class DescribeStep extends AbstractSubmissionStep
                 if (dcInput.isRequired())
                         fullSeries.setRequired();
                 if (isFieldInError(fieldName))
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                        fullSeries.addError(dcInput.getWarning());
+                    } else {
                         fullSeries.addError(T_required_field);
+                    }
                 if (dcInput.isRepeatable() && !readonly)
                         fullSeries.enableAddOperation();
                 if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
@@ -698,7 +710,11 @@ public class DescribeStep extends AbstractSubmissionStep
                 if (dcInput.isRequired())
                         qualdrop.setRequired();
                 if (isFieldInError(fieldName))
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                        qualdrop.addError(dcInput.getWarning());
+                    } else {
                         qualdrop.addError(T_required_field);
+                    }
                 if (dcInput.isRepeatable() && !readonly)
                         qualdrop.enableAddOperation();
                 // Update delete based upon the filtered values.
@@ -776,7 +792,11 @@ public class DescribeStep extends AbstractSubmissionStep
                 if (dcInput.isRequired())
                         textArea.setRequired();
                 if (isFieldInError(fieldName))
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                        textArea.addError(dcInput.getWarning());
+                    } else {
                         textArea.addError(T_required_field);
+                    }
                 if (dcInput.isRepeatable() && !readonly)
                         textArea.enableAddOperation();
                 if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
@@ -845,7 +865,11 @@ public class DescribeStep extends AbstractSubmissionStep
                 if (dcInput.isRequired())
                         select.setRequired();
                 if (isFieldInError(fieldName))
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                        select.addError(dcInput.getWarning());
+                    } else {
                         select.addError(T_required_field);
+                    }
                 if (dcInput.isRepeatable() || dcValues.length > 1)
                 {
                         // Use the multiple functionality from the HTML
@@ -900,7 +924,11 @@ public class DescribeStep extends AbstractSubmissionStep
                 if (dcInput.isRequired())
                         select.setRequired();
                 if (isFieldInError(fieldName))
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                        select.addError(dcInput.getWarning());
+                    } else {
                         select.addError(T_required_field);
+                    }
                 if (dcInput.isRepeatable() || dcValues.length > 1)
                 {
                         // Use the multiple functionality from the HTML
@@ -974,8 +1002,12 @@ public class DescribeStep extends AbstractSubmissionStep
                 if (dcInput.isRequired())
                         listField.setRequired();
                 if (isFieldInError(fieldName))
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                        listField.addError(dcInput.getWarning());
+                    } else {
                         listField.addError(T_required_field);
-                
+                    }
+
         
                 //Setup each of the possible options
                 java.util.List<String> pairs = dcInput.getPairs();
@@ -1050,7 +1082,11 @@ public class DescribeStep extends AbstractSubmissionStep
                 if (dcInput.isRequired())
                         text.setRequired();
                 if (isFieldInError(fieldName))
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                        text.addError(dcInput.getWarning());
+                    } else {
                         text.addError(T_required_field);
+                    }
                 if (dcInput.isRepeatable() && !readonly)
                         text.enableAddOperation();
                 if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
