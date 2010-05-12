@@ -54,6 +54,7 @@
  - [DS-515] Czech localization of 1.5.2
 
 (Ben Bosman)
+ - [DS-579] Required fields in submissions display wrong error message
  - [DS-538] restricted items are being returned in OAI GetRecord method while using harvest.includerestricted.oai
  - [DS-493] Url in browser is incorrect after login
 
