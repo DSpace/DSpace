@@ -1,6 +1,9 @@
 1.7.0
 =====
 
+(Paulo Jobim)
+- [DS-471] Accessing site-level 'mets.xml' in XMLUI doesn't work properly for handle prefixes with periods (e.g. 2010.1)
+
 (Yin Yin Latt)
 - [DS-565] Empty description column in Itemview Page - General-Handler.xsl
 - [DS-566] Side bar menu dropping when there is license text in collection - DIM-Handler.xsl

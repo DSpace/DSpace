@@ -184,32 +184,38 @@ public class DSpaceMETSGenerator extends AbstractGenerator
          	if (parts.length == 2)
          	{
          		String type = parts[0];
-         		int id = Integer.valueOf(parts[1]);
-         		
-         		if ("item".equals(type))
-         		{
-         			Item item = Item.find(context,id);
-         			if (item != null)
-                                        adapter = new ItemAdapter(context,item,contextPath);
-         		}
-         		else if ("collection".equals(type))
-         		{
-         			Collection collection = Collection.find(context,id);
-         			if (collection != null)
-         				adapter = new ContainerAdapter(context, collection,contextPath);
-         		}
-         		else if ("community".equals(type))
-         		{
-         			Community community = Community.find(context,id);
-         			if (community != null)
-         				adapter = new ContainerAdapter(context, community,contextPath);
-         		}
-         		else if ("repository".equals(type))
-     			{
-         			if (ConfigurationManager.getProperty("handle.prefix").equals(String.valueOf(id)))
-                        adapter = new RepositoryAdapter(context,contextPath);
-     			}
-         		
+                       String strid = parts[1];
+         		int id = 0;
+
+                        // Handle prefixes must be treated as strings
+                        // all non-repository types need integer IDs
+                        if ("repository".equals(type))
+                        {
+                                if (ConfigurationManager.getProperty("handle.prefix").equals(strid))
+                                        adapter = new RepositoryAdapter(context,contextPath);
+                        }
+                        else
+                        {
+                               id = Integer.valueOf(parts[1]); 
+         			if ("item".equals(type))
+         			{
+         				Item item = Item.find(context,id);
+         				if (item != null)
+                                       	        adapter = new ItemAdapter(context,item,contextPath);
+         			}
+         			else if ("collection".equals(type))
+         			{
+         				Collection collection = Collection.find(context,id);
+         				if (collection != null)
+         					adapter = new ContainerAdapter(context, collection,contextPath);
+         			}
+         			else if ("community".equals(type))
+         			{
+         				Community community = Community.find(context,id);
+         				if (community != null)
+         					adapter = new ContainerAdapter(context, community,contextPath);
+         			}
+			}
          	}
          }
 		 return adapter;
