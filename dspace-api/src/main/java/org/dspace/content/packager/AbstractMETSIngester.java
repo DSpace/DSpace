@@ -203,7 +203,7 @@ public abstract class AbstractMETSIngester
             METSManifest manifest = null;
             wi = WorkspaceItem.create(context, collection, useTemplate);
             Item item = wi.getItem();
-            Bundle contentBundle = item.createBundle(Constants.CONTENT_BUNDLE_NAME);
+            Bundle contentBundle = null;
             Bundle mdBundle = null;
             ZipEntry ze;
             while ((ze = zip.getNextEntry()) != null)
@@ -238,6 +238,11 @@ public abstract class AbstractMETSIngester
                 }
                 else
                 {
+                	// we need to create the bundle only the first time
+                	if (contentBundle == null)
+                	{
+                		contentBundle = item.createBundle(Constants.CONTENT_BUNDLE_NAME);
+                	}
                     bs = contentBundle.createBitstream(new PackageUtils.UnclosableInputStream(zip));
                     bs.setSource(fname);
                     bs.setName(fname);

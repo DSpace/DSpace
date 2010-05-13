@@ -32,6 +32,7 @@
  - [DS-513] Connection leak in SWORD authentication process 
  - [DS-581] DIDL doesn't respect the hidden fields and the oai_dc metadata section is different than the simple oai_dc implementation
  - [DS-580] DIDL format include HTML element if the item has no files
+ - [DS-574] DSpaceMETSIngester creates empty original bundle
 
 (Caryn Neiswender)
  - [DS-518] Duplicate listing of dependencies in dspace-sword/pom.xml
