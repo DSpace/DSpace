@@ -809,8 +809,12 @@ public class LocationUtils {
     }
 
     public static String getContinentCode(String countryCode){
-        int index = countryCodeList.indexOf(countryCode);
-        return continentCodeList.get(index).toString();
+        if(countryCode.length() > 0 && countryCodeList.contains(countryCode)) {
+            int index = countryCodeList.indexOf(countryCode);
+            return continentCodeList.get(index).toString();
+        } else {
+            return I18nUtil.getMessage("org.dspace.statistics.util.LocationUtils.unknown-continent");
+        }
     }
 
     public static String getContinentName(String continentCode){
