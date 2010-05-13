@@ -451,14 +451,15 @@
     -->
 
    <!-- Sample Distributed cache settings -->
-   <!-- automatic discovery using tcp multicast 
+
+
+   <!-- Option A: automatic discovery using tcp multicast
         For the multicast version, the IP address is no longer that of the server. 
         Rather, you need to choose the address and port in a designated range that has been reserved for multicasting. 
         It is as if the server and all potential clients are agreeing that messages will be left in a particular location. 
         The available addresses for multicasting are in the range 224.0.0.0 through 239.255.255.255. 
         You can check for the assigned addresses in this range (http://www.iana.org/assignments/multicast-addresses). 
         Recommended default is to use the IP address 230.0.0.1 and the port 4446.
-   -->
 
    <cacheManagerPeerProviderFactory
       class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
@@ -466,14 +467,18 @@
          multicastGroupAddress=230.0.0.1,
          multicastGroupPort=4446, 
          timeToLive=1" />
+    -->
 
 
-   <!-- manual discovery (you must customize this to include every node in the cluster) -->
-<!--   <cacheManagerPeerProviderFactory
+
+   <!-- Option B: manual discovery (you must customize this to include every node in the cluster) -->
+<!--
+   <cacheManagerPeerProviderFactory
       class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
       properties="peerDiscovery=manual,
       rmiUrls=//server2:40001/sampleCache11|//server2:40001/sampleCache12" />
 -->
+
 
     <!-- 
         A CacheManagerPeerListener listens for messages from peers to the current CacheManager.
@@ -518,10 +523,10 @@
             listener until they give up. By default this is 2000ms.
     -->
 
-    <!-- this will listen for the messages from peers  -->
+    <!-- For Distributed Caching in a cluster, this will listen for the messages from peers
     <cacheManagerPeerListenerFactory
       class="net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory"
       properties="hostName=127.0.0.1, port=40001" />
-
+    -->
 
 </ehcache>
