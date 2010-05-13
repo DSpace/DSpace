@@ -168,13 +168,17 @@ public class Dataset {
 
     public String[][] getMatrixFormatted(){
         DecimalFormat decimalFormat = new DecimalFormat(format);
-        String [][]strMatrix = new String[matrix.length][matrix[0].length];
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[i].length; j++) {
-                strMatrix[i][j] = decimalFormat.format(matrix[i][j]);
+        if (matrix.length == 0) {
+            return new String[0][0];
+        } else {
+            String[][] strMatrix = new String[matrix.length][matrix[0].length];
+            for (int i = 0; i < matrix.length; i++) {
+                for (int j = 0; j < matrix[i].length; j++) {
+                    strMatrix[i][j] = decimalFormat.format(matrix[i][j]);
+                }
             }
+            return strMatrix;
         }
-        return strMatrix;
     }
 
     public void addValueToMatrix(int row, int coll, float value) {

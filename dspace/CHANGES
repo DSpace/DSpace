@@ -15,6 +15,7 @@
 - [DS-537] Malformed Japanese option values in the authority lookup window
 
 (Peter Dietz)
+- [DS-509] SOLR returns ArrayIndexOutOfBounds with non-existent country code OR when there is no view/download data
 - [DS-542] verbose output for stats-log-importer displays spurious city/country from previous committed entry
 
 (Kim Shepherd)
