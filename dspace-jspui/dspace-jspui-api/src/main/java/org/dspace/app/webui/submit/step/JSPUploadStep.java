@@ -39,11 +39,7 @@
  */
 package org.dspace.app.webui.submit.step;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 
 import javax.servlet.ServletException;
@@ -51,15 +47,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.app.util.Util;
+import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.webui.submit.JSPStep;
 import org.dspace.app.webui.submit.JSPStepManager;
-import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
-import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -67,7 +60,6 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.FormatIdentifier;
-import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -217,8 +209,19 @@ public class JSPUploadStep extends JSPStep
             Bundle[] bundles = subInfo.getSubmissionItem().getItem()
                     .getBundles("ORIGINAL");
 
+            boolean fileAlreadyUploaded = false;
+            
+            for (Bundle bnd : bundles)
+            {
+            	fileAlreadyUploaded = bnd.getBitstreams().length > 0;
+            	if (fileAlreadyUploaded)
+            	{
+            		break;
+            	}
+            }
+            
             // if user already has uploaded at least one file
-            if (bundles.length > 0)
+            if (fileAlreadyUploaded)
             {
                 // return to list of uploaded files
                 showUploadFileList(context, request, response, subInfo, true,
@@ -408,8 +411,23 @@ public class JSPUploadStep extends JSPStep
     {
         Bundle[] bundles = subInfo.getSubmissionItem().getItem().getBundles(
                 "ORIGINAL");
-
-        if (justUploaded || bundles.length > 0)
+        
+        boolean fileAlreadyUploaded = false;
+        
+        if (!justUploaded)
+        {
+	        for (Bundle bnd : bundles)
+	        {
+	        	fileAlreadyUploaded = bnd.getBitstreams().length > 0;
+	        	if (fileAlreadyUploaded)
+	        	{
+	        		break;
+	        	}
+	        }
+        }
+        
+        // if user already has uploaded at least one file
+        if (justUploaded || fileAlreadyUploaded)
         {
             // The item already has files associated with it.
             showUploadFileList(context, request, response, subInfo,

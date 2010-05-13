@@ -731,7 +731,19 @@ public class ItemTag extends TagSupport
         {
         	Bundle[] bundles = item.getBundles("ORIGINAL");
 
-        	if (bundles.length == 0)
+        	boolean filesExist = false;
+            
+            for (Bundle bnd : bundles)
+            {
+            	filesExist = bnd.getBitstreams().length > 0;
+            	if (filesExist)
+            	{
+            		break;
+            	}
+            }
+            
+            // if user already has uploaded at least one file
+        	if (!filesExist)
         	{
         		out.println("<p>"
         				+ LocaleSupport.getLocalizedMessage(pageContext,
