@@ -45,8 +45,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.dspace.app.didl.UUIDFactory;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -72,9 +70,16 @@ public class DIDLCrosswalk extends Crosswalk
     /** default value if no oai.didl.maxresponse property is defined */
     public static int MAXRESPONSE_INLINE_BITSTREAM = 0;
     
+    /** another crosswalk that will be used to generate the metadata section */
+    private Crosswalk metadataCrosswalk;
+    
     public DIDLCrosswalk(Properties properties)
     {
     	super("urn:mpeg:mpeg21:2002:02-DIDL-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd ");
+
+    	// FIXME this should be injected from the configuration... 
+    	// but it is better than duplicate the OAIDCCrosswalk code! 
+    	metadataCrosswalk = new OAIDCCrosswalk(properties);
     }
     
     
@@ -90,14 +95,7 @@ public class DIDLCrosswalk extends Crosswalk
     {
         Item item = ((HarvestedItemInfo) nativeItem).item;
        
-        Date d = ((HarvestedItemInfo) nativeItem).datestamp;
-        String ITEMDATE = new DCDate(d).toString();
-        
-        // Get all the DC
-        DCValue[] allDC = item.getDC(Item.ANY, Item.ANY, Item.ANY);
-        
         StringBuffer metadata = new StringBuffer();
-        StringBuffer metadata1 = new StringBuffer();
         String itemhandle=item.getHandle();
         String strMaxSize = ConfigurationManager.getProperty("oai.didl.maxresponse");
         int maxsize = MAXRESPONSE_INLINE_BITSTREAM;
@@ -128,57 +126,10 @@ public class DIDLCrosswalk extends Crosswalk
         metadata.append("<didl:Descriptor>")
             .append("<didl:Statement mimeType=\"application/xml; charset=utf-8\">");
 					
-        for (int i = 0; i < allDC.length; i++)
-        {
-            // Do not include description.provenance
-            boolean description = allDC[i].element.equals("description");
-            boolean provenance = allDC[i].qualifier != null &&
-                                 allDC[i].qualifier.equals("provenance");
-
-            if (!(description && provenance))
-            {
-                // Escape XML chars <, > and &
-                String value = allDC[i].value;
-
-                // First do &'s - need to be careful not to replace the
-                // & in "&amp;" again!
-                int c = -1;
-                while ((c = value.indexOf("&", c + 1)) > -1)
-                {
-                    value = value.substring(0, c) +
-                        "&amp;" +
-                        value.substring(c + 1);
-                }
-
-                while ((c = value.indexOf("<")) > -1)
-                {
-                    value = value.substring(0, c) +
-                        "&lt;" +
-                        value.substring(c + 1);
-                }
-                
-                while ((c = value.indexOf(">")) > -1)
-                {
-                    value = value.substring(0, c) +
-                        "&gt;" +
-                        value.substring(c + 1);
-                }
-
-                metadata1.append("<dc:")
-                    .append(allDC[i].element)
-                    .append(">")
-                    .append(value)
-                    .append("</dc:")
-                    .append(allDC[i].element)
-                    .append(">");
-            }
-        }
+        // delegate the metadata section to another crosswalk
+        metadata.append(metadataCrosswalk.createMetadata(nativeItem));
         
-        metadata.append("<oai_dc:dc xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">");
-        				
-        metadata.append(metadata1);
-        
-        metadata.append("</oai_dc:dc>")
+        metadata
             .append("</didl:Statement>")
             .append("</didl:Descriptor>");				
         
@@ -191,12 +142,8 @@ public class DIDLCrosswalk extends Crosswalk
         {
             Bundle[] bundles= item.getBundles("ORIGINAL");    
             
-            if (bundles.length == 0)
+            if (bundles.length != 0)
             {
-                metadata.append("<P>There are no files associated with this item.</P>");
-            }
-            else
-            {  
             	/**cycle bundles**/
                 for (int i = 0; i < bundles.length; i++)
                 { 
