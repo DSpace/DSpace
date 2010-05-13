@@ -262,6 +262,8 @@ public class LCNameAuthority implements ChoiceAuthority
         private int hits = -1;
         private String textValue = null;
         private String name = null;
+        private String oname = null;
+        private String bname = null;
         private String lccn = null;
         private String lastTag = null;
         private String lastCode = null;
@@ -332,6 +334,10 @@ public class LCNameAuthority implements ChoiceAuthority
                     // 100.a is the personal name
                     else if (lastTag.equals("100") && lastCode.equals("a"))
                         name = textValue;
+
+                        if (lastTag.equals("100") && lastCode.equals("d") && (name != null)) 
+                        name = name+"  "+textValue; 
+                         
                 }
             }
         }
