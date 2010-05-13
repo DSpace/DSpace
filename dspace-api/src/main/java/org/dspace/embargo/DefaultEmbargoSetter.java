@@ -64,7 +64,7 @@ import org.dspace.core.Constants;
  */
 public class DefaultEmbargoSetter implements EmbargoSetter
 {
-	private String termsOpen = null;
+    protected String termsOpen = null;
 	
     public DefaultEmbargoSetter()
     {
