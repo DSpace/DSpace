@@ -15,6 +15,7 @@ import java.util.Vector;
 import java.util.Arrays;
 import java.util.List;
 import java.lang.reflect.Array;
+import org.dspace.core.I18nUtil;
 
 /**
  * Mapping between Country codes, English Country names, 
@@ -799,13 +800,21 @@ public class LocationUtils {
             {"OC", "Oceania"}};
 
     public static String getCountryName(String countryCode){
-        int index = countryCodeList.indexOf(countryCode);
-        return countryNameList.get(index).toString();           
+        if (countryCode.length() > 0 && countryCodeList.contains(countryCode)) {
+            int index = countryCodeList.indexOf(countryCode);
+            return countryNameList.get(index).toString();
+        } else {
+            return I18nUtil.getMessage("org.dspace.statistics.util.LocationUtils.unknown-country");
+        }
     }
 
     public static String getContinentCode(String countryCode){
-        int index = countryCodeList.indexOf(countryCode);
-        return continentCodeList.get(index).toString();
+        if(countryCode.length() > 0 && countryCodeList.contains(countryCode)) {
+            int index = countryCodeList.indexOf(countryCode);
+            return continentCodeList.get(index).toString();
+        } else {
+            return I18nUtil.getMessage("org.dspace.statistics.util.LocationUtils.unknown-continent");
+        }
     }
 
     public static String getContinentName(String continentCode){
