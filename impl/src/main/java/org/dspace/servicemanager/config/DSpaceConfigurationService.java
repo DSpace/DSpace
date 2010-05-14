@@ -43,13 +43,18 @@ public class DSpaceConfigurationService implements ConfigurationService {
 
     private static final Logger log = LoggerFactory.getLogger(DSpaceConfigurationService.class);
 
+    public static final String DSPACE_WEB_CONTEXT_PARAM = "dspace-config";
     public static final String DSPACE = "dspace";
-    public static final String DOT_PROPERTIES = ".cfg";
+    public static final String DOT_CONFIG = ".cfg";
+    public static final String DOT_PROPERTIES = ".properties";
+
     public static final String DSPACE_PREFIX = "dspace.";
     public static final String DSPACE_HOME = DSPACE + ".dir";
     public static final String DEFAULT_CONFIGURATION_FILE_NAME = "dspace-defaults.properties";
     public static final String DEFAULT_DSPACE_CONFIG_PATH = "config/" + DEFAULT_CONFIGURATION_FILE_NAME;
+
     public static final String DSPACE_CONFIG_PATH = "config/" + DSPACE + DOT_PROPERTIES;
+    public static final String LEGACY_DSPACE_CONFIG_PATH = "config/" + DSPACE + DOT_CONFIG;
     
     protected transient Map<String, Map<String, ServiceConfig>> serviceNameConfigs;
     
@@ -366,10 +371,12 @@ public class DSpaceConfigurationService implements ConfigurationService {
         // Collect values from all the properties files: the later ones loaded override settings from prior.
 
         // read all the known files from the home path that are properties files
+        pushPropsToMap(configMap, readPropertyFile(homePath + File.separatorChar + LEGACY_DSPACE_CONFIG_PATH));
         pushPropsToMap(configMap, readPropertyFile(homePath + File.separatorChar + DSPACE_CONFIG_PATH));
         pushPropsToMap(configMap, readPropertyFile(homePath + "local" + DOT_PROPERTIES));
 
         // attempt to load from the current classloader also (works for commandline config sitting on classpath
+        pushPropsToMap(configMap, readPropertyResource(DSPACE + DOT_CONFIG));
         pushPropsToMap(configMap, readPropertyResource(DSPACE + DOT_PROPERTIES));
         pushPropsToMap(configMap, readPropertyResource("local" + DOT_PROPERTIES));
         pushPropsToMap(configMap, readPropertyResource("webapp" + DOT_PROPERTIES));
@@ -531,7 +538,6 @@ public class DSpaceConfigurationService implements ConfigurationService {
 
     /**
      * Constructs service name configs map for fast lookup of service configurations
-     * @param configurationService the dspace configuration service
      * @return the map of config service settings
      */
     public Map<String, Map<String, ServiceConfig>> makeServiceNameConfigs() {
