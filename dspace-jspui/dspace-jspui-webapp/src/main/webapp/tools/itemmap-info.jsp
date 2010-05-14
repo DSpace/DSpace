@@ -63,7 +63,7 @@
 <%
     Collection collection = (Collection)request.getAttribute("collection");
     
-    // supported values: "none-selected", "added", "remove"
+    // supported values: "none-selected", "none-removed", "added", "remove"
     String message        = (String)request.getAttribute("message");    
     
     LinkedList processedItems = (LinkedList)request.getAttribute("processedItems");
@@ -76,6 +76,8 @@
     <p>
     <% if (message.equals("none-selected")) { %>
         <fmt:message key="jsp.tools.itemmap-info.msg.none-selected" />
+    <% } else if (message.equals("none-removed")) { %>
+        <fmt:message key="jsp.tools.itemmap-info.msg.none-removed" />
     <% } else if (message.equals("added")) { %>
             <%-- Iterate through processed items --%>
             <% for (int i=0; i<processedItems.size(); i++) { %>
