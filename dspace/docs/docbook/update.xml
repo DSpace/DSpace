@@ -565,13 +565,6 @@ the output of the queries you'll need.</screen>
 ant -Dconfig=[dspace]/config/dspace.cfg update</screen>
 			</listitem>
 			<listitem>
-				<para><emphasis role="bold">Rolling Log Aappender Upgrade</emphasis>. You will want to upgrade your logs to the new format to use the SOLR Statistics now included with DSpace. While the commands for this are cound in Chapter 8, here is the steps needed to be performed.</para>
-				<screen>[dspace]/bin/dspace log-converter -i <emphasis>input file name</emphasis> -o <emphasis>output file name</emphasis> -m <emphasis>(if you have more than one</emphasis> dspace.log<emphasis> file)</emphasis>
-[dspace]/bin/dspace log-importer -i <emphasis>input file name (probably the output name from above)</emphasis> -m 
-</screen>
-				<para>The user is highly recommend to see <link linkend="docbook-sys_admin.html-log-converter">DSpace Log Converter</link>.</para>
-			</listitem>
-			<listitem>
 				<para><emphasis role="bold">Generate Browse and Search Indexes</emphasis>. It makes good policy to rebuild your search and browse indexes when upgrading to a new release. Almost every release has database changes and indexes can be affected by this. In the DSpace 1.6 release there is Authority Control features and those will need the indexes to be regenerated. To do this, run the following command from your DSpace install directory (as the dspace user):</para>
 				<para><literal>[dspace]/bin/dspace index-init</literal></para>
 			</listitem>
@@ -581,6 +574,13 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</screen>
 			</listitem>
 			<listitem>
 				<para><emphasis role="bold">Restart servlet.</emphasis> Now restart your Tomcat/Jetty/Resin server program and test out the upgrade.</para>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Rolling Log Aappender Upgrade</emphasis>. You will want to upgrade your logs to the new format to use the SOLR Statistics now included with DSpace. While the commands for this are cound in Chapter 8, here is the steps needed to be performed.</para>
+				<screen>[dspace]/bin/dspace stat-log-converter -i <emphasis>input file name</emphasis> -o <emphasis>output file name</emphasis> -m <emphasis>(if you have more than one</emphasis> dspace.log<emphasis> file)</emphasis>
+[dspace]/bin/dspace stat-log-importer -i <emphasis>input file name (probably the output name from above)</emphasis> -m 
+</screen>
+				<para>The user is highly recommend to see <link linkend="docbook-sys_admin.html-log-converter">DSpace Log Converter</link>.</para>
 			</listitem>
 		</orderedlist>
 	</section>
