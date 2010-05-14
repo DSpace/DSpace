@@ -11,11 +11,14 @@
 package org.dspace.servicemanager;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.dspace.activators.FakeActivator;
+import org.dspace.activators.FakeActivator2;
 import org.dspace.kernel.mixins.InitializedService;
 import org.dspace.kernel.mixins.ShutdownService;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
@@ -67,7 +70,7 @@ public class DSpaceServiceManagerTest {
     }
 
     /**
-     * Test method for {@link org.dspace.servicemanager.DSpaceServiceManager#startup(java.util.List, ConfigurationService)}.
+     * Test method for {@link org.dspace.servicemanager.DSpaceServiceManager#startup()}.
      */
     @Test
     public void testStartup() {
@@ -305,6 +308,20 @@ public class DSpaceServiceManagerTest {
         assertEquals(5, service.getTriggers());
     }
 
+    @Test
+    public void testActivator(){
+        dsm.startup();
+
+        {
+            FakeActivator activator = dsm.getServiceByName(FakeActivator.class.getName(),FakeActivator.class);
+            assertEquals("Started", activator.status);
+        }
+
+        {
+            FakeActivator2 activator2 = dsm.getServiceByName(FakeActivator2.class.getName(),FakeActivator2.class);
+            assertEquals("Started", activator2.status);
+        }
+    }
 
     public static class TestService implements InitializedService, ShutdownService {
 

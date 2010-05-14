@@ -119,35 +119,17 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
      * Registers the activators using this service manager
      */
     private void registerActivators() {
-        // get out the list of all activators
-        List<DSpaceConfig> allConfigs = configurationService.getConfiguration();
-        List<DSpaceConfig> configs = new ArrayList<DSpaceConfig>();
-        for (DSpaceConfig config : allConfigs) {
-            if (config.isActivator()) {
-                configs.add(config);
-            }
-        }
-        // now startup and register all the activators
-        for (DSpaceConfig config : configs) {
-            String activatorClassName = config.getActivatorClassName();
-            Activator activator = null;
-            try {
-                Class<?> c = ServiceMixinManager.getClassByName(activatorClassName);
-                Object o = ReflectUtils.getInstance().constructClass(c);
-                activator = (Activator) o;
-            } catch (Exception e) {
-                System.err.println("ERROR: Failed to find and create activator with className ("+activatorClassName+"): " + e);
-            }
-            if (activator != null) {
-                // succeeded creating the activator
+
+        for (Activator activator : this.getServicesByType(Activator.class))
+        {
+             // succeeded creating the activator
                 try {
                     activator.start(this);
                     activators.add(activator);
-                    log.info("Started and registered activator: " + activatorClassName);
+                    log.info("Started and registered activator: " + activator.getClass().getName());
                 } catch (Exception e1) {
-                    log.error("ERROR: Failed to start activator ("+activatorClassName+"): " + e1, e1);
+                    log.error("ERROR: Failed to start activator ("+ activator.getClass().getName() +"): " + e1, e1);
                 }
-            }
         }
     }
 
@@ -175,7 +157,7 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
      * finds out all the interfaces that are implemented by this service
      * for future lookup, handles the service change listener
      * 
-     * @param name the name of the service
+     * @param serviceName the name of the service
      * @param service the service object
      */
     public void registerServiceAPIs(String serviceName, Object service) {
@@ -198,7 +180,7 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
 
     /**
      * Clears out any existing mixin registration and handles the service change listener
-     * @param name the name of the service
+     * @param serviceName the name of the service
      */
     public void unregisterServiceAPIs(String serviceName) {
         checkRunning();

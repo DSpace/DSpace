@@ -59,7 +59,7 @@ public class TestSpringServiceManager {
     }
 
     /**
-     * Test method for {@link org.dspace.servicemanager.spring.SpringServiceManager#startup(java.util.List, ConfigurationService)}.
+     * Test method for {@link org.dspace.servicemanager.spring.SpringServiceManager#startup()}.
      */
     @Test
     public void testStartup() {
