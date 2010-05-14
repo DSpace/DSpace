@@ -1120,23 +1120,26 @@ Transforming DSpace Content"/>MediaFilters: Transforming DSpace Content</title>
 			<para>Subsequent rows in the csv file relate to items. A typical row might look like:</para>
 			<screen><code>350,2292,Item title,"Smith, John",2008</code></screen>
 			<para>If you want to store multiple values for a given metadata element, they can be separated with the double-pipe &apos;||&apos; (or another character that you defined in your <literal>dspace.cfg </literal>file. For example:</para>
+					
 			<screen><code>Horses||Dogs||Cats</code></screen>
-			<para>Elements are stored in the database in the order that they appear in the csv file. You can use this to order elements where order may matter, such as authors, or controlled vocabulary such as Library of Congress Subject Headings.</para>
-			<para>When importing a csv file, the importer will <emphasis>overlay</emphasis> the data onto what is already in the repository to determine the differences. It only acts on the contents of the cvs file, rather than on the complete item metadata. This means that the CSV file that is exported can be manipulated quite substantially before being re-imported. Rows (items) or Columns (metadata elements) can be removed and will be ignored. For example, if you only want to edit item abstracts, you can remove all of the other columns and just leave the abstract column. (You do need to leave the ID column intact. This is mandatory).</para>
-			<para><emphasis role="bold">Deleting Data.</emphasis> It is possible to perform deletes across the board of certain metadata fields from an exported file. For example, let's say you have used keywords (dc.subject) that need to be removed <emphasis>en masse</emphasis>. You would leave the column (dc.subject) intact, but remove the data in the corresponding rows.</para>
-			<para><emphasis role="bold">Migrating Data or Exchanging data.</emphasis>It is possbile that you have data in one Dublin Core (DC) element and you wish to really have it in another. An example would be that your staff have input Library of Congress Subject Headings in the Subject field (dc.subject) instead of the LCSH field (dc.subject.lcsh). Follow these steps and your data is migrated upon import:</para>
-			<orderedlist>
+ 			<para>Elements are stored in the database in the order that they appear in the csv file. You can use this to order elements where order may matter, such as authors, or controlled vocabulary such as Library of Congress Subject Headings.</para>
+ 			<para>When importing a csv file, the importer will <emphasis>overlay</emphasis> the data onto what is already in the repository to determine the differences. It only acts on the contents of the cvs file, rather than on the complete item metadata. This means that the CSV file that is exported can be manipulated quite substantially before being re-imported. Rows (items) or Columns (metadata elements) can be removed and will be ignored. For example, if you only want to edit item abstracts, you can remove all of the other columns and just leave the abstract column. (You do need to leave the ID column intact. This is mandatory).</para>
+			<para><emphasis role="bold">Editing collection membership.</emphasis> Items can be moved between collections by editing the collection handles in the 'collection' column. Multiple collections can be included. The first collection is the 'owning collection'. The owning collection is the primary collection that the item appears in. Subsequent collections (separated by the field separator) are treated as mapped collections. These are the same as using the map item functionality in the DSpace user interface. To move items between collections, or to edit which other collections they are mapped to, change the data in the collection column.</para>
+            <para><emphasis role="bold">Adding items.</emphasis> New metadata-only items can be added to DSpace using the batch metadata importer. To do this, enter a plus sign '+' in the first 'id' column. The importer will then treat this as a new item. If you are using the command line importer, you will need to use the -e flag to specify the user email address or id of the user that is registered as submitting the items.</para>
+            <para><emphasis role="bold">Deleting Data.</emphasis> It is possible to perform deletes across the board of certain metadata fields from an exported file. For example, let's say you have used keywords (dc.subject) that need to be removed <emphasis>en masse</emphasis>. You would leave the column (dc.subject) intact, but remove the data in the corresponding rows.</para>
+			<para><emphasis role="bold">Migrating Data or Exchanging data.</emphasis> It is possible that you have data in one Dublin Core (DC) element and you wish to really have it in another. An example would be that your staff have input Library of Congress Subject Headings in the Subject field (dc.subject) instead of the LCSH field (dc.subject.lcsh). Follow these steps and your data is migrated upon import:</para>
+ 			<orderedlist>
 				<listitem>
-					<para>Insert a new column. The first row should be the new metadata element. (We will refer to it as the TARGET)</para>
+ 					<para>Insert a new column. The first row should be the new metadata element. (We will refer to it as the TARGET)</para>
 				</listitem>
-				<listitem>
+ 				<listitem>
 					<para>Select the column/rows of the data you wish to change. (We will refer to it as the SOURCE)</para>
 				</listitem>
 				<listitem>
 					<para>Cut and paste this data into the new column (TARGET) you created in Step 1.</para>
 				</listitem>
 				<listitem>
-					<para>Leave the column (SOURCE) you just cut and pasteed from empty. Do not delete it.</para>
+					<para>Leave the column (SOURCE) you just cut and pasted from empty. Do not delete it.</para>
 				</listitem>
 			</orderedlist>
 		</section>
