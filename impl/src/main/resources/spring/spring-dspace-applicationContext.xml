@@ -10,6 +10,15 @@
     A copy of the DuraSpace License has been included in this
     distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
 
+    Level One (Spring Defaults) Spring Configuration File
+
+    This configuration file is sets up defaults for Spring Autowiring based on Annotations used by
+    later loading spring configurations.
+
+    Only override this file if you know what you are doing. Do not use it as a catchall for
+    getting beans into your application configuration.
+
+    Only the first file matching this resource path will be loaded off the classpath.
 -->
 <beans xmlns="http://www.springframework.org/schema/beans" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
