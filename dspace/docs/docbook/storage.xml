@@ -8,8 +8,15 @@
       <title><anchor id="docbook-storage.html-rdbms" xreflabel="RDBMS"/>RDBMS</title>
       <para>DSpace uses a relational database to store all information about the organization of content, metadata about the content, information about e-people and authorization, and the state of currently-running workflows. The DSpace system also uses the relational database in order to maintain indices that users can browse.</para>
       <para>
+			<inlinemediaobject>
+				<imageobject>
+					<imagedata fileref="image/db-schema.png" format="GIF" width="6.5in" scalefit="1"/>
+				</imageobject>
+			</inlinemediaobject>
+		</para>
+    	<!-- para>
         <ulink url="image/db-schema.gif">Graphical visualization of the relational database</ulink>
-      </para>
+      </para -->
       <para>Most of the functionality that DSpace uses can be offered by any standard SQL database that supports transactions. Presently, the browse indices use some features specific to <ulink url="http://www.postgresql.org/">PostgreSQL</ulink> and <ulink url="http://www.oracle.com/database/">Oracle</ulink>, so some modification to the code would be needed before DSpace would function fully with an alternative database back-end.</para>
       <para>The <literal>org.dspace.storage.rdbms</literal> package provides access to an SQL database in a somewhat simpler form than using JDBC directly. The main class is <literal>DatabaseManager</literal>, which executes SQL queries and returns <literal>TableRow</literal> or <literal>TableRowIterator</literal> objects. The <literal>InitializeDatabase</literal> class is used to load SQL into the database via JDBC, for example to set up the schema.</para>
       <para>All calls to the <literal>Database Manager</literal> require a <link linkend="docbook-business.html-core">DSpace <literal>Context</literal> object</link>. Example use of the database manager API is given in the <literal>org.dspace.storage.rdbms</literal> package Javadoc.</para>
