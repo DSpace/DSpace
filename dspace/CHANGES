@@ -25,6 +25,7 @@
 - [DS-547] Value for Recent Submissions is not workin in the XMLUI
 - [DS-527] Withdrawn items not shown as deleted in OAI
 - [DS-548] Removing repeatable values in DescribeStep does not properly test for authority control
+- [DS-544] Removal of mapped items can lead to NPE
 
 (Claudia Jurgen)
 - [DS-558] Error in update sequence script 1.5 to 1.6 Oracle
