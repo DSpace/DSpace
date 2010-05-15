@@ -186,7 +186,8 @@ public class SolrLogger
             }
             catch (Exception e)
             {
-    			log.error(e.getMessage());
+    			log.error("Failed DNS Lookup for IP:" + ip);
+                log.debug(e.getMessage(),e);
     		}
             
             // Save the location information if valid, save the event without
