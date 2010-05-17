@@ -17,6 +17,7 @@
 
 (Robin Taylor)
 - [DS-497] Date month and day get default values when user returns to describe form
+- [DS-501] Change kubrick.xsl to check for the presence of a day and month before displaying them
 
 (Keiji Suzuki)
 - [DS-537] Malformed Japanese option values in the authority lookup window
