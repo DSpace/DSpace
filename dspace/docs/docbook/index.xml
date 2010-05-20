@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<chapter remap="h1">
+  <chapter remap="h1">
     <title><anchor id="docbook-index.html"/>DSpace System Documentation: Contents</title>
     <para>Authors: Robert Tansley, Mick Bass, Margret Branschofsky, Grace Carpenter, Greg McClellan, David Stuve, and others</para>
     <para>For DSpace Version: <emphasis role="bold">1.5</emphasis> (January-2008)</para>
