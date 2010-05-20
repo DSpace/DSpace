@@ -13,8 +13,8 @@ package org.dspace.kernel;
 import org.dspace.services.ConfigurationService;
 
 /**
- * The interface of the Kernel,
- * this is the most core piece of the system and initalizing this will startup the dspace core
+ * This is the most core piece of the system:  instantiating one will
+ * startup the dspace services framework.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */

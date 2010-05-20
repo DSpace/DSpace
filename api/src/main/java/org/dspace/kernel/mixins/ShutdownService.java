@@ -12,16 +12,17 @@ package org.dspace.kernel.mixins;
 
 
 /**
- * This service mixin will cause the service/provider/etc. to be shutdown when the service manager is shutting down the service,
- * this will typically be called when the kernel is stopped or destroyed,
- * any cleanup that a service needs to do when it is shutdown should happen here
+ * Allow the service to be notified when the service manager is shutting 
+ * it down.  This will typically be called when the kernel is stopped or
+ * destroyed.  Any cleanup that a service needs to do when it is 
+ * shut down should happen here.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public interface ShutdownService {
 
     /**
-     * Called as the service manager is stopping or shutting down
+     * Called as the service manager is stopping or shutting down.
      */
     public void shutdown();
 

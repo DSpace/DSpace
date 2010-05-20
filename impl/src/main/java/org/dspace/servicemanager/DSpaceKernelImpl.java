@@ -40,13 +40,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This is the kernel implementation which starts up the core of DSpace and
- * registers the mbean and initializes the {@link DSpace} object,
- * it also loads up the configuration <br/>
- * Note that this does not start itself and calling the constuctor does not actually
- * start it up either. It has to be explicitly started by calling the start method
- * so something in the system needs to do that. If the bean is already started then calling start on
- * it again has no effect. <br/>
+ * This is the kernel implementation which starts up the core of DSpace,
+ * registers the mbean, and initializes the {@link DSpace} object.
+ * It also loads up the configuration.  Sets a JRE shutdown hook.
+ * <p>
+ * Note that this does not start itself and calling the constuctor does 
+ * not actually start it up either. It has to be explicitly started by
+ * calling the start method so something in the system needs to do that. 
+ * If the bean is already started then calling start on it again has no 
+ * effect.
+ * <p>
  * The name of this instance can be specified if desired.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
@@ -54,9 +57,11 @@ import org.slf4j.LoggerFactory;
 public class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, CommonLifecycle<DSpaceKernel> {
 
     private static Logger log = LoggerFactory.getLogger(DSpaceKernelImpl.class);
+
     /**
-     * Creates a DSpace Kernel, does not do any checks though,
-     * do not call this, use {@link DSpaceKernelInit#getKernel(String)}
+     * Creates a DSpace Kernel, does not do any checks though.
+     * Do not call this; use {@link DSpaceKernelInit#getKernel(String)}.
+     *
      * @param name the name for the kernel
      */
     protected DSpaceKernelImpl(String name) {
@@ -70,6 +75,7 @@ public class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, CommonLifec
     private DSpaceKernel kernel = null;
 
     private Thread shutdownHook;
+
     protected void registerShutdownHook() {
         if (this.shutdownHook == null) {
             synchronized (lock) {
@@ -125,9 +131,14 @@ public class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, CommonLifec
     public void start() {
 		start(null);
 	}
-    
+
+    /**
+     * This starts up the entire core system.  May be called more than 
+     * once:  subsequent calls return without effect.
+     *
+     * @param dspaceHome path to FIXME
+     */
     public void start(String dspaceHome) {
-        // this starts up the entire core system
         if (running) {
             //log.warn("Kernel ("+this+") is already started");
             return;
@@ -221,7 +232,7 @@ public class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, CommonLifec
     }
 
     /**
-     * allows this to be called from within the shutdown thread
+     * Called from within the shutdown thread.
      */
     protected void doDestroy() {
         if (! this.destroyed) {
@@ -247,10 +258,13 @@ public class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, CommonLifec
     // MBEAN methods
 
     private Date lastLoadDate;
+    /** Time that this kernel was started, as a java.util.Date. */
     public Date getLastLoadDate() {
         return new Date(lastLoadDate.getTime());
     }
+
     private long loadTime;
+    /** Time that this kernel was started, as seconds since the epoch. */
     public long getLoadTime() {
         return loadTime;
     }

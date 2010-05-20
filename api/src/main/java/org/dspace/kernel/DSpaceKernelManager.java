@@ -22,7 +22,7 @@ import javax.management.ReflectionException;
 
 
 /**
- * Allows the DSpace kernel to be accessed if desired
+ * Allows the DSpace kernel to be accessed if desired.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -40,8 +40,9 @@ public class DSpaceKernelManager {
     private Object lock = new Object();
 
     /**
-     * Get the kernel, this will be a single instance for the JVM, but the method will retrieve
-     * the same instance regardless of this object instance.
+     * Get the kernel.  This will be a single instance for the JVM, but
+     * the method will retrieve the same instance regardless of this 
+     * object instance.
      *
      * @return the DSpace kernel
      * @throws IllegalStateException if the kernel is not available
@@ -51,10 +52,12 @@ public class DSpaceKernelManager {
     }
 
     /**
-     * Get the kernel, this will be a single instance for the JVM, but the method will retrieve
-     * the same instance regardless of this object instance.
+     * Get the kernel.  This will be a single instance for the JVM, but
+     * the method will retrieve the same instance regardless of this 
+     * object instance.
      *
-     * @param name this is the name of this kernel instance, if you do not know what this is then use null
+     * @param name this is the name of this kernel instance.  If you do
+     * not know what this is then use null.
      * @return the DSpace kernel
      * @throws IllegalStateException if the kernel is not available or not running
      */
@@ -91,6 +94,7 @@ public class DSpaceKernelManager {
     private static String defaultKernelName = UUID.randomUUID().toString();
     
     /**
+     * Ensure that we have a name suitable for an mbean.
      * @param name the name for the kernel
      * @return a proper mbean name based on the given name
      */

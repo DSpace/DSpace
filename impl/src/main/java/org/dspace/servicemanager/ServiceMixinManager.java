@@ -29,8 +29,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Borrowed from EntityBus since this already will handle the mixins for something correctly and easily,
- * no need to reinvent this
+ * Maintain a map of services and their mixin interfaces.
+ *
+ * Borrowed from EntityBus since this already will handle the mixins for 
+ * something correctly and easily.  No need to reinvent this.
  * 
  * @author Aaron Zeckoski (aaronz@vt.edu)
  */
@@ -40,13 +42,15 @@ public class ServiceMixinManager {
 
     /**
      * This is a map from the serviceName only to the service and also 
-     * from the bikey made from the serviceName AND the implemented interfaces and superclasses to the service,
-     * in other words, a service which implements 3 interfaces should have 4 entries in the map
+     * from the bikey made from the serviceName AND the implemented 
+     * interfaces and superclasses to the service.
+     * In other words, a service which implements 3 interfaces should 
+     * have 4 entries in the map.
      */
     protected ReferenceMap<String, Object> serviceNameMap = new ReferenceMap<String, Object>(ReferenceType.STRONG, ReferenceType.SOFT);
 
     /**
-     * Looks up a service by the well known name
+     * Looks up a service by the well known name.
      * @param serviceName the well known and unique service name
      * @return the service OR null if none can be found
      */
@@ -60,6 +64,7 @@ public class ServiceMixinManager {
     }
 
     /**
+     * Looks up a service by name and mixin type.
      * @param <T>
      * @param serviceName the well known and unique service name
      * @param mixin the class type of the implemented mixin interface
@@ -81,6 +86,7 @@ public class ServiceMixinManager {
     }
 
     /**
+     * List known services by name.
      * @return the list of all known service names
      */
     public List<String> getRegisteredServiceNames() {
@@ -97,6 +103,7 @@ public class ServiceMixinManager {
     }
 
     /**
+     * List known services by FIXME.
      * @return all known registered services
      */
     public List<Object> getRegisteredServices() {
@@ -114,6 +121,7 @@ public class ServiceMixinManager {
     }
 
     /**
+     * List known mixin types for a named service.
      * @param serviceName the well known and unique service name
      * @return the list of all known mixins for this service
      */
@@ -134,6 +142,7 @@ public class ServiceMixinManager {
     }
 
     /**
+     * Map service names to mixin types.
      * WARNING: this is slow so do not use it unless you really need it!
      * @return the map of all service names -> mixins that are currently registered
      */
@@ -152,7 +161,7 @@ public class ServiceMixinManager {
     }
 
     /**
-     * Allows retrieval of service and their names
+     * Allows retrieval of service and their names.
      * @param <T>
      * @param mixin an interface which is a service mixin (technically any class)
      * @return the list of all registered services wrapped in service holders which implement this mixin interface
@@ -176,6 +185,7 @@ public class ServiceMixinManager {
     }
 
     /**
+     * List services implementing a given mixin.
      * @param <T>
      * @param mixin an interface which is a service mixin (technically any class)
      * @return the list of all registered services which implement this mixin interface
@@ -198,8 +208,8 @@ public class ServiceMixinManager {
     }
 
     /**
-     * Registers a service with the system and extracts all mixins,
-     * this will manage and track the mixins and the service
+     * Registers a service with the system and extracts all mixins.
+     * This will manage and track the mixins and the service.
      * 
      * @param serviceName the well known and unique service name
      * @param service the service itself
@@ -239,7 +249,7 @@ public class ServiceMixinManager {
     }
 
     /**
-     * Unregisters a service and throws out all the mapped mixins
+     * Unregisters a service and throws out all the mapped mixins.
      * 
      * @param serviceName the well known and unique service name
      * @return the list of mixin classes registered for this service
@@ -270,7 +280,7 @@ public class ServiceMixinManager {
     }
 
     /**
-     * Unregisters a single mixin from a service
+     * Unregisters a single mixin from a service.
      * 
      * @param serviceName the well known and unique service name
      * @param mixin an interface which is a service mixin (technically any class)
@@ -291,11 +301,11 @@ public class ServiceMixinManager {
     }
 
     /**
-     * Allows for easy registration of a serviceName and mixin
+     * Allows for easy registration of a serviceName and mixin.
      * 
-     * @param serviceName
-     * @param mixin
-     * @param service
+     * @param serviceName the well known and unique service name
+     * @param mixin a service mixin interface
+     * @param entityProvider
      * @return true if the service is newly registered, false if it was already registered
      */
     public boolean registerPrefixCapability(String serviceName,
@@ -305,7 +315,7 @@ public class ServiceMixinManager {
     }
 
     /**
-     * Clears all service registrations
+     * Clears all service registrations.
      * 
      * @return the number of currently registered service names
      */
@@ -317,6 +327,7 @@ public class ServiceMixinManager {
     }
 
     /**
+     * Count registered services.
      * @return the number of currently registered services
      */
     public int size() {
@@ -378,7 +389,7 @@ public class ServiceMixinManager {
     // STATICS - OTHER
 
     /**
-     * Attempts to get a class by name in the current classloader
+     * Attempts to get a class by name in the current classloader.
      * @param className the classname (fully qualified)
      * @return the class object
      * @throws RuntimeException if the class is not found 
@@ -400,9 +411,10 @@ public class ServiceMixinManager {
     }
 
     /**
-     * Get the mixins implemented by this service,
-     * only gets interfaces and will not pick up superclasses <br/>
-     * WARNING: this is not the fastest ever
+     * Get the mixins implemented by this service.
+     * Only gets interfaces and will not pick up superclasses.
+     * <p>
+     * WARNING: this is not the fastest ever.
      * 
      * @param service any object
      * @return the list of services this class implements
@@ -423,7 +435,7 @@ public class ServiceMixinManager {
     }
 
     /**
-     * Compares based on the class name
+     * Compares classes by name.
      */
     public static class ClassComparator implements Comparator<Class<?>>, Serializable {
         public final static long serialVersionUID = 1l;
@@ -436,7 +448,7 @@ public class ServiceMixinManager {
     }
 
     /**
-     * Compares based on the class name
+     * Compares objects by class name.
      */
     public static class ServiceComparator implements Comparator<Object>, Serializable {
         public final static long serialVersionUID = 1l;
@@ -449,17 +461,19 @@ public class ServiceMixinManager {
     }
 
     /**
-     * A class designed to carry services and their names for type safety
+     * Carry services and their names for type safety.
      */
     public static class ServiceHolder<T> {
         public String serviceName;
         public T service;
+
         /**
          * @return the service object cast to the type requested (probably not the type of the actual object)
          */
         public T getService() {
             return service;
         }
+
         /**
          * @return the name the service is registered under
          */
@@ -473,6 +487,7 @@ public class ServiceMixinManager {
             this.serviceName = serviceName;
             this.service = service;
         }
+
         @Override
         public String toString() {
             return serviceName+":"+service.getClass().getName()+":"+super.toString();
@@ -480,7 +495,7 @@ public class ServiceMixinManager {
     }
 
     /**
-     * Compares based on the service
+     * Compares {@code ServiceHolder}s by name.
      */
     public static class ServiceHolderComparator implements Comparator<ServiceHolder<?>>, Serializable {
         public final static long serialVersionUID = 1l;

@@ -15,8 +15,8 @@ import org.dspace.servicemanager.config.DSpaceConfig;
 
 
 /**
- * This holds the settings for a service config triple,
- * can create this from a {@link DSpaceConfig} object
+ * This holds the settings for a service config triple.
+ * Create this from a {@link DSpaceConfig} object, or by name and value.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -26,6 +26,7 @@ public class ServiceConfig {
     private String serviceName;
     private Object value;
 
+    /** Construct from scratch. */
     public ServiceConfig(String paramName, String serviceName, Object value) {
         if (paramName == null || serviceName == null) {
             throw new IllegalArgumentException("paramName and serviceName must not be null");
@@ -35,6 +36,7 @@ public class ServiceConfig {
         this.value = value;
     }
 
+    /** Construct from an existing DSpaceConfig. */
     public ServiceConfig(DSpaceConfig dspaceConfig) {
         this.paramName = dspaceConfig.getBeanProperty();
         this.serviceName = dspaceConfig.getBeanName();
