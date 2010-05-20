@@ -234,6 +234,26 @@ archive_directory/
 			<para> where &apos;\t&apos; is the tab character and &apos;bundlename&apos; is replaced by the name of the bundle to which the bitstream should be added. If no bundle is specified, the bitstream will be added to the &apos;ORIGINAL&apos; bundle.</para>
 		</section>
 		<section remap="h3">
+			<title><anchor id="docbook-sys_admin.html-dsafvariations" xreflabel="Different Schema"/>Configuring <literal>metadata-[prefix].xml</literal> for Different Schema</title>
+			<para>It is possible to use other Schema such as EAD, VRA Core, etc. Make sure you have defined the new scheme in the DSpace Metada Schema Registry. <orderedlist>
+					<listitem>
+						<para>Create a separate file for the other schema named "<literal>metadata_{prefix}.xml</literal>", where the <literal>{prefix}</literal> is replaced with the schema's prefix.</para>
+					</listitem>
+					<listitem>
+						<para>Inside the xml file use the dame Dublin Core <emphasis>syntax</emphasis>, but on the <literal>&lt;dublin_core&gt;</literal> element include the attribute "<literal>schema={prefix}</literal>".</para>
+					</listitem>
+					<listitem>
+						<para>Here is an example for ETD metadata, which would be in the file "<literal>metadata_etd.xml"</literal>:</para>
+						<screen>&lt;xml version="1.0" encoding="UTF-8"?&gt;
+&lt;dublin_core schema="etd"&gt;
+     &lt;dcvalue element="degree" qualifier="department"&gt;Computer Science&lt;/dcvalue&gt;
+     &lt;dcvalue element="degree" qualifier="level"&gt;Masters&lt;/dcvalue&gt;
+     &lt;dcvalue element="degree" qualifier="grantor"&gt;Texas A &amp; M&lt;/dcvalue&gt;
+						</screen>
+					</listitem>
+				</orderedlist></para>
+		</section>
+		<section remap="h3">
 			<title><anchor id="docbook-sys_admin.html-importingitems" xreflabel="ImportingItems"/>Importing Items</title>
 			<note>
 				<para>Before running the item importer over items previously exported from a DSpace instance, please first refer to <link linkend="docbook-sys_admin.html-transferitem">Transferring Items Between DSpace Instances</link>.</para>
@@ -578,7 +598,7 @@ archive_directory/
 		<section>
 			<title>CLI Examples</title>
 			<para><emphasis role="bold">Adding Metadata</emphasis>:</para>
-			<para><literal>[dspace]/bin/dspace updateitem -e joe@user.com -s [path/to/archive] -a dc.description</literal></para>
+			<para><literal>[dspace]/bin/dspace itemupdate -e joe@user.com -s [path/to/archive] -a dc.description</literal></para>
 			<para><emphasis>This will add from your archive the dc element description based on the handle from the URI (since the -i argument wasn't used).</emphasis></para>
 		</section>
 	</section>
@@ -1123,8 +1143,11 @@ Transforming DSpace Content"/>MediaFilters: Transforming DSpace Content</title>
 			<screen><code>Horses||Dogs||Cats</code></screen>
 			<para>Elements are stored in the database in the order that they appear in the csv file. You can use this to order elements where order may matter, such as authors, or controlled vocabulary such as Library of Congress Subject Headings.</para>
 			<para>When importing a csv file, the importer will <emphasis>overlay</emphasis> the data onto what is already in the repository to determine the differences. It only acts on the contents of the cvs file, rather than on the complete item metadata. This means that the CSV file that is exported can be manipulated quite substantially before being re-imported. Rows (items) or Columns (metadata elements) can be removed and will be ignored. For example, if you only want to edit item abstracts, you can remove all of the other columns and just leave the abstract column. (You do need to leave the ID column intact. This is mandatory).</para>
+			<para><emphasis role="bold"
+				>Editing collection membership.</emphasis> Items can be moved between collections by editing the collection handles in the 'collection' column. Multiple collections can be included. The first collection is the 'owning collection'. The owning collection is the primary collection that the item appears in. Subsequent collections (separated by the field separator) are treated as mapped collections. These are the same as using the map item functionality in the DSpace user interface. To move items between collections, or to edit which other collections they are mapped to, change the data in the collection column.</para>
+			<para><emphasis role="bold">Adding items.</emphasis> New metadata-only items can be added to DSpace using the batch metadata importer. To do this, enter a plus sign '+' in the first 'id' column. The importer will then treat this as a new item. If you are using the command line importer, you will need to use the -e flag to specify the user email address or id of the user that is registered as submitting the items.</para>
 			<para><emphasis role="bold">Deleting Data.</emphasis> It is possible to perform deletes across the board of certain metadata fields from an exported file. For example, let's say you have used keywords (dc.subject) that need to be removed <emphasis>en masse</emphasis>. You would leave the column (dc.subject) intact, but remove the data in the corresponding rows.</para>
-			<para><emphasis role="bold">Migrating Data or Exchanging data.</emphasis>It is possbile that you have data in one Dublin Core (DC) element and you wish to really have it in another. An example would be that your staff have input Library of Congress Subject Headings in the Subject field (dc.subject) instead of the LCSH field (dc.subject.lcsh). Follow these steps and your data is migrated upon import:</para>
+			<para><emphasis role="bold">Migrating Data or Exchanging data.</emphasis> It is possible that you have data in one Dublin Core (DC) element and you wish to really have it in another. An example would be that your staff have input Library of Congress Subject Headings in the Subject field (dc.subject) instead of the LCSH field (dc.subject.lcsh). Follow these steps and your data is migrated upon import:</para>
 			<orderedlist>
 				<listitem>
 					<para>Insert a new column. The first row should be the new metadata element. (We will refer to it as the TARGET)</para>
@@ -1136,7 +1159,7 @@ Transforming DSpace Content"/>MediaFilters: Transforming DSpace Content</title>
 					<para>Cut and paste this data into the new column (TARGET) you created in Step 1.</para>
 				</listitem>
 				<listitem>
-					<para>Leave the column (SOURCE) you just cut and pasteed from empty. Do not delete it.</para>
+					<para>Leave the column (SOURCE) you just cut and pasted from empty. Do not delete it.</para>
 				</listitem>
 			</orderedlist>
 		</section>
@@ -1591,7 +1614,7 @@ checker.retention.CHECKSUM_MATCH = 8w</screen> You can use the table above for y
 				<tbody>
 					<row>
 						<entry>Command used:</entry>
-						<entry><emphasis><literal>[dspace]</literal></emphasis><literal>/bin/dspace log-converter</literal></entry>
+						<entry><emphasis><literal>[dspace]</literal></emphasis><literal>/bin/dspace stats-log-converter</literal></entry>
 					</row>
 					<row>
 						<entry>Java class:</entry>
@@ -1640,7 +1663,7 @@ checker.retention.CHECKSUM_MATCH = 8w</screen> You can use the table above for y
 				<tbody>
 					<row>
 						<entry>Command used:</entry>
-						<entry><emphasis><literal>[dspace]</literal></emphasis><literal>/bin/dspace log-importer</literal></entry>
+						<entry><emphasis><literal>[dspace]</literal></emphasis><literal>/bin/dspace stats-log-importer</literal></entry>
 					</row>
 					<row>
 						<entry>Java class:</entry>
@@ -1692,7 +1715,7 @@ checker.retention.CHECKSUM_MATCH = 8w</screen> You can use the table above for y
 				<tbody>
 					<row>
 						<entry>Command used:</entry>
-						<entry><emphasis><literal>[dspace]</literal></emphasis><literal>/bin/dspace stats-utils</literal></entry>
+						<entry><emphasis><literal>[dspace]</literal></emphasis><literal>/bin/dspace stats-util</literal></entry>
 					</row>
 					<row>
 						<entry>Java class:</entry>
@@ -1704,19 +1727,19 @@ checker.retention.CHECKSUM_MATCH = 8w</screen> You can use the table above for y
 					</row>
 					<row>
 						<entry><literal>-u</literal> or <literal>--update-spider-files</literal></entry>
-						<entry>Update Spider IP Files from internet into /dspace/config/spiders.  Downloads Spider files identified in <literal>dspace.cfg</literal> under property</entry>
+						<entry>Update Spider IP Files from internet into /dspace/config/spiders. Downloads Spider files identified in <literal>dspace.cfg</literal> under property</entry>
 					</row>
 					<row>
 						<entry><literal>-f</literal> or <literal>--delete-spiders-by-flag</literal></entry>
-						<entry>Delete Spiders in Solr By isBot Flag.  Will prune out all records that have <literal>isBot:true</literal></entry>
+						<entry>Delete Spiders in Solr By isBot Flag. Will prune out all records that have <literal>isBot:true</literal></entry>
 					</row>
 					<row>
 						<entry><literal>-i</literal> or <literal>--delete-spiders-by-ip</literal></entry>
-						<entry>Delete Spiders in Solr By IP Address.  Will prune out all records that have IP's that match spider IPs.</entry>
+						<entry>Delete Spiders in Solr By IP Address. Will prune out all records that have IP's that match spider IPs.</entry>
 					</row>
 					<row>
 						<entry><literal>-m</literal> or <literal>--mark-spiders</literal></entry>
-						<entry>Update isBog Flag in Solr.  Marks any records currently stored in statistics that have IP addresses matched in spiders files</entry>
+						<entry>Update isBog Flag in Solr. Marks any records currently stored in statistics that have IP addresses matched in spiders files</entry>
 					</row>
 					<row>
 						<entry><literal>-h</literal> or <literal>--help</literal></entry>
@@ -1728,7 +1751,7 @@ checker.retention.CHECKSUM_MATCH = 8w</screen> You can use the table above for y
 		<para>Notes:</para>
 		<para>The usage of these options is open for the user to choose, If they want to keep spider entires in their repository, they can just mark them using &quot;<literal>-m</literal>&quot; and they will be excluded from statistics queries when &quot;<literal>solr.statistics.query.filter.isBot = true</literal>&quot; in the <literal>dspace.cfg</literal>.</para>
 		<para>If they want to keep the spiders out of the solr repository, they can run just use the &quot;<literal>-i</literal>&quot; option and they will be removed immediately.</para>
-		<para>There are guards in place to control what can be defined as an IP range for a bot, in <literal>[dspace]/config/spiders</literal>, spider IP address ranges have to be at least 3 subnet sections in length 123.123.123 and IP Ranges can only be on the smallest subnet [123.123.123.0 - 123.123.123.255].  If not, loading that row will cause exceptions in the dspace logs and exclude that IP entry.</para>
+		<para>There are guards in place to control what can be defined as an IP range for a bot, in <literal>[dspace]/config/spiders</literal>, spider IP address ranges have to be at least 3 subnet sections in length 123.123.123 and IP Ranges can only be on the smallest subnet [123.123.123.0 - 123.123.123.255]. If not, loading that row will cause exceptions in the dspace logs and exclude that IP entry.</para>
 	</section>
 	<section remap="h2">
 		<title><anchor id="docbook-sys_admin.html-testDB" xreflabel="Test Database"/>Test Database</title>
