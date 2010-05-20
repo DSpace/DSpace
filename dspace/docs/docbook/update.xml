@@ -6,8 +6,68 @@
 		<para>It is always recommended that when performing an upgrade that the user should use a Development or Test instance or server in order to minimize downtime. You should note any problems you have encountered (and also how to resolve them) before attempting to upgrade your production instance or server. It also gives you a chance to &quot;practice&quot; at the upgrade. (And practice makes perfect.)</para>
 	</warning>
 	<section remap="h2">
-		<title><anchor id="docbook-update.thml-16_16" xreflabel="Upgrading from 1.5.x to 1.6"/>Upgrading from 1.5.x to 1.6</title>
-		<para>In the notes below <literal>[dspace]</literal> refers to the install directory for your existing DSpace installation, and <literal>[dspace-source]</literal> to the source directory for DSpace 1.5. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</para>
+		<title><anchor id="docbook-update-html-16_161" xreflabel="Upgrading from 1.6 to 1.6.1"/>Upgrading from 1.6 to 1.6.1</title>
+		<para>In the notes below <literal>[dspace]</literal> refers to the install directory for your existing DSpace installation, and <literal>[dspace-source]</literal> to the source directory for DSpace 1.6.1. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</para>
+		<orderedlist>
+			<listitem>
+				<para><emphasis role="bold">Backup Your DSpace.</emphasis> First, and foremost, make a complete backup of your system, including:</para>
+				<itemizedlist>
+					<listitem>
+						<para>A snapshot of the database. <emphasis>To have a &quot;snapshot&quot; of the PostgreSQL database, you need to shut it down during the backup. You should also have your regular Postgresql Backup output (using pg_dump commands). </emphasis></para>
+					</listitem>
+					<listitem>
+						<para>The asset store (<literal>[dspace]/assetstore</literal> by default)</para>
+					</listitem>
+					<listitem>
+						<para>Your configuration files and customizations to DSpace (including any customized scripts).</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Download DSpace 1.6.1</emphasis> Retrieve the new DSpace 1.6.1 source code either as a download from <ulink url="http://www.dspace.org/current-release/latest-release/">SourceForge</ulink> or check it out directly from the <ulink url="http://scm.dspace.org/svn/repo/dspace/trunk">SVN code repository</ulink>. If you downloaded DSpace do not unpack it on top of your existing installation.</para>
+				<para>Refer to Chapter 3.3.3 Installation, Step 3 for unpacking directives.</para>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Stop Tomcat</emphasis>. Take down your servlet container. For Tomcat, use the <literal>$CATALINA/shutdown.sh</literal> script. (Many installations will have a startup/shutdown script in the <literal>/etc/init.d</literal> or <literal>/etc/rc.d</literal> directories.</para>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Apply any customizations</emphasis>. If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. These are housed in one of the following places:</para>
+				<para>JSPUI modifications: <literal>[dspace-source]/dspace/modules/jspui/src/main/webapp/</literal></para>
+				<para>XMLUI modificaitons: <literal>[dspace-source]/dspace/modules/xmlui/src/main/webbapp</literal></para>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Update Configuration Files</emphasis>. Some of the parameters have change and some are new. Changes will be noted below:</para>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Build DSpace.</emphasis> Run the following commands to compile DSpace.:</para>
+				<screen>cd /[dspace-source]/dspace/
+mvn -U clean package</screen>
+				<para>You will find the result in <literal>[dspace-source]/dspace/target/dspace-[version]-build.dir</literal> . Inside this directory is the compiled binary distribution of DSpace.</para>
+				<note>
+					<para>Before rebuilding DSpace, the above command will clean out any previously compiled code (&apos;clean&apos;) and ensure that your local DSpace JAR files are updated from the remote maven respository.</para>
+				</note>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Update DSpace</emphasis>. Update the DSpace installed directory with the new code and libraries. Issue the following commands:</para>
+				<screen>cd [dspace-source]/dspace/target/dspace-[version]-build.dir
+ant -Dconfig=[dspace]/config/dspace.cfg update</screen>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Generate Browse and Search Indexes</emphasis>. Though there are not any database changes in the 1.6 to 1.6.1 release, it makes good policy to rebuild your search and browse indexes when upgrading to a new release. To do this, run the following command from your DSpace install directory (as the dspace user):</para>
+				<para><literal>[dspace]/bin/dspace index-init</literal></para>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Deploy Web Applications</emphasis>. Copy the web applications files from your <literal>[dspace]/webapps</literal> directory to the subdirectory of your servlet container (e.g. tomcat):</para>
+				<para><literal>cp -R [dspace]/webapps/* [tomcat]/webapps/</literal></para>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Restart servlet.</emphasis> Now restart your Tomcat/Jetty/Resin server program and test out the upgrade.</para>
+			</listitem>
+		</orderedlist>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-update.html-15_16" xreflabel="Upgrading from 1.5.x to 1.6"/>Upgrading from 1.5.x to 1.6.x</title>
+		<para>In the notes below <literal>[dspace]</literal> refers to the install directory for your existing DSpace installation, and <literal>[dspace-source]</literal> to the source directory for DSpace 1.6. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</para>
 		<orderedlist>
 			<listitem>
 				<para><emphasis role="bold">Backup Your DSpace.</emphasis> First, and foremost, make a complete backup of your system, including:</para>
@@ -77,7 +137,7 @@ dspace.oai.url = ${dspace.baseUrl}/oai</screen>
 </screen>
 					</listitem>
 					<listitem>
-						<para><emphasis role="bold">**NEW**</emphasis>New Authorization levels and parameters. See Section 5.2.45 in <link linkend="docbook-configure.html-authorization">Configuration</link> for further information.</para>
+						<para><emphasis role="bold">**NEW**</emphasis>New Authorization levels and parameters. See Section 5.2.10 in <link linkend="docbook-configure.html-authorization">Configuration : Delegation Administration</link> for further information.</para>
 						<screen>##### Authorization system configuration - Delegate ADMIN #####
 
 # COMMUNITY ADMIN configuration
@@ -189,7 +249,7 @@ plugin.single.org.dspace.embargo.EmbargoLifter = \
 				org.dspace.embargo.DefaultEmbargoLifter</screen>
 					</listitem>
 					<listitem>
-						<para><emphasis role="bold">**NEW**</emphasis> New option for using the Batch Editing capabilities. See Section 5.2.46 in <link linkend="docbook-configure.html-batchedits">Configuration</link> and also 8.10 in <link linkend="docbook-sys_admin.html-batchedits">System Administration</link></para>
+						<para><emphasis role="bold">**NEW**</emphasis> New option for using the Batch Editing capabilities. See Section 5.2.21 in <link linkend="docbook-configure.html-batchedits">Configuration</link> and also 8.10 in <link linkend="docbook-sys_admin.html-batchedits">System Administration</link></para>
 						<screen>### Bulk metadata editor settings ###
 # The delimiter used to separate values within a single field (defaults to a double pipe ||)
 # bulkedit.valueseparator = ||
@@ -490,7 +550,7 @@ harvester.unknownSchema = fail
 					</listitem>
 					<listitem>
 						<para><emphasis role="bold">**NEW**</emphasis> SOLR Statistics Configurations.</para>
-						<para>For a little more detailed information regarding the configuration, please refer to <link linkend="docbook-configure.html-statistics"> Section 5.2.35 DSpace Statistics</link>; or, for installation procedures, refer to <link linked="docbook-install.html-statistics"> Section 3.4.6 Dspace Statistcs</link>.</para>
+						<para>For a little more detailed information regarding the configuration, please refer to Section 5.2.49 <link linkend="docbook-configure.html-statistics">DSpace SOLR Statistics Configuration</link> ; or, for installation procedures, refer to <link linkend="docbook-install.html-statistics"> Section 3.4.6 Dspace Statistcs</link>.</para>
 						<screen>
 #---------------------------------------------------------------#
 #--------------SOLR STATISTICS CONFIGURATIONS-------------------#
@@ -580,7 +640,7 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</screen>
 				<screen>[dspace]/bin/dspace stat-log-converter -i <emphasis>input file name</emphasis> -o <emphasis>output file name</emphasis> -m <emphasis>(if you have more than one</emphasis> dspace.log<emphasis> file)</emphasis>
 [dspace]/bin/dspace stat-log-importer -i <emphasis>input file name (probably the output name from above)</emphasis> -m 
 </screen>
-				<para>The user is highly recommend to see <link linkend="docbook-sys_admin.html-log-converter">DSpace Log Converter</link>.</para>
+				<para>The user is highly recommend to see Section 8.14 <link linkend="docbook-sys_admin.html-log-converter">DSpace Log Converter</link>.</para>
 			</listitem>
 		</orderedlist>
 	</section>
