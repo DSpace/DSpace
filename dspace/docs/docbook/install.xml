@@ -3,20 +3,21 @@
 	<title><anchor id="docbook-install.html"/>DSpace System Documentation: Installation</title>
 	<section remap="h2">
 		<title><anchor id="docbook-install.html-impatient" xreflabel="Impatient Install"/>For the Impatient</title>
-		<para>Since some users might want to get their test version up and running as fast as possible, offered below is an <emphasis role="italic">unsupported</emphasis> outline of getting DSpace to run quickly using Tomcat and PostgreSQL.</para>
+		<para>Since some users might want to get their test version up and running as fast as possible, offered below is an <emphasis role="italic">unsupported</emphasis> outline of getting DSpace to run quickly.</para>
 		<warning>
 			<para>Only experienced unix admins should even attempt the following without going to Section 3.3</para>
 		</warning>
 		<para>
 			<screen>
+useradd -m dspace
 gunzip -c dspace-1.x-src-release.tar.gz | tar -xf -
 createuser -U postgres -d -A -P dspace
 createdb -U dspace -E UNICODE dspace
 cd [dspace-source]/dspace/config
 vi dspace.cfg
 mkdir <emphasis>[dspace]</emphasis>
-chown &lt;tomcat-user&gt; [dspace]
-su - &lt;tomcat-user&gt;
+chown dspace [dspace]
+su - dspace
 cd [dspace-source]/dspace
 mvn package
 cd [dspace-source]/dspace/target/dspace-&lt;version&gt;-build.dir
@@ -122,7 +123,7 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 				<listitem>
 					<para><emphasis role="bold">Jakarta Tomcat 4.x or later.</emphasis></para>
 					<para>Tomcat can be dowloaded from the following location: <ulink url="http://tomcat.apache.org/whichversion.html">http://tomcat.apache.org</ulink></para>
-					<para>Note that DSpace will need to run as the same user as Tomcat.  If you install a Tomcat kit which is packaged for your operating system, the kit probably created an appropriate user account and you should set DSpace files and directories to be owned by that user.  If you build and install Tomcat from source, you might want to install and run Tomcat as a user called &apos;<literal>tomcat</literal>&apos;. Set the environment variable TOMCAT_USER appropriately.</para>
+					<para>Note that DSpace will need to run as the same user as Tomcat, so you might want to install and run Tomcat as a user called &apos;<literal>dspace</literal>&apos;. Set the environment variable TOMCAT_USER appropriately.</para>
 					<para>You need to ensure that Tomcat has a) enough memory to run DSpace and b) uses UTF-8 as its default file encoding for international character support. So ensure in your startup scripts (etc) that the following environment variable is set: </para>
 					<para><literal>JAVA_OPTS=&quot;-Xmx512M -Xms64M -Dfile.encoding=UTF-8&quot;</literal></para>
 					<para><emphasis role="bold">Modifications in <literal>/[tomcat]/conf/server.xml</literal></emphasis> :</para>
@@ -245,7 +246,7 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 			<para>DSpace uses three separate directory trees. Although you don&apos;t need to know all the details of them in order to install DSpace, you do need to know they exist and also know how they&apos;re referred to in this document:</para>
 			<orderedlist>
 				<listitem>
-					<para><emphasis role="bold">The installation directory</emphasis>, referred to as <emphasis><literal>[dspace]</literal></emphasis> . This is the location where DSpace is installed and from which it is run.  It is the location that gets defined in the dspace.cfg as &quot;dspace.dir&quot;. It is where all the DSpace configuration files, command line scripts, documentation and webapps will be installed to.</para>
+					<para><emphasis role="bold">The installation directory</emphasis>, referred to as <emphasis><literal>[dspace]</literal></emphasis> . This is the location where DSpace is installed and running off of it is the location that gets defined in the dspace.cfg as &quot;dspace.dir&quot;. It is where all the DSpace configuration files, command line scripts, documentation and webapps will be installed to.</para>
 				</listitem>
 				<listitem>
 					<para><emphasis role="bold">The source directory</emphasis>, referred to as <emphasis><literal>[dspace-source]</literal></emphasis> . This is the location where the DSpace release distribution has been unzipped into. It usually has the name of the archive that you expanded such as <emphasis>dspace-&lt;version&gt;-release</emphasis> or <emphasis>dspace-&lt;version&gt;-src-release</emphasis>. It is the directory where all of your &quot;build&quot; commands will be run.</para>
@@ -262,7 +263,8 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 			<para> This method gets you up and running with DSpace quickly and easily. It is identical in both the <link linkend="docbook-install.html-defaultRelease">Default Release</link> and <link linkend="docbook-install.html-sourceRelease">Source Release</link> distributions. </para>
 			<orderedlist>
 				<listitem>
-					<para><emphasis role="bold">Determine the DSpace user</emphasis>. This needs to be the same user that Tomcat (or Jetty etc.) will run as.  If you installed that from source then you should know what user you specified then.  Otherwise consult your operating system's documentation.  On Windows, consult the Services Control Panel entry for your servlet container (Tomcat or whatever) to see what user runs it.  We'll call this &lt;tomcat-user&gt;.</para>
+					<para><emphasis role="bold">Create the DSpace user</emphasis>. This needs to be the same user that Tomcat (or Jetty etc.) will run as. e.g. as <emphasis role="bold"><emphasis role="underline">root</emphasis></emphasis> run:</para>
+					<screen>useradd -m dspace</screen>
 				</listitem>
 				<listitem>
 					<para><emphasis role="bold">Download</emphasis> the <ulink url="http://sourceforge.net/projects/dspace/"
@@ -285,7 +287,7 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 						</orderedlist></para>
 					<para>For ease of reference, we will refer to the location of this unzipped version of the DSpace release as <literal>[dspace-source]</literal> in the remainder of these instructions.</para>
 					<tip>
-						<para>After unpacking the file, the user may which to change the ownership of the <literal>dspace-1.6-release</literal> to the &lt;tomcat-user&gt; user. (And you may need to change the group).</para>
+						<para>After unpacking the file, the user may which to change the ownership of the <literal>dspace-1.6-release</literal> to the &apos;dspace&apos; user. (And you may need to change the group).</para>
 					</tip>
 				</listitem>
 				<listitem>
@@ -301,7 +303,7 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 						<listitem>
 							<para>Create a <literal>dspace</literal> database, owned by the <literal>dspace</literal> PostgreSQL user <emphasis>(you are still logged in at &apos;root&apos;)</emphasis>:</para>
 							<screen>createuser -U postgres -d -A -P dspace ; createdb -U dspace -E UNICODE dspace</screen>
-							<para>You will be prompted for a password for the DSpace database. (This isn&apos;t the same as the &lt;tomcat-user&gt;&apos;s UNIX password.)</para>
+							<para>You will be prompted for a password for the DSpace database. (This isn&apos;t the same as the <literal>dspace</literal> user&apos;s UNIX password.)</para>
 						</listitem>
 					</orderedlist>
 					<para>
@@ -316,7 +318,7 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 							</para>
 						</listitem>
 						<listitem>
-							<para>Create a database for DSpace. Make sure that the character set is one of the Unicode character sets. DSpace uses UTF-8 natively, and it is suggested that the Oracle database use the same character set. Create a database user account for DSpace (e.g. <literal>dspace</literal>,) and ensure that it has permissions to add and remove tables in the database.</para>
+							<para>Create a database for DSpace. Make sure that the character set is one of the Unicode character sets. DSpace uses UTF-8 natively, and it is suggested that the Oracle database use the same character set. Create a user account for DSpace (e.g. <literal>dspace</literal>,) and ensure that it has permissions to add and remove tables in the database.</para>
 						</listitem>
 						<listitem>
 							<para>Edit the <literal>[dspace-source]/dspace/config/dspace.cfg</literal> database settings:</para>
@@ -350,12 +352,12 @@ db.driver = oracle.jdbc.OracleDriver
 					<para><emphasis role="bold">DSpace Directory</emphasis></para>
 					<para>Create the directory for the DSpace installation (i.e. <literal>[dspace]</literal>). As <emphasis>root</emphasis> (or a user with appropriate permissions), run: </para>
 					<screen>mkdir <emphasis>[dspace]</emphasis>
-chown tomcat <emphasis>[dspace]</emphasis></screen>
-					<para>(Assuming the &lt;tomcat-user&gt; is <literal>tomcat</literal>.)</para>
+chown dspace <emphasis>[dspace]</emphasis></screen>
+					<para>(Assuming the <literal>dspace</literal> UNIX username.)</para>
 				</listitem>
 				<listitem>
 					<para><emphasis role="bold">Installation Package</emphasis></para>
-					<para>As the &lt;tomcat-user&gt; UNIX user, generate the DSpace installation package in the <literal>[dspace-source]/dspace</literal> directory:</para>
+					<para>As the <literal>dspace</literal> UNIX user, generate the DSpace installation package in the <literal>[dspace-source]/dspace</literal> directory:</para>
 					<screen>cd <emphasis>[dspace-source]</emphasis>/dspace/
 mvn package</screen>
 					<para>Note: without any extra arguments, the DSpace installation package is initialized for PostgreSQL.</para>
@@ -364,7 +366,7 @@ mvn package</screen>
 				</listitem>
 				<listitem>
 					<para><emphasis role="bold">Build DSpace and Initialize Database</emphasis></para>
-					<para>As the &lt;tomcat-user&gt; UNIX user, initialize the DSpace database and install DSpace to <literal>[dspace]</literal>:</para>
+					<para>As the <literal>dspace</literal> UNIX user, initialize the DSpace database and install DSpace to <literal>[dspace]</literal>:</para>
 					<screen>cd <emphasis>[dspace-source]</emphasis>/dspace/target/dspace-[version]-build.dir
 
 ant fresh_install</screen>
@@ -421,7 +423,7 @@ ant fresh_install</screen>
 		<section remap="h3">
 			<title>&apos;cron&apos; Jobs</title>
 			<para>A couple of DSpace features require that a script is run regularly -- the e-mail subscription feature that alerts users of new items being deposited, and the new &apos;media filter&apos; tool, that generates thumbnails of images and extracts the full-text of documents for indexing.</para>
-			<para>To set these up, you just need to run the following command as the &lt;tomcat-user&gt; UNIX user:</para>
+			<para>To set these up, you just need to run the following command as the <literal>dspace</literal> UNIX user:</para>
 			<screen>crontab -e</screen>
 			<para>Then add the following lines:</para>
 			<screen># Send out subscription e-mails at 01:00 every day
@@ -449,9 +451,9 @@ ant fresh_install</screen>
 			<title>Multilingual Installation</title>
 			<para>In order to deploy a multilingual version of DSpace you have to configure two parameters in <literal>[dspace-source]/config/dspace.cfg:</literal></para>
 			<para><literal>default.locale</literal>, e. g. default.locale = en</para>
-			<para><literal>webui.supported.locales</literal>, e. g. webui.supported.locales = en, de</para>
+			<para><literal>webui.supported locales</literal>, e. g. webui.supported.locales = en, de</para>
 			<para>The Locales might have the form country, country_language, country_language_variant.</para>
-			<para>Accoding to the languages you wish to support, you have to make sure, that all the i18n related files are available.  See the <link linkend="docbook-configure.html-multilingualui">Multilingual User Interface Configuring MultiLingual Support</link> section for the JSPUI or the Multilingual Support for XMLUI in the configuration documentation. </para>
+			<para>Accoding to the languages you wish to support, you have to make sure, that all the i18n related files are available see the <link linkend="docbook-configure.html-multilingualui">Multilingual User Interface Configuring MultiLingual Support</link> section for the JSPUI or the Multilingual Support for XMLUI in the configuration documentation. </para>
 		</section>
 		<section remap="h3">
 			<title><anchor id="docbook-install.html-https" xreflabel="DSpace over HTTPS"/>DSpace over HTTPS</title>
@@ -642,7 +644,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
 					<para>Replace <literal>YOUR_NAMING_AUTHORITY</literal> with the assigned naming authority prefix sent to you.</para>
 				</listitem>
 				<listitem>
-					<para>Now start your handle server (as the &lt;tomcat-user&gt;):</para>
+					<para>Now start your handle server (as the dspace user):</para>
 					<screen>[dspace]/bin/start-handle-server</screen>
 				</listitem>
 			</orderedlist>
