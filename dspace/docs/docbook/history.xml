@@ -1,6 +1,17 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <chapter remap="h1">
     <title><anchor id="docbook-history.html"/>DSpace System Documentation: Version History</title>
+	<section remap="h2">
+		<title><anchor="id="docbook-history.html-version1_61" xreflabel="Changes in DSpace 1.6.0"/>Changes in DSpace 1.6.1</title>
+		<section remap="h3">
+			<title>Bug Fixes</title>
+			<itemizedlist>
+				<listitem>
+					<para>DS-</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+	</section>
   	<section remap="h2">
   		<title><anchor id="docbook-history.html-version1_6" xreflabel="Changes in DSpace 1.6.0"/>Changes in DSpace 1.6.0</title>
   		<section remap="h3">
@@ -65,7 +76,7 @@
   				</listitem>
   			</itemizedlist>
   		</section>
-  		<section>
+  		<section remap="h3">
   			<title>General Improvments</title>
   			<itemizedlist>
   				<listitem>
@@ -509,7 +520,8 @@
 			 	</listitem>
   			</itemizedlist>
   		</section>
-    <section remap="h2">
+	</section>
+  	<section remap="h2">
       <title><anchor id="docbook-history.html-version1_5_2" xreflabel="Changes in DSpace 1.5.2"/>Changes in DSpace 1.5.2</title>
       <section remap="h3">
         <title>General Improvements</title>
@@ -2015,8 +2027,6 @@
         </listitem>
       </itemizedlist>
     </section>
-  	</section>
-  	
-  </chapter>
+</chapter>
 
 

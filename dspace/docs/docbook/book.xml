@@ -22,15 +22,15 @@
 <book>
 	<bookinfo>
 		<title>DSpace Manual</title>
-		<subtitle>Release 1.6.0</subtitle>
+		<subtitle>Release 1.6.1</subtitle>
 		<author>
 			<surname>The DuraSpace Foundation</surname>
 			<affiliation>
 				<address><email>webmaster@dspace.org</email></address>
 			</affiliation>
 		</author>
-		<edition>1.6.0</edition>
-		<pubdate>2010-03-02  11:45:00 EST</pubdate>
+		<edition>1.6.1</edition>
+		<pubdate>2010-05-19  13:30:00 EST</pubdate>
 		<copyright>
 			<year>2002-2010</year>
 			<holder>
@@ -52,7 +52,7 @@
 		<revhistory>
 			<revision>
 				<revnumber>Version 1.6.0 </revnumber>
-				<date>This text generated: 2010-03-02  11:45:00 EST EST</date>
+				<date>This text generated: 2010-03-11  13:30:00 EST EST</date>
 				<authorinitials>JAT</authorinitials>
 			</revision>
 		</revhistory>
@@ -63,8 +63,8 @@
 	<preface>
 		<title>Preface</title>
 		<para/>
-		<para>Welcome to Release 1.6.0. The committers have volunteered many hours to fix, re-write and contribute new software code for this release. New features have been added and documentation has been updated.</para>
-		<para>Some of the new features include (not an exhaustive list):</para>
+		<para>Welcome to Release 1.6.1. This is a "fix" release.  The committers have volunteered many hours to fix, re-write and contribute new software code for this release. New features have been added and documentation has been updated.</para>
+		<para>The following is a list of the new features included (not an exhaustive list) for release 1.6.0 and 1.6.1:</para>
 		<itemizedlist>
 			<listitem>
 				<para>SOLR Statistics.</para>
@@ -92,8 +92,8 @@
 			</listitem>
 		</itemizedlist>
 		<para>The following people have contributed to this release of DSpace: @mire, BioMed Central, Andrea Bollini, Ben Bosman, Flavio Botelho, Peter Dietz, Mark Diggory, Tim Donohue, Enovation Solutions, Ladd Hanson, Leonie Hayes, Claudia Juergen, Keller, Fabio Kepler, Yin Yin Latt, Stuart Lewis, Bram Luyten, Van Ly, Alexey Maslov, Gabriela Mircea, Hardik Mishra, Venessa Newton-Wade, OhioLINK, Ekaterina Pechekhonova, Toni Prieto, Richard Rodgers, Ricardo Saraiva, Andreas Schwander, Kim Shepherd, Elin Stangeland, Larry Stone, Graham Triggs, Jeffrey Trimble, Kevin Van de velde, Steve Williams and Mark Wood. Many of them could not do this work without the support (release time and financial) of their institutions that they are associated with. We offer thanks to those institutions for supporting their staff to take time to contribute to the DSpace project.</para>
-		<para>Documentation for this release was overhauled by Jeffrey Trimble, the Documentation Gardener, with many other contributing suggestions, changes, edits, and additions. Special thanks to Bram Luyten for pulling his hair out for re-ordering Chapter 5 to match the order of the <literal>dspace.cfg</literal> file and for the Documentation Gardener who is still picking his own hair up from that re-ordering.</para>
-		<para>Stuart Lewis is the Release Co-ordinator and kept all of the committers inline and fixed things when broken.  Many thanks Stuart.</para>
+		<para>The Documentation Gardner for this release was Jeffrey Trimble with input from everyone.  All typose are his fault.</para>
+		<para>Kim Shepherd is the Release Co-ordinator of this release.</para>
 		<para>Additional thanks to Tim Donohue from DuraSpace Foundation on keeping all of us focused on the work at hand, and calming us when we got excited and for the general support for the DSpace project.</para>
 	</preface>
 	<toc/>
