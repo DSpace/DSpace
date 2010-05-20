@@ -28,8 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class simplifies the handling of MBean lookup, registration, etc. of the DSpace Kernel MBean.
- * This class has all static methods
+ * This class simplifies the handling of lookup, registration, and 
+ * access of a DSpace Kernel MBean.  This class has all static 
+ * methods.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -40,7 +41,8 @@ public class DSpaceKernelInit {
     private static Object staticLock = new Object();
 
     /**
-     * Creates or retrieves the existing DSpace Kernel with the given name
+     * Creates or retrieves a DSpace Kernel with the given name.
+     *
      * @return a DSpace Kernel
      * @throws IllegalStateException if the Kernel cannot be created
      */
@@ -66,7 +68,8 @@ public class DSpaceKernelInit {
     }
 
     /**
-     * Register a new kernel MBean with the given name or fail
+     * Register a new kernel MBean with the given name or fail.
+     *
      * @param mBeanName the bean name to use
      * @param kernel the kernel bean to register
      * @throws IllegalStateException if the MBean cannot be registered
@@ -97,7 +100,8 @@ public class DSpaceKernelInit {
     }
 
     /**
-     * Unregister an MBean if possible
+     * Unregister an MBean if possible.
+     *
      * @param mBeanName the bean name to use
      * @return true if the MBean was unregistered, false otherwise
      */
@@ -117,7 +121,8 @@ public class DSpaceKernelInit {
     }
 
     /**
-     * Check if an MBean is registered already
+     * Check if an MBean is registered already.
+     *
      * @param mBeanName the bean name to check
      * @return true if registered OR false if not
      * @throws IllegalStateException if a failure occurs
@@ -143,7 +148,8 @@ public class DSpaceKernelInit {
     }
 
     /**
-     * Gets the Kernel MBean if possible
+     * Gets the named Kernel MBean if possible.
+     *
      * @param mBeanName the bean name to use
      * @return the Kernel if found OR null if not found
      * @throws IllegalStateException if a failure occurs

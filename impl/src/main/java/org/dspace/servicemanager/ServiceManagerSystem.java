@@ -16,23 +16,25 @@ import org.dspace.kernel.ServiceManager;
 
 /**
  * This interface should be implemented by any service managers that we are using in the system,
- * e.g. Spring, Guice
+ * e.g. Spring, Guice.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public interface ServiceManagerSystem extends ServiceManager {
 
     /**
-     * Startup the service manager and initialize all services
+     * Startup the service manager and initialize all services.
      */
     public void startup();
 
     /**
-     * Shuts down the service manager and all services that it is managing
+     * Shuts down the service manager and all services that it is managing.
      */
     public void shutdown();
 
     /**
+     * Map service names to their beans.
+     *
      * @return a map of name -> bean for all services that are currently known
      */
     public Map<String, Object> getServices();

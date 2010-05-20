@@ -38,7 +38,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This is the core service manager which ties together the other
- * service managers and generally handles any edge cases in the various systems
+ * service managers and generally handles any edge cases in the various 
+ * systems.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -57,6 +58,7 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
     }
     /**
      * Checks to see if the service manager is running, if not throws an exception
+     * @throws IllegalStateException if not running
      */
     private void checkRunning() {
         if (! isRunning()) {
@@ -66,12 +68,16 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
 
     /**
      * This will track all the service movement in the system and will maintain an accurate indication
-     * of the implemented apis and mixins for all services
-     * NOTE: Spring interceptor is handling the {@link InitializedService} and {@link ShutdownService} mixins,
-     * {@link ServiceChangeListener} and {@link ConfigChangeListener} mixins are handled here,
-     * the {@link OrderedService} mixin will be handled by the util class to assist with easily getting providers,
-     * all other mixins will be handled in the services that use them exclusively by accessing the {@link ServiceMixinManager}
-     * from this class directly
+     * of the implemented apis and mixins for all services.
+     * NOTE: Spring interceptor is handling the {@link InitializedService}
+     * and {@link ShutdownService} mixins.
+     * {@link ServiceChangeListener} and {@link ConfigChangeListener} 
+     * mixins are handled here.
+     * The {@link OrderedService} mixin will be handled by the util
+     * class to assist with easily getting providers.
+     * All other mixins will be handled in the services that use them
+     * exclusively by accessing the {@link ServiceMixinManager}
+     * from this class directly.
      */
     private final ServiceMixinManager serviceMixinManager;
     /**
@@ -84,13 +90,13 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
     private List<ServiceManagerSystem> serviceManagers = new Vector<ServiceManagerSystem>();
     private SpringServiceManager primaryServiceManager = null;
     /**
-     * This holds the stack of activators, it is randomly ordered
+     * This holds the stack of activators.  It is randomly ordered.
      */
     private Vector<Activator> activators = new Vector<Activator>();
 
     protected boolean developing = false;
     /**
-     * Standard constructor
+     * Standard constructor.
      */
     public DSpaceServiceManager(DSpaceConfigurationService configurationService) {
         if (configurationService == null) {
@@ -104,7 +110,7 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
     protected boolean testing = false;
     protected String[] springXmlConfigFiles = null;
     /**
-     * TESTING - This is for testing only
+     * TESTING - This is for testing only.
      * @param springXmlConfigFiles
      */
     protected DSpaceServiceManager(DSpaceConfigurationService configurationService, String... springXmlConfigFiles) {
@@ -116,7 +122,7 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * Registers the activators using this service manager
+     * Registers the activators using this service manager.
      */
     private void registerActivators() {
 
@@ -134,7 +140,7 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * Unregisters all registered activators using this service manager
+     * Unregisters all registered activators using this service manager.
      */
     private void unregisterActivators() {
         for (Activator activator : activators) {
@@ -153,9 +159,9 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * Checks for service mixins and registers them in our keys set,
-     * finds out all the interfaces that are implemented by this service
-     * for future lookup, handles the service change listener
+     * Checks for service mixins and registers them in our keys set.
+     * Finds out all the interfaces that are implemented by this service
+     * for future lookup.  Handles the service change listener.
      * 
      * @param serviceName the name of the service
      * @param service the service object
@@ -179,7 +185,8 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * Clears out any existing mixin registration and handles the service change listener
+     * Clears out any existing mixin registration and handles the 
+     * service change listener.
      * @param serviceName the name of the service
      */
     public void unregisterServiceAPIs(String serviceName) {
@@ -201,7 +208,8 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * This will call all the services which want to be notified when the service manager is ready
+     * This will call all the services which want to be notified when 
+     * the service manager is ready.
      */
     public void notifyServiceManagerReady() {
         List<ServiceManagerReadyAware> services = serviceMixinManager.getServicesByMixin(ServiceManagerReadyAware.class);
@@ -215,7 +223,8 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * Checks to see if a listener should be notified
+     * Checks to see if a listener should be notified.
+     *
      * @param implementedTypes the types implemented by the service changing
      * @param serviceChangeListener the listener
      * @return true if it should be notified, false otherwise
@@ -239,6 +248,9 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
         return notify;
     }
 
+    /**
+     * Shut down all service managers, including this one.
+     */
     public void shutdown() {
         unregisterActivators();
         for (ServiceManagerSystem sms : serviceManagers) {
@@ -456,9 +468,9 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
     }
 
     /*
-     * Handles the configuration push for all services,
-     * every service gets called to notify them of the config change
-     * depending on the the listener they are using
+     * Handles the configuration push for all services.
+     * Every service gets called to notify them of the config change
+     * depending on the the listener they are using.
      */
     public void pushConfig(Map<String, String> properties) {
         checkRunning();
@@ -540,8 +552,8 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
     // STATICS
 
     /**
-     * Adds configuration settings into services if possible,
-     * skips any that are invalid
+     * Adds configuration settings into services if possible.
+     * Skips any that are invalid.
      * 
      * @param serviceName the name of the service
      * @param service the service object
@@ -564,7 +576,7 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * Initializes a service if it asks to be initialized or does nothing
+     * Initializes a service if it asks to be initialized or does nothing.
      * @param service any bean
      * @throws IllegalStateException if the service init fails
      */
@@ -579,7 +591,7 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * Shuts down a service if it asks to be shutdown or does nothing
+     * Shuts down a service if it asks to be shutdown or does nothing.
      * @param service any bean
      */
     public static void shutdownService(Object service) {

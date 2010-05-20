@@ -23,19 +23,21 @@ import org.dspace.servicemanager.config.DSpaceConfigurationService;
 
 
 /**
- * This servlet context listener will handle startup of the kernel if it is not there,
- * shutdown of the context listener does not shutdown the kernel though,
- * that is tied to the shutdown of the JVM <br/>
- * 
+ * This servlet context listener will handle startup of the kernel if it 
+ * is not there.
+ * Shutdown of the context listener does not shutdown the kernel though;
+ * that is tied to the shutdown of the JVM.
+ * <p>
  * This is implemented in the web application web.xml using:
- * 
+ * <literal>
  * <web-app>
  *
  * <listener>
  *   <listener-class>
- *  org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener
- *  </listener-class>
- *</listener>
+ *     org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener
+ *   </listener-class>
+ * </listener>
+ * </literal>
  *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  * @author Mark Diggory (mdiggory @ gmail.com)
@@ -45,8 +47,9 @@ public class DSpaceKernelServletContextListener implements ServletContextListene
     private transient DSpaceKernelImpl kernelImpl;
 
     /*
-     * Initially look for JNDI Resource called java:/comp/env/dspace.dir
-     * otherwise, look for "dspace.dir" initial context param 
+     * Find DSpace's "home" directory.
+     * Initially look for JNDI Resource called "java:/comp/env/dspace.dir".
+     * If not found, look for "dspace.dir" initial context parameter.
      */
     private String getProvidedHome(ServletContextEvent arg0){
     	String providedHome = null;

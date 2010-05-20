@@ -34,8 +34,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
 /**
- * The central DSpace configuration service,
- * this is effectively immutable once the config has loaded
+ * The central DSpace configuration service.
+ * This is effectively immutable once the config has loaded.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -67,7 +67,7 @@ public class DSpaceConfigurationService implements ConfigurationService {
 		loadInitialConfig(providedHome);
 	}
 
-	/* (non-Javadoc)
+    /* (non-Javadoc)
      * @see org.dspace.services.ConfigurationService#getAllProperties()
      */
     public Map<String, String> getAllProperties() {
@@ -165,7 +165,7 @@ public class DSpaceConfigurationService implements ConfigurationService {
     }
 
     /**
-     * Get all configs that start with the given value
+     * Get all configs that start with the given value.
      * @param prefix a string which the configs to return must start with
      * @return the list of all configs that start with the given string
      */
@@ -200,9 +200,9 @@ public class DSpaceConfigurationService implements ConfigurationService {
     }
 
     /**
-     * Load a series of properties into the configuration,
-     * checks to see if the settings exist or are changed and only loads changes,
-     * clears out existing ones depending on the setting
+     * Load a series of properties into the configuration.
+     * Checks to see if the settings exist or are changed and only loads 
+     * changes.  Clears out existing ones depending on the setting.
      * 
      * @param properties a map of key -> value strings 
      * @param clear if true then clears the existing configuration settings first
@@ -227,9 +227,9 @@ public class DSpaceConfigurationService implements ConfigurationService {
     }
 
     /**
-     * Load up a bunch of {@link DSpaceConfig}s into the configuration,
-     * checks to see if the settings exist or are changed and only loads changes,
-     * clears out existing ones depending on the setting
+     * Load up a bunch of {@link DSpaceConfig}s into the configuration.
+     * Checks to see if the settings exist or are changed and only
+     * loads changes.  Clears out existing ones depending on the setting.
      * 
      * @param dspaceConfigs a list of {@link DSpaceConfig} objects
      * @param clear if true then clears the existing configuration settings first
@@ -271,7 +271,7 @@ public class DSpaceConfigurationService implements ConfigurationService {
     }
 
     /**
-     * Loads an additional config setting into the system
+     * Loads an additional config setting into the system.
      * @param key
      * @param value
      * @return true if the config is new or changed
@@ -290,7 +290,7 @@ public class DSpaceConfigurationService implements ConfigurationService {
     }
 
     /**
-     * Clears the configuration settings
+     * Clears the configuration settings.
      */
     public void clear() {
         this.configuration.clear();
@@ -301,8 +301,8 @@ public class DSpaceConfigurationService implements ConfigurationService {
     // loading from files code
 
     /**
-     * Loads up the default initial configuration from the dspace config files in the file home
-     * and on the classpath
+     * Loads up the default initial configuration from the dspace config 
+     * files in the file home and on the classpath.
      */
     public void loadInitialConfig(String providedHome) {
         Map<String, String> configMap = new ArrayOrderedMap<String, String>();
@@ -388,7 +388,8 @@ public class DSpaceConfigurationService implements ConfigurationService {
 
 
     /**
-     * Adds in this DSConfig and then updates the config by checking for replacements everywhere else
+     * Adds in this DSConfig and then updates the config by checking for 
+     * replacements everywhere else.
      * @param dsConfig a DSConfig to update the value of and then add in to the main config
      * @return true if the config changed or is new
      */
@@ -434,10 +435,10 @@ public class DSpaceConfigurationService implements ConfigurationService {
     }
 
     /**
-     * This will replace the ${key} with the value from the matching key if it exists,
-     * logs a warning if the key does not exist <br/>
-     * Goes through and updates the replacements for the the entire configuration
-     * and updates any replaced values
+     * This will replace the ${key} with the value from the matching key 
+     * if it exists.  Logs a warning if the key does not exist.
+     * Goes through and updates the replacements for the the entire 
+     * configuration and updates any replaced values.
      */
     protected void replaceVariables(Map<String, DSpaceConfig> dsConfiguration) {
         for (Entry<String, DSpaceConfig> entry : dsConfiguration.entrySet()) {
@@ -519,7 +520,7 @@ public class DSpaceConfigurationService implements ConfigurationService {
     }
 
     /**
-     * this simply attempts to find the servlet container home for tomcat
+     * This simply attempts to find the servlet container home for tomcat.
      * @return the path to the servlet container home OR null if it cannot be found
      */
     protected String getCatalina() {
@@ -537,7 +538,8 @@ public class DSpaceConfigurationService implements ConfigurationService {
 
 
     /**
-     * Constructs service name configs map for fast lookup of service configurations
+     * Constructs service name configs map for fast lookup of service 
+     * configurations.
      * @return the map of config service settings
      */
     public Map<String, Map<String, ServiceConfig>> makeServiceNameConfigs() {

@@ -16,13 +16,14 @@ import java.util.List;
 
 /**
  * Interface for modular service manager systems.
- * Provides a generic initialization routine, in leiu of hardcoded constructors
+ * Provides a generic initialization routine, in lieu of hardcoded
+ * constructors.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public interface ExternalServiceManagerSystem extends ServiceManagerSystem {
     /**
-     * Initialize the service manager's configuration
+     * Initialize the service manager's configuration.
      *
      * @param parent
      * @param configurationService

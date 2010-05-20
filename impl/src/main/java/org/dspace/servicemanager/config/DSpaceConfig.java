@@ -13,7 +13,7 @@ package org.dspace.servicemanager.config;
 import org.dspace.kernel.Activator;
 
 /**
- * This represents a single config setting for a DSpace instance
+ * This represents a single config setting for a DSpace instance.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -88,7 +88,7 @@ public class DSpaceConfig {
     }
     
     /**
-     * gets the part before the @ in a config line
+     * Gets the part before the @ in a config line.
      * @return the bean property if there is one OR null if this is not a bean config
      */
     public String getBeanProperty() {
@@ -96,7 +96,7 @@ public class DSpaceConfig {
     }
     
     /**
-     * get the part after the @ in a config line
+     * Get the part after the @ in a config line.
      * @return the bean name which the property goes with OR null if there is none
      */
     public String getBeanName() {
@@ -104,7 +104,8 @@ public class DSpaceConfig {
     }
 
     /**
-     * Indicates that this configuration is for an activator (a class that implements {@link Activator}),
+     * Indicates that this configuration is for an activator (a class 
+     * that implements {@link Activator}).
      * @return true if this config is for an activator OR false if not
      */
     public boolean isActivator() {
@@ -112,8 +113,8 @@ public class DSpaceConfig {
     }
 
     /**
-     * Indicates this is a config for an activator class (a class which will be started
-     * as a service during the service manager startup)
+     * Indicates this is a config for an activator class (a class which 
+     * will be started as a service during the service manager startup).
      * @return true if this is a config for an activator class OR false if not
      */
     public boolean isActivatorClass() {
@@ -121,9 +122,13 @@ public class DSpaceConfig {
     }
 
     /**
-     * get the classname of the activator defined by the activator string if there is one,
-     * this will be the activator class or the class which should be activated,
-     * check the {@link #isActivator()} and {@link #isActivatorClass()} booleans to see which
+     * Get the classname of the activator defined by the activator
+     * string if there is one.
+     * This will be the activator class or the class which should be
+     * activated.
+     * Check the {@link #isActivator()} and {@link #isActivatorClass()}
+     * booleans to see which.
+     *
      * @return the activator class name OR null if this is not an activator config
      */
     public String getActivatorClassName() {
@@ -131,8 +136,9 @@ public class DSpaceConfig {
     }
 
     /**
-     * get the name to use for this activator (as defined by the activator string),
-     * this will always be set if the {@link #activatorClassName} is set
+     * Get the name to use for this activator (as defined by the
+     * activator string).
+     * This will always be set if the {@link #activatorClassName} is set.
      * @return the activator name OR null if this is not an activator config
      */
     public String getActivatorName() {
@@ -140,12 +146,17 @@ public class DSpaceConfig {
     }
 
     /**
-     * get the activator autowire string: <br/>
-     * auto - determine which type of autowiring automatically <br/>
-     * constructor - autowire the constructor <br/>
-     * setter - autowire the setters by type <br/>
-     * none - disable any autowiring (this will only start up the class using the default constructor) <br/>
-     * @return the autowiring setting (auto/constructor/setter/none) OR null if this is not an activator config
+     * Get the activator autowire string.  Returns one of:
+     * <dl>
+     *  <dt>auto</dt><dd>determine which type of autowiring automatically</dd>
+     *  <dt>constructor</dt><dd>autowire the constructor</dd>
+     *  <dt>setter</dt><dd>autowire the setters by type</dd>
+     *  <dt>none</dt><dd>disable any autowiring (this will only start up
+     *      the class using the default constructor)</dd>
+     * </dl>
+     *
+     * @return the autowiring setting (auto/constructor/setter/none) OR 
+     * null if this is not an activator config
      */
     public String getActivatorAutowire() {
         return activatorAutowire;
@@ -193,7 +204,7 @@ public class DSpaceConfig {
     }
 
     /**
-     * Get the bean name from a configuration key if it contains one
+     * Get the bean name from a configuration key if it contains one.
      * @param key a config key
      * @return the bean name if there is one OR null if none
      */
@@ -213,7 +224,7 @@ public class DSpaceConfig {
     }
 
     /**
-     * Get the bean property from a configuration key if it contains one
+     * Get the bean property from a configuration key if it contains one.
      * @param key a config key
      * @return the bean property if there is one OR null if none
      */
