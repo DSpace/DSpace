@@ -55,7 +55,7 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 		<section remap="h3">
 			<title>Apache Maven 2.0.8 or later (Java build tool)</title>
 			<para>Maven is necessary in the first stage of the build process to assemble the installation package for your DSpace instance. It gives you the flexibility to customize DSpace using the exisitng Maven projects found in the <literal>[dspace-source]/dspace/modules</literal> directory or by adding in your own Maven project to build the installation package for DSpace, and apply any custom interface &quot;overlay&quot; changes.</para>
-			<para>Maven can be downloaded from the the following location: <ulink url="http://maven.apache.org/download.html">http://maven.apache.org/download.html</ulink></para>
+			<para>Maven can be downloaded from the following location: <ulink url="http://maven.apache.org/download.html">http://maven.apache.org/download.html</ulink></para>
 			<section remap="h4">
 				<title>Configuring a Proxy</title>
 				<para>You can configure a proxy to use for some or all of your HTTP requests in Maven 2.0. The username and password are only required if your proxy requires basic authentication (note that later releases may support storing your passwords in a secured keystore&mdash;in the mean time, please ensure your <literal>settings.xml</literal> file (usually <literal>${user.home}/.m2/settings.xml</literal>) is secured with permissions appropriate for your operating system).</para>
@@ -122,7 +122,7 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 			<itemizedlist>
 				<listitem>
 					<para><emphasis role="bold">Jakarta Tomcat 4.x or later.</emphasis></para>
-					<para>Tomcat can be dowloaded from the following location: <ulink url="http://tomcat.apache.org/whichversion.html">http://tomcat.apache.org</ulink></para>
+					<para>Tomcat can be downloaded from the following location: <ulink url="http://tomcat.apache.org/whichversion.html">http://tomcat.apache.org</ulink></para>
 					<para>Note that DSpace will need to run as the same user as Tomcat, so you might want to install and run Tomcat as a user called &apos;<literal>dspace</literal>&apos;. Set the environment variable TOMCAT_USER appropriately.</para>
 					<para>You need to ensure that Tomcat has a) enough memory to run DSpace and b) uses UTF-8 as its default file encoding for international character support. So ensure in your startup scripts (etc) that the following environment variable is set: </para>
 					<para><literal>JAVA_OPTS=&quot;-Xmx512M -Xms64M -Dfile.encoding=UTF-8&quot;</literal></para>
@@ -163,8 +163,8 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 		<section remap="h3">
 			<title><anchor id="docbook-install.html-options" xreflabel="Overview of Install Options"/>Overview of Install Options</title>
 			<para>With the advent of a new Apache <ulink url="http://maven.apache.org/"
-				>Maven 2</ulink> based build architecture in DSpace 1.5.x, you now have two options in how you may wish to install and manage your local installation of DSpace. If you&apos;ve used DSpace 1.4.x, please recognize that the initial build proceedure has changed to allow for more customization. You will find the later &apos;Ant based&apos; stages of the installation proceedure familiar. Maven is used to resolve the dependencies of DSpace online from the &apos;Maven Central Repository&apos; server.</para>
-			<para>It is important to note that the strategies are identical in terms of the list of proceedures required to complete the build process, the only difference being that the Source Release includes &quot;more modules&quot; that will be built given their presence in the distribution package.</para>
+				>Maven 2</ulink> based build architecture in DSpace 1.5.x, you now have two options in how you may wish to install and manage your local installation of DSpace. If you&apos;ve used DSpace 1.4.x, please recognize that the initial build procedure has changed to allow for more customization. You will find the later &apos;Ant based&apos; stages of the installation procedure familiar. Maven is used to resolve the dependencies of DSpace online from the &apos;Maven Central Repository&apos; server.</para>
+			<para>It is important to note that the strategies are identical in terms of the list of procedures required to complete the build process, the only difference being that the Source Release includes &quot;more modules&quot; that will be built given their presence in the distribution package.</para>
 			<itemizedlist>
 				<listitem>
 					<para><anchor id="docbook-install.html-defaultRelease" xreflabel="Default Release (dspace-&lt;version&gt;-release.zip )"/>Default Release (dspace-&lt;version&gt;-release.zip)<itemizedlist>
@@ -178,7 +178,7 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 								<para>It downloads &quot;precompiled&quot; libraries for the core dspace-api, supporting servlets, taglibraries, aspects and themes for the dspace-xmlui, dspace-xmlui and other webservice/applications.</para>
 							</listitem>
 							<listitem>
-								<para>This approach exposes the parts of the application that the DSpace commiters would prefer to see customized. All other modules are downloaded from the &apos;Maven Central Repository&apos;</para>
+								<para>This approach exposes the parts of the application that the DSpace committers would prefer to see customized. All other modules are downloaded from the &apos;Maven Central Repository&apos;</para>
 								<para>The directory structure for this release is the following:<itemizedlist>
 										<listitem>
 											<para><literal>[dspace-source]</literal><itemizedlist>
@@ -298,7 +298,7 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 					<orderedlist>
 						<listitem>
 							<para>
-								<anchor id="docbook-install.html-pgdriver"/>A PostgreSQL 8.1-404 jdbc3 driver is configured as part of the default DSpace build. You no longer need to copy any postgreSQL jars to get postgreSQL installed.</para>
+								<anchor id="docbook-install.html-pgdriver"/>A PostgreSQL 8.1-404 jdbc3 driver is configured as part of the default DSpace build. You no longer need to copy any PostgreSQL jars to get PostgreSQL installed.</para>
 						</listitem>
 						<listitem>
 							<para>Create a <literal>dspace</literal> database, owned by the <literal>dspace</literal> PostgreSQL user <emphasis>(you are still logged in at &apos;root&apos;)</emphasis>:</para>
@@ -379,13 +379,13 @@ ant fresh_install</screen>
 				<listitem>
 					<para><emphasis role="bold">Deploy Web Applications</emphasis></para>
 					<para>You have two choices or techniques for having Tomcat/Jetty/Resin serve up your web applications.</para>
-					<para><emphasis role="bold">Technique A.</emphasis> Simple and complete. You copy only (or all) of the DSpace Web application(s) you wish to use from the <literal>[dspace]/webapps</literal> directory to the appropriate direcoty in your Tomcat/Jetty/Resin installation. For example:</para>
+					<para><emphasis role="bold">Technique A.</emphasis> Simple and complete. You copy only (or all) of the DSpace Web application(s) you wish to use from the <literal>[dspace]/webapps</literal> directory to the appropriate directory in your Tomcat/Jetty/Resin installation. For example:</para>
 					<para><literal>cp -R [dspace]/webapps/* [tomcat]/webapps</literal> (This will copy all the web applications to Tomcat.)</para>
 					<para><literal>cp -R [dspace]/webapps/jspui [tomcat]/webapps</literal> (This will copy only the jspui web application to Tomcat.)</para>
 					<para>__</para>
 					<para><emphasis role="bold">Technique B.</emphasis>Tell your Tomcat/Jetty/Resin installation where to find your DSpace web application(s). As an example, in the &lt;Host&gt; section of your <literal>[tomcat]/conf/server.xml</literal> you could add lines similar to the following (but replace <literal>[dspace]</literal> with your installation location:</para>
 					<screen>&lt;!-- Define the default virtual host
-	Note:  XML SChema validation will not work with Xerces 2.2.
+	Note:  XML Schema validation will not work with Xerces 2.2.
 	--&gt;
 	&lt;Host name=&quot;localhost&quot;  appBase=&quot;[dspace]/webapps&quot;
 	....</screen>
@@ -436,11 +436,11 @@ ant fresh_install</screen>
 0 4 * * * <emphasis> [dspace]</emphasis>/bin/dsrun org.dspace.checker.DailyReportEmailer -c
 </screen>
 			<para>Naturally you should change the frequencies to suit your environment.</para>
-			<para>PostgreSQL also benefits from regular &apos;vacuuming&apos;, which optimizes the indices and clears out any deleted data. Become the <literal>postgres</literal> UNIX user, run <literal>crontab -e</literal> and add (for example):</para>
+			<para>PostgreSQL also benefits from regular &apos;vacuuming&apos;, which optimizes the indexes and clears out any deleted data. Become the <literal>postgres</literal> UNIX user, run <literal>crontab -e</literal> and add (for example):</para>
 			<screen># Clean up the database nightly at 4.20am
 20 4 * * * vacuumdb --analyze dspace &gt; /dev/null 2&gt;&amp;1</screen>
 			<para>In order that statistical reports are generated regularly and thus kept up to date you should set up the following cron jobs:</para>
-			<screen># Run stat analyses
+			<screen># Run stat analysis
 0 1 * * * [dspace]/bin/stat-general
 0 1 * * * [dspace]/bin/stat-monthly
 0 2 * * * [dspace]/bin/stat-report-general
@@ -453,7 +453,7 @@ ant fresh_install</screen>
 			<para><literal>default.locale</literal>, e. g. default.locale = en</para>
 			<para><literal>webui.supported locales</literal>, e. g. webui.supported.locales = en, de</para>
 			<para>The Locales might have the form country, country_language, country_language_variant.</para>
-			<para>Accoding to the languages you wish to support, you have to make sure, that all the i18n related files are available see the <link linkend="docbook-configure.html-multilingualui">Multilingual User Interface Configuring MultiLingual Support</link> section for the JSPUI or the Multilingual Support for XMLUI in the configuration documentation. </para>
+			<para>According to the languages you wish to support, you have to make sure, that all the i18n related files are available see the <link linkend="docbook-configure.html-multilingualui">Multilingual User Interface Configuring MultiLingual Support</link> section for the JSPUI or the Multilingual Support for XMLUI in the configuration documentation. </para>
 		</section>
 		<section remap="h3">
 			<title><anchor id="docbook-install.html-https" xreflabel="DSpace over HTTPS"/>DSpace over HTTPS</title>
@@ -695,7 +695,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
 </screen>
 		</section>
 		<section remap="h3">
-			<title><anchor id="docbook-install.html-solr" xreflabel="SOLR Statistics Package"/>DSpace Statisics</title>
+			<title><anchor id="docbook-install.html-solr" xreflabel="SOLR Statistics Package"/>DSpace Statistics</title>
 			<para>DSpace uses the Apache Solr application underlaying the statistics. There is no need to download any separate software. All the necessary software is included. To understand all of the configuration property keys, the user should refer to<link linkend="docbook-configure.html-statistics"> 5.2.35 DSpace Statistic Configuration</link> for detailed information.</para>
 			<orderedlist>
 				<listitem>
@@ -822,7 +822,7 @@ cp -R [dspace]/webapps/* [TOMCAT]/webapps
 					<para> Create the directory for the DSpace installation (e.g. <literal>C:\DSpace</literal>)</para>
 				</listitem>
 				<listitem>
-					<para> Generate the DSpace installation package by running the following from commandline (cmd) from your <literal>[dspace-source]/dspace/</literal> directory: </para>
+					<para> Generate the DSpace installation package by running the following from command line (cmd) from your <literal>[dspace-source]/dspace/</literal> directory: </para>
 					<screen>
 mvn package
 </screen>
@@ -834,7 +834,7 @@ mvn -Ddb.name=oracle package
 </screen>
 				</listitem>
 				<listitem>
-					<para> Initialize the DSpace database and install DSpace to <literal>[dspace]</literal> (e.g. <literal>C:\DSpace</literal>) by running the following from commandline from your <literal>[dspace-source]/dspace/target/dspace-[version]-build.dir/</literal> directory:</para>
+					<para> Initialize the DSpace database and install DSpace to <literal>[dspace]</literal> (e.g. <literal>C:\DSpace</literal>) by running the following from command line from your <literal>[dspace-source]/dspace/target/dspace-[version]-build.dir/</literal> directory:</para>
 					<screen>
 ant fresh_install
 </screen>
@@ -907,7 +907,7 @@ ant help
 	</section>
 	<section remap="h2">
 		<title><anchor id="docbook-install.html-problems" xreflabel="Common Problems"/>Common Problems</title>
-		<para>In an ideal world everyone would follow the above steps and have a fully functioning DSpace. Of couse, in the real world it doesn&apos;t always seem to work out that way. This section lists common problems that people encounter when installing DSpace, and likely causes and fixes. This is likely to grow over time as we learn about users&apos; experiences.</para>
+		<para>In an ideal world everyone would follow the above steps and have a fully functioning DSpace. Of course, in the real world it doesn&apos;t always seem to work out that way. This section lists common problems that people encounter when installing DSpace, and likely causes and fixes. This is likely to grow over time as we learn about users&apos; experiences.</para>
 		<variablelist>
 			<varlistentry>
 				<term>Database errors occur when you run <literal>ant fresh_install</literal></term>
@@ -950,7 +950,7 @@ psql -U dspace -W -h localhost</screen>
 					<para> If you&apos;re trying to tweak Tomcat&apos;s configuration but nothing seems to make a difference to the error you&apos;re seeing, you might find that Tomcat hasn&apos;t been shutting down properly, perhaps because it&apos;s waiting for a stale connection to close gracefully which won&apos;t happen. To see if this is the case, try:</para>
 					<screen>
 ps -ef | grep java</screen>
-					<para>and look for Tomcat&apos;s Java processes. If they stay arround after running Tomcat&apos;s <literal>shutdown.sh</literal> script, trying <literal>kill</literal>ing them (with <literal>-9</literal> if necessary), then starting Tomcat again.</para>
+					<para>and look for Tomcat&apos;s Java processes. If they stay around after running Tomcat&apos;s <literal>shutdown.sh</literal> script, trying <literal>kill</literal>ing them (with <literal>-9</literal> if necessary), then starting Tomcat again.</para>
 				</listitem>
 			</varlistentry>
 			<varlistentry>
