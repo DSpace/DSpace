@@ -44,7 +44,7 @@ dspace.history = ${dspace.dir}/history</screen>
 		<section remap="h3">
 			<title><anchor id="docbook-configure.html-general-update" xreflabel="Update Reminder"/>Update Reminder</title>
 			<subtitle>Things you should know about editing <literal>dspace.cfg</literal> files.</subtitle>
-			<para>It is important to rememeber that there are <emphasis role="bold"> two <literal>dspace.cfg</literal> files after an installation of DSpace.</emphasis></para>
+			<para>It is important to remember that there are <emphasis role="bold"> two <literal>dspace.cfg</literal> files after an installation of DSpace.</emphasis></para>
 			<orderedlist>
 				<listitem>
 					<para>The &quot;source&quot; file that is found in <literal>[dspace-source]/dspace/config/dspace.cfg</literal></para>
@@ -1642,7 +1642,7 @@ solr.spiderips.urls</screen>
 						</row>
 						<row>
 							<entry align="right">Informational Note:</entry>
-							<entry>If no other language is explicitly stated in the <literal>inputforms.xml</literal>, the default language will be attributed to the metadata values.</entry>
+							<entry>If no other language is explicitly stated in the <literal>input-forms.xml</literal>, the default language will be attributed to the metadata values.</entry>
 						</row>
 					</tbody>
 				</tgroup>
@@ -1943,7 +1943,7 @@ assetstore.dir.2 = /third/assetstore</screen>
 				</listitem>
 			</itemizedlist>
 			<para>Should the be any conflict, like '2' referring to a local directory and to a set of SRB parameters, the program will select the local directory.</para>
-			<para>If SRB is chosen from the first install of DSpace, it is suggested that 'assetstore.dir' (no integer appended) be retained to reference a local directory (as above under File Storage) because build.xml uses this value to do a mkdir. In this case, 'assetstore.incoming' can be set to 1 (i.e. uncomment the line in File Storage above) and the 'assetstore.dir' will not be used.</para>
+			<para>If SRB is chosen from the first install of DSpace, it is suggested that 'assetstore.dir' (no integer appended) be retained to reference a local directory (as above under File Storage) because build.xml uses this value to do a <literal>mkdir</literal>. In this case, 'assetstore.incoming' can be set to 1 (i.e. uncomment the line in File Storage above) and the 'assetstore.dir' will not be used.</para>
 		</section>
 		<section remap="h3">
 			<title><anchor id="docbook-configure.html-logging" xreflabel="Logging"/>Logging Configuration</title>
@@ -4039,7 +4039,7 @@ Community|Collection|Item|Bundle+Add|Create|Modify|Modify_Metadata|Delete|Remove
 		</section>
 		<section remap="h3">
 			<title><anchor id="docbook-configure.htmtl-embargo" xreflabel="Embargo"/>Embargo</title>
-			<para>New in DSpace 1.6 is a feature to impose Embargos on thesis and dissertations.</para>
+			<para>DSpace embargoes utilize standard metadata fields to hold both the 'terms' and the 'lift date'. Which fields you use are configurable, and no specific metadata element is dedicated or predefined for use in embargo. Rather, you specify exactly what field you want the embargo system to examine when it needs to find the terms or assign the lift date.</para>
 			<informaltable>
 				<?dbhtml table-width="100%"?>
 				<?dbfo table-width="100%"?>
@@ -4136,6 +4136,158 @@ Community|Collection|Item|Bundle+Add|Create|Modify|Modify_Metadata|Delete|Remove
 					</tbody>
 				</tgroup>
 			</informaltable>
+			<para>Key Recommendations:</para>
+			<orderedlist>
+				<listitem>
+					<para> If using existing metadata fields, avoid any that are automatically managed by DSpace. For example, fields like &apos;<literal>date.issued</literal>&apos; or &apos;<literal>date.accessioned</literal>&apos; are normally automatically assigned, and thus must not be recruited for embargo use.</para>
+				</listitem>
+				<listitem>
+					<para>Do not place the field for &apos;<literal>lift date</literal>&apos; in submission screens. This can potentially confuse submitters because they may feel that they can directly assign values to it. As noted in the life-cycle above, this is erroneous: the lift date gets assigned by the embargo system based on the terms. Any pre-existing value will be over-written. But see next recommendation for an exception.</para>
+				</listitem>
+				<listitem>
+					<para>As the life-cycle discussion above makes clear, after the terms are applied, that field is no longer actionable in the embargo system. Conversely, the &apos;lift date&apos; field is not actionable *until* the application. Thus you may want to consider configuring both the &apos;terms&apos; and &apos;lift date&apos; to use the same metadata field. In this way, during workflow you would see only the terms, and after item installation, only the lift date. If you wish the metadata to retain the terms for any reason, use two distinct fields instead.</para>
+				</listitem>
+			</orderedlist>
+			<section>
+				<title>Detailed Operation</title>
+				<para>After the fields defined for terms and lift date have been assigned in <literal>dspace.cfg</literal>, and created and configured wherever they will be used, you can begin to embargo items simply by entering data (dates, if using the default setter) in the terms field. They will automatically be embargoed as they exit workflow. For the embargo to be lifted on any item, however, a new administrative procedure must be added: the &apos;embargo lifter&apos; must be invoked on a regular basis. This task examines all embargoed items, and if their &apos;lift date&apos; has passed, it removes the access restrictions on the item. Good practice dictates automating this procedure using cron jobs or the like, rather than manually running it. The lifter is available as a target of the 1.6 DSpace launcher: see Section 8.</para>
+			</section>
+			<section>
+				<title>Extending Embargo Functionality</title>
+				<para>The 1.6 Embargo system supplies a default &apos;interpreter/imposition&apos; class (the &apos;Setter&apos;) as well as a &apos;Lifter&apos;, but they are fairly rudimentary in several aspects.</para>
+				<orderedlist numeration="upperalpha">
+					<listitem>
+						<para>Setter.</para>
+						<para>The default setter recognizes only two expressions of terms: either a literal, non-relative date in the fixed format &apos;yyyy-mm-dd&apos; (known as ISO 8601), or a special string used for open-ended embargo (the default configured value for this is &apos;forever&apos;, but this can be changed in dspace.cfg to &apos;toujours&apos;, &apos;unendlich&apos;, etc). It will perform a minimal sanity check that the date is not in the past. Similarly, the default setter will only remove all read policies as noted above, rather than applying more nuanced rules (e.g allow access to certain IP groups, deny the rest). Fortunately, the setter class itself is configurable and you can &apos;plug in&apos; any behavior you like, provided it is written in java and conforms to the setter interface. The dspace.cfg property:</para>
+						<screen># implementation of embargo setter plugin - replace with local implementation if applicable
+plugin.single.org.dspace.embargo.EmbargoSetter = org.dspace.embargo.DefaultEmbargoSetter</screen>
+						<para>controls which setter to use.</para>
+					</listitem>
+					<listitem>
+						<para>Lifter.</para>
+						<para>The default lifter behavior as described above&mdash;essentially applying the collection policy rules to the item&mdash;might also not be sufficient for all purposes. It also can be replaced with another class:</para>
+						<screen># implementation of embargo lifter plugin--replace with local implementation if applicable
+plugin.single.org.dspace.embargo.EmbargoLifter = org.dspace.embargo.DefaultEmbargoLifter</screen>
+					</listitem>
+				</orderedlist>
+			</section>
+			<section>
+				<title>Step-by-Step Setup Examples</title>
+				<orderedlist numeration="upperalpha">
+					<listitem>
+						<para>Simple Dates.</para>
+						<para>If you want to enter simple calendar dates for when an embargo will expire, follow these steps.</para>
+						<orderedlist>
+							<listitem>
+								<para>Select a metadata field. Let's use <literal>dc.description.embargo</literal>. This field does not exist in in the default DSpace metadata directory, so login as an administrator, go the metadata registry page, select the &apos;dc&apos; schema, then add the metadata field.</para>
+							</listitem>
+							<listitem>
+								<para>Expose the metadata field. Edit <literal>[dspace]/config/input-forms.xml</literal> . If you have only one form&mdash;usually &apos;traditional&apos;, add it there. If you have multiple forms, add it only to the forms linked to collections for which embargo applies:</para>
+								<screen>&lt;form name="traditional"&gt;
+    &lt;page number="1"&gt;
+      …
+       &lt;field&gt;
+         &lt;dc-schema&gt;dc&lt;/dc-schema&gt;
+         &lt;dc-element&gt;description&lt;/dc-element&gt;
+         &lt;dc-qualifier&gt;embargo&lt;/dc-qualifier&gt;
+         &lt;repeatable&gt;false&lt;/repeatable&gt;
+         &lt;label&gt;Embargo Date&lt;/label&gt;
+         &lt;input-type&gt;onebox&lt;/input-type&gt;
+         &lt;hint&gt;If required, enter date 'yyyy-mm-dd' when embargo expires or 'forever'.&lt;/hint&gt;
+         &lt;required&gt;&lt;/required&gt;
+       &lt;/field&gt;
+</screen>
+								<para>Note: if you want to require embargo terms for every item, put a phrase in the &lt;required&gt; element. Example:</para>
+								<para><literal>&lt;required&gt;You must enter an embargo date&lt;/required&gt;</literal></para>
+							</listitem>
+							<listitem>
+								<para>Configure Embargo. Edit <literal>[dspace]/config/dspace.cfg</literal>. Find the Embargo properties and set these two:</para>
+								<screen># DC metadata field to hold the user-supplied embargo terms
+embargo.field.terms = dc.description.embargo
+
+# DC metadata field to hold computed "lift date" of embargo
+embargo.field.lift = dc.description.embargo</screen>
+							</listitem>
+							<listitem>
+								<para>Restart DSpace application. This will pick up these changes. Now just enter future dates (if applicable) in web submission and the items will be placed under embargo. You can enter years (&apos;2020&apos;), years and months (&apos;2020-12&apos;), or also days (&apos;2020-12-15&apos;). </para>
+							</listitem>
+							<listitem>
+								<para>Periodically run the lifter. Run the task:</para>
+								<para><literal>[dspace]/bin/dspace embargo-lifter</literal></para>
+								<para>You will want to run this task in a cron-scheduled or other repeating way. Item embargoes will be lifted as their dates pass.</para>
+							</listitem>
+						</orderedlist>
+					</listitem>
+					<listitem>
+						<para>Period Sets.</para>
+						<para>If you wish to use a fixed set of time periods (e.g. 90 days, 6 months and 1 year) as embargo terms, follow these steps, which involve using a custom &apos;setter&apos;.</para>
+						<orderedlist>
+							<listitem>
+								<para>Select two metadata fields. Let's use &apos;<literal>dc.embargo.terms</literal>&apos; and &apos;<literal>dc.embargo.lift</literal>&apos;. These fields do not exist in the default DSpace metadata registry. Login as an administrator, go the metadata registry page, select the &apos;dc&apos; schema, then add the metadata fields.</para>
+							</listitem>
+							<listitem>
+								<para>Expose the &apos;term&apos; metadata field. The lift field will be assigned by the embargo system, so it should not be exposed directly. Edit <literal>[dspace]/config/input-forms.xml</literal> . If you have only one form (usually &apos;traditional&apos;) add it there. If you have multiple forms, add it only to the form(s) linked to collection(s) for which embargo applies. First, add the new field to the &apos;form definition&apos;:</para>
+								<screen>&lt;form name="traditional"&gt;
+    &lt;page number="1"&gt;
+      …
+       &lt;field&gt;
+         &lt;dc-schema&gt;dc&lt;/dc-schema&gt;
+         &lt;dc-element&gt;embargo&lt;/dc-element&gt;
+         &lt;dc-qualifier&gt;terms&lt;/dc-qualifier&gt;
+         &lt;repeatable&gt;false&lt;/repeatable&gt;
+         &lt;label&gt;Embargo Terms&lt;/label&gt;
+         &lt;input-type value-pairs-name="embargo_terms"&gt;dropdown&lt;/input-type&gt;
+         &lt;hint&gt;If required, select embargo terms.&lt;/hint&gt;
+         &lt;required&gt;&lt;/required&gt;
+         &lt;/field&gt;</screen>
+								<para>Note: If you want to require embargo terms for every item, put a phrase in the <literal>&lt;required&gt;</literal> element, e.g.</para>
+								<para><literal>&lt;required&gt;You must select embargo terms&lt;/required&gt;</literal></para>
+								<para>Observe that we have referenced a new value-pair list: &quot;embargo_terms&apos;. We must now define that as well (only once even if references by multiple forms):</para>
+								<screen>&lt;form-value-pairs&gt;
+   …
+   &lt;value-pairs value-pairs-name="embargo_terms" dc-term="embargo.terms"&gt;
+     &lt;pair&gt;
+       &lt;displayed-value&gt;90 days&lt;/displayed-value&gt;
+       &lt;stored-value&gt;90 days&lt;/stored-value&gt;
+     &lt;/pair&gt;
+     &lt;pair&gt;
+       &lt;displayed-value&gt;6 months&lt;/displayed-value&gt;
+       &lt;stored-value&gt;6 months&lt;/stored-value&gt;
+     &lt;/pair&gt;
+     &lt;pair&gt;
+       &lt;displayed-value&gt;1 year&lt;/displayed-value&gt;
+       &lt;stored-value&gt;1 year&lt;/stored-value&gt;
+     &lt;/pair&gt;
+   &lt;/value-pairs&gt;
+</screen>
+								<para>Note: if desired, you could localize the language of the displayed value.</para>
+							</listitem>
+							<listitem>
+								<para>Configure Embargo. Edit /dspace/config/dspace.cfg. Find the Embargo properties and set the following properties:</para>
+								<screen>    # DC metadata field to hold the user-supplied embargo terms
+    embargo.field.terms = dc.embargo.terms
+
+    # DC metadata field to hold computed "lift date" of embargo
+    embargo.field.lift = dc.embargo.lift
+
+    # implementation of embargo setter plugin - replace with local implementation if applicable
+    plugin.single.org.dspace.embargo.EmbargoSetter = org.dspace.embargo.DayTableEmbargoSetter</screen>
+								<para>Now add a new property called &apos;<literal>embargo.terms.days</literal>&apos; as follows:</para>
+								<screen>    # DC metadata field to hold computed "lift date" of embargo
+    embargo.terms.days = 90 days:90, 6 months:180, 1 year:365</screen>
+							</listitem>
+							<listitem>
+								<para>This step is the same as Step A.4 above, except that instead of entering a date, the submitter will select a value form a drop-down list.</para>
+							</listitem>
+							<listitem>
+								<para>Periodically run the lifter. Run the task:</para>
+								<para><literal>[dspace]/bin/dspace embargo-lifter</literal></para>
+								<para>You will want to run this task in a cron-scheduled or other repeating way. Item embargoes will be lifted as their dates pass.</para>
+							</listitem>
+						</orderedlist>
+					</listitem>
+				</orderedlist>
+			</section>
 		</section>
 		<section remap="h3">
 			<title><anchor id="docbook-configure.html-checksum" xreflabel="Checksum Checker Settings"/>Checksum Checker Settings</title>
@@ -7227,7 +7379,7 @@ webui.itemlist.&lt;sort or index name&gt;.columns</screen>
 						<row>
 							<entry align="right">Informational Note:</entry>
 							<entry>If you would like to use Google analytics to track general website statistics then use the following parameter to provide your analytics key. First sign up for an account at <ulink url="http://analytics.google.com"
-								>http://analytics.google.com</ulink>, then create an entry for your repositories website. Google Analytics will give you a snipit of javascript code to place on your site, inside that snip it is your google analytics key usually found in the line: _uacct = "UA-XXXXXXX-X" Take this key (just the UA-XXXXXX-X part) and place it here in this parameter.</entry>
+								>http://analytics.google.com</ulink>, then create an entry for your repositories website. Google Analytics will give you a snippet of javascript code to place on your site, inside that snip it is your google analytics key usually found in the line: _uacct = "UA-XXXXXXX-X" Take this key (just the UA-XXXXXX-X part) and place it here in this parameter.</entry>
 						</row>
 						<row>
 							<?dbfo row-height="5mm"?>
@@ -7784,7 +7936,7 @@ hdl.handle.net, handle.test.edu</screen>
 			</section>
 			<section remap="h4">
 				<title>Bitstream Format Registry</title>
-				<para>The bitstream formats recognized by the system and levels of support are similarly stored in the bitstream format registry. This can also be edited at install-time via <literal>[dspace]/config/registries/bitstream-formats.xml</literal> or by the administation Web UI. The contents of the bitstream format registry are entirely up to you, though the system requires that the following two formats are present:</para>
+				<para>The bitstream formats recognized by the system and levels of support are similarly stored in the bitstream format registry. This can also be edited at install-time via <literal>[dspace]/config/registries/bitstream-formats.xml</literal> or by the administration Web UI. The contents of the bitstream format registry are entirely up to you, though the system requires that the following two formats are present:</para>
 				<itemizedlist>
 					<listitem>
 						<para>
@@ -8315,7 +8467,7 @@ sword.accept-packaging.[handle].METSDSpaceSIP.q = 1.0</screen>
 						</row>
 						<row>
 							<entry align="right">Informational Note:</entry>
-							<entry>Should the server identify the sword version in a deposti response. It is recommended to leave this unchanged.</entry>
+							<entry>Should the server identify the sword version in a deposit response. It is recommended to leave this unchanged.</entry>
 						</row>
 						<row>
 							<?dbfo row-height="5mm"?>
@@ -8332,7 +8484,7 @@ sword.accept-packaging.[handle].METSDSpaceSIP.q = 1.0</screen>
 						</row>
 						<row>
 							<entry align="right">Informational Note:</entry>
-							<entry>Should mediated deposit via sowrd be supported. If enabled, this will allow users to deposit content packages on behalf of other users.</entry>
+							<entry>Should mediated deposit via sword be supported. If enabled, this will allow users to deposit content packages on behalf of other users.</entry>
 						</row>
 						<row>
 							<?dbfo row-height="5mm"?>
