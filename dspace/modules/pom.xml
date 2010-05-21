@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.dspace</groupId>
 		<artifactId>dspace-parent</artifactId>
-		<version>1.6.1-SNAPSHOT</version>
+		<version>1.6.1</version>
 	</parent>
 
 	<repositories>
@@ -30,9 +30,9 @@
 	</repositories>
 
    <scm>
-      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules</url>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.1</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.1/dspace/modules</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.1/dspace/modules</url>
    </scm>
    
 	<modules>
