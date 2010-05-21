@@ -40,7 +40,7 @@
 					<para> A cache of content management API objects. Each time a content object is created (for example <literal>Item</literal> or <literal>Bitstream</literal>) it is stored in the <literal>Context</literal> object. If the object is then requested again, the cached copy is used. Apart from reducing database use, this addresses the problem of having two copies of the same object in memory in different states.</para>
 				</listitem>
 			</itemizedlist>
-			<para>The following information is also held in a context object, though it is the responsiblity of the application creating the context object to fill it out correctly:</para>
+			<para>The following information is also held in a context object, though it is the responsibility of the application creating the context object to fill it out correctly:</para>
 			<itemizedlist>
 				<listitem>
 					<para> The current authenticated user, if any</para>
@@ -49,7 +49,7 @@
 					<para> Any &apos;special groups&apos; the user is a member of. For example, a user might automatically be part of a particular group based on the IP address they are accessing DSpace from, even though they don&apos;t have an e-person record. Such a group is called a &apos;special group&apos;.</para>
 				</listitem>
 				<listitem>
-					<para> Any extra information from the application layer that should be added to log messages that are written within this context. For example, the Web UI adds a session ID, so that when the logs are analysed the actions of a particular user in a particular session can be tracked.</para>
+					<para> Any extra information from the application layer that should be added to log messages that are written within this context. For example, the Web UI adds a session ID, so that when the logs are analyzed the actions of a particular user in a particular session can be tracked.</para>
 				</listitem>
 				<listitem>
 					<para> A flag indicating whether authorization should be circumvented. This should only be used in rare, specific circumstances. For example, when first installing the system, there are no authorized administrators who would be able to create an administrator account!</para>
@@ -191,13 +191,13 @@
 					</tbody>
 				</tgroup>
 			</informaltable>
-			<para>The above format allows the logs to be easily parsed and analysed. The <literal>/dspace/bin/log-reporter</literal> script is a simple tool for analysing logs. Try:</para>
+			<para>The above format allows the logs to be easily parsed and analyzed. The <literal>/dspace/bin/log-reporter</literal> script is a simple tool for analyzing logs. Try:</para>
 			<para><literal>/dspace/bin/log-reporter --help</literal></para>
 			<para>It&apos;s a good idea to &apos;nice&apos; this log reporter to avoid an impact on server performance.</para>
 		</section>
 		<section remap="h3">
 			<title>Utils</title>
-			<para><literal>Utils</literal> comtains miscellaneous utility method that are required in a variety of places throughout the code, and thus have no particular &apos;home&apos; in a subsystem.</para>
+			<para><literal>Utils</literal> contains miscellaneous utility method that are required in a variety of places throughout the code, and thus have no particular &apos;home&apos; in a subsystem.</para>
 		</section>
 	</section>
 	<section remap="h2">
@@ -312,7 +312,7 @@ context.complete();</screen>
 			<para>Instantiating a <literal>Bundle</literal> object causes the appropriate <literal>Bitstream</literal> objects (and hence <literal>BitstreamFormat</literal>s) to be instantiated.</para>
 			<para>Instantiating an <literal>Item</literal> object causes the appropriate <literal>Bundle</literal> objects (etc.) and hence <literal>BitstreamFormat</literal>s to be instantiated. All the Dublin Core metadata associated with that item are also loaded into memory.</para>
 			<para>The reasoning behind this is that for the vast majority of cases, anyone instantiating an item object is going to need information about the bundles and bitstreams within it, and this methodology allows that to be done in the most efficient way and is simple for the caller. For example, in the Web UI, the servlet (controller) needs to pass information about an item to the viewer (JSP), which needs to have all the information in-memory to display the item without further accesses to the database which may cause errors mid-display.</para>
-			<para>You do not need to worry about multiple in-memory instantiations of the same object, or any inconsistenties that may result; the <literal>Context</literal> object keeps a cache of the instantiated objects. The <literal>find</literal> methods of classes in <literal>org.dspace.content</literal> will use a cached object if one exists.</para>
+			<para>You do not need to worry about multiple in-memory instantiations of the same object, or any inconsistencies that may result; the <literal>Context</literal> object keeps a cache of the instantiated objects. The <literal>find</literal> methods of classes in <literal>org.dspace.content</literal> will use a cached object if one exists.</para>
 			<para>It may be that in enough cases this automatic instantiation of contained objects reduces performance in situations where it is important; if this proves to be true the API may be changed in the future to include a <literal>loadContents</literal> method or somesuch, or perhaps a Boolean parameter indicating what to do will be added to the <literal>find</literal> methods.</para>
 			<para>When a <literal>Context</literal> object is completed, aborted or garbage-collected, any objects instantiated using that context are invalidated and should not be used (in much the same way an AWT button is invalid if the window containing it is destroyed).</para>
 		</section>
@@ -434,7 +434,7 @@ context.complete();</screen>
 		<section remap="h3">
 			<title><anchor id="docbook-business.html-otherschemas" xreflabel="Support for Other Metadata
 Schemas"/>Support for Other Metadata Schemas</title>
-			<para>To support additional metadata schemas a new set of metadata classes have been added. These are backwards compatible with the DC classes and should be used rather than the DC specific classes whereever possible. Note that hierarchical metadata schemas are not currently supported, only flat schemas (such as DC) are able to be defined.</para>
+			<para>To support additional metadata schemas a new set of metadata classes have been added. These are backwards compatible with the DC classes and should be used rather than the DC specific classes wherever possible. Note that hierarchical metadata schemas are not currently supported, only flat schemas (such as DC) are able to be defined.</para>
 			<para>The <literal>MetadataField</literal> class describes a metadata field by schema, element and optional qualifier. The value of a <literal>MetadataField</literal> is described by a <literal>MetadataValue</literal> which is roughly equivalent to the older <literal>DCValue</literal> class. Finally the <literal>MetadataSchema</literal> class is used to describe supported schemas. The DC schema is supported by default. Refer to the javadoc for method details.</para>
 		</section>
 		<section remap="h3">
@@ -476,7 +476,7 @@ Schemas"/>Support for Other Metadata Schemas</title>
 	</section>
 	<section remap="h2">
 		<title><anchor id="docbook-business.html-plugin" xreflabel="Plugin Manager"/>Plugin Manager</title>
-		<para>The PluginManager is a very simple component container. It creates and organizes components (plugins), and helps select a plugin in the cases where there are many possible choices. It also gives some limited control over the lifecycle of a plugin.</para>
+		<para>The PluginManager is a very simple component container. It creates and organizes components (plugins), and helps select a plugin in the cases where there are many possible choices. It also gives some limited control over the life cycle of a plugin.</para>
 		<section remap="h3">
 			<title>Concepts</title>
 			<para>The following terms are important in understanding the rest of this section:</para>
@@ -666,7 +666,7 @@ Schemas"/>Support for Other Metadata Schemas</title>
 						<para>
 							<literal>plugin.named.interface = classname = name [ , name.. ] [ classname = name.. ]</literal>
 						</para>
-						<para>The syntax of the configuration value is: classname, followed by an equal-sign and then at least one plugin name. Bind more names to the same implementation class by by adding them here, separated by commas. Names may include any character other than comma (,) and equal-sign (=).</para>
+						<para>The syntax of the configuration value is: classname, followed by an equal-sign and then at least one plugin name. Bind more names to the same implementation class by adding them here, separated by commas. Names may include any character other than comma (,) and equal-sign (=).</para>
 						<para>For example, this entry creates one plugin with the names GIF, JPEG, and image/png, and another with the name TeX:</para>
 						<screen>plugin.named.org.dspace.app.mediafilter.MediaFilter = \
         org.dspace.app.mediafilter.JPEGFilter = GIF, JPEG, image/png \
@@ -710,7 +710,7 @@ plugin.selfnamed.crosswalk.org.dspace.content.metadata.DisseminationCrosswalk = 
 		</section>
 		<section remap="h3">
 			<title><anchor id="docbook-business.html-confval" xreflabel="Validating the Configuration"/>Validating the Configuration</title>
-			<para>The Plugin Manager is very sensitive to mistakes in the DSpace configuration. Subtle errors can have unexpected consequnces that are hard to detect: for example, if there are two &quot;plugin.single&quot; entries for the same interface, one of them will be silently ignored.</para>
+			<para>The Plugin Manager is very sensitive to mistakes in the DSpace configuration. Subtle errors can have unexpected consequences that are hard to detect: for example, if there are two &quot;plugin.single&quot; entries for the same interface, one of them will be silently ignored.</para>
 			<para>To validate the Plugin Manager configuration, call the <literal>PluginManager.checkConfiguration()</literal> method. It looks for the following mistakes:</para>
 			<itemizedlist>
 				<listitem>
@@ -897,14 +897,14 @@ plugin.selfnamed.org.dspace.content.metadata.DisseminationCrosswalk = \
 		<para>The <literal>org.dspace.administer</literal> package contains some classes for administering a DSpace system that are not generally needed by most applications.</para>
 		<para>The <literal>CreateAdministrator</literal> class is a simple command-line tool, executed via <literal>/dspace/bin/create-administrator</literal>, that creates an administrator e-person with information entered from standard input. This is generally used only once when a DSpace system is initially installed, to create an initial administrator who can then use the Web administration UI to further set up the system. This script does not check for authorization, since it is typically run before there are any e-people to authorize! Since it must be run as a command-line tool on the server machine, generally this shouldn&apos;t cause a problem. A possibility is to have the script only operate when there are no e-people in the system already, though in general, someone with access to command-line scripts on your server is probably in a position to do what they want anyway!</para>
 		<para>The <literal>DCType</literal> class is similar to the <literal>org.dspace.content.BitstreamFormat</literal> class. It represents an entry in the Dublin Core type registry, that is, a particular element and qualifier, or unqualified element. It is in the <literal>administer</literal> package because it is only generally required when manipulating the registry itself. Elements and qualifiers are specified as literals in <literal>org.dspace.content.Item</literal> methods and the <literal>org.dspace.content.DCValue</literal> class. Only administrators may modify the Dublin Core type registry.</para>
-		<para>The <literal>org.dspace.administer.RegistryLoader</literal> class contains methods for initialising the Dublin Core type registry and bitstream format registry with entries in an XML file. Typically this is executed via the command line during the build process (see <literal>build.xml</literal> in the source.) To see examples of the XML formats, see the files in <literal>config/registries</literal> in the source directory. There is no XML schema, they aren&apos;t validated strictly when loaded in.</para>
+		<para>The <literal>org.dspace.administer.RegistryLoader</literal> class contains methods for initializing the Dublin Core type registry and bitstream format registry with entries in an XML file. Typically this is executed via the command line during the build process (see <literal>build.xml</literal> in the source.) To see examples of the XML formats, see the files in <literal>config/registries</literal> in the source directory. There is no XML schema, they aren&apos;t validated strictly when loaded in.</para>
 	</section>
 	<section remap="h2">
 		<title><anchor id="docbook-business.html-eperson" xreflabel="E-person/Group Manager"/>E-person/Group Manager</title>
-		<para>DSpace keeps track of registered users with the <literal>org.dspace.eperson.EPerson</literal> class. The class has methods to create and manipulate an <literal>EPerson</literal> such as get and set methods for first and last names, email, and password. (Actually, there is no <literal>getPassword()</literal> method--an MD5 hash of the password is stored, and can only be verified with the <literal>checkPassword()</literal> method.) There are find methods to find an EPerson by email (which is assumed to be unique,) or to find all EPeople in the system.</para>
+		<para>DSpace keeps track of registered users with the <literal>org.dspace.eperson.EPerson</literal> class. The class has methods to create and manipulate an <literal>EPerson</literal> such as get and set methods for first and last names, email, and password. (Actually, there is no <literal>getPassword()</literal> method&mdash;an MD5 hash of the password is stored, and can only be verified with the <literal>checkPassword()</literal> method.) There are find methods to find an EPerson by email (which is assumed to be unique,) or to find all EPeople in the system.</para>
 		<para>The <literal>EPerson</literal> object should probably be reworked to allow for easy expansion; the current EPerson object tracks pretty much only what MIT was interested in tracking - first and last names, email, phone. The access methods are hardcoded and should probably be replaced with methods to access arbitrary name/value pairs for institutions that wish to customize what EPerson information is stored.</para>
 		<para>Groups are simply lists of <literal>EPerson</literal> objects. Other than membership, <literal>Group</literal> objects have only one other attribute: a name. Group names must be unique, so we have adopted naming conventions where the role of the group is its name, such as <literal>COLLECTION_100_ADD</literal>. Groups add and remove EPerson objects with <literal>addMember()</literal> and <literal>removeMember()</literal> methods. One important thing to know about groups is that they store their membership in memory until the <literal>update()</literal> method is called - so when modifying a group&apos;s membership don&apos;t forget to invoke <literal>update()</literal> or your changes will be lost! Since group membership is used heavily by the authorization system a fast <literal>isMember()</literal> method is also provided.</para>
-		<para>Another kind of Group is also implemented in DSpace--special Groups. The <literal>Context</literal> object for each session carries around a List of Group IDs that the user is also a member of--currently the MITUser Group ID is added to the list of a user&apos;s special groups if certain IP address or certificate criteria are met.</para>
+		<para>Another kind of Group is also implemented in DSpace&mdash;special Groups. The <literal>Context</literal> object for each session carries around a List of Group IDs that the user is also a member of&mdash;currently the MITUser Group ID is added to the list of a user&apos;s special groups if certain IP address or certificate criteria are met.</para>
 	</section>
 	<section remap="h2">
 		<title><anchor id="docbook-business.html-authorize" xreflabel="Authorization"/>Authorization</title>
@@ -948,7 +948,7 @@ plugin.selfnamed.org.dspace.content.metadata.DisseminationCrosswalk = \
 			</tgroup>
 		</informaltable>
 		<para>The authorization system is based on the classic &apos;police state&apos; model of security; no action is allowed unless it is expressed in a policy. The policies are attached to resources (hence the name <literal>ResourcePolicy</literal>,) and detail who can perform that action. The resource can be any of the DSpace object types, listed in <literal>org.dspace.core.Constants</literal> (<literal>BITSTREAM</literal>, <literal>ITEM</literal>, <literal>COLLECTION</literal>, etc.) The &apos;who&apos; is made up of EPerson groups. The actions are also in <literal>Constants.java</literal> (<literal>READ</literal>, <literal>WRITE</literal>, <literal>ADD</literal>, etc.) The only non-obvious actions are <literal>ADD</literal> and <literal>REMOVE</literal>, which are authorizations for container objects. To be able to create an Item, you must have <literal>ADD</literal> permission in a Collection, which contains Items. (Communities, Collections, Items, and Bundles are all container objects.)</para>
-		<para>Currently most of the read policy checking is done with items--communities and collections are assumed to be openly readable, but items and their bitstreams are checked. Separate policy checks for items and their bitstreams enables policies that allow publicly readable items, but parts of their content may be restricted to certain groups.</para>
+		<para>Currently most of the read policy checking is done with items&mdash;communities and collections are assumed to be openly readable, but items and their bitstreams are checked. Separate policy checks for items and their bitstreams enables policies that allow publicly readable items, but parts of their content may be restricted to certain groups.</para>
 		<para>The <literal>AuthorizeManager</literal> class&apos;
 				<literal>authorizeAction(Context, object, action)</literal> is the primary source of all authorization in the system. It gets a list of all of the ResourcePolicies in the system that match the object and action. It then iterates through the policies, extracting the EPerson Group from each policy, and checks to see if the EPersonID from the Context is a member of any of those groups. If all of the policies are queried and no permission is found, then an <literal>AuthorizeException</literal> is thrown. An <literal>authorizeAction()</literal> method is also supplied that returns a boolean for applications that require higher performance.</para>
 		<para>ResourcePolicies are very simple, and there are quite a lot of them. Each can only list a single group, a single action, and a single object. So each object will likely have several policies, and if multiple groups share permissions for actions on an object, each group will get its own policy. (It&apos;s a good thing they&apos;re small.)</para>
@@ -958,7 +958,7 @@ plugin.selfnamed.org.dspace.content.metadata.DisseminationCrosswalk = \
 		</section>
 		<section remap="h3">
 			<title>Miscellaneous Authorization Notes</title>
-			<para>Where do items get their read policies? From the their collection&apos;s read policy. There once was a separate item read default policy in each collection, and perhaps there will be again since it appears that administrators are notoriously bad at defining collection&apos;s read policies. There is also code in place to enable policies that are timed--have a start and end date. However, the admin tools to enable these sorts of policies have not been written.</para>
+			<para>Where do items get their read policies? From the their collection&apos;s read policy. There once was a separate item read default policy in each collection, and perhaps there will be again since it appears that administrators are notoriously bad at defining collection&apos;s read policies. There is also code in place to enable policies that are timed&mdash;have a start and end date. However, the admin tools to enable these sorts of policies have not been written.</para>
 		</section>
 	</section>
 	<section remap="h2">
@@ -993,13 +993,13 @@ http://hdl.handle.net/1721.123/4567</screen>
 	<section remap="h2">
 		<title><anchor id="docbook-business.html-search" xreflabel="Search"/>Search</title>
 		<para>DSpace&apos;s search code is a simple API which currently wraps the Lucene search engine. The first half of the search task is indexing, and <literal>org.dspace.search.DSIndexer</literal> is the indexing class, which contains <literal>indexContent()</literal> which if passed an <literal>Item</literal>, <literal>Community</literal>, or <literal>Collection</literal>, will add that content&apos;s fields to the index. The methods <literal>unIndexContent()</literal> and <literal>reIndexContent()</literal> remove and update content&apos;s index information. The <literal>DSIndexer</literal> class also has a <literal>main()</literal> method which will rebuild the index completely. This can be invoked by the <literal>dspace/bin/index-init</literal> (complete rebuild) or <literal>dspace/bin/index-update</literal> (update) script. The intent was for the <literal>main()</literal> method to be invoked on a regular basis to avoid index corruption, but we have had no problem with that so far.</para>
-		<para>Which fields are indexed by <literal>DSIndexer</literal>? These fields are defined in dspace.cfg in the section &quot;Fields to index for search&quot; as name-value-pairs. The name must be unique in the form search.index.i (i is an arbitrary positive number). The value on the right side has a unique value again, which can be referenced in search-form (e.g. title, author). Then comes the metadata element which is indexed. &apos;*&apos; is a wildcard which includes all subelements. For example:</para>
+		<para>Which fields are indexed by <literal>DSIndexer</literal>? These fields are defined in dspace.cfg in the section &quot;Fields to index for search&quot; as name-value-pairs. The name must be unique in the form search.index.i (i is an arbitrary positive number). The value on the right side has a unique value again, which can be referenced in search-form (e.g. title, author). Then comes the metadata element which is indexed. &apos;*&apos; is a wildcard which includes all sub elements. For example:</para>
 		<para>
 			<literal>search.index.4 = keyword:dc.subject.*</literal>
 		</para>
 		<para>tells the indexer to create a keyword index containing all dc.subject element values. Since the wildcard (&apos;*&apos;) character was used in place of a qualifier, all subject metadata fields will be indexed (e.g. dc.subject.other, dc.subject.lcsh, etc)</para>
 		<para>By default, the fields shown in the <literal>Indexed Fields</literal> section below are indexed. These are hardcoded in the DSIndexer class. If any search.index.i items are specified in <literal>dspace.cfg</literal> these are used rather than these hardcoded fields.</para>
-		<para>The query class <literal>DSQuery</literal> contains the three flavors of <literal>doQuery()</literal> methods--one searches the DSpace site, and the other two restrict searches to Collections and Communities. The results from a query are returned as three lists of handles; each list represents a type of result. One list is a list of Items with matches, and the other two are Collections and Communities that match. This separation allows the UI to handle the types of results gracefully without resolving all of the handles first to see what kind of content the handle points to. The <literal>DSQuery</literal> class also has a <literal>main()</literal> method for debugging via command-line searches.</para>
+		<para>The query class <literal>DSQuery</literal> contains the three flavors of <literal>doQuery()</literal> methods&mdash;one searches the DSpace site, and the other two restrict searches to Collections and Communities. The results from a query are returned as three lists of handles; each list represents a type of result. One list is a list of Items with matches, and the other two are Collections and Communities that match. This separation allows the UI to handle the types of results gracefully without resolving all of the handles first to see what kind of content the handle points to. The <literal>DSQuery</literal> class also has a <literal>main()</literal> method for debugging via command-line searches.</para>
 		<section remap="h3">
 			<title>Current Lucene Implementation</title>
 			<para>Currently we have our own Analyzer and Tokenizer classes (<literal>DSAnalyzer</literal> and <literal>DSTokenizer</literal>) to customize our indexing. They invoke the stemming and stop word features within Lucene. We create an <literal>IndexReader</literal> for each query, which we now realize isn&apos;t the most efficient use of resources - we seem to run out of filehandles on really heavy loads. (A wildcard query can open many filehandles!) Since Lucene is thread-safe, a better future implementation would be to have a single Lucene IndexReader shared by all queries, and then is invalidated and re-opened when the index changes. Future API growth could include relevance scores (Lucene generates them, but we ignore them,) and abstractions for more advanced search concepts such as booleans.</para>
@@ -1127,7 +1127,7 @@ http://hdl.handle.net/1721.123/4567</screen>
 	</section>
 	<section remap="h2">
 		<title><anchor id="docbook-business.html-browse" xreflabel="Browse API"/>Browse API</title>
-		<para>The browse API maintains indices of dates, authors, titles and subjects, and allows callers to extract parts of these:</para>
+		<para>The browse API maintains indexes of dates, authors, titles and subjects, and allows callers to extract parts of these:</para>
 		<variablelist>
 			<varlistentry>
 				<term><emphasis role="bold">Title</emphasis></term>
@@ -1155,7 +1155,7 @@ Doe, John S.</screen>
 							<para> Another issue is that two authors may have the same name, even within a single institution. If this is the case they may appear as one author in the index.</para>
 						</listitem>
 					</itemizedlist>
-					<para>These issues are typically resolved in libraries with <emphasis>authority control records</emphasis>, in which are kept a &apos;preferred&apos; form of the author&apos;s name, with extra information (such as date of birth/death) in order to distinguish between authors of the same name. Maintaining such records is a huge task with many issues, particularly when metadata is received from faculty directly rather than trained library cataloguers. For these reasons, DSpace does not yet feature &apos;authority control&apos; functionality.</para>
+					<para>These issues are typically resolved in libraries with <emphasis>authority control records</emphasis>, in which are kept a &apos;preferred&apos; form of the author&apos;s name, with extra information (such as date of birth/death) in order to distinguish between authors of the same name. Maintaining such records is a huge task with many issues, particularly when metadata is received from faculty directly rather than trained library catalogers. For these reasons, DSpace does not yet feature &apos;authority control&apos; functionality.</para>
 				</listitem>
 			</varlistentry>
 			<varlistentry>
@@ -1183,7 +1183,7 @@ Doe, John S.</screen>
 				<term><emphasis role="bold">Items by a Particular Author</emphasis></term>
 				<listitem>
 					<para> The browse API can perform is to extract items by a particular author. They do not have to be primary author of an item for that item to be extracted. You can specify a scope, too; that is, you can ask for items by author X in collection Y, for example.</para>
-					<para>This particular flavour of browse is slightly simpler than the others. You cannot presently specify a particular subset of results to be returned. The API call will simply return all of the items by a particular author within a certain scope.</para>
+					<para>This particular flavor of browse is slightly simpler than the others. You cannot presently specify a particular subset of results to be returned. The API call will simply return all of the items by a particular author within a certain scope.</para>
 					<para>Note that the author of the item must <emphasis>exactly</emphasis> match the author passed in to the API; see the explanation about the caveats of the author index browsing to see why this is the case.</para>
 				</listitem>
 			</varlistentry>
@@ -1196,7 +1196,7 @@ Doe, John S.</screen>
 		</variablelist>
 		<section remap="h3">
 			<title>Using the API</title>
-			<para>The API is generally invoked by creating a <literal>BrowseScope</literal> object, and setting the parameters for which particular part of an index you want to extract. This is then passed to the relevent <literal>Browse</literal> method call, which returns a <literal>BrowseInfo</literal> object which contains the results of the operation. The parameters set in the <literal>BrowseScope</literal> object are:</para>
+			<para>The API is generally invoked by creating a <literal>BrowseScope</literal> object, and setting the parameters for which particular part of an index you want to extract. This is then passed to the relevant <literal>Browse</literal> method call, which returns a <literal>BrowseInfo</literal> object which contains the results of the operation. The parameters set in the <literal>BrowseScope</literal> object are:</para>
 			<itemizedlist>
 				<listitem>
 					<para>How many entries from the index you want</para>
@@ -1237,28 +1237,28 @@ FOCUS&gt;  The Really Exciting Research Video
 			<para>Note that in the case of title and date browses, <literal>Item</literal> objects are returned as opposed to actual titles. In these cases, you can specify the &apos;focus&apos; to be a specific item, or a partial or full literal value. In the case of a literal value, if no entry in the index matches exactly, the closest match is used as the focus. It&apos;s quite reasonable to specify a focus of a single letter, for example.</para>
 			<para>Being able to specify a specific item to start at is particularly important with dates, since many items may have the save issue date. Say 30 items in a collection have the issue date 2002. To be able to page through the index 20 items at a time, you need to be able to specify exactly which item&apos;s 2002 is the focus of the browse, otherwise each time you invoked the browse code, the results would start at the first item with the issue date 2002.</para>
 			<para>Author browses return <literal>String</literal> objects with the actual author names. You can only specify the focus as a full or partial literal <literal>String</literal>.</para>
-			<para>Another important point to note is that presently, the browse indices contain metadata for all items in the main archive, regardless of authorization policies. This means that all items in the archive will appear to all users when browsing. Of course, should the user attempt to access a non-public item, the usual authorization mechanism will apply. Whether this approach is ideal is under review; implementing the browse API such that the results retrieved reflect a user&apos;s level of authorization may be possible, but rather tricky.</para>
+			<para>Another important point to note is that presently, the browse indexes contain metadata for all items in the main archive, regardless of authorization policies. This means that all items in the archive will appear to all users when browsing. Of course, should the user attempt to access a non-public item, the usual authorization mechanism will apply. Whether this approach is ideal is under review; implementing the browse API such that the results retrieved reflect a user&apos;s level of authorization may be possible, but rather tricky.</para>
 		</section>
 		<section remap="h3">
 			<title>Index Maintenance</title>
-			<para>The browse API contains calls to add and remove items from the index, and to regenerate the indices from scratch. In general the content management API invokes the necessary browse API calls to keep the browse indices in sync with what is in the archive, so most applications will not need to invoke those methods.</para>
+			<para>The browse API contains calls to add and remove items from the index, and to regenerate the indexes from scratch. In general the content management API invokes the necessary browse API calls to keep the browse indexes in sync with what is in the archive, so most applications will not need to invoke those methods.</para>
 			<para>If the browse index becomes inconsistent for some reason, the <literal>InitializeBrowse</literal> class is a command line tool (generally invoked using the <literal>/dspace/bin/dspace index-init</literal> command) that causes the indexes to be regenerated from scratch.</para>
 		</section>
 		<section remap="h3">
 			<title>Caveats</title>
-			<para>Presently, the browse API is not tremendously efficient. &apos;Indexing&apos; takes the form of simply extracting the relevant Dublin Core value, normalising it (lower-casing and removing any leading article in the case of titles), and inserting that normalized value with the corresponding item ID in the appropriate browse database table. Database views of this table include collection and community IDs for browse operations with a limited scope. When a browse operation is performed, a simple <literal>SELECT</literal> query is performed, along the lines of:</para>
+			<para>Presently, the browse API is not tremendously efficient. &apos;Indexing&apos; takes the form of simply extracting the relevant Dublin Core value, normalizing it (lower-casing and removing any leading article in the case of titles), and inserting that normalized value with the corresponding item ID in the appropriate browse database table. Database views of this table include collection and community IDs for browse operations with a limited scope. When a browse operation is performed, a simple <literal>SELECT</literal> query is performed, along the lines of:</para>
 			<screen>SELECT item_id FROM ItemsByTitle ORDER BY sort_title OFFSET 40 LIMIT 20</screen>
 			<para>There are two main drawbacks to this: Firstly, <literal>LIMIT</literal> and <literal>OFFSET</literal> are PostgreSQL-specific keywords. Secondly, the database is still actually performing dynamic sorting of the titles, so the browse code as it stands will not scale particularly well. The code does cache <literal>BrowseInfo</literal> objects, so that common browse operations are performed quickly, but this is not an ideal solution.</para>
 		</section>
 	</section>
 	<section remap="h2">
 		<title><anchor id="docbook-business.html-checker" xreflabel="Checksum checker"/>Checksum checker</title>
-		<para>Checksum checker is used to verify every item within DSpace. While DSpace calculates and records the checksum of every file submitted to it, the checker can determine whterh the file has been changed. The idea being that the earlier you can identify a file has changed, the more likely you would be able to record it (assuming it was not a wanted change).</para>
+		<para>Checksum checker is used to verify every item within DSpace. While DSpace calculates and records the checksum of every file submitted to it, the checker can determine whether the file has been changed. The idea being that the earlier you can identify a file has changed, the more likely you would be able to record it (assuming it was not a wanted change).</para>
 		<para><literal>org.dspace.checker.CheckerCommand</literal> class, is the class for the checksum checker tool, which calculates checksums for each bitstream whose ID is in the <literal>most_recent_checksum</literal> table, and compares it against the last calculated checksum for that bitstream.</para>
 	</section>
 	<section remap="h2">
 		<title><anchor id="docbook-business.html-opensearch" xreflabel="OpenSearch Support"/>OpenSearch Support</title>
-		<para>DSpace is able to support OpenSearch. For those not aquainted with the standard, a very brief introduction, with emphasis on what possibilities it holds for current use and future development.</para>
+		<para>DSpace is able to support OpenSearch. For those not acquainted with the standard, a very brief introduction, with emphasis on what possibilities it holds for current use and future development.</para>
 		<para>OpenSearch is a small set of conventions and documents for describing and using &apos;search engines&apos;, meaning any service that returns a set of results for a query. It is nearly ubiquitous&mdash;but also nearly invisible&mdash;in modern web sites with search capability. If you look at the page source of Wikipedia, Facebook, CNN, etc you will find buried a link element declaring OpenSearch support. It is very much a lowest-common-denominator abstraction (think Google box), but does provide a means to extend its expressive power. This first implementation for DSpace supports <emphasis>none</emphasis> of these extensions&mdash;many of which are of potential value&mdash;so it should be regarded as a foundation, not a finished solution. So the short answer is that DSpace appears as a &apos;search-engine&apos; to OpenSearch-aware software.</para>
 		<para>Another way to look at OpenSearch is as a RESTful web service for search, very much like SRW/U, but considerably simpler. This comparative loss of power is offset by the fact that it is widely supported by web tools and players: browsers understand it, as do large metasearch tools.</para>
 		<para>&nbsp;</para>
@@ -1275,7 +1275,7 @@ FOCUS&gt;  The Really Exciting Research Video
 				<para>The default format returned is Atom 1.0, so you should see an Atom document containing your search results.</para>
 			</listitem>
 			<listitem>
-				<para>You can extend the syntax witha few other parameters, as follows:</para>
+				<para>You can extend the syntax with a few other parameters, as follows:</para>
 				<para>
 					<informaltable>
 						<?dbhtml table-width="100%"?>
@@ -1295,7 +1295,7 @@ FOCUS&gt;  The Really Exciting Research Video
 								</row>
 								<row>
 									<entry>scope</entry>
-									<entry>&lt;handle&gt;&mdash;search is restricted to a collection or communith with the indicated handle.</entry>
+									<entry>&lt;handle&gt;&mdash;search is restricted to a collection or community with the indicated handle.</entry>
 								</row>
 								<row>
 									<entry>rpp</entry>
@@ -1323,7 +1323,6 @@ FOCUS&gt;  The Really Exciting Research Video
 	</section>
 	<section remap="h2">
 		<title><anchor id="docbook-business.html-embargo" xreflabel="embargo"/>Embargo Support</title>
-		<para>The architecture of Embarge is documentated in the package javadocs. Run <literal>cd /[dspace-source]/dspace;mvn javadoc:javadoc</literal> and look in <literal>[dspace-source]/dspace-api/target/site/apidocs/index.html</literal>.</para>
 		<section remap="h3">
 			<title>What is an Embargo?</title>
 			<para>An embargo is a temporary access restriction placed on content, commencing at time of accession. It's scope or duration may vary, but the fact that it eventually expires is what distinguishes it from other content restrictions. For example, it is not unusual for content destined for DSpace to come with permanent restrictions on use or access based on license-driven or other IP-based requirements that limit access to institutionally affiliated users. Restrictions such as these are imposed and managed using standard administrative tools in DSpace, typically by attaching specific policies to Items or Collections, Bitstreams, etc. The embargo functionally introduced in 1.6, however, includes tools to automate the imposition and removal of restrictions in managed timeframes.</para>
@@ -1351,7 +1350,7 @@ FOCUS&gt;  The Really Exciting Research Video
 				<listitem>
 					<para>Embargo Period.</para>
 					<para>After an embargoed item has been installed, the policy restrictions remain in effect until removed. This is not an automatic process, however: a &apos;lifter&apos; must be run periodically to look for items whose &apos;lift date&apos; is past. Note that this means the effective removal of an embargo is <emphasis role="bold"
-						>not</emphasis> the lift date, but the earliest date after the lift date that the lifter is run. Typically, a nightly cron-scheduled invocation of the lifter is more than adequate, given the granularity of embargo terms. Also note that during the embargo period, all metadata of the item remains visible.This default behavior can be changed. One final point to note is that the &apos;lift date&apos;, although it was computed and assigned during the previous stage, is in the end a regular metadata field. That means, if there are extraordinary circumstances that require an administrator (or collection editor--anyone with edit permissions on metadata) to change the lift date, they can do so. Thus, they can &apos;revise&apos; the lift date without reference to the original terms. This date will be checked the next time the &apos;lifter&apos; is run. One could immediately lift the embargo by setting the lift date to the current day, or change it to &apos;forever&apos; to indefinitely postpone lifting.</para>
+						>not</emphasis> the lift date, but the earliest date after the lift date that the lifter is run. Typically, a nightly cron-scheduled invocation of the lifter is more than adequate, given the granularity of embargo terms. Also note that during the embargo period, all metadata of the item remains visible.  This default behavior can be changed. One final point to note is that the &apos;lift date&apos;, although it was computed and assigned during the previous stage, is in the end a regular metadata field. That means, if there are extraordinary circumstances that require an administrator (or collection editor&mdash;anyone with edit permissions on metadata) to change the lift date, they can do so. Thus, they can &apos;revise&apos; the lift date without reference to the original terms. This date will be checked the next time the &apos;lifter&apos; is run. One could immediately lift the embargo by setting the lift date to the current day, or change it to &apos;forever&apos; to indefinitely postpone lifting.</para>
 				</listitem>
 				<listitem>
 					<para>Embargo Lift.</para>
