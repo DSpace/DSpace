@@ -13,7 +13,7 @@
 				<para><emphasis role="bold">Backup Your DSpace.</emphasis> First, and foremost, make a complete backup of your system, including:</para>
 				<itemizedlist>
 					<listitem>
-						<para>A snapshot of the database. <emphasis>To have a &quot;snapshot&quot; of the PostgreSQL database, you need to shut it down during the backup. You should also have your regular Postgresql Backup output (using pg_dump commands). </emphasis></para>
+						<para>A snapshot of the database. <emphasis>To have a &quot;snapshot&quot; of the PostgreSQL database, you need to shut it down during the backup. You should also have your regular PostgreSQL Backup output (using pg_dump commands). </emphasis></para>
 					</listitem>
 					<listitem>
 						<para>The asset store (<literal>[dspace]/assetstore</literal> by default)</para>
@@ -33,10 +33,10 @@
 			<listitem>
 				<para><emphasis role="bold">Apply any customizations</emphasis>. If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. These are housed in one of the following places:</para>
 				<para>JSPUI modifications: <literal>[dspace-source]/dspace/modules/jspui/src/main/webapp/</literal></para>
-				<para>XMLUI modificaitons: <literal>[dspace-source]/dspace/modules/xmlui/src/main/webbapp</literal></para>
+				<para>XMLUI modifications: <literal>[dspace-source]/dspace/modules/xmlui/src/main/webbapp</literal></para>
 			</listitem>
 			<listitem>
-				<para><emphasis role="bold">Update Configuration Files</emphasis>. Some of the parameters have change and some are new. Changes will be noted below:</para>
+				<para><emphasis role="bold">Update Configuration Files</emphasis>. There are no additions to this release. So you do not have to update the configuration files.</para>
 			</listitem>
 			<listitem>
 				<para><emphasis role="bold">Build DSpace.</emphasis> Run the following commands to compile DSpace.:</para>
@@ -44,13 +44,54 @@
 mvn -U clean package</screen>
 				<para>You will find the result in <literal>[dspace-source]/dspace/target/dspace-[version]-build.dir</literal> . Inside this directory is the compiled binary distribution of DSpace.</para>
 				<note>
-					<para>Before rebuilding DSpace, the above command will clean out any previously compiled code (&apos;clean&apos;) and ensure that your local DSpace JAR files are updated from the remote maven respository.</para>
+					<para>Before rebuilding DSpace, the above command will clean out any previously compiled code (&apos;clean&apos;) and ensure that your local DSpace JAR files are updated from the remote maven repository.</para>
 				</note>
 			</listitem>
 			<listitem>
 				<para><emphasis role="bold">Update DSpace</emphasis>. Update the DSpace installed directory with the new code and libraries. Issue the following commands:</para>
 				<screen>cd [dspace-source]/dspace/target/dspace-[version]-build.dir
 ant -Dconfig=[dspace]/config/dspace.cfg update</screen>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Run Registry Format Update for CC License.</emphasis></para>
+				<para>Creative Commons licenses have been assigned the wrong mime-type in past versions of DSpace. Even if you are not currently using CC Licenses, you should update your Bitstream Format Registry to include a new entry with the proper mime-type. To update your registry, run the following command:</para>
+				<para><literal>[dspace]/bin/dsrun org.dspace.administrator.RegistryLoader -b bitstream [dspace-source]/dspace/etc/upgrades/15-16/new-bitstream-formats.xml</literal></para>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Update the Database.</emphasis></para>
+				<para>If you are using Creative Commons Licenses in your DSpace submission process, you will need to run the 1.5.x to 1.6.x database upgrade script again. In 1.6.0 the improper mime-type was being assigned to all CC Licenses. This has now been resolved, and rerunning the upgrade script will now assign the proper mime-type to all existing CC Licenses in your DSpace installation. NOTE: You will receive messages that most of the script additions already exist. This is normal, and nothing to be worried about. </para>
+				<itemizedlist>
+					<listitem>
+						<para>For PostgreSQL:</para>
+						<para><literal>psql -U [dspace-user] -f [dspace-source]/dspace/etc/postgres/database_schema_15_16.sql [database name]</literal> (Your database name is by default &apos;dspace&apos;). Example:</para>
+						<para><emphasis><literal>psql -U dspace -f /dspace-1.6-1-src-release/dspace/etc/postgres/database_schema_15_16.sql dspace</literal></emphasis></para>
+					</listitem>
+					<listitem>
+						<para>For Oracle:</para>
+						<para>Execute the upgrade script, e.g. with sqlplus, recording the output:</para>
+						<orderedlist>
+							<listitem>
+								<para>Start SQL*Plus with &quot;<literal>sqlplus [connect args]</literal>&quot;</para>
+							</listitem>
+							<listitem>
+								<para>Record the output:</para>
+								<para><literal>SQL> spool &apos;upgrade.lst&apos;</literal></para>
+							</listitem>
+							<listitem>
+								<para>Run the upgrade script</para>
+								<para><literal>SQL> @[dspace-source]/dspace/etc/oracle/database_schema_15_16.sql</literal></para>
+								<para><literal>SQL> spool off</literal></para>
+							</listitem>
+							<listitem>
+								<para>Please note: The final few statements WILL FAIL. That is because you have run some queries and use the results to construct the statements to remove the constraints, manually&mdash;Oracle doesn't have any easy way to automate this (unless you know PL/SQL). So, look for the comment line beginning:</para>
+								<screen>&quot;--You need to remove the already in place constraints&quot;
+and follow the instructions in the actual SQL file.
+Refer to the contents of the spool file &quot;upgrade.lst&quot; for
+the output of the queries you'll need.</screen>
+							</listitem>
+						</orderedlist>
+					</listitem>
+				</itemizedlist>
 			</listitem>
 			<listitem>
 				<para><emphasis role="bold">Generate Browse and Search Indexes</emphasis>. Though there are not any database changes in the 1.6 to 1.6.1 release, it makes good policy to rebuild your search and browse indexes when upgrading to a new release. To do this, run the following command from your DSpace install directory (as the dspace user):</para>
@@ -73,7 +114,7 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</screen>
 				<para><emphasis role="bold">Backup Your DSpace.</emphasis> First, and foremost, make a complete backup of your system, including:</para>
 				<itemizedlist>
 					<listitem>
-						<para>A snapshot of the database. <emphasis>To have a &quot;snapshot&quot; of the PostgreSQL database, you need to shut it down during the backup. You should also have your regular Postgresql Backup output (using pg_dump commands). </emphasis></para>
+						<para>A snapshot of the database. <emphasis>To have a &quot;snapshot&quot; of the PostgreSQL database, you need to shut it down during the backup. You should also have your regular PostgreSQL Backup output (using pg_dump commands). </emphasis></para>
 					</listitem>
 					<listitem>
 						<para>The asset store (<literal>[dspace]/assetstore</literal> by default)</para>
@@ -84,7 +125,7 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</screen>
 				</itemizedlist>
 			</listitem>
 			<listitem>
-				<para><emphasis role="bold">Download DSpace 1.6.</emphasis> Retrieve the new DSpace 1.6 source code either as a download from <ulink url="http://www.dspace.org/current-release/latest-release/">SourceForge</ulink> or check it out directly from the <ulink url="http://scm.dspace.org/svn/repo/dspace/trunk">SVN code repository</ulink>. If you downloaded DSpace do not unpack it on top of your existing installation.</para>
+				<para><emphasis role="bold">Download DSpace 1.6.x</emphasis> Retrieve the new DSpace 1.6.x source code either as a download from <ulink url="http://www.dspace.org/current-release/latest-release/">SourceForge</ulink> or check it out directly from the <ulink url="http://scm.dspace.org/svn/repo/dspace/trunk">SVN code repository</ulink>. If you downloaded DSpace do not unpack it on top of your existing installation.</para>
 				<para>Refer to Chapter 3.3.3 Installation, Step 3 for unpacking directives.</para>
 			</listitem>
 			<listitem>
@@ -93,7 +134,7 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</screen>
 			<listitem>
 				<para><emphasis role="bold">Apply any customizations</emphasis>. If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. These are housed in one of the following places:</para>
 				<para>JSPUI modifications: <literal>[dspace-source]/dspace/modules/jspui/src/main/webapp/</literal></para>
-				<para>XMLUI modificaitons: <literal>[dspace-source]/dspace/modules/xmlui/src/main/webbapp</literal></para>
+				<para>XMLUI modifications: <literal>[dspace-source]/dspace/modules/xmlui/src/main/webbapp</literal></para>
 			</listitem>
 			<listitem>
 				<para><emphasis role="bold">Update Configuration Files</emphasis>. Some of the parameters have change and some are new. Changes will be noted below:</para>
@@ -118,7 +159,7 @@ dspace.oai.url = ${dspace.baseUrl}/oai</screen>
 					<listitem>
 						<para><emphasis role="bold">**NEW**</emphasis> New email options (Add these at the end of the &quot;Email Settings&quot; sub-section):</para>
 						<screen># A comma separated list of hostnames that are allowed to refer browsers to
-# email forms. Default behaviour is to accept referrals only from
+# email forms. Default behavior is to accept referrals only from
 # dspace.hostname
 #mail.allowed.referrers = localhost
 
@@ -187,7 +228,7 @@ dspace.oai.url = ${dspace.baseUrl}/oai</screen>
 #core.authorization.item-admin.cc-license = true</screen>
 					</listitem>
 					<listitem>
-						<para><emphasis role="bold">**CHANGE**</emphasis> METS ingester has been revised. (Modify In &quot;<literal>Crosswalk and Pacakger Plugin Settings</literal>&quot;)</para>
+						<para><emphasis role="bold">**CHANGE**</emphasis> METS ingester has been revised. (Modify In &quot;<literal>Crosswalk and Packager Plugin Settings</literal>&quot;)</para>
 						<screen># Option to make use of collection templates when using the METS ingester (default is false)
 mets.submission.useCollectionTemplate = false
 
@@ -254,7 +295,7 @@ plugin.single.org.dspace.embargo.EmbargoLifter = \
 # The delimiter used to separate values within a single field (defaults to a double pipe ||)
 # bulkedit.valueseparator = ||
 
-# The delimiter used to serarate fields (defaults to a comma for CSV)
+# The delimiter used to separate fields (defaults to a comma for CSV)
 # bulkedit.fieldseparator = ,
 
 # A hard limit of the number of items allowed to be edited in one go in the UI
@@ -387,7 +428,7 @@ webui.feed.localresolve = false
 webui.feed.item.title = dc.title
 webui.feed.item.date = dc.date.issued
 
-# Customise the metadata fields to show in the feed for each item's description.
+# Customize the metadata fields to show in the feed for each item's description.
 # Elements will be displayed in the order that they are specified here.
 #
 # The form is &lt;schema prefix&gt;.&lt;element&gt;[.&lt;qualifier&gt;|.*][(date)], ...
@@ -479,7 +520,7 @@ sword.accepts = application/zip
 
 ### Harvester settings
 
-# Crosswalk settings; the {name} value must correspond to a declated ingestion crosswalk
+# Crosswalk settings; the {name} value must correspond to a declared ingestion crosswalk
 # harvester.oai.metadataformats.{name} = {namespace},{optional display name}
 harvester.oai.metadataformats.dc = http://www.openarchives.org/OAI/2.0/oai_dc/, Simple Dublin Core
 harvester.oai.metadataformats.qdc = http://purl.org/dc/terms/, Qualified Dublin Core
@@ -500,7 +541,7 @@ harvester.autoStart=false
 #harvester.timePadding = 120
 
 # How frequently the harvest scheduler checks the remote provider for updates,
-# messured in minutes. The default vaule is 12 hours (or 720 minutes)
+# measured in minutes. The default value is 12 hours (or 720 minutes)
 #harvester.harvestFrequency = 720
 
 # The heartbeat is the frequency at which the harvest scheduler queries the local 
@@ -515,7 +556,7 @@ harvester.autoStart=false
 # How many harvest process threads the scheduler can spool up at once. Default value is 3.
 #harvester.maxThreads = 3
 
-# How much time passess before a harvest thread is terminated. The termination process
+# How much time passes before a harvest thread is terminated. The termination process
 # waits for the current item to complete ingest and saves progress made up to that point.
 # Measured in hours. Default value is 24.
 #harvester.threadTimeout = 24
@@ -550,7 +591,7 @@ harvester.unknownSchema = fail
 					</listitem>
 					<listitem>
 						<para><emphasis role="bold">**NEW**</emphasis> SOLR Statistics Configurations.</para>
-						<para>For a little more detailed information regarding the configuration, please refer to Section 5.2.49 <link linkend="docbook-configure.html-statistics">DSpace SOLR Statistics Configuration</link> ; or, for installation procedures, refer to <link linkend="docbook-install.html-statistics"> Section 3.4.6 Dspace Statistcs</link>.</para>
+						<para>For a little more detailed information regarding the configuration, please refer to Section 5.2.49 <link linkend="docbook-configure.html-statistics">DSpace SOLR Statistics Configuration</link> ; or, for installation procedures, refer to <link linkend="docbook-install.html-statistics"> Section 3.4.6 Dspace Statistics</link>.</para>
 						<screen>
 #---------------------------------------------------------------#
 #--------------SOLR STATISTICS CONFIGURATIONS-------------------#
@@ -581,8 +622,13 @@ statistics.item.authorization.admin=true</screen>
 mvn -U clean package</screen>
 				<para>You will find the result in <literal>[dspace-source]/dspace/target/dspace-[version]-build.dir</literal> . Inside this directory is the compiled binary distribution of DSpace.</para>
 				<note>
-					<para>Before rebuilding DSpace, the above command will clean out any previously compiled code (&apos;clean&apos;) and ensure that your local DSpace JAR files are updated from the remote maven respository.</para>
+					<para>Before rebuilding DSpace, the above command will clean out any previously compiled code (&apos;clean&apos;) and ensure that your local DSpace JAR files are updated from the remote maven repository.</para>
 				</note>
+			</listitem>
+			<listitem>
+				<para><emphasis role="bold">Update Registry for the CC License.</emphasis></para>
+				<para>If you use the CC License, an incorrect mime-type type is being assigned. You will need to run the following step:</para>
+				<para><literal>[dspace]/bin/dsrun org.dspace.administrator.RegistryLoader -b bitstream [dspace-source]/dspace/etc/upgrades/15-16/new-bitstream-formats.xml</literal></para>
 			</listitem>
 			<listitem>
 				<para><emphasis role="bold">Update the database</emphasis>. The database schema needs to be updated to accommodate changes to the database. SQL files contain the relevant updates are provided. Please note that if you have made any local customizations to the database schema, you should consult these updates and make sure they will work for you.</para>
@@ -590,7 +636,7 @@ mvn -U clean package</screen>
 					<listitem>
 						<para>For PostgreSQL:</para>
 						<para><literal>psql -U [dspace-user] -f [dspace-source]/dspace/etc/postgres/database_schema_15_16.sql [database name]</literal> (Your database name is by default &apos;dspace&apos;). Example:</para>
-						<para><emphasis><literal>psql -U dspace -f /dspace-1.6-rc1-src-release/dspace/etc/postgres/database_schema_15_16.sql dspace</literal></emphasis></para>
+						<para><emphasis><literal>psql -U dspace -f /dspace-1.6-1-src-release/dspace/etc/postgres/database_schema_15_16.sql dspace</literal></emphasis></para>
 					</listitem>
 					<listitem>
 						<para>For Oracle:</para>
@@ -600,7 +646,7 @@ mvn -U clean package</screen>
 								<para>Start SQL*Plus with &quot;<literal>sqlplus [connect args]</literal>&quot;</para>
 							</listitem>
 							<listitem>
-								<para>Record the ouput:</para>
+								<para>Record the output:</para>
 								<para><literal>SQL> spool &apos;upgrade.lst&apos;</literal></para>
 							</listitem>
 							<listitem>
@@ -609,7 +655,7 @@ mvn -U clean package</screen>
 								<para><literal>SQL> spool off</literal></para>
 							</listitem>
 							<listitem>
-								<para>Please note: The final few statements WILL FAIL. That is because you have run some queries and use the results to construct the statements to remove the constraints, manually&mdash;Oracle doesn't have any easy way to automate this (unless you know PL/SQL). So, look for the coment line beginning:</para>
+								<para>Please note: The final few statements WILL FAIL. That is because you have run some queries and use the results to construct the statements to remove the constraints, manually&mdash;Oracle doesn't have any easy way to automate this (unless you know PL/SQL). So, look for the comment line beginning:</para>
 								<screen>&quot;--You need to remove the already in place constraints&quot;
 and follow the instructions in the actual SQL file.
 Refer to the contents of the spool file &quot;upgrade.lst&quot; for
@@ -636,7 +682,7 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</screen>
 				<para><emphasis role="bold">Restart servlet.</emphasis> Now restart your Tomcat/Jetty/Resin server program and test out the upgrade.</para>
 			</listitem>
 			<listitem>
-				<para><emphasis role="bold">Rolling Log Aappender Upgrade</emphasis>. You will want to upgrade your logs to the new format to use the SOLR Statistics now included with DSpace. While the commands for this are cound in Chapter 8, here is the steps needed to be performed.</para>
+				<para><emphasis role="bold">Rolling Log Appender Upgrade</emphasis>. You will want to upgrade your logs to the new format to use the SOLR Statistics now included with DSpace. While the commands for this are found in Chapter 8, here is the steps needed to be performed.</para>
 				<screen>[dspace]/bin/dspace stat-log-converter -i <emphasis>input file name</emphasis> -o <emphasis>output file name</emphasis> -m <emphasis>(if you have more than one</emphasis> dspace.log<emphasis> file)</emphasis>
 [dspace]/bin/dspace stat-log-importer -i <emphasis>input file name (probably the output name from above)</emphasis> -m 
 </screen>
@@ -850,7 +896,7 @@ authentication.shib.lastname-header = SHIB-EP-SURNAME
 # this option below forces the software to acquire the email from Tomcat.
 authentication.shib.email-use-tomcat-remote-user = true
 
-# should we allow new users to be registered automtically
+# should we allow new users to be registered automatically
 # if the IdP provides sufficient info (and user not exists in DSpace)
 authentication.shib.autoregister = true
 
@@ -1037,7 +1083,7 @@ sword.expose-items = false
 # Should the server offer as the default the list of all Communities
 # to a Service Document request.  If false, the server will offer
 # the list of all collections, which is the default and recommended
-# behaviour at this stage.
+# behavior at this stage.
 #
 # NOTE: a service document for Communities will not offer any viable
 # deposit targets, and the client will need to request the list of
@@ -1120,7 +1166,7 @@ http://purl.org/net/sword-types/METSDSpaceSIP \
 	</section>
 	<section remap="h2">
 		<title><anchor id="docbook-update.html-142_15" xreflabel="Updating From 1.4.2 to 1.5"/>Upgrading From 1.4.2 to 1.5</title>
-		<para>The changes in DSpace 1.5 are significant and wide spread involving database schema upgrades, code restructuring, completely new user and programatic interfaces, and new build system.</para>
+		<para>The changes in DSpace 1.5 are significant and wide spread involving database schema upgrades, code restructuring, completely new user and programmatic interfaces, and new build system.</para>
 		<para>In the notes below <literal>[dspace]</literal> refers to the install directory for your existing DSpace installation, and <literal>[dspace-source]</literal> to the source directory for DSpace 1.5. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</para>
 		<orderedlist>
 			<listitem>
@@ -1155,7 +1201,7 @@ http://purl.org/net/sword-types/METSDSpaceSIP \
 				<para><emphasis role="bold">Stop Tomcat</emphasis> Take down your servlet container, for Tomcat use the <literal>bin/shutdown.sh</literal> script.</para>
 			</listitem>
 			<listitem>
-				<para><emphasis role="bold">Update <literal>dspace.cfg</literal></emphasis> Serveral new parameters need to be added to your <literal>[dspace]/config/dspace.cfg</literal>. While it is advisable to start with a fresh <emphasis>DSpace 1.5 <literal>dspace.cfg</literal> configuration file</emphasis> here are the minimum set of parameters that need to be added to an old <emphasis>DSpace 1.4.2 configuration</emphasis>.</para>
+				<para><emphasis role="bold">Update <literal>dspace.cfg</literal></emphasis> Several new parameters need to be added to your <literal>[dspace]/config/dspace.cfg</literal>. While it is advisable to start with a fresh <emphasis>DSpace 1.5 <literal>dspace.cfg</literal> configuration file</emphasis> here are the minimum set of parameters that need to be added to an old <emphasis>DSpace 1.4.2 configuration</emphasis>.</para>
 				<screen>
 #### Stackable Authentication Methods #####
 #
@@ -1166,7 +1212,7 @@ http://purl.org/net/sword-types/METSDSpaceSIP \
 plugin.sequence.org.dspace.authenticate.AuthenticationMethod = \
         org.dspace.authenticate.PasswordAuthentication
 
-###### JSPUI item sytle plugin #####
+###### JSPUI item style plugin #####
 #
 # Specify which strategy use for select the style for an item
 plugin.single.org.dspace.app.webui.util.StyleSelection = \
@@ -1330,7 +1376,7 @@ cp [dspace-source]/dspace/config/registries/sword-metadata.xml
 				<screen>
     cp [dspace-source]/dspace/bin/stat* [dspace]/bin/
 </screen>
-				<para>Then edit your statistics configuration file with the start details. Add the follwing to <literal>[dspace]/conf/dstat.cfg</literal></para>
+				<para>Then edit your statistics configuration file with the start details. Add the following to <literal>[dspace]/conf/dstat.cfg</literal></para>
 				<para>
 					<literal># the year and month to start creating reports from</literal>
 				</para>
@@ -1350,7 +1396,7 @@ cp [dspace-source]/dspace/config/registries/sword-metadata.xml
 				<para><literal>dstat.cfg</literal> also used to contain the hostname and service name as displayed at the top of the statistics. These values are now taken from <literal>dspace.cfg</literal> so you can remove <literal>host.name</literal> and <literal>host.url</literal> from <literal>dstat.cfg</literal> if you wish. The values now used are <literal>dspace.hostname</literal> and <literal>dspace.name</literal> from <literal>dspace.cfg</literal></para>
 			</listitem>
 			<listitem>
-				<para><emphasis role="bold">Deploy webapplications</emphasis> Copy the webapplications files from your [dspace]/webapps directory to the subdirectory of your servlet container (e.g. Tomcat):</para>
+				<para><emphasis role="bold">Deploy web applications</emphasis> Copy the web applications files from your [dspace]/webapps directory to the subdirectory of your servlet container (e.g. Tomcat):</para>
 				<screen>
 cp [dspace]/webapps/* [tomcat]/webapps/
 </screen>
@@ -1551,7 +1597,7 @@ checker.retention.CHECKSUM_MATCH=8w
 </screen>
 					</listitem>
 					<listitem>
-						<para> If you have customised advanced search fields (<literal>search.index.n</literal> fields, note that you now need to include the schema in the values. Dublin Core is specifed as <literal>dc</literal>. So for example, if in 1.3.2 you had:</para>
+						<para> If you have customized advanced search fields (<literal>search.index.n</literal> fields, note that you now need to include the schema in the values. Dublin Core is specified as <literal>dc</literal>. So for example, if in 1.3.2 you had:</para>
 						<screen>
 search.index.1 = title:title.alternative
 </screen>
@@ -1604,7 +1650,7 @@ ant -Dconfig=<emphasis> [dspace]</emphasis>/config/dspace.cfg update
 				</variablelist>
 			</listitem>
 			<listitem>
-				<para> Rebuild the search indices:</para>
+				<para> Rebuild the search indexes:</para>
 				<para>
 					<literal>[dspace]/bin/index-all</literal>
 				</para>
@@ -1724,10 +1770,10 @@ report.dir = /dspace/reports/
 				</para>
 			</listitem>
 			<listitem>
-				<para> Customise the stat generating statistics as per the instructions in <link linkend="docbook-configure.html-statistics">System Statistical Reports</link></para>
+				<para> Customize the stat generating statistics as per the instructions in <link linkend="docbook-configure.html-statistics">System Statistical Reports</link></para>
 			</listitem>
 			<listitem>
-				<para> Initialise the statistics using:</para>
+				<para> Initialize the statistics using:</para>
 				<para>
 					<literal>[dspace]/bin/stat-initial</literal>
 				</para>
@@ -1742,7 +1788,7 @@ report.dir = /dspace/reports/
 				</para>
 			</listitem>
 			<listitem>
-				<para> Rebuild the search indices:</para>
+				<para> Rebuild the search indexes:</para>
 				<para>
 					<literal>[dspace]/bin/index-all</literal>
 				</para>
@@ -1807,7 +1853,7 @@ cp <emphasis> [dspace-1.2.2-source]</emphasis>/build/*.war <emphasis>
 				<para>If you&apos;re using Tomcat, you need to delete the directories corresponding to the old <literal>.war</literal> files. For example, if <literal>dspace.war</literal> is installed in <literal>[tomcat]/webapps/dspace.war</literal>, you should delete the <literal>[tomcat]/webapps/dspace</literal> directory. Otherwise, Tomcat will continue to use the old code in that directory.</para>
 			</listitem>
 			<listitem>
-				<para> To finialise the install of the new configurable submission forms you need to copy the file <literal>[dspace-1.2.2-source]/config/input-forms.xml</literal> into <literal>[dspace]/config</literal>.</para>
+				<para> To finalize the install of the new configurable submission forms you need to copy the file <literal>[dspace-1.2.2-source]/config/input-forms.xml</literal> into <literal>[dspace]/config</literal>.</para>
 			</listitem>
 			<listitem>
 				<para> Restart Tomcat.</para>
@@ -2001,7 +2047,7 @@ psql -f etc/database_schema_11-12.sql [DSpace database name] -h
 </screen>
 			</listitem>
 			<listitem>
-				<para> Then rebuild the search indices:</para>
+				<para> Then rebuild the search indexes:</para>
 				<screen>
 <emphasis> [dspace]</emphasis>/bin/index-all
 </screen>
@@ -2034,7 +2080,7 @@ cp <emphasis> [dspace-1.2-source]</emphasis>/build/*.war <emphasis>
 			</listitem>
 			<listitem>
 				<para>
-					<emphasis role="bold">Note 2:</emphasis> After consulation with the OAI community, various OAI-PMH changes have occurred:</para>
+					<emphasis role="bold">Note 2:</emphasis> After consultation with the OAI community, various OAI-PMH changes have occurred:</para>
 				<itemizedlist>
 					<listitem>
 						<para> The OAI-PMH identifiers have changed (they&apos;re now of the form <literal>oai:hostname:handle</literal> as opposed to just Handles)</para>
@@ -2109,10 +2155,10 @@ admin/eperson-edit.jsp
 				<para> Take down Tomcat (or whichever servlet container you&apos;re using).</para>
 			</listitem>
 			<listitem>
-				<para> We recommend that you upgrage to the latest version of PostgreSQL (7.3.2). Included are some <ulink url="postgres-upgrade-notes.txt">notes to help you do this</ulink>. Note you will also have to upgrade Ant to version 1.5 if you do this.</para>
+				<para> We recommend that you upgrade to the latest version of PostgreSQL (7.3.2). Included are some <ulink url="postgres-upgrade-notes.txt">notes to help you do this</ulink>. Note you will also have to upgrade Ant to version 1.5 if you do this.</para>
 			</listitem>
 			<listitem>
-				<para> Make the necessary changes to the DSpace database. These include a couple of minor schema changes, and some new indices which should improve performance. Also, the names of a couple of database views have been changed since the old names were so long they were causing problems. First run <literal>psql</literal> to access your database (e.g. <literal>psql -U dspace -W</literal> and then enter the password), and enter these SQL commands:</para>
+				<para> Make the necessary changes to the DSpace database. These include a couple of minor schema changes, and some new indexes which should improve performance. Also, the names of a couple of database views have been changed since the old names were so long they were causing problems. First run <literal>psql</literal> to access your database (e.g. <literal>psql -U dspace -W</literal> and then enter the password), and enter these SQL commands:</para>
 				<screen>
 ALTER TABLE bitstream ADD store_number INTEGER;
 UPDATE bitstream SET store_number = 0;
@@ -2122,7 +2168,7 @@ CREATE INDEX last_modified_idx ON Item(last_modified);
 
 CREATE INDEX eperson_email_idx ON EPerson(email);
 CREATE INDEX item2bundle_item_idx on Item2Bundle(item_id);
-REATE INDEX bundle2bitstream_bundle_idx ON
+CREATE INDEX bundle2bitstream_bundle_idx ON
 	Bundle2Bitstream(bundle_id);
 CREATE INDEX dcvalue_item_idx on DCValue(item_id);
 CREATE INDEX collection2item_collection_idx ON
@@ -2189,7 +2235,7 @@ Run <emphasis> [dspace]</emphasis>/bin/dsrun
 </screen>
 			</listitem>
 			<listitem>
-				<para> Run the collection default authorisation policy tool:</para>
+				<para> Run the collection default authorization policy tool:</para>
 				<screen>
 <emphasis> [dspace]</emphasis>/bin/dsrun
 	org.dspace.authorize.FixDefaultPolicies
