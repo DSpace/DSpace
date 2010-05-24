@@ -24,8 +24,10 @@ import org.dspace.kernel.mixins.OrderedService;
 
 /**
  * This class stores a list of providers in a specific order 
- * (determined by insertion order and the {@link OrderedService} settings) <br/>
- * Should be thread safe
+ * (determined by insertion order and the {@link OrderedService} 
+ * settings).
+ * <p>
+ * Should be thread safe.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -34,16 +36,19 @@ public class ProviderStack<T> {
     protected final Vector<ProviderHolder<T>> providers;
 
     /**
-     * Default empty constructor <br/>
-     * This is mostly only useful if you are planning to add new providers later,
-     * you should probably use the other contructors
+     * Default empty constructor.
+     * <p>
+     * This is mostly only useful if you are planning to add new 
+     * providers later.  You should probably use the other contructors.
      */
     public ProviderStack() {
         providers = new Vector<ProviderHolder<T>>();
     }
 
     /**
-     * Construct a provider holder with all currently known providers of the given type
+     * Construct a provider holder with all currently known providers of 
+     * the given type.
+     *
      * @param serviceManager the system service manager
      * @param providerType the interface type of the providers we care about
      */
@@ -64,8 +69,10 @@ public class ProviderStack<T> {
     }
 
     /**
-     * Construct a provider holder with a given set of providers,
-     * this will maintain the current order as long as it does not violate the rules for {@link OrderedService}s
+     * Construct a provider holder with a given set of providers.
+     * This will maintain the current order as long as it does not
+     * violate the rules for {@link OrderedService}s.
+     *
      * @param currentProviders the current set of providers to register in this stack
      */
     public ProviderStack(T[] currentProviders) {
@@ -101,8 +108,9 @@ public class ProviderStack<T> {
     }
 
     /**
-     * Add a provider to the stack of providers, 
-     * this will be placed at the bottom if the order is less than or equal to 0 or this provider is not ordered
+     * Add a provider to the stack of providers.
+     * This will be placed at the bottom if the order is less than or
+     * equal to 0 or this provider is not ordered.
      * 
      * @param provider the provider to add to the stack
      * @return the position in the stack that this provider was added
@@ -130,7 +138,8 @@ public class ProviderStack<T> {
     }
 
     /**
-     * Remove a provider based on the position in the stack (starting at 0 and ending at size-1)
+     * Remove a provider based on the position in the stack (starting at 
+     * 0 and ending at size-1).
      * @param position the position to remove the provider from
      * @return true if the provider position was found and removed OR false if not found
      */
@@ -147,7 +156,7 @@ public class ProviderStack<T> {
     }
 
     /**
-     * Remove a provider by the object equality
+     * Remove a provider by the object equality.
      * @param provider the provider to remove from the stack
      * @return true if the provider was found and removed OR false if not found
      */
@@ -173,8 +182,10 @@ public class ProviderStack<T> {
     }
 
     /**
-     * Get the list of all providers currently in the stack <br/>
-     * WARNING: this should not be held onto and should be only used for iteration and then discarded
+     * Get the list of all providers currently in the stack.
+     * <p>
+     * WARNING: this should not be held onto; it should be only used for
+     * iteration and then discarded.
      * @return a read-only list of all providers in the stack in the correct order, highest priority first
      */
     public List<T> getProviders() {
@@ -183,7 +194,7 @@ public class ProviderStack<T> {
     }
 
     /**
-     * This allows access to the provider holders
+     * This allows access to the provider holders.
      * @return a read only list of the provider holders in the correct order
      */
     public List<ProviderHolder<T>> getProviderHolders() {
@@ -191,13 +202,17 @@ public class ProviderStack<T> {
     }
 
     /**
-     * Get the iterator of all providers currently in the stack <br/>
+     * Get the iterator of all providers currently in the stack.
      * This will load up lazy so it can be held onto safely but should not be
-     * used more than once (i.e. only iterate over this completely once, stopping and continuing later is likely to produce failures)
-     * <br/>
-     * NOTE: This will attempt to iterate over all the valid providers in the stack but if the provider has been garbage collected
-     * during the iteration then a {@link NoSuchElementException} will be thrown if the provider was the last one in the
-     * stack and next() is called, you should probably handle the exception by assuming this indicates all items were iterated over
+     * used more than once (i.e. only iterate over this completely once:
+     * stopping and continuing later is likely to produce failures).
+     * <p>
+     * NOTE: This will attempt to iterate over all the valid providers 
+     * in the stack, but if the provider has been garbage collected
+     * during the iteration then a {@link NoSuchElementException} will 
+     * be thrown if the provider was the last one in the stack and 
+     * next() is called.  You should probably handle the exception by
+     * assuming this indicates all items were iterated over.
      * @return an iterator over all the providers in the stack in order of priority
      */
     public Iterator<T> getIterator() {
@@ -236,7 +251,9 @@ public class ProviderStack<T> {
     }
 
     /**
-     * Get a provider based on the position in the stack (starting at 0 and ending at size-1)
+     * Get a provider based on the position in the stack (starting at 0 
+     * and ending at size-1).
+     *
      * @param position the position to check for the provider
      * @return the provider from the position OR null if there is no provider at that position
      */
@@ -250,7 +267,9 @@ public class ProviderStack<T> {
     }
 
     /**
-     * Get the provider holder from the position in the stack if there is one
+     * Get the provider holder from the position in the stack if there 
+     * is one.
+     *
      * @param position the position to check for the provider
      * @return the holder from the position OR null if there is no provider at that position
      */
@@ -267,7 +286,9 @@ public class ProviderStack<T> {
     }
 
     /**
-     * Check the number of current providers which are available in this stack
+     * Check the number of current providers which are available in this 
+     * stack.
+     *
      * @return the total number of viable providers
      */
     public int size() {
@@ -276,14 +297,15 @@ public class ProviderStack<T> {
     }
 
     /**
-     * Delete all providers from the current provider stack
+     * Delete all providers from the current provider stack.
      */
     public void clear() {
         providers.clear();
     }
 
     /**
-     * Check to make sure all providers are refreshed and any that are no longer valid are flushed out of the list
+     * Check to make sure all providers are refreshed and any that are 
+     * no longer valid are flushed out of the list.
      */
     protected List<T> refresh() {
         ArrayList<T> l = new ArrayList<T>();

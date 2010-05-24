@@ -15,6 +15,8 @@ import org.dspace.services.model.Event;
 import org.dspace.services.model.EventListener;
 
 /**
+ * A sample EventListener which writes a string form of each received 
+ * Event to the DSpace log.
  * 
  * @author Mark Diggory (mdiggory at atmire.com)
  * @version $Revision$
@@ -25,10 +27,12 @@ public class EventListenerExample implements EventListener{
     private static Logger log = Logger
             .getLogger(EventListenerExample.class);
 
+	/** @return null */
 	public String[] getEventNamePrefixes() {
 		return null;
 	}
 
+	/** @return null */
 	public String getResourcePrefix() {
 		return null;
 	}

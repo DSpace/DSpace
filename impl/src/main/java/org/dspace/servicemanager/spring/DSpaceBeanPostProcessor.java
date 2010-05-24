@@ -18,8 +18,8 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
 
 /**
- * This processes beans as they are loaded into the system by spring,
- * allows us to handle the init method and also push config options
+ * This processes beans as they are loaded into the system by spring.
+ * Allows us to handle the init method and also push config options.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */

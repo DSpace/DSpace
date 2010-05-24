@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Service;
 
 /**
- * Example impl of the example service
+ * Example implementation of the example service.  Spring annotations 
+ * will require the injection of a ConcreteExample instance, whose name 
+ * will be returned by {@link #getOtherName}.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */

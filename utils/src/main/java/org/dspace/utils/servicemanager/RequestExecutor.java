@@ -17,10 +17,13 @@ import org.dspace.services.model.RequestInterceptor;
 
 
 /**
- * This will execute a request and ensure that it closes even if the thing that is being
- * executed (run) dies, it will appropriately end the request based on the result of the
- * execution and can start a new request or tie into an existing request if there is one <br/>
- * This is also a Runnable so it can be used as a wrapper which allows something to be executed inside a request
+ * This will execute a request and ensure that it closes even if the 
+ * thing that is being executed (run) dies.  It will appropriately end 
+ * the request based on the result of the execution and can start a new 
+ * request or tie into an existing request if there is one.
+ * <p>
+ * This is also a Runnable so it can be used as a wrapper which allows 
+ * something to be executed inside a request.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -31,10 +34,11 @@ public class RequestExecutor implements Runnable {
     private final boolean useExistingRequestIfPossible;
 
     /**
-     * Create an executor which can be used to execute the runnable within a request
-     * by calling the execute method <br/>
-     * This will create a new request to execute the code in when the execute method is called
-     * All params are required
+     * Create an executor which can be used to execute the runnable 
+     * within a request by calling the execute method.
+     * This will create a new request to execute the code in when the 
+     * execute method is called.
+     * All parameters are required.
      * 
      * @param requestService the request service
      * @param toExecute the code to execute
@@ -45,9 +49,9 @@ public class RequestExecutor implements Runnable {
     }
 
     /**
-     * Create an executor which can be used to execute the runnable within a request
-     * by calling the execute method <br/>
-     * All params are required
+     * Create an executor which can be used to execute the runnable 
+     * within a request by calling the execute method.
+     * All parameters are required.
      * 
      * @param requestService the request service
      * @param toExecute the code to execute
@@ -66,7 +70,7 @@ public class RequestExecutor implements Runnable {
 
     /**
      * Execute the {@link Runnable} which is contained in this object,
-     * the same as calling {@link #run()}
+     * the same as calling {@link #run()}.
      * @throws RequestInterceptor.RequestInterruptionException if the method fails
      */
     public void execute() {

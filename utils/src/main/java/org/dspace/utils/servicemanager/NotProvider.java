@@ -13,11 +13,12 @@ package org.dspace.utils.servicemanager;
 
 /**
  * This is a special marker interface which is used to indicate that this
- * service is not a provider and thus should not be included in the provider stacks
- * which are being setup and stored, any service which implements this interface
- * will not be able to be added to the provider stack, in some cases this results in
- * an exception but it mostly just results in the object being ignored and not placed
- * into the stack
+ * service is not a provider and thus should not be included in the 
+ * provider stacks which are being setup and stored.  Any service which 
+ * implements this interface will not be able to be added to the 
+ * provider stack.  In some cases this results in an exception but it
+ * mostly just results in the object being ignored and not placed into 
+ * the stack.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */

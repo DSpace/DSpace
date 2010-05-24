@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * A sample RequestInterceptor which simply logs request start and end 
+ * calls.
  * 
  * @author Mark Diggory (mdiggory at atmire.com)
  * @version $Revision$

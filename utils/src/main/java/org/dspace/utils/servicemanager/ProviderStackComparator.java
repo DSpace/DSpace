@@ -15,9 +15,9 @@ import java.io.Serializable;
 
 
 /**
- * A comparator for provider stacks, this is specially designed for sorting a list
- * of ProviderHolders so it will unpack them and then do the typical sorting on them
- * while properly handling the null cases
+ * A Comparator for provider stacks.  This is specially designed for
+ * sorting a list of ProviderHolders so it will unpack them and then do 
+ * the typical sorting on them while properly handling the null cases.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */

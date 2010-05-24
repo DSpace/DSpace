@@ -28,8 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This will allow us to put the configuration into beans as they are being created,
- * it also handles activator classes from the configuration
+ * This will allow us to put the configuration into beans as they are 
+ * being created.  It also handles activator classes from the 
+ * configuration.
  *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */

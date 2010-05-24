@@ -12,7 +12,8 @@ package org.dspace.utils.servicemanager;
 
 
 /**
- * This exception indicates that the provider was not found (the reference was collected)
+ * This exception indicates that the provider was not found (the 
+ * reference was collected).
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */

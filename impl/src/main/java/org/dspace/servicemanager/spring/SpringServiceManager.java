@@ -31,7 +31,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- * This is the Spring implementation of the service manager
+ * This is the Spring implementation of the service manager.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -64,7 +64,8 @@ public class SpringServiceManager implements ServiceManagerSystem {
     private String[] configPaths = null;
     /**
      * For TESTING:
-     * Allows adding extra spring config paths
+     * Allows adding extra spring config paths.
+     *
      * @param testMode if true then do not load the core beans
      * @param configPaths additional spring config paths within this classloader
      */
@@ -86,8 +87,9 @@ public class SpringServiceManager implements ServiceManagerSystem {
     public static final String corePath = "classpath*:spring/spring-dspace-core-services.xml";
 
     /**
-     * Spring does not actually allow us to add in new singletons which have bean definitions so we
-     * have to track the added singleton names ourselves manually
+     * Spring does not actually allow us to add in new singletons which 
+     * have bean definitions so we have to track the added singleton 
+     * names ourselves manually.
      */
     private Vector<String> singletonNames = new Vector<String>();
 
@@ -230,7 +232,9 @@ public class SpringServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * This handles the common part of the 2 types of service registrations
+     * This handles the common part of the 2 types of service 
+     * registrations.
+     *
      * @param name
      * @param service
      */

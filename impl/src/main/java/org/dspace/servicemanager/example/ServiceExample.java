@@ -12,7 +12,7 @@ package org.dspace.servicemanager.example;
 
 
 /**
- * Sample service
+ * Sample service.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */

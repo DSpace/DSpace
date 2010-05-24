@@ -18,9 +18,10 @@ import org.dspace.kernel.mixins.OrderedService;
 
 /**
  * A comparator for provider beans, filters, and plugins which will
- * take ordering into account if {@link OrderedService} is implemented,
- * small numbers are ordered first in priority (i.e. are before large ones),
- * NOTE that 0 means "not a priority" so it gets placed at the end
+ * take ordering into account if {@link OrderedService} is implemented.
+ * Small numbers are ordered first in priority (i.e. are before large
+ * ones).  NOTE that 0 means "not a priority" so it gets placed at the 
+ * end.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */

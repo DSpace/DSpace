@@ -25,9 +25,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Takes a list of paths to resources and turns them into different things (file/IS/resource),
- * this also allows us to look on a relative or absolute path and will automatically
- * check the typical places one might expect to put dspace config files<br/>
+ * Takes a list of paths to resources and turns them into different 
+ * things (file/IS/resource).
+ * This also allows us to look on a relative or absolute path and will
+ * automatically check the typical places one might expect to put DSpace
+ * config files.
  * 
  * @author Aaron Zeckoski (aaron@caret.cam.ac.uk)
  */
@@ -96,7 +98,9 @@ public class ResourceFinder {
     }
 
     /**
-     * Resolves a list of paths into resources relative to environmental defaults or relative paths or the classloader
+     * Resolves a list of paths into resources relative to environmental 
+     * defaults or relative paths or the classloader.
+     *
      * @param paths a list of paths to resources (org/sakaiproject/mystuff/Thing.xml)
      * @return an array of Spring Resource objects
      */
@@ -133,7 +137,9 @@ public class ResourceFinder {
     }
 
     /**
-     * Resolve a path into a resource relative to environmental defaults or relative paths or the classloader
+     * Resolve a path into a resource relative to environmental defaults 
+     * or relative paths or the classloader.
+     *
      * @param path a path to a resource (org/dspace/mystuff/Thing.xml)
      * @return the Spring Resource object
      * @throws IllegalArgumentException if no resource can be found
@@ -147,7 +153,8 @@ public class ResourceFinder {
     }
 
     /**
-     * Attempt to resolve multiple paths in order until one is found
+     * Attempt to resolve multiple paths in order until one is found.
+     *
      * @param paths an array of paths to a resource (org/dspace/mystuff/Thing.xml)
      * @return the Spring Resource object
      * @throws IllegalArgumentException if no resource can be found
@@ -225,6 +232,8 @@ public class ResourceFinder {
     }
 
     /**
+     * If running in Tomcat, get its home directory.
+     *
      * @return the container home if one can be found
      */
     public static String getContainerHome() {

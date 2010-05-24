@@ -11,8 +11,9 @@
 package org.dspace.servicemanager.example;
 
 /**
- * Example of a concrete example to fire up as a service,
- * this is fired up using XML in the case of spring (though it does not have to be)
+ * Example of a concrete example to fire up as a service.
+ * This is fired up using XML in the case of Spring (though it does not
+ * have to be).
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
