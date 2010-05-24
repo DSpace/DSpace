@@ -28,9 +28,10 @@ import javax.servlet.http.HttpSessionContext;
 import org.dspace.services.model.Session;
 
 /**
- * Represents a users session (login session) in the system, can hold some additional attributes as
- * needed but the underlying implementation may limit the number and size of attributes to ensure
- * session replication is not impacted negatively
+ * Represents a users session (login session) in the system.  Can hold 
+ * some additional attributes as needed, but the underlying
+ * implementation may limit the number and size of attributes to ensure
+ * that session replication is not impacted negatively.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -46,12 +47,13 @@ public class SessionImpl implements Session {
     public static final String HOST_NAME = "originatingHostName";
 
     /**
-     * this is the only thing that is actually replicated across the cluster
+     * This is the only thing that is actually replicated across the cluster.
      */
     private transient HttpSession httpSession;
 
     /**
-     * Make a session that is associated with the current http request
+     * Make a session that is associated with the current HTTP request.
+     *
      * @param request
      */
     public SessionImpl(HttpServletRequest request) {
@@ -64,7 +66,7 @@ public class SessionImpl implements Session {
     }
 
     /**
-     * Make a session which is not associated with the current http request
+     * Make a session which is not associated with the current HTTP request.
      */
     public SessionImpl() {
         // creates a new internal http session that is not cached anywhere
@@ -81,7 +83,7 @@ public class SessionImpl implements Session {
     }
 
     /**
-     * Set the sessionId, normally this should not probably happen much
+     * Set the sessionId.  Normally this should not probably happen much.
      * @param sessionId
      */
     public void setSessionId(String sessionId) {
@@ -95,8 +97,10 @@ public class SessionImpl implements Session {
     }
 
     /**
-     * Set the userId and userEid, this should only happen when re-binding the session
-     * or clearing the associated user, if userId is null then user is cleared
+     * Set the userId and userEid.  This should only happen when
+     * re-binding the session or clearing the associated user.
+     * If userId is null then user is cleared.
+     *
      * @param userId
      * @param userEid
      */
@@ -111,7 +115,8 @@ public class SessionImpl implements Session {
     }
 
     /**
-     * Set the DSpace serverId which originated this session
+     * Set the DSpace serverId which originated this session.
+     *
      * @param serverId the serverId
      */
     public void setServerId(String serverId) {
@@ -119,8 +124,12 @@ public class SessionImpl implements Session {
     }
 
     /**
-     * @return true if this session already has all the required values needed to complete it,
-     * this means the serverId and other values in the session are already set
+     * Are all required values set?  Notice that the sense of the test 
+     * is the complement of what the name of this method implies.
+     *
+     * @return true if this session already has all the required values
+     * needed to complete it.  This means the serverId and other values
+     * in the session are already set.
      */
     public boolean isIncomplete() {
         boolean complete = false;
@@ -160,10 +169,11 @@ public class SessionImpl implements Session {
     }
 
     /**
-     * Handles the general setting of things in the session,
-     * use this to build other set methods,
-     * handles checking the session is still valid and handles
-     * the checking for null values in the value and key
+     * Handles the general setting of things in the session.
+     * Use this to build other set methods.
+     * Handles checking the session is still valid, and
+     * the checking for null values in the value and key.
+     *
      * @param key the key to use
      * @param value the value to set
      * @return true if the value was set, false if cleared or failure
@@ -186,9 +196,10 @@ public class SessionImpl implements Session {
     }
 
     /**
-     * Handles the general getting of things from the session,
-     * use this to build other set methods,
-     * checks the session is still valid
+     * Handles the general getting of things from the session.
+     * Use this to build other set methods.
+     * Checks that the session is still valid.
+     *
      * @param key the key to use
      * @return the value OR null if not found
      * @throws IllegalArgumentException if the key is null
@@ -205,7 +216,8 @@ public class SessionImpl implements Session {
     }
 
     /**
-     * Handles removal of attributes and related checks
+     * Handles removal of attributes and related checks.
+     *
      * @param key the key to use
      * @throws IllegalArgumentException if the key is null
      */
@@ -290,8 +302,8 @@ public class SessionImpl implements Session {
     }
 
     /**
-     * @return a copy of the attributes in this session, 
-     * modifying it has no effect on the session attributes
+     * @return a copy of the attributes in this session.
+     * Modifying it has no effect on the session attributes.
      */
     @SuppressWarnings("unchecked")
     public Map<String, String> getAttributes() {
@@ -449,7 +461,8 @@ public class SessionImpl implements Session {
 
 
     /**
-     * Check if something is blank (null or "")
+     * Check if something is blank (null or "").
+     *
      * @param string
      * @return true if is blank
      */
@@ -458,7 +471,8 @@ public class SessionImpl implements Session {
     }
 
     /**
-     * Compares sessions by the last time they were accessed with more recent first
+     * Compares sessions by the last time they were accessed, with more 
+     * recent first.
      */
     public static class SessionLastAccessedComparator implements Comparator<Session>, Serializable {
         public final static long serialVersionUID = 1l;

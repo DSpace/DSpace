@@ -14,39 +14,43 @@ import org.dspace.services.CachingService;
 
 
 /**
- * Part of the {@link CachingService}<br/>
- * Encodes the configuration for a cache into an object
+ * Encodes the configuration for a cache into an object.
+ * <p>
+ * Part of the {@link CachingService}.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class CacheConfig {
 
     /**
-     * Controls the scope of each created cache
+     * Controls the scope of each created cache.
      */
     public enum CacheScope { 
         /**
-         * This cache is destroyed at the end of the current request for the current thread it was created in
+         * This cache is destroyed at the end of the current request for 
+         * the current thread it was created in.
          */
         REQUEST,
         /**
-         * This cache is destroyed when the current JVM shuts down
+         * This cache is destroyed when the current JVM shuts down.
          */
         INSTANCE,
         /**
-         * This cache is destroyed when the entire cluster goes down,
-         * the cache will invalidate the same entries in other caches when it changes
+         * This cache is destroyed when the entire cluster goes down.
+         * The cache will invalidate the same entries in other caches
+         * when it changes.
          */
         CLUSTERINVALIDATED,
         /**
-         * This cache is destroyed when the entire cluster goes down,
-         * the cache will copy an entry over to other caches when it changes or is created
+         * This cache is destroyed when the entire cluster goes down.
+         * The cache will copy an entry over to other caches when it
+         * changes or is created.
          */
         CLUSTERREPLICATED;
     };
 
     /**
-     * Defines the lifecycle of the cache
+     * Defines the lifecycle of the cache.
      * @see CacheScope
      */
     private CacheScope cacheScope;
@@ -57,7 +61,7 @@ public class CacheConfig {
         return cacheScope;
     }
     /**
-     * Configure the cache to use the given scope
+     * Configure the cache to use the given scope.
      * @param cacheScope defines the lifecycle of the cache
      */
     public CacheConfig(CacheScope cacheScope) {

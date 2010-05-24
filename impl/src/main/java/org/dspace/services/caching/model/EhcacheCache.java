@@ -24,7 +24,7 @@ import org.dspace.services.model.CacheConfig.CacheScope;
 
 
 /**
- * The ehcache implementation of the cache object
+ * The ehcache implementation of the Cache object.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -154,7 +154,7 @@ public class EhcacheCache implements Cache {
     }
 
     /**
-     * Retrieve a payload from the cache for this key if one can be found
+     * Retrieve a payload from the cache for this key if one can be found.
      * @param key the key for this cache element
      * @return the payload or null if none found
      */

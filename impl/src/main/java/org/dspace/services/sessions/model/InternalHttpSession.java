@@ -21,8 +21,8 @@ import javax.servlet.http.HttpSessionContext;
 
 
 /**
- * This is a special http session object that stands in for a real one when sessions are
- * not initiated or associated by http requests
+ * This is a special HTTP session object that stands in for a real one
+ * when sessions are not initiated or associated by HTTP requests.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */

@@ -20,8 +20,8 @@ import org.dspace.services.model.CacheConfig.CacheScope;
 
 
 /**
- * This is a simple cache that just uses a map to store the cache values,
- * used for the request and thread caches
+ * This is a simple Cache that just uses a map to store the cache values.
+ * Used for the request and thread caches.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */

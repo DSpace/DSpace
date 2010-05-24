@@ -48,7 +48,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * This is the core caching service which is available for anyone who is writing code for DSpace to use
+ * Implementation of the core caching service, which is available for
+ * anyone who is writing code for DSpace to use.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -57,22 +58,23 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
     private static Logger log = LoggerFactory.getLogger(CachingServiceImpl.class);
 
     /**
-     * This is the event key for a full cache reset
+     * This is the event key for a full cache reset.
      */
     protected static final String EVENT_RESET = "caching.reset";
     /**
-     * The default config location
+     * The default config location.
      */
     protected static final String DEFAULT_CONFIG = "org/dspace/services/caching/ehcache-config.xml";
 
     /**
-     * all the non-thread caches that we know about,
-     * mostly used for tracking purposes
+     * All the non-thread caches that we know about.
+     * Mostly used for tracking purposes.
      */
     private Map<String, EhcacheCache> cacheRecord = new ConcurrentHashMap<String, EhcacheCache>();
     /**
-     * All the request caches, this is bound to the thread,
-     * the initial value of this TL is set automatically when it is created
+     * All the request caches.  This is bound to the thread.
+     * The initial value of this TL is set automatically when it is
+     * created.
      */
     private ThreadLocal<Map<String, MapCache>> requestMap = new ThreadLocalMap();
     /**
@@ -83,7 +85,7 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
     }
 
     /**
-     * Unbinds all request caches, destroys the caches completely
+     * Unbinds all request caches.  Destroys the caches completely.
      */
     public void unbindRequestCaches() {
         // not sure if I really need to clear these first, it should be sufficient to just wipe the request map -AZ
@@ -107,7 +109,7 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
         this.serviceManager = serviceManager;
     }
 
-    /** The underlying cache manager; injected */
+    /** The underlying cache manager; injected. */
     protected net.sf.ehcache.CacheManager cacheManager;
     @Autowired
     @Required
@@ -125,7 +127,7 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
     public int timeToIdleSecs = 600;
 
     /**
-     * Reloads the config settings from the configuration service
+     * Reloads the config settings from the configuration service.
      */
     protected void reloadConfig() {
         useClustering = configurationService.getPropertyAsType(knownConfigNames[0], boolean.class);
@@ -161,7 +163,8 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
     }
 
     /**
-     * This will make it easier to handle a provider which might go away because the classloader is gone
+     * This will make it easier to handle a provider which might go away 
+     * because the classloader is gone.
      */
     private ProviderHolder<CacheProvider> provider = new ProviderHolder<CacheProvider>();
     public CacheProvider getCacheProvider() {
@@ -421,7 +424,7 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
     }
 
     /**
-     * Return all caches from the CacheManager
+     * Return all caches from the CacheManager.
      * 
      * @param sorted if true then sort by name
      * @return the list of all known ehcaches
@@ -441,14 +444,20 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
     }
 
     /**
-     * Create an EhcacheCache (and the associated EhCache) using the supplied name (with default settings) 
-     * or get the cache out of spring or the current configured cache <br/>
-     * This expects that the cacheRecord has already been checked and will not check it again <br/>
+     * Create an EhcacheCache (and the associated EhCache) using the 
+     * supplied name (with default settings), or get the cache out of
+     * Spring or the current configured cache.
+     * <p>
+     * This expects that the cacheRecord has already been checked and 
+     * will not check it again.
+     * <p>
      * Will proceed in this order:
-     * 1) Attempt to load a bean with the name of the cache
-     * 2) Attempt to load cache from caching system
-     * 3) Create a new cache by this name
-     * 4) Put the cache in the cache record
+     * <ol>
+     *  <li>Attempt to load a bean with the name of the cache</li>
+     *  <li>Attempt to load cache from caching system</li>
+     *  <li>Create a new cache by this name</li>
+     *  <li>Put the cache in the cache record</li>
+     * </ol>
      * 
      * @param cacheName the name of the cache
      * @param cacheConfig the config for this cache
@@ -491,9 +500,12 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
     }
 
     /**
-     * Create a thread map cache using the supplied name with supplied settings <br/>
-     * This expects that the cacheRecord has already been checked and will not check it again <br/>
-     * It also places the cache into the request map
+     * Create a thread map cache using the supplied name with supplied 
+     * settings.
+     * <p>
+     * This expects that the cacheRecord has already been checked and 
+     * will not check it again.  It also places the cache into the
+     * request map.
      * 
      * @param cacheName the name of the cache
      * @param cacheConfig the config for this cache
@@ -528,8 +540,9 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
     }
 
     /**
-     * Generate some stats for this cache,
-     * note that this is not cheap so do not use it very often
+     * Generate some stats for this cache.
+     * Note that this is not cheap so do not use it very often.
+     *
      * @param cache an Ehcache
      * @return the stats of this cache as a string
      */
@@ -553,6 +566,9 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
         return sb.toString();
     }
 
+    /**
+     * Compare two Cache objects by name.
+     */
     public static class NameComparator implements Comparator<Cache>, Serializable {
         public final static long serialVersionUID = 1l;
         public int compare(Cache o1, Cache o2) {

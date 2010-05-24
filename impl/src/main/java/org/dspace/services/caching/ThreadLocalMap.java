@@ -16,7 +16,7 @@ import java.util.Map;
 import org.dspace.services.caching.model.MapCache;
 
 /**
- * A simple threadlocal for holding maps of caches
+ * A simple ThreadLocal for holding maps of caches.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */

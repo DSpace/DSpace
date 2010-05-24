@@ -16,29 +16,30 @@ import org.dspace.services.model.EventListener;
 
 /**
  * Allows the creation of system events and registration of event listeners
- * for notification of system events <br/>
- * The service can be configured to log events or ignore certain events
+ * for notification of system events.
+ * The service can be configured to log events or ignore certain events.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public interface EventService {
 
     /**
-     * Fires an event immediately (does not add it to the queue)
+     * Fires an event immediately (does not add it to the queue).
      * 
      * @param event contains the data related to this event
      */
     public void fireEvent(Event event);
 
     /**
-     * Queues up an event to be fired at the end of a successful request/transaction
+     * Queues up an event to be fired at the end of a successful 
+     * request/transaction.
      * 
      * @param event contains the data related to this event
      */
     public void queueEvent(Event event);
 
     /**
-     * Register an event listener which will be notified when events occur
+     * Register an event listener which will be notified when events occur.
      * 
      * @param listener an implementation of the event listener
      */

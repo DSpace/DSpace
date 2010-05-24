@@ -15,27 +15,35 @@ import java.util.Properties;
 
 
 /**
- * This service handles retrieval of the configuration data for a DSpace instance <br/>
- * The config files are properties files which look like this for simple config values:
+ * This service handles retrieval of the configuration data for a DSpace 
+ * instance.
+ * <p>
+ * The configuration files are properties files which look like this for
+ * simple values:
  * <xmp>
  * thing.name = aaronz
  * thing.number = 1234
  * thing.on = true
  * thing.value = abc,def,ghi
  * </xmp>
- * For these simple cases the service will automatically translate the settings into strings, booleans, numbers and arrays as requested
- * in the various {@link #getPropertyAsType(String, Class)} methods <br/>
- * <br/>
- * There are special case config params allowed as well. <br/>
- * The first allows setting of a param on any DSpace service by the given name, 
- * this should be used sparingly and really only by system admins (not developers), 
- * developers should be using simple config values to expose service configurations:
+ * For these simple cases the service will automatically translate the 
+ * settings into strings, booleans, numbers and arrays as requested
+ * in the various {@link #getPropertyAsType(String, Class)} methods.
+ * <p>
+ * There are special case configuration parameters allowed as well.
+ * <p>
+ * The first allows setting of a parameter on any DSpace service by the 
+ * given name:
  * <xmp>
  * emailEnabled@org.dspace.Service = true
  * adminUser@org.dspace.impl.MyService = aaronz
  * </xmp>
- * 
- * The second allows controlling the implementation used for a service interface or provider:
+ * This should be used sparingly and really only by system admins (not 
+ * developers).  Developers should be using simple config values to 
+ * expose service configurations.
+ * <p>
+ * The second allows controlling the implementation used for a service 
+ * interface or provider:
  * <xmp>
  * $org.dspace.Service = org.dspace.impl.MyService
  * </xmp>
@@ -45,7 +53,8 @@ import java.util.Properties;
 public interface ConfigurationService {
 
     /**
-     * Get a configuration property (setting) from the system as a certain type
+     * Get a configuration property (setting) from the system as a 
+     * specified type.
      * 
      * @param <T>
      * @param name the property name
@@ -56,7 +65,8 @@ public interface ConfigurationService {
     public <T> T getPropertyAsType(String name, Class<T> type);
 
     /**
-     * Get a configuration property (setting) from the system and return the default value if none is found
+     * Get a configuration property (setting) from the system, or return
+     * a default value if none is found.
      * 
      * @param <T>
      * @param name the property name
@@ -67,14 +77,16 @@ public interface ConfigurationService {
     public <T> T getPropertyAsType(String name, T defaultValue);
 
     /**
-     * Get a configuration property (setting) from the system and return the default value if none is found
+     * Get a configuration property (setting) from the system, or return 
+     * (and possibly store) a default value if none is found.
      * 
      * @param <T>
      * @param name the property name
      * @param defaultValue the value to return if this name is not found
-     * @param setDefaultIfNotFound if this is true and the config value is not found then 
-     * the default value will be set in the configuration store assuming it is not null,
-     * otherwise the default value is just returned but not set
+     * @param setDefaultIfNotFound if this is true and the config value 
+     * is not found then the default value will be set in the 
+     * configuration store assuming it is not null.  Otherwise the
+     * default value is just returned but not set.
      * @return the property value OR null if none is found
      * @throws IllegalArgumentException if the defaultValue type does not match the type of the property by name
      */
@@ -88,7 +100,8 @@ public interface ConfigurationService {
     public Map<String, String> getAllProperties();
 
     /**
-     * Convenience method - get a configuration property (setting) from the system
+     * Convenience method - get a configuration property (setting) from 
+     * the system.
      * 
      * @param name the property name
      * @return the property value OR null if none is found
@@ -96,15 +109,17 @@ public interface ConfigurationService {
     public String getProperty(String name);
 
     /**
-     * Convenience method - get many configuration properties (setting) from the system
+     * Convenience method - get all configuration properties (settings)
+     * from the system.
      * 
      * @return all the configuration properties in a properties object (name -> value)
      */
     public Properties getProperties();
 
     /**
-     * Set a configuration property (setting) in the system,
-     * type is not important here since conversion happens automatically when properties are requested
+     * Set a configuration property (setting) in the system.
+     * Type is not important here since conversion happens automatically
+     * when properties are requested.
      * 
      * @param name the property name 
      * @param value the property value (set this to null to clear out the property)

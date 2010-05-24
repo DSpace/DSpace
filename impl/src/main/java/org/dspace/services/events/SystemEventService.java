@@ -35,9 +35,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * This is a placeholder until we get a real event service going,
- * it does pretty much everything the service should do EXCEPT sending the events
- * across a cluster
+ * This is a placeholder until we get a real event service going.
+ * It does pretty much everything the service should do EXCEPT sending
+ * the events across a cluster.
  * 
  * @author Aaron Zeckoski (azeckoski@gmail.com) - azeckoski - 4:02:31 PM Nov 19, 2008
  */
@@ -48,7 +48,7 @@ public class SystemEventService implements EventService, ShutdownService {
     private static final String QUEUE_CACHE_NAME = "eventQueueCache";
     
     /**
-     * map for holding onto the listeners which is ClassLoader safe
+     * Map for holding onto the listeners which is ClassLoader safe.
      */
     private ReferenceMap<String, EventListener> listenersMap = new ReferenceMap<String, EventListener>(ReferenceType.STRONG, ReferenceType.WEAK);
 
@@ -139,8 +139,9 @@ public class SystemEventService implements EventService, ShutdownService {
 
 
     /**
-     * Fires off a local event immediately,
-     * this is internal so the event should have already been validated
+     * Fires off a local event immediately.
+     * This is internal so the event should have already been validated.
+     *
      * @param event a valid event
      */
     private void fireLocalEvent(Event event) {
@@ -161,8 +162,8 @@ public class SystemEventService implements EventService, ShutdownService {
     }
 
     /**
-     * Will eventually fire events to the entire cluster
-     * TODO not implemented
+     * Will eventually fire events to the entire cluster.
+     * TODO not implemented.
      * 
      * @param event a validated event
      */
@@ -171,8 +172,8 @@ public class SystemEventService implements EventService, ShutdownService {
     }
 
     /**
-     * Will eventually fire events to external systems
-     * TODO not implemented
+     * Will eventually fire events to external systems.
+     * TODO not implemented.
      * 
      * @param event a validated event
      */
@@ -181,7 +182,7 @@ public class SystemEventService implements EventService, ShutdownService {
     }
 
     /**
-     * Fires all queued events for the current request
+     * Fires all queued events for the current request.
      * 
      * @return the number of events which were fired
      */
@@ -201,7 +202,7 @@ public class SystemEventService implements EventService, ShutdownService {
     }
 
     /**
-     * Clears all events for the current request
+     * Clears all events for the current request.
      * 
      * @return the number of events that were cleared
      */
@@ -212,7 +213,8 @@ public class SystemEventService implements EventService, ShutdownService {
     }
 
     /**
-     * This will validate the event object and set any values which are unset but can be figured out
+     * This will validate the event object and set any values which are 
+     * unset but can be figured out.
      * 
      * @param event the event which is being sent into the system
      */
@@ -239,7 +241,8 @@ public class SystemEventService implements EventService, ShutdownService {
     }
 
     /**
-     * Checks to see if the filtering in the given listener allows the event to be received
+     * Checks to see if the filtering in the given listener allows the 
+     * event to be received.
      * 
      * @param listener an event listener
      * @param event an event
@@ -293,15 +296,17 @@ public class SystemEventService implements EventService, ShutdownService {
 
     private Random random = new Random();
     /**
-     * @return a generated event Id used to identify and track this event uniquely
+     * Generate an event ID used to identify and track this event uniquely.
+     *
+     * @return event Id
      */
     private String makeEventId() {
         return "event-" + random.nextInt(1000) + "-" + System.currentTimeMillis();
     }
 
     /**
-     * The request interceptor for the event service,
-     * this will take care of firing queued events at the end of the request
+     * The request interceptor for the event service.
+     * This will take care of firing queued events at the end of the request.
      * 
      * @author Aaron Zeckoski (azeckoski@gmail.com) - azeckoski - 10:24:58 AM Nov 20, 2008
      */

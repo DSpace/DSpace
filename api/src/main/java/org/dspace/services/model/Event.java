@@ -15,7 +15,7 @@ import java.util.Map;
 
 
 /**
- * This holds all the settings related to an event in the system
+ * This holds all the settings related to an event in the system.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -23,7 +23,7 @@ public class Event implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The event scopes to send events to
+     * The event scopes to send events to.
      */
     public static enum Scope {LOCAL, CLUSTER, EXTERNAL};
 
@@ -36,9 +36,9 @@ public class Event implements Serializable {
     private Map<String, String> properties;
 
     /**
-     * Create a new event with the given name,
-     * will default to a read event (instead of modify event),
-     * also defaults to the current user and local/cluster scope
+     * Create a new event with the given name.
+     * Will default to a read event (instead of modify event)
+     * and to the current user and local/cluster scope.
      * 
      * @param name an event name (e.g. collection.read, item.modify)
      */
@@ -47,8 +47,9 @@ public class Event implements Serializable {
     }
 
     /**
-     * Create a new event with the given name for the given resource (item, collection, etc.),
-     * defaults to the current user and local/cluster scope
+     * Create a new event with the given name for the given resource 
+     * (item, collection, etc.).
+     * Defaults to the current user and local/cluster scope.
      * 
      * @param name an event name (e.g. collection.read, item.modify)
      * @param resourceReference the reference (identifier) for the resource affected by this event
@@ -59,8 +60,9 @@ public class Event implements Serializable {
     }
 
     /**
-     * Create a new event with the given name for the given resource (item, collection, etc.),
-     * defaults to the current user and local/cluster scope
+     * Create a new event with the given name for the given resource 
+     * (item, collection, etc.).
+     * Defaults to the current user and local/cluster scope.
      * 
      * @param name an event name (e.g. collection.read, item.modify)
      * @param resourceReference the reference (identifier) for the resource affected by this event
@@ -72,7 +74,8 @@ public class Event implements Serializable {
     }
 
     /**
-     * Create a new event with the given name for the given user on the given resource (item, collection, etc.)
+     * Create a new event with the given name for the given user on the 
+     * given resource (item, collection, etc.).
      * 
      * @param name an event name (e.g. collection.read, item.modify)
      * @param resourceReference the reference (identifier) for the resource affected by this event
@@ -84,7 +87,8 @@ public class Event implements Serializable {
     }
 
     /**
-     * Create a new event with the given name for the given user on the given resource (item, collection, etc.)
+     * Create a new event with the given name for the given user on the 
+     * given resource (item, collection, etc.).
      * 
      * @param name an event name (e.g. collection.read, item.modify)
      * @param resourceReference the reference (identifier) for the resource affected by this event
@@ -140,6 +144,7 @@ public class Event implements Serializable {
     }
 
     /**
+     * Reference the resource affected by this event.
      * @return the reference (identifier) for the resource affected by this event OR null if none specified
      */
     public String getResourceReference() {
@@ -151,6 +156,8 @@ public class Event implements Serializable {
     }
 
     /**
+     * Did this event modify something in the system?
+     *
      * @return true if this event modified soemthing in the system, false if it was read only
      */
     public boolean isModify() {

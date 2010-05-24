@@ -44,9 +44,11 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * Implementation of the session service <br/>
- * This depends on having something (a filter typically) which is placing the current requests into
- * a request storage cache <br/>
+ * Implementation of the session service.
+ * <p>
+ * This depends on having something (a filter typically) which is 
+ * placing the current requests into a request storage cache.
+ * <p>
  * TODO use a HttpSessionListener to keep track of all sessions?
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
@@ -72,12 +74,12 @@ public class SessionRequestServiceImpl implements SessionService, RequestService
     }
 
     /**
-     * map for holding onto the request interceptors which is classloader safe
+     * map for holding onto the request interceptors which is classloader safe.
      */
     private ReferenceMap<String, RequestInterceptor> interceptorsMap = new ReferenceMap<String, RequestInterceptor>(ReferenceType.STRONG, ReferenceType.WEAK);
 
     /**
-     * Keeps track of the sessions created by this service
+     * Keeps track of the sessions created by this service.
      */
     private ConcurrentHashMap<String, SessionImpl> sessions = new ConcurrentHashMap<String, SessionImpl>();
 
@@ -139,8 +141,8 @@ public class SessionRequestServiceImpl implements SessionService, RequestService
     }
 
     /**
-     * clears out the settings inside this service,
-     * mostly for testing
+     * Clears out the settings inside this service.
+     * Mostly for testing.
      */
     public void clear() {
         // immediately clear all interceptors when the service is terminated
@@ -216,6 +218,8 @@ public class SessionRequestServiceImpl implements SessionService, RequestService
 
     private Random random = new Random();
     /**
+     * Generate an identifier for this request.
+     *
      * @return a generated request Id used to identify and track this request
      */
     private String makeRequestId() {
@@ -228,6 +232,9 @@ public class SessionRequestServiceImpl implements SessionService, RequestService
     }
 
     /**
+     * List this session's interceptors.
+     *
+     * @param reverse return the list in reverse order?
      * @return the current list of interceptors in the correct order
      */
     private List<RequestInterceptor> getInterceptors(boolean reverse) {
@@ -255,8 +262,9 @@ public class SessionRequestServiceImpl implements SessionService, RequestService
     }
 
     /**
-     * Makes a session from the existing http session stuff in the current request or creates
-     * a new session of non-http related sessions
+     * Makes a session from the existing HTTP session stuff in the 
+     * current request, or creates a new session of non-HTTP related 
+     * sessions.
      * 
      * @param sessionId an optional id to assign
      * @return the new session object which is placed into the request
@@ -298,7 +306,7 @@ public class SessionRequestServiceImpl implements SessionService, RequestService
     }
 
     /**
-     * Retrieves a session by the id if it is active
+     * Retrieves a session by the id if it is active.
      * 
      * @param sessionId the unique id for a session
      * @return a session if one is available OR null if none found
@@ -309,8 +317,8 @@ public class SessionRequestServiceImpl implements SessionService, RequestService
     }
 
     /**
-     * INTERNAL USE
-     * Same as getSession but retrieves the implementation
+     * INTERNAL USE<br/>
+     * Same as getSession but retrieves the implementation.
      */
     private SessionImpl getSessionImpl(String sessionId) {
         SessionImpl session = null;
@@ -327,8 +335,9 @@ public class SessionRequestServiceImpl implements SessionService, RequestService
     }
 
     /**
-     * Get the list of sessions,
-     * this will automatically purge out any sessions which have expired
+     * Get the list of sessions.
+     * This will automatically purge any sessions which have expired.
+     *
      * @return the list of all active sessions ordered by last time accessed
      */
     public List<Session> getAllActiveSessions() {
