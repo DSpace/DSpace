@@ -17,14 +17,15 @@ import java.io.InputStreamReader;
 
 
 /**
- * Simple set of utils which handle various stream operations
+ * Simple set of utilities which handle various stream operations.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class StreamUtils {
 
     /**
-     * A simple utility to convert inputstreams into strings
+     * A simple utility to convert {@code InputStream}s into strings.
+     *
      * @param is the input stream
      * @return the string version of the IS
      */

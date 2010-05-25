@@ -20,11 +20,16 @@ import org.dspace.services.SessionService;
 
 
 /**
- * This is the DSpace helper services access object,
- * it allows access to all core DSpace services for those who cannot or will not use the injection service to get services <br/>
- * Note that this may not include every core service but should include all the services that are useful to UI developers at least <br/>
- * This should be initialized using the constructor and then can be used as long as the kernel is not shutdown,
- * making multiple copies of this is cheap and can be done without worry about the cost
+ * This is the DSpace helper services access object.
+ * It allows access to all core DSpace services for those who cannot or 
+ * will not use the injection service to get services.
+ * <p>
+ * Note that this may not include every core service but should include 
+ * all the services that are useful to UI developers at least.
+ * <p>
+ * This should be initialized using the constructor and then can be used 
+ * as long as the kernel is not shutdown.  Making multiple copies of
+ * this is cheap and can be done without worry about the cost.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -36,7 +41,8 @@ public class DSpace {
     }
 
     /**
-     * Construct a DSpace helper object which uses the default kernel
+     * Construct a DSpace helper object which uses the default kernel.
+     *
      * @throws IllegalStateException if the kernel is not already running
      */
     public DSpace() {
@@ -44,7 +50,9 @@ public class DSpace {
     }
 
     /**
-     * Construct a DSpace helper object which uses the a specific named instance of the kernel
+     * Construct a DSpace helper object which uses the a specific named 
+     * instance of the kernel.
+     *
      * @param kernelName the name of the kernel to use (null to use the default kernel)
      * @throws IllegalStateException if the kernel is not already running or no kernel exists with this name
      */
