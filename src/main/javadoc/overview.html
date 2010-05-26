@@ -1,10 +1,12 @@
 <html>
 <body>
+<p>
 The DSpace Services Framework provides the infrastructure of a more
 componentized realization of DSpace.  Services, plugins, and providers
 are registered with the framework so that they can find each other without
 having to know each other too intimately.  This should make it easier to
 maintain, extend, and understand DSpace as it evolves.
+</p>
 
 <p>The framework consists of:</p>
 
@@ -19,6 +21,23 @@ maintain, extend, and understand DSpace as it evolves.
  <dt>utilities</dt>
  <dd>includes the DSpace object, a starting point in using the framework</dd>
 </dl>
+
+<p>
+To use the Services Framework, start by obtaining a reference to a 
+running kernel.
+</p>
+<ul>
+ <li>In a standalone application, you can instantiate {@link 
+org.dspace.utils.DSpace the DSpace object}.  It will provide references 
+to the kernel and core services.</li>
+ <li>In a Spring context you can wire ??? as needed.</li>
+ <li>In a servlet context, you should configure a {@link 
+org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener 
+context listener} and a {@link 
+org.dspace.utils.servlet.DSpaceWebappServletFilter filter} to start the 
+kernel and establish the connection between the web application and the 
+framework.</li>
+</ul>
 
 @see <a href='http://wiki.dspace.org/confluence/display/DSPACE/DSpace+Services+Framework'>
 DSpace Services Framework</a>

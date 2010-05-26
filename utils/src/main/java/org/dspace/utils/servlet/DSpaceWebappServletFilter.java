@@ -32,10 +32,12 @@ import org.dspace.services.model.CacheConfig.CacheScope;
 
 
 /**
- * This servlet filter will handle the hookup and setup for DSpace requests and should
- * be applied to any webapp that is using the DSpace core <br/>
- * It will also do anything necessary to the requests that are coming into a DSpace web application
- * and the responses on their way out
+ * This servlet filter will handle the hookup and setup for DSpace 
+ * requests.  It should be applied to any webapp that is using the 
+ * DSpace core.
+ * <p>
+ * It will also do anything necessary to the requests that are coming 
+ * into a DSpace web application and the responses on their way out.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
