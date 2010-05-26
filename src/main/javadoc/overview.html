@@ -23,19 +23,29 @@ maintain, extend, and understand DSpace as it evolves.
 </dl>
 
 <p>
-To use the Services Framework, start by obtaining a reference to a 
-running kernel.
+To use the Services Framework, start by creating a running kernel 
+instance.
 </p>
 <ul>
- <li>In a standalone application, you can instantiate {@link 
-org.dspace.utils.DSpace the DSpace object}.  It will provide references 
-to the kernel and core services.</li>
- <li>In a Spring context you can wire ??? as needed.</li>
- <li>In a servlet context, you should configure a {@link 
-org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener 
-context listener} and a {@link 
-org.dspace.utils.servlet.DSpaceWebappServletFilter filter} to start the 
-kernel and establish the connection between the web application and the 
+ <li>In a standalone application, you can call {@link 
+org.dspace.servicemanager.DSpaceKernelInit#getKernel} to get a reference 
+to one.</li>
+ <li>In a Spring container, you need to ensure that
+{@code spring/spring-dspace-applicationContext.xml} and
+{@code spring/spring-dspace-core-services.xml} are loaded.  Then you can
+wire references to
+  <ul>
+   <li>{@code org.dspace.services.CachingService}</li>
+   <li>{@code org.dspace.services.SessionService}</li>
+   <li>{@code org.dspace.services.RequestService}</li>
+   <li>{@code org.dspace.services.EventService}</li>
+  </ul>
+into your beans as needed.</li>
+ <li>In a servlet container, you should configure a
+{@link org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener context listener}
+to instantiate the kernel and a
+{@link org.dspace.utils.servlet.DSpaceWebappServletFilter filter}
+to establish the connection between the web application and the 
 framework.</li>
 </ul>
 
