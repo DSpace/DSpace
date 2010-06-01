@@ -5,7 +5,7 @@
  *
  * Date: $Date$
  *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
+ * Copyright (c) 2002-2010, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -41,13 +41,14 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.embargo.EmbargoManager;
+import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
 
 /**
- * Support to install item in the archive
+ * Support to install an Item in the archive.
  * 
  * @author dstuve
  * @version $Revision$
@@ -56,7 +57,7 @@ public class InstallItem
 {
     /**
      * Take an InProgressSubmission and turn it into a fully-archived Item,
-     * creating a new Handle
+     * creating a new Handle.
      * 
      * @param c
      *            DSpace Context
@@ -78,7 +79,7 @@ public class InstallItem
      * @param is
      *            submission to install
      * @param suppliedHandle
-     *            the existing Handle to give the installed item
+     *            the existing Handle to give to the installed item
      * 
      * @return the fully archived Item
      */
@@ -125,7 +126,8 @@ public class InstallItem
 
         String handleref = HandleManager.getCanonicalForm(handle);
 
-        // Add handle as identifier.uri DC value, first check that identifier dosn't allready exist
+        // Add handle as identifier.uri DC value.
+        // First check that identifier dosn't already exist.
         boolean identifierExists = false;
         DCValue[] identifiers = item.getDC("identifier", "uri", Item.ANY);
         for (DCValue identifier : identifiers)
@@ -158,6 +160,10 @@ public class InstallItem
 
         // save changes ;-)
         item.update();
+
+        // Notify interested parties of newly archived Item
+        c.addEvent(new Event(Event.INSTALL, Constants.ITEM, item.getID(),
+                handle));
 
         // remove in-progress submission
         is.deleteWrapper();

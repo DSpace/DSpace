@@ -65,19 +65,23 @@ import org.dspace.core.Context;
  * Note that the type of the event itself is actually descriptive of the
  * <em>action</em> it performs: ADD, MODIFY, etc. The most significant
  * elements of the event are:
- * <p>
- * <br> - (Action) Type <br> - Subject -- DSpace object to which the action
- * applies, e.g. the Collection to which an ADD adds a member. <br> - Object --
- * optional, when present it is the other object effected by an action, e.g. the
- * Item ADDed to a Collection by an ADD. <br> - detail -- a textual summary of
- * what changed, content and its significance varies by the combination of
- * action and subject type. <br> - timestamp -- exact millisecond timestamp at
- * which event was logged.
+ * <ul>
+ * <li>(Action) Type</li>
+ * <li>Subject -- DSpace object to which the action applies, e.g. the Collection
+ * to which an ADD adds a member.</li>
+ * <li>Object -- optional, when present it is the other object effected by an
+ * action, e.g. the Item ADDed to a Collection by an ADD.</li>
+ * <li>detail -- a textual summary of what changed.  Content and its
+ * significance varies by the combination of action and subject type.</li>
+ * <li> - timestamp -- exact millisecond timestamp at which event was logged.</li>
+ * </ul>
  * 
  * @version $Revision$
  */
 public class Event implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     /** ---------- Constants ------------- * */
 
     /** Event (Action) types */
@@ -92,6 +96,8 @@ public class Event implements Serializable
     public static final int REMOVE = 1 << 4; // remove content from container
 
     public static final int DELETE = 1 << 5; // destroy object
+    
+    public static final int INSTALL = 1 << 6; // object exits workspace/flow
 
     /** Index of filter parts in their array: */
     public static final int SUBJECT_MASK = 0; // mask of subject types
@@ -100,7 +106,7 @@ public class Event implements Serializable
 
     // XXX NOTE: keep this up to date with any changes to event (action) types.
     private static final String eventTypeText[] = { "CREATE", "MODIFY",
-            "MODIFY_METADATA", "ADD", "REMOVE", "DELETE" };
+            "MODIFY_METADATA", "ADD", "REMOVE", "DELETE", "INSTALL" };
 
     /** XXX NOTE: These constants must be kept synchronized * */
     /** XXX NOTE: with ALL_OBJECTS_MASK *AND* objTypeToMask hash * */
@@ -197,12 +203,12 @@ public class Event implements Serializable
     /** unique key to bind together events from one context's transaction */
     private String transactionID;
 
-    /** identity of authenticated user, i.e. context.getCurrentUser() */
-    /** only needed in the event for marshalling for asynch event messages */
+    /** identity of authenticated user, i.e. context.getCurrentUser(). */
+    /** Only needed in the event for marshalling for asynch event messages */
     private int currentUser = -1;
 
-    /** copy of context's "extraLogInfo" filed, used only for */
-    /** marshalling for asynch event messages */
+    /** copy of context's "extraLogInfo" field.  Used only for */
+    /** marshalling for asynch event messages. */
     private String extraLogInfo = null;
 
     private BitSet consumedBy = new BitSet();
@@ -214,7 +220,7 @@ public class Event implements Serializable
      * Constructor.
      * 
      * @param eventType
-     *            action type, e.g. Event.ADD
+     *            action type, e.g. Event.ADD.
      * @param subjectType
      *            DSpace Object Type of subject e.g. Constants.ITEM.
      * @param subjectID
@@ -235,7 +241,7 @@ public class Event implements Serializable
      * Constructor.
      * 
      * @param eventType
-     *            action type, e.g. Event.ADD
+     *            action type, e.g. Event.ADD.
      * @param subjectType
      *            DSpace Object Type of subject e.g. Constants.ITEM.
      * @param subjectID
@@ -528,6 +534,8 @@ public class Event implements Serializable
     }
 
     /**
+     * Test whether this event would pass through a list of filters.
+     * 
      * @param filters
      *            list of filter masks; each one is an Array of two ints.
      * @returns true if this event would be passed through the given filter
@@ -575,7 +583,6 @@ public class Event implements Serializable
     public void setBitSet(String consumerName)
     {
         consumedBy.set(EventManager.getConsumerIndex(consumerName));
-
     }
 
     public BitSet getBitSet()
