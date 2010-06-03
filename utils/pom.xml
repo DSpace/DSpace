@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-services-utils</artifactId>
@@ -6,16 +7,19 @@
     <description>The core services utilities for DSpace</description>
     <url>http://projects.dspace.org</url>
     <inceptionYear>2008</inceptionYear>
-    <parent>
-        <artifactId>dspace-services</artifactId>
-        <groupId>org.dspace</groupId>
-        <version>2.0.2-SNAPSHOT</version><!--dspace2.version-->
-    </parent>
     <organization>
         <name>The DSpace Foundation</name>
         <url>http://www.dspace.org</url>
     </organization>
     <packaging>jar</packaging>
+    <version>2.0.2-SNAPSHOT</version>
+    
+    <parent>
+        <artifactId>dspace-pom</artifactId>
+        <groupId>org.dspace</groupId>
+        <version>3</version>
+    </parent>
+    
 
     <!--
         The Subversion repository location is used by Continuum to
@@ -25,37 +29,23 @@
     -->
     <scm>
         <connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-services/trunk/utils</connection>
-        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-services/trunk/utils</developerConnection>
+        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-services/trunk/utils
+        </developerConnection>
         <url>http://scm.dspace.org/svn/repo/modules/dspace-services/trunk/utils</url>
     </scm>
-
-    <repositories>
-        <repository>
-            <id>dspace-snapshot</id>
-            <name>DSpace Snapshot Repository</name>
-            <url>http://maven.dspace.org/snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>fail</checksumPolicy>
-            </snapshots>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services-api</artifactId>
-            <scope>provided</scope>
+            <version>2.0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
+            <version>2.4</version>
             <scope>provided</scope>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -64,5 +54,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
 
 </project>

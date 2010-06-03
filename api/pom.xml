@@ -11,11 +11,12 @@
         <url>http://www.dspace.org</url>
     </organization>
     <packaging>jar</packaging>
-
+    <version>2.0.2-SNAPSHOT</version>
+    
     <parent>
-        <artifactId>dspace-services</artifactId>
+        <artifactId>dspace-pom</artifactId>
         <groupId>org.dspace</groupId>
-        <version>2.0.2-SNAPSHOT</version><!--dspace2.version-->
+        <version>3</version>
     </parent>
 
     <!--
@@ -30,29 +31,14 @@
         <url>http://scm.dspace.org/svn/repo/modules/dspace-services/trunk/api</url>
     </scm>
 
-    <repositories>
-        <repository>
-            <id>dspace-snapshot</id>
-            <name>DSpace Snapshot Repository</name>
-            <url>http://maven.dspace.org/snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>fail</checksumPolicy>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <dependencies>
         <!-- should be an absolutely minimal set of dependencies -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
+            <version>2.4</version>
             <scope>provided</scope>
+            <type>jar</type>
         </dependency>
     </dependencies>
 
