@@ -1,12 +1,17 @@
 1.7.0
 =====
 
+1.6.2
+=====
+
+(Tim Donohue, Kim Shepherd, Keith Gilbertson, Stuart Lewis)
+- [DS-584] start-handle-server script broken - Error in launcher.xml: Invalid class name
+
 1.6.1
 =====
 
 (Mark Diggory)
 - [DS-571] Upgrade DSpace Services to next release 2.0.1
-
 
 (Dale Poulter)
 - [DS-557] LC Authority Names - Lookup Feature - names w/o dates
