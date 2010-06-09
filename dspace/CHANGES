@@ -1,3 +1,9 @@
+1.6.2
+=====
+
+(Tim Donohue, Kim Shepherd, Keith Gilbertson, Stuart Lewis)
+- [DS-584] start-handle-server script broken - Error in launcher.xml: Invalid class name
+
 1.6.1
 =====
 

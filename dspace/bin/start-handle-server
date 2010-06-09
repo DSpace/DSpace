@@ -8,7 +8,7 @@
 #
 # Date: $Date$
 #
-# Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
+# Copyright (c) 2002-2010, The DSpace Foundation.  All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -45,6 +45,22 @@
 
 # Assume we're in the bin subdirectory of the DSpace installation directory
 BINDIR=`dirname $0`
+DSPACEDIR=`cd "$BINDIR/.." ; pwd`
+
+# Get the JARs in $DSPACEDIR/jsp/WEB-INF/lib, separated by ':'
+JARS=`echo $DSPACEDIR/lib/*.jar | sed 's/ /\:/g'`
+
+# Class path for DSpace will be:
+#   Any existing classpath
+#   The JARs (WEB-INF/lib/*.jar)
+#   The WEB-INF/classes directory
+FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config
+
+#Allow user to specify java options through JAVA_OPTS variable
+if [ "$JAVA_OPTS" = "" ]; then
+ #Default Java to use 256MB of memory
+ JAVA_OPTS=-Xmx256m
+fi
 
 # Read parameters from DSpace config
 handledir=`$BINDIR/dsrun org.dspace.core.ConfigurationManager -property handle.dir`
@@ -56,4 +72,4 @@ rm -f $handledir/txns/lock
 # Start the Handle server, with a special log4j properties file.
 # We cannot simply write to the same logs, since log4j
 # does not support more than one JVM writing to the same rolling log.
-nohup $BINDIR/dsrun -Ddspace.log.init.disable=true -Dlog4j.configuration=log4j-handle-plugin.properties net.handle.server.Main $handledir </dev/null >> $logdir/handle-server.log 2>&1 &
+nohup java $JAVA_OPTS -classpath $FULLPATH -Ddspace.log.init.disable=true -Dlog4j.configuration=log4j-handle-plugin.properties net.handle.server.Main $handledir </dev/null >> $logdir/handle-server.log 2>&1 &
