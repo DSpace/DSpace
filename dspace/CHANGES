@@ -4,6 +4,9 @@
 (Tim Donohue, Kim Shepherd, Keith Gilbertson, Stuart Lewis)
 - [DS-584] start-handle-server script broken - Error in launcher.xml: Invalid class name
 
+(Stuart Lewis)
+- [DS-607] Invalid identifiers not escaped
+
 1.6.1
 =====
 
