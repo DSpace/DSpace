@@ -45,6 +45,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -163,7 +164,7 @@ public class JSPManager
             HttpServletResponse response, String badID, int type)
             throws ServletException, IOException
     {
-        request.setAttribute("bad.id", badID);
+        request.setAttribute("bad.id", StringEscapeUtils.escapeHtml(badID));
         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
         if (type != -1)
