@@ -572,7 +572,7 @@ public class Item extends DSpaceObject
         int i = 0;
         while(dcf.hasMoreTokens())
         {
-            tokens[i] = dcf.nextToken().toLowerCase().trim();
+            tokens[i] = dcf.nextToken().trim();
             i++;
         }
         String schema = tokens[0];
