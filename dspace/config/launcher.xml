@@ -294,6 +294,14 @@
     </command>
 
     <command>
+        <name>sub-daily</name>
+        <description>Send daily subscription notices</description>
+        <step>
+            <class>org.dspace.eperson.Subscribe</class>
+        </step>
+    </command>
+    
+    <command>
         <name>test-database</name>
         <description>Test the DSpace database connection is OK</description>
         <step>
@@ -306,14 +314,6 @@
         <description>Test the DSpace email server settings OK</description>
         <step>
             <class>org.dspace.core.Email</class>
-        </step>
-    </command>
-
-    <command>
-        <name>sub-daily</name>
-        <description>Send daily subscription notices</description>
-        <step>
-            <class>org.dspace.eperson.Subscribe</class>
         </step>
     </command>
 
