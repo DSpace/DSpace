@@ -10,6 +10,10 @@
 (Stuart Lewis)
 - [DS-607] Invalid identifiers not escaped
 
+ (Ivan Masár, Claudia Jürgen)
+- [DS-567] Czech localization of 1.6.0
+- [DS-595] Czech localization of 1.6.1
+
 
 1.6.1
 =====
