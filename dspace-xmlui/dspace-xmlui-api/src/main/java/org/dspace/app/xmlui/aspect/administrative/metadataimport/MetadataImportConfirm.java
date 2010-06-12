@@ -141,13 +141,14 @@ public class MetadataImportConfirm extends AbstractDSpaceTransformer {
                             (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null))
                         {
                             Row headerrow = mdchanges.addRow(Row.ROLE_HEADER);
+
                             // Show the item
                             if (!change.isNewItem())
                             {
                                 Item i = change.getItem();
                                 Cell cell = headerrow.addCell();
                                 cell.addContent(T_changes_committed);
-                                cell.addContent(" " + i.getID() + "(" + i.getHandle() + ")");
+                                cell.addContent(" " + i.getID() + " (" + i.getHandle() + ")");
 
                             }
                             else

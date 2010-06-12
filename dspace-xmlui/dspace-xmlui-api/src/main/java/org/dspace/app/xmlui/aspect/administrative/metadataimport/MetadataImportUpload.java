@@ -138,7 +138,8 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
                 ArrayList<Collection> oldCollections = change.getOldMappedCollections();
 
                 if ((adds.size() > 0) || (removes.size() > 0) ||
-                    (newCollections.size() > 0) || (oldCollections.size() > 0))
+                    (newCollections.size() > 0) || (oldCollections.size() > 0) ||
+                    (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null))
                 {
                     Row headerrow = mdchanges.addRow(Row.ROLE_HEADER);
                     // Show the item
@@ -147,7 +148,7 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
                         Item i = change.getItem();
                         Cell cell = headerrow.addCell();
                         cell.addContent(T_changes_pending);
-                        cell.addContent(" " + i.getID() + "(" + i.getHandle() + ")");
+                        cell.addContent(" " + i.getID() + " (" + i.getHandle() + ")");
 
                     }
                     else

@@ -6,8 +6,9 @@
 
 (Stuart Lewis)
 - [DS-607] Invalid identifiers not escaped
+- [DS-608] Batch metadata import missing item headers
 
- (Ivan Masár, Claudia Jürgen)
+(Ivan Masar, Claudia Jurgen)
 - [DS-567] Czech localization of 1.6.0
 - [DS-595] Czech localization of 1.6.1
 
