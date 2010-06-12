@@ -147,8 +147,7 @@ public class MetadataImportConfirm extends AbstractDSpaceTransformer {
                                 Item i = change.getItem();
                                 Cell cell = headerrow.addCell();
                                 cell.addContent(T_changes_committed);
-                                cell.addContent(" " + i.getID() + "(" + i.getHandle() + ")");
-
+                                cell.addContent(" " + i.getID() + " (" + i.getHandle() + ")");
                             }
                             else
                             {
