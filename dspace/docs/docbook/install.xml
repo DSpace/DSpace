@@ -652,7 +652,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
 			<section remap="h4">
 				<title>Updating Existing Handle Prefixes</title>
 				<para>If you need to update the handle prefix on items created before the CNRI registration process you can run the <literal>[dspace]/bin/update-handle-prefix script</literal>. You may need to do this if you loaded items prior to CNRI registration (e.g. setting up a demonstration system prior to migrating it to production). The script takes the current and new prefix as parameters. For example:</para>
-				<screen>[dspace]/bin/update-handle-prefix 123456789 1303
+				<screen>[dspace]/bin/dspace update-handle-prefix 123456789 1303 
                 </screen>
 				<para>This script will change any handles currently assigned prefix 123456789 to prefix 1303, so for example handle 123456789/23 will be updated to 1303/23 in the database.</para>
 			</section>
