@@ -6,7 +6,7 @@
 		<para>It is always recommended that when performing an upgrade that the user should use a Development or Test instance or server in order to minimize downtime. You should note any problems you have encountered (and also how to resolve them) before attempting to upgrade your production instance or server. It also gives you a chance to &quot;practice&quot; at the upgrade. (And practice makes perfect.)</para>
 	</warning>
 	<section remap="h2">
-		<title><anchor id="docbook-update-html-16_161" xreflabel="Upgrading from 1.6 to 1.6.1"/>Upgrading from 1.6 to 1.6.1</title>
+		<title><anchor id="docbook-update-html-16_161" xreflabel="Upgrading from 1.6 to 1.6.1"/>Upgrading from 1.6 to 1.6.x</title>
 		<para>In the notes below <literal>[dspace]</literal> refers to the install directory for your existing DSpace installation, and <literal>[dspace-source]</literal> to the source directory for DSpace 1.6.1. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</para>
 		<orderedlist>
 			<listitem>
@@ -55,7 +55,7 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</screen>
 			<listitem>
 				<para><emphasis role="bold">Run Registry Format Update for CC License.</emphasis></para>
 				<para>Creative Commons licenses have been assigned the wrong mime-type in past versions of DSpace. Even if you are not currently using CC Licenses, you should update your Bitstream Format Registry to include a new entry with the proper mime-type. To update your registry, run the following command:</para>
-				<para><literal>[dspace]/bin/dsrun org.dspace.administrator.RegistryLoader -b bitstream [dspace-source]/dspace/etc/upgrades/15-16/new-bitstream-formats.xml</literal></para>
+				<para><literal>dspace]/bin/dspace registry-loader -bitstream [dspace]/etc/upgrades/15-16/new-bitstream-formats.xml</literal></para>
 			</listitem>
 			<listitem>
 				<para><emphasis role="bold">Update the Database.</emphasis></para>
@@ -628,7 +628,7 @@ mvn -U clean package</screen>
 			<listitem>
 				<para><emphasis role="bold">Update Registry for the CC License.</emphasis></para>
 				<para>If you use the CC License, an incorrect mime-type type is being assigned. You will need to run the following step:</para>
-				<para><literal>[dspace]/bin/dsrun org.dspace.administrator.RegistryLoader -b bitstream [dspace-source]/dspace/etc/upgrades/15-16/new-bitstream-formats.xml</literal></para>
+				<para><literal>dspace]/bin/dspace registry-loader -bitstream [dspace]/etc/upgrades/15-16/new-bitstream-formats.xml </literal></para>
 			</listitem>
 			<listitem>
 				<para><emphasis role="bold">Update the database</emphasis>. The database schema needs to be updated to accommodate changes to the database. SQL files contain the relevant updates are provided. Please note that if you have made any local customizations to the database schema, you should consult these updates and make sure they will work for you.</para>
@@ -683,8 +683,8 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</screen>
 			</listitem>
 			<listitem>
 				<para><emphasis role="bold">Rolling Log Appender Upgrade</emphasis>. You will want to upgrade your logs to the new format to use the SOLR Statistics now included with DSpace. While the commands for this are found in Chapter 8, here is the steps needed to be performed.</para>
-				<screen>[dspace]/bin/dspace stat-log-converter -i <emphasis>input file name</emphasis> -o <emphasis>output file name</emphasis> -m <emphasis>(if you have more than one</emphasis> dspace.log<emphasis> file)</emphasis>
-[dspace]/bin/dspace stat-log-importer -i <emphasis>input file name (probably the output name from above)</emphasis> -m 
+				<screen>[dspace]/bin/dspace stats-log-converter -i <emphasis>input file name</emphasis> -o <emphasis>output file name</emphasis> -m <emphasis>(if you have more than one</emphasis> dspace.log<emphasis> file)</emphasis>
+[dspace]/bin/dspace stats-log-importer -i <emphasis>input file name (probably the output name from above)</emphasis> -m 
 </screen>
 				<para>The user is highly recommend to see Section 8.14 <link linkend="docbook-sys_admin.html-log-converter">DSpace Log Converter</link>.</para>
 			</listitem>
