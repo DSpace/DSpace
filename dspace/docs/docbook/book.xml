@@ -22,15 +22,15 @@
 <book>
 	<bookinfo>
 		<title>DSpace Manual</title>
-		<subtitle>Release 1.6.1</subtitle>
+		<subtitle>Release 1.6.2</subtitle>
 		<author>
 			<surname>DuraSpace</surname>
 			<affiliation>
 				<address><email>webmaster@dspace.org</email></address>
 			</affiliation>
 		</author>
-		<edition>1.6.1</edition>
-		<pubdate>2010-05-21  12:00:00 EST</pubdate>
+		<edition>1.6.2</edition>
+		<pubdate>2010-06-13 08:00:00 EST</pubdate>
 		<copyright>
 			<year>2002-2010</year>
 			<holder>
@@ -51,8 +51,8 @@
 		</legalnotice>
 		<revhistory>
 			<revision>
-				<revnumber>Version 1.6.1 </revnumber>
-				<date>This text generated: 2010-05-21  12:00:00 EST EST</date>
+				<revnumber>Version 1.6.2 </revnumber>
+				<date>This text generated: 2010-06-13 08:00:00 EST EST</date>
 				<authorinitials>JAT</authorinitials>
 			</revision>
 		</revhistory>
@@ -63,8 +63,8 @@
 	<preface>
 		<title>Preface</title>
 		<para/>
-		<para>Welcome to Release 1.6.1. This is a "fix" release.  The committers have volunteered many hours to fix, re-write and contribute new software code for this release. Documentation has been updated.  No new features have been added to this release.</para>
-		<para>The following is a list of the new features included (not an exhaustive list) for release 1.6.0 and are also contained in 1.6.1:</para>
+		<para>Welcome to Release 1.6.2. This is a "fix" release. The committers have volunteered many hours to fix, re-write and contribute new software code for this release. Documentation has been updated. No new features have been added to this release.</para>
+		<para>The following is a list of the new features included (not an exhaustive list) for release 1.6.0 and are also contained in 1.6.2:</para>
 		<itemizedlist>
 			<listitem>
 				<para>SOLR Statistics.</para>
@@ -92,8 +92,8 @@
 			</listitem>
 		</itemizedlist>
 		<para>The following people have contributed to this release of DSpace: @mire, BioMed Central, Andrea Bollini, Ben Bosman, Flavio Botelho, Peter Dietz, Mark Diggory, Tim Donohue, Serhij Dubyk, Enovation Solutions, Javier Garrido, Keith Gilbertson, Ladd Hanson, Leonie Hayes, Paulo Jobim, Claudia Juergen, Keller, Fabio Kepler, Yin Yin Latt, Stuart Lewis, Bram Luyten, Van Ly, Ivan Masar, Alexey Maslov, Gabriela Mircea, Hardik Mishra, Caryn, Neiswender, Venessa Newton-Wade, OhioLINK, Ekaterina Pechekhonova, Dale Poulter, Toni Prieto, Richard Rodgers, Ricardo Saraiva, Andreas Schwander, Kim Shepherd, Elin Stangeland, Larry Stone, Keiji Suzuki, Robin Taylor, Graham Triggs, Jeffrey Trimble, Kevin Van de velde, Steve Williams and Mark Wood. Many of them could not do this work without the support (release time and financial) of their institutions that they are associated with. We offer thanks to those institutions for supporting their staff to take time to contribute to the DSpace project.</para>
-		<para>We apologize to any committer left off this list.  DSpace has such a large, arctive development community that we sometimes loose track of all our contributors.  Our ongoing list of all known people/institutions that contribute to DSpace can be found on our DSpace Contributors Wiki page (http://wiki.dspace.org/confluence/display/DSPACE/DSpaceContributors).  Acknowledgements to those left off will be made in future releases.</para>
-		<para>The Documentation Gardener for this release was Jeffrey Trimble with input from everyone.  All typos are his fault. </para>
+		<para>We apologize to any committer left off this list. DSpace has such a large, arctive development community that we sometimes loose track of all our contributors. Our ongoing list of all known people/institutions that contribute to DSpace can be found on our DSpace Contributors Wiki page (http://wiki.dspace.org/confluence/display/DSPACE/DSpaceContributors). Acknowledgements to those left off will be made in future releases.</para>
+		<para>The Documentation Gardener for this release was Jeffrey Trimble with input from everyone. All typos are his fault. </para>
 		<para>Kim Shepherd is the Release Co-ordinator of this release.</para>
 		<para>Additional thanks to Tim Donohue from DuraSpace on keeping all of us focused on the work at hand, and calming us when we got excited and for the general support for the DSpace project.</para>
 	</preface>
