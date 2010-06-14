@@ -12,7 +12,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-lni</artifactId>
-      <version>1.6.2</version>
+      <version>1.6.3-SNAPSHOT</version>
    </parent>
 
    <repositories>
@@ -33,9 +33,9 @@
    </repositories>
 
    <scm>
-      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-lni/dspace-lni-webapp</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-lni/dspace-lni-webapp</url>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-lni/dspace-lni-webapp</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-lni/dspace-lni-webapp</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-lni/dspace-lni-webapp</url>
    </scm>
 
    <build>
