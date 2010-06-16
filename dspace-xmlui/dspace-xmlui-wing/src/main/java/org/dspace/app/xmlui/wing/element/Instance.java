@@ -79,9 +79,6 @@ public class Instance extends Container
 
     /**
      * Set the raw value of the field removing any previous raw values.
-     *
-     * @param characters
-     *            (May be null) Field value as a string
      */
     public Value setValue() throws WingException
     {
@@ -185,9 +182,6 @@ public class Instance extends Container
     /**
      * Set the interpreted value of the field removing any previous interpreted
      * values.
-     *
-     * @param characters
-     *            (May be null) Field value as a string
      */
     public Value setInterpretedValue() throws WingException
     {
@@ -230,7 +224,7 @@ public class Instance extends Container
     /** ******************************************************************** */
     
     /**
-     * Add an option value, there may be many of these. These values refrence
+     * Add an option value, there may be many of these. These values reference
      * an option all ready added to the field.
      *
      * @param option
@@ -245,7 +239,7 @@ public class Instance extends Container
     
     /**
      * Set the checkbox (or radio) value of this field. This is a parameter
-     * wheather the field is selected or not along with the return string that
+     * whether the field is selected or not along with the return string that
      * should be used with this parameter.
      *
      * @param checked

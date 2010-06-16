@@ -241,7 +241,7 @@ public class HarvestedCollection
     /**
      * Find all collections with the specified status flag 
      * @param c
-     * @param status, see HarvestInstance.STATUS_...
+     * @param status see HarvestInstance.STATUS_...
      * @return
      * @throws SQLException
      */
@@ -309,7 +309,7 @@ public class HarvestedCollection
     	setHarvestMetadataConfig(mdConfigId);
     }     
 
-    /* Setters for the appropriate harverting-related columns */
+    /* Setters for the appropriate harvesting-related columns */
     public void setHarvestType(int type) {
     	harvestRow.setColumn("harvest_type",type);
     	modified = true;
@@ -389,7 +389,7 @@ public class HarvestedCollection
     }
     
 
-    /* Getting for the appropriate harverting-related columns */
+    /* Getting for the appropriate harvesting-related columns */
     public int getCollectionId() {
     	return harvestRow.getIntColumn("collection_id");
     }

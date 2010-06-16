@@ -68,7 +68,8 @@ public interface StreamIngestionCrosswalk
      *
      * @param context the DSpace context
      * @param dso the  DSpace Object whose metadata is being ingested.
-     * @param out input stream containing the metadata.
+     * @param in input stream containing the metadata.
+     * @param MIMEType MIME type of the ???
      *
      * @throws CrosswalkInternalException (<code>CrosswalkException</code>) failure of the crosswalk itself.
      * @throws CrosswalkObjectNotSupported (<code>CrosswalkException</code>) Cannot crosswalk this kind of DSpace object.

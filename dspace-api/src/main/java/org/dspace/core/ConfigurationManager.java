@@ -253,9 +253,9 @@ public class ConfigurationManager
      * Get the License
      * 
      * @param
-     *         license file name
-     *  
-     *  @return
+     *         licenseFile file name
+     * 
+     * @return
      *         license text
      * 
      */
@@ -469,9 +469,8 @@ public class ConfigurationManager
     /**
      * Reads news from a text file.
      * 
-     * @param position
-     *            a constant indicating which file (top or side) should be read
-     *            in.
+     * @param newsFile
+     *            name of the news file to read in, relative to the news file path.
      */
     public static String readNewsFile(String newsFile)
     {
@@ -508,9 +507,8 @@ public class ConfigurationManager
     /**
      * Writes news to a text file.
      * 
-     * @param position
-     *            a constant indicating which file (top or side) should be
-     *            written to.
+     * @param newsFile
+     *            name of the news file to write, relative to the news file path.
      * 
      * @param news
      *            the text to be written to the file.
@@ -541,7 +539,10 @@ public class ConfigurationManager
     /**
      * Writes license to a text file.
      * 
-     * @param news
+     * @param licenseFile
+     *            name for the file into which the license will be written,
+     *            relative to the current directory.
+     * @param newLicense
      *            the text to be written to the file.
      */
     public static void writeLicenseFile(String licenseFile, String newLicense)

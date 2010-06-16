@@ -84,9 +84,6 @@ public class Hidden extends Field
 
     /**
      * Set the raw value of the field removing any previous raw values.
-     * 
-     * @param characters
-     *            (May be null) Field value as a string
      */
     public Value setValue() throws WingException
     {
@@ -111,8 +108,8 @@ public class Hidden extends Field
     /**
      * Set the raw value of the field removing any previous raw values.
      * 
-     * @param integere
-     *            (May be null) Field value as a string
+     * @param integer
+     *            Field value as an integer
      */
     public void setValue(int integer) throws WingException
     {

@@ -57,7 +57,7 @@ public class OriginalBitstreamFilter extends BitstreamFilterByBundleName
 	/**
 	 *   Tests bitstreams for containment in an ORIGINAL bundle
 	 *  
-	 *  @returns true if the bitstream is in the ORIGINAL bundle
+	 *  @return true if the bitstream is in the ORIGINAL bundle
 	 *  
 	 *  @throws BitstreamFilterException
 	 */

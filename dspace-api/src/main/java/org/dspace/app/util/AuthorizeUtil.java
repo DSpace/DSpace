@@ -53,7 +53,7 @@ import org.dspace.core.Context;
 
 /**
  * This class is an addition to the AuthorizeManager that perform authorization
- * check on not crud (ADD, WRITE, etc.) actions.
+ * check on not CRUD (ADD, WRITE, etc.) actions.
  * 
  * @author bollini
  * 
@@ -522,7 +522,7 @@ public class AuthorizeUtil
     /**
      * Can the current user remove or edit the supplied policy?
      * 
-     * @param context
+     * @param c
      *            the DSpace Context Object
      * @param rp
      *            a resource policy
@@ -607,7 +607,7 @@ public class AuthorizeUtil
     }
 
     /**
-    * Can the current user reistate the item?
+    * Can the current user reinstate the item?
     * 
     * @param context
     *            the DSpace Context Object
@@ -617,7 +617,7 @@ public class AuthorizeUtil
     *             if a db error occur
     * @throws AuthorizeException
     *             if the current user is not allowed to perform the item
-    *             reistate
+    *             reinstatement
     */
     public static void authorizeReinstateItem(Context context, Item item)
             throws SQLException, AuthorizeException

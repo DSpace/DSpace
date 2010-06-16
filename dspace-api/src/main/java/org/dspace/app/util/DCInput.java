@@ -112,8 +112,10 @@ public class DCInput
      * Class constructor for creating a DCInput object based on the contents of
      * a HashMap
      * 
-     * @param row
-     *            the corresponding row in the table
+     * @param fieldMap
+     *            ???
+     * @param listMap
+     *            ?the corresponding row in the table?
      */
     public DCInput(Map fieldMap, Map listMap)
     {
@@ -339,11 +341,9 @@ public class DCInput
      * Gets the display string that corresponds to the passed storage string in
      * a particular display-storage pair set.
      * 
-     * @param allPairs
-     *            HashMap of all display-storage pair sets
      * @param pairTypeName
      *            Name of display-storage pair set to search
-     * @param storageString
+     * @param storedString
      *            the string that gets stored
      * 
      * @return the displayed string whose selection causes storageString to be
@@ -368,11 +368,9 @@ public class DCInput
      * Gets the stored string that corresponds to the passed display string in a
      * particular display-storage pair set.
      * 
-     * @param allPairs
-     *            HashMap of all display-storage pair sets
      * @param pairTypeName
      *            Name of display-storage pair set to search
-     * @param displayString
+     * @param displayedString
      *            the string that gets displayed
      * 
      * @return the string that gets stored when displayString gets selected,

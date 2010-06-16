@@ -57,7 +57,7 @@ public abstract class Dispatcher
 {
     protected String name;
 
-    /** unique identifer of this dispatcher - cached hash of its text Name */
+    /** unique identifier of this dispatcher - cached hash of its text Name */
     protected int identifier;
 
     /**
@@ -78,7 +78,7 @@ public abstract class Dispatcher
     }
 
     /**
-     * @returns unique integer that identifies this Dispatcher configuration.
+     * @return unique integer that identifies this Dispatcher configuration.
      */
     public int getIdentifier()
     {
@@ -86,12 +86,10 @@ public abstract class Dispatcher
     }
 
     /**
-     * Add a consumer to the end of the list.
+     * Add a consumer profile to the end of the list.
      * 
-     * @param consumer
-     *            the event consumer to add
-     * @param filter
-     *            the event filter to apply
+     * @param cp
+     *            the event consumer profile to add
      */
     public abstract void addConsumerProfile(ConsumerProfile cp)
             throws IllegalArgumentException;

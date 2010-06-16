@@ -125,9 +125,6 @@ public class Table extends AbstractWingElement implements StructuralElement
 
     /**
      * Set the head element which is the label associated with this table.
-     * 
-     * @param characters
-     *            (May be null) Unprocessed characters to be included
      */
     public Head setHead() throws WingException
     {

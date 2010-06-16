@@ -43,7 +43,7 @@ import java.io.UnsupportedEncodingException;
  *  <li>Add a {@link DatasetDSpaceObjectGenerator} for the appropriate object type.</li>
  *  <li>Add other generators as required to get the statistic you want.</li>
  *  <li>Add {@link org.dspace.statistics.content.filter filters} as required.</li>
- *  <li>{@link createDataset} will run the query and return a result matrix.
+ *  <li>{@link #createDataset(Context)} will run the query and return a result matrix.
  *      Subsequent calls skip the query and return the same matrix.</li>
  * </ol>
  *

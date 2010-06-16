@@ -74,9 +74,6 @@ public class SimpleReporterImpl implements SimpleReporter
 
     /**
      * Main Constructor.
-     * 
-     * @param reporter
-     *            reporter to select the information
      */
     public SimpleReporterImpl()
     {
@@ -84,7 +81,7 @@ public class SimpleReporterImpl implements SimpleReporter
     }
 
     /**
-     * Sends the Deleteted bitstream report to an administrator. for the
+     * Sends the Deleted bitstream report to an administrator. for the
      * specified date range.
      * 
      * @param startDate

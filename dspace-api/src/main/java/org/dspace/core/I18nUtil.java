@@ -312,12 +312,12 @@ public class I18nUtil
     }
     
     /**
-     * Get the i18n message string for a given key and locale
+     * Get the i18n message string for a given key and context
      *
      * @param key
      *        String - name of the key to get the message for
-     * @param locale
-     *        Locale, to get the message for
+     * @param c
+     *        Context having the desired Locale
      *
      * @return message
      *         String of the message

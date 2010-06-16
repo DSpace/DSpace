@@ -59,9 +59,9 @@ import org.dspace.eperson.EPerson;
 
 /**
  * Unauthenticate the current user. There is no way this action will fail, 
- * so any components inside the action will be exceuted.
+ * so any components inside the action will be executed.
  * 
- * This aciton will always send an HTTP redirect to the DSpace homepage.
+ * This action will always send an HTTP redirect to the DSpace homepage.
  * 
  * Example: 
  * 
@@ -80,10 +80,12 @@ public class UnAuthenticateAction extends AbstractAction
     /**
      * Logout the current user.
      * 
-     * @param pattern
-     *            un-used.
+     * @param redirector
+     * @param resolver
      * @param objectModel
      *            Cocoon's object model
+     * @param source
+     * @param parameters
      */
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
@@ -97,7 +99,7 @@ public class UnAuthenticateAction extends AbstractAction
 
         EPerson eperson = context.getCurrentUser();
         
-        // Actualy log the user out.
+        // Actually log the user out.
         AuthenticationUtil.logOut(context,httpRequest);
         
         // Set the user as logged in for the rest of this request so that the cache does not get spoiled.

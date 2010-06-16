@@ -137,7 +137,7 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
      * Read in the given src path into an internal DOM for later processing when
      * needed.
      * 
-     * @param sourceResolver
+     * @param resolver
      *            Resolver for cocoon pipelines.
      * @param objectModel
      *            The pipelines's object model.

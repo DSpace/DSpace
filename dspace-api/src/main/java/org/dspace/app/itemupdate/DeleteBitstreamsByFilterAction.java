@@ -88,7 +88,7 @@ public class DeleteBitstreamsByFilterAction extends UpdateBitstreamsAction {
 	 * 	 Delete bitstream
 	 * 
 	 *  @param context
-	 *  @param ItemArchive
+	 *  @param itarch
 	 *  @param isTest
 	 *  @param suppressUndo
 	 *  @throws IllegalArgumentException
@@ -97,8 +97,9 @@ public class DeleteBitstreamsByFilterAction extends UpdateBitstreamsAction {
 	 *  @throws AuthorizeException
 	 *  @throws SQLException
 	 */
-	public void execute(Context context, ItemArchive itarch, boolean isTest, boolean suppressUndo) 
-	throws AuthorizeException, BitstreamFilterException, IOException, ParseException, SQLException 
+	public void execute(Context context, ItemArchive itarch, boolean isTest,
+            boolean suppressUndo) throws AuthorizeException,
+            BitstreamFilterException, IOException, ParseException, SQLException 
 	{
 		
 		List<String> deleted = new ArrayList<String>();

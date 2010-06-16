@@ -75,7 +75,7 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
 	 * 	Adds bitstreams from the archive as listed in the contents file.
 	 * 
 	 *  @param context
-	 *  @param ItemArchive
+	 *  @param itarch
 	 *  @param isTest
 	 *  @param suppressUndo
 	 *  @throws IllegalArgumentException
@@ -84,8 +84,9 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
 	 *  @throws AuthorizeException
 	 *  @throws SQLException
 	 */
-	public void execute(Context context, ItemArchive itarch, boolean isTest, boolean suppressUndo) 
-	throws IllegalArgumentException, ParseException, IOException, AuthorizeException, SQLException 
+	public void execute(Context context, ItemArchive itarch, boolean isTest,
+            boolean suppressUndo) throws IllegalArgumentException,
+            ParseException, IOException, AuthorizeException, SQLException 
 	{
 		Item item = itarch.getItem();
 		File dir = itarch.getDirectory();

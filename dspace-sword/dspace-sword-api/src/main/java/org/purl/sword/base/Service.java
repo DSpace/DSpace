@@ -109,7 +109,7 @@ public class Service extends XmlElement implements SwordElementInterface
    /**
     * Create a new instance. 
     * 
-    * @param complianceLevel The service compliance level. 
+    * @param version The service compliance level. 
     */
    public Service(String version)
    {
@@ -121,9 +121,9 @@ public class Service extends XmlElement implements SwordElementInterface
     * Create a new instance with the specified compliance level, noOp and 
     * verbose values. 
     * 
-    * @param complianceLevel  The service compliance level. 
-    * @param noOp             The noOp.
-    * @param verbose          The verbose element. 
+    * @param version  The service compliance level. 
+    * @param noOp     The noOp.
+    * @param verbose  The verbose element. 
     */
    public Service(String version, boolean noOp, boolean verbose) 
    {
@@ -209,7 +209,7 @@ public class Service extends XmlElement implements SwordElementInterface
    
    /**
     * Determine if the NoOp value has been set. This should be called to 
-    * check if an item has been programatically set and does not have a
+    * check if an item has been programmatically set and does not have a
     * default value. 
     * 
     * @return True if it has been set programmatically. Otherwise, false. 
@@ -251,7 +251,7 @@ public class Service extends XmlElement implements SwordElementInterface
 
    /**
     * Determine if the Verbose value has been set. This should be called to 
-    * check if an item has been programatically set and does not have a
+    * check if an item has been programmatically set and does not have a
     * default value. 
     * 
     * @return True if it has been set programmatically. Otherwise, false. 
@@ -340,7 +340,7 @@ public class Service extends XmlElement implements SwordElementInterface
    }
    
    /**
-    * Marshall the data in this object to an Element object. 
+    * Marshal the data in this object to an Element object. 
     * 
     * @return A XOM Element that holds the data for this Content element. 
     */
@@ -385,7 +385,7 @@ public class Service extends XmlElement implements SwordElementInterface
    }
      
    /**
-    * Unmarshall the content element into the data in this object. 
+    * Unmarshal the content element into the data in this object. 
     * 
     * @throws UnmarshallException If the element does not contain a
     *                             content element or if there are problems
@@ -400,7 +400,7 @@ public class Service extends XmlElement implements SwordElementInterface
    /**
     * 
     * @param service
-    * @param validate
+    * @param validationProperties
     * @return
     * @throws org.purl.sword.base.UnmarshallException
     */

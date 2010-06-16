@@ -169,7 +169,7 @@ public class Workspace extends XmlElement implements SwordElementInterface
    /**
     * Get a list of the collections
     * 
-    * @ return A list.
+    * @return A list.
     */
    public List<Collection> getCollections( )
    {
@@ -177,7 +177,7 @@ public class Workspace extends XmlElement implements SwordElementInterface
    }
 
    /**
-    * Marshall the data in this element to an Element. 
+    * Marshal the data in this element to an Element. 
     * 
     * @return An element that contains the data in this object. 
     */
@@ -201,7 +201,7 @@ public class Workspace extends XmlElement implements SwordElementInterface
    }
 
    /**
-    * Unmarshall the workspace element into the data in this object. 
+    * Unmarshal the workspace element into the data in this object. 
     * 
     * @throws UnmarshallException If the element does not contain a
     *                             workspace element or if there are problems
@@ -216,7 +216,7 @@ public class Workspace extends XmlElement implements SwordElementInterface
    /**
     *
     * @param workspace
-    * @param validate
+    * @param validationProperties
     * @return
     * @throws org.purl.sword.base.UnmarshallException
     */

@@ -55,7 +55,7 @@ import org.dspace.core.Context;
 /**
  * Remove all selected submissions. This action is used by the 
  * submission page, the user may check each unfinished submission 
- * and when thy click the remove submissions button this action 
+ * and when he clicks the remove submissions button this action 
  * will remove them all. 
  * 
  * @author Scott Phillips
@@ -66,10 +66,12 @@ public class RemoveSubmissionsAction extends AbstractAction
     /**
      * Remove all selected submissions
      * 
-     * @param pattern
-     *            un-used.
+     * @param redirector
+     * @param resolver
      * @param objectModel
      *            Cocoon's object model
+     * @param source
+     * @param parameters
      */
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception

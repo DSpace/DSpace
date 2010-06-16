@@ -56,7 +56,7 @@ public class PackageValidationException extends PackageException
 {
     /**
      * Create a new exception with the given message.
-     * @param s - diagnostic message.
+     * @param message - diagnostic message.
      */
     public PackageValidationException(String message)
     {
@@ -65,7 +65,7 @@ public class PackageValidationException extends PackageException
 
     /**
      * Create a new exception wrapping it around another exception.
-     * @param e - exception specifying the cause of this failure.
+     * @param exception - exception specifying the cause of this failure.
      */
     public PackageValidationException(Exception exception)
     {

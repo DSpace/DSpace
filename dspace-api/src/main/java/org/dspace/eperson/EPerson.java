@@ -359,7 +359,7 @@ public class EPerson extends DSpaceObject
      * @param query
      *            The search string
      * 
-     * @return the number of epeople mathching the query
+     * @return the number of epeople matching the query
      */
     public static int searchResultCount(Context context, String query)
     	throws SQLException
@@ -576,7 +576,7 @@ public class EPerson extends DSpaceObject
      * Locale specification of the form {language} or {language}_{territory},
      * e.g. "en", "en_US", "pt_BR" (the latter is Brazilian Portugese).
      * 
-     * @param s
+     * @param language
      *            language
      */
      public void setLanguage(String language)

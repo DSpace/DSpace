@@ -59,16 +59,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 
 /**
- * This class determines the correct Aspect to use. This is determined by the
- * url string, if it is prepended with a number followed by a slash (such as 1/
- * or 3/) then the Aspect identified by the number is used. When the URL does
- * not start with an integer then the first Aspect (aspect zero) is loaded.
- * 
- * Once the Aspect has been identified the following sitemap parameters are
- * provided: {ID} is the Aspect ID, {aspect} is the path to the aspect,
- * {aspectName} is a unique name for the aspect, and {prefix} is the aspect
- * identifier prepending the URL (if one exists!).
- * 
  * This class determines the correct Theme to apply to the URL. This is
  * determined by the Theme rules defined in the xmlui.xml configuration file.
  * Each rule is evaluated in order and the first rule to match is the selected
@@ -84,11 +74,13 @@ import org.dspace.core.ConfigurationManager;
 public class ThemeMatcher extends AbstractLogEnabled implements Matcher {
 
 	/**
-	 * @param pattern
-	 *            name of sitemap parameter to find
+	 * @param src
+	 *            name of sitemap parameter to find (ignored)
 	 * @param objectModel
 	 *            environment passed through via cocoon
-	 * @return null or map containing value of sitemap parameter 'pattern'
+	 * @param parameters
+	 *            parameters passed to this matcher in the sitemap
+	 * @return null or map containing value of sitemap parameter 'src'
 	 */
 	public Map match(String src, Map objectModel, Parameters parameters)
 			throws PatternException {

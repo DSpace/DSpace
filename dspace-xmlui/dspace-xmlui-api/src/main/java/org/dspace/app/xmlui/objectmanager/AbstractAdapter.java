@@ -70,8 +70,8 @@ import org.xml.sax.helpers.NamespaceSupport;
  * translate a given type of DSpace object into a METS document for rendering
  * into the DRI document.
  * 
- * This class provides the chasses for those unique parts of the document to be
- * build upon, there are seven rendering methods that may be overriden for each
+ * This class provides the chassis for those unique parts of the document to be
+ * build upon, there are seven rendering methods that may be overridden for each
  * section of the METS document.
  * 
  * Header
@@ -98,12 +98,12 @@ public abstract class AbstractAdapter
     public static final Namespace DIM = new Namespace(DIM_URI);    
     
     /**
-     * A sequence used to generate unquie mets ids.
+     * A sequence used to generate unique mets ids.
      */
     private int idSequence = 0;
     
     /**
-     * The contextPath of this webapplication, used for generateing urls.
+     * The contextPath of this web application, used for generating URLs.
      */
     protected String contextPath;
     
@@ -118,7 +118,7 @@ public abstract class AbstractAdapter
     
     /**
      * Construct a new adapter, implementers must use call this method so
-     * the approprate internal values are insured to be set correctly.
+     * the appropriate internal values are insured to be set correctly.
      * 
      * @param contextPath
      *            The contextPath of this web application.
@@ -128,7 +128,7 @@ public abstract class AbstractAdapter
         this.contextPath = contextPath;
     }
 
-    /** The variables that dicatacte what part of the METS document to render */
+    /** The variables that dictate what part of the METS document to render */
     List<String> sections = new ArrayList<String>();
     List<String> dmdTypes = new ArrayList<String>();
     HashMap<String,List> amdTypes = new HashMap<String,List>();
@@ -136,10 +136,10 @@ public abstract class AbstractAdapter
     List<String> structTypes = new ArrayList<String>();
     
     /**
-     * A comma seperated list of METS sections to render. If no value 
+     * A comma separated list of METS sections to render. If no value 
      * is provided then all METS sections are rendered.
      * 
-     * @param sections Comma seperated list of METS sections.
+     * @param sections Comma separated list of METS sections.
      */
     public void setSections(String sections)
     {
@@ -153,10 +153,10 @@ public abstract class AbstractAdapter
     }
     
     /**
-     * A comma seperated list of METS descriptive metadata formats to 
+     * A comma separated list of METS descriptive metadata formats to 
      * render. If no value is provided then only the DIM format is used.
      * 
-     * @param sections Comma seperated list of METS metadata types.
+     * @param dmdTypes Comma separated list of METS metadata types.
      */
     public void setDmdTypes(String dmdTypes)
     {
@@ -175,7 +175,7 @@ public abstract class AbstractAdapter
      *
      * @param amdSec Section of <amdSec> where this administrative metadata
      *                will be rendered
-     * @param mdTypes Comma seperated list of METS metadata types.
+     * @param mdTypes Comma separated list of METS metadata types.
      */
     public void setAmdTypes(String amdSec, String mdTypes)
     {
@@ -192,10 +192,10 @@ public abstract class AbstractAdapter
     }
 
     /**
-     * A comma seperated list of METS technical metadata formats to
+     * A comma separated list of METS technical metadata formats to
      * render.
      *
-     * @param techMDTypes Comma seperated list of METS metadata types.
+     * @param techMDTypes Comma separated list of METS metadata types.
      */
     public void setTechMDTypes(String techMDTypes)
     {
@@ -203,10 +203,10 @@ public abstract class AbstractAdapter
     }
 
     /**
-     * A comma seperated list of METS intellectual property rights metadata
+     * A comma separated list of METS intellectual property rights metadata
      * formats to render.
      *
-     * @param rightsMDTypes Comma seperated list of METS metadata types.
+     * @param rightsMDTypes Comma separated list of METS metadata types.
      */
     public void setRightsMDTypes(String rightsMDTypes)
     {
@@ -214,10 +214,10 @@ public abstract class AbstractAdapter
     }
 
     /**
-     * A comma seperated list of METS source metadata
+     * A comma separated list of METS source metadata
      * formats to render.
      *
-     * @param sourceMDTypes Comma seperated list of METS metadata types.
+     * @param sourceMDTypes Comma separated list of METS metadata types.
      */
     public void setSourceMDTypes(String sourceMDTypes)
     {
@@ -225,10 +225,10 @@ public abstract class AbstractAdapter
     }
 
     /**
-     * A comma seperated list of METS digital provenance metadata
+     * A comma separated list of METS digital provenance metadata
      * formats to render.
      *
-     * @param digiprovMDTypes Comma seperated list of METS metadata types.
+     * @param digiprovMDTypes Comma separated list of METS metadata types.
      */
     public void setDigiProvMDTypes(String digiprovMDTypes)
     {
@@ -236,10 +236,10 @@ public abstract class AbstractAdapter
     }
     
     /**
-     * A comma seperated list of METS fileGrps to render. If no value
+     * A comma separated list of METS fileGrps to render. If no value
      * is provided then all groups are rendered.
      * 
-     * @param sections Comma seperated list of METS file groups.
+     * @param fileGrpTypes Comma separated list of METS file groups.
      */
     public void setFileGrpTypes(String fileGrpTypes)
     {
@@ -253,10 +253,10 @@ public abstract class AbstractAdapter
     }
     
     /**
-     * A comma seperated list of METS structural types to render. If no 
+     * A comma separated list of METS structural types to render. If no 
      * value is provided then only the DIM format is used.
      * 
-     * @param sections Comma seperated list of METS structure types.
+     * @param structTypes Comma separated list of METS structure types.
      */
     public void setStructTypes(String structTypes)
     {
@@ -349,7 +349,7 @@ public abstract class AbstractAdapter
 
     		startElement(METS,"METS",attributes);
 
-    		// If the user requested no specefic sections then render them all.
+    		// If the user requested no specific sections then render them all.
     		boolean all = (sections.size() == 0);
     		
     		if (all || sections.contains("metsHdr"))
@@ -397,7 +397,7 @@ public abstract class AbstractAdapter
      * Generate a METS file element for a given bitstream.
      *
      * @param item
-     *            If the bitstream is associated with an item provid the item
+     *            If the bitstream is associated with an item provide the item
      *            otherwise leave null.
      * @param bitstream
      *            The bitstream to build a file element for.
@@ -406,7 +406,6 @@ public abstract class AbstractAdapter
      * @param groupID
      *            The group id for this file, if it is derived from another file
      *            then they should share the same groupID.
-     * @return The METS file element.
      */
 	protected void renderFile(Item item, Bitstream bitstream, String fileID, String groupID) throws SAXException
 	{
@@ -417,7 +416,7 @@ public abstract class AbstractAdapter
      * Generate a METS file element for a given bitstream.
      * 
      * @param item
-     *            If the bitstream is associated with an item provid the item
+     *            If the bitstream is associated with an item provide the item
      *            otherwise leave null.
      * @param bitstream
      *            The bitstream to build a file element for.
@@ -429,7 +428,6 @@ public abstract class AbstractAdapter
      * @param admID
      *            The IDs of the administrative metadata sections which pertain
      *            to this file
-     * @return The METS file element.
      */
 	protected void renderFile(Item item, Bitstream bitstream, String fileID, String groupID, String admID) throws SAXException
 	{
@@ -469,10 +467,10 @@ public abstract class AbstractAdapter
         String description = bitstream.getDescription();
 
         
-        // If possible refrence this bitstream via a handle, however this may
-        // be null if a handle has not yet been assigned. In this case refrence the
+        // If possible reference this bitstream via a handle, however this may
+        // be null if a handle has not yet been assigned. In this case reference the
         // item its internal id. In the last case where the bitstream is not associated
-        // with an item (such as a community logo) then refrence the bitstreamID directly.
+        // with an item (such as a community logo) then reference the bitstreamID directly.
         String identifier = null;
         if (item != null && item.getHandle() != null)
         	identifier = "handle/"+item.getHandle();
@@ -493,7 +491,7 @@ public abstract class AbstractAdapter
         catch (UnsupportedEncodingException uee)
         {
             // just ignore it, we don't have to have a pretty
-            // name on the end of the url because the sequence id will 
+            // name on the end of the URL because the sequence id will 
         	// locate it. However it means that links in this file might
         	// not work....
         }
@@ -527,7 +525,7 @@ public abstract class AbstractAdapter
 	
 	/**
      * 
-     * Generate a unique METS id. For consistancy, all prefixs should probably
+     * Generate a unique METS id. For consistency, all prefixes should probably
      * end in an underscore, "_".
      * 
      * @param prefix
@@ -548,7 +546,7 @@ public abstract class AbstractAdapter
      */
     public DisseminationCrosswalk getDisseminationCrosswalk(String crosswalkName) throws WingException 
     {
-    	// Fixme add some caching here
+    	// FIXME add some caching here
     	DisseminationCrosswalk crosswalk = (DisseminationCrosswalk) PluginManager.getNamedPlugin(DisseminationCrosswalk.class, crosswalkName);
 
 	    if (crosswalk == null)
@@ -566,7 +564,7 @@ public abstract class AbstractAdapter
     	{"MARC","MODS","EAD","DC","NISOIMG","LC-AV","VRA","TEIHDR","DDI","FGDC","PREMIS"/*,"OTHER"*/};
     
     /**
-     * Determine if the provided metadata type is a stardard METS
+     * Determine if the provided metadata type is a standard METS
      * defined type. If it is not, use the other string.
      * 
      * @param metadataType type name
@@ -598,12 +596,6 @@ public abstract class AbstractAdapter
 	/**
      * Send the SAX events to start this element.
      * 
-     * @param contentHandler
-     *            (Required) The registered contentHandler where SAX events
-     *            should be routed too.
-     * @param namespaces
-     *            (Required) SAX Helper class to keep track of namespaces able
-     *            to determine the correct prefix for a given namespace URI.
      * @param namespace
      *            (Required) The namespace of this element.
      * @param name
@@ -611,7 +603,8 @@ public abstract class AbstractAdapter
      * @param attributes
      *            (May be null) Attributes for this element
      */
-    protected void startElement(Namespace namespace, String name, AttributeMap ... attributes) throws SAXException
+    protected void startElement(Namespace namespace, String name,
+            AttributeMap... attributes) throws SAXException
     {
         contentHandler.startElement(namespace.URI, name, qName(namespace, name),
                 map2sax(namespace,attributes));
@@ -621,9 +614,6 @@ public abstract class AbstractAdapter
      * Send the SAX event for these plain characters, not wrapped in any
      * elements.
      * 
-     * @param contentHandler
-     *            (Required) The registered contentHandler where SAX events
-     *            should be routed too.
      * @param characters
      *            (May be null) Characters to send.
      */
@@ -639,12 +629,6 @@ public abstract class AbstractAdapter
     /**
      * Send the SAX events to end this element.
      * 
-     * @param contentHandler
-     *            (Required) The registered contentHandler where SAX events
-     *            should be routed too.
-     * @param namespaces
-     *            (Required) SAX Helper class to keep track of namespaces able
-     *            to determine the correct prefix for a given namespace URI.
      * @param namespace
      *            (Required) The namespace of this element.
      * @param name

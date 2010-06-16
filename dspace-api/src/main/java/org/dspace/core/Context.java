@@ -92,11 +92,11 @@ public class Context
     /** Indicates whether authorisation subsystem should be ignored */
     private boolean ignoreAuth;
 
-    /** A stack with the history of authoritation system check modify */
+    /** A stack with the history of authorisation system check modify */
     private Stack<Boolean> authStateChangeHistory;
 
     /**
-     * A stack with the name of the caller class that modify authoritation
+     * A stack with the name of the caller class that modify authorisation
      * system check
      */
     private Stack<String> authStateClassCallHistory;
@@ -185,7 +185,7 @@ public class Context
     /**
      * set the current Locale
      * 
-     * @param Locale
+     * @param locale
      *            the current Locale
      */
     public void setCurrentLocale(Locale locale)
@@ -314,7 +314,7 @@ public class Context
 
     /**
      * Close the context object after all of the operations performed in the
-     * context have completed succesfully. Any transaction with the database is
+     * context have completed successfully. Any transaction with the database is
      * committed.
      * 
      * @exception SQLException

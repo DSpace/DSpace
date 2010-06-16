@@ -40,7 +40,7 @@ package org.dspace.app.xmlui.wing.element;
 
 /**
  * A class representing a text area input control. The text area control enables
- * to user to entere muliple lines of text.
+ * to user to enter multiple lines of text.
  *
  * @author Scott Phillips
  */
@@ -94,7 +94,7 @@ public class TextArea extends Field
     /**
      * Set the maximum length of the field.
      *
-     * @param maxlength
+     * @param maxLength
      *            (May be zero for no defined value) The maximum length that the
      *            theme should accept for form input.
      */
@@ -131,9 +131,6 @@ public class TextArea extends Field
 
     /**
      * Set the raw value of the field removing any previous raw values.
-     *
-     * @param characters
-     *            (May be null) Field value as a string
      */
     public Value setValue() throws WingException
     {

@@ -136,10 +136,10 @@ public class METSManifest
          *
          * @param mdRef JDOM element of mdRef in the METS manifest.
          * @return stream containing the metadata mentioned in mdRef.
-         * @throw MetadataValidationException if the mdRef is unacceptable or missing required information.
-         * @throw IOException if it is returned by services called by this method.
-         * @throw SQLException if it is returned by services called by this method.
-         * @throw AuthorizeException if it is returned by services called by this method.
+         * @throws MetadataValidationException if the mdRef is unacceptable or missing required information.
+         * @throws IOException if it is returned by services called by this method.
+         * @throws SQLException if it is returned by services called by this method.
+         * @throws AuthorizeException if it is returned by services called by this method.
          */
         public InputStream getInputStream(Element mdRef)
             throws MetadataValidationException, IOException, SQLException, AuthorizeException;
@@ -181,7 +181,7 @@ public class METSManifest
     /** all mdRef elements in the manifest */
     private List mdFiles = null;
 
-    /** <file> elements in "original" filegroup (bundle) */
+    /** <file> elements in "original" file group (bundle) */
     private List contentFiles = null;
 
     /** builder to use for mdRef streams, inherited from create() */
@@ -539,7 +539,7 @@ public class METSManifest
 
     /**
      * Return contents of *md element as List of XML Element objects.
-     * Gets content, dereferecing mdRef if necessary, or decoding and parsing
+     * Gets content, dereferencing mdRef if necessary, or decoding and parsing
      * a binData that contains XML.
      * @return contents of metadata section, or empty list if no XML content is available.
      * @throws MetadataValidationException if METS is invalid, or there is an error parsing the XML.
@@ -612,7 +612,7 @@ public class METSManifest
 
     /**
      * Return contents of *md element as stream.
-     * Gets content, dereferecing mdRef if necessary, or decoding
+     * Gets content, dereferencing mdRef if necessary, or decoding
      * a binData element if necessary.
      * @return Stream containing contents of metadata section.  Never returns null.
      * @throws MetadataValidationException if METS format does not contain any metadata.
@@ -802,9 +802,10 @@ public class METSManifest
      * Crosswalk the metadata associated with a particular <code>file</code>
      * element into the bitstream it corresponds to.
      * @param context a dspace context.
-     * @param bs bitstream target of the crosswalk
+     * @param bitstream bitstream target of the crosswalk
      * @param fileId value of ID attribute in the file element responsible
      *  for the contents of that bitstream.
+     *  @param callback ???
      */
     public void crosswalkBitstream(Context context, Bitstream bitstream,
                                    String fileId, Mdref callback)

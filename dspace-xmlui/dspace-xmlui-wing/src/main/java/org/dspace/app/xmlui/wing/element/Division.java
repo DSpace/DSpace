@@ -127,10 +127,10 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     /** What method should this interactive division use for posting the result? */
     private String method;
 
-    /** Does this interactive division support the ajax behavior? */
+    /** Does this interactive division support the AJAX behavior? */
     private boolean behaviorAJAXenabled = false;
     
-    /** A list of fields which need to be handled specialy when using bhavior */
+    /** A list of fields which need to be handled specially when using behavior */
     private String behaviorSensitiveFields;
     
     /** Special rendering instructions */
@@ -148,7 +148,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      */
     private String paginationType;
 
-    /** Url to the previousPage. (used by simple pagination) */
+    /** URL to the previousPage. (used by simple pagination) */
     private String previousPage;
 
     /** URL to the nextPage. (used by simple pagination) */
@@ -161,30 +161,30 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     private int itemsTotal;
 
     /**
-     * The index of the first item inculded in this div. (used by both
+     * The index of the first item included in this div. (used by both
      * pagination types)
      */
     private int firstItemIndex;
 
     /**
-     * The index of the first item inculded in this div. (used by both
+     * The index of the first item included in this div. (used by both
      * pagination types)
      */
     private int lastItemIndex;
 
     /**
-     * The index the current page being displayed. (used by maksed pagination
+     * The index the current page being displayed. (used by masked pagination
      * type)
      */
     private int currentPage;
 
     /**
-     * The total number of pages in the pagination set. (used by maksed
+     * The total number of pages in the pagination set. (used by masked
      * pagination type)
      */
     private int pagesTotal;
 
-    /** The pagination URL mask. (used by maksed pagination type) */
+    /** The pagination URL mask. (used by masked pagination type) */
     private String pageURLMask;
 
     /** The possible interactive division methods: get,post, or multipart. */
@@ -315,7 +315,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * simple page paradigm.
      * 
      * @param itemsTotal
-     *            (Required) How many items exist accross all paginated divs.
+     *            (Required) How many items exist across all paginated divs.
      * @param firstItemIndex
      *            (Required) The index of the first item included in this div.
      * @param lastItemIndex
@@ -343,7 +343,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * masked page paradigm.
      * 
      * @param itemsTotal
-     *            (Required) How many items exist accross all paginated divs.
+     *            (Required) How many items exist across all paginated divs.
      * @param firstItemIndex
      *            (Required) The index of the first item included in this div.
      * @param lastItemIndex
@@ -354,7 +354,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * @param pagesTotal
      *            (Required) How many pages the paginated div spans.
      * @param pageURLMask
-     *            (Required) The mask of a url to a particular within the
+     *            (Required) The mask of a URL to a particular within the
      *            paginated set. The destination page's number should replace
      *            the {pageNum} string in the URL mask to generate a full URL to
      *            that page.
@@ -374,9 +374,6 @@ public class Division extends AbstractWingElement implements StructuralElement, 
 
     /**
      * Set the head element which is the label associated with this division.
-     * 
-     * @param characters
-     *            (May be null) Unprocessed characters to be included
      */
     public Head setHead() throws WingException
     {
@@ -475,7 +472,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
 
     /**
      * Add an interactive sub division for further logical grouping of content
-     * without specifing special rendering instructions.
+     * without specifying special rendering instructions.
      * 
      * The valid values for method may be found in the static variable METHODS.
      * 
@@ -664,7 +661,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     }
 
     /**
-     * Add a reference set for metadata refrences.
+     * Add a reference set for metadata references.
      * 
      * @param name
      *            (Required) a local identifier used to differentiate the
@@ -686,18 +683,13 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     }
 
     /**
-     * Add a reference set for metadata refrences.
+     * Add a reference set for metadata references.
      * 
      * @param name
      *            (Required) a local identifier used to differentiate the
      *            element from its siblings.
      * @param type
      *            (Required) The include type, see IncludeSet.TYPES
-     * @param orderBy
-     *            (May be null) An statement of ordering within the include set.
-     * @param rend
-     *            (May be null) a rendering hint used to override the default
-     *            display of the element.
      */
     public ReferenceSet addReferenceSet(String name, String type)
             throws WingException

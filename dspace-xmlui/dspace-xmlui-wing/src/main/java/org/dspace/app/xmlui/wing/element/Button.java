@@ -104,9 +104,9 @@ public class Button extends Field
     }
 
     /**
-     * Set the button's label, removing any previous label's
+     * Set the button's label, removing any previous labels.
      * 
-     * @param translate
+     * @param translated
      *            (Required) A key into the i18n catalogue for translation into
      *            the user's preferred language.
      */

@@ -656,8 +656,8 @@ public class JSPStepManager
      * @param request
      *            current servlet request object
      * 
-     * @returns pathToJSP The context path to the JSP page (e.g.
-     *          "/submit/select-collection.jsp")
+     * @return pathToJSP The context path to the JSP page (e.g.
+     *         "/submit/select-collection.jsp")
      */
     public static final String getLastJSPDisplayed(HttpServletRequest request)
     {

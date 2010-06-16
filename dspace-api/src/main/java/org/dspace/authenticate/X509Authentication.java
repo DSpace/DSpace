@@ -486,8 +486,8 @@ public class X509Authentication implements AuthenticationMethod
      * Return special groups configured in dspace.cfg for X509 certificate
      * authentication.
      * 
-     * @param Context
-     * @param HttpServletRequest
+     * @param context
+     * @param request
      *            object potentially containing the cert
      * 
      * @return An int array of group IDs

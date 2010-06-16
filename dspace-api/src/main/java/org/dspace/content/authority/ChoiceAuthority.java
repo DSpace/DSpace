@@ -42,12 +42,13 @@ package org.dspace.content.authority;
  * one metadata field.
  *
  * @author Larry Stone
- * @see ChoiceAuthorityManager, MetadataAuthorityManager
+ * @see ChoiceAuthorityManager
+ * @see MetadataAuthorityManager
  */
 public interface ChoiceAuthority
 {
     /**
-     * Get all values from the authority that match the proferred value.
+     * Get all values from the authority that match the profferred value.
      * Note that the offering was entered by the user and may contain
      * mixed/incorrect case, whitespace, etc so the plugin should be careful
      * to clean up user data before making comparisons.

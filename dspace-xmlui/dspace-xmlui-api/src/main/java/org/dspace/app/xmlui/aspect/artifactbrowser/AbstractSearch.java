@@ -84,7 +84,7 @@ import org.xml.sax.SAXException;
 
 /**
  * This is an abstract search page. It is a collection of search methods that
- * are common between diffrent search implementation. An implementer must
+ * are common between different search implementation. An implementer must
  * implement at least three methods: addBody(), getQuery(), and generateURL().
  * 
  * See the two implementors: SimpleSearch and AdvancedSearch.
@@ -166,7 +166,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             if (scope != null)
                 key += "-" + scope.getHandle();
             
-            // The actualy search query.
+            // The actual search query.
             key += "-" + getQuery();
 
             return HashUtil.hash(key);
@@ -241,7 +241,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         if (getQuery().length() > 0)
         {
 
-            // Preform the actual search
+            // Perform the actual search
             performSearch();
             DSpaceObject searchScope = getScope();
             
@@ -413,8 +413,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     /**
      * Query DSpace for a list of all items / collections / or communities that
      * match the given search query.
-     * 
-     * @return The associated query results.
      */
     protected void performSearch() throws SQLException, IOException, UIException
     {

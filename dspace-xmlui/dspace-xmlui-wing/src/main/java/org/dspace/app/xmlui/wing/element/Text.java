@@ -130,9 +130,6 @@ public class Text extends Field
 
     /**
      * Set the raw value of the field removing any previous raw values.
-     *
-     * @param characters
-     *            (May be null) Field value as a string
      */
     public Value setValue() throws WingException
     {

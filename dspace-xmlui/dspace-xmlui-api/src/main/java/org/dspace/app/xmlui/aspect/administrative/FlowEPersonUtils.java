@@ -62,7 +62,7 @@ import org.dspace.eperson.EPersonDeletionException;
 
 /**
  * Utility methods to processes actions on EPeople. These methods are used
- * exclusivly from the administrative flow scripts.
+ * exclusively from the administrative flow scripts.
  * 
  * @author scott phillips
  */
@@ -86,8 +86,8 @@ public class FlowEPersonUtils {
 	
 	/**
 	 * Add a new eperson. This method will check that the email address, 
-	 * first name, and last name are non empty. Also a check is preformed 
-	 * to see if the requested email address is allready in use by another
+	 * first name, and last name are non empty. Also a check is performed 
+	 * to see if the requested email address is already in use by another
 	 * user.
 	 * 
 	 * @param context The current DSpace context
@@ -153,15 +153,17 @@ public class FlowEPersonUtils {
 	/**
 	 * Edit an eperson's metadata, the email address, first name, and last name are all
 	 * required. The user's email address can be updated but it must remain unique, if
-	 * the email address allready exists then the an error is produced.
+	 * the email address already exists then the an error is produced.
 	 * 
 	 * @param context The current DSpace context
 	 * @param request The HTTP request parameters
-	 * @param objectModel Cocoon's object model
+	 * @param ObjectModel Cocoon's object model
 	 * @param epersonID The unique id of the eperson being edited.
 	 * @return A process result's object.
 	 */
-	public static FlowResult processEditEPerson(Context context, Request request, Map ObjectModel, int epersonID) throws SQLException, AuthorizeException 
+	public static FlowResult processEditEPerson(Context context,
+            Request request, Map ObjectModel, int epersonID)
+            throws SQLException, AuthorizeException 
 	{
 
 		FlowResult result = new FlowResult();
@@ -262,8 +264,8 @@ public class FlowEPersonUtils {
 	
 	/**
 	 * Log this user in as another user. If the operation failed then the flow result
-	 * will be set to failure with it's mesage set correctly. Note that after logging out
-	 * the user may not have sufficent priveleges to continue.
+	 * will be set to failure with it's message set correctly. Note that after logging out
+	 * the user may not have sufficient privileges to continue.
 	 * 
 	 * @param context The current DSpace context.
 	 * @param objectModel Object model to obtain the HTTP request from.
@@ -295,7 +297,7 @@ public class FlowEPersonUtils {
 	
 	/**
 	 * Delete the epeople specified by the epeopleIDs parameter. This assumes that the
-	 * detetion has been confirmed.
+	 * deletion has been confirmed.
 	 * 
 	 * @param context The current DSpace context
 	 * @param epeopleIDs The unique id of the eperson being edited.

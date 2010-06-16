@@ -25,14 +25,14 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
     }
 
     /** Set the start date as a string expression.
-     * Must be paired with {@link setEndStr()}.
+     * Must be paired with {@link #setEndStr(String)}.
      */
     public void setStartStr(String startStr) {
         this.startStr = startStr;
     }
 
     /** Set the end date as a string expression.
-     * Must be paired with {@link setStartStr()}.
+     * Must be paired with {@link #setStartStr(String)}.
      */
     public void setEndStr(String endStr) {
         this.endStr = endStr;
@@ -44,14 +44,14 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
     }
 
     /** Set the start date as a Date object.
-     * Must be paired with {@link setEndDate()}.
+     * Must be paired with {@link #setEndDate(Date)}.
      */
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
     /** Set the end date as a Date object.
-     * Must be paired with {@link setStartDate()}.
+     * Must be paired with {@link #setStartDate(Date)}.
      */
     public void setEndDate(Date endDate) {
         this.endDate = endDate;

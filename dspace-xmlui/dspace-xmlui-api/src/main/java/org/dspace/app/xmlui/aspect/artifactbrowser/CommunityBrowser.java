@@ -113,7 +113,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     /** What depth is the maximum depth of the tree */
     protected int depth = DEFAULT_DEPTH;
 
-    /** Cached version the community / collection hierarch */
+    /** Cached version the community / collection hierarchy */
     protected TreeNode root;
     
     /** cached validity object */
@@ -207,7 +207,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     }
 
     /**
-     * Add a community-browser division that includes refrences to community and
+     * Add a community-browser division that includes references to community and
      * collection metadata.
      */
     public void addBody(Body body) throws SAXException, WingException,
@@ -248,11 +248,11 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     } 
     
     /**
-     * Recursively build an includeset of the community / collection hierarcher based upon
+     * Recursively build an includeset of the community / collection hierarchy based upon
      * the given NodeTree.
      * 
      * @param referenceSet The include set
-     * @param node The current node of the hierarch.
+     * @param node The current node of the hierarchy.
      */
     public void buildReferenceSet(ReferenceSet referenceSet, TreeNode node) throws WingException
     {
@@ -286,11 +286,11 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     }
     
     /**
-     * Recursively build a list of the community / collection hierarchery based upon
+     * Recursively build a list of the community / collection hierarchy based upon
      * the given NodeTree.
      * 
-     * @param List The parent list
-     * @param node The current node of the hierarch.
+     * @param list The parent list
+     * @param node The current node of the hierarchy.
      */
     public void buildList(List list, TreeNode node) throws WingException
     {
@@ -348,7 +348,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 
     /**
      * construct a tree structure of communities and collections. The results 
-     * of this hirarchy are cached so calling it multipletimes is acceptable.
+     * of this hierarchy are cached so calling it multiple times is acceptable.
      * 
      * @param communities The root level communities
      * @return A root level node.
@@ -404,7 +404,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         /** The object this node represents */
         private DSpaceObject dso;
 
-        /** The level in the hirarchy that this node is at. */
+        /** The level in the hierarchy that this node is at. */
         private int level;
 
         /** All children of this node */
@@ -443,7 +443,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         }
 
         /**
-         * @return The current level in the hirarchy of this node.
+         * @return The current level in the hierarchy of this node.
          */
         public int getLevel()
         {

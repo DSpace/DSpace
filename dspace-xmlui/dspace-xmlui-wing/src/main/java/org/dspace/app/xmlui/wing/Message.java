@@ -102,7 +102,7 @@ public class Message
      * current translate object but instead create a 
      * cloned copy that has been parameterized.
      * 
-     * @param object The dictionary parameters
+     * @param dictionaryParameters The dictionary parameters
      */
     public Message parameterize(Object ... dictionaryParameters)
     {

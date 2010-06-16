@@ -119,13 +119,13 @@ public class BrowseInfo
 	/** offset of the item at the top of the previous page */
 	private int prevOffset = -1;
 
-	/** the value upon which we are focussing */
+	/** the value upon which we are focusing */
 	private String focus;
 
-	/** number of resutls to display per page */
+	/** number of results to display per page */
 	private int resultsPerPage = -1;
 
-	/** database id of the item upon which we are focussing */
+	/** database id of the item upon which we are focusing */
 	private int focusItem = -1;
 
 	/** number of metadata elements to display before truncating using "et al" */
@@ -340,7 +340,7 @@ public class BrowseInfo
     }
 
     /**
-     * @param id	the database id of the item at the top of the next page
+     * @param offset	the database id of the item at the top of the next page
      */
     public void setNextOffset(int offset)
     {
@@ -396,7 +396,7 @@ public class BrowseInfo
 	}
 
 	/**
-	 * @param prevItem The prevItem to set.
+	 * @param prevOffset The prevOffset to set.
 	 */
 	public void setPrevOffset(int prevOffset)
 	{
@@ -460,7 +460,7 @@ public class BrowseInfo
 	}
 
 	/**
-	 * @param value The authority key to set.
+	 * @param authority The authority key to set.
 	 */
 	public void setAuthority(String authority)
 	{

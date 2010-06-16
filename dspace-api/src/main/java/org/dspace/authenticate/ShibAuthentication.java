@@ -372,7 +372,7 @@ public class ShibAuthentication implements AuthenticationMethod
      *            DSpace context
      * @param request
      *            HTTP request, in case anything in that is used to decide
-     * @param email
+     * @param username
      *            e-mail address of user attempting to register
      * 
      */

@@ -133,7 +133,7 @@ implements SwordElementInterface
     }
 
 	/**
-	 * Marshall the data in this object to an Element object. 
+	 * Marshal the data in this object to an Element object. 
 	 * 
 	 * @return The data expressed in an Element. 
 	 */
@@ -154,7 +154,7 @@ implements SwordElementInterface
    }
 
    /**
-    * Unmarshall the text element into this object.
+    * Unmarshal the text element into this object.
     * 
     * This unmarshaller only handles plain text content, although it can 
     * recognise the three different type elements of text, html and xhtml. This
@@ -176,7 +176,7 @@ implements SwordElementInterface
    /**
     * 
     * @param text
-    * @param validate
+    * @param validationProperties
     * @return
     * @throws org.purl.sword.base.UnmarshallException
     */

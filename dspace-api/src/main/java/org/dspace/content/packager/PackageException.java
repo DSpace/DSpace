@@ -55,19 +55,26 @@ import org.apache.log4j.Logger;
 public class PackageException extends Exception
 {
     /**
-     * Create a new exception with the given message.
-     * @param s - diagnostic message.
+     * Create a new exception with no message.
      */
     public PackageException()
     {
         super();
     }
 
+    /**
+     * Create a new exception with the given message.
+     * @param message - message text.
+     */
     public PackageException(String message)
     {
         super(message);
     }
 
+    /**
+     * Create a new exception wrapping the given underlying cause.
+     * @param cause - exception specifying the cause of this failure.
+     */
     public PackageException(Throwable cause)
     {
         super(cause);
@@ -75,7 +82,8 @@ public class PackageException extends Exception
 
     /**
      * Create a new exception wrapping it around another exception.
-     * @param e - exception specifying the cause of this failure.
+     * @param message - message text.
+     * @param cause - exception specifying the cause of this failure.
      */
     public PackageException(String message, Throwable cause)
     {

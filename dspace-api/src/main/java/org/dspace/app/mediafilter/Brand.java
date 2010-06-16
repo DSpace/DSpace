@@ -65,8 +65,8 @@ public class Brand
 	/**
 	 * Constructor to set up footer image attributes.
 	 *
-	 * @param footerWidth length of the footer in pixels
-	 * @param footerHeight height of the footer in pixels
+	 * @param brandWidth length of the footer in pixels
+	 * @param brandHeight height of the footer in pixels
 	 * @param font font to use for text on the footer
 	 * @param xOffset number of pixels text should be indented from left-hand side of footer
 	 *

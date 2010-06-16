@@ -330,7 +330,7 @@ public class AuthorizeConfiguration
     }
 
     /**
-     * Are community admins allowed to reinstatiate an item from them
+     * Are community admins allowed to reinstate an item from them
      * collections?
      * 
      * @return
@@ -459,7 +459,7 @@ public class AuthorizeConfiguration
     }
 
     /**
-     * Are collection admins allowed to reinstatiate an item from the
+     * Are collection admins allowed to reinstate an item from the
      * collection?
      * 
      * @return

@@ -105,13 +105,11 @@ public class ReferenceSet extends AbstractWingElement implements
      * @param context
      *            (Required) The context this element is contained in, such as
      *            where to route SAX events and what i18n catalogue to use.
+     * @param childreference
+     *            Whether this is a child reference (not requiring a name).
      * @param name
      *            (May be null) a local identifier used to differentiate the
      *            element from its siblings.
-     * @param informationModel
-     *            (May be null) The information model the enclosed objects
-     *            follow. If no model is given then the default information
-     *            model is used. (INFORMATION_MODEL_DEFAULT)
      * @param type
      *            (Required) The type of reference set which determines the level
      *            of detail for the metadata rendered. See TYPES for a list of
@@ -142,9 +140,6 @@ public class ReferenceSet extends AbstractWingElement implements
 
     /**
      * Set the head element which is the label associated with this referenceset.
-     * 
-     * @param characters
-     *            (May be null) Unprocessed characters to be referenced
      */
     public Head setHead() throws WingException
     {
@@ -180,7 +175,7 @@ public class ReferenceSet extends AbstractWingElement implements
     }
 
     /**
-     * Add an object refrence.
+     * Add an object reference.
      * 
      * @param object
      *            (Required) The referenced object.

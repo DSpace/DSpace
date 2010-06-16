@@ -347,7 +347,7 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
      * default control/paging buttons appear on each submission page.
      * <P>
      * Note: A given step may define its own buttons as necessary,
-     * and not call this method (since it must be explicitly envoked by
+     * and not call this method (since it must be explicitly invoked by
      * the step's addBody() method)
      *
      * @param controls
@@ -460,9 +460,6 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
      * Find the maximum step and page that the user has 
      * reached in the submission processes. 
      * If this submission is a workflow then return max-int.
-     * 
-     * @param context The current DSpace content
-     * @param id The unique ID of the current workflow/workspace
      */
     public double getMaxStepAndPageReached() throws SQLException {
         
@@ -486,7 +483,7 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
     }
 	
 	/**
-	 * Retreive error fields from the list of parameters
+	 * Retrieve error fields from the list of parameters
 	 * and return a List of all fields which had errors
 	 *
 	 * @return java.util.List of field names with errors

@@ -64,7 +64,7 @@ public class DeleteBitstreamsAction extends UpdateBitstreamsAction
 	 *   Delete bitstream from item
 	 * 
 	 *  @param context
-	 *  @param ItemArchive
+	 *  @param itarch
 	 *  @param isTest
 	 *  @param suppressUndo
 	 *  @throws IllegalArgumentException
@@ -73,8 +73,9 @@ public class DeleteBitstreamsAction extends UpdateBitstreamsAction
 	 *  @throws AuthorizeException
 	 *  @throws SQLException
 	 */
-	public void execute(Context context, ItemArchive itarch, boolean isTest, boolean suppressUndo) 
-	throws IllegalArgumentException, IOException, SQLException, AuthorizeException, ParseException 
+	public void execute(Context context, ItemArchive itarch, boolean isTest,
+            boolean suppressUndo) throws IllegalArgumentException, IOException,
+            SQLException, AuthorizeException, ParseException 
 	{
 		File f = new File(itarch.getDirectory(), ItemUpdate.DELETE_CONTENTS_FILE);
 		if (!f.exists())

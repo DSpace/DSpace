@@ -40,7 +40,7 @@ package org.purl.sword.base;
  * Definition of the error codes that will be used in 
  * SWORD error documents.
  * 
- * @see org.purl.sword.atom.SWORDErrorDocument
+ * @see SWORDErrorDocument
  * 
  * @author Stuart Lewis
  */

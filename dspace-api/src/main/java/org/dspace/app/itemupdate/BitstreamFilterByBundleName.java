@@ -60,7 +60,7 @@ public class BitstreamFilterByBundleName extends BitstreamFilter {
 	 *    
 	 *    @param bitstream
 	 *    @throws BitstreamFilterException
-	 *    @returns whether bitstream is in bundle
+	 *    @return whether bitstream is in bundle
 	 *    
 	 */
 	public boolean accept(Bitstream bitstream) 

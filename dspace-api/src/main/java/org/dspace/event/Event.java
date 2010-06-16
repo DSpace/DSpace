@@ -252,7 +252,6 @@ public class Event implements Serializable
      *            database ID of object instance.
      * @param detail
      *            detail information that depends on context.
-     * @param
      */
     public Event(int eventType, int subjectType, int subjectID, int objectType,
             int objectID, String detail)
@@ -272,7 +271,7 @@ public class Event implements Serializable
      * 
      * @param other
      *            the event to compare this one to
-     * @returns true if events are "equal", false otherwise.
+     * @return true if events are "equal", false otherwise.
      */
     public boolean equals(Event other)
     {
@@ -319,7 +318,7 @@ public class Event implements Serializable
     /**
      * Get the DSpace object which is the "object" of an event.
      * 
-     * @returns DSpaceObject or null if none can be found or no object was set.
+     * @return DSpaceObject or null if none can be found or no object was set.
      */
     public DSpaceObject getObject(Context context) throws SQLException
     {
@@ -335,7 +334,7 @@ public class Event implements Serializable
      * Syntactic sugar to get the DSpace object which is the "subject" of an
      * event.
      * 
-     * @returns DSpaceObject or null if none can be found.
+     * @return DSpaceObject or null if none can be found.
      */
     public DSpaceObject getSubject(Context context) throws SQLException
     {
@@ -343,7 +342,7 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns database ID of subject of this event.
+     * @return database ID of subject of this event.
      */
     public int getSubjectID()
     {
@@ -351,7 +350,7 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns database ID of object of this event, or -1 if none was set.
+     * @return database ID of object of this event, or -1 if none was set.
      */
     public int getObjectID()
     {
@@ -359,7 +358,7 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns type number (e.g. Constants.ITEM) of subject of this event.
+     * @return type number (e.g. Constants.ITEM) of subject of this event.
      */
     public int getSubjectType()
     {
@@ -367,7 +366,7 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns type number (e.g. Constants.ITEM) of object of this event, or -1
+     * @return type number (e.g. Constants.ITEM) of object of this event, or -1
      *          if none was set.
      */
     public int getObjectType()
@@ -376,7 +375,7 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns type of subject of this event as a String, e.g. for logging.
+     * @return type of subject of this event as a String, e.g. for logging.
      */
     public String getSubjectTypeAsString()
     {
@@ -388,7 +387,7 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns type of object of this event as a String, e.g. for logging.
+     * @return type of object of this event as a String, e.g. for logging.
      */
     public String getObjectTypeAsString()
     {
@@ -406,7 +405,7 @@ public class Event implements Serializable
      * 
      * @param s
      *            text name of object type.
-     * @returns numeric value of object type or 0 for error.
+     * @return numeric value of object type or 0 for error.
      */
     public static int parseObjectType(String s)
     {
@@ -422,7 +421,7 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns event-type (i.e. action) this event, one of the masks like
+     * @return event-type (i.e. action) this event, one of the masks like
      *          Event.ADD defined above.
      */
     public int getEventType()
@@ -433,7 +432,7 @@ public class Event implements Serializable
     /**
      * Get the text name of event (action) type.
      * 
-     * @returns event-type (i.e. action) this event as a String, e.g. for
+     * @return event-type (i.e. action) this event as a String, e.g. for
      *          logging.
      */
     public String getEventTypeAsString()
@@ -448,9 +447,9 @@ public class Event implements Serializable
     /**
      * Interpret named event type.
      * 
-     * @param text
+     * @param s
      *            name of event type.
-     * @returns numeric value of event type or 0 for error.
+     * @return numeric value of event type or 0 for error.
      */
     public static int parseEventType(String s)
     {
@@ -469,8 +468,8 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns timestamp at which event occurred, as a count of milliseconds
-     *          since the epoch (standard Java format).
+     * @return timestamp at which event occurred, as a count of milliseconds
+     *         since the epoch (standard Java format).
      */
     public long getTimeStamp()
     {
@@ -478,8 +477,8 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns hashcode identifier of name of Dispatcher which first dispatched
-     *          this event. (Needed by asynch dispatch code.)
+     * @return hashcode identifier of name of Dispatcher which first dispatched
+     *         this event. (Needed by asynch dispatch code.)
      */
     public int getDispatcher()
     {
@@ -487,7 +486,7 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns value of detail element of the event.
+     * @return value of detail element of the event.
      */
     public String getDetail()
     {
@@ -495,7 +494,7 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns value of transactionID element of the event.
+     * @return value of transactionID element of the event.
      */
     public String getTransactionID()
     {
@@ -538,8 +537,8 @@ public class Event implements Serializable
      * 
      * @param filters
      *            list of filter masks; each one is an Array of two ints.
-     * @returns true if this event would be passed through the given filter
-     *          list.
+     * @return true if this event would be passed through the given filter
+     *         list.
      */
     public boolean pass(List filters)
     {
@@ -585,13 +584,16 @@ public class Event implements Serializable
         consumedBy.set(EventManager.getConsumerIndex(consumerName));
     }
 
+    /**
+     * @return the set of consumers which have consumed this Event.
+     */
     public BitSet getBitSet()
     {
         return consumedBy;
     }
 
     /**
-     * @returns Detailed string representation of contents of this event, to
+     * @return Detailed string representation of contents of this event, to
      *          help in logging and debugging.
      */
     public String toString()

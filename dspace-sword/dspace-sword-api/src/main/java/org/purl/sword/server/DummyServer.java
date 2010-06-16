@@ -95,12 +95,14 @@ public class DummyServer implements SWORDServer {
 	 * an anonymous workspace and collection, and one personalised
 	 * for the onBehalfOf user.
 	 * 
-	 * @param onBehalfOf The user that the client is acting on behalf of
+	 * @param sdr The request
 	 * @throws SWORDAuthenticationException If the credentials are bad
 	 * @throws SWORDErrorException If something goes wrong, such as 
 	 */
-	public ServiceDocument doServiceDocument(ServiceDocumentRequest sdr) 
-	                           throws SWORDAuthenticationException, SWORDErrorException, SWORDException {
+	public ServiceDocument doServiceDocument(ServiceDocumentRequest sdr)
+            throws SWORDAuthenticationException, SWORDErrorException,
+            SWORDException
+    {
 		// Authenticate the user
 		String username = sdr.getUsername();
 		String password = sdr.getPassword();

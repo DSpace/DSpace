@@ -80,7 +80,7 @@ public class Figure extends TextContainer implements StructuralElement
      * 
      * @param context
      *            (Required) The context this element is contained in
-     * @param Source
+     * @param source
      *            (Required) The figure's image source.
      * @param target
      *            (May be null) The figure's external reference, if present then

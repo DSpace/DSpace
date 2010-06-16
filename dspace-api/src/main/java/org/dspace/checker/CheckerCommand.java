@@ -301,7 +301,7 @@ public final class CheckerCommand
 
     /**
      * <p>
-     * Process general case bistream.
+     * Process general case bitstream.
      * </p>
      * 
      * <p>
@@ -351,7 +351,7 @@ public final class CheckerCommand
         }
         catch (SQLException e)
         {
-            // ??this code only executes if an sql
+            // ??this code only executes if an SQL
             // exception occurs in *DSpace* code, probably
             // indicating a general db problem?
             info
@@ -453,7 +453,7 @@ public final class CheckerCommand
     /**
      * Set report errors only
      * 
-     * @param reportErrorsOnly
+     * @param reportVerbose
      *            true to report only errors in the logs.
      */
     public void setReportVerbose(boolean reportVerbose)

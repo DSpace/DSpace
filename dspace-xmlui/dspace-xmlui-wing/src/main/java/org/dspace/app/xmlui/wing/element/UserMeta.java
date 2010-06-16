@@ -83,8 +83,6 @@ public class UserMeta extends AbstractWingElement implements
      * @param context
      *            (Required) The context this element is contained in, such as
      *            where to route SAX events and what i18n catalogue to use.
-     * @param authenticated
-     *            (Required) Weather the user has been authenticated.
      */
     protected UserMeta(WingContext context) throws WingException
     {
@@ -112,7 +110,7 @@ public class UserMeta extends AbstractWingElement implements
 	 * @param language
 	 *            (May be null) The metadata's language
 	 * @param allowMultiple
-	 *            (Required) determine if multipe metadata element with the same
+	 *            (Required) determine if multiple metadata elements with the same
 	 *            element, qualifier and language are allowed.
 	 * @return A new metadata
 	 */
@@ -211,8 +209,8 @@ public class UserMeta extends AbstractWingElement implements
             String qName, Attributes attributes) throws SAXException,
             WingException
     {
-    	// We don't merge our children but we do have one special optimization, 
-    	// if a metadata is allready in the document and it is taged as not allowing 
+    	// We don't merge our children but we do have one special optimization: 
+    	// if a metadata is already in the document and it is tagged as not allowing 
     	// multiples then we do not add the new metadata to the document.
     	
     	if (WingConstants.DRI.URI.equals(namespace) && Metadata.E_METADATA.equals(localName))
@@ -253,7 +251,7 @@ public class UserMeta extends AbstractWingElement implements
 
         if ("yes".equals(mergedAuthenticated))
         {
-            // The user has allready been set to authenticated.
+            // The user has already been set to authenticated.
             // Do nothing.
         }
         else if ("no".equals(mergedAuthenticated))

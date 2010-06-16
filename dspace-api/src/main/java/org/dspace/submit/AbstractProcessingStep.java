@@ -174,7 +174,7 @@ public abstract class AbstractProcessingStep
     }
     
     /**
-     * Sets th list of all UI fields which had errors that occurred during the
+     * Sets the list of all UI fields which had errors that occurred during the
      * step processing. This list is for usage in generating the appropriate
      * error message(s) in the UI.
      * <P>
@@ -272,8 +272,10 @@ public abstract class AbstractProcessingStep
      * This is extremely useful to define the error message which will be logged
      * for a non-interactive step.
      * 
-     * @param fieldName
-     *            the name of the field which had an error
+     * @param errorFlag
+     *            the status value indicating the type of error
+     * @param errorMessage
+     *            text of the message to be added
      */
     protected final void addErrorMessage(int errorFlag, String errorMessage)
     {

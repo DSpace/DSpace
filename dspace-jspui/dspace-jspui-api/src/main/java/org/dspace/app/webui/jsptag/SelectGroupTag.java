@@ -103,7 +103,7 @@ public class SelectGroupTag extends TagSupport
 	/**
 	 * Setter for groups in list
 	 * 
-	 * @param e  attribute from JSP
+	 * @param g  attribute from JSP
 	 */
 	public void setSelected(Object g)
 	{

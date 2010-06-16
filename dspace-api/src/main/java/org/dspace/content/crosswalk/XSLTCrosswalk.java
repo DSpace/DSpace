@@ -158,7 +158,7 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin
 
     /**
      * Initialize the Transformation stylesheet from configured stylesheet file.
-     * @param prefix the direction of xwalk, either "submission" or
+     * @param direction the direction of xwalk, either "submission" or
      *    "dissemination"
      * @return transformer or null if there was error initializing.
      */

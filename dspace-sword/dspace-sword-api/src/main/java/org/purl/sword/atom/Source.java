@@ -88,7 +88,7 @@ public class Source extends XmlElement implements SwordElementInterface
    }
 
    /**
-    * Marshall the data stored in this object into Element objects. 
+    * Marshal the data stored in this object into Element objects. 
     * 
     * @return An element that holds the data associated with this object. 
     */
@@ -105,7 +105,7 @@ public class Source extends XmlElement implements SwordElementInterface
    }
    
    /**
-    * Unmarshall the contents of the source element into the internal data objects
+    * Unmarshal the contents of the source element into the internal data objects
     * in this object. 
     * 
     * @param source The Source element to process. 
@@ -123,7 +123,7 @@ public class Source extends XmlElement implements SwordElementInterface
    /**
     * 
     * @param source
-    * @param validate
+    * @param validationProperties
     * @return
     * @throws org.purl.sword.base.UnmarshallException
     */

@@ -241,7 +241,7 @@ public abstract class Field extends AbstractWingElement implements
      * Set this field to either be required or not required as determined by the
      * required parameter.
      *
-     * @param requeired
+     * @param required
      *            Determine if the field is required or not.
      */
     public void setRequired(boolean required)
@@ -325,7 +325,7 @@ public abstract class Field extends AbstractWingElement implements
      * Set the kind of UI presentation requested for this choice, e.g.
      * select vs. suggest.  Value must match one of the PRESENTATIONS.
      *
-     * @param fieldKey pre-determined metadata field key
+     * @param value pre-determined metadata field key
      */
     public void setChoicesPresentation(String value)
         throws WingException

@@ -551,7 +551,7 @@ public class TableRow
      * 
      * @param column
      *            The column name (case-insensitive)
-     * @param l
+     * @param d
      *            The double value
      */
     public void setColumn(String column, double d)
@@ -604,7 +604,7 @@ public class TableRow
     /**
      * Return a String representation of this object.
      * 
-     * @return String representaton
+     * @return String representation
      */
     public String toString()
     {

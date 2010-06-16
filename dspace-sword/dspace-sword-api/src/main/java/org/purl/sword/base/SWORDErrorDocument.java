@@ -114,8 +114,8 @@ public class SWORDErrorDocument extends SWORDEntry
    }
    
    /**
-    * Overrides the marshall method in the parent SWORDEntry. This will 
-    * call the parent marshall method and then add the additional 
+    * Overrides the marshal method in the parent SWORDEntry. This will 
+    * call the parent marshal method and then add the additional 
     * elements that have been added in this subclass.  
     */
    public Element marshall()
@@ -130,7 +130,7 @@ public class SWORDErrorDocument extends SWORDEntry
    }
 
    /**
-    * Overrides the unmarshall method in the parent SWORDEntry. This will 
+    * Overrides the unmarshal method in the parent SWORDEntry. This will 
     * call the parent method to parse the general Atom elements and
     * attributes. This method will then parse the remaining sword
     * extensions that exist in the element. 
@@ -222,11 +222,12 @@ public class SWORDErrorDocument extends SWORDEntry
 
    /**
     * 
-    * @param elements
-    * @param attributes
+    * @param info
+    * @param validationContext
     * @return
     */
-   protected SwordValidationInfo validate(SwordValidationInfo info, Properties validationContext)
+   protected SwordValidationInfo validate(SwordValidationInfo info,
+            Properties validationContext)
    {
       
       if( errorURI == null )

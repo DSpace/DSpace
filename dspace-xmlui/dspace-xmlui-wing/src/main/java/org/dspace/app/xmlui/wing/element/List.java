@@ -174,10 +174,6 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      * Set the head element which is the label associated with this list. This
      * method should be called before any other elements have been added to the
      * list.
-     * 
-     * @param characters
-     *            (May be null) Untranslated character data to be included as
-     *            the list's head.
      */
     public Head setHead() throws WingException
     {

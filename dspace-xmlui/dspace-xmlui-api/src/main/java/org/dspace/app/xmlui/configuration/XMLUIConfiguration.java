@@ -79,7 +79,7 @@ public class XMLUIConfiguration
      * supplied but only the first valid file (exists and readable) will
      * be used.
      * 
-     * @param configPath Multiple paths configuration paths may be specified
+     * @param configPaths Multiple paths configuration paths may be specified
      */
     public static void loadConfig(String ... configPaths) throws IOException,
             JDOMException

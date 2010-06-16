@@ -57,14 +57,14 @@ public class AddMetadataAction extends UpdateMetadataAction {
 	 * 	Adds metadata specified in the source archive
 	 * 
 	 *  @param context
-	 *  @param ItemArchive
+	 *  @param itarch
 	 *  @param isTest
 	 *  @param suppressUndo
 	 *  @throws AuthorizeException
 	 *  @throws SQLException
 	 */
-	public void execute(Context context, ItemArchive itarch, boolean isTest, boolean suppressUndo) 
-	throws AuthorizeException, SQLException
+	public void execute(Context context, ItemArchive itarch, boolean isTest,
+            boolean suppressUndo) throws AuthorizeException, SQLException
 	{
 		Item item = itarch.getItem();
 		String dirname = itarch.getDirectoryName();

@@ -98,7 +98,7 @@ public class Site extends DSpaceObject
 
     /**
      * Static method to return site Handle without creating a Site.
-     * @returns handle of the Site.
+     * @return handle of the Site.
      */
     public static String getSiteHandle()
     {
@@ -112,7 +112,7 @@ public class Site extends DSpaceObject
      * Get Site object corresponding to db id (which is ignroed).
      * @param context the context.
      * @param id integer database id, ignored.
-     * @returns Site object.
+     * @return Site object.
      */
     public static DSpaceObject find(Context context, int id)
         throws SQLException

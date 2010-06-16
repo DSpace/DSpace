@@ -141,7 +141,7 @@ public class DSpaceLocaleAction extends ServiceableAction implements Configurabl
 
     
     /**
-     * This validator class workes with cocoon's i18nutils class to test if locales are valid. 
+     * This validator class works with cocoon's i18nutils class to test if locales are valid. 
      * For dspace we define a locale as valid if it is listed in xmlui.supported.locales config 
      * parameter.
      */
@@ -176,8 +176,8 @@ public class DSpaceLocaleAction extends ServiceableAction implements Configurabl
     	
     	
     	/**
-         * @param name of the locale (for debugging)
-         * @param locale to test
+         * @param name name of the locale (for debugging)
+         * @param test locale to test
          * @return true if locale satisfies validator's criteria
          */
 		public boolean test(String name, Locale test) 

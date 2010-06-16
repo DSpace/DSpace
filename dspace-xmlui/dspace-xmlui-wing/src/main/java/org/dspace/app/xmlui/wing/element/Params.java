@@ -39,8 +39,8 @@
 package org.dspace.app.xmlui.wing.element;
 
 /**
- * A class represented parameters to fields. The parameter element is basicaly a
- * grab bag of attributes associated with varios fields.
+ * A class represented parameters to fields. The parameter element is basically a
+ * grab bag of attributes associated with various fields.
  *
  * @author Scott Phillips
  */
@@ -314,7 +314,7 @@ public class Params extends AbstractWingElement implements StructuralElement
      * Set the kind of UI presentation requested for this choice, e.g.
      * select vs. suggest.  Value must match one of the PRESENTATIONS.
      *
-     * @param fieldKey pre-determined metadata field key
+     * @param value pre-determined metadata field key
      */
     public void setChoicesPresentation(String value)
         throws WingException
@@ -325,9 +325,9 @@ public class Params extends AbstractWingElement implements StructuralElement
     }
 
     /**
-     * Sets whether choices are "closed" to teh set returned by plugin.
+     * Sets whether choices are "closed" to the set returned by plugin.
      *
-     * @param fieldKey pre-determined metadata field key
+     * @param value pre-determined metadata field key
      */
     public void setChoicesClosed(boolean value)
     {
@@ -335,7 +335,7 @@ public class Params extends AbstractWingElement implements StructuralElement
     }
 
     /**
-     * Sets whether choices are "closed" to teh set returned by plugin.
+     * Sets whether choices are "closed" to the set returned by plugin.
      */
     public void setChoicesClosed()
     {

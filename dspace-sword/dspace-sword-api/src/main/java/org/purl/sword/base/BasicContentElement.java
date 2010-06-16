@@ -69,7 +69,7 @@ implements SwordElementInterface
     }
 
     /**
-	 * Marshall the data in this object to an Element object. 
+	 * Marshal the data in this object to an Element object. 
 	 * 
 	 * @return The data expressed in an Element. 
 	 */
@@ -83,13 +83,14 @@ implements SwordElementInterface
    protected abstract void marshallContent(Element element);
 
    /**
-    * Unmarshall the text element into this object.
+    * Unmarshal the text element into this object.
     * 
     * This unmarshaller only handles plain text content, although it can 
     * recognise the three different type elements of text, html and xhtml. This
     * is an area that can be improved in a future implementation, if necessary. 
     * 
-    * @param text The text element. 
+    * @param element The text element.
+    * @param validationProperties
     * 
     * @throws UnmarshallException If the specified element is not of
     *                             the correct type, where the localname is used

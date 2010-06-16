@@ -419,7 +419,7 @@ public class FlowContainerUtils
 	
 	/**
 	 * Look up the id of a group authorized for one of the given roles. If no group is currently 
-	 * authorized to preform this role then a new group will be created and assigned the role.
+	 * authorized to perform this role then a new group will be created and assigned the role.
 	 * 
 	 * @param context The current DSpace context.
 	 * @param collectionID The collection id.
@@ -516,7 +516,7 @@ public class FlowContainerUtils
 			
 		}
 		
-		// Second, remove all outhorizations for this role by searching for all policies that this 
+		// Second, remove all authorizations for this role by searching for all policies that this 
 		// group has on the collection and remove them otherwise the delete will fail because 
 		// there are dependencies.
 		@SuppressWarnings("unchecked") // the cast is correct
@@ -541,11 +541,10 @@ public class FlowContainerUtils
 	
 	/**
 	 * Look up the id of a group authorized for one of the given roles. If no group is currently 
-	 * authorized to preform this role then a new group will be created and assigned the role.
+	 * authorized to perform this role then a new group will be created and assigned the role.
 	 * 
 	 * @param context The current DSpace context.
 	 * @param collectionID The collection id.
-	 * @param roleName ADMIN, WF_STEP1,	WF_STEP2, WF_STEP3,	SUBMIT, DEFAULT_READ.
 	 * @return The id of the group associated with that particular role.
 	 */
 	public static int getCollectionDefaultRead(Context context, int collectionID) throws SQLException, AuthorizeException
@@ -556,16 +555,16 @@ public class FlowContainerUtils
 		Group[] bitstreamGroups = AuthorizeManager.getAuthorizedGroups(context, collection, Constants.DEFAULT_BITSTREAM_READ);
 		
 		if (itemGroups.length != 1 && bitstreamGroups.length != 1)
-			// If there are more than one groups assigned either of these privleges then this role based method will not work.
-			// The user will need to go to the authorization section to manualy straight this out.
+			// If there are more than one groups assigned either of these privileges then this role based method will not work.
+			// The user will need to go to the authorization section to manually straighten this out.
 			return -1;
 		
 		Group itemGroup = itemGroups[0];
 		Group bitstreamGroup = bitstreamGroups[0];
 		
 		if (itemGroup.getID() != bitstreamGroup.getID())
-			// If the same group is not assigned both of these priveleges then this role based method will not work. The user 
-			// will need to go to the authorization section to manualy straighten this out.
+			// If the same group is not assigned both of these privileges then this role based method will not work. The user 
+			// will need to go to the authorization section to manually straighten this out.
 			return -1;
 		
 		
@@ -574,8 +573,8 @@ public class FlowContainerUtils
 	}
 	
 	/**
-	 * Change default privleges from the anonymous group to a new group that will be created and
-	 * approrpate privleges assigned. The id of this new group will be returned.
+	 * Change default privileges from the anonymous group to a new group that will be created and
+	 * appropriate privileges assigned. The id of this new group will be returned.
 	 * 
 	 * @param context The current DSpace context.
 	 * @param collectionID The collection id.
@@ -592,15 +591,15 @@ public class FlowContainerUtils
 		Group role = Group.create(context);
 		role.setName("COLLECTION_"+collection.getID() +"_DEFAULT_READ");
 		
-		// Remove existing privleges from the anynomous group.
+		// Remove existing privileges from the anonymous group.
 		AuthorizeManager.removePoliciesActionFilter(context, collection, Constants.DEFAULT_ITEM_READ);
 		AuthorizeManager.removePoliciesActionFilter(context, collection, Constants.DEFAULT_BITSTREAM_READ);
 		
-		// Grant our new role the default privleges.
+		// Grant our new role the default privileges.
 		AuthorizeManager.addPolicy(context, collection, Constants.DEFAULT_ITEM_READ,      role);
 		AuthorizeManager.addPolicy(context, collection, Constants.DEFAULT_BITSTREAM_READ, role);
 		
-		// Committ the changes
+		// Commit the changes
 		role.update();
 		context.commit();
 		
@@ -608,7 +607,7 @@ public class FlowContainerUtils
 	}
 	
 	/**
-	 * Change the default read priveleges to the anonymous group.
+	 * Change the default read privileges to the anonymous group.
 	 * 
 	 * If getCollectionDefaultRead() returns -1 or the anonymous group then nothing 
 	 * is done. 
@@ -632,7 +631,7 @@ public class FlowContainerUtils
 		Group role = Group.find(context, roleID);
 		Group anonymous = Group.find(context,0);
 		
-		// Delete the old role, this will remove the default privleges.
+		// Delete the old role, this will remove the default privileges.
 		role.delete();
 		
 		// Set anonymous as the default read group.
@@ -934,7 +933,7 @@ public class FlowContainerUtils
      * authorized to perform this role then a new group will be created and assigned the role.
      * 
      * @param context The current DSpace context.
-     * @param collectionID The collection id.
+     * @param communityID The collection id.
      * @param roleName ADMIN.
      * @return The id of the group associated with that particular role, or -1 if the role was not found.
      */
@@ -1043,7 +1042,7 @@ public class FlowContainerUtils
 		// escape the ampersand correctly;
 		value = escapeXMLEntities(value);
 		
-		// Try and parse the XML into a mini-dom
+		// Try and parse the XML into a mini-DOM
     	String xml = "<?xml version='1.0' encoding='UTF-8'?><fragment>"+value+"</fragment>";
  	   
  	   	ByteArrayInputStream inputStream = null;
@@ -1067,7 +1066,7 @@ public class FlowContainerUtils
 		} 
 		catch (IOException ioe) 
 		{
-			// This shouldn't ever occure because we are parsing
+			// This shouldn't ever occur because we are parsing
 			// an in-memory string, but in case it does we'll just return
 			// it as a normal error.
 			return ioe.getMessage();
@@ -1077,13 +1076,13 @@ public class FlowContainerUtils
 	}
 	
     /** 
-     * Sanatize any XML that was inputed by the user, this will clean up
+     * Sanitize any XML that was inputed by the user, this will clean up
      * any unescaped characters so that they can be stored as proper XML.
      * These are errors that in general we want to take care of on behalf
      * of the user.
      * 
-     * @param value The unsantized value
-     * @return A sanatized value
+     * @param value The unsanitized value
+     * @return A sanitized value
      */
 	public static String escapeXMLEntities(String value)
 	{

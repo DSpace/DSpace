@@ -66,7 +66,7 @@ public abstract class DSpaceObject
      * separates entries with a comma.
      * Subclass can just start calling addDetails, since it creates
      * the cache if it needs to.
-     * @param detail detail string to add.
+     * @param d detail string to add.
      */
     protected void addDetails(String d)
     {
@@ -77,7 +77,7 @@ public abstract class DSpaceObject
     }
 
     /**
-     * @returns summary of event details, or null if there are none.
+     * @return summary of event details, or null if there are none.
      */
     protected String getDetails()
     {

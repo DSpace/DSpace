@@ -127,7 +127,7 @@ public class Entry extends XmlElement implements SwordElementInterface
 
    /**
     * This is a simplified version. The ID can also have atomCommonAttributes, 
-    * but these have not been modelled in this version. The content of 
+    * but these have not been modeled in this version. The content of 
     * ID is an unconstrained string, which is intended to represent a URI. 
     */
    private Id id;
@@ -198,7 +198,7 @@ public class Entry extends XmlElement implements SwordElementInterface
     * Create a new instance of the class an initalise it, setting the
     * element namespace and name.
     * 
-     * @param namespace The namespace of the element
+    * @param prefix The namespace prefix of the element
     * @param element The element name
     */
    public Entry(String prefix, String element)
@@ -264,7 +264,7 @@ public class Entry extends XmlElement implements SwordElementInterface
    }
 
    /**
-    * Mashall the data stored in this object into Element objects. 
+    * Marshal the data stored in this object into Element objects. 
     * 
     * @return An element that holds the data associated with this object. 
     */
@@ -346,7 +346,7 @@ public class Entry extends XmlElement implements SwordElementInterface
    }
 
    /**
-    * Unmarshall the contents of the Entry element into the internal data objects
+    * Unmarshal the contents of the Entry element into the internal data objects
     * in this object. 
     * 
     * @param entry The Entry element to process. 
@@ -369,7 +369,7 @@ public class Entry extends XmlElement implements SwordElementInterface
          return handleIncorrectElement(entry, validationProperties);
       }
 
-      // used to hold the element and attribute unmarshall info results
+      // used to hold the element and attribute unmarshal info results
       SwordValidationInfo result = new SwordValidationInfo(xmlName);
 
       try
@@ -605,11 +605,12 @@ public class Entry extends XmlElement implements SwordElementInterface
 
    /**
     *
-    * @param elementsInfo
-    * @param attributeInfo
+    * @param info
+    * @param validationContext
     * @return
     */
-   protected SwordValidationInfo validate(SwordValidationInfo info, Properties validationContext)
+   protected SwordValidationInfo validate(SwordValidationInfo info,
+            Properties validationContext)
    {
        // determine if a full validation is required 
        boolean validateAll = (info == null);
@@ -934,8 +935,6 @@ public class Entry extends XmlElement implements SwordElementInterface
     * is in the correct format. 
     * 
     * @param published The string. 
-    * @see org.purl.sword.base.XmlElement#stringToDate(String) stringToDate
-    * @see Entry#setPublished(Date) setPublished
     */
    public void setPublished(String published) 
    {
@@ -962,7 +961,7 @@ public class Entry extends XmlElement implements SwordElementInterface
    /**
     * Get the source for this Entry. 
     * @return The source.
-    * @Deprecated
+    * @deprecated
     */
    @Deprecated
    public Source getSource() {
@@ -973,7 +972,7 @@ public class Entry extends XmlElement implements SwordElementInterface
     * Set the source for this entry. 
     * 
     * @param source The source.
-    * @Deprecated
+    * @deprecated
     */
    @Deprecated
    public void setSource(Source source) 
@@ -1044,8 +1043,7 @@ public class Entry extends XmlElement implements SwordElementInterface
     * string. 
     * 
     * @param updated The string. 
-    * @see org.purl.sword.base.XmlElement#stringToDate(String) stringToDate
-    * @see Entry#setPublished(Date) setPublished
+    * @see Entry#setPublished(String) setPublished
     */ 
    public void setUpdated(String updated) 
    {

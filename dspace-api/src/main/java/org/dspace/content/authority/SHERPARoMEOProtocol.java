@@ -75,7 +75,7 @@ import org.apache.commons.httpclient.HttpException;
  * Choice Authority based on SHERPA/RoMEO - for Publishers and Journals
  * See the subclasses  SHERPARoMEOPublisher and SHERPARoMEOJournalTitle
  * for actual choice plugin implementations.  This is a superclass
- * containing all the common prototcol logic.
+ * containing all the common protocol logic.
  *
  * Reads these DSpace Config properties:
  *
@@ -86,7 +86,8 @@ import org.apache.commons.httpclient.HttpException;
  *  as a proof-of-concept.  Any site that actually wants to use it will
  *  probably have to refine it (and give patches back to dspace.org).
  *
- * @see SHERPARoMEOPublisher, SHERPARoMEOJournalTitle
+ * @see SHERPARoMEOPublisher
+ * @see SHERPARoMEOJournalTitle
  * @author Larry Stone
  * @version $Revision $
  */

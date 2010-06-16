@@ -188,7 +188,7 @@ public class PackageUtils
     /**
      * Predicate, does this bundle container meta-information.  I.e.
      * does this bundle contain descriptive metadata or other metadata
-     * such as license bitstreams?  If so we probablly don't want to put
+     * such as license bitstreams?  If so we probably don't want to put
      * it into the "content" section of a package; hence this predicate.
      *
      * @param bn -- the bundle
@@ -239,7 +239,7 @@ public class PackageUtils
      *  generic like ".xml", to accidentally get set to this format.
      * @param context - the context.
      * @param shortDesc - short descriptive name, used to locate existing format.
-     * @param MIMEtype - mime content-type
+     * @param MIMEType - MIME content-type
      * @param desc - long description
      * @return BitstreamFormat object that was found or created.  Never null.
      */

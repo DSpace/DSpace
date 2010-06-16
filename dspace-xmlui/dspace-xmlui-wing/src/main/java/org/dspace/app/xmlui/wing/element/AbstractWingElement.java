@@ -212,7 +212,7 @@ public abstract class AbstractWingElement implements WingElement
      * 
      * @param parameter
      *            An int who's value is less than lesser.
-     * @param greater
+     * @param lesser
      *            An int who's value is greater that lesser.
      * @param message
      *            The exception message thrown if the parameter is invalid.

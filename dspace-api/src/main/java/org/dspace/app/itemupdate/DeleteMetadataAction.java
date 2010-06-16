@@ -55,14 +55,14 @@ public class DeleteMetadataAction extends UpdateMetadataAction {
 	 *   Delete metadata from item
 	 * 
 	 *  @param context
-	 *  @param ItemArchive
+	 *  @param itarch
 	 *  @param isTest
 	 *  @param suppressUndo
 	 *  @throws ParseException
 	 *  @throws AuthorizeException
 	 */
-	public void execute(Context context, ItemArchive itarch, boolean isTest, boolean suppressUndo) 
-	throws AuthorizeException, ParseException 
+	public void execute(Context context, ItemArchive itarch, boolean isTest,
+            boolean suppressUndo) throws AuthorizeException, ParseException 
 	{
 		Item item = itarch.getItem();
 		for (String f : targetFields)

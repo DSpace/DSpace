@@ -146,7 +146,7 @@ public class PackageParameters extends Properties
     /**
      * Returns boolean form of property with selectable default
      * @param key the key to look for in this property list.
-     * @param default default to return if there is no such property
+     * @param defaultAnswer default to return if there is no such property
      * @return the boolean derived from the value of property, or default
      *   if it was not specified.
      */

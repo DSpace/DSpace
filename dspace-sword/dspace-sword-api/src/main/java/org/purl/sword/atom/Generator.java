@@ -59,7 +59,7 @@ import org.purl.sword.base.XmlName;
 public class Generator extends XmlElement implements SwordElementInterface
 {
    /**
-    * Label for the uri attribute. 
+    * Label for the URI attribute. 
     */
    public static final String ATTRIBUTE_URI = "uri";
 	
@@ -123,7 +123,7 @@ public class Generator extends XmlElement implements SwordElementInterface
    }
 
    /**
-    * Marshall the data in the object to an Element object. 
+    * Marshal the data in the object to an Element object. 
     * 
     * @return The element. 
     */
@@ -153,7 +153,7 @@ public class Generator extends XmlElement implements SwordElementInterface
    }
 
    /**
-    * Unmarshall the specified Generator element into the data in this object. 
+    * Unmarshal the specified Generator element into the data in this object. 
     * 
     * @param generator The generator element. 
     * 
@@ -367,8 +367,6 @@ public class Generator extends XmlElement implements SwordElementInterface
    
    /**
     * Get a string representation. 
-    * 
-    * @param The string. 
     */
    public String toString()
    {

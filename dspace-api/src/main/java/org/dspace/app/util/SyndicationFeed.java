@@ -399,7 +399,7 @@ public class SyndicationFeed
     }
 
     /**
-     * @add a ROME plugin module (e.g. for OpenSearch) at the feed level
+     * Add a ROME plugin module (e.g. for OpenSearch) at the feed level.
      */
     public void addModule(Module m)
     {

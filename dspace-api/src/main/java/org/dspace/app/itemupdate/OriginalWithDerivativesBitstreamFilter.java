@@ -60,7 +60,7 @@ public class OriginalWithDerivativesBitstreamFilter extends BitstreamFilter
 	 * 
 	 * @param bitstream
 	 * @throws BitstreamFilterException
-	 * @returns true if bitstream is in specified bundles
+	 * @return true if bitstream is in specified bundles
 	 */
 	public boolean accept(Bitstream bitstream) 
 	throws BitstreamFilterException

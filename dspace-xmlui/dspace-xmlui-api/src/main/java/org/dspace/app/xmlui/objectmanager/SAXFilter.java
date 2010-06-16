@@ -49,17 +49,17 @@ import org.xml.sax.helpers.NamespaceSupport;
 
 
 /** 
- * This is a swiss army like SAX Filter, it's purpose is to filter out 
- * undesierable SAX events from the stream. The primary application of 
+ * This is a Swiss army like SAX Filter, its purpose is to filter out 
+ * undesirable SAX events from the stream. The primary application of 
  * this is for inserting SAX fragment into an existing SAX pipeline, 
- * under this senario you would not want new startDocument or 
+ * under this scenario you would not want new startDocument or 
  * endDocument events interfering with the existing pipeline thus 
  * this class can filter those out.
  * 
- * The swiss army part comes in because it's configurable. Instead of 
+ * The Swiss army part comes in because it's configurable. Instead of 
  * defining a static set of events that are filled out by default all
  * events are filled out and must be turned on to allow each type
- * individualy.
+ * Individually.
  * 
  * Primarily you can filter events based upon their type, i.e. start/end 
  * elements or start/end documents. However there is one special control,
@@ -93,24 +93,24 @@ public class SAXFilter implements ContentHandler, LexicalHandler
 	/** 
 	 * The current XML level, each time start element is encountered this 
 	 * is increased, and each time an end element is encountered it is 
-	 * decressed. 
+	 * decreased. 
 	 */
 	private int currentElementLevel = 0;
 	
 	
 	/**
-	 * If no uri is provided then substitute this default prefix and URI:
+	 * If no URI is provided then substitute this default prefix and URI:
 	 */
 	private String defaultURI;
 	
-	/** The sax handlers and namespace support */
+	/** The SAX handlers and namespace support */
 	private ContentHandler contentHandler;
 	private LexicalHandler lexicalHandler;
 	private NamespaceSupport namespaces;
 
 	/**
 	 * Construct a new SAXFilter such that the allowed events will be routed
-	 * to the corresponding content and lexcial handlers.
+	 * to the corresponding content and lexical handlers.
 	 * 
 	 * @param contentHandler The SAX content handler.
 	 * @param lexicalHandler The SAX lexical handler.
@@ -160,8 +160,8 @@ public class SAXFilter implements ContentHandler, LexicalHandler
 	 * they are below the given XML level. I.e. each nested 
 	 * element is a new level.
 	 * 
-	 * @param belowElementLevel 
-	 * 				the minumum level required.
+	 * @param minimumElementLevel 
+	 * 				the minimum level required.
 	 * @return
 	 */
 	public SAXFilter allowElements(int minimumElementLevel)

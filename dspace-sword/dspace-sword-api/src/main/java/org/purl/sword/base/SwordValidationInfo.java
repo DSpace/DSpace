@@ -76,13 +76,13 @@ public class SwordValidationInfo {
 
     /**
      * List of validation info notes that were generated during
-     * an unmarshall stage.
+     * an unmarshal stage.
      */
     private ArrayList<SwordValidationInfo> unmarshallElementInfo;
 
     /**
      * List of validation info notes that were generated during an
-     * unmarshall stage.
+     * unmarshal stage.
      */
     private ArrayList<SwordValidationInfo> unmarshallAttributeInfo;
 
@@ -105,7 +105,7 @@ public class SwordValidationInfo {
      * Create a new information object for the specified element. Sets the
      * default type to be VALID.
      *
-     * @param theElement The element.
+     * @param element The element.
      */
     public SwordValidationInfo(XmlName element)
     {
@@ -116,8 +116,8 @@ public class SwordValidationInfo {
      * Create a new information object for the specified element's
      * attribute. Sets the default type to be VALID.
      *
-     * @param theElement   the element.
-     * @param theAttribute the attribute. 
+     * @param element   the element.
+     * @param attribute the attribute. 
      */
     public SwordValidationInfo(XmlName element, XmlName attribute)
     {
@@ -128,7 +128,7 @@ public class SwordValidationInfo {
      * Create a new instance of a validation information object that
      * reports on an element.
      *
-     * @param theElement The element.
+     * @param element The element.
      * @param theMessage The information message.
      * @param theType    The type of message.
      */
@@ -143,10 +143,8 @@ public class SwordValidationInfo {
      * Create a new instance of a validation information object that
      * reports on an attribute in the specified element.
      *
-     * @param elementPrefix    Prefix for the element.
-     * @param elementName      The local name for the element.
-     * @param attributePrefix  Prefix for the attribute. 
-     * @param attributeName    The attribute.
+     * @param element          The local name for the element.
+     * @param attribute        The attribute.
      * @param theMessage       The information message.
      * @param theType          The type of message.
      */

@@ -59,7 +59,7 @@ public class BitstreamFilterByFilename extends BitstreamFilter {
 	 *   Tests bitstream by matching the regular expression in the 
 	 *   properties against the bitstream name
 	 * 
-	 *   @returns whether bitstream name matches the regular expression
+	 *   @return whether bitstream name matches the regular expression
 	 */
 	public boolean accept(Bitstream bitstream) throws BitstreamFilterException
 	{		

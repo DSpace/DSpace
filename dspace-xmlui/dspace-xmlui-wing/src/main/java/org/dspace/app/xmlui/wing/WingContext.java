@@ -95,7 +95,7 @@ public class WingContext
     /**
      * Return the cocoon logger
      * 
-     * @return
+     * @return the current logger
      */
     public Log getLogger()
     {
@@ -105,8 +105,8 @@ public class WingContext
     /**
      * Set the cocoon logger
      * 
-     * @param contentHandler
-     *            A new content handler.
+     * @param log
+     *            A new logger.
      */
     public void setLogger(Log log)
     {

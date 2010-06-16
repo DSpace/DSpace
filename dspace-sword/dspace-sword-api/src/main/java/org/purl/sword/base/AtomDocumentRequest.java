@@ -68,7 +68,7 @@ public class AtomDocumentRequest
    /**
     * Set the username. 
     * 
-    * @param authenticatedUserName the authenticatedUserName to set
+    * @param username the authenticated UserName to set
     */
    public void setUsername(String username) {
       this.username = username;
@@ -104,7 +104,7 @@ public class AtomDocumentRequest
    /**
     * Set the IP address of the user
     *
-    * @param String the IP address
+    * @param IPAddress the IP address
     */
    public void setIPAddress(String IPAddress) {
 	   this.IPAddress = IPAddress;
@@ -122,7 +122,7 @@ public class AtomDocumentRequest
    /**
     * Set the location of the service document
     *
-    * @param String the location
+    * @param location the location
     */
    public void setLocation(String location) {
 	   this.location = location;

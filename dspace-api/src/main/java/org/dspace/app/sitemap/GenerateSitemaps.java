@@ -322,7 +322,6 @@ public class GenerateSitemaps
      * @param engineURL
      *            Search engine URL minus protocol etc, e.g.
      *            {@code www.google.com}
-     * @return {@code true} if the operation was successful
      * @throws MalformedURLException
      *             if the passed in URL is malformed
      * @throws UnsupportedEncodingException

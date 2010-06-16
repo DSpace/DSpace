@@ -604,7 +604,7 @@ public class Item extends DSpaceObject
      * @param element
      *            the Dublin Core element
      * @param qualifier
-     *            the Dublin Core qualifer, or <code>null</code> for
+     *            the Dublin Core qualifier, or <code>null</code> for
      *            unqualified
      * @param lang
      *            the ISO639 language code, optionally followed by an underscore
@@ -627,7 +627,7 @@ public class Item extends DSpaceObject
      * @param element
      *            the Dublin Core element
      * @param qualifier
-     *            the Dublin Core qualifer, or <code>null</code> for
+     *            the Dublin Core qualifier, or <code>null</code> for
      *            unqualified
      * @param lang
      *            the ISO639 language code, optionally followed by an underscore
@@ -657,7 +657,7 @@ public class Item extends DSpaceObject
      * @param element
      *            the metadata element name
      * @param qualifier
-     *            the metadata qualifer name, or <code>null</code> for
+     *            the metadata qualifier name, or <code>null</code> for
      *            unqualified
      * @param lang
      *            the ISO639 language code, optionally followed by an underscore
@@ -697,7 +697,7 @@ public class Item extends DSpaceObject
      * @param element
      *            the metadata element name
      * @param qualifier
-     *            the metadata qualifer name, or <code>null</code> for
+     *            the metadata qualifier name, or <code>null</code> for
      *            unqualified
      * @param lang
      *            the ISO639 language code, optionally followed by an underscore
@@ -705,9 +705,9 @@ public class Item extends DSpaceObject
      *            value has no language (for example, a date).
      * @param values
      *            the values to add.
-     * @param authority
+     * @param authorities
      *            the external authority key for this value (or null)
-     * @param confidence
+     * @param confidences
      *            the authority confidence (default 0)
      */
     public void addMetadata(String schema, String element, String qualifier, String lang,
@@ -793,7 +793,7 @@ public class Item extends DSpaceObject
      * @param element
      *            the metadata element name
      * @param qualifier
-     *            the metadata qualifer, or <code>null</code> for
+     *            the metadata qualifier, or <code>null</code> for
      *            unqualified
      * @param lang
      *            the ISO639 language code, optionally followed by an underscore
@@ -821,7 +821,7 @@ public class Item extends DSpaceObject
      * @param element
      *            the metadata element name
      * @param qualifier
-     *            the metadata qualifer, or <code>null</code> for
+     *            the metadata qualifier, or <code>null</code> for
      *            unqualified
      * @param lang
      *            the ISO639 language code, optionally followed by an underscore
@@ -921,7 +921,7 @@ public class Item extends DSpaceObject
      * method will return <code>true</code> if the given schema,
      * element, qualifier and language match the schema, element,
      * qualifier and language of the <code>DCValue</code> object passed
-     * in.  Any or all of the elemenent, qualifier and language passed
+     * in.  Any or all of the element, qualifier and language passed
      * in can be the <code>Item.ANY</code> wildcard.
      *
      * @param schema
@@ -1942,7 +1942,7 @@ public class Item extends DSpaceObject
 //               FIXME: there is an exception handling problem here
         try
         {
-//               Remove from indicies
+//               Remove from indices
             IndexBrowse ib = new IndexBrowse(ourContext);
             ib.itemRemoved(this);
         }
@@ -2171,7 +2171,7 @@ public class Item extends DSpaceObject
                 Constants.DEFAULT_ITEM_READ);
 
         // change the action to just READ
-        // just don't call update on the resourcepolicies!!!
+        // just don't call update on the resource policies!!!
         Iterator i = policies.iterator();
 
         // MUST have default policies
@@ -2193,7 +2193,7 @@ public class Item extends DSpaceObject
                 Constants.DEFAULT_BITSTREAM_READ);
 
         // change the action to just READ
-        // just don't call update on the resourcepolicies!!!
+        // just don't call update on the resource policies!!!
         i = policies.iterator();
 
         if (!i.hasNext())
@@ -2256,7 +2256,6 @@ public class Item extends DSpaceObject
     /**
      * Check the bundle ORIGINAL to see if there are any uploaded files
      *
-     * @param item
      * @return true if there is a bundle named ORIGINAL with one or more
      *         bitstreams inside
      * @throws SQLException
@@ -2364,9 +2363,9 @@ public class Item extends DSpaceObject
      * those matching the passed value, if value is not Item.ANY
      *
      * @param context DSpace context object
-     * @param schema metdata field schema
-     * @param element metdata field element
-     * @param qualifier metdata field qualifier
+     * @param schema metadata field schema
+     * @param element metadata field element
+     * @param qualifier metadata field qualifier
      * @param value field value or Item.ANY to match any value
      * @return an iterator over the items matching that authority value
      * @throws SQLException, AuthorizeException, IOException
@@ -2432,7 +2431,7 @@ public class Item extends DSpaceObject
         switch (action)
         {
             case Constants.ADD:
-                // ADD a cc license is less general then add a bitstream but we can't/wan't
+                // ADD a cc license is less general than add a bitstream but we can't/won't
                 // add complex logic here to know if the ADD action on the item is required by a cc or
                 // a generic bitstream so simply we ignore it.. UI need to enforce the requirements.
                 if (AuthorizeConfiguration.canItemAdminPerformBitstreamCreation())
@@ -2540,9 +2539,9 @@ public class Item extends DSpaceObject
      * in the indicated metadata field.
      *
      * @param context DSpace context object
-     * @param schema metdata field schema
-     * @param element metdata field element
-     * @param qualifier metdata field qualifier
+     * @param schema metadata field schema
+     * @param element metadata field element
+     * @param qualifier metadata field qualifier
      * @param value the value of authority key to look for
      * @return an iterator over the items matching that authority value
      * @throws SQLException, AuthorizeException, IOException

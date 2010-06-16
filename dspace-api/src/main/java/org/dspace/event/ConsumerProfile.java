@@ -82,7 +82,7 @@ public class ConsumerProfile
      * 
      * @param name
      *            configuration name of the consumer profile
-     * @returns a new ConsumerProfile; never null.
+     * @return a new ConsumerProfile; never null.
      */
     public static ConsumerProfile makeConsumerProfile(String name)
             throws IllegalArgumentException, ClassNotFoundException,

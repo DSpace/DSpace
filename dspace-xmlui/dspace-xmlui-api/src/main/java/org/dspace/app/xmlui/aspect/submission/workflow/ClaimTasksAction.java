@@ -55,7 +55,7 @@ import org.dspace.workflow.WorkflowManager;
 
 /**
  * Claim all the selected workflows. This action is used by the 
- * submission page, when the user clicks the claim tasks botton.
+ * submission page, when the user clicks the claim tasks button.
  * 
  * @author Scott Phillips
  */
@@ -63,10 +63,12 @@ public class ClaimTasksAction extends AbstractAction
 {
 
     /**
-     * @param pattern
-     *            un-used.
+     * @param redirector
+     * @param resolver
      * @param objectModel
      *            Cocoon's object model
+     * @param source
+     * @param parameters
      */
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
@@ -83,7 +85,7 @@ public class ClaimTasksAction extends AbstractAction
     			WorkflowItem workflowItem = WorkflowItem.find(context, Integer.valueOf(workflowID));
     			
     			int state = workflowItem.getState();
-    			// Only unclaim tasks that are allready claimed.
+    			// Only unclaim tasks that are already claimed.
     			if ( state == WorkflowManager.WFSTATE_STEP1POOL || 
     				 state == WorkflowManager.WFSTATE_STEP2POOL || 
     				 state == WorkflowManager.WFSTATE_STEP3POOL)

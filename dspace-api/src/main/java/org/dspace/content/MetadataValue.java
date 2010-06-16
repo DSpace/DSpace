@@ -53,11 +53,12 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * Database access class representing a Dublin Core metadata value.
  * It represents a value of a given <code>MetadataField</code> on an Item.
  * (The Item can have many values of the same field.)  It contains                                           element, qualifier, value and language.
- * the field (which names the schema, element, and qualifer), language,
+ * the field (which names the schema, element, and qualifier), language,
  * and a value.
  *
  * @author Martin Hald
- * @see org.dspace.content.MetadataSchema, org.dspace.content.MetadataField
+ * @see org.dspace.content.MetadataSchema
+ * @see org.dspace.content.MetadataField
  */
 public class MetadataValue
 {
@@ -122,7 +123,7 @@ public class MetadataValue
     /**
      * Constructor to create a value for a given field.
      *
-     * @param field inital value for field
+     * @param field initial value for field
      */
     public MetadataValue(MetadataField field)
     {

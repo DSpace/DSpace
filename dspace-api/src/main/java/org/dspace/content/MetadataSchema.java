@@ -65,7 +65,8 @@ import org.dspace.storage.rdbms.TableRowIterator;
  *
  * @author Martin Hald
  * @version $Revision$
- * @see org.dspace.content.MetadataValue, org.dspace.content.MetadataField
+ * @see org.dspace.content.MetadataValue
+ * @see org.dspace.content.MetadataField
  */
 public class MetadataSchema
 {

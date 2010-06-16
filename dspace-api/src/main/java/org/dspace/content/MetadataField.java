@@ -62,7 +62,8 @@ import org.dspace.storage.rdbms.TableRowIterator;
  *
  * @author Martin Hald
  * @version $Revision$
- * @see org.dspace.content.MetadataValue, org.dspace.content.MetadataSchema
+ * @see org.dspace.content.MetadataValue
+ * @see org.dspace.content.MetadataSchema
  */
 public class MetadataField
 {
@@ -100,7 +101,7 @@ public class MetadataField
     }
 
     /**
-     * Full contructor for new metadata field elements.
+     * Full constructor for new metadata field elements.
      *
      * @param schema schema to which the field belongs
      * @param element element of the field
@@ -117,10 +118,10 @@ public class MetadataField
     }
 
     /**
-     * Full construtor for existing metadata field elements.
+     * Full constructor for existing metadata field elements.
      *
      * @param schemaID schema to which the field belongs
-     * @param fieldID dataabse ID of field.
+     * @param fieldID database ID of field.
      * @param element element of the field
      * @param qualifier qualifier of the field
      * @param scopeNote scope note of the field
