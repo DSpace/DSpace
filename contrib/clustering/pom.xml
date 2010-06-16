@@ -1,6 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <!--
     Licensed to the Apache Software Foundation (ASF) under one
@@ -26,13 +24,13 @@
   <parent>
     <groupId>org.dspace.dependencies.solr</groupId>
     <artifactId>dspace-solr-contrib</artifactId>
-    <version>1.4.0.1-SNAPSHOT</version>
+    <version>1.4.0.1</version>
   </parent>
 
   <groupId>org.dspace.dependencies.solr</groupId>
   <artifactId>dspace-solr-clustering</artifactId>
   <name>Apache Solr Clustering</name>
-  <version>1.4.0.1-SNAPSHOT</version>
+  <version>1.4.0.1</version>
   <description>Apache Solr Clustering</description>
   <packaging>jar</packaging>
 
@@ -51,23 +49,24 @@
 
   <scm>
       <connection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/contrib/clustering
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-parent-1.4.0.1/contrib/clustering
     </connection>
       <developerConnection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/contrib/clustering
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-parent-1.4.0.1/contrib/clustering
     </developerConnection>
-   </scm>
+     <url>http://svn.apache.org/viewvc/maven/pom/tags/dspace-solr-parent-1.4.0.1/dspace-solr-contrib/dspace-solr-clustering</url>
+  </scm>
 
   <dependencies>
     <dependency>
       <groupId>org.dspace.dependencies.solr</groupId>
       <artifactId>dspace-solr-solrj</artifactId>
-      <version>1.4.0.1-SNAPSHOT</version>
+      <version>1.4.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.dspace.dependencies.solr</groupId>
       <artifactId>dspace-solr-core</artifactId>
-      <version>1.4.0.1-SNAPSHOT</version>
+      <version>1.4.0.1</version>
     </dependency>
     <!-- Carrot -->
     <dependency>

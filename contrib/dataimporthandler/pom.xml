@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<!--
 		Licensed to the Apache Software Foundation (ASF) under one or more
@@ -23,7 +22,7 @@
 		<groupId>org.dspace.dependencies.solr
 		</groupId>
 		<artifactId>dspace-solr-contrib</artifactId>
-		<version>1.4.0.1-SNAPSHOT</version>
+		<version>1.4.0.1</version>
 	</parent>
 
 	<groupId>org.dspace.dependencies.solr
@@ -31,18 +30,19 @@
 	<artifactId>dspace-solr-dataimporthandler
 	</artifactId>
 	<name>Apache Solr DataImportHandler</name>
-	<version>1.4.0.1-SNAPSHOT</version>
+	<version>1.4.0.1</version>
 	<description>Apache Solr DataImportHandler</description>
 	<packaging>war</packaging>
 
    <scm>
       <connection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/contrib/dataimporthandler
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-parent-1.4.0.1/contrib/dataimporthandler
     </connection>
       <developerConnection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/contrib/dataimporthandler
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-parent-1.4.0.1/contrib/dataimporthandler
     </developerConnection>
-   </scm>
+     <url>http://svn.apache.org/viewvc/maven/pom/tags/dspace-solr-parent-1.4.0.1/dspace-solr-contrib/dspace-solr-dataimporthandler</url>
+  </scm>
 
 	<build>
 		<plugins>
@@ -87,19 +87,19 @@
 			<groupId>org.dspace.dependencies.solr
 			</groupId>
 			<artifactId>dspace-solr-solrj</artifactId>
-			<version>1.4.0.1-SNAPSHOT</version>
+			<version>1.4.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.dspace.dependencies.solr
 			</groupId>
 			<artifactId>dspace-solr-core</artifactId>
-			<version>1.4.0.1-SNAPSHOT</version>
+			<version>1.4.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.dspace.dependencies.solr
 			</groupId>
 			<artifactId>dspace-solr-server</artifactId>
-			<version>1.4.0.1-SNAPSHOT</version>
+			<version>1.4.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
