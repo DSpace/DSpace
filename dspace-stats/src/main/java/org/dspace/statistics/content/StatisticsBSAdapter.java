@@ -20,11 +20,12 @@ import org.dspace.statistics.SolrLogger;
 import org.dspace.statistics.content.filter.StatisticsFilter;
 
 /**
+ * Class that will hold the data needed to show
+ * statistics in the browse and search pages.
+ * 
  * User: @author kevinvandevelde at atmire.com (kevin at atmire.com)
  * Date: 20-mei-2009
  * Time: 16:44:29
- * Class that will hold the data needed to show
- * statistical data in the browse, search pages
  */
 
 public class StatisticsBSAdapter {
@@ -34,8 +35,11 @@ public class StatisticsBSAdapter {
     private boolean displayTotalViews;
     private List<StatisticsFilter> filters;
 
+    /** visitType is ITEM */
     public static final int ITEM_VISITS = 0;
+    /** visitType is BITSTREAM */
     public static final int BITSTREAM_VISITS = 1;
+    /** visitType is TOTAL */
     public static final int TOTAL_VISITS = 2;
 
     public StatisticsBSAdapter() {
@@ -45,8 +49,9 @@ public class StatisticsBSAdapter {
     }
 
     /**
-     * Returns the number of visits for the item,
-     * depending on the visitype it can either be item, bitstream, total, ...
+     * Returns the number of visits for the item.
+     * Depending on the visitType it can either be item, bitstream, total, ...
+     * 
      * @param visitType the type of visits we want, from the item, bitstream, total
      * @param item the item from which we need our visits
      * @return the number of visits

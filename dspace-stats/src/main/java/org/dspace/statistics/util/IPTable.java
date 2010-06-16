@@ -17,9 +17,9 @@ import java.util.Set;
 
 /**
  * A Spare v4 IPTable implementation that uses nested HashMaps
- * TO optimize IP Address matching over ranges of IP Addresses.
+ * to optimize IP Address matching over ranges of IP Addresses.
  *
- * @author: mdiggory at atmire.com
+ * @author mdiggory at atmire.com
  */
 public class IPTable {
 
@@ -112,6 +112,12 @@ public class IPTable {
         }
     }
 
+    /** Check whether a given address is contained in this netblock.
+     * 
+     * @param ip the address to be tested
+     * @return true if {@code ip} is within this table's limits
+     * @throws IPFormatException
+     */
     public boolean contains(String ip) throws IPFormatException {
 
         String[] subnets = ip.split("\\.");
@@ -135,8 +141,8 @@ public class IPTable {
 
     }
 
-    /**
-     * @return
+    /** Convert to a Set.
+     * @return this table's content as a Set
      */
     public Set<String> toSet() {
         HashSet<String> set = new HashSet<String>();
@@ -180,5 +186,3 @@ public class IPTable {
 
 
 }
-
-

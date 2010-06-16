@@ -36,11 +36,13 @@ public class DatasetTimeGenerator extends DatasetGenerator {
     }
 
     /**
-     * Sets the date interval
-     * For example if you wish to see the data from today to six months ago give the following params:
+     * Sets the date interval.
+     * For example if you wish to see the data from today to six months ago give
+     * the following parameters:
      * datatype = "month"
      * start = "-6"
-     * end = "+1" the +1 indicates this month also 
+     * end = "+1" // the +1 indicates this month also
+     * 
      * @param dateType type can be days, months, years
      * @param start the start of the interval
      * @param end the end of the interval
@@ -52,7 +54,9 @@ public class DatasetTimeGenerator extends DatasetGenerator {
 
     }
 
-    public void setDateInterval(String dateType, Date start, Date end) throws IllegalArgumentException{
+    public void setDateInterval(String dateType, Date start, Date end)
+            throws IllegalArgumentException
+    {
         actualStartDate = (Date) start.clone();
         actualEndDate = (Date) end.clone();
         
@@ -67,8 +71,9 @@ public class DatasetTimeGenerator extends DatasetGenerator {
         if(endCal1.before(startCal1))
             throw new IllegalArgumentException();
 
-        //TODO: ensure future dates are tested. Although we normally do not have visits from the future
-        //Depending on our dateType check if we need to use days/months/years
+        // TODO: ensure future dates are tested. Although we normally do not
+        // have visits from the future.
+        //Depending on our dateType check if we need to use days/months/years.
         int type = -1;
         if("year".equalsIgnoreCase(dateType)){
             type = Calendar.YEAR;
@@ -152,11 +157,15 @@ public class DatasetTimeGenerator extends DatasetGenerator {
         this.type = type;
     }
 
-    /**
+    /** Get the difference between two Dates in terms of a given interval.
+     * That is:  if you specify the difference in months, you get back the
+     * number of months between the dates.
      *
      * @param date1 the first date
-     * @param date2
-     * @param type
+     * @param date2 the other date
+     * @param type Calendar.HOUR or .DATE or .MONTH
+     * @return number of {@code type} intervals between {@code date1} and
+     *  {@code date2}
      */
     private int getTimeDifference(Date date1, Date date2, int type){
         int toAdd;

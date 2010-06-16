@@ -7,11 +7,11 @@ import java.util.Date;
 import java.util.Calendar;
 
 /**
+ * Encapsulate a range of dates for Solr query filtering.
  * Created by IntelliJ IDEA.
  * User: kevinvandevelde
  * Date: 13-mrt-2009
  * Time: 13:14:14
- * To change this template use File | Settings | File Templates.
  */
 public class StatisticsSolrDateFilter implements StatisticsFilter {
     private Date startDate;
@@ -24,29 +24,46 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
     public StatisticsSolrDateFilter() {
     }
 
+    /** Set the start date as a string expression.
+     * Must be paired with {@link setEndStr()}.
+     */
     public void setStartStr(String startStr) {
         this.startStr = startStr;
     }
 
+    /** Set the end date as a string expression.
+     * Must be paired with {@link setStartStr()}.
+     */
     public void setEndStr(String endStr) {
         this.endStr = endStr;
     }
 
+    /** Set the range granularity:  DAY, MONTH, or YEAR. */
     public void setTypeStr(String typeStr) {
         this.typeStr = typeStr;
     }
 
+    /** Set the start date as a Date object.
+     * Must be paired with {@link setEndDate()}.
+     */
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
+    /** Set the end date as a Date object.
+     * Must be paired with {@link setStartDate()}.
+     */
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 
+    /** Convert the date range to a filter expression.
+     * @return Solr date filter expression
+     */
     public String toQuery() {
         if(startDate == null && endDate == null){
-            //We have got a strings instead of dates so calculate our dates out of these strings
+            // We have got strings instead of dates so calculate our dates out
+            // of these strings
             Calendar startCal = Calendar.getInstance();
 
             startCal.clear(Calendar.MILLISECOND);
@@ -82,7 +99,7 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
             endDate = endCal.getTime();
         }
 
-        //Parse them dates
+        //Parse the dates
         SimpleDateFormat formatter = new SimpleDateFormat(SolrLogger.DATE_FORMAT_8601);
         String startDateParsed = formatter.format(startDate);
         String endDateParsed = formatter.format(endDate);

@@ -11,7 +11,7 @@
 package org.dspace.statistics;
 
 /**
- * ObjectCount data structure for returning results froms tatistics searches.
+ * Data structure for returning results from statistics searches.
  * 
  * @author mdiggory at atmire.com
  * @author ben at atmire.com

@@ -39,8 +39,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * Static SolrLogger used to hold HttpSolrClient connection pool to issue
- * usage logging events to Solr from DSpace libraries.
+ * Static holder for a HttpSolrClient connection pool to issue
+ * usage logging events to Solr from DSpace libraries, and some static query
+ * composers.
  * 
  * @author ben at atmire.com
  * @author kevinvandevelde at atmire.com
@@ -130,6 +131,13 @@ public class SolrLogger
         }
     }
 
+    /**
+     * Store a usage event into Solr.
+     * 
+     * @param dspaceObject the object used.
+     * @param request the current request context.
+     * @param currentUser the current session's user.
+     */
     public static void post(DSpaceObject dspaceObject, HttpServletRequest request,
             EPerson currentUser)
     {
@@ -257,12 +265,16 @@ public class SolrLogger
     }
 
     /**
-     * Method just used to log the parents Community log: owning comms
-     * Collection log: owning comms & their comms Item log: owning colls/comms
-     * Bitstream log: owning item/colls/comms
+     * Method just used to log the parents.
+     * <ul>
+     *  <li>Community log: owning comms.</li>
+     *  <li>Collection log: owning comms & their comms.</li>
+     *  <li>Item log: owning colls/comms.</li>
+     *  <li>Bitstream log: owning item/colls/comms.</li>
+     * </ul>
      * 
      * @param doc1
-     *            the current solrinputdoc
+     *            the current SolrInputDocument
      * @param dso
      *            the current dspace object we want to log
      * @throws java.sql.SQLException
@@ -321,6 +333,13 @@ public class SolrLogger
         return useProxies;
     }
 
+    /**
+     * Delete data from the index, as described by a query.
+     * 
+     * @param query description of the records to be deleted.
+     * @throws IOException
+     * @throws SolrServerException
+     */
     public static void removeIndex(String query) throws IOException,
             SolrServerException
     {
@@ -411,7 +430,7 @@ public class SolrLogger
         }
 
         /**
-         * Overide to manage individual documents
+         * Override to manage individual documents
          * @param doc
          */
         public void process(SolrDocument doc) throws IOException, SolrServerException {
@@ -582,7 +601,7 @@ public class SolrLogger
     }
 
     /**
-     * Query used to get values grouped by the given facetfield
+     * Query used to get values grouped by the given facet field.
      * 
      * @param query
      *            the query to be used
@@ -592,7 +611,7 @@ public class SolrLogger
      *            the max number of values given back (in case of 10 the top 10
      *            will be given)
      * @param showTotal
-     *            a boolean determening whether the total amount should be given
+     *            a boolean determining whether the total amount should be given
      *            back as the last element of the array
      * @return an array containing our results
      * @throws SolrServerException
@@ -639,7 +658,7 @@ public class SolrLogger
     }
 
     /**
-     * Query used to get values grouped by the date
+     * Query used to get values grouped by the date.
      * 
      * @param query
      *            the query to be used
@@ -655,7 +674,7 @@ public class SolrLogger
      *            the end date stop Format (-2, +1, ..) the date is calculated
      *            relatively on today
      * @param showTotal
-     *            a boolean determening whether the total amount should be given
+     *            a boolean determining whether the total amount should be given
      *            back as the last element of the array
      * @return and array containing our results
      * @throws SolrServerException
