@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
    <!--
       Licensed to the Apache Software Foundation (ASF) under one or more
@@ -21,23 +20,24 @@
    <parent>
       <groupId>org.dspace.dependencies.solr</groupId>
       <artifactId>dspace-solr-parent</artifactId>
-      <version>1.4.0.1-SNAPSHOT</version>
+      <version>1.4.0.1</version>
    </parent>
 
    <groupId>org.dspace.dependencies.solr</groupId>
    <artifactId>dspace-solr-server</artifactId>
    <name>Apache Solr Server Libraries</name>
-   <version>1.4.0.1-SNAPSHOT</version>
+   <version>1.4.0.1</version>
    <description>Apache Solr Server</description>
 
    <scm>
       <connection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/server
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/server/tags/dspace-solr-parent-1.4.0.1
     </connection>
       <developerConnection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/server
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/server/tags/dspace-solr-parent-1.4.0.1
     </developerConnection>
-   </scm>
+     <url>http://svn.apache.org/viewvc/maven/pom/tags/dspace-solr-parent-1.4.0.1/dspace-solr-server</url>
+  </scm>
 
    <build>
       <plugins>
@@ -59,9 +59,8 @@
                   <configuration>
                      <tasks>
                      
-                        <delete dir="{project.build.directory}/generated-sources/main/java"/>
-                        <copy
-                           todir="${project.build.directory}/generated-sources/main/java">
+                        <delete dir="{project.build.directory}/generated-sources/main/java" />
+                        <copy todir="${project.build.directory}/generated-sources/main/java">
                            <fileset dir="src/main/external-java" />
                         </copy>
                      </tasks>
@@ -104,12 +103,12 @@
       <dependency>
          <groupId>org.dspace.dependencies.solr</groupId>
          <artifactId>dspace-solr-solrj</artifactId>
-         <version>1.4.0.1-SNAPSHOT</version>
+         <version>1.4.0.1</version>
       </dependency>
       <dependency>
          <groupId>org.dspace.dependencies.solr</groupId>
          <artifactId>dspace-solr-core</artifactId>
-         <version>1.4.0.1-SNAPSHOT</version>
+         <version>1.4.0.1</version>
       </dependency>
       <dependency>
          <groupId>org.mortbay.jetty</groupId>

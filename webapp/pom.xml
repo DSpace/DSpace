@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
    <!--
       Licensed to the Apache Software Foundation (ASF) under one or more
@@ -21,24 +20,25 @@
    <parent>
       <groupId>org.dspace.dependencies.solr</groupId>
       <artifactId>dspace-solr-parent</artifactId>
-      <version>1.4.0.1-SNAPSHOT</version>
+      <version>1.4.0.1</version>
    </parent>
 
    <groupId>org.dspace.dependencies.solr</groupId>
    <artifactId>dspace-solr-webapp</artifactId>
    <name>Apache Solr Webapp</name>
-   <version>1.4.0.1-SNAPSHOT</version>
+   <version>1.4.0.1</version>
    <description>Apache Solr Server</description>
    <packaging>war</packaging>
 
    <scm>
       <connection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/webapp
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-parent-1.4.0.1/webapp
     </connection>
       <developerConnection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/webapp
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-parent-1.4.0.1/webapp
     </developerConnection>
-   </scm>
+     <url>http://svn.apache.org/viewvc/maven/pom/tags/dspace-solr-parent-1.4.0.1/dspace-solr-webapp</url>
+  </scm>
    
    <build>
       <plugins>
@@ -96,8 +96,7 @@
             </systemProperty>
                </systemProperties>
                <connectors>
-                  <connector
-                     implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+                  <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
                      <port>9090</port>
                      <maxIdleTime>60000</maxIdleTime>
                   </connector>
@@ -124,45 +123,45 @@
       <dependency>
          <groupId>org.dspace.dependencies.solr</groupId>
          <artifactId>dspace-solr-solrj</artifactId>
-         <version>1.4.0.1-SNAPSHOT</version>
+         <version>1.4.0.1</version>
       </dependency>
       <dependency>
          <groupId>org.dspace.dependencies.solr</groupId>
          <artifactId>dspace-solr-core</artifactId>
-         <version>1.4.0.1-SNAPSHOT</version>
+         <version>1.4.0.1</version>
       </dependency>
       <dependency>
          <groupId>org.dspace.dependencies.solr</groupId>
          <artifactId>dspace-solr-server</artifactId>
-         <version>1.4.0.1-SNAPSHOT</version>
+         <version>1.4.0.1</version>
       </dependency>
       <dependency>
          <groupId>org.dspace.dependencies.solr</groupId>
          <artifactId>dspace-solr-clustering</artifactId>
-         <version>1.4.0.1-SNAPSHOT</version>
+         <version>1.4.0.1</version>
       </dependency>
       <dependency>
          <groupId>org.dspace.dependencies.solr</groupId>
          <artifactId>dspace-solr-dataimporthandler</artifactId>
-         <version>1.4.0.1-SNAPSHOT</version>
+         <version>1.4.0.1</version>
          <type>war</type>
       </dependency>
       <dependency>
          <groupId>org.dspace.dependencies.solr</groupId>
          <artifactId>dspace-solr-dataimporthandler</artifactId>
-         <version>1.4.0.1-SNAPSHOT</version>
+         <version>1.4.0.1</version>
          <classifier>classes</classifier>
          <type>jar</type>
       </dependency>
       <dependency>
          <groupId>org.dspace.dependencies.solr</groupId>
          <artifactId>dspace-solr-cell</artifactId>
-         <version>1.4.0.1-SNAPSHOT</version>
+         <version>1.4.0.1</version>
       </dependency>
       <dependency>
          <groupId>org.dspace.dependencies.solr</groupId>
          <artifactId>dspace-solr-velocity</artifactId>
-         <version>1.4.0.1-SNAPSHOT</version>
+         <version>1.4.0.1</version>
       </dependency>
       <dependency>
          <groupId>org.mortbay.jetty</groupId>
