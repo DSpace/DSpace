@@ -20,23 +20,23 @@
    <parent>
       <groupId>org.dspace.dependencies.solr</groupId>
       <artifactId>dspace-solr-parent</artifactId>
-      <version>1.4.0.1</version>
+      <version>1.4.0.2-SNAPSHOT</version>
    </parent>
 
    <groupId>org.dspace.dependencies.solr</groupId>
    <artifactId>dspace-solr-server</artifactId>
    <name>Apache Solr Server Libraries</name>
-   <version>1.4.0.1</version>
+   <version>1.4.0.2-SNAPSHOT</version>
    <description>Apache Solr Server</description>
 
    <scm>
       <connection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/server/tags/dspace-solr-parent-1.4.0.1
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/server
     </connection>
       <developerConnection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/server/tags/dspace-solr-parent-1.4.0.1
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/server
     </developerConnection>
-     <url>http://svn.apache.org/viewvc/maven/pom/tags/dspace-solr-parent-1.4.0.1/dspace-solr-server</url>
+     <url>http://svn.apache.org/viewvc/maven/pom/tags/apache-4/dspace-solr-parent/dspace-solr-server</url>
   </scm>
 
    <build>
@@ -103,12 +103,12 @@
       <dependency>
          <groupId>org.dspace.dependencies.solr</groupId>
          <artifactId>dspace-solr-solrj</artifactId>
-         <version>1.4.0.1</version>
+         <version>1.4.0.2-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>org.dspace.dependencies.solr</groupId>
          <artifactId>dspace-solr-core</artifactId>
-         <version>1.4.0.1</version>
+         <version>1.4.0.2-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>org.mortbay.jetty</groupId>

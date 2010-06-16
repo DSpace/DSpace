@@ -21,24 +21,24 @@
 	<parent>
 		<groupId>org.dspace.dependencies.solr</groupId>
 		<artifactId>dspace-solr-parent</artifactId>
-		<version>1.4.0.1</version>
+		<version>1.4.0.2-SNAPSHOT</version>
 	</parent>
 
 	<groupId>org.dspace.dependencies.solr</groupId>
 	<artifactId>dspace-solr-solrj</artifactId>
 	<name>Apache Solr Solrj</name>
-	<version>1.4.0.1</version>
+	<version>1.4.0.2-SNAPSHOT</version>
 	<description>Apache Solr Solrj</description>
 	<packaging>jar</packaging>
 
     <scm>
       <connection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/solrj/tags/dspace-solr-parent-1.4.0.1
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/solrj
     </connection>
       <developerConnection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/solrj/tags/dspace-solr-parent-1.4.0.1
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/solrj
     </developerConnection>
-     <url>http://svn.apache.org/viewvc/maven/pom/tags/dspace-solr-parent-1.4.0.1/dspace-solr-solrj</url>
+     <url>http://svn.apache.org/viewvc/maven/pom/tags/apache-4/dspace-solr-parent/dspace-solr-solrj</url>
   </scm>
    
    <build>
@@ -98,7 +98,7 @@
 		<dependency>
 			<groupId>org.dspace.dependencies.solr</groupId>
 			<artifactId>dspace-solr-common</artifactId>
-			<version>1.4.0.1</version>
+			<version>1.4.0.2-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>

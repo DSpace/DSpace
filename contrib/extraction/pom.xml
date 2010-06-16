@@ -24,24 +24,24 @@
   <parent>
     <groupId>org.dspace.dependencies.solr</groupId>
     <artifactId>dspace-solr-contrib</artifactId>
-    <version>1.4.0.1</version>
+    <version>1.4.0.2-SNAPSHOT</version>
   </parent>
 
   <groupId>org.dspace.dependencies.solr</groupId>
   <artifactId>dspace-solr-cell</artifactId>
   <name>Apache Solr Content Extraction Library</name>
-  <version>1.4.0.1</version>
+  <version>1.4.0.2-SNAPSHOT</version>
   <description>Apache Solr Content Extraction Library integrates Apache Tika content extraction framework into Solr</description>
   <packaging>jar</packaging>
 
   <scm>
       <connection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-parent-1.4.0.1/contrib/extraction
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/contrib/extraction
     </connection>
       <developerConnection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-parent-1.4.0.1/contrib/extraction
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/contrib/extraction
     </developerConnection>
-     <url>http://svn.apache.org/viewvc/maven/pom/tags/dspace-solr-parent-1.4.0.1/dspace-solr-contrib/dspace-solr-cell</url>
+     <url>http://svn.apache.org/viewvc/maven/pom/tags/apache-4/dspace-solr-parent/dspace-solr-contrib/dspace-solr-cell</url>
   </scm>
    
   <build>
@@ -61,12 +61,12 @@
     <dependency>
       <groupId>org.dspace.dependencies.solr</groupId>
       <artifactId>dspace-solr-solrj</artifactId>
-      <version>1.4.0.1</version>
+      <version>1.4.0.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.dspace.dependencies.solr</groupId>
       <artifactId>dspace-solr-core</artifactId>
-      <version>1.4.0.1</version>
+      <version>1.4.0.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.tika</groupId>

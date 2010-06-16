@@ -24,13 +24,13 @@
   <parent>
     <groupId>org.dspace.dependencies.solr</groupId>
     <artifactId>dspace-solr-contrib</artifactId>
-    <version>1.4.0.1</version>
+    <version>1.4.0.2-SNAPSHOT</version>
   </parent>
 
   <groupId>org.dspace.dependencies.solr</groupId>
   <artifactId>dspace-solr-velocity</artifactId>
   <name>Apache Solr Velocity Extension</name>
-  <version>1.4.0.1</version>
+  <version>1.4.0.2-SNAPSHOT</version>
   <description>Apache Solr Velocity Extension adds support for integrating Solr and Velocity</description>
   <packaging>jar</packaging>
 
@@ -49,29 +49,29 @@
 
   <scm>
       <connection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-parent-1.4.0.1/contrib/velocity
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/contrib/velocity
     </connection>
       <developerConnection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-parent-1.4.0.1/contrib/velocity
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/contrib/velocity
     </developerConnection>
-     <url>http://svn.apache.org/viewvc/maven/pom/tags/dspace-solr-parent-1.4.0.1/dspace-solr-contrib/dspace-solr-velocity</url>
+     <url>http://svn.apache.org/viewvc/maven/pom/tags/apache-4/dspace-solr-parent/dspace-solr-contrib/dspace-solr-velocity</url>
   </scm>
       
   <dependencies>
      <dependency>
       <groupId>org.dspace.dependencies.solr</groupId>
       <artifactId>dspace-solr-solrj</artifactId>
-      <version>1.4.0.1</version>
+      <version>1.4.0.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.dspace.dependencies.solr</groupId>
       <artifactId>dspace-solr-core</artifactId>
-      <version>1.4.0.1</version>
+      <version>1.4.0.2-SNAPSHOT</version>
     </dependency>
         <dependency>
     	<groupId>org.dspace.dependencies.solr</groupId>
     	<artifactId>dspace-solr-server</artifactId>
-    	<version>1.4.0.1</version>
+    	<version>1.4.0.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>commons-lang</groupId>
