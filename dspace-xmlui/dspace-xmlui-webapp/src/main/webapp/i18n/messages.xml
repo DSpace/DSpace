@@ -1180,7 +1180,7 @@
 	<message key="xmlui.administrative.authorization.EditPolicyForm.title">Edit Policy</message>
 	<message key="xmlui.administrative.authorization.EditPolicyForm.trail">Edit Policy</message>
 	<message key="xmlui.administrative.authorization.EditPolicyForm.main_head_new">Create new policy for {0} {1}</message>
-	<message key="xmlui.administrative.authorization.EditPolicyForm.main_head_edit">Edit policiy {0} for {1} {2}</message>
+	<message key="xmlui.administrative.authorization.EditPolicyForm.main_head_edit">Edit policy {0} for {1} {2}</message>
 	<message key="xmlui.administrative.authorization.EditPolicyForm.error_no_group">No group selected</message>
 	<message key="xmlui.administrative.authorization.EditPolicyForm.error_no_action">No action selected</message>
 	<message key="xmlui.administrative.authorization.EditPolicyForm.groups_column4"></message>
