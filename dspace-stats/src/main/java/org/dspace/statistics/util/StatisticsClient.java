@@ -97,7 +97,7 @@ public class StatisticsClient
                 "Update Spider IP Files from internet into " +
                         ConfigurationManager.getProperty("dspace.dir") + "/config/spiders");
 
-        options.addOption("m", "mark-spiders", false, "Update isBog Flag in Solr");
+        options.addOption("m", "mark-spiders", false, "Update isBot Flag in Solr");
         options.addOption("f", "delete-spiders-by-flag", false, "Delete Spiders in Solr By isBot Flag");
         options.addOption("i", "delete-spiders-by-ip", false, "Delete Spiders in Solr By IP Address");
         options.addOption("h", "help", false, "help");
