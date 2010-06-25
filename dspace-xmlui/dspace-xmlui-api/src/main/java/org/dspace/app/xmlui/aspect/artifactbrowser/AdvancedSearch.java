@@ -419,7 +419,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
             	if (!util.match("/\".*\"/", subquery))
                 {
             		// ... then seperate each word and re-specify the search field.
-                    subquery = util.substitute("s/ / " + field.getField() + ":/g", subquery);
+                    subquery = util.substitute("s/[ ]+/ " + field.getField() + ":/g", subquery);
                 }
             	
             	// Put the subquery into the general query
