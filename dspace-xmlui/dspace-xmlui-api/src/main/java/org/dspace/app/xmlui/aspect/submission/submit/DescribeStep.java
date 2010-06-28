@@ -175,6 +175,7 @@ public class DescribeStep extends AbstractSubmissionStep
         public void addPageMeta(PageMeta pageMeta) throws SAXException, WingException,
         UIException, SQLException, IOException, AuthorizeException
         {
+            super.addPageMeta(pageMeta);
             int collectionID = submission.getCollection().getID();
             pageMeta.addMetadata("choice", "collection").addContent(String.valueOf(collectionID));
 
