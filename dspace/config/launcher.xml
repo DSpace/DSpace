@@ -235,7 +235,7 @@
 
     <command>
         <name>stat-report-initial</name>
-        <description>Create the general statistics report</description>
+        <description>Create the initial statistics report</description>
         <step passuserargs="false">
             <class>org.dspace.app.statistics.CreateStatReport</class>
             <argument>-r</argument>
