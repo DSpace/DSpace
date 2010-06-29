@@ -287,18 +287,17 @@ public class DCDate
     }
 
     /**
-     * Get the date as a Java Date object
+     * Get the date as a Java Date object, assuming the granularity is sufficient for it to be expressed as a Date.
      *
      * @return a Date object
      */
     public Date toDate()
     {
-        if (calendar == null)
+        if ((calendar == null) || (!withinGranularity(DateGran.DAY)))
             return null;
         else
             return calendar.getTime();
     }
-
     /**
      * Set the date. The date passed in is assumed to be in the current time
      * zone, and is adjusting to fit the current time zone. Unknown values
@@ -317,6 +316,7 @@ public class DCDate
      * @param ss
      *            the seconds
      */
+
     public void setDateLocal(int yyyy, int mm, int dd, int hh, int mn, int ss)
     {
         // default values
