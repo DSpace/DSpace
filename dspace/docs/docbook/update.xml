@@ -1998,8 +1998,8 @@ cp activation.jar servlet.jar mail.jar <emphasis>
 				<screen>
 ##### Media Filter settings #####
 # maximum width and height of generated thumbnails
-thumbnail.maxwidth  80
-thumbnail.maxheight 80
+thumbnail.maxwidth = 80
+thumbnail.maxheight = 80
 </screen>
 				<para>There are one or two other, optional extra parameters (for controlling the pool of database connections). See <link linkend="docbook-history.html">the version history</link> for details. If you leave them out, defaults will be used.</para>
 				<para>Also, to avoid future confusion, you might like to <emphasis role="bold">remove</emphasis> the following property, which is no longer required:</para>

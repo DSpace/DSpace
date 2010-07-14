@@ -8025,8 +8025,8 @@ tar xzf jai_imageio-1_1-lib-linux-i586.tar.gz
 				<title>Edit DSpace Configuration</title>
 				<para>First, be sure there is a value for <literal>thumbnail.maxwidth</literal> and that it corresponds to the size you want for preview images for the UI, e.g.: (<emphasis>NOTE:</emphasis> this code doesn&apos;t pay any attention to <literal>thumbnail.maxheight</literal> but it&apos;s best to set it too so the other thumbnail filters make square images.)</para>
 				<screen>        # maximum width and height of generated thumbnails
-        thumbnail.maxwidth  300
-        thumbnail.maxheight 300</screen>
+        thumbnail.maxwidth = 80
+        thumbnail.maxheight = 80</screen>
 				<para> Now, add the absolute paths to the XPDF tools you installed. In this example they are installed under <literal>/usr/local/bin</literal> (a logical place on Linux and MacOSX), but they may be anywhere.</para>
 				<screen>        xpdf.path.pdftotext = /usr/local/bin/pdftotext
         xpdf.path.pdftoppm = /usr/local/bin/pdftoppm
