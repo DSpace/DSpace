@@ -92,7 +92,7 @@
 
     <p><strong>Any UM Faculty member can make digital works
     permanently accessible and available across the Internet with
-    DRUM.</strong><a href="/drum/help/about_submitting.jsp">  Find out
+    DRUM.</strong><a href="<%= request.getContextPath() %>/help/about_submitting.jsp">  Find out
     more about depositing your work.</a></p>
 
     <table class="standard" width="95%" align="center">
