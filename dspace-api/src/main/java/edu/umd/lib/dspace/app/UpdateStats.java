@@ -76,7 +76,7 @@ public class UpdateStats {
   static long lItems = 0;
   static long lBitstreams = 0;
 
-  private static Pattern pStat = Pattern.compile("^ *(\\d+): /drum/(handle|bitstream)/(\\d+[^/]*/\\d+)(/(\\d+))?");
+  private static Pattern pStat = Pattern.compile("^ *(\\d+): /(handle|bitstream)/(\\d+[^/]*/\\d+)(/(\\d+))?");
 
 
   /***************************************************************** main */

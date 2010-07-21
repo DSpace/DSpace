@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+
+# Roll the apache logs files nightly.
+# 
+# Cloned, adapted from tomos:/usr/local/apache/htadm/apache-logs
+
+$server_root = "/apps/drum/apache";
+$log_dir = "$server_root/logs";
+
+$drum_share = "$log_dir/stats";
+
+sub execute {
+    my($cmd) = @_[0];
+    
+    print "$cmd\n";
+    system($cmd);
+}
+
+#
+# Determine the name of the backup file
+#
+
+chomp($oldext = `/bin/date +"%Y-%m-%d"`);
+
+# Move the current log file to its directory
+
+&execute("/bin/mv $log_dir/access_log $log_dir/access/$oldext");
+&execute("/bin/mv $log_dir/error_log $log_dir/error/$oldext");
+
+#
+# Restart Apache
+#
+&execute("cd $server_root; ./control restart");
+
+#
+# Compress the log files
+#
+&execute("/bin/gzip --best $log_dir/access/$oldext");
+&execute("/bin/gzip --best $log_dir/error/$oldext");
+
+#
+# Copy the access_log file for use in DRUM stats
+#
+&execute("/bin/cp $log_dir/access/${oldext}.gz $drum_share");
+
+
