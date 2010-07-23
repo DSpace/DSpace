@@ -320,7 +320,7 @@ public class EPerson extends DSpaceObject
 		TableRowIterator rows = DatabaseManager.query(context, dbquery, paramArr);
 		try
         {
-            List epeopleRows = rows.toList();
+            List<TableRow> epeopleRows = rows.toList();
             EPerson[] epeople = new EPerson[epeopleRows.size()];
 
             for (int i = 0; i < epeopleRows.size(); i++)
@@ -441,7 +441,7 @@ public class EPerson extends DSpaceObject
 
         try
         {
-            List epeopleRows = rows.toList();
+            List<TableRow> epeopleRows = rows.toList();
 
             EPerson[] epeople = new EPerson[epeopleRows.size()];
 
@@ -517,7 +517,7 @@ public class EPerson extends DSpaceObject
 
         // check for presence of eperson in tables that
         // have constraints on eperson_id
-        Vector constraintList = getDeleteConstraints();
+        Vector<String> constraintList = getDeleteConstraints();
 
         // if eperson exists in tables that have constraints
         // on eperson, throw an exception

@@ -45,10 +45,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -423,11 +421,11 @@ public class Group extends DSpaceObject
 
         Set<Integer> myGroups = allMemberGroupIDs(c, e);
         // now convert those Integers to Groups
-        Iterator i = myGroups.iterator();
+        Iterator<Integer> i = myGroups.iterator();
 
         while (i.hasNext())
         {
-            groupList.add(Group.find(c, ((Integer) i.next()).intValue()));
+            groupList.add(Group.find(c, (i.next()).intValue()));
         }
 
         return (Group[]) groupList.toArray(new Group[0]);
@@ -497,14 +495,14 @@ public class Group extends DSpaceObject
 
         String groupQuery = "";
 
-        Iterator i = groupIDs.iterator();
+        Iterator<Integer> i = groupIDs.iterator();
 
         // Build a list of query parameters
         Object[] parameters = new Object[groupIDs.size()];
         int idx = 0;
         while (i.hasNext())
         {
-            int groupID = ((Integer) i.next()).intValue();
+            int groupID = (i.next()).intValue();
 
             parameters[idx++] = new Integer(groupID);
             
@@ -514,8 +512,8 @@ public class Group extends DSpaceObject
         }
 
         // was member of at least one group
-        // NOTE: even through the query is built dynamicaly all data is seperated into the
-        // the parameters array.
+        // NOTE: even through the query is built dynamically, all data is
+        // separated into the parameters array.
         TableRowIterator tri = DatabaseManager.queryTable(c, "group2groupcache",
                 "SELECT * FROM group2groupcache WHERE " + groupQuery,
                 parameters);
@@ -561,11 +559,11 @@ public class Group extends DSpaceObject
 
         Set<Integer> myEpeople = allMemberIDs(c, g);
         // now convert those Integers to EPerson objects
-        Iterator i = myEpeople.iterator();
+        Iterator<Integer> i = myEpeople.iterator();
 
         while (i.hasNext())
         {
-            epersonList.add(EPerson.find(c, ((Integer) i.next()).intValue()));
+            epersonList.add(EPerson.find(c, (i.next()).intValue()));
         }
 
         return (EPerson[]) epersonList.toArray(new EPerson[0]);
@@ -620,7 +618,7 @@ public class Group extends DSpaceObject
 
         Object[] parameters = new Object[groupIDs.size()+1];
         int idx = 0;
-        Iterator i = groupIDs.iterator();
+        Iterator<Integer> i = groupIDs.iterator();
 
         // don't forget to add the current group to this query!
         parameters[idx++] = new Integer(g.getID());
@@ -630,7 +628,7 @@ public class Group extends DSpaceObject
         
         while (i.hasNext())
         {
-            int groupID = ((Integer) i.next()).intValue();
+            int groupID = (i.next()).intValue();
             parameters[idx++] = new Integer(groupID);
             
             epersonQuery += "eperson_group_id= ? ";
@@ -639,7 +637,7 @@ public class Group extends DSpaceObject
         }
 
         //get all the EPerson IDs
-        // Note: even through the query is dynamicaly built all data is seperated
+        // Note: even through the query is dynamically built all data is separated
         // into the parameters array.
         tri = DatabaseManager.queryTable(c, "epersongroup2eperson",
                 "SELECT * FROM epersongroup2eperson WHERE " + epersonQuery,
@@ -768,7 +766,7 @@ public class Group extends DSpaceObject
             s = "name";
         }
 
-        // NOTE: The use of 's' in the order by clause can not cause an sql 
+        // NOTE: The use of 's' in the order by clause can not cause an SQL 
         // injection because the string is derived from constant values above.
         TableRowIterator rows = DatabaseManager.queryTable(
         		context, "epersongroup",
@@ -776,13 +774,13 @@ public class Group extends DSpaceObject
 
         try
         {
-            List gRows = rows.toList();
+            List<TableRow> gRows = rows.toList();
 
             Group[] groups = new Group[gRows.size()];
 
             for (int i = 0; i < gRows.size(); i++)
             {
-                TableRow row = (TableRow) gRows.get(i);
+                TableRow row = gRows.get(i);
 
                 // First check the cache
                 Group fromCache = (Group) context.fromCache(Group.class, row
@@ -905,12 +903,12 @@ public class Group extends DSpaceObject
 
         try
         {
-            List groupRows = rows.toList();
+            List<TableRow> groupRows = rows.toList();
             Group[] groups = new Group[groupRows.size()];
 
             for (int i = 0; i < groupRows.size(); i++)
             {
-                TableRow row = (TableRow) groupRows.get(i);
+                TableRow row = groupRows.get(i);
 
                 // First check the cache
                 Group fromCache = (Group) context.fromCache(Group.class, row
@@ -943,7 +941,7 @@ public class Group extends DSpaceObject
      * @param query
      *            The search string
      * 
-     * @return the number of groups mathching the query
+     * @return the number of groups matching the query
      */
     public static int searchResultCount(Context context, String query)
     	throws SQLException
@@ -1110,11 +1108,11 @@ public class Group extends DSpaceObject
                     getID());
 
             // Add new mappings
-            Iterator i = epeople.iterator();
+            Iterator<EPerson> i = epeople.iterator();
 
             while (i.hasNext())
             {
-                EPerson e = (EPerson) i.next();
+                EPerson e = i.next();
 
                 TableRow mappingRow = DatabaseManager.create(myContext,
                         "epersongroup2eperson");
@@ -1135,11 +1133,11 @@ public class Group extends DSpaceObject
                     getID());
 
             // Add new mappings
-            Iterator i = groups.iterator();
+            Iterator<Group> i = groups.iterator();
 
             while (i.hasNext())
             {
-                Group g = (Group) i.next();
+                Group g = i.next();
 
                 TableRow mappingRow = DatabaseManager.create(myContext,
                         "group2group");
@@ -1241,20 +1239,20 @@ public class Group extends DSpaceObject
         // so now to establish all parent,child relationships we can iterate
         // through the parents hash
 
-        Iterator i = parents.keySet().iterator();
+        Iterator<Integer> i = parents.keySet().iterator();
 
         while (i.hasNext())
         {
-            Integer parentID = (Integer) i.next();
+            Integer parentID = i.next();
 
             Set<Integer> myChildren = getChildren(parents, parentID);
 
-            Iterator j = myChildren.iterator();
+            Iterator<Integer> j = myChildren.iterator();
 
             while (j.hasNext())
             {
                 // child of a parent
-                Integer childID = (Integer) j.next();
+                Integer childID = j.next();
 
                 ((Set<Integer>) parents.get(parentID)).add(childID);
             }
@@ -1265,18 +1263,18 @@ public class Group extends DSpaceObject
                 "DELETE FROM group2groupcache WHERE id >= 0");
 
         // write out new one
-        Iterator pi = parents.keySet().iterator(); // parent iterator
+        Iterator<Integer> pi = parents.keySet().iterator(); // parent iterator
 
         while (pi.hasNext())
         {
-            Integer parent = (Integer) pi.next();
+            Integer parent = pi.next();
 
             Set<Integer> children =  parents.get(parent);
-            Iterator ci = children.iterator(); // child iterator
+            Iterator<Integer> ci = children.iterator(); // child iterator
 
             while (ci.hasNext())
             {
-                Integer child = (Integer) ci.next();
+                Integer child = ci.next();
 
                 TableRow row = DatabaseManager.create(myContext,
                         "group2groupcache");
@@ -1314,11 +1312,11 @@ public class Group extends DSpaceObject
         Set<Integer> children =  parents.get(parent);
 
         // now iterate over all of the children
-        Iterator i = children.iterator();
+        Iterator<Integer> i = children.iterator();
 
         while (i.hasNext())
         {
-            Integer childID = (Integer) i.next();
+            Integer childID = i.next();
 
             // add this child's ID to our return set
             myChildren.add(childID);
@@ -1332,7 +1330,7 @@ public class Group extends DSpaceObject
     
     public DSpaceObject getParentObject() throws SQLException
     {
-        // could a collection/community admin manage related groups?
+        // could a collection/community administrator manage related groups?
         // check before the configuration options could give a performance gain
         // if all group management are disallowed
         if (AuthorizeConfiguration.canCollectionAdminManageAdminGroup()
@@ -1398,7 +1396,7 @@ public class Group extends DSpaceObject
                     }
                 }
             }
-            // is the group releated to a community and community admin allowed
+            // is the group related to a community and community administrator allowed
             // to manage it?
             else if (AuthorizeConfiguration.canCommunityAdminManageAdminGroup())
             {

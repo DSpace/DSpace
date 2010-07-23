@@ -187,15 +187,15 @@ public class TableRowIterator
      * Saves all the values returned by iterator into a list.
      * 
      * As a side effect the result set is closed and no more 
-     * operations can be preformed on this object.
+     * operations can be performed on this object.
      * 
      * @return - A list of all the values returned by the iterator.
      * @exception SQLException -
      *                If a database error occurs while fetching values
      */
-    public List toList() throws SQLException
+    public List<TableRow> toList() throws SQLException
     {
-        List resultsList = new ArrayList();
+        List<TableRow> resultsList = new ArrayList<TableRow>();
 
         try
         {
