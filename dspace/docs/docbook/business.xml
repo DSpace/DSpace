@@ -1155,7 +1155,7 @@ Doe, John S.</screen>
 							<para> Another issue is that two authors may have the same name, even within a single institution. If this is the case they may appear as one author in the index.</para>
 						</listitem>
 					</itemizedlist>
-					<para>These issues are typically resolved in libraries with <emphasis>authority control records</emphasis>, in which are kept a &apos;preferred&apos; form of the author&apos;s name, with extra information (such as date of birth/death) in order to distinguish between authors of the same name. Maintaining such records is a huge task with many issues, particularly when metadata is received from faculty directly rather than trained library catalogers. For these reasons, DSpace does not yet feature &apos;authority control&apos; functionality.</para>
+					<para>These issues are typically resolved in libraries with <emphasis>authority control records</emphasis>, in which are kept a &apos;preferred&apos; form of the author&apos;s name, with extra information (such as date of birth/death) in order to distinguish between authors of the same name. Maintaining such records is a huge task with many issues, particularly when metadata is received from faculty directly rather than trained library catalogers.</para>
 				</listitem>
 			</varlistentry>
 			<varlistentry>
