@@ -797,6 +797,9 @@ public class DatabaseManager
      */
     public static int delete(Context context, TableRow row) throws SQLException
     {
+        if (null == row.getTable())
+            throw new IllegalArgumentException("Row not associated with a table");
+
         String pk = getPrimaryKeyColumn(row);
 
         if (row.isColumnNull(pk))

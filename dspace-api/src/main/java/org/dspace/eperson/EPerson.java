@@ -145,9 +145,9 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Find the eperson by their email address
+     * Find the eperson by their email address.
      * 
-     * @return EPerson
+     * @return EPerson, or {@code null} if none such exists.
      */
     public static EPerson findByEmail(Context context, String email)
             throws SQLException, AuthorizeException
@@ -157,7 +157,7 @@ public class EPerson extends DSpaceObject
             return null;
         }
         
-        // All email addresses are stored as lowercase, so ensure that the email address is lowercased for the lookup 
+        // All email addresses are stored as lower case, so ensure that the email address is lowercased for the lookup 
         TableRow row = DatabaseManager.findByUnique(context, "eperson",
                 "email", email.toLowerCase());
 
@@ -183,7 +183,7 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Find the eperson by their netid
+     * Find the eperson by their netid.
      * 
      * @param context
      *            DSpace context
@@ -223,7 +223,7 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Find the epeople that match the search query across firstname, lastname or email
+     * Find the epeople that match the search query across firstname, lastname or email.
      * 
      * @param context
      *            DSpace context
@@ -317,7 +317,8 @@ public class EPerson extends DSpaceObject
             paramArr = new Object[] {int_param,params,params,params,offset};
 
         // Get all the epeople that match the query
-		TableRowIterator rows = DatabaseManager.query(context, dbquery, paramArr);
+		TableRowIterator rows = DatabaseManager.queryTable(context, "eperson",
+		        dbquery, paramArr);
 		try
         {
             List<TableRow> epeopleRows = rows.toList();
@@ -434,9 +435,9 @@ public class EPerson extends DSpaceObject
             s = "lastname";
         }
 
-        // NOTE: The use of 's' in the order by clause can not cause an sql 
+        // NOTE: The use of 's' in the order by clause can not cause an SQL 
         // injection because the string is derived from constant values above.
-        TableRowIterator rows = DatabaseManager.query(context,
+        TableRowIterator rows = DatabaseManager.queryTable(context, "eperson",
                 "SELECT * FROM eperson ORDER BY "+s);
 
         try
@@ -915,7 +916,7 @@ public class EPerson extends DSpaceObject
         Vector<String> tableList = new Vector<String>();
 
         // check for eperson in item table
-        TableRowIterator tri = DatabaseManager.query(myContext,
+        TableRowIterator tri = DatabaseManager.queryTable(myContext, "item",
                 "SELECT * from item where submitter_id= ? ",
                 getID());
 
@@ -934,7 +935,7 @@ public class EPerson extends DSpaceObject
         }
 
         // check for eperson in workflowitem table
-        tri = DatabaseManager.query(myContext,
+        tri = DatabaseManager.queryTable(myContext, "workflowitem",
                 "SELECT * from workflowitem where owner= ? ",
                 getID());
 
@@ -953,7 +954,7 @@ public class EPerson extends DSpaceObject
         }
 
         // check for eperson in tasklistitem table
-        tri = DatabaseManager.query(myContext,
+        tri = DatabaseManager.queryTable(myContext, "tasklistitem",
                 "SELECT * from tasklistitem where eperson_id= ? ",
                 getID());
 
