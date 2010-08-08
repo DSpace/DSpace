@@ -1,5 +1,12 @@
+1.6.3
+=====
+
 (Flavio Botelho)
-[DS-563] Multiple spaces in between words in advanced search will make the search return nothing
+ - [DS-563] Multiple spaces in between words in advanced search will make the search return nothing
+
+(Mark Wood)
+ - [DS-469] DCDate.displayDate(false,*) displays only year
+
 
 1.6.2
 =====
@@ -81,9 +88,6 @@
  - [DS-516] DSRUN does not start Service Manager
  - [DS-526] ItemUpdate - script update
  - [DS-572] Batch metadata editor fails to notice change of item's owning collection
-
-(Mark Wood)
- - [DS-469] DCDate.displayDate(false,*) displays only year
 
  (Ivan Masar)
  - [DS-515] Czech localization of 1.5.2
