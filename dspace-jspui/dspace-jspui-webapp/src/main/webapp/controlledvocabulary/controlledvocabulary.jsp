@@ -46,7 +46,7 @@
   --%>
 
   
-<%@ page language="java" contentType="text/html;charset=iso-8859-1" %>
+<%@ page language="java" contentType="text/html;charset=UTF-8" %>
 <%@ page  import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -57,7 +57,7 @@
 
 <head> 
 <title><fmt:message key="jsp.controlledvocabulary.controlledvocabulary.title"/></title>
-<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
 
 
 <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
