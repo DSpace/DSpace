@@ -572,7 +572,7 @@ public class Item extends DSpaceObject
         int i = 0;
         while(dcf.hasMoreTokens())
         {
-            tokens[i] = dcf.nextToken().trim();
+            tokens[i] = dcf.nextToken().toLowerCase().trim();
             i++;
         }
         String schema = tokens[0];
@@ -705,15 +705,15 @@ public class Item extends DSpaceObject
      *            value has no language (for example, a date).
      * @param values
      *            the values to add.
-     * @param authorities
+     * @param authority
      *            the external authority key for this value (or null)
-     * @param confidences
+     * @param confidence
      *            the authority confidence (default 0)
      */
     public void addMetadata(String schema, String element, String qualifier, String lang,
             String[] values, String authorities[], int confidences[])
     {
-        MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
+        MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();        
         ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
         boolean authorityControlled = mam.isAuthorityControlled(schema, element, qualifier);
         boolean authorityRequired = mam.isAuthorityRequired(schema, element, qualifier);
@@ -1918,6 +1918,11 @@ public class Item extends DSpaceObject
      */
     void delete() throws SQLException, AuthorizeException, IOException
     {
+        // Check authorisation here. If we don't, it may happen that we remove the
+        // metadata but when getting to the point of removing the bundles we get an exception
+        // leaving the database in an inconsistent state
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
+
         ourContext.addEvent(new Event(Event.DELETE, Constants.ITEM, getID(), getHandle()));
 
         log.info(LogManager.getHeader(ourContext, "delete_item", "item_id="
@@ -2017,18 +2022,34 @@ public class Item extends DSpaceObject
      * @return <code>true</code> if object passed in represents the same item
      *         as this object
      */
-    public boolean equals(DSpaceObject other)
-    {
-        if (this.getType() == other.getType())
-        {
-            if (this.getID() == other.getID())
-            {
-                return true;
-            }
-        }
+     @Override
+     public boolean equals(Object obj)
+     {
+         if (obj == null)
+         {
+             return false;
+         }
+         if (getClass() != obj.getClass())
+         {
+             return false;
+         }
+         final Item other = (Item) obj;
+         if (this.getType() != other.getType()) return false;
+         if (this.getID() != other.getID()) return false;
 
-        return false;
-    }
+         return true;
+     }
+
+     @Override
+     public int hashCode()
+     {
+         int hash = 5;
+         hash = 71 * hash + (this.itemRow != null ? this.itemRow.hashCode() : 0);
+         return hash;
+     }
+
+
+
 
     /**
      * Return true if this Collection 'owns' this item
@@ -2171,7 +2192,7 @@ public class Item extends DSpaceObject
                 Constants.DEFAULT_ITEM_READ);
 
         // change the action to just READ
-        // just don't call update on the resource policies!!!
+        // just don't call update on the resourcepolicies!!!
         Iterator i = policies.iterator();
 
         // MUST have default policies
@@ -2193,7 +2214,7 @@ public class Item extends DSpaceObject
                 Constants.DEFAULT_BITSTREAM_READ);
 
         // change the action to just READ
-        // just don't call update on the resource policies!!!
+        // just don't call update on the resourcepolicies!!!
         i = policies.iterator();
 
         if (!i.hasNext())

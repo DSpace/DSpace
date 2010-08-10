@@ -658,6 +658,24 @@ public class Bundle extends DSpaceObject
         AuthorizeManager.removeAllPolicies(ourContext, this);
         AuthorizeManager.addPolicies(ourContext, newpolicies, this);
     }
+
+    public List<ResourcePolicy> getBundlePolicies() throws SQLException
+    {
+        return AuthorizeManager.getPolicies(ourContext, this);
+    }
+
+    public List<ResourcePolicy> getBitstreamPolicies() throws SQLException
+    {
+        List<ResourcePolicy> list = new ArrayList<ResourcePolicy>();
+        if (bitstreams != null && bitstreams.size() > 0)
+        {
+            for (Bitstream bs : bitstreams)
+            {
+                list.addAll(AuthorizeManager.getPolicies(ourContext, bs));
+            }
+        }
+        return list;
+    }
     
     public DSpaceObject getAdminObject(int action) throws SQLException
     {

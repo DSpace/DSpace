@@ -148,19 +148,26 @@ public class DCDate
     public DCDate(Date date)
     {
         super();
+        if(date != null)
+        {
         setTime(date);
         if (!(calendar.get(Calendar.HOUR_OF_DAY) == 0 &&
               calendar.get(Calendar.MINUTE) == 0 &&
               calendar.get(Calendar.SECOND) == 0))
+            {
             granularity = DateGran.TIME;
-
+            }
         // if date is 1-jan, assume it's because this was set for year
         else if (calendar.get(Calendar.DAY_OF_MONTH) == 1 && calendar.get(Calendar.MONTH) == 0)
+            {
             granularity = DateGran.YEAR;
-
+            }
         // otherwise day
         else
+            {
             granularity = DateGran.DAY;
+            }
+        }
     }
 
     /**

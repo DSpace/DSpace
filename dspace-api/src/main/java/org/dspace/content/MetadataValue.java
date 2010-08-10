@@ -424,4 +424,51 @@ public class MetadataValue
                 " metadata_value_id=" + getValueId()));
         DatabaseManager.delete(context, row);
     }
+
+    /**
+     * Return <code>true</code> if <code>other</code> is the same MetadataValue
+     * as this object, <code>false</code> otherwise
+     *
+     * @param obj
+     *            object to compare to
+     *
+     * @return <code>true</code> if object passed in represents the same
+     *         MetadataValue as this object
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == null)
+        {
+            return false;
+        }
+        if (getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final MetadataValue other = (MetadataValue) obj;
+        if (this.fieldId != other.fieldId)
+        {
+            return false;
+        }
+        if (this.valueId != other.valueId)
+        {
+            return false;
+        }
+        if (this.itemId != other.itemId)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 7;
+        hash = 47 * hash + this.fieldId;
+        hash = 47 * hash + this.valueId;
+        hash = 47 * hash + this.itemId;
+        return hash;
+    }
 }

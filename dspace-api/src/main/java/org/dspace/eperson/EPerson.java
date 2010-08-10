@@ -113,6 +113,56 @@ public class EPerson extends DSpaceObject
     }
 
     /**
+     * Return true if this object equals obj, false otherwise.
+     * 
+     * @param obj
+     * @return true if ResourcePolicy objects are equal
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == null)
+        {
+            return false;
+        }
+        if (getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final EPerson other = (EPerson) obj;
+        if (this.getID() != other.getID())
+        {
+            return false;
+        }
+        if (!this.getEmail().equals(other.getEmail()))
+        {
+            return false;
+        }
+        if (!this.getFullName().equals(other.getFullName()))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Return a hash code for this object.
+     *
+     * @return int hash of object
+     */
+    @Override
+    public int hashCode()
+    {
+        int hash = 5;
+        hash = 89 * hash + this.getID();
+        hash = 89 * hash + (this.getEmail() != null? this.getEmail().hashCode():0);
+        hash = 89 * hash + (this.getFullName() != null? this.getFullName().hashCode():0);
+        return hash;
+    }
+
+
+
+    /**
      * Get an EPerson from the database.
      * 
      * @param context
@@ -157,7 +207,7 @@ public class EPerson extends DSpaceObject
             return null;
         }
         
-        // All email addresses are stored as lower case, so ensure that the email address is lowercased for the lookup 
+        // All email addresses are stored as lowercase, so ensure that the email address is lowercased for the lookup 
         TableRow row = DatabaseManager.findByUnique(context, "eperson",
                 "email", email.toLowerCase());
 

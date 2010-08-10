@@ -1,10 +1,13 @@
 1.7.0
 =====
 (Flavio Botelho)
-[DS-563] Multiple spaces in between words in advanced search will make the search return nothing
+- [DS-563] Multiple spaces in between words in advanced search will make the search return nothing
 
 (Vladislav Zhivkov, Claudia Jürgen)
-[DS-625] Bulgarian translation of the jspui for DSpace 1.6.0
+- [DS-625] Bulgarian translation of the jspui for DSpace 1.6.0
+
+(Pere Villega)
+- [DS-643] New testing framework (GSoC 2010)
 
 1.6.2
 =====

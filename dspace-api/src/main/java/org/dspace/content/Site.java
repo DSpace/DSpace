@@ -136,4 +136,5 @@ public class Site extends DSpaceObject
     {
         return ConfigurationManager.getProperty("dspace.name");
     }
+
 }

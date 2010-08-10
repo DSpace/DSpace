@@ -73,7 +73,7 @@ public class LicenseUtils
             int i = 1;
             for (String key : additionalInfo.keySet())
             {
-                args[6 + 1] = new FormattableArgument(key, additionalInfo
+                args[6 + i] = new FormattableArgument(key, additionalInfo
                         .get(key));
                 i++;
             }
@@ -86,7 +86,7 @@ public class LicenseUtils
 
     /**
      * Utility method if no additional arguments has need to be supplied to the
-     * license template. (i.e. call the full getLicenseText suppling
+     * license template. (i.e. call the full getLicenseText supplying
      * <code>null</code> for the additionalInfo argument)
      * 
      * @param locale

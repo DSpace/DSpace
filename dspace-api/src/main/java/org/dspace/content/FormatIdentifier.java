@@ -66,15 +66,17 @@ public class FormatIdentifier
     public static BitstreamFormat guessFormat(Context context,
             Bitstream bitstream) throws SQLException
     {
+         String filename = bitstream.getName();
         // FIXME: Just setting format to first guess
-        // For now just get the file name
-        String filename = bitstream.getName().toLowerCase();
+        // For now just get the file name       
 
         // Gracefully handle the null case
         if (filename == null)
         {
             return null;
         }
+
+        filename = filename.toLowerCase();
 
         // This isn't rocket science. We just get the name of the
         // bitstream, get the extension, and see if we know the type.

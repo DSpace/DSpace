@@ -37,6 +37,7 @@
  */
 package org.dspace.event;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -99,7 +100,7 @@ public class BasicDispatcher extends Dispatcher
     {
         if (!consumers.isEmpty())
         {
-            List events = ctx.getEvents();
+            List events = Collections.synchronizedList(ctx.getEvents());
 
             if (events == null)
             {
@@ -115,42 +116,45 @@ public class BasicDispatcher extends Dispatcher
             // some letters so RDF readers don't mistake it for an integer.
             String tid = "TX" + Utils.generateKey();
 
-            for (Iterator ei = events.iterator(); ei.hasNext();)
+            synchronized(events)
             {
-                Event event = (Event) ei.next();
-                event.setDispatcher(getIdentifier());
-                event.setTransactionID(tid);
-
-                if (log.isDebugEnabled())
-                    log.debug("Iterating over "
-                            + String.valueOf(consumers.values().size())
-                            + " consumers...");
-
-                for (Iterator ci = consumers.values().iterator(); ci.hasNext();)
+                for (Iterator ei = events.iterator(); ei.hasNext();)
                 {
-                    ConsumerProfile cp = (ConsumerProfile) ci.next();
+                    Event event = (Event) ei.next();
+                    event.setDispatcher(getIdentifier());
+                    event.setTransactionID(tid);
 
-                    if (event.pass(cp.getFilters()))
+                    if (log.isDebugEnabled())
+                        log.debug("Iterating over "
+                                + String.valueOf(consumers.values().size())
+                                + " consumers...");
+
+                    for (Iterator ci = consumers.values().iterator(); ci.hasNext();)
                     {
-                        if (log.isDebugEnabled())
-                            log.debug("Sending event to \"" + cp.getName()
-                                    + "\": " + event.toString());
+                        ConsumerProfile cp = (ConsumerProfile) ci.next();
 
-                        try
+                        if (event.pass(cp.getFilters()))
                         {
-                            cp.getConsumer().consume(ctx, event);
+                            if (log.isDebugEnabled())
+                                log.debug("Sending event to \"" + cp.getName()
+                                        + "\": " + event.toString());
 
-                            // Record that the event has been consumed by this
-                            // consumer
-                            event.setBitSet(cp.getName());
+                            try
+                            {
+                                cp.getConsumer().consume(ctx, event);
+
+                                // Record that the event has been consumed by this
+                                // consumer
+                                event.setBitSet(cp.getName());
+                            }
+                            catch (Exception e)
+                            {
+                                log.error("Consumer(\"" + cp.getName()
+                                        + "\").consume threw: " + e.toString(), e);
+                            }
                         }
-                        catch (Exception e)
-                        {
-                            log.error("Consumer(\"" + cp.getName()
-                                    + "\").consume threw: " + e.toString(), e);
-                        }
+
                     }
-
                 }
             }
 

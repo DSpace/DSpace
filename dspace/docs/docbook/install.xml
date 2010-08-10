@@ -230,6 +230,9 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 														<para><literal>dspace-sword</literal> -- SWORD (Simple Web-serve Offering Repository Deposit) deposit service source module</para>
 													</listitem>
 													<listitem>
+														<para><literal>dspace-test</literal> -- DSpace Tests (Unit and Integration Tests)</para>
+													</listitem>
+													<listitem>
 														<para><literal>pom.xml</literal> - DSpace Parent Project definition</para>
 													</listitem>
 												</itemizedlist></para>

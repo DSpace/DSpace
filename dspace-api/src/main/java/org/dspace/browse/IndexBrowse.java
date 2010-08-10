@@ -786,7 +786,7 @@ public class IndexBrowse
                 createTables(bis[i]);
 
                 // prepare some CLI output
-                StringBuffer logMe = new StringBuffer();
+                StringBuilder logMe = new StringBuilder();
                 for (SortOption so : SortOption.getSortOptions())
                 {
                     logMe.append(" ").append(so.getMetadata()).append(" ");
@@ -1062,12 +1062,12 @@ public class IndexBrowse
     public void initBrowse()
 		throws SQLException, BrowseException
 	{
-		Date start = new Date();
+		Date localStart = new Date();
 		
 		output.message("Creating browse indexes for DSpace");
 		
 	    Date initDate = new Date();
-	    long init = initDate.getTime() - start.getTime();
+	    long init = initDate.getTime() - localStart.getTime();
 	    
 	    output.message("init complete (" + Long.toString(init) + " ms)");
 	    
@@ -1090,7 +1090,7 @@ public class IndexBrowse
 	    }
 	    
 	    Date prepDate = new Date();
-	    long prep = prepDate.getTime() - start.getTime();
+	    long prep = prepDate.getTime() - localStart.getTime();
 	    long prepinit = prepDate.getTime() - initDate.getTime();
 	    
 	    output.message("tables prepped (" + Long.toString(prep) + " ms, " + Long.toString(prepinit) + " ms)");
@@ -1100,7 +1100,7 @@ public class IndexBrowse
 	    context.complete();
 	    
 	    Date endDate = new Date();
-	    long end = endDate.getTime() - start.getTime();
+	    long end = endDate.getTime() - localStart.getTime();
 	    long endprep = endDate.getTime() - prepDate.getTime();
 	    
 	    output.message("content indexed (" + Long.toString(end) + " ms, " + Long.toString(endprep) + " ms)");

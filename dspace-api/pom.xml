@@ -47,7 +47,20 @@
    <!--
       Runtime and Compile Time dependencies for DSpace.
    -->
-   <dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0.2</version>
+                <configuration>
+                    <debug>true</debug>
+                    <showDeprecation>true</showDeprecation>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>handle</artifactId>
@@ -196,6 +209,12 @@
          <groupId>commons-httpclient</groupId>
          <artifactId>commons-httpclient</artifactId>
       </dependency>
-   </dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.4</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 </project>

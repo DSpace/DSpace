@@ -415,6 +415,10 @@ public class Context
      * Get the current event list. If there is a separate list of events from
      * already-committed operations combine that with current list.
      * 
+     * TODO WARNING: events uses an ArrayList, a class not ready for concurrency.
+     * Read http://download.oracle.com/javase/6/docs/api/java/util/Collections.html#synchronizedList%28java.util.List%29
+     * on how to properly synchronize the class when calling this method
+     *
      * @return List of all available events.
      */
     public List<Event> getEvents()

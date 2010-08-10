@@ -585,6 +585,33 @@ public class Bitstream extends DSpaceObject
     }
 
     /**
+     * Bitstreams are only logically deleted (via a flag in the database).
+     * This method allows us to verify is the bitstream is still valid
+     *
+     * @return true if the bitstream has been deleted
+     */
+    boolean isDeleted() throws SQLException
+    {
+        String query = "select count(*) as mycount from Bitstream where deleted = '1' and bitstream_id = ? ";
+        TableRowIterator tri = DatabaseManager.query(bContext, query, bRow.getIntColumn("bitstream_id"));
+        long count = 0;
+
+        try
+        {
+            TableRow r = tri.next();
+            count = r.getLongColumn("mycount");
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+                tri.close();
+        }
+        
+        return count == 1;
+    }
+
+    /**
      * Retrieve the contents of the bitstream
      * 
      * @return a stream from which the bitstream can be read.

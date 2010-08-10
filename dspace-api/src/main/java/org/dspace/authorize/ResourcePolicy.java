@@ -39,6 +39,7 @@ package org.dspace.authorize;
 
 import java.sql.SQLException;
 import java.util.Date;
+import org.apache.log4j.Logger;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
@@ -56,6 +57,9 @@ import org.dspace.storage.rdbms.TableRow;
  */
 public class ResourcePolicy
 {
+    /** log4j logger */
+    private static Logger log = Logger.getLogger(ResourcePolicy.class);
+
     /** Our context */
     private Context myContext;
 
@@ -74,6 +78,80 @@ public class ResourcePolicy
     {
         myContext = context;
         myRow = row;
+    }
+
+    /**
+     * Return true if this object equals obj, false otherwise.
+     * 
+     * @param obj
+     * @return true if ResourcePolicy objects are equal
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        try
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+            if (getClass() != obj.getClass())
+            {
+                return false;
+            }
+            final ResourcePolicy other = (ResourcePolicy) obj;         
+            if (this.getAction() != other.getAction())
+            {
+                return false;
+            }
+            if (this.getEPerson() != other.getEPerson() && (this.getEPerson() == null || !this.getEPerson().equals(other.getEPerson())))
+            {
+                return false;
+            }
+            if (this.getGroup() != other.getGroup() && (this.getGroup() == null || !this.getGroup().equals(other.getGroup())))
+            {
+                return false;
+            }
+            if (this.getStartDate() != other.getStartDate() && (this.getStartDate() == null || !this.getStartDate().equals(other.getStartDate())))
+            {
+                return false;
+            }
+            if (this.getEndDate() != other.getEndDate() && (this.getEndDate() == null || !this.getEndDate().equals(other.getEndDate())))
+            {
+                return false;
+            }    
+            return true;
+        }
+        catch (SQLException ex)
+        {
+            log.error("Error while comparing ResourcePolicy objects", ex);
+        }
+        return false;
+    }
+
+    /**
+     * Return a hash code for this object.
+     *
+     * @return int hash of object
+     */
+    @Override
+    public int hashCode()
+    {
+        int hash = 7;
+        try
+        {
+            hash = 19 * hash + this.getAction();
+            hash = 19 * hash + (this.getEPerson() != null? this.getEPerson().hashCode():0);
+            hash = 19 * hash + (this.getGroup() != null? this.getGroup().hashCode():0);
+            hash = 19 * hash + (this.getStartDate() != null? this.getStartDate().hashCode():0);
+            hash = 19 * hash + (this.getEndDate() != null? this.getEndDate().hashCode():0);
+            hash = 19 * hash + (this.getEPerson() != null? this.getEPerson().hashCode():0);
+        }
+        catch (SQLException ex)
+        {
+            log.error("Error generating hascode of ResourcePolicy", ex);
+        }
+        return hash;
     }
 
     /**

@@ -1160,21 +1160,37 @@ public class Group extends DSpaceObject
      * Return <code>true</code> if <code>other</code> is the same Group as
      * this object, <code>false</code> otherwise
      * 
-     * @param other
+     * @param obj
      *            object to compare to
      * 
      * @return <code>true</code> if object passed in represents the same group
      *         as this object
      */
-    public boolean equals(Object other)
-    {
-        if (!(other instanceof Group))
-        {
-            return false;
-        }
+     @Override
+     public boolean equals(Object obj)
+     {
+         if (obj == null)
+         {
+             return false;
+         }
+         if (getClass() != obj.getClass())
+         {
+             return false;
+         }
+         final Group other = (Group) obj;
+         if(this.getID() != other.getID()) return false;
+         return true;
+     }
 
-        return (getID() == ((Group) other).getID());
-    }
+     @Override
+     public int hashCode()
+     {
+         int hash = 7;
+         hash = 59 * hash + (this.myRow != null ? this.myRow.hashCode() : 0);
+         return hash;
+     }
+
+
 
     public int getType()
     {

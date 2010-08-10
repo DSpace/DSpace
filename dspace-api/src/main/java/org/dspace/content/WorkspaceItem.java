@@ -513,6 +513,22 @@ public class WorkspaceItem implements InProgressSubmission
     }
 
     /**
+     * Decide if this WorkspaceItem is equal to another
+     *
+     * @param o The other workspace item to compare to
+     * @return If they are equal or not
+     */
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final WorkspaceItem that = (WorkspaceItem)o;
+        if (this.getID() != that.getID()) return false;
+
+        return true;
+    }
+
+    /**
      * Delete the workspace item. The entry in workspaceitem, the unarchived
      * item and its contents are all removed (multiple inclusion
      * notwithstanding.)
@@ -524,6 +540,7 @@ public class WorkspaceItem implements InProgressSubmission
          * Authorisation is a special case. The submitter won't have REMOVE
          * permission on the collection, so our policy is this: Only the
          * original submitter or an administrator can delete a workspace item.
+
          */
         if (!AuthorizeManager.isAdmin(ourContext)
                 && ((ourContext.getCurrentUser() == null) || (ourContext

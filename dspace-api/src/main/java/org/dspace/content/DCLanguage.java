@@ -93,7 +93,12 @@ public class DCLanguage
      */
     public void setLanguage(String l)
     {
-        if (l.equals("other"))
+        if(l == null)
+        {
+            language = "";
+            country = "";
+        }
+        else if("other".equals(l))
         {
             language = "other";
             country = "";

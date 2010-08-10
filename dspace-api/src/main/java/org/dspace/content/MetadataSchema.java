@@ -142,6 +142,40 @@ public class MetadataSchema
         }
     }
 
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == null)
+        {
+            return false;
+        }
+        if (getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final MetadataSchema other = (MetadataSchema) obj;
+        if (this.schemaID != other.schemaID)
+        {
+            return false;
+        }
+        if ((this.namespace == null) ? (other.namespace != null) : !this.namespace.equals(other.namespace))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 5;
+        hash = 67 * hash + this.schemaID;
+        hash = 67 * hash + (this.namespace != null ? this.namespace.hashCode() : 0);
+        return hash;
+    }
+
+
+
     /**
      * Get the schema namespace.
      *

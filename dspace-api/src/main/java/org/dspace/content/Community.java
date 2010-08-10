@@ -203,7 +203,11 @@ public class Community extends DSpaceObject
         TableRow row = DatabaseManager.create(context, "community");
         Community c = new Community(context, row);
         c.handle = HandleManager.createHandle(context, c);
-
+        if(parent != null)
+        {
+            parent.addSubcommunity(c);
+        }
+        
         // create the default authorization policy for communities
         // of 'anonymous' READ
         Group anonymousGroup = Group.find(context, 0);

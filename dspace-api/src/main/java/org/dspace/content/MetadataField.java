@@ -673,4 +673,46 @@ public class MetadataField
             }
         }
     }
+
+    /**
+     * Return <code>true</code> if <code>other</code> is the same MetadataField
+     * as this object, <code>false</code> otherwise
+     *
+     * @param other
+     *            object to compare to
+     *
+     * @return <code>true</code> if object passed in represents the same
+     *         MetadataField as this object
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == null)
+        {
+            return false;
+        }
+        if (getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final MetadataField other = (MetadataField) obj;
+        if (this.fieldID != other.fieldID)
+        {
+            return false;
+        }
+        if (this.schemaID != other.schemaID)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 7;
+        hash = 47 * hash + this.fieldID;
+        hash = 47 * hash + this.schemaID;
+        return hash;
+    }
 }

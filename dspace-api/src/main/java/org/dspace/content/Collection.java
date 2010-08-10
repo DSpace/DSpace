@@ -1244,15 +1244,31 @@ public class Collection extends DSpaceObject
      * @return <code>true</code> if object passed in represents the same
      *         collection as this object
      */
-    public boolean equals(Object other)
-    {
-        if (!(other instanceof Collection))
-        {
-            return false;
-        }
+     @Override
+     public boolean equals(Object other)
+     {
+         if (other == null)
+         {
+             return false;
+         }
+         if (getClass() != other.getClass())
+         {
+             return false;
+         }
+         final Collection otherCollection = (Collection) other;
+         if (this.getID() != otherCollection.getID()) return false;
 
-        return (getID() == ((Collection) other).getID());
-    }
+         return true;
+     }
+
+     @Override
+     public int hashCode()
+     {
+         int hash = 7;
+         hash = 89 * hash + (this.collectionRow != null ? this.collectionRow.hashCode() : 0);
+         return hash;
+     }
+
 
     /**
      * Utility method for reading in a group from a group ID in a column. If the
