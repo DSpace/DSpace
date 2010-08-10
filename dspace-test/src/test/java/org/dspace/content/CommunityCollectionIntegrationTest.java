@@ -95,7 +95,7 @@ public class CommunityCollectionIntegrationTest extends AbstractIntegrationTest
      */
     @Test
     @PerfTest(invocations = 25, threads = 1)
-    @Required(percentile95 = 1000, average = 200, throughput = 5)
+    @Required(percentile95 = 1000, average = 400, throughput = 3)
     public void testCreateTree() throws SQLException, AuthorizeException
     {
         //we create the structure
