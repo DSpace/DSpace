@@ -39,22 +39,31 @@
 package org.dspace.content.packager;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DCValue;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
+import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.license.CreativeCommons;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowManager;
 
 /**
  * Container class for code that is useful to many packagers.
@@ -65,6 +74,70 @@ import org.dspace.license.CreativeCommons;
 
 public class PackageUtils
 {
+
+    // Map of metadata elements for Communities and Collections
+    // Format is alternating key/value in a straight array; use this
+    // to initialize hash tables that convert to and from.
+    private final static String ccMetadataMap[] =
+    {
+        // getMetadata()  ->  DC element.term
+        "name",                    "dc.title",
+        "introductory_text",       "dc.description",
+        "short_description",       "dc.description.abstract",
+        "side_bar_text",           "dc.description.tableofcontents",
+        "copyright_text",          "dc.rights",
+        "provenance_description",  "dc.provenance",
+        "license",                 "dc.rights.license"
+    };
+
+    // HashMaps to convert Community/Collection metadata to/from Dublin Core
+    // (useful when crosswalking Communities/Collections)
+    private final static Map<String,String> ccMetadataToDC = new HashMap<String,String>();
+    private final static Map<String,String> ccDCToMetadata = new HashMap<String,String>();
+    static
+    {
+        for (int i = 0; i < ccMetadataMap.length; i += 2)
+        {
+            ccMetadataToDC.put(ccMetadataMap[i], ccMetadataMap[i+1]);
+            ccDCToMetadata.put(ccMetadataMap[i+1], ccMetadataMap[i]);
+        }
+    }
+
+    /**
+     * Translate a Dublin Core metadata field into a Container's (Community or Collection)
+     * database column for that metadata entry.
+     * <P>
+     * e.g. "dc.title" would translate to the "name" database column
+     * <P>
+     * This method is of use when crosswalking Community or Collection metadata for ingest, 
+     * as most ingest Crosswalks tend to deal with translating to DC-based metadata.
+     * 
+     * @param dcField The dublin core metadata field
+     * @return The Community or Collection DB column where this metadata info is stored.
+     */
+    public static String dcToContainerMetadata(String dcField)
+    {
+        return ccDCToMetadata.get(dcField);
+    }
+
+    /**
+     * Translate a Container's (Community or Collection) database column into
+     * a valid Dublin Core metadata field.  This is the opposite of 'dcToContainerMetadata()'.
+     * <P>
+     * e.g. the "name" database column would translate to "dc.title"
+     * <P>
+     * This method is of use when crosswalking Community or Collection metadata for dissemination,
+     * as most dissemination Crosswalks tend to deal with translating from DC-based metadata.
+     *
+     *
+     * @param databaseField The Community or Collection DB column
+     * @return The Dublin Core metadata field that this metadata translates to.
+     */
+    public static String containerMetadataToDC(String databaseField)
+    {
+        return ccMetadataToDC.get(databaseField);
+    }
+
     /**
      * Test that item has adequate metadata.
      * Check item for the minimal DC metadata required to ingest a
@@ -73,7 +146,7 @@ public class PackageUtils
      *
      * @param item - item to test.
      */
-    public static void checkMetadata(Item item)
+    public static void checkItemMetadata(Item item)
         throws PackageValidationException
     {
         DCValue t[] = item.getDC( "title", null, Item.ANY);
@@ -99,7 +172,20 @@ public class PackageUtils
         if (license == null)
             license = collection.getLicense();
         InputStream lis = new ByteArrayInputStream(license.getBytes());
-        Bundle lb = item.createBundle(Constants.LICENSE_BUNDLE_NAME);
+
+        Bundle lb;
+        //If LICENSE bundle is missing, create it
+        Bundle[] bundles = item.getBundles(Constants.LICENSE_BUNDLE_NAME);
+        if(bundles==null || bundles.length==0)
+        {
+            lb = item.createBundle(Constants.LICENSE_BUNDLE_NAME);
+        }
+        else
+        {
+            lb = bundles[0];
+        }
+
+        //Create the License bitstream
         Bitstream lbs = lb.createBitstream(lis);
         lis.close();
         BitstreamFormat bf = BitstreamFormat.findByShortDescription(context, "License");
@@ -247,6 +333,29 @@ public class PackageUtils
             String shortDesc, String MIMEType, String desc)
         throws SQLException, AuthorizeException
      {
+        return findOrCreateBitstreamFormat(context, shortDesc, MIMEType, desc, BitstreamFormat.KNOWN, false);
+     }
+
+    /**
+     * Find or create a bitstream format to match the given short
+     * description.
+     * Used by packager ingesters to obtain a special bitstream
+     * format for the manifest (and/or metadata) file.
+     * <p>
+     * NOTE: When creating a new format, do NOT set any extensions, since
+     *  we don't want any file with the same extension, which may be something
+     *  generic like ".xml", to accidentally get set to this format.
+     * @param context - the context.
+     * @param shortDesc - short descriptive name, used to locate existing format.
+     * @param MIMEtype - mime content-type
+     * @param desc - long description
+     * @param internal value for the 'internal' flag of a new format if created.
+     * @return BitstreamFormat object that was found or created.  Never null.
+     */
+     public static BitstreamFormat findOrCreateBitstreamFormat(Context context,
+            String shortDesc, String MIMEType, String desc, int supportLevel, boolean internal)
+        throws SQLException, AuthorizeException
+     {
         BitstreamFormat bsf = BitstreamFormat.findByShortDescription(context,
                                 shortDesc);
         // not found, try to create one
@@ -256,9 +365,382 @@ public class PackageUtils
             bsf.setShortDescription(shortDesc);
             bsf.setMIMEType(MIMEType);
             bsf.setDescription(desc);
-            bsf.setSupportLevel(BitstreamFormat.KNOWN);
+            bsf.setSupportLevel(supportLevel);
+            bsf.setInternal(internal);
             bsf.update();
         }
         return bsf;
     }
+
+    /**
+     * Utility to find the license bitstream from an item
+     *
+     * @param context
+     *            DSpace context
+     * @param item
+     *            the item
+     * @return the license bitstream or null
+     *
+     * @throws IOException
+     *             if the license bitstream can't be read
+     */
+    public static Bitstream findDepositLicense(Context context, Item item)
+            throws SQLException, IOException, AuthorizeException
+    {
+        // get license format ID
+        int licenseFormatId = -1;
+        BitstreamFormat bf = BitstreamFormat.findByShortDescription(context,
+                "License");
+        if (bf != null)
+            licenseFormatId = bf.getID();
+
+        Bundle[] bundles = item.getBundles(Constants.LICENSE_BUNDLE_NAME);
+        for (int i = 0; i < bundles.length; i++)
+        {
+            // Assume license will be in its own bundle
+            Bitstream[] bitstreams = bundles[i].getBitstreams();
+
+            for(int j=0; j < bitstreams.length; j++)
+            {
+                // The License should have a file format of "License"
+                if (bitstreams[j].getFormat().getID() == licenseFormatId)
+                {
+                    //found a bitstream with format "License" -- return it
+                    return bitstreams[j];
+                }
+            }
+
+            // If we couldn't find a bitstream with format = "License",
+            // we will just assume the first bitstream is the deposit license
+            // (usually a safe assumption as it is in the LICENSE bundle)
+            if(bitstreams.length>0)
+                return bitstreams[0];
+        }
+
+        // Oops! No license!
+        return null;
+    }
+
+
+    /*=====================================================
+     *  Utility Methods -- may be useful for subclasses
+     *====================================================*/
+
+
+    /**
+     * Create the specified DSpace Object, based on the passed
+     * in Package Parameters (along with other basic info required
+     * to create the object)
+     *
+     * @param context DSpace Context
+     * @param parent Parent Object
+     * @param type Type of new Object
+     * @param handle Handle of new Object (may be null)
+     * @param params Properties-style list of options (interpreted by each packager).
+     * @return newly created DSpace Object (or null)
+     * @throws AuthorizeException
+     * @throws SQLException
+     * @throws IOException
+     */
+    public static DSpaceObject createDSpaceObject(Context context, DSpaceObject parent, int type, String handle, PackageParameters params)
+        throws AuthorizeException, SQLException, IOException
+    {
+        DSpaceObject dso = null;
+
+        switch (type)
+        {
+            case Constants.COLLECTION:
+                dso = ((Community)parent).createCollection(handle);
+                return dso;
+
+            case Constants.COMMUNITY:
+                // top-level community?
+                if (parent == null || parent.getType() == Constants.SITE)
+                    dso = Community.create(null, context, handle);
+                else
+                    dso = ((Community)parent).createSubcommunity(handle);
+                return dso;
+
+            case Constants.ITEM:
+                //Initialize a WorkspaceItem
+                //(Note: Handle is not set until item is finished)
+                WorkspaceItem wsi = WorkspaceItem.create(context, (Collection)parent, params.useCollectionTemplate());
+
+                // Finish creating item with specified handle 
+                // (this will either install item immediately or start a workflow, based on params)
+                dso = finishCreateItem(context, wsi, handle, params);
+
+                return dso;
+        }
+
+        return null;
+    }
+
+    /**
+     * Perform any final tasks on a newly created WorkspaceItem in order to finish
+     * ingestion of an Item.
+     * <p>
+     * This may include starting up a workflow for the new item, restoring it,
+     * or archiving it (based on params passed in)
+     *
+     * @param context DSpace Context
+     * @param wsi Workspace Item that requires finishing
+     * @param handle Handle to assign to item (may be null)
+     * @param params Properties-style list of options (interpreted by each packager).
+     * @return finished Item
+     * @throws IOException
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    public static Item finishCreateItem(Context context, WorkspaceItem wsi, String handle, PackageParameters params)
+            throws IOException, SQLException, AuthorizeException
+    {
+        // if we are restoring/replacing existing object using the package
+        if (params.restoreModeEnabled())
+        {
+            // Restore & install item immediately
+            //(i.e. skip over any Collection workflows, as we are essentially restoring item from backup)
+            InstallItem.restoreItem(context, wsi, handle);
+
+            //return newly restored item
+            return wsi.getItem();
+        }
+        // if we are treating package as a SIP, and we are told to respect workflows
+        else if (params.workflowEnabled())
+        {
+            // Start an item workflow
+            // (NOTICE: The specified handle is ignored, as Workflows *always* end in a new handle being assigned)
+            WorkflowItem wfi = WorkflowManager.startWithoutNotify(context, wsi);
+
+            // return item with workflow started
+            return wfi.getItem();
+        }
+
+        // default: skip workflow, but otherwise normal submission (i.e. package treated like a SIP)
+        else
+        {
+            // Intall item immediately with the specified handle
+            InstallItem.installItem(context, wsi, handle);
+
+            // return newly installed item
+            return wsi.getItem();
+        }
+    }//end finishCreateItem
+
+
+    /**
+     * Commit all recent changes to DSpaceObject.
+     * <p>
+     * This method is necessary as there is no generic 'update()' on a DSpaceObject
+     *
+     * @param dso DSpaceObject to update
+     */
+    public static void updateDSpaceObject(DSpaceObject dso)
+            throws AuthorizeException, SQLException, IOException
+    {
+        if (dso != null)
+        {
+            switch (dso.getType())
+            {
+                case Constants.BITSTREAM:
+                    ((Bitstream)dso).update();
+                    break;
+                case Constants.ITEM:
+                    ((Item)dso).update();
+                    break;
+                case Constants.COLLECTION:
+                    ((Collection)dso).update();
+                    break;
+                case Constants.COMMUNITY:
+                    ((Community)dso).update();
+                    break;
+            }
+        }
+    }
+
+
+    /**
+     * Utility method to retrieve the file extension off of a filename.
+     *
+     * @param filename Full filename
+     * @return file extension
+     */
+    public static String getFileExtension(String filename)
+    {
+        // Extract the file extension off of a filename
+        String extension = filename;
+        int lastDot = filename.lastIndexOf('.');
+
+        if (lastDot != -1)
+        {
+            extension = filename.substring(lastDot + 1);
+        }
+
+        return extension;
+    }
+
+
+    /**
+     * Returns name of a dissemination information package (DIP), based on the
+     * DSpace object and a provided fileExtension
+     * <p>
+     * Format: [dspace-obj-type]@[handle-with-dashes].[fileExtension]
+     * OR      [dspace-obj-type]@internal-id-[dspace-ID].[fileExtension]
+     *
+     * @param dso  DSpace Object to create file name for
+     * @param fileExtension file Extension of output file.
+     * @return filename of a DIP representing the DSpace Object
+     */
+    public static String getPackageName(DSpaceObject dso, String fileExtension)
+    {
+        String handle = dso.getHandle();
+        // if Handle is empty, use internal ID for name
+        if(handle==null || handle.isEmpty())
+            handle = "internal-id-" + dso.getID();
+        else // if Handle exists, replace '/' with '-' to meet normal file naming conventions
+            handle = handle.replace("/", "-");
+
+        //Get type name
+        int typeID = dso.getType();
+        String type = Constants.typeText[typeID];
+
+        //check if passed in file extension already starts with "."
+        if(!fileExtension.startsWith(".")) fileExtension = "." + fileExtension;
+
+        //Here we go, here's our magical file name!
+        //Format: typeName@handle.extension
+        return type + "@" + handle + fileExtension;
+    }
+
+
+    /**
+     * Creates the specified file (along with all parent directories) if it doesn't already
+     * exist.  If the file already exists, nothing happens.
+     * 
+     * @param file
+     * @return boolean true if succeeded, false otherwise
+     * @throws IOException
+     */
+    public static boolean createFile(File file)
+            throws IOException
+    {
+        boolean success = false;
+
+        //Check if file exists
+        if(!file.exists())
+        {
+            //file doesn't exist yet, does its parent directory exist?
+            File parentFile = file.getCanonicalFile().getParentFile();
+            if((null != parentFile) && !parentFile.exists())
+            {
+                //create the parent directory structure
+                parentFile.mkdirs();
+            }
+            //create actual file
+            success = file.createNewFile();
+        }
+        return success;
+    }
+
+    /**
+     * Remove all bitstreams (files) associated with a DSpace object.
+     * <P>
+     * If this object is an Item, it removes all bundles & bitstreams.  If this
+     * object is a Community or Collection, it removes all logo bitstreams.
+     * <P>
+     * This method is useful for replace functionality.
+     *
+     * @param dso The object to remove all bitstreams from
+     */
+    public static void removeAllBitstreams(DSpaceObject dso)
+            throws SQLException, IOException, AuthorizeException
+    {
+        //If we are dealing with an Item
+        if(dso.getType()==Constants.ITEM)
+        {
+            Item item = (Item) dso;
+            // Get a reference to all Bundles in Item (which contain the bitstreams)
+            Bundle[] bunds = item.getBundles();
+
+            // Remove each bundle -- this will in turn remove all bitstreams associated with this Item.
+            for (int i = 0; i < bunds.length; i++)
+            {
+                item.removeBundle(bunds[i]);
+            }
+        }
+        else if (dso.getType()==Constants.COLLECTION)
+        {
+            Collection collection = (Collection) dso;
+            //clear out the logo for this collection
+            collection.setLogo(null);
+        }
+        else if (dso.getType()==Constants.COMMUNITY)
+        {
+            Community community = (Community) dso;
+            //clear out the logo for this community
+            community.setLogo(null);
+        }
+    }
+
+
+    /**
+     * Removes all metadata associated with a DSpace object.
+     * <P>
+     * This method is useful for replace functionality.
+     *
+     * @param dso The object to remove all metadata from
+     */
+    public static void clearAllMetadata(DSpaceObject dso)
+            throws SQLException, IOException, AuthorizeException
+    {
+        //If we are dealing with an Item
+        if(dso.getType()==Constants.ITEM)
+        {
+            Item item = (Item) dso;
+            //clear all metadata entries
+            item.clearMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        }
+        //Else if collection, clear its database table values
+        else if (dso.getType()==Constants.COLLECTION)
+        {
+            Collection collection = (Collection) dso;
+
+            // Use the MetadataToDC map (defined privately in this class)
+            // to clear out all the Collection database fields.
+            for(String dbField : ccMetadataToDC.keySet())
+            {
+                try
+                {
+                    collection.setMetadata(dbField, null);
+                }
+                catch(IllegalArgumentException ie)
+                {
+                    // ignore the error -- just means the field doesn't exist in DB
+                    // Communities & Collections don't include the exact same metadata fields
+                }
+            }
+        }
+        //Else if community, clear its database table values
+        else if (dso.getType()==Constants.COMMUNITY)
+        {
+            Community community = (Community) dso;
+
+            // Use the MetadataToDC map (defined privately in this class)
+            // to clear out all the Community database fields.
+            for(String dbField : ccMetadataToDC.keySet())
+            {
+                try
+                {
+                    community.setMetadata(dbField, null);
+                }
+                catch(IllegalArgumentException ie)
+                {
+                    // ignore the error -- just means the field doesn't exist in DB
+                    // Communities & Collections don't include the exact same metadata fields
+                }
+            }
+        }
+            
+    }
+
 }

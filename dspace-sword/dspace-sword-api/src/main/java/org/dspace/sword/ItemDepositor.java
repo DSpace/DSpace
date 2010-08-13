@@ -97,39 +97,6 @@ public class ItemDepositor extends Depositor
 					"Unacceptable packaging type in deposit request: " + deposit.getPackaging());
 		}
 
-		String tempDir = swordConfig.getTempDir();
-		String tempFile = tempDir + "/" + swordService.getTempFilename();
-
-		if (swordConfig.isKeepOriginal())
-		{
-			try
-			{
-				swordService.message("DSpace will store an original copy of the deposit file, " +
-						"as well as attaching it to the item");
-
-				// first, store the temp file
-				InputStream is = deposit.getFile();
-				FileOutputStream fos = new FileOutputStream(tempFile);
-				Utils.copy(is, fos);
-				fos.close();
-				is.close();
-
-				// now create an input stream from that temp file to ingest
-				InputStream fis = new FileInputStream(tempFile);
-				deposit.setFile(fis);
-			}
-			catch (FileNotFoundException e)
-			{
-				log.error("caught exception: ", e);
-				throw new DSpaceSWORDException(e);
-			}
-			catch (IOException e)
-			{
-				log.error("caught exception: ", e);
-				throw new DSpaceSWORDException(e);
-			}
-		}
-
 		// Obtain the relevant ingester from the factory
 		SWORDIngester si = SWORDIngesterFactory.getInstance(context, deposit, item);
 		swordService.message("Loaded ingester: " + si.getClass().getName());
@@ -144,6 +111,9 @@ public class ItemDepositor extends Depositor
 		{
 			if (swordConfig.isKeepOriginal())
 			{
+                                swordService.message("DSpace will store an original copy of the deposit file, " +
+						"as well as attaching it to the item");
+
 				// in order to be allowed to add the file back to the item, we need to ignore authorisations
 				// for a moment
 				boolean ignoreAuth = context.ignoreAuthorization();
@@ -168,7 +138,7 @@ public class ItemDepositor extends Depositor
 
 				String fn = swordService.getFilename(context, deposit, true);
 
-				FileInputStream fis = new FileInputStream(tempFile);
+				FileInputStream fis = new FileInputStream(deposit.getFile());
 				Bitstream bitstream = swordBundle.createBitstream(fis);
 				bitstream.setName(fn);
 				bitstream.setDescription("Original file deposited via SWORD");

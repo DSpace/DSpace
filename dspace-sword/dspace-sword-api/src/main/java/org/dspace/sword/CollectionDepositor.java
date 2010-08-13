@@ -37,6 +37,7 @@
  */
 package org.dspace.sword;
 
+import java.io.File;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -137,40 +138,6 @@ public class CollectionDepositor extends Depositor
 					"Unacceptable packaging type in deposit request: " + deposit.getPackaging());
 		}
 
-		String tempDir = swordConfig.getTempDir();
-		String tempFile = tempDir + "/" + swordService.getTempFilename();
-		log.debug("Storing temporary file at " + tempFile);
-
-		if (swordConfig.isKeepOriginal())
-		{
-			try
-			{
-				swordService.message("DSpace will store an original copy of the deposit, " +
-						"as well as ingesting the item into the archive");
-
-				// first, store the temp file
-				InputStream is = deposit.getFile();
-				FileOutputStream fos = new FileOutputStream(tempFile);
-				Utils.copy(is, fos);
-				fos.close();
-				is.close();
-
-				// now create an input stream from that temp file to ingest
-				InputStream fis = new FileInputStream(tempFile);
-				deposit.setFile(fis);
-			}
-			catch (FileNotFoundException e)
-			{
-				log.error("caught exception: ", e);
-				throw new DSpaceSWORDException(e);
-			}
-			catch (IOException e)
-			{
-				log.error("caught exception: ", e);
-				throw new DSpaceSWORDException(e);
-			}
-		}
-
 		// Obtain the relevant ingester from the factory
 		SWORDIngester si = SWORDIngesterFactory.getInstance(context, deposit, collection);
 		swordService.message("Loaded ingester: " + si.getClass().getName());
@@ -185,6 +152,9 @@ public class CollectionDepositor extends Depositor
 		{
 			if (swordConfig.isKeepOriginal())
 			{
+                                swordService.message("DSpace will store an original copy of the deposit, " +
+						"as well as ingesting the item into the archive");
+
 				// in order to be allowed to add the file back to the item, we need to ignore authorisations
 				// for a moment
 				boolean ignoreAuth = context.ignoreAuthorization();
@@ -209,7 +179,7 @@ public class CollectionDepositor extends Depositor
 
 				String fn = swordService.getFilename(context, deposit, true);
 
-				FileInputStream fis = new FileInputStream(tempFile);
+				FileInputStream fis = new FileInputStream(deposit.getFile());
 				Bitstream bitstream = swordBundle.createBitstream(fis);
 				bitstream.setName(fn);
 				bitstream.setDescription("SWORD deposit package");

@@ -40,10 +40,13 @@
 package org.dspace.app.dav;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Vector;
+import javax.servlet.ServletException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,6 +63,7 @@ import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.packager.PackageDisseminator;
 import org.dspace.content.packager.PackageException;
 import org.dspace.content.packager.PackageParameters;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
@@ -497,10 +501,20 @@ class DAVItem extends DAVDSpaceObject
         {
             try
             {
+                // Create a temporary file to disseminate into
+                String tempDirectory = ConfigurationManager.getProperty("upload.temp.dir");
+                File tempFile = File.createTempFile("DAVItemGet" + this.item.hashCode(), null, new File(tempDirectory));
+                tempFile.deleteOnExit();
+
+                // Disseminate item to temporary file
                 PackageParameters pparams = PackageParameters.create(this.request);
                 this.response.setContentType(dip.getMIMEType(pparams));
-                dip.disseminate(this.context, this.item, pparams, this.response
-                        .getOutputStream());
+                dip.disseminate(this.context, this.item, pparams, tempFile);
+
+                // Copy temporary file contents to response stream
+                FileInputStream fileIn = new FileInputStream(tempFile);
+                Utils.copy(fileIn, this.response.getOutputStream());
+                fileIn.close();
             }
             catch (CrosswalkException pe)
             {

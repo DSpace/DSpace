@@ -182,7 +182,7 @@ public class Community extends DSpaceObject
     }
 
     /**
-     * Create a new community, with a new ID.
+     * Create a new top-level community, with a new ID.
      * 
      * @param context
      *            DSpace context object
@@ -192,9 +192,23 @@ public class Community extends DSpaceObject
     public static Community create(Community parent, Context context)
             throws SQLException, AuthorizeException
     {
-        // Only administrators and adders can create communities
-        if (!(AuthorizeManager.isAdmin(context) || AuthorizeManager
-                .authorizeActionBoolean(context, parent, Constants.ADD)))
+        return create(parent, context, null);
+    }
+
+    /**
+     * Create a new top-level community, with a new ID.
+     *
+     * @param context
+     *            DSpace context object
+     * @param handle the pre-determined Handle to assign to the new community
+     *
+     * @return the newly created community
+     */
+    public static Community create(Community parent, Context context, String handle)
+            throws SQLException, AuthorizeException
+    {
+        if (!(AuthorizeManager.isAdmin(context) ||
+              (parent != null && AuthorizeManager.authorizeActionBoolean(context, parent, Constants.ADD))))
         {
             throw new AuthorizeException(
                     "Only administrators can create communities");
@@ -202,12 +216,32 @@ public class Community extends DSpaceObject
 
         TableRow row = DatabaseManager.create(context, "community");
         Community c = new Community(context, row);
-        c.handle = HandleManager.createHandle(context, c);
+        
+        try
+        {
+            c.handle = (handle == null) ?
+                       HandleManager.createHandle(context, c) :
+                       HandleManager.createHandle(context, c, handle);
+        }
+        catch(IllegalStateException ie)
+        {
+            //If an IllegalStateException is thrown, then an existing object is already using this handle
+            //Remove the community we just created -- as it is incomplete
+            try
+            {
+                if(c!=null) 
+                    c.delete();
+            } catch(Exception e) { }
+
+            //pass exception on up the chain
+            throw ie;
+        }
+
         if(parent != null)
         {
             parent.addSubcommunity(c);
         }
-        
+
         // create the default authorization policy for communities
         // of 'anonymous' READ
         Group anonymousGroup = Group.find(context, 0);
@@ -781,10 +815,23 @@ public class Community extends DSpaceObject
     public Collection createCollection() throws SQLException,
             AuthorizeException
     {
+        return createCollection(null);
+    }
+
+    /**
+     * Create a new collection within this community. The collection is created
+     * without any workflow groups or default submitter group.
+     *
+     * @param handle the pre-determined Handle to assign to the new community
+     * @return the new collection
+     */
+    public Collection createCollection(String handle) throws SQLException,
+            AuthorizeException
+    {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
-        Collection c = Collection.create(ourContext);
+        Collection c = Collection.create(ourContext, handle);
         addCollection(c);
 
         return c;
@@ -843,10 +890,22 @@ public class Community extends DSpaceObject
     public Community createSubcommunity() throws SQLException,
             AuthorizeException
     {
+        return createSubcommunity(null);
+    }
+
+    /**
+     * Create a new sub-community within this community.
+     *
+     * @param handle the pre-determined Handle to assign to the new community
+     * @return the new community
+     */
+    public Community createSubcommunity(String handle) throws SQLException,
+            AuthorizeException
+    {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
-        Community c = create(this, ourContext);
+        Community c = create(this, ourContext, handle);
         addSubcommunity(c);
 
         return c;
@@ -1052,7 +1111,10 @@ public class Community extends DSpaceObject
             // exception framework
             throw new RuntimeException(e.getMessage(),e);
         }
-        
+
+        // Remove any Handle
+        HandleManager.unbindHandle(ourContext, this);
+
         // Delete community row
         DatabaseManager.delete(ourContext, communityRow);
 

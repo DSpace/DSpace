@@ -38,9 +38,10 @@
 
 package org.dspace.content.packager;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -82,26 +83,63 @@ public interface PackageDisseminator
      * "package" on the indicated OutputStream.  Package is any serialized
      * representation of the item, at the discretion of the implementing
      * class.  It does not have to include content bitstreams.
-     * <br>
+     * <p>
      * Use the <code>params</code> parameter list to adjust the way the
      * package is made, e.g. including a "<code>metadataOnly</code>"
      * parameter might make the package a bare manifest in XML
      * instead of a Zip file including manifest and contents.
-     * <br>
+     * <p>
      * Throws an exception of the chosen object is not acceptable or there is
      * a failure creating the package.
      *
      * @param context  DSpace context.
      * @param object  DSpace object (item, collection, etc)
      * @param params Properties-style list of options specific to this packager
-     * @param out  output stream on which to write package
+     * @param pkgFile File where export package should be written
      * @throws PackageValidationException if package cannot be created or there is
      *  a fatal error in creating it.
      */
     void disseminate(Context context, DSpaceObject object,
-                     PackageParameters params, OutputStream out)
+                     PackageParameters params, File pkgFile)
         throws PackageException, CrosswalkException,
                AuthorizeException, SQLException, IOException;
+
+    /**
+     * Recursively export one or more DSpace Objects as a series of packages.
+     * This method will export the given DSpace Object as well as all referenced
+     * DSpaceObjects (e.g. child objects) into a series of packages. The
+     * initial object is exported to the location specified by the pkgFile.
+     * All other generated packages are recursively exported to the same directory.
+     * <p>
+     * Package is any serialized representation of the item, at the discretion
+     * of the implementing class.  It does not have to include content bitstreams.
+     * <p>
+     * Use the <code>params</code> parameter list to adjust the way the
+     * package is made, e.g. including a "<code>metadataOnly</code>"
+     * parameter might make the package a bare manifest in XML
+     * instead of a Zip file including manifest and contents.
+     * <p>
+     * Throws an exception of the initial object is not acceptable or there is
+     * a failure creating the packages.
+     * <p>
+     * A packager <em>may</em> choose not to implement <code>disseminateAll</code>,
+     * or simply forward the call to <code>disseminate</code> if it is unable to
+     * support recursive dissemination.
+     *
+     * @param context  DSpace context.
+     * @param dso  initial DSpace object
+     * @param params Properties-style list of options specific to this packager
+     * @param pkgFile File where initial package should be written. All other
+     *          packages will be written to the same directory as this File.
+     * @return List of all package Files which were successfully disseminated
+     * @throws PackageValidationException if package cannot be created or there is
+     *  a fatal error in creating it.
+     */
+    List<File> disseminateAll(Context context, DSpaceObject dso,
+                     PackageParameters params, File pkgFile)
+        throws PackageException, CrosswalkException,
+               AuthorizeException, SQLException, IOException;
+
 
     /**
      * Identifies the MIME-type of this package, e.g. <code>"application/zip"</code>.

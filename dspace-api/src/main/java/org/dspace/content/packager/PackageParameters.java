@@ -161,4 +161,203 @@ public class PackageParameters extends Properties
                    stringValue.equalsIgnoreCase("on") ||
                    stringValue.equalsIgnoreCase("yes");
     }
+
+
+    /**
+     * Utility method to tell if workflow is enabled for Item ingestion.
+     * Checks the Packager parameters.
+     * <p>
+     * Defaults to 'true' if previously unset, as by default all
+     * DSpace Workflows should be enabled.
+     *
+     * @return boolean result
+     */
+    public boolean workflowEnabled()
+    {
+        return getBooleanProperty("useWorkflow", true);
+    }
+
+    /***
+     * Utility method to enable/disable workflow for Item ingestion.
+     *
+     * @param value boolean value (true = workflow enabled, false = workflow disabled)
+     * @return boolean result
+     */
+    public void setWorkflowEnabled(boolean value)
+    {
+        addProperty("useWorkflow", String.valueOf(value));
+    }
+
+
+    /***
+     * Utility method to tell if restore mode is enabled.
+     * Checks the Packager parameters.
+     * <p>
+     * Restore mode attempts to restore an missing/deleted object completely
+     * (including handle), based on contents of a package.
+     * <p>
+     * NOTE: restore mode should throw an error if it attempts to restore an
+     * object which already exists.  Use 'keep-existing' or 'replace' mode to
+     * either skip-over (keep) or replace existing objects.
+     * <p>
+     * Defaults to 'false' if previously unset. NOTE: 'replace' mode and 
+     * 'keep-existing' mode are special types of "restores".  So, when either
+     * replaceModeEnabled() or keepExistingModeEnabled() is true, this method
+     * should also return true.
+     *
+     * @return boolean result
+     */
+    public boolean restoreModeEnabled()
+    {
+        if(getBooleanProperty("restoreMode", false) ||
+           replaceModeEnabled() ||
+           keepExistingModeEnabled())
+            return true;
+        else
+            return false;
+    }
+
+    /***
+     * Utility method to enable/disable restore mode.
+     * <p>
+     * Restore mode attempts to restore an missing/deleted object completely
+     * (including handle), based on a given package's contents.
+     * <p>
+     * NOTE: restore mode should throw an error if it attempts to restore an
+     * object which already exists.  Use 'keep-existing' or 'replace' mode to
+     * either skip-over (keep) or replace existing objects.
+     *
+     * @param value boolean value (true = restore enabled, false = restore disabled)
+     * @return boolean result
+     */
+    public void setRestoreModeEnabled(boolean value)
+    {
+        addProperty("restoreMode", String.valueOf(value));
+    }
+
+    /***
+     * Utility method to tell if replace mode is enabled.
+     * Checks the Packager parameters.
+     * <p>
+     * Replace mode attempts to overwrite an existing object and replace it
+     * with the contents of a package. Replace mode is considered a special type
+     * of "restore", where the current object is being restored to a previous state.
+     * <p>
+     * Defaults to 'false' if previously unset.
+     *
+     * @return boolean result
+     */
+    public boolean replaceModeEnabled()
+    {
+        return getBooleanProperty("replaceMode", false);
+    }
+
+    /***
+     * Utility method to enable/disable replace mode.
+     * <p>
+     * Replace mode attempts to overwrite an existing object and replace it
+     * with the contents of a package. Replace mode is considered a special type
+     * of "restore", where the current object is being restored to a previous state.
+     *
+     * @param value boolean value (true = replace enabled, false = replace disabled)
+     * @return boolean result
+     */
+    public void setReplaceModeEnabled(boolean value)
+    {
+        addProperty("replaceMode", String.valueOf(value));
+    }
+
+    /***
+     * Utility method to tell if 'keep-existing' mode is enabled.
+     * Checks the Packager parameters.
+     * <p>
+     * Keep-Existing mode is identical to 'restore' mode, except that it
+     * skips over any objects which are found to already be existing. It
+     * essentially restores all missing objects, but keeps existing ones intact.
+     * <p>
+     * Defaults to 'false' if previously unset.
+     *
+     * @return boolean result
+     */
+    public boolean keepExistingModeEnabled()
+    {
+        return getBooleanProperty("keepExistingMode", false);
+    }
+
+    /***
+     * Utility method to enable/disable 'keep-existing' mode.
+     * <p>
+     * Keep-Existing mode is identical to 'restore' mode, except that it
+     * skips over any objects which are found to already be existing. It
+     * essentially restores all missing objects, but keeps existing ones intact.
+     *
+     * @param value boolean value (true = replace enabled, false = replace disabled)
+     * @return boolean result
+     */
+    public void setKeepExistingModeEnabled(boolean value)
+    {
+        addProperty("keepExistingMode", String.valueOf(value));
+    }
+
+    /***
+     * Utility method to tell if Items should use a Collection's template
+     * when they are created.
+     * <p>
+     * Defaults to 'false' if previously unset.
+     *
+     * @return boolean result
+     */
+    public boolean useCollectionTemplate()
+    {
+        return getBooleanProperty("useCollectionTemplate", false);
+    }
+
+    /***
+     * Utility method to enable/disable Collection Template for Item ingestion.
+     * <p>
+     * When enabled, the Item will be installed using the parent collection's
+     * Item Template
+     *
+     * @param value boolean value (true = template enabled, false = template disabled)
+     * @return boolean result
+     */
+    public void setUseCollectionTemplate(boolean value)
+    {
+        addProperty("useCollectionTemplate", String.valueOf(value));
+    }
+
+
+    /***
+     * Utility method to tell if recursive mode is enabled.
+     * Checks the Packager parameters.
+     * <p>
+     * Recursive mode should be enabled anytime one of the *All() methods
+     * is called (e.g. ingestAll(), replaceAll() or disseminateAll()). It
+     * recursively performs the same action on all related objects.
+     * <p>
+     * Defaults to 'false' if previously unset.
+     *
+     * @return boolean result
+     */
+    public boolean recursiveModeEnabled()
+    {
+        return getBooleanProperty("recursiveMode", false);
+    }
+
+    /***
+     * Utility method to enable/disable recursive mode.
+     * <p>
+     * Recursive mode should be enabled anytime one of the *All() methods
+     * is called (e.g. ingestAll(), replaceAll() or disseminateAll()).  It
+     * recursively performs the same action on all related objects.
+     *
+     * @param value boolean value (true = recursion enabled, false = recursion disabled)
+     * @return boolean result
+     */
+    public void setRecursiveModeEnabled(boolean value)
+    {
+        addProperty("recursiveMode", String.valueOf(value));
+    }
+
+
 }

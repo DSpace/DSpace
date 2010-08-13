@@ -210,9 +210,7 @@ public class DepositServlet extends HttpServlet {
 		
 		// Set up some variables
 		String filename = null;
-		File f = null;
-		FileInputStream fis = null;
-
+		
 		// Do the processing
 		try {
 			// Write the file to the temp directory
@@ -266,10 +264,8 @@ public class DepositServlet extends HttpServlet {
 				log.debug("Bad MD5 for file. Aborting with appropriate error message");
 				return;
 			} else {
-				// Set the file
-				f = new File(filename);
-				fis = new FileInputStream(f);
-				d.setFile(fis);
+				// Set the file to be deposited
+				d.setFile(file);
 
 				// Set the X-On-Behalf-Of header
                 String onBehalfOf = request.getHeader(HttpHeaders.X_ON_BEHALF_OF.toString());
@@ -381,14 +377,9 @@ public class DepositServlet extends HttpServlet {
 		}
 		
 		finally {
-			// Close the input stream if it still open
-			if (fis != null) {
-				fis.close();
-			}
-
 			// Try deleting the temp file
 			if (filename != null) {
-				f = new File(filename);
+				File f = new File(filename);
 				f.delete();
 			}
 		}

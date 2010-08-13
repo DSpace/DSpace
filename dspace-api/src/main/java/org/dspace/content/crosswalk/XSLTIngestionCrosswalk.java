@@ -47,11 +47,14 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.packager.PackageUtils;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
@@ -89,7 +92,7 @@ public class XSLTIngestionCrosswalk
     }
 
     // apply metadata values returned in DIM to the target item.
-    private void applyDim(List dimList, Item item)
+    private static void applyDim(List dimList, Item item)
         throws MetadataValidationException
     {
         Iterator di = dimList.iterator();
@@ -112,7 +115,7 @@ public class XSLTIngestionCrosswalk
     }
 
     // adds the metadata element from one <field>
-    private void applyDimField(Element field, Item item)
+    private static void applyDimField(Element field, Item item)
     {
         String schema = field.getAttributeValue("mdschema");
         String element = field.getAttributeValue("element");
@@ -121,6 +124,11 @@ public class XSLTIngestionCrosswalk
         String authority = field.getAttributeValue("authority");
         String sconf = field.getAttributeValue("confidence");
 
+        // sanity check: some XSL puts an empty string in qualifier,
+        // change it to null so we match the unqualified DC field:
+        if (qualifier != null && qualifier.equals(""))
+            qualifier = null;
+        
         if ((authority != null && authority.length() > 0) ||
             (sconf != null && sconf.length() > 0))
         {
@@ -144,17 +152,13 @@ public class XSLTIngestionCrosswalk
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
-        if (dso.getType() != Constants.ITEM)
-            throw new CrosswalkObjectNotSupported("XsltSubmissionionCrosswalk can only crosswalk to an Item.");
-        Item item = (Item)dso;
-
         XSLTransformer xform = getTransformer(DIRECTION);
         if (xform == null)
             throw new CrosswalkInternalException("Failed to initialize transformer, probably error loading stylesheet.");
         try
         {
             List dimList = xform.transform(metadata);
-            applyDim(dimList, item);
+            ingestDIM(context, dso, dimList);
         }
         catch (XSLTransformException e)
         {
@@ -171,17 +175,13 @@ public class XSLTIngestionCrosswalk
     public void ingest(Context context, DSpaceObject dso, Element root)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
-        if (dso.getType() != Constants.ITEM)
-            throw new CrosswalkObjectNotSupported("XsltSubmissionionCrosswalk can only crosswalk to an Item.");
-        Item item = (Item)dso;
-
         XSLTransformer xform = getTransformer(DIRECTION);
         if (xform == null)
             throw new CrosswalkInternalException("Failed to initialize transformer, probably error loading stylesheet.");
         try
         {
             Document dimDoc = xform.transform(new Document((Element)root.clone()));
-            applyDim(dimDoc.getRootElement().getChildren(), item);
+            ingestDIM(context, dso, dimDoc.getRootElement().getChildren());
         }
         catch (XSLTransformException e)
         {
@@ -190,6 +190,88 @@ public class XSLTIngestionCrosswalk
         }
 
     }
+
+    // return coll/comm "metadata" label corresponding to a DIM field.
+    private static String getMetadataForDIM(Element field)
+    {
+        // make up fieldname, then look for it in xwalk
+        String element = field.getAttributeValue("element");
+        String qualifier = field.getAttributeValue("qualifier");
+        String fname = "dc." + element;
+        if (qualifier != null)
+            fname += "." + qualifier;
+        return PackageUtils.dcToContainerMetadata(fname);
+    }
+
+    /**
+     * Ingest a DIM metadata expression directly, without
+     * translating some other format into DIM.
+     * The <code>dim</code> element is expected to be be the root of
+     * a DIM document.
+     * <p>
+     * Note that this is ONLY implemented for Item, Collection, and
+     * Community objects.  Also only works for the "dc" metadata schema.
+     * <p>
+     * @param context the context
+     * @param dso object into which to ingest metadata
+     * @param  dim root of a DIM expression
+     */
+
+    public static void ingestDIM(Context context, DSpaceObject dso, Element dim)
+        throws CrosswalkException,
+               IOException, SQLException, AuthorizeException
+    {
+        ingestDIM(context, dso, dim.getChildren());
+    }
+
+    public static void ingestDIM(Context context, DSpaceObject dso, List fields)
+        throws CrosswalkException,
+               IOException, SQLException, AuthorizeException
+    {
+        int type = dso.getType();
+        if (type == Constants.ITEM)
+        {
+            Item item = (Item)dso;
+            applyDim(fields, item);
+        }
+        else if (type == Constants.COLLECTION ||
+                 type == Constants.COMMUNITY)
+        {
+            Iterator di = fields.iterator();
+            while (di.hasNext())
+            {
+                Element field = (Element)di.next();
+                String schema = field.getAttributeValue("mdschema");
+                if (field.getName().equals("dim") &&
+                    field.getNamespace().equals(DIM_NS))
+                    ingestDIM(context, dso, field.getChildren());
+
+                else if (field.getName().equals("field") &&
+                    field.getNamespace().equals(DIM_NS) &&
+                    schema != null && schema.equals("dc"))
+                {
+                    String md = getMetadataForDIM(field);
+                    if (md == null)
+                        log.warn("Cannot map to Coll/Comm metadata field, DIM element="+
+                            field.getAttributeValue("element")+", qualifier="+field.getAttributeValue("qualifier"));
+                    else
+                    {
+                        if (type == Constants.COLLECTION)
+                            ((Collection)dso).setMetadata(md, field.getText());
+                        else
+                            ((Community)dso).setMetadata(md, field.getText());
+                    }
+                }
+
+                else
+                    log.warn("ignoring unrecognized DIM element: "+field.toString());
+            }
+        }
+        else
+            throw new CrosswalkObjectNotSupported("XsltSubmissionionCrosswalk can only crosswalk to an Item.");
+
+    }
+
 
     /**
      * Simple command-line rig for testing the DIM output of a stylesheet.

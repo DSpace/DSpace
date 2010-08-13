@@ -38,8 +38,7 @@
 
 package org.dspace.content.crosswalk;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -52,6 +51,7 @@ import org.dspace.content.Item;
 import org.dspace.content.packager.PackageDisseminator;
 import org.dspace.content.packager.PackageException;
 import org.dspace.content.packager.PackageParameters;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
@@ -60,8 +60,6 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 
 /**
  * METS dissemination crosswalk
@@ -94,7 +92,7 @@ public class METSDisseminationCrosswalk
 
 
     /** METS namespace -- includes "mets" prefix for use in XPaths */
-    private static Namespace METS_NS = Namespace
+    private static final Namespace METS_NS = Namespace
             .getNamespace("mets", "http://www.loc.gov/METS/");
 
     private static final Namespace namespaces[] = { METS_NS, MODS_NS, XLINK_NS };
@@ -104,10 +102,6 @@ public class METSDisseminationCrosswalk
 
     private static final String schemaLocation =
         METS_NS.getURI()+" "+METS_XSD;
-
-    private static XMLOutputter outputUgly = new XMLOutputter();
-    private static XMLOutputter outputPretty = new XMLOutputter(Format.getPrettyFormat());
-    private static SAXBuilder builder = new SAXBuilder();
 
     public Namespace[] getNamespaces()
     {
@@ -147,16 +141,19 @@ public class METSDisseminationCrosswalk
             PackageParameters pparams = new PackageParameters();
             pparams.put("manifestOnly", "true");
 
-            // "pipe" the output into a parser to create JDOM document.
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            // Create a temporary file to disseminate into
+            String tempDirectory = ConfigurationManager.getProperty("upload.temp.dir");
+            File tempFile = File.createTempFile("METSDissemination" + item.hashCode(), null, new File(tempDirectory));
+            tempFile.deleteOnExit();
+
+            // Disseminate METS to temp file
             Context context = new Context();
-            dip.disseminate(context, item, pparams, baos);
-            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            dip.disseminate(context, item, pparams, tempFile);
 
             try
             {
                 SAXBuilder builder = new SAXBuilder();
-                Document metsDocument = builder.build(bais);
+                Document metsDocument = builder.build(tempFile);
                 return metsDocument.getRootElement();
             }
             catch (JDOMException je)

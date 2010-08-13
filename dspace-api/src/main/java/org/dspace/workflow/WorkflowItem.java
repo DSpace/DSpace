@@ -296,6 +296,34 @@ public class WorkflowItem implements InProgressSubmission
         return wsArray;
     }
 
+
+    /**
+     * Check to see if a particular item is currently under Workflow.
+     * If so, its WorkflowItem is returned.  If not, null is returned
+     *
+     * @param context
+     *            the context object
+     * @param i
+     *            the item
+     *
+     * @return workflow item corresponding to the item, or null
+     */
+    public static WorkflowItem findByItem(Context context, Item i)
+            throws SQLException
+    {
+        // Look for the unique workflowitem entry where 'item_id' references this item
+        TableRow row =  DatabaseManager.findByUnique(context, "workflowitem", "item_id", i.getID());
+
+        if (row == null)
+        {
+            return null;
+        }
+        else
+        {
+            return new WorkflowItem(context, row);
+        }
+    }
+
     /**
      * Get the internal ID of this workflow item
      * 

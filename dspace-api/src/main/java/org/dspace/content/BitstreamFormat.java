@@ -44,7 +44,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -83,6 +82,13 @@ public class BitstreamFormat
      */
     public static final int SUPPORTED = 2;
 
+
+    /** translate support-level ID to string.  MUST keep this table in sync
+     *  with support level definitions above.
+     */
+    public static final String supportLevelText[] =
+        { "UNKNOWN", "KNOWN", "SUPPORTED" };
+
     /** Our context */
     private Context bfContext;
 
@@ -90,7 +96,7 @@ public class BitstreamFormat
     private TableRow bfRow;
 
     /** File extensions for this format */
-    private List extensions;
+    private List<String> extensions;
 
     /**
      * Class constructor for creating a BitstreamFormat object based on the
@@ -106,7 +112,7 @@ public class BitstreamFormat
     {
         bfContext = context;
         bfRow = row;
-        extensions = new ArrayList();
+        extensions = new ArrayList<String>();
 
         TableRowIterator tri = DatabaseManager.query(context,
                 "SELECT * FROM fileextension WHERE bitstream_format_id= ? ",
@@ -298,7 +304,7 @@ public class BitstreamFormat
     public static BitstreamFormat[] findAll(Context context)
             throws SQLException
     {
-        List formats = new ArrayList();
+        List<BitstreamFormat> formats = new ArrayList<BitstreamFormat>();
 
         TableRowIterator tri = DatabaseManager.queryTable(context, "bitstreamformatregistry",
                         "SELECT * FROM bitstreamformatregistry ORDER BY bitstream_format_id");
@@ -352,7 +358,7 @@ public class BitstreamFormat
     public static BitstreamFormat[] findNonInternal(Context context)
             throws SQLException
     {
-        List formats = new ArrayList();
+        List<BitstreamFormat> formats = new ArrayList<BitstreamFormat>();
 
         String myQuery = "SELECT * FROM bitstreamformatregistry WHERE internal='0' "
                 + "AND short_description NOT LIKE 'Unknown' "
@@ -456,7 +462,7 @@ public class BitstreamFormat
        throws SQLException
     {
         // You can not reset the unknown's registry's name
-        BitstreamFormat unknown = null;;
+        BitstreamFormat unknown = null;
 		try {
 			unknown = findUnknown(bfContext);
 		} catch (IllegalStateException e) {
@@ -672,11 +678,34 @@ public class BitstreamFormat
      */
     public void setExtensions(String[] exts)
     {
-        extensions = new ArrayList();
+        extensions = new ArrayList<String>();
 
         for (int i = 0; i < exts.length; i++)
         {
             extensions.add(exts[i]);
         }
+    }
+
+    /**
+     * If you know the support level string, look up the corresponding type ID
+     * constant.
+     *
+     * @param action
+     *            String with the name of the action (must be exact match)
+     *
+     * @return the corresponding action ID, or <code>-1</code> if the action
+     *         string is unknown
+     */
+    public static int getSupportLevelID(String slevel)
+    {
+        for (int i = 0; i < supportLevelText.length; i++)
+        {
+            if (supportLevelText[i].equals(slevel))
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }

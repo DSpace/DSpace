@@ -38,11 +38,15 @@
 
 package org.dspace.content.packager;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.Calendar;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -51,9 +55,9 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.MetadataValidationException;
 import org.dspace.core.Constants;
@@ -65,7 +69,7 @@ import org.pdfbox.cos.COSDocument;
 import org.pdfbox.pdfparser.PDFParser;
 import org.pdfbox.pdmodel.PDDocument;
 import org.pdfbox.pdmodel.PDDocumentInformation;
-                                    
+
 /**
  * Accept a PDF file by itself as a SIP.
  * <p>
@@ -80,6 +84,8 @@ import org.pdfbox.pdmodel.PDDocumentInformation;
  *
  * @author Larry Stone
  * @version $Revision$
+ * @see PackageIngester
+ * @see PackageDisseminator
  */
 public class PDFPackager
        extends SelfNamedPlugin
@@ -124,15 +130,15 @@ public class PDFPackager
      * <p>
      * @param context  DSpace context.
      * @param collection  collection under which to create new item.
-     * @param pkg  input stream containing package to ingest.
+     * @param pkgFile  The package file to ingest
      * @param params  package parameters (none recognized)
      * @param license  may be null, which takes default license.
      * @return workspace item created by ingest.
      * @throws PackageException if package is unacceptable or there is
      *  a fatal error turning it into an Item.
      */
-    public WorkspaceItem ingest(Context context, Collection collection,
-                                InputStream pkg, PackageParameters params,
+    public DSpaceObject ingest(Context context, DSpaceObject parent,
+                                File pkgFile, PackageParameters params,
                                 String license)
         throws PackageValidationException, CrosswalkException,
                AuthorizeException, SQLException, IOException
@@ -144,41 +150,23 @@ public class PDFPackager
         Bitstream bs = null;
         WorkspaceItem wi = null;
 
-        /** XXX comment out for now
-          // XXX for debugging of parameter handling
-          if (params != null)
-          {
-              Enumeration pe = params.propertyNames();
-              while (pe.hasMoreElements())
-              {
-                  String name = (String)pe.nextElement();
-                  String v[] = params.getProperties(name);
-                  StringBuffer msg = new StringBuffer("PackageParam: ");
-                  msg.append(name).append(" = ");
-                  for (int i = 0; i < v.length; ++i)
-                  {
-                      if (i > 0)
-                          msg.append(", ");
-                      msg.append(v[i]);
-                  }
-                  log.debug(msg);
-              }
-          }
-        **/
-           
         try
         {
             // Save the PDF in a bitstream first, since the parser
             // has to read it as well, and we cannot "rewind" it after that.
-            wi = WorkspaceItem.create(context, collection, false);
+            wi = WorkspaceItem.create(context, (Collection)parent, false);
             Item myitem = wi.getItem();
             original = myitem.createBundle("ORIGINAL");
-            bs = original.createBitstream(pkg);
-            pkg.close();
+
+            InputStream fileStream = new FileInputStream(pkgFile);
+            bs = original.createBitstream(fileStream);
+            fileStream.close();
+
             bs.setName("package.pdf");
             setFormatToMIMEType(context, bs, "application/pdf");
             bs.update();
-            log.debug("Created bitstream ID="+String.valueOf(bs.getID())+", parsing...");
+            if (log.isDebugEnabled())
+               log.debug("Created bitstream ID="+String.valueOf(bs.getID())+", parsing...");
 
             crosswalkPDF(context, myitem, bs.retrieve());
 
@@ -188,7 +176,9 @@ public class PDFPackager
             log.info(LogManager.getHeader(context, "ingest",
                 "Created new Item, db ID="+String.valueOf(myitem.getID())+
                 ", WorkspaceItem ID="+String.valueOf(wi.getID())));
-            return wi;
+
+            myitem = PackageUtils.finishCreateItem(context, wi, null, params);
+            return myitem;
         }
         finally
         {
@@ -216,14 +206,40 @@ public class PDFPackager
     }
 
     /**
+     * IngestAll() cannot be implemented for a PDF ingester, because there's only one PDF to ingest
+     */
+    public List<DSpaceObject> ingestAll(Context context, DSpaceObject parent, File pkgFile,
+                                PackageParameters params, String license)
+        throws PackageException, UnsupportedOperationException,
+               CrosswalkException, AuthorizeException,
+               SQLException, IOException
+    {
+        throw new UnsupportedOperationException("PDF packager does not support the ingestAll() operation at this time.");
+    }
+
+
+    /**
      * Replace is not implemented.
      */
-    public Item replace(Context ctx, Item item, InputStream pckage, PackageParameters params)
-        throws PackageValidationException, CrosswalkException,
-               AuthorizeException, SQLException, IOException,
-               UnsupportedOperationException
+    public DSpaceObject replace(Context context, DSpaceObject dso,
+                            File pkgFile, PackageParameters params)
+        throws PackageException, UnsupportedOperationException,
+               CrosswalkException, AuthorizeException,
+               SQLException, IOException
     {
-        throw new UnsupportedOperationException("The replace operation is not implemented.");
+        throw new UnsupportedOperationException("PDF packager does not support the replace() operation at this time.");
+    }
+
+    /**
+     * ReplaceAll() cannot be implemented for a PDF ingester, because there's only one PDF to ingest
+     */
+    public List<DSpaceObject> replaceAll(Context context, DSpaceObject dso,
+                                File pkgFile, PackageParameters params)
+        throws PackageException, UnsupportedOperationException,
+               CrosswalkException, AuthorizeException,
+               SQLException, IOException
+    {
+        throw new UnsupportedOperationException("PDF packager does not support the replaceAll() operation at this time.");
     }
 
     /**
@@ -232,7 +248,7 @@ public class PDFPackager
      * Works on packages importer with this packager, and maybe some others.
      */
     public void disseminate(Context context, DSpaceObject dso,
-                            PackageParameters params, OutputStream out)
+                            PackageParameters params, File pkgFile)
         throws PackageValidationException, CrosswalkException,
                AuthorizeException, SQLException, IOException
     {
@@ -249,10 +265,33 @@ public class PDFPackager
             Bitstream pkgBs = PackageUtils.getBitstreamByFormat(item, pdff, Constants.DEFAULT_BUNDLE_NAME);
             if (pkgBs == null)
                 throw new PackageValidationException("Cannot find Bitstream with format \""+BITSTREAM_FORMAT_NAME+"\"");
+
+            //Make sure our package file exists
+            if(!pkgFile.exists())
+            {
+                PackageUtils.createFile(pkgFile);
+            }
+
+            //open up output stream to copy bistream to file
+            FileOutputStream out = new FileOutputStream(pkgFile);
             Utils.copy(pkgBs.retrieve(), out);
+            //close output stream & save to file
+            out.close();
         }
             finally {}
     }
+
+    /**
+     * disseminateAll() cannot be implemented for a PDF disseminator, because there's only one PDF to disseminate
+     */
+    public List<File> disseminateAll(Context context, DSpaceObject dso,
+                     PackageParameters params, File pkgFile)
+        throws PackageException, CrosswalkException,
+               AuthorizeException, SQLException, IOException
+    {
+        throw new UnsupportedOperationException("PDF packager does not support the disseminateAll() operation at this time.");
+    }
+
 
     /**
      * Identifies the MIME-type of this package, i.e. "application/pdf".
@@ -303,14 +342,16 @@ public class PDFPackager
             // sanity check: item must have a title.
             if (title == null)
                 throw new MetadataValidationException("This PDF file is unacceptable, it does not have a value for \"Title\" in its Info dictionary.");
-            log.debug("PDF Info dict title=\""+title+"\"");
+            if (log.isDebugEnabled())
+               log.debug("PDF Info dict title=\""+title+"\"");
             item.addDC("title", null, "en", title);
             String value;
             Calendar date;
             if ((value = docinfo.getAuthor()) != null)
             {
                 item.addDC("contributor", "author", null, value);
-                log.debug("PDF Info dict author=\""+value+"\"");
+                if (log.isDebugEnabled())
+                   log.debug("PDF Info dict author=\""+value+"\"");
             }
             if ((value = docinfo.getCreator()) != null)
                 item.addDC("description", "provenance", "en",

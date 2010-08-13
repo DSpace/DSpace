@@ -39,6 +39,8 @@
  */
 package org.dspace.app.dav;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,6 +57,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.WorkspaceItem;
@@ -62,8 +65,10 @@ import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.packager.PackageException;
 import org.dspace.content.packager.PackageIngester;
 import org.dspace.content.packager.PackageParameters;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
+import org.dspace.core.Utils;
 import org.dspace.handle.HandleManager;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
@@ -82,6 +87,10 @@ class DAVCollection extends DAVDSpaceObject
 
     /** The collection. */
     private Collection collection = null;
+
+    /** The temporary upload directory. */
+    private static String tempDirectory = ConfigurationManager
+            .getProperty("upload.temp.dir");
 
     /** The Constant short_descriptionProperty. */
     private static final Element short_descriptionProperty = new Element(
@@ -502,28 +511,64 @@ class DAVCollection extends DAVDSpaceObject
                 log.debug("put: Using CountedInputStream, length="
                         + String.valueOf(contentLength));
             }
-            WorkspaceItem wi = sip.ingest(this.context, this.collection, pis,
-                    PackageParameters.create(this.request), null);
-            WorkflowItem wfi = WorkflowManager.startWithoutNotify(this.context, wi);
+
+            // Write to temporary file (so that SIP ingester can process it)
+            File tempDir = new File(tempDirectory);
+            File tempFile = File.createTempFile("davUpload" + pis.hashCode(), null, tempDir);
+            log.debug("Storing temporary file at " + tempFile.getCanonicalPath());
+
+            FileOutputStream fos = new FileOutputStream(tempFile);
+            Utils.copy(pis, fos);
+            fos.close();
+            pis.close();
+
+            // Initialize parameters to packager
+            PackageParameters params = PackageParameters.create(this.request);
+            // Force package ingester to respect Collection workflows (i.e. start workflow automatically as needed)
+            params.setWorkflowEnabled(true);
+
+            //ingest from the temp file to create the new DSpaceObject
+            DSpaceObject ingestedDso = sip.ingest(this.context, this.collection, tempFile,
+                    params, null);
+            Item item = (Item) ingestedDso;
+
+            //schedule temp file for deletion
+            tempFile.deleteOnExit();
+
+            //get the new workflowitem (if it exists)
+            WorkflowItem wfi = WorkflowItem.findByItem(context, item);
+
+            //Get status of item
+            //  if we found a WorkflowItem, then it is still in-process
+            //  if we didn't find one, item is already in archive
+            int state;
+            if(wfi!=null)
+            {
+                state = wfi.getState();
+            }
+            else
+            {
+                state = WorkflowManager.WFSTATE_ARCHIVE;
+            }
 
             // get new item's location: if workflow completed, then look
             // for handle (but be ready for disappointment); otherwise,
             // return the workflow item's resource.
-            int state = wfi.getState();
             String location = null;
             if (state == WorkflowManager.WFSTATE_ARCHIVE)
             {
-                Item ni = wfi.getItem();
-                String handle = HandleManager.findHandle(this.context, ni);
+                // Item is already in the archive
+                String handle = HandleManager.findHandle(this.context, item);
                 String end = (handle != null) ? DAVDSpaceObject
-                        .getPathElt(handle) : DAVItem.getPathElt(ni);
+                        .getPathElt(handle) : DAVItem.getPathElt(item);
                 DAVItem newItem = new DAVItem(this.context, this.request, this.response,
-                        makeChildPath(end), ni);
+                        makeChildPath(end), item);
                 location = newItem.hrefURL();
             }
             else if (state == WorkflowManager.WFSTATE_SUBMIT
                     || state == WorkflowManager.WFSTATE_STEP1POOL)
             {
+                // Item is still in-process in the workflow
                 location = hrefPrefix() + DAVWorkflow.getPath(wfi);
             }
             else

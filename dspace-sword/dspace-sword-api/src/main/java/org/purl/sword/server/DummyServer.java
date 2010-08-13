@@ -37,6 +37,8 @@
 
 package org.purl.sword.server;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -251,7 +253,9 @@ public class DummyServer implements SWORDServer {
 			filenames.append("(slug = " + deposit.getSlug() + ") ");
 		}
 		try {
-			ZipInputStream zip = new ZipInputStream(deposit.getFile());
+                        File depositFile = deposit.getFile();
+                        FileInputStream fileStream = new FileInputStream(depositFile);
+			ZipInputStream zip = new ZipInputStream(fileStream);
 			ZipEntry ze;
 			while ((ze = zip.getNextEntry()) != null) {
 				filenames.append(" " + ze.toString());

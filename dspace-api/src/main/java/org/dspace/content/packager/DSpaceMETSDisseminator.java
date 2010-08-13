@@ -39,29 +39,30 @@
 package org.dspace.content.packager;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.license.CreativeCommons;
 
-import edu.harvard.hul.ois.mets.AmdSec;
-import edu.harvard.hul.ois.mets.BinData;
-import edu.harvard.hul.ois.mets.Loctype;
-import edu.harvard.hul.ois.mets.MdRef;
-import edu.harvard.hul.ois.mets.MdWrap;
-import edu.harvard.hul.ois.mets.Mdtype;
+import edu.harvard.hul.ois.mets.Agent;
 import edu.harvard.hul.ois.mets.Mets;
-import edu.harvard.hul.ois.mets.RightsMD;
-import edu.harvard.hul.ois.mets.helper.Base64;
+import edu.harvard.hul.ois.mets.MetsHdr;
+import edu.harvard.hul.ois.mets.Role;
 import edu.harvard.hul.ois.mets.helper.MetsException;
+import edu.harvard.hul.ois.mets.Type;
+import edu.harvard.hul.ois.mets.Name;
+import edu.harvard.hul.ois.mets.helper.PCData;
 
 /**
  * Packager plugin to produce a
@@ -95,12 +96,19 @@ public class DSpaceMETSDisseminator
     private final static String PROFILE_LABEL = "DSpace METS SIP Profile 1.0";
 
     // MDTYPE value for deposit license -- "magic string"
+    // NOTE: format is  <label-for-METS>:<DSpace-crosswalk-name>
     private final static String DSPACE_DEPOSIT_LICENSE_MDTYPE =
-                                "DSpace Deposit License";
+        "DSpaceDepositLicense:DSPACE_DEPLICENSE";
 
-    // MDTYPE value for CC license -- "magic string"
-    private final static String CREATIVE_COMMONS_LICENSE_MDTYPE =
-                                "Creative Commons";
+    // MDTYPE value for CC license in RDF -- "magic string"
+    // NOTE: format is  <label-for-METS>:<DSpace-crosswalk-name>
+    private final static String CREATIVE_COMMONS_RDF_MDTYPE =
+        "CreativeCommonsRDF:DSPACE_CCRDF";
+
+    // MDTYPE value for CC license in Text -- "magic string"
+    // NOTE: format is  <label-for-METS>:<DSpace-crosswalk-name>
+    private final static String CREATIVE_COMMONS_TEXT_MDTYPE =
+        "CreativeCommonsText:DSPACE_CCTXT";
 
     /**
      * Return identifier string for the profile this produces.
@@ -129,17 +137,42 @@ public class DSpaceMETSDisseminator
     }
 
     /**
+     * Create metsHdr element - separate so subclasses can override.
+     */
+    public MetsHdr makeMetsHdr(Context context, DSpaceObject dso,
+                               PackageParameters params)
+    {
+        MetsHdr metsHdr = new MetsHdr();
+        metsHdr.setCREATEDATE(new Date()); // FIXME: CREATEDATE is now:
+                                           // maybe should be item create
+        // date?
+
+        // Agent
+        Agent agent = new Agent();
+        agent.setROLE(Role.CUSTODIAN);
+        agent.setTYPE(Type.ORGANIZATION);
+        Name name = new Name();
+        name.getContent()
+                .add(new PCData(ConfigurationManager
+                                .getProperty("dspace.name")));
+        agent.getContent().add(name);
+        metsHdr.getContent().add(agent);
+        return metsHdr;
+    }
+
+
+    /**
      * Get DMD choice for Item.  It defaults to MODS, but is overridden
      * by the package parameters if they contain any "dmd" keys.  The
      * params may contain one or more values for "dmd"; each of those is
      * the name of a crosswalk plugin, optionally followed by colon and
      * its METS MDTYPE name.
      */
-    public String [] getDmdTypes(PackageParameters params)
+    public String [] getDmdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException
     {
 
-    // XXX maybe let dmd choices be configured in DSpace config too?
+    // XXX FIXME maybe let dmd choices be configured in DSpace config?
 
         String result[] = null;
         if (params != null)
@@ -157,144 +190,71 @@ public class DSpaceMETSDisseminator
      * Default is PREMIS.  This is both the name of the crosswalk plugin
      * and the METS MDTYPE.
      */
-    public String getTechMdType(PackageParameters params)
+    public String[] getTechMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException
     {
-        return "PREMIS";
+        if (dso.getType() == Constants.BITSTREAM)
+    {
+            String result[] = new String[1];
+            result[0] = "PREMIS";
+            return result;
+    }
+        else
+            return new String[0];
+    }
+
+    public String[] getSourceMdTypes(Context context, DSpaceObject dso, PackageParameters params)
+        throws SQLException, IOException, AuthorizeException
+    {
+        return new String[0];
+    }
+        
+    public String[] getDigiprovMdTypes(Context context, DSpaceObject dso, PackageParameters params)
+        throws SQLException, IOException, AuthorizeException
+        {
+        return new String[0];
+    }
+
+    public String makeBitstreamURL(Bitstream bitstream, PackageParameters params)
+        {
+        String base = "bitstream_"+String.valueOf(bitstream.getID());
+        String ext[] = bitstream.getFormat().getExtensions();
+        return (ext.length > 0) ? base+"."+ext[0] : base;
     }
 
     /**
      * Add rights MD (licenses) for DSpace item.  These
      * may include a deposit license, and Creative Commons.
      */
-    public void addRightsMd(Context context, Item item, AmdSec amdSec)
-        throws SQLException, IOException, AuthorizeException, MetsException
-    {
-        addDepositLicense(context, item, amdSec);
-        addCreativeCommons(context, item, amdSec);
-    }
-
-    // Add deposit license, if any, as external file.
-    // Give it a unique name including the SID in case there are other
-    // deposit license artifacts in the Item.
-    private boolean addDepositLicense(Context context, Item item, AmdSec amdSec)
-        throws SQLException, IOException, AuthorizeException, MetsException
-    {
-        Bitstream licenseBs = findDepositLicense(context, item);
-
-        if (licenseBs == null)
-            return false;
-        else
-        {
-            String resource = "depositlicense_"+
-                              String.valueOf(licenseBs.getSequenceID())+".txt";
-            addRightsStream(licenseBs.retrieve(), resource, "text/plain",
-                           DSPACE_DEPOSIT_LICENSE_MDTYPE, amdSec);
-            return true;
-        }
-    }
-
-    // if there's a CC RDF license, chuck it in external file.
-    private boolean addCreativeCommons(Context context, Item item, AmdSec amdSec)
-        throws SQLException, IOException, AuthorizeException, MetsException
-    {
-        // License as <rightsMD><mdWrap><binData>base64encoded</binData>...
-        Bitstream cc;
-        
-        if ((cc = CreativeCommons.getLicenseRdfBitstream(item)) != null)
-        {
-            addRightsStream(cc.retrieve(),
-                            (gensym("creativecommons") + ".rdf"),
-                            "text/rdf",
-                            CREATIVE_COMMONS_LICENSE_MDTYPE, amdSec);
-        }
-        else if ((cc = CreativeCommons.getLicenseTextBitstream(item)) != null)
-        {
-            addRightsStream(cc.retrieve(),
-                            (gensym("creativecommons") + ".txt"),
-                            "text/plain",
-                            CREATIVE_COMMONS_LICENSE_MDTYPE, amdSec);
-        }
-        else
-            return false;
-        return true;
-    }
-
-    // utility to add a stream to the METS manifest.
-    // use external file and mdRef if possible, wrap and binData if not.
-    private void addRightsStream(InputStream is , String resourceName,
-                                 String mimeType, String mdType, AmdSec amdSec)
-        throws IOException, MetsException
-    {
-        RightsMD rightsMD = new RightsMD();
-        rightsMD.setID(gensym("rights"));
-        if (extraFiles == null)
-        {
-            MdWrap rightsMDWrap = new MdWrap();
-            rightsMDWrap.setMIMETYPE(mimeType);
-            rightsMDWrap.setMDTYPE(Mdtype.OTHER);
-            rightsMDWrap.setOTHERMDTYPE(mdType);
-            BinData bin = new BinData();
-            bin.getContent().add(new Base64(is));
-            rightsMDWrap.getContent().add(bin);
-            rightsMD.getContent().add(rightsMDWrap);
-        }
-        else
-        {
-            extraFiles.put(resourceName, is);
-            MdRef rightsMDRef = new MdRef();
-            rightsMDRef.setMIMETYPE(mimeType);
-            rightsMDRef.setMDTYPE(Mdtype.OTHER);
-            rightsMDRef.setOTHERMDTYPE(mdType);
-            rightsMDRef.setLOCTYPE(Loctype.URL);
-            rightsMDRef.setXlinkHref(resourceName);
-            rightsMD.getContent().add(rightsMDRef);
-        }
-        amdSec.getContent().add(rightsMD);
-    }
-
-    /**
-     * Utility to find the license bitstream from an item
-     *
-     * @param context
-     *            DSpace context
-     * @param item
-     *            the item
-     * @return the license bitstream or null
-     *
-     * @throws IOException
-     *             if the license bitstream can't be read
-     */
-    private static Bitstream findDepositLicense(Context context, Item item)
+    public String[] getRightsMdTypes(Context context, DSpaceObject dso, PackageParameters params)
             throws SQLException, IOException, AuthorizeException
     {
-        // get license format ID
-        int licenseFormatId = -1;
-        BitstreamFormat bf = BitstreamFormat.findByShortDescription(context,
-                "License");
-        if (bf != null)
-            licenseFormatId = bf.getID();
+        List<String> result = new ArrayList<String>();
 
-        Bundle[] bundles = item.getBundles(Constants.LICENSE_BUNDLE_NAME);
-        for (int i = 0; i < bundles.length; i++)
+        if (dso.getType() == Constants.ITEM)
         {
-            // Assume license will be in its own bundle
-            Bitstream[] bitstreams = bundles[i].getBitstreams();
+            Item item = (Item)dso;
+            if (PackageUtils.findDepositLicense(context, item) != null)
+                result.add(DSPACE_DEPOSIT_LICENSE_MDTYPE);
 
-            if (bitstreams[0].getFormat().getID() == licenseFormatId)
-            {
-                return bitstreams[0];
+            if (CreativeCommons.getLicenseRdfBitstream(item) != null)
+                result.add(CREATIVE_COMMONS_RDF_MDTYPE);
+            else if (CreativeCommons.getLicenseTextBitstream(item) != null)
+                result.add(CREATIVE_COMMONS_TEXT_MDTYPE);
             }
-        }
-
-        // Oops! No license!
-        return null;
+        return result.toArray(new String[result.size()]);
     }
 
     // This is where we'd elaborate on the default structMap; nothing to add, yet.
-    public void addStructMap(Context context, Item item,
+    public void addStructMap(Context context, DSpaceObject dso,
                                PackageParameters params, Mets mets)
         throws SQLException, IOException, AuthorizeException, MetsException
     {
+    }
+
+    // only exclude metadata bundles from package.
+    public boolean includeBundle(Bundle bundle)
+    {
+        return ! PackageUtils.isMetaInfoBundle(bundle);
     }
 }

@@ -39,19 +39,22 @@
 package org.dspace.content.packager;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.MetadataValidationException;
 import org.dspace.core.Context;
-import org.dspace.license.CreativeCommons;
+import org.dspace.core.Constants;
+import org.dspace.core.PluginManager;
+import org.dspace.app.mediafilter.MediaFilter;
+
 import org.jdom.Element;
 
 /**
@@ -66,8 +69,12 @@ import org.jdom.Element;
  * for more information about the DSpace METS SIP profile.
  *
  * @author Larry Stone
+ * @author Tim Donohue
  * @version $Revision$
  * @see org.dspace.content.packager.METSManifest
+ * @see AbstractMETSIngester
+ * @see AbstractPackageIngester
+ * @see PackageIngester
  */
 public class DSpaceMETSIngester
        extends AbstractMETSIngester
@@ -89,16 +96,6 @@ public class DSpaceMETSIngester
             throw new MetadataValidationException("METS has unacceptable PROFILE value, profile="+profile);
     }
 
-    // nothing needed.
-    public void checkPackageFiles(Set packageFiles, Set missingFiles,
-                                  METSManifest manifest)
-        throws PackageValidationException, CrosswalkException
-    {
-        // This is where a subclass would arrange to use or ignore
-        // any "extra" files added to its type of package.
-    }
-
-
     /**
      * Choose DMD section(s) to crosswalk.
      * <p>
@@ -109,11 +106,11 @@ public class DSpaceMETSIngester
      *    same GROUPID<br>
      * 4. Crosswalk remaining DMDs not eliminated already.
      */
-    public void chooseItemDmd(Context context, Item item,
+    public void crosswalkObjectDmd(Context context, DSpaceObject dso,
                               METSManifest manifest,
                               AbstractMETSIngester.MdrefManager callback,
                               Element dmds[], PackageParameters params)
-        throws CrosswalkException,
+        throws CrosswalkException, PackageValidationException,
                AuthorizeException, SQLException, IOException
     {
         int found = -1;
@@ -152,7 +149,7 @@ public class DSpaceMETSIngester
         String groupID = null;
         if (found >= 0)
         {
-            manifest.crosswalkItem(context, item, dmds[found], callback);
+            manifest.crosswalkItemDmd(context, dso, dmds[found], callback);
             groupID = dmds[found].getAttributeValue("GROUPID");
 
             if (groupID != null)
@@ -161,7 +158,7 @@ public class DSpaceMETSIngester
                 {
                     String g = dmds[i].getAttributeValue("GROUPID");
                     if (g != null && !g.equals(groupID))
-                        manifest.crosswalkItem(context, item, dmds[i], callback);
+                        manifest.crosswalkItemDmd(context, dso, dmds[i], callback);
                 }
             }
         }
@@ -171,7 +168,7 @@ public class DSpaceMETSIngester
         else
         {
             if (dmds.length > 0)
-                manifest.crosswalkItem(context, item, dmds[0], callback);
+                manifest.crosswalkItemDmd(context, dso, dmds[0], callback);
         }
     }
 
@@ -182,52 +179,86 @@ public class DSpaceMETSIngester
      * default deposit license.
      * For Creative Commons, look for a rightsMd containing a CC license.
      */
-    public void addLicense(Context context, Collection collection,
-                           Item item, METSManifest manifest,
-                           AbstractMETSIngester.MdrefManager callback,
-                           String license)
-        throws PackageValidationException, CrosswalkException,
+    public void addLicense(Context context, Item item, String license,
+                                    Collection collection, PackageParameters params)
+        throws PackageValidationException,
                AuthorizeException, SQLException, IOException
     {
+        if (PackageUtils.findDepositLicense(context, item) == null)
         PackageUtils.addDepositLicense(context, license, item, collection);
+    }
 
-        // If package includes a Creative Commons license, add that:
-        Element rmds[] = manifest.getItemRightsMD();
-        for (int i = 0; i < rmds.length; ++i)
-        {
-            String type = manifest.getMdType(rmds[i]);
-            if (type != null && type.equals("Creative Commons"))
-            {
-                log.debug("Got Creative Commons license in rightsMD");
-                CreativeCommons.setLicense(context, item,
-                            manifest.getMdContentAsStream(rmds[i], callback),
-                            manifest.getMdContentMimeType(rmds[i]));
+    public void finishObject(Context context, DSpaceObject dso)
+        throws PackageValidationException, CrosswalkException,
+         AuthorizeException, SQLException, IOException
+    {
+        // nothing to do.
+    }
 
-                // if there was a bitstream, get rid of it, since
-                // it's just an artifact now that the CC license is installed.
-                Element mdRef = rmds[i].getChild("mdRef", METSManifest.metsNS);
-                if (mdRef != null)
-                {
-                    Bitstream bs = callback.getBitstreamForMdRef(mdRef);
-                    if (bs != null)
-                    {
-                        Bundle parent[] = bs.getBundles();
-                        if (parent.length > 0)
+    public int getObjectType(METSManifest manifest)
+        throws PackageValidationException
+    {
+        return Constants.ITEM;
+    }
+
+    // return name of derived file as if MediaFilter created it, or null
+    // only needed when importing a SIP without canonical DSpace derived file naming.
+    private String makeDerivedFilename(String bundleName, String origName)
+    {
+        // get the MediaFilter that would create this bundle:
+        String mfNames[] = PluginManager.getAllPluginNames(MediaFilter.class);
+
+        for (int i = 0; i < mfNames.length; ++i)
                         {
-                            parent[0].removeBitstream(bs);
-                            parent[0].update();
+            MediaFilter mf = (MediaFilter)PluginManager.getNamedPlugin(MediaFilter.class, mfNames[i]);
+            if (bundleName.equals(mf.getBundleName()))
+                return mf.getFilteredName(origName);
                         }
+        return null;
                     }
+
+    /**
+     * Take a second pass over files to correct names of derived files
+     * (e.g. thumbnails, extracted text) to what DSpace expects:
+     */
+    public void finishBitstream(Context context,
+                                                Bitstream bs,
+                                                Element mfile,
+                                                METSManifest manifest,
+                                                PackageParameters params)
+        throws MetadataValidationException, SQLException, AuthorizeException, IOException
+    {
+        String bundleName = METSManifest.getBundleName(mfile);
+        if (!bundleName.equals(Constants.CONTENT_BUNDLE_NAME))
+        {
+            String opath = manifest.getOriginalFilePath(mfile);
+            if (opath != null)
+            {
+                // String ofileId = origFile.getAttributeValue("ID");
+                // Bitstream obs = (Bitstream)fileIdToBitstream.get(ofileId);
+
+                String newName = makeDerivedFilename(bundleName, opath);
+
+                if (newName != null)
+                {
+                    //String mfileId = mfile.getAttributeValue("ID");
+                    //Bitstream bs = (Bitstream)fileIdToBitstream.get(mfileId);
+                    bs.setName(newName);
+                    bs.update();
                 }
             }
         }
     }
 
-    // last change to fix up Item.
-    public void finishItem(Context context, Item item)
-        throws PackageValidationException, CrosswalkException,
-         AuthorizeException, SQLException, IOException
+
+    public String getConfigurationName()
     {
-        // nothing to do.
+        return "dspaceSIP";
+    }
+
+
+    public boolean probe(Context context, InputStream in, PackageParameters params)
+    {
+        throw new UnsupportedOperationException("PDF package ingester does not implement probe()");
     }
 }

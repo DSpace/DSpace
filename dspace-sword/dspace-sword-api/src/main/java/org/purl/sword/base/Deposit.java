@@ -36,7 +36,7 @@
  */
 package org.purl.sword.base;
 
-import java.io.InputStream;
+import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +51,7 @@ public class Deposit
 {
    
    /** The File deposited */
-   private InputStream file;
+   private File file;
    
    /** The content type */
    private String contentType;
@@ -178,14 +178,14 @@ public class Deposit
    /**
     * @return the file
     */
-   public InputStream getFile() {
+   public File getFile() {
       return file;
    }
 
    /**
     * @param file the file to set
     */
-   public void setFile(InputStream file) {
+   public void setFile(File file) {
       this.file = file;
    }
 

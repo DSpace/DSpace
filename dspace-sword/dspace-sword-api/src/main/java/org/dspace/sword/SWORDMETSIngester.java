@@ -38,7 +38,7 @@
 
 package org.dspace.sword;
 
-import java.io.InputStream;
+import java.io.File;
 import java.util.Date;
 import java.util.StringTokenizer;
 
@@ -49,15 +49,12 @@ import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.content.packager.PackageIngester;
 import org.dspace.content.packager.PackageParameters;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.handle.HandleManager;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowManager;
 
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.SWORDErrorException;
@@ -90,8 +87,8 @@ public class SWORDMETSIngester implements SWORDIngester
 			// get the things out of the service that we need
 			Context context = swordService.getContext();
 
-			// the DSpaceMETSIngester requires an input stream
-			InputStream is = deposit.getFile();
+			// get deposited file as InputStream
+			File depositFile = deposit.getFile();
 
 			// load the plugin manager for the required configuration
 			String cfg = ConfigurationManager.getProperty("sword.mets-ingester.package-ingester");
@@ -108,23 +105,32 @@ public class SWORDMETSIngester implements SWORDIngester
 			// it's none of our business here
 			String licence = null;
 			
-			// We don't need to include any parameters
+			// Initialize parameters to packager
 			PackageParameters params = new PackageParameters();
+                        // Force package ingester to respect Collection workflows
+                        params.setWorkflowEnabled(true);
 			
-			// ingest the item
-			WorkspaceItem wsi = pi.ingest(context, collection, is, params, licence);
-			if (wsi == null)
+			// ingest the item from the temp file
+			DSpaceObject ingestedObject = pi.ingest(context, collection, depositFile, params, licence);
+			if (ingestedObject == null)
 			{
 				swordService.message("Failed to ingest the package; throwing exception");
 				throw new SWORDErrorException(DSpaceSWORDErrorCodes.UNPACKAGE_FAIL, "METS package ingester failed to unpack package");
 			}
-			
-			// now we can inject the newly constructed item into the workflow
-			WorkflowItem wfi = WorkflowManager.startWithoutNotify(context, wsi);
-			swordService.message("Workflow process started");
-			
-			// pull the item out so that we can report on it
-			Item installedItem = wfi.getItem();
+                        
+                        //Verify we have an Item as a result -- SWORD can only ingest Items
+                        if (!(ingestedObject instanceof Item))
+			{
+                            throw new DSpaceSWORDException("DSpace Ingester returned wrong object type -- not an Item result.");
+			}
+                        else
+                        {
+                            //otherwise, we have an item, and a workflow should have already been started for it.
+                            swordService.message("Workflow process started");
+                        }
+                        
+			// get reference to item so that we can report on it
+			Item installedItem = (Item)ingestedObject;
 			
 			// update the item metadata to inclue the current time as
 			// the updated date

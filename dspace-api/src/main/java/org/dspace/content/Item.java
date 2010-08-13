@@ -1972,13 +1972,7 @@ public class Item extends DSpaceObject
         AuthorizeManager.removeAllPolicies(ourContext, this);
         
         // Remove any Handle
-        // FIXME: HandleManager should provide a way of doing this.
-        // Plus, deleting a Handle may have ramifications
-        // that need considering.
-        DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM handle WHERE resource_type_id= ? " +
-                "AND resource_id= ? ",
-                Constants.ITEM,getID());
+        HandleManager.unbindHandle(ourContext, this);
         
         // Finally remove item row
         DatabaseManager.delete(ourContext, itemRow);

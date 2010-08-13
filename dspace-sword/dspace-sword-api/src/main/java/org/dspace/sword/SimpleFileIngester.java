@@ -37,6 +37,8 @@
  */
 package org.dspace.sword;
 
+import java.io.File;
+import java.io.FileInputStream;
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.SWORDErrorException;
 import org.dspace.content.Bitstream;
@@ -49,7 +51,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
-import java.io.InputStream;
 import java.io.IOException;
 
 /**
@@ -107,8 +108,9 @@ public class SimpleFileIngester implements SWORDIngester
 				original = item.createBundle("ORIGINAL");
 			}
 
-			InputStream is = deposit.getFile();
-			Bitstream bs = original.createBitstream(is);
+                        File depositFile = deposit.getFile();
+			FileInputStream fis = new FileInputStream(depositFile);
+			Bitstream bs = original.createBitstream(fis);
 
 			String fn = swordService.getFilename(context, deposit, false);
 			bs.setName(fn);

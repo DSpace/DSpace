@@ -38,25 +38,26 @@
 
 package org.dspace.content.packager;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.mediafilter.MediaFilter;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
@@ -66,448 +67,1099 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.core.PluginManager;
+import org.dspace.handle.HandleManager;
+import org.dspace.workflow.WorkflowItem;
 import org.jdom.Element;
 
 /**
  * Base class for package ingester of
- * METS (Metadata Encoding & Transmission Standard) Package.<br>
+ * METS (Metadata Encoding & Transmission Standard) Packages.<br>
  *   See <a href="http://www.loc.gov/standards/mets/">http://www.loc.gov/standards/mets/</a>
  * <p>
  * This is a generic packager framework intended to be subclassed to create
  * ingesters for more specific METS "profiles".   METS is an
  * abstract and flexible framework that can encompass many
  * different kinds of metadata and inner package structures.
+ *
  * <p>
- * <b>Configuration:</b>
- * If the property <code>mets.submission.preserveManifest</code> is <em>true</em>,
+ * <b>Package Parameters:</b>
+ * <ul>
+ *   <li><code>validate</code> -- true/false attempt to schema-validate the METS manifest.</li>
+ *   <li><code>manifestOnly</code> -- package consists only of a manifest document.</li>
+ *   <li><code>ignoreHandle</code> -- true/false, ignore AIP's idea of handle when ingesting.</li>
+ *   <li><code>ignoreParent</code> -- true/false, ignore AIP's idea of parent when ingesting.</li>
+ * </ul>
+ * <p>
+ * <b>Configuration Properties:</b>
+ * <ul>
+ *   <li><code>mets.CONFIGNAME.ingest.preserveManifest</code> - if  <em>true</em>,
  * the METS manifest itself is preserved in a bitstream named
  * <code>mets.xml</code> in the <code>METADATA</code> bundle.  If it is
- * <em>false</em> (the default), the manifest is discarded after ingestion.
+ * <em>false</em> (the default), the manifest is discarded after ingestion.</li>
+ *
+ *   <li><code>mets.CONFIGNAME.ingest.manifestBitstreamFormat</code> - short name of
+ * the bitstream format to apply to the manifest; MUST be specified when
+ * preserveManifest is true.</li>
+ *
+ *   <li><code>mets.default.ingest.crosswalk.MD_SEC_NAME</code> = PLUGIN_NAME
+ *  Establishes a default crosswalk plugin for the given type of metadata
+ *  in a METS mdSec (e.g. "DC", "MODS").  The plugin may be either a stream
+ *  or XML-oriented ingestion crosswalk.  Subclasses can override the
+ *  default mapping with their own, substituting their configurationName
+ *  for "default" in the configuration property key above.</li>
+ *
+ *  <li><code>mets.CONFIGNAME.ingest.useCollectionTemplate</code> - if  <em>true</em>,
+ * when an item is created, use the collection template.  If it is
+ * <em>false</em> (the default), any existing collection template is ignored.</li>
+ * </ul>
  *
  * @author Larry Stone
+ * @author Tim Donohue
  * @version $Revision$
  * @see org.dspace.content.packager.METSManifest
+ * @see AbstractPackageIngester
+ * @see PackageIngester
  */
 public abstract class AbstractMETSIngester
-       implements PackageIngester
+       extends AbstractPackageIngester
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(AbstractMETSIngester.class);
 
-    /** Filename of manifest, relative to package toplevel. */
-    public static final String MANIFEST_FILE = "mets.xml";
-
-    // bitstream format name of magic METS SIP format..
-    private static final String MANIFEST_BITSTREAM_FORMAT =
-            "DSpace METS SIP";
-
-    // value of mets.submission.preserveManifest config key
-    private static final boolean preserveManifest =
-        ConfigurationManager.getBooleanProperty("mets.submission.preserveManifest", false);
-
-    // value of mets.submission.useCollectionTemplate config key
-    private static final boolean useTemplate =
-        ConfigurationManager.getBooleanProperty("mets.submission.useCollectionTemplate", false);
-
     /**
-     * An instance of MdrefManager holds the state needed to
-     * retrieve the contents (or bitstream corresponding to) an
-     * external metadata stream referenced by an <code>mdRef</code>
-     * element in the METS manifest.
+     * An instance of ZipMdrefManager holds the state needed to
+     * retrieve the contents of an external metadata stream
+     * referenced by an <code>mdRef</code>
+     * element in a Zipped up METS manifest.
      * <p>
-     * Initialize it with the DSpace Bundle containing all of the
+     * Initialize it with the Content (ORIGINAL) Bundle containing all of the
      * metadata bitstreams.  Match an mdRef by finding the bitstream
      * with the same name.
      */
     protected class MdrefManager
         implements METSManifest.Mdref
     {
-    private Bundle mdBundle = null;
+        private File packageFile = null;
+        private PackageParameters params;
 
-        // constructor initializes metadata bundle.
-        private MdrefManager(Bundle mdBundle)
+        // constructor initializes from package file
+        private MdrefManager(File packageFile, PackageParameters params)
         {
             super();
-            this.mdBundle = mdBundle;
+            this.packageFile = packageFile;
+            this.params = params;
         }
 
-        /**
-         * Find the local Bitstream referenced in
-         * an <code>mdRef</code> element.
-         * @param mdref the METS mdRef element to locate the bitstream for.
-         * @return bitstream or null if none found.
-         */
-        public Bitstream getBitstreamForMdRef(Element mdref)
-            throws MetadataValidationException, IOException, SQLException, AuthorizeException
-        {
-            String path = METSManifest.getFileName(mdref);
-            if (mdBundle == null)
-                throw new MetadataValidationException("Failed referencing mdRef element, because there were no metadata files.");
-            return mdBundle.getBitstreamByName(path);
-        }
-         
         /**
          * Make the contents of an external resource mentioned in
          * an <code>mdRef</code> element available as an <code>InputStream</code>.
          * See the <code>METSManifest.MdRef</code> interface for details.
+         *
          * @param mdref the METS mdRef element to locate the input for.
          * @return the input stream of its content.
+         * @see METSManifest
          */
         public InputStream getInputStream(Element mdref)
-            throws MetadataValidationException, IOException, SQLException, AuthorizeException
+            throws MetadataValidationException, IOException
         {
-            Bitstream mdbs = getBitstreamForMdRef(mdref);
-            if (mdbs == null)
-                throw new MetadataValidationException("Failed dereferencing bitstream for mdRef element="+mdref.toString());
-            return mdbs.retrieve();
+            String path = METSManifest.getFileName(mdref);
+            if (packageFile == null)
+                throw new MetadataValidationException("Failed referencing mdRef element, because there is no package specified.");
+
+            //Use the 'getFileInputStream()' method from the AbstractMETSIngester to retrieve
+            // the inputstream for the referenced external metadata file.
+            return AbstractMETSIngester.getFileInputStream(packageFile, params, path);
         }
-    }
+    }//end MdrefManager class
 
     /**
-     * Create a new DSpace item out of a METS content package.
+     * Create a new DSpace object out of a METS content package.
      * All contents are dictated by the METS manifest.
-     * Package is a ZIP archive, all files relative to top level
+     * Package is a ZIP archive (or optionally bare manifest XML document).
+     * In a Zip, all files relative to top level
      * and the manifest (as per spec) in mets.xml.
      *
-     * @param context - DSpace context.
-     * @param collection - collection under which to create new item.
-     * @param pkg - input stream containing package to ingest.
-     * @param license - may be null, which takes default license.
-     * @return workspace item created by ingest.
+     * @param context  DSpace context.
+     * @param parent parent under which to create new object
+     *        (may be null -- in which case ingester must determine parent from package
+     *         or throw an error).
+     * @param pkgFile  The package file to ingest
+     * @param params Properties-style list of options (interpreted by each packager).
+     * @param license  may be null, which takes default license.
+     * @return DSpaceObject created by ingest.
+     *
      * @throws PackageValidationException if package is unacceptable or there is
-     *  a fatal error turning it into an Item.
+     *  a fatal error turning it into a DSpaceObject.
+     * @throws CrosswalkException
+     * @throws AuthorizeException
+     * @throws SQLException
+     * @throws IOException
      */
-    public WorkspaceItem ingest(Context context, Collection collection,
-                                InputStream pkg, PackageParameters params,
+    public DSpaceObject ingest(Context context, DSpaceObject parent,
+                                File pkgFile, PackageParameters params,
                                 String license)
         throws PackageValidationException, CrosswalkException,
                AuthorizeException, SQLException, IOException
     {
-        ZipInputStream zip = new ZipInputStream(pkg);
-        HashMap fileIdToBitstream = new HashMap();
-        WorkspaceItem wi = null;
-        boolean success = false;
-        HashSet packageFiles = new HashSet();
+        //parsed out METS Manifest from the file.
+        METSManifest manifest = null;
 
-        boolean validate = params.getBooleanProperty("validate", true);
+        //new DSpace object created
+        DSpaceObject dso = null;
 
         try
         {
-            /* 1. Read all the files in the Zip into bitstreams first,
-             *  because we only get to take one pass through a Zip input
-             *  stream.  Give them temporary bitstream names corresponding
-             *  to the same names they had in the Zip, since those MUST
-             *  match the URL references in <Flocat> and <mdRef> elements.
-             */
-            METSManifest manifest = null;
-            wi = WorkspaceItem.create(context, collection, useTemplate);
-            Item item = wi.getItem();
-            Bundle contentBundle = null;
-            Bundle mdBundle = null;
-            ZipEntry ze;
-            while ((ze = zip.getNextEntry()) != null)
-            {
-                if (ze.isDirectory())
-                    continue;
-                Bitstream bs = null;
-                String fname = ze.getName();
-                if (fname.equals(MANIFEST_FILE))
-                {
-                    if (preserveManifest)
-                    {
-                        mdBundle = item.createBundle(Constants.METADATA_BUNDLE_NAME);
-                        bs = mdBundle.createBitstream(new PackageUtils.UnclosableInputStream(zip));
-                        bs.setName(fname);
-                        bs.setSource(fname);
+            log.info(LogManager.getHeader(context, "package_parse",
+                        "Parsing package for ingest, file=" + pkgFile.getName()));
 
-                        // Get magic bitstream format to identify manifest.
-                        BitstreamFormat manifestFormat = null;
-                        manifestFormat = PackageUtils.findOrCreateBitstreamFormat(context,
-                             MANIFEST_BITSTREAM_FORMAT, "application/xml",
-                             MANIFEST_BITSTREAM_FORMAT+" package manifest");
-                        bs.setFormat(manifestFormat);
+            //Parse our ingest package, extracting out the METS manifest in the package
+            manifest = parsePackage(context, pkgFile, params);
 
-                        manifest = METSManifest.create(bs.retrieve(), validate);
-                    }
-                    else
-                    {
-                        manifest = METSManifest.create(new PackageUtils.UnclosableInputStream(zip), validate);
-                        continue;
-                    }
-                }
-                else
-                {
-                	// we need to create the bundle only the first time
-                	if (contentBundle == null)
-                	{
-                		contentBundle = item.createBundle(Constants.CONTENT_BUNDLE_NAME);
-                	}
-                    bs = contentBundle.createBitstream(new PackageUtils.UnclosableInputStream(zip));
-                    bs.setSource(fname);
-                    bs.setName(fname);
-                }
-                packageFiles.add(fname);
-                bs.setSource(fname);
-                bs.update();
-            }
-            zip.close();
-
+            //must have a METS Manifest to ingest anything
             if (manifest == null)
-                throw new PackageValidationException("No METS Manifest found (filename="+MANIFEST_FILE+").  Package is unacceptable.");
+                throw new PackageValidationException("No METS Manifest found (filename="+METSManifest.MANIFEST_FILE+").  Package is unacceptable!");
 
-            // initial sanity checks on manifest (in subclass)
+            //validate our manifest
             checkManifest(manifest);
 
-            /* 2. Grovel a file list out of METS Manifest and compare
-             *  it to the files in package, as an integrity test.
-             */
-            List manifestContentFiles = manifest.getContentFiles();
-
-            // Compare manifest files with the ones found in package:
-            //  a. Start with content files (mentioned in <fileGrp>s)
-            HashSet missingFiles = new HashSet();
-            for (Iterator mi = manifestContentFiles.iterator(); mi.hasNext(); )
-            {
-                // First locate corresponding Bitstream and make
-                // map of Bitstream to <file> ID.
-                Element mfile = (Element)mi.next();
-                String mfileId = mfile.getAttributeValue("ID");
-                if (mfileId == null)
-                    throw new PackageValidationException("Invalid METS Manifest: file element without ID attribute.");
-                String path = METSManifest.getFileName(mfile);
-                Bitstream bs = contentBundle.getBitstreamByName(path);
-                if (bs == null)
-                {
-                    log.warn("Cannot find bitstream for filename=\""+path+
-                             "\", skipping it..may cause problems later.");
-                    missingFiles.add(path);
-                }
-                else
-                {
-                    fileIdToBitstream.put(mfileId, bs);
-
-                    // Now that we're done using Name to match to <file>,
-                    // set default bitstream Name to last path element;
-                    // Zip entries all have '/' pathname separators
-                    // NOTE: set default here, hopefully crosswalk of
-                    // a bitstream techMD section will override it.
-                    String fname = bs.getName();
-                    int lastSlash = fname.lastIndexOf('/');
-                    if (lastSlash >= 0  && lastSlash+1 < fname.length())
-                        bs.setName(fname.substring(lastSlash+1));
-
-                    // Set Default bitstream format:
-                    //  1. attempt to guess from MIME type
-                    //  2. if that fails, guess from "name" extension.
-                    String mimeType = mfile.getAttributeValue("MIMETYPE");
-                    BitstreamFormat bf = (mimeType == null) ? null :
-                            BitstreamFormat.findByMIMEType(context, mimeType);
-                    if (bf == null)
-                        bf = FormatIdentifier.guessFormat(context, bs);
-                    bs.setFormat(bf);
-
-                    // if this bitstream belongs in another Bundle, move it:
-                    String bundleName = manifest.getBundleName(mfile);
-                    if (!bundleName.equals(Constants.CONTENT_BUNDLE_NAME))
-                    {
-                        Bundle bn;
-                        Bundle bns[] = item.getBundles(bundleName);
-                        if (bns != null && bns.length > 0)
-                            bn = bns[0];
-                        else
-                            bn = item.createBundle(bundleName);
-                        bn.addBitstream(bs);
-                        contentBundle.removeBitstream(bs);
-                    }
-
-                    // finally, build compare lists by deleting matches.
-                    if (packageFiles.contains(path))
-                        packageFiles.remove(path);
-                    else
-                        missingFiles.add(path);
-                }
+            //if we are not restoring an object (i.e. we are submitting a new object)
+            // then, default the 'ignoreHandle' option to true (as a new object should get a new handle by default)
+            if(!params.restoreModeEnabled() && !params.containsKey("ignoreHandle"))
+            {   //ignore the handle in the manifest, and instead create a new handle
+                params.addProperty("ignoreHandle", "true");
             }
 
-            //  b. Process files mentioned in <mdRef>s - check and move
-            //     to METADATA bundle.
-            for (Iterator mi = manifest.getMdFiles().iterator(); mi.hasNext(); )
-            {
-                Element mdref = (Element)mi.next();
-                String path = METSManifest.getFileName(mdref);
-
-                // finally, build compare lists by deleting matches.
-                if (packageFiles.contains(path))
-                    packageFiles.remove(path);
-                else
-                    missingFiles.add(path);
-
-                // if there is a bitstream with that name in Content, move
-                // it to the Metadata bundle:
-                Bitstream mdbs = contentBundle.getBitstreamByName(path);
-                if (mdbs != null)
-                {
-                    if (mdBundle == null)
-                        mdBundle = item.createBundle(Constants.METADATA_BUNDLE_NAME);
-                    mdBundle.addBitstream(mdbs);
-                    contentBundle.removeBitstream(mdbs);
-                }
+            //if we have a Parent Object, default 'ignoreParent' option to True (this will ignore the Parent specified in manifest)
+            if(parent!=null && !params.containsKey("ignoreParent"))
+            {   //ignore the parent in the manifest, and instead use the specified parent object
+                params.addProperty("ignoreParent", "true");
             }
 
-            // KLUDGE: make sure Manifest file doesn't get flagged as missing
-            // or extra, since it won't be mentioned in the manifest.
-            if (packageFiles.contains(MANIFEST_FILE))
-                packageFiles.remove(MANIFEST_FILE);
+            //Actually ingest the object described by the METS Manifest
+            dso = ingestObject(context, parent, manifest, pkgFile,
+                                  params, license);
 
-            // Give subclass a chance to refine the lists of in-package
-            // and missing files, delete extraneous files, etc.
-            checkPackageFiles(packageFiles, missingFiles, manifest);
+            //Log whether we finished an ingest (create new obj) or a restore (restore previously existing obj)
+            String action = "package_ingest";
+            if(params.restoreModeEnabled())
+                action = "package_restore";
+            log.info(LogManager.getHeader(context, action,
+                        "Created new Object, type=" + Constants.typeText[dso.getType()] +
+                                    ", handle=" + dso.getHandle() + ", dbID=" + String.valueOf(dso.getID())));
 
-            // Any discrepency in file lists is a fatal error:
-            if (!(packageFiles.isEmpty() && missingFiles.isEmpty()))
+            // Check if the Packager is currently running recursively.
+            // If so, this means the Packager will attempt to recursively
+            // ingest all referenced child packages.
+            if(params.recursiveModeEnabled())
             {
-                StringBuffer msg = new StringBuffer("Package is unacceptable: contents do not match manifest.");
-                if (!missingFiles.isEmpty())
-                {
-                    msg.append("\nPackage is missing these files listed in Manifest:");
-                    for (Iterator mi = missingFiles.iterator(); mi.hasNext(); )
-                        msg.append("\n\t"+(String)mi.next());
-                }
-                if (!packageFiles.isEmpty())
-                {
-                    msg.append("\nPackage contains extra files NOT in manifest:");
-                    for (Iterator mi = packageFiles.iterator(); mi.hasNext(); )
-                        msg.append("\n\t"+(String)mi.next());
-                }
-                throw new PackageValidationException(msg.toString());
+                //Retrieve list of all Child object METS file paths from the current METS manifest.
+                // This is our list of known child packages
+                String[] childFilePaths = manifest.getChildMetsFilePaths();
+
+                //Save this list to our AbstractPackageIngester (and note which DSpaceObject the pkgs relate to)
+                //NOTE: The AbstractPackageIngester itself will perform the recursive ingest call,
+                //      based on these child pkg references
+                for(int i=0; i<childFilePaths.length; i++)
+                    addPackageReference(dso, childFilePaths[i]);
             }
 
-            /* 3. crosswalk the metadata
-             */
-            // get mdref'd streams from "callback" object.
-            MdrefManager callback = new MdrefManager(mdBundle);
-
-            chooseItemDmd(context, item, manifest, callback, manifest.getItemDmds(), params);
-
-            // crosswalk content bitstreams too.
-            for (Iterator ei = fileIdToBitstream.entrySet().iterator();
-                 ei.hasNext();)
-            {
-                Map.Entry ee = (Map.Entry)ei.next();
-                manifest.crosswalkBitstream(context, (Bitstream)ee.getValue(),
-                                        (String)ee.getKey(), callback);
-            }
-
-            // Take a second pass over files to correct names of derived files
-            // (e.g. thumbnails, extracted text) to what DSpace expects:
-            for (Iterator mi = manifestContentFiles.iterator(); mi.hasNext(); )
-            {
-                Element mfile = (Element)mi.next();
-                String bundleName = manifest.getBundleName(mfile);
-                if (!bundleName.equals(Constants.CONTENT_BUNDLE_NAME))
-                {
-                    Element origFile = manifest.getOriginalFile(mfile);
-                    if (origFile != null)
-                    {
-                        String ofileId = origFile.getAttributeValue("ID");
-                        Bitstream obs = (Bitstream)fileIdToBitstream.get(ofileId);
-                        String newName = makeDerivedFilename(bundleName, obs.getName());
-                        if (newName != null)
-                        {
-                            String mfileId = mfile.getAttributeValue("ID");
-                            Bitstream bs = (Bitstream)fileIdToBitstream.get(mfileId);
-                            bs.setName(newName);
-                            bs.update();
-                        }
-                    }
-                }
-            }
-
-            // Sanity-check the resulting metadata on the Item:
-            PackageUtils.checkMetadata(item);
-
-            /* 4. Set primary bitstream; same Bundle
-             */
-            Element pbsFile = manifest.getPrimaryBitstream();
-            if (pbsFile != null)
-            {
-                Bitstream pbs = (Bitstream)fileIdToBitstream.get(pbsFile.getAttributeValue("ID"));
-                if (pbs == null)
-                    log.error("Got Primary Bitstream file ID="+pbsFile.getAttributeValue("ID")+
-                             ", but found no corresponding bitstream.");
-                else
-                {
-                    Bundle bn[] = pbs.getBundles();
-                    if (bn.length > 0)
-                        bn[0].setPrimaryBitstreamID(pbs.getID());
-                    else
-                        log.error("Sanity check, got primary bitstream without any parent bundle.");
-                }
-            }
-
-            // have subclass manage license since it may be extra package file.
-            addLicense(context, collection, item, manifest, callback, license );
-
-            // subclass hook for final checks and rearrangements
-            finishItem(context, item);
-
-            // commit any changes to bundles
-            Bundle allBn[] = item.getBundles();
-            for (int i = 0; i < allBn.length; ++i)
-            {
-                allBn[i].update();
-            }
-
-            wi.update();
-            success = true;
-            log.info(LogManager.getHeader(context, "ingest",
-                "Created new Item, db ID="+String.valueOf(item.getID())+
-                ", WorkspaceItem ID="+String.valueOf(wi.getID())));
-            return wi;
+            return dso;
         }
         catch (SQLException se)
         {
-            // disable attempt to delete the workspace object, since
-            // database may have suffered a fatal error and the
+            // no need to really clean anything up,
             // transaction rollback will get rid of it anyway.
-            wi = null;
+            dso = null;
 
             // Pass this exception on to the next handler.
             throw se;
         }
-        finally
-        {
-            // kill item (which also deletes bundles, bitstreams) if ingest fails
-            if (!success && wi != null)
-                wi.deleteAll();
-        }
     }
 
     /**
-     * XXX FIXME Replace is not implemented yet.
+     * Parse a given input package, ultimately returning the METS manifest out
+     * of the package.  METS manifest is assumed to be a file named 'mets.xml'
+     *
+     * @param context DSpace Context
+     * @param pkgFile package to parse
+     * @param params Ingestion parameters
+     * @return parsed out METSManifest
+     * @throws IOException
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws MetadataValidationException
      */
-    public Item replace(Context ctx, Item item, InputStream pckage, PackageParameters params)
-        throws PackageException, UnsupportedOperationException,
-               CrosswalkException, AuthorizeException,
-               SQLException, IOException
+    protected METSManifest parsePackage(Context context, File pkgFile,
+                                        PackageParameters params)
+            throws IOException, SQLException, AuthorizeException, MetadataValidationException
     {
-        throw new UnsupportedOperationException("The replace operation is not implemented.");
-    }
+        //whether or not to validate the METSManifest before processing (default=false)
+        // (Even though it's preferrable to validate -- it's costly and takes a lot of time, unless you cache schemas locally)
+        boolean validate = params.getBooleanProperty("validate", false);
 
-    // return name of derived file as if MediaFilter created it, or null
-    private String makeDerivedFilename(String bundleName, String origName)
-    {
-        // get the MediaFilter that would create this bundle:
-        String mfNames[] = PluginManager.getAllPluginNames(MediaFilter.class);
+        //parsed out METS Manifest from the file.
+        METSManifest manifest = null;
 
-        for (int i = 0; i < mfNames.length; ++i)
+        //try to locate the METS Manifest in package
+        // 1. read "package" stream:  it will be either bare Manifest
+        // or Package contents into bitstreams, depending on params:
+        if (params.getBooleanProperty("manifestOnly", false))
         {
-            MediaFilter mf = (MediaFilter)PluginManager.getNamedPlugin(MediaFilter.class, mfNames[i]);
-            if (bundleName.equals(mf.getBundleName()))
-                return mf.getFilteredName(origName);
+            // parse the bare METS manifest and sanity-check it.
+            manifest = METSManifest.create(new FileInputStream(pkgFile),
+                            validate, getConfigurationName());
         }
-        return null;
+        else
+        {
+            ZipFile zip = new ZipFile(pkgFile);
+
+            //Retrieve the manifest file entry (named mets.xml)
+            ZipEntry manifestEntry = zip.getEntry(METSManifest.MANIFEST_FILE);
+
+            // parse the manifest and sanity-check it.
+            manifest = METSManifest.create( zip.getInputStream(manifestEntry),
+                            validate, getConfigurationName());
+
+            //close the Zip file for now
+            //(we'll extract the other files from zip when we need them)
+            zip.close();
+        }
+
+        //return our parsed out METS manifest
+        return manifest;
     }
+
+
+    /**
+     * Ingest/import a single DSpace Object, based on the associated METS Manifest
+     * and the parameters passed to the METSIngester
+     *
+     * @param context DSpace Context
+     * @param parent Parent DSpace Object
+     * @param manifest the parsed METS Manifest
+     * @param pkgFile the full package file (which may include content files if a zip)
+     * @param params Parameters passed to METSIngester
+     * @param license DSpace license agreement
+     * @return completed result as a DSpace object
+     * @throws IOException
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws CrosswalkException
+     * @throws MetadataValidationException
+     * @throws PackageValidationException
+     */
+    protected DSpaceObject ingestObject(Context context, DSpaceObject parent,
+                                METSManifest manifest,
+                                File pkgFile,
+                                PackageParameters params, String license)
+            throws IOException, SQLException, AuthorizeException,
+                   CrosswalkException,
+                   MetadataValidationException, PackageValidationException
+    {
+        //type of DSpace Object (one of the type constants)
+        int type;
+
+        //-- Step 1 --
+        //Extract basic information (type, parent, handle) about DSpace object represented by manifest
+        type = getObjectType(manifest);
+
+        // if no parent passed in (or ignoreParent is false),
+        // attempt to determine parent DSpace object from manifest
+        if(parent==null || !params.getBooleanProperty("ignoreParent", false))
+        {
+            // get parent object from manifest
+            parent = getParentObject(context, manifest);
+        }
+
+        String handle = null;
+        //if we are *not* ignoring the handle in manifest (i.e. ignoreHandle is false)
+        if(!params.getBooleanProperty("ignoreHandle", false))
+        {
+            // get handle from manifest
+            handle = getObjectHandle(manifest);
+        }
+
+        //-- Step 2 --
+        // Create our DSpace Object based on info parsed from manifest, and packager params
+        DSpaceObject dso = PackageUtils.createDSpaceObject(context, parent, type, handle, params);
+
+        //if we are uninitialized, throw an error -- something's wrong!
+        if(dso==null)
+        {
+            throw new PackageValidationException("Unable to initialize object specified by package (type='" + type + "', handle='" + handle + "' and parent='" + parent.getHandle() + "').");
+        }
+
+        //-- Step 3 --
+        // Run our Administrative metadata crosswalks!
+
+        //initialize callback object which will retrieve external inputstreams for any <mdRef>'s found in METS
+        MdrefManager callback = new MdrefManager(pkgFile, params);
+
+        // Crosswalk the sourceMD first, so that we make sure to fill in
+        // submitter info (and any other initial applicable info)
+        manifest.crosswalkObjectSourceMD(context, dso, callback);
+
+        // Next, crosswalk techMD, digiprovMD, rightsMD
+        manifest.crosswalkObjectOtherAdminMD(context, dso, callback);
+
+
+        //-- Step 4 --
+        // Add all content files as bitstreams on new DSpace Object
+        if (type == Constants.ITEM)
+        {
+            Item item = (Item)dso;
+            // @TODO: maybe add an option to apply template Item on ingest??
+
+            // Get collection this item is being submitted to
+            Collection collection = item.getOwningCollection();
+            if(collection==null)
+            {
+                // If an item doesn't have an owning-collection, that means it
+                // has entered a workflow (and is not fully in the archive yet)
+                WorkflowItem wfi = WorkflowItem.findByItem(context, item);
+
+                //Get the collection this workflow item belongs to
+                if(wfi!=null)
+                    collection = wfi.getCollection();
+            }
+
+            // save manifest as a bitstream in Item if desired
+            if (preserveManifest())
+            {
+                addManifestBitstream(context, item, manifest);
+            }
+
+            // save all other bitstreams in Item
+            addBitstreams(context, item, manifest, pkgFile, params, callback);
+
+            // have subclass manage license since it may be extra package file.
+            addLicense(context, item, license, collection, params);
+
+            // XXX FIXME
+            // should set lastModifiedTime e.g. when ingesting AIP.
+            // maybe only do it in the finishObject() callback for AIP.
+
+        } // end if ITEM
+        else if (type == Constants.COLLECTION ||
+                 type == Constants.COMMUNITY)
+        {
+            // Add logo if one is referenced from manifest
+            addContainerLogo(context, dso, manifest, pkgFile, params);
+        }//end if Community/Collection
+        else
+            throw new PackageValidationException("Unknown DSpace Object type in package, type="+String.valueOf(type));
+
+        //-- Step 5 --
+        // Run our Descriptive metadata (dublin core, etc) crosswalks!
+        crosswalkObjectDmd(context, dso, manifest, callback, manifest.getItemDmds(), params);
+
+        // For Items, also sanity-check the metadata for minimum requirements.
+        if (type == Constants.ITEM)
+            PackageUtils.checkItemMetadata((Item)dso);
+
+        //-- Step 6 --
+        // Finish things up!
+
+        // Subclass hook for final checks and rearrangements
+        // (this allows subclasses to do some final validation / changes as necessary)
+        finishObject(context, dso);
+
+        // Update the object to make sure all changes are committed
+        PackageUtils.updateDSpaceObject(dso);
+
+        return dso;
+    }
+
+
+    /**
+     * Replace the contents of a single DSpace Object, based on the associated METS Manifest
+     * and the parameters passed to the METSIngester
+     *
+     * @param context DSpace Context
+     * @param dso DSpace Object to replace
+     * @param manifest the parsed METS Manifest
+     * @param pkgFile the full package file (which may include content files if a zip)
+     * @param params Parameters passed to METSIngester
+     * @param license DSpace license agreement
+     * @return completed result as a DSpace object
+     * @throws IOException
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws CrosswalkException
+     * @throws MetadataValidationException
+     * @throws PackageValidationException
+     */
+    protected DSpaceObject replaceObject(Context context, DSpaceObject dso,
+                                METSManifest manifest,
+                                File pkgFile,
+                                PackageParameters params, String license)
+            throws IOException, SQLException, AuthorizeException,
+                   CrosswalkException,
+                   MetadataValidationException, PackageValidationException
+    {
+        //-- Step 1 --
+        // Before going forward with the replace, let's verify these objects are of the same TYPE!
+        // (We don't want to go around trying to replace a COMMUNITY with an ITEM -- that's dangerous.)
+        int manifestType = getObjectType(manifest);
+        if(manifestType!=dso.getType())
+        {
+            throw new PackageValidationException("The object type of the METS manifest (" + Constants.typeText[manifestType] + ") does not match up with the object type (" + Constants.typeText[dso.getType()] + ") of the DSpaceObject to be replaced!");
+        }
+
+        if (log.isDebugEnabled())
+            log.debug("Object to be replaced (handle=" + dso.getHandle() +") is " + Constants.typeText[dso.getType()] + " id=" + dso.getID());
+
+        //-- Step 2 --
+        // Clear out current object (as we are replacing all its contents & metadata)
+
+        //remove all files attached to this object
+        // (For communities/collections this just removes the logo bitstream)
+        PackageUtils.removeAllBitstreams(dso);
+
+        //clear out all metadata values associated with this object
+        PackageUtils.clearAllMetadata(dso);
+
+        //@TODO -- We are currently NOT clearing out the following during a replace.
+        // So, even after a replace, the following information may be retained in the system
+        // 1. Groups/People in system
+        // 2. Rights/Permissions in system or on objects
+        // 3. Collection item templates or Content Source info (e.g. OAI Harvesting collections)
+        // 4. Item status (embargo, withdrawn) or mappings to other collections
+
+        //-- Step 3 --
+        // Run our Administrative metadata crosswalks!
+
+        //initialize callback object which will retrieve external inputstreams for any <mdRef>'s found in METS
+        MdrefManager callback = new MdrefManager(pkgFile, params);
+
+        // Crosswalk the sourceMD first, so that we make sure to fill in
+        // submitter info (and any other initial applicable info)
+        manifest.crosswalkObjectSourceMD(context, dso, callback);
+
+        // Next, crosswalk techMD, digiprovMD, rightsMD
+        manifest.crosswalkObjectOtherAdminMD(context, dso, callback);
+
+
+        //-- Step 4 --
+        // Add all content files as bitstreams on new DSpace Object
+        if (dso.getType() == Constants.ITEM)
+        {
+            Item item = (Item)dso;
+            // @TODO: maybe add an option to apply template Item on ingest??
+
+            // save manifest as a bitstream in Item if desired
+            if (preserveManifest())
+            {
+                addManifestBitstream(context, item, manifest);
+            }
+
+            // save all other bitstreams in Item
+            addBitstreams(context, item, manifest, pkgFile, params, callback);
+
+            // have subclass manage license since it may be extra package file.
+            addLicense(context, item, license, (Collection)dso.getParentObject(), params);
+
+            // FIXME ?
+            // should set lastModifiedTime e.g. when ingesting AIP.
+            // maybe only do it in the finishObject() callback for AIP.
+
+        } // end if ITEM
+        else if (dso.getType() == Constants.COLLECTION ||
+                 dso.getType() == Constants.COMMUNITY)
+        {
+            // Add logo if one is referenced from manifest
+            addContainerLogo(context, dso, manifest, pkgFile, params);
+        }//end if Community/Collection
+
+
+        //-- Step 5 --
+        // Run our Descriptive metadata (dublin core, etc) crosswalks!
+        crosswalkObjectDmd(context, dso, manifest, callback, manifest.getItemDmds(), params);
+
+        // For Items, also sanity-check the metadata for minimum requirements.
+        if (dso.getType() == Constants.ITEM)
+            PackageUtils.checkItemMetadata((Item)dso);
+
+        //-- Step 6 --
+        // Finish things up!
+
+        // Subclass hook for final checks and rearrangements
+        // (this allows subclasses to do some final validation / changes as necessary)
+        finishObject(context, dso);
+
+        // Update the object to make sure all changes are committed
+        PackageUtils.updateDSpaceObject(dso);
+
+        return dso;
+    }
+
+
+
+    /**
+     * Add Bitstreams to an Item, based on the files listed in the METS Manifest
+     *
+     * @param context DSpace Context
+     * @param item DSpace Item
+     * @param manifest METS Manifest
+     * @param pkgFile the full package file (which may include content files if a zip)
+     * @param params Ingestion Parameters
+     * @param mdRefCallback MdrefManager storing info about mdRefs in manifest
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
+     * @throws MetadataValidationException
+     * @throws CrosswalkException
+     * @throws PackageValidationException
+     */
+    protected void addBitstreams(Context context, Item item, METSManifest manifest,
+                                File pkgFile,
+                                PackageParameters params, MdrefManager mdRefCallback)
+            throws SQLException, IOException, AuthorizeException,
+                   MetadataValidationException, CrosswalkException,
+                   PackageValidationException
+    {
+        // Step 1 -- find the ID of the primary or Logo bitstream in manifest
+        String primaryID = null;
+        Element primaryFile = manifest.getPrimaryOrLogoBitstream();
+        if (primaryFile != null)
+        {
+            primaryID = primaryFile.getAttributeValue("ID");
+            if (log.isDebugEnabled())
+                log.debug("Got primary bitstream file ID=\""+primaryID+"\"");
+        }
+
+        // Step 2 -- find list of all content files from manifest
+        //  Loop through these files, and add them one by one to Item
+        List manifestContentFiles = manifest.getContentFiles();
+
+        boolean setPrimaryBitstream = false;
+        BitstreamFormat unknownFormat = BitstreamFormat.findUnknown(context);
+
+        for (Iterator mi = manifestContentFiles.iterator(); mi.hasNext(); )
+        {
+            Element mfile = (Element)mi.next();
+
+            //basic validation -- check that it has an ID attribute
+            String mfileID = mfile.getAttributeValue("ID");
+            if (mfileID == null)
+                throw new PackageValidationException("Invalid METS Manifest: file element without ID attribute.");
+
+            // retrieve path/name of file in manifest
+            String path = METSManifest.getFileName(mfile);
+
+            // extract the file input stream from package (or retrieve externally, if it is an externally referenced file)
+            InputStream fileStream = getFileInputStream(pkgFile, params, path);
+
+            // retrieve bundle name from manifest
+            String bundleName = METSManifest.getBundleName(mfile);
+
+            // Find or create the bundle where bitstrem should be attached
+            Bundle bundle;
+            Bundle bns[] = item.getBundles(bundleName);
+            if (bns != null && bns.length > 0)
+                bundle = bns[0];
+            else
+                bundle = item.createBundle(bundleName);
+
+            // Create the bitstream in the bundle & initialize its name
+            Bitstream bitstream = bundle.createBitstream(fileStream);
+            bitstream.setName(path);
+
+            // crosswalk this bitstream's administrative metadata located in METS manifest (or referenced externally)
+            manifest.crosswalkBitstream(context, bitstream, mfileID, mdRefCallback);
+
+            // is this the primary bitstream?
+            if (primaryID != null && mfileID.equals(primaryID))
+            {
+                bundle.setPrimaryBitstreamID(bitstream.getID());
+                bundle.update();
+                setPrimaryBitstream = true;
+            }
+
+            // Run any finishing activities -- this allows subclasses to
+            // change default bitstream information
+            finishBitstream(context, bitstream, mfile, manifest, params);
+
+            //Last-ditch attempt to divine the format, if crosswalk failed to set it:
+            //  1. attempt to guess from MIME type
+            //  2. if that fails, guess from "name" extension.
+            if (bitstream.getFormat().equals(unknownFormat))
+            {
+                if (log.isDebugEnabled())
+                    log.debug("Guessing format of Bitstream left un-set: "+bitstream.toString());
+                String mimeType = mfile.getAttributeValue("MIMETYPE");
+                BitstreamFormat bf = (mimeType == null) ? null :
+                        BitstreamFormat.findByMIMEType(context, mimeType);
+                if (bf == null)
+                    bf = FormatIdentifier.guessFormat(context, bitstream);
+                bitstream.setFormat(bf);
+            }
+            bitstream.update();
+        }//end for each manifest file
+
+
+        // Step 3 -- Sanity checks
+        // sanity check for primary bitstream
+        if (primaryID != null && !setPrimaryBitstream)
+            log.warn("Could not find primary bitstream file ID=\""+primaryID+"\" in manifest file \"" + pkgFile.getAbsolutePath() + "\"");
+    }
+
+    /**
+     * Save/Preserve the METS Manifest as a Bitstream attached to the
+     * given DSpace item.
+     *
+     * @param context DSpace Context
+     * @param item DSpace Item
+     * @param manifest The METS Manifest
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws PackageValidationException
+     */
+    protected void addManifestBitstream(Context context, Item item, METSManifest manifest)
+            throws IOException, SQLException, AuthorizeException, PackageValidationException
+    {
+        //We'll save the METS Manifest as part of the METADATA bundle.
+        Bundle mdBundle = item.createBundle(Constants.METADATA_BUNDLE_NAME);
+
+        //Create a Bitstream from the METS Manifest's content
+        Bitstream manifestBitstream = mdBundle.createBitstream(manifest.getMetsAsStream());
+        manifestBitstream.setName(METSManifest.MANIFEST_FILE);
+        manifestBitstream.setSource(METSManifest.MANIFEST_FILE);
+        manifestBitstream.update();
+
+        // Get magic bitstream format to identify manifest.
+        String fmtName = getManifestBitstreamFormat();
+        if (fmtName == null)
+            throw new PackageValidationException("Configuration Error: No Manifest BitstreamFormat configured for METS ingester type="+getConfigurationName());
+        BitstreamFormat manifestFormat = PackageUtils.findOrCreateBitstreamFormat(context,
+             fmtName, "application/xml",
+             fmtName+" package manifest");
+        manifestBitstream.setFormat(manifestFormat);
+        manifestBitstream.update();
+    }
+
+
+    /**
+     * Add a Logo to a Community or Collection container object based on
+     * a METS Manifest.
+     *
+     * @param context DSpace Context
+     * @param dso DSpace Container Object
+     * @param manifest METS Manifest
+     * @param pkgFile the full package file (which may include content files if a zip)
+     * @param params Ingestion Parameters
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
+     * @throws MetadataValidationException
+     * @throws PackageValidationException
+     */
+    protected void addContainerLogo(Context context, DSpaceObject dso,
+                                  METSManifest manifest, File pkgFile,
+                                  PackageParameters params)
+            throws SQLException, IOException, AuthorizeException,
+                   MetadataValidationException, PackageValidationException
+    {
+
+        Element logoRef = manifest.getPrimaryOrLogoBitstream();
+
+        //only continue if a logo specified in manifest
+        if (logoRef != null)
+        {
+            //Find ID of logo file
+            String logoID = logoRef.getAttributeValue("ID");
+
+            // Loop through manifest content files to find actual logo file
+            for (Iterator mi = manifest.getContentFiles().iterator(); mi.hasNext(); )
+            {
+                Element mfile = (Element)mi.next();
+                if (logoID.equals(mfile.getAttributeValue("ID")))
+                {
+                    String path = METSManifest.getFileName(mfile);
+
+                    // extract the file input stream from package (or retrieve externally, if it is an externally referenced file)
+                    InputStream fileStream = getFileInputStream(pkgFile, params, path);
+
+                    // Add this logo to the Community/Collection
+                    if (dso.getType() == Constants.COLLECTION)
+                        ((Collection)dso).setLogo(fileStream);
+                    else
+                        ((Community)dso).setLogo(fileStream);
+
+                    break;
+                }
+            }// end for each file in manifest
+        }// end if logo reference found
+    }
+
+
+    /**
+     * Replace an existing DSpace object with the contents of a METS-based package.
+     * All contents are dictated by the METS manifest.
+     * Package is a ZIP archive (or optionally bare manifest XML document).
+     * In a Zip, all files relative to top level
+     * and the manifest (as per spec) in mets.xml.
+     * <P>
+     * This method is similar to ingest(), except that if the object already exists in
+     * DSpace, it is deleted & replaced.  The METS-based package is then used to ingest a new
+     * object in its place.
+     * <P>
+     * In order to attempt to avoid data loss, this method first ingests a new object (with same parent)
+     * based on the METS manifest. Assuming that succeeds, the existing object is removed,
+     * and its handle is reassigned to the new object.  If the ingest fails, the new object
+     * is removed and the existing object is left in tact.
+     *
+     * @param context DSpace Context
+     * @param dsoToReplace DSpace Object to be replaced (may be null if it will be specified in the METS manifest itself)
+     * @param pkgFile  The package file to ingest
+     * @param params Parameters passed from the packager script
+     * @return DSpaceObject created by ingest.
+     * @throws PackageValidationException if package is unacceptable or there is
+     *  a fatal error turning it into a DSpace Object.
+     * @throws IOException
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws CrosswalkException
+     */
+    public DSpaceObject replace(Context context, DSpaceObject dsoToReplace,
+                     File pkgFile, PackageParameters params)
+        throws PackageValidationException, CrosswalkException,
+               AuthorizeException, SQLException, IOException
+    {
+        //parsed out METS Manifest from the file.
+        METSManifest manifest = null;
+
+        //resulting DSpace Object
+        DSpaceObject dso = null;
+
+        try
+        {
+            log.info(LogManager.getHeader(context, "package_parse",
+                        "Parsing package for replace, file=" + pkgFile.getName()));
+
+            //Parse our ingest package, extracting out the METS manifest in the package
+            manifest = parsePackage(context, pkgFile, params);
+
+            //must have a METS Manifest to replace anything
+            if (manifest == null)
+                throw new PackageValidationException("No METS Manifest found (filename="+METSManifest.MANIFEST_FILE+").  Package is unacceptable!");
+
+            //it's possible that the object to replace will be passed in as null
+            // Let's determine the handle of the object to replace
+            if(dsoToReplace==null)
+            {
+                // since we don't know what we are replacing, we'll have to
+                // try to determine it from the parsed manifest
+
+                // Handle of object described by METS should be in OBJID
+                String handleURI = manifest.getObjID();
+                String handle = decodeHandleURN(handleURI);
+                try
+                {
+                    // Attempt to resolve this handle to an existing object
+                    dsoToReplace = HandleManager.resolveToObject(context, handle);
+                }
+                catch(IllegalStateException ie)
+                {
+                    //we don't care if this errors out -- we can continue whether or not an object exists with this handle
+                }
+            }
+            // NOTE: At this point, it's still possible we don't have an object to replace
+            // This could happen when there is actually no existing object in DSpace using that handle
+            // (In which case, we're actually just doing a "restore" -- so we aren't going to throw an error or complain)
+
+            // If we were unable to find the object to replace, then assume we are restoring it
+            if(dsoToReplace==null)
+            {
+                //In order to restore an object, we must first figure out which parent it belongs to
+                DSpaceObject parent = null;
+                // Let's try to figure out the parent using the Manifest
+                // look for a Parent Object link in manifest <structmap>
+                String parentLink = manifest.getParentOwnerLink();
+
+                //verify we have a valid Parent Object
+                if(parentLink!=null && parentLink.length()>0)
+                {
+                    parent = HandleManager.resolveToObject(context, parentLink);
+                    if (parent == null)
+                        throw new UnsupportedOperationException("Could not find a parent DSpaceObject references as '" + parentLink + "' in the METS Manifest. A valid parent DSpaceObject must be specified in the METS Manifest itself.");
+                }
+                else
+                    throw new UnsupportedOperationException("Could not find a parent DSpaceObject where we can ingest this package.  A valid parent DSpaceObject must be specified in the METS Manifest itself.");
+
+                // As this object doesn't already exist, we will perform an ingest of a new object in order to restore it
+                dso = ingestObject(context, parent, manifest, pkgFile, params, null);
+
+                //Log that we created an object
+                log.info(LogManager.getHeader(context, "package_replace",
+                            "Created new Object, type=" + Constants.typeText[dso.getType()] +
+                                        ", handle=" + dso.getHandle() + ", dbID=" + String.valueOf(dso.getID())));
+            }
+            else // otherwise, we found the DSpaceObject to replace -- so, replace it!
+            {
+                // Actually replace the object described by the METS Manifest
+                // NOTE: This will perform an in-place replace of all metadata and files currently associated with the object.
+                dso = replaceObject(context, dsoToReplace, manifest,
+                                      pkgFile,
+                                      params, null);
+
+                //Log that we replaced an object
+                log.info(LogManager.getHeader(context, "package_replace",
+                            "Replaced Object, type=" + Constants.typeText[dso.getType()] +
+                                        ", handle=" + dso.getHandle() + ", dbID=" + String.valueOf(dso.getID())));
+            }
+
+            // Check if the Packager is currently running recursively.
+            // If so, this means the Packager will attempt to recursively
+            // replace all referenced child packages.
+            if(params.recursiveModeEnabled())
+            {
+                //Retrieve list of all Child object METS file paths from the current METS manifest.
+                // This is our list of known child packages
+                String[] childFilePaths = manifest.getChildMetsFilePaths();
+
+                //Save this list to our AbstractPackageIngester (and note which DSpaceObject the pkgs relate to)
+                //NOTE: The AbstractPackageIngester itself will perform the recursive ingest call,
+                //      based on these child pkg references
+                for(int i=0; i<childFilePaths.length; i++)
+                    addPackageReference(dso, childFilePaths[i]);
+            }
+
+            return dso;
+        }
+        catch (SQLException se)
+        {
+            // no need to really clean anything up,
+            // transaction rollback will get rid of it anyway, and will also restore everything to previous state.
+            dso = null;
+
+            // Pass this exception on to the next handler.
+            throw se;
+        }
+    }
+
+    // whether or not to save manifest as a bitstream in METADATA bndl.
+    protected boolean preserveManifest()
+    {
+        return ConfigurationManager.getBooleanProperty("mets."+
+            getConfigurationName()+".ingest.preserveManifest", false);
+    }
+
+    // return short name of manifest bitstream format
+    protected String getManifestBitstreamFormat()
+    {
+        return ConfigurationManager.getProperty("mets."+
+            getConfigurationName()+".ingest.manifestBitstreamFormat");
+    }
+
+    // whether or not to use Collection Templates when creating a new item
+    protected boolean useCollectionTemplate()
+    {
+        return ConfigurationManager.getBooleanProperty("mets."+
+            getConfigurationName()+".ingest.useCollectionTemplate", false);
+    }
+
+
+    /**
+     * Parse the hdl: URI/URN format into a raw Handle.
+     *
+     * @param value handle URI string
+     * @return raw handle (with 'hdl:' prefix removed)
+     */
+    protected String decodeHandleURN(String value)
+    {
+        if (value!=null && value.startsWith("hdl:"))
+            return value.substring(4);
+        else
+            return null;
+    }
+
+    /**
+     * Remove an existing DSpace Object (called during a replace)
+     *
+     * @param dso DSpace Object
+     */
+    protected void removeObject(Context context, DSpaceObject dso)
+            throws AuthorizeException, SQLException, IOException
+    {
+        if (log.isDebugEnabled())
+            log.debug("Removing object " + Constants.typeText[dso.getType()] + " id=" + dso.getID());
+
+        switch (dso.getType())
+        {
+            case Constants.ITEM :
+                Item item = (Item) dso;
+                Collection[] collections = item.getCollections();
+
+                // Remove item from all the collections it is in
+                for (Collection collection : collections)
+                {
+                    collection.removeItem(item);
+                }
+                // Note: when removing an item from the last collection it will
+                // be removed from the system. So there is no need to also call
+                // an item.delete() method.
+
+                // Remove item from cache immediately
+                context.removeCached(item, item.getID());
+
+                //clear object
+                item = null;
+                break;
+
+            case Constants.COLLECTION :
+                Collection collection = (Collection) dso;
+                Community[] communities = collection.getCommunities();
+
+                // Remove collection from all the communities it is in
+                for (Community community : communities)
+                {
+                    community.removeCollection(collection);
+                }
+                // Note: when removing a collection from the last community it will
+                // be removed from the system. So there is no need to also call
+                // an collection.delete() method.
+
+                // Remove collection from cache immediately
+                context.removeCached(collection, collection.getID());
+
+                //clear object
+                collection = null;
+                break;
+
+            case Constants.COMMUNITY :
+                //Just remove the Community entirely
+                Community community = (Community) dso;
+                community.delete();
+
+                // Remove community from cache immediately
+                context.removeCached(community, community.getID());
+
+                //clear object
+                community = null;
+                break;
+        }
+
+    }
+
+    /**
+     * Determines what parent DSpace object is referenced in this METS doc.
+     * <p>
+     * This is a default implementation which assumes the parent
+     * will be specified in a <structMap LABEL="Parent">.  You should override
+     * this method if your METS manifest specifies the parent object in another
+     * location.
+     *
+     * @param context DSpace Context
+     * @param manifest METS manifest
+     * @returns a DSpace Object which is the parent (or null, if not found)
+     * @throws PackageValidationException if parent reference cannot be found in manifest
+     * @throws MetadataValidationException
+     * @throws SQLException
+     */
+    public DSpaceObject getParentObject(Context context, METSManifest manifest)
+        throws PackageValidationException, MetadataValidationException,
+               SQLException
+    {
+        DSpaceObject parent = null;
+        // look for a Parent Object link in manifest <structmap>
+        String parentLink = manifest.getParentOwnerLink();
+
+        //verify we have a valid Parent Object
+        if(parentLink!=null && parentLink.length()>0)
+        {
+            parent = HandleManager.resolveToObject(context, parentLink);
+            if (parent == null)
+                throw new UnsupportedOperationException("Could not find a parent DSpaceObject references as '" + parentLink + "' in the METS Manifest. A parent DSpaceObject must be specified from either the 'packager' command or noted in the METS Manifest itself.");
+        }
+        else
+            throw new UnsupportedOperationException("Could not find a parent DSpaceObject where we can ingest this package.  A parent DSpaceObject must be specified from either the 'packager' command or noted in the METS Manifest itself.");
+
+        return parent;
+    }
+
+    /**
+     * Determines the handle of the DSpace object represented in this METS doc.
+     * <p>
+     * This is a default implementation which assumes the handle of the
+     * DSpace Object can be found in the <mets> @OBJID attribute.  You should
+     * override this method if your METS manifest specifies the handle in
+     * another location.
+     *
+     * @param manifest METS manifest
+     * @returns handle as a string (or null, if not found)
+     * @throws PackageValidationException if handle cannot be found in manifest
+     */
+    public String getObjectHandle(METSManifest manifest)
+        throws PackageValidationException, MetadataValidationException,
+               SQLException
+    {
+        //retrieve handle URI from manifest
+        String handleURI = manifest.getObjID();
+
+        //decode this URI (by removing the 'hdl:' prefix)
+        String handle = decodeHandleURN(handleURI);
+
+        if(handle==null || handle.length()==0)
+        {
+            throw new PackageValidationException("The DSpace Object handle required to ingest this package could not be resolved in manifest. The <mets OBJID='hdl:xxxx'> is missing.");
+        }
+
+        return handle;
+    }
+
+    /**
+     * Retrieve the inputStream for a File referenced from a specific path within
+     * a METS package.
+     * <p>
+     * If the packager is set to 'manifest-only' (i.e. pkgFile is just a manifest),
+     * we assume the file is available for download via a URL.
+     * <p>
+     * Otherwise, the pkgFile is a Zip, so the file should be retrieved from
+     * within that Zip package.
+     *
+     * @param pkgFile the full package file (which may include content files if a zip)
+     * @param params Parameters passed to METSIngester
+     * @param path the File path (either path in Zip package or a URL)
+     * @return the InputStream for the file
+     */
+    protected static InputStream getFileInputStream(File pkgFile, PackageParameters params, String path)
+            throws MetadataValidationException, IOException
+    {
+        //If this is a manifest only package (i.e. not a zip file)
+        if (params.getBooleanProperty("manifestOnly", false))
+        {
+            //NOTE: since we are only dealing with a METS manifest,
+            // we will assume all external files are available via URLs.
+            try
+            {
+                //attempt to open a connection to given URL
+                URL fileURL = new URL(path);
+                URLConnection connection = fileURL.openConnection();
+
+                //open stream to access file contents
+                return connection.getInputStream();
+            }
+            catch(IOException io)
+            {
+                log.error("Unable to retrieve external file from URL '" + path + "' for manifest-only METS package.  All externally referenced files must be retrievable via URLs.");
+                //pass exception upwards
+                throw io;
+            }
+        }
+        else
+        {
+            //open the Zip package
+            ZipFile zipPackage = new ZipFile(pkgFile);
+
+            //Retrieve the manifest file entry by name
+            ZipEntry manifestEntry = zipPackage.getEntry(path);
+
+            //Get inputStream associated with this file
+            return zipPackage.getInputStream(manifestEntry);
+        }
+    }
+
 
     /**
      * Profile-specific tests to validate manifest.  The implementation
@@ -519,42 +1171,12 @@ public abstract class AbstractMETSIngester
         throws MetadataValidationException;
 
     /**
-     * Hook for subclass to modify the test of the package's
-     * integrity, and add other tests. E.g. evaluate a PGP signature of
-     * the manifest in a separate file.
-     * <p>
-     * The <code>packageFiles</code> contains "extra" files that were in
-     * the package but were not referenced by the METS manifest (either as
-     * content or metadata (mdRefs)).
-     * The implementation of this method should look for any "extra" files
-     * uses (e.g. a checksum or cryptographic signature for the manifest
-     * itself) and remove them from the Set.
-     * <p>
-     * The <code>missingFiles</code> set is for
-     * any files
-     * referenced by the manifest but not found in the package.
-     * The implementation can check it for "false positives", or add
-     * other missing files it knows of.
-     * <p>
-     * If either  of the Sets <code>missingFiles</code>
-     * or <code>packageFiles</code>
-     * is not empty, the ingest will fail.
-     *
-     * @param packageFiles files in package but not referenced by METS
-     * @param missingFiles files referenced by manifest but not in package
-     *
-     */
-    abstract public void checkPackageFiles(Set packageFiles, Set missingFiles,
-                                           METSManifest manifest)
-        throws PackageValidationException, CrosswalkException;
-
-    /**
      * Select the <code>dmdSec</code> element(s) to apply to the
      * Item.  The implementation is responsible for choosing which
      * (if any) of the metadata sections to crosswalk to get the
      * descriptive metadata for the item being ingested.  It is
      * responsible for calling the crosswalk, using the manifest's helper
-     * i.e. <code>manifest.crosswalkItem(context,item,dmdElement,callback);</code>
+     * i.e. <code>manifest.crosswalkItemDmd(context,item,dmdElement,callback);</code>
      * (The <code>callback</code> argument is a reference to itself since the
      * class also implements the <code>METSManifest.MdRef</code> interface
      * to fetch package files referenced by mdRef elements.)
@@ -569,10 +1191,10 @@ public abstract class AbstractMETSIngester
      * @param dmds array of Elements, each a METS <code>dmdSec</code> that applies to the Item as a whole.
      * @param params any user parameters passed to the Packager script
      */
-    abstract public void chooseItemDmd(Context context, Item item,
+    abstract public void crosswalkObjectDmd(Context context, DSpaceObject dso,
                                        METSManifest manifest, MdrefManager callback,
                                        Element dmds[], PackageParameters params)
-        throws CrosswalkException,
+        throws CrosswalkException, PackageValidationException,
                AuthorizeException, SQLException, IOException;
 
     /**
@@ -587,28 +1209,56 @@ public abstract class AbstractMETSIngester
      * information of interest, e.g. a Creative Commons license.
      * <p>
      * This framework does not add any licenses by default.
+     * <p>
+     * Note that crosswalking rightsMD sections can also add a deposit or CC
+     * license to the object.
      *
      * @param context the DSpace context
      * @param collection DSpace Collection to which the item is being submitted.
      * @param license optional user-supplied Deposit License text (may be null)
      */
-    abstract public void addLicense(Context context, Collection collection,
-                                    Item item, METSManifest manifest,
-                                    MdrefManager callback, String license)
-        throws PackageValidationException, CrosswalkException,
+    abstract public void addLicense(Context context, Item item, String license,
+                                    Collection collection, PackageParameters params)
+        throws PackageValidationException,
                AuthorizeException, SQLException, IOException;
 
     /**
-     * Hook for final "finishing" operations on the new Item.
-     * This method is called when the new Item is otherwise complete and
+     * Hook for final "finishing" operations on the new Object.
+     * This method is called when the new Object is otherwise complete and
      * ready to be returned.  The implementation should use this
      * opportunity to make whatever final checks and modifications are
      * necessary.
      *
      * @param context the DSpace context
      */
-    abstract public void finishItem(Context context, Item item)
+    abstract public void finishObject(Context context, DSpaceObject dso)
         throws PackageValidationException, CrosswalkException,
          AuthorizeException, SQLException, IOException;
+
+    /**
+     * Determines what type of DSpace object is represented in this METS doc.
+     * @returns one of the object types in Constants.
+     */
+    abstract public int getObjectType(METSManifest manifest)
+        throws PackageValidationException;
+
+    /**
+     * Subclass-dependent final processing on a Bitstream; could include
+     * fixing up the name, bundle, other attributes.
+     */
+    abstract public void finishBitstream(Context context,
+                                                Bitstream bs,
+                                                Element mfile,
+                                                METSManifest manifest,
+                                                PackageParameters params)
+        throws MetadataValidationException, SQLException, AuthorizeException, IOException;
+
+
+    /**
+     * Returns keyword that makes the configuration keys of this subclass
+     * unique, e.g. if it returns NAME, the key would be:
+     *    "mets.NAME.ingest.preserveManifest = true"
+     */
+    abstract public String getConfigurationName();
 
 }

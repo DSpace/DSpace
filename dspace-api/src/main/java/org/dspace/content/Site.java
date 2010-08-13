@@ -137,4 +137,8 @@ public class Site extends DSpaceObject
         return ConfigurationManager.getProperty("dspace.name");
     }
 
+    public String getURL()
+    {
+        return ConfigurationManager.getProperty("dspace.url");
+    }
 }

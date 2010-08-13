@@ -236,9 +236,46 @@ public class Collection extends DSpaceObject
     static Collection create(Context context) throws SQLException,
             AuthorizeException
     {
+        return create(context, null);
+    }
+
+    /**
+     * Create a new collection, with a new ID. This method is not public, and
+     * does not check authorisation.
+     *
+     * @param context
+     *            DSpace context object
+     *
+     * @param handle the pre-determined Handle to assign to the new community
+     * @return the newly created collection
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    static Collection create(Context context, String handle) throws SQLException,
+            AuthorizeException
+    {
         TableRow row = DatabaseManager.create(context, "collection");
         Collection c = new Collection(context, row);
-        c.handle = HandleManager.createHandle(context, c);
+
+        try
+        {
+            c.handle = (handle == null) ?
+                       HandleManager.createHandle(context, c) :
+                       HandleManager.createHandle(context, c, handle);
+        }
+        catch(IllegalStateException ie)
+        {
+            //If an IllegalStateException is thrown, then an existing object is already using this handle
+            //Remove the collection we just created -- as it is incomplete
+            try
+            {
+                if(c!=null) 
+                    c.delete();
+            } catch(Exception e) { }
+
+            //pass exception on up the chain
+            throw ie;
+        }
 
         // create the default authorization policy for collections
         // of 'anonymous' READ
@@ -1132,6 +1169,9 @@ public class Collection extends DSpaceObject
         	// exception framework
         	throw new RuntimeException(e.getMessage(), e);
         }
+
+        // Remove any Handle
+        HandleManager.unbindHandle(ourContext, this);
         
         // Delete collection row
         DatabaseManager.delete(ourContext, collectionRow);

@@ -38,63 +38,74 @@
 
 package org.dspace.content.packager;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.crosswalk.CrosswalkException;
-import org.dspace.content.crosswalk.DisseminationCrosswalk;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
-import org.dspace.core.Utils;
-import org.jdom.Namespace;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-
-import edu.harvard.hul.ois.mets.Agent;
 import edu.harvard.hul.ois.mets.AmdSec;
+import edu.harvard.hul.ois.mets.BinData;
 import edu.harvard.hul.ois.mets.Checksumtype;
 import edu.harvard.hul.ois.mets.Div;
 import edu.harvard.hul.ois.mets.DmdSec;
+import edu.harvard.hul.ois.mets.MdRef;
 import edu.harvard.hul.ois.mets.FLocat;
 import edu.harvard.hul.ois.mets.FileGrp;
 import edu.harvard.hul.ois.mets.FileSec;
 import edu.harvard.hul.ois.mets.Fptr;
+import edu.harvard.hul.ois.mets.Mptr;
 import edu.harvard.hul.ois.mets.Loctype;
 import edu.harvard.hul.ois.mets.MdWrap;
 import edu.harvard.hul.ois.mets.Mdtype;
 import edu.harvard.hul.ois.mets.Mets;
 import edu.harvard.hul.ois.mets.MetsHdr;
-import edu.harvard.hul.ois.mets.Name;
-import edu.harvard.hul.ois.mets.Role;
 import edu.harvard.hul.ois.mets.StructMap;
 import edu.harvard.hul.ois.mets.TechMD;
-import edu.harvard.hul.ois.mets.Type;
+import edu.harvard.hul.ois.mets.SourceMD;
+import edu.harvard.hul.ois.mets.DigiprovMD;
+import edu.harvard.hul.ois.mets.RightsMD;
+import edu.harvard.hul.ois.mets.helper.MdSec;
 import edu.harvard.hul.ois.mets.XmlData;
+import edu.harvard.hul.ois.mets.helper.Base64;
 import edu.harvard.hul.ois.mets.helper.MetsElement;
 import edu.harvard.hul.ois.mets.helper.MetsException;
 import edu.harvard.hul.ois.mets.helper.MetsValidator;
 import edu.harvard.hul.ois.mets.helper.MetsWriter;
-import edu.harvard.hul.ois.mets.helper.PCData;
 import edu.harvard.hul.ois.mets.helper.PreformedXML;
+import java.io.File;
+import java.io.FileOutputStream;
+
+import org.apache.log4j.Logger;
+
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Community;
+import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
+import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
+import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.PluginManager;
+import org.dspace.core.Utils;
+import org.dspace.license.CreativeCommons;
+import org.jdom.Element;
+import org.jdom.Namespace;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 /**
  * Base class for disseminator of
@@ -107,31 +118,32 @@ import edu.harvard.hul.ois.mets.helper.PreformedXML;
  * different kinds of metadata and inner package structures.
  * <p>
  * <b>Package Parameters:</b><br>
- * <code>manifestOnly</code> -- if true, generate a standalone XML
+ * <ul>
+ * <li><code>manifestOnly</code> -- if true, generate a standalone XML
  * document of the METS manifest instead of a complete package.  Any
  * other metadata (such as licenses) will be encoded inline.
- * Default is <code>false</code>.
+ * Default is <code>false</code>.</li>
  *
- *   <code>unauthorized</code> -- this determines what is done when the
- *   packager encounters a Bundle or Bitstream it is not authorized to
- *   read.  By default, it just quits with an AuthorizeException.
+ * <li><code>unauthorized</code> -- this determines what is done when the
+ * packager encounters a Bundle or Bitstream it is not authorized to
+ * read.  By default, it just quits with an AuthorizeException.
  *   If this option is present, it must be one of the following values:
- *     <code>skip</code> -- simply exclude unreadable content from package.
- *     <code>zero</code> -- include unreadable bitstreams as 0-length files;
- *       unreadable Bundles will still cause authorize errors.
+ *   <ul>
+ *     <li><code>skip</code> -- simply exclude unreadable content from package.</li>
+ *     <li><code>zero</code> -- include unreadable bitstreams as 0-length files;
+ *       unreadable Bundles will still cause authorize errors.</li></ul></li>
+ * </ul>
  *
  * @author Larry Stone
  * @author Robert Tansley
+ * @author Tim Donohue
  * @version $Revision$
  */
 public abstract class AbstractMETSDisseminator
-    implements PackageDisseminator
+    extends AbstractPackageDisseminator
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(AbstractMETSDisseminator.class);
-
-    /** Filename of manifest, relative to package toplevel. */
-    public static final String MANIFEST_FILE = "mets.xml";
 
     // JDOM xml output writer - indented format for readability.
     private static XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
@@ -140,157 +152,294 @@ public abstract class AbstractMETSDisseminator
     private int idCounter = 1;
 
     /**
-     * Table of files to add to package, such as mdRef'd metadata.
-     * Key is relative pathname of file, value is <code>InputStream</code>
-     * with contents to put in it.
-     * New map is created by disseminate().
+     * Wrapper for a table of streams to add to the package, such as
+     * mdRef'd metadata.  Key is relative pathname of file, value is
+     * <code>InputStream</code> with contents to put in it.  Some
+     * superclasses will put streams in this table when adding an mdRef
+     * element to e.g. a rightsMD segment.
      */
-    protected Map extraFiles = null;
+    protected class MdStreamCache
+    {
+        private Map<MdRef,InputStream> extraFiles = new HashMap<MdRef,InputStream>();
+
+        public void addStream(MdRef key, InputStream md)
+        {
+            extraFiles.put(key, md);
+        }
+
+        public Map<MdRef,InputStream> getMap()
+        {
+            return extraFiles;
+        }
+
+        public void close()
+            throws IOException
+        {
+            for (InputStream is : extraFiles.values())
+                is.close();
+        }
+    }
 
     /**
-     * Make a new unique ID with specified prefix.
+     * Make a new unique ID symbol with specified prefix.
      * @param prefix the prefix of the identifier, constrained to XML ID schema
      * @return a new string identifier unique in this session (instance).
      */
-    protected String gensym(String prefix)
+    protected synchronized String gensym(String prefix)
     {
         return prefix + "_" + String.valueOf(idCounter++);
     }
 
     public String getMIMEType(PackageParameters params)
     {
-        return (params != null && params.getProperty("manifestOnly") != null) ?
+        return (params != null &&
+                (params.getBooleanProperty("manifestOnly", false))) ?
                 "text/xml" : "application/zip";
     }
 
     /**
-     * Export the object (Item, Collection, or Community) to a
-     * package file on the indicated OutputStream.
-     * Gets an exception of the object cannot be packaged or there is
+     * Export the object (Item, Collection, or Community) as a
+     * "package" on the indicated OutputStream.  Package is any serialized
+     * representation of the item, at the discretion of the implementing
+     * class.  It does not have to include content bitstreams.
+     * <p>
+     * Use the <code>params</code> parameter list to adjust the way the
+     * package is made, e.g. including a "<code>metadataOnly</code>"
+     * parameter might make the package a bare manifest in XML
+     * instead of a Zip file including manifest and contents.
+     * <p>
+     * Throws an exception of the chosen object is not acceptable or there is
      * a failure creating the package.
      *
-     * @param context - DSpace context.
-     * @param dso - DSpace object (item, collection, etc)
-     * @param pkg - output stream on which to write package
-     * @throws PackageException if package cannot be created or there is
+     * @param context  DSpace context.
+     * @param object  DSpace object (item, collection, etc)
+     * @param params Properties-style list of options specific to this packager
+     * @param pkgFile File where export package should be written
+     * @throws PackageValidationException if package cannot be created or there is
      *  a fatal error in creating it.
      */
     public void disseminate(Context context, DSpaceObject dso,
-                            PackageParameters params, OutputStream pkg)
+                            PackageParameters params, File pkgFile)
         throws PackageValidationException, CrosswalkException, AuthorizeException, SQLException, IOException
     {
-        if (dso.getType() == Constants.ITEM)
+        try
         {
-            Item item = (Item)dso;
-            long lmTime = item.getLastModified().getTime();
-
-            // how to handle unauthorized bundle/bitstream:
-            String unauth = (params == null) ? null : params.getProperty("unauthorized");
-
-            if (params != null && params.getProperty("manifestOnly") != null)
+            //Make sure our package file exists
+            if(!pkgFile.exists())
             {
-                extraFiles = null;
-                writeManifest(context, item, params, pkg);
+                PackageUtils.createFile(pkgFile);
+            }
+
+            //Open up an output stream to write to package file
+            FileOutputStream outStream = new FileOutputStream(pkgFile);
+
+            // Generate a true manifest-only "package", no external files/data & no need to zip up
+            if (params != null && params.getBooleanProperty("manifestOnly", false))
+            {
+                Mets manifest = makeManifest(context, dso, params, null);
+                manifest.validate(new MetsValidator());
+                manifest.write(new MetsWriter(outStream));
             }
             else
             {
-                extraFiles = new HashMap();
-                ZipOutputStream zip = new ZipOutputStream(pkg);
-                zip.setComment("METS archive created by DSpace METSDisseminationCrosswalk");
+                // make a Zip-based package
+                writeZipPackage(context, dso, params, outStream);
+            }//end if/else
 
-                // write manifest first.
-                ZipEntry me = new ZipEntry(MANIFEST_FILE);
-                me.setTime(lmTime);
-                zip.putNextEntry(me);
-                writeManifest(context, item, params, zip);
-                zip.closeEntry();
-                
-                // copy extra (meta?) bitstreams into zip
-                Iterator fi = extraFiles.keySet().iterator();
-                while (fi.hasNext())
+            //Close stream / stop writing to file
+            outStream.close();
+        }//end try
+        catch (MetsException e)
+        {
+            // We don't pass up a MetsException, so callers don't need to
+            // know the details of the METS toolkit
+            log.error("METS error: ",e);
+            throw new PackageValidationException(e);
+        }
+    }
+
+
+    /**
+     * Make a Zipped up METS package for the given DSpace Object
+     *
+     * @param context DSpace Context
+     * @param dso The DSpace Object
+     * @param params Parameters to the Packager script
+     * @param pkg Package output stream
+     * @throws PackageValidationException
+     * @throws AuthorizeException
+     * @throws SQLException
+     * @throws IOException
+     */
+    protected void writeZipPackage(Context context, DSpaceObject dso, PackageParameters params, OutputStream pkg)
+            throws PackageValidationException, CrosswalkException, MetsException, AuthorizeException, SQLException, IOException
+    {
+        long lmTime = 0;
+        if (dso.getType() == Constants.ITEM)
+            lmTime = ((Item)dso).getLastModified().getTime();
+
+        // map of extra streams to put in Zip (these are located during makeManifest())
+        MdStreamCache extraStreams = new MdStreamCache();
+        ZipOutputStream zip = new ZipOutputStream(pkg);
+        zip.setComment("METS archive created by DSpace METSDisseminationCrosswalk");
+        Mets manifest = makeManifest(context, dso, params, extraStreams);
+
+        // copy extra (metadata, license, etc) bitstreams into zip, update manifest
+        if (extraStreams != null)
+        {
+            for (Map.Entry ment : extraStreams.getMap().entrySet())
+            {
+                MdRef ref = (MdRef)ment.getKey();
+
+                // Both Deposit Licenses & CC Licenses which are referenced as "extra streams" may already be
+                // included in our Package (if their bundles are already included in the <filSec> section of manifest).
+                // So, do a special check to see if we need to link up extra License <mdRef> entries to the bitstream in the <fileSec>.
+                // (this ensures that we don't accidentally add the same License file to our package twice)
+                linkLicenseRefsToBitstreams(context, params, dso, ref);
+
+                //If this 'mdRef' is NOT already linked up to a file in the package, then its file must be missing.
+                // So, we are going to add a new file to the Zip package.
+                if(ref.getXlinkHref()==null || ref.getXlinkHref().isEmpty())
                 {
-                    String fname = (String)fi.next();
+                    InputStream is = (InputStream)ment.getValue();
+
+                    // create a hopefully unique filename within the Zip
+                    String fname = gensym("metadata");
+                    // link up this 'mdRef' to point to that file
+                    ref.setXlinkHref(fname);
+                    if (log.isDebugEnabled())
+                        log.debug("Writing EXTRA stream to Zip: "+fname);
+                    //actually add the file to the Zip package
                     ZipEntry ze = new ZipEntry(fname);
-                    ze.setTime(lmTime);
+                    if (lmTime != 0)
+                        ze.setTime(lmTime);
                     zip.putNextEntry(ze);
-                    Utils.copy((InputStream)extraFiles.get(fname), zip);
+                    Utils.copy(is, zip);
                     zip.closeEntry();
-                }
 
-                // copy all non-meta bitstreams into zip
-                Bundle bundles[] = item.getBundles();
-                for (int i = 0; i < bundles.length; i++)
+                    is.close();
+                }
+            }
+        }
+
+        // write manifest after metadata.
+        ZipEntry me = new ZipEntry(METSManifest.MANIFEST_FILE);
+        if (lmTime != 0)
+            me.setTime(lmTime);
+        zip.putNextEntry(me);
+
+        // can only validate now after fixing up extraStreams
+        manifest.validate(new MetsValidator());
+        manifest.write(new MetsWriter(zip));
+        zip.closeEntry();
+
+        //write any bitstreams associated with DSpace object to zip package
+        addBitstreamsToZip(context, dso, params, zip);
+
+        zip.close();
+
+    }
+    /**
+     * Add Bitstreams associated with a given DSpace Object into an
+     * existing ZipOutputStream
+     * @param context DSpace Context
+     * @param dso The DSpace Object
+     * @param params Parameters to the Packager script
+     * @param zip Zip output
+     */
+    protected void addBitstreamsToZip(Context context, DSpaceObject dso, PackageParameters params, ZipOutputStream zip)
+            throws PackageValidationException, AuthorizeException, SQLException, IOException
+    {
+        // how to handle unauthorized bundle/bitstream:
+        String unauth = (params == null) ? null : params.getProperty("unauthorized");
+
+        // copy all non-meta bitstreams into zip
+        if (dso.getType() == Constants.ITEM)
+        {
+            Item item = (Item)dso;
+
+            //get last modified time
+            long lmTime = ((Item)dso).getLastModified().getTime();
+
+            Bundle bundles[] = item.getBundles();
+            for (int i = 0; i < bundles.length; i++)
+            {
+                if (includeBundle(bundles[i]))
                 {
-                    if (!PackageUtils.isMetaInfoBundle(bundles[i]))
+                    // unauthorized bundle?
+                    if (!AuthorizeManager.authorizeActionBoolean(context,
+                                bundles[i], Constants.READ))
                     {
-                        // unauthorized bundle?
-                        if (!AuthorizeManager.authorizeActionBoolean(context,
-                                    bundles[i], Constants.READ))
+                        if (unauth != null &&
+                            (unauth.equalsIgnoreCase("skip")))
                         {
-                            if (unauth != null &&
-                                (unauth.equalsIgnoreCase("skip")))
-                            {
-                                log.warn("Skipping Bundle[\""+bundles[i].getName()+"\"] because you are not authorized to read it.");
-                                continue;
-                            }
-                            else
-                                throw new AuthorizeException("Not authorized to read Bundle named \""+bundles[i].getName()+"\"");
+                            log.warn("Skipping Bundle[\""+bundles[i].getName()+"\"] because you are not authorized to read it.");
+                            continue;
                         }
-                        Bitstream[] bitstreams = bundles[i].getBitstreams();
-                        for (int k = 0; k < bitstreams.length; k++)
+                        else
+                            throw new AuthorizeException("Not authorized to read Bundle named \""+bundles[i].getName()+"\"");
+                    }
+                    Bitstream[] bitstreams = bundles[i].getBitstreams();
+                    for (int k = 0; k < bitstreams.length; k++)
+                    {
+                        boolean auth = AuthorizeManager.authorizeActionBoolean(context,
+                                bitstreams[k], Constants.READ);
+                        if (auth ||
+                            (unauth != null && unauth.equalsIgnoreCase("zero")))
                         {
-                            boolean auth = AuthorizeManager.authorizeActionBoolean(context,
-                                    bitstreams[k], Constants.READ);
-                            if (auth ||
-                                (unauth != null && unauth.equalsIgnoreCase("zero")))
-                            {
-                                ZipEntry ze = new ZipEntry(
-                                    makeBitstreamName(bitstreams[k]));
+                            String zname = makeBitstreamURL(bitstreams[k], params);
+                            ZipEntry ze = new ZipEntry(zname);
+                            if (log.isDebugEnabled())
+                                log.debug("Writing CONTENT stream of bitstream("+String.valueOf(bitstreams[k].getID())+") to Zip: "+zname+
+                                            ", size="+String.valueOf(bitstreams[k].getSize()));
+                            if (lmTime != 0)
                                 ze.setTime(lmTime);
-                                ze.setSize(auth ? bitstreams[k].getSize() : 0);
-                                zip.putNextEntry(ze);
-                                if (auth)
+                            ze.setSize(auth ? bitstreams[k].getSize() : 0);
+                            zip.putNextEntry(ze);
+                            if (auth)
                                 Utils.copy(bitstreams[k].retrieve(), zip);
-                                else
-                                    log.warn("Adding zero-length file for Bitstream, SID="+String.valueOf(bitstreams[k].getSequenceID())+", not authorized for READ.");
-                                zip.closeEntry();
-                            }
-                            else if (unauth != null &&
-                                     unauth.equalsIgnoreCase("skip"))
-                            {
-                                log.warn("Skipping Bitstream, SID="+String.valueOf(bitstreams[k].getSequenceID())+", not authorized for READ.");
-                            }
                             else
-                            {
-                                throw new AuthorizeException("Not authorized to read Bitstream, SID="+String.valueOf(bitstreams[k].getSequenceID()));
-                            }
+                                log.warn("Adding zero-length file for Bitstream, SID="+String.valueOf(bitstreams[k].getSequenceID())+", not authorized for READ.");
+                            zip.closeEntry();
+                        }
+                        else if (unauth != null &&
+                                 unauth.equalsIgnoreCase("skip"))
+                        {
+                            log.warn("Skipping Bitstream, SID="+String.valueOf(bitstreams[k].getSequenceID())+", not authorized for READ.");
+                        }
+                        else
+                        {
+                            throw new AuthorizeException("Not authorized to read Bitstream, SID="+String.valueOf(bitstreams[k].getSequenceID()));
                         }
                     }
                 }
-                zip.close();
-                extraFiles = null;
             }
-
         }
-        else
-            throw new PackageValidationException("Can only disseminate an Item now.");
-    }
 
-    /**
-     * Create name that bitstream will have in archive.  Name must
-     * be unique and relative to archive top level, e.g. "bitstream_<id>.ext"
-     */
-    private String makeBitstreamName(Bitstream bitstream)
-    {
-        String base = "bitstream_"+String.valueOf(bitstream.getID());
-        String ext[] = bitstream.getFormat().getExtensions();
-        return (ext.length > 0) ? base+"."+ext[0] : base;
+        // Coll, Comm just add logo bitstream to content if there is one
+        else if (dso.getType() == Constants.COLLECTION ||
+                 dso.getType() == Constants.COMMUNITY)
+        {
+            Bitstream logoBs = dso.getType() == Constants.COLLECTION ?
+                                 ((Collection)dso).getLogo() :
+                                 ((Community)dso).getLogo();
+            if (logoBs != null)
+            {
+                String zname = makeBitstreamURL(logoBs, params);
+                ZipEntry ze = new ZipEntry(zname);
+                if (log.isDebugEnabled())
+                    log.debug("Writing CONTENT stream of bitstream("+String.valueOf(logoBs.getID())+") to Zip: "+zname+", size="+String.valueOf(logoBs.getSize()));
+                ze.setSize(logoBs.getSize());
+                zip.putNextEntry(ze);
+                Utils.copy(logoBs.retrieve(), zip);
+                zip.closeEntry();
+            }
+        }
     }
-
 
     // set metadata type - if Mdtype.parse() gets exception,
     // that means it's not in the MDTYPE vocabulary, so use OTHER.
-    private void setMdType(MdWrap mdWrap, String mdtype)
+    protected void setMdType(MdWrap mdWrap, String mdtype)
     {
         try
         {
@@ -303,144 +452,299 @@ public abstract class AbstractMETSDisseminator
         }
     }
 
-    /**
-     * Write out a METS manifest.
-     * Mostly lifted from Rob Tansley's METS exporter.
-     */
-    private void writeManifest(Context context, Item item,
-                               PackageParameters params, OutputStream out)
-        throws PackageValidationException, CrosswalkException, AuthorizeException, SQLException, IOException
-
+    // set metadata type - if Mdtype.parse() gets exception,
+    // that means it's not in the MDTYPE vocabulary, so use OTHER.
+    protected void setMdType(MdRef  mdRef, String mdtype)
     {
         try
         {
-            // Create the METS file
-            Mets mets = new Mets();
-         
-            // Top-level stuff
-            mets.setID(gensym("mets"));
-            mets.setOBJID("hdl:" + item.getHandle());
-            mets.setLABEL("DSpace Item");
-            mets.setPROFILE(getProfile());
-         
-            // MetsHdr
-            MetsHdr metsHdr = new MetsHdr();
-            metsHdr.setCREATEDATE(new Date()); // FIXME: CREATEDATE is now:
-                                               // maybe should be item create
-            // date?
+            mdRef.setMDTYPE(Mdtype.parse(mdtype));
+        }
+        catch (MetsException e)
+        {
+            mdRef.setMDTYPE(Mdtype.OTHER);
+            mdRef.setOTHERMDTYPE(mdtype);
+        }
+    }
 
-            // Agent
-            Agent agent = new Agent();
-            agent.setROLE(Role.CUSTODIAN);
-            agent.setTYPE(Type.ORGANIZATION);
-            Name name = new Name();
-            name.getContent()
-                    .add(new PCData(ConfigurationManager
-                                    .getProperty("dspace.name")));
-            agent.getContent().add(name);
-            metsHdr.getContent().add(agent);
-            mets.getContent().add(metsHdr);
-         
-            // add DMD sections
-            // Each type element MAY be either just a MODS-and-crosswalk name, OR
-            // a combination "MODS-name:crosswalk-name" (e.g. "DC:qDC").
-            String dmdTypes[] = getDmdTypes(params);
 
-            // record of ID of each dmdsec to make DMDID in structmap.
-            String dmdGroup = gensym("dmd_group");
-            String dmdId[] = new String[dmdTypes.length];
-            for (int i = 0; i < dmdTypes.length; ++i)
-            {
-                dmdId[i] = gensym("dmd");
-                XmlData xmlData = new XmlData();
-                String xwalkName, metsName;
-                String parts[] = dmdTypes[i].split(":", 2);
-                if (parts.length > 1)
-                {
-                    metsName = parts[0];
-                    xwalkName = parts[1];
-                }
-                else
-                    xwalkName = metsName = dmdTypes[i];
-
-                DisseminationCrosswalk xwalk = (DisseminationCrosswalk)
-                  PluginManager.getNamedPlugin(DisseminationCrosswalk.class, xwalkName);
-                if (xwalk == null)
-                    throw new PackageValidationException("Cannot find "+dmdTypes[i]+" crosswalk plugin!");
-                else
-                    crosswalkToMets(xwalk, item, xmlData);
-
-                DmdSec dmdSec = new DmdSec();
-                dmdSec.setID(dmdId[i]);
-                dmdSec.setGROUPID(dmdGroup);
-                MdWrap mdWrap = new MdWrap();
-                setMdType(mdWrap, metsName);
-                mdWrap.getContent().add(xmlData);
-                dmdSec.getContent().add(mdWrap);
-                mets.getContent().add(dmdSec);
-            }
-         
-            // Only add license AMD section if there are any licenses.
-            // Catch authorization failures accessing license bitstreams
-            // only if we are skipping unauthorized bitstreams.
-            String licenseID = null;
-            try
-            {
-            AmdSec amdSec = new AmdSec();
-            addRightsMd(context, item, amdSec);
-            if (amdSec.getContent().size() > 0)
-            {
-                licenseID = gensym("license");
-                amdSec.setID(licenseID);
-                mets.getContent().add(amdSec);
-            }
-            }
-            catch (AuthorizeException e)
-            {
-                String unauth = (params == null) ? null : params.getProperty("unauthorized");
-                if (!(unauth != null && unauth.equalsIgnoreCase("skip")))
-                    throw e;
-                else
-                    log.warn("Skipping license metadata because of access failure: "+e.toString());
-            }
-
-            // FIXME: History data???? Nooooo!!!!
-
-            // fileSec - all non-metadata bundles go into fileGrp,
-            // and each bitstream therein into a file.
-            // Create the bitstream-level techMd and div's for structmap
-            // at the same time so we can connec the IDREFs to IDs.
-            FileSec fileSec = new FileSec();
-         
-            String techMdType = getTechMdType(params);
-            String parts[] = techMdType.split(":", 2);
+    /**
+     * Create an element wrapped around a metadata reference (either mdWrap
+     * or mdRef); i.e. dmdSec, techMd, sourceMd, etc.  Checks for
+     * XML-DOM oriented crosswalk first, then if not found looks for
+     * stream crosswalk of the same name.
+     *
+     * @param context DSpace Context
+     * @param dso DSpace Object we are generating METS manifest for
+     * @param mdSecClass class of mdSec (TechMD, RightsMD, DigiProvMD, etc)
+     * @param typeSpec Type of metadata going into this mdSec (e.g. MODS, DC, PREMIS, etc)
+     * @param extraStreams list of extra files which need to be added to final dissemination package
+     * @return mdSec element or null if xwalk returns empty results.
+     * @throws SQLException
+     * @throws PackageValidationException
+     * @throws CrosswalkException
+     * @throws IOException
+     * @throws AuthorizeException
+     */
+    protected MdSec makeMdSec(Context context, DSpaceObject dso, Class mdSecClass, String typeSpec,
+                            MdStreamCache extraStreams)
+        throws SQLException, PackageValidationException, CrosswalkException,
+               IOException, AuthorizeException
+    {
+        try
+        {
+            //create our metadata element (dmdSec, techMd, sourceMd, rightsMD etc.)
+            MdSec mdSec = (MdSec) mdSecClass.newInstance();
+            mdSec.setID(gensym(mdSec.getLocalName()));
+            String parts[] = typeSpec.split(":", 2);
             String xwalkName, metsName;
+
+            //determine the name of the crosswalk to use to generate metadata
+            // for dmdSecs this is the part *after* the colon in the 'type' (see getDmdTypes())
+            // for all others this is usually just corresponds to type name.
             if (parts.length > 1)
             {
                 metsName = parts[0];
                 xwalkName = parts[1];
             }
             else
-                xwalkName = metsName = techMdType;
+                xwalkName = metsName = typeSpec;
 
+            // First, check to see if the crosswalk we are using is a normal DisseminationCrosswalk
             DisseminationCrosswalk xwalk = (DisseminationCrosswalk)
               PluginManager.getNamedPlugin(DisseminationCrosswalk.class, xwalkName);
-            if (xwalk == null)
-                throw new PackageValidationException("Cannot find "+xwalkName+" crosswalk plugin!");
 
-            // log the primary bitstream for structmap
-            String primaryBitstreamFileID = null;
+            // If we found the correct crosswalk, run it!
+            if (xwalk != null)
+            {
+                //For a normal DisseminationCrosswalk, we will be expecting an XML (DOM) based result.
+                // So, we are going to wrap this XML result in an <mdWrap> element
+                MdWrap mdWrap = new MdWrap();
+                setMdType(mdWrap, metsName);
+                XmlData xmlData = new XmlData();
+                if (crosswalkToMetsElement(xwalk, dso, xmlData) != null)
+                {
+                    mdWrap.getContent().add(xmlData);
+                    mdSec.getContent().add(mdWrap);
+                    return mdSec;
+                }
+                else
+                    return null;
+            }
+            // If we didn't find the correct crosswalk, we will check to see if this is
+            // a StreamDisseminationCrosswalk -- a Stream crosswalk disseminates to an OutputStream
+            else
+            {
+                StreamDisseminationCrosswalk sxwalk = (StreamDisseminationCrosswalk)
+                  PluginManager.getNamedPlugin(StreamDisseminationCrosswalk.class, xwalkName);
+                if (sxwalk != null)
+                {
+                    if (sxwalk.canDisseminate(context, dso))
+                    {
+                        // Disseminate crosswalk output to an outputstream
+                        ByteArrayOutputStream disseminateOutput = new ByteArrayOutputStream();
+                        sxwalk.disseminate(context, dso, disseminateOutput);
+                        // Convert output to an inputstream, so we can write to manifest or Zip file
+                        ByteArrayInputStream crosswalkedStream = new ByteArrayInputStream(disseminateOutput.toByteArray());
 
-            // accumulate content DIV items to put in structMap later.
-            List contentDivs = new ArrayList();
+                        //If we are capturing extra files to put into a Zip package
+                        if(extraStreams!=null)
+                        {
+                            //Create an <mdRef> -- we'll just reference the file by name in Zip package
+                            MdRef mdRef = new MdRef();
+                            //add the crosswalked Stream to list of files to add to Zip package later
+                            extraStreams.addStream(mdRef, crosswalkedStream);
+
+                            //set properties on <mdRef>
+                            // Note, filename will get set on this <mdRef> later,
+                            // when we process all the 'extraStreams'
+                            mdRef.setMIMETYPE(sxwalk.getMIMEType());
+                            setMdType(mdRef, metsName);
+                            mdRef.setLOCTYPE(Loctype.URL);
+                            mdSec.getContent().add(mdRef);
+                        }
+                        else
+                        {
+                            //If we are *not* capturing extra streams to add to Zip package later,
+                            // that means we are likely only generating a METS manifest
+                            // (i.e. manifestOnly = true)
+                            // In this case, the best we can do is take the crosswalked
+                            // Stream, base64 encode it, and add in an <mdWrap> field
+
+                            // First, create our <mdWrap>
+                            MdWrap mdWrap = new MdWrap();
+                            mdWrap.setMIMETYPE(sxwalk.getMIMEType());
+                            setMdType(mdWrap, metsName);
+
+                            // Now, create our <binData> and add base64 encoded contents to it.
+                            BinData binData = new BinData();
+                            Base64 base64 = new Base64(crosswalkedStream);
+                            binData.getContent().add(base64);
+                            mdWrap.getContent().add(binData);
+                            mdSec.getContent().add(mdWrap);
+                        }
+                        return mdSec;
+                    }
+                    else
+                        return null;
+                }
+                else
+                    throw new PackageValidationException("Cannot find "+xwalkName+" crosswalk plugin, either DisseminationCrosswalk or StreamDisseminationCrosswalk");
+            }
+        }
+        catch (InstantiationException e)
+        {
+            throw new PackageValidationException("Error instantiating Mdsec object: "+ e.toString());
+        }
+        catch (IllegalAccessException e)
+        {
+            throw new PackageValidationException("Error instantiating Mdsec object: "+ e.toString());
+        }
+    }
+
+    // add either a techMd or sourceMd element to amdSec.
+    // mdSecClass determines which type.
+    // mdTypes[] is array of "[metsName:]PluginName" strings, maybe empty.
+    protected void addToAmdSec(AmdSec fAmdSec, String mdTypes[], Class mdSecClass,
+                             Context context, DSpaceObject dso, MdStreamCache extraStreams)
+        throws SQLException, PackageValidationException, CrosswalkException,
+               IOException, AuthorizeException
+    {
+        for (int i = 0; i < mdTypes.length; ++i)
+        {
+            MdSec md = makeMdSec(context, dso, mdSecClass, mdTypes[i], extraStreams);
+            if (md != null)
+                fAmdSec.getContent().add(md);
+        }
+    }
+
+    // Create amdSec for any tech md's, return its ID attribute.
+    protected String addAmdSec(Context context, DSpaceObject dso, PackageParameters params,
+                             Mets mets, MdStreamCache extraStreams)
+        throws SQLException, PackageValidationException, CrosswalkException,
+               IOException, AuthorizeException
+    {
+        String techMdTypes[] = getTechMdTypes(context, dso, params);
+        String rightsMdTypes[] = getRightsMdTypes(context, dso, params);
+        String sourceMdTypes[] = getSourceMdTypes(context, dso, params);
+        String digiprovMdTypes[] = getDigiprovMdTypes(context, dso, params);
+
+        // only bother if there are any sections to add
+        if ((techMdTypes.length+sourceMdTypes.length+
+             digiprovMdTypes.length+rightsMdTypes.length) > 0)
+        {
+            String result = gensym("amd");
+            AmdSec fAmdSec = new AmdSec();
+            fAmdSec.setID(result);
+            addToAmdSec(fAmdSec, techMdTypes, TechMD.class, context, dso, extraStreams);
+            addToAmdSec(fAmdSec, rightsMdTypes, RightsMD.class, context, dso, extraStreams);
+            addToAmdSec(fAmdSec, sourceMdTypes, SourceMD.class, context, dso, extraStreams);
+            addToAmdSec(fAmdSec, digiprovMdTypes, DigiprovMD.class, context, dso, extraStreams);
+
+            mets.getContent().add(fAmdSec);
+            return result;
+        }
+        else
+            return null;
+    }
+
+    // make the most "persistent" identifier possible, preferably a URN
+    // based on the Handle.
+    protected String makePersistentID(DSpaceObject dso)
+    {
+        String handle = dso.getHandle();
+
+        // If no Handle, punt to much-less-satisfactory database ID and type..
+        if (handle == null)
+            return "DSpace_DB_"+Constants.typeText[dso.getType()] + "_" + String.valueOf(dso.getID());
+        else
+            return getHandleURN(handle);
+    }
+
+    /**
+     * Write out a METS manifest.
+     * Mostly lifted from Rob Tansley's METS exporter.
+     */
+    protected Mets makeManifest(Context context, DSpaceObject dso,
+                              PackageParameters params,
+                              MdStreamCache extraStreams)
+        throws MetsException, PackageValidationException, CrosswalkException, AuthorizeException, SQLException, IOException
+
+    {
+        // Create the METS manifest in memory
+        Mets mets = new Mets();
+        String typeStr = Constants.typeText[dso.getType()];
+
+        // this ID should be globally unique
+        mets.setID("dspace"+Utils.generateKey());
+
+        // identifies the object described by this document
+        mets.setOBJID(makePersistentID(dso));
+        mets.setTYPE("DSpace "+typeStr);
+
+        // this is the signature by which the ingester will recognize
+        // a document it can expect to interpret.
+        mets.setPROFILE(getProfile());
+
+        MetsHdr metsHdr = makeMetsHdr(context, dso, params);
+        if (metsHdr != null)
+            mets.getContent().add(metsHdr);
+
+        // add DMD sections
+        // Each type element MAY be either just a MODS-and-crosswalk name, OR
+        // a combination "MODS-name:crosswalk-name" (e.g. "DC:qDC").
+        String dmdTypes[] = getDmdTypes(context, dso, params);
+
+        // record of ID of each dmdsec to make DMDID in structmap.
+        String dmdId[] = new String[dmdTypes.length];
+        for (int i = 0; i < dmdTypes.length; ++i)
+        {
+            MdSec dmdSec = makeMdSec(context, dso, DmdSec.class, dmdTypes[i], extraStreams);
+            if (dmdSec != null)
+            {
+                mets.getContent().add(dmdSec);
+                dmdId[i] = dmdSec.getID();
+            }
+        }
+
+        // add object-wide technical/source MD segments, get ID string:
+        // Put that ID in ADMID of first div in structmap.
+        String objectAMDID = addAmdSec(context, dso, params, mets, extraStreams);
+
+        // Create simple structMap: initial div represents the Object's
+        // contents, its children are e.g. Item bitstreams (content only),
+        // Collection's members, or Community's members.
+        StructMap structMap = new StructMap();
+        structMap.setID(gensym("struct"));
+        structMap.setTYPE("LOGICAL");
+        structMap.setLABEL("DSpace Object");
+        Div div0 = new Div();
+        div0.setID(gensym("div"));
+        div0.setTYPE("DSpace Object Contents");
+        structMap.getContent().add(div0);
+
+        // fileSec is optional, let object type create it if needed.
+        FileSec fileSec = null;
+
+        // Item-specific manifest - license, bitstreams as Files, etc.
+        if (dso.getType() == Constants.ITEM)
+        {
+            // this tags file ID and group identifiers for bitstreams.
+            String bitstreamIDstart = "bitstream_";
+            Item item = (Item)dso;
 
             // how to handle unauthorized bundle/bitstream:
             String unauth = (params == null) ? null : params.getProperty("unauthorized");
 
+            // fileSec - all non-metadata bundles go into fileGrp,
+            // and each bitstream therein into a file.
+            // Create the bitstream-level techMd and div's for structmap
+            // at the same time so we can connec the IDREFs to IDs.
+            fileSec = new FileSec();
             Bundle[] bundles = item.getBundles();
             for (int i = 0; i < bundles.length; i++)
             {
-                if (PackageUtils.isMetaInfoBundle(bundles[i]))
+                if (!includeBundle(bundles[i]))
                     continue;
 
                 // unauthorized bundle?
@@ -457,14 +761,12 @@ public abstract class AbstractMETSDisseminator
 
                 Bitstream[] bitstreams = bundles[i].getBitstreams();
 
-                // Create a fileGrp
+                // Create a fileGrp, USE = permuted Bundle name
                 FileGrp fileGrp = new FileGrp();
-         
-                // Bundle name for USE attribute
                 String bName = bundles[i].getName();
                 if ((bName != null) && !bName.equals(""))
                     fileGrp.setUSE(bundleToFileGrp(bName));
-         
+
                 // watch for primary bitstream
                 int primaryBitstreamID = -1;
                 boolean isContentBundle = false;
@@ -492,39 +794,30 @@ public abstract class AbstractMETSDisseminator
                     }
 
                     String sid = String.valueOf(bitstreams[bits].getSequenceID());
-         
+                    String fileID = bitstreamIDstart + sid;
                     edu.harvard.hul.ois.mets.File file = new edu.harvard.hul.ois.mets.File();
-         
-                    String xmlIDstart = "bitstream_";
-                    String fileID = xmlIDstart + sid;
-
                     file.setID(fileID);
+                    file.setSEQ(bitstreams[bits].getSequenceID());
+                    fileGrp.getContent().add(file);
 
-                    // log primary bitstream for later (structMap)
+                    // set primary bitstream in structMap
                     if (bitstreams[bits].getID() == primaryBitstreamID)
-                        primaryBitstreamFileID = fileID;
+                    {
+                        Fptr fptr = new Fptr();
+                        fptr.setFILEID(fileID);
+                        div0.getContent().add(0, fptr);
+                    }
 
                     // if this is content, add to structmap too:
                     if (isContentBundle)
-                    {
-                        Div div = new Div();
-                        div.setID(gensym("div"));
-                        div.setTYPE("DSpace Content Bitstream");
-                        Fptr fptr = new Fptr();
-                        fptr.setFILEID(fileID);
-                        div.getContent().add(fptr);
-                        contentDivs.add(div);
-                    }
+                        div0.getContent().add(makeFileDiv(fileID, "DSpace Content Bitstream"));
 
-                    file.setSEQ(bitstreams[bits].getSequenceID());
-         
-                    String groupID = "GROUP_" + xmlIDstart + sid;
-         
                     /*
                      * If we're in THUMBNAIL or TEXT bundles, the bitstream is
                      * extracted text or a thumbnail, so we use the name to work
                      * out which bitstream to be in the same group as
                      */
+                    String groupID = "GROUP_" + bitstreamIDstart + sid;
                     if ((bundles[i].getName() != null)
                             && (bundles[i].getName().equals("THUMBNAIL") ||
                                 bundles[i].getName().startsWith("TEXT")))
@@ -533,22 +826,20 @@ public abstract class AbstractMETSDisseminator
                         // derived bitstream in the same group
                         Bitstream original = findOriginalBitstream(item,
                                 bitstreams[bits]);
-         
                         if (original != null)
                         {
-                            groupID = "GROUP_" + xmlIDstart
+                                groupID = "GROUP_" + bitstreamIDstart
                                     + original.getSequenceID();
                         }
                     }
-         
                     file.setGROUPID(groupID);
                     file.setMIMETYPE(bitstreams[bits].getFormat().getMIMEType());
-         
+
                     // FIXME: CREATED: no date
 
                     file.setSIZE(auth ? bitstreams[bits].getSize() : 0);
 
-                    // translate checksum and type to METS, if available.
+                    // FIXME: need to translate checksum and type to METS, if available.
                     String csType = bitstreams[bits].getChecksumAlgorithm();
                     String cs = bitstreams[bits].getChecksum();
                     if (auth && cs != null && csType != null)
@@ -563,87 +854,219 @@ public abstract class AbstractMETSDisseminator
                             log.warn("Cannot set bitstream checksum type="+csType+" in METS.");
                         }
                     }
-         
-                    // FLocat: filename is MD5 checksum
+
+                    // FLocat: point to location of bitstream contents.
                     FLocat flocat = new FLocat();
                     flocat.setLOCTYPE(Loctype.URL);
-                    flocat.setXlinkHref(makeBitstreamName(bitstreams[bits]));
-
-                    // Make bitstream techMD metadata, add to file.
-                    String techID = "techMd_for_bitstream_"+bitstreams[bits].getSequenceID();
-                    AmdSec fAmdSec = new AmdSec();
-                    fAmdSec.setID(techID);
-                    TechMD techMd = new TechMD();
-                    techMd.setID(gensym("tech"));
-                    MdWrap mdWrap = new MdWrap();
-                    setMdType(mdWrap, metsName);
-                    XmlData xmlData = new XmlData();
-                    mdWrap.getContent().add(xmlData);
-                    techMd.getContent().add(mdWrap);
-                    fAmdSec.getContent().add(techMd);
-                    mets.getContent().add(fAmdSec);
-                    crosswalkToMets(xwalk, bitstreams[bits], xmlData);
-                    file.setADMID(techID);
-
-                    // Add FLocat to File, and File to FileGrp
+                    flocat.setXlinkHref(makeBitstreamURL(bitstreams[bits], params));
                     file.getContent().add(flocat);
-                    fileGrp.getContent().add(file);
+
+                    // technical metadata for bitstream
+                    String techID = addAmdSec(context, bitstreams[bits], params, mets, extraStreams);
+                    if (techID != null)
+                    file.setADMID(techID);
                 }
-         
-                // Add fileGrp to fileSec
                 fileSec.getContent().add(fileGrp);
             }
-         
-            // Add fileSec to document
-            mets.getContent().add(fileSec);
-         
-            // Create simple structMap: initial div represents the Item,
-            // and user-visible content bitstreams are in its child divs.
-            StringBuffer dmdIds = new StringBuffer();
-            for (int i = 0; i < dmdId.length; ++i)
-                dmdIds.append(" "+dmdId[i]);
-            StructMap structMap = new StructMap();
-            structMap.setID(gensym("struct"));
-            structMap.setTYPE("LOGICAL");
-            structMap.setLABEL("DSpace");
-            Div div0 = new Div();
-            div0.setID(gensym("div"));
-            div0.setTYPE("DSpace Item");
-            div0.setDMDID(dmdIds.substring(1));
-            if (licenseID != null)
-                div0.setADMID(licenseID);
-
-            // if there is a primary bitstream, add FPTR to it.
-            if (primaryBitstreamFileID != null)
-            {
-                Fptr fptr = new Fptr();
-                fptr.setFILEID(primaryBitstreamFileID);
-                div0.getContent().add(fptr);
-            }
-
-            // add DIV for each content bitstream
-            div0.getContent().addAll(contentDivs);
-
-            structMap.getContent().add(div0);
-
-            // Does subclass have something to add to structMap?
-            addStructMap(context, item, params, mets);
-
-            mets.getContent().add(structMap);
-
-            mets.validate(new MetsValidator());
-         
-            mets.write(new MetsWriter(out));
         }
-        catch (MetsException e)
+        else if (dso.getType() == Constants.COLLECTION)
         {
-            // We don't pass up a MetsException, so callers don't need to
-            // know the details of the METS toolkit
-            // e.printStackTrace();
-            throw new PackageValidationException(e);
+            ItemIterator ii = ((Collection)dso).getItems();
+            while (ii.hasNext())
+            {
+                //add a child <div> for each item in collection
+                Item item = ii.next();
+                Div childDiv = makeChildDiv("DSpace Item", item, params);
+                if(childDiv!=null)
+                    div0.getContent().add(childDiv);
+            }
+            Bitstream logoBs = ((Collection)dso).getLogo();
+            if (logoBs != null)
+            {
+                fileSec = new FileSec();
+                addLogoBitstream(logoBs, fileSec, div0, params);
+            }
         }
+        else if (dso.getType() == Constants.COMMUNITY)
+        {
+            // Subcommunities are directly under "DSpace Object Contents" <div>, but are labeled as Communities
+            Community subcomms[] = ((Community)dso).getSubcommunities();
+            for (int i = 0; i < subcomms.length; ++i)
+            {
+                //add a child <div> for each subcommunity in this community
+                Div childDiv = makeChildDiv("DSpace Community", subcomms[i], params);
+                if(childDiv!=null)
+                    div0.getContent().add(childDiv);
+            }
+            // Collections are also directly under "DSpace Object Contents" <div>, but are labeled as Collections
+            Collection colls[] = ((Community)dso).getCollections();
+            for (int i = 0; i < colls.length; ++i)
+            {
+                //add a child <div> for each collection in this community
+                Div childDiv = makeChildDiv("DSpace Collection", colls[i], params);
+                if(childDiv!=null)
+                    div0.getContent().add(childDiv);
+            }
+            //add Community logo bitstream
+            Bitstream logoBs = ((Community)dso).getLogo();
+            if (logoBs != null)
+            {
+                fileSec = new FileSec();
+                addLogoBitstream(logoBs, fileSec, div0, params);
+            }
+        }
+        else if (dso.getType() == Constants.SITE)
+        {
+            // This is a site-wide <structMap>, which just lists the top-level communities
+            // each top level community is referenced by a div
+            Community comms[] = Community.findAllTop(context);
+            for (int i = 0; i < comms.length; ++i)
+            {
+                //add a child <div> for each top level community in this site
+                Div childDiv = makeChildDiv("DSpace Community", comms[i], params);
+                if(childDiv!=null)
+                    div0.getContent().add(childDiv);
+            }
+        }
+        if (fileSec != null)
+            mets.getContent().add(fileSec);
+        mets.getContent().add(structMap);
+
+        // set links to metadata for object -- after type-specific
+        // code since that can add to the object metadata.
+        StringBuffer dmdIds = new StringBuffer();
+        for (int i = 0; i < dmdId.length; ++i)
+            dmdIds.append(" "+dmdId[i]);
+        div0.setDMDID(dmdIds.substring(1));
+        if (objectAMDID != null)
+            div0.setADMID(objectAMDID);
+
+        // Does subclass have something to add to structMap?
+        addStructMap(context, dso, params, mets);
+
+        return mets;
     }
 
+    // Install logo bitstream into METS for Community, Collection.
+    // Add a file element, and refer to it from an fptr in the first div
+    // of the main structMap.
+    protected void addLogoBitstream(Bitstream logoBs, FileSec fileSec, Div div0, PackageParameters params)
+    {
+        edu.harvard.hul.ois.mets.File file = new edu.harvard.hul.ois.mets.File();
+        String fileID = gensym("logo");
+        file.setID(fileID);
+        file.setMIMETYPE(logoBs.getFormat().getMIMEType());
+        file.setSIZE(logoBs.getSize());
+
+        // FIXME: need to translate checksum and type to METS, if available.
+        String csType = logoBs.getChecksumAlgorithm();
+        String cs = logoBs.getChecksum();
+        if (cs != null && csType != null)
+        {
+            try
+            {
+                file.setCHECKSUMTYPE(Checksumtype.parse(csType));
+                file.setCHECKSUM(cs);
+            }
+            catch (MetsException e)
+            {
+                log.warn("Cannot set bitstream checksum type="+csType+" in METS.");
+            }
+        }
+        FLocat flocat = new FLocat();
+        flocat.setLOCTYPE(Loctype.URL);
+        flocat.setXlinkHref(makeBitstreamURL(logoBs, params));
+        file.getContent().add(flocat);
+        FileGrp fileGrp = new FileGrp();
+        fileGrp.setUSE("LOGO");
+        fileGrp.getContent().add(file);
+        fileSec.getContent().add(fileGrp);
+
+        // add fptr directly to div0 of structMap
+        Fptr fptr = new Fptr();
+        fptr.setFILEID(fileID);
+        div0.getContent().add(0, fptr);
+    }
+
+    // create <div> element pointing to a file
+    protected Div makeFileDiv(String fileID, String type)
+    {
+        Div div = new Div();
+        div.setID(gensym("div"));
+        div.setTYPE(type);
+        Fptr fptr = new Fptr();
+        fptr.setFILEID(fileID);
+        div.getContent().add(fptr);
+        return div;
+    }
+
+    /**
+     * Create a <div> element with <mptr> which references a child
+     * object via its handle (and via a local file name, when recursively disseminating
+     * all child objects).
+     * @param type - type attr value for the <div>
+     * @param dso - object for which to create the div
+     * @param params
+     * @return
+     */
+    protected Div makeChildDiv(String type, DSpaceObject dso, PackageParameters params)
+    {
+        String handle = dso.getHandle();
+
+        //start <div>
+        Div div = new Div();
+        div.setID(gensym("div"));
+        div.setTYPE(type);
+        boolean emptyDiv = true;
+
+        //make sure we have a handle
+        if (handle == null || handle.length()==0)
+        {
+            log.warn("METS Disseminator is skipping "+type+" without handle: " + dso.toString());
+        }
+        else
+        {
+            //create <mptr> with handle reference
+            Mptr mptr = new Mptr();
+            mptr.setID(gensym("mptr"));
+            mptr.setLOCTYPE(Loctype.HANDLE);
+            mptr.setXlinkHref(handle);
+            div.getContent().add(mptr);
+            emptyDiv=false;
+        }
+
+        // Check to see if this is a recursive dissemination (i.e. disseminating children METS packages)
+        // if so, we want a direct reference to the eventual child METS file
+        if(params.recursiveModeEnabled())
+        {
+            //determine file extension of child references,
+            //based on whether we are exporting just a manifest or a full Zip pkg
+            String childFileExtension  = (params!=null && params.getBooleanProperty("manifestOnly", false)) ? "xml" : "zip";
+
+            //create <mptr> with file-name reference to child package
+            Mptr mptr2 = new Mptr();
+            mptr2.setID(gensym("mptr"));
+            mptr2.setLOCTYPE(Loctype.URL);
+            //we get the name of the child package from the Packager -- as it is what will actually create this child pkg file
+            mptr2.setXlinkHref(PackageUtils.getPackageName(dso, childFileExtension));
+            div.getContent().add(mptr2);
+            emptyDiv=false;
+        }
+
+        if(emptyDiv)
+            return null;
+        else
+            return div;
+    }
+
+    // put handle in canonical URN format -- note that HandleManager's
+    // canonicalize currently returns HTTP URL format.
+    protected String getHandleURN(String handle)
+    {
+        if (handle.startsWith("hdl:"))
+            return handle;
+        return "hdl:"+handle;
+    }
 
     /**
      * For a bitstream that's a thumbnail or extracted text, find the
@@ -691,33 +1114,144 @@ public abstract class AbstractMETSDisseminator
 
     // Get result from crosswalk plugin and add it to the document,
     // including namespaces and schema.
-    private void crosswalkToMets(DisseminationCrosswalk xwalk,
+    // returns the new/modified element upon success.
+    private MetsElement crosswalkToMetsElement(DisseminationCrosswalk xwalk,
                                  DSpaceObject dso, MetsElement me)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
-        // add crosswalk's namespaces and schemaLocation to this element:
-        String raw = xwalk.getSchemaLocation();
-        String sloc[] = raw == null ? null : raw.split("\\s+");
-        Namespace ns[] = xwalk.getNamespaces();
-        for (int i = 0; i < ns.length; ++i)
+        try
         {
-            String uri = ns[i].getURI();
-            if (sloc != null && sloc.length > 1 && uri.equals(sloc[0]))
-                me.setSchema(ns[i].getPrefix(), uri, sloc[1]);
-            else
-                me.setSchema(ns[i].getPrefix(), uri);
-        }
+            // add crosswalk's namespaces and schemaLocation to this element:
+            String raw = xwalk.getSchemaLocation();
+            String sloc[] = raw == null ? null : raw.split("\\s+");
+            Namespace ns[] = xwalk.getNamespaces();
+            for (int i = 0; i < ns.length; ++i)
+            {
+                String uri = ns[i].getURI();
+                if (sloc != null && sloc.length > 1 && uri.equals(sloc[0]))
+                    me.setSchema(ns[i].getPrefix(), uri, sloc[1]);
+                else
+                    me.setSchema(ns[i].getPrefix(), uri);
+            }
 
-        // add result of crosswalk
-        PreformedXML pXML =
-          new PreformedXML(
-            xwalk.preferList() ?
-              outputter.outputString(xwalk.disseminateList(dso)) :
-              outputter.outputString(xwalk.disseminateElement(dso)));
-        me.getContent().add(pXML);
+            // add result of crosswalk
+            PreformedXML pXML = null;
+            if (xwalk.preferList())
+            {
+                List res = xwalk.disseminateList(dso);
+                if (!(res == null || res.isEmpty()))
+                    pXML = new PreformedXML(outputter.outputString(res));
+            }
+            else
+            {
+                Element res = xwalk.disseminateElement(dso);
+                if (res != null)
+                    pXML = new PreformedXML(outputter.outputString(res));
+            }
+            if (pXML != null)
+            {
+                me.getContent().add(pXML);
+                return me;
+            }
+            return null;
+        }
+        catch (CrosswalkObjectNotSupported e)
+        {
+            // ignore this xwalk if object is unsupported.
+            if (log.isDebugEnabled())
+                log.debug("Skipping MDsec because of CrosswalkObjectNotSupported: dso="+dso.toString()+", xwalk="+xwalk.getClass().getName());
+            return null;
+        }
     }
 
+    /**
+     * Cleanup our license file reference links, as Deposit Licenses & CC Licenses can be
+     * added two ways (and we only want to add them to zip package *once*):
+     * (1) Added as a normal Bitstream (assuming LICENSE and CC_LICENSE bundles will be included in pkg)
+     * (2) Added via a 'rightsMD' crosswalk (as they are rights information/metadata on an Item)
+     * <p>
+     * So, if they are being added by *both*, then we want to just link the rightsMD <mdRef> entry so
+     * that it points to the Bitstream location.  This implementation is a bit 'hackish', but it's
+     * the best we can do, as the Harvard METS API doesn't allow us to go back and crawl an entire
+     * METS file to look for these inconsistencies/duplications.
+     *
+     * @param context current DSpace Context
+     * @param params current Packager Parameters
+     * @param dso current DSpace Object
+     * @param ref the rightsMD <mdRef> element
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
+     */
+    protected void linkLicenseRefsToBitstreams(Context context, PackageParameters params, DSpaceObject dso, MdRef mdRef)
+            throws SQLException, IOException, AuthorizeException
+    {
+        //If this <mdRef> is a reference to a DSpace Deposit License
+        if(mdRef.getMDTYPE()!=null && mdRef.getMDTYPE()==Mdtype.OTHER &&
+           mdRef.getOTHERMDTYPE()!=null && mdRef.getOTHERMDTYPE().equals("DSpaceDepositLicense"))
+        {
+            //Locate the LICENSE bundle
+            Item i = (Item)dso;
+            Bundle license[] = i.getBundles(Constants.LICENSE_BUNDLE_NAME);
+
+            //Are we already including the LICENSE bundle's bitstreams in this package?
+            if(license!=null && license.length>0 && includeBundle(license[0]))
+            {
+                //Since we are including the LICENSE bitstreams, lets find our LICENSE bitstream path & link to it.
+                Bitstream licenseBs = PackageUtils.findDepositLicense(context, (Item)dso);
+                mdRef.setXlinkHref(makeBitstreamURL(licenseBs, params));
+            }
+        }
+        //If this <mdRef> is a reference to a Creative Commons Textual License
+        else if(mdRef.getMDTYPE() != null && mdRef.getMDTYPE() == Mdtype.OTHER &&
+                mdRef.getOTHERMDTYPE()!=null && mdRef.getOTHERMDTYPE().equals("CreativeCommonsText"))
+        {
+            //Locate the CC-LICENSE bundle
+            Item i = (Item)dso;
+            Bundle license[] = i.getBundles(CreativeCommons.CC_BUNDLE_NAME);
+
+            //Are we already including the CC-LICENSE bundle's bitstreams in this package?
+            if(license!=null && license.length>0 && includeBundle(license[0]))
+            {
+                //Since we are including the CC-LICENSE bitstreams, lets find our CC-LICENSE (textual) bitstream path & link to it.
+                Bitstream ccText = CreativeCommons.getLicenseTextBitstream(i);
+                mdRef.setXlinkHref(makeBitstreamURL(ccText, params));
+            }
+        }
+        //If this <mdRef> is a reference to a Creative Commons RDF License
+        else if(mdRef.getMDTYPE() != null && mdRef.getMDTYPE() == Mdtype.OTHER &&
+                mdRef.getOTHERMDTYPE()!=null && mdRef.getOTHERMDTYPE().equals("CreativeCommonsRDF"))
+        {
+            //Locate the CC-LICENSE bundle
+            Item i = (Item)dso;
+            Bundle license[] = i.getBundles(CreativeCommons.CC_BUNDLE_NAME);
+
+            //Are we already including the CC-LICENSE bundle's bitstreams in this package?
+            if(license!=null && license.length>0 && includeBundle(license[0]))
+            {
+                //Since we are including the CC-LICENSE bitstreams, lets find our CC-LICENSE (RDF) bitstream path & link to it.
+                Bitstream ccRdf = CreativeCommons.getLicenseRdfBitstream(i);
+                mdRef.setXlinkHref(makeBitstreamURL(ccRdf, params));
+            }
+        }
+    }
+
+    /**
+     * Return identifier for bitstream in an Item; when making a package,
+     * this is the archive member name (e.g. in Zip file).  In a bare
+     * manifest, it might be an external URL.  The name should be in URL
+     * format ("file:" may be elided for in-archive filenames).  It should
+     * be deterministic, since this gets called twice for each bitstream
+     * when building archive.
+     */
+    abstract public String makeBitstreamURL(Bitstream bitstream, PackageParameters params);
+
+    /**
+     * Create metsHdr element - separate so subclasses can override.
+     */
+    abstract public MetsHdr makeMetsHdr(Context context, DSpaceObject dso,
+                               PackageParameters params);
     /**
      * Returns name of METS profile to which this package conforms, e.g.
      *  "DSpace METS DIP Profile 1.0"
@@ -745,26 +1279,54 @@ public abstract class AbstractMETSDisseminator
      * @param params the PackageParameters passed to the disseminator.
      * @return array of metadata type strings, never null.
      */
-    abstract public String [] getDmdTypes(PackageParameters params)
+    abstract public String [] getDmdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException;
 
     /**
      * Get the type string of the technical metadata to create for each
-     * Bitstream in the Item.  The type string may be a simple name or
-     * colon-separated compound as specified for <code>getDmdTypes()</code> above.
+     * object and each Bitstream in an Item.  The type string may be a
+     * simple name or colon-separated compound as specified for
+     *  <code>getDmdTypes()</code> above.
      * @param params the PackageParameters passed to the disseminator.
      * @return array of metadata type strings, never null.
      */
-    abstract public String getTechMdType(PackageParameters params)
+    abstract public String[] getTechMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException;
 
     /**
-     * Add Rights metadata for the Item, in the form of
-     * (<code>rightsMd</code> elements) to the given metadata section.
-     *
+     * Get the type string of the source metadata to create for each
+     * object and each Bitstream in an Item.  The type string may be a
+     * simple name or colon-separated compound as specified for
+     * <code>getDmdTypes()</code> above.
+     * @param params the PackageParameters passed to the disseminator.
+     * @return array of metadata type strings, never null.
      */
-    abstract public void addRightsMd(Context context, Item item, AmdSec amdSec)
-        throws SQLException, IOException, AuthorizeException, MetsException;
+    abstract public String[] getSourceMdTypes(Context context, DSpaceObject dso, PackageParameters params)
+        throws SQLException, IOException, AuthorizeException;
+
+    /**
+     * Get the type string of the "digiprov" (digital provenance)
+     * metadata to create for each object and each Bitstream in an Item.
+     * The type string may be a simple name or colon-separated compound
+     * as specified for <code>getDmdTypes()</code> above.
+     *
+     * @param params the PackageParameters passed to the disseminator.
+     * @return array of metadata type strings, never null.
+     */
+    abstract public String[] getDigiprovMdTypes(Context context, DSpaceObject dso, PackageParameters params)
+        throws SQLException, IOException, AuthorizeException;
+
+    /**
+     * Get the type string of the "rights" (permission and/or license)
+     * metadata to create for each object and each Bitstream in an Item.
+     * The type string may be a simple name or colon-separated compound
+     * as specified for <code>getDmdTypes()</code> above.
+     *
+     * @param params the PackageParameters passed to the disseminator.
+     * @return array of metadata type strings, never null.
+     */
+    abstract public String[] getRightsMdTypes(Context context, DSpaceObject dso, PackageParameters params)
+        throws SQLException, IOException, AuthorizeException;
 
     /**
      * Add any additional <code>structMap</code> elements to the
@@ -773,7 +1335,13 @@ public abstract class AbstractMETSDisseminator
      * requirements is already present, so this does not need to do anything.
      * @param mets the METS document to which to add structMaps
      */
-    abstract public void addStructMap(Context context, Item item,
+    abstract public void addStructMap(Context context, DSpaceObject dso,
                                PackageParameters params, Mets mets)
         throws SQLException, IOException, AuthorizeException, MetsException;
+
+    /**
+     * @return true when this bundle should be included as "content"
+     *  in the package.. e.g. DSpace SIP does not include metadata bundles.
+     */
+    abstract public boolean includeBundle(Bundle bundle);
 }
