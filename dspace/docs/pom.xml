@@ -1,14 +1,32 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!--
+This POM simply transforms all DocBook Docs to Confluence format,
+using the provided XSL stylesheet at:
+confluence/docBook2confluence.xsl
+
 To run confluence transformation just execute
 
 mvn package
 
 in this directory.
 
-The pom is not included as a module to reduce unnecessary compilation time.
+NOTE: You may receive errors for XML Entities which are undefined in any
+individual Docbook XML file.  For example: "Error reported by XML parser:
+The entity "mdash" was referenced, but not declared."
 
+If you receive the above errors, temporarily add the ENTITY reference to the top
+of each DocBook XML. (They are not there by default as it breaks PDF creation)
+For example:
 
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+                    "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+<!ENTITY mdash "&#x2014;">
+]>
+<chapter>
+...
+
+This pom is not included as a module to reduce unnecessary compilation time.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -18,6 +36,16 @@ The pom is not included as a module to reduce unnecessary compilation time.
     <name>DSpace Documentation Module</name>
     <packaging>pom</packaging>
 
+    <!--
+       A Parent POM that Maven inherits DSpace Default
+       POM atrributes from.
+    -->
+    <parent>
+        <groupId>org.dspace</groupId>
+        <artifactId>dspace-parent</artifactId>
+        <version>1.6.1-SNAPSHOT</version>
+    </parent>
+	
     <build>
         <plugins>
             <plugin>
@@ -28,9 +56,7 @@ The pom is not included as a module to reduce unnecessary compilation time.
                         <goals>
                             <goal>transform</goal>
                         </goals>
-                        <phase>
-                            package
-                        </phase>
+                        <phase>package</phase>
                     </execution>
                 </executions>
                 <configuration>
