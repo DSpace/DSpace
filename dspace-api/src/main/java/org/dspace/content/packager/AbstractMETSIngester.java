@@ -60,6 +60,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
+import org.dspace.content.Site;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.MetadataValidationException;
@@ -235,17 +236,33 @@ public abstract class AbstractMETSIngester
                 params.addProperty("ignoreParent", "true");
             }
 
-            //Actually ingest the object described by the METS Manifest
-            dso = ingestObject(context, parent, manifest, pkgFile,
-                                  params, license);
+            //Figure out the type of object we are ingesting
+            int type = getObjectType(manifest);
 
-            //Log whether we finished an ingest (create new obj) or a restore (restore previously existing obj)
-            String action = "package_ingest";
-            if(params.restoreModeEnabled())
-                action = "package_restore";
-            log.info(LogManager.getHeader(context, action,
-                        "Created new Object, type=" + Constants.typeText[dso.getType()] +
-                                    ", handle=" + dso.getHandle() + ", dbID=" + String.valueOf(dso.getID())));
+            // If this is a full DSpace SITE we are ingesting
+            if(type==Constants.SITE)
+            {
+                //For now, do nothing -- SITE AIP has nothing that needs restoring
+                //But it does contain a list of Top-Level communities
+                //(which will be handled by recursion below)
+                
+                // return the Site object
+                dso = Site.find(context, Site.SITE_ID);
+            }
+            else // Not a SITE manifest, that means there's content to ingest
+            {
+                //Actually ingest the object described by the METS Manifest
+                dso = ingestObject(context, parent, manifest, pkgFile,
+                                      params, license);
+
+                //Log whether we finished an ingest (create new obj) or a restore (restore previously existing obj)
+                String action = "package_ingest";
+                if(params.restoreModeEnabled())
+                    action = "package_restore";
+                log.info(LogManager.getHeader(context, action,
+                            "Created new Object, type=" + Constants.typeText[dso.getType()] +
+                                        ", handle=" + dso.getHandle() + ", dbID=" + String.valueOf(dso.getID())));
+            }
 
             // Check if the Packager is currently running recursively.
             // If so, this means the Packager will attempt to recursively
