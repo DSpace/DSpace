@@ -4,7 +4,7 @@
    <artifactId>dspace-test</artifactId>
    <name>DSpace Test :: Platform Unit tests</name>
    <packaging>jar</packaging>
-   <url></url>
+   <url />
    <description>DSpace Unit and Integration tests</description>
 
    <!--
@@ -14,7 +14,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>1.6.1-SNAPSHOT</version>
+      <version>1.7.0-SNAPSHOT</version>
    </parent>
 
    <repositories>
@@ -40,9 +40,9 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection></connection>
-      <developerConnection></developerConnection>
-      <url></url>
+      <connection />
+      <developerConnection />
+      <url />
    </scm>
 
    <dependencies>

@@ -43,7 +43,7 @@ This pom is not included as a module to reduce unnecessary compilation time.
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>1.6.1-SNAPSHOT</version>
+        <version>1.7.0-SNAPSHOT</version>
     </parent>
 	
     <build>

@@ -3,7 +3,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-parent</artifactId>
    <packaging>pom</packaging>
-   <version>1.6.1-SNAPSHOT</version>
+   <version>1.7.0-SNAPSHOT</version>
    <name>DSpace Parent Project</name>
    <url>http://projects.dspace.org</url>
 
@@ -25,6 +25,7 @@
          -->
          <plugin>
             <artifactId>maven-release-plugin</artifactId>
+            <version>2.0</version>
             <configuration>
                 <!-- During release:perform, enable the "addons" profile -->
                 <releaseProfiles>addons</releaseProfiles>
@@ -240,78 +241,78 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
-            <version>1.6.1-SNAPSHOT</version>
+            <version>1.7.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-ui-shared</artifactId>
-            <version>1.6.1-SNAPSHOT</version>
+            <version>1.7.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-api</artifactId>
-              <version>1.6.1-SNAPSHOT</version>
+              <version>1.7.0-SNAPSHOT</version>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-webapp</artifactId>
-              <version>1.6.1-SNAPSHOT</version>
+              <version>1.7.0-SNAPSHOT</version>
               <type>war</type>
           </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-api</artifactId>
-            <version>1.6.1-SNAPSHOT</version>
+            <version>1.7.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-webapp</artifactId>
-            <version>1.6.1-SNAPSHOT</version>
+            <version>1.7.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai-api</artifactId>
-            <version>1.6.1-SNAPSHOT</version>
+            <version>1.7.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai-webapp</artifactId>
-            <version>1.6.1-SNAPSHOT</version>
+            <version>1.7.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-core</artifactId>
-            <version>1.6.1-SNAPSHOT</version>
+            <version>1.7.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-client</artifactId>
-            <version>1.6.1-SNAPSHOT</version>
+            <version>1.7.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-webapp</artifactId>
-            <version>1.6.1-SNAPSHOT</version>
+            <version>1.7.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-api</artifactId>
-            <version>1.6.1-SNAPSHOT</version>
+            <version>1.7.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-webapp</artifactId>
-            <version>1.6.1-SNAPSHOT</version>
+            <version>1.7.0-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-wing</artifactId>
-            <version>1.6.1-SNAPSHOT</version>
+            <version>1.7.0-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
@@ -331,7 +332,7 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-stats</artifactId>
-            <version>1.6.1-SNAPSHOT</version>
+            <version>1.7.0-SNAPSHOT</version>
          </dependency>
          <!-- DSpace Localization Packages -->
          <dependency>
@@ -842,8 +843,8 @@
          <name>Pere Villega</name>
          <email>pere.villega@gmail.com</email>
          <url>http://www.perevillega.com</url>
-         <organization></organization>
-         <organizationUrl></organizationUrl>
+         <organization />
+         <organizationUrl />
          <roles>
             <role>developer</role>
          </roles>

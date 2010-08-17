@@ -13,7 +13,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-xmlui</artifactId>
-      <version>1.6.1-SNAPSHOT</version>
+      <version>1.7.0-SNAPSHOT</version>
    </parent>
 
    <repositories>
@@ -135,5 +135,9 @@
          <type>war</type>
       </dependency>
    </dependencies>
-
+    <properties>
+        <netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
+    </properties>
 </project>
+
+
