@@ -172,14 +172,31 @@
                                 <browser name="spider" useragent="yacybot"/>
 
                                 <!-- Interactive browsers -->
+                                <browser name="opera" useragent="Opera"/>
+                                <browser name="opera8" useragent="Opera/8."/>
+                                <browser name="opera9" useragent="Opera/9."/>
+                                <!-- Yes, Opera 10, really identifies itself as "9.8" -->
+                                <browser name="opera10" useragent="Opera/9.8"/>
                                 <browser name="explorer" useragent="MSIE"/>
                                 <browser name="explorer6" useragent="MSIE 6"/>
                                 <browser name="explorer7" useragent="MSIE 7"/>
+                                <browser name="explorer8" useragent="MSIE 8"/>
+                                <browser name="explorer9" useragent="MSIE 9"/>
+                                <browser name="chrome" useragent="Chrome"/>
+                                <browser name="chrome4" useragent="Chrome/4."/>
+                                <browser name="chrome5" useragent="Chrome/5."/>
+                                <browser name="chrome6" useragent="Chrome/6."/>
+                                <browser name="safari" useragent="Safari"/>
                                 <browser name="safari2" useragent="(KHTML, like Gecko) Safari"/>
                                 <browser name="safari3" useragent="(KHTML, like Gecko) Version/3"/>
+                                <browser name="safari4" useragent="(KHTML, like Gecko) Version/4"/>
+                                <browser name="safari5" useragent="(KHTML, like Gecko) Version/5"/>
                                 <browser name="firefox" useragent="Firefox"/>
                                 <browser name="firefox1" useragent="Firefox/1."/>
                                 <browser name="firefox2" useragent="Firefox/2."/>
+                                <browser name="firefox3" useragent="Firefox/3."/>
+                                <browser name="firefox4" useragent="Firefox/4."/>
+                                <browser name="konqueror" useragent="Konqueror/"/>
                         </map:selector>
                         <map:selector name="parameter" src="org.apache.cocoon.selection.ParameterSelector"/>
                         <map:selector logger="sitemap.selector.exception" name="exception" src="org.apache.cocoon.selection.ExceptionSelector">
