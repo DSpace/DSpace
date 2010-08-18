@@ -3,7 +3,7 @@
 (Flavio Botelho)
 - [DS-563] Multiple spaces in between words in advanced search will make the search return nothing
 
-(Vladislav Zhivkov, Claudia J�rgen)
+(Vladislav Zhivkov, Claudia Juergen)
 - [DS-625] Bulgarian translation of the jspui for DSpace 1.6.0
 - [DS-650] Bulgarian translation of the jspui for DSpace 1.6.2
 
@@ -24,7 +24,7 @@
 - [DS-607] Invalid identifiers not escaped
 - [DS-608] Batch metadata import missing item headers
 
- (Ivan Masar, Claudia Jurgen)
+ (Ivan Masar, Claudia Juergen)
 - [DS-567] Czech localization of 1.6.0
 - [DS-595] Czech localization of 1.6.1
 
