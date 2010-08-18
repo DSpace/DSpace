@@ -19,10 +19,6 @@
 
    <build>
       <plugins>
-         <!--
-            Java 1.5 is our officially endorsed build target
-            platform.
-         -->
          <plugin>
             <artifactId>maven-release-plugin</artifactId>
             <version>2.0</version>
@@ -32,11 +28,14 @@
                 <goals>deploy</goals>
             </configuration>
          </plugin>
+         <!--
+            Java 1.6 is our officially endorsed build target platform.
+         -->
          <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
-               <source>1.5</source>
-               <target>1.5</target>
+               <source>1.6</source>
+               <target>1.6</target>
                <showDeprecation>true</showDeprecation>
             </configuration>
          </plugin>
@@ -916,7 +915,7 @@
                   <link>
                      http://projects.dspace.org/dspace-oai/apidocs
                   </link>
-                  <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+                  <link>http://java.sun.com/j2se/6/docs/api</link>
                   <link>
                      http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/
                   </link>
