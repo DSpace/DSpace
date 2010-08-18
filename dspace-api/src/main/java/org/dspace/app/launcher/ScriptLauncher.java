@@ -278,8 +278,8 @@ public class ScriptLauncher
         System.out.println("Usage: dspace [command-name] {parameters}");
         for (Element command : commands)
         {
-            System.out.println(" - " + command.getChild("name").getValue() +
-                               ": " + command.getChild("description").getValue());
+            System.out.println("  * " + command.getChild("name").getValue() +
+                               " : " + command.getChild("description").getValue());
         }
     }
 }
