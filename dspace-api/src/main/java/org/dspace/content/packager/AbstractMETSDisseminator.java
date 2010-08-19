@@ -271,8 +271,10 @@ public abstract class AbstractMETSDisseminator
      * @throws SQLException
      * @throws IOException
      */
-    protected void writeZipPackage(Context context, DSpaceObject dso, PackageParameters params, OutputStream pkg)
-            throws PackageValidationException, CrosswalkException, MetsException, AuthorizeException, SQLException, IOException
+    protected void writeZipPackage(Context context, DSpaceObject dso,
+            PackageParameters params, OutputStream pkg)
+            throws PackageValidationException, CrosswalkException, MetsException,
+            AuthorizeException, SQLException, IOException
     {
         long lmTime = 0;
         if (dso.getType() == Constants.ITEM)
@@ -287,9 +289,9 @@ public abstract class AbstractMETSDisseminator
         // copy extra (metadata, license, etc) bitstreams into zip, update manifest
         if (extraStreams != null)
         {
-            for (Map.Entry ment : extraStreams.getMap().entrySet())
+            for (Map.Entry<MdRef, InputStream> ment : extraStreams.getMap().entrySet())
             {
-                MdRef ref = (MdRef)ment.getKey();
+                MdRef ref = ment.getKey();
 
                 // Both Deposit Licenses & CC Licenses which are referenced as "extra streams" may already be
                 // included in our Package (if their bundles are already included in the <filSec> section of manifest).
@@ -297,11 +299,12 @@ public abstract class AbstractMETSDisseminator
                 // (this ensures that we don't accidentally add the same License file to our package twice)
                 linkLicenseRefsToBitstreams(context, params, dso, ref);
 
-                //If this 'mdRef' is NOT already linked up to a file in the package, then its file must be missing.
-                // So, we are going to add a new file to the Zip package.
+                //If this 'mdRef' is NOT already linked up to a file in the package,
+                // then its file must be missing.  So, we are going to add a new
+                // file to the Zip package.
                 if(ref.getXlinkHref()==null || ref.getXlinkHref().isEmpty())
                 {
-                    InputStream is = (InputStream)ment.getValue();
+                    InputStream is = ment.getValue();
 
                     // create a hopefully unique filename within the Zip
                     String fname = gensym("metadata");
@@ -347,8 +350,10 @@ public abstract class AbstractMETSDisseminator
      * @param params Parameters to the Packager script
      * @param zip Zip output
      */
-    protected void addBitstreamsToZip(Context context, DSpaceObject dso, PackageParameters params, ZipOutputStream zip)
-            throws PackageValidationException, AuthorizeException, SQLException, IOException
+    protected void addBitstreamsToZip(Context context, DSpaceObject dso,
+            PackageParameters params, ZipOutputStream zip)
+            throws PackageValidationException, AuthorizeException, SQLException,
+            IOException
     {
         // how to handle unauthorized bundle/bitstream:
         String unauth = (params == null) ? null : params.getProperty("unauthorized");
@@ -479,15 +484,17 @@ public abstract class AbstractMETSDisseminator
      * @param mdSecClass class of mdSec (TechMD, RightsMD, DigiProvMD, etc)
      * @param typeSpec Type of metadata going into this mdSec (e.g. MODS, DC, PREMIS, etc)
      * @param extraStreams list of extra files which need to be added to final dissemination package
+     * 
      * @return mdSec element or null if xwalk returns empty results.
+     * 
      * @throws SQLException
      * @throws PackageValidationException
      * @throws CrosswalkException
      * @throws IOException
      * @throws AuthorizeException
      */
-    protected MdSec makeMdSec(Context context, DSpaceObject dso, Class mdSecClass, String typeSpec,
-                            MdStreamCache extraStreams)
+    protected MdSec makeMdSec(Context context, DSpaceObject dso, Class mdSecClass,
+                            String typeSpec, MdStreamCache extraStreams)
         throws SQLException, PackageValidationException, CrosswalkException,
                IOException, AuthorizeException
     {
@@ -606,7 +613,8 @@ public abstract class AbstractMETSDisseminator
     // mdSecClass determines which type.
     // mdTypes[] is array of "[metsName:]PluginName" strings, maybe empty.
     protected void addToAmdSec(AmdSec fAmdSec, String mdTypes[], Class mdSecClass,
-                             Context context, DSpaceObject dso, MdStreamCache extraStreams)
+                             Context context, DSpaceObject dso,
+                             MdStreamCache extraStreams)
         throws SQLException, PackageValidationException, CrosswalkException,
                IOException, AuthorizeException
     {
@@ -739,7 +747,7 @@ public abstract class AbstractMETSDisseminator
             // fileSec - all non-metadata bundles go into fileGrp,
             // and each bitstream therein into a file.
             // Create the bitstream-level techMd and div's for structmap
-            // at the same time so we can connec the IDREFs to IDs.
+            // at the same time so we can connect the IDREFs to IDs.
             fileSec = new FileSec();
             Bundle[] bundles = item.getBundles();
             for (int i = 0; i < bundles.length; i++)
@@ -889,7 +897,8 @@ public abstract class AbstractMETSDisseminator
         }
         else if (dso.getType() == Constants.COMMUNITY)
         {
-            // Subcommunities are directly under "DSpace Object Contents" <div>, but are labeled as Communities
+            // Subcommunities are directly under "DSpace Object Contents" <div>,
+            // but are labeled as Communities.
             Community subcomms[] = ((Community)dso).getSubcommunities();
             for (int i = 0; i < subcomms.length; ++i)
             {
@@ -898,7 +907,8 @@ public abstract class AbstractMETSDisseminator
                 if(childDiv!=null)
                     div0.getContent().add(childDiv);
             }
-            // Collections are also directly under "DSpace Object Contents" <div>, but are labeled as Collections
+            // Collections are also directly under "DSpace Object Contents" <div>,
+            // but are labeled as Collections.
             Collection colls[] = ((Community)dso).getCollections();
             for (int i = 0; i < colls.length; ++i)
             {
@@ -917,8 +927,8 @@ public abstract class AbstractMETSDisseminator
         }
         else if (dso.getType() == Constants.SITE)
         {
-            // This is a site-wide <structMap>, which just lists the top-level communities
-            // each top level community is referenced by a div
+            // This is a site-wide <structMap>, which just lists the top-level
+            // communities.  Each top level community is referenced by a div.
             Community comms[] = Community.findAllTop(context);
             for (int i = 0; i < comms.length; ++i)
             {
@@ -927,6 +937,38 @@ public abstract class AbstractMETSDisseminator
                 if(childDiv!=null)
                     div0.getContent().add(childDiv);
             }
+
+            // Create a reference to a file containing users and groups.
+            RoleDisseminator users = new RoleDisseminator();
+
+            MdRef usersRef = new MdRef();
+            setMdType(usersRef,"DSpaceUsersAndGroups");
+            usersRef.setID("usersAndGroups");
+            usersRef.setMIMETYPE(users.getMIMEType(params));
+            usersRef.setLOCTYPE(Loctype.URL);
+
+            // Add the stream to the list of non-content streams to be packed.
+            extraStreams.addStream(usersRef,
+                    users.asStream(context, params.containsKey("passwords")));
+
+            // Link the reference into the METS
+            TechMD techMd = new TechMD();
+            techMd.setID(gensym("techMD"));
+            techMd.getContent().add(usersRef);
+
+            AmdSec aMdSec = new AmdSec();
+            String amdId = gensym("amd");
+            aMdSec.setID(amdId);
+            aMdSec.getContent().add(techMd);
+
+            mets.getContent().add(aMdSec);
+            
+            // Mention in the structMap
+            Div usersDiv = new Div();
+            usersDiv.setID(gensym("div"));
+            usersDiv.setTYPE("DSpace Users");
+            usersDiv.setADMID(amdId);
+            structMap.getContent().add(usersDiv);
         }
         if (fileSec != null)
             mets.getContent().add(fileSec);
@@ -1184,7 +1226,8 @@ public abstract class AbstractMETSDisseminator
      * @throws IOException
      * @throws AuthorizeException
      */
-    protected void linkLicenseRefsToBitstreams(Context context, PackageParameters params, DSpaceObject dso, MdRef mdRef)
+    protected void linkLicenseRefsToBitstreams(Context context, PackageParameters params,
+            DSpaceObject dso, MdRef mdRef)
             throws SQLException, IOException, AuthorizeException
     {
         //If this <mdRef> is a reference to a DSpace Deposit License

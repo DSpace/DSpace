@@ -878,6 +878,27 @@ public class EPerson extends DSpaceObject
     }
 
     /**
+     * Set the EPerson's password hash
+     * 
+     * @param s
+     *          hash of the password
+     */
+    public void setPasswordHash(String s)
+    {
+        myRow.setColumn("password", s);
+        modified = true;
+    }
+
+    /**
+     * Return the EPerson's password hash
+     * @return hash of the password
+     */
+    public String getPasswordHash()
+    {
+        return myRow.getStringColumn("password");
+    }
+
+    /**
      * Check EPerson's password
      * 
      * @param attempt
