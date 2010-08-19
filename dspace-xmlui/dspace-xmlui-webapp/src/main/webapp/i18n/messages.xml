@@ -45,11 +45,11 @@
 		
 		xmlui.<Aspect>.<Java Class>.<name>
 		
-		There are a few exceptions to this nameing format,
+		There are a few exceptions to this naming format,
 		1) Some general keys are in the xmlui.general namespace 
 		   because they are used very frequently.
 		2) Some general keys which are specific to a particular aspect 
-		   may be found at xmlui.<Aspect> without specifiying a 
+		   may be found at xmlui.<Aspect> without specifying a 
 		   particular java class. 
 		--> 
 	
@@ -78,6 +78,14 @@
 	<message key="xmlui.PageNotFound.para1">We can't find the page you asked for.</message>
 	
 	
+	<!-- 
+	   The "utils" non-aspect
+       -->
+    <message key="xmlui.utils.AuthenticationUtil.onlyAdmins">Only site administrators may assume login as another user.</message>
+    <message key="xmlui.utils.AuthenticationUtil.onlyAuthenticatedAdmins">Only authenticated users who are administrators may assume the login as another user.</message>
+    <message key="xmlui.utils.AuthenticationUtil.notAnotherAdmin">You may not assume the login as another administrator.</message>
+
+
 	<!--
 		This section is for feed syndications (RSS, atom, etc)  
 	-->

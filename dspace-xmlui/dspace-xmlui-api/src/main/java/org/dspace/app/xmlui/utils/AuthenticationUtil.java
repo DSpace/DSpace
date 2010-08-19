@@ -48,6 +48,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.aspect.administrative.SystemwideAlerts;
+import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authorize.AuthorizeException;
@@ -72,7 +73,7 @@ public class AuthenticationUtil
     private static final Logger log = Logger.getLogger(AuthenticationUtil.class);
 
     /**
-     * Session attribute name for storing the return url where the user should
+     * Session attribute name for storing the return URL where the user should
      * be redirected too once successfully authenticated.
      */
     public static final String REQUEST_INTERRUPTED = "dspace.request.interrupted";
@@ -111,9 +112,9 @@ public class AuthenticationUtil
      * @param password
      *            The password credentials provided by the user.
      * @param realm
-     *            The realm credentials proveded by the user.
+     *            The realm credentials provided by the user.
      * @return Return a current context with either the eperson attached if the
-     *         authentication was successfull or or no eperson attached if the
+     *         authentication was successful or or no eperson attached if the
      *         attempt failed.
      */
     public static Context Authenticate(Map objectModel, String email, String password, String realm) 
@@ -159,9 +160,9 @@ public class AuthenticationUtil
     }
 
     /**
-     * Preform implicite authentication. The authenticationManager will consult
+     * Perform implicit authentication. The authenticationManager will consult
      * the authentication stack for any methods that can implicitly authenticate
-     * this session. If the attempt was successfull then the returned context
+     * this session. If the attempt was successful then the returned context
      * will have an eperson attached other wise the context will not have an
      * eperson attached.
      * 
@@ -191,7 +192,7 @@ public class AuthenticationUtil
 
     /**
      * Log the given user in as a real authenticated user. This should only be used after 
-     * a user has presented their credintals and they have been validated. 
+     * a user has presented credentials and they have been validated. 
      * 
      * @param context
      *            DSpace context
@@ -218,7 +219,7 @@ public class AuthenticationUtil
         	return;
         }
         
-        // Set any special groups - invoke the authentication mgr.
+        // Set any special groups - invoke the authentication manager.
         int[] groupIDs = AuthenticationManager.getSpecialGroups(context,
                 request);
         for (int groupID : groupIDs)
@@ -236,7 +237,7 @@ public class AuthenticationUtil
     
     /**
      * Log the given user in as a real authenticated user. This should only be used after 
-     * a user has presented their credintals and they have been validated. This method 
+     * a user has presented credentials and they have been validated. This method 
      * signature is provided to be easier to call from flow scripts.
      * 
      * @param objectModel 
@@ -285,7 +286,7 @@ public class AuthenticationUtil
                     if (!AuthorizeManager.isAdmin(context) && !SystemwideAlerts.canUserMaintainSession())
                     {
                     	// Normal users can not maintain their sessions, check to see if this is really an
-                    	// administrator loging in as someone else.
+                    	// administrator logging in as someone else.
                     	
                     	EPerson realEPerson = EPerson.find(context, realid);
                     	Group administrators = Group.find(context,1);
@@ -312,14 +313,16 @@ public class AuthenticationUtil
     }
 
     /**
-     * Assume the login as another user. Only site administrators may preform the action.
+     * Assume the login as another user. Only site administrators may perform the action.
      * 
      * @param context
-     * 		The current DSpace context loged in as a site administrator
+     * 		The current DSpace context logged in as a site administrator
      * @param request
-     * 		The reall HTTP request.
+     * 		The real HTTP request.
      * @param loginAs
      * 		Whom to login as.
+     * @throws SQLException
+     * @throws AuthorizeException using an I18nTransformer key as the message
      */
     public static void loginAs(Context context, HttpServletRequest request, EPerson loginAs ) 
     throws SQLException, AuthorizeException
@@ -330,21 +333,21 @@ public class AuthenticationUtil
     	
     	// Only super administrators can login as someone else.
     	if (!AuthorizeManager.isAdmin(context))
-    		throw new AuthorizeException("Only site administrators may assume login as another user.");
+    		throw new AuthorizeException("xmlui.utils.AuthenticationUtil.onlyAdmins");
     		
     	// Just to be double be sure, make sure the administrator
-    	// is the one who actualy authenticated themself.
+    	// is the one who actually authenticated himself.
 	    HttpSession session = request.getSession(false);
 	    Integer authenticatedID = (Integer) session.getAttribute(AUTHENTICATED_USER_ID); 
 	    if (context.getCurrentUser().getID() != authenticatedID)
-	    	throw new AuthorizeException("Only authenticated users whom are administrators may assume the login as another user.");
+	    	throw new AuthorizeException("xmlui.utils.AuthenticationUtil.onlyAuthenticatedAdmins");
 	    
 	    // You may not assume the login of another super administrator
 	    if (loginAs == null)
 	    	return;
 	    Group administrators = Group.find(context,1);
 	    if (administrators.isMember(loginAs))
-	    	throw new AuthorizeException("You may not assume the login as another super administrator.");
+	    	throw new AuthorizeException("xmlui.utils.AuthenticationUtil.notAnotherAdmin");
 	    
 	    // Success, allow the user to login as another user.
 	    context.setCurrentUser(loginAs);
@@ -398,7 +401,7 @@ public class AuthenticationUtil
     
     
     /**
-     * Determine if the email can register them selfs or need to be
+     * Determine if the email can register itself or needs to be
      * created by a site administrator first.
      * 
      * @param objectModel
@@ -420,7 +423,7 @@ public class AuthenticationUtil
     }
     
     /**
-     * Determine if the EPerson (to be created or allready created) has the
+     * Determine if the EPerson (to be created or already created) has the
      * ability to set their own password.
      * 
      * @param objectModel
@@ -475,7 +478,7 @@ public class AuthenticationUtil
     
     
     /**
-     * Is there a currently interuppted request?
+     * Is there a currently interrupted request?
      * 
      * @param objectModel The Cocoon object Model
      */
@@ -493,7 +496,7 @@ public class AuthenticationUtil
     		return true;
     	}
     		
-    	// There are not interupted requests.
+    	// There are not interrupted requests.
     	return false;
     }
     
@@ -501,13 +504,13 @@ public class AuthenticationUtil
     
     /**
      * Interrupt the current request and store if for later resumption. This request will
-     * send an http redirect telling the client to authenticate first. Once that has been finished
+     * send an HTTP redirect telling the client to authenticate first. Once that has been finished
      * then the request can be resumed.
      * 
      * @param objectModel The Cocoon object Model
      * @param header A message header (i18n tag)
      * @param message A message for why the request was interrupted (i18n tag)
-     * @param characters An untranslated messsage, perhaps an error message?
+     * @param characters An untranslated message, perhaps an error message?
      */
     public static void interruptRequest(Map objectModel, String header, String message, String characters)
     {
@@ -516,7 +519,7 @@ public class AuthenticationUtil
 
     	HttpSession session = request.getSession();
         
-        // Store this interrupted request untill after the user successfully authenticates.
+        // Store this interrupted request until after the user successfully authenticates.
         RequestInfo interruptedRequest = new RequestInfo(request);
         
         // Set the request as interrupted
@@ -534,9 +537,9 @@ public class AuthenticationUtil
     
     /**
      * Set the interrupted request to a resumable state. The
-     * next request that the server recieves (for this session) that
+     * next request that the server receives (for this session) that
      * has the same servletPath will be replaced with the previously
-     * inturrupted request.
+     * interrupted request.
      * 
      * @param objectModel The Cocoon object Model
      * @return
@@ -562,7 +565,7 @@ public class AuthenticationUtil
         	session.setAttribute(REQUEST_INTERRUPTED, null);
         	session.setAttribute(REQUEST_RESUME, interruptedRequest); 
         	
-        	// Return the path for which this request belongs too. Only urls
+        	// Return the path for which this request belongs too. Only URLs
         	// for this path may be resumed.
         	if (interruptedRequest.getServletPath() == null || interruptedRequest.getServletPath().length() == 0) {
                 return interruptedRequest.getActualPath();
@@ -597,7 +600,7 @@ public class AuthenticationUtil
         {
         	RequestInfo interruptedRequest = (RequestInfo) object;
         
-        	// Next, check to make sure this real request if for the same url
+        	// Next, check to make sure this real request if for the same URL
         	// path, if so then resume the previous request.
         	String interruptedServletPath = interruptedRequest.getServletPath();
         	String realServletPath = realHttpRequest.getServletPath();

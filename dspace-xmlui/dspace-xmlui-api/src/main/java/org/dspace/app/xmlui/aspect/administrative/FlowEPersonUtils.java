@@ -289,7 +289,7 @@ public class FlowEPersonUtils {
 		{
 			// give the exception error as a notice.
 			result.setOutcome(false);
-			result.setCharacters(ae.getMessage());
+			result.setMessage(new Message(null,ae.getMessage()));
 		}
 		
 		return result;
