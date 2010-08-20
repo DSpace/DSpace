@@ -420,7 +420,7 @@ public class AIPTechMDCrosswalk
                                     sub.update();
                                 }
                                 else
-                                    log.warn("Ignoring unknown Submitter="+value+" in AIP Tech MD, no matching EPerson and aip.ingest.createEperson is false.");
+                                    log.warn("Ignoring unknown Submitter="+value+" in AIP Tech MD, no matching EPerson and 'mets.dspaceAIP.ingest.createSubmitter' is false in dspace.cfg.");
                             }
                             if (sub != null)
                                 item.setSubmitter(sub);
