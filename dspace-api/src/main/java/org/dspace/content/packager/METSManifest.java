@@ -162,19 +162,19 @@ public class METSManifest
     private final static String CONFIG_XSD_PREFIX = CONFIG_METS_PREFIX+"xsd.";
 
     /** Dublin core element namespace */
-    private static Namespace dcNS = Namespace
+    private final static Namespace dcNS = Namespace
             .getNamespace("http://purl.org/dc/elements/1.1/");
 
     /** Dublin core term namespace (for qualified DC) */
-    private static Namespace dcTermNS = Namespace
+    private final static Namespace dcTermNS = Namespace
             .getNamespace("http://purl.org/dc/terms/");
 
     /** METS namespace -- includes "mets" prefix for use in XPaths */
-    public static Namespace metsNS = Namespace
+    public final static Namespace metsNS = Namespace
             .getNamespace("mets", "http://www.loc.gov/METS/");
 
     /** XLink namespace -- includes "xlink" prefix prefix for use in XPaths */
-    public static Namespace xlinkNS = Namespace
+    public final static Namespace xlinkNS = Namespace
             .getNamespace("xlink", "http://www.w3.org/1999/xlink");
 
     /** root element of the current METS manifest. */
@@ -443,7 +443,9 @@ public class METSManifest
     }
 
     /**
-     * Get the DSpace bundle name corresponding to the <code>USE</code> attribute of the file group enclosing this <code>file</code> element.
+     * Get the DSpace bundle name corresponding to the <code>USE</code>
+     * attribute of the file group enclosing this <code>file</code> element.
+     * 
      * @return DSpace bundle name
      * @throws MetadataValidationException when there is no USE attribute on the enclosing fileGrp.
      */
@@ -499,8 +501,8 @@ public class METSManifest
 
     /**
      * Returns file element corresponding to primary bitstream.
-     * There is <i>ONLY</i> a primary bitstream if the first <code>div</code> under
-     * first </code>structMap</code> has an </code>fptr</code>.
+     * There is <i>ONLY</i> a primary bitstream if the first {@code div} under
+     * first {@code structMap} has an {@code fptr}.
      *
      * @return file element of Item's primary bitstream, or null if there is none.
      */
@@ -696,11 +698,11 @@ public class METSManifest
 
 
     /**
-     * Return the <div> which describes this DSpace Object (and its contents)
-     * from the <structMap>.  In all cases, this is the first <div> in the first
-     * <structMap>.
+     * Return the {@code <div>} which describes this DSpace Object (and its contents)
+     * from the {@code <structMap>}.  In all cases, this is the first {@code <div>}
+     * in the first {@code <structMap>}.
      *
-     * @return Element which is the DSpace Object Contents <div>
+     * @return Element which is the DSpace Object Contents {@code <div>}
      * @throws MetadataValidationException
      */
     public Element getObjStructDiv()
@@ -723,10 +725,10 @@ public class METSManifest
     }
 
     /**
-     * Get an array of child object <div>'s from the METS Manifest <structMap>
-     * These <div>'s reference the location of any child objects METS manifests
+     * Get an array of child object {@code <div>}s from the METS Manifest {@code <structMap>}.
+     * These {@code <div>}s reference the location of any child objects METS manifests.
      * 
-     * @return a List of <code>Element</code>s, each a <div>.  May be empty but NOT null
+     * @return a List of {@code Element}s, each a {@code <div>}.  May be empty but NOT null.
      * @throws MetadataValidationException
      */
     public List getChildObjDivs()
@@ -735,13 +737,13 @@ public class METSManifest
         //get the <div> in <structMap> which describes the current object's contents
         Element objDiv = getObjStructDiv();
 
-        //get the child <div>'s -- these should reference the child METS manifest
+        //get the child <div>s -- these should reference the child METS manifest
         return objDiv.getChildren("div", metsNS);
     }
 
     /**
      * Retrieve the file paths for the children objects' METS Manifest files.
-     * These file paths are located in the <mptr> where @LOCTYPE=URL
+     * These file paths are located in the {@code <mptr>} where @LOCTYPE=URL
      *
      * @return a list of Strings, corresponding to relative file paths of children METS manifests
      * @throws MetadataValidationException
@@ -749,7 +751,7 @@ public class METSManifest
     public String[] getChildMetsFilePaths()
             throws MetadataValidationException
     {
-        //get our child object <div>'s
+        //get our child object <div>s
         List childObjDivs = getChildObjDivs();
 
         List childPathList = new ArrayList<String>();
@@ -782,7 +784,7 @@ public class METSManifest
                      }//end <mptr> loop
                 }//end if <mptr>'s exist
             }//end child <div> loop
-        }//end if child <div>'s exist
+        }//end if child <div>s exist
 
         String[] childPaths = new String[childPathList.size()];
         childPaths = (String[]) childPathList.toArray(childPaths);
@@ -790,7 +792,7 @@ public class METSManifest
     }
 
     /**
-     * Return the reference to the Parent Object from the "Parent" <structMap>.
+     * Return the reference to the Parent Object from the "Parent" {@code <structMap>}.
      * This parent object is the owner of current object.
      *
      * @return Link to the Parent Object (this is the Handle of that Parent)
