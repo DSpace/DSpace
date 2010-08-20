@@ -12,9 +12,11 @@
       <url>http://www.dspace.org</url>
    </organization>
 
-   <!--Force UTF-8 encoding during build on all platforms-->
    <properties>
+      <!--Force UTF-8 encoding during build on all platforms-->
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <!--Java 1.6 is our officially endorsed build target platform.-->
+      <dspace.java.target>1.6</dspace.java.target>
    </properties>
 
    <build>
@@ -28,14 +30,11 @@
                 <goals>deploy</goals>
             </configuration>
          </plugin>
-         <!--
-            Java 1.6 is our officially endorsed build target platform.
-         -->
          <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
-               <source>1.6</source>
-               <target>1.6</target>
+               <source>${dspace.java.target}</source>
+               <target>${dspace.java.target}</target>
                <showDeprecation>true</showDeprecation>
             </configuration>
          </plugin>
@@ -969,6 +968,9 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-pmd-plugin</artifactId>
             <version>2.4</version>
+            <configuration>
+                <targetJdk>${dspace.java.target}</targetJdk>
+            </configuration>
          </plugin>
          <plugin>
             <groupId>org.codehaus.mojo</groupId>
