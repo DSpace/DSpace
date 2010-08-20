@@ -188,7 +188,8 @@ public class DSpaceMETSIngester
         PackageUtils.addDepositLicense(context, license, item, collection);
     }
 
-    public void finishObject(Context context, DSpaceObject dso)
+    public void finishObject(Context context, DSpaceObject dso,
+                             PackageParameters params)
         throws PackageValidationException, CrosswalkException,
          AuthorizeException, SQLException, IOException
     {

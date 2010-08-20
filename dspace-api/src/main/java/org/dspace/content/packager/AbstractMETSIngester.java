@@ -479,7 +479,7 @@ public abstract class AbstractMETSIngester
 
         // Subclass hook for final checks and rearrangements
         // (this allows subclasses to do some final validation / changes as necessary)
-        finishObject(context, dso);
+        finishObject(context, dso, params);
 
         // Update the object to make sure all changes are committed
         PackageUtils.updateDSpaceObject(dso);
@@ -602,7 +602,7 @@ public abstract class AbstractMETSIngester
 
         // Subclass hook for final checks and rearrangements
         // (this allows subclasses to do some final validation / changes as necessary)
-        finishObject(context, dso);
+        finishObject(context, dso, params);
 
         // Update the object to make sure all changes are committed
         PackageUtils.updateDSpaceObject(dso);
@@ -1247,8 +1247,11 @@ public abstract class AbstractMETSIngester
      * necessary.
      *
      * @param context the DSpace context
+     * @param dso the DSpace Object
+     * @param params the Packager Parameters
      */
-    abstract public void finishObject(Context context, DSpaceObject dso)
+    abstract public void finishObject(Context context, DSpaceObject dso,
+                                      PackageParameters params)
         throws PackageValidationException, CrosswalkException,
          AuthorizeException, SQLException, IOException;
 
