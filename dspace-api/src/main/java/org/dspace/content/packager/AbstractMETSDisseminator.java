@@ -966,7 +966,7 @@ public abstract class AbstractMETSDisseminator
             // Mention in the structMap
             Div usersDiv = new Div();
             usersDiv.setID(gensym("div"));
-            usersDiv.setTYPE("DSpace Users");
+            usersDiv.setTYPE(RoleDisseminator.DSPACE_ROLES);
             usersDiv.setADMID(amdId);
             structMap.getContent().add(usersDiv);
         }
