@@ -415,7 +415,35 @@ public class PluginManager
         return null;
     }
 
-
+    /**
+     * Returns whether a plugin exists which implements the specified interface
+     * and has a specified name.  If a matching plugin is found to be configured,
+     * return true. If there is no matching plugin, return false.
+     *
+     * @param intfc the interface class of the plugin
+     * @param name under which the plugin implementation is configured.
+     * @return true if plugin was found to be configured, false otherwise
+     */
+    public static boolean hasNamedPlugin(Class intfc, String name)
+         throws PluginInstantiationException
+    {
+        try
+        {
+            String iname = intfc.getName();
+            configureNamedPlugin(iname);
+            String key = iname + SEP + name;
+            String cname = (String)namedPluginClasses.get(key);
+            if (cname != null)
+                return true;
+            else
+                return false;
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new PluginInstantiationException("Cannot load plugin class: " +
+            		                               e.toString(), e);
+        }
+    }
     /**
      * Returns all of the names under which a named plugin implementing
      * the interface intface can be requested (with getNamedPlugin()).

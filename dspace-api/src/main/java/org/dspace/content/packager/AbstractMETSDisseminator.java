@@ -190,6 +190,7 @@ public abstract class AbstractMETSDisseminator
         return prefix + "_" + String.valueOf(idCounter++);
     }
 
+    @Override
     public String getMIMEType(PackageParameters params)
     {
         return (params != null &&
@@ -218,6 +219,7 @@ public abstract class AbstractMETSDisseminator
      * @throws PackageValidationException if package cannot be created or there is
      *  a fatal error in creating it.
      */
+    @Override
     public void disseminate(Context context, DSpaceObject dso,
                             PackageParameters params, File pkgFile)
         throws PackageValidationException, CrosswalkException, AuthorizeException, SQLException, IOException
@@ -518,12 +520,13 @@ public abstract class AbstractMETSDisseminator
                 xwalkName = metsName = typeSpec;
 
             // First, check to see if the crosswalk we are using is a normal DisseminationCrosswalk
-            DisseminationCrosswalk xwalk = (DisseminationCrosswalk)
-              PluginManager.getNamedPlugin(DisseminationCrosswalk.class, xwalkName);
+            boolean xwalkFound = PluginManager.hasNamedPlugin(DisseminationCrosswalk.class, xwalkName);
 
-            // If we found the correct crosswalk, run it!
-            if (xwalk != null)
+            if(xwalkFound)
             {
+                DisseminationCrosswalk xwalk = (DisseminationCrosswalk)
+                    PluginManager.getNamedPlugin(DisseminationCrosswalk.class, xwalkName);
+
                 //For a normal DisseminationCrosswalk, we will be expecting an XML (DOM) based result.
                 // So, we are going to wrap this XML result in an <mdWrap> element
                 MdWrap mdWrap = new MdWrap();
