@@ -58,6 +58,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
+import org.dspace.content.Site;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -471,6 +472,9 @@ public class PackageUtils
                 dso = finishCreateItem(context, wsi, handle, params);
 
                 return dso;
+                
+            case Constants.SITE:
+                return Site.find(context, Site.SITE_ID);
         }
 
         return null;
@@ -740,7 +744,6 @@ public class PackageUtils
                 }
             }
         }
-            
     }
 
 }
