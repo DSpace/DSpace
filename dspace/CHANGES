@@ -16,6 +16,7 @@
 
 (Claudia Juergen)
 - [DS-569] Trailing white spaces lead to wrong order of texts in browse
+- [DS-596] Cannot Delete Community which has two or more levels of SubCommunities
 
 (Erick Rocha Fonseca, Claudia Juergen)
 - [DS-563] Brazilian Portuguese (pt_BR) translation for XML-UI 1.6.2

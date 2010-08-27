@@ -1056,6 +1056,13 @@ public class Community extends DSpaceObject
 
         if (parent != null)
         {
+            // remove the subcommunities first
+            Community[] subcommunities = getSubcommunities();
+            for (int i = 0; i < subcommunities.length; i++)
+            {
+                subcommunities[i].delete();
+            }
+            // now let the parent remove the community
             parent.removeSubcommunity(this);
 
             return;
@@ -1085,12 +1092,12 @@ public class Community extends DSpaceObject
             removeCollection(cols[i]);
         }
 
-        // Remove subcommunities
+        // delete subcommunities
         Community[] comms = getSubcommunities();
 
         for (int j = 0; j < comms.length; j++)
         {
-            removeSubcommunity(comms[j]);
+            comms[j].delete();
         }
 
         // Remove the logo
