@@ -962,6 +962,10 @@ public class ItemImport
         // //getElementData(n,
         // "qualifier");
         String language = getAttributeValue(n, "language");
+        if (language != null)
+        {
+            language = language.trim();
+        }
 
         System.out.println("\tSchema: " + schema + " Element: " + element + " Qualifier: " + qualifier
                 + " Value: " + value);

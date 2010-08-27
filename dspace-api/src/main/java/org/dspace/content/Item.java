@@ -727,7 +727,7 @@ public class Item extends DSpaceObject
             dcv.schema = schema;
             dcv.element = element;
             dcv.qualifier = qualifier;
-            dcv.language = lang;
+            dcv.language = (lang == null ? lang : lang.trim());
 
             // Logic to set Authority and Confidence:
             //  - normalize an empty string for authority to NULL.

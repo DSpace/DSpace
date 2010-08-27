@@ -421,7 +421,7 @@
                     <% } %>
                 </td>
                 <td headers="t4" class="<%= row %>RowOddCol">
-                    <input type="text" name="language_<%= key %>_<%= sequenceNumber %>" value="<%= (dcv[i].language == null ? "" : dcv[i].language) %>" size="5"/>
+                    <input type="text" name="language_<%= key %>_<%= sequenceNumber %>" value="<%= (dcv[i].language == null ? "" : dcv[i].language.trim()) %>" size="5"/>
                 </td>
                 <td headers="t5" class="<%= row %>RowEvenCol">
                     <%-- <input type="submit" name="submit_remove_<%= key %>_<%= sequenceNumber %>" value="Remove" /> --%>

@@ -600,10 +600,14 @@ public class EditItemServlet extends DSpaceServlet
                 String language = request.getParameter("language_" + key + "_"
                         + sequenceNumber);
 
-                // Empty string language = null
-                if ((language != null) && language.equals(""))
+                // trim language and set empty string language = null
+                if (language != null)
                 {
-                    language = null;
+                    language = language.trim();
+                    if (language.equals(""))
+                    {
+                        language = null;
+                    }
                 }
 
                 // Get the authority key if any
@@ -734,10 +738,14 @@ public class EditItemServlet extends DSpaceServlet
             String value = request.getParameter("addfield_value").trim();
             String lang = request.getParameter("addfield_language");
 
-            // Empty language = null
-            if (lang.equals(""))
+            // trim language and set empty string language = null
+            if (lang != null)
             {
-                lang = null;
+                lang = lang.trim();
+                if (lang.equals(""))
+                {
+                    lang = null;
+                }
             }
 
             MetadataField field = MetadataField.find(context, dcTypeID);

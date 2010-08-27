@@ -14,6 +14,9 @@
 - [DS-648] Modern Browsers are not identified in XMLUI main sitemap.xmap
 - [DS-466] Add ability to export/import entire Community/Collection/Item structure (for easier backups, migrations, etc.)
 
+(Claudia Juergen)
+- [DS-569] Trailing white spaces lead to wrong order of texts in browse
+
 1.6.2
 =====
 
