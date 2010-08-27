@@ -70,6 +70,7 @@ import org.dspace.handle.HandleManager;
 import org.dspace.workflow.WorkflowItem;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.Namespace;
 import org.jdom.xpath.XPath;
 
 /**
@@ -130,6 +131,10 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(AbstractMETSIngester.class);
+
+    /** Declare a prefix referring to the METS namespace */
+    private static final Namespace metsNS = Namespace.getNamespace("mets",
+            "http://www.loc.gov/METS/");
 
     /**
      * An instance of ZipMdrefManager holds the state needed to retrieve the
@@ -1325,17 +1330,20 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             MetadataValidationException, SQLException, AuthorizeException,
             PackageValidationException
     {
-        if (params.getBooleanProperty("manifestOnly", false))
+        if (!params.getBooleanProperty("manifestOnly", false))
         {
             // Find the groups/users document and ingest it
             try
             {
                 Element mets = manifest.getMets();
+                XPath finder;
 
                 // Find the roles <div> in the structMap.
-                final String smPath = "/structMap/div{@TYPE='"
-                        + RoleDisseminator.DSPACE_ROLES + "'}";
-                Element userDiv = (Element) XPath.selectSingleNode(mets, smPath);
+                final String smPath = "mets:structMap/mets:div[@TYPE='"
+                        + RoleDisseminator.DSPACE_ROLES + "']";
+                finder = XPath.newInstance(smPath);
+                finder.addNamespace(metsNS);
+                Element userDiv = (Element) finder.selectSingleNode(mets);
                 if (null == userDiv)
                     throw new PackageValidationException(
                             "No structMap division for roles");
@@ -1343,13 +1351,16 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
                 // Find the mdRef naming the roles file, in the section named
                 // in the structMap.
-                final String mdPath = "/amdSec{@ID='" + admId
-                        + "'}/techMD/mdRef";
-                Element mdRef = (Element) XPath.selectSingleNode(mets, mdPath);
+                final String mdPath = "mets:amdSec[@ID='" + admId
+                        + "']/mets:techMD/mets:mdRef";
+                finder = XPath.newInstance(mdPath);
+                finder.addNamespace(metsNS);
+                Element mdRef = (Element) finder.selectSingleNode(mets);
                 if (null == mdRef)
                     throw new PackageValidationException("No mdRef for roles");
                 String usersLoc = METSManifest.getFileName(mdRef);
 
+                // Find that file in the package, and ingest it
                 ZipFile pkg = new ZipFile(pkgFile);
                 ZipEntry pkgEntry = pkg.getEntry(usersLoc);
                 if (null == pkgEntry)
@@ -1362,7 +1373,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 {
                     RoleIngester.ingestStream(context, params, pkg
                             .getInputStream(pkgEntry));
-
                     pkg.close();
                 }
             }
