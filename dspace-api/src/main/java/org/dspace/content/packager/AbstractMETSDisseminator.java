@@ -684,14 +684,13 @@ public abstract class AbstractMETSDisseminator
     {
         // Create the METS manifest in memory
         Mets mets = new Mets();
-        String typeStr = Constants.typeText[dso.getType()];
-
+        
         // this ID should be globally unique
         mets.setID("dspace"+Utils.generateKey());
 
         // identifies the object described by this document
         mets.setOBJID(makePersistentID(dso));
-        mets.setTYPE("DSpace "+typeStr);
+        mets.setTYPE(getObjectTypeString(dso));
 
         // this is the signature by which the ingester will recognize
         // a document it can expect to interpret.
@@ -787,6 +786,7 @@ public abstract class AbstractMETSDisseminator
                     primaryBitstreamID = bundles[i].getPrimaryBitstreamID();
                 }
 
+                // For each bitstream, add to METS manifest
                 for (int bits = 0; bits < bitstreams.length; bits++)
                 {
                     // Check for authorization.  Handle unauthorized
@@ -821,7 +821,7 @@ public abstract class AbstractMETSDisseminator
 
                     // if this is content, add to structmap too:
                     if (isContentBundle)
-                        div0.getContent().add(makeFileDiv(fileID, "DSpace Content Bitstream"));
+                        div0.getContent().add(makeFileDiv(fileID, getObjectTypeString(bitstreams[bits])));
 
                     /*
                      * If we're in THUMBNAIL or TEXT bundles, the bitstream is
@@ -845,12 +845,9 @@ public abstract class AbstractMETSDisseminator
                     }
                     file.setGROUPID(groupID);
                     file.setMIMETYPE(bitstreams[bits].getFormat().getMIMEType());
-
-                    // FIXME: CREATED: no date
-
                     file.setSIZE(auth ? bitstreams[bits].getSize() : 0);
 
-                    // FIXME: need to translate checksum and type to METS, if available.
+                    // Translate checksum and type to METS
                     String csType = bitstreams[bits].getChecksumAlgorithm();
                     String cs = bitstreams[bits].getChecksum();
                     if (auth && cs != null && csType != null)
@@ -887,7 +884,7 @@ public abstract class AbstractMETSDisseminator
             {
                 //add a child <div> for each item in collection
                 Item item = ii.next();
-                Div childDiv = makeChildDiv("DSpace Item", item, params);
+                Div childDiv = makeChildDiv(getObjectTypeString(item), item, params);
                 if(childDiv!=null)
                     div0.getContent().add(childDiv);
             }
@@ -906,7 +903,7 @@ public abstract class AbstractMETSDisseminator
             for (int i = 0; i < subcomms.length; ++i)
             {
                 //add a child <div> for each subcommunity in this community
-                Div childDiv = makeChildDiv("DSpace Community", subcomms[i], params);
+                Div childDiv = makeChildDiv(getObjectTypeString(subcomms[i]), subcomms[i], params);
                 if(childDiv!=null)
                     div0.getContent().add(childDiv);
             }
@@ -916,7 +913,7 @@ public abstract class AbstractMETSDisseminator
             for (int i = 0; i < colls.length; ++i)
             {
                 //add a child <div> for each collection in this community
-                Div childDiv = makeChildDiv("DSpace Collection", colls[i], params);
+                Div childDiv = makeChildDiv(getObjectTypeString(colls[i]), colls[i], params);
                 if(childDiv!=null)
                     div0.getContent().add(childDiv);
             }
@@ -936,7 +933,7 @@ public abstract class AbstractMETSDisseminator
             for (int i = 0; i < comms.length; ++i)
             {
                 //add a child <div> for each top level community in this site
-                Div childDiv = makeChildDiv("DSpace Community", comms[i], params);
+                Div childDiv = makeChildDiv(getObjectTypeString(comms[i]), comms[i], params);
                 if(childDiv!=null)
                     div0.getContent().add(childDiv);
             }
@@ -1003,7 +1000,7 @@ public abstract class AbstractMETSDisseminator
         file.setMIMETYPE(logoBs.getFormat().getMIMEType());
         file.setSIZE(logoBs.getSize());
 
-        // FIXME: need to translate checksum and type to METS, if available.
+        // Translate checksum and type to METS
         String csType = logoBs.getChecksumAlgorithm();
         String cs = logoBs.getChecksum();
         if (cs != null && csType != null)
@@ -1018,6 +1015,8 @@ public abstract class AbstractMETSDisseminator
                 log.warn("Cannot set bitstream checksum type="+csType+" in METS.");
             }
         }
+
+        //Create <fileGroup USE="LOGO"> with a <FLocat> pointing at bitstream
         FLocat flocat = new FLocat();
         flocat.setLOCTYPE(Loctype.URL);
         flocat.setXlinkHref(makeBitstreamURL(logoBs, params));
@@ -1281,6 +1280,22 @@ public abstract class AbstractMETSDisseminator
                 mdRef.setXlinkHref(makeBitstreamURL(ccRdf, params));
             }
         }
+    }
+
+    /**
+     * Build a string which will be used as the "Type" of this object in
+     * the METS manifest.
+     * <P>
+     * Default format is "DSpace [Type-as-string]".
+     *
+     * @param dso DSpaceObject to create type-string for
+     * @return a string which will represent this object Type in METS
+     * @see org.dspace.core.Constants
+     */
+    public String getObjectTypeString(DSpaceObject dso)
+    {
+        //Format: "DSpace <Type-as-string>" (e.g. "DSpace ITEM", "DSpace COLLECTION", etc)
+        return  "DSpace " + Constants.typeText[dso.getType()];
     }
 
     /**
