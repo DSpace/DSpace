@@ -86,6 +86,8 @@ public class RoleIngester implements PackageIngester
     {
         String myEmail = context.getCurrentUser().getEmail();
         String myNetid = context.getCurrentUser().getNetid();
+
+        // Ingest users (EPersons) first so Groups can use them
         NodeList users = document
                 .getElementsByTagName(RoleDisseminator.EPERSON);
         for (int i = 0; i < users.getLength(); i++)
@@ -95,6 +97,7 @@ public class RoleIngester implements PackageIngester
             // no way to set ID!
             NodeList emails = user.getElementsByTagName(RoleDisseminator.EMAIL);
             NodeList netids = user.getElementsByTagName(RoleDisseminator.NETID);
+            EPerson eperson;
             EPerson collider;
             String email = null;
             String netid = null;
@@ -114,7 +117,7 @@ public class RoleIngester implements PackageIngester
                 if (netid.equals(myNetid))
                     continue; // Cannot operate on my own EPerson!
                 identity = netid;
-                collider = EPerson.findByEmail(context, identity);
+                collider = EPerson.findByNetid(context, identity);
             }
             else
                 throw new PackageException(
@@ -123,16 +126,7 @@ public class RoleIngester implements PackageIngester
             if (null != collider)
                 if (params.replaceModeEnabled()) // -r -f
                 {
-                    try
-                    {
-                        collider.delete();
-                        log.info("Deleted existing EPerson {}.", identity);
-                    }
-                    catch (EPersonDeletionException e)
-                    {
-                        throw new PackageException(e);
-                    }
-
+                    eperson = collider;
                 }
                 else if (params.keepExistingModeEnabled()) // -r -k
                 {
@@ -143,49 +137,55 @@ public class RoleIngester implements PackageIngester
                 else
                     throw new PackageException("EPerson " + identity
                             + " already exists.");
+            else
+            {
+                eperson = EPerson.create(context);
+                log.info("Created EPerson {}.", identity);
+            }
 
-            EPerson eperson = EPerson.create(context);
-            log.info("Created EPerson {}.", identity);
-
-            if (null != email)
-                eperson.setEmail(email);
-            if (null != netid)
-                eperson.setNetid(netid);
+            eperson.setEmail(email);
+            eperson.setNetid(netid);
 
             NodeList data;
 
             data = user.getElementsByTagName(RoleDisseminator.FIRST_NAME);
             if (data.getLength() > 0)
                 eperson.setFirstName(data.item(0).getTextContent());
+            else
+                eperson.setFirstName(null);
 
             data = user.getElementsByTagName(RoleDisseminator.LAST_NAME);
             if (data.getLength() > 0)
                 eperson.setLastName(data.item(0).getTextContent());
+            else
+                eperson.setLastName(null);
 
             data = user.getElementsByTagName(RoleDisseminator.LANGUAGE);
             if (data.getLength() > 0)
                 eperson.setLanguage(data.item(0).getTextContent());
+            else
+                eperson.setLanguage(null);
 
             data = user.getElementsByTagName(RoleDisseminator.CAN_LOGIN);
-            if (data.getLength() > 0)
-                eperson.setCanLogIn(true);
+            eperson.setCanLogIn(data.getLength() > 0);
 
             data = user
                     .getElementsByTagName(RoleDisseminator.REQUIRE_CERTIFICATE);
-            if (data.getLength() > 0)
-                eperson.setRequireCertificate(true);
+            eperson.setRequireCertificate(data.getLength() > 0);
 
             data = user.getElementsByTagName(RoleDisseminator.SELF_REGISTERED);
-            if (data.getLength() > 0)
-                eperson.setSelfRegistered(true);
+            eperson.setSelfRegistered(data.getLength() > 0);
 
             data = user.getElementsByTagName(RoleDisseminator.PASSWORD_HASH);
             if (data.getLength() > 0)
                 eperson.setPasswordHash(data.item(0).getTextContent());
+            else
+                eperson.setPasswordHash(null);
 
-            eperson.update();
+            // Do not update eperson!  Let subsequent problems roll it back.
         }
 
+        // Now ingest the Groups
         NodeList groups = document.getElementsByTagName(RoleDisseminator.GROUP);
 
         // Create the groups and add their EPerson members
@@ -222,18 +222,18 @@ public class RoleIngester implements PackageIngester
             else
             { // No such group exists
                 groupObj = Group.create(context);
+                groupObj.setName(name);
                 log.info("Created Group {}.", name);
             }
-
-            groupObj.setName(name);
 
             NodeList members = group
                     .getElementsByTagName(RoleDisseminator.MEMBER);
             for (int memberx = 0; memberx < members.getLength(); memberx++)
             {
                 Element member = (Element) members.item(memberx);
-                groupObj.addMember(EPerson.findByEmail(context, member
-                        .getAttribute(RoleDisseminator.NAME)));
+                String memberName = member.getAttribute(RoleDisseminator.NAME);
+                EPerson memberEPerson = EPerson.findByEmail(context, memberName);
+                groupObj.addMember(memberEPerson);
             }
             // Do not groupObj.update! We want to roll back on subsequent
             // failures.
@@ -250,10 +250,10 @@ public class RoleIngester implements PackageIngester
             for (int memberx = 0; memberx < members.getLength(); memberx++)
             {
                 Element member = (Element) members.item(memberx);
-                groupObj.addMember(EPerson.findByEmail(context, member
-                        .getAttribute(RoleDisseminator.NAME)));
+                String memberName = member.getAttribute(RoleDisseminator.NAME);
+                Group memberGroup = Group.findByName(context, memberName);
+                groupObj.addMember(memberGroup);
             }
-
             // Do not groupObj.update!
         }
     }
