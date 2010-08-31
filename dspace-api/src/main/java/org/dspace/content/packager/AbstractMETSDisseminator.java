@@ -949,7 +949,7 @@ public abstract class AbstractMETSDisseminator
 
             // Add the stream to the list of non-content streams to be packed.
             extraStreams.addStream(usersRef,
-                    users.asStream(context, params.containsKey("passwords")));
+                    users.asStream(context, true));
 
             // Link the reference into the METS
             TechMD techMd = new TechMD();

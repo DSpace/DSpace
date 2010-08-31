@@ -121,6 +121,7 @@ public class RoleDisseminator implements PackageDisseminator
      * Make serialized users and groups available on an InputStream, for code
      * which wants to read one.
      * 
+     * @param emitPasswords true if password hashes should be included.
      * @return the stream of XML representing users and groups.
      * @throws IOException
      *             if a PipedOutputStream or PipedInputStream cannot be created.
