@@ -217,7 +217,7 @@ public class RoleIngester implements PackageIngester
                 }
                 else
                     throw new PackageException("Group " + name
-                            + "already exists");
+                            + " already exists");
             }
             else
             { // No such group exists
