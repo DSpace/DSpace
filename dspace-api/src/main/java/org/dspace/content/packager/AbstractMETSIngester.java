@@ -715,7 +715,8 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
         // Step 2 -- find list of all content files from manifest
         // Loop through these files, and add them one by one to Item
-        List<Element> manifestContentFiles = manifest.getContentFiles();
+        List<Element> manifestContentFiles = (List<Element>) manifest
+                .getContentFiles();
 
         boolean setPrimaryBitstream = false;
         BitstreamFormat unknownFormat = BitstreamFormat.findUnknown(context);
@@ -874,8 +875,8 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             String logoID = logoRef.getAttributeValue("ID");
 
             // Loop through manifest content files to find actual logo file
-            for (Iterator<Element> mi = manifest.getContentFiles().iterator(); mi
-                    .hasNext();)
+            for (Iterator<Element> mi = (Iterator<Element>) manifest
+                    .getContentFiles().iterator(); mi.hasNext();)
             {
                 Element mfile = mi.next();
                 if (logoID.equals(mfile.getAttributeValue("ID")))

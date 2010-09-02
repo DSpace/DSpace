@@ -52,7 +52,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.EPersonDeletionException;
 import org.dspace.eperson.Group;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
