@@ -181,4 +181,14 @@ public class SiteTest extends AbstractUnitTest
         assertThat("testGetName 0",s.getName(), equalTo(ConfigurationManager.getProperty("dspace.name")));
     }
 
+
+    /**
+     * Test of getURL method, of class Site.
+     */
+    @Test
+    public void testGetURL() 
+    {
+        assertThat("testGetURL 0",s.getURL(), equalTo(ConfigurationManager.getProperty("dspace.url")));
+    }
+
 }

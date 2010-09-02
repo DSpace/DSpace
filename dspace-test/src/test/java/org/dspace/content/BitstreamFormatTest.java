@@ -408,13 +408,39 @@ public class BitstreamFormatTest extends AbstractUnitTest
     @Test
     public void testSetSupportLevelValidValues()
     {
-        bf.setSupportLevel(0);
-        assertThat("testSetSupportLevelValidValues 0", bf.getSupportLevel(), equalTo(0));
-        bf.setSupportLevel(1);
-        assertThat("testSetSupportLevelValidValues 1", bf.getSupportLevel(), equalTo(1));
-        bf.setSupportLevel(2);
-        assertThat("testSetSupportLevelValidValues 2", bf.getSupportLevel(), equalTo(2));
+        bf.setSupportLevel(BitstreamFormat.UNKNOWN);
+        assertThat("testSetSupportLevelValidValues 0", bf.getSupportLevel(), equalTo(BitstreamFormat.UNKNOWN));
+        bf.setSupportLevel(BitstreamFormat.KNOWN);
+        assertThat("testSetSupportLevelValidValues 1", bf.getSupportLevel(), equalTo(BitstreamFormat.KNOWN));
+        bf.setSupportLevel(BitstreamFormat.SUPPORTED);
+        assertThat("testSetSupportLevelValidValues 2", bf.getSupportLevel(), equalTo(BitstreamFormat.SUPPORTED));
     }
+
+
+    /**
+     * Test of getSupportLevelID method, of class BitstreamFormat.
+     */
+    @Test
+    public void testGetSupportLevelIDValid()
+    {
+        int id1 = BitstreamFormat.getSupportLevelID("UNKNOWN");
+        assertThat("testGetSupportLevelIDValid 0", id1, equalTo(BitstreamFormat.UNKNOWN));
+        int id2 = BitstreamFormat.getSupportLevelID("KNOWN");
+        assertThat("testGetSupportLevelIDValid 1", id2, equalTo(BitstreamFormat.KNOWN));
+        int id3 = BitstreamFormat.getSupportLevelID("SUPPORTED");
+        assertThat("testGetSupportLevelIDValid 2", id3, equalTo(BitstreamFormat.SUPPORTED));
+    }
+
+    /**
+     * Test of getSupportLevelID method, of class BitstreamFormat.
+     */
+    @Test
+    public void testGetSupportLevelIDInvalid()
+    {
+        int id1 = BitstreamFormat.getSupportLevelID("IAmNotAValidSupportLevel");
+        assertThat("testGetSupportLevelIDInvalid 0", id1, equalTo(-1));
+    }
+
 
     /**
      * Test of isInternal method, of class BitstreamFormat.

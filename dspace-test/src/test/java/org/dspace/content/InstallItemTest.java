@@ -34,8 +34,16 @@
 
 package org.dspace.content;
 
+import mockit.*;
+
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+
 import java.io.FileInputStream;
 import java.io.File;
+import java.sql.SQLException;
+
 import org.dspace.AbstractUnitTest;
 import org.apache.log4j.Logger;
 import org.junit.*;
@@ -97,20 +105,89 @@ public class InstallItemTest extends AbstractUnitTest
     }
 
     /**
-     * Test of installItem method, of class InstallItem.
+     * Test of installItem method (with a valid handle), of class InstallItem.
      */
     @Test
-    public void testInstallItem_3args() throws Exception
+    public void testInstallItem_validHandle() throws Exception
     {
         context.turnOffAuthorisationSystem();
         String handle = "1345/567";
         Collection col = Collection.create(context);
         WorkspaceItem is = WorkspaceItem.create(context, col, false);
 
+        //Test assigning a specified handle to an item
+        // (this handle should not already be used by system, as it doesn't start with "1234567689" prefix)
         Item result = InstallItem.installItem(context, is, handle);
         context.restoreAuthSystemState();
-        assertThat("testInstallItem_3args 0", result, equalTo(is.getItem()));
-        assertThat("testInstallItem_3args 1", result.getHandle(), equalTo(handle));
+        assertThat("testInstallItem_validHandle", result, equalTo(is.getItem()));
+        assertThat("testInstallItem_validHandle", result.getHandle(), equalTo(handle));
+    }
+
+    /**
+     * Test of installItem method (with an invalid handle), of class InstallItem.
+     */
+    @Test(expected=SQLException.class)
+    public void testInstallItem_invalidHandle() throws Exception
+    {
+        //Default to Full-Admin rights
+        new NonStrictExpectations()
+        {
+            AuthorizeManager authManager;
+            {
+                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                        Constants.ADD); result = false;
+                AuthorizeManager.isAdmin((Context) any); result = true;
+            }
+        };
+
+        String handle = "1345/567";
+        Collection col = Collection.create(context);
+        WorkspaceItem is = WorkspaceItem.create(context, col, false);
+        WorkspaceItem is2 = WorkspaceItem.create(context, col, false);
+        
+        //Test assigning the same Handle to two different items
+        // this should throw an exception
+        Item result1 = InstallItem.installItem(context, is, handle);
+        Item result2 = InstallItem.installItem(context, is2, handle);
+        fail("Exception expected");
+    }
+
+
+    /**
+     * Test of restoreItem method, of class InstallItem.
+     */
+    @Test
+    public void testRestoreItem() throws Exception
+    {
+        context.turnOffAuthorisationSystem();
+        String handle = "1345/567";
+        Collection col = Collection.create(context);
+        WorkspaceItem is = WorkspaceItem.create(context, col, false);
+
+        //get current date
+        DCDate now = DCDate.getCurrent();
+        String dayAndTime = now.toString();
+        //parse out just the date, remove the time (format: yyyy-mm-ddT00:00:00Z)
+        String date = dayAndTime.substring(0, dayAndTime.indexOf("T"));
+
+        //Build the beginning of a dummy provenance message
+        //(restoreItem should NEVER insert a provenance message with today's date)
+        String provDescriptionBegins = "Made available in DSpace on " + date;
+        
+        Item result = InstallItem.restoreItem(context, is, handle);
+        context.restoreAuthSystemState();
+
+        //Make sure restore worked
+        assertThat("testRestoreItem 0", result, equalTo(is.getItem()));
+
+        //Make sure that restore did NOT insert a new provenance message with today's date
+        DCValue[] provMsgValues = result.getMetadata("dc", "description", "provenance", Item.ANY);
+        int i = 1;
+        for(DCValue val : provMsgValues)
+        {
+            assertFalse("testRestoreItem " + i, val.value.startsWith(provDescriptionBegins));
+            i++;
+        }
     }
 
     /**

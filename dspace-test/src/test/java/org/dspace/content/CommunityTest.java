@@ -134,27 +134,56 @@ public class CommunityTest extends AbstractDSpaceObjectTest
     @Test
     public void testCreateAuth() throws Exception
     {
+
+        //Default to Community-Admin Rights (but not full Admin rights)
         new NonStrictExpectations()
         {
             AuthorizeManager authManager;
             {
                 AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
                         Constants.ADD); result = true;
+                AuthorizeManager.isAdmin((Context) any); result = false;
+            }
+        };
+
+        // test that a Community Admin can create a Community with parent (Sub-Community)
+        Community son = Community.create(c, context);
+        //the item created by default has no name set
+        assertThat("testCreate 2", son, notNullValue());        
+        assertThat("testCreate 3", son.getName(), equalTo(""));        
+        assertTrue("testCreate 4", son.getAllParents().length == 1);
+        assertThat("testCreate 5", son.getAllParents()[0], equalTo(c));
+    }
+
+
+     /**
+     * Test of create method, of class Community.
+     */
+    @Test
+    public void testCreateAuth2() throws Exception
+    {
+        //Default to Admin Rights, but NOT Community Admin Rights
+        new NonStrictExpectations()
+        {
+            AuthorizeManager authManager;
+            {
+                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                        Constants.ADD); result = false;
                 AuthorizeManager.isAdmin((Context) any); result = true;
             }
         };
 
-        //community with no parent
+        //Test that a full Admin can create a Community without a parent (Top-Level Community)
         Community created = Community.create(null, context);
         //the item created by default has no name set
         assertThat("testCreate 0", created, notNullValue());
         assertThat("testCreate 1", created.getName(), equalTo(""));
 
-        //community with  parent
+        //Test that a full Admin can also create a Community with a parent (Sub-Community)
         Community son = Community.create(created, context);
         //the item created by default has no name set
-        assertThat("testCreate 2", son, notNullValue());        
-        assertThat("testCreate 3", son.getName(), equalTo(""));        
+        assertThat("testCreate 2", son, notNullValue());
+        assertThat("testCreate 3", son.getName(), equalTo(""));
         assertTrue("testCreate 4", son.getAllParents().length == 1);
         assertThat("testCreate 5", son.getAllParents()[0], equalTo(created));
     }
@@ -165,6 +194,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testCreateNoAuth() throws Exception
     {
+        //Default to NO Admin Rights, and NO Community Admin Rights
         new NonStrictExpectations()
         {
             AuthorizeManager authManager;
@@ -175,8 +205,62 @@ public class CommunityTest extends AbstractDSpaceObjectTest
             }
         };
 
-        //community with no parent
+        // test creating community with no parent (as a non-admin & non-Community Admin)
+        // this should throw an exception
         Community created = Community.create(null, context);
+        fail("Exception expected");
+    }
+
+    /**
+     * Test of create method (with specified valid handle), of class Community.
+     */
+    @Test
+    public void testCreateWithValidHandle() throws Exception
+    {
+        //Default to Community Admin Rights, but NO full-Admin rights
+        new NonStrictExpectations()
+        {
+            AuthorizeManager authManager;
+            {
+                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                        Constants.ADD); result = false;
+                AuthorizeManager.isAdmin((Context) any); result = true;
+            }
+        };
+
+        // test creating community with a specified handle which is NOT already in use
+        // (this handle should not already be used by system, as it doesn't start with "1234567689" prefix)
+        Community created = Community.create(null, context, "987654321/100");
+
+        // check that community was created, and that its handle was set to proper value
+        assertThat("testCreateWithValidHandle 0", created, notNullValue());
+        assertThat("testCreateWithValidHandle 1", created.getHandle(), equalTo("987654321/100"));
+    }
+    
+    
+     /**
+     * Test of create method (with specified invalid handle), of class Community.
+     */
+    @Test(expected=IllegalStateException.class)
+    public void testCreateWithInvalidHandle() throws Exception
+    {
+        //Default to Community Admin Rights, but NO full-Admin rights
+        new NonStrictExpectations()
+        {
+            AuthorizeManager authManager;
+            {
+                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                        Constants.ADD); result = false;
+                AuthorizeManager.isAdmin((Context) any); result = true;
+            }
+        };
+
+        //get handle of our default created community
+        String inUseHandle = c.getHandle();
+
+        // test creating community with a specified handle which IS already in use
+        // This should throw an exception
+        Community created = Community.create(null, context, inUseHandle);
         fail("Exception expected");
     }
 
@@ -186,6 +270,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testCreateNoAuth2() throws Exception
     {
+        //Default to Community Admin Rights, but NO full-Admin rights
         new NonStrictExpectations()
         {
             AuthorizeManager authManager;
@@ -196,7 +281,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest
             }
         };
 
-        //community with no parent can't be created if we are not admin
+        // test creating community with no parent (as a non-admin, but with Community Admin rights)
+        // this should throw an exception, as only admins can create Top Level communities
         Community created = Community.create(null, context);
         fail("Exception expected");
     }
@@ -251,6 +337,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
      * Test of getID method, of class Community.
      */
     @Test
+    @Override
     public void testGetID()
     {
         assertTrue("testGetID 0", c.getID() >= 1);
@@ -260,6 +347,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
      * Test of getHandle method, of class Community.
      */
     @Test
+    @Override
     public void testGetHandle() 
     {
         //default instance has a random handle
@@ -313,6 +401,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
      * Test of getName method, of class Community.
      */
     @Test
+    @Override
     public void testGetName()
     {
         //by default is empty
@@ -1057,6 +1146,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
      * Test of getType method, of class Community.
      */
     @Test
+    @Override
     public void testGetType()
     {
         assertThat("testGetType 0", c.getType(), equalTo(Constants.COMMUNITY));

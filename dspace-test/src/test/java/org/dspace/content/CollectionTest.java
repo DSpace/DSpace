@@ -139,6 +139,38 @@ public class CollectionTest extends AbstractDSpaceObjectTest
         assertThat("testCreate 1", created.getName(), equalTo(""));
     }
 
+     /**
+     * Test of create method (with specified valid handle), of class Collection
+     */
+    @Test
+    public void testCreateWithValidHandle() throws Exception
+    {
+        // test creating collection with a specified handle which is NOT already in use
+        // (this handle should not already be used by system, as it doesn't start with "1234567689" prefix)
+        Collection created = Collection.create(context, "987654321/100");
+
+        // check that collection was created, and that its handle was set to proper value
+        assertThat("testCreateWithValidHandle 0", created, notNullValue());
+        assertThat("testCreateWithValidHandle 1", created.getHandle(), equalTo("987654321/100"));
+    }
+
+
+     /**
+     * Test of create method (with specified invalid handle), of class Collection.
+     */
+    @Test(expected=IllegalStateException.class)
+    public void testCreateWithInvalidHandle() throws Exception
+    {
+        //get handle of our default created collection
+        String inUseHandle = c.getHandle();
+
+        // test creating collection with a specified handle which IS already in use
+        // This should throw an exception
+        Collection created = Collection.create(context, inUseHandle);
+        fail("Exception expected");
+    }
+
+
     /**
      * Test of findAll method, of class Collection.
      */
@@ -192,6 +224,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
      * Test of getID method, of class Collection.
      */
     @Test
+    @Override
     public void testGetID() 
     {
         assertTrue("testGetID 0", c.getID() >= 1);
@@ -201,6 +234,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
      * Test of getHandle method, of class Collection.
      */
     @Test
+    @Override
     public void testGetHandle() 
     {
         //default instance has a random handle
@@ -266,6 +300,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
      * Test of getName method, of class Collection.
      */
     @Test
+    @Override
     public void testGetName()
     {
         //by default is empty
@@ -1780,6 +1815,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
      * Test of getType method, of class Collection.
      */
     @Test
+    @Override
     public void testGetType() 
     {
         assertThat("testGetType 0", c.getType(), equalTo(Constants.COLLECTION));
