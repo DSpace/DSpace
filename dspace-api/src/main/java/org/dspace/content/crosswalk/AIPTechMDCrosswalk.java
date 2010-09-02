@@ -107,6 +107,7 @@ public class AIPTechMDCrosswalk
      *
      * @return array of namespaces, which may be empty.
      */
+    @Override
     public Namespace[] getNamespaces()
     {
         Namespace result[] = new Namespace[1];
@@ -125,6 +126,7 @@ public class AIPTechMDCrosswalk
      * @return SchemaLocation string, including URI namespace, followed by
      *  whitespace and URI of XML schema document, or empty string if unknown.
      */
+    @Override
     public String getSchemaLocation()
     {
         return "";
@@ -137,9 +139,20 @@ public class AIPTechMDCrosswalk
      * @param dso  dspace object, e.g. an <code>Item</code>.
      * @return true when disseminator is capable of producing metadata.
      */
+    @Override
     public boolean canDisseminate(DSpaceObject dso)
     {
-        return true;
+        //can only Disseminate SITE, COMMUNITY, COLLECTION, ITEM, BITSTREAM
+        if(dso.getType()==Constants.SITE
+                || dso.getType()==Constants.COMMUNITY
+                || dso.getType()==Constants.COLLECTION
+                || dso.getType()==Constants.ITEM
+                || dso.getType()==Constants.BITSTREAM)
+        {
+            return true;
+        }
+        else
+            return false;
     }
 
     /**
@@ -156,6 +169,7 @@ public class AIPTechMDCrosswalk
      *
      * @return true when disseminator prefers you call disseminateList().
      */
+    @Override
     public boolean preferList()
     {
         return false;
@@ -180,6 +194,7 @@ public class AIPTechMDCrosswalk
      * @throws SQLException  Database failure in services this calls
      * @throws AuthorizeException current user not authorized for this operation.
      */
+    @Override
     public List disseminateList(DSpaceObject dso)
         throws CrosswalkException, IOException, SQLException,
                AuthorizeException
@@ -203,6 +218,7 @@ public class AIPTechMDCrosswalk
      * @throws SQLException  Database failure in services this calls
      * @throws AuthorizeException current user not authorized for this operation.
      */
+    @Override
     public Element disseminateElement(DSpaceObject dso)
         throws CrosswalkException, IOException, SQLException,
                AuthorizeException
@@ -310,6 +326,7 @@ public class AIPTechMDCrosswalk
      * and feed that to the transformation, since it may get handled
      * differently than a List of metadata elements.
      */
+    @Override
     public void ingest(Context context, DSpaceObject dso, Element root)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
@@ -322,6 +339,7 @@ public class AIPTechMDCrosswalk
      * these correspond directly to Item.addMetadata() calls so
      * they are simply executed.
      */
+    @Override
     public void ingest(Context context, DSpaceObject dso, List dimList)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
@@ -498,14 +516,5 @@ public class AIPTechMDCrosswalk
             else
                 log.warn("Failed to find or create bitstream format named \""+bsfShortName+"\"");
         }
-    }
-
-    // parse the hdl: URI/URN format into a raw Handle.
-    private String decodeHandleURI(String value)
-    {
-        if (value.startsWith("hdl:"))
-            return value.substring(4);
-        else
-            return null;
     }
 }

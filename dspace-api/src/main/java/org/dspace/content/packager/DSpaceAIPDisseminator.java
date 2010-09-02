@@ -81,24 +81,13 @@ import java.net.URLEncoder;
  * object model.  An AIP contains all of the information needed to restore
  * the object precisely in another DSpace archive instance.
  * <p>
- * This ingester recognizes two distinct types of AIPs: "Manifest-Only" and "External".
- * The Manifest-Only AIP, which is selected by specifying a PackageParameters
- * key "manifestOnly" with the value "true", refers to all its contents by
- * reference only. For Community or Collection AIPs this means all references to their
- * child objects are just via Handles. For Item AIPs all Bitreams are just
- * referenced by their asset store location instead of finding them in the "package".
- * The Manifest-Only AIP package format is simply a METS XML document serialized into a file.
- * <p>
- * An "external" AIP (the default), is a conventional Zip-file based package
- * that includes copies of all bitstreams referenced by the object as well
- * as a serialized METS XML document in the path "mets.xml".
- *
  * Configuration keys:
+ * <p>
  * The following take as values a space-and-or-comma-separated list
  * of plugin names that name *either* a DisseminationCrosswalk or
- * StreamDisseminationCrosswalk plugin.  Shown are the dfeault values.
- * The value may be a simple plugin name, or a METS MDsec-name followed by
- * a colon and the plugin name e.g. "DSpaceHistory :HISTORY"
+ * StreamDisseminationCrosswalk plugin.  Shown are the default values.
+ * The value may be a simple crosswalk name, or a METS MDsec-name followed by
+ * a colon and the crosswalk name e.g. "DSpaceDepositLicense:DSPACE_DEPLICENSE"
  *
  *    # MD types to put in the sourceMD section of the object.
  *    aip.disseminate.sourceMD = AIP-TECHMD
@@ -107,19 +96,20 @@ import java.net.URLEncoder;
  *    aip.disseminate.techMD = PREMIS
  *
  *    # MD types to put in digiprovMD section of the object.
- *    # (Note that this is disabled unless the History System is installed)
- *    #aip.disseminate.digiprovMD = DSpaceHistory :HISTORY
+ *    #aip.disseminate.digiprovMD = 
  *
  *    # MD types to put in the rightsMD section of the object.
  *    aip.disseminate.rightsMD = DSpaceDepositLicense:DSPACE_DEPLICENSE, \
- *       CreativeCommonsRDF:DSPACE_CCRDF, CreativeCommonsText:DSPACE_CCTXT
+ *       CreativeCommonsRDF:DSPACE_CCRDF, CreativeCommonsText:DSPACE_CCTXT, METSRights
  *
  *    # MD types to put in dmdSec's corresponding  the object.
  *    aip.disseminate.dmd = MODS, DIM
  *
  * @author Larry Stone
+ * @author Tim Donohue
  * @version $Revision: 1.1 $
  * @see AbstractMETSDisseminator
+ * @see AbstractPackageDisseminator
  */
 public class DSpaceAIPDisseminator
     extends AbstractMETSDisseminator
@@ -158,6 +148,7 @@ public class DSpaceAIPDisseminator
      *
      * @return string name of profile.
      */
+    @Override
     public String getProfile()
     {
         return PROFILE_1_0;
@@ -166,20 +157,32 @@ public class DSpaceAIPDisseminator
     /**
      * Returns name of METS fileGrp corresponding to a DSpace bundle name.
      * For AIP the mapping is direct.
+     *
      * @param bname name of DSpace bundle.
      * @return string name of fileGrp
      */
+    @Override
     public String bundleToFileGrp(String bname)
     {
         return bname;
     }
 
     /**
-     * metsHdr for AIP.
+     * Create the metsHdr element for the AIP METS Manifest.
+     * <p>
      * CREATEDATE is time at which the package (i.e. this manifest) was created.
      * LASTMODDATE is last-modified time of the target object, if available.
      * Agent describes the archive this belongs to.
+     *
+     * @param context DSpace Context
+     * @param dso current DSpace Object
+     * @param params Packager Parameters
+     * @return List of crosswalk names to run
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
      */
+    @Override
     public MetsHdr makeMetsHdr(Context context, DSpaceObject dso,
                                PackageParameters params)
     {
@@ -205,8 +208,20 @@ public class DSpaceAIPDisseminator
     }
 
     /**
-     * Get DMD choice for Item.  It defaults to MODS, plus DIM.
+     * Return the name of all crosswalks to run for the dmdSec section of
+     * the METS Manifest.
+     * <p>
+     * Default is DIM (DSpace Internal Metadata) and MODS.
+     *
+     * @param context DSpace Context
+     * @param dso current DSpace Object
+     * @param params Packager Parameters
+     * @return List of crosswalk names to run
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
      */
+    @Override
     public String [] getDmdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException
     {
@@ -223,11 +238,20 @@ public class DSpaceAIPDisseminator
     }
 
     /**
-     * Get name of technical metadata crosswalk for Bitstreams.
-     * Default is PREMIS (for Bistreams only).
-     * This is both the name of the crosswalk plugin
-     * and the METS MDTYPE.
+     * Return the name of all crosswalks to run for the techMD section of
+     * the METS Manifest.
+     * <p>
+     * Default is PREMIS.
+     *
+     * @param context DSpace Context
+     * @param dso current DSpace Object
+     * @param params Packager Parameters
+     * @return List of crosswalk names to run
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
      */
+    @Override
     public String[] getTechMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException
     {
@@ -250,12 +274,24 @@ public class DSpaceAIPDisseminator
     }
 
     /**
-     * Get name of source metadata crosswalk for each kind of DSO.
+     * Return the name of all crosswalks to run for the sourceMD section of
+     * the METS Manifest.
+     * <p>
      * Default is AIP-TECHMD.
+     * <p>
      * In an AIP, the sourceMD element MUST include the original persistent
      * identifier (Handle) of the object, and the original persistent ID
      * (Handle) of its parent in the archive, so that it can be restored.
+     *
+     * @param context DSpace Context
+     * @param dso current DSpace Object
+     * @param params Packager Parameters
+     * @return List of crosswalk names to run
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
      */
+    @Override
     public String[] getSourceMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException
     {
@@ -271,8 +307,20 @@ public class DSpaceAIPDisseminator
     }
 
     /**
-     * Get name of provenance MD crosswalks - none by default.
+     * Return the name of all crosswalks to run for the digiprovMD section of
+     * the METS Manifest.  
+     * <p>
+     * By default, none are returned
+     *
+     * @param context DSpace Context
+     * @param dso current DSpace Object
+     * @param params Packager Parameters
+     * @return List of crosswalk names to run
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
      */
+    @Override
     public String[] getDigiprovMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException
     {
@@ -284,20 +332,36 @@ public class DSpaceAIPDisseminator
     }
 
     /**
-     * Return crosswalks of Rights metadata types.  By default, for Item
-     * only, return the deposit license and CreativeCommons if available.
+     * Return the name of all crosswalks to run for the rightsMD section of
+     * the METS Manifest.
+     * <p>
+     * By default, Deposit Licenses and CC Licenses will be added for Items.
+     * Also, by default METSRights info will be added for all objects.
+     * 
+     * @param context DSpace Context
+     * @param dso current DSpace Object
+     * @param params Packager Parameters
+     * @return List of crosswalk names to run
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
      */
+    @Override
     public String[] getRightsMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException
     {
 
-        // rights only apply to Item at this time.
-        if (dso.getType() == Constants.ITEM)
+        List<String> result = new ArrayList<String>();
+        String rTypes = ConfigurationManager.getProperty("aip.disseminate.rightsMD");
+
+        //If unspecified in configuration file, add default settings
+        if (rTypes == null)
         {
-            String rTypes = ConfigurationManager.getProperty("aip.disseminate.rightsMD");
-            if (rTypes == null)
+            // Licenses only apply to an Item
+            if (dso.getType() == Constants.ITEM)
             {
-                List<String> result = new ArrayList<String>();
+                //By default, disseminate Deposit License, and any CC Licenses
+                // to an item's rightsMD section
                 if (PackageUtils.findDepositLicense(context, (Item)dso) != null)
                     result.add(DSPACE_DEPOSIT_LICENSE_MDTYPE);
 
@@ -305,28 +369,33 @@ public class DSpaceAIPDisseminator
                     result.add(CREATIVE_COMMONS_RDF_MDTYPE);
                 else if (CreativeCommons.getLicenseTextBitstream((Item)dso) != null)
                     result.add(CREATIVE_COMMONS_TEXT_MDTYPE);
-                return result.toArray(new String[result.size()]);
             }
-            else
-                return rTypes.split("\\s*,\\s*");
+            
+            //By default, also add METSRights info to the rightsMD
+            result.add("METSRights");
         }
-        return new String[0];
+        else
+            return rTypes.split("\\s*,\\s*");
+
+        return result.toArray(new String[result.size()]);
     }
 
     /**
      * Get the URL by which the METS manifest refers to a Bitstream
-     * member of an Item the "package".  Note that this ONLY has to work
-     * for the Bitstreams belonging to a Bunde in an Item, NOT for the
-     * other associated Bitstreams containing metadata streams, or logo
-     * of a Community/Collection, etc.
+     * member within the same package.  In other words, this is generally
+     * a relative path link to where the Bitstream file is within the Zipped
+     * up AIP.
      * <p>
-     * For an manifest-only AIP, this is a reference to an HTTP URL where
+     * For a manifest-only AIP, this is a reference to an HTTP URL where
      * the bitstream should be able to be downloaded from.
      * An external AIP names a file in the package
      * with a relative URL, that is, relative pathname.
-     * <p>
+     * 
+     * @param bitstream  the Bitstream
+     * @param params Packager Parameters
      * @return String in URL format naming path to bitstream.
      */
+    @Override
     public String makeBitstreamURL(Bitstream bitstream, PackageParameters params)
     {
         // if bare manifest, use external "persistent" URI for bitstreams
@@ -391,7 +460,17 @@ public class DSpaceAIPDisseminator
      * by crosswalks (e.g.  AIP techMd) for the parent, it has to be at
      * a higher level in the AIP manifest.  The structMap is an obvious
      * and standards-compliant location for it.
+     * 
+     * @param context DSpace context
+     * @param dso Current DSpace object
+     * @param params Packager Parameters
+     * @param mets METS manifest
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
+     * @throws MetsException
      */
+    @Override
     public void addStructMap(Context context, DSpaceObject dso,
                                PackageParameters params, Mets mets)
         throws SQLException, IOException, AuthorizeException, MetsException
@@ -441,8 +520,11 @@ public class DSpaceAIPDisseminator
     }
 
     /**
-     * include all bundles in AIP as content.
+     * Include all bundles in AIP as content.
+     * @param bundle Bundle to check for
+     * @return true always
      */
+    @Override
     public boolean includeBundle(Bundle bundle)
     {
         return true;

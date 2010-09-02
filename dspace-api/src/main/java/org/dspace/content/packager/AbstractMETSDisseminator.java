@@ -527,16 +527,21 @@ public abstract class AbstractMETSDisseminator
                 DisseminationCrosswalk xwalk = (DisseminationCrosswalk)
                     PluginManager.getNamedPlugin(DisseminationCrosswalk.class, xwalkName);
 
-                //For a normal DisseminationCrosswalk, we will be expecting an XML (DOM) based result.
-                // So, we are going to wrap this XML result in an <mdWrap> element
-                MdWrap mdWrap = new MdWrap();
-                setMdType(mdWrap, metsName);
-                XmlData xmlData = new XmlData();
-                if (crosswalkToMetsElement(xwalk, dso, xmlData) != null)
+                if (xwalk.canDisseminate(dso))
                 {
-                    mdWrap.getContent().add(xmlData);
-                    mdSec.getContent().add(mdWrap);
-                    return mdSec;
+                    //For a normal DisseminationCrosswalk, we will be expecting an XML (DOM) based result.
+                    // So, we are going to wrap this XML result in an <mdWrap> element
+                    MdWrap mdWrap = new MdWrap();
+                    setMdType(mdWrap, metsName);
+                    XmlData xmlData = new XmlData();
+                    if (crosswalkToMetsElement(xwalk, dso, xmlData) != null)
+                    {
+                        mdWrap.getContent().add(xmlData);
+                        mdSec.getContent().add(mdWrap);
+                        return mdSec;
+                    }
+                    else
+                        return null;
                 }
                 else
                     return null;
@@ -777,6 +782,11 @@ public abstract class AbstractMETSDisseminator
                 if ((bName != null) && !bName.equals(""))
                     fileGrp.setUSE(bundleToFileGrp(bName));
 
+                // add technical metadata for a bundle
+                String techBundID = addAmdSec(context, bundles[i], params, mets, extraStreams);
+                if (techBundID != null)
+                    fileGrp.setADMID(techBundID);
+
                 // watch for primary bitstream
                 int primaryBitstreamID = -1;
                 boolean isContentBundle = false;
@@ -872,7 +882,7 @@ public abstract class AbstractMETSDisseminator
                     // technical metadata for bitstream
                     String techID = addAmdSec(context, bitstreams[bits], params, mets, extraStreams);
                     if (techID != null)
-                    file.setADMID(techID);
+                        file.setADMID(techID);
                 }
                 fileSec.getContent().add(fileGrp);
             }
@@ -976,9 +986,9 @@ public abstract class AbstractMETSDisseminator
 
         // set links to metadata for object -- after type-specific
         // code since that can add to the object metadata.
-        StringBuffer dmdIds = new StringBuffer();
+        StringBuilder dmdIds = new StringBuilder();
         for (int i = 0; i < dmdId.length; ++i)
-            dmdIds.append(" "+dmdId[i]);
+            dmdIds.append(" ").append(dmdId[i]);
         div0.setDMDID(dmdIds.substring(1));
         if (objectAMDID != null)
             div0.setADMID(objectAMDID);
