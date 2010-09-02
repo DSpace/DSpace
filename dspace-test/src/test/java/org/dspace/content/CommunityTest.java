@@ -140,6 +140,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
             {
                 AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
                         Constants.ADD); result = true;
+                AuthorizeManager.isAdmin((Context) any); result = true;
             }
         };
 
@@ -170,10 +171,32 @@ public class CommunityTest extends AbstractDSpaceObjectTest
             {
                 AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
                         Constants.ADD); result = false;
+                AuthorizeManager.isAdmin((Context) any); result = false;
             }
         };
 
         //community with no parent
+        Community created = Community.create(null, context);
+        fail("Exception expected");
+    }
+
+    /**
+     * Test of create method, of class Community.
+     */
+    @Test(expected=AuthorizeException.class)
+    public void testCreateNoAuth2() throws Exception
+    {
+        new NonStrictExpectations()
+        {
+            AuthorizeManager authManager;
+            {
+                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                        Constants.ADD); result = true;
+                AuthorizeManager.isAdmin((Context) any); result = false;
+            }
+        };
+
+        //community with no parent can't be created if we are not admin
         Community created = Community.create(null, context);
         fail("Exception expected");
     }
@@ -820,6 +843,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
                         Constants.ADD); result = null;
                 AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
                         Constants.ADD); result = true;
+                AuthorizeManager.isAdmin((Context) any); result = true;
             }
         };
 
@@ -926,6 +950,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
                         Constants.ADD); result = true;
                 AuthorizeManager.authorizeAction((Context) any, (Community) any,
                         Constants.REMOVE); result = null;
+                AuthorizeManager.isAdmin((Context) any); result = true;
             }
         };
 
@@ -1019,8 +1044,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest
         {
             AuthorizeManager authManager;
             {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD); result = true;
+                AuthorizeManager.isAdmin((Context) any); result = true;
             }
         };
 
