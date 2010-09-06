@@ -198,7 +198,8 @@ public class Data extends AbstractWingElement
                 // i18n:param tags
                 for (Object dictionaryParameter : dictionaryParameters)
                 {
-                    toSAX(contentHandler, namespaces, dictionaryParameter);
+                    if (dictionaryParameter != null)
+                	toSAX(contentHandler, namespaces, dictionaryParameter);
                 }
 
                 endElement(contentHandler, namespaces, WingConstants.I18N,
