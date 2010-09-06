@@ -229,11 +229,22 @@ public class RegistryLoader
     {
         Document document = loadXML(filename);
 
-        // Get the nodes corresponding to formats
+        // Get the nodes corresponding to schemas
+        NodeList schemaNodes = XPathAPI.selectNodeList(document,
+                "/dspace-dc-types/dc-schema");
+
+        // Add each schema
+        for (int i = 0; i < schemaNodes.getLength(); i++)
+        {
+            Node n = schemaNodes.item(i);
+            loadMDSchema(context, n);
+        }
+        
+        // Get the nodes corresponding to fields
         NodeList typeNodes = XPathAPI.selectNodeList(document,
                 "/dspace-dc-types/dc-type");
 
-        // Add each one as a new format to the registry
+        // Add each one as a new field to the schema
         for (int i = 0; i < typeNodes.getLength(); i++)
         {
             Node n = typeNodes.item(i);
@@ -244,6 +255,32 @@ public class RegistryLoader
                 "number_loaded=" + typeNodes.getLength()));
     }
 
+    /**
+     * Load Dublin Core Schemas
+     * 
+     * @param context
+     * @param node
+     */
+    private static void loadMDSchema(Context context, Node node) 
+    		throws TransformerException, SQLException, AuthorizeException, 
+    		NonUniqueMetadataException
+    {
+    	// Get the values
+        String shortname = getElementData(node, "name");
+        String namespace = getElementData(node, "namespace");
+
+        // Check if the schema exists allready
+        MetadataSchema schema = MetadataSchema.find(context, shortname);
+        if (schema == null)
+        {
+        	// If not create it.
+        	schema = new MetadataSchema();
+        	schema.setNamespace(namespace);
+        	schema.setName(shortname);
+        	schema.create(context);
+        }
+    }
+    
     /**
      * Process a node in the bitstream format registry XML file. The node must
      * be a "bitstream-type" node
