@@ -596,6 +596,8 @@ public class ItemImport
         }
 
         String[] dircontents = d.list(directoryFilter);
+        
+        Arrays.sort(dircontents);
 
         for (int i = 0; i < dircontents.length; i++)
         {
