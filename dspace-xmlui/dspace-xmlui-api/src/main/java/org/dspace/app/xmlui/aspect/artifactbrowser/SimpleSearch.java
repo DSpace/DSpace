@@ -165,6 +165,12 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     protected String generateURL(Map<String, String> parameters)
             throws UIException
     {
+	Request request = ObjectModelHelper.getRequest(objectModel);
+        
+        String scope = request.getParameter("scope");
+        if (scope != null)
+        	parameters.put("scope", scope);
+	
         String query = getQuery();
         if (!"".equals(query))
             parameters.put("query", URLEncode(query));
