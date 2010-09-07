@@ -195,8 +195,7 @@ public class InstallItem
 
         if (currentDateIssued.length == 0)
         {
-            DCDate issued = new DCDate();
-            issued.setDateLocal(now.getYear(),now.getMonth(),now.getDay(),-1,-1,-1);
+            DCDate issued = new DCDate(now.getYear(),now.getMonth(),now.getDay(),-1,-1,-1);
             item.addDC("date", "issued", null, issued.toString());
         }
 

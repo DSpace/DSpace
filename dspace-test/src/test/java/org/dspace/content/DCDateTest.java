@@ -34,12 +34,8 @@
 package org.dspace.content;
 
 import org.apache.log4j.Logger;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Locale;
+
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -84,8 +80,7 @@ public class DCDateTest extends AbstractUnitTest
     public void init()
     {
         super.init();
-        dc = new DCDate();
-        c = new GregorianCalendar();
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT-8"));
     }
 
     /**
@@ -108,42 +103,97 @@ public class DCDateTest extends AbstractUnitTest
      * Test of DCDate constructor, of class DCDate.
      */
     @Test
-    public void testDCDate()
+    public void testDCDateDate()
     {
-        dc = new DCDate();
-        assertThat("testDCDate 0", dc.toString(), equalTo("null"));
+        dc = new DCDate((String)null);
+        assertThat("testDCDateDate 1", dc.getYear(), equalTo(-1));
+        assertThat("testDCDateDate 2", dc.getMonth(), equalTo(-1));
+        assertThat("testDCDateDate 3", dc.getDay(), equalTo(-1));
+        assertThat("testDCDateDate 4", dc.getHour(), equalTo(-1));
+        assertThat("testDCDateDate 5", dc.getMinute(), equalTo(-1));
+        assertThat("testDCDateDate 6", dc.getSecond(), equalTo(-1));
+
+        assertThat("testDCDateDate 7", dc.getYearUTC(), equalTo(-1));
+        assertThat("testDCDateDate 8", dc.getMonthUTC(), equalTo(-1));
+        assertThat("testDCDateDate 9", dc.getDayUTC(), equalTo(-1));
+        assertThat("testDCDateDate 10", dc.getHourUTC(), equalTo(-1));
+        assertThat("testDCDateDate 11", dc.getMinuteUTC(), equalTo(-1));
+        assertThat("testDCDateDate 12", dc.getSecondUTC(), equalTo(-1));
+
+        // NB. Months begin at 0 in GregorianCalendar so 0 is January.
+        c = new GregorianCalendar(2010,0,1);
+        dc = new DCDate(c.getTime());
+
+        assertThat("testDCDateDate 1 ", dc.getYear(), equalTo(2010));
+        assertThat("testDCDateDate 2 ", dc.getMonth(), equalTo(1));
+        assertThat("testDCDateDate 3 ", dc.getDay(), equalTo(1));
+        assertThat("testDCDateDate 4 ", dc.getHour(), equalTo(0));
+        assertThat("testDCDateDate 5 ", dc.getMinute(), equalTo(0));
+        assertThat("testDCDateDate 6 ", dc.getSecond(), equalTo(0));
+
+        assertThat("testDCDateDate 7 ", dc.getYearUTC(), equalTo(2010));
+        assertThat("testDCDateDate 8 ", dc.getMonthUTC(), equalTo(1));
+        assertThat("testDCDateDate 9 ", dc.getDayUTC(), equalTo(1));
+        assertThat("testDCDateDate 10 ", dc.getHourUTC(), equalTo(8));
+        assertThat("testDCDateDate 11 ", dc.getMinuteUTC(), equalTo(0));
+        assertThat("testDCDateDate 12 ", dc.getSecondUTC(), equalTo(0));
+
+        c = new GregorianCalendar(2009,11,31,18,30);
+        dc = new DCDate(c.getTime());
+
+        assertThat("testDCDateDate 13 ", dc.getYear(), equalTo(2009));
+        assertThat("testDCDateDate 14 ", dc.getMonth(), equalTo(12));
+        assertThat("testDCDateDate 15 ", dc.getDay(), equalTo(31));
+        assertThat("testDCDateDate 16 ", dc.getHour(), equalTo(18));
+        assertThat("testDCDateDate 17 ", dc.getMinute(), equalTo(30));
+        assertThat("testDCDateDate 18 ", dc.getSecondUTC(), equalTo(0));
+
+        assertThat("testDCDateDate 19 ", dc.getYearUTC(), equalTo(2010));
+        assertThat("testDCDateDate 20 ", dc.getMonthUTC(), equalTo(1));
+        assertThat("testDCDateDate 21 ", dc.getDayUTC(), equalTo(1));
+        assertThat("testDCDateDate 22 ", dc.getHourUTC(), equalTo(2));
+        assertThat("testDCDateDate 23 ", dc.getMinuteUTC(), equalTo(30));
+        assertThat("testDCDateDate 24 ", dc.getSecondUTC(), equalTo(0));
     }
 
     /**
      * Test of DCDate constructor, of class DCDate.
      */
     @Test
-    public void testDCDateDate()
+    public void testDCDateIntBits()
     {
-        dc = new DCDate((Date)null);
-        assertThat("testDCDateDate 0", dc.toString(), equalTo("null"));
+        dc = new DCDate(2010,1,1,-1,-1,-1);
 
-        // If date is Jan 1st, DCDate incorrectly treats this as year granularity
-        // c = new GregorianCalendar(2010,0,1);
-        c = new GregorianCalendar(2010,1,1);
-        dc = new DCDate(c.getTime());
-        assertThat("testDCDateDate 1", dc.toString(), equalTo("2010-02-01"));
+        assertThat("testDCDateIntBits 1", dc.getYear(), equalTo(2010));
+        assertThat("testDCDateIntBits 2", dc.getMonth(), equalTo(1));
+        assertThat("testDCDateIntBits 3", dc.getDay(), equalTo(1));
+        assertThat("testDCDateIntBits 4", dc.getHour(), equalTo(-1));
+        assertThat("testDCDateIntBits 5", dc.getMinute(), equalTo(-1));
+        assertThat("testDCDateIntBits 6", dc.getSecond(), equalTo(-1));
 
-        // DCDate doesn't currently support month granularity when constructed from a calendar object
-        // c = new GregorianCalendar(2010,3,0);
-        // dc = new DCDate(c.getTime());
-        // assertThat("testDCDateDate 2", dc.toString(), equalTo("2010-04"));
+        assertThat("testDCDateIntBits 7", dc.getYearUTC(), equalTo(2010));
+        assertThat("testDCDateIntBits 8", dc.getMonthUTC(), equalTo(1));
+        assertThat("testDCDateIntBits 9", dc.getDayUTC(), equalTo(1));
+        assertThat("testDCDateIntBits 10", dc.getHourUTC(), equalTo(-1));
+        assertThat("testDCDateIntBits 11", dc.getMinuteUTC(), equalTo(-1));
+        assertThat("testDCDateIntBits 12", dc.getSecondUTC(), equalTo(-1));
 
-        // Broken by a 1 hour offset
-        // c = new GregorianCalendar(2010,3,14);        
-        // dc = new DCDate(c.getTime());
-        // assertThat("testDCDateDate 3", dc.toString(), equalTo("2010-04-14"));
+        dc = new DCDate(2009,12,31,18,30,5);
+
+        assertThat("testDCDateIntBits 13", dc.getYear(), equalTo(2009));
+        assertThat("testDCDateIntBits 14", dc.getMonth(), equalTo(12));
+        assertThat("testDCDateIntBits 15", dc.getDay(), equalTo(31));
+        assertThat("testDCDateIntBits 16", dc.getHour(), equalTo(18));
+        assertThat("testDCDateIntBits 17", dc.getMinute(), equalTo(30));
+        assertThat("testDCDateIntBits 18", dc.getSecond(), equalTo(5));
+
+        assertThat("testDCDateIntBits 19", dc.getYearUTC(), equalTo(2010));
+        assertThat("testDCDateIntBits 20", dc.getMonthUTC(), equalTo(1));
+        assertThat("testDCDateIntBits 21", dc.getDayUTC(), equalTo(1));
+        assertThat("testDCDateIntBits 22", dc.getHourUTC(), equalTo(2));
+        assertThat("testDCDateIntBits 23", dc.getMinuteUTC(), equalTo(30));
+        assertThat("testDCDateIntBits 24", dc.getSecondUTC(), equalTo(5));
         
-        // Broken by a 1 hour offset
-        // c = new GregorianCalendar(2010,3,14,0,0,1);
-        // dc = new DCDate(c.getTime());
-        // assertThat("testDCDateDate 4", dc.toString(),
-        //         equalTo("2010-04-14T00:00:01Z"));
     }
 
     /**
@@ -153,42 +203,127 @@ public class DCDateTest extends AbstractUnitTest
     public void testDCDateString()
     {
         dc = new DCDate((String)null);
-        assertThat("testDCDateString 0", dc.toString(), equalTo("null"));
+        assertThat("testDCDateString 1", dc.getYear(), equalTo(-1));
+        assertThat("testDCDateString 2", dc.getMonth(), equalTo(-1));
+        assertThat("testDCDateString 3", dc.getDay(), equalTo(-1));
+        assertThat("testDCDateString 4", dc.getHour(), equalTo(-1));
+        assertThat("testDCDateString 5", dc.getMinute(), equalTo(-1));
+        assertThat("testDCDateIntBits 6", dc.getSecond(), equalTo(-1));
+
+        assertThat("testDCDateString 7", dc.getYearUTC(), equalTo(-1));
+        assertThat("testDCDateString 8", dc.getMonthUTC(), equalTo(-1));
+        assertThat("testDCDateString 9", dc.getDayUTC(), equalTo(-1));
+        assertThat("testDCDateString 10", dc.getHourUTC(), equalTo(-1));
+        assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(-1));
+        assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(-1));
 
         dc = new DCDate("");
-        assertThat("testDCDateString 1", dc.toString(), equalTo("null"));
+        assertThat("testDCDateString 1", dc.getYear(), equalTo(-1));
+        assertThat("testDCDateString 2", dc.getMonth(), equalTo(-1));
+        assertThat("testDCDateString 3", dc.getDay(), equalTo(-1));
+        assertThat("testDCDateString 4", dc.getHour(), equalTo(-1));
+        assertThat("testDCDateString 5", dc.getMinute(), equalTo(-1));
+        assertThat("testDCDateIntBits 6", dc.getSecond(), equalTo(-1));
+
+        assertThat("testDCDateString 7", dc.getYearUTC(), equalTo(-1));
+        assertThat("testDCDateString 8", dc.getMonthUTC(), equalTo(-1));
+        assertThat("testDCDateString 9", dc.getDayUTC(), equalTo(-1));
+        assertThat("testDCDateString 10", dc.getHourUTC(), equalTo(-1));
+        assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(-1));
+        assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(-1));
 
         dc = new DCDate("2010");
-        assertThat("testDCDateString 2", dc.toString(), equalTo("2010"));
+        assertThat("testDCDateString 1", dc.getYear(), equalTo(2010));
+        assertThat("testDCDateString 2", dc.getMonth(), equalTo(-1));
+        assertThat("testDCDateString 3", dc.getDay(), equalTo(-1));
+        assertThat("testDCDateString 4", dc.getHour(), equalTo(-1));
+        assertThat("testDCDateString 5", dc.getMinute(), equalTo(-1));
+        assertThat("testDCDateIntBits 6", dc.getSecond(), equalTo(-1));
+
+        assertThat("testDCDateString 7", dc.getYearUTC(), equalTo(2010));
+        assertThat("testDCDateString 8", dc.getMonthUTC(), equalTo(-1));
+        assertThat("testDCDateString 9", dc.getDayUTC(), equalTo(-1));
+        assertThat("testDCDateString 10", dc.getHourUTC(), equalTo(-1));
+        assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(-1));
+        assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(-1));
 
         dc = new DCDate("2010-04");
-        assertThat("testDCDateString 3", dc.toString(), equalTo("2010-04"));
+        assertThat("testDCDateString 1", dc.getYear(), equalTo(2010));
+        assertThat("testDCDateString 2", dc.getMonth(), equalTo(04));
+        assertThat("testDCDateString 3", dc.getDay(), equalTo(-1));
+        assertThat("testDCDateString 4", dc.getHour(), equalTo(-1));
+        assertThat("testDCDateString 5", dc.getMinute(), equalTo(-1));
+        assertThat("testDCDateIntBits 6", dc.getSecond(), equalTo(-1));
+
+        assertThat("testDCDateString 7", dc.getYearUTC(), equalTo(2010));
+        assertThat("testDCDateString 8", dc.getMonthUTC(), equalTo(04));
+        assertThat("testDCDateString 9", dc.getDayUTC(), equalTo(-1));
+        assertThat("testDCDateString 10", dc.getHourUTC(), equalTo(-1));
+        assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(-1));
+        assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(-1));
 
         dc = new DCDate("2010-04-14");
-        assertThat("testDCDateString 4", dc.toString(), equalTo("2010-04-14"));
+        assertThat("testDCDateString 1", dc.getYear(), equalTo(2010));
+        assertThat("testDCDateString 2", dc.getMonth(), equalTo(04));
+        assertThat("testDCDateString 3", dc.getDay(), equalTo(14));
+        assertThat("testDCDateString 4", dc.getHour(), equalTo(-1));
+        assertThat("testDCDateString 5", dc.getMinute(), equalTo(-1));
+        assertThat("testDCDateIntBits 6", dc.getSecond(), equalTo(-1));
+
+        assertThat("testDCDateString 7", dc.getYearUTC(), equalTo(2010));
+        assertThat("testDCDateString 8", dc.getMonthUTC(), equalTo(04));
+        assertThat("testDCDateString 9", dc.getDayUTC(), equalTo(14));
+        assertThat("testDCDateString 10", dc.getHourUTC(), equalTo(-1));
+        assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(-1));
+        assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(-1));
 
         dc = new DCDate("2010-04-14T01");
-        assertThat("testDCDateString 5", dc.toString(), equalTo("2010-04-14"));
+        assertThat("testDCDateString 1", dc.getYear(), equalTo(2010));
+        assertThat("testDCDateString 2", dc.getMonth(), equalTo(04));
+        assertThat("testDCDateString 3", dc.getDay(), equalTo(13));
+        assertThat("testDCDateString 4", dc.getHour(), equalTo(17));
+        assertThat("testDCDateString 5", dc.getMinute(), equalTo(0));
+        assertThat("testDCDateIntBits 6", dc.getSecond(), equalTo(0));
+
+        assertThat("testDCDateString 7", dc.getYearUTC(), equalTo(2010));
+        assertThat("testDCDateString 8", dc.getMonthUTC(), equalTo(04));
+        assertThat("testDCDateString 9", dc.getDayUTC(), equalTo(14));
+        assertThat("testDCDateString 10", dc.getHourUTC(), equalTo(1));
+        assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(0));
+        assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(0));
 
         dc = new DCDate("2010-04-14T00:01");
-        assertThat("testDCDateString 6", dc.toString(),
-                equalTo("2010-04-14T00:01:00Z"));
+        assertThat("testDCDateString 1", dc.getYear(), equalTo(2010));
+        assertThat("testDCDateString 2", dc.getMonth(), equalTo(04));
+        assertThat("testDCDateString 3", dc.getDay(), equalTo(13));
+        assertThat("testDCDateString 4", dc.getHour(), equalTo(16));
+        assertThat("testDCDateString 5", dc.getMinute(), equalTo(1));
+        assertThat("testDCDateIntBits 6", dc.getSecond(), equalTo(0));
+
+        assertThat("testDCDateString 7", dc.getYearUTC(), equalTo(2010));
+        assertThat("testDCDateString 8", dc.getMonthUTC(), equalTo(04));
+        assertThat("testDCDateString 9", dc.getDayUTC(), equalTo(14));
+        assertThat("testDCDateString 10", dc.getHourUTC(), equalTo(0));
+        assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(1));
+        assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(0));
 
         dc = new DCDate("2010-04-14T00:00:01Z");
-        assertThat("testDCDateString 7", dc.toString(),
-                equalTo("2010-04-14T00:00:01Z"));
+        assertThat("testDCDateString 1", dc.getYear(), equalTo(2010));
+        assertThat("testDCDateString 2", dc.getMonth(), equalTo(04));
+        assertThat("testDCDateString 3", dc.getDay(), equalTo(13));
+        assertThat("testDCDateString 4", dc.getHour(), equalTo(16));
+        assertThat("testDCDateString 5", dc.getMinute(), equalTo(0));
+        assertThat("testDCDateIntBits 6", dc.getSecond(), equalTo(1));
 
+        assertThat("testDCDateString 7", dc.getYearUTC(), equalTo(2010));
+        assertThat("testDCDateString 8", dc.getMonthUTC(), equalTo(04));
+        assertThat("testDCDateString 9", dc.getDayUTC(), equalTo(14));
+        assertThat("testDCDateString 10", dc.getHourUTC(), equalTo(0));
+        assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(0));
+        assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(1));
     }
 
-    /**
-     * Test of getCurrent method, of class DCDate.
-     */
-    @Test
-    public void testGetCurrent()
-    {
-        assertThat("testGetCurrent 0", DCDate.getCurrent().toDate(),
-                equalTo(new Date()));
-    }
+
 
     /**
      * Test of toString method, of class DCDate.
@@ -212,7 +347,7 @@ public class DCDateTest extends AbstractUnitTest
         assertThat("testToString 4", dc.toString(), equalTo("2010-04-14"));
 
         dc = new DCDate("2010-04-14T01");
-        assertThat("testToString 5", dc.toString(), equalTo("2010-04-14"));
+        assertThat("testToString 5", dc.toString(), equalTo("2010-04-14T01:00:00Z"));
 
         dc = new DCDate("2010-04-14T00:01");
         assertThat("testToString 6", dc.toString(),
@@ -249,344 +384,62 @@ public class DCDateTest extends AbstractUnitTest
         assertThat("testToDate 4", dc.toDate(), equalTo(c.getTime()));
     }
 
-    /**
-     * Test of setDateLocal method, of class DCDate.
-     */
-    @Test
-    public void testSetDateLocal()
-    {
-        dc = new DCDate("");
-        dc.setDateLocal(2010,0,0,-1,-1,-1);
-        assertThat("testSetDateLocal 0", dc.toString(), equalTo("2010"));
 
-        dc = new DCDate("");
-        dc.setDateLocal(2010,4,0,-1,-1,-1);
-        assertThat("testSetDateLocal 1", dc.toString(), equalTo("2010-04"));
 
-        dc = new DCDate("");
-        dc.setDateLocal(2010,4,14,-1,-1,-1);
-        assertThat("testSetDateLocal 2", dc.toString(), equalTo("2010-04-14"));
-        
-        // Broken by a 1 hour offset
-        // dc = new DCDate("");
-        // dc.setDateLocal(2010,4,14,5,5,5);
-        // assertThat("testSetDateLocal 3", dc.toString(),
-        //         equalTo("2010-04-14T05:05:05Z"));
-
-        // Broken by a 1 hour offset
-        // dc = new DCDate("");
-        // dc.setDateLocal(2010,4,14,0,0,1);
-        // assertThat("testSetDateLocal 4", dc.toString(),
-        //         equalTo("2010-04-14T00:00:01Z"));
-    }
 
     /**
-     * Test of getYear method, of class DCDate.
+     * Test of displayDate method, of class DCDate.
      */
     @Test
-    public void testGetYear()
+    public void testDisplayDate()
     {
-        dc = new DCDate((String)null);
-        assertThat("testGetYear 0", dc.getYear(), equalTo(-1));
-
-        dc = new DCDate("");
-        assertThat("testGetYear 1", dc.getYear(), equalTo(-1));
-
         dc = new DCDate("2010");
-        assertThat("testGetYear 2", dc.getYear(), equalTo(2010));
+        assertThat("testDisplayDate 1 ", dc.displayDate(true, true,
+                new Locale("en_GB")),
+                equalTo("2010"));
 
         dc = new DCDate("2010-04");
-        assertThat("testGetYear 3", dc.getYear(), equalTo(2010));
+        assertThat("testDisplayDate 2 ", dc.displayDate(true, true,
+                new Locale("en_GB")),
+                equalTo("Apr-2010"));
 
         dc = new DCDate("2010-04-14");
-        assertThat("testGetYear 4", dc.getYear(), equalTo(2010));
+        assertThat("testDisplayDate 3 ", dc.displayDate(true, true,
+                new Locale("en_GB")),
+                equalTo("14-Apr-2010"));
 
         dc = new DCDate("2010-04-14T00:00:01Z");
-        assertThat("testGetYear 5", dc.getYear(), equalTo(2010));
-    }
-
-    /**
-     * Test of getMonth method, of class DCDate.
-     */
-    @Test
-    public void testGetMonth()
-    {
-        dc = new DCDate((String)null);
-        assertThat("testGetMonth 0", dc.getMonth(), equalTo(-1));
-
-        dc = new DCDate("");
-        assertThat("testGetMonth 1", dc.getMonth(), equalTo(-1));
-
-        dc = new DCDate("2010");
-        assertThat("testGetMonth 2", dc.getMonth(), equalTo(-1));
-
-        dc = new DCDate("2010-04");
-        assertThat("testGetMonth 3", dc.getMonth(), equalTo(4));
-
-        dc = new DCDate("2010-04-14");
-        assertThat("testGetMonth 4", dc.getMonth(), equalTo(4));
+        assertThat("testDisplayDate 4 ", dc.displayDate(true, true,
+                new Locale("en_GB")),
+                equalTo("13-Apr-2010 16:00:01"));
 
         dc = new DCDate("2010-04-14T00:00:01Z");
-        assertThat("testGetMonth 5", dc.getMonth(), equalTo(4));
-    }
-
-    /**
-     * Test of getDay method, of class DCDate.
-     */
-    @Test
-    public void testGetDay()
-    {
-        dc = new DCDate((String)null);
-        assertThat("testGetDay 0", dc.getDay(), equalTo(-1));
-
-        dc = new DCDate("");
-        assertThat("testGetDay 1", dc.getDay(), equalTo(-1));
-
-        dc = new DCDate("2010");
-        assertThat("testGetDay 2", dc.getDay(), equalTo(-1));
-
-        dc = new DCDate("2010-04");
-        assertThat("testGetDay 3", dc.getDay(), equalTo(-1));
-
-        dc = new DCDate("2010-04-14");
-        assertThat("testGetDay 4", dc.getDay(), equalTo(14));
+        assertThat("testDisplayDate 5 ", dc.displayDate(false, true,
+                new Locale("en_GB")),
+                equalTo("13-Apr-2010"));
 
         dc = new DCDate("2010-04-14T00:00:01Z");
-        assertThat("testGetDay 5", dc.getDay(), equalTo(14));
-    }
-
-    /**
-     * Test of getHour method, of class DCDate.
-     */
-    @Test
-    public void testGetHour()
-    {
-        dc = new DCDate((String)null);
-        assertThat("testGetHour 0", dc.getHour(), equalTo(-1));
-
-        dc = new DCDate("");
-        assertThat("testGetHour 1", dc.getHour(), equalTo(-1));
-
-        dc = new DCDate("2010");
-        assertThat("testGetHour 2", dc.getHour(), equalTo(0));
-        
-        dc = new DCDate("2010-04");
-        assertThat("testGetHour 3", dc.getHour(), equalTo(0));
-        
-        dc = new DCDate("2010-04-14");
-        assertThat("testGetHour 4", dc.getHour(), equalTo(0));
-
-        // Broken with 1 hour offset
-        // dc = new DCDate("2010-04-14T01:00:00Z");
-        // assertThat("testGetHour 5", dc.getHour(), equalTo(1));
-    }
-
-    /**
-     * Test of getMinute method, of class DCDate.
-     */
-    @Test
-    public void testGetMinute()
-    {
-        dc = new DCDate((String)null);
-        assertThat("testGetMinute 0", dc.getMinute(), equalTo(-1));
-
-        dc = new DCDate("");
-        assertThat("testGetMinute 1", dc.getMinute(), equalTo(-1));
-
-        dc = new DCDate("2010");
-        assertThat("testGetMinute 2", dc.getMinute(), equalTo(0));
-
-        dc = new DCDate("2010-04");
-        assertThat("testGetMinute 3", dc.getMinute(), equalTo(0));
-
-        dc = new DCDate("2010-04-14");
-        assertThat("testGetMinute 4", dc.getMinute(), equalTo(0));
-
-        dc = new DCDate("2010-04-14T00:01:00Z");
-        assertThat("testGetMinute 5", dc.getMinute(), equalTo(1));
-    }
-
-    /**
-     * Test of getSecond method, of class DCDate.
-     */
-    @Test
-    public void testGetSecond()
-    {
-        dc = new DCDate((String)null);
-        assertThat("testGetSecond 0", dc.getSecond(), equalTo(-1));
-
-        dc = new DCDate("");
-        assertThat("testGetSecond 1", dc.getSecond(), equalTo(-1));
-
-        dc = new DCDate("2010");
-        assertThat("testGetSecond 2", dc.getSecond(), equalTo(0));
-
-        dc = new DCDate("2010-04");
-        assertThat("testGetSecond 3", dc.getSecond(), equalTo(0));
-
-        dc = new DCDate("2010-04-14");
-        assertThat("testGetSecond 4", dc.getSecond(), equalTo(0));
+        assertThat("testDisplayDate 6 ", dc.displayDate(true, false,
+                 new Locale("es")),
+                 equalTo("14-abr-2010 00:00:01"));
 
         dc = new DCDate("2010-04-14T00:00:01Z");
-        assertThat("testGetSecond 5", dc.getSecond(), equalTo(1));
+        assertThat("testDisplayDate 7 ", dc.displayDate(false, false,
+                new Locale("en_GB")),
+                equalTo("14-Apr-2010"));
     }
 
     /**
-     * Test of getYearGMT method, of class DCDate.
+     * Test of getCurrent method, of class DCDate.
      */
     @Test
-    public void testGetYearGMT()
+    public void testGetCurrent()
     {
-        dc = new DCDate((String)null);
-        assertThat("testGetYearGMT 0", dc.getYearGMT(), equalTo(-1));
-
-        dc = new DCDate("");
-        assertThat("testGetYearGMT 1", dc.getYearGMT(), equalTo(-1));
-
-        dc = new DCDate("2010");
-        assertThat("testGetYearGMT 2", dc.getYearGMT(), equalTo(2010));
-
-        dc = new DCDate("2010-04");
-        assertThat("testGetYearGMT 3", dc.getYearGMT(), equalTo(2010));
-
-        dc = new DCDate("2010-04-14");
-        assertThat("testGetYearGMT 4", dc.getYearGMT(), equalTo(2010));
-
-        dc = new DCDate("2010-04-14T00:00:01Z");
-        assertThat("testGetYearGMT 5", dc.getYearGMT(), equalTo(2010));
+        assertThat("testGetCurrent 0", DCDate.getCurrent().toDate(),
+                equalTo(new Date()));
     }
 
-    /**
-     * Test of getMonthGMT method, of class DCDate.
-     */
-    @Test
-    public void testGetMonthGMT()
-    {
-        dc = new DCDate((String)null);
-        assertThat("testGetMonthGMT 0", dc.getMonthGMT(), equalTo(-1));
 
-        dc = new DCDate("");
-        assertThat("testGetMonthGMT 1", dc.getMonthGMT(), equalTo(-1));
-
-        // Should return 0, returns 1
-        // dc = new DCDate("2010");
-        //assertThat("testGetMonthGMT 2", dc.getMonthGMT(), equalTo(0));
-
-        dc = new DCDate("2010-04");
-        assertThat("testGetMonthGMT 3", dc.getMonthGMT(), equalTo(3));
-
-        // Should return 3, returns 4
-        // dc = new DCDate("2010-04-14");
-        // assertThat("testGetMonthGMT 4", dc.getMonthGMT(), equalTo(3));
-
-        // Should return 3, returns 4
-        // dc = new DCDate("2010-04-14T00:00:01Z");
-        // assertThat("testGetMonthGMT 5", dc.getMonthGMT(), equalTo(3));
-    }
-
-    /**
-     * Test of getDayGMT method, of class DCDate.
-     */
-    @Test
-    public void testGetDayGMT()
-    {
-        dc = new DCDate((String)null);
-        assertThat("testGetDayGMT 0", dc.getDayGMT(), equalTo(-1));
-
-        dc = new DCDate("");
-        assertThat("testGetDayGMT 1", dc.getDayGMT(), equalTo(-1));
-
-        dc = new DCDate("2010");
-        assertThat("testGetDayGMT 2", dc.getDayGMT(), equalTo(1));
-
-        // Expect 1, gets 31
-        //dc = new DCDate("2010-04");
-        //assertThat("testGetDayGMT 3", dc.getDayGMT(), equalTo(1));
-
-        // Another day less than expected, gets 13 instead of 14
-        // dc = new DCDate("2010-04-14");
-        //assertThat("testGetDayGMT 4", dc.getDayGMT(), equalTo(14));
-
-        dc = new DCDate("2010-04-14T00:00:01Z");
-        assertThat("testGetDayGMT 5", dc.getDayGMT(), equalTo(14));
-    }
-
-    /**
-     * Test of getHourGMT method, of class DCDate.
-     */
-    @Test
-    public void testGetHourGMT()
-    {
-        dc = new DCDate((String)null);
-        assertThat("testGetHourGMT 0", dc.getHourGMT(), equalTo(-1));
-
-        dc = new DCDate("");
-        assertThat("testGetHourGMT 1", dc.getHourGMT(), equalTo(-1));
-
-        dc = new DCDate("2010");
-        assertThat("testGetHourGMT 2", dc.getHourGMT(), equalTo(0));
-
-        // One hour out, returns 23
-        // dc = new DCDate("2010-04");
-        // assertThat("testGetHourGMT 3", dc.getHourGMT(), equalTo(0));
-
-        // One hour out, returns 23
-        // dc = new DCDate("2010-04-14");
-        // assertThat("testGetHourGMT 4", dc.getHourGMT(), equalTo(0));
-
-        dc = new DCDate("2010-04-14T01:00:00Z");
-        assertThat("testGetHourGMT 5", dc.getHourGMT(), equalTo(1));
-    }
-
-    /**
-     * Test of getMinuteGMT method, of class DCDate.
-     */
-    @Test
-    public void testGetMinuteGMT()
-    {
-        dc = new DCDate((String)null);
-        assertThat("testGetMinuteGMT 0", dc.getMinuteGMT(), equalTo(-1));
-
-        dc = new DCDate("");
-        assertThat("testGetMinuteGMT 1", dc.getMinuteGMT(), equalTo(-1));
-
-        dc = new DCDate("2010");
-        assertThat("testGetMinuteGMT 2", dc.getMinuteGMT(), equalTo(0));
-
-        dc = new DCDate("2010-04");
-        assertThat("testGetMinuteGMT 3", dc.getMinuteGMT(), equalTo(0));
-
-        dc = new DCDate("2010-04-14");
-        assertThat("testGetMinuteGMT 4", dc.getMinuteGMT(), equalTo(0));
-
-        dc = new DCDate("2010-04-14T00:01:00Z");
-        assertThat("testGetMinuteGMT 5", dc.getMinuteGMT(), equalTo(1));
-    }
-
-    /**
-     * Test of getSecondGMT method, of class DCDate.
-     */
-    @Test
-    public void testGetSecondGMT()
-    {
-        dc = new DCDate((String)null);
-        assertThat("testGetSecondGMT 0", dc.getSecondGMT(), equalTo(-1));
-
-        dc = new DCDate("");
-        assertThat("testGetSecondGMT 1", dc.getSecondGMT(), equalTo(-1));
-
-        dc = new DCDate("2010");
-        assertThat("testGetSecondGMT 2", dc.getSecondGMT(), equalTo(0));
-
-        dc = new DCDate("2010-04");
-        assertThat("testGetSecondGMT 3", dc.getSecondGMT(), equalTo(0));
-
-        dc = new DCDate("2010-04-14");
-        assertThat("testGetSecondGMT 4", dc.getSecondGMT(), equalTo(0));
-
-        dc = new DCDate("2010-04-14T00:00:01Z");
-        assertThat("testGetSecondGMT 5", dc.getSecondGMT(), equalTo(1));
-    }
 
     /**
      * Test of getMonthName method, of class DCDate.
@@ -654,52 +507,6 @@ public class DCDateTest extends AbstractUnitTest
                 equalTo("diciembre"));
     }
 
-    /**
-     * Test of displayDate method, of class DCDate.
-     */
-    @Test
-    public void testDisplayDate()
-    {
-         dc = new DCDate("");
-        assertThat("testToString 0", dc.toString(), equalTo("null"));
-
-        dc = new DCDate("2010");
-        assertThat("testToString 1", dc.displayDate(true, true,
-                new Locale("en_GB")),
-                equalTo("2010"));
-
-        dc = new DCDate("2010-04");
-        assertThat("testToString 2", dc.displayDate(true, true,
-                new Locale("en_GB")),
-                equalTo("Apr-2010"));
-
-        dc = new DCDate("2010-04-14");
-        assertThat("testToString 3", dc.displayDate(true, true,
-                new Locale("en_GB")),
-                equalTo("14-Apr-2010"));
-
-        dc = new DCDate("2010-04-14T00:00:01Z");
-        //hour increses in 1 due to locale
-        assertThat("testToString 4", dc.displayDate(true, true,
-                new Locale("en_GB")),
-                equalTo("14-Apr-2010 01:00:01"));
-
-        dc = new DCDate("2010-04-14T00:00:01Z");
-        assertThat("testToString 5", dc.displayDate(false, true,
-                new Locale("en_GB")),
-                equalTo("14-Apr-2010"));
-
-        // Get different values depending on locale
-        // dc = new DCDate("2010-04-14T00:00:01Z");
-        // assertThat("testToString 6", dc.displayDate(true, false,
-        //         new Locale("en_GB")),
-        //         equalTo("14-Apr-2010 01:00:01"));
-
-        dc = new DCDate("2010-04-14T00:00:01Z");
-        assertThat("testToString 7", dc.displayDate(false, false,
-                new Locale("en_GB")),
-                equalTo("14-Apr-2010"));
-    }
 
     /**
      * Tests concurrency issues with date

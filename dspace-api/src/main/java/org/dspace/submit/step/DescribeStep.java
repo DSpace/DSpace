@@ -780,9 +780,7 @@ public class DescribeStep extends AbstractProcessingStep
 
         // FIXME: Probably should be some more validation
         // Make a standard format date
-        DCDate d = new DCDate();
-
-        d.setDateLocal(year, month, day, -1, -1, -1);
+        DCDate d = new DCDate(year, month, day, -1, -1, -1);
 
         // already done in doProcessing see also bug DS-203
         // item.clearMetadata(schema, element, qualifier, Item.ANY);
