@@ -1342,6 +1342,8 @@ public class ItemImport
 
             bs.update();
         }
+
+        bis.close();
     }
 
     /**
