@@ -46,7 +46,7 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 
 /**
- * Plugin interface for the embargo lifting function.
+ * Default plugin implementation of the embargo lifting function.
  *
  * @author Larry Stone
  * @author Richard Rodgers

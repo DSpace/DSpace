@@ -121,8 +121,7 @@ public class DefaultEmbargoSetter implements EmbargoSetter
     }
 
     /**
-     * Check that embargo is properly set on Item, e.g. no read access
-     * to bitstreams.
+     * Check that embargo is properly set on Item: no read access to bitstreams.
      *
      * @param context the DSpace context
      * @param item the item to embargo

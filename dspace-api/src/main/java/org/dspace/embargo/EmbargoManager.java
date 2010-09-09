@@ -38,48 +38,43 @@
  */
 package org.dspace.embargo;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
-import java.io.IOException;
 
-import org.apache.log4j.Logger;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.cli.ParseException;
-
+import org.apache.commons.cli.PosixParser;
+import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.Utils;
 import org.dspace.core.PluginManager;
 import org.dspace.handle.HandleManager;
 
 /**
  * Public interface to the embargo subsystem.
- *
+ * <p>
  * Configuration properties: (with examples)
- *   # DC metadata field to hold the user-supplied embargo terms
- *   embargo.field.terms = dc.embargo.terms
- *   # DC metadata field to hold computed "lift date" of embargo
- *   embargo.field.lift = dc.date.available
- *   # String to indicate indefinite (forever) embargo in terms
- *   embargo.terms.open = Indefinite
- *   # implementation of embargo setter plugin
- *   plugin.single.org.dspace.embargo.EmbargoSetter = edu.my.Setter
- *   # implementation of embargo lifter plugin
- *   plugin.single.org.dspace.embargo.EmbargoLifter = edu.my.Lifter
+ *   <br/># DC metadata field to hold the user-supplied embargo terms
+ *   <br/>embargo.field.terms = dc.embargo.terms
+ *   <br/># DC metadata field to hold computed "lift date" of embargo
+ *   <br/>embargo.field.lift = dc.date.available
+ *   <br/># String to indicate indefinite (forever) embargo in terms
+ *   <br/>embargo.terms.open = Indefinite
+ *   <br/># implementation of embargo setter plugin
+ *   <br/>plugin.single.org.dspace.embargo.EmbargoSetter = edu.my.Setter
+ *   <br/># implementation of embargo lifter plugin
+ *   <br/>plugin.single.org.dspace.embargo.EmbargoLifter = edu.my.Lifter
  *
  * @author Larry Stone
  * @author Richard Rodgers
@@ -194,22 +189,31 @@ public class EmbargoManager
     }
 
     /**
-     * Command-line service to scan for every Items with an expired embargo,
+     * Command-line service to scan for every Item with an expired embargo,
      * and then lift that embargo.
-     *
+     * <p>
      * Options:
-     *   -c,--check         Function: ONLY check the state of embargoed Items, do
-     *                      NOT lift any embargoes.
-     *   -h,--help          help
-     *   -i,--identifier    Process ONLY this Handle identifier(s), which must be
-     *                      an Item.  Can be repeated.
-     *   -l,--lift          Function: ONLY lift embargoes, do NOT check the state
-     *                      of any embargoed Items.
-     *   -n,--dryrun        Do not change anything in the data model, print
-     *                      message instead.
-     *   -v,--verbose       Print a line describing action taken for each
-     *                      embargoed Item found.
-     *   -q,--quiet         No output except upon error
+     * <dl>
+     *   <dt>-c,--check</dt>
+     *   <dd>         Function: ONLY check the state of embargoed Items, do
+     *                      NOT lift any embargoes.</dd>
+     *   <dt>-h,--help</dt>
+     *   <dd>         Help.</dd>
+     *   <dt>-i,--identifier</dt>
+     *   <dd>         Process ONLY this Handle identifier(s), which must be
+     *                      an Item.  Can be repeated.</dd>
+     *   <dt>-l,--lift</dt>
+     *   <dd>         Function: ONLY lift embargoes, do NOT check the state
+     *                      of any embargoed Items.</dd>
+     *   <dt>-n,--dryrun</dt>
+     *   <dd>         Do not change anything in the data model; print
+     *                      message instead.</dd>
+     *   <dt>-v,--verbose</dt>
+     *   <dd>         Print a line describing action taken for each
+     *                      embargoed Item found.</dd>
+     *   <dt>-q,--quiet</dt>
+     *   <dd>         No output except upon error.</dd>
+     * </dl>
      */
     public static void main(String argv[])
     {

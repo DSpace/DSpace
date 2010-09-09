@@ -79,8 +79,8 @@ public interface EmbargoSetter
         throws SQLException, AuthorizeException, IOException;
 
     /**
-     * Enforce embargo by e.g. turning off all read access to bitstreams in
-     * this Item.
+     * Enforce embargo by (for example) turning off all read access to
+     * bitstreams in this Item.
      *
      * @param context the DSpace context
      * @param item the item to embargo
@@ -89,7 +89,7 @@ public interface EmbargoSetter
         throws SQLException, AuthorizeException, IOException;
 
     /**
-     * Check that embargo is properly set on Item, e.g. no read access
+     * Check that embargo is properly set on Item.  For example: no read access
      * to bitstreams.  It is expected to report any noteworthy
      * discrepencies by writing on the stream System.err, although
      * logging is also encouraged.  Only report conditions that

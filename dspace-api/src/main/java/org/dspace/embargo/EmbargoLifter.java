@@ -56,7 +56,8 @@ public interface EmbargoLifter
 {
     /**
      * Implement the lifting of embargo in the "resource policies"
-     * (access control) by e.g. turning on default read access to all Bitstreams.
+     * (access control) by (for example) turning on default read access to all
+     * Bitstreams.
      *
      * @param context the DSpace context
      * @param item the Item on which to lift the embargo
