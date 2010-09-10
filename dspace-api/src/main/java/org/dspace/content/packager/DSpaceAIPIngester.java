@@ -174,7 +174,7 @@ public class DSpaceAIPIngester
         String groupID = null;
         if (found >= 0)
         {
-            manifest.crosswalkItemDmd(context, dso, dmds[found], callback);
+            manifest.crosswalkItemDmd(context, params, dso, dmds[found], callback);
             groupID = dmds[found].getAttributeValue("GROUPID");
 
             if (groupID != null)
@@ -183,7 +183,7 @@ public class DSpaceAIPIngester
                 {
                     String g = dmds[i].getAttributeValue("GROUPID");
                     if (g != null && !g.equals(groupID))
-                        manifest.crosswalkItemDmd(context, dso, dmds[i], callback);
+                        manifest.crosswalkItemDmd(context, params, dso, dmds[i], callback);
                 }
             }
         }
@@ -192,7 +192,7 @@ public class DSpaceAIPIngester
         // each xwalk _adds_ metadata, and could add duplicate fields.
         else if (dmds.length > 0)
         {
-            manifest.crosswalkItemDmd(context, dso, dmds[0], callback);
+            manifest.crosswalkItemDmd(context, params, dso, dmds[0], callback);
         }
 
         // it's an error if there is nothing to crosswalk:

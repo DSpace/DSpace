@@ -86,6 +86,7 @@ public class DSpaceMETSIngester
     private final static String PROFILE_START = "DSpace METS SIP Profile";
 
     // just check the profile name.
+    @Override
     void checkManifest(METSManifest manifest)
         throws MetadataValidationException
     {
@@ -106,6 +107,7 @@ public class DSpaceMETSIngester
      *    same GROUPID<br>
      * 4. Crosswalk remaining DMDs not eliminated already.
      */
+    @Override
     public void crosswalkObjectDmd(Context context, DSpaceObject dso,
                               METSManifest manifest,
                               AbstractMETSIngester.MdrefManager callback,
@@ -149,7 +151,7 @@ public class DSpaceMETSIngester
         String groupID = null;
         if (found >= 0)
         {
-            manifest.crosswalkItemDmd(context, dso, dmds[found], callback);
+            manifest.crosswalkItemDmd(context, params, dso, dmds[found], callback);
             groupID = dmds[found].getAttributeValue("GROUPID");
 
             if (groupID != null)
@@ -158,7 +160,7 @@ public class DSpaceMETSIngester
                 {
                     String g = dmds[i].getAttributeValue("GROUPID");
                     if (g != null && !g.equals(groupID))
-                        manifest.crosswalkItemDmd(context, dso, dmds[i], callback);
+                        manifest.crosswalkItemDmd(context, params, dso, dmds[i], callback);
                 }
             }
         }
@@ -168,7 +170,7 @@ public class DSpaceMETSIngester
         else
         {
             if (dmds.length > 0)
-                manifest.crosswalkItemDmd(context, dso, dmds[0], callback);
+                manifest.crosswalkItemDmd(context, params, dso, dmds[0], callback);
         }
     }
 
@@ -179,6 +181,7 @@ public class DSpaceMETSIngester
      * default deposit license.
      * For Creative Commons, look for a rightsMd containing a CC license.
      */
+    @Override
     public void addLicense(Context context, Item item, String license,
                                     Collection collection, PackageParameters params)
         throws PackageValidationException,
@@ -188,6 +191,7 @@ public class DSpaceMETSIngester
         PackageUtils.addDepositLicense(context, license, item, collection);
     }
 
+    @Override
     public void finishObject(Context context, DSpaceObject dso,
                              PackageParameters params)
         throws PackageValidationException, CrosswalkException,
@@ -196,6 +200,7 @@ public class DSpaceMETSIngester
         // nothing to do.
     }
 
+    @Override
     public int getObjectType(METSManifest manifest)
         throws PackageValidationException
     {
@@ -222,6 +227,7 @@ public class DSpaceMETSIngester
      * Take a second pass over files to correct names of derived files
      * (e.g. thumbnails, extracted text) to what DSpace expects:
      */
+    @Override
     public void finishBitstream(Context context,
                                                 Bitstream bs,
                                                 Element mfile,
@@ -251,7 +257,7 @@ public class DSpaceMETSIngester
         }
     }
 
-
+    @Override
     public String getConfigurationName()
     {
         return "dspaceSIP";

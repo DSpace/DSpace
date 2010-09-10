@@ -51,6 +51,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.packager.PackageException;
+import org.dspace.content.packager.PackageUtils;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -220,10 +222,23 @@ public class METSRightsCrosswalk
               //to specify the group Name, and set @USERTYPE='GROUP'
               if(contextClass.equals(GROUP_CONTEXTCLASS))
               {
-                  Element rightsUser = new Element("UserName", METSRights_NS);
-                  rightsUser.setAttribute("USERTYPE",GROUP_USERTYPE);
-                  rightsUser.addContent(group.getName());
-                  rightsContext.addContent(rightsUser);
+                  try
+                  {
+                      //Create <UserName USERTYPE='GROUP'> element.  Add the Group's name to that element
+                      // But first, make sure to crosswalk all DSpace Default Group names:
+                      // e.g. translate COLLECTION_<ID>_ADMIN to COLLECTION_<handle>_ADMIN ,
+                      // as internal IDs are meaningless once content is outside of DSpace
+                      Element rightsUser = new Element("UserName", METSRights_NS);
+                      rightsUser.setAttribute("USERTYPE",GROUP_USERTYPE);
+                      rightsUser.addContent(PackageUtils.crosswalkDefaultGroupName(context, group.getName()));
+                      rightsContext.addContent(rightsUser);
+                  }
+                  catch(PackageException pe)
+                  {
+                      //A PackageException will only be thrown if crosswalkDefaultGroupName() fails
+                      //We'll just wrap it as a CrosswalkException and throw it upwards
+                      throw new CrosswalkException(pe);
+                  }
               }
            }//end if group
            //Next, handle User-based policies
@@ -411,27 +426,40 @@ public class METSRightsCrosswalk
                 } // else if this permission pertains to another DSpace group
                 else if(contextClass.equals(GROUP_CONTEXTCLASS))
                 {
-                    //we need to find the name of DSpace group it pertains to
-                    //Get the text within the <UserName> child element,
-                    // this is the group's name
-                    String groupName = element.getChildTextTrim("UserName", METSRights_NS);
-                    
-                    //Check if this group exists in DSpace already
-                    Group group = Group.findByName(context, groupName);
-
-                    //if not found, throw an error -- user should restore group from the SITE AIP
-                    if(group==null)
+                    try
                     {
-                        throw new CrosswalkInternalException("Cannot restore Group permissions on object ("
-                                + "type=" + Constants.typeText[dso.getType()] + ", "
-                                + "handle=" + dso.getHandle() + ", "
-                                + "ID=" + dso.getID()
-                                + "). The Group named '" + groupName + "' is missing from DSpace. "
-                                + "Please restore this group using the SITE AIP, or recreate it.");
-                    }
+                        //we need to find the name of DSpace group it pertains to
+                        //Get the text within the <UserName> child element,
+                        // this is the group's name
+                        String groupName = element.getChildTextTrim("UserName", METSRights_NS);
 
-                    //assign permissions to group on this object
-                    assignPermissions(context, dso, group, permsElement);
+                        //Translate Group name back to internal ID format (e.g. COLLECTION_<ID>_ADMIN)
+                        // from its external format (e.g. COLLECTION_<handle>_ADMIN)
+                        groupName = PackageUtils.crosswalkDefaultGroupName(context, groupName);
+
+                        //Check if this group exists in DSpace already
+                        Group group = Group.findByName(context, groupName);
+
+                        //if not found, throw an error -- user should restore group from the SITE AIP
+                        if(group==null)
+                        {
+                            throw new CrosswalkInternalException("Cannot restore Group permissions on object ("
+                                    + "type=" + Constants.typeText[dso.getType()] + ", "
+                                    + "handle=" + dso.getHandle() + ", "
+                                    + "ID=" + dso.getID()
+                                    + "). The Group named '" + groupName + "' is missing from DSpace. "
+                                    + "Please restore this group using the SITE AIP, or recreate it.");
+                        }
+
+                        //assign permissions to group on this object
+                        assignPermissions(context, dso, group, permsElement);
+                    }
+                    catch(PackageException pe)
+                    {
+                        //A PackageException will only be thrown if crosswalkDefaultGroupName() fails
+                        //We'll just wrap it as a CrosswalkException and throw it upwards
+                        throw new CrosswalkException(pe);
+                    }
                 }//end if Group
                 else if(contextClass.equals(PERSON_CONTEXTCLASS))
                 {

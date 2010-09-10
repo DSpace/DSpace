@@ -58,6 +58,8 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
+import org.jdom.Namespace;
+
 /**
  * Plugin to export all Group and EPerson objects in XML, perhaps for reloading.
  * 
@@ -65,6 +67,13 @@ import org.dspace.eperson.Group;
  */
 public class RoleDisseminator implements PackageDisseminator
 {
+
+    /**
+     * DSpace Roles XML Namespace in JDOM form.
+     */
+    public static final Namespace DSROLES_NS =
+        Namespace.getNamespace("dsroles", "http://www.dspace.org/xmlns/dspace/dspace-roles");
+
     public static final String DSPACE_ROLES = "DSpaceRoles";
     public static final String ID = "ID";
     public static final String GROUPS = "Groups";
@@ -101,20 +110,12 @@ public class RoleDisseminator implements PackageDisseminator
     {
         boolean emitPasswords = params.containsKey("passwords");
 
-        try
-        {
-            //open file stream for writing
-            FileOutputStream fileOut = new FileOutputStream(pkgFile);
-            writeToStream(context, fileOut, emitPasswords);
+        //open file stream for writing
+        FileOutputStream fileOut = new FileOutputStream(pkgFile);
+        writeToStream(context, fileOut, emitPasswords);
 
-            //close file stream & save
-            fileOut.close();
-        }
-        catch (XMLStreamException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        //close file stream & save
+        fileOut.close();
     }
 
     /**
@@ -175,17 +176,12 @@ public class RoleDisseminator implements PackageDisseminator
                 writeToStream(context, stream, emitPasswords);
                 stream.close();
             }
-            catch (XMLStreamException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            catch (SQLException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
             catch (IOException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            catch (PackageException e)
             {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -204,28 +200,36 @@ public class RoleDisseminator implements PackageDisseminator
      */
     private void writeToStream(Context context, OutputStream stream,
             boolean emitPasswords)
-    throws XMLStreamException, SQLException
+    throws PackageException
     {
-        XMLOutputFactory factory = XMLOutputFactory.newInstance();
-        XMLStreamWriter writer;
+        try
+        {
+            XMLOutputFactory factory = XMLOutputFactory.newInstance();
+            XMLStreamWriter writer;
 
-        writer = factory.createXMLStreamWriter(stream, "UTF-8");
-        writer.writeStartDocument("UTF-8", "1.0");
-        writer.writeStartElement(DSPACE_ROLES);
+            writer = factory.createXMLStreamWriter(stream, "UTF-8");
+            writer.setDefaultNamespace(DSROLES_NS.getURI());
+            writer.writeStartDocument("UTF-8", "1.0");
+            writer.writeStartElement(DSPACE_ROLES);
 
-        writer.writeStartElement(GROUPS);
-        for (Group group : Group.findAll(context, Group.NAME))
-            writeGroup(group, writer);
-        writer.writeEndElement(); // GROUPS
+            writer.writeStartElement(GROUPS);
+            for (Group group : Group.findAll(context, Group.NAME))
+                writeGroup(context, group, writer);
+            writer.writeEndElement(); // GROUPS
 
-        writer.writeStartElement(EPERSONS);
-        for (EPerson eperson : EPerson.findAll(context, EPerson.EMAIL))
-            writeEPerson(eperson, writer, emitPasswords);
-        writer.writeEndElement(); // EPERSONS
+            writer.writeStartElement(EPERSONS);
+            for (EPerson eperson : EPerson.findAll(context, EPerson.EMAIL))
+                writeEPerson(eperson, writer, emitPasswords);
+            writer.writeEndElement(); // EPERSONS
 
-        writer.writeEndElement(); // DSPACE_ROLES
-        writer.writeEndDocument();
-        writer.close();
+            writer.writeEndElement(); // DSPACE_ROLES
+            writer.writeEndDocument();
+            writer.close();
+        }
+        catch (Exception e)
+        {
+            throw new PackageException(e);
+        }
     }
 
     /* (non-Javadoc)
@@ -257,18 +261,20 @@ public class RoleDisseminator implements PackageDisseminator
 
     /**
      * Emit XML describing a single Group.
-     * 
+     *
+     * @param context
+     *            the DSpace Context
      * @param group
      *            the Group to describe
      * @param write
      *            the description to this stream
      */
-    private void writeGroup(Group group, XMLStreamWriter writer)
-            throws XMLStreamException
+    private void writeGroup(Context context, Group group, XMLStreamWriter writer)
+            throws XMLStreamException, PackageException
     {
         writer.writeStartElement(GROUP);
         writer.writeAttribute(ID, String.valueOf(group.getID()));
-        writer.writeAttribute(NAME, group.getName());
+        writer.writeAttribute(NAME, PackageUtils.crosswalkDefaultGroupName(context, group.getName()));
 
         writer.writeStartElement(MEMBERS);
         for (EPerson member : group.getMembers())
@@ -284,7 +290,7 @@ public class RoleDisseminator implements PackageDisseminator
         {
             writer.writeEmptyElement(MEMBER_GROUP);
             writer.writeAttribute(ID, String.valueOf(member.getID()));
-            writer.writeAttribute(NAME, member.getName());
+            writer.writeAttribute(NAME, PackageUtils.crosswalkDefaultGroupName(context, member.getName()));
         }
         writer.writeEndElement();
 

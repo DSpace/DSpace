@@ -169,6 +169,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
          * @return the input stream of its content.
          * @see METSManifest
          */
+        @Override
         public InputStream getInputStream(Element mdref)
                 throws MetadataValidationException, IOException
         {
@@ -214,6 +215,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * @throws SQLException
      * @throws IOException
      */
+    @Override
     public DSpaceObject ingest(Context context, DSpaceObject parent,
             File pkgFile, PackageParameters params, String license)
             throws PackageValidationException, CrosswalkException,
@@ -448,10 +450,10 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
         // Crosswalk the sourceMD first, so that we make sure to fill in
         // submitter info (and any other initial applicable info)
-        manifest.crosswalkObjectSourceMD(context, dso, callback);
+        manifest.crosswalkObjectSourceMD(context, params, dso, callback);
 
         // Next, crosswalk techMD, digiprovMD, rightsMD
-        manifest.crosswalkObjectOtherAdminMD(context, dso, callback);
+        manifest.crosswalkObjectOtherAdminMD(context, params, dso, callback);
 
         // -- Step 4 --
         // Add all content files as bitstreams on new DSpace Object
@@ -607,10 +609,10 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
         // Crosswalk the sourceMD first, so that we make sure to fill in
         // submitter info (and any other initial applicable info)
-        manifest.crosswalkObjectSourceMD(context, dso, callback);
+        manifest.crosswalkObjectSourceMD(context, params, dso, callback);
 
         // Next, crosswalk techMD, digiprovMD, rightsMD
-        manifest.crosswalkObjectOtherAdminMD(context, dso, callback);
+        manifest.crosswalkObjectOtherAdminMD(context, params, dso, callback);
 
         // -- Step 4 --
         // Add all content files as bitstreams on new DSpace Object
@@ -756,7 +758,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
             // crosswalk this bitstream's administrative metadata located in
             // METS manifest (or referenced externally)
-            manifest.crosswalkBitstream(context, bitstream, mfileID,
+            manifest.crosswalkBitstream(context, params, bitstream, mfileID,
                     mdRefCallback);
 
             // is this the primary bitstream?
@@ -928,6 +930,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * @throws AuthorizeException
      * @throws CrosswalkException
      */
+    @Override
     public DSpaceObject replace(Context context, DSpaceObject dsoToReplace,
             File pkgFile, PackageParameters params)
             throws PackageValidationException, CrosswalkException,

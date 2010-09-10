@@ -192,9 +192,14 @@ public class RoleIngester implements PackageIngester
         {
             Element group = (Element) groups.item(groupx);
             String name = group.getAttribute(RoleDisseminator.NAME);
-            // int groupID = Integer.valueOf(group.getAttribute("ID")); // FIXME
-            // no way to set ID!
 
+            //Translate Group name back to internal ID format (e.g. COLLECTION_<ID>_ADMIN)
+            // TODO: is this necessary? can we leave it in format with Handle in place of <ID>?
+            // For now, this might be necessary, because we don't want to accidentally
+            // create a new group COLLECTION_hdl:123/34_ADMIN, which is equivalent
+            // to an existing COLLECTION_45_ADMIN group
+            name = PackageUtils.crosswalkDefaultGroupName(context, name);
+            
             Group groupObj; // The group to restore
             Group collider = Group.findByName(context, name); // Existing group?
             if (null != collider)
@@ -365,8 +370,8 @@ public class RoleIngester implements PackageIngester
             UnsupportedOperationException, CrosswalkException,
             AuthorizeException, SQLException, IOException
     {
-        // TODO Auto-generated method stub
-        throw new PackageException("replace is not implemented yet"); // FIXME
+        //Just call ingest() -- this will perform a replacement as necessary
+        return ingest(context, dso, pkgFile, params, null);
     }
 
     /*
@@ -382,7 +387,7 @@ public class RoleIngester implements PackageIngester
             UnsupportedOperationException, CrosswalkException,
             AuthorizeException, SQLException, IOException
     {
-        // TODO Auto-generated method stub
-        throw new PackageException("replaceAll is not implemented");
+        throw new PackageException(
+                "replaceAll() is not implemented, as replace() method already handles replacement of all roles from an external file.");
     }
 }

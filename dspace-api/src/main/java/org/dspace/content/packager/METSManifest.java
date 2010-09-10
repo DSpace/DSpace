@@ -53,6 +53,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.crosswalk.AbstractPackagerWrappingCrosswalk;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
 import org.dspace.content.crosswalk.MetadataValidationException;
@@ -940,12 +941,13 @@ public class METSManifest
     /**
      * Invokes appropriate crosswalks on Item-wide descriptive metadata.
      */
-    public void crosswalkItemDmd(Context context, DSpaceObject dso,
-                              Element dmdSec, Mdref callback)
+    public void crosswalkItemDmd(Context context, PackageParameters params,
+                                DSpaceObject dso,
+                                Element dmdSec, Mdref callback)
         throws MetadataValidationException, PackageValidationException,
                CrosswalkException, IOException, SQLException, AuthorizeException
     {
-        crosswalkXmd(context, dso, dmdSec, callback);
+        crosswalkXmd(context, params, dso, dmdSec, callback);
     }
 
     /**
@@ -953,8 +955,8 @@ public class METSManifest
      * to the whole object.
      * @throws MetadataValidationException if METS is invalid, e.g. referenced amdSec is missing.
      */
-    public void crosswalkObjectOtherAdminMD(Context context, DSpaceObject dso,
-                                      Mdref callback)
+    public void crosswalkObjectOtherAdminMD(Context context, PackageParameters params,
+                                      DSpaceObject dso, Mdref callback)
         throws MetadataValidationException, PackageValidationException,
                CrosswalkException, IOException, SQLException, AuthorizeException
     {
@@ -962,11 +964,11 @@ public class METSManifest
         {
             Element amdSec = getElementByXPath("mets:amdSec[@ID=\""+amdID+"\"]", false);
             for (Iterator ti = amdSec.getChildren("techMD", metsNS).iterator(); ti.hasNext();)
-                crosswalkXmd(context, dso, (Element)ti.next(), callback);
+                crosswalkXmd(context, params, dso, (Element)ti.next(), callback);
             for (Iterator ti = amdSec.getChildren("digiprovMD", metsNS).iterator(); ti.hasNext();)
-                crosswalkXmd(context, dso, (Element)ti.next(), callback);
+                crosswalkXmd(context, params, dso, (Element)ti.next(), callback);
             for (Iterator ti = amdSec.getChildren("rightsMD", metsNS).iterator(); ti.hasNext();)
-                crosswalkXmd(context, dso, (Element)ti.next(), callback);
+                crosswalkXmd(context, params, dso, (Element)ti.next(), callback);
         }
     }
 
@@ -974,8 +976,8 @@ public class METSManifest
      * Just crosswalk the sourceMD sections; used to set the handle and parent of AIP.
      * @return true if any metadata section was actually crosswalked, false otherwise
      */
-    public boolean crosswalkObjectSourceMD(Context context, DSpaceObject dso,
-                                      Mdref callback)
+    public boolean crosswalkObjectSourceMD(Context context, PackageParameters params,
+                                        DSpaceObject dso, Mdref callback)
         throws MetadataValidationException, PackageValidationException,
                CrosswalkException, IOException, SQLException, AuthorizeException
     {
@@ -986,7 +988,7 @@ public class METSManifest
             Element amdSec = getElementByXPath("mets:amdSec[@ID=\""+amdID+"\"]", false);
             for (Iterator ti = amdSec.getChildren("sourceMD", metsNS).iterator(); ti.hasNext();)
             {
-                crosswalkXmd(context, dso, (Element)ti.next(), callback);
+                crosswalkXmd(context, params, dso, (Element)ti.next(), callback);
                 result = true;
             }
         }
@@ -1015,29 +1017,56 @@ public class METSManifest
     }
 
     // Crosswalk *any* kind of metadata section - techMD, rightsMD, etc.
-    private void crosswalkXmd(Context context, DSpaceObject dso,
+    private void crosswalkXmd(Context context, PackageParameters params,
+                              DSpaceObject dso,
                               Element xmd, Mdref callback)
         throws MetadataValidationException, PackageValidationException,
                CrosswalkException, IOException, SQLException, AuthorizeException
     {
         String type = getMdType(xmd);
+
+        //First, try to find the IngestionCrosswalk to use
         IngestionCrosswalk xwalk = (IngestionCrosswalk)getCrosswalk(type, IngestionCrosswalk.class);
 
         // If metadata is not simply applicable to object,
         // let it go with a warning.
         try
         {
-            // xwalk the DOM-model
+            // If we found the IngestionCrosswalk, crosswalk our XML-based content
             if (xwalk != null)
-                xwalk.ingest(context, dso, getMdContentAsXml(xmd,callback));
+            {
+                // Check if our Crosswalk actually wraps another Packager Plugin
+                if(xwalk instanceof AbstractPackagerWrappingCrosswalk)
+                {
+                    // If this crosswalk wraps another Packager Plugin, we can pass it our Packaging Parameters
+                    // (which essentially allow us to customize the ingest process of the crosswalk)
+                    AbstractPackagerWrappingCrosswalk wrapper = (AbstractPackagerWrappingCrosswalk) xwalk;
+                    wrapper.setPackagingParameters(params);
+                }
 
-            // try stream-based xwalk
+                xwalk.ingest(context, dso, getMdContentAsXml(xmd,callback));
+            }
+            // Otherwise, try stream-based crosswalk
             else
             {
                 StreamIngestionCrosswalk sxwalk =
                   (StreamIngestionCrosswalk)getCrosswalk(type, StreamIngestionCrosswalk.class);
+
                 if (sxwalk != null)
                 {
+                    // Check if our Crosswalk actually wraps another Packager Plugin
+                    if(sxwalk instanceof AbstractPackagerWrappingCrosswalk)
+                    {
+                        // If this crosswalk wraps another Packager Plugin, we can pass it our Packaging Parameters
+                        // (which essentially allow us to customize the ingest process of the crosswalk)
+                        AbstractPackagerWrappingCrosswalk wrapper = (AbstractPackagerWrappingCrosswalk) sxwalk;
+                        wrapper.setPackagingParameters(params);
+                    }
+
+                    // If we found a Stream-based crosswalk that matches, we now want to
+                    // locate the stream we are crosswalking.  This stream should be
+                    // references in METS via an <mdRef> element
+                    // (which is how METS references external files)
                     Element mdRef = xmd.getChild("mdRef", metsNS);
                     if (mdRef != null)
                     {
@@ -1053,7 +1082,9 @@ public class METSManifest
                             if (in != null)
                                 in.close();
                         }
-                    }
+                    } // If we couldn't find an <mdRef>, then we'll try an <mdWrap> 
+                      // with a <binData> element instead.
+                      // (this is how METS wraps embedded base64-encoded content streams)
                     else
                     {
                         Element mdWrap = xmd.getChild("mdWrap", metsNS);
@@ -1090,12 +1121,14 @@ public class METSManifest
      * Crosswalk the metadata associated with a particular <code>file</code>
      * element into the bitstream it corresponds to.
      * @param context a dspace context.
+     * @param params any PackageParameters which may affect how bitstreams are crosswalked
      * @param bitstream bitstream target of the crosswalk
      * @param fileId value of ID attribute in the file element responsible
      *  for the contents of that bitstream.
      *  @param callback ???
      */
-    public void crosswalkBitstream(Context context, Bitstream bitstream,
+    public void crosswalkBitstream(Context context, PackageParameters params,
+                                   Bitstream bitstream,
                                    String fileId, Mdref callback)
         throws MetadataValidationException, PackageValidationException,
                CrosswalkException, IOException, SQLException, AuthorizeException
@@ -1117,9 +1150,9 @@ public class METSManifest
         {
             Element amdSec = getElementByXPath("mets:amdSec[@ID=\""+amdID[i]+"\"]", false);
             for (Iterator ti = amdSec.getChildren("techMD", metsNS).iterator(); ti.hasNext();)
-                crosswalkXmd(context, bitstream, (Element)ti.next(), callback);
+                crosswalkXmd(context, params, bitstream, (Element)ti.next(), callback);
             for (Iterator ti = amdSec.getChildren("sourceMD", metsNS).iterator(); ti.hasNext();)
-                crosswalkXmd(context, bitstream, (Element)ti.next(), callback);
+                crosswalkXmd(context, params, bitstream, (Element)ti.next(), callback);
         }
     }
 

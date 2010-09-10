@@ -93,6 +93,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.content.crosswalk.AbstractPackagerWrappingCrosswalk;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
@@ -485,6 +486,7 @@ public abstract class AbstractMETSDisseminator
      * @param dso DSpace Object we are generating METS manifest for
      * @param mdSecClass class of mdSec (TechMD, RightsMD, DigiProvMD, etc)
      * @param typeSpec Type of metadata going into this mdSec (e.g. MODS, DC, PREMIS, etc)
+     * @param params the PackageParameters
      * @param extraStreams list of extra files which need to be added to final dissemination package
      * 
      * @return mdSec element or null if xwalk returns empty results.
@@ -496,7 +498,8 @@ public abstract class AbstractMETSDisseminator
      * @throws AuthorizeException
      */
     protected MdSec makeMdSec(Context context, DSpaceObject dso, Class mdSecClass,
-                            String typeSpec, MdStreamCache extraStreams)
+                              String typeSpec, PackageParameters params,
+                              MdStreamCache extraStreams)
         throws SQLException, PackageValidationException, CrosswalkException,
                IOException, AuthorizeException
     {
@@ -510,7 +513,7 @@ public abstract class AbstractMETSDisseminator
 
             //determine the name of the crosswalk to use to generate metadata
             // for dmdSecs this is the part *after* the colon in the 'type' (see getDmdTypes())
-            // for all others this is usually just corresponds to type name.
+            // for all other mdSecs this is usually just corresponds to type name.
             if (parts.length > 1)
             {
                 metsName = parts[0];
@@ -524,11 +527,21 @@ public abstract class AbstractMETSDisseminator
 
             if(xwalkFound)
             {
+                // Find the crosswalk we will be using to generate the metadata for this mdSec
                 DisseminationCrosswalk xwalk = (DisseminationCrosswalk)
                     PluginManager.getNamedPlugin(DisseminationCrosswalk.class, xwalkName);
 
                 if (xwalk.canDisseminate(dso))
                 {
+                    // Check if our Crosswalk actually wraps another Packager Plugin
+                    if(xwalk instanceof AbstractPackagerWrappingCrosswalk)
+                    {
+                        // If this crosswalk wraps another Packager Plugin, we can pass it our Packaging Parameters
+                        // (which essentially allow us to customize the output of the crosswalk)
+                        AbstractPackagerWrappingCrosswalk wrapper = (AbstractPackagerWrappingCrosswalk) xwalk;
+                        wrapper.setPackagingParameters(params);
+                    }
+
                     //For a normal DisseminationCrosswalk, we will be expecting an XML (DOM) based result.
                     // So, we are going to wrap this XML result in an <mdWrap> element
                     MdWrap mdWrap = new MdWrap();
@@ -556,6 +569,15 @@ public abstract class AbstractMETSDisseminator
                 {
                     if (sxwalk.canDisseminate(context, dso))
                     {
+                        // Check if our Crosswalk actually wraps another Packager Plugin
+                        if(sxwalk instanceof AbstractPackagerWrappingCrosswalk)
+                        {
+                            // If this crosswalk wraps another Packager Plugin, we can pass it our Packaging Parameters
+                            // (which essentially allow us to customize the output of the crosswalk)
+                            AbstractPackagerWrappingCrosswalk wrapper = (AbstractPackagerWrappingCrosswalk) sxwalk;
+                            wrapper.setPackagingParameters(params);
+                        }
+
                         // Disseminate crosswalk output to an outputstream
                         ByteArrayOutputStream disseminateOutput = new ByteArrayOutputStream();
                         sxwalk.disseminate(context, dso, disseminateOutput);
@@ -622,13 +644,14 @@ public abstract class AbstractMETSDisseminator
     // mdTypes[] is array of "[metsName:]PluginName" strings, maybe empty.
     protected void addToAmdSec(AmdSec fAmdSec, String mdTypes[], Class mdSecClass,
                              Context context, DSpaceObject dso,
+                             PackageParameters params,
                              MdStreamCache extraStreams)
         throws SQLException, PackageValidationException, CrosswalkException,
                IOException, AuthorizeException
     {
         for (int i = 0; i < mdTypes.length; ++i)
         {
-            MdSec md = makeMdSec(context, dso, mdSecClass, mdTypes[i], extraStreams);
+            MdSec md = makeMdSec(context, dso, mdSecClass, mdTypes[i], params, extraStreams);
             if (md != null)
                 fAmdSec.getContent().add(md);
         }
@@ -652,10 +675,10 @@ public abstract class AbstractMETSDisseminator
             String result = gensym("amd");
             AmdSec fAmdSec = new AmdSec();
             fAmdSec.setID(result);
-            addToAmdSec(fAmdSec, techMdTypes, TechMD.class, context, dso, extraStreams);
-            addToAmdSec(fAmdSec, rightsMdTypes, RightsMD.class, context, dso, extraStreams);
-            addToAmdSec(fAmdSec, sourceMdTypes, SourceMD.class, context, dso, extraStreams);
-            addToAmdSec(fAmdSec, digiprovMdTypes, DigiprovMD.class, context, dso, extraStreams);
+            addToAmdSec(fAmdSec, techMdTypes, TechMD.class, context, dso, params, extraStreams);
+            addToAmdSec(fAmdSec, rightsMdTypes, RightsMD.class, context, dso, params, extraStreams);
+            addToAmdSec(fAmdSec, sourceMdTypes, SourceMD.class, context, dso, params, extraStreams);
+            addToAmdSec(fAmdSec, digiprovMdTypes, DigiprovMD.class, context, dso, params, extraStreams);
 
             mets.getContent().add(fAmdSec);
             return result;
@@ -714,7 +737,7 @@ public abstract class AbstractMETSDisseminator
         String dmdId[] = new String[dmdTypes.length];
         for (int i = 0; i < dmdTypes.length; ++i)
         {
-            MdSec dmdSec = makeMdSec(context, dso, DmdSec.class, dmdTypes[i], extraStreams);
+            MdSec dmdSec = makeMdSec(context, dso, DmdSec.class, dmdTypes[i], params, extraStreams);
             if (dmdSec != null)
             {
                 mets.getContent().add(dmdSec);
@@ -943,42 +966,11 @@ public abstract class AbstractMETSDisseminator
             for (int i = 0; i < comms.length; ++i)
             {
                 //add a child <div> for each top level community in this site
-                Div childDiv = makeChildDiv(getObjectTypeString(comms[i]), comms[i], params);
+                Div childDiv = makeChildDiv(getObjectTypeString(comms[i]),
+                        comms[i], params);
                 if(childDiv!=null)
                     div0.getContent().add(childDiv);
             }
-
-            // Create a reference to a file containing users and groups.
-            RoleDisseminator users = new RoleDisseminator();
-
-            MdRef usersRef = new MdRef();
-            setMdType(usersRef,"DSpaceUsersAndGroups");
-            usersRef.setID("usersAndGroups");
-            usersRef.setMIMETYPE(users.getMIMEType(params));
-            usersRef.setLOCTYPE(Loctype.URL);
-
-            // Add the stream to the list of non-content streams to be packed.
-            extraStreams.addStream(usersRef,
-                    users.asStream(context, true));
-
-            // Link the reference into the METS
-            TechMD techMd = new TechMD();
-            techMd.setID(gensym("techMD"));
-            techMd.getContent().add(usersRef);
-
-            AmdSec aMdSec = new AmdSec();
-            String amdId = gensym("amd");
-            aMdSec.setID(amdId);
-            aMdSec.getContent().add(techMd);
-
-            mets.getContent().add(aMdSec);
-            
-            // Mention in the structMap
-            Div usersDiv = new Div();
-            usersDiv.setID(gensym("div"));
-            usersDiv.setTYPE(RoleDisseminator.DSPACE_ROLES);
-            usersDiv.setADMID(amdId);
-            structMap.getContent().add(usersDiv);
         }
         if (fileSec != null)
             mets.getContent().add(fileSec);

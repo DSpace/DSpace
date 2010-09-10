@@ -62,6 +62,7 @@ import org.dspace.content.Site;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.handle.HandleManager;
 import org.dspace.license.CreativeCommons;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
@@ -743,6 +744,103 @@ public class PackageUtils
                     // Communities & Collections don't include the exact same metadata fields
                 }
             }
+        }
+    }
+
+
+    /**
+     * When DSpace creates Default Group Names they are of a very specific format,
+     * for example:
+     * <li> COMMUNITY_[ID]_ADMIN
+     * <li> COLLECTION_[ID]_ADMIN
+     * <li> COLLECTION_[ID]_SUBMIT
+     * <li> COLLECTION_[ID]_WORKFLOW_STEP_#
+     * <p>
+     * Although these names work fine within DSpace, the DSpace internal ID
+     * (represented by [ID] above) becomes meaningless when content is exported
+     * outside of DSpace.  In order to make these Group names meaningful outside
+     * of DSpace, they must be translated into a different format:
+     * <li> COMMUNITY_[HANDLE]_ADMIN (e.g. COMMUNITY_hdl:123456789/10_ADMIN), etc.
+     * <p>
+     * This format replaces the internal ID with an external Handle identifier
+     * (which is expected to be more meaningful even when content is exported
+     *  from DSpace).
+     * <p>
+     * This method translates between the two Group Name formats.
+     * In either case if the specified <code>groupDefaultName</code> looks to
+     * be a default group name with an identifier, its identifier is replaced
+     * with the value of <code>newGroupIdentifier</code>.  This allows you
+     * to more easily translate an internal group name to one that can have
+     * meaning external to DSpace (and visa versa).
+     * <p>
+     * This method may be useful to any Crosswalks/Packagers which deal with
+     * import/export of DSpace Groups.
+     *
+     * @param relatedDso DSpaceObject associated with group
+     * @param groupDefaultName Group's default name
+     * @return a new default Group name, containing the newGroupIdentifier
+     */
+    public static String crosswalkDefaultGroupName(Context context, String groupDefaultName)
+            throws PackageException
+    {
+        // Check if this looks like a default Group name -- must have at LEAST two underscores surrounded by other characters
+        if(!groupDefaultName.matches("^.+_.+_.+$"))
+        {
+            //if this is not a valid default group name, just return group name as-is (no crosswalking necessary)
+            return groupDefaultName;
+        }
+
+        //Pull apart default group name into its three main parts
+        // Format: <DSpace-Obj-Type>_<DSpace-Obj-ID>_<Group-Type>
+        // (e.g. COLLECTION_123_ADMIN)
+        String objType = groupDefaultName.substring(0, groupDefaultName.indexOf("_"));
+        String tmpEndString = groupDefaultName.substring(groupDefaultName.indexOf("_")+1);
+        String objID = tmpEndString.substring(0, tmpEndString.indexOf("_"));
+        String groupType = tmpEndString.substring(tmpEndString.indexOf("_")+1);
+
+        try
+        {
+            //Which way are we crosswalking? Two options exist:
+            // Option #1 -- Translate Handle to Internal ID (for import into DSpace)
+            if(objID.contains("hdl:"))
+            {
+                //We'll translate this handle into an internal ID
+                //Format for Handle => "hdl:<handle-prefix>/<handle-suffix>"
+                // (e.g. "hdl:123456789/10")
+
+                //First, get the object via the Handle
+                DSpaceObject dso = HandleManager.resolveToObject(context, objID.substring(4));
+
+                if(dso==null)
+                    throw new PackageException("DSpace Object referenced by handle '" + objID + "' does not exist within DSpace.  Cannot crosswalk the group named '" + groupDefaultName + "'");
+
+                //verify our group specified object Type corresponds to this object's type
+                if(Constants.getTypeID(objType)!=dso.getType())
+                    throw new PackageException("DSpace Object referenced by handle '" + objID + "' does not correspond to the object type specified by Group named '" + groupDefaultName + "'.  Cannot crosswalk the group name.");
+
+                //Create an updated group name, using the Internal ID to replace the Handle
+                // Format: <DSpace-Obj-Type>_<DSpace-Obj-ID>_<Group-Type>
+                return objType + "_" + dso.getID() + "_" + groupType;
+            }
+            // Option #2 -- Translate ID to Handle (for export outside of DSpace)
+            else
+            {
+                //We'll translate this internal ID into a Handle
+
+                //First, get the object via the Internal ID
+                DSpaceObject dso = DSpaceObject.find(context, Constants.getTypeID(objType), Integer.parseInt(objID));
+
+                if(dso==null)
+                    throw new PackageException("DSpace Object referenced by internal ID '" + objID + "' and type '" + objType + "' does not exist within DSpace.  Cannot crosswalk the group named '" + groupDefaultName + "'");
+
+                //Create an updated group name, using the Handle to replace the InternalID
+                // Format: <DSpace-Obj-Type>_hdl:<Handle>_<Group-Type>
+                return objType + "_" + "hdl:" + dso.getHandle() + "_" + groupType;
+            }
+        }
+        catch (SQLException sqle)
+        {
+            throw new PackageException("Error locating object related to group named '" + groupDefaultName + "'.  Cannot crosswalk this group name.");
         }
     }
 
