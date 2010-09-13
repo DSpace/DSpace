@@ -91,32 +91,26 @@ public class DCDate
     DateGran granularity = null;
 
     // Full ISO 8601 is e.g. "2009-07-16T13:59:21Z"
-    private static final SimpleDateFormat fullIso = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-    static { fullIso.setTimeZone(utcZone); }
+    private final SimpleDateFormat fullIso = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     // without Z
-    private static final SimpleDateFormat fullIso2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    static { fullIso2.setTimeZone(utcZone); }
+    private final SimpleDateFormat fullIso2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     // without seconds
-    private static final SimpleDateFormat fullIso3 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-    static { fullIso3.setTimeZone(utcZone); }
+    private final SimpleDateFormat fullIso3 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
 
     // without minutes
-    private static final SimpleDateFormat fullIso4 = new SimpleDateFormat("yyyy-MM-dd'T'HH");
-    static { fullIso4.setTimeZone(utcZone); }
+    private final SimpleDateFormat fullIso4 = new SimpleDateFormat("yyyy-MM-dd'T'HH");
 
     // Date-only ISO 8601 is e.g. "2009-07-16"
-    private static final SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
-    static { dateIso.setTimeZone(utcZone); }
+    private final SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
 
     // Year-Month-only ISO 8601 is e.g. "2009-07"
-    private static final SimpleDateFormat yearMonthIso = new SimpleDateFormat("yyyy-MM");
-    static { yearMonthIso.setTimeZone(utcZone); }
+    private final SimpleDateFormat yearMonthIso = new SimpleDateFormat("yyyy-MM");
 
     // just year, "2009"
-    private static final SimpleDateFormat yearIso = new SimpleDateFormat("yyyy");
-    static { yearIso.setTimeZone(utcZone); }
+    private final SimpleDateFormat yearIso = new SimpleDateFormat("yyyy");
+    
 
    /**
     * DateFormatSymbols for locale months name
@@ -137,6 +131,8 @@ public class DCDate
      */
     public DCDate(Date date)
     {
+        setUTCForFormatting();
+
         if (date == null)
         {
             return;
@@ -173,6 +169,8 @@ public class DCDate
      */
     public DCDate(int yyyy, int mm, int dd, int hh, int mn, int ss)
     {
+        setUTCForFormatting();
+
         // default values
         int lyear = 0;
         int lhours = 0;
@@ -237,6 +235,8 @@ public class DCDate
      */
     public DCDate(String fromDC)
     {
+        setUTCForFormatting();
+
         // An empty date is OK
         if ((fromDC == null) || fromDC.equals(""))
         {
@@ -300,6 +300,21 @@ public class DCDate
                 localCalendar = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
             }
         }
+    }
+
+    /**
+     * Set all the formatters to use UTC. SimpleDateFormat is not thread-safe which
+     * is why they are not static variables initialised once.
+     */
+    private void setUTCForFormatting()
+    {
+        fullIso.setTimeZone(utcZone);
+        fullIso2.setTimeZone(utcZone);
+        fullIso3.setTimeZone(utcZone);
+        fullIso4.setTimeZone(utcZone);
+        dateIso.setTimeZone(utcZone);
+        yearMonthIso.setTimeZone(utcZone);
+        yearIso.setTimeZone(utcZone);
     }
 
     // Attempt to parse, swallowing errors; return null for failure.
