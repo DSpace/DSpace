@@ -318,17 +318,18 @@ to administer DSpace.
 		        			describe the notice, if they are present then we add them to the DRI document 
 		        			before all other flow pages.
 		        			-->
-		        		<map:match type="WildcardParameterMatcher" pattern="true">
-		        			<map:parameter name="parameter-name" value="notice"/>
-		        			<map:parameter name="notice" value="{flow-attribute:notice}"/>
-			        		<map:transform type="notice">
-			        			<map:parameter name="outcome" value="{flow-attribute:outcome}"/>
-			        			<map:parameter name="header" value="{flow-attribute:header}"/>
-			        			<map:parameter name="message" value="{flow-attribute:message}"/>
-			        			<map:parameter name="characters" value="{flow-attribute:characters}"/>
-			        		</map:transform>
-			        	</map:match>
-		        		
+                        <map:match pattern="admin/**">
+                            <map:match type="WildcardParameterMatcher" pattern="true">
+                                <map:parameter name="parameter-name" value="notice"/>
+                                <map:parameter name="notice" value="{flow-attribute:notice}"/>
+                                <map:transform type="notice">
+                                    <map:parameter name="outcome" value="{flow-attribute:outcome}"/>
+                                    <map:parameter name="header" value="{flow-attribute:header}"/>
+                                    <map:parameter name="message" value="{flow-attribute:message}"/>
+                                    <map:parameter name="characters" value="{flow-attribute:characters}"/>
+                                </map:transform>
+                            </map:match>
+                        </map:match>
 		        		
 		        		<map:match pattern="admin/not-authorized">
 		        			<map:transform type="NotAuthorized"/>
