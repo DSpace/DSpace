@@ -1561,8 +1561,18 @@
     
     <xsl:template match="dri:xref">
         <a>
-            <xsl:attribute name="href"><xsl:value-of select="@target"/></xsl:attribute>
-            <xsl:attribute name="class"><xsl:value-of select="@rend"/></xsl:attribute>
+            <xsl:if test="@target">
+                <xsl:attribute name="href"><xsl:value-of select="@target"/></xsl:attribute>
+            </xsl:if>
+            
+            <xsl:if test="@rend">
+                <xsl:attribute name="class"><xsl:value-of select="@rend"/></xsl:attribute>
+            </xsl:if>
+            
+            <xsl:if test="@n">
+                <xsl:attribute name="name"><xsl:value-of select="@n"/></xsl:attribute>
+            </xsl:if>
+
             <xsl:apply-templates />
         </a>
     </xsl:template>
@@ -2785,7 +2795,7 @@
                 <xsl:value-of select="@rend"/>
             </xsl:if>
         </xsl:attribute>
-        
+
     </xsl:template>
     
     <!-- templates for required textarea attributes used if not found in DRI document -->

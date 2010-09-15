@@ -21,6 +21,9 @@
 (Erick Rocha Fonseca, Claudia Juergen)
 - [DS-563] Brazilian Portuguese (pt_BR) translation for XML-UI 1.6.2
 
+(Peter Dietz)
+- [DS-549] Added <a name> anchors in XMLUI
+
 1.6.2
 =====
 
