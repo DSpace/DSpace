@@ -57,6 +57,7 @@
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
+            <version>2.1-beta-1</version>
             <configuration>
                <failOnMissingWebXml>false</failOnMissingWebXml>
                <archive>
@@ -837,6 +838,17 @@
    </developers>
 
    <contributors>
+      <contributor>
+         <name>Add Your Name Here and submit a patch!</name>
+         <email>contributor at myu.edu</email>
+         <url>http://www.myu.edu/me</url>
+         <organization>My University</organization>
+         <organizationUrl>http://www.myu.edu</organizationUrl>
+         <roles>
+            <role>developer</role>
+         </roles>
+         <timezone>0</timezone>
+      </contributor>
       <contributor>
          <name>Pere Villega</name>
          <email>pere.villega@gmail.com</email>
