@@ -10,21 +10,25 @@
 </head>
 <body bgcolor="white">
 <p>
-Provides classes and mehtods for browsing Items in DSpace by whatever
+Provides classes and methods for browsing Items in DSpace by whatever
 is specified in the configuration.  The standard method by which you 
 would perform a browse is as follows:
 </p>
 
 <ul>
-	<li>Create a <a href="BrowserScope.html">BrowserScope</a> object.  This object holds all of the parameters
-	of your browse request</li>
-	<li>Pass the <a href="BrowserScope.html">BrowserScope</a> object into the <a href="BrowseEngine.html">BrowseEngine</a> object.
-	This object should be invoked through either the browse() method or the browseMini() method</li>
-	<li>The <a href="BrowseEngine.html">BrowseEngine</a> will pass back a <a href="BrowseInfo.html">BrowseInfo</a> object which contains all the relevant details of your request</li>
+	<li>Create a <a href="BrowserScope.html">BrowserScope</a> object.
+	This object holds all of the parameters of your browse request</li>
+	<li>Pass the <a href="BrowserScope.html">BrowserScope</a> object
+	into the <a href="BrowseEngine.html">BrowseEngine</a> object. This
+	object should be invoked through either the browse() method or the
+	browseMini() method</li>
+	<li>The <a href="BrowseEngine.html">BrowseEngine</a> will pass
+	back a <a href="BrowseInfo.html">BrowseInfo</a> object which contains
+	all the relevant details of your request</li>
 </ul>
 
 <p>
-Browses only return archived Items; other Items (eg, those 
+Browses only return archived Items; other Items (e.g. those 
 in the workflow system) are ignored.
 </p>
 
@@ -32,6 +36,7 @@ in the workflow system) are ignored.
 
 <p>
 An example use of the Browse API is shown below:
+</p>
 <pre>
     // Create or obtain a context object
     Context context = new Context();
@@ -56,10 +61,10 @@ An example use of the Browse API is shown below:
 	BrowseEngine be = new BrowseEngine();
     BrowseInfo results = be.browse(scope);
 </pre>
-</p>
 
 <p>
 In this case, the results might be Items with titles like:
+</p>
 
 <pre>
 Tehran, City of the Ages
@@ -72,8 +77,6 @@ Thematic Alignment
 Thesis and Antithesis
 ...
 </pre>
-
-</p>
 
 <h2>Browse Indexes</h2>
 
