@@ -48,8 +48,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -74,14 +77,18 @@ public class RoleIngester implements PackageIngester
      * Common code to ingest roles from a Document.
      * 
      * @param context
+     *          DSpace Context
+     * @param parent
+     *          the Parent DSpaceObject
      * @param document
+     *          the XML Document
      * @throws SQLException
      * @throws AuthorizeException
      * @throws PackageException
      */
-    static void ingestDocument(Context context, PackageParameters params,
-            Document document) throws SQLException, AuthorizeException,
-            PackageException
+    static void ingestDocument(Context context, DSpaceObject parent,
+            PackageParameters params, Document document)
+            throws SQLException, AuthorizeException, PackageException
     {
         String myEmail = context.getCurrentUser().getEmail();
         String myNetid = context.getCurrentUser().getNetid();
@@ -181,7 +188,10 @@ public class RoleIngester implements PackageIngester
             else
                 eperson.setPasswordHash(null);
 
-            // Do not update eperson!  Let subsequent problems roll it back.
+            // Actually write Eperson info to DB
+            // NOTE: this update() doesn't call a commit(). So, Eperson info
+            // may still be rolled back if a subsequent error occurs
+            eperson.update();
         }
 
         // Now ingest the Groups
@@ -200,7 +210,7 @@ public class RoleIngester implements PackageIngester
             // to an existing COLLECTION_45_ADMIN group
             name = PackageUtils.crosswalkDefaultGroupName(context, name);
             
-            Group groupObj; // The group to restore
+            Group groupObj = null; // The group to restore
             Group collider = Group.findByName(context, name); // Existing group?
             if (null != collider)
             { // Group already exists, so empty it
@@ -224,12 +234,52 @@ public class RoleIngester implements PackageIngester
                             + " already exists");
             }
             else
-            { // No such group exists
-                groupObj = Group.create(context);
-                groupObj.setName(name);
-                log.info("Created Group {}.", name);
+            { // No such group exists  -- so, we'll need to create it!
+
+                // First Check if this is a "typed" group (i.e. Community or Collection associated Group)
+                // If so, we'll create it via the Community or Collection
+                String type = group.getAttribute(RoleDisseminator.TYPE);
+                if(type!=null && !type.isEmpty() && parent!=null)
+                {
+                    //What type of dspace object is this group associated with
+                    if(parent.getType()==Constants.COLLECTION)
+                    {
+                        Collection collection = (Collection) parent;
+
+                        // Create this Collection-associated group, based on its group type
+                        if(type.equals(RoleDisseminator.GROUP_TYPE_ADMIN))
+                            groupObj = collection.createAdministrators();
+                        else if(type.equals(RoleDisseminator.GROUP_TYPE_SUBMIT))
+                            groupObj = collection.createSubmitters();
+                        else if(type.equals(RoleDisseminator.GROUP_TYPE_WORKFLOW_STEP_1))
+                            groupObj = collection.createWorkflowGroup(1);
+                        else if(type.equals(RoleDisseminator.GROUP_TYPE_WORKFLOW_STEP_2))
+                            groupObj = collection.createWorkflowGroup(2);
+                        else if(type.equals(RoleDisseminator.GROUP_TYPE_WORKFLOW_STEP_3))
+                            groupObj = collection.createWorkflowGroup(3);
+                    }
+                    else if(parent.getType()==Constants.COMMUNITY)
+                    {
+                        Community community = (Community) parent;
+
+                        // Create this Community-associated group, based on its group type
+                        if(type.equals(RoleDisseminator.GROUP_TYPE_ADMIN))
+                            groupObj = community.createAdministrators();
+                    }
+                    //Ignore all other dspace object types
+                }
+
+                //If group not yet created, create it with the given name
+                if(groupObj==null)
+                {
+                    groupObj = Group.create(context);
+                    groupObj.setName(name);
+                }
+                
+                log.info("Created Group {}.", groupObj.getName());
             }
 
+            // Add EPeople to newly created Group
             NodeList members = group
                     .getElementsByTagName(RoleDisseminator.MEMBER);
             for (int memberx = 0; memberx < members.getLength(); memberx++)
@@ -239,8 +289,12 @@ public class RoleIngester implements PackageIngester
                 EPerson memberEPerson = EPerson.findByEmail(context, memberName);
                 groupObj.addMember(memberEPerson);
             }
-            // Do not groupObj.update! We want to roll back on subsequent
-            // failures.
+
+            // Actually write Group info to DB
+            // NOTE: this update() doesn't call a commit(). So, Group info
+            // may still be rolled back if a subsequent error occurs
+            groupObj.update();
+
         }
 
         // Go back and add Group members, now that all groups exist
@@ -248,6 +302,9 @@ public class RoleIngester implements PackageIngester
         {
             Element group = (Element) groups.item(groupx);
             String name = group.getAttribute(RoleDisseminator.NAME);
+            // Translate Group name back to internal ID format (e.g. COLLECTION_<ID>_ADMIN)
+            name = PackageUtils.crosswalkDefaultGroupName(context, name);
+            // Find previously created group
             Group groupObj = Group.findByName(context, name);
             NodeList members = group
                     .getElementsByTagName(RoleDisseminator.MEMBER_GROUP);
@@ -255,25 +312,34 @@ public class RoleIngester implements PackageIngester
             {
                 Element member = (Element) members.item(memberx);
                 String memberName = member.getAttribute(RoleDisseminator.NAME);
+                //Translate Group name back to internal ID format (e.g. COLLECTION_<ID>_ADMIN)
+                memberName = PackageUtils.crosswalkDefaultGroupName(context, memberName);
+                // Find previously created group
                 Group memberGroup = Group.findByName(context, memberName);
                 groupObj.addMember(memberGroup);
             }
-            // Do not groupObj.update!
+            // Actually update Group info in DB
+            // NOTE: Group info may still be rolled back if a subsequent error occurs
+            groupObj.update();
         }
     }
 
     /**
      * Ingest roles from an InputStream.
-     * 
+     *
      * @param context
+     *          DSpace Context
+     * @param parent
+     *          the Parent DSpaceObject
      * @param stream
+     *          the XML Document InputStream
      * @throws PackageException
      * @throws SQLException
      * @throws AuthorizeException
      */
-    static public void ingestStream(Context context, PackageParameters params,
-            InputStream stream) throws PackageException, SQLException,
-            AuthorizeException
+    static public void ingestStream(Context context, DSpaceObject parent,
+            PackageParameters params, InputStream stream)
+            throws PackageException, SQLException, AuthorizeException
     {
         Document document;
 
@@ -300,7 +366,7 @@ public class RoleIngester implements PackageIngester
         /*
          * TODO ? finally { close(stream); }
          */
-        ingestDocument(context, params, document);
+        ingestDocument(context, parent, params, document);
     }
 
     /*
@@ -311,6 +377,7 @@ public class RoleIngester implements PackageIngester
      * , org.dspace.content.DSpaceObject, java.io.File,
      * org.dspace.content.packager.PackageParameters, java.lang.String)
      */
+    @Override
     public DSpaceObject ingest(Context context, DSpaceObject parent,
             File pkgFile, PackageParameters params, String license)
             throws PackageException, CrosswalkException, AuthorizeException,
@@ -334,7 +401,7 @@ public class RoleIngester implements PackageIngester
         {
             throw new PackageException(e);
         }
-        ingestDocument(context, params, document);
+        ingestDocument(context, parent, params, document);
 
         /* Does not create a DSpaceObject */
         return null;
@@ -348,6 +415,7 @@ public class RoleIngester implements PackageIngester
      * .Context, org.dspace.content.DSpaceObject, java.io.File,
      * org.dspace.content.packager.PackageParameters, java.lang.String)
      */
+    @Override
     public List<DSpaceObject> ingestAll(Context context, DSpaceObject parent,
             File pkgFile, PackageParameters params, String license)
             throws PackageException, UnsupportedOperationException,
@@ -365,6 +433,7 @@ public class RoleIngester implements PackageIngester
      * , org.dspace.content.DSpaceObject, java.io.File,
      * org.dspace.content.packager.PackageParameters)
      */
+    @Override
     public DSpaceObject replace(Context context, DSpaceObject dso,
             File pkgFile, PackageParameters params) throws PackageException,
             UnsupportedOperationException, CrosswalkException,
@@ -382,6 +451,7 @@ public class RoleIngester implements PackageIngester
      * .Context, org.dspace.content.DSpaceObject, java.io.File,
      * org.dspace.content.packager.PackageParameters)
      */
+    @Override
     public List<DSpaceObject> replaceAll(Context context, DSpaceObject dso,
             File pkgFile, PackageParameters params) throws PackageException,
             UnsupportedOperationException, CrosswalkException,

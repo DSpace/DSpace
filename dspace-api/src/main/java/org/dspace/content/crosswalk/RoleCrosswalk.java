@@ -38,6 +38,7 @@
 package org.dspace.content.crosswalk;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -48,6 +49,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.packager.PackageDisseminator;
 import org.dspace.content.packager.PackageException;
+import org.dspace.content.packager.PackageIngester;
 import org.dspace.content.packager.PackageParameters;
 import org.dspace.content.packager.RoleDisseminator;
 import org.dspace.content.packager.RoleIngester;
@@ -60,6 +62,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
 
 /**
  * Role Crosswalk
@@ -138,9 +141,16 @@ public class RoleCrosswalk
     @Override
     public boolean canDisseminate(DSpaceObject dso)
     {
-        //We can only disseminate a SITE object,
-        //as Roles (Groups / Epeople) belong to a Site
-        return dso.getType() == Constants.SITE;
+        //We can only disseminate SITE, COMMUNITY or COLLECTION objects,
+        //as Groups are only associated with those objects.
+        if(dso.getType() == Constants.SITE ||
+           dso.getType() == Constants.COMMUNITY ||
+           dso.getType() == Constants.COLLECTION)
+        {
+            return true;
+        }
+        else
+            return false;
     }
 
     /**
@@ -213,7 +223,7 @@ public class RoleCrosswalk
 
             // Create a temporary file to disseminate into
             String tempDirectory = ConfigurationManager.getProperty("upload.temp.dir");
-            File tempFile = File.createTempFile("RoleDissemination" + dso.hashCode(), null, new File(tempDirectory));
+            File tempFile = File.createTempFile("RoleCrosswalkDisseminate" + dso.hashCode(), null, new File(tempDirectory));
             tempFile.deleteOnExit();
 
             // Initialize our packaging parameters
@@ -248,34 +258,83 @@ public class RoleCrosswalk
 
 
     /**
-     * Ingest a whole document.  Build Document object around root element,
-     * and feed that to the transformation, since it may get handled
-     * differently than a List of metadata elements.
+     * Ingest a List of XML elements
+     *
+     * @param context
+     * @param dso
+     * @param metadata
+     * @throws CrosswalkException
+     * @throws IOException
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    @Override
+    public void ingest(Context context, DSpaceObject dso, List metadata)
+        throws CrosswalkException, IOException, SQLException, AuthorizeException
+    {
+        if(!metadata.isEmpty())
+            ingest(context, dso, ((Element) metadata.get(0)).getParentElement());
+    }
+
+
+    /**
+     * Ingest a whole XML document, starting at specified root.
+     * <P>
+     * This essentially just wraps a call to the configured Role PackageIngester.
+     *
+     * @param context
+     * @param dso
+     * @param root
+     * @throws CrosswalkException
+     * @throws IOException
+     * @throws SQLException
+     * @throws AuthorizeException
      */
     @Override
     public void ingest(Context context, DSpaceObject dso, Element root)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
-        ingest(context, dso, root.getChildren());
-    }
+        if (dso.getType() != Constants.SITE &&
+            dso.getType() != Constants.COMMUNITY &&
+            dso.getType() != Constants.COLLECTION)
+                throw new CrosswalkObjectNotSupported("Role crosswalk only valid for Site, Community or Collection");
 
+        //locate our "DSPACE-ROLES" PackageIngester plugin
+        PackageIngester sip = (PackageIngester)
+                                PluginManager.getNamedPlugin(PackageIngester.class, ROLE_PACKAGER_PLUGIN);
+        if (sip == null)
+            throw new CrosswalkInternalException("Cannot find a PackageIngester plugin named " + ROLE_PACKAGER_PLUGIN);
 
-    @Override
-    public void ingest(Context context, DSpaceObject dso, List metadata)
-        throws CrosswalkException, IOException, SQLException, AuthorizeException
-    {
-        if (dso.getType() != Constants.SITE)
-            throw new CrosswalkObjectNotSupported("Role crosswalk only valid for Site");
+        // Initialize our packaging parameters
+        PackageParameters pparams;
+        if(this.getPackagingParameters()!=null)
+            pparams = this.getPackagingParameters();
+        else
+            pparams = new PackageParameters();
+        
+        // Initialize our license info
+        String license = null;
+        if(this.getIngestionLicense()!=null) license = this.getIngestionLicense();
+        
+        // Create a temporary file to ingest from
+        String tempDirectory = ConfigurationManager.getProperty("upload.temp.dir");
+        File tempFile = File.createTempFile("RoleCrosswalkIngest" + dso.hashCode(), null, new File(tempDirectory));
+        tempFile.deleteOnExit();
+        FileOutputStream fileOutStream = new FileOutputStream(tempFile);
+        
+        XMLOutputter writer = new XMLOutputter();
+        writer.output(root, fileOutStream);
+        fileOutStream.close();
 
-        // Find the groups/users document and ingest it
-        /*try
+        //Actually call the ingester
+        try
         {
-            RoleIngester.ingestStream(context, new PackageParameters(), in);
+            sip.ingest(context, dso, tempFile, pparams, license);
         }
         catch (PackageException e)
         {
             throw new CrosswalkInternalException(e);
-        }*/
+        }
     }
 
 }

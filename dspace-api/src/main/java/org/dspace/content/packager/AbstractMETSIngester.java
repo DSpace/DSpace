@@ -69,9 +69,7 @@ import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.workflow.WorkflowItem;
 import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.jdom.Namespace;
-import org.jdom.xpath.XPath;
 
 /**
  * Base class for package ingester of METS (Metadata Encoding & Transmission
@@ -499,8 +497,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         }// end if Community/Collection
         else if (type == Constants.SITE)
         {
-            // Load users and groups
-            addSiteRoles(context, manifest, pkgFile, params);
+            // Do nothing -- Crosswalks will handle anything necessary to ingest at Site-level
         }
         else
             throw new PackageValidationException(
@@ -647,9 +644,8 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         } // end if Community/Collection
         else if (dso.getType() == Constants.SITE)
         {
-            // Load users and groups
-            addSiteRoles(context, manifest, pkgFile, params);
-        } // end if SITE
+            // Do nothing -- Crosswalks will handle anything necessary to replace at Site-level
+        }
 
         // -- Step 5 --
         // Run our Descriptive metadata (dublin core, etc) crosswalks!
@@ -1314,81 +1310,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             // Get inputStream associated with this file
             return zipPackage.getInputStream(manifestEntry);
         }
-    }
-
-    /**
-     * Locate the roles document in the package and apply it
-     * 
-     * @param context
-     * @param manifest
-     * @param pkgFile
-     * @param params
-     * @throws IOException
-     * @throws MetadataValidationException
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws PackageValidationException
-     */
-    private void addSiteRoles(Context context, METSManifest manifest,
-            File pkgFile, PackageParameters params) throws IOException,
-            MetadataValidationException, SQLException, AuthorizeException,
-            PackageValidationException
-    {
-        if (!params.getBooleanProperty("manifestOnly", false))
-        {
-            // Find the groups/users document and ingest it
-            try
-            {
-                Element mets = manifest.getMets();
-                XPath finder;
-
-                // Find the roles <div> in the structMap.
-                final String smPath = "mets:structMap/mets:div[@TYPE='"
-                        + RoleDisseminator.DSPACE_ROLES + "']";
-                finder = XPath.newInstance(smPath);
-                finder.addNamespace(metsNS);
-                Element userDiv = (Element) finder.selectSingleNode(mets);
-                if (null == userDiv)
-                    throw new PackageValidationException(
-                            "No structMap division for roles");
-                String admId = userDiv.getAttributeValue("ADMID");
-
-                // Find the mdRef naming the roles file, in the section named
-                // in the structMap.
-                final String mdPath = "mets:amdSec[@ID='" + admId
-                        + "']/mets:techMD/mets:mdRef";
-                finder = XPath.newInstance(mdPath);
-                finder.addNamespace(metsNS);
-                Element mdRef = (Element) finder.selectSingleNode(mets);
-                if (null == mdRef)
-                    throw new PackageValidationException("No mdRef for roles");
-                String usersLoc = METSManifest.getFileName(mdRef);
-
-                // Find that file in the package, and ingest it
-                ZipFile pkg = new ZipFile(pkgFile);
-                ZipEntry pkgEntry = pkg.getEntry(usersLoc);
-                if (null == pkgEntry)
-                {
-                    pkg.close();
-                    throw new PackageValidationException(
-                            "No file of roles in package");
-                }
-                else
-                {
-                    RoleIngester.ingestStream(context, params, pkg
-                            .getInputStream(pkgEntry));
-                    pkg.close();
-                }
-            }
-            catch (JDOMException e)
-            {
-                throw new PackageValidationException(e);
-            }
-            catch (PackageException e)
-            {
-                throw new PackageValidationException(e);
-            }
-        } // manifestOnly == false
     }
 
     /**

@@ -45,6 +45,7 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.stream.XMLOutputFactory;
@@ -52,8 +53,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -79,6 +83,7 @@ public class RoleDisseminator implements PackageDisseminator
     public static final String GROUPS = "Groups";
     public static final String GROUP = "Group";
     public static final String NAME = "Name";
+    public static final String TYPE = "Type";
     public static final String MEMBERS = "Members";
     public static final String MEMBER = "Member";
     public static final String MEMBER_GROUPS = "MemberGroups";
@@ -94,7 +99,14 @@ public class RoleDisseminator implements PackageDisseminator
     public static final String CAN_LOGIN = "CanLogin";
     public static final String REQUIRE_CERTIFICATE = "RequireCertificate";
     public static final String SELF_REGISTERED = "SelfRegistered";
-    
+
+    // Valid type values for Groups (only used when Group is associated with a Community or Collection)
+    public static final String GROUP_TYPE_ADMIN = "ADMIN";
+    public static final String GROUP_TYPE_SUBMIT = "SUBMIT";
+    public static final String GROUP_TYPE_WORKFLOW_STEP_1 = "WORKFLOW_STEP_1";
+    public static final String GROUP_TYPE_WORKFLOW_STEP_2 = "WORKFLOW_STEP_2";
+    public static final String GROUP_TYPE_WORKFLOW_STEP_3 = "WORKFLOW_STEP_3";
+
     /*
      * (non-Javadoc)
      * 
@@ -103,6 +115,7 @@ public class RoleDisseminator implements PackageDisseminator
      * .core.Context, org.dspace.content.DSpaceObject,
      * org.dspace.content.packager.PackageParameters, java.io.File)
      */
+    @Override
     public void disseminate(Context context, DSpaceObject object,
                      PackageParameters params, File pkgFile)
         throws PackageException, CrosswalkException,
@@ -112,7 +125,7 @@ public class RoleDisseminator implements PackageDisseminator
 
         //open file stream for writing
         FileOutputStream fileOut = new FileOutputStream(pkgFile);
-        writeToStream(context, fileOut, emitPasswords);
+        writeToStream(context, object, fileOut, emitPasswords);
 
         //close file stream & save
         fileOut.close();
@@ -127,7 +140,7 @@ public class RoleDisseminator implements PackageDisseminator
      * @throws IOException
      *             if a PipedOutputStream or PipedInputStream cannot be created.
      */
-    InputStream asStream(Context context, boolean emitPasswords)
+    InputStream asStream(Context context, DSpaceObject object, boolean emitPasswords)
             throws IOException
     {
         // Create a PipedOutputStream to which to write some XML
@@ -135,7 +148,7 @@ public class RoleDisseminator implements PackageDisseminator
         PipedInputStream inStream = new PipedInputStream(outStream);
 
         // Create a new Thread to push serialized objects into the pipe
-        Serializer serializer = new Serializer(context, outStream,
+        Serializer serializer = new Serializer(context, object, outStream,
                 emitPasswords);
         new Thread(serializer).start();
 
@@ -150,6 +163,7 @@ public class RoleDisseminator implements PackageDisseminator
     private class Serializer implements Runnable
     {
         private Context context;
+        private DSpaceObject object;
         private OutputStream stream;
         private boolean emitPasswords;
         
@@ -158,13 +172,15 @@ public class RoleDisseminator implements PackageDisseminator
 
         /**
          * @param context
+         * @param object the DSpaceObject
          * @param stream receives serialized user and group objects.  Will be
          *          closed when serialization is complete.
          * @param emitPasswords true if password hashes should be included.
          */
-        Serializer(Context context, OutputStream stream, boolean emitPasswords)
+        Serializer(Context context, DSpaceObject object, OutputStream stream, boolean emitPasswords)
         {
             this.context = context;
+            this.object = object;
             this.stream = stream;
             this.emitPasswords = emitPasswords;
         }
@@ -173,7 +189,7 @@ public class RoleDisseminator implements PackageDisseminator
         {
             try
             {
-                writeToStream(context, stream, emitPasswords);
+                writeToStream(context, object, stream, emitPasswords);
                 stream.close();
             }
             catch (IOException e)
@@ -198,7 +214,7 @@ public class RoleDisseminator implements PackageDisseminator
      * @throws XMLStreamException
      * @throws SQLException
      */
-    private void writeToStream(Context context, OutputStream stream,
+    private void writeToStream(Context context, DSpaceObject object, OutputStream stream,
             boolean emitPasswords)
     throws PackageException
     {
@@ -213,13 +229,21 @@ public class RoleDisseminator implements PackageDisseminator
             writer.writeStartElement(DSPACE_ROLES);
 
             writer.writeStartElement(GROUPS);
-            for (Group group : Group.findAll(context, Group.NAME))
-                writeGroup(context, group, writer);
+            Group[] groups = findAssociatedGroups(context, object);
+            if(groups!=null)
+            {
+                for (Group group : groups)
+                    writeGroup(context, object, group, writer);
+            }
             writer.writeEndElement(); // GROUPS
 
             writer.writeStartElement(EPERSONS);
-            for (EPerson eperson : EPerson.findAll(context, EPerson.EMAIL))
-                writeEPerson(eperson, writer, emitPasswords);
+            EPerson[] people = findAssociatedPeople(context, object);
+            if(people!=null)
+            {
+                for (EPerson eperson : people)
+                    writeEPerson(eperson, writer, emitPasswords);
+            }
             writer.writeEndElement(); // EPERSONS
 
             writer.writeEndElement(); // DSPACE_ROLES
@@ -239,6 +263,7 @@ public class RoleDisseminator implements PackageDisseminator
      * .core.Context, org.dspace.content.DSpaceObject,
      * org.dspace.content.packager.PackageParameters, java.io.File)
      */
+    @Override
      public List<File> disseminateAll(Context context, DSpaceObject dso,
                      PackageParameters params, File pkgFile)
         throws PackageException, CrosswalkException,
@@ -254,6 +279,7 @@ public class RoleDisseminator implements PackageDisseminator
      * org.dspace.content.packager.PackageDisseminator#getMIMEType(org.dspace
      * .content.packager.PackageParameters)
      */
+    @Override
     public String getMIMEType(PackageParameters params)
     {
         return "application/xml";
@@ -264,17 +290,23 @@ public class RoleDisseminator implements PackageDisseminator
      *
      * @param context
      *            the DSpace Context
+     * @parm relatedObject
+     *            the DSpaceObject related to this group (if any)
      * @param group
      *            the Group to describe
      * @param write
      *            the description to this stream
      */
-    private void writeGroup(Context context, Group group, XMLStreamWriter writer)
+    private void writeGroup(Context context, DSpaceObject relatedObject, Group group, XMLStreamWriter writer)
             throws XMLStreamException, PackageException
     {
         writer.writeStartElement(GROUP);
         writer.writeAttribute(ID, String.valueOf(group.getID()));
         writer.writeAttribute(NAME, PackageUtils.crosswalkDefaultGroupName(context, group.getName()));
+
+        String groupType = getGroupType(relatedObject, group);
+        if(groupType!=null && !groupType.isEmpty())
+            writer.writeAttribute(TYPE, groupType);
 
         writer.writeStartElement(MEMBERS);
         for (EPerson member : group.getMembers())
@@ -295,6 +327,56 @@ public class RoleDisseminator implements PackageDisseminator
         writer.writeEndElement();
 
         writer.writeEndElement();
+    }
+
+    /**
+     * Return a Group Type string (see RoleDisseminator.GROUP_TYPE_* constants)
+     * which describes the type of group and its relation to the given object.
+     * <P>
+     * As a basic example, if the Group is a Collection Administration group,
+     * the Group Type string returned should be "ADMIN"
+     * <P>
+     * If type string cannot be determined, null is returned.
+     *
+     * @param dso
+     *          the related DSpaceObject
+     * @param group
+     *          the group
+     * @return a group type string or null
+     */
+    private String getGroupType(DSpaceObject dso, Group group)
+    {
+        if(dso.getType()==Constants.COMMUNITY)
+        {
+            Community community = (Community) dso;
+
+            //Check if this is the ADMIN group for this community
+            if(community.getAdministrators().equals(group))
+                return GROUP_TYPE_ADMIN;
+        }
+        else if(dso.getType() == Constants.COLLECTION)
+        {
+            Collection collection = (Collection) dso;
+
+            //Check if this is the ADMIN group for this collection
+            if(collection.getAdministrators().equals(group))
+                return GROUP_TYPE_ADMIN;
+            //Check if Submitters group
+            else if(collection.getSubmitters().equals(group))
+                return GROUP_TYPE_SUBMIT;
+            //Check if workflow step 1 group
+            else if(collection.getWorkflowGroup(1).equals(group))
+                return GROUP_TYPE_WORKFLOW_STEP_1;
+            //check if workflow step 2 group
+            else if(collection.getWorkflowGroup(2).equals(group))
+                return GROUP_TYPE_WORKFLOW_STEP_2;
+            //check if workflow step 3 group
+            else if(collection.getWorkflowGroup(3).equals(group))
+                return GROUP_TYPE_WORKFLOW_STEP_3;
+        }
+
+        //by default, return null
+        return null;
     }
 
     /**
@@ -351,4 +433,121 @@ public class RoleDisseminator implements PackageDisseminator
 
         writer.writeEndElement();
     }
+
+    /**
+     * Find all Groups associated with this DSpace Object.
+     * <P>
+     * If object is SITE, all groups are returned.
+     * <P>
+     * If object is COMMUNITY or COLLECTION, only groups associated with
+     * those objects are returned (if any).
+     * <P>
+     * For all other objects, null is returned.
+     *
+     * @param context The DSpace context
+     * @param object the DSpace object
+     * @return array of all associated groups
+     */
+    private Group[] findAssociatedGroups(Context context, DSpaceObject object)
+            throws SQLException
+    {
+        if(object.getType()==Constants.SITE)
+        {
+            // @TODO FIXME -- if there was a way to ONLY export Groups which are NOT
+            // associated with a Community or Collection, we should be doing that instead!
+            return Group.findAll(context, Group.NAME);
+        }
+        else if(object.getType()==Constants.COMMUNITY)
+        {
+            Community community = (Community) object;
+
+            ArrayList<Group> list = new ArrayList<Group>();
+
+            //check for admin group
+            if(community.getAdministrators()!=null)
+                list.add(community.getAdministrators());
+
+            // FINAL CATCH-ALL -> Find any other groups where name begins with "COMMUNITY_<ID>_"
+            // (There should be none, but this code is here just in case)
+            Group[] matchingGroups = Group.search(context, "COMMUNITY_" + community.getID() + "_");
+            for(Group g : matchingGroups)
+            {
+                if(!list.contains(g))
+                    list.add(g);
+            }
+
+            if(list.size()>0)
+            {
+                Group[] groupArray = new Group[list.size()];
+                groupArray = (Group[]) list.toArray(groupArray);
+                return groupArray;
+            }
+        }
+        else if(object.getType()==Constants.COLLECTION)
+        {
+            Collection collection = (Collection) object;
+            
+            ArrayList<Group> list = new ArrayList<Group>();
+            
+            //check for admin group
+            if(collection.getAdministrators()!=null)
+                list.add(collection.getAdministrators());
+            //check for submitters group
+            if(collection.getSubmitters()!=null)
+                list.add(collection.getSubmitters());
+            //check for workflow step 1 group
+            if(collection.getWorkflowGroup(1)!=null)
+                list.add(collection.getWorkflowGroup(1));
+            //check for workflow step 2 group
+            if(collection.getWorkflowGroup(2)!=null)
+                list.add(collection.getWorkflowGroup(2));
+            //check for workflow step 3 group
+            if(collection.getWorkflowGroup(3)!=null)
+                list.add(collection.getWorkflowGroup(3));
+
+            // FINAL CATCH-ALL -> Find any other groups where name begins with "COLLECTION_<ID>_"
+            // (Necessary cause XMLUI allows you to generate a 'COLLECTION_<ID>_DEFAULT_READ' group)
+            Group[] matchingGroups = Group.search(context, "COLLECTION_" + collection.getID() + "_");
+            for(Group g : matchingGroups)
+            {
+                if(!list.contains(g))
+                    list.add(g);
+            }
+
+            if(list.size()>0)
+            {
+                Group[] groupArray = new Group[list.size()];
+                groupArray = (Group[]) list.toArray(groupArray);
+                return groupArray;
+            }
+        }
+
+        //by default, return nothing
+        return null;
+    }
+
+
+    /**
+     * Find all EPeople associated with this DSpace Object.
+     * <P>
+     * If object is SITE, all people are returned.
+     * <P>
+     * For all other objects, null is returned.
+     *
+     * @param context The DSpace context
+     * @param object the DSpace object
+     * @return array of all associated EPerson objects
+     */
+    private EPerson[] findAssociatedPeople(Context context, DSpaceObject object)
+            throws SQLException
+    {
+        if(object.getType()==Constants.SITE)
+        {
+            return EPerson.findAll(context, EPerson.EMAIL);
+        }
+
+        //by default, return nothing
+        return null;
+    }
+
 }

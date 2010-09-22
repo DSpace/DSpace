@@ -370,6 +370,17 @@ public class METSRightsCrosswalk
 
     /*----------- Ingestion functions -------------------*/
 
+    /**
+     * Ingest a whole XML document, starting at specified root.
+     *
+     * @param context
+     * @param dso
+     * @param root
+     * @throws CrosswalkException
+     * @throws IOException
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
     @Override
     public void ingest(Context context, DSpaceObject dso, Element root)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
@@ -379,6 +390,27 @@ public class METSRightsCrosswalk
         ingest(context, dso, root.getChildren());
     }
 
+    /**
+     * Ingest a List of XML elements
+     * <P>
+     * This method creates new DSpace Policies based on the parsed
+     * METSRights XML contents. These Policies assign permissions
+     * to DSpace Groups or EPeople.
+     * <P>
+     * NOTE: This crosswalk will NOT create missing DSpace Groups or EPeople.
+     * Therefore, it is recommended to use this METSRightsCrosswalk in
+     * conjunction with another Crosswalk which can create/restore missing
+     * Groups or EPeople (e.g. RoleCrosswalk).
+     *
+     * @param context
+     * @param dso
+     * @param metadata
+     * @throws CrosswalkException
+     * @throws IOException
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @see RoleCrosswalk
+     */
     @Override
     public void ingest(Context context, DSpaceObject dso, List ml)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
@@ -386,6 +418,11 @@ public class METSRightsCrosswalk
         // we cannot crosswalk METSRights to a SITE object
         if (dso.getType() == Constants.SITE)
             throw new CrosswalkObjectNotSupported("Wrong target object type, METSRightsCrosswalk cannot crosswalk a SITE object.");
+
+        //First, clear all existing Policies on this DSpace Object
+        // as we don't want them to conflict with policies we will be adding
+        if(!ml.isEmpty())
+            AuthorizeManager.removeAllPolicies(context, dso);
 
         // Loop through each Element in the List
         Iterator mi = ml.iterator();
