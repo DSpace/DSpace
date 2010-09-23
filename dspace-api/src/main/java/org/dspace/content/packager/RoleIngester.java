@@ -203,13 +203,25 @@ public class RoleIngester implements PackageIngester
             Element group = (Element) groups.item(groupx);
             String name = group.getAttribute(RoleDisseminator.NAME);
 
-            //Translate Group name back to internal ID format (e.g. COLLECTION_<ID>_ADMIN)
-            // TODO: is this necessary? can we leave it in format with Handle in place of <ID>?
-            // For now, this might be necessary, because we don't want to accidentally
-            // create a new group COLLECTION_hdl:123/34_ADMIN, which is equivalent
-            // to an existing COLLECTION_45_ADMIN group
-            name = PackageUtils.crosswalkDefaultGroupName(context, name);
-            
+            try
+            {
+                //Translate Group name back to internal ID format (e.g. COLLECTION_<ID>_ADMIN)
+                // TODO: is this necessary? can we leave it in format with Handle in place of <ID>?
+                // For now, this is necessary, because we don't want to accidentally
+                // create a new group COLLECTION_hdl:123/34_ADMIN, which is equivalent
+                // to an existing COLLECTION_45_ADMIN group
+                name = PackageUtils.translateGroupNameForImport(context, name);
+            }
+            catch(PackageException pe)
+            {
+                // If an error is thrown, then this Group corresponds to a
+                // Community or Collection that doesn't currently exist in the
+                // system.  So, log a warning & skip it for now.
+                log.warn("Skipping group named '" + name + "' as it seems to correspond to a Community or Collection that does not exist in the system.  " +
+                         "If you are performing an AIP restore, you can ignore this warning as the Community/Collection AIP will likely create this group once it is processed.");
+                continue;
+            }
+
             Group groupObj = null; // The group to restore
             Group collider = Group.findByName(context, name); // Existing group?
             if (null != collider)
@@ -219,8 +231,15 @@ public class RoleIngester implements PackageIngester
                     for (Group member : collider.getMemberGroups())
                         collider.removeMember(member);
                     for (EPerson member : collider.getMembers())
-                        collider.removeMember(member);
-                    log.info("Existing Group {} was cleared.", name);
+                    {
+                        // Remove all group members *EXCEPT* we don't ever want
+                        // to remove the current user from the list of Administrators
+                        // (otherwise remainder of ingest will fail)
+                        if(!(collider.equals(Group.find(context, 1)) &&
+                             member.equals(context.getCurrentUser())))
+                            collider.removeMember(member);
+                    }
+                    log.info("Existing Group {} was cleared. Its members will be replaced.", name);
                     groupObj = collider;
                 }
                 else if (params.keepExistingModeEnabled()) // -r -k
@@ -275,7 +294,7 @@ public class RoleIngester implements PackageIngester
                     groupObj = Group.create(context);
                     groupObj.setName(name);
                 }
-                
+
                 log.info("Created Group {}.", groupObj.getName());
             }
 
@@ -302,8 +321,21 @@ public class RoleIngester implements PackageIngester
         {
             Element group = (Element) groups.item(groupx);
             String name = group.getAttribute(RoleDisseminator.NAME);
-            // Translate Group name back to internal ID format (e.g. COLLECTION_<ID>_ADMIN)
-            name = PackageUtils.crosswalkDefaultGroupName(context, name);
+            try
+            {
+                // Translate Group name back to internal ID format (e.g. COLLECTION_<ID>_ADMIN)
+                name = PackageUtils.translateGroupNameForImport(context, name);
+            }
+            catch(PackageException pe)
+            {
+                // If an error is thrown, then this Group corresponds to a
+                // Community or Collection that doesn't currently exist in the
+                // system.  So,skip it for now.
+                // (NOTE: We already logged a warning about this group earlier as
+                //  this is the second time we are looping through all groups)
+                continue;
+            }
+
             // Find previously created group
             Group groupObj = Group.findByName(context, name);
             NodeList members = group
@@ -313,7 +345,7 @@ public class RoleIngester implements PackageIngester
                 Element member = (Element) members.item(memberx);
                 String memberName = member.getAttribute(RoleDisseminator.NAME);
                 //Translate Group name back to internal ID format (e.g. COLLECTION_<ID>_ADMIN)
-                memberName = PackageUtils.crosswalkDefaultGroupName(context, memberName);
+                memberName = PackageUtils.translateGroupNameForImport(context, memberName);
                 // Find previously created group
                 Group memberGroup = Group.findByName(context, memberName);
                 groupObj.addMember(memberGroup);

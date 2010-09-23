@@ -302,7 +302,7 @@ public class RoleDisseminator implements PackageDisseminator
     {
         writer.writeStartElement(GROUP);
         writer.writeAttribute(ID, String.valueOf(group.getID()));
-        writer.writeAttribute(NAME, PackageUtils.crosswalkDefaultGroupName(context, group.getName()));
+        writer.writeAttribute(NAME, PackageUtils.translateGroupNameForExport(context, group.getName()));
 
         String groupType = getGroupType(relatedObject, group);
         if(groupType!=null && !groupType.isEmpty())
@@ -322,7 +322,7 @@ public class RoleDisseminator implements PackageDisseminator
         {
             writer.writeEmptyElement(MEMBER_GROUP);
             writer.writeAttribute(ID, String.valueOf(member.getID()));
-            writer.writeAttribute(NAME, PackageUtils.crosswalkDefaultGroupName(context, member.getName()));
+            writer.writeAttribute(NAME, PackageUtils.translateGroupNameForExport(context, member.getName()));
         }
         writer.writeEndElement();
 

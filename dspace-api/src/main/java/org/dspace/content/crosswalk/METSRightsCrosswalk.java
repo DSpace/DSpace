@@ -230,7 +230,7 @@ public class METSRightsCrosswalk
                       // as internal IDs are meaningless once content is outside of DSpace
                       Element rightsUser = new Element("UserName", METSRights_NS);
                       rightsUser.setAttribute("USERTYPE",GROUP_USERTYPE);
-                      rightsUser.addContent(PackageUtils.crosswalkDefaultGroupName(context, group.getName()));
+                      rightsUser.addContent(PackageUtils.translateGroupNameForExport(context, group.getName()));
                       rightsContext.addContent(rightsUser);
                   }
                   catch(PackageException pe)
@@ -472,7 +472,7 @@ public class METSRightsCrosswalk
 
                         //Translate Group name back to internal ID format (e.g. COLLECTION_<ID>_ADMIN)
                         // from its external format (e.g. COLLECTION_<handle>_ADMIN)
-                        groupName = PackageUtils.crosswalkDefaultGroupName(context, groupName);
+                        groupName = PackageUtils.translateGroupNameForImport(context, groupName);
 
                         //Check if this group exists in DSpace already
                         Group group = Group.findByName(context, groupName);
@@ -493,7 +493,7 @@ public class METSRightsCrosswalk
                     }
                     catch(PackageException pe)
                     {
-                        //A PackageException will only be thrown if crosswalkDefaultGroupName() fails
+                        //A PackageException will only be thrown if translateDefaultGroupName() fails
                         //We'll just wrap it as a CrosswalkException and throw it upwards
                         throw new CrosswalkException(pe);
                     }
