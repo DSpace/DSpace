@@ -42,11 +42,11 @@ package org.dspace.content.packager;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -188,13 +188,15 @@ public class DSpaceAIPDisseminator
     {
         MetsHdr metsHdr = new MetsHdr();
 
-        // date the METS package/manifest was created.
-        metsHdr.setCREATEDATE(new Date());
+        // Note: we specifically do not add a CREATEDATE to <metsHdr>
+        // as for AIPs we want md5 checksums to be identical if no content
+        // has changed.  Adding a CREATEDATE changes checksum each time.
 
+        // Add a LASTMODDATE for items
         if (dso.getType() == Constants.ITEM)
             metsHdr.setLASTMODDATE(((Item)dso).getLastModified());
 
-        // Agent - name custodian, the DSpace Archive, by handle.
+        // Agent Custodian - name custodian, the DSpace Archive, by handle.
         Agent agent = new Agent();
         agent.setROLE(Role.CUSTODIAN);
         agent.setTYPE(Type.OTHER);
@@ -204,6 +206,18 @@ public class DSpaceAIPDisseminator
                 .add(new PCData(Site.getSiteHandle()));
         agent.getContent().add(name);
         metsHdr.getContent().add(agent);
+
+        // Agent Creator - name creator, which is a specific version of DSpace.
+        Agent agentCreator = new Agent();
+        agentCreator.setROLE(Role.CREATOR);
+        agentCreator.setTYPE(Type.OTHER);
+        agentCreator.setOTHERTYPE("DSpace Software");
+        Name creatorName = new Name();
+        creatorName.getContent()
+                .add(new PCData("DSpace " + Util.getSourceVersion()));
+        agentCreator.getContent().add(creatorName);
+        metsHdr.getContent().add(agentCreator);
+        
         return metsHdr;
     }
 

@@ -84,6 +84,7 @@ import java.io.FileOutputStream;
 
 import org.apache.log4j.Logger;
 
+import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
@@ -286,7 +287,7 @@ public abstract class AbstractMETSDisseminator
         // map of extra streams to put in Zip (these are located during makeManifest())
         MdStreamCache extraStreams = new MdStreamCache();
         ZipOutputStream zip = new ZipOutputStream(pkg);
-        zip.setComment("METS archive created by DSpace METSDisseminationCrosswalk");
+        zip.setComment("METS archive created by DSpace " + Util.getSourceVersion());
         Mets manifest = makeManifest(context, dso, params, extraStreams);
 
         // copy extra (metadata, license, etc) bitstreams into zip, update manifest
@@ -714,7 +715,7 @@ public abstract class AbstractMETSDisseminator
         Mets mets = new Mets();
         
         // this ID should be globally unique
-        mets.setID("dspace"+Utils.generateKey());
+        mets.setID("dspace" + dso.hashCode());
 
         // identifies the object described by this document
         mets.setOBJID(makePersistentID(dso));
