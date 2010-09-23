@@ -245,12 +245,12 @@ public class RoleCrosswalk
             }
             catch (JDOMException je)
             {
-                throw new MetadataValidationException("Error parsing METS: ",je);
+                throw new MetadataValidationException("Error parsing Roles XML (see wrapped error message for more details) ",je);
             }
         }
         catch (PackageException pe)
         {
-            throw new CrosswalkInternalException("Failed making METS manifest in packager: ",pe);
+            throw new CrosswalkInternalException("Failed to export Roles via packager (see wrapped error message for more details) ",pe);
         }
     }
 

@@ -47,6 +47,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -76,6 +78,9 @@ import org.dspace.workflow.WorkflowManager;
 
 public class PackageUtils
 {
+
+    /** log4j category */
+    private static Logger log = Logger.getLogger(DSpaceAIPDisseminator.class);
 
     // Map of metadata elements for Communities and Collections
     // Format is alternating key/value in a straight array; use this
@@ -812,7 +817,11 @@ public class PackageUtils
                 DSpaceObject dso = HandleManager.resolveToObject(context, objID.substring(4));
 
                 if(dso==null)
-                    throw new PackageException("DSpace Object referenced by handle '" + objID + "' does not exist within DSpace.  Cannot crosswalk the group named '" + groupDefaultName + "'");
+                {
+                    //Just log a warning -- it's possible this object was deleted
+                    log.warn("Unable to crosswalk the group named '" + groupDefaultName + "' as DSpace Object with handle '" + objID + "' does not exist.");
+                    return groupDefaultName;
+                }
 
                 //verify our group specified object Type corresponds to this object's type
                 if(Constants.getTypeID(objType)!=dso.getType())
@@ -829,10 +838,15 @@ public class PackageUtils
 
                 //First, get the object via the Internal ID
                 DSpaceObject dso = DSpaceObject.find(context, Constants.getTypeID(objType), Integer.parseInt(objID));
-
+  
                 if(dso==null)
-                    throw new PackageException("DSpace Object referenced by internal ID '" + objID + "' and type '" + objType + "' does not exist within DSpace.  Cannot crosswalk the group named '" + groupDefaultName + "'");
-
+                {
+                    // Just log a warning -- it's possible this Group was not cleaned up when the associated DSpace Object was removed.
+                    // So, we don't want to throw an error and stop all other processing.
+                    log.warn("Unable to crosswalk the group named '" + groupDefaultName + "' as DSpace Object with internal ID '" + objID + "' and type '" + objType + "'  does not exist.");
+                    return groupDefaultName;
+                }
+                
                 //Create an updated group name, using the Handle to replace the InternalID
                 // Format: <DSpace-Obj-Type>_hdl:<Handle>_<Group-Type>
                 return objType + "_" + "hdl:" + dso.getHandle() + "_" + groupType;

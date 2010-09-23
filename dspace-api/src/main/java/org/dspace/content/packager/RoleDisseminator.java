@@ -351,7 +351,8 @@ public class RoleDisseminator implements PackageDisseminator
             Community community = (Community) dso;
 
             //Check if this is the ADMIN group for this community
-            if(community.getAdministrators().equals(group))
+            if(community.getAdministrators()!=null &&
+               community.getAdministrators().equals(group))
                 return GROUP_TYPE_ADMIN;
         }
         else if(dso.getType() == Constants.COLLECTION)
@@ -359,19 +360,24 @@ public class RoleDisseminator implements PackageDisseminator
             Collection collection = (Collection) dso;
 
             //Check if this is the ADMIN group for this collection
-            if(collection.getAdministrators().equals(group))
+            if(collection.getAdministrators()!=null &&
+               collection.getAdministrators().equals(group))
                 return GROUP_TYPE_ADMIN;
             //Check if Submitters group
-            else if(collection.getSubmitters().equals(group))
+            else if(collection.getSubmitters()!=null &&
+                    collection.getSubmitters().equals(group))
                 return GROUP_TYPE_SUBMIT;
             //Check if workflow step 1 group
-            else if(collection.getWorkflowGroup(1).equals(group))
+            else if(collection.getWorkflowGroup(1)!=null &&
+                    collection.getWorkflowGroup(1).equals(group))
                 return GROUP_TYPE_WORKFLOW_STEP_1;
             //check if workflow step 2 group
-            else if(collection.getWorkflowGroup(2).equals(group))
+            else if(collection.getWorkflowGroup(2)!=null &&
+                    collection.getWorkflowGroup(2).equals(group))
                 return GROUP_TYPE_WORKFLOW_STEP_2;
             //check if workflow step 3 group
-            else if(collection.getWorkflowGroup(3).equals(group))
+            else if(collection.getWorkflowGroup(3)!=null &&
+                    collection.getWorkflowGroup(3).equals(group))
                 return GROUP_TYPE_WORKFLOW_STEP_3;
         }
 
