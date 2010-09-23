@@ -154,6 +154,16 @@ public abstract class AbstractMETSDisseminator
     private int idCounter = 1;
 
     /**
+     * Default date/time (in milliseconds since epoch) to set for Zip Entries
+     * for DSpace Objects which don't have a Last Modified date.  If we don't
+     * set our own date/time, then it will default to current system date/time.
+     * This is less than ideal, as it causes the md5 checksum of Zip file to
+     * change whenever Zip is regenerated (even if compressed files are unchanged)
+     * 1036368000 seconds * 1000 = Nov 4, 2002 GMT (the date DSpace 1.0 was released)
+     */
+    private static int DEFAULT_MODIFIED_DATE = 1036368000 * 1000;
+
+    /**
      * Wrapper for a table of streams to add to the package, such as
      * mdRef'd metadata.  Key is relative pathname of file, value is
      * <code>InputStream</code> with contents to put in it.  Some
@@ -320,6 +330,8 @@ public abstract class AbstractMETSDisseminator
                     ZipEntry ze = new ZipEntry(fname);
                     if (lmTime != 0)
                         ze.setTime(lmTime);
+                    else //Set a default modified date so that checksum of Zip doesn't change if Zip contents are unchanged
+                        ze.setTime(DEFAULT_MODIFIED_DATE);
                     zip.putNextEntry(ze);
                     Utils.copy(is, zip);
                     zip.closeEntry();
@@ -333,6 +345,9 @@ public abstract class AbstractMETSDisseminator
         ZipEntry me = new ZipEntry(METSManifest.MANIFEST_FILE);
         if (lmTime != 0)
             me.setTime(lmTime);
+        else //Set a default modified date so that checksum of Zip doesn't change if Zip contents are unchanged
+            me.setTime(DEFAULT_MODIFIED_DATE);
+
         zip.putNextEntry(me);
 
         // can only validate now after fixing up extraStreams
@@ -403,6 +418,8 @@ public abstract class AbstractMETSDisseminator
                                             ", size="+String.valueOf(bitstreams[k].getSize()));
                             if (lmTime != 0)
                                 ze.setTime(lmTime);
+                            else //Set a default modified date so that checksum of Zip doesn't change if Zip contents are unchanged
+                                ze.setTime(DEFAULT_MODIFIED_DATE);
                             ze.setSize(auth ? bitstreams[k].getSize() : 0);
                             zip.putNextEntry(ze);
                             if (auth)
@@ -439,6 +456,8 @@ public abstract class AbstractMETSDisseminator
                 if (log.isDebugEnabled())
                     log.debug("Writing CONTENT stream of bitstream("+String.valueOf(logoBs.getID())+") to Zip: "+zname+", size="+String.valueOf(logoBs.getSize()));
                 ze.setSize(logoBs.getSize());
+                //Set a default modified date so that checksum of Zip doesn't change if Zip contents are unchanged
+                ze.setTime(DEFAULT_MODIFIED_DATE);
                 zip.putNextEntry(ze);
                 Utils.copy(logoBs.retrieve(), zip);
                 zip.closeEntry();
@@ -715,7 +734,7 @@ public abstract class AbstractMETSDisseminator
         Mets mets = new Mets();
         
         // this ID should be globally unique
-        mets.setID("dspace" + dso.hashCode());
+        mets.setID("DSpace-" + Constants.typeText[dso.getType()] +"-hdl:" + dso.getHandle());
 
         // identifies the object described by this document
         mets.setOBJID(makePersistentID(dso));
