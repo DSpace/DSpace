@@ -475,7 +475,7 @@ public class RoleDisseminator implements PackageDisseminator
 
             // FINAL CATCH-ALL -> Find any other groups where name begins with "COMMUNITY_<ID>_"
             // (There should be none, but this code is here just in case)
-            Group[] matchingGroups = Group.search(context, "COMMUNITY_" + community.getID() + "_");
+            Group[] matchingGroups = Group.search(context, "COMMUNITY\\_" + community.getID() + "\\_");
             for(Group g : matchingGroups)
             {
                 if(!list.contains(g))
@@ -513,7 +513,7 @@ public class RoleDisseminator implements PackageDisseminator
 
             // FINAL CATCH-ALL -> Find any other groups where name begins with "COLLECTION_<ID>_"
             // (Necessary cause XMLUI allows you to generate a 'COLLECTION_<ID>_DEFAULT_READ' group)
-            Group[] matchingGroups = Group.search(context, "COLLECTION_" + collection.getID() + "_");
+            Group[] matchingGroups = Group.search(context, "COLLECTION\\_" + collection.getID() + "\\_");
             for(Group g : matchingGroups)
             {
                 if(!list.contains(g))
