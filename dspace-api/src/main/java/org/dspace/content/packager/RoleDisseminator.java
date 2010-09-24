@@ -88,8 +88,8 @@ public class RoleDisseminator implements PackageDisseminator
     public static final String MEMBER = "Member";
     public static final String MEMBER_GROUPS = "MemberGroups";
     public static final String MEMBER_GROUP = "MemberGroup";
-    public static final String EPERSONS = "EPersons";
-    public static final String EPERSON = "EPerson";
+    public static final String EPERSONS = "People";
+    public static final String EPERSON = "Person";
     public static final String EMAIL = "Email";
     public static final String NETID = "Netid";
     public static final String FIRST_NAME = "FirstName";
@@ -220,35 +220,48 @@ public class RoleDisseminator implements PackageDisseminator
     {
         try
         {
-            XMLOutputFactory factory = XMLOutputFactory.newInstance();
-            XMLStreamWriter writer;
-
-            writer = factory.createXMLStreamWriter(stream, "UTF-8");
-            writer.setDefaultNamespace(DSROLES_NS.getURI());
-            writer.writeStartDocument("UTF-8", "1.0");
-            writer.writeStartElement(DSPACE_ROLES);
-
-            writer.writeStartElement(GROUPS);
+            //First, find all Groups/People associated with our current Object
             Group[] groups = findAssociatedGroups(context, object);
-            if(groups!=null)
-            {
-                for (Group group : groups)
-                    writeGroup(context, object, group, writer);
-            }
-            writer.writeEndElement(); // GROUPS
-
-            writer.writeStartElement(EPERSONS);
             EPerson[] people = findAssociatedPeople(context, object);
-            if(people!=null)
-            {
-                for (EPerson eperson : people)
-                    writeEPerson(eperson, writer, emitPasswords);
-            }
-            writer.writeEndElement(); // EPERSONS
 
-            writer.writeEndElement(); // DSPACE_ROLES
-            writer.writeEndDocument();
-            writer.close();
+            //Only continue if we've found Groups or People which we need to disseminate
+            if((groups!=null && groups.length>0) ||
+               (people!=null && people.length>0))
+            {
+                XMLOutputFactory factory = XMLOutputFactory.newInstance();
+                XMLStreamWriter writer;
+
+                writer = factory.createXMLStreamWriter(stream, "UTF-8");
+                writer.setDefaultNamespace(DSROLES_NS.getURI());
+                writer.writeStartDocument("UTF-8", "1.0");
+                writer.writeStartElement(DSPACE_ROLES);
+
+                //Only disseminate a <Groups> element if some groups exist
+                if(groups!=null)
+                {
+                    writer.writeStartElement(GROUPS);
+
+                    for (Group group : groups)
+                        writeGroup(context, object, group, writer);
+
+                    writer.writeEndElement(); // GROUPS
+                }
+
+                //Only disseminate an <People> element if some people exist
+                if(people!=null)
+                {
+                    writer.writeStartElement(EPERSONS);
+
+                    for (EPerson eperson : people)
+                        writeEPerson(eperson, writer, emitPasswords);
+
+                    writer.writeEndElement(); // EPERSONS
+                }
+
+                writer.writeEndElement(); // DSPACE_ROLES
+                writer.writeEndDocument();
+                writer.close();
+            }//end if Groups or People exist
         }
         catch (Exception e)
         {
@@ -308,23 +321,31 @@ public class RoleDisseminator implements PackageDisseminator
         if(groupType!=null && !groupType.isEmpty())
             writer.writeAttribute(TYPE, groupType);
 
-        writer.writeStartElement(MEMBERS);
-        for (EPerson member : group.getMembers())
+        //Add People to Group (if any belong to this group)
+        if(group.getMembers().length>0)
         {
-            writer.writeEmptyElement(MEMBER);
-            writer.writeAttribute(ID, String.valueOf(member.getID()));
-            writer.writeAttribute(NAME, member.getName());
+            writer.writeStartElement(MEMBERS);
+            for (EPerson member : group.getMembers())
+            {
+                writer.writeEmptyElement(MEMBER);
+                writer.writeAttribute(ID, String.valueOf(member.getID()));
+                writer.writeAttribute(NAME, member.getName());
+            }
+            writer.writeEndElement();
         }
-        writer.writeEndElement();
 
-        writer.writeStartElement(MEMBER_GROUPS);
-        for (Group member : group.getMemberGroups())
+        //Add Groups as Member Groups (if any belong to this group)
+        if(group.getMemberGroups().length>0)
         {
-            writer.writeEmptyElement(MEMBER_GROUP);
-            writer.writeAttribute(ID, String.valueOf(member.getID()));
-            writer.writeAttribute(NAME, PackageUtils.translateGroupNameForExport(context, member.getName()));
+            writer.writeStartElement(MEMBER_GROUPS);
+            for (Group member : group.getMemberGroups())
+            {
+                writer.writeEmptyElement(MEMBER_GROUP);
+                writer.writeAttribute(ID, String.valueOf(member.getID()));
+                writer.writeAttribute(NAME, PackageUtils.translateGroupNameForExport(context, member.getName()));
+            }
+            writer.writeEndElement();
         }
-        writer.writeEndElement();
 
         writer.writeEndElement();
     }

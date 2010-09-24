@@ -237,11 +237,21 @@ public class RoleCrosswalk
             Context context = new Context();
             dip.disseminate(context, dso, pparams, tempFile);
 
+            // if we ended up with a Zero-length output file,
+            // this means dissemination was successful but had no results
+            if(tempFile.exists() && tempFile.length()==0)
+                return null;
+           
             try
             {
+                //Try to parse our XML results (which were disseminated by the Packager)
                 SAXBuilder builder = new SAXBuilder();
                 Document xmlDocument = builder.build(tempFile);
-                return xmlDocument.getRootElement();
+                //If XML parsed successfully, return root element of doc
+                if(xmlDocument!=null && xmlDocument.hasRootElement())
+                    return xmlDocument.getRootElement();
+                else
+                    return null;
             }
             catch (JDOMException je)
             {
