@@ -10,7 +10,7 @@ DSpace version information can be found in this release package under
 Documentation for the most recent stable release may be viewed online at
 dspace.org:
 
- - http://dspace.org/current-release/latest-release/
+ - http://dspace.org/latest-release/
 
 
 Installation instructions for other version may be different, so you
@@ -35,7 +35,7 @@ Detailed Issue Tracking for DSpace is done on our JIRA Issue Tracker
 
 To contribute to DSpace, please see:
 
- - http://wiki.dspace.org/index.php/HowToContribute
+ - https://wiki.duraspace.org/display/DSPACE/HowToContribute
 
 
 For more details about DSpace, including a list of service providers,
@@ -43,5 +43,8 @@ places to seek help, news articles and lists of other users, please see:
 
  - http://www.dspace.org/
 
+
+DSpace source code licensing information available online at:
+ - http://www.dspace.org/license/
 
 Copyright (c) 2002-2010, DuraSpace.  All rights reserved.
