@@ -74,7 +74,7 @@ import org.dspace.workflow.WorkflowManager;
 /**
  * This is a utility class to aid in the submission flow scripts. 
  * Since data validation is cumbersome inside a flow script this 
- * is a collection of methods to preform processing at each step 
+ * is a collection of methods to perform processing at each step 
  * of the flow, the flow script will ties these operations 
  * together in a meaningful order but all actually processing 
  * is done through these various processes.
@@ -408,7 +408,7 @@ public class FlowUtils {
 	
 	/**
 	 * Return the given task back to the pool of unclaimed tasks for another user
-	 * to select and preform.
+	 * to select and perform.
 	 * 
 	 * @param context The current DSpace content
 	 * @param id The unique ID of the current workflow
@@ -432,7 +432,7 @@ public class FlowUtils {
 	
 	/**
 	 * Claim this task from the pool of unclaimed task so that this user may
-	 * preform the task by either approving or rejecting it.
+	 * perform the task by either approving or rejecting it.
 	 * 
 	 * @param context The current DSpace content
 	 * @param id The unique ID of the current workflow
@@ -532,10 +532,6 @@ public class FlowUtils {
      * Retrieves a list of all steps and pages within the
      * current submission process.
      * <P>
-     * This returns an array of Doubles of the form "#.#"
-     * where the former number is the step number, and the
-     * latter is the page number.
-     * <P>
      * This list may differ from the list of steps in the
      * progress bar if the current submission process includes
      * non-interactive steps which do not appear in the progress bar!
@@ -549,9 +545,9 @@ public class FlowUtils {
      *            the current SubmissionInfo object
      *  
      */
-    public static Double[] getListOfAllSteps(HttpServletRequest request, SubmissionInfo subInfo)
+    public static StepAndPage[] getListOfAllSteps(HttpServletRequest request, SubmissionInfo subInfo)
     {
-        ArrayList listStepNumbers = new ArrayList();
+        ArrayList<StepAndPage> listStepNumbers = new ArrayList<StepAndPage>();
 
         // loop through all steps
         for (int i = 0; i < subInfo.getSubmissionConfig().getNumberOfSteps(); i++)
@@ -559,8 +555,7 @@ public class FlowUtils {
             // get the current step info
             SubmissionStepConfig currentStep = subInfo.getSubmissionConfig()
                     .getStep(i);
-            String stepNumber = Integer.toString(currentStep
-                    .getStepNumber());
+            int stepNumber = currentStep.getStepNumber();
             
             //Skip over the "Select Collection" step, since
             // a user is never allowed to return to that step or jump from that step
@@ -576,7 +571,7 @@ public class FlowUtils {
             {
                 // load the processing class for this step
                 ClassLoader loader = subInfo.getClass().getClassLoader();
-                Class stepClass = loader.loadClass(currentStep.getProcessingClassName());
+                Class<?> stepClass = loader.loadClass(currentStep.getProcessingClassName());
    
                 // call the "getNumberOfPages()" method of the class 
                 // to get it's number of pages
@@ -596,15 +591,13 @@ public class FlowUtils {
             // save each of the step's pages to the progress bar
             for (int j = 1; j <= numPages; j++)
             {
-                String stepAndPage = stepNumber + "." + j;
-
-                Double stepAndPageNum = Double.valueOf(stepAndPage);
+                StepAndPage stepAndPageNum = new StepAndPage(stepNumber,j);
                 
                 listStepNumbers.add(stepAndPageNum);
             }// end for each page
         }// end for each step
 
-        //convert into an array of Doubles
-        return (Double[]) listStepNumbers.toArray(new Double[listStepNumbers.size()]);
+        //convert into an array and return that
+        return listStepNumbers.toArray(new StepAndPage[listStepNumbers.size()]);
     }
 }

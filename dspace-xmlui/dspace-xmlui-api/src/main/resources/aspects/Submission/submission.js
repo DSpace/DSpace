@@ -56,6 +56,7 @@ importClass(Packages.org.dspace.license.CreativeCommons);
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
 importClass(Packages.org.dspace.app.xmlui.cocoon.HttpServletRequestCocoonWrapper);
 importClass(Packages.org.dspace.app.xmlui.aspect.submission.FlowUtils);
+importClass(Packages.org.dspace.app.xmlui.aspect.submission.StepAndPage);
 
 importClass(Packages.org.dspace.app.util.SubmissionConfig);
 importClass(Packages.org.dspace.app.util.SubmissionConfigReader);
@@ -78,7 +79,7 @@ function getObjectModel()
 
 /**
  * Return the DSpace context for this request since each HTTP request generates
- * a new context this object should never be stored and instead allways accessed 
+ * a new context this object should never be stored and instead always accessed 
  * through this method so you are ensured that it is the correct one.
  */
 function getDSContext()
@@ -95,12 +96,12 @@ function getHttpRequest()
 	//return getObjectModel().get(HttpEnvironment.HTTP_REQUEST_OBJECT)
 	
 	// Cocoon's request object handles form encoding, thus if the users enters 
-	// non-ascii characters such as those found in foriegn languages they will 
-	// come through corruped if they are not obtained through the cocoon request
+	// non-ascii characters such as those found in foreign languages they will 
+	// come through corrupted if they are not obtained through the cocoon request
 	// object. However, since the dspace-api is built to accept only HttpServletRequest
 	// a wrapper class HttpServletRequestCocoonWrapper has bee built to translate
 	// the cocoon request back into a servlet request. This is not a fully complete 
-	// translation as some methods are unimplemeted. But it is enough for our 
+	// translation as some methods are unimplemented. But it is enough for our 
 	// purposes here.
 	return new HttpServletRequestCocoonWrapper(getObjectModel());
 }
@@ -123,11 +124,10 @@ function getSubmissionInfo(workspaceID)
 }
 
 /**
- * Return an array of all step and page numbers as Java Double
- * objects (format: #.#). 
+ * Return an array of all step and page numbers as StepAndPage objects.
  * This returns all steps within the current submission process,
  * including non-interactive steps which do not appear in 
- * the Progress Bar
+ * the Progress Bar.
  */
 function getSubmissionSteps(submissionInfo)
 {
@@ -151,8 +151,8 @@ function sendPageAndWait(uri,bizData)
 }
 
 /**
- * Send the given page and DO NOT wait for the flow to be continued. Excution will 
- * proccede as normal. Use this method to add a flow=true parameter. This allows the 
+ * Send the given page and DO NOT wait for the flow to be continued. Execution will
+ * proceed as normal. Use this method to add a flow=true parameter. This allows the
  * sitemap to filter out all flow related requests from non flow related requests.
  */
 function sendPage(uri,bizData)
@@ -232,13 +232,14 @@ function doSubmission()
        {
            // Get the collection handle for this item.
            var handle = workspace.getCollection().getHandle();
-           
+
            // Record that this is a submission id, not a workflow id.
            //(specify "S" for submission item, for FlowUtils.findSubmission())
            workspaceID = "S"+workspaceID;
            do {
-               sendPageAndWait("handle/"+handle+"/submit/resumeStep",{"id":workspaceID,"step":"0"});
-               
+               sendPageAndWait("handle/"+handle+"/submit/resumeStep",
+                   {"id":workspaceID,"step":"0.0"});
+
                if (cocoon.request.get("submit_resume"))
                {
                    submissionControl(handle,workspaceID, step);
@@ -250,11 +251,11 @@ function doSubmission()
                    getDSContext().complete();
                    cocoon.exit();
                }
-               
-               
+
+
            } while (1 == 1)
-           
-   
+
+
        }
    }
 
@@ -262,70 +263,69 @@ function doSubmission()
 
 /**
  * This is the master flow control for submissions. This method decides
- * which steps are excuted in which order. Each step is called and does
- * not return until it's exit conditions have been meet. Then the standard
+ * which steps are executed in which order. Each step is called and does
+ * not return until its exit conditions have been met. Then the standard
  * navigation buttons are checked and the step is either decreased or
- * increased accordingly. Special cases like jumping or saveing are also
+ * increased accordingly. Special cases like jumping or saving are also
  * handled here.
  *
  * Parameters:
  *     collectionHandle - the handle of the collection we are submitting to
  *     workspaceID - the in progress submission's Workspace ID
- *     stepAndPage - the Step and Page number to start on (e.g. "1.1")
+ *     stepAndPage - the Step and Page number to start on (e.g. (1,1))
  */
 function submissionControl(collectionHandle, workspaceID, initStepAndPage) 
 {
 	//load initial submission information
 	var submissionInfo = getSubmissionInfo(workspaceID);
-	
+
 	//Initialize a Cocoon Local Page to save current state information
 	//(This lets us handle when users click the browser "back button"
 	// by caching the state of that previous page, etc.)
 	var state = cocoon.createPageLocal(); 
     state.progressIterator = 0;  //initialize our progress indicator
-    
+
     //this is array of all the steps/pages in current submission process
     //it's used to step back and forth between pages!
     var stepsInSubmission = getSubmissionSteps(submissionInfo);
-    
-	
+
+
     //if we didn't have a page passed in, go to first page in process
     if(initStepAndPage==null)
     	state.stepAndPage = stepsInSubmission[0];
     else
 	    state.stepAndPage = initStepAndPage;
-		
+
     var response_flag = 0;
-    
+
     do { 
      	// Loop forever, exit cases such as save, remove, or completed
         // will call cocoon.exit() stopping execution.
-        
+
   		cocoon.log.debug("Current step & page=" + state.stepAndPage, null);
   		cocoon.log.debug("Current ERROR Fields=" + getErrorFields(), null);
-    	
+
     	//----------------------------------------------------------
     	// #1: Actually load the next page in the process
     	//-----------------------------------------------------------
     	//split out step and page (e.g. 1.2 is page 2 of step 1)
-	 	var fields = String(state.stepAndPage).split(".");
-		var step = fields[0];
-		var page = fields[1];
-		
+		var step = state.stepAndPage.getStep();
+		var page = state.stepAndPage.getPage();
+
 	    //Set the current page we've reached in current step
 	    FlowUtils.setPageReached(getDSContext(),workspaceID, step, page);
-	  
+
 	  	//Load this step's configuration
 	  	var stepConfig = submissionInfo.getSubmissionConfig().getStep(step);
-	  		
+
     	//Pass it all the info it needs, including any response/error flags
     	//in case an error occurred
     	response_flag = doNextPage(collectionHandle, workspaceID, stepConfig, state.stepAndPage, response_flag); 
-    	
+
     	var maxStep = FlowUtils.getMaximumStepReached(getDSContext(),workspaceID);
         var maxPage = FlowUtils.getMaximumPageReached(getDSContext(),workspaceID);
-        var maxStepAndPage = parseFloat(maxStep + "." + maxPage);
-    	
+        var maxStepAndPage = new StepAndPage(maxStep,maxPage);
+
     	//----------------------------------------------------------
     	// #2: Determine which page/step the user should be sent to next
     	//-----------------------------------------------------------
@@ -334,10 +334,10 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
         if ((cocoon.request.get(AbstractProcessingStep.NEXT_BUTTON) || !stepHasUI(stepConfig))  && (response_flag==AbstractProcessingStep.STATUS_COMPLETE))
         {
            	state.progressIterator++;
-           	
+
            	var totalSteps = stepsInSubmission.length;
            	var inWorkflow = submissionInfo.isInWorkflow();
-  	
+
            	//check if we've completed the submission
            	if(state.progressIterator >= totalSteps)
            	{
@@ -345,7 +345,7 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
            		{
            		  	//Submission is completed!
            			cocoon.log.debug("Submission Completed!");
-           			
+
            			showCompleteConfirmation(collectionHandle);
            		}
            		else
@@ -363,25 +363,25 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
         			(response_flag==AbstractProcessingStep.STATUS_COMPLETE || state.stepAndPage == maxStepAndPage))
         {  
             var stepBack = true;
-            
+
             //Need to find the previous step which HAS a user interface.
             while(stepBack)
             {
             	state.progressIterator--;
             	if(state.progressIterator<0)
             	    stepBack = false;
-            	   
+
             	state.stepAndPage = stepsInSubmission[state.progressIterator];
-            
-            	var prevStep = String(state.stepAndPage).split(".")[0];
+
+            	var prevStep = state.stepAndPage.getStep();
             	var prevStepConfig = submissionInfo.getSubmissionConfig().getStep(prevStep);
-            
+
             	if(!stepHasUI(prevStepConfig))
             		stepBack = true;
             	else
             		stepBack = false;
      		}
-            
+
             cocoon.log.debug("Previous Step & Page=" + state.stepAndPage);
         }
         // User clicked "Save/Cancel" Button
@@ -412,19 +412,19 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
 	            if (name.startsWith(AbstractProcessingStep.PROGRESS_BAR_PREFIX))
 	            {
 	                var newStepAndPage = name.substring(AbstractProcessingStep.PROGRESS_BAR_PREFIX.length());
-	                newStepAndPage = parseFloat(newStepAndPage);
-	                
+	                newStepAndPage = new StepAndPage(newStepAndPage);
+
 	                //only allow a jump to a page user has already been to
-	                if (newStepAndPage >= 0 && newStepAndPage <= maxStepAndPage)
+	                if (newStepAndPage.isSet() && (newStepAndPage.compareTo(maxStepAndPage) <= 0))
 	                {
 	                   state.stepAndPage = newStepAndPage;
-	                   
+
 					   cocoon.log.debug("Jump To Step & Page=" + state.stepAndPage);
-	                   
+
 	                   //reset progress iterator
 	                   for(var i=0; i<stepsInSubmission.length; i++)
 	                   {
-	                   		if(state.stepAndPage==stepsInSubmission[i])
+	                   		if(state.stepAndPage.equals(stepsInSubmission[i]))
 	                   		{
 	                   			state.progressIterator = i;
 	                   			break;
@@ -452,9 +452,8 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
 function doNextPage(collectionHandle, workspaceID, stepConfig, stepAndPage, response_flag)
 {
   	//split out step and page (e.g. 1.2 is page 2 of step 1)
-	var fields = String(stepAndPage).split(".");
-    var step = fields[0];
-	var page = fields[1];
+    var step = stepAndPage.getStep();
+	var page = stepAndPage.getPage();
   
   	//-------------------------------------
  	// #1: Check if this step has a UI
@@ -582,7 +581,7 @@ function processPage(workspaceID, stepConfig, page)
  * (which is the default setting for Manakin).
  *
  * The uploaded files will be added to the Request object as two
- * seperate attributes: [name]-path and [name]-inputstream. The first
+ * separate attributes: [name]-path and [name]-inputstream. The first
  * attribute contains the full path to the uploaded file on the client's
  * Operating System. The second attribute contains an inputstream to the
  * file. These two attributes will be created for any file uploaded.
@@ -700,11 +699,11 @@ function submitStepSaveOrRemove(collectionHandle,workspaceID,step,page)
     // or keep empty required metadata using the resume
     var maxStep = FlowUtils.getMaximumStepReached(getDSContext(),workspaceID);
     var maxPage = FlowUtils.getMaximumPageReached(getDSContext(),workspaceID);
-    var maxStepAndPage = parseFloat(maxStep + "." + maxPage);
+    var maxStepAndPage = new StepAndPage(maxStep,maxPage);
     
-    var currStepAndPage = parseFloat(step + "." + page);
- 	   
-    if (maxStepAndPage > currStepAndPage)
+    var currStepAndPage = new StepAndPage(step,page);
+
+    if (maxStepAndPage.compareTo(currStepAndPage) > 0)
     {
  	   FlowUtils.setBackPageReached(getDSContext(),workspaceID, step, page);
     }
@@ -715,7 +714,7 @@ function submitStepSaveOrRemove(collectionHandle,workspaceID,step,page)
     
     if (cocoon.request.get("submit_save"))
     {
-       // Allready saved...
+       // Already saved...
        var contextPath = cocoon.request.getContextPath();
        cocoon.redirectTo(contextPath+"/submissions",true);
        cocoon.exit();
@@ -723,7 +722,7 @@ function submitStepSaveOrRemove(collectionHandle,workspaceID,step,page)
     else if (cocoon.request.get("submit_remove"))
     {
         sendPage("handle/"+collectionHandle+"/submit/removedStep");
-        cocoon.exit(); // We're done, Stop excecution.
+        cocoon.exit(); // We're done, Stop execution.
     }
     
     // go back to submission control and continue.
@@ -743,7 +742,7 @@ function showCompleteConfirmation(handle)
 /**
  * This is the starting point for all workflow tasks. The id of the workflow
  * is expected to be passed in as a request parameter. The user will be able
- * to view the item and preform the nessesary actions on the task such as: 
+ * to view the item and perform the necessary actions on the task such as: 
  * accept, reject, or edit the item's metadata. 
  */
 function doWorkflow() 
@@ -844,7 +843,7 @@ function workflowStepReject(handle,workflowID)
             
             if (error_fields == null)
             {
-                // Only exit if rejection succeded, otherwise ask for a reason again.
+                // Only exit if rejection succeeded, otherwise ask for a reason again.
                 return true;
             }      
         }
@@ -856,5 +855,3 @@ function workflowStepReject(handle,workflowID)
     } while (1 == 1)
     
 }
-
-

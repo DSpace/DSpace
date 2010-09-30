@@ -54,6 +54,7 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.aspect.submission.FlowUtils;
+import org.dspace.app.xmlui.aspect.submission.StepAndPage;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -162,18 +163,18 @@ public class ReviewStep extends AbstractSubmissionStep
         //adding each as a separate section to the review form
         for(int i=0; i<submissionPages.length; i++)
         {
-            double currentStepAndPage = Double.valueOf(submissionPages[i]).doubleValue();
+            StepAndPage currentStepAndPage = new StepAndPage(submissionPages[i]);
             
             //If the step we are looking at is this current
             // Review/Verify step, exit the for loop,
             // since we have completed all steps up to this one!
-            if(currentStepAndPage==this.stepAndPage)
+            if(currentStepAndPage.equals(this.stepAndPage))
             {
                 break;
             }
             
             //load up step configuration
-            SubmissionStepConfig stepConfig = subConfig.getStep(FlowUtils.getStep(currentStepAndPage));
+            SubmissionStepConfig stepConfig = subConfig.getStep(currentStepAndPage.getStep());
             
             //load the step's XML-UI Class
             AbstractStep stepUIClass = loadXMLUIClass(stepConfig.getXMLUIClassName());
@@ -181,7 +182,7 @@ public class ReviewStep extends AbstractSubmissionStep
             try
             {
                 //initialize this class (with proper step parameter)
-                parameters.setParameter("step", Double.toString(currentStepAndPage));
+                parameters.setParameter("step", currentStepAndPage.toString());
                 stepUIClass.setup(resolver, objectModel, src, parameters);
             }
             catch(Exception e)
