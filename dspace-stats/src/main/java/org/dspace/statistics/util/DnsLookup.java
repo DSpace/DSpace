@@ -10,6 +10,7 @@
  */
 package org.dspace.statistics.util;
 
+import org.dspace.core.ConfigurationManager;
 import org.xbill.DNS.*;
 
 import java.io.IOException;
@@ -26,7 +27,10 @@ public class DnsLookup {
     public static String reverseDns(String hostIp) throws IOException {
          Record opt = null;
          Resolver res = new ExtendedResolver();
-         res.setTimeout(0, 20);
+         
+         // set the timeout, defaults to 200 milliseconds
+         int timeout = ConfigurationManager.getIntProperty("solr.resolver.timeout", 200);
+         res.setTimeout(0, timeout);
 
          Name name = ReverseMap.fromAddress(hostIp);
          int type = Type.PTR;
