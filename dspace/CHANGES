@@ -25,6 +25,9 @@
 (Peter Dietz)
 - [DS-549] Added <a name> anchors in XMLUI
 
+(Stuart Lewis, Christophe Dupriez)
+- [DS-686] Incorrect use of UTF8 in DSpaceCSV
+
 1.6.2
 =====
 

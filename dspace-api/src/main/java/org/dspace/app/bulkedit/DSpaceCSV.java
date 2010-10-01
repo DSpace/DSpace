@@ -79,7 +79,7 @@ public class DSpaceCSV
     private boolean exportAll;
 
     /** A list of metadata elements to ignore */
-    private Hashtable ignore;
+    private Hashtable<String, String> ignore;
 
 
     /**
@@ -109,7 +109,7 @@ public class DSpaceCSV
         init();
 
         // Open the CSV file
-        BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(f),"UTF8"));
+        BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(f),"UTF-8"));
 
         // Read the heading line
         String head = input.readLine();
@@ -164,7 +164,7 @@ public class DSpaceCSV
         counter = 0;
 
         // Set the metadata fields to ignore
-        ignore = new Hashtable();
+        ignore = new Hashtable<String, String>();
         String toIgnore = ConfigurationManager.getProperty("bulkedit.ignore-on-export");
         if ((toIgnore == null) || ("".equals(toIgnore.trim())))
         {
@@ -401,7 +401,7 @@ public class DSpaceCSV
             catch (NumberFormatException nfe)
             {
                 System.err.println("Invalid item identifier: " + id);
-                System.err.println("Please check your CSV file for informaton. " +
+                System.err.println("Please check your CSV file for information. " +
                                    "Item id must be numeric, or a '+' to add a new item");
                 throw(nfe);
             }
@@ -485,7 +485,7 @@ public class DSpaceCSV
         // Save the file
         BufferedWriter out = new BufferedWriter(
                              new OutputStreamWriter(
-                             new FileOutputStream(filename), "UTF8"));
+                             new FileOutputStream(filename), "UTF-8"));
         for (String csvLine : getCSVLinesAsStringArray()) {
             out.write(csvLine + "\n");
         }
@@ -562,7 +562,7 @@ public class DSpaceCSV
         String filename = "test.csv";
         BufferedWriter out = new BufferedWriter(
                              new OutputStreamWriter(
-                             new FileOutputStream(filename), "UTF8"));
+                             new FileOutputStream(filename), "UTF-8"));
         for (String csvLine : csv) {
             out.write(csvLine + "\n");
         }
