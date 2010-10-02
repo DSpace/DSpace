@@ -61,7 +61,7 @@
 
 
 <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
-<link type="text/css" rel="stylesheet" href="<%= request.getContextPath() %>/styles.css.jsp"/>
+<link type="text/css" rel="stylesheet" href="<%= request.getContextPath() %>/styles.css"/>
 
 <style type="text/css">
 	body {background-color: #ffffff}

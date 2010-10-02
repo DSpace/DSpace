@@ -44,7 +44,7 @@
                 </tbody>
             </tgroup>
         </informaltable>
-        <para>Heavy use is made of a style sheet, <literal>styles.css.jsp</literal>. If you make edits, copy the local version to <literal>[jsp.custom-dir]/dspace/modules/jspui/src/main/webapp/styles.css.jsp</literal>, and it will be used automatically in preference to the default, as described above.</para>
+        <para>Heavy use is made of a style sheet, <literal>styles.css</literal>. If you make edits, copy the local version to <literal>[jsp.custom-dir]/dspace/modules/jspui/src/main/webapp/styles.css</literal>, and it will be used automatically in preference to the default, as described above.</para>
         <para>Fonts and colors can be easily changed using the stylesheet. The stylesheet is a JSP so that the user&apos;s browser version can be detected and the stylesheet tweaked accordingly.</para>
         <para>The &apos;layout&apos; of each page, that is, the top and bottom banners and the navigation bar, are determined by the JSPs <literal>/layout/header-*.jsp</literal> and <literal>/layout/footer-*.jsp</literal>. You can provide modified versions of these (in <literal>[jsp.custom-dir]/dspace/modules/jspui/src/main/webapp/layout</literal>), or define more styles and apply them to pages by using the &quot;style&quot; attribute of the <literal>dspace:layout</literal> tag.</para>
         <orderedlist>

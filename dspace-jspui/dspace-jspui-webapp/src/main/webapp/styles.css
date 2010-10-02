@@ -1,65 +1,3 @@
-<%--
-  - styles.css.jsp
-  -
-  - Version: $Revision$
-  -
-  - Date: $Date$
-  -
-  - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
-  - Institute of Technology.  All rights reserved.
-  -
-  - Redistribution and use in source and binary forms, with or without
-  - modification, are permitted provided that the following conditions are
-  - met:
-  -
-  - - Redistributions of source code must retain the above copyright
-  - notice, this list of conditions and the following disclaimer.
-  -
-  - - Redistributions in binary form must reproduce the above copyright
-  - notice, this list of conditions and the following disclaimer in the
-  - documentation and/or other materials provided with the distribution.
-  -
-  - - Neither the name of the Hewlett-Packard Company nor the name of the
-  - Massachusetts Institute of Technology nor the names of their
-  - contributors may be used to endorse or promote products derived from
-  - this software without specific prior written permission.
-  -
-  - THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-  - ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-  - LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-  - A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-  - HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  - INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-  - BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
-  - OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-  - ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-  - TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-  - USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-  - DAMAGE.
-  --%>
-
-<%--
-  - Main DSpace Web UI stylesheet
-  -
-  - This is a JSP so it can be tailored for different browser types
-  --%>
-<%@ page import="org.dspace.app.webui.util.JSPManager" %>
-
-<%
-    // Make sure the browser knows we're a stylesheet
-    response.setContentType("text/css");
-
-    String imageUrl   = request.getContextPath() + "/image/";
-
-    // Netscape 4.x?
-    boolean usingNetscape4 = false;
-    String userAgent = request.getHeader( "User-Agent" );
-    if( userAgent != null && userAgent.startsWith( "Mozilla/4" ) )
-    {
-        usingNetscape4 = true;
-    }
-%>
-
 A { color: #336699 }
 
 BODY { font-family: "verdana", Arial, Helvetica, sans-serif;
@@ -74,7 +12,6 @@ BODY { font-family: "verdana", Arial, Helvetica, sans-serif;
        margin-top:0px;
        margin-bottom:0px }
 
-<%-- Note: Font information must be repeated for broken Netscape 4.xx --%>
 H1 { margin-left: 10px;
      margin-right: 10px;
      font-size: 16pt;
@@ -104,9 +41,9 @@ p {  margin-left: 10px;
      font-family: "verdana", "Arial", "Helvetica", sans-serif;
      font-size: 10pt }
      
-<%-- This class is here so that a "DIV" by default acts as a "P".    --%>
-<%-- This is necessary since the "dspace:popup" tag must have a "DIV" --%>
-<%-- (or block element) surrounding it in order to be valid XHTML 1.0 --%>
+/* This class is here so that a "DIV" by default acts as a "P".
+   This is necessary since the "dspace:popup" tag must have a "DIV"
+   (or block element) surrounding it in order to be valid XHTML 1.0 */
 DIV { margin-left: 10px;
       margin-right: 10px;
       margin-bottom: 15px;
@@ -116,8 +53,7 @@ DIV { margin-left: 10px;
 UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
      font-size: 10pt }
 
-<%-- This class is here so the standard style from "P" above can be applied --%>
-<%-- to anything else. --%>
+/* This class is here so the standard style from "P" above can be applied to anything else. */
 .standard { margin-left: 10px;
             margin-right: 10px;
             font-family: "verdana", "Arial", "Helvetica", sans-serif;
@@ -155,7 +91,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                border: 0;
                margin: 0 }
 
-.stripe { background: #336699 url(<%= imageUrl %>stripe.gif) repeat-x;
+.stripe { background: #336699 url(./image/stripe.gif) repeat-x;
           vertical-align: top;
           border: 0;
           padding: 0;
@@ -171,12 +107,12 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                padding: 3px;
                border: 0 }
 
-<%-- HACK: Width shouldn't really be 100%:  Really, this is asking that the --%>
-<%--       table cell be the full width of the table.  The side effect of --%>
-<%--       this should theoretically be that other cells in the row be made --%>
-<%--       a width of 0%, but in practice browsers will only take this 100% --%>
-<%--       as a hint, and just make it as wide as it can without impinging --%>
-<%--       the other cells.  This, fortunately, is precisely what we want. --%>
+/* HACK: Width shouldn't really be 100%:  Really, this is asking that the
+       table cell be the full width of the table.  The side effect of
+       this should theoretically be that other cells in the row be made
+       a width of 0%, but in practice browsers will only take this 100%
+       as a hint, and just make it as wide as it can without impinging
+       the other cells.  This, fortunately, is precisely what we want. */
 .pageContents { FONT-FAMILY: "verdana", Arial, Helvetica, sans-serif;
                 background: white;
                 color: black;
@@ -205,10 +141,9 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                          background: white;
                          white-space: nowrap }
 
-<%-- HACK: Shouldn't have to repeat font information and colour here, it --%>
-<%--       should be inherited from the parent, but isn't in Netscape 4.x, --%>
-<%--       IE or Opera.  (Only Mozilla functions correctly.) --%>
-
+/* HACK: Shouldn't have to repeat font information and colour here, it
+       should be inherited from the parent, but isn't in Netscape 4.x,
+       IE or Opera.  (Only Mozilla functions correctly.) */
 .navigationBarItem { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                      font-size: 10pt;
                      font-style: normal;
@@ -389,7 +324,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
 .submitProgressButton{ border: 0 }
 
 .submitProgressButtonDone{ border: 0;
-                           background-image: url(<%= imageUrl %>/submit/done.gif);
+                           background-image: url(./image/submit/done.gif);
                            background-position: center;
                            height: 30px;
                            width: 90px;
@@ -398,7 +333,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                            background-repeat: no-repeat; }
 
 .submitProgressButtonCurrent{ border: 0;
-                           background-image: url(<%= imageUrl %>/submit/current.gif);
+                           background-image: url(./image/submit/current.gif);
                            background-position: center;
                            height: 30px;
                            width: 90px;
@@ -407,7 +342,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                            background-repeat: no-repeat; }
 
 .submitProgressButtonNotDone{ border: 0;
-                           background-image: url(<%= imageUrl %>/submit/notdone.gif);
+                           background-image: url(./image/submit/notdone.gif);
                            background-position: center;
                            height: 30px;
                            width: 90px;
@@ -433,19 +368,6 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
              text-decoration: none;
              background: #ffffff }
 
-<%-- The padding element breaks Netscape 4 - it puts a big gap at the top
-  -- of the browse tables if it's present.  So, we decide here which
-  -- padding elements to use. --%>
-<%
-    String padding = "padding: 3px";
-
-    if( usingNetscape4 )
-    {
-        padding = "padding-left: 3px;  padding-right: 3px; padding-top: 1px";
-    }
-%>
-
-
 .oddRowOddCol{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
                font-size: 12pt;
                font-style: normal;
@@ -453,8 +375,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                color: #000000;
                vertical-align: middle;
                text-decoration: none;
-               background: #ffffff;
-               <%= padding %> }
+               background: #ffffff }
 
 .evenRowOddCol{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
                 font-size: 12pt;
@@ -463,8 +384,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                 color: #000000;
                 vertical-align: middle;
                 text-decoration: none;
-                background: #eeeeee;
-                <%= padding %>  }
+                background: #eeeeee }
 
 .oddRowEvenCol{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
                 font-size: 12pt;
@@ -473,8 +393,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                 color: #000000;
                 vertical-align: middle;
                 text-decoration: none;
-                background: #eeeeee;
-                <%= padding %>  }
+                background: #eeeeee }
 
 .evenRowEvenCol{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
                  font-size: 12pt;
@@ -483,8 +402,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                  color: #000000;
                  vertical-align: middle;
                  text-decoration: none;
-                 background: #dddddd;
-                 <%= padding %>  }
+                 background: #dddddd }
 
 .highlightRowOddCol{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
                      font-size: 12pt;
@@ -493,8 +411,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                      color: #000000;
                      vertical-align: middle;
                      text-decoration: none;
-                     background: #ccccee;
-                     <%= padding %> }
+                     background: #ccccee }
 
 .highlightRowEvenCol{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
                       font-size: 12pt;
@@ -503,8 +420,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                       color: #000000;
                       vertical-align: middle;
                       text-decoration: none;
-                      background: #bbbbcc;
-                      <%= padding %> }
+                      background: #bbbbcc }
 
 .itemDisplayTable{ text-align: center;
                    border: 0;
@@ -518,8 +434,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                      vertical-align: top;
                      text-align: right;
                      text-decoration: none;
-                     white-space: nowrap;
-                     <%= padding %> }
+                     white-space: nowrap }
 
 .metadataFieldValue{ font-family: "verdana", "Arial", "Helvetica", sans-serif;
                      font-size: 12pt;
@@ -528,8 +443,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                      color: #000000;
                      vertical-align: top;
                      text-align: left;
-                     text-decoration: none;
-                     <%= padding %> }  <%-- width 100% ?? --%>
+                     text-decoration: none }
 
 .recentItem { margin-left: 10px;
               margin-right: 10px;
@@ -618,8 +532,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                     font-size:10pt;}
                     
 
-<%-- The following rules are used by the controlled-vocabulary add-on --%>
-
+/* The following rules are used by the controlled-vocabulary add-on */
 ul.controlledvocabulary  {
                 list-style-type:none; }
 
@@ -671,7 +584,7 @@ img.controlledvocabulary {
 }
 
 
-<%-- styles added by authority control --%>
+/* styles added by authority control */
 div.autocomplete {
     background-color:white;
     border:1px solid #888888;
@@ -703,7 +616,7 @@ div.autocomplete ul li span.value {
 }
 
 
-/* this magic gets the 16x16 icon to show up.. setting height/width didn't
+/* This magic gets the 16x16 icon to show up.. setting height/width didn't
    do it, but adding padding actually made it show up. */
 img.ds-authority-confidence,
 span.ds-authority-confidence
@@ -711,27 +624,27 @@ span.ds-authority-confidence
   padding: 0px 2px; vertical-align: bottom; color: transparent;}
 img.ds-authority-confidence.cf-unset,
 span.ds-authority-confidence.cf-unset
-  { background-image: url(<%= request.getContextPath() %>/image/authority/bug.png);}
+  { background-image: url(./image/authority/bug.png);}
 img.ds-authority-confidence.cf-novalue,
 span.ds-authority-confidence.cf-novalue
-  { background-image: url(<%= request.getContextPath() %>/image/confidence/0-unauthored.gif);}
+  { background-image: url(./image/confidence/0-unauthored.gif);}
 img.ds-authority-confidence.cf-rejected,
 img.ds-authority-confidence.cf-failed,
 span.ds-authority-confidence.cf-rejected,
 span.ds-authority-confidence.cf-failed
-  { background-image: url(<%= request.getContextPath() %>/image/confidence/2-errortriangle.gif); }
+  { background-image: url(./image/confidence/2-errortriangle.gif); }
 img.ds-authority-confidence.cf-notfound,
 span.ds-authority-confidence.cf-notfound
-  { background-image: url(<%= request.getContextPath() %>/image/confidence/3-thumb1.gif); }
+  { background-image: url(./image/confidence/3-thumb1.gif); }
 img.ds-authority-confidence.cf-ambiguous,
 span.ds-authority-confidence.cf-ambiguous
-  { background-image: url(<%= request.getContextPath() %>/image/confidence/4-question.gif); }
+  { background-image: url(./image/confidence/4-question.gif); }
 img.ds-authority-confidence.cf-uncertain,
 span.ds-authority-confidence.cf-uncertain
-  { background-image: url(<%= request.getContextPath() %>/image/confidence/5-pinion.gif); }
+  { background-image: url(./image/confidence/5-pinion.gif); }
 img.ds-authority-confidence.cf-accepted,
 span.ds-authority-confidence.cf-accepted
-  { background-image: url(<%= request.getContextPath() %>/image/confidence/6-greencheck.gif); }
+  { background-image: url(./image/confidence/6-greencheck.gif); }
 
 /* hide authority-value inputs in forms */
 input.ds-authority-value { display:none; }
@@ -769,7 +682,7 @@ div#authority-message {
  }
 
 a.authority {
-    background: transparent url(<%= request.getContextPath() %>/image/authority/book_key.png) no-repeat;
+    background: transparent url(./image/authority/book_key.png) no-repeat;
     background-position: top right;
     padding-right: 20px;
 }
@@ -779,6 +692,6 @@ input.ds-authority-lock
   { vertical-align: bottom; height: 24px; width: 24px; margin-right: 8px;
     background-repeat: no-repeat; background-color: transparent; }
 input.ds-authority-lock.is-locked
-  { background-image: url(<%= request.getContextPath() %>/image/lock24.png); }
+  { background-image: url(./image/lock24.png); }
 input.ds-authority-lock.is-unlocked
-  { background-image: url(<%= request.getContextPath() %>/image/unlock24.png); }
+  { background-image: url(./image/unlock24.png); }

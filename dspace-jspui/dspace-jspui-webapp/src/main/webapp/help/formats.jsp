@@ -99,7 +99,7 @@
 <title>
 	<fmt:message key="jsp.help.formats.title"/></title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<link rel="stylesheet" href="../styles.css.jsp" type="text/css"/>
+<link rel="stylesheet" href="../styles.css" type="text/css"/>
 </head>
 <body class="help">
 
