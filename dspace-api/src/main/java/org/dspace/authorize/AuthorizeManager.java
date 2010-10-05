@@ -311,8 +311,6 @@ public class AuthorizeManager
     private static boolean authorize(Context c, DSpaceObject o, int action,
             EPerson e, boolean useInheritance) throws SQLException
     {
-        int userid;
-
         // return FALSE if there is no DSpaceObject
         if (o == null)
         {
@@ -326,11 +324,8 @@ public class AuthorizeManager
         }
 
         // is eperson set? if not, userid = 0 (anonymous)
-        if (e == null)
-        {
-            userid = 0;
-        }
-        else
+	int userid = 0;
+        if (e != null)
         {
             userid = e.getID();
 
@@ -388,21 +383,30 @@ public class AuthorizeManager
      *         given DSpace object
      */
     public static boolean isAdmin(Context c, DSpaceObject o) throws SQLException {
-		if (isAdmin(c))
-		{
-			return true;
-		}
-		
-		if (o == null)
-		{
-		    return false;
-		}
+
+	// return true if user is an Administrator
+	if (isAdmin(c))
+	{
+	    return true;
+	}
+
+	if (o == null)
+	{
+	    return false;
+	}
+
+        // is eperson set? if not, userid = 0 (anonymous)
+	int userid = 0;
+	EPerson e = c.getCurrentUser();
+	if(e != null)
+	{
+            userid = e.getID();
+	}
 
         //
         // First, check all Resource Policies directly on this object
         //
-		List<ResourcePolicy> policies = getPoliciesActionFilter(c, o, Constants.ADMIN);
-        int userid = c.getCurrentUser().getID();
+	List<ResourcePolicy> policies = getPoliciesActionFilter(c, o, Constants.ADMIN);
         
         for (ResourcePolicy rp : policies)
         {
@@ -435,7 +439,7 @@ public class AuthorizeManager
         }
 	
 		return false;
-	}
+    }
 
    
     /**
