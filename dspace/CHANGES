@@ -2,6 +2,7 @@
 =====
 (Kim Shepherd)
 - [DS-688] AuthorizeManager.isAdmin(Context, DSpaceObject) throws exception when EPerson is null
+- [DS-689] DisplayStatisticsServlet throws NPE if requested handle is null, should throw 404
 
 (Flavio Botelho)
 - [DS-563] Multiple spaces in between words in advanced search will make the search return nothing

@@ -136,6 +136,13 @@ public class DisplayStatisticsServlet extends DSpaceServlet
 
         String handle = request.getParameter("handle");
         DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+
+	if(dso == null) {
+		response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+	        JSPManager.showJSP(request, response, "/error/404.jsp");
+                return;
+	}
+
         boolean isItem = false;
 
         StatisticsBean statsVisits = new StatisticsBean();
