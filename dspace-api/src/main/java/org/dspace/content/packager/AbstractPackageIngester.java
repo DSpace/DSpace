@@ -49,7 +49,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -163,7 +165,7 @@ public abstract class AbstractPackageIngester
         {
             //add to list of successfully ingested objects
             addToIngestedList(dso);
-            
+
             //We can only recursively ingest non-Items
             //(NOTE: Items have no children, as Bitstreams/Bundles are created from Item packages)
             if(dso.getType()!=Constants.ITEM)
@@ -178,11 +180,25 @@ public abstract class AbstractPackageIngester
                     //Recursively ingest each child package, using this current object as the parent DSpace Object
                     for(String childPkgRef : childPkgRefs)
                     {
+                        // Remember where the additions start
+                        int oldSize = dsoIngestedList.size();
+
                         //Assume package reference is relative to current package location
                         File childPkg = new File(pkgFile.getAbsoluteFile().getParent(), childPkgRef);
                         
                         //fun, it's recursive! -- ingested referenced package as a child of current object
                         ingestAll(context, dso, childPkg, params, license);
+
+                        // A Collection can map to Items that it does not "own".
+                        // If a Collection package has an Item as a child, it
+                        // should be mapped regardless of ownership.
+                        if (Constants.COLLECTION == dso.getType())
+                        {
+                            Item childItem = (Item)dsoIngestedList.get(oldSize);
+                            Collection collection = (Collection)dso;
+                            if (!childItem.isIn(collection))
+                                collection.addItem(childItem);
+                        }
                     }
                 }//end if child pkgs
             }//end if not an Item
@@ -260,12 +276,26 @@ public abstract class AbstractPackageIngester
                 //Recursively replace each child package
                 for(String childPkgRef : childPkgRefs)
                 {
+                    // Remember where the additions start
+                    int oldSize = dsoIngestedList.size();
+
                     //Assume package reference is relative to current package location
                     File childPkg = new File(pkgFile.getAbsoluteFile().getParent(), childPkgRef);
 
                     //fun, it's recursive! -- replaced referenced package as a child of current object
                     // Pass object to replace as 'null', as we don't know which object to replace.
                     replaceAll(context, null, childPkg, params);
+
+                    // A Collection can map to Items that it does not "own".
+                    // If a Collection package has an Item as a child, it
+                    // should be mapped regardless of ownership.
+                    if (Constants.COLLECTION == replacedDso.getType())
+                    {
+                        Item childItem = (Item)dsoIngestedList.get(oldSize);
+                        Collection collection = (Collection)replacedDso;
+                        if (!childItem.isIn(collection))
+                            collection.addItem(childItem);
+                    }
                 }
             }//end if child pkgs
         }//end if not an Item

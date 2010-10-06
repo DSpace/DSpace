@@ -1035,6 +1035,22 @@ public class Item extends DSpaceObject
     }
 
     /**
+     * See whether this Item is contained by a given Collection.
+     * @param collection
+     * @return true if {@code collection} contains this Item.
+     * @throws SQLException
+     */
+    public boolean isIn(Collection collection) throws SQLException
+    {
+        TableRow tr = DatabaseManager.querySingle(ourContext,
+                "SELECT COUNT(*) AS count" +
+                " FROM collection2item" +
+                " WHERE collection_id = ? AND item_id = ?",
+                collection.getID(), itemRow.getIntColumn("item_id"));
+        return tr.getLongColumn("count") > 0;
+    }
+
+    /**
      * Get the collections this item is in. The order is indeterminate.
      *
      * @return the collections this item is in, if any.
