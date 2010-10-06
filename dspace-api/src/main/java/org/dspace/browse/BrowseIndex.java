@@ -93,7 +93,7 @@ public class BrowseIndex
     private static BrowseIndex withdrawnIndex = new BrowseIndex("bi_withdrawn");
 
     /**
-     * Ensure noone else can create these
+     * Ensure no one else can create these
      */
     private BrowseIndex()
     {
@@ -336,7 +336,7 @@ public class BrowseIndex
     }
     
 	/**
-	 * Get the name of the sequence that will be used in the given circumnstances
+	 * Get the name of the sequence that will be used in the given circumstances
 	 * 
 	 * @param isDistinct	is a distinct table
 	 * @param isMap			is a map table
@@ -393,7 +393,7 @@ public class BrowseIndex
      * 
      * @param number		the index configuration number
      * @param isCommunity	whether this is a community constrained index (view)
-     * @param isCollection	whether this is a collection constrainted index (view)
+     * @param isCollection	whether this is a collection constrained index (view)
      * @param isDistinct	whether this is a distinct table
      * @param isMap			whether this is a distinct map table
      * @return				the name of the table
@@ -445,7 +445,7 @@ public class BrowseIndex
      * Get the name of the table in the given circumstances
      * 
      * @param isCommunity	whether this is a community constrained index (view)
-     * @param isCollection	whether this is a collection constrainted index (view)
+     * @param isCollection	whether this is a collection constrained index (view)
      * @param isDistinct	whether this is a distinct table
      * @param isMap			whether this is a distinct map table
      * @return				the name of the table
@@ -467,7 +467,7 @@ public class BrowseIndex
      * </code>
      * 
      * @param isCommunity	whether this is a community constrained index (view)
-     * @param isCollection	whether this is a collection constrainted index (view)
+     * @param isCollection	whether this is a collection constrained index (view)
      * @return				the name of the table
      * @deprecated 1.5
      */
@@ -677,7 +677,7 @@ public class BrowseIndex
     {
         int idx = 1;
         String definition;
-        ArrayList browseIndices = new ArrayList();
+        ArrayList<BrowseIndex> browseIndices = new ArrayList<BrowseIndex>();
 
         while ( ((definition = ConfigurationManager.getProperty("webui.browse.index." + idx))) != null)
         {
@@ -687,7 +687,7 @@ public class BrowseIndex
         }
 
         BrowseIndex[] bis = new BrowseIndex[browseIndices.size()];
-        bis = (BrowseIndex[]) browseIndices.toArray((BrowseIndex[]) bis);
+        bis = browseIndices.toArray(bis);
 
         return bis;
     }

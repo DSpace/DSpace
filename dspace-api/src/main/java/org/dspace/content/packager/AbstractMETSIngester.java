@@ -69,7 +69,6 @@ import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.workflow.WorkflowItem;
 import org.jdom.Element;
-import org.jdom.Namespace;
 
 /**
  * Base class for package ingester of METS (Metadata Encoding & Transmission
@@ -129,10 +128,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(AbstractMETSIngester.class);
-
-    /** Declare a prefix referring to the METS namespace */
-    private static final Namespace metsNS = Namespace.getNamespace("mets",
-            "http://www.loc.gov/METS/");
 
     /**
      * An instance of ZipMdrefManager holds the state needed to retrieve the
@@ -1069,7 +1064,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         }
     }
 
-    // whether or not to save manifest as a bitstream in METADATA bndl.
+    // whether or not to save manifest as a bitstream in METADATA bundle.
     protected boolean preserveManifest()
     {
         return ConfigurationManager.getBooleanProperty("mets."
