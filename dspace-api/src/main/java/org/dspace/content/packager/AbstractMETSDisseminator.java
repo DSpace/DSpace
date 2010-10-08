@@ -734,7 +734,7 @@ public abstract class AbstractMETSDisseminator
         Mets mets = new Mets();
         
         // this ID should be globally unique
-        mets.setID("DSpace-" + Constants.typeText[dso.getType()] +"-hdl:" + dso.getHandle());
+        mets.setID("DSpace-" + Constants.typeText[dso.getType()] +"-" + dso.getHandle());
 
         // identifies the object described by this document
         mets.setOBJID(makePersistentID(dso));
