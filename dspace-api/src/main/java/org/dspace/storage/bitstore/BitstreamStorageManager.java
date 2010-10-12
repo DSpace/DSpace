@@ -579,6 +579,10 @@ public class BitstreamStorageManager
     public static void delete(Context context, int id) throws SQLException
     {
         DatabaseManager.updateQuery(context,
+                "update Bundle set primary_bitstream_id=null where primary_bitstream_id = ? ",
+                id);
+
+        DatabaseManager.updateQuery(context,
                         "update Bitstream set deleted = '1' where bitstream_id = ? ",
                         id);
     }
