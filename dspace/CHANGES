@@ -38,6 +38,9 @@
 (Stuart Lewis)
 - [DS-467] Consider making the JSPUI styles.css.jsp a static file
 
+[Graham Triggs]
+- [DS-698] Clear primary_bitstream_id references when deleting a bitstream
+
 1.6.2
 =====
 
