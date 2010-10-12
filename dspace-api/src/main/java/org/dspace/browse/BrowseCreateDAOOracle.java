@@ -785,10 +785,10 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
     {
         try
         {
-            String query = "DELETE FROM " + table + 
-                            " WHERE id IN (SELECT id FROM " + table +
-                            " MINUS SELECT distinct_id AS id FROM " + map + ")";
-            
+            String query = "DELETE FROM " + table +
+                            " WHERE NOT EXISTS (SELECT 1 FROM " + map +
+                            " WHERE " + map + ".distinct_id = " + table +".id)";
+
             DatabaseManager.updateQuery(context, query);
         }
         catch (SQLException e)
@@ -805,18 +805,14 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
     {
         try
         {
-            String itemQuery = "SELECT item_id FROM item WHERE ";
-            if (withdrawn)
-                itemQuery += "withdrawn = 1";
-            else
-                itemQuery += "in_archive = 1 AND withdrawn = 0";
-            
-            String delete         = "DELETE FROM " + table + " WHERE item_id IN ( SELECT item_id FROM " + table + " MINUS " + itemQuery + ")";
+            String itemCriteria = withdrawn ? "item.withdrawn = 1" : "item.in_archive = 1 AND item.withdrawn = 0";
+
+            String delete = "DELETE FROM " + table + " WHERE NOT EXISTS (SELECT 1 FROM item WHERE item.item_id=" + table + ".item_id AND " + itemCriteria + ")";
             DatabaseManager.updateQuery(context, delete);
 
             if (map != null)
             {
-                String deleteDistinct = "DELETE FROM " + map   + " WHERE item_id IN ( SELECT item_id FROM " + map   + " MINUS " + itemQuery + ")";
+                String deleteDistinct = "DELETE FROM " + map + " WHERE NOT EXISTS (SELECT 1 FROM item WHERE item.item_id=" + map + ".item_id AND " + itemCriteria + ")";
                 DatabaseManager.updateQuery(context, deleteDistinct);
             }
         }

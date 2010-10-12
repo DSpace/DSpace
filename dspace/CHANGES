@@ -40,6 +40,7 @@
 
 [Graham Triggs]
 - [DS-698] Clear primary_bitstream_id references when deleting a bitstream
+- [DS-696] Reduce cost of browse index pruning
 
 1.6.2
 =====

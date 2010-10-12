@@ -794,8 +794,8 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
         try
         {
             String query = "DELETE FROM " + table +
-                            " WHERE id IN (SELECT id FROM " + table +
-                            " EXCEPT SELECT distinct_id AS id FROM " + map + ")";
+                            " WHERE NOT EXISTS (SELECT 1 FROM " + map +
+                            " WHERE " + map + ".distinct_id = " + table +".id)";
 
             DatabaseManager.updateQuery(context, query);
         }
@@ -814,18 +814,14 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     {
         try
         {
-            String itemQuery = "SELECT item_id FROM item WHERE ";
-            if (withdrawn)
-                itemQuery += "withdrawn = true";
-            else
-                itemQuery += "in_archive = true AND withdrawn = false";
+            String itemCriteria = withdrawn ? "item.withdrawn = true" : "item.in_archive = true AND item.withdrawn = false";
 
-            String delete         = "DELETE FROM " + table + " WHERE item_id IN ( SELECT item_id FROM " + table + " EXCEPT " + itemQuery + ")";
+            String delete = "DELETE FROM " + table + " WHERE NOT EXISTS (SELECT 1 FROM item WHERE item.item_id=" + table + ".item_id AND " + itemCriteria + ")";
             DatabaseManager.updateQuery(context, delete);
 
             if (map != null)
             {
-                String deleteDistinct = "DELETE FROM " + map + " WHERE item_id IN ( SELECT item_id FROM " + map   + " EXCEPT " + itemQuery + ")";
+                String deleteDistinct = "DELETE FROM " + map + " WHERE NOT EXISTS (SELECT 1 FROM item WHERE item.item_id=" + map + ".item_id AND " + itemCriteria + ")";
                 DatabaseManager.updateQuery(context, deleteDistinct);
             }
         }
