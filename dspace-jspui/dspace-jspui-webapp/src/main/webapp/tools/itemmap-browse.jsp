@@ -44,10 +44,10 @@
   -
   - Attributes to pass in:
   -
-  -   items          - sorted Map of Items to display
-  -   collection     - Collection we're managing
-  -   collections    - Map of Collections, keyed by collection_id
-  -   browsetext     - text to display at the top
+  -   items          - sorted Map of mapped Items to display
+  -   collection     - Collection we're mapping into
+  -   collections    - Map of Collections mapped into this one, keyed by collection_id
+  -   browsetext     - text to display at the top (name of collection we are mapping from)
   -   browsetype     - "Add" or "Remove"
   --%>
   
@@ -84,16 +84,25 @@
         <% } else if (browsetype.equals("Remove")) { %>
             <fmt:message key="jsp.tools.itemmap-browse.heading-collection">
                 <fmt:param><%= browsetext %></fmt:param>
+                <fmt:param><%= collection.getName() %></fmt:param>
             </fmt:message>
         <% } %>
     </h2>
 
     <%-- <p>Check the box next to items you wish to add or remove, and choose 'add' or 'remove'.</p> --%>
     <% if (browsetype.equals("Add")){ %>
-    <p><fmt:message key="jsp.tools.itemmap-browse.add"/></p>
+    <p>
+        <fmt:message key="jsp.tools.itemmap-browse.add">
+            <fmt:param><%= collection.getName() %></fmt:param>
+        </fmt:message>
+    </p>
     <% }%>
     <% if (browsetype.equals("Remove")){ %>
-    <p><fmt:message key="jsp.tools.itemmap-browse.remove"/></p>
+    <p>
+        <fmt:message key="jsp.tools.itemmap-browse.remove">
+            <fmt:param><%= collection.getName() %></fmt:param>
+        </fmt:message>
+    </p>
     <% } %>
     
     <%-- %>p><fmt:message key="jsp.tools.itemmap-browse.infomsg"/></p--%>
