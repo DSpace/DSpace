@@ -148,20 +148,20 @@
             <!-- File size always comes in bytes and thus needs conversion --> 
             <td>
                 <xsl:choose>
-                    <xsl:when test="@SIZE &lt; 1000">
+                    <xsl:when test="@SIZE &lt; 1024">
                         <xsl:value-of select="@SIZE"/>
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
                     </xsl:when>
-                    <xsl:when test="@SIZE &lt; 1000000">
-                        <xsl:value-of select="substring(string(@SIZE div 1000),1,5)"/>
+                    <xsl:when test="@SIZE &lt; 1024 * 1024">
+                        <xsl:value-of select="substring(string(@SIZE div 1024),1,5)"/>
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
                     </xsl:when>
-                    <xsl:when test="@SIZE &lt; 1000000000">
-                        <xsl:value-of select="substring(string(@SIZE div 1000000),1,5)"/>
+                    <xsl:when test="@SIZE &lt; 1024 * 1024 * 1024">
+                        <xsl:value-of select="substring(string(@SIZE div (1024 * 1024)),1,5)"/>
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:value-of select="substring(string(@SIZE div 1000000000),1,5)"/>
+                        <xsl:value-of select="substring(string(@SIZE div (1024 * 1024 * 1024)),1,5)"/>
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
                     </xsl:otherwise>
                 </xsl:choose>

@@ -1,5 +1,8 @@
 1.7.0
 =====
+(Hardy Pottinger)
+- [DS-691] File size math in the mets:file template in General-Hander.xsl (XMLUI) is incorrect
+
 (Kim Shepherd)
 - [DS-688] AuthorizeManager.isAdmin(Context, DSpaceObject) throws exception when EPerson is null
 - [DS-689] DisplayStatisticsServlet throws NPE if requested handle is null, should throw 404
