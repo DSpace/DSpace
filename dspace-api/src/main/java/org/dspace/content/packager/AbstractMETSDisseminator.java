@@ -733,8 +733,12 @@ public abstract class AbstractMETSDisseminator
         // Create the METS manifest in memory
         Mets mets = new Mets();
         
-        // this ID should be globally unique
-        mets.setID("DSpace-" + Constants.typeText[dso.getType()] +"-" + dso.getHandle());
+        String identifier = "DB-ID-" + dso.getID();
+        if(dso.getHandle()!=null)
+            identifier =  dso.getHandle().replace('/', '-');
+        
+        // this ID should be globally unique (format: DSpace_[objType]_[handle with slash replaced with a dash])
+        mets.setID("DSpace_" + Constants.typeText[dso.getType()] + "_" + identifier);
 
         // identifies the object described by this document
         mets.setOBJID(makePersistentID(dso));
