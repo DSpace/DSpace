@@ -107,7 +107,7 @@ public class METSRightsCrosswalk
     }
 
     // Value of METSRights <Context> @CONTEXTCLASS attribute to use for DSpace Groups
-    private static final String GROUP_CONTEXTCLASS = "MANAGED_GRP";
+    private static final String GROUP_CONTEXTCLASS = "MANAGED GRP";
     // Value of METSRights <Context> @CONTEXTCLASS attribute to use for DSpace EPeople
     private static final String PERSON_CONTEXTCLASS = "ACADEMIC USER";
     // Value of METSRights <Context> @CONTEXTCLASS attribute to use for "Anonymous" DSpace Group
