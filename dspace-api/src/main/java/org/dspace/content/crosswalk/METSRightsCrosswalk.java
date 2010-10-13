@@ -192,12 +192,6 @@ public class METSRightsCrosswalk
            Group group = policy.getGroup();
            EPerson person = policy.getEPerson();
 
-
-           //if(isSpecialGroup(group))
-           //    {
-           //        disseminateMembers(rightsContext)
-           //    }
-
            // Create our <Context> node for this policy
            Element rightsContext = new Element("Context", METSRights_NS);
            rightsMD.addContent(rightsContext);
@@ -235,7 +229,7 @@ public class METSRightsCrosswalk
                   }
                   catch(PackageException pe)
                   {
-                      //A PackageException will only be thrown if crosswalkDefaultGroupName() fails
+                      //A PackageException will only be thrown if translateGroupNameForExport() fails
                       //We'll just wrap it as a CrosswalkException and throw it upwards
                       throw new CrosswalkException(pe);
                   }
