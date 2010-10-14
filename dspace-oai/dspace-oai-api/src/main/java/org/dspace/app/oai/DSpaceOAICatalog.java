@@ -96,7 +96,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             + ConfigurationManager.getProperty("dspace.hostname") + ":";
 
     /** Maximum number of records returned by one request */
-    private final int MAX_RECORDS = 100;
+    private final int MAX_RECORDS = ConfigurationManager.getIntProperty("oai.response.max-records", 100);
 
     public DSpaceOAICatalog(Properties properties)
     {

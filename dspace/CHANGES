@@ -42,6 +42,9 @@
 - [DS-698] Clear primary_bitstream_id references when deleting a bitstream
 - [DS-696] Reduce cost of browse index pruning
 
+(Ben Bosman)
+- [DS-703] Making the OAI max amount of records configurable
+
 1.6.2
 =====
 
