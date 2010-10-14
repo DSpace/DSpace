@@ -3,3 +3,6 @@ User-agent: *
 # Uncomment the following line ONLY if sitemaps.org or HTML sitemaps are used
 # and you have verified that your site is being indexed correctly.
 # Disallow: /browse
+Disallow: /browse
+Disallow: /items-by-author
+Disallow: /handle/*/*/browse
