@@ -52,9 +52,6 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
 import org.apache.log4j.Category;
 import org.apache.log4j.Logger;
 import org.apache.log4j.helpers.OptionConverter;
@@ -358,7 +355,7 @@ public class ConfigurationManager
      * 
      * @return an enumeration of all the keys in the DSpace configuration
      */
-    public static Enumeration propertyNames()
+    public static Enumeration<?> propertyNames()
     {
         if (properties == null)
             loadConfig(null);
@@ -622,7 +619,7 @@ public class ConfigurationManager
                 info("Loading provided config file: " + configFile);
                 
                 loadedFile = new File(configFile);
-                url = loadedFile.toURL();
+                url = loadedFile.toURI().toURL();
                 
             }
             // Has the default configuration location been overridden?
@@ -632,7 +629,7 @@ public class ConfigurationManager
                 
                 // Load the overriding configuration
                 loadedFile = new File(configProperty);
-                url = loadedFile.toURL();
+                url = loadedFile.toURI().toURL();
             }
             // Load configuration from default location
             else
@@ -658,7 +655,7 @@ public class ConfigurationManager
                 properties.load(is);
 
                 // walk values, interpolating any embedded references.
-                for (Enumeration pe = properties.propertyNames(); pe.hasMoreElements(); )
+                for (Enumeration<?> pe = properties.propertyNames(); pe.hasMoreElements(); )
                 {
                     String key = (String)pe.nextElement();
                     String value = interpolate(key, 1);
@@ -773,9 +770,10 @@ public class ConfigurationManager
                 if(logConfigFile.exists())
                 {
                     info("Loading: " + dsLogConfiguration);
-                    
-                    OptionConverter.selectAndConfigure(logConfigFile.toURL(), null,
-                            org.apache.log4j.LogManager.getLoggerRepository());
+
+                    OptionConverter.selectAndConfigure(logConfigFile.toURI()
+                            .toURL(), null, org.apache.log4j.LogManager
+                            .getLoggerRepository());
                 }
                 else
                 {
@@ -937,7 +935,7 @@ public class ConfigurationManager
      */
     private static boolean isLog4jConfigured()
     {
-        Enumeration en = org.apache.log4j.LogManager.getRootLogger()
+        Enumeration<?> en = org.apache.log4j.LogManager.getRootLogger()
                 .getAllAppenders();
 
         if (!(en instanceof org.apache.log4j.helpers.NullEnumeration))
@@ -946,7 +944,7 @@ public class ConfigurationManager
         }
         else
         {
-            Enumeration cats = Category.getCurrentCategories();
+            Enumeration<?> cats = Category.getCurrentCategories();
             while (cats.hasMoreElements())
             {
                 Category c = (Category) cats.nextElement();
