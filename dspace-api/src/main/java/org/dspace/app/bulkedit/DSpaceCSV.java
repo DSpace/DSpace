@@ -41,6 +41,7 @@ package org.dspace.app.bulkedit;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -100,10 +101,11 @@ public class DSpaceCSV
      * Create a new instance, reading the lines in from file
      *
      * @param f The file to read from
+     * @param c The DSpace Context
      *
      * @throws Exception thrown if there is an error reading or processing the file
      */
-    public DSpaceCSV(File f) throws Exception
+    public DSpaceCSV(File f, Context c) throws Exception
     {
         // Initalise the class
         init();
@@ -122,8 +124,39 @@ public class DSpaceCSV
                 element = element.substring(1, element.length() - 1);
             }
 
-            if (!"id".equals(element))
+            // Store the heading
+            if ("collection".equals(element))
             {
+                // Store the heading
+                headings.add(element);
+            }
+            else if (!"id".equals(element))
+            {
+                // Verify that the heading is valid in the metadata registry
+                String[] clean = element.split("\\[");
+                String[] parts = clean[0].split("\\.");
+                String metadataSchema = parts[0];
+                String metadataElement = parts[1];
+                String metadataQualifier = null;
+                if (parts.length > 2) {
+                    metadataQualifier = parts[2];
+                }
+
+                // Check that the scheme exists
+                MetadataSchema foundSchema = MetadataSchema.find(c, metadataSchema);
+                if (foundSchema == null) {
+                    throw new MetadataImportInvalidHeadingException(clean[0],
+                                                                    MetadataImportInvalidHeadingException.SCHEMA);
+                }
+
+                // Check that the metadata element exists in the schema
+                int schemaID = foundSchema.getSchemaID();
+        	    MetadataField foundField = MetadataField.findByElement(c, schemaID, metadataElement, metadataQualifier);
+                if (foundField == null) {
+                    throw new MetadataImportInvalidHeadingException(clean[0],
+                                                                    MetadataImportInvalidHeadingException.ELEMENT);
+                }
+
                 // Store the heading
                 headings.add(element);
             }
@@ -169,8 +202,8 @@ public class DSpaceCSV
         if ((toIgnore == null) || ("".equals(toIgnore.trim())))
         {
             // Set a default value
-            toIgnore = "dc.date.accession, dc.date.available, " +
-                       "dc.description.provenance";
+            toIgnore = "dc.date.accessioned, dc.date.available, " +
+                       "dc.date.updated, dc.description.provenance";
         }
         String[] toIgnoreArray = toIgnore.split(",");
         for (String toIgnoreString : toIgnoreArray)
@@ -287,7 +320,7 @@ public class DSpaceCSV
             // Get the key (schema.element)
             String key = value.schema + "." + value.element;
 
-            // Add the qualifer if there is one (schema.element.qualifier)
+            // Add the qualifier if there is one (schema.element.qualifier)
             if (value.qualifier != null)
             {
                 key = key + "." + value.qualifier;
@@ -550,13 +583,13 @@ public class DSpaceCSV
     public static void main(String[] args) throws Exception
     {
         // Test the CSV parsing
-        String[] csv = {"id,\"dc.title\",dc.contributor.author,dc.description.abstract",
-                        "1,Easy line,\"Lewis, Stuart\",A nice short abstract",
-                        "2,Two authors,\"Lewis, Stuart||Bloggs, Joe\",Two people wrote this item",
-                        "3,Three authors,\"Lewis, Stuart||Bloggs, Joe||Loaf, Meat\",Three people wrote this item",
-                        "4,\"Two line\ntitle\",\"Lewis, Stuart\",abstract",
-                        "5,\"\"\"Embedded quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\"",
-                        "6,\"\"\"Unbalanced embedded\"\" quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\"",};
+        String[] csv = {"id,collection,\"dc.title[en]\",dc.contributor.author,dc.description.abstract",
+                        "1,2,Easy line,\"Lewis, Stuart\",A nice short abstract",
+                        "2,2,Two authors,\"Lewis, Stuart||Bloggs, Joe\",Two people wrote this item",
+                        "3,2,Three authors,\"Lewis, Stuart||Bloggs, Joe||Loaf, Meat\",Three people wrote this item",
+                        "4,2,\"Two line\ntitle\",\"Lewis, Stuart\",abstract",
+                        "5,2,\"\"\"Embedded quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\"",
+                        "6,2,\"\"\"Unbalanced embedded\"\" quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\"",};
 
         // Write the string to a file
         String filename = "test.csv";
@@ -570,12 +603,42 @@ public class DSpaceCSV
         out.close();
         System.gc();
 
-        // test the CSV parsing
-        DSpaceCSV dcsv = new DSpaceCSV(new File(filename));
+        // Test the CSV parsing
+        Context c = new Context();
+        DSpaceCSV dcsv = new DSpaceCSV(new File(filename), c);
         String[] lines = dcsv.getCSVLinesAsStringArray();
         for (String line : lines)
         {
             System.out.println(line);          
+        }
+
+        // Test the CSV parsing with a bad heading value
+        String[] csv2 = {"id,collection,\"dc.title[en]\",dc.contributor.foobar[en-US],dc.description.abstract",
+                         "1,2,Easy line,\"Lewis, Stuart\",A nice short abstract",
+                         "2,2,Two authors,\"Lewis, Stuart||Bloggs, Joe\",Two people wrote this item",
+                         "3,2,Three authors,\"Lewis, Stuart||Bloggs, Joe||Loaf, Meat\",Three people wrote this item",
+                         "4,2,\"Two line\ntitle\",\"Lewis, Stuart\",abstract",
+                         "5,2,\"\"\"Embedded quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\"",
+                         "6,2,\"\"\"Unbalanced embedded\"\" quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\"",};
+
+        // Write the string to a file
+        filename = "test.csv";
+        out = new BufferedWriter(
+                 new OutputStreamWriter(
+                 new FileOutputStream(filename), "UTF-8"));
+        for (String csvLine : csv2) {
+            out.write(csvLine + "\n");
+        }
+        out.flush();
+        out.close();
+        System.gc();
+
+        // Test the CSV parsing
+        dcsv = new DSpaceCSV(new File(filename), c);
+        lines = dcsv.getCSVLinesAsStringArray();
+        for (String line : lines)
+        {
+            System.out.println(line);
         }
 
         // Delete the test file

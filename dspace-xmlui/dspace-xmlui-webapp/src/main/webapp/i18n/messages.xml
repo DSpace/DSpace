@@ -1371,42 +1371,44 @@
 	<message key="xmlui.administrative.item.FindItemForm.identifier_error">Unable to resolve identifier.</message>
 	<message key="xmlui.administrative.item.FindItemForm.find">Find</message>
 
-        <!-- org.dspace.app.xmlui.administrative.metadataimport -->
-        <message key="xmlui.administrative.metadataimport.general.title">Import Metadata</message>
-        <message key="xmlui.administrative.metadataimport.general.head1">Import Metadata</message>
-        <message key="xmlui.administrative.metadataimport.general.trail">Import Metadata</message>
-        <message key="xmlui.administrative.metadataimport.general.changes">changes</message>
-        <message key="xmlui.administrative.metadataimport.general.no_changes">No changes were detected</message>
-        <message key="xmlui.administrative.metadataimport.general.new_item">New item</message>
-        <message key="xmlui.administrative.metadataimport.flow.upload_successful">Upload successful</message>
-        <message key="xmlui.administrative.metadataimport.flow.upload_failed">Upload failed</message>
-        <message key="xmlui.administrative.metadataimport.flow.import_successful">Import successful</message>
-        <message key="xmlui.administrative.metadataimport.flow.import_failed">Import failed</message>
-        <message key="xmlui.administrative.metadataimport.flow.over_limit">Number of changes exceeds maximum allowed. Limit changes or alter bulkedit.gui-item-limit in dspace.cfg</message>
+    <!-- org.dspace.app.xmlui.administrative.metadataimport -->
+    <message key="xmlui.administrative.metadataimport.general.title">Import Metadata</message>
+    <message key="xmlui.administrative.metadataimport.general.head1">Import Metadata</message>
+    <message key="xmlui.administrative.metadataimport.general.trail">Import Metadata</message>
+    <message key="xmlui.administrative.metadataimport.general.changes">changes</message>
+    <message key="xmlui.administrative.metadataimport.general.no_changes">No changes were detected</message>
+    <message key="xmlui.administrative.metadataimport.general.new_item">New item</message>
+    <message key="xmlui.administrative.metadataimport.flow.upload_successful">Upload successful</message>
+    <message key="xmlui.administrative.metadataimport.flow.upload_failed">Upload failed</message>
+    <message key="xmlui.administrative.metadataimport.flow.upload_badschema">Unknown metadata schema in heading</message>
+    <message key="xmlui.administrative.metadataimport.flow.upload_badelement">Unknown metadata element in heading</message>
+    <message key="xmlui.administrative.metadataimport.flow.import_successful">Import successful</message>
+    <message key="xmlui.administrative.metadataimport.flow.import_failed">Import failed</message>
+    <message key="xmlui.administrative.metadataimport.flow.over_limit">Number of changes exceeds maximum allowed. Limit changes or alter bulkedit.gui-item-limit in dspace.cfg</message>
 
-        <!-- org.dspace.app.xmlui.administrative.metadataimport.MetadataImportConfirm -->
-        <message key="xmlui.administrative.metadataimport.MetadataImportMain.submit_upload">Upload CSV</message>
+    <!-- org.dspace.app.xmlui.administrative.metadataimport.MetadataImportConfirm -->
+    <message key="xmlui.administrative.metadataimport.MetadataImportMain.submit_upload">Upload CSV</message>
 
-        <!-- org.dspace.app.xmlui.administrative.metadataimport.MetadataImportConfirm -->
-        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.success">Successfully processed</message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.changes_committed">Changes applied to item</message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.item_added">Added: </message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.item_removed">Removed: </message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_newowner">Added to owning collection</message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_oldowner">Removed from owning collection</message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_mapped">Mapped to collection</message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_unmapped">Unmapped from collection</message>
-        
-        <!-- org.dspace.app.xmlui.administrative.metadataimport.MetadataImportUpload -->
-        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.item_add">Add: </message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.item_remove">Remove: </message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.collection_newowner">Add to owning collection</message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.collection_oldowner">Remove from owning collection</message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.collection_mapped">Map to collection</message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.collection_unmapped">Un-map from collection</message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.changes_pending">Changes pending for item</message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.submit_confirm">Apply changes</message>
-        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.hint">Pending changes are listed below for review</message>
+    <!-- org.dspace.app.xmlui.administrative.metadataimport.MetadataImportConfirm -->
+    <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.success">Successfully processed</message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.changes_committed">Changes applied to item</message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.item_added">Added: </message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.item_removed">Removed: </message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_newowner">Added to owning collection</message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_oldowner">Removed from owning collection</message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_mapped">Mapped to collection</message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_unmapped">Unmapped from collection</message>
+
+    <!-- org.dspace.app.xmlui.administrative.metadataimport.MetadataImportUpload -->
+    <message key="xmlui.administrative.metadataimport.MetadataImportUpload.item_add">Add: </message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportUpload.item_remove">Remove: </message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportUpload.collection_newowner">Add to owning collection</message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportUpload.collection_oldowner">Remove from owning collection</message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportUpload.collection_mapped">Map to collection</message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportUpload.collection_unmapped">Un-map from collection</message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportUpload.changes_pending">Changes pending for item</message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportUpload.submit_confirm">Apply changes</message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportUpload.hint">Pending changes are listed below for review</message>
 
 	<!-- general mapper messages -->
 	<message key="xmlui.administrative.mapper.general.mapper_trail">Item mapper</message>

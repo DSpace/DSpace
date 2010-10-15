@@ -1,4 +1,5 @@
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="org.dspace.app.bulkedit.MetadataImportInvalidHeadingException" %>
 <%--
 - Version: $Revision$
 - Date: $Date$
@@ -45,11 +46,30 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%
-    String error = (String)request.getAttribute("error");
-    if (error == null)
+    // Get the error message
+    String error = (String)request.getAttribute("message");
+
+    // Is it a bad metadata element in the header?
+    String badheader = (String)request.getAttribute("badheading");
+    if (badheader != null)
+    {
+        if (badheader.equals("" + MetadataImportInvalidHeadingException.SCHEMA))
+        {
+            error = LocaleSupport.getLocalizedMessage(pageContext, "jsp.dspace-admin.metadataimport.badheadingschema") +
+                    ": " + error;
+        }
+        else
+        {
+            error = LocaleSupport.getLocalizedMessage(pageContext, "jsp.dspace-admin.metadataimport.badheadingelement") +
+                    ": " + error;
+        }
+    }
+    else if (error == null)
     {
         error = LocaleSupport.getLocalizedMessage(pageContext, "jsp.dspace-admin.metadataimport.unknownerror");
     }
+
+
 %>
 
 <dspace:layout titlekey="jsp.dspace-admin.metadataimport.title"

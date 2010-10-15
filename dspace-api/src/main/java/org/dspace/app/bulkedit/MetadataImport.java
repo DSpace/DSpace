@@ -1026,7 +1026,7 @@ public class MetadataImport
         DSpaceCSV csv;
         try
         {
-            csv = new DSpaceCSV(new File(filename));
+            csv = new DSpaceCSV(new File(filename), c);
         }
         catch (Exception e)
         {

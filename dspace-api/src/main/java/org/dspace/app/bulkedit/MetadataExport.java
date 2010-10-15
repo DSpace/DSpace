@@ -83,7 +83,7 @@ public class MetadataExport
     }
 
     /**
-     * Method to export a community (and sub-communites and collections)
+     * Method to export a community (and sub-communities and collections)
      *
      * @param c The Context
      * @param toExport The Community to export
@@ -111,7 +111,7 @@ public class MetadataExport
      * Build an array list of item ids that are in a community (include sub-communities and collections)
      *
      * @param community The community to build from
-     * @param itemIDs The itemID (used for recuriosn - use an empty ArrayList)
+     * @param itemIDs The itemID (used for recursion - use an empty ArrayList)
      * @param indent How many spaces to use when writing out the names of items added
      * @return The list of item ids
      * @throws SQLException

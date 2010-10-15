@@ -47,6 +47,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.bulkedit.MetadataImportInvalidHeadingException;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.bulkedit.MetadataImport;
@@ -105,7 +106,7 @@ public class MetadataImportServlet extends DSpaceServlet
                 // Get the changes
                 log.info(LogManager.getHeader(context, "metadataimport", "loading file"));
                 ArrayList<BulkEditChange> changes = processUpload(context, request);
-                log.debug(LogManager.getHeader(context, "metadataimport", changes.size() + " items with changes identifed"));                
+                log.debug(LogManager.getHeader(context, "metadataimport", changes.size() + " items with changes identified"));                
 
                 // Were there any changes detected?
                 if (changes.size() != 0)
@@ -134,10 +135,16 @@ public class MetadataImportServlet extends DSpaceServlet
                     JSPManager.showJSP(request, response, "/dspace-admin/metadataimport.jsp");
                 }
             }
+            catch (MetadataImportInvalidHeadingException mihe) {
+                request.setAttribute("message", mihe.getBadHeader());
+                request.setAttribute("badheading", mihe.getType());
+                log.info(LogManager.getHeader(context, "metadataimport", "Error encountered while looking for changes: " + mihe.getMessage()));                
+                JSPManager.showJSP(request, response, "/dspace-admin/metadataimport-error.jsp");
+            }
             catch (Exception e)
             {
                 request.setAttribute("message", e.getMessage());
-                log.debug(LogManager.getHeader(context, "metadataimport", "Error encountered while looking for changes: " + e.getMessage()));                
+                log.info(LogManager.getHeader(context, "metadataimport", "Error encountered while looking for changes: " + e.getMessage()));                
                 JSPManager.showJSP(request, response, "/dspace-admin/metadataimport-error.jsp");
             }
         }
@@ -226,7 +233,7 @@ public class MetadataImportServlet extends DSpaceServlet
         File f = wrapper.getFile("file");
 
         // Run the import
-        DSpaceCSV csv = new DSpaceCSV(f);
+        DSpaceCSV csv = new DSpaceCSV(f, context);
         MetadataImport mImport = new MetadataImport(context, csv.getCSVLines());
         ArrayList<BulkEditChange> changes = mImport.runImport(false, false, false, false);
 
