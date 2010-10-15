@@ -281,8 +281,8 @@ public class ConfigurationManager
             fatal("Can't load configuration", e);
 
             // FIXME: Maybe something more graceful here, but with the
-           // configuration we can't do anything
-            System.exit(1);
+            // configuration we can't do anything
+            throw new RuntimeException("Failed to read default license.");
         }
         finally
         {
