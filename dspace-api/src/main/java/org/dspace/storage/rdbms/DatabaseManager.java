@@ -1820,7 +1820,7 @@ public class DatabaseManager
             System.exit(1);
         }
 
-        System.out.println("Connected succesfully!\n");
+        System.out.println("Connected successfully!\n");
     }
 
 }
