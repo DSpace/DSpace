@@ -280,17 +280,17 @@
             
             <!-- Add a google analytics script if the key is present -->
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">
-                                <script type="text/javascript">
-                                        <xsl:text>var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");</xsl:text>
-                                        <xsl:text>document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));</xsl:text>
-                                </script>
+                <script type="text/javascript"><xsl:text>
+                       var _gaq = _gaq || [];
+                       _gaq.push(['_setAccount', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>']);
+                       _gaq.push(['_trackPageview']);
 
-                                <script type="text/javascript">
-                                        <xsl:text>try {</xsl:text>
-                                                <xsl:text>var pageTracker = _gat._getTracker("</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>");</xsl:text>
-                                                <xsl:text>pageTracker._trackPageview();</xsl:text>
-                                        <xsl:text>} catch(err) {}</xsl:text>
-                                </script>
+                       (function() {
+                           var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                           ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                           var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                       })();
+               </xsl:text></script>
             </xsl:if>
             
             
