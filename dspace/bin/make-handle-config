@@ -50,12 +50,12 @@ BINDIR=`dirname $0`
 echo "Writing simple Handle server configuration"
 
 # Read parameters from DSpace config
-dshostname=`$BINDIR/dsrun org.dspace.core.ConfigurationManager -property dspace.hostname`
-dsname=`$BINDIR/dsrun org.dspace.core.ConfigurationManager -property dspace.name`
-handle=`$BINDIR/dsrun org.dspace.core.ConfigurationManager -property handle.prefix`
-handledir=`$BINDIR/dsrun org.dspace.core.ConfigurationManager -property handle.dir`
+dshostname=`$BINDIR/dspace dsprop -property dspace.hostname`
+dsname=`$BINDIR/dspace dsprop -property dspace.name`
+handle=`$BINDIR/dspace dsprop -property handle.prefix`
+handledir=`$BINDIR/dspace dsprop -property handle.dir`
 tempfile=/tmp/handleconfig$$
-contactemail=`$BINDIR/dsrun org.dspace.core.ConfigurationManager -property mail.admin`
+contactemail=`$BINDIR/dspace dsprop -property mail.admin`
 
 # Write the options to a file we can pipe into the setup tool
 echo "1" >$tempfile   # 1 = non-caching server, 2 = caching server
@@ -78,7 +78,7 @@ echo "n" >>$tempfile  # Do not encrypt admin private key
                       # OR do not overwrite old admin private key
 
 # Now run Handle server config tool, and pipe our config in
-$BINDIR/dsrun net.handle.server.SimpleSetup $handledir < $tempfile >/dev/null
+$BINDIR/dspace dsrun net.handle.server.SimpleSetup $handledir < $tempfile >/dev/null
 
 # Remove temp file
 rm -f $tempfile

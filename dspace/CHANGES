@@ -38,6 +38,7 @@
 (Stuart Lewis)
 - [DS-467] Consider making the JSPUI styles.css.jsp a static file
 - [DS-632] Batch Metadata Import needs to validate metadata fields specified in CSVs
+- [DS-646] Remove /bin scripts (replaced by 'dspace' command)
 
 [Graham Triggs]
 - [DS-698] Clear primary_bitstream_id references when deleting a bitstream

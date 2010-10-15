@@ -63,7 +63,6 @@ public class ScriptLauncher
      * Execute the DSpace script launcher
      *
      * @param args Any parameters required to be passed to the scripts it executes
-     * @throws Exception
      */
     public static void main(String[] args)
     {
@@ -113,7 +112,21 @@ public class ScriptLauncher
                 {
                     // Instantiate the class
                     Class target = null;
-                    String className = step.getChild("class").getValue();
+
+                    // Is it the special case 'dsrun' where the user provides the class name?
+                    String className;
+                    if ("dsrun".equals(request))
+                    {
+                        if (args.length < 2)
+                        {
+                            System.err.println("Error in launcher.xml: Missing class name");
+                            System.exit(1);
+                        }
+                        className = args[1];
+                    }
+                    else {
+                        className = step.getChild("class").getValue();
+                    }
                     try
                     {
                         target = Class.forName(className,
@@ -136,16 +149,20 @@ public class ScriptLauncher
                     {
                         passargs = false;
                     }
-                    if ((args.length == 1) || (!passargs))
+                    if ((args.length == 1) || (("dsrun".equals(request)) && (args.length == 2)) || (!passargs))
                     {
                         useargs = new String[0];
                     }
                     else
                     {
-                        String[] argsnew = new String[useargs.length - 1];
-                        for (int i = 1; i < useargs.length; i++)
+                        // The number of arguments to ignore
+                        // If dsrun is the command, ignore the next, as it is the class name not an arg
+                        int x = 1;
+                        if ("dsrun".equals(request)) x = 2;
+                        String[] argsnew = new String[useargs.length - x];
+                        for (int i = x; i < useargs.length; i++)
                         {
-                            argsnew[i - 1] = useargs[i];
+                            argsnew[i - x] = useargs[i];
                         }
                         useargs = argsnew;
                     }
@@ -176,7 +193,7 @@ public class ScriptLauncher
                     // Establish a request related to the current session
                     // that will trigger the various request listeners
                     requestService.startRequest();
-                    
+
                     // Run the main() method
                     try
                     {
@@ -189,33 +206,31 @@ public class ScriptLauncher
                             System.out.print(" " + param);
                         }
                         System.out.println("");**/
-                        
+
                         Method main = target.getMethod("main", argTypes);
                         Object output = main.invoke(null, arguments);
 
                         // ensure we close out the request (happy request)
                         requestService.endRequest(null);
-                       
-                        
                     }
                     catch (Exception e)
                     {
                         // Failure occurred in the request so we destroy it
                         requestService.endRequest(e);
-                        
+
                     	if (kernelImpl != null)
                         {
                             kernelImpl.destroy();
                             kernelImpl = null;
                         }
-                    	
+
                         // Exceptions from the script are reported as a 'cause'
                         Throwable cause = e.getCause();
                         System.err.println("Exception: " + cause.getMessage());
                         cause.printStackTrace();
                         System.exit(1);
                     }
-                    
+
                 }
 
                 // Destroy the service kernel
@@ -224,7 +239,8 @@ public class ScriptLauncher
                     kernelImpl.destroy();
                     kernelImpl = null;
                 }
-                
+
+                // Everything completed OK
                 System.exit(0);
             }
         }
@@ -235,7 +251,7 @@ public class ScriptLauncher
             kernelImpl.destroy();
             kernelImpl = null;
         }
-        
+
         // The command wasn't found
         System.err.println("Command not found: " + args[0]);
         display();
@@ -278,8 +294,8 @@ public class ScriptLauncher
         System.out.println("Usage: dspace [command-name] {parameters}");
         for (Element command : commands)
         {
-            System.out.println("  * " + command.getChild("name").getValue() +
-                               " : " + command.getChild("description").getValue());
+            System.out.println(" - " + command.getChild("name").getValue() +
+                               ": " + command.getChild("description").getValue());
         }
     }
 }

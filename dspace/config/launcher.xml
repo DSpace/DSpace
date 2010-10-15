@@ -50,6 +50,14 @@
     </command>
 
     <command>
+        <name>dsrun</name>
+        <description>Run a class directly</description>
+        <step>
+            <class>dsrun</class>
+        </step>
+    </command>
+
+    <command>
         <name>embargo-lifter</name>
         <description>Embargo manager tool used to check, list and lift embargoes</description>
         <step>
