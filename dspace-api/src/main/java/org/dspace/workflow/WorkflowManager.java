@@ -910,7 +910,7 @@ public class WorkflowManager
      * 
      * @param c
      *            Context
-     * @param epeople
+     * @param epa
      *            Eperson[] of recipients
      * @param email
      *            Email object containing the message
@@ -1012,7 +1012,7 @@ public class WorkflowManager
     {
         String submitter = e.getFullName();
 
-        submitter = submitter + "(" + e.getEmail() + ")";
+        submitter = submitter + " (" + e.getEmail() + ")";
 
         return submitter;
     }
