@@ -1,5 +1,8 @@
 1.7.0
 =====
+(Reinhard Engels)
+- [DS-637] Browse index bug/fix ONLY for authority index: first "too low" confidence value stop current item metadata to be indexed in the autority index
+
 (Hardy Pottinger)
 - [DS-691] File size math in the mets:file template in General-Hander.xsl (XMLUI) is incorrect
 

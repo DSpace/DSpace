@@ -445,9 +445,10 @@ public class IndexBrowse
                                         if (bis[i].isAuthorityIndex() && 
                                                 (values[x].authority == null || values[x].confidence < minConfidence))
                                         {
-                                            // if we have an authority index only authored metadata will go here!
-                                            log.debug("Skipping item="+item.getID()+", field="+values[x].schema+"."+values[x].element+"."+values[x].qualifier+", value="+values[x].value+", authority="+values[x].authority+", confidence="+values[x].confidence+" (BAD AUTHORITY)");
-                                            break;
+                                        	// skip to next value in this authority field if value is not authoritative
+                                            log.debug("Skipping non-authoritative value: "+item.getID()+", field="+values[x].schema+"."+values[x].element+"."+values[x].qualifier+", value="+values[x].value+", authority="+values[x].authority+", confidence="+values[x].confidence+" (BAD AUTHORITY)");
+                                            continue;
+
                                         }
                                         
                                         // is there any valid (with appropriate confidence) authority key?
