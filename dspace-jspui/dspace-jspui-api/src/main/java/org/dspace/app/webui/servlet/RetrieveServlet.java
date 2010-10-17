@@ -43,14 +43,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
+import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -71,6 +74,19 @@ public class RetrieveServlet extends DSpaceServlet
     /** log4j category */
     private static Logger log = Logger.getLogger(RetrieveServlet.class);
 
+    /**
+     * Threshold on Bitstream size before content-disposition will be set.
+     */
+    private int threshold;
+    
+    @Override
+	public void init(ServletConfig arg0) throws ServletException {
+
+		super.init(arg0);
+		threshold = ConfigurationManager
+				.getIntProperty("webui.content_disposition_threshold");
+	}
+    
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -135,6 +151,11 @@ public class RetrieveServlet extends DSpaceServlet
             // Response length
             response.setHeader("Content-Length", String.valueOf(bitstream
                     .getSize()));
+            
+    		if(threshold != -1 && bitstream.getSize() >= threshold)
+    		{
+    			UIUtil.setBitstreamDisposition(bitstream.getName(), request, response);
+    		}
 
             Utils.bufferedCopy(is, response.getOutputStream());
             is.close();

@@ -55,6 +55,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
+import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -90,11 +91,6 @@ public class BitstreamServlet extends DSpaceServlet
      */
     private int threshold;
     
-	/**
-	 * Pattern used to get file.ext from filename (which can be a path)
-	 */
-	private static Pattern p = Pattern.compile("[^/]*$");
-
     @Override
 	public void init(ServletConfig arg0) throws ServletException {
 
@@ -257,58 +253,11 @@ public class BitstreamServlet extends DSpaceServlet
 
 		if(threshold != -1 && bitstream.getSize() >= threshold)
 		{
-			setBitstreamDisposition(bitstream.getName(), request, response);
+			UIUtil.setBitstreamDisposition(bitstream.getName(), request, response);
 		}
 
         Utils.bufferedCopy(is, response.getOutputStream());
         is.close();
         response.getOutputStream().flush();
     }
-	
-	/**
-	 * Evaluate filename and client and encode appropriate disposition
-	 * 
-	 * @param uri
-	 * @param request
-	 * @param response
-	 * @throws UnsupportedEncodingException
-	 */
-	private void setBitstreamDisposition(String filename, HttpServletRequest request,
-			HttpServletResponse response)
-	{
-		
-		String name = filename;
-		
-		Matcher m = p.matcher(name);
-		
-		if (m.find() && !m.group().equals(""))
-		{
-			name = m.group();
-		}
-
-		try 
-		{
-			String agent = request.getHeader("USER-AGENT");
-
-			if (null != agent && -1 != agent.indexOf("MSIE")) 
-			{
-				name = URLEncoder.encode(name, "UTF8");
-			} 
-			else if (null != agent && -1 != agent.indexOf("Mozilla")) 
-			{
-				name = MimeUtility.encodeText(name, "UTF8", "B");
-			} 
-
-		} 
-		catch (UnsupportedEncodingException e) 
-		{
-			log.error(e.getMessage(),e);
-		}
-		finally
-		{
-			response.setHeader("Content-Disposition", "attachment;filename=" + name);
-		}
-		
-		
-	}
 }

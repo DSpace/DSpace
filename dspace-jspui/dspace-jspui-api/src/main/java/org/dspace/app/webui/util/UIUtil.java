@@ -41,12 +41,18 @@ package org.dspace.app.webui.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import javax.mail.internet.MimeUtility;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.jstl.core.Config;
 
@@ -73,6 +79,11 @@ public class UIUtil extends Util
 {
     /** log4j category */
     public static Logger log = Logger.getLogger(UIUtil.class);
+    
+    /**
+	 * Pattern used to get file.ext from filename (which can be a path)
+	 */
+	private static Pattern p = Pattern.compile("[^/]*$");
 
     /**
      * Obtain a new context object. If a context object has already been created
@@ -425,4 +436,49 @@ public class UIUtil extends Util
             log.warn("Unable to send email alert", e);
         }
     }
+    
+    /**
+	 * Evaluate filename and client and encode appropriate disposition
+	 * 
+	 * @param uri
+	 * @param request
+	 * @param response
+	 * @throws UnsupportedEncodingException
+	 */
+	public static void setBitstreamDisposition(String filename, HttpServletRequest request,
+			HttpServletResponse response)
+	{
+		
+		String name = filename;
+		
+		Matcher m = p.matcher(name);
+		
+		if (m.find() && !m.group().equals(""))
+		{
+			name = m.group();
+		}
+
+		try 
+		{
+			String agent = request.getHeader("USER-AGENT");
+
+			if (null != agent && -1 != agent.indexOf("MSIE")) 
+			{
+				name = URLEncoder.encode(name, "UTF8");
+			} 
+			else if (null != agent && -1 != agent.indexOf("Mozilla")) 
+			{
+				name = MimeUtility.encodeText(name, "UTF8", "B");
+			} 
+
+		} 
+		catch (UnsupportedEncodingException e) 
+		{
+			log.error(e.getMessage(),e);
+		}
+		finally
+		{
+			response.setHeader("Content-Disposition", "attachment;filename=" + name);
+		}
+	}
 }
