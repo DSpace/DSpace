@@ -59,10 +59,8 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
             Context context = ContextUtil.obtainContext(objectModel);
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
-            if (dso == null)
-            	return null;
-
-            boolean authorized = AuthorizeManager.authorizeActionBoolean(context, dso, action, false);
+            //We have always got rights to view stats on the home page (admin rights will be checked later)
+            boolean authorized = dso == null || AuthorizeManager.authorizeActionBoolean(context, dso, action, false);
             //If we are authorized check for any other authorization actions present
             if(authorized && ConfigurationManager.getBooleanProperty("statistics.item.authorization.admin"))
             {
