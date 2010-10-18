@@ -26,7 +26,7 @@
    <groupId>org.dspace.dependencies.solr</groupId>
    <artifactId>dspace-solr-parent</artifactId>
    <name>Apache Solr Parent POM</name>
-   <version>1.4.1.0-SNAPSHOT</version>
+   <version>1.4.1.0</version>
    <description>Apache Solr Parent POM</description>
    <url>http://lucene.apache.org/solr</url>
    <packaging>pom</packaging>
@@ -48,12 +48,12 @@
 
    <scm>
       <connection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-parent-1.4.1.0
     </connection>
       <developerConnection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-parent-1.4.1.0
     </developerConnection>
-     <url>http://svn.apache.org/viewvc/maven/pom/tags/apache-4/dspace-solr-parent</url>
+     <url>http://svn.apache.org/viewvc/maven/pom/tags/dspace-solr-parent-1.4.1.0</url>
   </scm>
 
    <!--
