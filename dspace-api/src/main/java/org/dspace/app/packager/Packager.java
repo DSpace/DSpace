@@ -182,7 +182,7 @@ public class Packager
                 "Submission package (Input); this is the default. ");
         options.addOption("i", "identifier", true, "Handle of object to disseminate.");
         options.addOption("a", "all", false, "also recursively ingest/disseminate any child packages, e.g. all Items within a Collection (not all packagers may support this option!)");
-        options.addOption("h", "help", false, "help");
+        options.addOption("h", "help", false, "help (you may also specify '-h -t [type]' for additional help with a specific type of packager)");
         options.addOption("u", "no-user-interaction", false, "Skips over all user interaction (i.e. [y/n] question prompts) within this script. This flag can be used if you want to save (pipe) a report of all changes to a file, and therefore need to bypass all user interaction.");
 
         CommandLineParser parser = new PosixParser();
@@ -202,16 +202,51 @@ public class Packager
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("Packager  [options]  package-file|-\n",
                     options);
-            System.out.println("\nAvailable Submission Package (SIP) types:");
-            String pn[] = PluginManager
-                    .getAllPluginNames(PackageIngester.class);
-            for (int i = 0; i < pn.length; ++i)
-                System.out.println("  " + pn[i]);
-            System.out
-                    .println("\nAvailable Dissemination Package (DIP) types:");
-            pn = PluginManager.getAllPluginNames(PackageDisseminator.class);
-            for (int i = 0; i < pn.length; ++i)
-                System.out.println("  " + pn[i]);
+            //If user specified a type, also print out the SIP and DIP options
+            // that are specific to that type of packager
+            if (line.hasOption('t'))
+            {
+                System.out.println("\n--------------------------------------------------------------");
+                System.out.println("Additional options for the " + line.getOptionValue('t') + " packager:");
+                System.out.println("--------------------------------------------------------------");
+                System.out.println("(These options may be specified using --option as described above)");
+
+                PackageIngester sip = (PackageIngester) PluginManager
+                    .getNamedPlugin(PackageIngester.class, line.getOptionValue('t'));
+
+                if (sip != null)
+                {
+                    System.out.println("\n\n" + line.getOptionValue('t') + " Submission (SIP) plugin options:\n");
+                    System.out.println(sip.getParameterHelp());
+                }
+                else
+                    System.out.println("\nNo valid Submission plugin found for " + line.getOptionValue('t') + " type.");
+
+                PackageDisseminator dip = (PackageDisseminator) PluginManager
+                    .getNamedPlugin(PackageDisseminator.class, line.getOptionValue('t'));
+
+                if (dip != null)
+                {
+                    System.out.println("\n\n" + line.getOptionValue('t') + " Dissemination (DIP) plugin options:\n");
+                    System.out.println(dip.getParameterHelp());
+                }
+                else
+                    System.out.println("\nNo valid Dissemination plugin found for " + line.getOptionValue('t') + " type.");
+
+            }
+            else  //otherwise, display list of valid packager types
+            {
+                System.out.println("\nAvailable Submission Package (SIP) types:");
+                String pn[] = PluginManager
+                        .getAllPluginNames(PackageIngester.class);
+                for (int i = 0; i < pn.length; ++i)
+                    System.out.println("  " + pn[i]);
+                System.out
+                        .println("\nAvailable Dissemination Package (DIP) types:");
+                pn = PluginManager.getAllPluginNames(PackageDisseminator.class);
+                for (int i = 0; i < pn.length; ++i)
+                    System.out.println("  " + pn[i]);
+            }
             System.exit(0);
         }
 

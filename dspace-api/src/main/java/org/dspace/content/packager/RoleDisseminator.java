@@ -577,4 +577,20 @@ public class RoleDisseminator implements PackageDisseminator
         return null;
     }
 
+    /**
+     * Returns a user help string which should describe the
+     * additional valid command-line options that this packager
+     * implementation will accept when using the <code>-o</code> or
+     * <code>--option</code> flags with the Packager script.
+     *
+     * @return a string describing additional command-line options available
+     * with this packager
+     */
+    @Override
+    public String getParameterHelp()
+    {
+        return  "* passwords=[boolean]      " +
+                   "If true, user password hashes are also exported (so that they can be later restored).  If false, user passwords are not exported. (Default is false)";
+    }
+
 }

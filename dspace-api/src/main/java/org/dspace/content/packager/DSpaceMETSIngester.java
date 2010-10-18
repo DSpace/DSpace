@@ -268,4 +268,25 @@ public class DSpaceMETSIngester
     {
         throw new UnsupportedOperationException("PDF package ingester does not implement probe()");
     }
+
+    /**
+     * Returns a user help string which should describe the
+     * additional valid command-line options that this packager
+     * implementation will accept when using the <code>-o</code> or
+     * <code>--option</code> flags with the Packager script.
+     *
+     * @return a string describing additional command-line options available
+     * with this packager
+     */
+    @Override
+    public String getParameterHelp()
+    {
+        String parentHelp = super.getParameterHelp();
+
+        //Return superclass help info, plus the extra parameter/option that this class supports
+        return parentHelp +
+                "\n\n" +
+                "* dmd=[dmdSecType]      " +
+                   "Type of the METS <dmdSec> which should be used for primary item metadata (defaults to MODS, then DC)";
+    }
 }

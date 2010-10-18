@@ -149,4 +149,17 @@ public interface PackageDisseminator
      * @return the MIME type (content-type header) of the package to be returned
      */
     String getMIMEType(PackageParameters params);
+
+
+     /**
+     * Returns a user help string which should describe the
+     * additional valid command-line options that this packager
+     * implementation will accept when using the <code>-o</code> or
+     * <code>--option</code> flags with the Packager script.
+     *
+     * @return a string describing additional command-line options available
+     * with this packager
+     */
+    String getParameterHelp();
+
 }

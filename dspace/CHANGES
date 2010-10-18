@@ -26,6 +26,7 @@
 (Tim Donohue)
 - [DS-648] Modern Browsers are not identified in XMLUI main sitemap.xmap
 - [DS-466] Add ability to export/import entire Community/Collection/Item structure (for easier backups, migrations, etc.)
+- [DS-387] Add ability for various Packager plugins to report their custom "options" via command line
 
 (Claudia Juergen)
 - [DS-569] Trailing white spaces lead to wrong order of texts in browse

@@ -381,6 +381,29 @@ public class DSpaceAIPIngester
         }
     }
 
+    /**
+     * Returns a user help string which should describe the
+     * additional valid command-line options that this packager
+     * implementation will accept when using the <code>-o</code> or
+     * <code>--option</code> flags with the Packager script.
+     *
+     * @return a string describing additional command-line options available
+     * with this packager
+     */
+    @Override
+    public String getParameterHelp()
+    {
+        String parentHelp = super.getParameterHelp();
 
+        //Return superclass help info, plus the extra parameters/options that this class supports
+        return parentHelp +
+                "\n\n" +
+                "* createMetadataFields=[boolean]      " +
+                   "If true, ingest attempts to create any missing metadata fields." +
+                   "If false, ingest will fail if a metadata field is encountered which doesn't already exist. (default = true)" +
+                "\n\n" +
+                "* dmd=[dmdSecType]      " +
+                   "Type of the METS <dmdSec> which should be used to restore item metadata (defaults to DIM, then MODS)";
+    }
 
 }

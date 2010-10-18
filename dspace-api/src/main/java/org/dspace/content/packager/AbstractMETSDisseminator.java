@@ -1324,6 +1324,27 @@ public abstract class AbstractMETSDisseminator
         return  "DSpace " + Constants.typeText[dso.getType()];
     }
 
+
+    /**
+     * Returns a user help string which should describe the
+     * additional valid command-line options that this packager
+     * implementation will accept when using the <code>-o</code> or
+     * <code>--option</code> flags with the Packager script.
+     *
+     * @return a string describing additional command-line options available
+     * with this packager
+     */
+    public String getParameterHelp()
+    {
+        return  "* manifestOnly=[boolean]      " +
+                   "If true, only export the METS manifest (mets.xml) and don't export content files (defaults to false)." +
+                "\n\n" +
+                "* unauthorized=[value]      " +
+                   "If 'skip', skip over any files which the user doesn't have authorization to read. " +
+                   "If 'zero', create a zero-length file for any files the user doesn't have authorization to read. " +
+                   "By default, an AuthorizationException will be thrown for any files the user cannot read.";
+    }
+
     /**
      * Return identifier for bitstream in an Item; when making a package,
      * this is the archive member name (e.g. in Zip file).  In a bare

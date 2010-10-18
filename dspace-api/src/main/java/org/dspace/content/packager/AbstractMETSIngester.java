@@ -1307,6 +1307,34 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         }
     }
 
+
+    /**
+     * Returns a user help string which should describe the
+     * additional valid command-line options that this packager
+     * implementation will accept when using the <code>-o</code> or
+     * <code>--option</code> flags with the Packager script.
+     *
+     * @return a string describing additional command-line options available
+     * with this packager
+     */
+    @Override
+    public String getParameterHelp()
+    {
+        return "* ignoreHandle=[boolean]      " +
+                   "If true, the ingester will ignore any Handle specified in the METS manifest itself, and instead create a new Handle during the ingest process (this is the default when running in Submit mode, using the -s flag). " +
+                   "If false, the ingester attempts to restore the Handles specified in the METS manifest (this is the default when running in Restore/replace mode, using the -r flag). " +
+               "\n\n" +
+               "* ignoreParent=[boolean]      " +
+                   "If true, the ingester will ignore any Parent object specified in the METS manifest itself, and instead ingest under a new Parent object (this is the default when running in Submit mode, using the -s flag). The new Parent object must be specified via the -p flag. " +
+                   "If false, the ingester attempts to restore the object directly under its old Parent (this is the default when running in Restore/replace mode, using the -r flag). " +
+               "\n\n" +
+               "* manifestOnly=[boolean]      " +
+                   "Specify true if the ingest package consists of just a METS manifest (mets.xml), without any content files (defaults to false)." +
+               "\n\n" +
+               "* validate=[boolean]      " +
+                   "If true, enable XML validation of METS file using schemas in document (default is true).";
+    }
+
     /**
      * Profile-specific tests to validate manifest. The implementation can
      * access the METS document through the <code>manifest</code> variable, an
