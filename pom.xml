@@ -26,7 +26,7 @@
    <groupId>org.dspace.dependencies.solr</groupId>
    <artifactId>dspace-solr-parent</artifactId>
    <name>Apache Solr Parent POM</name>
-   <version>1.4.0.2-SNAPSHOT</version>
+   <version>1.4.1.0-SNAPSHOT</version>
    <description>Apache Solr Parent POM</description>
    <url>http://lucene.apache.org/solr</url>
    <packaging>pom</packaging>
@@ -78,11 +78,6 @@
 
 
    <modules>
-      <module>common</module>
-      <module>solrj</module>
-      <module>core</module>
-      <module>server</module>
-      <module>contrib</module>
       <module>webapp</module>
    </modules>
 

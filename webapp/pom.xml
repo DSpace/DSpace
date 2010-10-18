@@ -20,13 +20,13 @@
    <parent>
       <groupId>org.dspace.dependencies.solr</groupId>
       <artifactId>dspace-solr-parent</artifactId>
-      <version>1.4.0.2-SNAPSHOT</version>
+      <version>1.4.1.0-SNAPSHOT</version>
    </parent>
 
    <groupId>org.dspace.dependencies.solr</groupId>
    <artifactId>dspace-solr-webapp</artifactId>
    <name>Apache Solr Webapp</name>
-   <version>1.4.0.2-SNAPSHOT</version>
+   <version>1.4.1.0-SNAPSHOT</version>
    <description>Apache Solr Server</description>
    <packaging>war</packaging>
 
@@ -121,47 +121,34 @@
    </build>
    <dependencies>
       <dependency>
-         <groupId>org.dspace.dependencies.solr</groupId>
-         <artifactId>dspace-solr-solrj</artifactId>
-         <version>1.4.0.2-SNAPSHOT</version>
+         <groupId>org.apache.solr</groupId>
+         <artifactId>solr-solrj</artifactId>
+         <version>1.4.1</version>
       </dependency>
       <dependency>
-         <groupId>org.dspace.dependencies.solr</groupId>
-         <artifactId>dspace-solr-core</artifactId>
-         <version>1.4.0.2-SNAPSHOT</version>
+         <groupId>org.apache.solr</groupId>
+         <artifactId>solr-core</artifactId>
+         <version>1.4.1</version>
       </dependency>
       <dependency>
-         <groupId>org.dspace.dependencies.solr</groupId>
-         <artifactId>dspace-solr-server</artifactId>
-         <version>1.4.0.2-SNAPSHOT</version>
+         <groupId>org.apache.solr</groupId>
+         <artifactId>solr-clustering</artifactId>
+         <version>1.4.1</version>
       </dependency>
       <dependency>
-         <groupId>org.dspace.dependencies.solr</groupId>
-         <artifactId>dspace-solr-clustering</artifactId>
-         <version>1.4.0.2-SNAPSHOT</version>
+         <groupId>org.apache.solr</groupId>
+         <artifactId>solr-dataimporthandler</artifactId>
+         <version>1.4.1</version>
       </dependency>
       <dependency>
-         <groupId>org.dspace.dependencies.solr</groupId>
-         <artifactId>dspace-solr-dataimporthandler</artifactId>
-         <version>1.4.0.2-SNAPSHOT</version>
-         <type>war</type>
+         <groupId>org.apache.solr</groupId>
+         <artifactId>solr-cell</artifactId>
+         <version>1.4.1</version>
       </dependency>
       <dependency>
-         <groupId>org.dspace.dependencies.solr</groupId>
-         <artifactId>dspace-solr-dataimporthandler</artifactId>
-         <version>1.4.0.2-SNAPSHOT</version>
-         <classifier>classes</classifier>
-         <type>jar</type>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace.dependencies.solr</groupId>
-         <artifactId>dspace-solr-cell</artifactId>
-         <version>1.4.0.2-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace.dependencies.solr</groupId>
-         <artifactId>dspace-solr-velocity</artifactId>
-         <version>1.4.0.2-SNAPSHOT</version>
+         <groupId>org.apache.solr</groupId>
+         <artifactId>solr-velocity</artifactId>
+         <version>1.4.1</version>
       </dependency>
       <dependency>
          <groupId>org.mortbay.jetty</groupId>
