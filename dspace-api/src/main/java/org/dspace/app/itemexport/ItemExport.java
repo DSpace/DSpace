@@ -840,7 +840,8 @@ public class ItemExport
 
         // before we create a new export archive lets delete the 'expired'
         // archives
-        deleteOldExportArchives(eperson.getID());
+        //deleteOldExportArchives(eperson.getID());
+        deleteOldExportArchives();
 
         // keep track of the commulative size of all bitstreams in each of the
         // items
@@ -1292,6 +1293,48 @@ public class ItemExport
         }
 
     }
+
+    /**
+     * A clean up method that is ran before a new export archive is created. It
+     * uses the config file entry 'org.dspace.app.itemexport.life.span.hours' to
+     * determine if the current exports are too old and need purgeing
+     * Removes all old exports, not just those for the person doing the export.
+     *
+     * @throws Exception
+     */
+    public static void deleteOldExportArchives() throws Exception
+    {
+        int hours = ConfigurationManager.getIntProperty("org.dspace.app.itemexport.life.span.hours");
+        Calendar now = Calendar.getInstance();
+        now.setTime(new Date());
+        now.add(Calendar.HOUR, (-hours));
+        File downloadDir = new File(ConfigurationManager.getProperty("org.dspace.app.itemexport.download.dir"));
+        if (downloadDir.exists())
+        {
+            // Get a list of all the sub-directories, potentially one for each ePerson.
+            File[] dirs = downloadDir.listFiles();
+            for (File dir : dirs)
+            {
+                // For each sub-directory delete any old files.
+                File[] files = dir.listFiles();
+                for (File file : files)
+                {
+                    if (file.lastModified() < now.getTimeInMillis())
+                    {
+                        file.delete();
+                    }
+                }
+
+                // If the directory is now empty then we delete it too.
+                if (dir.listFiles().length == 0)
+                {
+                    dir.delete();
+                }
+            }
+        }
+
+    }
+
 
     /**
      * Since the archive is created in a new thread we are unable to communicate

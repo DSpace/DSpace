@@ -126,12 +126,7 @@ public class ItemExport extends AbstractDSpaceTransformer implements
 		this.objectModel = objectModel;
 		this.request = ObjectModelHelper.getRequest(objectModel);
 		this.response = ObjectModelHelper.getResponse(objectModel);
-		try {
-			availableExports = org.dspace.app.itemexport.ItemExport
-					.getExportsAvailable(context.getCurrentUser());
-		} catch (Exception e) {
-			// nothing to do
-		}
+
 		errors = new ArrayList<Message>();
 		if (request.getParameter("itemID") != null) {
 			Item item = null;
@@ -196,6 +191,13 @@ public class ItemExport extends AbstractDSpaceTransformer implements
 			}
 			if (errors.size() <= 0)
 				message = T_community_export_success;
+		}
+        
+        try {
+			availableExports = org.dspace.app.itemexport.ItemExport
+					.getExportsAvailable(context.getCurrentUser());
+		} catch (Exception e) {
+			// nothing to do
 		}
 	}
 
