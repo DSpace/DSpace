@@ -52,6 +52,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.handle.HandleManager;
 
 
 /**
@@ -162,13 +163,14 @@ public class DSpaceObjectManager implements ObjectManager
 			
 		return null;
 	}
-	
-	/**
-	 * Return a globably unique identifier for the repository. For dspace, we use the handle prefix.
-	 */
+
+    /**
+     * Return a globally unique identifier for the repository. For dspace, we
+     * use the handle prefix.
+     */
 	public String getRepositoryIdentifier(Object object) throws WingException
 	{
-		return ConfigurationManager.getProperty("handle.prefix");
+		return HandleManager.getPrefix();
 	}
 	
 	/**
@@ -186,7 +188,7 @@ public class DSpaceObjectManager implements ObjectManager
 	 */
 	public HashMap<String,String> getAllManagedRepositories() throws WingException
 	{
-		String handlePrefix = ConfigurationManager.getProperty("handle.prefix");
+		String handlePrefix = HandleManager.getPrefix();
 		
 		HashMap<String,String> allRepositories = new HashMap<String,String>();
 		allRepositories.put(handlePrefix, "/metadata/internal/repository/"+handlePrefix +"/mets.xml");

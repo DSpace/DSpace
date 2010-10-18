@@ -50,11 +50,12 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
 
 /**
  * This is an an adapter which translates a DSpace repository into a METS 
- * document. Unfortunitaly there is no real definition of what this is. So
+ * document. Unfortunately there is no real definition of what this is. So
  * we just kind of made it up based upon what we saw for the item profile.
  * 
  * The basic structure is simply two parts, the descriptive metadata and a 
@@ -72,7 +73,7 @@ public class RepositoryAdapter extends AbstractAdapter
     public static Namespace MODS = new Namespace(MODS_URI);
 
 	
-    /** A space seperated list of descriptive metadata sections */
+    /** A space separated list of descriptive metadata sections */
     private String dmdSecIDS;
     
     /** Dspace context to be able to look up additional objects */
@@ -108,7 +109,7 @@ public class RepositoryAdapter extends AbstractAdapter
      */
     protected String getMETSID()
     {
-        return ConfigurationManager.getProperty("handle.prefix");
+        return HandleManager.getPrefix();
     }
     
 	/**
@@ -223,7 +224,7 @@ public class RepositoryAdapter extends AbstractAdapter
 		attributes.put("mdschema","dspace");
 		attributes.put("element", "handle");
 		startElement(DIM,"field",attributes);
-		sendCharacters(ConfigurationManager.getProperty("handle.prefix"));
+		sendCharacters(HandleManager.getPrefix());
 		endElement(DIM,"field");
 		
 		// Entry for default.language
@@ -249,7 +250,7 @@ public class RepositoryAdapter extends AbstractAdapter
     }
 
     /**
-     * Render the repository's structure map. This map will include a refrence to
+     * Render the repository's structure map. This map will include a reference to
      * all the community and collection objects showing how they are related to
      * one another. 
      */
@@ -291,14 +292,14 @@ public class RepositoryAdapter extends AbstractAdapter
      * 
      * 
      * 
-     * private helpfull methods
+     * private helpful methods
      * 
      * 
      * 
      */
 
     /**
-     * Recursively the DSpace hirearchy rendering each container and subcontainers.
+     * Recursively the DSpace hierarchy rendering each container and subcontainers.
      *
      * @param dso
      *            The DSpace Object to be rendered.
@@ -328,7 +329,7 @@ public class RepositoryAdapter extends AbstractAdapter
         endElement(METS,"mptr");
         
         // Recurse to insure that our children are also included even if this
-        // node allready existed in the div structure.
+        // node already existed in the div structure.
         if (dso instanceof Community)
         {
         	for (DSpaceObject child : ((Community)dso).getCollections())

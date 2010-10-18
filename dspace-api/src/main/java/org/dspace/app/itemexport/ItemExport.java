@@ -513,7 +513,7 @@ public class ItemExport
                      (dcv.element.equals("date") && qualifier.equals("available")) ||
                      (dcv.element.equals("identifier") && qualifier.equals("uri") &&
                       (dcv.value.startsWith("http://hdl.handle.net/" +
-                       ConfigurationManager.getProperty("handle.prefix") + "/"))) ||
+                       HandleManager.getPrefix() + "/"))) ||
                      (dcv.element.equals("description") && qualifier.equals("provenance")) ||
                      (dcv.element.equals("format") && qualifier.equals("extent")) ||
                      (dcv.element.equals("format") && qualifier.equals("mimetype")))))
@@ -521,7 +521,7 @@ public class ItemExport
                     out.write(utf8, 0, utf8.length);
                 }
 
-                // Store the date issued and assection to see if they are different
+                // Store the date issued and accession to see if they are different
                 // because we need to keep date.issued if they are, when migrating
                 if ((dcv.element.equals("date") && qualifier.equals("issued")))
                 {

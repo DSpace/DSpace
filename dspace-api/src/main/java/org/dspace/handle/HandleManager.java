@@ -72,6 +72,9 @@ public class HandleManager
     /** log4j category */
     private static Logger log = Logger.getLogger(HandleManager.class);
 
+    /** Prefix registered to no one */
+    static final String EXAMPLE_PREFIX = "123456789";
+
     /** Private Constructor */
     private HandleManager()
     {
@@ -150,6 +153,7 @@ public class HandleManager
     //    {
     //        return "http://hdl.handle.net/" + handle;
     //    }
+
     /**
      * Creates a new handle in the database.
      * 
@@ -400,12 +404,12 @@ public class HandleManager
      * @exception SQLException
      *                If a database error occurs
      */
-    static List getHandlesForPrefix(Context context, String prefix)
+    static List<String> getHandlesForPrefix(Context context, String prefix)
             throws SQLException
     {
         String sql = "SELECT handle FROM handle WHERE handle LIKE ? ";
         TableRowIterator iterator = DatabaseManager.queryTable(context, null, sql, prefix+"%");
-        List results = new ArrayList();
+        List<String> results = new ArrayList<String>();
 
         try
         {
@@ -423,6 +427,21 @@ public class HandleManager
         }
 
         return results;
+    }
+
+    /**
+     * Get the configured Handle prefix string, or a default
+     * @return configured prefix or "123456789"
+     */
+    public static String getPrefix()
+    {
+        String prefix = ConfigurationManager.getProperty("handle.prefix");
+        if (null == prefix)
+        {
+            prefix = EXAMPLE_PREFIX; // XXX no good way to exit cleanly
+            log.error("handle.prefix is not configured; using " + prefix);
+        }
+        return prefix;
     }
 
     ////////////////////////////////////////
@@ -484,7 +503,7 @@ public class HandleManager
      */
     private static String createId(int id) throws SQLException
     {
-        String handlePrefix = ConfigurationManager.getProperty("handle.prefix");
+        String handlePrefix = getPrefix();
 
         return new StringBuffer().append(handlePrefix).append(
                 handlePrefix.endsWith("/") ? "" : "/").append(id).toString();

@@ -37,19 +37,14 @@
  */
 package org.dspace.content;
 
-import java.sql.SQLException;
-import java.net.URI;
 import java.io.IOException;
+import java.sql.SQLException;
 
-
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
-import org.dspace.event.Event;
-import org.dspace.authorize.AuthorizeException;
+import org.dspace.handle.HandleManager;
 
 /**
  * Represents the root of the DSpace Archive.
@@ -103,13 +98,13 @@ public class Site extends DSpaceObject
     public static String getSiteHandle()
     {
         if (handle == null)
-            handle = ConfigurationManager.getProperty("handle.prefix")+"/"+
+            handle = HandleManager.getPrefix()+"/"+
                 String.valueOf(SITE_ID);
         return handle;
     }
 
     /**
-     * Get Site object corresponding to db id (which is ignroed).
+     * Get Site object corresponding to db id (which is ignored).
      * @param context the context.
      * @param id integer database id, ignored.
      * @return Site object.

@@ -356,10 +356,9 @@ public class HandlePlugin implements HandleStorage
         // resolvable.
         if (ConfigurationManager.getBooleanProperty("handle.plugin.checknameauthority",true))
         {
-	        // First, construct a string representating the naming authority Handle
+	        // First, construct a string representing the naming authority Handle
 	        // we'd expect.
-	        String expected = "0.NA/"
-	                + ConfigurationManager.getProperty("handle.prefix");
+	        String expected = "0.NA/" + HandleManager.getPrefix();
 	
 	        // Which authority does the request pertain to?
 	        String received = Util.decodeString(theHandle);
