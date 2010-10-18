@@ -54,6 +54,7 @@
 (Ben Bosman)
 - [DS-703] Making the OAI max amount of records configurable
 - [DS-603] Including a most used item list on the home page
+- [DS-615] Optimize solr performance with solr.optimize and autocommit
 
 1.6.2
 =====

@@ -189,7 +189,7 @@ Common usage:
     <!-- in the target directory, the new file is suffixed wth *.new   -->
     <!-- and should be hand updated afterward                .          -->
     <!-- ============================================================= -->
-    <target name="update_configs" depends="overwrite_configs" description="Updates the Configuration Directory">
+    <target name="update_configs" depends="overwrite_configs,overwrite_solr_configs" description="Updates the Configuration Directory">
     	<antcall target="init_geolite" />
     </target>
         
@@ -350,6 +350,155 @@ Common usage:
         -->
         <copy todir="config-temp" preservelastmodified="true" overwrite="true" failonerror="false">
             <fileset dir="config" excludes="dspace.cfg" />
+            <filterchain>
+                <expandproperties />
+            </filterchain>
+        </copy>
+
+    </target>
+
+    <target name="overwrite_solr_configs" description="Overwrites a configuration directory." if="overwrite" depends="copy_solr_configs_keep">
+
+        <!--
+        Copy files that are absent in target
+        -->
+        <copy todir="${dspace.dir}/solr/statistics/conf" preservelastmodified="true">
+            <fileset dir="solr-config-temp/statistics/conf" includes="**/*">
+                <present present="srconly" targetdir="${dspace.dir}/solr/statistics/conf" />
+            </fileset>
+        </copy>
+
+        <!--
+        Copy files that are different in target to *.old suffix
+        -->
+        <copy todir="${dspace.dir}/solr/statistics/conf" preservelastmodified="true" overwrite="true">
+                <fileset dir="${dspace.dir}/solr/statistics/conf">
+                   <and>
+                    <different targetdir="solr-config-temp/statistics/conf" ignoreFileTimes="true" />
+                    <present present="both" targetdir="solr-config-temp/statistics/conf" />
+                   </and>
+                    <type type="file" />
+                </fileset>
+            <globmapper from="*" to="*-${build.date}.old" />
+        </copy>
+
+        <!--
+        Force overwrite of whats left
+        -->
+        <copy todir="${dspace.dir}/solr/statistics/conf" preservelastmodified="true" overwrite="true">
+            <fileset dir="solr-config-temp/statistics/conf">
+                <different targetdir="${dspace.dir}/solr/statistics/conf" ignoreFileTimes="true" />
+                <type type="file" />
+            </fileset>
+        </copy>
+
+        <!--
+        Remove the work directory
+        -->
+        <delete dir="solr-config-temp" />
+
+        <echo>
+====================================================================
+ The DSpace configuration has been updated.
+
+ During the upgrade process the build has attempted to overwrite the
+ previous configuration while preserving your previous changes in files
+ suffixed "*.old"
+
+ To complete installation, you should do the following:
+
+ * Check that you've properly merged any differences in the following files:
+
+        </echo>
+
+        <fileset dir="${dspace.dir}/solr/statistics/conf" id="config.files">
+              <include name="**/*.old"/>
+        </fileset>
+
+        <pathconvert pathsep="${line.separator}" property="configfiles" refid="config.files"/>
+
+        <echo>${configfiles}</echo>
+
+        <echo>
+
+  * To properly merge your previous configuration files, its
+    best to try to take the newer version and copy your
+    previous changes into it.
+====================================================================
+        </echo>
+
+    </target>
+
+    <target name="copy_solr_configs_keep" unless="overwrite" depends="prepare_solr_configs">
+
+        <!--
+        Copy files that are absent in target
+        -->
+        <copy todir="${dspace.dir}/solr/statistics/conf" preservelastmodified="true">
+            <fileset dir="solr-config-temp/statistics/conf" includes="**/*">
+                <present present="srconly" targetdir="${dspace.dir}/solr/statistics/conf" />
+            </fileset>
+        </copy>
+
+        <!--
+        Copy files that are different to target to *.new suffix
+        -->
+        <copy todir="${dspace.dir}/solr/statistics/conf" preservelastmodified="true">
+            <fileset dir="solr-config-temp/statistics/conf">
+                <different targetdir="${dspace.dir}/solr/statistics/conf" ignoreFileTimes="true" />
+                <type type="file" />
+            </fileset>
+            <globmapper from="*" to="*.new" />
+        </copy>
+
+        <!--
+            Remove the work directory
+            -->
+        <delete dir="solr-config-temp" />
+
+        <echo>
+====================================================================
+ The DSpace configuration has been updated.
+
+ During the upgrade process the build has preserved your original
+ configuration and placed any conflicting new files next to your
+ original suffixed with the "*.new" extension.
+
+ To complete installation, you should do the following:
+
+ * Check that you've properly merged any differences in the following files:
+
+        </echo>
+
+        <fileset dir="${dspace.dir}/solr/statistics/conf" id="config.files">
+              <include name="**/*.new"/>
+        </fileset>
+
+        <pathconvert pathsep="${line.separator}" property="configfiles" refid="config.files"/>
+
+        <echo>${configfiles}</echo>
+
+        <echo>
+
+  * To properly merge your previous configuration files, its
+    best to try to take the newer version and copy your
+    previous changes into it. Delete the old and remove the
+    ".new" suffix from the new file.
+
+====================================================================
+        </echo>
+
+    </target>
+
+    <target name="prepare_solr_configs" description="Prepares solr configuration directory.">
+
+        <mkdir dir="solr-config-temp" />
+
+        <!--
+        Prepare properly filtered files
+        -->
+        <copy todir="solr-config-temp" preservelastmodified="true" overwrite="true" failonerror="false">
+            <fileset dir="solr" />
             <filterchain>
                 <expandproperties />
             </filterchain>
