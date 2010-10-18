@@ -1,0 +1,285 @@
+<!--
+  utils.xsl
+
+  Version: $Revision: 3705 $
+
+  Date: $Date: 2009-04-11 17:02:24 +0000 (Sat, 11 Apr 2009) $
+
+  Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+  Institute of Technology.  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+
+  - Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+
+  - Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+
+  - Neither the name of the Hewlett-Packard Company nor the name of the
+  Massachusetts Institute of Technology nor the names of their
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+  DAMAGE.
+-->
+
+<!--
+    These templates are devoted to handling the
+    referenceSet and reference elements.
+
+    Author: art.lowel at atmire.com
+    Author: lieven.droogmans at atmire.com
+    Author: ben at atmire.com
+    Author: Alexey Maslov
+
+-->
+
+<xsl:stylesheet xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+	xmlns:dri="http://di.tamu.edu/DRI/1.0/"
+	xmlns:mets="http://www.loc.gov/METS/"
+	xmlns:xlink="http://www.w3.org/TR/xlink/"
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+	xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
+	xmlns:xhtml="http://www.w3.org/1999/xhtml"
+	xmlns:mods="http://www.loc.gov/mods/v3"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns="http://www.w3.org/1999/xhtml"
+	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
+
+    <xsl:output indent="yes"/>
+
+<!-- These templates are devoted to handling the referenceSet and reference elements. Although they are considered
+    structural elements, neither of the two contains actual content. Instead, references contain references
+    to object metadata under objectMeta, while referenceSets group references together.
+-->
+
+
+    <!-- Starting off easy here, with a summaryList -->
+
+    <!-- Current issues:
+
+        1. There is no check for the repository identifier. Need to fix that by concatenating it with the
+            object identifier and using the resulting string as the key on items and reps.
+        2. The use of a key index across the object store is cryptic and counterintuitive and most likely
+            could benefit from better documentation.
+    -->
+
+    <!-- When you come to an referenceSet you have to make a decision. Since it contains objects, and each
+        object is its own entity (and handled in its own template) the decision of the overall structure
+        would logically (and traditionally) lie with this template. However, to accomplish this we would
+        have to look ahead and check what objects are included in the set, which involves resolving the
+        references ahead of time and getting the information from their METS profiles directly.
+
+        Since this approach creates strong coupling between the set and the objects it contains, and we
+        have tried to avoid that, we use the "pioneer" method. -->
+
+    <!-- Summarylist case. This template used to apply templates to the "pioneer" object (the first object
+        in the set) and let it figure out what to do. This is no longer the case, as everything has been
+        moved to the list model. A special theme, called TableTheme, has beeen created for the purpose of
+        preserving the pioneer model. -->
+    <xsl:template match="dri:referenceSet[@type = 'summaryList']" priority="2">
+        <xsl:apply-templates select="dri:head"/>
+        <!-- Here we decide whether we have a hierarchical list or a flat one -->
+        <xsl:choose>
+            <xsl:when test="descendant-or-self::dri:referenceSet/@rend='hierarchy' or ancestor::dri:referenceSet/@rend='hierarchy'">
+                <ul>
+                    <xsl:apply-templates select="*[not(name()='head')]" mode="summaryList"/>
+                </ul>
+            </xsl:when>
+            <xsl:otherwise>
+                <ul class="ds-artifact-list">
+                    <xsl:apply-templates select="*[not(name()='head')]" mode="summaryList"/>
+                </ul>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <!-- First, the detail list case -->
+    <xsl:template match="dri:referenceSet[@type = 'detailList']" priority="2">
+        <xsl:apply-templates select="dri:head"/>
+        <ul class="ds-referenceSet-list">
+            <xsl:apply-templates select="*[not(name()='head')]" mode="detailList"/>
+        </ul>
+    </xsl:template>
+
+
+    <!-- Next up is the summary view case that at this point applies only to items, since communities and
+        collections do not have two separate views. -->
+    <xsl:template match="dri:referenceSet[@type = 'summaryView']" priority="2">
+        <xsl:apply-templates select="dri:head"/>
+        <xsl:apply-templates select="*[not(name()='head')]" mode="summaryView"/>
+    </xsl:template>
+
+    <!-- Finally, we have the detailed view case that is applicable to items, communities and collections.
+        In DRI it constitutes a standard view of collections/communities and a complete metadata listing
+        view of items. -->
+    <xsl:template match="dri:referenceSet[@type = 'detailView']" priority="2">
+        <xsl:apply-templates select="dri:head"/>
+        <xsl:apply-templates select="*[not(name()='head')]" mode="detailView"/>
+    </xsl:template>
+
+
+
+
+
+    <!-- The following options can be appended to the external metadata URL to request specific
+        sections of the METS document:
+
+        sections:
+
+        A comma seperated list of METS sections to included. The possible values are: "metsHdr", "dmdSec",
+        "amdSec", "fileSec", "structMap", "structLink", "behaviorSec", and "extraSec". If no list is provided then *ALL*
+        sections are rendered.
+
+
+        dmdTypes:
+
+        A comma seperated list of metadata formats to provide as descriptive metadata. The list of avaialable metadata
+        types is defined in the dspace.cfg, disseminationcrosswalks. If no formats are provided them DIM - DSpace
+        Intermediate Format - is used.
+
+
+        amdTypes:
+
+        A comma seperated list of metadata formats to provide administative metadata. DSpace does not currently
+        support this type of metadata.
+
+
+        fileGrpTypes:
+
+        A comma seperated list of file groups to render. For DSpace a bundle is translated into a METS fileGrp, so
+        possible values are "THUMBNAIL","CONTENT", "METADATA", etc... If no list is provided then all groups are
+        rendered.
+
+
+        structTypes:
+
+        A comma seperated list of structure types to render. For DSpace there is only one structType: LOGICAL. If this
+        is provided then the logical structType will be rendered, otherwise none will. The default operation is to
+        render all structure types.
+    -->
+
+    <!-- Then we resolve the reference tag to an external mets object -->
+    <xsl:template match="dri:reference" mode="summaryList">
+        <xsl:variable name="externalMetadataURL">
+            <xsl:text>cocoon:/</xsl:text>
+            <xsl:value-of select="@url"/>
+            <!-- Since this is a summary only grab the descriptive metadata, and the thumbnails -->
+            <xsl:text>?sections=dmdSec,fileSec&amp;fileGrpTypes=THUMBNAIL</xsl:text>
+            <!-- An example of requesting a specific metadata standard (MODS and QDC crosswalks only work for items)->
+            <xsl:if test="@type='DSpace Item'">
+                <xsl:text>&amp;dmdTypes=DC</xsl:text>
+            </xsl:if>-->
+        </xsl:variable>
+        <xsl:comment> External Metadata URL: <xsl:value-of select="$externalMetadataURL"/> </xsl:comment>
+        <li>
+            <xsl:attribute name="class">
+                <xsl:text>ds-artifact-item </xsl:text>
+                <xsl:choose>
+                    <xsl:when test="position() mod 2 = 0">even</xsl:when>
+                    <xsl:otherwise>odd</xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>
+            <xsl:apply-templates select="document($externalMetadataURL)" mode="summaryList"/>
+            <xsl:apply-templates />
+        </li>
+    </xsl:template>
+
+    <xsl:template match="dri:reference" mode="detailList">
+        <xsl:variable name="externalMetadataURL">
+            <xsl:text>cocoon:/</xsl:text>
+            <xsl:value-of select="@url"/>
+            <!-- No options selected, render the full METS document -->
+        </xsl:variable>
+        <xsl:comment> External Metadata URL: <xsl:value-of select="$externalMetadataURL"/> </xsl:comment>
+        <li>
+            <xsl:apply-templates select="document($externalMetadataURL)" mode="detailList"/>
+            <xsl:apply-templates />
+        </li>
+    </xsl:template>
+
+    <xsl:template match="dri:reference" mode="summaryView">
+        <xsl:variable name="externalMetadataURL">
+            <xsl:text>cocoon:/</xsl:text>
+            <xsl:value-of select="@url"/>
+            <!-- No options selected, render the full METS document -->
+        </xsl:variable>
+        <xsl:comment> External Metadata URL: <xsl:value-of select="$externalMetadataURL"/> </xsl:comment>
+        <xsl:apply-templates select="document($externalMetadataURL)" mode="summaryView"/>
+        <xsl:apply-templates />
+    </xsl:template>
+
+    <xsl:template match="dri:reference" mode="detailView">
+        <xsl:variable name="externalMetadataURL">
+            <xsl:text>cocoon:/</xsl:text>
+            <xsl:value-of select="@url"/>
+            <!-- No options selected, render the full METS document -->
+        </xsl:variable>
+        <xsl:comment> External Metadata URL: <xsl:value-of select="$externalMetadataURL"/> </xsl:comment>
+        <xsl:apply-templates select="document($externalMetadataURL)" mode="detailView"/>
+        <xsl:apply-templates />
+    </xsl:template>
+
+
+
+
+
+    <!-- The standard attributes template -->
+    <!-- TODO: should probably be moved up some, since it is commonly called -->
+    <xsl:template name="standardAttributes">
+        <xsl:param name="class"/>
+        <xsl:if test="@id">
+            <xsl:attribute name="id"><xsl:value-of select="translate(@id,'.','_')"/></xsl:attribute>
+        </xsl:if>
+        <xsl:attribute name="class">
+            <xsl:value-of select="normalize-space($class)"/>
+            <xsl:if test="@rend">
+                <xsl:text> </xsl:text>
+                <xsl:value-of select="@rend"/>
+            </xsl:if>
+        </xsl:attribute>
+
+    </xsl:template>
+
+    <!-- templates for required textarea attributes used if not found in DRI document -->
+    <xsl:template name="textAreaCols">
+      <xsl:attribute name="cols">20</xsl:attribute>
+    </xsl:template>
+
+    <xsl:template name="textAreaRows">
+      <xsl:attribute name="rows">5</xsl:attribute>
+    </xsl:template>
+
+
+
+    <!-- This does it for all the DRI elements. The only thing left to do is to handle Cocoon's i18n
+        transformer tags that are used for text translation. The templates below simply push through
+        the i18n elements so that they can translated after the XSL step. -->
+    <xsl:template match="i18n:text">
+        <xsl:copy-of select="."/>
+    </xsl:template>
+
+    <xsl:template match="i18n:translate">
+        <xsl:copy-of select="."/>
+    </xsl:template>
+
+    <xsl:template match="i18n:param">
+        <xsl:copy-of select="."/>
+    </xsl:template>
+
+</xsl:stylesheet>

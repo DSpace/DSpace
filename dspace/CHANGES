@@ -55,6 +55,7 @@
 - [DS-703] Making the OAI max amount of records configurable
 - [DS-603] Including a most used item list on the home page
 - [DS-615] Optimize solr performance with solr.optimize and autocommit
+- [DS-706] Alternative to dri2xhtml, with the goal to be more developer-friendly
 
 1.6.2
 =====
