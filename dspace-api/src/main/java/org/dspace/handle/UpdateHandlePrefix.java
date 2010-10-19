@@ -47,7 +47,7 @@ import org.dspace.search.DSIndexer;
 import org.dspace.browse.IndexBrowse;
 
 /**
- * A sciprt to update the handle values in the database. This is typically used
+ * A script to update the handle values in the database. This is typically used
  * when moving from a test machine (handle = 123456789) to a production service.
  *
  * @author Stuart Lewis

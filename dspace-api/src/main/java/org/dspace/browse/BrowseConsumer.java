@@ -126,7 +126,7 @@ public class BrowseConsumer implements Consumer
             }
             break;
         default:
-            log.debug("consume() ingnoring event: " + event.toString());
+            log.debug("consume() ignoring event: " + event.toString());
         }
         
     }

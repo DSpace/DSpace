@@ -78,7 +78,6 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.harvest.OAIHarvester.HarvestingException;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.IngestionCrosswalk;
 import org.dspace.core.ConfigurationManager;
@@ -105,7 +104,7 @@ import ORG.oclc.oai.harvester2.verb.ListSets;
 
 
 /**
- * This class handles OAI harvesting of externaly located records into this repository. 
+ * This class handles OAI harvesting of externally located records into this repository. 
  * 
  * @author Alexey Maslov
  */
@@ -138,9 +137,9 @@ public class OAIHarvester {
 	Context ourContext;
     
     // Namespace used by the ORE serialization format
-    // Set in dspace.cfg as harvester.oai.oreSerializationFormat.{ORESeialKey} = {ORESeialNS}
-    private Namespace ORESeialNS;
-    private String ORESeialKey;
+    // Set in dspace.cfg as harvester.oai.oreSerializationFormat.{ORESerialKey} = {ORESerialNS}
+    private Namespace ORESerialNS;
+    private String ORESerialKey;
     
     // Namespace of the descriptive metadata that should be harvested in addition to the ORE
     // Set in dspace.cfg as harvester.oai.metadataformats.{MetadataKey} = {MetadataNS},{Display Name}
@@ -170,11 +169,11 @@ public class OAIHarvester {
 		Namespace ORESerializationNamespace = OAIHarvester.getORENamespace();
 		
         if (ORESerializationNamespace == null) {
-        	log.error("No ORE serialization namespace declared; see dspace.cfg option \"harvester.oai.oreSerializationFormat.{ORESeialKey} = {ORESeialNS}\"");
+        	log.error("No ORE serialization namespace declared; see dspace.cfg option \"harvester.oai.oreSerializationFormat.{ORESerialKey} = {ORESerialNS}\"");
         	throw new HarvestingException("No ORE serialization namespace specified");
         } else {
-        	ORESeialNS = Namespace.getNamespace(ORESerializationNamespace.getURI());
-        	ORESeialKey = ORESerializationNamespace.getPrefix();
+        	ORESerialNS = Namespace.getNamespace(ORESerializationNamespace.getURI());
+        	ORESerialKey = ORESerializationNamespace.getPrefix();
         }
         
         // Set the metadata options
@@ -285,7 +284,7 @@ public class OAIHarvester {
 	    		toDate = toDate.substring(0, dateGranularity.length());
 	    		
 	    		descMDPrefix = OAIResolveNamespaceToPrefix(oaiSource, metadataNS.getURI());
-	    		OREPrefix = OAIResolveNamespaceToPrefix(oaiSource, ORESeialNS.getURI());
+	    		OREPrefix = OAIResolveNamespaceToPrefix(oaiSource, ORESerialNS.getURI());
 	    	}
 	    	catch (FileNotFoundException fe) {
 	    		log.error("The OAI server did not respond.");
@@ -300,7 +299,7 @@ public class OAIHarvester {
 				throw new HarvestingException("The OAI server does not support this metadata format: " + metadataNS.getURI());
 			}
 			if (OREPrefix == null && harvestRow.getHarvestType() != HarvestedCollection.TYPE_DMD) {
-				throw new HarvestingException("The OAI server does not support ORE dissemination in the configured serialization format: " + ORESeialNS.getURI());
+				throw new HarvestingException("The OAI server does not support ORE dissemination in the configured serialization format: " + ORESerialNS.getURI());
 			}
 			
 			Document oaiResponse = null;
@@ -461,7 +460,7 @@ public class OAIHarvester {
     	Element oreREM = null;
     	if (harvestRow.getHarvestType() > 1) {
     		oreREM = getMDrecord(harvestRow.getOaiSource(), itemOaiID, OREPrefix).get(0);
-    		ORExwalk = (IngestionCrosswalk)PluginManager.getNamedPlugin(IngestionCrosswalk.class, this.ORESeialKey);
+    		ORExwalk = (IngestionCrosswalk)PluginManager.getNamedPlugin(IngestionCrosswalk.class, this.ORESerialKey);
     	}
     	
     	// Ignore authorization

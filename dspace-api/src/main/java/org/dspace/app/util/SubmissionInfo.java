@@ -477,7 +477,7 @@ public class SubmissionInfo
      * @param subInfo
      *            the SubmissionInfo object we are loading into
      * @param forceReload
-     *            If true, this method reloads from stratch (and overwrites
+     *            If true, this method reloads from scratch (and overwrites
      *            cached progress bar info)
      * 
      */
@@ -618,7 +618,7 @@ public class SubmissionInfo
      * @param subInfo
      *            the SubmissionInfo object we are loading into
      * @param forceReload
-     *            If true, this method reloads from stratch (and overwrites
+     *            If true, this method reloads from scratch (and overwrites
      *            cached SubmissionConfig)
      * 
      */

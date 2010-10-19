@@ -124,7 +124,7 @@ public interface Report
      *
      * @param   explanation     the explanatory or clarification text for the stats
      *
-     * @return      a string contianing the formatted explanation
+     * @return      a string containing the formatted explanation
      */
     abstract public String blockExplanation(String explanation);
     

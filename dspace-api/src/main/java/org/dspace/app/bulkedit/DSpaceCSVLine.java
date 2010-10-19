@@ -63,7 +63,7 @@ public class DSpaceCSVLine
      */
     public DSpaceCSVLine(int id)
     {
-        // Store the ID + separator, and initalise the hashtable
+        // Store the ID + separator, and initialise the hashtable
         this.id = id;
         items = new Hashtable<String, ArrayList>();
     }
@@ -73,7 +73,7 @@ public class DSpaceCSVLine
      */
     public DSpaceCSVLine()
     {
-        // Set the ID to be -1, and initalise the hashtable
+        // Set the ID to be -1, and initialise the hashtable
         this.id = -1;
         this.items = new Hashtable<String, ArrayList>();
     }

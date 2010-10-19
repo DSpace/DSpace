@@ -91,7 +91,7 @@ public interface EmbargoSetter
     /**
      * Check that embargo is properly set on Item.  For example: no read access
      * to bitstreams.  It is expected to report any noteworthy
-     * discrepencies by writing on the stream System.err, although
+     * discrepancies by writing on the stream System.err, although
      * logging is also encouraged.  Only report conditions that
      * constitute a risk of exposing Bitstreams that should be under
      * embargo -- e.g. readable Bitstreams or ORIGINAL bundles.  A

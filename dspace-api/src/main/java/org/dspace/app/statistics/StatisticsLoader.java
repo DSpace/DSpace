@@ -200,7 +200,7 @@ public class StatisticsLoader
     }
 
     /**
-     * Syncronize the cached list of analysis / report files with the reports directory
+     * Synchronize the cached list of analysis / report files with the reports directory
      *
      * We synchronize if:
      *
@@ -233,7 +233,7 @@ public class StatisticsLoader
             fileList = StatisticsLoader.getAnalysisAndReportFileList();
         }
 
-        // Create new maps for the monthly analyis / reports
+        // Create new maps for the monthly analysis / reports
         Map<String, StatsFile> newMonthlyAnalysis = new HashMap<String, StatsFile>();
         Map<String, StatsFile> newMonthlyReports  = new HashMap<String, StatsFile>();
 

@@ -1,5 +1,5 @@
 /*
- * DailyFileApender.java
+ * DailyFileAppender.java
  *
  * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
@@ -219,7 +219,7 @@ public class DailyFileAppender extends FileAppender
  * Helpers
  *----------------------------------------------------------------------------*/
     /**
-     * The helper function to vaildate the DatePattern.
+     * The helper function to validate the DatePattern.
      * @param pstrPattern The DatePattern to be validated.
      * @return The validated date pattern or defautlt DATE_PATTERN
      */

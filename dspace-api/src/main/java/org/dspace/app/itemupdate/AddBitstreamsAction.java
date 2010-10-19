@@ -210,7 +210,7 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
 				}
 	        }
 	        
-	        if (alterProvenance && !targetBundle.getName().equals("THUMBMNAIL") 
+	        if (alterProvenance && !targetBundle.getName().equals("THUMBNAIL") 
 	        		&& !targetBundle.getName().equals("TEXT"))
 	        {
 	        	DtoMetadata dtom = DtoMetadata.create("dc.description.provenance", "en", "");

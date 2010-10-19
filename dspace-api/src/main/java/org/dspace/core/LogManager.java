@@ -93,7 +93,7 @@ public class LogManager
     
     
     /**
-     * If any string within the log line contains a field seperator (:) they need to be escaped so as the 
+     * If any string within the log line contains a field separator (:) they need to be escaped so as the 
      * line may be parsed and analysed later. This method will escape a log field.
      * 
      * Single slashes and colons will be escaped so that colons no longer appear in the logs

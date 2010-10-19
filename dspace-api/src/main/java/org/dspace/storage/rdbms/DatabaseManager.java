@@ -777,15 +777,15 @@ public class DatabaseManager
         ColumnInfo pk = getPrimaryKeyColumnInfo(table);
         ColumnInfo[] info = getNonPrimaryKeyColumns(table);
 
-        String seperator = "";
+        String separator = "";
         for (int i = 0; i < info.length; i++)
         {
             // Only update this column if it has changed
             if (row.hasColumnChanged(info[i].getName()))
             {
-                sql.append(seperator).append(info[i].getName()).append(" = ?");
+                sql.append(separator).append(info[i].getName()).append(" = ?");
                 columns.add(info[i]);
-                seperator = ", ";
+                separator = ", ";
             }
         }
 

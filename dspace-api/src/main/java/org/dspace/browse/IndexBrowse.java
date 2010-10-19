@@ -838,7 +838,7 @@ public class IndexBrowse
                 String distinctComViewName = BrowseIndex.getTableName(i, true, false, false, true);
 
     			output.message("Checking for " + tableName);
-    			if (dao.testTableExistance(tableName))
+    			if (dao.testTableExistence(tableName))
     			{
                     output.message("...found");
                     
@@ -865,7 +865,7 @@ public class IndexBrowse
                 // done.  Therefore we use a blank context to make the requests,
                 // not caring if it gets aborted or not
                 output.message("Checking for " + distinctTableName);
-                if (!dao.testTableExistance(distinctTableName))
+                if (!dao.testTableExistence(distinctTableName))
     			{
                     if (i < bis.length || i < 10)
                     {
@@ -927,7 +927,7 @@ public class IndexBrowse
      */
     private void dropItemTables(BrowseIndex bix) throws BrowseException
     {
-        if (dao.testTableExistance(bix.getTableName()))
+        if (dao.testTableExistence(bix.getTableName()))
         {
             String tableName = bix.getTableName();
             String dropper = dao.dropIndexAndRelated(tableName, this.execute());

@@ -64,7 +64,7 @@ public class HarvestConsumer implements Consumer
     private static Logger log = Logger.getLogger(HarvestConsumer.class);
 
     /**
-     * Initalise the consumer
+     * Initialise the consumer
      *
      * @throws Exception
      */

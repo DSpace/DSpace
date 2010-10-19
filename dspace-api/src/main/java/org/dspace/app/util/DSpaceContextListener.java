@@ -105,7 +105,7 @@ public class DSpaceContextListener implements ServletContextListener
         // first check the local per webapp parameter, then check the global parameter.
         dspaceConfig = event.getServletContext().getInitParameter(DSPACE_CONFIG_PARAMETER);
         
-        // Finaly, if no config parameter found throw an error
+        // Finally, if no config parameter found throw an error
         if (dspaceConfig == null || "".equals(dspaceConfig))
         {
             throw new RuntimeException(

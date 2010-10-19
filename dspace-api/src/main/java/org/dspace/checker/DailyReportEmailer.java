@@ -63,7 +63,7 @@ import org.dspace.core.ConfigurationManager;
 /**
  * <p>
  * The email reporter creates and sends emails to an administrator. This only
- * reports information for todays date. It is expected this will be used just
+ * reports information for today's date. It is expected this will be used just
  * after the checksum checker has been run.
  * </p>
  * 
@@ -154,9 +154,9 @@ public class DailyReportEmailer
      *            <dt>-m</dt>
      *            <dd>Bitstreams missing from assetstore</dd>
      *            <dt>-c</dt>
-     *            <dd>Bitstreams whoses checksums were changed</dd>
+     *            <dd>Bitstreams whose checksums were changed</dd>
      *            <dt>-n</dt>
-     *            <dd>Bitstreams whoses checksums were changed</dd>
+     *            <dd>Bitstreams whose checksums were changed</dd>
      *            <dt>-a</dt>
      *            <dd>Send all reports in one email</dd>
      *            </dl>

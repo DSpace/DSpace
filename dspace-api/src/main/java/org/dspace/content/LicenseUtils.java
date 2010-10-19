@@ -37,7 +37,7 @@ public class LicenseUtils
      * LicenseArgumentFormatter plugin (if defined)<br>
      * {6} the eperson object that will be formatted using the appropriate
      * LicenseArgumentFormatter plugin (if defined)<br>
-     * {x} any addittion argument supplied wrapped in the
+     * {x} any addition argument supplied wrapped in the
      * LicenseArgumentFormatter based on his type (map key)
      * 
      * @see LicenseArgumentFormatter

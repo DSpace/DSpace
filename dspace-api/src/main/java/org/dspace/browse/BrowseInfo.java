@@ -53,7 +53,7 @@ import org.dspace.sort.SortOption;
 /**
  * The results of a Browse, including all the contextual information about
  * the query, as well as the results and associated information to create
- * pagable navigation.
+ * pageable navigation.
  *
  * @author Richard Jones
  */
@@ -725,7 +725,7 @@ public class BrowseInfo
 
 	/**
 	 * Get an integer representing the number within the total set of results which
-	 * marks the poisition of the last result in the current sub-set
+	 * marks the position of the last result in the current sub-set
 	 *
 	 * @return	the end point of the browse page
 	 */

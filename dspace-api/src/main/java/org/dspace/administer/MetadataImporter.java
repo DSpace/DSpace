@@ -224,7 +224,7 @@ public class MetadataImporter
                 System.out.println("xml: " + namespace);
                 System.out.println("aborting - use -u to force the update");
                 
-                throw new RegistryImportException("schema already registerd with different namespace - use -u to update");
+                throw new RegistryImportException("schema already registered with different namespace - use -u to update");
             }
         }
         

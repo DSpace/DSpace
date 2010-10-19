@@ -194,7 +194,7 @@ public class Util {
           *
           *  The numbers are formatted using java Locales
           *
-          * @param in The number to covnert
+          * @param in The number to convert
           * @return the file size as a String
           */
         public static String formatFileSize(double in) {

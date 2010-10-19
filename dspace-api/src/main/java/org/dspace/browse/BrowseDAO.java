@@ -88,7 +88,7 @@ public interface BrowseDAO
 
     /**
      * This executes a query which returns a List object containing BrowseItem objects
-     * represening the results of a full item browse.
+     * representing the results of a full item browse.
      *
      * @return  List of BrowseItem objects
      * @throws BrowseException

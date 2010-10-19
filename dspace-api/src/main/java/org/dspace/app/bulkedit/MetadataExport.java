@@ -290,7 +290,7 @@ public class MetadataExport
         // Save the files to the file
         csv.save(filename);        
 
-        // Finsh off and tidy up
+        // Finish off and tidy up
         c.restoreAuthSystemState();
         c.complete();
     }

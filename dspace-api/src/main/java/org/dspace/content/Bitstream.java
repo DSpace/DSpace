@@ -113,7 +113,7 @@ public class Bitstream extends DSpaceObject
             // Panic if we can't find it
             if (bitstreamFormat == null)
             {
-                throw new IllegalStateException("No Unknown bitsream format");
+                throw new IllegalStateException("No Unknown bitstream format");
             }
         }
 

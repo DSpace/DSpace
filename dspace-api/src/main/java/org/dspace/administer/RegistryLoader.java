@@ -269,7 +269,7 @@ public class RegistryLoader
         String shortname = getElementData(node, "name");
         String namespace = getElementData(node, "namespace");
 
-        // Check if the schema exists allready
+        // Check if the schema exists already
         MetadataSchema schema = MetadataSchema.find(context, shortname);
         if (schema == null)
         {

@@ -55,7 +55,7 @@ import org.dspace.core.ConfigurationManager;
 /**
  * Item Submission configuration generator for DSpace. Reads and parses the
  * installed submission process configuration file, item-submission.xml, from
- * the configuration directory. This submission process definiton details the
+ * the configuration directory. This submission process definition details the
  * ordering of the steps (and number of steps) that occur during the Item
  * Submission Process. There may be multiple Item Submission processes defined,
  * where each definition is assigned a unique name.

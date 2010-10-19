@@ -325,7 +325,7 @@ public class EmbargoManager
     }
 
     // lift or check embargo on one Item, handle exceptions
-    // return flase on success, true if there was fatal exception.
+    // return false on success, true if there was fatal exception.
     private static boolean processOneItem(Context context, Item item, CommandLine line, Date now)
         throws Exception
     {

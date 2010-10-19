@@ -53,7 +53,7 @@ public final class BitstreamInfo
     private DSpaceBitstreamInfo dspaceBitstream;
 
     /**
-     * Indicates the bitstream info (metdata) was found in the database.
+     * Indicates the bitstream info (metadata) was found in the database.
      * 
      * @todo Is this actually used for anything?
      */

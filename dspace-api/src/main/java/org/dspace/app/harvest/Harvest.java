@@ -120,7 +120,7 @@ public class Harvest
         Options options = new Options();
 
         options.addOption("p", "purge", false, "delete all items in the collection");
-        options.addOption("r", "run", false, "run the standrad harvest procedure");
+        options.addOption("r", "run", false, "run the standard harvest procedure");
         options.addOption("g", "ping", false, "test the OAI server and set");
         options.addOption("o", "once", false, "run the harvest procedure with specified parameters");
         options.addOption("s", "setup", false, "Set the collection up for harvesting");
@@ -429,7 +429,7 @@ public class Harvest
      * @param email
      */
     private void purgeCollection(String collectionID, String email) {
-    	System.out.println("Purging collection of all items and reseting last_harvested and harvest_message: " + collectionID);
+    	System.out.println("Purging collection of all items and resetting last_harvested and harvest_message: " + collectionID);
     	Collection collection = resolveCollection(collectionID);
    	
     	try 

@@ -161,7 +161,7 @@ public class BrowseEngine
         // tell the browse query whether we are ascending or descending on the value
         dao.setAscending(scope.isAscending());
 
-        // define a clause for the WHERE clause which will allow us to constraine
+        // define a clause for the WHERE clause which will allow us to constrain
         // our browse to a specified community or collection
         if (scope.inCollection() || scope.inCommunity())
         {
@@ -272,7 +272,7 @@ public class BrowseEngine
                                            browseIndex.getMapTableName());
             }
 
-            // define a clause for the WHERE clause which will allow us to constraine
+            // define a clause for the WHERE clause which will allow us to constrain
             // our browse to a specified community or collection
             if (scope.inCollection() || scope.inCommunity())
             {
@@ -480,7 +480,7 @@ public class BrowseEngine
             // set the ordering field (there is only one option)
             dao.setOrderField("sort_value");
 
-            // assemble the focus clase if we are to have one
+            // assemble the focus clause if we are to have one
             // it will look like one of the following
             // - sort_value < myvalue
             // = sort_1 > myvalue

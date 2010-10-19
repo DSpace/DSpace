@@ -93,7 +93,7 @@ public class CreateAdministrator
     	
     	options.addOption("e", "email", true, "administrator email address");
     	options.addOption("f", "first", true, "administrator first name");
-    	options.addOption("l", "last", true, "administrator lastt name");
+    	options.addOption("l", "last", true, "administrator last name");
     	options.addOption("c", "language", true, "administrator language");
     	options.addOption("p", "password", true, "administrator password");
     	

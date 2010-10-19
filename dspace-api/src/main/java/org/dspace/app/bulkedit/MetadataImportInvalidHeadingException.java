@@ -103,7 +103,7 @@ public class MetadataImportInvalidHeadingException extends Exception
         }
         else
         {
-            return "Unknown metadata elemnt in heading: " + badHeading;
+            return "Unknown metadata element in heading: " + badHeading;
         }
     }
 }

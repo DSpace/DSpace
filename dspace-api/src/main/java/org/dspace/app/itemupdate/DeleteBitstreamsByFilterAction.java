@@ -124,7 +124,7 @@ public class DeleteBitstreamsByFilterAction extends UpdateBitstreamsAction {
 	    			else
 	    			{	    					    				
 	    				//provenance is not maintained for derivative bitstreams
-	    				if (!bundleName.equals("THUMBMNAIL") && !bundleName.equals("TEXT"))
+	    				if (!bundleName.equals("THUMBNAIL") && !bundleName.equals("TEXT"))
 	    				{
 	    					deleted.add(bs.getName());
 	    				}

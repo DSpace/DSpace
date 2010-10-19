@@ -116,7 +116,7 @@ public class DCInputsReader
     private HashMap formFileUploadDefns = null;
 
     /**
-     * Reference to the value-pairs map, computed from the forms defition file
+     * Reference to the value-pairs map, computed from the forms definition file
      */
     private HashMap valuePairs = null;    // Holds display/storage pairs
     

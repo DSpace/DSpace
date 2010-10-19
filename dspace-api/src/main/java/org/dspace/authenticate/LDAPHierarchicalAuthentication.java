@@ -57,10 +57,10 @@ import org.dspace.eperson.Group;
 
 /**
  * This LDAP authentication method is more complex than the simple 'LDAPAuthentication'
- * in that it allows authentication against structured heirarchical LDAP trees of
+ * in that it allows authentication against structured hierarchical LDAP trees of
  * users. An initial bind is required using a user name and password in order to
- * searchthe tree and find the DN of the user. A second bind is then required to
- * chack the credentials of the user by binding directly to their DN.
+ * search the tree and find the DN of the user. A second bind is then required to
+ * check the credentials of the user by binding directly to their DN.
  *
  * @author Stuart Lewis, Chris Yates, Alex Barbieri, Flavio Botelho, Reuben Pasquini
  * @version $Revision$

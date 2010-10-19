@@ -74,7 +74,7 @@ public class ScriptLauncher
             System.exit(1);
         }
 
-        // Initalise the service manager kernel
+        // Initialise the service manager kernel
         try {
             kernelImpl = DSpaceKernelInit.getKernel(null);
             if (!kernelImpl.isRunning())

@@ -82,7 +82,7 @@ public abstract class AbstractTextFilterOFD implements OrderFormatDelegate
 
 	/**
 	 * Prepare the appropriate sort string for the given value in the
-	 * given language.  Languate should be supplied with the ISO-6390-1
+	 * given language.  Language should be supplied with the ISO-6390-1
 	 * or ISO-639-2 standards.  For example "en" or "eng".
 	 * 
 	 * @param	value	the string value

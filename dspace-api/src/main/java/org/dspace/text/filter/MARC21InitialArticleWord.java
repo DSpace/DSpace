@@ -82,7 +82,7 @@ public class MARC21InitialArticleWord extends InitialArticleWord
 
         Language l = Language.getLanguage(lang);
         
-        // Is the lanugage in our map?
+        // Is the language in our map?
         if (l != null && ianaArticleMap.containsKey(l.IANA))
         {
             // Get the list of words for this language

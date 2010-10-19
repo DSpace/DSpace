@@ -68,7 +68,7 @@ public class DSpaceCSV
     protected static String valueSeparator;
 
     /** The value separator in an escaped form for using in regexs */
-    protected static String escpaedValueSeparator;
+    protected static String escapedValueSeparator;
 
     /** The field separator (defaults to comma) */
     protected static String fieldSeparator;
@@ -90,10 +90,10 @@ public class DSpaceCSV
      */
     public DSpaceCSV(boolean exportAll)
     {
-        // Initalise the class
+        // Initialise the class
         init();
 
-        // Stoee the exportAll setting
+        // Store the exportAll setting
         this.exportAll = exportAll;
     }
 
@@ -107,7 +107,7 @@ public class DSpaceCSV
      */
     public DSpaceCSV(File f, Context c) throws Exception
     {
-        // Initalise the class
+        // Initialise the class
         init();
 
         // Open the CSV file
@@ -177,7 +177,7 @@ public class DSpaceCSV
     }
 
     /**
-     * Initalise this class with values from dspace.cfg
+     * Initialise this class with values from dspace.cfg
      */
     private void init()
     {
@@ -193,7 +193,7 @@ public class DSpaceCSV
         // Create the blank list of items
         lines = new ArrayList<DSpaceCSVLine>();
 
-        // Initalise the counter
+        // Initialise the counter
         counter = 0;
 
         // Set the metadata fields to ignore
@@ -238,7 +238,7 @@ public class DSpaceCSV
         // Now store the escaped version
         Pattern spchars = Pattern.compile("([\\\\*+\\[\\](){}\\$.?\\^|])");
         Matcher match = spchars.matcher(valueSeparator);
-        escpaedValueSeparator = match.replaceAll("\\\\$1");
+        escapedValueSeparator = match.replaceAll("\\\\$1");
     }
 
     /**
@@ -454,7 +454,7 @@ public class DSpaceCSV
 
                 // Make sure we register that this column was there
                 csvLine.add(headings.get(i - 1), null);
-                String[] elements = part.split(escpaedValueSeparator);
+                String[] elements = part.split(escapedValueSeparator);
                 for (String element : elements)
                 {
                     if ((element != null) && (!"".equals(element)))

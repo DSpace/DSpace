@@ -195,7 +195,7 @@ public interface BrowseCreateDAO
 	 * @return			true if exists, false if not
 	 * @throws BrowseException
 	 */
-	public boolean testTableExistance(String table) throws BrowseException;
+	public boolean testTableExistence(String table) throws BrowseException;
 	
 	/**
 	 * Drop the given table name, and all other resources that are attached to it.  In normal
@@ -365,7 +365,7 @@ public interface BrowseCreateDAO
 	
 	/**
 	 * So that any left over indices for items which have been deleted can be assured to have
-	 * been removed, this method checks for indicies for items which are not in the item table.
+	 * been removed, this method checks for indices for items which are not in the item table.
 	 * If it finds an index which does not have an associated item it removes it.
 	 * 
 	 * @param table		the index table to check

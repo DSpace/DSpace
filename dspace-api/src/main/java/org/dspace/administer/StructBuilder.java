@@ -213,7 +213,7 @@ public class StructBuilder
     private static void usage()
     {
         System.out.println("Usage: java StructBuilder -f <source XML file> -o <output file> -e <eperson email>");
-        System.out.println("Communitities will be created from the top level, and a map of communities to handles will be returned in the output file");
+        System.out.println("Communities will be created from the top level, and a map of communities to handles will be returned in the output file");
         return;
     }
     
@@ -398,7 +398,7 @@ public class StructBuilder
      * to the relevant methods in this class for sub-communities and collections
      * 
      * @param context the context of the request
-     * @param communities a nodelist of communities to create along with their subjstructures
+     * @param communities a nodelist of communities to create along with their sub-structures
      * @param parent the parent community of the nodelist of communities to create
      * 
      * @return an element array containing additional information regarding the 

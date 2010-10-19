@@ -783,7 +783,7 @@ public class BrowseDAOPostgres implements BrowseDAO
         buildSelectStatementDistinct(queryBuf, params);
         buildWhereClauseOpReset();
 
-        // assemble the focus clase if we are to have one
+        // assemble the focus clause if we are to have one
         // it will look like one of the following, for example
         //     sort_value <= myvalue
         //     sort_1 >= myvalue
@@ -824,7 +824,7 @@ public class BrowseDAOPostgres implements BrowseDAO
         buildSelectStatement(queryBuf, params);
         buildWhereClauseOpReset();
 
-        // assemble the focus clase if we are to have one
+        // assemble the focus clause if we are to have one
         // it will look like one of the following, for example
         //     sort_value <= myvalue
         //     sort_1 >= myvalue
@@ -1195,7 +1195,7 @@ public class BrowseDAOPostgres implements BrowseDAO
         // be matched using
         String focusComparator = getFocusComparator();
 
-        // assemble the focus clase if we are to have one
+        // assemble the focus clause if we are to have one
         // it will look like one of the following
         // - sort_value <= myvalue
         // - sort_1 >= myvalue

@@ -10,7 +10,7 @@
           but it is also simple to get programmatic access to ChecksumChecker 
           if you wish, via a {@link org.dspace.checker.CheckerCommand} object.</p>
       
-      <p>CheckerCommand is a simple Command object. You initalize it with
+      <p>CheckerCommand is a simple Command object. You initialize it with
          a strategy for iterating through bitstreams to check (an implementation of 
          {@link org.dspace.checker.BitstreamDispatcher}), and a object to collect
          the results (an implementation of @link org.dspace.checker.ChecksumResultsCollector})
@@ -22,7 +22,7 @@
       <h2>BitstreamDispatcher</h2>
       <p>The order in which bitstreams are checked and when a checking run terminates 
       is controlled  by implementations of BitstreamDispatcher, and you can extend the 
-      functionality of the package by writing your own implementatio of this simple 
+      functionality of the package by writing your own implementation of this simple 
       interface, although the package includes several useful implementations that will 
       probably suffice in most cases: - </p>
       

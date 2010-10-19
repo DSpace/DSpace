@@ -151,7 +151,7 @@ public abstract class InitialArticleWord implements TextFilter
                 {
                     // No - move the initial article word to the end
                     return new StringBuffer(str.substring(cutPos))
-                                        .append(wordSeperator)
+                                        .append(wordSeparator)
                                         .append(str.substring(initialStart, initialEnd))
                                         .toString();
                 }
@@ -181,8 +181,8 @@ public abstract class InitialArticleWord implements TextFilter
      */
     protected abstract String[] getArticleWords(String lang);
 
-    // Seperator to use when appending article to end
-    private String wordSeperator = ", ";
+    // Separator to use when appending article to end
+    private String wordSeparator = ", ";
 
     // Flag to signify initial article word should be removed
     // If false, then the initial article word is appended to the end

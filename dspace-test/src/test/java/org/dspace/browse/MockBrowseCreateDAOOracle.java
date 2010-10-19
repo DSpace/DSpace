@@ -968,7 +968,7 @@ public class MockBrowseCreateDAOOracle
     }
 
     /* (non-Javadoc)
-     * @see org.dspace.browse.BrowseCreateDAO#testTableExistance(java.lang.String)
+     * @see org.dspace.browse.BrowseCreateDAO#testTableExistence(java.lang.String)
      */
     @Mock
     public boolean testTableExistance(String table) throws BrowseException

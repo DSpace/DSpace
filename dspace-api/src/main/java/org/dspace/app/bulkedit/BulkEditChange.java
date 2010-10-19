@@ -60,7 +60,7 @@ public class BulkEditChange
     /** The ArrayList of hashtables with the removed elements */
     private ArrayList<DCValue> removes;
 
-    /** The ArrayList of hashtablles with the unchanged elements */
+    /** The ArrayList of hashtables with the unchanged elements */
     private ArrayList<DCValue> constant;
 
     /** The ArrayList of the complete set of new values (constant + adds) */
@@ -86,7 +86,7 @@ public class BulkEditChange
 
 
     /**
-     * Initalise a change holder for a new item 
+     * Initialise a change holder for a new item 
      */
     public BulkEditChange()
     {
@@ -107,7 +107,7 @@ public class BulkEditChange
     }
 
     /**
-     * Initalise a new change holder for an existing item
+     * Initialise a new change holder for an existing item
      *
      * @param i The Item to store
      */
@@ -118,7 +118,7 @@ public class BulkEditChange
         newItem = false;
         empty = true;
 
-        // Initalise the arrays
+        // Initialise the arrays
         adds = new ArrayList<DCValue>();
         removes = new ArrayList<DCValue>();
         constant = new ArrayList<DCValue>();

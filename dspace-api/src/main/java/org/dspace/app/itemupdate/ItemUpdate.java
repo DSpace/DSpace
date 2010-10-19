@@ -148,8 +148,8 @@ public class ItemUpdate {
 
         Options options = new Options();
 
-     //processing basis for detemining items    
-        //item-specific changes with metadata in source directory with dublic_core.xml files  
+     //processing basis for determining items    
+        //item-specific changes with metadata in source directory with dublin_core.xml files  
         options.addOption("s", "source", true, "root directory of source dspace archive ");
       
     //actions  on items     

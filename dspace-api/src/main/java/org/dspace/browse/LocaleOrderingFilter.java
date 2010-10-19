@@ -82,12 +82,12 @@ public class LocaleOrderingFilter implements TextFilter
             int element;
             StringBuffer buf = new StringBuffer();
 
-            // Iterate throught the elements of the collator
+            // Iterate through the elements of the collator
             CollationElementIterator iter = collator.getCollationElementIterator(str);
             
             while ((element = iter.next()) != CollationElementIterator.NULLORDER)
             {
-                // Generate a hexadecimal string representaion of the Collation element
+                // Generate a hexadecimal string representation of the Collation element
                 // This can then be compared in a text sort ;-)
                 String test = Integer.toString(element, 16);
                 buf.append(test);

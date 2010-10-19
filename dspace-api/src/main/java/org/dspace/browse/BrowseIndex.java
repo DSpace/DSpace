@@ -539,7 +539,7 @@ public class BrowseIndex
     }
 
     /**
-     * Get the name of the colum that is used to store the default value column
+     * Get the name of the column that is used to store the default value column
      * 
      * @return	the name of the value column
      */

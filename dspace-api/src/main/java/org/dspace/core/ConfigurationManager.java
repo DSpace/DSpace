@@ -758,7 +758,7 @@ public class ConfigurationManager
                  * via classpath or system properties.
                  */
                 info("Using default log4j provided log configuration," +
-                        "if uninitended, check your dspace.cfg for (log.init.config)");
+                        "if unintended, check your dspace.cfg for (log.init.config)");
             }
             else
             {

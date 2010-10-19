@@ -401,7 +401,7 @@ public final class CheckerCommand
     /**
      * Get the collector that holds/logs the results for this process run.
      * 
-     * @return The ChecksumResultsCollecter being used.
+     * @return The ChecksumResultsCollector being used.
      */
     public ChecksumResultsCollector getCollector()
     {

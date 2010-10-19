@@ -175,7 +175,7 @@ public class BrowseItem extends DSpaceObject
     }
 	
 	/**
-	 * Get the type of object.  This object masquerates as an Item, so this
+	 * Get the type of object.  This object masquerades as an Item, so this
 	 * returns the value of Constants.ITEM
 	 * 
 	 *@return Constants.ITEM
@@ -227,7 +227,7 @@ public class BrowseItem extends DSpaceObject
      * method will return <code>true</code> if the given schema,
      * element, qualifier and language match the schema, element,
      * qualifier and language of the <code>DCValue</code> object passed
-     * in.  Any or all of the elemenent, qualifier and language passed
+     * in.  Any or all of the element, qualifier and language passed
      * in can be the <code>Item.ANY</code> wildcard.
      *
      * @param schema

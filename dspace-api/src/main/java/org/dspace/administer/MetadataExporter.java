@@ -92,7 +92,7 @@ public class MetadataExporter
         xmlSerializer.startDocument();
         xmlSerializer.startElement("dspace-dc-types", null);
         
-        // Save the schema defintion(s)
+        // Save the schema definition(s)
         saveSchema(context, xmlSerializer, schema);
 
         MetadataField[] mdFields = null;

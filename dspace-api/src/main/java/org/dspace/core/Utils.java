@@ -275,7 +275,7 @@ public class Utils
      * Copy stream-data from source to destination, with buffering. This is
      * equivalent to passing {@link #copy}a
      * <code>java.io.BufferedInputStream</code> and
-     * <code>java.io.BufferedOuputStream</code> to {@link #copy}, and
+     * <code>java.io.BufferedOutputStream</code> to {@link #copy}, and
      * flushing the output stream afterwards. The streams are not closed after
      * the copy.
      * 
@@ -405,7 +405,7 @@ public class Utils
         else if (tzSign == '-' || tzSign == '+')
             s = s.substring(0, s.length()-6) + "GMT" + s.substring(s.length()-6);
 
-        // try to parse without millseconds
+        // try to parse without milliseconds
         ParseException lastError = null;
         for (int i = 0; i < parseFmt.length; ++i)
         {
