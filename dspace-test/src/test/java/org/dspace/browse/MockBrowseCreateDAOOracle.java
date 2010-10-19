@@ -971,7 +971,7 @@ public class MockBrowseCreateDAOOracle
      * @see org.dspace.browse.BrowseCreateDAO#testTableExistence(java.lang.String)
      */
     @Mock
-    public boolean testTableExistance(String table) throws BrowseException
+    public boolean testTableExistence(String table) throws BrowseException
     {
         // this method can kill the db connection, so we start up
         // our own private context to do it
