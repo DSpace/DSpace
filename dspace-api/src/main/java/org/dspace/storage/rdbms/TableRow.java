@@ -447,7 +447,7 @@ public class TableRow
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
             // if oracle, use 1 or 0 for true/false
-            Integer value = b ? new Integer(1) : new Integer(0);
+            Integer value = b ? Integer.valueOf(1) : Integer.valueOf(0);
             if (!value.equals(data.get(canonName)))
             {
                 data.put(canonName, value);
@@ -510,7 +510,7 @@ public class TableRow
         }
 
         String canonName = canonicalize(column);
-        Integer value = new Integer(i);
+        Integer value = Integer.valueOf(i);
         if (!value.equals(data.get(canonName)))
         {
             data.put(canonName, value);
@@ -536,7 +536,7 @@ public class TableRow
         }
 
         String canonName = canonicalize(column);
-        Long value = new Long(l);
+        Long value = Long.valueOf(l);
         if (!value.equals(data.get(canonName)))
         {
             data.put(canonName, value);
