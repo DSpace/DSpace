@@ -84,11 +84,10 @@ public class I18nUtil
     {
         // First, try configured default locale
         Locale defaultLocale = null;
-        if ((ConfigurationManager.getProperty("default.locale") != null)
-                && (ConfigurationManager.getProperty("default.locale") != ""))
+        if (!StringUtils.isEmpty(ConfigurationManager.getProperty("default.locale")))
         {
             defaultLocale = makeLocale(ConfigurationManager.getProperty("default.locale"));
-            }
+        }
 
         // Finally, get the Locale of the JVM
         if (defaultLocale == null)

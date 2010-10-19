@@ -146,7 +146,7 @@ public final class CheckerCommand
             BitstreamInfo info = checkBitstream(id);
 
             if (reportVerbose
-                    || (info.getChecksumCheckResult() != ChecksumCheckResults.CHECKSUM_MATCH))
+                    || !ChecksumCheckResults.CHECKSUM_MATCH.equals(info.getChecksumCheckResult()))
             {
                 collector.collect(info);
             }
