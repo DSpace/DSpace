@@ -108,7 +108,6 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 			addDisplayTable(division, statisticsTable);
 
 		} catch (Exception e) {
-            e.printStackTrace();
 			log.error("Error occurred while creating statistics for home page",
 					e);
 		}
