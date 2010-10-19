@@ -70,11 +70,10 @@ public class LicenseUtils
 
         if (additionalInfo != null)
         {
-            int i = 1;
-            for (String key : additionalInfo.keySet())
+            int i = 7; // Start is next index after previous args
+            for (Map.Entry<String, Object> info : additionalInfo.entrySet())
             {
-                args[6 + i] = new FormattableArgument(key, additionalInfo
-                        .get(key));
+                args[i] = new FormattableArgument(info.getKey(), info.getValue());
                 i++;
             }
         }

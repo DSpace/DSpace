@@ -695,7 +695,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#insertIndex(java.lang.String, int, java.lang.String, java.lang.String, java.util.Map)
      */
-    public void insertIndex(String table, int itemID, Map sortCols)
+    public void insertIndex(String table, int itemID, Map<Integer, String> sortCols)
         throws BrowseException
     {
         try
@@ -707,12 +707,9 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             row.setColumn("item_id", itemID);
             
             // now set the columns for the other sort values
-            Iterator itra = sortCols.keySet().iterator();
-            while (itra.hasNext())
+            for (Map.Entry<Integer, String> sortCol : sortCols.entrySet())
             {
-                Integer key = (Integer) itra.next();
-                String nValue = (String) sortCols.get(key);
-                row.setColumn("sort_" + key.toString(), utils.truncateSortValue(nValue));
+                row.setColumn("sort_" + sortCol.getKey().toString(), utils.truncateSortValue(sortCol.getValue()));
             }
             
             DatabaseManager.update(context, row);
@@ -727,7 +724,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#updateIndex(java.lang.String, int, java.util.Map)
      */
-    public boolean updateIndex(String table, int itemID, Map sortCols)
+    public boolean updateIndex(String table, int itemID, Map<Integer, String> sortCols)
             throws BrowseException
     {
         try
@@ -740,16 +737,13 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
                 return false;
 
             // Iterate through all the sort values
-            Iterator itra = sortCols.keySet().iterator();
-            while (itra.hasNext())
+            for (Map.Entry<Integer, String> sortCol : sortCols.entrySet())
             {
-                Integer key = (Integer) itra.next();
-
                 // Generate the appropriate column name
-                String column = "sort_" + key.toString();
+                String column = "sort_" + sortCol.getKey().toString();
 
                 // Create the value that will be written in to the column
-                String newValue = utils.truncateSortValue( (String) sortCols.get(key) );
+                String newValue = utils.truncateSortValue( sortCol.getValue() );
 
                 // Check the column exists - if it doesn't, something has gone seriously wrong
                 if (!row.hasColumn(column))

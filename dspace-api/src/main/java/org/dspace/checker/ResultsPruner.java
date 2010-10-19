@@ -180,7 +180,7 @@ public final class ResultsPruner
     /**
      * Map of retention durations, keyed by result code name
      */
-    Map interests = new HashMap();
+    Map<String, Long> interests = new HashMap<String, Long>();
 
     /**
      * Checksum results database Data access

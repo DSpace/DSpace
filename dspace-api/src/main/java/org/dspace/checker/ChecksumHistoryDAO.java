@@ -267,10 +267,10 @@ public class ChecksumHistoryDAO extends DAOSupport
      * @param interests
      *            set of results and the duration of time before they are
      *            removed from the database
-     * 
+     *
      * @return number of bitstreams deleted
      */
-    public int prune(Map interests)
+    public int prune(Map<String, Long> interests)
     {
         Connection conn = null;
         try
@@ -278,12 +278,10 @@ public class ChecksumHistoryDAO extends DAOSupport
             conn = DatabaseManager.getConnection();
             long now = System.currentTimeMillis();
             int count = 0;
-            for (Iterator iter = interests.keySet().iterator(); iter.hasNext();)
+            for (Map.Entry<String, Long> interest : interests.entrySet())
             {
-                String result = (String) iter.next();
-                Long dur = (Long) interests.get(result);
                 count += deleteHistoryByDateAndCode(new Date(now
-                        - dur.longValue()), result, conn);
+                        - interest.getValue().longValue()), interest.getKey(), conn);
                 conn.commit();
             }
             return count;

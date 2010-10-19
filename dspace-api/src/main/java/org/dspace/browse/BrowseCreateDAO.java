@@ -103,7 +103,7 @@ public interface BrowseCreateDAO
 	 * @param sortCols	an Integer-String map of sort column numbers and values
 	 * @throws BrowseException
 	 */
-    public void insertIndex(String table, int itemID, Map sortCols) throws BrowseException;
+    public void insertIndex(String table, int itemID, Map<Integer, String> sortCols) throws BrowseException;
 
     /**
      * Updates an index record into the given table for the given item id.  The Map should contain
@@ -127,7 +127,7 @@ public interface BrowseCreateDAO
      * @return true if the record is updated, false if not found
      * @throws BrowseException
      */
-    public boolean updateIndex(String table, int itemID, Map sortCols) throws BrowseException;
+    public boolean updateIndex(String table, int itemID, Map<Integer, String> sortCols) throws BrowseException;
 
     /**
 	 * Get the browse index's internal id for the location of the given string

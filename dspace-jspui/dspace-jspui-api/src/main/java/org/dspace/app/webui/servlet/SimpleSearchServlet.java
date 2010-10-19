@@ -46,7 +46,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -71,7 +71,6 @@ import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
 import org.dspace.sort.SortOption;
-import org.dspace.browse.*;
 
 /**
  * Servlet for handling a simple search.
@@ -108,7 +107,7 @@ public class SimpleSearchServlet extends DSpaceServlet
         String order = request.getParameter("order");
         int rpp = UIUtil.getIntParameter(request, "rpp");
         String advancedQuery = "";
-        HashMap queryHash = new HashMap();
+        Map<String, String> queryHash = new HashMap<String, String>();
 
         // can't start earlier than 0 in the results!
         if (start < 0)
@@ -402,7 +401,7 @@ public class SimpleSearchServlet extends DSpaceServlet
             request.setAttribute("communities", communities);
             request.setAttribute("no_results", "yes");
 
-            queryHash = qArgs.buildQueryHash(request);
+            queryHash = qArgs.buildQueryMap(request);
 
             Iterator i = queryHash.keySet().iterator();
 

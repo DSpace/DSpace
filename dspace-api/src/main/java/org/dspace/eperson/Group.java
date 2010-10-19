@@ -1255,23 +1255,10 @@ public class Group extends DSpaceObject
         // so now to establish all parent,child relationships we can iterate
         // through the parents hash
 
-        Iterator<Integer> i = parents.keySet().iterator();
-
-        while (i.hasNext())
+        for (Map.Entry<Integer, Set<Integer>> parent : parents.entrySet())
         {
-            Integer parentID = i.next();
-
-            Set<Integer> myChildren = getChildren(parents, parentID);
-
-            Iterator<Integer> j = myChildren.iterator();
-
-            while (j.hasNext())
-            {
-                // child of a parent
-                Integer childID = j.next();
-
-                ((Set<Integer>) parents.get(parentID)).add(childID);
-            }
+            Set<Integer> myChildren = getChildren(parents, parent.getKey());
+            parent.getValue().addAll(myChildren);
         }
 
         // empty out group2groupcache table

@@ -44,6 +44,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 
@@ -342,33 +343,30 @@ public class QueryArgs
      *
      * @return the created HashMap
      */
-    public HashMap buildQueryHash(HttpServletRequest request)
+    public Map<String, String> buildQueryMap(HttpServletRequest request)
     {
-        HashMap queryHash = new HashMap();
+        Map<String, String> queryMap = new HashMap<String, String>();
         String numFieldStr = request.getParameter("num_search_field");
         // for backward compatibility
         if (numFieldStr == null) numFieldStr = "3"; 
         int numField = Integer.parseInt(numFieldStr);
         for (int i = 1; i < numField; i++)
         {
-        	queryHash.put("query"+i, (request.getParameter("query"+i) == null) ? ""
-                    : request.getParameter("query"+i));
-        	queryHash.put("field"+i,
-                    (request.getParameter("field"+i) == null) ? "ANY" : request
-                            .getParameter("field"+i));
-            queryHash.put("conjunction"+i,
-                    (request.getParameter("conjunction"+i) == null) ? "AND"
-                            : request.getParameter("conjunction"+i));            
+            String queryStr = "query" + i;
+            String fieldStr = "field" + i;
+            String conjunctionStr = "conjunction" + i;
+
+        	queryMap.put(queryStr, StringUtils.defaultString(request.getParameter(queryStr), ""));
+        	queryMap.put(fieldStr, StringUtils.defaultString(request.getParameter(fieldStr), "ANY"));
+            queryMap.put(conjunctionStr, StringUtils.defaultString(request.getParameter(conjunctionStr), "AND"));
         }
         
-        queryHash.put("query"+numField, (request.getParameter("query"+numField) == null) ? ""
-                : request.getParameter("query"+numField));
+        String queryStr = "query" + numField;
+        String fieldStr = "field" + numField;
+        queryMap.put(queryStr, StringUtils.defaultString(request.getParameter(queryStr), ""));
+        queryMap.put(fieldStr, StringUtils.defaultString(request.getParameter(fieldStr), "ANY"));
         
-        queryHash.put("field"+numField,
-                (request.getParameter("field"+numField) == null) ? "ANY" 
-                : request.getParameter("field"+numField));
-        
-        return (queryHash);
+        return (queryMap);
     }
 
     /**
@@ -396,25 +394,23 @@ public class QueryArgs
     public String buildHTTPQuery(HttpServletRequest request)
             throws UnsupportedEncodingException
     {
-        String querystring = "";
-        HashMap queryHash = buildQueryHash(request);
+        StringBuilder queryString = new StringBuilder();
+        Map<String, String> queryMap = buildQueryMap(request);
 
-        Iterator i = queryHash.keySet().iterator();
-
-        while (i.hasNext())
+        for (Map.Entry<String, String> query : queryMap.entrySet())
         {
-            String key = (String) i.next();
-            String value = (String) queryHash.get(key);
-
-            querystring = querystring + "&" + key + "="
-                    + URLEncoder.encode(value, Constants.DEFAULT_ENCODING);
+            queryString.append("&")
+                       .append(query.getKey())
+                       .append("=")
+                       .append(URLEncoder.encode(query.getValue(), Constants.DEFAULT_ENCODING));
         }
+
         if (request.getParameter("num_search_field") != null)
         {
-        	querystring = querystring + "&num_search_field="+request.getParameter("num_search_field");	
-        }        
+            queryString.append("&num_search_field=").append(request.getParameter("num_search_field"));
+        }
 
         // return the result with the leading "&" removed
-        return (querystring.substring(1));
+        return queryString.substring(1);
     }
 }
