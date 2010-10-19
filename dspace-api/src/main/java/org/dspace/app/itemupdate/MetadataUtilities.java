@@ -141,7 +141,7 @@ public class MetadataUtilities {
         		item.clearMetadata(dtom.schema, dtom.element, dtom.qualifier, Item.ANY);
         	}
     	
-    		item.addMetadata(dtom.schema, dtom.element, dtom.qualifier, dtom.language, vals.toArray(new String[0]));   	
+    		item.addMetadata(dtom.schema, dtom.element, dtom.qualifier, dtom.language, vals.toArray(new String[vals.size()]));   	
     	}
 		return found;
     }
@@ -205,7 +205,7 @@ public class MetadataUtilities {
     		item.clearMetadata(dtom.schema, dtom.element, dtom.qualifier, Item.ANY);
     	}
 	
-		item.addMetadata(dtom.schema, dtom.element, dtom.qualifier, dtom.language, vals.toArray(new String[0]));   	
+		item.addMetadata(dtom.schema, dtom.element, dtom.qualifier, dtom.language, vals.toArray(new String[vals.size()]));   	
     }
  
     /**

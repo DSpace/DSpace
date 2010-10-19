@@ -585,7 +585,7 @@ public class Context
      */
     public Group[] getSpecialGroups() throws SQLException
     {
-        List myGroups = new ArrayList();
+        List<Group> myGroups = new ArrayList<Group>();
 
         Iterator i = specialGroups.iterator();
 
@@ -594,7 +594,7 @@ public class Context
             myGroups.add(Group.find(this, ((Integer) i.next()).intValue()));
         }
 
-        return (Group[]) myGroups.toArray(new Group[0]);
+        return myGroups.toArray(new Group[myGroups.size()]);
     }
 
     protected void finalize()

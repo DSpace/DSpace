@@ -94,7 +94,7 @@ public class SubmissionConfig implements Serializable
         this.isWorkflow = isWorkflowProcess;
 
         // initialize a vector of SubmissionStepConfig objects
-        Vector stepConfigs = new Vector();
+        Vector<SubmissionStepConfig> stepConfigs = new Vector<SubmissionStepConfig>();
 
         // loop through our steps, and create SubmissionStepConfig objects
         for (int stepNum = 0; stepNum < steps.size(); stepNum++)
@@ -121,8 +121,8 @@ public class SubmissionConfig implements Serializable
         }
 
         // get steps as an array of Strings
-        submissionSteps = (SubmissionStepConfig[]) stepConfigs
-                .toArray(new SubmissionStepConfig[0]);
+        submissionSteps = stepConfigs
+                .toArray(new SubmissionStepConfig[stepConfigs.size()]);
     }
 
     /**

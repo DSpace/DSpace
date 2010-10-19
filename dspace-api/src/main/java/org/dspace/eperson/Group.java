@@ -428,7 +428,7 @@ public class Group extends DSpaceObject
             groupList.add(Group.find(c, (i.next()).intValue()));
         }
 
-        return (Group[]) groupList.toArray(new Group[0]);
+        return groupList.toArray(new Group[groupList.size()]);
     }
 
     /**
@@ -566,7 +566,7 @@ public class Group extends DSpaceObject
             epersonList.add(EPerson.find(c, (i.next()).intValue()));
         }
 
-        return (EPerson[]) epersonList.toArray(new EPerson[0]);
+        return epersonList.toArray(new EPerson[epersonList.size()]);
     }
 
     /**
