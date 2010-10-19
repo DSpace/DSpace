@@ -1204,7 +1204,17 @@ public class DatabaseManager
                         row.setColumn(name, longValue);
                 }
                 else
-                    row.setColumn(name, results.getInt(i));
+                { // Not Oracle
+                	if (jdbctype == Types.INTEGER)
+                	{
+                		row.setColumn(name, results.getInt(i));
+                	}
+                	else // NUMERIC or DECIMAL
+                	{
+                		row.setColumn(name, results.getLong(i));
+                		// FIXME should be BigDecimal if TableRow supported that
+                	}
+                }
             }
             else if (jdbctype == Types.BIGINT)
             {
@@ -1395,7 +1405,17 @@ public class DatabaseManager
                     if ("oracle".equals(dbName))
                         statement.setLong(count, row.getLongColumn(column));
                     else
-                        statement.setInt(count, row.getIntColumn(column));
+                    { // not Oracle
+                        if (jdbctype == Types.INTEGER)
+                        {
+                            statement.setInt(count, row.getIntColumn(column));
+                        }
+                        else // NUMERIC or DECIMAL
+                        {
+                            statement.setLong(count, row.getLongColumn(column));
+                            // FIXME should be BigDecimal if TableRow supported that
+                        }
+                    }
 
                     continue;
                 }
