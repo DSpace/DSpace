@@ -108,8 +108,8 @@ public class Item extends DSpaceObject
     /** The bundles in this item - kept in sync with DB */
     private List<Bundle> bundles;
 
-    /** The Dublin Core metadata - a list of DCValue objects. */
-    private List<DCValue> dublinCore;
+    /** The Dublin Core metadata - inner class for lazy loading */
+    MetadataCache dublinCore = new MetadataCache();
 
     /** Handle, if any */
     private String handle;
@@ -141,54 +141,7 @@ public class Item extends DSpaceObject
         itemRow = row;
         dublinCoreChanged = false;
         modified = false;
-        dublinCore = new ArrayList<DCValue>();
         clearDetails();
- 
-        // Get Dublin Core metadata
-        TableRowIterator tri = retrieveMetadata();
-
-        try
-        {
-            while (tri.hasNext())
-            {
-                TableRow resultRow = tri.next();
-
-                // Get the associated metadata field and schema information
-                int fieldID = resultRow.getIntColumn("metadata_field_id");
-                MetadataField field = MetadataField.find(context, fieldID);
-
-                if (field == null)
-                {
-                    log.error("Loading item - cannot found metadata field "
-                            + fieldID);
-                }
-                else
-                {
-                    MetadataSchema schema = MetadataSchema.find(
-                            context, field.getSchemaID());
-
-                    // Make a DCValue object
-                    DCValue dcv = new DCValue();
-                        dcv.element = field.getElement();
-                        dcv.qualifier = field.getQualifier();
-                    dcv.value = resultRow.getStringColumn("text_value");
-                    dcv.language = resultRow.getStringColumn("text_lang");
-                        //dcv.namespace = schema.getNamespace();
-                        dcv.schema = schema.getName();
-                    dcv.authority = resultRow.getStringColumn("authority");
-                    dcv.confidence = resultRow.getIntColumn("confidence");
-
-                    // Add it to the list
-                    dublinCore.add(dcv);
-                }
-            }
-        }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-                tri.close();
-        }
 
         // Get our Handle if any
         handle = HandleManager.findHandle(context, this);
@@ -532,7 +485,7 @@ public class Item extends DSpaceObject
     {
         // Build up list of matching values
         List<DCValue> values = new ArrayList<DCValue>();
-        for (DCValue dcv : dublinCore)
+        for (DCValue dcv : getMetadata())
         {
             if (match(schema, element, qualifier, lang, dcv))
             {
@@ -713,6 +666,7 @@ public class Item extends DSpaceObject
     public void addMetadata(String schema, String element, String qualifier, String lang,
             String[] values, String authorities[], int confidences[])
     {
+        List<DCValue> dublinCore = getMetadata();
         MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();        
         ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
         boolean authorityControlled = mam.isAuthorityControlled(schema, element, qualifier);
@@ -903,7 +857,7 @@ public class Item extends DSpaceObject
     {
         // We will build a list of values NOT matching the values to clear
         List<DCValue> values = new ArrayList<DCValue>();
-        for (DCValue dcv : dublinCore)
+        for (DCValue dcv : getMetadata())
         {
             if (!match(schema, element, qualifier, lang, dcv))
             {
@@ -912,7 +866,7 @@ public class Item extends DSpaceObject
         }
 
         // Now swap the old list of values for the new, unremoved values
-        dublinCore = values;
+        setMetadata(values);
         dublinCoreChanged = true;
     }
 
@@ -1547,9 +1501,6 @@ public class Item extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "update_item", "item_id="
                 + getID()));
 
-        // Set the last modified date
-        itemRow.setColumn("last_modified", new Date());
-
         // Set sequence IDs for bitstreams in item
         int sequence = 0;
         Bundle[] bunds = getBundles();
@@ -1582,19 +1533,9 @@ public class Item extends DSpaceObject
                     streams[k].setSequenceID(sequence);
                     sequence++;
                     streams[k].update();
+                    modified = true;
                 }
             }
-        }
-
-        // Make sure that withdrawn and in_archive are non-null
-        if (itemRow.isColumnNull("in_archive"))
-        {
-            itemRow.setColumn("in_archive", false);
-        }
-
-        if (itemRow.isColumnNull("withdrawn"))
-        {
-            itemRow.setColumn("withdrawn", false);
         }
 
         // Map counting number of values for each element/qualifier.
@@ -1608,15 +1549,17 @@ public class Item extends DSpaceObject
         // Redo Dublin Core if it's changed
         if (dublinCoreChanged)
         {
+            dublinCoreChanged = false;
+
             // Arrays to store the working information required
-            int[]     placeNum = new int[dublinCore.size()];
-            boolean[] storedDC = new boolean[dublinCore.size()];
-            MetadataField[] dcFields = new MetadataField[dublinCore.size()];
+            int[]     placeNum = new int[getMetadata().size()];
+            boolean[] storedDC = new boolean[getMetadata().size()];
+            MetadataField[] dcFields = new MetadataField[getMetadata().size()];
 
             // Work out the place numbers for the in memory DC
-            for (int dcIdx = 0; dcIdx < dublinCore.size(); dcIdx++)
+            for (int dcIdx = 0; dcIdx < getMetadata().size(); dcIdx++)
             {
-                DCValue dcv = dublinCore.get(dcIdx);
+                DCValue dcv = getMetadata().get(dcIdx);
 
                 // Work out the place number for ordering
                 int current = 0;
@@ -1674,13 +1617,13 @@ public class Item extends DSpaceObject
                         boolean removeRow = true;
 
                         // Go through the in-memory metadata, unless we've already decided to keep this row
-                        for (int dcIdx = 0; dcIdx < dublinCore.size() && removeRow; dcIdx++)
+                        for (int dcIdx = 0; dcIdx < getMetadata().size() && removeRow; dcIdx++)
                         {
                             // Only process if this metadata has not already been matched to something in the DB
                             if (!storedDC[dcIdx])
                             {
                                 boolean matched = true;
-                                DCValue dcv   = dublinCore.get(dcIdx);
+                                DCValue dcv   = getMetadata().get(dcIdx);
 
                                 // Check the metadata field is the same
                                 if (matched && dcFields[dcIdx].getFieldID() != tr.getIntColumn("metadata_field_id"))
@@ -1742,6 +1685,8 @@ public class Item extends DSpaceObject
                         if (removeRow)
                         {
                             DatabaseManager.delete(ourContext, tr);
+                            dublinCoreChanged = true;
+                            modified = true;
                         }
                     }
                 }
@@ -1752,12 +1697,12 @@ public class Item extends DSpaceObject
             }
 
             // Add missing in-memory DC
-            for (int dcIdx = 0; dcIdx < dublinCore.size(); dcIdx++)
+            for (int dcIdx = 0; dcIdx < getMetadata().size(); dcIdx++)
             {
                 // Only write values that are not already in the db
                 if (!storedDC[dcIdx])
                 {
-                    DCValue dcv = dublinCore.get(dcIdx);
+                    DCValue dcv = getMetadata().get(dcIdx);
 
                     // Write DCValue
                     MetadataValue metadata = new MetadataValue();
@@ -1769,12 +1714,39 @@ public class Item extends DSpaceObject
                     metadata.setAuthority(dcv.authority);
                     metadata.setConfidence(dcv.confidence);
                     metadata.create(ourContext);
+                    dublinCoreChanged = true;
+                    modified = true;
                 }
             }
 
-            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.ITEM, getID(), getDetails()));
-            dublinCoreChanged = false;
-            clearDetails();
+            if (dublinCoreChanged || modified)
+            {
+                // Set the last modified date
+                itemRow.setColumn("last_modified", new Date());
+
+                // Make sure that withdrawn and in_archive are non-null
+                if (itemRow.isColumnNull("in_archive"))
+                {
+                    itemRow.setColumn("in_archive", false);
+                }
+
+                if (itemRow.isColumnNull("withdrawn"))
+                {
+                    itemRow.setColumn("withdrawn", false);
+                }
+
+                DatabaseManager.update(ourContext, itemRow);
+
+                if (dublinCoreChanged)
+                {
+                    ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.ITEM, getID(), getDetails()));
+                    clearDetails();
+                    dublinCoreChanged = false;
+                }
+
+                ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
+                modified = false;
+            }
         }
 
         if (modified)
@@ -2593,5 +2565,111 @@ public class Item extends DSpaceObject
             "AND item.item_id = metadatavalue.item_id AND metadata_field_id = ? AND authority = ?",
             mdf.getFieldID(), value);
         return new ItemIterator(context, rows);
+    }
+
+
+    private List<DCValue> getMetadata()
+    {
+        try
+        {
+            return dublinCore.get(ourContext, getID(), log);
+        }
+        catch (SQLException e)
+        {
+            log.error("Loading item - cannot load metadata");
+        }
+
+        return new ArrayList<DCValue>();
+    }
+
+    private void setMetadata(List<DCValue> metadata)
+    {
+        dublinCore.set(metadata);
+        dublinCoreChanged = true;
+    }
+
+    class MetadataCache
+    {
+        List<DCValue> metadata = null;
+
+        List<DCValue> get(Context c, int itemId, Logger log) throws SQLException
+        {
+            if (metadata == null)
+            {
+                metadata = new ArrayList<DCValue>();
+
+                // Get Dublin Core metadata
+                TableRowIterator tri = retrieveMetadata(itemId);
+
+                if (tri != null)
+                {
+                    try
+                    {
+                        while (tri.hasNext())
+                        {
+                            TableRow resultRow = tri.next();
+
+                            // Get the associated metadata field and schema information
+                            int fieldID = resultRow.getIntColumn("metadata_field_id");
+                            MetadataField field = MetadataField.find(c, fieldID);
+
+                            if (field == null)
+                            {
+                                log.error("Loading item - cannot find metadata field " + fieldID);
+                            }
+                            else
+                            {
+                                MetadataSchema schema = MetadataSchema.find(c, field.getSchemaID());
+                                if (schema == null)
+                                {
+                                    log.error("Loading item - cannot find metadata schema " + field.getSchemaID() + ", field " + fieldID);
+                                }
+                                else
+                                {
+                                    // Make a DCValue object
+                                    DCValue dcv = new DCValue();
+                                    dcv.element = field.getElement();
+                                    dcv.qualifier = field.getQualifier();
+                                    dcv.value = resultRow.getStringColumn("text_value");
+                                    dcv.language = resultRow.getStringColumn("text_lang");
+                                    //dcv.namespace = schema.getNamespace();
+                                    dcv.schema = schema.getName();
+                                    dcv.authority = resultRow.getStringColumn("authority");
+                                    dcv.confidence = resultRow.getIntColumn("confidence");
+
+                                    // Add it to the list
+                                    metadata.add(dcv);
+                                }
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        // close the TableRowIterator to free up resources
+                        if (tri != null)
+                            tri.close();
+                    }
+                }
+            }
+
+            return metadata;
+        }
+
+        void set(List<DCValue> m)
+        {
+            metadata = m;
+        }
+
+        TableRowIterator retrieveMetadata(int itemId) throws SQLException
+        {
+            if (itemId > 0)
+            {
+                return DatabaseManager.queryTable(ourContext, "MetadataValue",
+                        "SELECT * FROM MetadataValue WHERE item_id= ? ORDER BY metadata_field_id, place",
+                        itemId);
+            }
+
+            return null;
+        }
     }
 }
