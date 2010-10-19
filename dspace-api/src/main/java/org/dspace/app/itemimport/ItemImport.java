@@ -557,7 +557,7 @@ public class ItemImport
     private void addItems(Context c, Collection[] mycollections,
             String sourceDir, String mapFile, boolean template) throws Exception
     {
-        Map skipItems = new HashMap(); // set of items to skip if in 'resume'
+        Map<String, String> skipItems = new HashMap(); // set of items to skip if in 'resume'
         // mode
 
         System.out.println("Adding items from directory: " + sourceDir);
@@ -627,18 +627,15 @@ public class ItemImport
         }
 
         // read in HashMap first, to get list of handles & source dirs
-        Map myhash = readMapFile(mapFile);
+        Map<String, String> myHash = readMapFile(mapFile);
 
         // for each handle, re-import the item, discard the new handle
         // and re-assign the old handle
-        Iterator i = myhash.keySet().iterator();
-        ArrayList itemsToDelete = new ArrayList();
-
-        while (i.hasNext())
+        for (Map.Entry<String, String> mapEntry : myHash.entrySet())
         {
             // get the old handle
-            String newItemName = (String) i.next();
-            String oldHandle = (String) myhash.get(newItemName);
+            String newItemName = mapEntry.getKey();
+            String oldHandle = mapEntry.getValue();
 
             Item oldItem = null;
             Item newItem = null;
@@ -654,15 +651,15 @@ public class ItemImport
             {
                 oldItem = Item.find(c, Integer.parseInt(oldHandle));
             }
-            
-            /* Rather than exposing public item methods to change handles -- 
+
+            /* Rather than exposing public item methods to change handles --
              * two handles can't exist at the same time due to key constraints
              * so would require temp handle being stored, old being copied to new and
              * new being copied to old, all a bit messy -- a handle file is written to
-             * the import directory containing the old handle, the existing item is 
-             * deleted and then the import runs as though it were loading an item which 
+             * the import directory containing the old handle, the existing item is
+             * deleted and then the import runs as though it were loading an item which
              * had already been assigned a handle (so a new handle is not even assigned).
-             * As a commit does not occur until after a successful add, it is safe to 
+             * As a commit does not occur until after a successful add, it is safe to
              * do a delete as any error results in an aborted transaction without harming
              * the original item */
             File handleFile = new File(sourceDir + File.separatorChar + newItemName + File.separatorChar + "handle");
@@ -672,13 +669,14 @@ public class ItemImport
             {
                 throw new Exception("can't open handle file: " + handleFile.getCanonicalPath());
             }
-            
+
             handleOut.println(oldHandle);
             handleOut.close();
-            
+
             deleteItem(c, oldItem);
-            
+
             newItem = addItem(c, mycollections, sourceDir, newItemName, null, template);
+
         }
     }
 
@@ -848,9 +846,9 @@ public class ItemImport
     // utility methods
     ////////////////////////////////////
     // read in the map file and generate a hashmap of (file,handle) pairs
-    private Map readMapFile(String filename) throws Exception
+    private Map<String, String> readMapFile(String filename) throws Exception
     {
-        Map myhash = new HashMap();
+        Map<String, String> myHash = new HashMap<String, String>();
 
         BufferedReader is = null;
         try
@@ -861,15 +859,15 @@ public class ItemImport
 
             while ((line = is.readLine()) != null)
             {
-                String myfile;
-                String myhandle;
+                String myFile;
+                String myHandle;
 
                 // a line should be archive filename<whitespace>handle
                 StringTokenizer st = new StringTokenizer(line);
 
                 if (st.hasMoreTokens())
                 {
-                    myfile = st.nextToken();
+                    myFile = st.nextToken();
                 }
                 else
                 {
@@ -878,14 +876,14 @@ public class ItemImport
 
                 if (st.hasMoreTokens())
                 {
-                    myhandle = st.nextToken();
+                    myHandle = st.nextToken();
                 }
                 else
                 {
                     throw new Exception("Bad mapfile line:\n" + line);
                 }
 
-                myhash.put(myfile, myhandle);
+                myHash.put(myFile, myHandle);
             }
         }
         finally
@@ -896,7 +894,7 @@ public class ItemImport
             }
         }
 
-        return myhash;
+        return myHash;
     }
 
     // Load all metadata schemas into the item.

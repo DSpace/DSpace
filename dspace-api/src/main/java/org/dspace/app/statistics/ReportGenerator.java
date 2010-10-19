@@ -57,6 +57,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -495,12 +496,11 @@ public class ReportGenerator
         Stat[] stats = new Stat[aggregator.size()];
         if (aggregator.size() > 0)
         {
-            Iterator keys = aggregator.keySet().iterator();
             int i = 0;
-            while (keys.hasNext())
+            for (Map.Entry aggregatorEntry : (Set<Map.Entry>)aggregator.entrySet())
             {
-                String key = (String) keys.next();
-                int value = Integer.parseInt((String) aggregator.get(key));
+                String key = (String) aggregatorEntry.getKey();
+                int value = Integer.parseInt((String) aggregatorEntry.getValue());
                 if (translate)
                 {
                     stats[i] = new Stat(translate(key), value);

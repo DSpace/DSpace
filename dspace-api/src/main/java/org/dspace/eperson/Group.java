@@ -1254,7 +1254,6 @@ public class Group extends DSpaceObject
         // parent groups
         // so now to establish all parent,child relationships we can iterate
         // through the parents hash
-
         for (Map.Entry<Integer, Set<Integer>> parent : parents.entrySet())
         {
             Set<Integer> myChildren = getChildren(parents, parent.getKey());
@@ -1266,23 +1265,15 @@ public class Group extends DSpaceObject
                 "DELETE FROM group2groupcache WHERE id >= 0");
 
         // write out new one
-        Iterator<Integer> pi = parents.keySet().iterator(); // parent iterator
-
-        while (pi.hasNext())
+        for (Map.Entry<Integer, Set<Integer>> parent : parents.entrySet())
         {
-            Integer parent = pi.next();
+            int parentID = parent.getKey().intValue();
 
-            Set<Integer> children =  parents.get(parent);
-            Iterator<Integer> ci = children.iterator(); // child iterator
-
-            while (ci.hasNext())
+            for (Integer child : parent.getValue())
             {
-                Integer child = ci.next();
-
                 TableRow row = DatabaseManager.create(myContext,
                         "group2groupcache");
 
-                int parentID = parent.intValue();
                 int childID = child.intValue();
 
                 row.setColumn("parent_id", parentID);
