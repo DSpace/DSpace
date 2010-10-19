@@ -437,7 +437,7 @@ public class Email
      * @author ojd20
      * 
      */
-    private class FileAttachment
+    private static class FileAttachment
     {
         public FileAttachment(File f, String n)
         {
@@ -453,7 +453,7 @@ public class Email
     /**
      * Inner Class for SMTP authentication information
      */
-    private class SMTPAuthenticator extends Authenticator
+    private static class SMTPAuthenticator extends Authenticator
     {
         // User name
         private String name;

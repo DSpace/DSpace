@@ -1213,7 +1213,7 @@ public class IndexBrowse
 	// private inner class
 	//	 Hides the Item / BrowseItem in such a way that we can remove
 	//	 the duplication in indexing an item.
-	private class ItemMetadataProxy
+	private static class ItemMetadataProxy
 	{
 	    private Item item;
 	    private BrowseItem browseItem;

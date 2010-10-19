@@ -1026,7 +1026,7 @@ public class OAIHarvester {
 	 * are caught and turned into a HarvestingException. Uncaught exceptions are irrecoverable errors.   
 	 * @author alexey
 	 */
-	public class HarvestingException extends Exception 
+	public static class HarvestingException extends Exception 
 	{
 		public HarvestingException() {
 	        super();

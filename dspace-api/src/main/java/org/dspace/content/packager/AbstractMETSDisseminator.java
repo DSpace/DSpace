@@ -170,7 +170,7 @@ public abstract class AbstractMETSDisseminator
      * superclasses will put streams in this table when adding an mdRef
      * element to e.g. a rightsMD segment.
      */
-    protected class MdStreamCache
+    protected static class MdStreamCache
     {
         private Map<MdRef,InputStream> extraFiles = new HashMap<MdRef,InputStream>();
 

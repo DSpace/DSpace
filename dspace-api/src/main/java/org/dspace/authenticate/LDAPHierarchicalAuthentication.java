@@ -344,7 +344,7 @@ public class LDAPHierarchicalAuthentication
      * Internal class to manage LDAP query and results, mainly
      * because there are multiple values to return.
      */
-    public class SpeakerToLDAP {
+    private static class SpeakerToLDAP {
 
         private Logger log = null;
 
