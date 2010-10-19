@@ -102,6 +102,10 @@ import edu.harvard.hul.ois.mets.helper.PreformedXML;
  * 
  * @author Robert Tansley
  * @version $Revision$
+ * @deprecated Please use METS Packager to import/export METS files
+ * @see org.dspace.content.packager.DSpaceMETSDisseminator
+ * @see org.dspace.content.packager.DSpaceMETSIngester
+ * @see org.dspace.app.packager.Packager
  */
 public class METSExport
 {
