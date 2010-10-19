@@ -51,7 +51,7 @@
 - [DS-632] Batch Metadata Import needs to validate metadata fields specified in CSVs
 - [DS-646] Remove /bin scripts (replaced by 'dspace' command)
 
-[Graham Triggs]
+(Graham Triggs)
 - [DS-698] Clear primary_bitstream_id references when deleting a bitstream
 - [DS-696] Reduce cost of browse index pruning
 - [DS-694] Add inner class to Item for more efficient metadata handling

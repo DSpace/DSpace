@@ -399,21 +399,6 @@
         </profile>
 
         <!--
-           Builds Unit Testing module for DSpace
-        -->
-        <profile>
-            <id>dspace-test</id>
-            <activation>
-                <file>
-                    <exists>../dspace-test/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-test</module>
-            </modules>
-        </profile>
-        
-        <!--
            These profiles setup properties and build configuration
            appropriate to the database that DSpace will be installed
            against.

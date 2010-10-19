@@ -111,7 +111,6 @@
             <module>dspace-lni</module>
             <module>dspace-oai</module>
             <module>dspace-sword</module>
-            <module>dspace-test</module>
             <module>dspace</module>
          </modules>
       </profile>
