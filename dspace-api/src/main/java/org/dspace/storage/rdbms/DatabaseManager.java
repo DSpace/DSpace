@@ -47,8 +47,6 @@ import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Date;
-import java.sql.Driver;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -69,14 +67,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.apache.commons.dbcp.ConnectionFactory;
-import org.apache.commons.dbcp.DriverManagerConnectionFactory;
-import org.apache.commons.dbcp.PoolableConnectionFactory;
-import org.apache.commons.dbcp.PoolingDriver;
-import org.apache.commons.pool.ObjectPool;
-import org.apache.commons.pool.impl.GenericKeyedObjectPool;
-import org.apache.commons.pool.impl.GenericKeyedObjectPoolFactory;
-import org.apache.commons.pool.impl.GenericObjectPool;
+import javax.naming.InitialContext;
+import javax.naming.NoInitialContextException;
+import javax.sql.DataSource;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
 import org.dspace.core.ConfigurationManager;
@@ -96,6 +91,10 @@ public class DatabaseManager
 
     /** True if initialization has been done */
     private static boolean initialized = false;
+
+    /** DataSource (retrieved from jndi */
+    private static DataSource dataSource = null;
+    private static String sqlOnBorrow = null;
 
     /** Name to use for the pool */
     private static String poolName = "dspacepool";
@@ -617,8 +616,26 @@ public class DatabaseManager
     {
         initialize();
 
-        return DriverManager
-                .getConnection("jdbc:apache:commons:dbcp:" + poolName);
+        if (dataSource != null) {
+        	Connection conn = dataSource.getConnection();
+        	if (!StringUtils.isEmpty(sqlOnBorrow))
+        	{
+	        	PreparedStatement pstmt = conn.prepareStatement(sqlOnBorrow);
+	        	try
+	        	{
+	        		pstmt.execute();
+	        	}
+	        	finally
+	        	{
+	        		if (pstmt != null)
+	        			pstmt.close();
+	        	}
+        	}
+
+        	return conn;
+        }
+
+        return null;
     }
 
     /**
@@ -1564,13 +1581,8 @@ public class DatabaseManager
     {
         if (initialized)
         {
+            dataSource = null;
             initialized = false;
-            // Get the registered DBCP pooling driver
-            PoolingDriver driver = (PoolingDriver)DriverManager.getDriver("jdbc:apache:commons:dbcp:");
-
-            // Close the named pool
-            if (driver != null)
-                driver.closePool(poolName);
         }
     }
 
@@ -1586,119 +1598,53 @@ public class DatabaseManager
 
         try
         {
-            // Register basic JDBC driver
-            Class.forName(ConfigurationManager.getProperty("db.driver"));
-
-            // Register the DBCP driver
-            Class.forName("org.apache.commons.dbcp.PoolingDriver");
-
-            // Read pool configuration parameter or use defaults
-            // Note we check to see if property is null; getIntProperty returns
-            // '0' if the property is not set OR if it is actually set to zero.
-            // But 0 is a valid option...
-            int maxConnections = ConfigurationManager
-                    .getIntProperty("db.maxconnections");
-
-            if (ConfigurationManager.getProperty("db.maxconnections") == null)
+            String jndiName = ConfigurationManager.getProperty("db.jndi");
+            if (!StringUtils.isEmpty(jndiName))
             {
-                maxConnections = 30;
+                try
+                {
+                    javax.naming.Context ctx = new InitialContext();
+                    javax.naming.Context env = ctx == null ? null : (javax.naming.Context)ctx.lookup("java:/comp/env");
+                    dataSource = (DataSource)(env == null ? null : env.lookup(jndiName));
+                }
+                catch (Exception e)
+                {
+                    log.error("Error retrieving JNDI context: " + jndiName, e);
+                }
+
+                if (dataSource != null)
+                {
+                    if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+                    {
+                        sqlOnBorrow = "ALTER SESSION SET current_schema=" + ConfigurationManager.getProperty("db.username").trim().toUpperCase();
+                    }
+
+                    log.debug("Using JNDI dataSource: " + jndiName);
+                }
+                else
+                {
+                    log.info("Unable to locate JNDI dataSource: " + jndiName);
+                }
             }
 
-            int maxWait = ConfigurationManager.getIntProperty("db.maxwait");
-
-            if (ConfigurationManager.getProperty("db.maxwait") == null)
+            if (!"oracle".equals(ConfigurationManager.getProperty("db.name")))
             {
-                maxWait = 5000;
+                if (!StringUtils.isEmpty(ConfigurationManager.getProperty("db.postgres.schema")))
+                {
+                    sqlOnBorrow = "SET SEARCH_PATH TO " + ConfigurationManager.getProperty("db.postgres.schema").trim();
+                }
             }
 
-            int maxIdle = ConfigurationManager.getIntProperty("db.maxidle");
-
-            if (ConfigurationManager.getProperty("db.maxidle") == null)
+            if (dataSource == null)
             {
-                maxIdle = -1;
+                if (!StringUtils.isEmpty(jndiName))
+                {
+                    log.info("Falling back to creating own Database pool");
+                }
+
+                dataSource = DataSourceInit.getDatasource();
             }
 
-            boolean useStatementPool = ConfigurationManager.getBooleanProperty("db.statementpool",true);
-
-            // Create object pool
-            ObjectPool connectionPool = new GenericObjectPool(null, // PoolableObjectFactory
-                    // - set below
-                    maxConnections, // max connections
-                    GenericObjectPool.WHEN_EXHAUSTED_BLOCK, maxWait, // don't
-                                                                     // block
-                    // more than 5
-                    // seconds
-                    maxIdle, // max idle connections (unlimited)
-                    true, // validate when we borrow connections from pool
-                    false // don't bother validation returned connections
-            );
-
-            // ConnectionFactory the pool will use to create connections.
-            ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(
-                    ConfigurationManager.getProperty("db.url"),
-                    ConfigurationManager.getProperty("db.username"),
-                    ConfigurationManager.getProperty("db.password"));
-
-            //
-            // Now we'll create the PoolableConnectionFactory, which wraps
-            // the "real" Connections created by the ConnectionFactory with
-            // the classes that implement the pooling functionality.
-            //
-            String validationQuery = "SELECT 1";
-
-            // Oracle has a slightly different validation query
-            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-            {
-                validationQuery = "SELECT 1 FROM DUAL";
-            }
-
-            GenericKeyedObjectPoolFactory statementFactory = null;
-            if (useStatementPool)
-            {
-	            // The statement Pool is used to pool prepared statements.
-	            GenericKeyedObjectPool.Config statementFactoryConfig = new GenericKeyedObjectPool.Config();
-	            // Just grow the pool size when needed. 
-	            // 
-	            // This means we will never block when attempting to 
-	            // create a query. The problem is unclosed statements, 
-	            // they can never be reused. So if we place a maximum 
-	            // cap on them, then we might reach a condition where 
-	            // a page can only be viewed X number of times. The 
-	            // downside of GROW_WHEN_EXHAUSTED is that this may 
-	            // allow a memory leak to exist. Both options are bad, 
-	            // but I'd prefer a memory leak over a failure.
-	            //
-	            // FIXME: Perhaps this decision should be derived from config parameters?
-	            statementFactoryConfig.whenExhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_GROW;
-	
-	            statementFactory = new GenericKeyedObjectPoolFactory(null,statementFactoryConfig);
-            }
-            
-            PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(
-                    connectionFactory, connectionPool, statementFactory,
-                    validationQuery, // validation query
-                    false, // read only is not default for now
-                    false); // Autocommit defaults to none
-
-            // Obtain a poolName from the config, default is "dspacepool"
-            if (ConfigurationManager.getProperty("db.poolname") != null)
-            {
-                poolName = ConfigurationManager.getProperty("db.poolname");
-            }
-
-            //
-            // Finally, we get the PoolingDriver itself...
-            //
-            PoolingDriver driver = (PoolingDriver)DriverManager.getDriver("jdbc:apache:commons:dbcp:");
-
-            //
-            // ...and register our pool with it.
-            //
-            if (driver != null)
-                driver.registerPool(poolName, connectionPool);
-
-            // Old SimplePool init
-            //DriverManager.registerDriver(new SimplePool());
             initialized = true;
         }
         catch (SQLException se)

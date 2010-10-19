@@ -55,6 +55,7 @@
 - [DS-698] Clear primary_bitstream_id references when deleting a bitstream
 - [DS-696] Reduce cost of browse index pruning
 - [DS-694] Add inner class to Item for more efficient metadata handling
+- [DS-695] Convert DatabaseManager to use DataSource, allow for JNDI
 
 (Ben Bosman)
 - [DS-703] Making the OAI max amount of records configurable
