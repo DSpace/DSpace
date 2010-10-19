@@ -52,7 +52,7 @@ import org.dspace.core.ConfigurationManager;
  * thumbnail.maxwidth, thumbnail.maxheight, the size we want our thumbnail to be
  * no bigger than. Creates only JPEGs.
  */
-public class JPEGFilter extends MediaFilter
+public class JPEGFilter extends MediaFilter implements SelfRegisterInputFormats
 {
     public String getFilteredName(String oldFilename)
     {
@@ -174,5 +174,23 @@ public class JPEGFilter extends MediaFilter
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 
         return bais; // hope this gets written out before its garbage collected!
+    }
+
+
+    public String[] getInputMIMETypes()
+    {
+        return ImageIO.getReaderMIMETypes();
+    }
+
+    public String[] getInputDescriptions()
+    {
+        return null;
+    }
+
+    public String[] getInputExtensions()
+    {
+        // Temporarily disabled as JDK 1.6 only
+        // return ImageIO.getReaderFileSuffixes();
+        return null;
     }
 }

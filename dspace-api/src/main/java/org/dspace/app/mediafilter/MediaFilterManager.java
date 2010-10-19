@@ -55,6 +55,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -602,6 +603,83 @@ public class MediaFilterManager
                     e.printStackTrace();
                 }
     		}
+            else if (filterClasses[i] instanceof SelfRegisterInputFormats)
+            {
+                // Filter implements self registration, so check to see if it should be applied
+                // given the formats it claims to support
+                SelfRegisterInputFormats srif = (SelfRegisterInputFormats)filterClasses[i];
+                boolean applyFilter = false;
+
+                // Check MIME type
+                String[] mimeTypes = srif.getInputMIMETypes();
+                if (mimeTypes != null)
+                {
+                    for (String mimeType : mimeTypes)
+                    {
+                        if (mimeType.equalsIgnoreCase(myBitstream.getFormat().getMIMEType()))
+                        {
+                            applyFilter = true;
+                        }
+                    }
+                }
+
+                // Check description
+                if (!applyFilter)
+                {
+                    String[] descriptions = srif.getInputDescriptions();
+                    if (descriptions != null)
+                    {
+                        for (String desc : descriptions)
+                        {
+                            if (desc.equalsIgnoreCase(myBitstream.getFormat().getShortDescription()))
+                            {
+                                applyFilter = true;
+                            }
+                        }
+                    }
+                }
+
+                // Check extensions
+                if (!applyFilter)
+                {
+                    String[] extensions = srif.getInputExtensions();
+                    if (extensions != null)
+                    {
+                        for (String ext : extensions)
+                        {
+                            String[] formatExtensions = myBitstream.getFormat().getExtensions();
+                            if (formatExtensions != null)
+                            {
+                                if (ArrayUtils.contains(formatExtensions, ext))
+                                {
+                                    applyFilter = true;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Filter claims to handle this type of file, so attempt to apply it
+                if (applyFilter)
+                {
+                    try
+                    {
+                        // only update item if bitstream not skipped
+                        if (processBitstream(c, myItem, myBitstream, filterClasses[i]))
+                        {
+                               myItem.update(); // Make sure new bitstream has a sequence
+                                                 // number
+                               filtered = true;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        System.out.println("ERROR filtering, skipping bitstream #"
+                                + myBitstream.getID() + " " + e);
+                        e.printStackTrace();
+                    }
+                }
+            }
     	}
         return filtered;
     }

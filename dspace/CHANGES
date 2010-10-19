@@ -56,6 +56,7 @@
 - [DS-696] Reduce cost of browse index pruning
 - [DS-694] Add inner class to Item for more efficient metadata handling
 - [DS-695] Convert DatabaseManager to use DataSource, allow for JNDI
+- [DS-697] Allow media filter plugins to register their input formats directly
 
 (Ben Bosman)
 - [DS-703] Making the OAI max amount of records configurable
