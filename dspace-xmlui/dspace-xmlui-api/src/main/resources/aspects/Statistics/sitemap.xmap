@@ -40,7 +40,7 @@
             </map:match>
 
             <!--Home page statistics-->
-            <map:match pattern="statistics">
+            <map:match pattern="statistics-home">
                 <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
                     <map:transform type="StatisticsTransformer"/>
                 </map:match>
