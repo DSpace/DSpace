@@ -244,7 +244,7 @@ public class Context
             log.warn(LogManager.getHeader(this, "restore_auth_sys_state",
                     "not previous state info available "
                             + ex.getLocalizedMessage()));
-            previousState = new Boolean(false);
+            previousState = Boolean.FALSE;
         }
         if (log.isDebugEnabled())
         {
@@ -553,7 +553,7 @@ public class Context
      */
     public void setSpecialGroup(int groupID)
     {
-        specialGroups.add(new Integer(groupID));
+        specialGroups.add(Integer.valueOf(groupID));
 
         // System.out.println("Added " + groupID);
     }
@@ -567,7 +567,7 @@ public class Context
      */
     public boolean inSpecialGroup(int groupID)
     {
-        if (specialGroups.contains(new Integer(groupID)))
+        if (specialGroups.contains(Integer.valueOf(groupID)))
         {
             // System.out.println("Contains " + groupID);
             return true;
