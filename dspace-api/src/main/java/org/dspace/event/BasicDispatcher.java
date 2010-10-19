@@ -116,45 +116,42 @@ public class BasicDispatcher extends Dispatcher
             // some letters so RDF readers don't mistake it for an integer.
             String tid = "TX" + Utils.generateKey();
 
-            synchronized(events)
+            for (Iterator ei = events.iterator(); ei.hasNext();)
             {
-                for (Iterator ei = events.iterator(); ei.hasNext();)
+                Event event = (Event) ei.next();
+                event.setDispatcher(getIdentifier());
+                event.setTransactionID(tid);
+
+                if (log.isDebugEnabled())
+                    log.debug("Iterating over "
+                            + String.valueOf(consumers.values().size())
+                            + " consumers...");
+
+                for (Iterator ci = consumers.values().iterator(); ci.hasNext();)
                 {
-                    Event event = (Event) ei.next();
-                    event.setDispatcher(getIdentifier());
-                    event.setTransactionID(tid);
+                    ConsumerProfile cp = (ConsumerProfile) ci.next();
 
-                    if (log.isDebugEnabled())
-                        log.debug("Iterating over "
-                                + String.valueOf(consumers.values().size())
-                                + " consumers...");
-
-                    for (Iterator ci = consumers.values().iterator(); ci.hasNext();)
+                    if (event.pass(cp.getFilters()))
                     {
-                        ConsumerProfile cp = (ConsumerProfile) ci.next();
+                        if (log.isDebugEnabled())
+                            log.debug("Sending event to \"" + cp.getName()
+                                    + "\": " + event.toString());
 
-                        if (event.pass(cp.getFilters()))
+                        try
                         {
-                            if (log.isDebugEnabled())
-                                log.debug("Sending event to \"" + cp.getName()
-                                        + "\": " + event.toString());
+                            cp.getConsumer().consume(ctx, event);
 
-                            try
-                            {
-                                cp.getConsumer().consume(ctx, event);
-
-                                // Record that the event has been consumed by this
-                                // consumer
-                                event.setBitSet(cp.getName());
-                            }
-                            catch (Exception e)
-                            {
-                                log.error("Consumer(\"" + cp.getName()
-                                        + "\").consume threw: " + e.toString(), e);
-                            }
+                            // Record that the event has been consumed by this
+                            // consumer
+                            event.setBitSet(cp.getName());
                         }
-
+                        catch (Exception e)
+                        {
+                            log.error("Consumer(\"" + cp.getName()
+                                    + "\").consume threw: " + e.toString(), e);
+                        }
                     }
+
                 }
             }
 
