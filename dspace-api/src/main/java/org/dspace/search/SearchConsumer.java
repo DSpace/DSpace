@@ -117,7 +117,7 @@ public class SearchConsumer implements Consumer
         if (st == Constants.BUNDLE)
         {
             if ((et == Event.ADD || et == Event.REMOVE) && subject != null
-                    && ((Bundle) subject).getName().equals("TEXT"))
+                    && "TEXT".equals( ((Bundle) subject).getName()) )
             {
                 st = Constants.ITEM;
                 et = Event.MODIFY;
