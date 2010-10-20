@@ -102,10 +102,10 @@ public class Context
     private Stack<String> authStateClassCallHistory;
 
     /** Object cache for this context */
-    private Map objectCache;
+    private Map<String, Object> objectCache;
 
     /** Group IDs of special groups user is a member of */
-    private List specialGroups;
+    private List<Integer> specialGroups;
 
     /** Content events */
     private List<Event> events = null;
@@ -131,8 +131,8 @@ public class Context
         extraLogInfo = "";
         ignoreAuth = false;
 
-        objectCache = new HashMap();
-        specialGroups = new ArrayList();
+        objectCache = new HashMap<String, Object>();
+        specialGroups = new ArrayList<Integer>();
 
         authStateChangeHistory = new Stack<Boolean>();
         authStateClassCallHistory = new Stack<String>();
@@ -486,7 +486,7 @@ public class Context
      * @return the object from the cache, or <code>null</code> if it's not
      *         cached.
      */
-    public Object fromCache(Class objectClass, int id)
+    public Object fromCache(Class<?> objectClass, int id)
     {
         String key = objectClass.getName() + id;
 
@@ -587,7 +587,7 @@ public class Context
     {
         List<Group> myGroups = new ArrayList<Group>();
 
-        Iterator i = specialGroups.iterator();
+        Iterator<Integer> i = specialGroups.iterator();
 
         while (i.hasNext())
         {
