@@ -196,7 +196,7 @@ public class ChecksumChecker
             {
                 try
                 {
-                    idList.add(new Integer(ids[i]));
+                    idList.add(Integer.valueOf(ids[i]));
                 }
                 catch (NumberFormatException nfe)
                 {
@@ -232,7 +232,7 @@ public class ChecksumChecker
         }
         else if (line.hasOption('c'))
         {
-        	int count = new Integer(line.getOptionValue('c')).intValue();
+        	int count = Integer.valueOf(line.getOptionValue('c')).intValue();
             
         	// run checker process for specified number of bitstreams
             dispatcher = new LimitedCountDispatcher(new SimpleDispatcher(

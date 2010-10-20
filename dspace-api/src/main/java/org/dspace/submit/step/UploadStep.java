@@ -318,7 +318,7 @@ public class UploadStep extends AbstractProcessingStep
             Bundle[] bundles = item.getBundles("ORIGINAL");
             if (bundles.length > 0)
             {
-            	bundles[0].setPrimaryBitstreamID(new Integer(request
+            	bundles[0].setPrimaryBitstreamID(Integer.valueOf(request
                     .getParameter("primary_bitstream_id")).intValue());
             	bundles[0].update();
             }
