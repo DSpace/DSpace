@@ -136,35 +136,29 @@ public class Event implements Serializable
     private static Map<Integer, Integer> objMaskToType = new HashMap<Integer, Integer>();
     static
     {
-        objTypeToMask.put(new Integer(Constants.BITSTREAM), new Integer(
-                BITSTREAM));
-        objMaskToType.put(new Integer(BITSTREAM), new Integer(
-                Constants.BITSTREAM));
+        objTypeToMask.put(Constants.BITSTREAM, BITSTREAM);
+        objMaskToType.put(BITSTREAM, Constants.BITSTREAM);
 
-        objTypeToMask.put(new Integer(Constants.BUNDLE), new Integer(BUNDLE));
-        objMaskToType.put(new Integer(BUNDLE), new Integer(Constants.BUNDLE));
+        objTypeToMask.put(Constants.BUNDLE, BUNDLE);
+        objMaskToType.put(BUNDLE, Constants.BUNDLE);
 
-        objTypeToMask.put(new Integer(Constants.ITEM), new Integer(ITEM));
-        objMaskToType.put(new Integer(ITEM), new Integer(Constants.ITEM));
+        objTypeToMask.put(Constants.ITEM, ITEM);
+        objMaskToType.put(ITEM, Constants.ITEM);
 
-        objTypeToMask.put(new Integer(Constants.COLLECTION), new Integer(
-                COLLECTION));
-        objMaskToType.put(new Integer(COLLECTION), new Integer(
-                Constants.COLLECTION));
+        objTypeToMask.put(Constants.COLLECTION, COLLECTION);
+        objMaskToType.put(COLLECTION, Constants.COLLECTION);
 
-        objTypeToMask.put(new Integer(Constants.COMMUNITY), new Integer(
-                COMMUNITY));
-        objMaskToType.put(new Integer(COMMUNITY), new Integer(
-                Constants.COMMUNITY));
+        objTypeToMask.put(Constants.COMMUNITY, COMMUNITY);
+        objMaskToType.put(COMMUNITY, Constants.COMMUNITY);
 
-        objTypeToMask.put(new Integer(Constants.SITE), new Integer(SITE));
-        objMaskToType.put(new Integer(SITE), new Integer(Constants.SITE));
+        objTypeToMask.put(Constants.SITE, SITE);
+        objMaskToType.put(SITE, Constants.SITE);
 
-        objTypeToMask.put(new Integer(Constants.GROUP), new Integer(GROUP));
-        objMaskToType.put(new Integer(GROUP), new Integer(Constants.GROUP));
+        objTypeToMask.put(Constants.GROUP, GROUP);
+        objMaskToType.put(GROUP, Constants.GROUP);
 
-        objTypeToMask.put(new Integer(Constants.EPERSON), new Integer(EPERSON));
-        objMaskToType.put(new Integer(EPERSON), new Integer(Constants.EPERSON));
+        objTypeToMask.put(Constants.EPERSON, EPERSON);
+        objMaskToType.put(EPERSON, Constants.EPERSON);
     }
 
     /** ---------- Event Fields ------------- * */
@@ -298,7 +292,7 @@ public class Event implements Serializable
     // translate a "core.Constants" object type value to local bitmask value.
     private static int coreTypeToMask(int core)
     {
-        Integer mask = (Integer) objTypeToMask.get(new Integer(core));
+        Integer mask = objTypeToMask.get(core);
         if (mask == null)
             return -1;
         else
@@ -308,7 +302,7 @@ public class Event implements Serializable
     // translate bitmask object-type to "core.Constants" object type.
     private static int maskTypeToCore(int mask)
     {
-        Integer core = (Integer) objMaskToType.get(new Integer(mask));
+        Integer core = objMaskToType.get(mask);
         if (core == null)
             return -1;
         else
