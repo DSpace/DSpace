@@ -122,7 +122,7 @@ public class XPDF2Thumbnail extends MediaFilter
     private int maxwidth = 0;
 
     // backup default for size, on the large side.
-    final private int DEFAULT_MAXWIDTH = 500;
+    private static final int DEFAULT_MAXWIDTH = 500;
 
     public String getFilteredName(String oldFilename)
     {
