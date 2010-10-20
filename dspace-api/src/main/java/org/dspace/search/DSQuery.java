@@ -408,7 +408,7 @@ public class DSQuery
     /**
      * Close any IndexSearcher that is currently open.
      */
-    public static void close()
+    public static synchronized void close()
     {
         if (searcher != null)
         {

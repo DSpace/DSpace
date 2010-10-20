@@ -620,7 +620,10 @@ public class MetadataField
     public static MetadataField find(Context context, int id)
             throws SQLException
     {
-        initCache(context);
+        if (!isCacheInitialized())
+        {
+            initCache(context);
+        }
 
         // 'sanity check' first.
         Integer iid = new Integer(id);
@@ -636,41 +639,40 @@ public class MetadataField
         id2field = null;
     }
 
-    // load caches if necessary
-    private static void initCache(Context context) throws SQLException
+    private static boolean isCacheInitialized()
     {
-        if (id2field != null)
-            return;
-
-        synchronized (MetadataField.class)
+        return id2field != null;
+    }
+    
+    // load caches if necessary
+    private static synchronized void initCache(Context context) throws SQLException
+    {
+        if (!isCacheInitialized())
         {
-            if (id2field == null)
+            HashMap new_id2field = new HashMap();
+            log.info("Loading MetadataField elements into cache.");
+
+            // Grab rows from DB
+            TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataFieldRegistry",
+                    "SELECT * from MetadataFieldRegistry");
+
+            try
             {
-                HashMap new_id2field = new HashMap();
-                log.info("Loading MetadataField elements into cache.");
-
-                // Grab rows from DB
-                TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataFieldRegistry",
-                        "SELECT * from MetadataFieldRegistry");
-
-                try
+                while (tri.hasNext())
                 {
-                    while (tri.hasNext())
-                    {
-                        TableRow row = tri.next();
-                        int fieldID = row.getIntColumn("metadata_field_id");
-                        new_id2field.put(new Integer(fieldID), new MetadataField(row));
-                    }
+                    TableRow row = tri.next();
+                    int fieldID = row.getIntColumn("metadata_field_id");
+                    new_id2field.put(new Integer(fieldID), new MetadataField(row));
                 }
-                finally
-                {
-                    // close the TableRowIterator to free up resources
-                    if (tri != null)
-                        tri.close();
-                }
-
-                id2field = new_id2field;
             }
+            finally
+            {
+                // close the TableRowIterator to free up resources
+                if (tri != null)
+                    tri.close();
+            }
+
+            id2field = new_id2field;
         }
     }
 

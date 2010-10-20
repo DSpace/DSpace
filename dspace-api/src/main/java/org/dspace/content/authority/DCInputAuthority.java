@@ -98,7 +98,10 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
             List<String> names = new ArrayList<String>();
             Iterator pi = dci.getPairsNameIterator();
             while (pi.hasNext())
+            {
                 names.add((String)pi.next());
+            }
+
             pluginNames = names.toArray(new String[names.size()]);
             log.debug("Got plugin names = "+Arrays.deepToString(pluginNames));
         }

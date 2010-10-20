@@ -44,6 +44,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -54,6 +55,8 @@ import org.dspace.core.ConfigurationManager;
  */
 public class SortOption
 {
+    private static final Logger log = Logger.getLogger(SortOption.class);
+
     public static final String ASCENDING  = "ASC";
     public static final String DESCENDING = "DESC";
 
@@ -77,8 +80,27 @@ public class SortOption
 
     /** the sort options available for this index */
     private static Set<SortOption> sortOptionsSet = null;
-    private static Map<Integer, SortOption> sortOptionsMap = null;
-	
+    static {
+        try
+        {
+            Set<SortOption> newSortOptionsSet = new HashSet<SortOption>();
+            int idx = 1;
+            String option;
+
+            while ( ((option = ConfigurationManager.getProperty("webui.itemlist.sort-option." + idx))) != null)
+            {
+                SortOption so = new SortOption(idx, option);
+                newSortOptionsSet.add(so);
+                idx++;
+            }
+
+            SortOption.sortOptionsSet = newSortOptionsSet;
+        }
+        catch (SortException se)
+        {
+            log.fatal("Unable to load SortOptions", se);
+        }
+    }
 	/**
 	 * Construct a new SortOption object with the given parameters
 	 * 
@@ -298,57 +320,15 @@ public class SortOption
     }
 
     /**
-     * @return	a map of the configured sort options
-     */
-    public static Map<Integer, SortOption> getSortOptionsMap() throws SortException
-    {
-        if (SortOption.sortOptionsMap != null)
-            return SortOption.sortOptionsMap;
-
-        synchronized (SortOption.class)
-        {
-            if (SortOption.sortOptionsMap == null)
-            {
-                Map<Integer, SortOption> newSortOptionsMap = new HashMap<Integer, SortOption>();
-                for (SortOption so : SortOption.getSortOptions())
-                {
-                    newSortOptionsMap.put(new Integer(so.getNumber()), so);
-                }
-
-                SortOption.sortOptionsMap = newSortOptionsMap;
-            }
-        }
-
-    	return SortOption.sortOptionsMap;
-    }
-
-    /**
      * Return all the configured sort options
      * @return
      * @throws SortException
      */
     public static Set<SortOption> getSortOptions() throws SortException
     {
-        if (SortOption.sortOptionsSet != null)
-            return SortOption.sortOptionsSet;
-        
-        synchronized (SortOption.class)
+        if (SortOption.sortOptionsSet == null)
         {
-            if (SortOption.sortOptionsSet == null)
-            {
-                Set<SortOption> newSortOptionsSet = new HashSet<SortOption>();
-                int idx = 1;
-                String option;
-
-                while ( ((option = ConfigurationManager.getProperty("webui.itemlist.sort-option." + idx))) != null)
-                {
-                    SortOption so = new SortOption(idx, option);
-                    newSortOptionsSet.add(so);
-                    idx++;
-                }
-
-                SortOption.sortOptionsSet = newSortOptionsSet;
-            }
+            throw new SortException("Sort options not loaded");
         }
 
         return SortOption.sortOptionsSet;

@@ -536,7 +536,11 @@ public class MetadataSchema
     public static MetadataSchema find(Context context, int id)
             throws SQLException
     {
-        initCache(context);
+        if (!isCacheInitialized())
+        {
+            initCache(context);
+        }
+        
         Integer iid = new Integer(id);
 
         // sanity check
@@ -563,7 +567,10 @@ public class MetadataSchema
         if (shortName == null)
             return null;
 
-        initCache(context);
+        if (!isCacheInitialized())
+        {
+            initCache(context);
+        }
 
         if (!name2schema.containsKey(shortName))
             return null;
@@ -578,44 +585,43 @@ public class MetadataSchema
         name2schema = null;
     }
 
-    // load caches if necessary
-    private static void initCache(Context context) throws SQLException
+    private static boolean isCacheInitialized()
     {
-        if (id2schema != null && name2schema != null)
-            return;
+        return (id2schema != null && name2schema != null);
+    }
 
-        synchronized (MetadataSchema.class)
+    // load caches if necessary
+    private static synchronized void initCache(Context context) throws SQLException
+    {
+        if (!isCacheInitialized())
         {
-            if (id2schema == null && name2schema == null)
+            log.info("Loading schema cache for fast finds");
+            HashMap new_id2schema = new HashMap();
+            HashMap new_name2schema = new HashMap();
+
+            TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataSchemaRegistry",
+                    "SELECT * from MetadataSchemaRegistry");
+
+            try
             {
-                log.info("Loading schema cache for fast finds");
-                HashMap new_id2schema = new HashMap();
-                HashMap new_name2schema = new HashMap();
-
-                TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataSchemaRegistry",
-                        "SELECT * from MetadataSchemaRegistry");
-
-                try
+                while (tri.hasNext())
                 {
-                    while (tri.hasNext())
-                    {
-                        TableRow row = tri.next();
+                    TableRow row = tri.next();
 
-                        MetadataSchema s = new MetadataSchema(row);
-                        new_id2schema.put(new Integer(s.schemaID), s);
-                        new_name2schema.put(s.name, s);
-                    }
+                    MetadataSchema s = new MetadataSchema(row);
+                    new_id2schema.put(new Integer(s.schemaID), s);
+                    new_name2schema.put(s.name, s);
                 }
-                finally
-                {
-                    // close the TableRowIterator to free up resources
-                    if (tri != null)
-                        tri.close();
-                }
-
-                id2schema = new_id2schema;
-                name2schema = new_name2schema;
             }
+            finally
+            {
+                // close the TableRowIterator to free up resources
+                if (tri != null)
+                    tri.close();
+            }
+
+            id2schema = new_id2schema;
+            name2schema = new_name2schema;
         }
     }
 }

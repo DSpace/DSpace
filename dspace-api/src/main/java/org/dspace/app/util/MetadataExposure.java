@@ -103,7 +103,11 @@ public class MetadataExposure
             return false;
 
         // for schema.element, just check schema->elementSet
-        init();
+        if (!isInitialized())
+        {
+            init();
+        }
+
         if (qualifier == null)
         {
             Set<String> elts = hiddenElementSets.get(schema);
@@ -121,10 +125,15 @@ public class MetadataExposure
         }
     }
 
-    // load maps from configuration unless it's already done.
-    private static void init()
+    private static boolean isInitialized()
     {
-        if (hiddenElementSets == null)
+        return hiddenElementSets != null;
+    }
+
+    // load maps from configuration unless it's already done.
+    private static synchronized void init()
+    {
+        if (!isInitialized())
         {
             hiddenElementSets = new HashMap<String,Set<String>>();
             hiddenElementMaps = new HashMap<String,Map<String,Set<String>>>();
