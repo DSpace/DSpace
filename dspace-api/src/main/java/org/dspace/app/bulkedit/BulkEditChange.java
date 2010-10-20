@@ -43,6 +43,7 @@ import org.dspace.content.DCValue;
 import org.dspace.content.Collection;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utility class to store changes to item that may occur during a batch edit.
@@ -54,23 +55,23 @@ public class BulkEditChange
     /** The item these changes relate to */
     private Item item;
 
-    /** The ArrayList of hashtables with the new elements */
-    private ArrayList<DCValue> adds;
+    /** The List of hashtables with the new elements */
+    private List<DCValue> adds;
 
-    /** The ArrayList of hashtables with the removed elements */
-    private ArrayList<DCValue> removes;
+    /** The List of hashtables with the removed elements */
+    private List<DCValue> removes;
 
-    /** The ArrayList of hashtables with the unchanged elements */
-    private ArrayList<DCValue> constant;
+    /** The List of hashtables with the unchanged elements */
+    private List<DCValue> constant;
 
-    /** The ArrayList of the complete set of new values (constant + adds) */
-    private ArrayList<DCValue> complete;
+    /** The List of the complete set of new values (constant + adds) */
+    private List<DCValue> complete;
 
-    /** The Arraylist of old collections the item used to be mapped to */
-    private ArrayList<Collection> oldMappedCollections;
+    /** The list of old collections the item used to be mapped to */
+    private List<Collection> oldMappedCollections;
 
-    /** The Arraylist of new collections the item has been mapped into */
-    private ArrayList<Collection> newMappedCollections;
+    /** The list of new collections the item has been mapped into */
+    private List<Collection> newMappedCollections;
 
     /** The old owning collection */
     private Collection oldOwningCollection;
@@ -262,7 +263,7 @@ public class BulkEditChange
      *
      * @return the list of elements and their values that have been added.
      */
-    public ArrayList<DCValue> getAdds()
+    public List<DCValue> getAdds()
     {
         // Return the array
         return adds;
@@ -273,7 +274,7 @@ public class BulkEditChange
      *
      * @return the list of elements and their values that have been removed.
      */
-    public ArrayList<DCValue> getRemoves()
+    public List<DCValue> getRemoves()
     {
         // Return the array
         return removes;
@@ -284,7 +285,7 @@ public class BulkEditChange
      *
      * @return the list of unchanged values
      */
-    public ArrayList<DCValue> getConstant()
+    public List<DCValue> getConstant()
     {
         // Return the array
         return constant;
@@ -295,7 +296,7 @@ public class BulkEditChange
      *
      * @return the list of all values
      */
-    public ArrayList<DCValue> getComplete()
+    public List<DCValue> getComplete()
     {
         // Return the array
         return complete;
@@ -306,7 +307,7 @@ public class BulkEditChange
      *
      * @return the list of new mapped collections
      */
-    public ArrayList<Collection> getNewMappedCollections()
+    public List<Collection> getNewMappedCollections()
     {
         // Return the array
         return newMappedCollections;
@@ -317,7 +318,7 @@ public class BulkEditChange
      *
      * @return the list of old mapped collections
      */
-    public ArrayList<Collection> getOldMappedCollections()
+    public List<Collection> getOldMappedCollections()
     {
         // Return the array
         return oldMappedCollections;

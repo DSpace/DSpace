@@ -75,7 +75,7 @@ public class EventManager
     // Keyed FIFO Pool of event dispatchers
     private static KeyedObjectPool dispatcherPool = null;
 
-    private static HashMap<String, Integer> consumerIndicies = null;
+    private static Map<String, Integer> consumerIndicies = null;
 
     private static final String CONSUMER_PFX = "event.consumer.";
 

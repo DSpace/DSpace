@@ -56,10 +56,10 @@ import java.io.*;
 public class DSpaceCSV
 {
     /** The headings of the CSV file */
-    private ArrayList<String> headings;
+    private List<String> headings;
 
     /** An array list of CSV lines */
-    private ArrayList<DSpaceCSVLine> lines;
+    private List<DSpaceCSVLine> lines;
 
     /** A counter of how many CSV lines this object holds */
     private int counter;
@@ -485,7 +485,7 @@ public class DSpaceCSV
      *
      * @return The lines
      */
-    public ArrayList<DSpaceCSVLine> getCSVLines()
+    public List<DSpaceCSVLine> getCSVLines()
     {
         // Return the lines
         return lines;

@@ -99,24 +99,24 @@ public class DCInputsReader
      * Reference to the collections to forms map, computed from the forms
      * definition file
      */
-    private HashMap whichForms = null;
+    private Map whichForms = null;
 
     /**
      * Reference to the forms definitions map, computed from the forms
      * definition file
      */
-    private HashMap formDefns  = null;
+    private Map formDefns  = null;
 
     /**
      * Reference to the forms which allow, disallow or mandate files to be
      * uploaded.
      */
-    private HashMap formFileUploadDefns = null;
+    private Map formFileUploadDefns = null;
 
     /**
      * Reference to the value-pairs map, computed from the forms definition file
      */
-    private HashMap valuePairs = null;    // Holds display/storage pairs
+    private Map valuePairs = null;    // Holds display/storage pairs
     
     /**
      * Mini-cache of last DCInputSet requested. If submissions are not typically
@@ -481,7 +481,7 @@ public class DCInputsReader
      * Check that this is the only field with the name dc-element.dc-qualifier
      * If there is a duplicate, return an error message, else return null;
      */
-    private String checkForDups(String formName, HashMap field, List pages)
+    private String checkForDups(String formName, Map field, List pages)
     {
         int matches = 0;
         String err = null;

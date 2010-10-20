@@ -38,6 +38,7 @@
 package org.dspace.browse;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.dspace.core.ConfigurationManager;
 
@@ -52,7 +53,7 @@ import org.dspace.core.ConfigurationManager;
 public class CrossLinks
 {
 	/** a map of the desired links */
-	private HashMap links = new HashMap();
+	private Map links = new HashMap();
 	
 	/**
 	 * Construct a new object which will obtain the configuration for itself

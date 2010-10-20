@@ -48,6 +48,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -159,7 +160,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     private static XMLOutputter outputUgly = new XMLOutputter();
     private static SAXBuilder builder = new SAXBuilder();
 
-    private HashMap modsMap = null;
+    private Map modsMap = null;
 
     /**
      * Container for crosswalk mapping: expressed as "triple" of:

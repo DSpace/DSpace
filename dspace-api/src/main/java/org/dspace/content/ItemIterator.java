@@ -41,6 +41,7 @@ import java.sql.SQLException;
 
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.TableRow;
@@ -97,7 +98,7 @@ public class ItemIterator
      * @param iids
      *            the array list to be iterated over
      */
-    public ItemIterator(Context context, ArrayList iids)
+    public ItemIterator(Context context, List iids)
     {
     	ourContext = context;
     	iditr = iids.iterator();

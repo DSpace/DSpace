@@ -55,6 +55,7 @@ import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Metadata importer to allow the batch import of metadata from a file
@@ -67,7 +68,7 @@ public class MetadataImport
     Context c;
 
     /** The lines to import */
-    ArrayList<DSpaceCSVLine> toImport;
+    List<DSpaceCSVLine> toImport;
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(MetadataImport.class);
@@ -79,7 +80,7 @@ public class MetadataImport
      * @param c The context
      * @param toImport An array of CSV lines to examine
      */
-    public MetadataImport(Context c, ArrayList<DSpaceCSVLine> toImport)
+    public MetadataImport(Context c, List<DSpaceCSVLine> toImport)
     {
         // Store the import settings
         this.c = c;
@@ -98,7 +99,7 @@ public class MetadataImport
      *
      * @throws MetadataImportException if something goes wrong
      */
-    public ArrayList<BulkEditChange> runImport(boolean change,
+    public List<BulkEditChange> runImport(boolean change,
                                                boolean useWorkflow,
                                                boolean workflowNotify,
                                                boolean useTemplate) throws MetadataImportException
@@ -127,7 +128,7 @@ public class MetadataImport
                     BulkEditChange whatHasChanged = new BulkEditChange(item);
 
                     // Has it moved collection?
-                    ArrayList<String> collections = line.get("collection");
+                    List<String> collections = line.get("collection");
                     if (collections != null)
                     {
                         // Sanity check we're not orphaning it
@@ -189,7 +190,7 @@ public class MetadataImport
                     }
 
                     // Check it has an owning collection
-                    ArrayList<String> collections = line.get("collection");
+                    List<String> collections = line.get("collection");
                     if (collections == null)
                     {
                         throw new MetadataImportException("New items must have a 'collection' assigned in the form of a handle");
@@ -412,8 +413,8 @@ public class MetadataImport
             ((changes.getAdds().size() > 0) || (changes.getRemoves().size() > 0)))
         {
             // Get the complete list of what values should now be in that element
-            ArrayList<DCValue> list = changes.getComplete();
-            ArrayList<String> values = new ArrayList<String>();
+            List<DCValue> list = changes.getComplete();
+            List<String> values = new ArrayList<String>();
             for (DCValue value : list)
             {
                 if ((qualifier == null) && (language == null))
@@ -482,7 +483,7 @@ public class MetadataImport
      * @throws MetadataImportException If something goes wrong to be reported back to the user
      */
     private void compare(Item item,
-                         ArrayList<String> collections,
+                         List<String> collections,
                          Collection[] actualCollections,
                          BulkEditChange bechange,
                          boolean change) throws SQLException, AuthorizeException, IOException, MetadataImportException
@@ -748,17 +749,17 @@ public class MetadataImport
      * @param changed Whether or not the changes have been made
      * @return The number of items that have changed
      */
-    private static int displayChanges(ArrayList<BulkEditChange> changes, boolean changed)
+    private static int displayChanges(List<BulkEditChange> changes, boolean changed)
     {
         // Display the changes
         int changeCounter = 0;
         for (BulkEditChange change : changes)
         {
             // Get the changes
-            ArrayList<DCValue> adds = change.getAdds();
-            ArrayList<DCValue> removes = change.getRemoves();
-            ArrayList<Collection> newCollections = change.getNewMappedCollections();
-            ArrayList<Collection> oldCollections = change.getOldMappedCollections();
+            List<DCValue> adds = change.getAdds();
+            List<DCValue> removes = change.getRemoves();
+            List<Collection> newCollections = change.getNewMappedCollections();
+            List<Collection> oldCollections = change.getOldMappedCollections();
             if ((adds.size() > 0) || (removes.size() > 0) ||
                 (newCollections.size() > 0) || (oldCollections.size() > 0) ||
                 (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null))
@@ -1037,7 +1038,7 @@ public class MetadataImport
 
         // Perform the first import - just higlight differences
         MetadataImport importer = new MetadataImport(c, csv.getCSVLines());
-        ArrayList<BulkEditChange> changes;
+        List<BulkEditChange> changes;
 
         if (!line.hasOption('s'))
         {

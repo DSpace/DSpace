@@ -112,7 +112,7 @@ public class PluginManager
 
     // Map of plugin class to "reusable" metric (as Boolean, must be Object)
     // Key is Class, value is Boolean (true by default).
-    private static HashMap cacheMeCache = new HashMap();
+    private static Map cacheMeCache = new HashMap();
 
     // Predicate -- whether or not to cache this class.  Ironically,
     // the cacheability information is itself cached.
@@ -161,7 +161,7 @@ public class PluginManager
 
     // cache of config data for Sequence Plugins; format its
     // <interface-name> -> [ <classname>.. ]  (value is Array)
-    private static HashMap sequenceConfig = new HashMap();
+    private static Map sequenceConfig = new HashMap();
 
     /**
      * Returns instances of all plugins that implement the interface
@@ -206,7 +206,7 @@ public class PluginManager
     }
 
     // Map of cached (reusable) single plugin instances - class -> instance.
-    private static HashMap anonymousInstanceCache = new HashMap();
+    private static Map anonymousInstanceCache = new HashMap();
 
     // Get possibly-cached plugin instance for un-named plugin,
     // this is shared by Single and Sequence plugins.
@@ -246,10 +246,10 @@ public class PluginManager
 
     // Map of named plugin classes, [intfc,name] -> class
     // Also contains intfc -> "marker" to mark when interface has been loaded.
-    private static HashMap namedPluginClasses = new HashMap();
+    private static Map namedPluginClasses = new HashMap();
 
     // Map of cached (reusable) named plugin instances, [class,name] -> instance
-    private static HashMap namedInstanceCache = new HashMap();
+    private static Map namedInstanceCache = new HashMap();
 
     // load and cache configuration data for the given interface.
     private static void configureNamedPlugin(String iname)

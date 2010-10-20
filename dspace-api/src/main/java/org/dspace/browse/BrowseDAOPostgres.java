@@ -132,8 +132,8 @@ public class BrowseDAOPostgres implements BrowseDAO
     // administrative attributes for this class
 
     /** a cache of the actual query to be executed */
-    private String    querySql    = "";
-    private ArrayList queryParams = new ArrayList();
+    private String querySql    = "";
+    private List   queryParams = new ArrayList();
 
     /** whether the query (above) needs to be regenerated */
     private boolean rebuildQuery = true;

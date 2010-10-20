@@ -45,6 +45,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -87,10 +88,10 @@ public class MetadataSchema
     private String name;
 
     // cache of schema by ID (Integer)
-    private static HashMap id2schema = null;
+    private static Map id2schema = null;
 
     // cache of schema by short name
-    private static HashMap name2schema = null;
+    private static Map name2schema = null;
 
 
     /**

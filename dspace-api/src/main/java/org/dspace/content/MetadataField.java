@@ -45,6 +45,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -80,7 +81,7 @@ public class MetadataField
     private TableRow row;
 
     // cache of field by ID (Integer)
-    private static HashMap id2field = null;
+    private static Map id2field = null;
 
 
     /**

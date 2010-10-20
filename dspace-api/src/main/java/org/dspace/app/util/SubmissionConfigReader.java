@@ -97,7 +97,7 @@ public class SubmissionConfigReader
      * which collection, computed from the item submission config file
      * (specifically, the 'submission-map' tag)
      */
-    private HashMap collectionToSubmissionConfig = null;
+    private Map collectionToSubmissionConfig = null;
 
     /**
      * Reference to the global submission step definitions defined in the
@@ -396,7 +396,7 @@ public class SubmissionConfigReader
                             "There are two step elements with the id '" + stepID + "' in 'item-submission.xml'");
                 }
 
-                HashMap stepInfo = processStepChildNodes("step-definition", nd);
+                Map stepInfo = processStepChildNodes("step-definition", nd);
 
                 stepDefns.put(stepID, stepInfo);
             } // ignore any child that is not a 'step'
@@ -489,7 +489,7 @@ public class SubmissionConfigReader
                         // check for an 'id' attribute
                         String stepID = getAttribute(nStep, "id");
 
-                        HashMap stepInfo;
+                        Map stepInfo;
 
                         // if this step has an id, load its information from the
                         // step-definition section
@@ -567,7 +567,7 @@ public class SubmissionConfigReader
      * and the value is the field value.
      * 
      */
-    private HashMap processStepChildNodes(String configSection, Node nStep)
+    private Map processStepChildNodes(String configSection, Node nStep)
             throws SAXException, ServletException
     {
         // initialize the HashMap of step Info

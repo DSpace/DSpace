@@ -86,7 +86,7 @@ public class SubmissionInfo
     * second page of Step 5) Values are the Headings to display for each step
     * (e.g. "Describe")
     **************************************************************************/
-    private HashMap progressBar = null;
+    private Map progressBar = null;
     
     /** The element or element_qualifier to show more input boxes for */
     private String moreBoxesFor;
@@ -583,7 +583,7 @@ public class SubmissionInfo
      * 
      */
     private static void saveProgressBarToCache(HttpSession session,
-            HashMap progressBarInfo)
+            Map progressBarInfo)
     {
         // cache progress bar info to Session
         session.setAttribute("submission.progressbar", progressBarInfo);
@@ -601,9 +601,9 @@ public class SubmissionInfo
      * @return progressBarInfo HashMap (if found), or null (if not)
      * 
      */
-    private static HashMap loadProgressBarFromCache(HttpSession session)
+    private static Map loadProgressBarFromCache(HttpSession session)
     {
-        return (HashMap) session.getAttribute("submission.progressbar");
+        return (Map) session.getAttribute("submission.progressbar");
     }
 
     /**

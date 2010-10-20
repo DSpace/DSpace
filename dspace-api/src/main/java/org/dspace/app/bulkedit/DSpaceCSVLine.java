@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Utility class to store a line from a CSV file
@@ -116,7 +117,7 @@ public class DSpaceCSVLine
      * @param key The metadata key
      * @return All the elements that match
      */
-    public ArrayList<String> get(String key)
+    public List<String> get(String key)
     {
         // Return any relevant values
         return items.get(key);
@@ -139,7 +140,7 @@ public class DSpaceCSVLine
      * @param headings The headings which define the order the elements must be presented in
      * @return The CSV formatted String
      */
-    protected String toCSV(ArrayList<String> headings)
+    protected String toCSV(List<String> headings)
     {
         StringBuilder bits = new StringBuilder();
 
@@ -172,7 +173,7 @@ public class DSpaceCSVLine
      * @param values The values to create the string from
      * @return The line as a CSV formatted String
      */
-    private String valueToCSV(ArrayList<String> values)
+    private String valueToCSV(List<String> values)
     {
         // Check there is some content
         if (values == null)

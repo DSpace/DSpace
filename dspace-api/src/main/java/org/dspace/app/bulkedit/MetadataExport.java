@@ -47,6 +47,7 @@ import org.dspace.handle.HandleManager;
 
 import java.util.ArrayList;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Metadata exporter to allow the batch export of metadata into a file
@@ -116,7 +117,7 @@ public class MetadataExport
      * @return The list of item ids
      * @throws SQLException
      */
-    private ArrayList buildFromCommunity(Community community, ArrayList itemIDs, int indent)
+    private List buildFromCommunity(Community community, List itemIDs, int indent)
                                                                                throws SQLException
     {
         // Add all the collections

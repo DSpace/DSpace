@@ -48,6 +48,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -128,10 +129,10 @@ public class QDCCrosswalk extends SelfNamedPlugin
     private static Logger log = Logger.getLogger(QDCCrosswalk.class);
 
     // map of qdc to JDOM Element
-    private HashMap qdc2element = new HashMap();
+    private Map qdc2element = new HashMap();
 
     // map of JDOM Element to qdc DCValue
-    private HashMap element2qdc = new HashMap();
+    private Map element2qdc = new HashMap();
 
     // the XML namespaces from config file for this name.
     private Namespace namespaces[] = null;
