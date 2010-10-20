@@ -67,7 +67,7 @@ public class ConsumerProfile
     private List<int[]> filters;
 
     // Prefix of keys in DSpace Configuration.
-    private final String CONSUMER_PREFIX = "event.consumer.";
+    private static final String CONSUMER_PREFIX = "event.consumer.";
 
     /**
      * Constructor.
