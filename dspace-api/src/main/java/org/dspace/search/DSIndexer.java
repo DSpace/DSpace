@@ -51,7 +51,6 @@ import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.Vector;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 
@@ -1089,7 +1088,7 @@ public class DSIndexer
 
         log.debug("  Added Sorting");
         
-        Vector<InputStreamReader> readers = new Vector<InputStreamReader>();
+        List<InputStreamReader> readers = new ArrayList<InputStreamReader>();
 
         try
         {

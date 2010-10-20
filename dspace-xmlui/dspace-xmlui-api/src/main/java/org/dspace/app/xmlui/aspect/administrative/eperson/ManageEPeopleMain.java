@@ -40,7 +40,6 @@
 package org.dspace.app.xmlui.aspect.administrative.eperson;
 
 import java.sql.SQLException;
-import java.util.Vector;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -218,7 +217,7 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
         	String fullName = person.getFullName();
         	String email = person.getEmail();
         	String url = baseURL+"&submit_edit&epersonID="+epersonID;
-        	Vector<String> deleteConstraints = person.getDeleteConstraints();
+        	java.util.List<String> deleteConstraints = person.getDeleteConstraints();
         	
         	
         	Row row;

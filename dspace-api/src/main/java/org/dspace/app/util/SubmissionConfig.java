@@ -38,7 +38,8 @@
 
 package org.dspace.app.util;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.io.Serializable;
 
@@ -87,19 +88,19 @@ public class SubmissionConfig implements Serializable
      *            not. If it is a workflow process this may limit the steps that
      *            are available for editing.
      */
-    public SubmissionConfig(String submissionName, Vector steps,
+    public SubmissionConfig(String submissionName, List<Map> steps,
             boolean isWorkflowProcess)
     {
         this.submissionName = submissionName;
         this.isWorkflow = isWorkflowProcess;
 
         // initialize a vector of SubmissionStepConfig objects
-        Vector<SubmissionStepConfig> stepConfigs = new Vector<SubmissionStepConfig>();
+        List<SubmissionStepConfig> stepConfigs = new ArrayList<SubmissionStepConfig>();
 
         // loop through our steps, and create SubmissionStepConfig objects
         for (int stepNum = 0; stepNum < steps.size(); stepNum++)
         {
-            Map stepInfo = (Map) steps.get(stepNum);
+            Map stepInfo = steps.get(stepNum);
             SubmissionStepConfig step = new SubmissionStepConfig(stepInfo);
 
             // Only add this step to the process if either:

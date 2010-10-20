@@ -41,10 +41,8 @@
 package org.dspace.app.util;
 
 import java.io.File;
-import java.util.List;
-import java.util.Vector;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
+
 import org.xml.sax.SAXException;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
@@ -186,7 +184,7 @@ public class DCInputsReader
 
     public List getPairs(String name)
     {
-        return (Vector)valuePairs.get(name);
+        return (List)valuePairs.get(name);
     }
 
     /**
@@ -217,7 +215,7 @@ public class DCInputsReader
                 return lastInputSet;
         }
         // cache miss - construct new DCInputSet
-        Vector pages = (Vector)formDefns.get(formName);
+        List pages = (List)formDefns.get(formName);
         if ( pages == null )
         {
                 throw new DCInputsReaderException("Missing the " + formName  + " form");
@@ -351,7 +349,7 @@ public class DCInputsReader
                         {
                                 throw new SAXException("form element has no name attribute");
                         }
-                        Vector pages = new Vector(); // the form contains pages
+                        List pages = new ArrayList(); // the form contains pages
                         formDefns.put(formName, pages);
                         NodeList pl = nd.getChildNodes();
                         int lenpg = pl.getLength();
@@ -366,7 +364,7 @@ public class DCInputsReader
                                         {
                                                 throw new SAXException("Form " + formName + " has no identified pages");
                                         }
-                                        Vector page = new Vector();
+                                        List page = new ArrayList();
                                         pages.add(page);
                                         NodeList flds = npg.getChildNodes();
                                         int lenflds = flds.getLength();
@@ -483,7 +481,7 @@ public class DCInputsReader
      * Check that this is the only field with the name dc-element.dc-qualifier
      * If there is a duplicate, return an error message, else return null;
      */
-    private String checkForDups(String formName, HashMap field, Vector pages)
+    private String checkForDups(String formName, HashMap field, List pages)
     {
         int matches = 0;
         String err = null;
@@ -498,7 +496,7 @@ public class DCInputsReader
         
         for (int i = 0; i < pages.size(); i++)
         {
-            Vector pg = (Vector)pages.get(i);
+            List pg = (List)pages.get(i);
             for (int j = 0; j < pg.size(); j++)
             {
                 HashMap fld = (HashMap)pg.get(j);
@@ -575,7 +573,7 @@ public class DCInputsReader
                                 throw new SAXException(errString);
 
                         }
-                        Vector pairs = new Vector();
+                        List pairs = new ArrayList();
                         valuePairs.put(pairsName, pairs);
                         NodeList cl = nd.getChildNodes();
                         int lench = cl.getLength();
@@ -630,10 +628,10 @@ public class DCInputsReader
         while (ki.hasNext())
         {
                 String idName = (String)ki.next();
-                Vector pages = (Vector)formDefns.get(idName);
+                List pages = (List)formDefns.get(idName);
                 for (int i = 0; i < pages.size(); i++)
                 {
-                        Vector page = (Vector)pages.get(i);
+                        List page = (List)pages.get(i);
                         for (int j = 0; j < page.size(); j++)
                         {
                                 HashMap fld = (HashMap)page.get(j);
@@ -644,7 +642,7 @@ public class DCInputsReader
                             || type.equals("list"))
                                 {
                                         String pairsName = (String)fld.get(PAIR_TYPE_NAME);
-                                        Vector v = (Vector)valuePairs.get(pairsName);
+                                        List v = (List)valuePairs.get(pairsName);
                                         if (v == null)
                                         {
                                                 String errString = "Cannot find value pairs for " + pairsName;

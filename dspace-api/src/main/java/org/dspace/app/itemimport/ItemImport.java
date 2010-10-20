@@ -739,7 +739,7 @@ public class ItemImport
         // and the bitstreams from the contents file
         // process contents file, add bistreams and bundles, return any
         // non-standard permissions
-        Vector options = processContentsFile(c, myitem, path
+        List<String> options = processContentsFile(c, myitem, path
                 + File.separatorChar + itemname, "contents");
 
         if (useWorkflow)
@@ -1061,16 +1061,16 @@ public class ItemImport
 
     /**
      * Given a contents file and an item, stuffing it with bitstreams from the
-     * contents file Returns a Vector of Strings with lines from the contents
+     * contents file Returns a List of Strings with lines from the contents
      * file that request non-default bitstream permission
      */
-    private Vector processContentsFile(Context c, Item i, String path,
+    private List<String> processContentsFile(Context c, Item i, String path,
             String filename) throws SQLException, IOException,
             AuthorizeException
     {
         String contentspath = path + File.separatorChar + filename;
         String line = "";
-        Vector options = new Vector();
+        List<String> options = new ArrayList<String>();
 
         System.out.println("\tProcessing contents file: " + contentspath);
 
@@ -1432,13 +1432,11 @@ public class ItemImport
      * @throws SQLException
      * @throws AuthorizeException
      */
-    private void processOptions(Context c, Item myItem, Vector options)
+    private void processOptions(Context c, Item myItem, List<String> options)
             throws SQLException, AuthorizeException
     {
-        for (int i = 0; i < options.size(); i++)
+        for (String line : options)
         {
-            String line = options.elementAt(i).toString();
-
             System.out.println("\tprocessing " + line);
 
             boolean permissionsExist = false;

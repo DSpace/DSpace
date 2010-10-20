@@ -53,12 +53,12 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.eperson.EPerson" %>
-<%@ page import="java.util.Vector" %>
+<%@ page import="java.util.List" %>
 <%@ page import="java.util.Iterator" %>
 
 <%
     EPerson eperson = (EPerson) request.getAttribute("eperson");
-    Vector tableList = (Vector) request.getAttribute("tableList");
+    List tableList = (List) request.getAttribute("tableList");
     String fullName = eperson.getFullName();
     Iterator tableIt = tableList.iterator();
   

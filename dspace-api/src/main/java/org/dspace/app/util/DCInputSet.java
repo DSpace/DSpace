@@ -40,7 +40,6 @@ package org.dspace.app.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.util.Map;
 
 /**
@@ -58,13 +57,13 @@ public class DCInputSet
 	private DCInput[][] inputPages = null;
 	
 	/** constructor */
-	public DCInputSet(String formName, Vector pages, Map listMap)
+	public DCInputSet(String formName, List pages, Map listMap)
 	{
 		this.formName = formName;
 		inputPages = new DCInput[pages.size()][];
 		for ( int i = 0; i < inputPages.length; i++ )
 		{
-			Vector page = (Vector)pages.get(i);
+			List page = (List)pages.get(i);
 			inputPages[i] = new DCInput[page.size()];
 			for ( int j = 0; j < inputPages[i].length; j++ )
 			{

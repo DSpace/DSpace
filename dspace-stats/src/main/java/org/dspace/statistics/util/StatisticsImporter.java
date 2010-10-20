@@ -82,16 +82,16 @@ public class StatisticsImporter
     private static boolean skipReverseDNS = false;
 
     /** Local items */
-    private Vector<Integer> localItems;
+    private List<Integer> localItems;
 
     /** Local collections */
-    private Vector<Integer> localCollections;
+    private List<Integer> localCollections;
 
     /** Local communities */
-    private Vector<Integer> localCommunities;
+    private List<Integer> localCommunities;
 
     /** Local bitstreams */
-    private Vector<Integer> localBitstreams;
+    private List<Integer> localBitstreams;
 
     /** Whether or not to replace item IDs with local values (for testing) */
     private boolean useLocal;
@@ -113,7 +113,7 @@ public class StatisticsImporter
                 System.out.print("Loading local communities... ");
                 Context c = new Context();
                 Community[] communities = Community.findAll(c);
-                localCommunities = new Vector<Integer>();
+                localCommunities = new ArrayList<Integer>();
                 for (Community community : communities)
                 {
                     localCommunities.add(community.getID());
@@ -122,7 +122,7 @@ public class StatisticsImporter
 
                 System.out.print("Loading local collections... ");
                 Collection[] collections = Collection.findAll(c);
-                localCollections = new Vector<Integer>();
+                localCollections = new ArrayList<Integer>();
                 for (Collection collection : collections)
                 {
                     localCollections.add(collection.getID());
@@ -131,7 +131,7 @@ public class StatisticsImporter
 
                 System.out.print("Loading local items... ");
                 ItemIterator items = Item.findAll(c);
-                localItems = new Vector<Integer>();
+                localItems = new ArrayList<Integer>();
                 Item i;
                 while (items.hasNext())
                 {
@@ -142,7 +142,7 @@ public class StatisticsImporter
 
                 System.out.print("Loading local bitstreams... ");
                 Bitstream[] bitstreams = Bitstream.findAll(c);
-                localBitstreams = new Vector<Integer>();
+                localBitstreams = new ArrayList<Integer>();
                 for (Bitstream bitstream : bitstreams)
                 {
                     if (bitstream.getName() != null)

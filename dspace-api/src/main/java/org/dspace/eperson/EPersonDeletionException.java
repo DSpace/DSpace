@@ -37,7 +37,7 @@
  */
 package org.dspace.eperson;
 
-import java.util.Vector;
+import java.util.List;
 
 /**
  * Exception indicating that an EPerson may not be deleted due to the presence
@@ -47,7 +47,7 @@ import java.util.Vector;
  */
 public class EPersonDeletionException extends Exception
 {
-    private Vector myTableList; //set of tables in which EPerson exists
+    private List<String> myTableList; //set of tables in which EPerson exists
 
     /**
      * Create an empty EPersonDeletionException
@@ -66,7 +66,7 @@ public class EPersonDeletionException extends Exception
      *            deleted if it exists in these tables.
      *  
      */
-    public EPersonDeletionException(Vector tableList)
+    public EPersonDeletionException(List<String> tableList)
     {
         super();
         myTableList = tableList;
@@ -77,7 +77,7 @@ public class EPersonDeletionException extends Exception
      * 
      * @return The tables in which the eperson ID exists.
      */
-    public Vector getTables()
+    public List<String> getTables()
     {
         return myTableList;
     }

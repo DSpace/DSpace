@@ -74,11 +74,8 @@ package org.purl.sword.client;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Vector;
+import java.util.*;
 
-import java.util.List;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -874,7 +871,7 @@ implements TreeSelectionListener
       DefaultMutableTreeNode entryNode = new DefaultMutableTreeNode(wrapper);
 
       DefaultMutableTreeNode newParentNode = top; 
-      Vector<DefaultMutableTreeNode> nodes = getCollectionNodes();
+      List<DefaultMutableTreeNode> nodes = getCollectionNodes();
       for( DefaultMutableTreeNode node : nodes )
       {
          Object o = node.getUserObject();
@@ -906,13 +903,13 @@ implements TreeSelectionListener
     */
    public String[] getCollectionLocations() 
    {
-      Vector<DefaultMutableTreeNode> nodes = getCollectionNodes();
+      List<DefaultMutableTreeNode> nodes = getCollectionNodes();
       String[] locations = new String[nodes.size()];
       
       DefaultMutableTreeNode node;
       for( int i = 0; i < nodes.size(); i++ )
       {
-         node = nodes.elementAt(i);
+         node = nodes.get(i);
          Object o = node.getUserObject();
          if( o instanceof TreeNodeWrapper )
          {
@@ -937,9 +934,9 @@ implements TreeSelectionListener
     * 
     * @return A vector of the collection nodes. 
     */
-   private Vector<DefaultMutableTreeNode> getCollectionNodes()
+   private List<DefaultMutableTreeNode> getCollectionNodes()
    {
-      Vector<DefaultMutableTreeNode> nodes = new Vector<DefaultMutableTreeNode>();
+      List<DefaultMutableTreeNode> nodes = new ArrayList<DefaultMutableTreeNode>();
       
       DefaultMutableTreeNode node;
       Enumeration treeNodes = top.depthFirstEnumeration(); 

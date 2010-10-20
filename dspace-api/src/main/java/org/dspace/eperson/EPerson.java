@@ -38,8 +38,8 @@
 package org.dspace.eperson;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -568,7 +568,7 @@ public class EPerson extends DSpaceObject
 
         // check for presence of eperson in tables that
         // have constraints on eperson_id
-        Vector<String> constraintList = getDeleteConstraints();
+        List<String> constraintList = getDeleteConstraints();
 
         // if eperson exists in tables that have constraints
         // on eperson, throw an exception
@@ -980,11 +980,11 @@ public class EPerson extends DSpaceObject
      * An EPerson cannot be deleted if it exists in the item, workflowitem, or
      * tasklistitem tables.
      * 
-     * @return Vector of tables that contain a reference to the eperson.
+     * @return List of tables that contain a reference to the eperson.
      */
-    public Vector<String> getDeleteConstraints() throws SQLException
+    public List<String> getDeleteConstraints() throws SQLException
     {
-        Vector<String> tableList = new Vector<String>();
+        List<String> tableList = new ArrayList<String>();
 
         // check for eperson in item table
         TableRowIterator tri = DatabaseManager.queryTable(myContext, "item",

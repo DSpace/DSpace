@@ -41,7 +41,6 @@ package org.dspace.app.xmlui.aspect.administrative.eperson;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Vector;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -215,7 +214,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 		String phoneValue = eperson.getMetadata("phone");
 		boolean canLogInValue = eperson.canLogIn();
 		boolean certificatValue = eperson.getRequireCertificate();
-		Vector<String> deleteConstraints = eperson.getDeleteConstraints();
+		java.util.List<String> deleteConstraints = eperson.getDeleteConstraints();
 		
 		if (request.getParameter("email_address") != null)
 			emailValue = request.getParameter("email_address");

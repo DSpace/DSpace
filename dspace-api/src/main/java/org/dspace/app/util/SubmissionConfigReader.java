@@ -39,9 +39,7 @@
 package org.dspace.app.util;
 
 import java.io.File;
-import java.util.Vector;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.lang.Exception;
 import javax.servlet.ServletException;
 import org.xml.sax.SAXException;
@@ -105,13 +103,13 @@ public class SubmissionConfigReader
      * Reference to the global submission step definitions defined in the
      * "step-definitions" section
      */
-    private HashMap stepDefns = null;
+    private Map<String, Map> stepDefns = null;
 
     /**
      * Reference to the item submission definitions defined in the
      * "submission-definitions" section
      */
-    private HashMap submitDefns = null;
+    private Map<String, List<Map>> submitDefns = null;
 
     /**
      * Mini-cache of last SubmissionConfig object requested (so that we don't
@@ -142,7 +140,7 @@ public class SubmissionConfigReader
     private void buildInputs(String fileName) throws ServletException
     {
         collectionToSubmissionConfig = new HashMap();
-        submitDefns = new HashMap();
+        submitDefns = new HashMap<String, List<Map>>();
 
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
@@ -216,7 +214,7 @@ public class SubmissionConfigReader
         }
 
         // cache miss - construct new SubmissionConfig
-        Vector steps = (Vector) submitDefns.get(submitName);
+        List<Map> steps = submitDefns.get(submitName);
 
         if (steps == null)
         {
@@ -258,7 +256,7 @@ public class SubmissionConfigReader
         if (stepDefns != null)
         {
             // retreive step info
-            Map stepInfo = (Map) stepDefns.get(stepID);
+            Map stepInfo = stepDefns.get(stepID);
 
             if (stepInfo != null)
                 return new SubmissionStepConfig(stepInfo);
@@ -375,7 +373,7 @@ public class SubmissionConfigReader
             ServletException
     {
         int numStepDefns = 0;
-        stepDefns = new HashMap();
+        stepDefns = new HashMap<String, Map>();
 
         NodeList nl = e.getChildNodes();
         int len = nl.getLength();
@@ -444,7 +442,7 @@ public class SubmissionConfigReader
             ServletException
     {
         int numSubmitProcesses = 0;
-        Vector submitNames = new Vector();
+        List submitNames = new ArrayList();
 
         // find all child nodes of the 'submission-definition' node and loop
         // through
@@ -473,7 +471,7 @@ public class SubmissionConfigReader
                 submitNames.add(submitName);
 
                 // the 'submission-process' definition contains steps
-                Vector steps = new Vector();
+                List steps = new ArrayList();
                 submitDefns.put(submitName, steps);
 
                 // loop through all the 'step' nodes of the 'submission-process'

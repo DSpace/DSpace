@@ -47,8 +47,6 @@ import org.dspace.core.Context;
 
 import java.io.*;
 import java.sql.SQLException;
-import java.util.Hashtable;
-import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.text.SimpleDateFormat;

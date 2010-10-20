@@ -41,7 +41,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -121,7 +120,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
      */
     private List extractKeywords(HttpServletRequest request)
     {
-        List keywords = new Vector();
+        List keywords = new ArrayList();
         Enumeration enumeration = request.getParameterNames();
         while (enumeration.hasMoreElements())
         {

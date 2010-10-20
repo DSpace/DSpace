@@ -41,14 +41,7 @@ package org.dspace.app.webui.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -78,7 +71,7 @@ public class FileUploadRequest extends HttpServletRequestWrapper
 
     private HashMap fileitems = new HashMap();
 
-    private Vector filenames = new Vector();
+    private List filenames = new ArrayList();
 
     private String tempDir = null;
 
@@ -205,7 +198,7 @@ public class FileUploadRequest extends HttpServletRequestWrapper
     
     public Enumeration getFileNames()
     {
-        return filenames.elements();
+        return Collections.enumeration(filenames);
     }
 
     /**
