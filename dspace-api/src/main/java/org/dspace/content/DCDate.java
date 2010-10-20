@@ -42,11 +42,7 @@ import java.text.DateFormatSymbols;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 
@@ -111,17 +107,7 @@ public class DCDate
     // just year, "2009"
     private final SimpleDateFormat yearIso = new SimpleDateFormat("yyyy");
     
-
-   /**
-    * DateFormatSymbols for locale months name
-    */
-    private static DateFormatSymbols dfs = null;
-
-   /**
-     * note the session locale
-     */
-    private static Locale langMonth = null;
-
+    private static Map<Locale, DateFormatSymbols> dfsLocaleMap = new HashMap<Locale, DateFormatSymbols>();
 
     /**
      * Construct a date object from a Java <code>Date</code> object.
@@ -640,11 +626,13 @@ public class DCDate
     {
         if ((m > 0) && (m < 13))
         {
-            if (dfs == null || !langMonth.equals(locale))
-                {
-                        dfs = new DateFormatSymbols(locale);
-                        langMonth = locale;
-                }
+            DateFormatSymbols dfs = dfsLocaleMap.get(locale);
+            if (dfs == null)
+            {
+                dfs = new DateFormatSymbols(locale);
+                dfsLocaleMap.put(locale, dfs);
+            }
+
            return dfs.getMonths()[m-1];
         }
         else
