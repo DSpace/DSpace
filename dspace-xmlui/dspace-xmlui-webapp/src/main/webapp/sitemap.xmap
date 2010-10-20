@@ -3,28 +3,28 @@
   sitemap.xmap
 
   Version: $Revision$
- 
+
   Date: $Date$
- 
+
   Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
   Institute of Technology.  All rights reserved.
- 
+
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are
   met:
- 
+
   - Redistributions of source code must retain the above copyright
   notice, this list of conditions and the following disclaimer.
- 
+
   - Redistributions in binary form must reproduce the above copyright
   notice, this list of conditions and the following disclaimer in the
   documentation and/or other materials provided with the distribution.
- 
+
   - Neither the name of the Hewlett-Packard Company nor the name of the
   Massachusetts Institute of Technology nor the names of their
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
   ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -207,15 +207,16 @@
                         </map:selector>
                 </map:selectors>
                 <map:readers default="resource">
-                        <map:reader name="resource" src="org.apache.cocoon.reading.ResourceReader"
-                                logger="sitemap.reader.resource" pool-max="32">
-                                <expires>3600000</expires> <!-- 1000 * 60 * 60 = 3600000 = One hour -->
-                        </map:reader>
-                        <map:reader name="BitstreamReader" src="org.dspace.app.xmlui.cocoon.BitstreamReader"/>
-                        <map:reader name="ExportReader" src="org.dspace.app.xmlui.cocoon.ItemExportDownloadReader"/>
-                        <map:reader name="MetadataExportReader" src="org.dspace.app.xmlui.cocoon.MetadataExportReader"/>
-            <map:reader name="OpenURLReader" src="org.dspace.app.xmlui.cocoon.OpenURLReader"/>
-            <map:reader name="SitemapReader" src="org.dspace.app.xmlui.cocoon.SitemapReader"/>
+                    <map:reader name="resource" src="org.apache.cocoon.reading.ResourceReader"
+                            logger="sitemap.reader.resource" pool-max="32">
+                            <expires>3600000</expires> <!-- 1000 * 60 * 60 = 3600000 = One hour -->
+                    </map:reader>
+                    <map:reader name="BitstreamReader" src="org.dspace.app.xmlui.cocoon.BitstreamReader"/>
+                    <map:reader name="ExportReader" src="org.dspace.app.xmlui.cocoon.ItemExportDownloadReader"/>
+                    <map:reader name="MetadataExportReader" src="org.dspace.app.xmlui.cocoon.MetadataExportReader"/>
+                    <map:reader name="OpenURLReader" src="org.dspace.app.xmlui.cocoon.OpenURLReader"/>
+                    <map:reader name="SitemapReader" src="org.dspace.app.xmlui.cocoon.SitemapReader"/>
+                    <map:reader name="ConcatenationReader" src="org.dspace.app.xmlui.cocoon.ConcatenationReader"/>
                 </map:readers>
                 <map:actions>
                         <map:action name="locale" src="org.dspace.app.xmlui.cocoon.DSpaceLocaleAction"/>
@@ -230,10 +231,10 @@
                         </map:pipe>
                 </map:pipes>
         </map:components>
-        
+
         <map:resources>
-                
-                
+
+
                 <map:resource name="i18n-transformer">
                         <map:act type="locale">
                                 <map:transform type="i18n">
@@ -241,14 +242,14 @@
                                 </map:transform>
                         </map:act>
                 </map:resource>
-                
+
         </map:resources>
 
 
         <!-- =========================== Pipelines ================================= -->
         <map:pipelines>
-                
-                
+
+
                 <!-- Bitstream pipeline -->
                 <map:pipeline type="noncaching">
                         <map:parameter name="outputBufferSize" value="8192"/>
@@ -259,7 +260,7 @@
                                 Bitstreams for items that have a handle assigned. If the
                                 sequence parameter is given then that will be used to resolve the
                                 bitstream, other wise the name will attempt to be matched.
-                                
+
                                 /bitstream/handle/[handlePrefix]/[handlePostfix]/[name]?sequence=[sequence]
 
                                 NOTE: When user-agent was identified as a spider (crawler robot), pass
@@ -302,12 +303,12 @@
                                   </map:otherwise>
                                 </map:select>
                         </map:match>
-                        
+
                         <!--
                                 Bitstreams for items that do not have a handle assigned. If the
                                 sequence parameter is given then that will be used to resolve the
                                 bitstream, other wise the name will attempt to be matched.
-                                
+
                                 /bitstream/item/[itemID]/[name]?sequence=[sequence]
                         -->
                         <map:match pattern="bitstream/item/*/**">
@@ -346,10 +347,10 @@
                                   </map:otherwise>
                                 </map:select>
                         </map:match>
-                        
+
                         <!--
                                 Bitstreams not attached to to items (community / collection logos)
-                                
+
                                 /bitstream/id/[bitstreamID]/[ignored]
                         -->
                         <map:match pattern="bitstream/id/*/**">
@@ -367,11 +368,11 @@
                                   </map:otherwise>
                                 </map:select>
                         </map:match>
-                        
-                        
+
+
                         <!--
                                 For URL compatability with the JSPUI, redirect these old url to their new locations.
-                                
+
                                 /bitstream/[handlePrefix]/[handlePostfix]/[sequence]/[name]
                                 /html/[handlePrefix]/[handePostfix]/[name]
                         -->
@@ -399,9 +400,9 @@
                                     <map:parameter name="handle" value="{1}/{2}" />
                                 </map:read>
                         </map:match>
-                        
+
                 </map:pipeline>
-                
+
                 <!-- new AJAX menu (choices) responses for metadata authority control -->
                 <map:pipeline type="noncaching">
                   <map:match pattern="choices/*">
@@ -421,10 +422,10 @@
                          -->
                   </map:match>
                 </map:pipeline>
-                
-                
-                
-                
+
+
+
+
                 <!-- non-bitstream pipeline -->
                 <map:pipeline>
                         <!--<map:parameter name="expires" value="now"/>-->
@@ -446,8 +447,8 @@
                         <map:match pattern="DRI/**">
                                 <map:mount check-reload="no" src="aspects/aspects.xmap" uri-prefix="DRI/"/>
                         </map:match>
-                        
-                        
+
+
                         <map:match pattern="metadata/**">
                                 <map:match pattern="metadata/handle/*/*/mets.xml">
                                         <map:generate type="DSpaceMETSGenerator">
@@ -463,7 +464,7 @@
                                         </map:generate>
                                         <map:serialize type="xml"/>
                                 </map:match>
-                                
+
                                 <map:match pattern="metadata/handle/*/*/ore.xml**">
                                         <map:generate type="DSpaceOREGenerator">
                                                 <map:parameter name="handle" value="{1}/{2}"/>
@@ -479,7 +480,7 @@
                                         <map:serialize type="xml"/>
                                 </map:match>
                         </map:match>
-                        
+
                         <!-- Syndication feeds for whole repo or community/collection -->
                         <map:match pattern="feed/*/**">
                                 <map:generate type="DSpaceFeedGenerator">
@@ -493,7 +494,7 @@
                                 </map:act>
                                 <map:serialize type="xml"/>
                         </map:match>
-                        
+
                         <!-- OpenSearch results for whole repo or community/collection -->
                         <map:match pattern="open-search/**">
                           <map:match pattern="open-search/description.xml">
@@ -523,7 +524,7 @@
                             </map:select>
                           </map:match>
                         </map:match>
-                        
+
       <!-- HTML Sitemaps and Sitemaps.org Sitemaps for whole repo -->
       <map:match pattern="htmlmap">
         <map:read type="SitemapReader">
@@ -536,11 +537,29 @@
                                 </map:read>
       </map:match>
 
+                    <!-- handle static js and css -->
+                    <map:match pattern="themes/*.js">
+                            <map:read type="ConcatenationReader" src="{1}.js">
+                                <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                            </map:read>
+                    </map:match>
+                    <map:match pattern="themes/*.css">
+                            <map:read type="ConcatenationReader" src="{1}.css">
+                                <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                            </map:read>
+                    </map:match>
+                    <map:match pattern="themes/*.json">
+                            <map:read type="ConcatenationReader" src="{1}.json">
+                                <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                            </map:read>
+                    </map:match>
+
+
                         <!-- handle common theme resources, such as dri2xhtml -->
                         <map:match pattern="themes/*">
                                 <map:read src="themes/{1}"/>
                         </map:match>
-                        
+
                         <!-- handle theme specific resources static or dynamic -->
                         <map:match pattern="themes/*/**">
                <map:mount check-reload="no" src="themes/{1}/sitemap.xmap" uri-prefix=""/>
@@ -567,10 +586,10 @@
                         <map:mount check-reload="no" src="themes/themes.xmap" uri-prefix=""/>
                         <!--</map:match>-->
                 </map:pipeline>
-                
+
                 <map:handle-errors>
                         <map:select type="exception">
-                                
+
                                 <map:when test="not-found">
                                         <map:generate type="exception"/>
                                         <map:transform src="exception2html.xslt">
@@ -579,7 +598,7 @@
                                         </map:transform>
                                         <map:serialize type="xhtml" status-code="404"/>
                                 </map:when>
-                                
+
                                 <map:when test="invalid-continuation">
                                         <map:generate type="exception"/>
                                         <map:transform src="exception2html.xslt">
@@ -588,7 +607,7 @@
                                         </map:transform>
                                         <map:serialize type="xhtml" status-code="404"/>
                                 </map:when>
-                                
+
                                 <map:otherwise>
                                         <map:generate type="exception"/>
                                         <map:transform src="exception2html.xslt">
