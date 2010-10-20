@@ -33,6 +33,7 @@
  */
 package org.dspace.content;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -435,8 +436,7 @@ public class DCDateTest extends AbstractUnitTest
     @Test
     public void testGetCurrent()
     {
-        assertThat("testGetCurrent 0", DCDate.getCurrent().toDate(),
-                equalTo(new Date()));
+        assertTrue("testGetCurrent 0", DateUtils.isSameDay(DCDate.getCurrent().toDate(), new Date()));
     }
 
 
