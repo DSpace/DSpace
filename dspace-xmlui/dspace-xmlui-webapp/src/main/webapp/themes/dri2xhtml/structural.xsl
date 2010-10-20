@@ -502,6 +502,14 @@
                 </div>
             </xsl:if>
             <xsl:apply-templates />
+              	<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='sfx'][@qualifier='server']">
+	 			<a>
+                   <xsl:attribute name="href">
+                    	<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='sfx'][@qualifier='server']"/>
+                    </xsl:attribute>
+                    <xsl:text>Find Full text</xsl:text>
+                </a>
+			</xsl:if>
         </div>
     </xsl:template>
 

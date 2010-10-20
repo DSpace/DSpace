@@ -39,12 +39,14 @@
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 
@@ -82,38 +84,45 @@ import org.jdom.Element;
 import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
 import org.xml.sax.SAXException;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.app.sfx.SFXFileReader;
 
 /**
  * Display a single item.
- * 
+ *
  * @author Scott Phillips
  */
 public class ItemViewer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
     private static final Logger log = Logger.getLogger(ItemViewer.class);
-    
+
     /** Language strings */
     private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
-    
+
     private static final Message T_trail =
         message("xmlui.ArtifactBrowser.ItemViewer.trail");
-    
+
     private static final Message T_show_simple =
         message("xmlui.ArtifactBrowser.ItemViewer.show_simple");
-    
+
     private static final Message T_show_full =
         message("xmlui.ArtifactBrowser.ItemViewer.show_full");
-    
+
     private static final Message T_head_parent_collections =
         message("xmlui.ArtifactBrowser.ItemViewer.head_parent_collections");
-    
+
 	/** Cached validity object */
 	private SourceValidity validity = null;
-	
+
 	/** XHTML crosswalk instance */
 	private DisseminationCrosswalk xHTMLHeadCrosswalk = null;
-	
+
+	private String sfxFile = ConfigurationManager.getProperty("dspace.dir") + File.separator
+                                  + "config" + File.separator + "sfx.xml";
+
+	private String sfxQuery = null;
+
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
@@ -121,12 +130,12 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
     public Serializable getKey() {
         try {
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-            
+
             if (dso == null)
                 return "0"; // no item, something is wrong.
-            
+
             return HashUtil.hash(dso.getHandle() + "full:" + showFullItem(objectModel));
-        } 
+        }
         catch (SQLException sqle)
         {
             // Ignore all errors and just return that the component is not cachable.
@@ -136,11 +145,11 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
     /**
      * Generate the cache validity object.
-     * 
-     * The validity object will include the item being viewed, 
+     *
+     * The validity object will include the item being viewed,
      * along with all bundles & bitstreams.
      */
-    public SourceValidity getValidity() 
+    public SourceValidity getValidity()
     {
         DSpaceObject dso = null;
 
@@ -148,7 +157,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
     	{
 	        try {
 	            dso = HandleUtil.obtainHandle(objectModel);
-	            
+
 	            DSpaceValidity validity = new DSpaceValidity();
 	            validity.add(dso);
 	            this.validity =  validity.complete();
@@ -161,8 +170,8 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
     	}
     	return this.validity;
     }
-    
-    
+
+
     /**
      * Add the item's title and trail links to the page's metadata.
      */
@@ -186,7 +195,25 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         HandleUtil.buildHandleTrail(item,pageMeta,contextPath);
         pageMeta.addTrail().addContent(T_trail);
-        
+
+        // Add SFX link
+        String sfxserverUrl = ConfigurationManager.getProperty("sfx.server.url");
+        if (sfxserverUrl != null && sfxserverUrl.length() > 0)
+        {
+            sfxQuery = "";
+
+            // parse XML file -> XML document will be build
+            sfxQuery = SFXFileReader.loadSFXFile(sfxFile, item);
+
+            // Remove initial &, if any
+            if (sfxQuery.startsWith("&"))
+            {
+                sfxQuery = sfxQuery.substring(1);
+            }
+            sfxserverUrl = sfxserverUrl.trim() +"&" + sfxQuery.trim();
+            pageMeta.addMetadata("sfx","server").addContent(sfxserverUrl);
+        }
+
         // Metadata for <head> element
         if (xHTMLHeadCrosswalk == null)
         {
@@ -232,7 +259,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         if (!(dso instanceof Item))
             return;
         Item item = (Item) dso;
-        
+
         // Build the item viewer division.
         Division division = body.addDivision("item-view","primary");
         String title = getItemTitle(item);
@@ -254,7 +281,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
                     + "?show=full";
             showfullPara.addXref(link).addContent(T_show_full);
         }
-        
+
         ReferenceSet referenceSet;
         if (showFullItem(objectModel))
         {
@@ -270,13 +297,13 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         // Refrence the actual Item
         ReferenceSet appearsInclude = referenceSet.addReference(item).addReferenceSet(ReferenceSet.TYPE_DETAIL_LIST,null,"hierarchy");
         appearsInclude.setHead(T_head_parent_collections);
-        
+
         // Reference all collections the item appears in.
         for (Collection collection : item.getCollections())
         {
             appearsInclude.addReference(collection);
         }
-        
+
         showfullPara = division.addPara(null,"item-view-toggle item-view-toggle-bottom");
 
         if (showFullItem(objectModel))
@@ -291,7 +318,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             showfullPara.addXref(link).addContent(T_show_full);
         }
     }
-    
+
     /**
      * Determine if the full item should be referenced or just a summary.
      */
@@ -319,7 +346,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             title = null;
         return title;
     }
-    
+
     /**
      * Recycle
      */
