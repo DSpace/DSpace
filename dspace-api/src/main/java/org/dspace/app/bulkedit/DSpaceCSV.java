@@ -111,68 +111,79 @@ public class DSpaceCSV
         init();
 
         // Open the CSV file
-        BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(f),"UTF-8"));
-
-        // Read the heading line
-        String head = input.readLine();
-        String[] headingElements = head.split(escapedFieldSeparator);
-        for (String element : headingElements)
+        BufferedReader input = null;
+        try
         {
-            // Remove surrounding quotes if there are any
-            if ((element.startsWith("\"")) && (element.endsWith("\"")))
-            {
-                element = element.substring(1, element.length() - 1);
-            }
+            input = new BufferedReader(new InputStreamReader(new FileInputStream(f),"UTF-8"));
 
-            // Store the heading
-            if ("collection".equals(element))
+            // Read the heading line
+            String head = input.readLine();
+            String[] headingElements = head.split(escapedFieldSeparator);
+            for (String element : headingElements)
             {
-                // Store the heading
-                headings.add(element);
-            }
-            else if (!"id".equals(element))
-            {
-                // Verify that the heading is valid in the metadata registry
-                String[] clean = element.split("\\[");
-                String[] parts = clean[0].split("\\.");
-                String metadataSchema = parts[0];
-                String metadataElement = parts[1];
-                String metadataQualifier = null;
-                if (parts.length > 2) {
-                    metadataQualifier = parts[2];
-                }
-
-                // Check that the scheme exists
-                MetadataSchema foundSchema = MetadataSchema.find(c, metadataSchema);
-                if (foundSchema == null) {
-                    throw new MetadataImportInvalidHeadingException(clean[0],
-                                                                    MetadataImportInvalidHeadingException.SCHEMA);
-                }
-
-                // Check that the metadata element exists in the schema
-                int schemaID = foundSchema.getSchemaID();
-        	    MetadataField foundField = MetadataField.findByElement(c, schemaID, metadataElement, metadataQualifier);
-                if (foundField == null) {
-                    throw new MetadataImportInvalidHeadingException(clean[0],
-                                                                    MetadataImportInvalidHeadingException.ELEMENT);
+                // Remove surrounding quotes if there are any
+                if ((element.startsWith("\"")) && (element.endsWith("\"")))
+                {
+                    element = element.substring(1, element.length() - 1);
                 }
 
                 // Store the heading
-                headings.add(element);
+                if ("collection".equals(element))
+                {
+                    // Store the heading
+                    headings.add(element);
+                }
+                else if (!"id".equals(element))
+                {
+                    // Verify that the heading is valid in the metadata registry
+                    String[] clean = element.split("\\[");
+                    String[] parts = clean[0].split("\\.");
+                    String metadataSchema = parts[0];
+                    String metadataElement = parts[1];
+                    String metadataQualifier = null;
+                    if (parts.length > 2) {
+                        metadataQualifier = parts[2];
+                    }
+
+                    // Check that the scheme exists
+                    MetadataSchema foundSchema = MetadataSchema.find(c, metadataSchema);
+                    if (foundSchema == null) {
+                        throw new MetadataImportInvalidHeadingException(clean[0],
+                                                                        MetadataImportInvalidHeadingException.SCHEMA);
+                    }
+
+                    // Check that the metadata element exists in the schema
+                    int schemaID = foundSchema.getSchemaID();
+                    MetadataField foundField = MetadataField.findByElement(c, schemaID, metadataElement, metadataQualifier);
+                    if (foundField == null) {
+                        throw new MetadataImportInvalidHeadingException(clean[0],
+                                                                        MetadataImportInvalidHeadingException.ELEMENT);
+                    }
+
+                    // Store the heading
+                    headings.add(element);
+                }
+            }
+
+            // Read each subsequent line
+            String line;
+            while ((line = input.readLine()) != null){
+                // Are there an odd number of quotes?
+                while (((" " + line + " ").split("\"").length)%2 == 0)
+                {
+                    line = line + "\n" + input.readLine();
+                }
+
+                // Parse the item metadata
+                addItem(line);
             }
         }
-
-        // Read each subsequent line
-        String line;
-        while ((line = input.readLine()) != null){
-            // Are there an odd number of quotes?
-            while (((" " + line + " ").split("\"").length)%2 == 0)
+        finally
+        {
+            if (input != null)
             {
-                line = line + "\n" + input.readLine();
+                input.close();
             }
-
-            // Parse the item metadata
-            addItem(line);
         }
     }
 

@@ -190,11 +190,12 @@ public class XPDF2Thumbnail extends MediaFilter
             String pdfinfoCmd[] = XPDF_PDFINFO_COMMAND.clone();
             pdfinfoCmd[0] = pdfinfoPath;
             pdfinfoCmd[pdfinfoCmd.length-1] = sourceTmp.toString();
+            BufferedReader lr = null;
             try
             {
                 MatchResult mediaBox = null;
                 Process pdfProc = Runtime.getRuntime().exec(pdfinfoCmd);
-                BufferedReader lr = new BufferedReader(new InputStreamReader(pdfProc.getInputStream()));
+                lr = new BufferedReader(new InputStreamReader(pdfProc.getInputStream()));
                 String line;
                 for (line = lr.readLine(); line != null; line = lr.readLine())
                 {
@@ -231,6 +232,13 @@ public class XPDF2Thumbnail extends MediaFilter
             {
                 log.error("Failed interpreting pdfinfo results, check regexp: ",e);
                 throw new IllegalArgumentException("Failed transforming file for thumbnail: ",e);
+            }
+            finally
+            {
+                if (lr != null)
+                {
+                    lr.close();
+                }
             }
 
             // Render page 1 using xpdf's pdftoppm

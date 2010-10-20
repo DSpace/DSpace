@@ -1424,6 +1424,7 @@ public class ItemExport
             zipFiles(cpFile, strSource, tempFileName, cpZipOutputStream);
             cpZipOutputStream.finish();
             cpZipOutputStream.close();
+            cpZipOutputStream = null;
 
             // Fix issue on Windows with stale file handles open before trying to delete them
             System.gc();
@@ -1434,6 +1435,13 @@ public class ItemExport
         catch (Exception e)
         {
             throw e;
+        }
+        finally
+        {
+            if (cpZipOutputStream != null)
+            {
+                cpZipOutputStream.close();
+            }
         }
     }
 
