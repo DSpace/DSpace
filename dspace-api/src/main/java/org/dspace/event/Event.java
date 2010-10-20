@@ -46,6 +46,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
@@ -276,6 +277,17 @@ public class Event implements Serializable
                 && this.subjectID == other.subjectID
                 && this.objectType == other.objectType
                 && this.objectID == other.objectID;
+    }
+
+    public int hashCode()
+    {
+        return new HashCodeBuilder().append(this.detail)
+                                    .append(eventType)
+                                    .append(subjectType)
+                                    .append(subjectID)
+                                    .append(objectType)
+                                    .append(objectID)
+                                    .toHashCode();
     }
 
     /**

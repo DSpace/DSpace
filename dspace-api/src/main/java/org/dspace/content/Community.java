@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -1152,6 +1153,11 @@ public class Community extends DSpaceObject
         }
 
         return (getID() == ((Community) other).getID());
+    }
+
+    public int hashCode()
+    {
+        return new HashCodeBuilder().append(getID()).toHashCode();
     }
 
     /**

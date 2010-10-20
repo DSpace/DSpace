@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.dspace.sort.OrderFormat;
 
 /**
@@ -165,6 +166,11 @@ public class ItemComparator implements Comparator
         return _equals(element, other.element)
                 && _equals(qualifier, other.qualifier)
                 && _equals(language, other.language) && (max == other.max);
+    }
+
+    public int hashCode()
+    {
+        return new HashCodeBuilder().append(element).append(qualifier).append(language).append(max).toHashCode();
     }
 
     /**

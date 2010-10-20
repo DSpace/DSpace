@@ -42,6 +42,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -526,6 +527,11 @@ public class WorkspaceItem implements InProgressSubmission
         if (this.getID() != that.getID()) return false;
 
         return true;
+    }
+
+    public int hashCode()
+    {
+        return new HashCodeBuilder().append(getID()).toHashCode();
     }
 
     /**
