@@ -96,7 +96,7 @@ public class HTMLFilter extends MediaFilter
         HTMLEditorKit kit = new HTMLEditorKit();
         Document doc = kit.createDefaultDocument();
 
-        doc.putProperty("IgnoreCharsetDirective", new Boolean(true));
+        doc.putProperty("IgnoreCharsetDirective", Boolean.TRUE);
 
         kit.read(source, doc, 0);
 
