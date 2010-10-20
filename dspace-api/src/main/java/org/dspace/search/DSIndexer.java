@@ -66,7 +66,6 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.DateTools;
-import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
@@ -224,7 +223,7 @@ public class DSIndexer
         }
         
         /*
-         * Increase the default write lock so that Indexing can be interupted.
+         * Increase the default write lock so that Indexing can be interrupted.
          */
         IndexWriter.setDefaultWriteLockTimeout(WRITE_LOCK_TIMEOUT);
     
@@ -303,7 +302,7 @@ public class DSIndexer
                     /** 
                      * Make sure the item is not in the index if it is not in archive.
                      * TODO: Someday DSIndexer should block withdrawn
-                     * content on search/retrieval and allow admins the ablitity to
+                     * content on search/retrieval and allow admins the ability to
                      * still search for withdrawn Items.
                      */
                     DSIndexer.unIndexContent(context, handle);
@@ -354,7 +353,7 @@ public class DSIndexer
     }
 
     /**
-     * Unindex a Docment in the Lucene Index.
+     * Unindex a Document in the Lucene Index.
      * 
      * @param context
      * @param handle 
@@ -429,7 +428,7 @@ public class DSIndexer
     }
     
     /**
-     * Optimize the existing index. Iimportant to do regularly to reduce 
+     * Optimize the existing index. Important to do regularly to reduce 
      * filehandle usage and keep performance fast!
      * 
      * @param c Users Context
@@ -561,7 +560,7 @@ public class DSIndexer
     /**
      * Iterates over all Items, Collections and Communities. And updates
      * them in the index. Uses decaching to control memory footprint.
-     * Uses indexContent and isStale ot check state of item in index.
+     * Uses indexContent and isStale to check state of item in index.
      * 
      * At first it may appear counterintuitive to have an IndexWriter/Reader
      * opened and closed on each DSO. But this allows the UI processes
@@ -809,16 +808,16 @@ public class DSIndexer
         Collection[] collections = myitem.getCollections();
 
         // now put those into strings
-        String location = "";
+        StringBuffer location = new StringBuffer();
         int i = 0;
 
         for (i = 0; i < communities.length; i++)
-            location = new String(location + " m" + communities[i].getID());
+            location.append(" m").append(communities[i].getID());
 
         for (i = 0; i < collections.length; i++)
-            location = new String(location + " l" + collections[i].getID());
+            location.append(" l").append(collections[i].getID());
 
-        return location;
+        return location.toString();
     }
 
     private static String buildCollectionLocationString(Context c,
@@ -828,13 +827,13 @@ public class DSIndexer
         Community[] communities = target.getCommunities();
 
         // now put those into strings
-        String location = "";
+        StringBuffer location = new StringBuffer();
         int i = 0;
 
         for (i = 0; i < communities.length; i++)
-            location = new String(location + " m" + communities[i].getID());
+            location.append(" m").append(communities[i].getID());
 
-        return location;
+        return location.toString();
     }
 
     /**

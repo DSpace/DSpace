@@ -133,8 +133,8 @@ public class Harvest
         
         
         // We are building a complex query that may contain a variable 
-        // about of input data points. To accomidate this while still 
-        // providing type safty we build a list of parameters to be 
+        // about of input data points. To accommodate this while still 
+        // providing type safety we build a list of parameters to be 
         // plugged into the query at the database level.
         List parameters = new ArrayList();
         
@@ -158,13 +158,13 @@ public class Harvest
         	{
         		query += " AND collection2item.collection_id= ? " +
         	             " AND collection2item.item_id=handle.resource_id ";
-        		parameters.add(new Integer(scope.getID()));
+        		parameters.add(Integer.valueOf(scope.getID()));
         	}
         	else if (scope.getType() == Constants.COMMUNITY)
         	{
         		query += " AND communities2item.community_id= ? " +
 						 " AND communities2item.item_id=handle.resource_id";
-        		parameters.add(new Integer(scope.getID()));
+        		parameters.add(Integer.valueOf(scope.getID()));
         	}
         }      
                 

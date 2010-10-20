@@ -219,15 +219,15 @@ public class DSQuery
                     switch (Integer.parseInt( resourceType != null ? resourceType : handleType))
                     {
                         case Constants.ITEM:
-                            hitTypes.add(new Integer(Constants.ITEM));
+                            hitTypes.add(Integer.valueOf(Constants.ITEM));
                             break;
 
                         case Constants.COLLECTION:
-                            hitTypes.add(new Integer(Constants.COLLECTION));
+                            hitTypes.add(Integer.valueOf(Constants.COLLECTION));
                             break;
 
                         case Constants.COMMUNITY:
-                            hitTypes.add(new Integer(Constants.COMMUNITY));
+                            hitTypes.add(Integer.valueOf(Constants.COMMUNITY));
                             break;
                     }
 
@@ -285,7 +285,7 @@ public class DSQuery
         // Lucene currently has a bug which breaks wildcard
         // searching when you have uppercase characters.
         // Here we substitute the boolean operators -- which
-        // have to be uppercase -- before tranforming the
+        // have to be uppercase -- before transforming the
         // query string to lowercase.
         return myquery.replaceAll(" AND ", " && ")
                       .replaceAll(" OR ", " || ")
@@ -302,7 +302,7 @@ public class DSQuery
 
     static String stripAsterisk(String myquery)
     {
-        // query strings (or words) begining with "*" cause a null pointer error
+        // query strings (or words) beginning with "*" cause a null pointer error
         return myquery.replaceAll("^\\*", "")
                       .replaceAll("\\s\\*", " ")
                       .replaceAll("\\(\\*", "(")
@@ -330,8 +330,7 @@ public class DSQuery
 
         String location = "l" + (coll.getID());
 
-        String newquery = new String("+(" + querystring + ") +location:\""
-                + location + "\"");
+        String newquery = "+(" + querystring + ") +location:\"" + location + "\"";
 
         args.setQuery(newquery);
 
@@ -359,8 +358,7 @@ public class DSQuery
 
         String location = "m" + (comm.getID());
 
-        String newquery = new String("+(" + querystring + ") +location:\""
-                + location + "\"");
+        String newquery = "+(" + querystring + ") +location:\"" + location + "\"";
 
         args.setQuery(newquery);
 
