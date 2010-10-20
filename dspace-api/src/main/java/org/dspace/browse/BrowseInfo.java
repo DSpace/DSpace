@@ -802,28 +802,28 @@ public class BrowseInfo
 
     			if (value != null)
     			{
-    				sb.append(" on value: " + value);
+    				sb.append(" on value: ").append(value);
     			}
 
     			if (isStartsWith())
     			{
-    				sb.append(" sort column starting with: " + focus);
+    				sb.append(" sort column starting with: ").append(focus);
     			}
     			else if (hasFocus())
     			{
-    				sb.append(" sort column focus: " + focus);
+    				sb.append(" sort column focus: ").append(focus);
     			}
     		}
     		else if (browseIndex.isMetadataIndex())
     		{
-    			sb.append("Listing single column: " + browseIndex.getMetadata());
+    			sb.append("Listing single column: ").append(browseIndex.getMetadata());
     			if (isStartsWith())
     			{
-    				sb.append(" sort column starting with: " + focus);
+    				sb.append(" sort column starting with: ").append(focus);
     			}
     			else if (hasFocus())
     			{
-    				sb.append(" sort column focus: " + focus);
+    				sb.append(" sort column focus: ").append(focus);
     			}
     		}
 
@@ -851,7 +851,7 @@ public class BrowseInfo
     		sb.append("Top of next page: ");
     		if (hasNextPage())
     		{
-				sb.append("offset: " + Integer.toString(this.nextOffset));
+				sb.append("offset: ").append(Integer.toString(this.nextOffset));
     		}
     		else
     		{
@@ -862,7 +862,7 @@ public class BrowseInfo
     		sb.append("Top of previous page: ");
     		if (hasPrevPage())
     		{
-				sb.append("offset: " + Integer.toString(this.prevOffset));
+				sb.append("offset: ").append(Integer.toString(this.prevOffset));
     		}
     		else
     		{

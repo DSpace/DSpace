@@ -1087,8 +1087,15 @@ public class BrowseDAOOracle implements BrowseDAO
         queryBuf.append(table);
         if (containerTable != null || (value != null && valueField != null && tableDis != null && tableMap != null))
         {
-            queryBuf.append(", (SELECT " + (containerTable != null ? "" : "DISTINCT "));
-            queryBuf.append(containerTable != null ? containerTable : tableMap).append(".item_id");
+            queryBuf.append(", (SELECT ");
+            if (containerTable != null)
+            {
+                queryBuf.append(containerTable).append(".item_id");
+            }
+            else
+            {
+                queryBuf.append("DISTINCT ").append(tableMap).append(".item_id");
+            }
             queryBuf.append(" FROM ");
             buildFocusedSelectTables(queryBuf);
             queryBuf.append(" WHERE ");

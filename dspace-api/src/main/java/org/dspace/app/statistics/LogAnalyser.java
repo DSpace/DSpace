@@ -823,7 +823,7 @@ public class LogAnalyser
         charRegEx.append("[");
         for (int i = 0; i < excludeChars.size(); i++)
         {
-            charRegEx.append("\\" + (String) excludeChars.get(i));
+            charRegEx.append("\\").append((String) excludeChars.get(i));
         }
         charRegEx.append("]");
         excludeCharRX = Pattern.compile(charRegEx.toString());

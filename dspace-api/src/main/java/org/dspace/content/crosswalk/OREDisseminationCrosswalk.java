@@ -373,18 +373,18 @@ public class OREDisseminationCrosswalk
 		URLcharsSet.addAll(Arrays.asList(mark));
 		//URLcharsSet.addAll(Arrays.asList(reserved));
 		
-		String processedString = new String();
+        StringBuilder processedString = new StringBuilder();
 		for (int i=0; i<sourceString.length(); i++) {
 			char ch = sourceString.charAt(i);
 			if (URLcharsSet.contains(ch)) {
-				processedString += ch;
+				processedString.append(ch);
 			}
 			else {
-				processedString += "%" + Integer.toHexString((int)ch);
+				processedString.append("%").append(Integer.toHexString((int)ch));
 			}
 		}
 		
-		return processedString;
+		return processedString.toString();
     }
     
    

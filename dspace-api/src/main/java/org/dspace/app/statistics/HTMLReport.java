@@ -434,10 +434,10 @@ public class HTMLReport implements Report
             }
             frag.append("\n");
             frag.append("\t\t</td>\n\t\t<td class=\"rightAlign\">\n");
-            frag.append("\t\t\t" + ReportTools.numberFormat(stats[i].getValue()));
+            frag.append("\t\t\t").append(ReportTools.numberFormat(stats[i].getValue()));
             if (stats[i].getUnits() != null)
             {
-                frag.append(" " + stats[i].getUnits());
+                frag.append(" ").append(stats[i].getUnits());
             }
             frag.append("\n");
             frag.append("\t\t</td>\n\t</tr>\n");

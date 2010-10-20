@@ -268,7 +268,7 @@ public class SyndicationFeed
                     {
                         String fieldLabel = labels.get(MSG_METADATA + df);
                         if (fieldLabel != null && fieldLabel.length()>0)
-                            db.append(fieldLabel + ": ");
+                            db.append(fieldLabel).append(": ");
                         boolean first = true;
                         for (DCValue v : dcv)
                         {
