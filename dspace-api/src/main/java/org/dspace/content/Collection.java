@@ -43,6 +43,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.MissingResourceException;
 
@@ -1254,11 +1255,7 @@ public class Collection extends DSpaceObject
 
                 // now add any parent communities
                 Community[] parents = owner.getAllParents();
-
-                for (int i = 0; i < parents.length; i++)
-                {
-                    communities.add(parents[i]);
-                }
+                communities.addAll(Arrays.asList(parents));
             }
         }
         finally

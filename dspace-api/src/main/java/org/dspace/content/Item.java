@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1092,11 +1093,7 @@ public class Item extends DSpaceObject
 
                 // now add any parent communities
                 Community[] parents = owner.getAllParents();
-
-                for (int i = 0; i < parents.length; i++)
-                {
-                    communities.add(parents[i]);
-                }
+                communities.addAll(Arrays.asList(parents));
             }
         }
         finally
