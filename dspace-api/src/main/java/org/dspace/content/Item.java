@@ -1718,39 +1718,33 @@ public class Item extends DSpaceObject
                     modified = true;
                 }
             }
-
-            if (dublinCoreChanged || modified)
-            {
-                // Set the last modified date
-                itemRow.setColumn("last_modified", new Date());
-
-                // Make sure that withdrawn and in_archive are non-null
-                if (itemRow.isColumnNull("in_archive"))
-                {
-                    itemRow.setColumn("in_archive", false);
-                }
-
-                if (itemRow.isColumnNull("withdrawn"))
-                {
-                    itemRow.setColumn("withdrawn", false);
-                }
-
-                DatabaseManager.update(ourContext, itemRow);
-
-                if (dublinCoreChanged)
-                {
-                    ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.ITEM, getID(), getDetails()));
-                    clearDetails();
-                    dublinCoreChanged = false;
-                }
-
-                ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
-                modified = false;
-            }
         }
 
-        if (modified)
+        if (dublinCoreChanged || modified)
         {
+            // Set the last modified date
+            itemRow.setColumn("last_modified", new Date());
+
+            // Make sure that withdrawn and in_archive are non-null
+            if (itemRow.isColumnNull("in_archive"))
+            {
+                itemRow.setColumn("in_archive", false);
+            }
+
+            if (itemRow.isColumnNull("withdrawn"))
+            {
+                itemRow.setColumn("withdrawn", false);
+            }
+
+            DatabaseManager.update(ourContext, itemRow);
+
+            if (dublinCoreChanged)
+            {
+                ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.ITEM, getID(), getDetails()));
+                clearDetails();
+                dublinCoreChanged = false;
+            }
+
             ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
             modified = false;
         }
