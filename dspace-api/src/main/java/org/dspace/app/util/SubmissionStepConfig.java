@@ -63,12 +63,12 @@ public class SubmissionStepConfig implements Serializable
     /*
      * The identifier for the Select Collection step
      */
-    public static String SELECT_COLLECTION_STEP = "collection";
+    public static final String SELECT_COLLECTION_STEP = "collection";
 
     /*
      * The identifier for the Completion step
      */
-    public static String COMPLETE_STEP = "complete";
+    public static final String COMPLETE_STEP = "complete";
 
     /**
      * the id for this step ('id' only exists if this step is defined in the
@@ -130,7 +130,7 @@ public class SubmissionStepConfig implements Serializable
         String wfEditString = (String) stepMap.get("workflow-editable");
         if (wfEditString != null && wfEditString.length() > 0)
         {
-            workflowEditable = new Boolean(wfEditString).booleanValue();
+            workflowEditable = Boolean.parseBoolean(wfEditString);
         }
     }
 
