@@ -208,7 +208,7 @@ public class ShibAuthentication implements AuthenticationMethod
             // the person exists, just return ok
             context.setCurrentUser(eperson);
             request.getSession().setAttribute("shib.authenticated",
-                    new Boolean("true"));
+                    Boolean.TRUE);
         }
 
         return AuthenticationMethod.SUCCESS;

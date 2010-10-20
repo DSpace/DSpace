@@ -212,7 +212,7 @@ public class WorkflowManager
     {
         // make a hash table entry with item ID for no notify
         // notify code checks no notify hash for item id
-        noEMail.put(new Integer(wsi.getItem().getID()), new Boolean(true));
+        noEMail.put(new Integer(wsi.getItem().getID()), Boolean.TRUE);
 
         return start(c, wsi);
     }

@@ -471,14 +471,14 @@ public class X509Authentication implements AuthenticationMethod
             if (email.substring(email.length() - emailDomain.length()).equals(
                     emailDomain))
             {
-                session.setAttribute("x509Auth", new Boolean(true));
+                session.setAttribute("x509Auth", Boolean.TRUE);
             }
         }
         else
         {
             // No configured email domain to verify. Just flag
             // as authenticated so special groups are granted.
-            session.setAttribute("x509Auth", new Boolean(true));
+            session.setAttribute("x509Auth", Boolean.TRUE);
         }
     }
 

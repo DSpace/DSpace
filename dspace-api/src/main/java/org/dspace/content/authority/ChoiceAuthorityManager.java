@@ -139,7 +139,7 @@ public class ChoiceAuthorityManager
                         log.warn("Skipping invalid ChoiceAuthority configuration property: "+key+": does not have schema.element.qualifier");
                         continue property;
                     }
-                    closed.put(fkey, new Boolean(ConfigurationManager.getBooleanProperty(key)));
+                    closed.put(fkey, Boolean.valueOf(ConfigurationManager.getBooleanProperty(key)));
                 }
                 else
                     log.error("Illegal configuration property: "+key);

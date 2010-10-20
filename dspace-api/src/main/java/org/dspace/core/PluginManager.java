@@ -126,7 +126,7 @@ public class PluginManager
         {
         	String key = REUSABLE_PREFIX+implClass.getName();
             boolean reusable = ConfigurationManager.getBooleanProperty(key, true);
-            cacheMeCache.put(implClass, new Boolean(reusable));
+            cacheMeCache.put(implClass, Boolean.valueOf(reusable));
             return reusable;
         }
     }
