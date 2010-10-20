@@ -1781,20 +1781,28 @@ public class Item extends DSpaceObject
      */
     public void withdraw() throws SQLException, AuthorizeException, IOException
     {
-        String timestamp = DCDate.getCurrent().toString();
-
         // Check permission. User either has to have REMOVE on owning collection
         // or be COLLECTION_EDITOR of owning collection
         AuthorizeUtil.authorizeWithdrawItem(ourContext, this);
-        
+
+        String timestamp = DCDate.getCurrent().toString();
+
+        // Add suitable provenance - includes user, date, collections +
+        // bitstream checksums
+        EPerson e = ourContext.getCurrentUser();
+
         // Build some provenance data while we're at it.
-        String collectionProv = "";
+        StringBuilder prov = new StringBuilder();
+
+        prov.append("Item withdrawn by ").append(e.getFullName()).append(" (")
+                .append(e.getEmail()).append(") on ").append(timestamp).append("\n")
+                .append("Item was in collections:\n");
+
         Collection[] colls = getCollections();
 
         for (int i = 0; i < colls.length; i++)
         {
-            collectionProv = collectionProv + colls[i].getMetadata("name")
-                    + " (ID: " + colls[i].getID() + ")\n";
+            prov.append(colls[i].getMetadata("name")).append(" (ID: ").append(colls[i].getID()).append(")\n");
         }
 
         // Set withdrawn flag. timestamp will be set; last_modified in update()
@@ -1803,15 +1811,9 @@ public class Item extends DSpaceObject
         // in_archive flag is now false
         itemRow.setColumn("in_archive", false);
 
-        // Add suitable provenance - includes user, date, collections +
-        // bitstream checksums
-        EPerson e = ourContext.getCurrentUser();
-        String prov = "Item withdrawn by " + e.getFullName() + " ("
-                + e.getEmail() + ") on " + timestamp + "\n"
-                + "Item was in collections:\n" + collectionProv
-                + InstallItem.getBitstreamProvenanceMessage(this);
+        prov.append(InstallItem.getBitstreamProvenanceMessage(this));
 
-        addDC("description", "provenance", "en", prov);
+        addDC("description", "provenance", "en", prov.toString());
 
         // Update item in DB
         update();
@@ -1837,20 +1839,26 @@ public class Item extends DSpaceObject
     public void reinstate() throws SQLException, AuthorizeException,
             IOException
     {
+        // check authorization
+        AuthorizeUtil.authorizeReinstateItem(ourContext, this);
+
         String timestamp = DCDate.getCurrent().toString();
 
         // Check permission. User must have ADD on all collections.
         // Build some provenance data while we're at it.
-        String collectionProv = "";
         Collection[] colls = getCollections();
 
-        // check authorization
-        AuthorizeUtil.authorizeReinstateItem(ourContext, this);
-        
+        // Add suitable provenance - includes user, date, collections +
+        // bitstream checksums
+        EPerson e = ourContext.getCurrentUser();
+        StringBuilder prov = new StringBuilder();
+        prov.append("Item reinstated by ").append(e.getFullName()).append(" (")
+                .append(e.getEmail()).append(") on ").append(timestamp).append("\n")
+                .append("Item was in collections:\n");
+
         for (int i = 0; i < colls.length; i++)
         {
-            collectionProv = collectionProv + colls[i].getMetadata("name")
-                    + " (ID: " + colls[i].getID() + ")\n";
+            prov.append(colls[i].getMetadata("name")).append(" (ID: ").append(colls[i].getID()).append(")\n");
         }
         
         // Clear withdrawn flag
@@ -1861,13 +1869,9 @@ public class Item extends DSpaceObject
 
         // Add suitable provenance - includes user, date, collections +
         // bitstream checksums
-        EPerson e = ourContext.getCurrentUser();
-        String prov = "Item reinstated by " + e.getFullName() + " ("
-                + e.getEmail() + ") on " + timestamp + "\n"
-                + "Item was in collections:\n" + collectionProv
-                + InstallItem.getBitstreamProvenanceMessage(this);
+        prov.append(InstallItem.getBitstreamProvenanceMessage(this));
 
-        addDC("description", "provenance", "en", prov);
+        addDC("description", "provenance", "en", prov.toString());
 
         // Update item in DB
         update();

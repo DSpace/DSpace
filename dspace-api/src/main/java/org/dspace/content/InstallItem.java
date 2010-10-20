@@ -263,17 +263,18 @@ public class InstallItem
         Bitstream[] bitstreams = myitem.getNonInternalBitstreams();
 
         // Create provenance description
-        String mymessage = "No. of bitstreams: " + bitstreams.length + "\n";
+        StringBuilder myMessage = new StringBuilder();
+        myMessage.append("No. of bitstreams: ").append(bitstreams.length).append("\n");
 
         // Add sizes and checksums of bitstreams
         for (int j = 0; j < bitstreams.length; j++)
         {
-            mymessage = mymessage + bitstreams[j].getName() + ": "
-                    + bitstreams[j].getSize() + " bytes, checksum: "
-                    + bitstreams[j].getChecksum() + " ("
-                    + bitstreams[j].getChecksumAlgorithm() + ")\n";
+            myMessage.append(bitstreams[j].getName()).append(": ")
+                    .append(bitstreams[j].getSize()).append(" bytes, checksum: ")
+                    .append(bitstreams[j].getChecksum()).append(" (")
+                    .append(bitstreams[j].getChecksumAlgorithm()).append(")\n");
         }
 
-        return mymessage;
+        return myMessage.toString();
     }
 }

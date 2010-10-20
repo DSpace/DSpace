@@ -493,7 +493,8 @@ public class Group extends DSpaceObject
         // yes, I know this could have been done as one big query and a union,
         // but doing the Oracle port taught me to keep to simple SQL!
 
-        String groupQuery = "";
+        StringBuilder groupQuery = new StringBuilder();
+        groupQuery.append("SELECT * FROM group2groupcache WHERE ");
 
         Iterator<Integer> i = groupIDs.iterator();
 
@@ -506,16 +507,16 @@ public class Group extends DSpaceObject
 
             parameters[idx++] = new Integer(groupID);
             
-            groupQuery += "child_id= ? ";
+            groupQuery.append("child_id= ? ");
             if (i.hasNext())
-                groupQuery += " OR ";
+                groupQuery.append(" OR ");
         }
 
         // was member of at least one group
         // NOTE: even through the query is built dynamically, all data is
         // separated into the parameters array.
         TableRowIterator tri = DatabaseManager.queryTable(c, "group2groupcache",
-                "SELECT * FROM group2groupcache WHERE " + groupQuery,
+                groupQuery.toString(),
                 parameters);
 
         try
@@ -622,25 +623,29 @@ public class Group extends DSpaceObject
 
         // don't forget to add the current group to this query!
         parameters[idx++] = new Integer(g.getID());
-        String epersonQuery = "eperson_group_id= ? ";
+
+        StringBuilder epersonQuery = new StringBuilder();
+        epersonQuery.append("SELECT * FROM epersongroup2eperson WHERE ");
+        epersonQuery.append("eperson_group_id= ? ");
+
         if (i.hasNext())
-            epersonQuery += " OR ";
+            epersonQuery.append(" OR ");
         
         while (i.hasNext())
         {
             int groupID = (i.next()).intValue();
             parameters[idx++] = new Integer(groupID);
             
-            epersonQuery += "eperson_group_id= ? ";
+            epersonQuery.append("eperson_group_id= ? ");
             if (i.hasNext())
-                epersonQuery += " OR ";
+                epersonQuery.append(" OR ");
         }
 
         //get all the EPerson IDs
         // Note: even through the query is dynamically built all data is separated
         // into the parameters array.
         tri = DatabaseManager.queryTable(c, "epersongroup2eperson",
-                "SELECT * FROM epersongroup2eperson WHERE " + epersonQuery,
+                epersonQuery.toString(),
                 parameters);
 
         try

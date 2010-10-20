@@ -141,9 +141,11 @@ public class DSpaceCSVLine
      */
     protected String toCSV(ArrayList<String> headings)
     {
+        StringBuilder bits = new StringBuilder();
+
         // Add the id
-        String bits = "\"" + id + "\"" + DSpaceCSV.fieldSeparator;
-        bits += valueToCSV(items.get("collection")) + DSpaceCSV.fieldSeparator;
+        bits.append("\"").append(id).append("\"").append(DSpaceCSV.fieldSeparator);
+        bits.append(valueToCSV(items.get("collection"))).append(DSpaceCSV.fieldSeparator);
 
         // Add the rest of the elements
         Iterator<String> i = headings.iterator();
@@ -153,15 +155,15 @@ public class DSpaceCSVLine
             key = i.next();
             if ((items.get(key) != null) && (!"collection".equals(key)))
             {
-                bits = bits + valueToCSV(items.get(key));
+                bits.append(valueToCSV(items.get(key)));
             }
 
             if (i.hasNext())
             {
-                bits = bits + DSpaceCSV.fieldSeparator;
+                bits.append(DSpaceCSV.fieldSeparator);
             }
         }
-        return bits;
+        return bits.toString();
     }
 
     /**
@@ -172,41 +174,33 @@ public class DSpaceCSVLine
      */
     private String valueToCSV(ArrayList<String> values)
     {
-        // Concatenate any fields together 
-        String s = "";
-
         // Check there is some content
         if (values == null)
         {
-            return s;
+            return "";
         }
 
         // Get on with the work
         if (values.size() == 1)
         {
-            s = values.get(0);
+            return values.get(0);
         }
-        else
+
+        // Concatenate any fields together
+        StringBuilder str = new StringBuilder();
+
+        Iterator i = values.iterator();
+        while (i.hasNext())
         {
-            Iterator i = values.iterator();
-            while (i.hasNext())
+            str.append(i.next());
+            if (i.hasNext())
             {
-                s = s + i.next();
-                if (i.hasNext())
-                {
-                    s = s + DSpaceCSV.valueSeparator;
-                }
+                str.append(DSpaceCSV.valueSeparator);
             }
         }
 
         // Replace internal quotes with two sets of quotes
-        s = s.replaceAll("\"", "\"\"");
-
-        // Wrap in quotes
-        s = "\"" + s + "\"";
-
-        // Return the csv formatted string
-        return s;
+        return "\"" + str.toString().replaceAll("\"", "\"\"") + "\"";
     }
 }
 

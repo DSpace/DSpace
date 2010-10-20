@@ -475,7 +475,7 @@ public class ConfigurationManager
         
         fileName += newsFile;
         
-        String text = "";
+        StringBuilder text = new StringBuilder();
 
         try
         {
@@ -488,7 +488,7 @@ public class ConfigurationManager
 
             while ((lineIn = br.readLine()) != null)
             {
-                text += lineIn;
+                text.append(lineIn);
             }
 
             br.close();
@@ -498,7 +498,7 @@ public class ConfigurationManager
             warn("news_read: " + e.getLocalizedMessage());
         }
 
-        return text;
+        return text.toString();
     }
 
     /**
