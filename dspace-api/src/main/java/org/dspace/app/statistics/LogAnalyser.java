@@ -508,9 +508,7 @@ public class LogAnalyser
                             
                             // strip the item id string
                             Matcher matchItem = itemRX.matcher(handle);
-                            handle = matchItem.replaceAll("");
-
-                            handle.trim();
+                            handle = matchItem.replaceAll("").trim();
 
                             // either add the handle to the aggregator or
                             // increment its counter
@@ -950,7 +948,7 @@ public class LogAnalyser
                 // documentation for more info on config params)
                 if (key.equals("general.summary"))
                 {
-                    actionAggregator.put(value, new Integer(0));
+                    actionAggregator.put(value, Integer.valueOf(0));
                     generalSummary.add(value);
                 }
                 
@@ -1017,11 +1015,11 @@ public class LogAnalyser
         if (map.containsKey(key))
         {
             // FIXME: this seems like a ridiculous way to add Integers
-            newValue = new Integer(((Integer) map.get(key)).intValue() + 1);
+            newValue = Integer.valueOf(((Integer) map.get(key)).intValue() + 1);
         }
         else
         {
-            newValue = new Integer(1);
+            newValue = Integer.valueOf(1);
         }
         return newValue;
     }
@@ -1282,13 +1280,13 @@ public class LogAnalyser
         Integer numItems;
         if (oracle)
         {
-            numItems = new Integer(row.getIntColumn("num"));
+            numItems = Integer.valueOf(row.getIntColumn("num"));
         }
         else
         {
             // for some reason the number column is of "long" data type!
-            Long count = new Long(row.getLongColumn("num"));
-            numItems = new Integer(count.intValue());
+            Long count = Long.valueOf(row.getLongColumn("num"));
+            numItems = Integer.valueOf(count.intValue());
         }
         return numItems;
     }
