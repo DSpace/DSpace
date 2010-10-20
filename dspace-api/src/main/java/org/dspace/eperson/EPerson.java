@@ -354,7 +354,7 @@ public class EPerson extends DSpaceObject
 			int_param = Integer.valueOf(query);
 		}
 		catch (NumberFormatException e) {
-			int_param = new Integer(-1);
+			int_param = Integer.valueOf(-1);
 		}
 
         // Create the parameter array, including limit and offset if part of the query
@@ -424,7 +424,7 @@ public class EPerson extends DSpaceObject
 			int_param = Integer.valueOf(query);
 		}
 		catch (NumberFormatException e) {
-			int_param = new Integer(-1);
+			int_param = Integer.valueOf(-1);
 		}
 		
 		// Get all the epeople that match the query
@@ -436,11 +436,11 @@ public class EPerson extends DSpaceObject
 		// use getIntColumn for Oracle count data
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
-            count = new Long(row.getIntColumn("epcount"));
+            count = Long.valueOf(row.getIntColumn("epcount"));
         }
         else  //getLongColumn works for postgres
         {
-            count = new Long(row.getLongColumn("epcount"));
+            count = Long.valueOf(row.getLongColumn("epcount"));
         }
         
 		return count.intValue();

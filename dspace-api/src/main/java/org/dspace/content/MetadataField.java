@@ -626,7 +626,7 @@ public class MetadataField
         }
 
         // 'sanity check' first.
-        Integer iid = new Integer(id);
+        Integer iid = Integer.valueOf(id);
         if (!id2field.containsKey(iid))
             return null;
 
@@ -662,7 +662,7 @@ public class MetadataField
                 {
                     TableRow row = tri.next();
                     int fieldID = row.getIntColumn("metadata_field_id");
-                    new_id2field.put(new Integer(fieldID), new MetadataField(row));
+                    new_id2field.put(Integer.valueOf(fieldID), new MetadataField(row));
                 }
             }
             finally

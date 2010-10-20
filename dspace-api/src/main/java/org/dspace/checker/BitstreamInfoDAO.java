@@ -522,7 +522,7 @@ public final class BitstreamInfoDAO extends DAOSupport
 
             while (rs.next())
             {
-                ids.add(new Integer(rs.getInt(1)));
+                ids.add(Integer.valueOf(rs.getInt(1)));
             }
 
         }
@@ -565,7 +565,7 @@ public final class BitstreamInfoDAO extends DAOSupport
 
             while (rs.next())
             {
-                ids.add(new Integer(rs.getInt(1)));
+                ids.add(Integer.valueOf(rs.getInt(1)));
             }
 
         }
@@ -608,7 +608,7 @@ public final class BitstreamInfoDAO extends DAOSupport
 
             while (rs.next())
             {
-                ids.add(new Integer(rs.getInt(1)));
+                ids.add(Integer.valueOf(rs.getInt(1)));
             }
 
         }

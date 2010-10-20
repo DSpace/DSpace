@@ -374,7 +374,7 @@ public abstract class AbstractProcessingStep
             int pageNumber)
     {
         // set info to request
-        request.setAttribute("submission.page", new Integer(pageNumber));
+        request.setAttribute("submission.page", Integer.valueOf(pageNumber));
     }
 
 }

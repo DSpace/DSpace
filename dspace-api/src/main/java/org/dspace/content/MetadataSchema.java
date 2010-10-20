@@ -541,7 +541,7 @@ public class MetadataSchema
             initCache(context);
         }
         
-        Integer iid = new Integer(id);
+        Integer iid = Integer.valueOf(id);
 
         // sanity check
         if (!id2schema.containsKey(iid))
@@ -609,7 +609,7 @@ public class MetadataSchema
                     TableRow row = tri.next();
 
                     MetadataSchema s = new MetadataSchema(row);
-                    new_id2schema.put(new Integer(s.schemaID), s);
+                    new_id2schema.put(Integer.valueOf(s.schemaID), s);
                     new_name2schema.put(s.name, s);
                 }
             }

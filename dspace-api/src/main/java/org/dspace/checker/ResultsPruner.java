@@ -214,7 +214,7 @@ public final class ResultsPruner
      */
     public void addInterested(String result, long duration)
     {
-        interests.put(result, new Long(duration));
+        interests.put(result, Long.valueOf(duration));
     }
 
     /**
@@ -261,7 +261,7 @@ public final class ResultsPruner
             String code = (String) iter.next();
             if (!interests.containsKey(code))
             {
-                interests.put(code, new Long(defaultDuration));
+                interests.put(code, Long.valueOf(defaultDuration));
             }
 
         }

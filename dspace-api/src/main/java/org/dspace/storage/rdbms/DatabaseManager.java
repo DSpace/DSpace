@@ -512,7 +512,7 @@ public class DatabaseManager
         String ctable = canonicalize(table);
 
         return findByUnique(context, ctable, getPrimaryKeyColumn(ctable),
-                new Integer(id));
+                Integer.valueOf(id));
     }
 
     /**
@@ -569,7 +569,7 @@ public class DatabaseManager
         String ctable = canonicalize(table);
 
         return deleteByValue(context, ctable, getPrimaryKeyColumn(ctable),
-                new Integer(id));
+                Integer.valueOf(id));
     }
 
     /**

@@ -133,7 +133,7 @@ public class HandleDispatcher implements BitstreamDispatcher
             switch (dsoType)
             {
             case Constants.BITSTREAM:
-                ids.add(new Integer(id));
+                ids.add(Integer.valueOf(id));
                 break;
 
             case Constants.ITEM:

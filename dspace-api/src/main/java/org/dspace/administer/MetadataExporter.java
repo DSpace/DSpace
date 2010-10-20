@@ -294,7 +294,7 @@ public class MetadataExporter
             if (mdSchema != null)
             {
                 name = mdSchema.getName();
-                schemaMap.put(new Integer(mdSchema.getSchemaID()), name);
+                schemaMap.put(Integer.valueOf(mdSchema.getSchemaID()), name);
             }
             else
             {

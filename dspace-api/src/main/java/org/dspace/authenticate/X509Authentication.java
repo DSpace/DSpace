@@ -520,7 +520,7 @@ public class X509Authentication implements AuthenticationMethod
                     Group group = Group.findByName(context, groupName);
                     if (group != null)
                     {
-                        groupIDs.add(new Integer(group.getID()));
+                        groupIDs.add(Integer.valueOf(group.getID()));
                     }
                     else
                     {

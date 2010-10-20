@@ -462,7 +462,7 @@ public class Group extends DSpaceObject
 
                     int childID = row.getIntColumn("eperson_group_id");
 
-                    groupIDs.add(new Integer(childID));
+                    groupIDs.add(Integer.valueOf(childID));
                 }
             }
             finally
@@ -482,12 +482,12 @@ public class Group extends DSpaceObject
             Group[] specialGroups = c.getSpecialGroups();
             for(Group special : specialGroups)
             {
-                groupIDs.add(new Integer(special.getID()));
+                groupIDs.add(Integer.valueOf(special.getID()));
             }
         }
 
         // all the users are members of the anonymous group 
-        groupIDs.add(new Integer(0));
+        groupIDs.add(Integer.valueOf(0));
         
         // now we have all owning groups, also grab all parents of owning groups
         // yes, I know this could have been done as one big query and a union,
@@ -505,7 +505,7 @@ public class Group extends DSpaceObject
         {
             int groupID = (i.next()).intValue();
 
-            parameters[idx++] = new Integer(groupID);
+            parameters[idx++] = Integer.valueOf(groupID);
             
             groupQuery.append("child_id= ? ");
             if (i.hasNext())
@@ -527,7 +527,7 @@ public class Group extends DSpaceObject
 
                 int parentID = row.getIntColumn("parent_id");
 
-                groupIDs.add(new Integer(parentID));
+                groupIDs.add(Integer.valueOf(parentID));
             }
         }
         finally
@@ -603,7 +603,7 @@ public class Group extends DSpaceObject
 
                 int childID = row.getIntColumn("child_id");
 
-                groupIDs.add(new Integer(childID));
+                groupIDs.add(Integer.valueOf(childID));
             }
         }
         finally
@@ -622,7 +622,7 @@ public class Group extends DSpaceObject
         Iterator<Integer> i = groupIDs.iterator();
 
         // don't forget to add the current group to this query!
-        parameters[idx++] = new Integer(g.getID());
+        parameters[idx++] = Integer.valueOf(g.getID());
 
         StringBuilder epersonQuery = new StringBuilder();
         epersonQuery.append("SELECT * FROM epersongroup2eperson WHERE ");
@@ -634,7 +634,7 @@ public class Group extends DSpaceObject
         while (i.hasNext())
         {
             int groupID = (i.next()).intValue();
-            parameters[idx++] = new Integer(groupID);
+            parameters[idx++] = Integer.valueOf(groupID);
             
             epersonQuery.append("eperson_group_id= ? ");
             if (i.hasNext())
@@ -656,7 +656,7 @@ public class Group extends DSpaceObject
 
                 int epersonID = row.getIntColumn("eperson_id");
 
-                epeopleIDs.add(new Integer(epersonID));
+                epeopleIDs.add(Integer.valueOf(epersonID));
             }
         }
         finally
@@ -674,7 +674,7 @@ public class Group extends DSpaceObject
     {
         Set<Integer> groupIDs = Group.allMemberGroupIDs(c, e);
 
-        return groupIDs.contains(new Integer(groupID));
+        return groupIDs.contains(Integer.valueOf(groupID));
     }
 
     /**
@@ -891,7 +891,7 @@ public class Group extends DSpaceObject
 			int_param = Integer.valueOf(query);
 		}
 		catch (NumberFormatException e) {
-			int_param = new Integer(-1);
+			int_param = Integer.valueOf(-1);
 		}
 
         // Create the parameter array, including limit and offset if part of the query
@@ -960,7 +960,7 @@ public class Group extends DSpaceObject
 			int_param = Integer.valueOf(query);
 		}
 		catch (NumberFormatException e) {
-			int_param = new Integer(-1);
+			int_param = Integer.valueOf(-1);
 		}
 		
 		// Get all the epeople that match the query
@@ -970,11 +970,11 @@ public class Group extends DSpaceObject
 		Long count;
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
-            count = new Long(row.getIntColumn("gcount"));
+            count = Long.valueOf(row.getIntColumn("gcount"));
         }
         else  //getLongColumn works for postgres
         {
-            count = new Long(row.getLongColumn("gcount"));
+            count = Long.valueOf(row.getLongColumn("gcount"));
         }
 
 		return count.intValue();
@@ -1226,8 +1226,8 @@ public class Group extends DSpaceObject
             {
                 TableRow row = (TableRow) tri.next();
 
-                Integer parentID = new Integer(row.getIntColumn("parent_id"));
-                Integer childID = new Integer(row.getIntColumn("child_id"));
+                Integer parentID = Integer.valueOf(row.getIntColumn("parent_id"));
+                Integer childID = Integer.valueOf(row.getIntColumn("child_id"));
 
                 // if parent doesn't have an entry, create one
                 if (!parents.containsKey(parentID))

@@ -212,7 +212,7 @@ public class WorkflowManager
     {
         // make a hash table entry with item ID for no notify
         // notify code checks no notify hash for item id
-        noEMail.put(new Integer(wsi.getItem().getID()), Boolean.TRUE);
+        noEMail.put(Integer.valueOf(wsi.getItem().getID()), Boolean.TRUE);
 
         return start(c, wsi);
     }
@@ -841,7 +841,7 @@ public class WorkflowManager
         // check to see if notification is turned off
         // and only do it once - delete key after notification has
         // been suppressed for the first time
-        Integer myID = new Integer(wi.getItem().getID());
+        Integer myID = Integer.valueOf(wi.getItem().getID());
 
         if (noEMail.containsKey(myID))
         {

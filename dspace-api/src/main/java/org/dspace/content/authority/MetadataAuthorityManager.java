@@ -139,7 +139,7 @@ public class MetadataAuthorityManager
                 // get minConfidence level for this field if any
                 int mci = readConfidence("authority.minconfidence."+field);
                 if (mci >= Choices.CF_UNSET)
-                    minConfidence.put(fkey, new Integer(mci));
+                    minConfidence.put(fkey, Integer.valueOf(mci));
                 log.debug("Authority Control: For schema="+schema+", elt="+element+", qual="+qualifier+", controlled="+ctl+", required="+req);
             }
         }

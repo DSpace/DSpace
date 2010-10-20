@@ -226,11 +226,10 @@ public class IPAuthentication implements AuthenticationMethod
                             if (group != null)
                             {
                                 // Add ID so we won't have to do lookup again
-                                ipMatcherGroupIDs.put(ipm, new Integer(group
-                                        .getID()));
+                                ipMatcherGroupIDs.put(ipm, Integer.valueOf(group.getID()));
                                 ipMatcherGroupNames.remove(ipm);
 
-                                groupIDs.add(new Integer(group.getID()));
+                                groupIDs.add(Integer.valueOf(group.getID()));
                             }
                             else
                             {
@@ -273,11 +272,10 @@ public class IPAuthentication implements AuthenticationMethod
                             if (group != null)
                             {
                                 // Add ID so we won't have to do lookup again
-                                ipMatcherGroupIDs.put(ipm, new Integer(group
-                                        .getID()));
+                                ipMatcherGroupIDs.put(ipm, Integer.valueOf(group.getID()));
                                 ipMatcherGroupNames.remove(ipm);
 
-                                groupIDs.remove(new Integer(group.getID()));
+                                groupIDs.remove(Integer.valueOf(group.getID()));
                             }
                             else
                             {

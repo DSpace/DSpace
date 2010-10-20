@@ -316,11 +316,11 @@ public class ShibAuthentication implements AuthenticationMethod
                 log.warn(LogManager.getHeader(context, dspaceGroup
                         + " group is not found!! Admin needs to create one!",
                         "requiredGroup=" + dspaceGroup));
-                groups.add(new Integer(0));
+                groups.add(Integer.valueOf(0));
             }
             else
             {
-                groups.add(new Integer(g.getID()));
+                groups.add(Integer.valueOf(g.getID()));
             }
             log.info("Mapping group: " + dspaceGroup + " to groupID: "
                     + (g == null ? 0 : g.getID()));

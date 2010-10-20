@@ -226,7 +226,7 @@ public class ItemComparator implements Comparator
 
             if (value != null)
             {
-                values.put(value, new Integer(i));
+                values.put(value, Integer.valueOf(i));
             }
         }
 
