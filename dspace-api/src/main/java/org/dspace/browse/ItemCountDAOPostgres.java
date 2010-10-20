@@ -98,17 +98,17 @@ public class ItemCountDAOPostgres implements ItemCountDAO
         try
 		{
 			// first find out if we have a record
-			Object[] sparams = { new Integer(collection.getID()) };
+			Object[] sparams = { Integer.valueOf(collection.getID()) };
 			tri = DatabaseManager.query(context, collectionSelect, sparams);
 			
 			if (tri.hasNext())
 			{
-				Object[] params = { new Integer(count), new Integer(collection.getID()) };
+				Object[] params = { Integer.valueOf(count), Integer.valueOf(collection.getID()) };
 				DatabaseManager.updateQuery(context, collectionUpdate, params);
 			}
 			else
 			{
-				Object[] params = { new Integer(collection.getID()), new Integer(count) };
+				Object[] params = { Integer.valueOf(collection.getID()), Integer.valueOf(count) };
 				DatabaseManager.updateQuery(context, collectionInsert, params);
 			}
 		}
@@ -138,17 +138,17 @@ public class ItemCountDAOPostgres implements ItemCountDAO
         try
 		{
 			// first find out if we have a record
-			Object[] sparams = { new Integer(community.getID()) };
+			Object[] sparams = { Integer.valueOf(community.getID()) };
 			tri = DatabaseManager.query(context, communitySelect, sparams);
 			
 			if (tri.hasNext())
 			{
-				Object[] params = { new Integer(count), new Integer(community.getID()) };
+				Object[] params = { Integer.valueOf(count), Integer.valueOf(community.getID()) };
 				DatabaseManager.updateQuery(context, communityUpdate, params);
 			}
 			else
 			{
-				Object[] params = { new Integer(community.getID()), new Integer(count) };
+				Object[] params = { Integer.valueOf(community.getID()), Integer.valueOf(count) };
 				DatabaseManager.updateQuery(context, communityInsert, params);
 			}
 		}
@@ -233,7 +233,7 @@ public class ItemCountDAOPostgres implements ItemCountDAO
 	{
 		try
 		{
-			Object[] params = { new Integer(collection.getID()) };
+			Object[] params = { Integer.valueOf(collection.getID()) };
 			DatabaseManager.updateQuery(context, collectionRemove, params);
 		}
 		catch (SQLException e)
@@ -254,7 +254,7 @@ public class ItemCountDAOPostgres implements ItemCountDAO
 	{
 		try
 		{
-			Object[] params = { new Integer(community.getID()) };
+			Object[] params = { Integer.valueOf(community.getID()) };
 			DatabaseManager.updateQuery(context, communityRemove, params);
 		}
 		catch (SQLException e)
@@ -277,7 +277,7 @@ public class ItemCountDAOPostgres implements ItemCountDAO
         TableRowIterator tri = null;
         try
 		{
-			Object[] params = { new Integer(collection.getID()) };
+			Object[] params = { Integer.valueOf(collection.getID()) };
 			tri = DatabaseManager.query(context, collectionSelect, params);
 			
 			if (!tri.hasNext())
@@ -319,7 +319,7 @@ public class ItemCountDAOPostgres implements ItemCountDAO
         TableRowIterator tri = null;
         try
 		{
-			Object[] params = { new Integer(community.getID()) };
+			Object[] params = { Integer.valueOf(community.getID()) };
 			tri = DatabaseManager.query(context, communitySelect, params);
 			
 			if (!tri.hasNext())

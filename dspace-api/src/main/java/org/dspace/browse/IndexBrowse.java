@@ -535,7 +535,7 @@ public class IndexBrowse
             Map<Integer, String> sortMap = new HashMap<Integer, String>();
             for (SortOption so : SortOption.getSortOptions())
             {
-                Integer key = new Integer(so.getNumber());
+                Integer key = Integer.valueOf(so.getNumber());
                 String metadata = so.getMetadata();
 
                 // If we've already used the metadata for this Item
@@ -958,7 +958,7 @@ public class IndexBrowse
             List<Integer> sortCols = new ArrayList<Integer>();
             for (SortOption so : SortOption.getSortOptions())
             {
-                sortCols.add(new Integer(so.getNumber()));
+                sortCols.add(Integer.valueOf(so.getNumber()));
             }
 
             createItemTables(BrowseIndex.getItemBrowseIndex(), sortCols);

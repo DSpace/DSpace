@@ -210,7 +210,7 @@ public class BrowseDAOOracle implements BrowseDAO
         {
             String query = "SELECT MAX(" + column + ") AS max_value FROM " + table + " WHERE item_id=?";
 
-            Object[] params = { new Integer(itemID) };
+            Object[] params = { Integer.valueOf(itemID) };
             tri = DatabaseManager.query(context, query, params);
 
             TableRow row;
@@ -886,16 +886,16 @@ public class BrowseDAOOracle implements BrowseDAO
         {
             queryBuf.append("rec WHERE rownum<=? ");
             if (offset > 0)
-                params.add(new Integer(limit + offset));
+                params.add(Integer.valueOf(limit + offset));
             else
-                params.add(new Integer(limit));
+                params.add(Integer.valueOf(limit));
         }
 
         if (offset > 0)
         {
             queryBuf.insert(0, "SELECT * FROM (");
             queryBuf.append(") WHERE rnum>?");
-            params.add(new Integer(offset));
+            params.add(Integer.valueOf(offset));
         }
     }
 
@@ -964,7 +964,7 @@ public class BrowseDAOOracle implements BrowseDAO
             queryBuf.append(containerTable).append(".").append(containerIDField);
             queryBuf.append("=? ");
 
-            params.add(new Integer(containerID));
+            params.add(Integer.valueOf(containerID));
         }
     }
 

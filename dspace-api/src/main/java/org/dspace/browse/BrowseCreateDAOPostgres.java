@@ -406,7 +406,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     {
         try
         {
-            Object[] params = { new Integer(itemID) };
+            Object[] params = { Integer.valueOf(itemID) };
             String dquery = "DELETE FROM " + table + " WHERE item_id = ?";
             DatabaseManager.updateQuery(context, dquery, params);
         }
@@ -425,7 +425,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     {
         try
         {
-            Object[] params = { new Integer(itemID) };
+            Object[] params = { Integer.valueOf(itemID) };
             String dquery = "DELETE FROM Communities2Item WHERE item_id = ?";
             DatabaseManager.updateQuery(context, dquery, params);
         }

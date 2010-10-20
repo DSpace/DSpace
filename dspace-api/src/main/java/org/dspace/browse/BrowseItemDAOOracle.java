@@ -124,17 +124,17 @@ public class BrowseItemDAOOracle implements BrowseItemDAO
         {
             if (qualifier == null)
             {
-                Object[] params = { new Integer(itemId), element, schema };
+                Object[] params = { Integer.valueOf(itemId), element, schema };
                 tri = DatabaseManager.query(context, getByMetadataElement, params);
             }
             else if (Item.ANY.equals(qualifier))
             {
-                Object[] params = { new Integer(itemId), element, schema };
+                Object[] params = { Integer.valueOf(itemId), element, schema };
                 tri = DatabaseManager.query(context, getByMetadataAnyQualifier, params);
             }
             else
             {
-                Object[] params = { new Integer(itemId), element, qualifier, schema };
+                Object[] params = { Integer.valueOf(itemId), element, qualifier, schema };
                 tri = DatabaseManager.query(context, getByMetadata, params);
             }
 

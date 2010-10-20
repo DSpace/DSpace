@@ -216,7 +216,7 @@ public class BrowseDAOPostgres implements BrowseDAO
         {
             String query = "SELECT max(" + column + ") FROM " + table + " WHERE item_id = ?";
 
-            Object[] params = { new Integer(itemID) };
+            Object[] params = { Integer.valueOf(itemID) };
             tri = DatabaseManager.query(context, query, params);
 
             TableRow row;
@@ -890,7 +890,7 @@ public class BrowseDAOPostgres implements BrowseDAO
         {
             queryBuf.append(" LIMIT ? ");
 
-            params.add(new Integer(limit));
+            params.add(Integer.valueOf(limit));
         }
 
         // prepare the OFFSET clause
@@ -898,7 +898,7 @@ public class BrowseDAOPostgres implements BrowseDAO
         {
             queryBuf.append(" OFFSET ? ");
 
-            params.add(new Integer(offset));
+            params.add(Integer.valueOf(offset));
         }
     }
 
@@ -968,7 +968,7 @@ public class BrowseDAOPostgres implements BrowseDAO
             queryBuf.append(containerTable).append(".").append(containerIDField);
             queryBuf.append("=? ");
 
-            params.add(new Integer(containerID));
+            params.add(Integer.valueOf(containerID));
         }
     }
 

@@ -83,18 +83,18 @@ public class ItemListConfig
 			int i = 1;
 			while (st.hasMoreTokens())
 			{
-				Integer key = new Integer(i);
+				Integer key = Integer.valueOf(i);
 				String token = st.nextToken();
 				
 				// find out if the field is a date
 				if (token.indexOf("(date)") > 0)
 				{
 					token = token.replaceAll("\\(date\\)", "");
-					types.put(key, new Integer(ItemListConfig.DATE));
+					types.put(key, Integer.valueOf(ItemListConfig.DATE));
 				}
 				else
 				{
-					types.put(key, new Integer(ItemListConfig.TEXT));
+					types.put(key, Integer.valueOf(ItemListConfig.TEXT));
 				}
 				
 				String[] mdBits = interpretField(token.trim(), null);
@@ -128,7 +128,7 @@ public class ItemListConfig
 	 */
 	public String[] getMetadata(int col)
 	{
-		return (String[]) metadata.get(new Integer(col));
+		return (String[]) metadata.get(Integer.valueOf(col));
 	}
 	
 	/**
