@@ -686,7 +686,7 @@ public class SubmissionInfo
         // and the collection it corresponds to
         session.setAttribute("submission.config", subConfig);
         session.setAttribute("submission.config.collection", collectionHandle);
-        session.setAttribute("submission.config.isWorkflow", new Boolean(
+        session.setAttribute("submission.config.isWorkflow", Boolean.valueOf(
                 isWorkflow));
     }
 
