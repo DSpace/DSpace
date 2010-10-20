@@ -40,11 +40,8 @@ package org.dspace.app.statistics;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -455,7 +452,7 @@ public class ReportGenerator
         // get the display processing time information
         Calendar endTime = new GregorianCalendar();
         long timeInMillis = (endTime.getTimeInMillis() - startTime.getTimeInMillis());
-        int outputProcessTime = (new Long(timeInMillis).intValue() / 1000);
+        int outputProcessTime = (int) (timeInMillis / 1000);
         
         // prepare the processing information statistics
         Statistics process = new Statistics("Operation", "");
