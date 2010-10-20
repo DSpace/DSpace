@@ -285,7 +285,7 @@ public class MetadataExporter
     private static String getSchemaName(Context context, MetadataField mdField) throws SQLException, RegistryExportException
     {
         // Get name from cache
-        String name = schemaMap.get(new Integer(mdField.getSchemaID()));
+        String name = schemaMap.get(Integer.valueOf(mdField.getSchemaID()));
 
         if (name == null)
         {

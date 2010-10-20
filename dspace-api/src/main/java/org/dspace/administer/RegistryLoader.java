@@ -194,7 +194,7 @@ public class RegistryLoader
         int supportLevel = Integer.parseInt(supportLevelString);
 
         String internalString = getElementData(node, "internal");
-        boolean internal = new Boolean(internalString).booleanValue();
+        boolean internal = Boolean.valueOf(internalString).booleanValue();
 
         String[] extensions = getRepeatedElementData(node, "extension");
 
