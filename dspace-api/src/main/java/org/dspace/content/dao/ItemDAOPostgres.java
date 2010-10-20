@@ -48,11 +48,11 @@ import java.sql.SQLException;
 
 public class ItemDAOPostgres extends ItemDAO
 {
-    private final String selectPrimaryBitstreamID =
+    private final static String selectPrimaryBitstreamID =
             "SELECT bundle.primary_bitstream_id FROM item2bundle, bundle " +
             "WHERE item2bundle.item_id=? AND item2bundle.bundle_id=bundle.bundle_id AND bundle.name=? LIMIT 1";
 
-    private final String selectFirstBitstreamID =
+    private final static String selectFirstBitstreamID =
         "SELECT bundle2bitstream.bitstream_id FROM item2bundle, bundle, bundle2bitstream " +
         "WHERE item2bundle.item_id=? AND item2bundle.bundle_id=bundle.bundle_id AND bundle.name=? " +
         "AND bundle.bundle_id=bundle2bitstream.bundle_id LIMIT 1";
@@ -71,7 +71,7 @@ public class ItemDAOPostgres extends ItemDAO
 //        "ORDER BY bitstream.sequence_id" +
 //        ") allstreams LIMIT 1";
 
-    private final String selectNamedBitstreamID =
+    private final static String selectNamedBitstreamID =
         "SELECT bitstream.bitstream_id FROM item2bundle, bundle, bundle2bitstream, bitstream " +
         "WHERE item2bundle.item_id=? AND item2bundle.bundle_id=bundle.bundle_id AND bundle.name=? " +
         "AND bundle.bundle_id=bundle2bitstream.bundle_id AND bundle2bitstream.bitstream_id=bitstream.bitstream_id " +
