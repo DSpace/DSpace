@@ -40,6 +40,7 @@ package org.dspace.app.xmlui.aspect.administrative.metadataimport;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -131,10 +132,10 @@ public class MetadataImportConfirm extends AbstractDSpaceTransformer {
                     for (BulkEditChange change : changes)
                     {
                         // Get the changes
-                        ArrayList<DCValue> adds = change.getAdds();
-                        ArrayList<DCValue> removes = change.getRemoves();
-                        ArrayList<Collection> newCollections = change.getNewMappedCollections();
-                        ArrayList<Collection> oldCollections = change.getOldMappedCollections();
+                        List<DCValue> adds = change.getAdds();
+                        List<DCValue> removes = change.getRemoves();
+                        List<Collection> newCollections = change.getNewMappedCollections();
+                        List<Collection> oldCollections = change.getOldMappedCollections();
 
                         if ((adds.size() > 0) || (removes.size() > 0) ||
                             (newCollections.size() > 0) || (oldCollections.size() > 0) ||

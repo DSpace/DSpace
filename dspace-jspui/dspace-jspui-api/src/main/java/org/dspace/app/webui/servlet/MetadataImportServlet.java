@@ -40,6 +40,7 @@ package org.dspace.app.webui.servlet;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -105,7 +106,7 @@ public class MetadataImportServlet extends DSpaceServlet
             {
                 // Get the changes
                 log.info(LogManager.getHeader(context, "metadataimport", "loading file"));
-                ArrayList<BulkEditChange> changes = processUpload(context, request);
+                List<BulkEditChange> changes = processUpload(context, request);
                 log.debug(LogManager.getHeader(context, "metadataimport", changes.size() + " items with changes identified"));                
 
                 // Were there any changes detected?
@@ -157,7 +158,7 @@ public class MetadataImportServlet extends DSpaceServlet
             try
             {
                 MetadataImport mImport = new MetadataImport(context, csv.getCSVLines());
-                ArrayList<BulkEditChange> changes = mImport.runImport(true, false, false, false);
+                List<BulkEditChange> changes = mImport.runImport(true, false, false, false);
 
                 // Commit the changes
                 context.commit();
@@ -225,7 +226,7 @@ public class MetadataImportServlet extends DSpaceServlet
      * @return The response object
      * @throws Exception Thrown if an error occurs
      */
-    private ArrayList<BulkEditChange> processUpload(Context context,
+    private List<BulkEditChange> processUpload(Context context,
                                                     HttpServletRequest request) throws Exception
     {
         // Wrap multipart request to get the submission info
@@ -235,7 +236,7 @@ public class MetadataImportServlet extends DSpaceServlet
         // Run the import
         DSpaceCSV csv = new DSpaceCSV(f, context);
         MetadataImport mImport = new MetadataImport(context, csv.getCSVLines());
-        ArrayList<BulkEditChange> changes = mImport.runImport(false, false, false, false);
+        List<BulkEditChange> changes = mImport.runImport(false, false, false, false);
 
         // Store the csv lines in the session
         HttpSession session = request.getSession(true);

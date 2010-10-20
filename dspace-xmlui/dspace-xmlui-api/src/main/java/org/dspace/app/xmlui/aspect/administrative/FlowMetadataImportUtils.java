@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.io.File;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.cocoon.environment.Request;
@@ -95,7 +96,7 @@ public class FlowMetadataImportUtils
 
                 // Run the import
                 MetadataImport mImport = new MetadataImport(context, csv.getCSVLines());
-                ArrayList<BulkEditChange> changes = mImport.runImport(true, false, false, false);
+                List<BulkEditChange> changes = mImport.runImport(true, false, false, false);
 
                 // Commit the changes
                 context.commit();
@@ -177,7 +178,7 @@ public class FlowMetadataImportUtils
                         file.delete();
 
                         MetadataImport mImport = new MetadataImport(context, csv.getCSVLines());
-                        ArrayList<BulkEditChange> changes = mImport.runImport(false, false, false, false);
+                        List<BulkEditChange> changes = mImport.runImport(false, false, false, false);
                         log.debug(LogManager.getHeader(context, "metadataimport", changes.size() + " items with changes identified"));
 
                         if(changes.size() > 0)
