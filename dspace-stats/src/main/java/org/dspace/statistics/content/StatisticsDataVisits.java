@@ -601,7 +601,7 @@ public class StatisticsDataVisits extends StatisticsData
                 dataset.getMax(), false, null);
     }
 
-    public class DatasetQuery {
+    public static class DatasetQuery {
         private String name;
         private int max;
         private String facetField;

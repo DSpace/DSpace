@@ -555,7 +555,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 	 * bug had not been patch at that time.
 	 * 
 	 */
-	public class SAXFilter implements ContentHandler, LexicalHandler {
+	public static class SAXFilter implements ContentHandler, LexicalHandler {
 
 		private final String URI = WingConstants.DRI.URI;
 

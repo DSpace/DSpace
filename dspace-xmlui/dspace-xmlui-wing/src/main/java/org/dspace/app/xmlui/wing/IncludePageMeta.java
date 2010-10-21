@@ -341,7 +341,7 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
     /**
      * Private class to keep track of metadata name/value pairs.
      */
-    class Metadata implements Comparable<Metadata> {
+    static class Metadata implements Comparable<Metadata> {
 
     	private String element;
     	private String qualifier;

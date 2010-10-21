@@ -508,7 +508,7 @@ public class StatisticsImporter
      * @param <K>
      * @param <V>
      */
-    class DNSCache<K,V> extends LinkedHashMap<K,V>
+    static class DNSCache<K,V> extends LinkedHashMap<K,V>
     {
         private int maxCapacity;
 

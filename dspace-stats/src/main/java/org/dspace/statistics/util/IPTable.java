@@ -178,7 +178,7 @@ public class IPTable {
     /**
      * Exception Class to deal with IPFormat errors.
      */
-    public class IPFormatException extends Exception {
+    public static class IPFormatException extends Exception {
         public IPFormatException(String s) {
             super(s);
         }

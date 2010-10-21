@@ -130,18 +130,4 @@ public class MoveItemForm extends AbstractDSpaceTransformer {
 
 		main.addHidden("administrative-continue").setValue(knot.getId());
 	}
-
-	/**
-	 * Compare two metadata element's name so that they may be sorted.
-	 */
-	class DCValueComparator implements Comparator{
-		public int compare(Object arg0, Object arg1) {
-			final DCValue o1 = (DCValue)arg0;
-			final DCValue o2 = (DCValue)arg1;
-			final String s1 = o1.schema + o1.element + (o1.qualifier==null?"":("." + o1.qualifier));
-			final  String s2 = o2.schema + o2.element + (o2.qualifier==null?"":("." + o2.qualifier));
-			return s1.compareTo(s2);
-		}
-	}
-
 }

@@ -967,7 +967,7 @@ public class GuiClient extends JFrame implements ClientType,
 	 * 
 	 * @author Neil Taylor
 	 */
-	protected class AboutAction extends AbstractAction {
+	protected static class AboutAction extends AbstractAction {
 		/**
 		 * Create a new instance.
 		 */
@@ -995,7 +995,7 @@ public class GuiClient extends JFrame implements ClientType,
 	 * 
 	 * @author Neil Taylor
 	 */
-	protected class HelpAction extends AbstractAction {
+	protected static class HelpAction extends AbstractAction {
 		/**
 		 * Create a new instance.
 		 */

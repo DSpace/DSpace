@@ -319,7 +319,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         /**
          * Compare two metadata element's name so that they may be sorted.
          */
-        class DCValueComparator implements Comparator{
+        static class DCValueComparator implements Comparator{
                 public int compare(Object arg0, Object arg1) {
                         final DCValue o1 = (DCValue)arg0;
                         final DCValue o2 = (DCValue)arg1;

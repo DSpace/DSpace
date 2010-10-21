@@ -184,7 +184,7 @@ implements TreeSelectionListener
     * 
     * @author Neil Taylor
     */
-   class ServicePostTreeRenderer extends DefaultTreeCellRenderer 
+   static class ServicePostTreeRenderer extends DefaultTreeCellRenderer 
    {
       Icon workspaceIcon; 
       Icon serviceIcon; 
@@ -325,7 +325,7 @@ implements TreeSelectionListener
     *  
     * @author Neil Taylor
     */
-   class TreeNodeWrapper
+   static class TreeNodeWrapper
    {
       /**
        * The node name. 

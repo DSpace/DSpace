@@ -380,7 +380,7 @@ class DAVCollection extends DAVDSpaceObject
      * a problem in the Servlet container's input stream which will try to read
      * past the end of the request body.
      */
-    private class CountedInputStream extends FilterInputStream
+    private static class CountedInputStream extends FilterInputStream
     {
         
         /** The count. */

@@ -385,9 +385,9 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      * without rechecking it, for 24 hours.
      *
      */
-    private class FeedValidity extends DSpaceValidity
+    private static class FeedValidity extends DSpaceValidity
     {
-                private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
                         
         /** When the cache's validity expires */
         private long expires = 0;

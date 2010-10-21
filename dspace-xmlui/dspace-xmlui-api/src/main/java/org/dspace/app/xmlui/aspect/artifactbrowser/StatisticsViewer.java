@@ -297,7 +297,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
      * Note that all methods that return Strings return 'null' in this implementation, as
      * all the outputting is done directly using the Wing framework.
      */
-    class XMLUIReport implements Report
+    static class XMLUIReport implements Report
     {
         private ArrayList<Statistics> blocks = new ArrayList<Statistics>();
 
