@@ -37,6 +37,7 @@
 package org.purl.sword.base;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import nu.xom.Attribute;
 import nu.xom.Element;
@@ -322,7 +323,7 @@ public abstract class XmlElement
 
    public abstract SwordValidationInfo validate(Properties validationContext);
 
-   protected void processUnexpectedAttributes(Element element, ArrayList<SwordValidationInfo> attributeItems)
+   protected void processUnexpectedAttributes(Element element, List<SwordValidationInfo> attributeItems)
    {
        int attributeCount = element.getAttributeCount();
        Attribute attribute = null;

@@ -43,6 +43,7 @@ package org.dspace.app.xmlui.objectmanager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.dspace.app.xmlui.wing.ObjectManager;
 import org.dspace.app.xmlui.wing.WingException;
@@ -186,11 +187,11 @@ public class DSpaceObjectManager implements ObjectManager
 	 * For the DSpace implementation we just return a hash of one entry which contains
 	 * a reference to this repository's metadata.
 	 */
-	public HashMap<String,String> getAllManagedRepositories() throws WingException
+	public Map<String,String> getAllManagedRepositories() throws WingException
 	{
 		String handlePrefix = HandleManager.getPrefix();
 		
-		HashMap<String,String> allRepositories = new HashMap<String,String>();
+		Map<String,String> allRepositories = new HashMap<String,String>();
 		allRepositories.put(handlePrefix, "/metadata/internal/repository/"+handlePrefix +"/mets.xml");
 		
 		return allRepositories;

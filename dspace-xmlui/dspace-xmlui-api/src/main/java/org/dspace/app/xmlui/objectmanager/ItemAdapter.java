@@ -64,10 +64,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+
 import org.dspace.content.DSpaceObject;
 
 
@@ -109,7 +107,7 @@ public class ItemAdapter extends AbstractAdapter
     
     /** A hashmap of all Files and their corresponding space separated list of
         administrative metadata sections */
-    private HashMap<String,StringBuffer> fileAmdSecIDs = new HashMap<String,StringBuffer>();
+    private Map<String,StringBuffer> fileAmdSecIDs = new HashMap<String,StringBuffer>();
 
     // DSpace DB context
     private Context context;

@@ -95,7 +95,7 @@ public class Collection extends XmlElement implements SwordElementInterface
    /**
     * The SWORD acceptsPackaging details.
     */
-   private ArrayList<SwordAcceptPackaging> acceptPackaging;
+   private List<SwordAcceptPackaging> acceptPackaging;
 
    /**
     * The logger. 
@@ -712,8 +712,8 @@ public class Collection extends XmlElement implements SwordElementInterface
     * @param existing
     * @return
     */
-   protected SwordValidationInfo validate(ArrayList<SwordValidationInfo> existing,
-           ArrayList<SwordValidationInfo> attributes,
+   protected SwordValidationInfo validate(List<SwordValidationInfo> existing,
+           List<SwordValidationInfo> attributes,
            Properties validationContext)
    {
       boolean validateAll = (existing == null);

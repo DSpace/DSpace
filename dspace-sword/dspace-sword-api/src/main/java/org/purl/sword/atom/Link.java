@@ -37,6 +37,7 @@
 package org.purl.sword.atom;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import nu.xom.Attribute;
 import nu.xom.Element;
@@ -328,8 +329,8 @@ public class Link extends XmlElement implements SwordElementInterface
       return validate(null, null, validationContext);
    }
 
-   public SwordValidationInfo validate(ArrayList<SwordValidationInfo> elements,
-           ArrayList<SwordValidationInfo> attributes,
+   public SwordValidationInfo validate(List<SwordValidationInfo> elements,
+           List<SwordValidationInfo> attributes,
            Properties validationContext)
    {
        boolean validateAll = (elements == null);

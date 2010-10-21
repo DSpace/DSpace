@@ -38,6 +38,7 @@ package org.purl.sword.base;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Represents an validation information item about
@@ -70,21 +71,21 @@ public class SwordValidationInfo {
     private SwordValidationInfoType type;
 
     /** List of nested validation info items */
-    private ArrayList<SwordValidationInfo> elementInfo;
+    private List<SwordValidationInfo> elementInfo;
 
-    private ArrayList<SwordValidationInfo> attributeInfo;
+    private List<SwordValidationInfo> attributeInfo;
 
     /**
      * List of validation info notes that were generated during
      * an unmarshal stage.
      */
-    private ArrayList<SwordValidationInfo> unmarshallElementInfo;
+    private List<SwordValidationInfo> unmarshallElementInfo;
 
     /**
      * List of validation info notes that were generated during an
      * unmarshal stage.
      */
-    private ArrayList<SwordValidationInfo> unmarshallAttributeInfo;
+    private List<SwordValidationInfo> unmarshallAttributeInfo;
 
     public static final String UNKNOWN_ELEMENT = "This element is present, but it is not used as part of the SWORD profile";
 
@@ -388,8 +389,8 @@ public class SwordValidationInfo {
      * @param attributeItems
      */
     public void addUnmarshallValidationInfo(
-            ArrayList<SwordValidationInfo> elementItems,
-            ArrayList<SwordValidationInfo> attributeItems)
+            List<SwordValidationInfo> elementItems,
+            List<SwordValidationInfo> attributeItems)
     {
        if( elementItems != null )
        {

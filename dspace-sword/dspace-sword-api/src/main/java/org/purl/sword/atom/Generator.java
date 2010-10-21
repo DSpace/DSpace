@@ -37,6 +37,7 @@
 package org.purl.sword.atom;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import nu.xom.Attribute;
 import nu.xom.Element;
@@ -255,8 +256,8 @@ public class Generator extends XmlElement implements SwordElementInterface
     * @param attributeItems
     * @return
     */
-   public SwordValidationInfo validate(ArrayList<SwordValidationInfo> existing,
-           ArrayList<SwordValidationInfo> attributeItems,
+   public SwordValidationInfo validate(List<SwordValidationInfo> existing,
+           List<SwordValidationInfo> attributeItems,
            Properties validationContext)
    {
        boolean validateAll = (existing == null);

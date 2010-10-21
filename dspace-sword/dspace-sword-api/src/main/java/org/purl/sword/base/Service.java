@@ -557,7 +557,7 @@ public class Service extends XmlElement implements SwordElementInterface
     * @param existing
     * @return
     */
-   protected SwordValidationInfo validate(ArrayList<SwordValidationInfo> existing,
+   protected SwordValidationInfo validate(List<SwordValidationInfo> existing,
            Properties validationContext)
    {
 

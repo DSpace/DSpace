@@ -17,6 +17,7 @@ import org.apache.commons.cli.PosixParser;
 
 import java.io.*;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Commandline utility to create a file of spider addresses from an Apache
@@ -65,10 +66,15 @@ public class ApacheLogRobotsProcessor {
         File spiderIpFile = new File(spiderIpPath);
 
         //Get the IPs already added in our file
-        HashSet<String> logSpiders = new HashSet<String>();
+        Set<String> logSpiders;
         if (spiderIpFile.exists())
+        {
             logSpiders = SpiderDetector.readIpAddresses(spiderIpFile);
-
+        }
+        else
+        {
+            logSpiders = new HashSet<String>();
+        }
 
         //First read in our log file line per line
         BufferedReader in = new BufferedReader(new FileReader(logFileLoc));

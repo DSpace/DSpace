@@ -37,6 +37,7 @@
 package org.purl.sword.atom;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -186,8 +187,8 @@ public class Source extends XmlElement implements SwordElementInterface
        return validate(null, null, validationContext);
    }
 
-   public SwordValidationInfo validate(ArrayList<SwordValidationInfo> elements,
-           ArrayList<SwordValidationInfo> attributes,
+   public SwordValidationInfo validate(List<SwordValidationInfo> elements,
+           List<SwordValidationInfo> attributes,
            Properties validationContext)
    {
        SwordValidationInfo result = new SwordValidationInfo(xmlName);

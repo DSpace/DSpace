@@ -304,7 +304,7 @@ public class Workspace extends XmlElement implements SwordElementInterface
     * @param existing
     * @return
     */
-   protected SwordValidationInfo validate(ArrayList<SwordValidationInfo> existing,
+   protected SwordValidationInfo validate(List<SwordValidationInfo> existing,
            Properties validationContext)
    {
       boolean validateAll = (existing == null );

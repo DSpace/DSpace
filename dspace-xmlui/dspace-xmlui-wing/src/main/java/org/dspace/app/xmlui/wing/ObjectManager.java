@@ -41,6 +41,7 @@
 package org.dspace.app.xmlui.wing;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The object manager is a class that must be implemented by each specific repository 
@@ -96,5 +97,5 @@ public interface ObjectManager
 	 * hash should be of the form repository identifier as the key, 
 	 * and the value for each key is a metadata URL.
 	 */
-	public HashMap<String,String> getAllManagedRepositories() throws WingException;
+	public Map<String,String> getAllManagedRepositories() throws WingException;
 }

@@ -41,6 +41,7 @@
 package org.dspace.app.xmlui.wing.element;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.ObjectManager;
@@ -76,7 +77,7 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
     private boolean merged = false;
     
     /** The registered repositories on this page */
-    private HashMap<String,String> repositories = new HashMap<String,String>();
+    private Map<String,String> repositories = new HashMap<String,String>();
 
     /**
      * Construct a new RepositoryMeta

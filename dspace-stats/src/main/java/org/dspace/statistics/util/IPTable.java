@@ -24,8 +24,8 @@ import java.util.Set;
 public class IPTable {
 
     /* A lookup tree for IP Addresses and SubnetRanges */
-    private HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>> map =
-            new HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>>();
+    private Map<String, Map<String, Map<String, Set<String>>>> map =
+            new HashMap<String, Map<String, Map<String, Set<String>>>>();
 
     /**
      * Can be full v4 IP, subnet or range string
@@ -70,22 +70,22 @@ public class IPTable {
         if (start.length >= 3) {
 
 
-            HashMap<String, HashMap<String, HashSet<String>>> first = map.get(start[0]);
+            Map<String, Map<String, Set<String>>> first = map.get(start[0]);
 
             if (first == null) {
-                first = new HashMap<String, HashMap<String, HashSet<String>>>();
+                first = new HashMap<String, Map<String, Set<String>>>();
                 map.put(start[0], first);
             }
 
-            HashMap<String, HashSet<String>> second = first.get(start[1]);
+            Map<String, Set<String>> second = first.get(start[1]);
 
 
             if (second == null) {
-                second = new HashMap<String, HashSet<String>>();
+                second = new HashMap<String, Set<String>>();
                 first.put(start[1], second);
             }
 
-            HashSet<String> third = second.get(start[2]);
+            Set<String> third = second.get(start[2]);
 
             if (third == null) {
                 third = new HashSet<String>();
@@ -125,15 +125,15 @@ public class IPTable {
         if (subnets.length != 4)
             throw new IPFormatException("needs to be single IP Address");
 
-        HashMap<String, HashMap<String, HashSet<String>>> first = map.get(subnets[0]);
+        Map<String, Map<String, Set<String>>> first = map.get(subnets[0]);
 
         if (first == null) return false;
 
-        HashMap<String, HashSet<String>> second = first.get(subnets[1]);
+        Map<String, Set<String>> second = first.get(subnets[1]);
 
         if (second == null) return false;
 
-        HashSet<String> third = second.get(subnets[2]);
+        Set<String> third = second.get(subnets[2]);
 
         if (third == null) return false;
 
@@ -147,17 +147,17 @@ public class IPTable {
     public Set<String> toSet() {
         HashSet<String> set = new HashSet<String>();
 
-        for (Map.Entry<String, HashMap<String, HashMap<String, HashSet<String>>>> first : map.entrySet()) {
+        for (Map.Entry<String, Map<String, Map<String, Set<String>>>> first : map.entrySet()) {
             String firstString = first.getKey();
-            HashMap<String, HashMap<String, HashSet<String>>> secondMap = first.getValue();
+            Map<String, Map<String, Set<String>>> secondMap = first.getValue();
 
-            for (Map.Entry<String, HashMap<String, HashSet<String>>> second : secondMap.entrySet()) {
+            for (Map.Entry<String, Map<String, Set<String>>> second : secondMap.entrySet()) {
                 String secondString = second.getKey();
-                HashMap<String, HashSet<String>> thirdMap = second.getValue();
+                Map<String, Set<String>> thirdMap = second.getValue();
 
-                for (Map.Entry<String, HashSet<String>> third : thirdMap.entrySet()) {
+                for (Map.Entry<String, Set<String>> third : thirdMap.entrySet()) {
                     String thirdString = third.getKey();
-                    HashSet<String> fourthSet = third.getValue();
+                    Set<String> fourthSet = third.getValue();
 
                     if (fourthSet.contains("*")) {
                         set.add(firstString + "." + secondString + "." + thirdString);

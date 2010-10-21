@@ -47,8 +47,8 @@ public class SpiderDetector {
      * @return a vector full of ip's
      * @throws IOException could not happen since we check the file be4 we use it
      */
-    public static HashSet<String> readIpAddresses(File spiderIpFile) throws IOException {
-        HashSet<String> ips = new HashSet<String>();
+    public static Set<String> readIpAddresses(File spiderIpFile) throws IOException {
+        Set<String> ips = new HashSet<String>();
 
         if (!spiderIpFile.exists() || !spiderIpFile.isFile())
             return ips;

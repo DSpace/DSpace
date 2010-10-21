@@ -46,6 +46,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.wing.AttributeMap;
@@ -131,7 +132,7 @@ public abstract class AbstractAdapter
     /** The variables that dictate what part of the METS document to render */
     List<String> sections = new ArrayList<String>();
     List<String> dmdTypes = new ArrayList<String>();
-    HashMap<String,List> amdTypes = new HashMap<String,List>();
+    Map<String,List> amdTypes = new HashMap<String,List>();
     List<String> fileGrpTypes = new ArrayList<String>();
     List<String> structTypes = new ArrayList<String>();
     

@@ -108,7 +108,7 @@ public class LNISoapServletServiceLocator extends org.apache.axis.client.Service
         return new javax.xml.namespace.QName("http://dspace.org/xmlns/lni", "LNISoapServletService");
     }
 
-    private java.util.HashSet ports = null;
+    private java.util.Set ports = null;
 
     public java.util.Iterator getPorts() {
         if (ports == null) {

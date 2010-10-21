@@ -405,7 +405,7 @@ public class DCInputsReader
      * 'twobox' are marked repeatable. Complain if dc-element, label,
      * or input-type are missing.
      */
-    private void processPageParts(String formName, String page, Node n, HashMap field)
+    private void processPageParts(String formName, String page, Node n, Map field)
         throws SAXException
     {
         NodeList nl = n.getChildNodes();

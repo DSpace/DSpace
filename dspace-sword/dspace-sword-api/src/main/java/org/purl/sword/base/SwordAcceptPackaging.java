@@ -37,6 +37,7 @@
 package org.purl.sword.base;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import nu.xom.Attribute;
 import nu.xom.Element;
@@ -244,8 +245,8 @@ implements SwordElementInterface
     * @param attributeItems
     * @return
     */
-   protected SwordValidationInfo validate(ArrayList<SwordValidationInfo> existing,
-           ArrayList<SwordValidationInfo> attributeItems,
+   protected SwordValidationInfo validate(List<SwordValidationInfo> existing,
+           List<SwordValidationInfo> attributeItems,
            Properties validationContext)
    {
       SwordValidationInfo result = new SwordValidationInfo(xmlName); 

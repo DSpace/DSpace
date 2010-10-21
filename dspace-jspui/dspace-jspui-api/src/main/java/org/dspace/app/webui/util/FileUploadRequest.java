@@ -67,9 +67,9 @@ public class FileUploadRequest extends HttpServletRequestWrapper
     /** Multipart request */
     private List items = null;
 
-    private HashMap parameters = new HashMap();
+    private Map parameters = new HashMap();
 
-    private HashMap fileitems = new HashMap();
+    private Map fileitems = new HashMap();
 
     private List filenames = new ArrayList();
 

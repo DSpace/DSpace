@@ -41,6 +41,7 @@ package org.dspace.app.xmlui.aspect.administrative.mapper;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -101,7 +102,7 @@ public class BrowseItemForm extends AbstractDSpaceTransformer {
 		int collectionID = parameters.getParameterAsInteger("collectionID",-1);
 		Collection collection = Collection.find(context,collectionID);
 		
-		ArrayList<Item> items = getMappedItems(collection);
+		List<Item> items = getMappedItems(collection);
 		
 		// DIVISION: browse-items
 		Division div = body.addInteractiveDivision("browse-items",contextPath + "/admin/mapper", Division.METHOD_GET,"primary administrative mapper");
@@ -188,7 +189,7 @@ public class BrowseItemForm extends AbstractDSpaceTransformer {
 	 * 
 	 * @param collection The collection to look in.
 	 */
-	private ArrayList<Item> getMappedItems(Collection collection) throws SQLException
+	private List<Item> getMappedItems(Collection collection) throws SQLException
 	{
 
 		ArrayList<Item> items = new ArrayList<Item>();
