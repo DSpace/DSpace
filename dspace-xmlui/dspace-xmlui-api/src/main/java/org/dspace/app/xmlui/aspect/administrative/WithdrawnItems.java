@@ -369,8 +369,10 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                 Division.METHOD_POST, "secondary navigation");
 
         // Add all the query parameters as hidden fields on the form
-        for (String key : queryParams.keySet())
-            jump.addHidden(key).setValue(queryParams.get(key));
+        for (Map.Entry<String, String> param : queryParams.entrySet())
+        {
+            jump.addHidden(param.getKey()).setValue(param.getValue());
+        }
 
         // If this is a date based browse, render the date navigation
         if (isSortedByDate(info))
@@ -458,8 +460,10 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                 Division.METHOD_POST, "browse controls");
 
         // Add all the query parameters as hidden fields on the form
-        for (String key : queryParams.keySet())
-            controls.addHidden(key).setValue(queryParams.get(key));
+        for (Map.Entry<String, String> param : queryParams.entrySet())
+        {
+            controls.addHidden(param.getKey()).setValue(param.getValue());
+        }
 
         Para controlsForm = controls.addPara();
 

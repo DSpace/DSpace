@@ -387,8 +387,10 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 Division.METHOD_POST, "secondary navigation");
 
         // Add all the query parameters as hidden fields on the form
-        for (String key : queryParamsPOST.keySet())
-            jump.addHidden(key).setValue(queryParamsPOST.get(key));
+        for (Map.Entry<String, String> param : queryParamsPOST.entrySet())
+        {
+            jump.addHidden(param.getKey()).setValue(param.getValue());
+        }
 
         // If this is a date based browse, render the date navigation
         if (isSortedByDate(info))
@@ -486,8 +488,10 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 Division.METHOD_POST, "browse controls");
 
         // Add all the query parameters as hidden fields on the form
-        for (String key : queryParams.keySet())
-            controls.addHidden(key).setValue(queryParams.get(key));
+        for (Map.Entry<String, String> param : queryParams.entrySet())
+        {
+            controls.addHidden(param.getKey()).setValue(param.getValue());
+        }
 
         Para controlsForm = controls.addPara();
 
@@ -986,9 +990,9 @@ class BrowseParams
         Map<String, String> paramMap = getCommonParameters();
         Map<String, String> encodedParamMap = new HashMap<String, String>();
 
-        for (String key: paramMap.keySet())
+        for (Map.Entry<String, String> param : paramMap.entrySet())
         {
-            encodedParamMap.put(key, AbstractDSpaceTransformer.URLEncode(paramMap.get(key)));
+            encodedParamMap.put(param.getKey(), AbstractDSpaceTransformer.URLEncode(param.getValue()));
         }
 
         return encodedParamMap;

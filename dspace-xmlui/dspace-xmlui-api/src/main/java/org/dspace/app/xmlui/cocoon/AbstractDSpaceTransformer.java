@@ -263,7 +263,7 @@ public abstract class AbstractDSpaceTransformer extends AbstractWingTransformer
             Map<String, String> parameters)
     {
         boolean first = true;
-        for (String key : parameters.keySet())
+        for (Map.Entry<String, String> param : parameters.entrySet())
         {
             if (first)
             {
@@ -275,7 +275,7 @@ public abstract class AbstractDSpaceTransformer extends AbstractWingTransformer
                 baseURL += "&";
             }
 
-            baseURL += key + "=" + parameters.get(key);
+            baseURL += param.getKey() + "=" + param.getValue();
         }
 
         return baseURL;

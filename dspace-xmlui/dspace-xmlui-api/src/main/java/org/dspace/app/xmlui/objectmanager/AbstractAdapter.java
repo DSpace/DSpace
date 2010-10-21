@@ -646,7 +646,7 @@ public abstract class AbstractAdapter
      * convenience method will build, or add to an existing attributes object,
      * the attributes detailed in the AttributeMap.
      * 
-     * @param namespaces
+     * @param elementNamespace
      *            SAX Helper class to keep track of namespaces able to determine
      *            the correct prefix for a given namespace URI.
      * @param attributes
@@ -672,6 +672,25 @@ public abstract class AbstractAdapter
             		diffrentNamespaces = true;
             	}
             }
+
+            for (Map.Entry<String, String> attr : attributeMap.entrySet())
+            {
+                if (attr.getValue() == null)
+                {
+                    continue;
+                }
+
+                if (diffrentNamespaces)
+                {
+                    attributes.addAttribute(attributeNamespace.URI, attr.getKey(),
+                            qName(attributeNamespace, attr.getKey()), "CDATA", attr.getValue());
+
+                }
+                else
+                {
+                    attributes.addAttribute("", attr.getKey(), attr.getKey(), "CDATA", attr.getValue());
+                }
+            }
             
             // copy each one over.
             for (String name : attributeMap.keySet())
@@ -681,11 +700,8 @@ public abstract class AbstractAdapter
                     continue;
 
                 if (diffrentNamespaces)
-                	attributes.addAttribute(attributeNamespace.URI, name, 
-                			qName(attributeNamespace, name), "CDATA", value);
                 else
-                    attributes.addAttribute("", name, name, "CDATA", value);
-                
+
             }
         }
         return attributes;

@@ -53,6 +53,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.NamespaceSupport;
 
+import java.util.Map;
+
 /**
  * This class represents a generic element inside the Wing framework.
  * 
@@ -417,21 +419,26 @@ public abstract class AbstractWingElement implements WingElement
             String prefix = namespaces.getPrefix(URI);
 
             // copy each one over.
-            for (String name : attributeMap.keySet())
+            for (Map.Entry<String, String> attr : attributeMap.entrySet())
             {
-                String value = attributeMap.get(name);
-                if (value == null)
+                if (attr.getValue() == null)
+                {
                     continue;
+                }
 
                 // If the indended namespace is the element's namespace then we
                 // leave
                 // off the namespace declaration because w3c say's its redundent
                 // and breaks lots of xsl stuff.
                 if (elementNamespace.URI.equals(URI))
-                    attributes.addAttribute("", name, name, "CDATA", value);
+                {
+                    attributes.addAttribute("", attr.getKey(), attr.getKey(), "CDATA", attr.getValue());
+                }
                 else
-                    attributes.addAttribute(URI, name, qName(prefix, name),
-                            "CDATA", value);
+                {
+                    attributes.addAttribute(URI, attr.getKey(), qName(prefix, attr.getKey()),
+                            "CDATA", attr.getValue());
+                }
             }
         }
         return attributes;

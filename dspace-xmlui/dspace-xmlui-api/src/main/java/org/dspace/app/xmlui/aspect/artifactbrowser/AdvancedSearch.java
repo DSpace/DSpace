@@ -278,10 +278,9 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         select.addOption((current == null), "ANY").addContent(
                 message("xmlui.ArtifactBrowser.AdvancedSearch.type_ANY"));
 
-        for (String key : searchTypes.keySet())
+        for (Map.Entry<String, Message> searchType : searchTypes.entrySet())
         {
-            select.addOption(key.equals(current), key).addContent(
-                    searchTypes.get(key));
+            select.addOption(searchType.getKey().equals(current), searchType.getKey()).addContent(searchType.getValue());
         }
     }
 

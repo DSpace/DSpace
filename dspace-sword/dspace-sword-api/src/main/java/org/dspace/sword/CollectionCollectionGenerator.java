@@ -145,10 +145,9 @@ public class CollectionCollectionGenerator extends ATOMCollectionGenerator
 
 		// add the accept packaging values
 		Map<String, Float> aps = swordConfig.getAcceptPackaging(col);
-		for (String key : aps.keySet())
+		for (Map.Entry<String, Float> ap : aps.entrySet())
 		{
-			Float q = aps.get(key);
-			scol.addAcceptPackaging(key, q);
+			scol.addAcceptPackaging(ap.getKey(), ap.getValue());
 		}
 
 		// should we offer the items in the collection up as deposit
