@@ -673,6 +673,7 @@ public abstract class AbstractAdapter
             	}
             }
 
+            // copy each one over.
             for (Map.Entry<String, String> attr : attributeMap.entrySet())
             {
                 if (attr.getValue() == null)
@@ -691,18 +692,6 @@ public abstract class AbstractAdapter
                     attributes.addAttribute("", attr.getKey(), attr.getKey(), "CDATA", attr.getValue());
                 }
             }
-            
-            // copy each one over.
-            for (String name : attributeMap.keySet())
-            {
-                String value = attributeMap.get(name);
-                if (value == null)
-                    continue;
-
-                if (diffrentNamespaces)
-                else
-
-            }
         }
         return attributes;
     }
@@ -711,7 +700,7 @@ public abstract class AbstractAdapter
      * Create the qName for the element with the given localName and namespace
      * prefix.
      * 
-     * @param prefix
+     * @param namespace
      *            (May be null) The namespace prefix.
      * @param localName
      *            (Required) The element's local name.
