@@ -60,15 +60,6 @@ import org.dspace.core.LogManager;
 import org.dspace.core.I18nUtil;
 import java.util.Locale;
 
-// Internal class to pass LDAP details from authentication method
-class LDAPResult
-{
-    String email;
-    String givenName;
-    String surname;
-    String phone;
-}
-
 /**
  * LDAP username and password authentication servlet.  Displays the
  * login form <code>/login/ldap.jsp</code> on a GET,

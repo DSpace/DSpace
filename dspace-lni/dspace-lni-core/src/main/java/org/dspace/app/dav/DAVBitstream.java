@@ -217,8 +217,7 @@ class DAVBitstream extends DAVDSpaceObject
         {
             // get rid of extension, if any, e.g. ".pdf"
             int dot = pathElt.indexOf('.');
-            String strId = (dot >= 0) ? pathElt.substring(0, dot) : new String(
-                    pathElt);
+            String strId = (dot >= 0) ? pathElt.substring(0, dot) : pathElt;
             Bitstream result = null;
 
             if (strId.startsWith("bitstream_"))

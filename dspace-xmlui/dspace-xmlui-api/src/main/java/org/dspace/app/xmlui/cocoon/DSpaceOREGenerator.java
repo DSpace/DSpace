@@ -152,8 +152,7 @@ public class DSpaceOREGenerator extends AbstractGenerator
          		
          		if ("item".equals(type))
          		{
-         			Item item = Item.find(context,id);
-         			return item;
+                     return Item.find(context,id);
          		}
          		else
              		throw new CrosswalkException("ORE dissemination only available for DSpace Items.");

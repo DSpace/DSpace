@@ -160,8 +160,7 @@ public class HTMLReport implements Report
      */
     public String topLink()
     {
-        String frag = "<div class=\"reportNavigation\"><a href=\"#top\">Top</a></div>";
-        return frag;
+        return "<div class=\"reportNavigation\"><a href=\"#top\">Top</a></div>";
     }
     
     
@@ -277,8 +276,7 @@ public class HTMLReport implements Report
      */
     public String mainTitle()
     {
-        String frag = "<div class=\"reportTitle\"><a name=\"top\">" + mainTitle + "</a></div>\n\n";
-        return frag;
+        return "<div class=\"reportTitle\"><a name=\"top\">" + mainTitle + "</a></div>\n\n";
     }
     
     
@@ -356,8 +354,7 @@ public class HTMLReport implements Report
         Matcher matchSpace = space.matcher(aName);
         aName = matchSpace.replaceAll("_");
 
-        String frag = "<div class=\"reportSection\"><a name=\"" + aName + "\">" + title + "</a></div>\n\n";
-        return frag;
+        return "<div class=\"reportSection\"><a name=\"" + aName + "\">" + title + "</a></div>\n\n";
     }
     
     

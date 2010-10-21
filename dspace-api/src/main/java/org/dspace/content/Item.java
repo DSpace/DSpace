@@ -1582,7 +1582,7 @@ public class Item extends DSpaceObject
                     // Bad DC field, log and throw exception
                     log.warn(LogManager
                             .getHeader(ourContext, "bad_dc",
-                                    "Bad DC field. schema="+String.valueOf(dcv.schema)
+                                    "Bad DC field. schema="+dcv.schema
                                             + ", element: \""
                                             + ((dcv.element == null) ? "null"
                                                     : dcv.element)
@@ -2525,8 +2525,7 @@ public class Item extends DSpaceObject
                        "WHERE template_item_id = ?",getID());
             if (qResult != null)
             {
-                Collection collection = Collection.find(ourContext,qResult.getIntColumn("collection_id"));
-                return collection;
+                return Collection.find(ourContext,qResult.getIntColumn("collection_id"));
             }
             return null;
         }

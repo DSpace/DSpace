@@ -732,8 +732,7 @@ public class Bitstream extends DSpaceObject
                        "WHERE logo_bitstream_id = ?",getID());
             if (qResult != null) 
             {
-                Collection collection = Collection.find(bContext,qResult.getIntColumn("collection_id"));
-                return collection;
+                return Collection.find(bContext,qResult.getIntColumn("collection_id"));
             }
             else
             {   
@@ -744,8 +743,7 @@ public class Bitstream extends DSpaceObject
     
                 if (qResult != null)
                 {
-                    Community community = Community.find(bContext,qResult.getIntColumn("community_id"));
-                    return community;
+                    return Community.find(bContext,qResult.getIntColumn("community_id"));
                 }
                 else
                 {

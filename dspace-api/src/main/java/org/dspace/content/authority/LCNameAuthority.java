@@ -262,8 +262,6 @@ public class LCNameAuthority implements ChoiceAuthority
         private int hits = -1;
         private String textValue = null;
         private String name = null;
-        private String oname = null;
-        private String bname = null;
         private String lccn = null;
         private String lastTag = null;
         private String lastCode = null;

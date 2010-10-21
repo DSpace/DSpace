@@ -422,7 +422,7 @@ public class UKETDDCCrosswalk extends Crosswalk
                     if ((pubParts.length > 2) && (pubParts[2] != null)) {
                         dept.append(" " + pubParts[2]);
                     }
-                    if (dept.toString().length() > 0) {
+                    if (dept.length() > 0) {
                             this.makeUKDCTermsElement("department", null,
                                                       dept.toString(), metadata);
                     }

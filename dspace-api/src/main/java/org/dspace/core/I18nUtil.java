@@ -325,8 +325,7 @@ public class I18nUtil
      */
     public static String getMessage(String key, Context c) throws MissingResourceException
     {
-        String message = getMessage(key.trim(), c.getCurrentLocale());
-        return message;
+        return getMessage(key.trim(), c.getCurrentLocale());
     }
     
 

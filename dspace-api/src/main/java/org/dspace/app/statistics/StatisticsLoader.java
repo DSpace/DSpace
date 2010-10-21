@@ -135,7 +135,6 @@ public class StatisticsLoader
     protected static Date[] sortDatesDescending(Date[] dates)
     {
         Arrays.sort(dates, new Comparator<Date>() {
-            SimpleDateFormat sdf = monthlySDF;
             public int compare(Date d1, Date d2)
             {
                 if (d1 == null && d2 == null)

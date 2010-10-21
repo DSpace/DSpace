@@ -56,12 +56,6 @@ public class SimpleDispatcher implements BitstreamDispatcher
     private Date processStartTime = null;
 
     /**
-     * The next bitstreamId to be returned. -1 is a sentinel value used to
-     * indicate that there are no (more) bitstreams to give.
-     */
-    private int bitstreamId = -1;
-
-    /**
      * Access for bitstream information
      */
     private BitstreamInfoDAO bitstreamInfoDAO;

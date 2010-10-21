@@ -273,8 +273,7 @@ public class SWORDEntry extends Entry
     */
    public Element marshall()
    {
-      Element entry = super.marshall(); 
-      return entry;
+       return super.marshall();
    }
    
    protected void marshallElements(Element entry)

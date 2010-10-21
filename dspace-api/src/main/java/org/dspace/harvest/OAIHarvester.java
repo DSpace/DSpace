@@ -204,9 +204,8 @@ public class OAIHarvester {
             if (key.startsWith(oreString)) {
             	ORESeialKey = key.substring(oreString.length());
             	ORESerializationString = ConfigurationManager.getProperty(key);
-            	
-            	Namespace ORENS = Namespace.getNamespace(ORESeialKey, ORESerializationString);
-            	return ORENS;
+
+                return Namespace.getNamespace(ORESeialKey, ORESerializationString);
             }
         }
         

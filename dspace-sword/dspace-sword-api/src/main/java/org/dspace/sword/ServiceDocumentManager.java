@@ -193,8 +193,7 @@ public class ServiceDocumentManager
 			}
 		}
 
-		ServiceDocument sd = new ServiceDocument(service);
-		return sd;
+        return new ServiceDocument(service);
 	}
 
     /**

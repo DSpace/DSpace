@@ -365,7 +365,7 @@ public class ItemMapServlet extends DSpaceServlet
     		request.setAttribute("collection", myCollection);
     		request.setAttribute("browsetext", name);
     		request.setAttribute("items", items);
-    		request.setAttribute("browsetype", new String("Add"));
+    		request.setAttribute("browsetype", "Add");
     		
     		jspPage = "itemmap-browse.jsp";
     		JSPManager.showJSP(request, response, jspPage);

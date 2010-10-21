@@ -252,7 +252,7 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         actionsList.addLabel(T_label_search);
         Item searchItem = actionsList.addItem();
         Text searchText = searchItem.addText("query");
-        if (!query.equals(new String("-1")))
+        if (!query.equals("-1"))
         	searchText.setValue(query);
         searchItem.addButton("submit_search_groups").setValue(T_submit_search_groups);
         
@@ -264,7 +264,7 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         
         
 	    // Display the search results table
-        if (!query.equals(new String("-1"))) {
+        if (!query.equals("-1")) {
         	Division groupsList = main.addDivision("edit-policy-groupsList");
             groupsList.setHead(T_groups_head);  
         	this.addGroupSearch(groupsList, currentGroup, dso, query, page);
@@ -323,7 +323,7 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         	row.addCell().addXref(url,name);
         	
         	// Iterate other other polices of our parent resource to see if any match the currently selected group
-        	String otherAuthorizations = new String();
+        	String otherAuthorizations = "";
         	int groupsMatched = 0;
         	for (ResourcePolicy otherPolicy : otherPolicies) {
         		if (otherPolicy.getGroup() == group) {

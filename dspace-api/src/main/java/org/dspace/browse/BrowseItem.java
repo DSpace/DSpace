@@ -391,8 +391,7 @@ public class BrowseItem extends DSpaceObject
         	if ((thumbnailBitstream != null)
         			&& (AuthorizeManager.authorizeActionBoolean(context, thumbnailBitstream, Constants.READ)))
         	{
-        		Thumbnail thumbnail = new Thumbnail(thumbnailBitstream, originalBitstream);
-        		return thumbnail;
+                return new Thumbnail(thumbnailBitstream, originalBitstream);
         	}
         }
 

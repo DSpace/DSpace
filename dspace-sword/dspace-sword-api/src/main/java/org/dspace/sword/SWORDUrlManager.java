@@ -322,8 +322,7 @@ public class SWORDUrlManager
 					bsid = bsid.substring(0, url.length() - 1);
 				}
 
-				Bitstream bitstream = Bitstream.find(context, Integer.parseInt(bsid));
-				return bitstream;
+                return Bitstream.find(context, Integer.parseInt(bsid));
 			}
 			else
 			{
