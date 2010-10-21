@@ -1043,7 +1043,7 @@ public class DatabaseManager
                 int count = 0;
                 int inputlen = input.length();
 
-                while ((index = input.indexOf("'", count)) != -1)
+                while ((index = input.indexOf('\'', count)) != -1)
                 {
                     // Flip the value of inquote
                     inquote = !inquote;
@@ -1066,7 +1066,7 @@ public class DatabaseManager
                     continue;
                 }
 
-                int endMarker = input.indexOf(";", index);
+                int endMarker = input.indexOf(';', index);
 
                 if (endMarker == -1)
                 {
@@ -1530,7 +1530,7 @@ public class DatabaseManager
             String schema = ConfigurationManager.getProperty("db.schema");
             String catalog = null;
             
-            int dotIndex = table.indexOf("."); 
+            int dotIndex = table.indexOf('.'); 
             if (dotIndex > 0)
             {
                 catalog = table.substring(0, dotIndex);

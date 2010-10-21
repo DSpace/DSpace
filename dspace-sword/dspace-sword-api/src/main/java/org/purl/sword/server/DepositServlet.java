@@ -196,7 +196,7 @@ public class DepositServlet extends HttpServlet {
 		// Are there any authentication details?
 		String usernamePassword = getUsernamePassword(request);
 		if ((usernamePassword != null) && (!usernamePassword.equals(""))) {
-			int p = usernamePassword.indexOf(":");
+			int p = usernamePassword.indexOf(':');
 			if (p != -1) {
 				d.setUsername(usernamePassword.substring(0, p));
 				d.setPassword(usernamePassword.substring(p + 1));

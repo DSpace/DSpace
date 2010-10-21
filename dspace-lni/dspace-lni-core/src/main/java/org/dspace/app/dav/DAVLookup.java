@@ -185,7 +185,7 @@ class DAVLookup extends DAVResource
         String handle = null;
 
         // if "prefix" contains a slash, then it's the whole handle:
-        if (prefix.indexOf("/") >= 0)
+        if (prefix.indexOf('/') >= 0)
         {
             handle = prefix;
             log.debug("Lookup: resolving escaped handle \"" + handle + "\"");

@@ -347,7 +347,7 @@ public class MetadataImport
         // If there is a language on the element, strip if off
         if (element.contains("["))
         {
-            element = element.substring(0, element.indexOf("["));
+            element = element.substring(0, element.indexOf('['));
         }
         String qualifier = null;
         if (bits.length > 2)
@@ -357,7 +357,7 @@ public class MetadataImport
             // If there is a language, strip if off
             if (qualifier.contains("["))
             {
-                qualifier = qualifier.substring(0, qualifier.indexOf("["));
+                qualifier = qualifier.substring(0, qualifier.indexOf('['));
             }
         }
         DCValue[] current = item.getMetadata(schema, element, qualifier, language);
@@ -656,7 +656,7 @@ public class MetadataImport
         // If there is a language on the element, strip if off
         if (element.contains("["))
         {
-            element = element.substring(0, element.indexOf("["));
+            element = element.substring(0, element.indexOf('['));
         }
         String qualifier = null;
         if (bits.length > 2)
@@ -666,7 +666,7 @@ public class MetadataImport
             // If there is a language, strip if off
             if (qualifier.contains("["))
             {
-                qualifier = qualifier.substring(0, qualifier.indexOf("["));
+                qualifier = qualifier.substring(0, qualifier.indexOf('['));
             }
         }
 

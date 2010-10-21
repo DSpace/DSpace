@@ -95,7 +95,7 @@ public class LNIClientUtils
             throws MalformedURLException
     {
         /* chop off last path element */
-        int s = endpoint.lastIndexOf("/");
+        int s = endpoint.lastIndexOf('/');
         if (s < 0)
         {
             throw new MalformedURLException(

@@ -162,13 +162,13 @@ public class ChoiceAuthorityManager
     private String config2fkey(String field)
     {
         // field is expected to be "schema.element.qualifier"
-        int dot = field.indexOf(".");
+        int dot = field.indexOf('.');
         if (dot < 0)
             return null;
         String schema = field.substring(0, dot);
         String element = field.substring(dot+1);
         String qualifier = null;
-        dot = element.indexOf(".");
+        dot = element.indexOf('.');
         if (dot >= 0)
         {
             qualifier = element.substring(dot+1);

@@ -51,7 +51,7 @@ public class OrderFormatDate implements OrderFormatDelegate
     public String makeSortString(String value, String language)
     {
         int padding = 0;
-        int endYearIdx = value.indexOf("-");
+        int endYearIdx = value.indexOf('-');
 
         if (endYearIdx >= 0 && endYearIdx < 4)
         {

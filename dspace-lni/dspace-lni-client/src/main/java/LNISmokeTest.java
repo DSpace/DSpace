@@ -358,7 +358,7 @@ public class LNISmokeTest
         }
 
         // hack: parse "handle bitstream" syntax of handle.
-        if (handle.indexOf(" ") >= 0 && bitstream == null)
+        if (handle.indexOf(' ') >= 0 && bitstream == null)
         {
             String h[] = handle.split("\\s+");
             handle = h[0];
@@ -433,7 +433,7 @@ public class LNISmokeTest
                             {
                                 value = outputPretty.outputString(kids);
                             }
-                            if (value.indexOf("\n") >= 0)
+                            if (value.indexOf('\n') >= 0)
                             {
                                 value = "\n" + value;
                             }

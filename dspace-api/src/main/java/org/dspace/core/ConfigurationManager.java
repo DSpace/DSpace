@@ -808,7 +808,7 @@ public class ConfigurationManager
             int start = value.indexOf("${", from);
             if (start >= 0)
             {
-                int end = value.indexOf("}", start);
+                int end = value.indexOf('}', start);
                 if (end < 0)
                     break;
                 String var = value.substring(start+2, end);

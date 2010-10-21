@@ -83,7 +83,7 @@ public class AtomDocumentServlet extends DepositServlet {
 			// Are there any authentication details?
 			String usernamePassword = getUsernamePassword(request);
 			if ((usernamePassword != null) && (!usernamePassword.equals(""))) {
-				int p = usernamePassword.indexOf(":");
+				int p = usernamePassword.indexOf(':');
 				if (p != -1) {
 					adr.setUsername(usernamePassword.substring(0, p));
 					adr.setPassword(usernamePassword.substring(p + 1));

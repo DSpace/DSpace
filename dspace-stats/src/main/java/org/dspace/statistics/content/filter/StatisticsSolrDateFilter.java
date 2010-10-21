@@ -87,10 +87,14 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
             Calendar endCal = (Calendar) startCal.clone();
 
             if(startStr.startsWith("+"))
-                startStr = startStr.substring(startStr.indexOf("+") + 1);
+            {
+                startStr = startStr.substring(startStr.indexOf('+') + 1);
+            }
 
             if(endStr.startsWith("+"))
-                endStr = endStr.substring(endStr.indexOf("+") + 1);
+            {
+                endStr = endStr.substring(endStr.indexOf('+') + 1);
+            }
 
             startCal.add(dateType, Integer.parseInt(startStr));
             endCal.add(dateType, Integer.parseInt(endStr));

@@ -187,7 +187,7 @@ public class FeedServlet extends DSpaceServlet
         {
             // substring(1) is to remove initial '/'
             path = path.substring(1);
-            int split = path.indexOf("/");
+            int split = path.indexOf('/');
             if (split != -1)
             {
             	feedType = path.substring(0,split);

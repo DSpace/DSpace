@@ -355,7 +355,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             // Trim any path information from the bitstream
             if (bitstreamName != null && bitstreamName.length() >0 )
             {
-                        int finalSlashIndex = bitstreamName.lastIndexOf("/");
+                        int finalSlashIndex = bitstreamName.lastIndexOf('/');
                         if (finalSlashIndex > 0)
                         {
                                 bitstreamName = bitstreamName.substring(finalSlashIndex+1);

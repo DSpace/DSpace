@@ -1149,7 +1149,7 @@ public class ItemImport
                     continue;				// process next line in contents file
             	}
 
-                int bitstreamEndIndex = line.indexOf("\t");
+                int bitstreamEndIndex = line.indexOf('\t');
 
                 if (bitstreamEndIndex == -1)
                 {
@@ -1480,17 +1480,17 @@ public class ItemImport
                         + permissionsMarker.length(), pEndIndex);
 
                 // get permission type ("read" or "write")
-                int pTypeIndex = thisPermission.indexOf("-");
+                int pTypeIndex = thisPermission.indexOf('-');
 
                 // get permission group (should be in single quotes)
-                int groupIndex = thisPermission.indexOf("'", pTypeIndex);
-                int groupEndIndex = thisPermission.indexOf("'", groupIndex + 1);
+                int groupIndex = thisPermission.indexOf('\'', pTypeIndex);
+                int groupEndIndex = thisPermission.indexOf('\'', groupIndex + 1);
 
                 // if not in single quotes, assume everything after type flag is
                 // group name
                 if (groupIndex == -1)
                 {
-                    groupIndex = thisPermission.indexOf(" ", pTypeIndex);
+                    groupIndex = thisPermission.indexOf(' ', pTypeIndex);
                     groupEndIndex = thisPermission.length();
                 }
 

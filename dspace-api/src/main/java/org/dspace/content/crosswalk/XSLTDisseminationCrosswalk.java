@@ -134,13 +134,17 @@ public class XSLTDisseminationCrosswalk
         // right format for value of "schemaLocation" attribute.
         schemaLocation = ConfigurationManager.getProperty(prefix+"schemaLocation");
         if (schemaLocation == null)
+        {
             log.warn("No schemaLocation for crosswalk="+myAlias+", key="+prefix+"schemaLocation");
-
+        }
+        
         // sanity check: schemaLocation should have space.
-        else if (schemaLocation.length() > 0 && schemaLocation.indexOf(" ") < 0)
+        else if (schemaLocation.length() > 0 && schemaLocation.indexOf(' ') < 0)
+        {
             log.warn("Possible INVALID schemaLocation (no space found) for crosswalk="+
                       myAlias+", key="+prefix+"schemaLocation"+
                       "\n\tCorrect format is \"{namespace} {schema-URL}\"");
+        }
 
         // grovel for namespaces of the form:
         //  crosswalk.diss.{PLUGIN_NAME}.namespace.{PREFIX} = {URI}

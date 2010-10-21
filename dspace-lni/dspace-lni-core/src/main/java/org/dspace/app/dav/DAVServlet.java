@@ -346,7 +346,7 @@ public class DAVServlet extends HttpServlet
             {
                 String crud = ct.nextToken();
                 String dcrud = new String(Base64.decodeBase64(crud.getBytes()));
-                int colon = dcrud.indexOf(":");
+                int colon = dcrud.indexOf(':');
                 if (colon > 0)
                 {
                     username = URLDecode(dcrud.substring(0, colon));

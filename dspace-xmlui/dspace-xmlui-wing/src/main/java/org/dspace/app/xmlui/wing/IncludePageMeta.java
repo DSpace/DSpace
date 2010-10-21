@@ -221,8 +221,8 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
         {
             // only try to concatenate css and js
             String curfile = metadata.getValue();
-            if (curfile.lastIndexOf("?") != -1) {
-                curfile = curfile.substring(0, curfile.lastIndexOf("?"));
+            if (curfile.lastIndexOf('?') != -1) {
+                curfile = curfile.substring(0, curfile.lastIndexOf('?'));
             }
             if (curfile.endsWith(".css") || curfile.endsWith(".js") || curfile.endsWith(".json")) {
                 String curval = metadata.getValue();
@@ -231,29 +231,29 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
                     // merge
                     String lastval = last.getValue();
                     curval = metadata.getValue();
-                    String newval = lastval.substring(0,lastval.lastIndexOf(".")) + ",";
-                    newval += curval.substring(curval.lastIndexOf("/")+1,curval.lastIndexOf("."));
-                    newval += lastval.substring(lastval.lastIndexOf("."));
+                    String newval = lastval.substring(0,lastval.lastIndexOf('.')) + ",";
+                    newval += curval.substring(curval.lastIndexOf('/')+1,curval.lastIndexOf('.'));
+                    newval += lastval.substring(lastval.lastIndexOf('.'));
                     last.value = newval;
                 } else {
                     // no merge, so add to list
                     newMetadataList.add(metadata);
                     // handle query string cases
-                    if(curval.lastIndexOf("?") != -1) {
-                        if(curval.substring(curval.lastIndexOf("?")).equals("?nominify")) {
+                    if(curval.lastIndexOf('?') != -1) {
+                        if(curval.substring(curval.lastIndexOf('?')).equals("?nominify")) {
                             // concat should still be possible, so set last
                             last = metadata;
-                        } else if(curval.substring(curval.lastIndexOf("?")).equals("?noconcat")) {
+                        } else if(curval.substring(curval.lastIndexOf('?')).equals("?noconcat")) {
                             // no concat should be possible so set last to null
                             last = null;
                             // query string can be removed
-                            curval = curval.substring(0, curval.lastIndexOf("?"));
+                            curval = curval.substring(0, curval.lastIndexOf('?'));
                             metadata.value = curval;
                         } else {
                             // no concat should be possible so set last to null
                             last = null;
                             // query string should be set to "nominify"
-                            curval = curval.substring(0, curval.lastIndexOf("?")) + "?nominify";
+                            curval = curval.substring(0, curval.lastIndexOf('?')) + "?nominify";
                             metadata.value = curval;
                         }
                     } else {
@@ -302,17 +302,17 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
         String curval = current.getValue();
         String lastval = last.getValue();
         // check if extensions and query strings are equal
-        if(!lastval.substring(lastval.lastIndexOf(".")).equals(curval.substring(curval.lastIndexOf(".")))) {
+        if(!lastval.substring(lastval.lastIndexOf('.')).equals(curval.substring(curval.lastIndexOf('.')))) {
             return false;
         }
         // check if paths are equal
-        if(!lastval.substring(0,lastval.lastIndexOf("/")+1).equals(curval.substring(0,curval.lastIndexOf("/")+1))) {
+        if(!lastval.substring(0,lastval.lastIndexOf('/')+1).equals(curval.substring(0,curval.lastIndexOf('/')+1))) {
             return false;
         }
 
         // only valid nonempty query string is "nominify"
-        if(curval.lastIndexOf("?") != -1
-                && !"?nominify".equals(curval.substring(curval.lastIndexOf("?")))) {
+        if(curval.lastIndexOf('?') != -1
+                && !"?nominify".equals(curval.substring(curval.lastIndexOf('?')))) {
             return false;
         }
 

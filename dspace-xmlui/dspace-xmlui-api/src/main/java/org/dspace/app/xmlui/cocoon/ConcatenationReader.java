@@ -101,8 +101,8 @@ public class ConcatenationReader extends ResourceReader {
 
         // setup list of sources, get relevant parts of path
         this.inputSources = new ArrayList<Source>();
-        String path = src.substring(0, src.lastIndexOf("/"));
-        String file = src.substring(src.lastIndexOf("/")+1);
+        String path = src.substring(0, src.lastIndexOf('/'));
+        String file = src.substring(src.lastIndexOf('/')+1);
 
         // now build own list of inputsources
         String[] files = file.split(",");

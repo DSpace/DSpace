@@ -1161,7 +1161,7 @@ abstract class DAVResource
         {
             String srcPath = (new URI(this.request.getRequestURI())).getPath();
             String destPath = (new URI(destination)).getPath();
-            int slash = srcPath.lastIndexOf("/");
+            int slash = srcPath.lastIndexOf('/');
             if (slash > -1)
             {
                 String lastElt = srcPath.substring(slash);

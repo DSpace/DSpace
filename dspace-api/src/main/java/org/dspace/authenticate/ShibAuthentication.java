@@ -267,7 +267,7 @@ public class ShibAuthentication implements AuthenticationMethod
                 // strip scope if present and roleHeader_ignoreScope
                 if (roleHeader_ignoreScope) 
                 {
-                        int index = affiliation.indexOf("@");
+                        int index = affiliation.indexOf('@');
                         if (index != -1) affiliation = affiliation.substring(0,index);
                 }
 

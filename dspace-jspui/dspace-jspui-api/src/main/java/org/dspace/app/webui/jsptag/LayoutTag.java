@@ -319,7 +319,7 @@ public class LayoutTag extends TagSupport
         	}
         	
         	// build a list of link attributes for each link format
-        	String[] formats = feedData.substring(feedData.indexOf(":")+1).split(",");
+        	String[] formats = feedData.substring(feedData.indexOf(':')+1).split(",");
         	List linkParts = new ArrayList();
         	// each link has a mime-type, title, and format (used in href URL)
         	for (int i = 0; i < formats.length; i++)

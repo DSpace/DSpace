@@ -114,7 +114,7 @@ public class MetadataAuthorityManager
             {
                 // field is expected to be "schema.element.qualifier"
                 String field = key.substring(authPrefix.length());
-                int dot = field.indexOf(".");
+                int dot = field.indexOf('.');
                 if (dot < 0)
                 {
                     log.warn("Skipping invalid MetadataAuthority configuration property: "+key+": does not have schema.element.qualifier");
@@ -123,7 +123,7 @@ public class MetadataAuthorityManager
                 String schema = field.substring(0, dot);
                 String element = field.substring(dot+1);
                 String qualifier = null;
-                dot = element.indexOf(".");
+                dot = element.indexOf('.');
                 if (dot >= 0)
                 {
                     qualifier = element.substring(dot+1);

@@ -83,7 +83,7 @@ public class ApacheLogRobotsProcessor {
             //Currently only check if robot.txt is present in our line
             if (logLine.contains("robots.txt")) {
                 //We got a robots.txt so we got a bot
-                String ip = logLine.substring(0, logLine.indexOf("-")).trim();
+                String ip = logLine.substring(0, logLine.indexOf('-')).trim();
                 //Only add single IP addresses once we got it in it is enough
                 logSpiders.add(ip);
             }

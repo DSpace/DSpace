@@ -799,10 +799,10 @@ public class PackageUtils
         //Pull apart default group name into its three main parts
         // Format: <DSpace-Obj-Type>_<DSpace-Obj-ID>_<Group-Type>
         // (e.g. COLLECTION_123_ADMIN)
-        String objType = groupName.substring(0, groupName.indexOf("_"));
-        String tmpEndString = groupName.substring(groupName.indexOf("_")+1);
-        String objID = tmpEndString.substring(0, tmpEndString.indexOf("_"));
-        String groupType = tmpEndString.substring(tmpEndString.indexOf("_")+1);
+        String objType = groupName.substring(0, groupName.indexOf('_'));
+        String tmpEndString = groupName.substring(groupName.indexOf('_')+1);
+        String objID = tmpEndString.substring(0, tmpEndString.indexOf('_'));
+        String groupType = tmpEndString.substring(tmpEndString.indexOf('_')+1);
 
         try
         {
@@ -868,10 +868,10 @@ public class PackageUtils
         //Pull apart default group name into its three main parts
         // Format: <DSpace-Obj-Type>_<DSpace-Obj-ID>_<Group-Type>
         // (e.g. COLLECTION_123_ADMIN)
-        String objType = groupName.substring(0, groupName.indexOf("_"));
-        String tmpEndString = groupName.substring(groupName.indexOf("_")+1);
-        String objID = tmpEndString.substring(0, tmpEndString.indexOf("_"));
-        String groupType = tmpEndString.substring(tmpEndString.indexOf("_")+1);
+        String objType = groupName.substring(0, groupName.indexOf('_'));
+        String tmpEndString = groupName.substring(groupName.indexOf('_')+1);
+        String objID = tmpEndString.substring(0, tmpEndString.indexOf('_'));
+        String groupType = tmpEndString.substring(tmpEndString.indexOf('_')+1);
 
         try
         {

@@ -287,7 +287,7 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
 		//key: entry # (i.e. step & page), 
 		//value: entry name key (i.e. display name)
 		Map progBarInfo = this.submissionInfo.getProgressBarInfo();
-		
+
 		Iterator i = progBarInfo.keySet().iterator();
 		
 		//add each entry to progress bar
@@ -483,7 +483,7 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
 		
 		if (errors!=null && errors.length() > 0)
 		{	
-			if(errors.indexOf(",") > 0)
+			if(errors.indexOf(',') > 0)
 				fields = Arrays.asList(errors.split(","));
 			else//only one error field
 				fields.add(errors);
