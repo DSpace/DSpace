@@ -170,7 +170,7 @@ public class EditItemServlet extends DSpaceServlet
         {
             if (showError)
             {
-                request.setAttribute("invalid.id", new Boolean(true));
+                request.setAttribute("invalid.id", Boolean.TRUE);
             }
 
             JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
@@ -440,51 +440,51 @@ public class EditItemServlet extends DSpaceServlet
         try
         {
             AuthorizeUtil.authorizeManageItemPolicy(context, item);
-            request.setAttribute("policy_button", new Boolean(true));
+            request.setAttribute("policy_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex)
         {
-            request.setAttribute("policy_button", new Boolean(false));
+            request.setAttribute("policy_button", Boolean.FALSE);
         }
         
         if (AuthorizeManager.authorizeActionBoolean(context, item
                 .getParentObject(), Constants.REMOVE))
         {
-            request.setAttribute("delete_button", new Boolean(true));
+            request.setAttribute("delete_button", Boolean.TRUE);
         }
         else
         {
-            request.setAttribute("delete_button", new Boolean(false));
+            request.setAttribute("delete_button", Boolean.FALSE);
         }
         
         try
         {
             AuthorizeManager.authorizeAction(context, item, Constants.ADD);
-            request.setAttribute("create_bitstream_button", new Boolean(true));
+            request.setAttribute("create_bitstream_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex)
         {
-            request.setAttribute("create_bitstream_button", new Boolean(false));
+            request.setAttribute("create_bitstream_button", Boolean.FALSE);
         }
         
         try
         {
             AuthorizeManager.authorizeAction(context, item, Constants.REMOVE);
-            request.setAttribute("remove_bitstream_button", new Boolean(true));
+            request.setAttribute("remove_bitstream_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex)
         {
-            request.setAttribute("remove_bitstream_button", new Boolean(false));
+            request.setAttribute("remove_bitstream_button", Boolean.FALSE);
         }
         
         try
         {
             AuthorizeUtil.authorizeManageCCLicense(context, item);
-            request.setAttribute("cclicense_button", new Boolean(true));
+            request.setAttribute("cclicense_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex)
         {
-            request.setAttribute("cclicense_button", new Boolean(false));
+            request.setAttribute("cclicense_button", Boolean.FALSE);
         }
         
         if (!item.isWithdrawn())
@@ -492,11 +492,11 @@ public class EditItemServlet extends DSpaceServlet
             try
             {
                 AuthorizeUtil.authorizeWithdrawItem(context, item);
-                request.setAttribute("withdraw_button", new Boolean(true));
+                request.setAttribute("withdraw_button", Boolean.TRUE);
             }
             catch (AuthorizeException authex)
             {
-                request.setAttribute("withdraw_button", new Boolean(false));
+                request.setAttribute("withdraw_button", Boolean.FALSE);
             }
         }
         else
@@ -504,11 +504,11 @@ public class EditItemServlet extends DSpaceServlet
             try
             {
                 AuthorizeUtil.authorizeReinstateItem(context, item);
-                request.setAttribute("reinstate_button", new Boolean(true));
+                request.setAttribute("reinstate_button", Boolean.TRUE);
             }
             catch (AuthorizeException authex)
             {
-                request.setAttribute("reinstate_button", new Boolean(false));
+                request.setAttribute("reinstate_button", Boolean.FALSE);
             }
         }
         

@@ -143,7 +143,7 @@ public class SubscribeServlet extends DSpaceServlet
                 .getCurrentUser());
 
         request.setAttribute("subscriptions", subs);
-        request.setAttribute("updated", new Boolean(updated));
+        request.setAttribute("updated", Boolean.valueOf(updated));
 
         JSPManager.showJSP(request, response, "/mydspace/subscriptions.jsp");
     }

@@ -391,7 +391,7 @@ public class SimpleSearchServlet extends DSpaceServlet
         if (AuthorizeManager.isAdmin(context))
         {
             // Set a variable to create admin buttons
-            request.setAttribute("admin_button", new Boolean(true));
+            request.setAttribute("admin_button", Boolean.TRUE);
         }
         
         if ((fromAdvanced != null) && (qResults.getHitCount() == 0))

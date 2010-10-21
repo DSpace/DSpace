@@ -254,7 +254,7 @@ public class JSPLicenseStep extends JSPStep
         // Do we already have a CC license?
         Item item = subInfo.getSubmissionItem().getItem();
         boolean exists = CreativeCommons.hasLicense(context, item);
-        request.setAttribute("cclicense.exists", new Boolean(exists));
+        request.setAttribute("cclicense.exists", Boolean.valueOf(exists));
 
         JSPStepManager.showJSP(request, response, subInfo, CC_LICENSE_JSP);
     }

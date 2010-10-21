@@ -126,7 +126,7 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
         String date = (String) request.getParameter("date");
         request.setAttribute("date", date);
         
-        request.setAttribute("general", new Boolean(false));
+        request.setAttribute("general", Boolean.FALSE);
         
         File reportDir = new File(ConfigurationManager.getProperty("report.dir"));
         
@@ -151,7 +151,7 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
             // report
             if (date == null)
             {
-                request.setAttribute("general", new Boolean(true));
+                request.setAttribute("general", Boolean.TRUE);
 
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy'-'M'-'dd");
                 Date mostRecentDate = null;

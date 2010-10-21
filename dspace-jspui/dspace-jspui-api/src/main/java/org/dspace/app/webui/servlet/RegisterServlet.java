@@ -160,7 +160,7 @@ public class RegisterServlet extends DSpaceServlet
                 // Indicate if user can set password
                 boolean setPassword =
                     AuthenticationManager.allowSetPassword(context, request, email);
-                request.setAttribute("set.password", new Boolean(setPassword));
+                request.setAttribute("set.password", Boolean.valueOf(setPassword));
 
                 // Forward to "personal info page"
                 JSPManager.showJSP(request, response,
@@ -294,7 +294,7 @@ public class RegisterServlet extends DSpaceServlet
                                     log.info(LogManager.getHeader(context,
                                         "invalid_email",
                                         "email=" + email));
-                                    request.setAttribute("retry", new Boolean(true));
+                                    request.setAttribute("retry", Boolean.TRUE);
                                     JSPManager.showJSP(request, response, "/register/new-user.jsp");
                                     return;
                             	}
@@ -366,7 +366,7 @@ public class RegisterServlet extends DSpaceServlet
                     log.info(LogManager.getHeader(context, "unknown_email",
                             "email=" + email));
 
-                    request.setAttribute("retry", new Boolean(true));
+                    request.setAttribute("retry", Boolean.TRUE);
 
                     JSPManager.showJSP(request, response,
                             "/register/forgot-password.jsp");
@@ -411,7 +411,7 @@ public class RegisterServlet extends DSpaceServlet
             log.info(LogManager.getHeader(context, "bad_email", "email="
                     + email));
 
-            request.setAttribute("retry", new Boolean(true));
+            request.setAttribute("retry", Boolean.TRUE);
 
             if (registering)
             {
@@ -536,13 +536,13 @@ public class RegisterServlet extends DSpaceServlet
             request.setAttribute("token", token);
             request.setAttribute("eperson", eperson);
             request.setAttribute("netid", netid);
-            request.setAttribute("missing.fields", new Boolean(!infoOK));
-            request.setAttribute("password.problem", new Boolean(!passwordOK));
+            request.setAttribute("missing.fields", Boolean.valueOf(!infoOK));
+            request.setAttribute("password.problem", Boolean.valueOf(!passwordOK));
 
             // Indicate if user can set password
             boolean setPassword = AuthenticationManager.allowSetPassword(
                     context, request, email);
-            request.setAttribute("set.password", new Boolean(setPassword));
+            request.setAttribute("set.password", Boolean.valueOf(setPassword));
 
             JSPManager.showJSP(request, response,
                     "/register/registration-form.jsp");
@@ -609,7 +609,7 @@ public class RegisterServlet extends DSpaceServlet
         }
         else
         {
-            request.setAttribute("password.problem", new Boolean(true));
+            request.setAttribute("password.problem", Boolean.TRUE);
             request.setAttribute("token", token);
             request.setAttribute("eperson", eperson);
 

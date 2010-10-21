@@ -151,7 +151,7 @@ public class Authenticate
         {
             // Set the flag in the session, so that when the redirect is
             // followed, we'll know to resume the interrupted request
-            session.setAttribute("resuming.request", new Boolean(true));
+            session.setAttribute("resuming.request", Boolean.TRUE);
         }
 
         // Send the redirect
@@ -292,7 +292,7 @@ public class Authenticate
         }
         finally 
         {
-            request.setAttribute("is.admin", new Boolean(isAdmin));
+            request.setAttribute("is.admin", Boolean.valueOf(isAdmin));
         }
 
         // We store the current user in the request as an EPerson object...

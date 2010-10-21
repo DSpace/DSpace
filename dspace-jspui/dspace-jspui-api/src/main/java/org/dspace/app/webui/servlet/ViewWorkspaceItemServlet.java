@@ -137,7 +137,7 @@ public class ViewWorkspaceItemServlet
         // display item JSP for both handled and un-handled items
         // Set attributes and display
         // request.setAttribute("wsItem", wsItem);
-        request.setAttribute("display.all", new Boolean(displayAll));
+        request.setAttribute("display.all", Boolean.valueOf(displayAll));
         request.setAttribute("item", item);
         request.setAttribute("collections", collections);
         request.setAttribute("workspace_id", new Integer(wsItem.getID()));

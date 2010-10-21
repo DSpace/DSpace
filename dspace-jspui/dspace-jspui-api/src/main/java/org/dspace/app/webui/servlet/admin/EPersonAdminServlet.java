@@ -105,7 +105,7 @@ public class EPersonAdminServlet extends DSpaceServlet
             // Check the EPerson exists
             if (e == null)
             {
-            	request.setAttribute("no_eperson_selected", new Boolean(true));
+            	request.setAttribute("no_eperson_selected", Boolean.TRUE);
             	showMain(context, request, response);
             }
             else 
@@ -186,7 +186,7 @@ public class EPersonAdminServlet extends DSpaceServlet
                 {
                     // not unique - send error message & let try again
                     request.setAttribute("eperson", e);
-                    request.setAttribute("email_exists", new Boolean(true));
+                    request.setAttribute("email_exists", Boolean.TRUE);
 
                     JSPManager.showJSP(request, response,
                             "/dspace-admin/eperson-edit.jsp");
@@ -246,7 +246,7 @@ public class EPersonAdminServlet extends DSpaceServlet
             // Check the EPerson exists
             if (e == null)
             {
-            	request.setAttribute("no_eperson_selected", new Boolean(true));
+            	request.setAttribute("no_eperson_selected", Boolean.TRUE);
             	showMain(context, request, response);
             }
             else 

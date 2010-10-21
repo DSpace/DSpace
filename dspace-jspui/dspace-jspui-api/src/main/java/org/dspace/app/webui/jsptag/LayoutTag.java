@@ -176,7 +176,7 @@ public class LayoutTag extends TagSupport
         if (locbar.equalsIgnoreCase("off"))
         {
             // No location bar
-            request.setAttribute("dspace.layout.locbar", new Boolean(false));
+            request.setAttribute("dspace.layout.locbar", Boolean.FALSE);
         }
         else
         {
@@ -260,7 +260,7 @@ public class LayoutTag extends TagSupport
                 }
             }
 
-            request.setAttribute("dspace.layout.locbar", new Boolean(true));
+            request.setAttribute("dspace.layout.locbar", Boolean.TRUE);
         }
 
         request.setAttribute("dspace.layout.parenttitles", parents);

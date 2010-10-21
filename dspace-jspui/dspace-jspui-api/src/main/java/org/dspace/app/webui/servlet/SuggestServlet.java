@@ -162,7 +162,7 @@ public class SuggestServlet extends DSpaceServlet
             {
                 log.info(LogManager.getHeader(context, "show_suggest_form",
                     	 "problem=true"));
-                request.setAttribute("suggest.problem", new Boolean(true));
+                request.setAttribute("suggest.problem", Boolean.TRUE);
                 JSPManager.showJSP(request, response, "/suggest/suggest.jsp");
                 return;
             }

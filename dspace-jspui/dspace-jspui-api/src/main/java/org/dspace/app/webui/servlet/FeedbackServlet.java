@@ -130,7 +130,7 @@ public class FeedbackServlet extends DSpaceServlet
             {
                 log.info(LogManager.getHeader(context, "show_feedback_form",
                         "problem=true"));
-                request.setAttribute("feedback.problem", new Boolean(true));
+                request.setAttribute("feedback.problem", Boolean.TRUE);
                 JSPManager.showJSP(request, response, "/feedback/form.jsp");
 
                 return;

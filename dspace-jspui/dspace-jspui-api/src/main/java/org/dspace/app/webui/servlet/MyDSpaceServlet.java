@@ -770,7 +770,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         request.setAttribute("workflow.owned", owned);
         request.setAttribute("workflow.pooled", pooled);
         request.setAttribute("group.memberships", memberships);
-        request.setAttribute("display.groupmemberships", new Boolean(displayMemberships));
+        request.setAttribute("display.groupmemberships", Boolean.valueOf(displayMemberships));
         request.setAttribute("supervised.items", supervisedItems);
         request.setAttribute("export.archives", exportArchives);
 

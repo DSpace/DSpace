@@ -284,9 +284,9 @@ public class JSPInitialQuestionsStep extends JSPStep
             IOException
     {
         // Verify pruning of extra bits
-        request.setAttribute("multiple.titles", new Boolean(multipleTitles));
-        request.setAttribute("published.before", new Boolean(publishedBefore));
-        request.setAttribute("multiple.files", new Boolean(multipleFiles));
+        request.setAttribute("multiple.titles", Boolean.valueOf(multipleTitles));
+        request.setAttribute("published.before", Boolean.valueOf(publishedBefore));
+        request.setAttribute("multiple.files", Boolean.valueOf(multipleFiles));
         request.setAttribute("button.pressed", UIUtil.getSubmitButton(request,
                 InitialQuestionsStep.NEXT_BUTTON));
 

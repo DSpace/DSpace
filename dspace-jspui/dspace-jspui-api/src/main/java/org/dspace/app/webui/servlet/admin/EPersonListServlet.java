@@ -132,7 +132,7 @@ public class EPersonListServlet extends DSpaceServlet
         
         if (multiple)
         {
-            request.setAttribute("multiple", new Boolean(true));
+            request.setAttribute("multiple", Boolean.TRUE);
         }
 
         JSPManager.showJSP(request, response, "/tools/eperson-list.jsp");

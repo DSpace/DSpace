@@ -337,7 +337,7 @@ public class HandleServlet extends DSpaceServlet
         if (item.canEdit())
         {
             // set a variable to create an edit button
-            request.setAttribute("admin_button", new Boolean(true));
+            request.setAttribute("admin_button", Boolean.TRUE);
         }
 
         // Get the collections
@@ -416,8 +416,8 @@ public class HandleServlet extends DSpaceServlet
         }
         
         // Set attributes and display
-        request.setAttribute("suggest.enable", new Boolean(suggestEnable));
-        request.setAttribute("display.all", new Boolean(displayAll));
+        request.setAttribute("suggest.enable", Boolean.valueOf(suggestEnable));
+        request.setAttribute("display.all", Boolean.valueOf(displayAll));
         request.setAttribute("item", item);
         request.setAttribute("collections", collections);
         request.setAttribute("dspace.layout.head", headMetadata);
@@ -460,7 +460,7 @@ public class HandleServlet extends DSpaceServlet
             if (community.canEditBoolean())
             {
                 // set a variable to create an edit button
-                request.setAttribute("editor_button", new Boolean(true));
+                request.setAttribute("editor_button", Boolean.TRUE);
             }
 
             // can they add to this community?
@@ -468,7 +468,7 @@ public class HandleServlet extends DSpaceServlet
                     Constants.ADD))
             {
                 // set a variable to create an edit button
-                request.setAttribute("add_button", new Boolean(true));
+                request.setAttribute("add_button", Boolean.TRUE);
             }
 
             // can they remove from this community?
@@ -476,7 +476,7 @@ public class HandleServlet extends DSpaceServlet
                     Constants.REMOVE))
             {
                 // set a variable to create an edit button
-                request.setAttribute("remove_button", new Boolean(true));
+                request.setAttribute("remove_button", Boolean.TRUE);
             }
 
             // Forward to community home page
@@ -575,14 +575,14 @@ public class HandleServlet extends DSpaceServlet
                 if (collection.canEditBoolean(true))
                 {
                     // set a variable to create an edit button
-                    request.setAttribute("editor_button", new Boolean(true));
+                    request.setAttribute("editor_button", Boolean.TRUE);
                 }
 
                 // can they admin this collection?
                 if (AuthorizeManager.authorizeActionBoolean(context,
                         collection, Constants.COLLECTION_ADMIN))
                 {
-                    request.setAttribute("admin_button", new Boolean(true));
+                    request.setAttribute("admin_button", Boolean.TRUE);
 
                     // give them a button to manage submitter list
                     // what group is the submitter?
@@ -600,21 +600,21 @@ public class HandleServlet extends DSpaceServlet
                 {
                     request
                             .setAttribute("can_submit_button",
-                                    new Boolean(true));
+                                    Boolean.TRUE);
 
                 }
                 else
                 {
                     request.setAttribute("can_submit_button",
-                            new Boolean(false));
+                            Boolean.FALSE);
                 }
             }
 
             // Forward to collection home page
             request.setAttribute("collection", collection);
             request.setAttribute("community", community);
-            request.setAttribute("logged.in", new Boolean(e != null));
-            request.setAttribute("subscribed", new Boolean(subscribed));
+            request.setAttribute("logged.in", Boolean.valueOf(e != null));
+            request.setAttribute("subscribed", Boolean.valueOf(subscribed));
             JSPManager.showJSP(request, response, "/collection-home.jsp");
 
             if (updated)

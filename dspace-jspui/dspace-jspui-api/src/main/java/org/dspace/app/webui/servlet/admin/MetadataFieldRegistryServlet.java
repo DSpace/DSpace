@@ -198,7 +198,7 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
             try
             {
                 dc.delete(context);
-                request.setAttribute("failed", new Boolean(false));
+                request.setAttribute("failed", Boolean.FALSE);
                 showTypes(context, request, response, schemaID);
             } catch (Exception e)
             {

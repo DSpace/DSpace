@@ -588,7 +588,7 @@ public class SubmissionController extends DSpaceServlet
             {    
                 //flag to JSPStepManager that we are going backwards
                 //an entire step
-                request.setAttribute("step.backwards", new Boolean(true));
+                request.setAttribute("step.backwards", Boolean.TRUE);
                 
                 // flag that we are going back to the start of this step (for JSPStepManager class)
                 setBeginningOfStep(request, true);
@@ -1186,7 +1186,7 @@ public class SubmissionController extends DSpaceServlet
     public static void setBeginningOfStep(HttpServletRequest request,
             boolean beginningOfStep)
     {
-        request.setAttribute("step.start", new Boolean(beginningOfStep));
+        request.setAttribute("step.start", Boolean.valueOf(beginningOfStep));
     }
 
     
@@ -1226,7 +1226,7 @@ public class SubmissionController extends DSpaceServlet
      */
     private static void setCancellationInProgress(HttpServletRequest request, boolean cancellationInProgress)
     {
-        request.setAttribute("submission.cancellation", new Boolean(cancellationInProgress));
+        request.setAttribute("submission.cancellation", Boolean.valueOf(cancellationInProgress));
     }
     
     

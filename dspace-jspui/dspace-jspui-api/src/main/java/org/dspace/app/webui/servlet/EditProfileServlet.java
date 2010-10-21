@@ -99,7 +99,7 @@ public class EditProfileServlet extends DSpaceServlet
 
         if (!ok)
         {
-            request.setAttribute("missing.fields", new Boolean(true));
+            request.setAttribute("missing.fields", Boolean.TRUE);
         }
 
         String passwordProblem = null;
@@ -111,7 +111,7 @@ public class EditProfileServlet extends DSpaceServlet
 
             if (!ok)
             {
-                request.setAttribute("password.problem", new Boolean(true));
+                request.setAttribute("password.problem", Boolean.TRUE);
             }
         }
 
@@ -123,8 +123,7 @@ public class EditProfileServlet extends DSpaceServlet
             eperson.update();
 
             // Show confirmation
-            request.setAttribute("password.updated", new Boolean(
-                    settingPassword));
+            request.setAttribute("password.updated", Boolean.valueOf(settingPassword));
             JSPManager.showJSP(request, response,
                     "/register/profile-updated.jsp");
 

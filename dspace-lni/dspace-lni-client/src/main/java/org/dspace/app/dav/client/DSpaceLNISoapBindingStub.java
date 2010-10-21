@@ -227,7 +227,7 @@ public class DSpaceLNISoapBindingStub extends org.apache.axis.client.Stub implem
 
         setRequestHeaders(_call);
         setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {source, destination, new java.lang.Integer(depth), new java.lang.Boolean(overwrite), new java.lang.Boolean(keepProperties)});
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {source, destination, new java.lang.Integer(depth), java.lang.Boolean.valueOf(overwrite), java.lang.Boolean.valueOf(keepProperties)});
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException)_resp;

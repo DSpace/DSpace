@@ -178,7 +178,7 @@ public class JSPSelectCollectionStep extends JSPStep
             if (collectionID != null && Integer.parseInt(collectionID) == -1)
             {
                 // specify "no collection" error message should be displayed
-                request.setAttribute("no.collection", new Boolean(true));
+                request.setAttribute("no.collection", Boolean.TRUE);
             }
 
             // save collections to request for JSP
@@ -222,7 +222,7 @@ public class JSPSelectCollectionStep extends JSPStep
         if (status == SelectCollectionStep.STATUS_NO_COLLECTION)
         {
             // specify "no collection" error message should be displayed
-            request.setAttribute("no.collection", new Boolean(true));
+            request.setAttribute("no.collection", Boolean.TRUE);
 
             // reload this page, by re-calling doPreProcessing()
             doPreProcessing(context, request, response, subInfo);

@@ -315,37 +315,37 @@ public class EditCommunitiesServlet extends DSpaceServlet
         try 
         {
             AuthorizeUtil.authorizeManageAdminGroup(context, community);                
-            request.setAttribute("admin_create_button", new Boolean(true));
+            request.setAttribute("admin_create_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex) {
-            request.setAttribute("admin_create_button", new Boolean(false));
+            request.setAttribute("admin_create_button", Boolean.FALSE);
         }
         
         try 
         {
             AuthorizeUtil.authorizeRemoveAdminGroup(context, community);                
-            request.setAttribute("admin_remove_button", new Boolean(true));
+            request.setAttribute("admin_remove_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex) {
-            request.setAttribute("admin_remove_button", new Boolean(false));
+            request.setAttribute("admin_remove_button", Boolean.FALSE);
         }
         
         if (AuthorizeManager.authorizeActionBoolean(context, community, Constants.DELETE))
         {
-            request.setAttribute("delete_button", new Boolean(true));
+            request.setAttribute("delete_button", Boolean.TRUE);
         }
         else
         {
-            request.setAttribute("delete_button", new Boolean(false));
+            request.setAttribute("delete_button", Boolean.FALSE);
         }
         
         try 
         {
             AuthorizeUtil.authorizeManageCommunityPolicy(context, community);                
-            request.setAttribute("policy_button", new Boolean(true));
+            request.setAttribute("policy_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex) {
-            request.setAttribute("policy_button", new Boolean(false));
+            request.setAttribute("policy_button", Boolean.FALSE);
         }        
     }
     
@@ -363,74 +363,74 @@ public class EditCommunitiesServlet extends DSpaceServlet
     {
         if (AuthorizeManager.isAdmin(context, collection))
         {
-            request.setAttribute("admin_collection", new Boolean(true));
+            request.setAttribute("admin_collection", Boolean.TRUE);
         }
         else
         {
-            request.setAttribute("admin_collection", new Boolean(false));
+            request.setAttribute("admin_collection", Boolean.FALSE);
         }
         
         try 
         {
             AuthorizeUtil.authorizeManageAdminGroup(context, collection);                
-            request.setAttribute("admin_create_button", new Boolean(true));
+            request.setAttribute("admin_create_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex) {
-            request.setAttribute("admin_create_button", new Boolean(false));
+            request.setAttribute("admin_create_button", Boolean.FALSE);
         }
         
         try 
         {
             AuthorizeUtil.authorizeRemoveAdminGroup(context, collection);                
-            request.setAttribute("admin_remove_button", new Boolean(true));
+            request.setAttribute("admin_remove_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex) {
-            request.setAttribute("admin_remove_button", new Boolean(false));
+            request.setAttribute("admin_remove_button", Boolean.FALSE);
         }
         
         try 
         {
             AuthorizeUtil.authorizeManageSubmittersGroup(context, collection);                
-            request.setAttribute("submitters_button", new Boolean(true));
+            request.setAttribute("submitters_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex) {
-            request.setAttribute("submitters_button", new Boolean(false));
+            request.setAttribute("submitters_button", Boolean.FALSE);
         }
         
         try 
         {
             AuthorizeUtil.authorizeManageWorkflowsGroup(context, collection);                
-            request.setAttribute("workflows_button", new Boolean(true));
+            request.setAttribute("workflows_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex) {
-            request.setAttribute("workflows_button", new Boolean(false));
+            request.setAttribute("workflows_button", Boolean.FALSE);
         }
         
         try 
         {
             AuthorizeUtil.authorizeManageTemplateItem(context, collection);                
-            request.setAttribute("template_button", new Boolean(true));
+            request.setAttribute("template_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex) {
-            request.setAttribute("template_button", new Boolean(false));
+            request.setAttribute("template_button", Boolean.FALSE);
         }
         
         if (AuthorizeManager.authorizeActionBoolean(context, collection.getParentObject(), Constants.REMOVE))
         {
-            request.setAttribute("delete_button", new Boolean(true));
+            request.setAttribute("delete_button", Boolean.TRUE);
         }
         else
         {
-            request.setAttribute("delete_button", new Boolean(false));
+            request.setAttribute("delete_button", Boolean.FALSE);
         }
         
         try 
         {
             AuthorizeUtil.authorizeManageCollectionPolicy(context, collection);                
-            request.setAttribute("policy_button", new Boolean(true));
+            request.setAttribute("policy_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex) {
-            request.setAttribute("policy_button", new Boolean(false));
+            request.setAttribute("policy_button", Boolean.FALSE);
         }        
     }
 
@@ -997,7 +997,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
         if (AuthorizeManager.isAdmin(context, dso))
         {
             // set a variable to show all buttons
-            request.setAttribute("admin_button", new Boolean(true));
+            request.setAttribute("admin_button", Boolean.TRUE);
         }
         
         JSPManager.showJSP(request, response, jsp);

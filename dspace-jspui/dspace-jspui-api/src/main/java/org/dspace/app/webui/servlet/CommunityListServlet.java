@@ -99,7 +99,7 @@ public class CommunityListServlet extends DSpaceServlet
         if (AuthorizeManager.isAdmin(context))
         {
             // set a variable to create an edit button
-            request.setAttribute("admin_button", new Boolean(true));
+            request.setAttribute("admin_button", Boolean.TRUE);
         }
 
         request.setAttribute("communities", communities);

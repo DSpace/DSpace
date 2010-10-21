@@ -487,8 +487,8 @@ public class JSPUploadStep extends JSPStep
             throws SQLException, ServletException, IOException
     {
         // Set required attributes
-        request.setAttribute("just.uploaded", new Boolean(justUploaded));
-        request.setAttribute("show.checksums", new Boolean(showChecksums));
+        request.setAttribute("just.uploaded", Boolean.valueOf(justUploaded));
+        request.setAttribute("show.checksums", Boolean.valueOf(showChecksums));
 
         // Always go to advanced view in workflow mode
         if (subInfo.isInWorkflow()

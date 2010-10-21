@@ -179,43 +179,43 @@ public class CollectionWizardServlet extends DSpaceServlet
             if (AuthorizeManager.isAdmin(context))
             {
                 // set a variable to show all buttons
-                request.setAttribute("sysadmin_button", new Boolean(true));
+                request.setAttribute("sysadmin_button", Boolean.TRUE);
             }
             
             try 
             {
                 AuthorizeUtil.authorizeManageAdminGroup(context, newCollection);                
-                request.setAttribute("admin_create_button", new Boolean(true));
+                request.setAttribute("admin_create_button", Boolean.TRUE);
             }
             catch (AuthorizeException authex) {
-                request.setAttribute("admin_create_button", new Boolean(false));
+                request.setAttribute("admin_create_button", Boolean.FALSE);
             }
             
             try 
             {
                 AuthorizeUtil.authorizeManageSubmittersGroup(context, newCollection);                
-                request.setAttribute("submitters_button", new Boolean(true));
+                request.setAttribute("submitters_button", Boolean.TRUE);
             }
             catch (AuthorizeException authex) {
-                request.setAttribute("submitters_button", new Boolean(false));
+                request.setAttribute("submitters_button", Boolean.FALSE);
             }
             
             try 
             {
                 AuthorizeUtil.authorizeManageWorkflowsGroup(context, newCollection);                
-                request.setAttribute("workflows_button", new Boolean(true));
+                request.setAttribute("workflows_button", Boolean.TRUE);
             }
             catch (AuthorizeException authex) {
-                request.setAttribute("workflows_button", new Boolean(false));
+                request.setAttribute("workflows_button", Boolean.FALSE);
             }
             
             try 
             {
                 AuthorizeUtil.authorizeManageTemplateItem(context, newCollection);                
-                request.setAttribute("template_button", new Boolean(true));
+                request.setAttribute("template_button", Boolean.TRUE);
             }
             catch (AuthorizeException authex) {
-                request.setAttribute("template_button", new Boolean(false));
+                request.setAttribute("template_button", Boolean.FALSE);
             }
             
             JSPManager.showJSP(request, response,
@@ -638,7 +638,7 @@ public class CollectionWizardServlet extends DSpaceServlet
         // FIXME: Not a nice hack -- do we show the MIT users checkbox?
         if (Group.findByName(context, "MIT Users") != null)
         {
-            request.setAttribute("mitgroup", new Boolean(true));
+            request.setAttribute("mitgroup", Boolean.TRUE);
         }
 
         log.debug(LogManager.getHeader(context, "nextpage", "stage=" + stage));

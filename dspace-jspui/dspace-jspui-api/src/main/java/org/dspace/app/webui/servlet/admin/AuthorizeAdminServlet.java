@@ -164,7 +164,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             // no item set yet, failed ID & handle, ask user to try again
             if (item == null)
             {
-                request.setAttribute("invalid.id", new Boolean(true));
+                request.setAttribute("invalid.id", Boolean.TRUE);
                 JSPManager.showJSP(request, response,
                         "/dspace-admin/item-select.jsp");
             }

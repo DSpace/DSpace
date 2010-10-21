@@ -346,7 +346,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             if (AuthorizeManager.isAdmin(context))
             {
                 // Set a variable to create admin buttons
-                request.setAttribute("admin_button", new Boolean(true));
+                request.setAttribute("admin_button", Boolean.TRUE);
             }
 
             if (binfo.hasResults())
