@@ -1432,10 +1432,6 @@ public class ItemExport
             deleteDirectory(cpFile);
             targetFile.renameTo(new File(target));
         }
-        catch (Exception e)
-        {
-            throw e;
-        }
         finally
         {
             if (cpZipOutputStream != null)
@@ -1486,11 +1482,10 @@ public class ItemExport
                 }
 
                 // cpZipOutputStream.write(b, 0, (int)cpFile.length());
-                cpZipOutputStream.closeEntry();
             }
-            catch (Exception e)
+            finally
             {
-                throw e;
+                cpZipOutputStream.closeEntry();
             }
         }
     }

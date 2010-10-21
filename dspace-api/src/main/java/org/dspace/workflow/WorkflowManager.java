@@ -604,29 +604,16 @@ public class WorkflowManager
         case WFSTATE_ARCHIVE:
 
             // put in archive in one transaction
-            try
-            {
-                // remove workflow tasks
-                deleteTasks(c, wi);
+            // remove workflow tasks
+            deleteTasks(c, wi);
 
-                mycollection = wi.getCollection();
+            mycollection = wi.getCollection();
 
-                Item myitem = archive(c, wi);
+            Item myitem = archive(c, wi);
 
-                // now email notification
-                notifyOfArchive(c, myitem, mycollection);
-                archived = true;
-            }
-            catch (IOException e)
-            {
-                // indexer causes this
-                throw e;
-            }
-            catch (SQLException e)
-            {
-                // problem starting workflow
-                throw e;
-            }
+            // now email notification
+            notifyOfArchive(c, myitem, mycollection);
+            archived = true;
 
             break;
         }

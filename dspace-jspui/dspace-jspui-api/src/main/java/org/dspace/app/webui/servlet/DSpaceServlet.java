@@ -183,21 +183,6 @@ public class DSpaceServlet extends HttpServlet
                 JSPManager.showAuthorizeError(request, response, ae);
             }
         }
-        catch (RuntimeException e)
-        {
-            // Catch and re-throw to ensure context aborted (via "finally")
-            throw e;
-        }
-        catch (IOException ioe)
-        {
-            // Catch and re-throw to ensure context aborted (via "finally")
-            throw ioe;
-        }
-        catch (ServletException sve)
-        {
-            // Catch and re-throw to ensure context aborted (via "finally")
-            throw sve;
-        }
         finally
         {
             // Abort the context if it's still valid
