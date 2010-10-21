@@ -39,6 +39,8 @@
  */
 package org.dspace.app.xmlui.wing;
 
+import java.io.Serializable;
+
 /**
  * 
  * This class represents an i18n message, which is composed of three parts: a 
@@ -55,7 +57,7 @@ package org.dspace.app.xmlui.wing;
  * @author Scott Phillips
  */
 
-public class Message
+public class Message implements Serializable
 {
     /** What catalogue this key is to be found in. */
     protected final String catalogue;

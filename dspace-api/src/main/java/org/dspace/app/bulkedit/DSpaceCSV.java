@@ -51,9 +51,18 @@ import java.io.*;
 /**
  * Utility class to read and write CSV files
  *
+ * **************
+ * Important Note
+ * **************
+ *
+ * This class has been made serializable, as it is stored in a Session.
+ * Is it wise to:
+ *    a) be putting this into a user's session?
+ *    b) holding an entire CSV upload in memory?
+ *
  * @author Stuart Lewis
  */
-public class DSpaceCSV
+public class DSpaceCSV implements Serializable
 {
     /** The headings of the CSV file */
     private List<String> headings;
@@ -80,7 +89,7 @@ public class DSpaceCSV
     private boolean exportAll;
 
     /** A list of metadata elements to ignore */
-    private Hashtable<String, String> ignore;
+    private Map<String, String> ignore;
 
 
     /**
@@ -208,7 +217,7 @@ public class DSpaceCSV
         counter = 0;
 
         // Set the metadata fields to ignore
-        ignore = new Hashtable<String, String>();
+        ignore = new HashMap<String, String>();
         String toIgnore = ConfigurationManager.getProperty("bulkedit.ignore-on-export");
         if ((toIgnore == null) || ("".equals(toIgnore.trim())))
         {
