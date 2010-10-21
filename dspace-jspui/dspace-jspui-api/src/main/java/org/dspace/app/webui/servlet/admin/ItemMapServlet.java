@@ -136,7 +136,7 @@ public class ItemMapServlet extends DSpaceServlet
                     Item myItem = i.next();
 
                     // get key for hash
-                    Integer myKey = new Integer(myItem.getID());
+                    Integer myKey = Integer.valueOf(myItem.getID());
 
                     if (myItem.isOwningCollection(myCollection))
                     {
@@ -149,7 +149,7 @@ public class ItemMapServlet extends DSpaceServlet
 
                     // is the collection in the hash?
                     Collection owningCollection = myItem.getOwningCollection();
-                    Integer cKey = new Integer(owningCollection.getID());
+                    Integer cKey = Integer.valueOf(owningCollection.getID());
 
                     if (myCollections.containsKey(cKey))
                     {
@@ -157,13 +157,13 @@ public class ItemMapServlet extends DSpaceServlet
                         int myCount = x.intValue() + 1;
 
                         // increment count for that collection
-                        myCounts.put(cKey, new Integer(myCount));
+                        myCounts.put(cKey, Integer.valueOf(myCount));
                     }
                     else
                     {
                         // store and initialize count
                         myCollections.put(cKey, owningCollection);
-                        myCounts.put(cKey, new Integer(1));
+                        myCounts.put(cKey, Integer.valueOf(1));
                     }
 
                     // store the item
@@ -178,13 +178,13 @@ public class ItemMapServlet extends DSpaceServlet
             
             // remove this collection's entry because we already have a native
     		// count
-    		myCollections.remove(new Integer(myCollection.getID()));
+    		myCollections.remove(Integer.valueOf(myCollection.getID()));
     		
     		// sort items - later
     		// show page
     		request.setAttribute("collection", myCollection);
-    		request.setAttribute("count_native", new Integer(count_native));
-    		request.setAttribute("count_import", new Integer(count_import));
+    		request.setAttribute("count_native", Integer.valueOf(count_native));
+    		request.setAttribute("count_import", Integer.valueOf(count_import));
     		request.setAttribute("items", myItems);
     		request.setAttribute("collections", myCollections);
     		request.setAttribute("collection_counts", myCounts);
@@ -334,18 +334,18 @@ public class ItemMapServlet extends DSpaceServlet
                     ArrayList idslist = new ArrayList();
                     while (itr.hasNext())
                     {
-                        idslist.add(new Integer(itr.nextID()));
+                        idslist.add(Integer.valueOf(itr.nextID()));
                     }
 
                     for (int i = 0; i < browseItems.length; i++)
                     {
                         // only if it isn't already in this collection
-                        if (!idslist.contains(new Integer(browseItems[i].getID())))
+                        if (!idslist.contains(Integer.valueOf(browseItems[i].getID())))
                         {
                             // only put on list if you can read item
                             if (AuthorizeManager.authorizeActionBoolean(context, browseItems[i], Constants.READ))
                             {
-                                items.put(new Integer(browseItems[i].getID()), browseItems[i]);
+                                items.put(Integer.valueOf(browseItems[i].getID()), browseItems[i]);
                             }
                         }
                     }
@@ -389,7 +389,7 @@ public class ItemMapServlet extends DSpaceServlet
 
                     if (myItem.isOwningCollection(targetCollection))
                     {
-                        Integer myKey = new Integer(myItem.getID());
+                        Integer myKey = Integer.valueOf(myItem.getID());
                         items.put(myKey, myItem);
                     }
                 }
@@ -404,7 +404,7 @@ public class ItemMapServlet extends DSpaceServlet
     		request.setAttribute("browsetext", targetCollection
     				.getMetadata("name"));
     		request.setAttribute("items", items);
-    		request.setAttribute("browsetype", new String("Remove"));
+    		request.setAttribute("browsetype", "Remove");
     		
     		// show this page when we're done
     		jspPage = "itemmap-browse.jsp";

@@ -375,10 +375,10 @@ public class SimpleSearchServlet extends DSpaceServlet
         request.setAttribute("communities", resultsCommunities);
         request.setAttribute("collections", resultsCollections);
 
-        request.setAttribute("pagetotal", new Integer(pageTotal));
-        request.setAttribute("pagecurrent", new Integer(pageCurrent));
-        request.setAttribute("pagelast", new Integer(pageLast));
-        request.setAttribute("pagefirst", new Integer(pageFirst));
+        request.setAttribute("pagetotal", Integer.valueOf(pageTotal));
+        request.setAttribute("pagecurrent", Integer.valueOf(pageCurrent));
+        request.setAttribute("pagelast", Integer.valueOf(pageLast));
+        request.setAttribute("pagefirst", Integer.valueOf(pageFirst));
 
         request.setAttribute("queryresults", qResults);
 

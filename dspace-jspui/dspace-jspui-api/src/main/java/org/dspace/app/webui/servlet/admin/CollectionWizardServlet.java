@@ -656,7 +656,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             // be an anonymous one.
             if (anonReadPols.size() == 0)
             {
-                request.setAttribute("permission", new Integer(PERM_READ));
+                request.setAttribute("permission", Integer.valueOf(PERM_READ));
                 JSPManager.showJSP(request, response,
                         "/dspace-admin/wizard-permissions.jsp");
 
@@ -669,7 +669,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             // defined
             if (collection.getSubmitters() != null)
             {
-                request.setAttribute("permission", new Integer(PERM_SUBMIT));
+                request.setAttribute("permission", Integer.valueOf(PERM_SUBMIT));
                 JSPManager.showJSP(request, response,
                         "/dspace-admin/wizard-permissions.jsp");
 
@@ -682,7 +682,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             // defined
             if (collection.getWorkflowGroup(1) != null)
             {
-                request.setAttribute("permission", new Integer(PERM_WF1));
+                request.setAttribute("permission", Integer.valueOf(PERM_WF1));
                 JSPManager.showJSP(request, response,
                         "/dspace-admin/wizard-permissions.jsp");
 
@@ -695,7 +695,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             // defined
             if (collection.getWorkflowGroup(2) != null)
             {
-                request.setAttribute("permission", new Integer(PERM_WF2));
+                request.setAttribute("permission", Integer.valueOf(PERM_WF2));
                 JSPManager.showJSP(request, response,
                         "/dspace-admin/wizard-permissions.jsp");
 
@@ -708,7 +708,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             // defined
             if (collection.getWorkflowGroup(3) != null)
             {
-                request.setAttribute("permission", new Integer(PERM_WF3));
+                request.setAttribute("permission", Integer.valueOf(PERM_WF3));
                 JSPManager.showJSP(request, response,
                         "/dspace-admin/wizard-permissions.jsp");
 
@@ -721,7 +721,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             // administrator group
             if (collection.getAdministrators() != null)
             {
-                request.setAttribute("permission", new Integer(PERM_ADMIN));
+                request.setAttribute("permission", Integer.valueOf(PERM_ADMIN));
                 JSPManager.showJSP(request, response,
                         "/dspace-admin/wizard-permissions.jsp");
 

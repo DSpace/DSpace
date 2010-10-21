@@ -71,7 +71,7 @@ public class DebugOutputStream extends OutputStream
     */
    public void write(int arg0) throws IOException
    {
-      panel.addCharacter(new Character((char)arg0));  
+      panel.addCharacter(Character.valueOf((char)arg0));  
    }
 
 }

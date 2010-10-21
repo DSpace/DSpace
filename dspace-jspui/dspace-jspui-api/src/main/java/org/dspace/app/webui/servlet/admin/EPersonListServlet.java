@@ -115,18 +115,18 @@ public class EPersonListServlet extends DSpaceServlet
         if (search != null && !search.equals(""))
         {
             epeople = EPerson.search(context, search);
-            request.setAttribute("offset", new Integer(offset));
+            request.setAttribute("offset", Integer.valueOf(offset));
         }
         else
         {
             // Retrieve the e-people in the specified order
             epeople = EPerson.findAll(context, sortBy);
-            request.setAttribute("offset", new Integer(0));            
+            request.setAttribute("offset", Integer.valueOf(0));
         }        
         
         // Set attributes for JSP
-        request.setAttribute("sortby", new Integer(sortBy));
-        request.setAttribute("first", new Integer(first));
+        request.setAttribute("sortby", Integer.valueOf(sortBy));
+        request.setAttribute("first", Integer.valueOf(first));
         request.setAttribute("epeople", epeople);
         request.setAttribute("search", search);
         

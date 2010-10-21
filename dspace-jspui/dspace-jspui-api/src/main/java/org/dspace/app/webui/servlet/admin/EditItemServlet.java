@@ -429,7 +429,7 @@ public class EditItemServlet extends DSpaceServlet
             MetadataField[] fields = MetadataField.findAllInSchema(context, schemas[i].getSchemaID());
             for (int j = 0; j < fields.length; j++)
             {
-                Integer fieldID = new Integer(fields[j].getFieldID());
+                Integer fieldID = Integer.valueOf(fields[j].getFieldID());
                 String displayName = "";
                 displayName = schemaName + "." + fields[j].getElement() + (fields[j].getQualifier() == null ? "" : "." + fields[j].getQualifier());
                 metadataFields.put(fieldID, displayName);

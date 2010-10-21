@@ -84,7 +84,7 @@ public class CommunityListServlet extends DSpaceServlet
 
         for (int com = 0; com < communities.length; com++)
         {
-            Integer comID = new Integer(communities[com].getID());
+            Integer comID = Integer.valueOf(communities[com].getID());
 
             // Find collections in community
             Collection[] colls = communities[com].getCollections();

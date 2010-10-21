@@ -299,8 +299,7 @@ public class Authenticate
         request.setAttribute("dspace.current.user", eperson);
 
         // and in the session as an ID
-        session.setAttribute("dspace.current.user.id", new Integer(eperson
-                .getID()));
+        session.setAttribute("dspace.current.user.id", Integer.valueOf(eperson.getID()));
 
         // and the remote IP address to compare against later requests
         // so we can detect session hijacking.

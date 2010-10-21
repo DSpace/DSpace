@@ -231,8 +231,8 @@ public class ManageGroupsMain extends AbstractDSpaceTransformer
         	if (group.getID() > 1)
         	{
 	        	CheckBox select = row.addCell().addCheckBox("select_group");
-	        	select.setLabel(new Integer(group.getID()).toString());
-	        	select.addOption(new Integer(group.getID()).toString());
+	        	select.setLabel(Integer.valueOf(group.getID()).toString());
+	        	select.addOption(Integer.valueOf(group.getID()).toString());
         	}
         	else
         	{

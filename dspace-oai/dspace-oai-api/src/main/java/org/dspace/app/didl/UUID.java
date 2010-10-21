@@ -125,7 +125,7 @@ public final class UUID implements Serializable
      **/
     public int hashCode()
     {
-        return new Long(hi ^ lo).hashCode();
+        return Long.valueOf(hi ^ lo).hashCode();
     }
  
     

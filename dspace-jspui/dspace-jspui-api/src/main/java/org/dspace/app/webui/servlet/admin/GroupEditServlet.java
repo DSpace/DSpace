@@ -141,14 +141,14 @@ public class GroupEditServlet extends DSpaceServlet
                     // add all members to a set
                     for (int x = 0; x < members.length; x++)
                     {
-                        Integer epersonID = new Integer(members[x].getID());
+                        Integer epersonID = Integer.valueOf(members[x].getID());
                         memberSet.add(epersonID);
                     }
 
                     // now all eperson_ids are put in a set
                     for (int x = 0; x < eperson_ids.length; x++)
                     {
-                        epersonIDSet.add(new Integer(eperson_ids[x]));
+                        epersonIDSet.add(Integer.valueOf(eperson_ids[x]));
                     }
 
                     // process eperson_ids, adding those to group not already
@@ -171,7 +171,7 @@ public class GroupEditServlet extends DSpaceServlet
                     {
                         EPerson e = members[x];
 
-                        if (!epersonIDSet.contains(new Integer(e.getID())))
+                        if (!epersonIDSet.contains(Integer.valueOf(e.getID())))
                         {
                             group.removeMember(e);
                         }
@@ -197,14 +197,14 @@ public class GroupEditServlet extends DSpaceServlet
                     // add all members to a set
                     for (int x = 0; x < membergroups.length; x++)
                     {
-                        Integer myID = new Integer(membergroups[x].getID());
+                        Integer myID = Integer.valueOf(membergroups[x].getID());
                         memberSet.add(myID);
                     }
 
                     // now all eperson_ids are put in a set
                     for (int x = 0; x < group_ids.length; x++)
                     {
-                        groupIDSet.add(new Integer(group_ids[x]));
+                        groupIDSet.add(Integer.valueOf(group_ids[x]));
                     }
 
                     // process group_ids, adding those to group not already
@@ -228,7 +228,7 @@ public class GroupEditServlet extends DSpaceServlet
                     {
                         Group g = membergroups[x];
 
-                        if (!groupIDSet.contains(new Integer(g.getID())))
+                        if (!groupIDSet.contains(Integer.valueOf(g.getID())))
                         {
                             group.removeMember(g);
                         }

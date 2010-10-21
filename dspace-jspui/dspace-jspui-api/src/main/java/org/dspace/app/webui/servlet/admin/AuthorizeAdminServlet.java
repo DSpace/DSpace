@@ -762,7 +762,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             List myPolicies = AuthorizeManager.getPolicies(c, myBundle);
 
             // add bundle's policies to bundle_policies map
-            bundle_policies.put(new Integer(myBundle.getID()), myPolicies);
+            bundle_policies.put(Integer.valueOf(myBundle.getID()), myPolicies);
 
             // go through all bundle's bitstreams, add to bitstream map
             Bitstream[] bitstreams = myBundle.getBitstreams();
@@ -771,7 +771,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             {
                 Bitstream myBitstream = bitstreams[j];
                 myPolicies = AuthorizeManager.getPolicies(c, myBitstream);
-                bitstream_policies.put(new Integer(myBitstream.getID()),
+                bitstream_policies.put(Integer.valueOf(myBitstream.getID()),
                         myPolicies);
             }
         }

@@ -169,7 +169,7 @@ public class JSPManager
 
         if (type != -1)
         {
-            request.setAttribute("bad.type", new Integer(type));
+            request.setAttribute("bad.type", Integer.valueOf(type));
         }
 
         showJSP(request, response, "/error/invalid-id.jsp");

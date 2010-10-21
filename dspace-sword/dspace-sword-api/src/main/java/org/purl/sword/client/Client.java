@@ -224,7 +224,7 @@ public class Client implements SWORDClient {
 	 */
 	public void setSocketTimeout(int milliseconds) {
 		client.getParams().setParameter("http.socket.timeout",
-				new Integer(milliseconds));
+				Integer.valueOf(milliseconds));
 	}
 
 	/**

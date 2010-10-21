@@ -86,8 +86,8 @@ public class GroupListServlet extends DSpaceServlet
 		Group[] groups = Group.findAll(context, sortBy);
 		
 		// Set attributes for JSP
-		request.setAttribute("sortby", new Integer(sortBy));
-		request.setAttribute("first",  new Integer(first));
+		request.setAttribute("sortby", Integer.valueOf(sortBy));
+		request.setAttribute("first",  Integer.valueOf(first));
 		request.setAttribute("groups", groups);
 		if (multiple)
 		{
