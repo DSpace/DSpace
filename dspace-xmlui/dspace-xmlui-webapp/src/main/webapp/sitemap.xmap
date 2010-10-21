@@ -563,6 +563,23 @@
                             </map:read>
                     </map:match>
 
+                    <!-- handle static js and css -->
+                    <map:match pattern="static/**.js">
+                            <map:read type="ConcatenationReader" src="static/{1}.js">
+                                <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                            </map:read>
+                    </map:match>
+                    <map:match pattern="static/**.css">
+                            <map:read type="ConcatenationReader" src="static/{1}.css">
+                                <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                            </map:read>
+                    </map:match>
+                    <map:match pattern="static/**.json">
+                            <map:read type="ConcatenationReader" src="static/{1}.json">
+                                <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                            </map:read>
+                    </map:match>
+
 
                         <!-- handle common theme resources, such as dri2xhtml -->
                         <map:match pattern="themes/*">
