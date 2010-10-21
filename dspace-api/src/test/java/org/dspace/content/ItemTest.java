@@ -39,6 +39,8 @@ import java.io.FileInputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
+
+import org.apache.commons.lang.time.DateUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.apache.log4j.Logger;
 import java.util.ArrayList;
@@ -251,7 +253,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     public void testGetLastModified()
     {
         assertThat("testGetLastModified 0", it.getLastModified(), notNullValue());
-        assertThat("testGetLastModified 1", it.getLastModified().toString(), equalTo(new Date().toString()));
+        assertTrue("testGetLastModified 1", DateUtils.isSameDay(it.getLastModified(), new Date()));
     }
 
     /**
