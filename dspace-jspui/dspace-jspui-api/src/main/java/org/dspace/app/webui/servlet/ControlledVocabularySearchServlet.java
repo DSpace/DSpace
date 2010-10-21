@@ -34,7 +34,6 @@
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;

@@ -36,14 +36,11 @@
  */
 package org.purl.sword.base;
 
-import java.util.ArrayList;
 import java.util.Properties;
 import nu.xom.Attribute;
 import nu.xom.Element;
 
 import org.apache.log4j.Logger;
-import org.purl.sword.atom.Author;
-import org.purl.sword.atom.Title;
 
 /**
  * Extension of the SWORD Entry class, specialized for Error Documents. 

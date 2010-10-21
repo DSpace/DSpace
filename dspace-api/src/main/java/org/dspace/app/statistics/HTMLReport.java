@@ -38,10 +38,6 @@
 
 package org.dspace.app.statistics;
 
-import org.dspace.app.statistics.Report;
-import org.dspace.app.statistics.Stat;
-import org.dspace.app.statistics.Statistics;
-import org.dspace.app.statistics.ReportTools;
 import org.dspace.core.ConfigurationManager;
 
 import java.text.DateFormat;
@@ -50,7 +46,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.*;

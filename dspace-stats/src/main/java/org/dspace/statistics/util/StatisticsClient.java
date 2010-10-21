@@ -38,27 +38,13 @@
 
 package org.dspace.statistics.util;
 
-import com.maxmind.geoip.Location;
-import com.maxmind.geoip.LookupService;
 import org.apache.commons.cli.*;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.apache.solr.common.SolrInputDocument;
 import org.apache.tools.ant.taskdefs.Get;
-import org.dspace.content.*;
-import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;
 
 import java.io.*;
 import java.net.URL;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * Class to load intermediate statistics files into solr

@@ -36,14 +36,12 @@
  */
 package org.purl.sword.base;
 
-import java.util.ArrayList;
 import java.util.Properties;
 import nu.xom.Element;
 import nu.xom.Elements;
 
 import org.apache.log4j.Logger;
 import org.purl.sword.atom.Entry;
-import org.purl.sword.atom.Summary;
 
 
 /**

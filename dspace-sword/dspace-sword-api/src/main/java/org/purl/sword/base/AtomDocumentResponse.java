@@ -36,8 +36,6 @@
  */
 package org.purl.sword.base;
 
-import org.apache.log4j.Logger;
-
 /**
  * Represents a deposit response. This holds the SWORD Entry element. 
  * 

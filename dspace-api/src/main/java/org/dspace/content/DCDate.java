@@ -39,14 +39,11 @@
 package org.dspace.content;
 
 import java.text.DateFormatSymbols;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.util.*;
 
 import org.apache.log4j.Logger;
-
-import org.dspace.core.I18nUtil;
 
 // FIXME: Not very robust - assumes dates will always be valid
 

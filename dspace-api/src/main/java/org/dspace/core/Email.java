@@ -46,7 +46,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import java.security.Security;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;

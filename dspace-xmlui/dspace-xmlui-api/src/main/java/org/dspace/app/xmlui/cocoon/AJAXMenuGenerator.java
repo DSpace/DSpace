@@ -39,37 +39,14 @@
 package org.dspace.app.xmlui.cocoon;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import org.apache.cocoon.ProcessingException;
-import org.apache.cocoon.ResourceNotFoundException;
-import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.generation.AbstractGenerator;
-import org.dspace.app.xmlui.objectmanager.AbstractAdapter;
-import org.dspace.app.xmlui.objectmanager.ContainerAdapter;
-import org.dspace.app.xmlui.objectmanager.ItemAdapter;
-import org.dspace.app.xmlui.objectmanager.RepositoryAdapter;
-import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.ChoicesXMLGenerator;
-import org.dspace.content.crosswalk.CrosswalkException;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.ext.LexicalHandler;
-import org.xml.sax.Attributes;
-import org.xml.sax.helpers.AttributesImpl;
 
 import org.apache.log4j.Logger;
 

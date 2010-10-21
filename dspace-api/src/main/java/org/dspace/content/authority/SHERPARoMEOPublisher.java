@@ -37,39 +37,7 @@
  */
 package org.dspace.content.authority;
 
-import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.FileReader;
-import java.io.BufferedReader;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.ParserConfigurationException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.InputSource;
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXParseException;
-
-import org.apache.log4j.Logger;
-
-import org.dspace.core.ConfigurationManager;
-
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.util.EncodingUtil;
 import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.HttpException;
 
 /**
  * Sample Publisher name authority based on SHERPA/RoMEO

@@ -42,7 +42,6 @@ import java.util.Properties;
 import nu.xom.Attribute;
 import nu.xom.Element;
 
-import nu.xom.Node;
 import org.purl.sword.base.Namespaces;
 import org.purl.sword.base.SwordElementInterface;
 import org.purl.sword.base.UnmarshallException;

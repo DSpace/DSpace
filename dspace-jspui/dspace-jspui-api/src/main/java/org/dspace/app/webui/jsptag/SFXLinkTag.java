@@ -41,18 +41,13 @@ package org.dspace.app.webui.jsptag;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URLEncoder;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
-import org.dspace.content.DCPersonName;
-import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 
-import org.w3c.dom.*;
 import org.dspace.app.sfx.SFXFileReader;
 
 

@@ -27,7 +27,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.statistics.Dataset;
 import org.dspace.statistics.content.*;
-import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
 
 public class StatisticsTransformer extends AbstractDSpaceTransformer {

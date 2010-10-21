@@ -44,7 +44,6 @@ import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.utils.RequestUtils;

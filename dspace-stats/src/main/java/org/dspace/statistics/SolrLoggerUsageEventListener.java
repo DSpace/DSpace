@@ -13,7 +13,6 @@ package org.dspace.statistics;
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.model.Event;
-import org.dspace.statistics.util.SpiderDetector;
 import org.dspace.usage.AbstractUsageEventListener;
 import org.dspace.usage.UsageEvent;
 

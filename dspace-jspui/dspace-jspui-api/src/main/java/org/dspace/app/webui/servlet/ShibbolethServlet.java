@@ -50,11 +50,8 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.eperson.EPerson;
-import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authenticate.AuthenticationMethod;
-import org.dspace.eperson.Group;
 
 /**
  * Shibbolize dspace. Follow instruction at 

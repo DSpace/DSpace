@@ -57,7 +57,6 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.Context;
-import org.dspace.core.I18nUtil;
 
 /**
  * Servlet for editing the Dublin Core registry

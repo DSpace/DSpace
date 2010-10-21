@@ -41,43 +41,17 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.util.List;
-import java.net.URLEncoder;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 import org.dspace.authorize.AuthorizeException;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.jstl.fmt.LocaleSupport;
-import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.util.MetadataExposure;
-import org.dspace.app.webui.util.StyleSelection;
-import org.dspace.app.webui.util.UIUtil;
-import org.dspace.browse.BrowseException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
-import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
-import org.dspace.core.PluginManager;
-import org.dspace.core.Utils;
 import org.dspace.eperson.Group;
 
 import org.dspace.content.DSpaceObject;

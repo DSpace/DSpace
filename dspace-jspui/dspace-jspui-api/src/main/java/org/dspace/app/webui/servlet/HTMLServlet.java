@@ -60,7 +60,6 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
 import org.dspace.handle.HandleManager;
-import org.dspace.services.model.Event;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 

@@ -44,12 +44,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.Item;
-import org.dspace.core.Context;
-
 import javax.imageio.ImageIO;
 
 import org.dspace.core.ConfigurationManager;

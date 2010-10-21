@@ -40,16 +40,13 @@ package org.dspace.sword;
 import org.dspace.content.*;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.SWORDErrorException;
 import org.purl.sword.base.ErrorCodes;
 import org.apache.log4j.Logger;
 
-import java.util.Date;
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.sql.SQLException;
 
 public class ItemDepositor extends Depositor

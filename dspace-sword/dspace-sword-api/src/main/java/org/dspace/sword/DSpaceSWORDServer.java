@@ -54,8 +54,6 @@ import org.purl.sword.base.SWORDException;
 import org.purl.sword.base.ServiceDocument;
 import org.purl.sword.base.ServiceDocumentRequest;
 
-import java.sql.SQLException;
-
 /**
  * An implementation of the SWORDServer interface to allow SWORD deposit
  * operations on DSpace.  See:

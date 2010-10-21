@@ -10,10 +10,8 @@
  */
 package org.dspace.statistics.util;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.lang.reflect.Array;
 import org.dspace.core.I18nUtil;
 
 /**

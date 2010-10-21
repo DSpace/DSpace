@@ -39,25 +39,14 @@
 package org.dspace.app.xmlui.aspect.general;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.sql.SQLException;
-
-import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.DCPersonName;
 import org.dspace.core.ConfigurationManager;
-import org.apache.cocoon.caching.CacheableProcessingComponent;
-import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.environment.http.HttpEnvironment;
-import org.apache.cocoon.util.HashUtil;
-import org.apache.excalibur.source.SourceValidity;
-import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
-import org.dspace.app.xmlui.wing.WingConstants;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Composite;
@@ -70,7 +59,6 @@ import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.authorize.AuthorizeException;
-import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import org.apache.log4j.Logger;

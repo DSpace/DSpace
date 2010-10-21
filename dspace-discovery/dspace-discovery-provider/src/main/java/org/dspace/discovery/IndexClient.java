@@ -42,7 +42,6 @@ package org.dspace.discovery;
 import org.apache.log4j.Logger;
 import org.apache.commons.cli.*;
 import org.dspace.core.Context;
-import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 
 import java.io.IOException;

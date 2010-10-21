@@ -25,9 +25,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Iterator;
 import java.text.SimpleDateFormat;
 
 import com.maxmind.geoip.LookupService;

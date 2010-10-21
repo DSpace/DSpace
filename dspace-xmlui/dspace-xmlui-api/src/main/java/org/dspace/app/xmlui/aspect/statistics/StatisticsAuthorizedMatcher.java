@@ -20,9 +20,6 @@ import org.dspace.core.Constants;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Community;
-import org.dspace.content.Collection;
-import org.dspace.content.Item;
 import org.dspace.authorize.AuthorizeManager;
 
 import java.util.Map;

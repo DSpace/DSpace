@@ -40,7 +40,6 @@
 
 package org.dspace.app.xmlui.wing;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**

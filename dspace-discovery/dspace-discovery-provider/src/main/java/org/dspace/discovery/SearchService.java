@@ -41,13 +41,10 @@ package org.dspace.discovery;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Date;
 
 /**
  * Search interface that discovery to search in solr

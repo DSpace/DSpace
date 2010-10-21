@@ -49,7 +49,6 @@ import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.dspace.harvest.OAIHarvester;
-import org.dspace.harvest.OAIHarvester.HarvestScheduler;
 
 /**
  * Update the alert system based upon the form submitted from the control panel.

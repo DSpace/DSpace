@@ -55,7 +55,6 @@ import org.apache.log4j.Logger;
 
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.SubmissionStepConfig;
-import org.dspace.app.util.Util;
 import org.dspace.app.webui.submit.JSPStepManager;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
@@ -68,7 +67,6 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.submit.AbstractProcessingStep;
-import org.dspace.submit.step.UploadStep;
 
 /**
  * Submission Manager servlet for DSpace. Handles the initial submission of

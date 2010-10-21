@@ -69,7 +69,6 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.content.authority.ChoiceAuthorityManager;
-import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.Choices;
 
 /**

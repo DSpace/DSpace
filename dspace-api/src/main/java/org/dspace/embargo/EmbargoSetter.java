@@ -38,7 +38,6 @@
  */
 package org.dspace.embargo;
 
-import java.util.Date;
 import java.sql.SQLException;
 import java.io.IOException;
 

@@ -41,21 +41,13 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Writer;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.FileInputStream;
-import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
-import java.io.CharArrayWriter;
 import java.io.ByteArrayOutputStream;
-import java.util.List;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.pdfbox.pdfparser.PDFParser;
 import org.pdfbox.pdmodel.PDDocument;
-import org.pdfbox.pdmodel.PDPage;
-import org.pdfbox.pdmodel.common.PDStream;
 import org.pdfbox.util.PDFTextStripper;
 import org.dspace.core.ConfigurationManager;
 

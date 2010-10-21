@@ -42,8 +42,6 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
-import java.util.Hashtable;
-import java.util.Enumeration;
 
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -53,7 +51,6 @@ import org.purl.sword.atom.Contributor;
 import org.purl.sword.atom.Generator;
 import org.purl.sword.atom.Link;
 import org.purl.sword.atom.Rights;
-import org.purl.sword.atom.Source;
 import org.purl.sword.atom.Summary;
 import org.purl.sword.atom.Title;
 import org.purl.sword.base.Collection;
@@ -61,7 +58,6 @@ import org.purl.sword.base.DepositResponse;
 import org.purl.sword.base.SWORDEntry;
 import org.purl.sword.base.ServiceDocument;
 import org.purl.sword.base.Workspace;
-import org.purl.sword.base.QualityValue;
 import org.purl.sword.base.SwordAcceptPackaging;
 
 /**

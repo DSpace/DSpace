@@ -48,7 +48,6 @@ import org.dspace.content.Item;
 
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
-import org.dspace.core.Utils;
 
 import java.io.IOException;
 import java.sql.SQLException;

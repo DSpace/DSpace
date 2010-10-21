@@ -37,7 +37,6 @@
  */
 package org.dspace.sword;
 
-import java.io.File;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -46,7 +45,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.purl.sword.base.Deposit;
 
@@ -56,9 +54,7 @@ import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 
 /**

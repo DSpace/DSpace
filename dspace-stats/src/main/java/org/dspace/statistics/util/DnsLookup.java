@@ -14,7 +14,6 @@ import org.dspace.core.ConfigurationManager;
 import org.xbill.DNS.*;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 /**
  * XBill DNS resolver to retrieve hostnames for client IP addresses.

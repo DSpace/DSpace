@@ -36,7 +36,6 @@
  */
 package org.purl.sword.base;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import nu.xom.Attribute;

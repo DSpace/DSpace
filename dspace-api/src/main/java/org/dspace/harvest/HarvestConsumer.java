@@ -41,13 +41,9 @@
 package org.dspace.harvest;
 
 import org.apache.log4j.Logger;
-import org.dspace.content.Item;
 import org.dspace.core.*;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
-
-import javax.mail.MessagingException;
-import java.util.Date;
 
 /**
  * Class for handling cleanup of harvest settings for collections and items

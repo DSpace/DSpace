@@ -66,7 +66,6 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.text.ParseException;
 
 /**
  * Transformer to display statistics data in XML UI.

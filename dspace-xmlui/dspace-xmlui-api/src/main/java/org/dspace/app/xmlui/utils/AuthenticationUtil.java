@@ -48,7 +48,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.aspect.administrative.SystemwideAlerts;
-import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authorize.AuthorizeException;

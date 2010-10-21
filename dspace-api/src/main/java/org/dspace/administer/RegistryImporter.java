@@ -35,33 +35,17 @@ package org.dspace.administer;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
-
 import org.apache.xpath.XPathAPI;
-
-import org.dspace.administer.DCType;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
-import org.dspace.content.NonUniqueMetadataException;
-import org.dspace.core.Context;
-import org.dspace.core.LogManager;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.NamedNodeMap;
 
 import org.xml.sax.SAXException;
 

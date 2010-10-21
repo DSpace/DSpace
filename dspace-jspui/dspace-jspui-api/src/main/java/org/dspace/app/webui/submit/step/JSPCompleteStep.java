@@ -52,7 +52,6 @@ import org.dspace.app.webui.submit.JSPStep;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.submit.step.CompleteStep;
 
 /**
  * This is the JSP binding class which defines what happens once a submission completes!

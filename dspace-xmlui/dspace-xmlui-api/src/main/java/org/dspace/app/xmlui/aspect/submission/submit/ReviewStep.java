@@ -53,7 +53,6 @@ import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractStep;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
-import org.dspace.app.xmlui.aspect.submission.FlowUtils;
 import org.dspace.app.xmlui.aspect.submission.StepAndPage;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;

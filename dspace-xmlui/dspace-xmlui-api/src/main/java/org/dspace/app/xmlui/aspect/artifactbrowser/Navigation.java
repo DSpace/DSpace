@@ -68,7 +68,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.app.util.Util;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 import org.xml.sax.SAXException;
 
 /**

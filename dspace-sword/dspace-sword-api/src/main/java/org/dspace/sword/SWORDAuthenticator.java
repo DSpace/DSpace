@@ -51,7 +51,6 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.apache.log4j.Logger;
 import org.purl.sword.base.*;
-import org.purl.sword.base.Collection;
 
 import java.sql.SQLException;
 import java.util.List;

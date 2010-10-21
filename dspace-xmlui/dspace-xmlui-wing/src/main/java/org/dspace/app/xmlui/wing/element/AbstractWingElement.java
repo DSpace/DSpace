@@ -45,7 +45,6 @@ import org.dspace.app.xmlui.wing.Namespace;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingConstants;
 import org.dspace.app.xmlui.wing.WingContext;
-import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.WingInvalidArgument;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;

@@ -39,7 +39,6 @@ package org.dspace.app.xmlui.aspect.administrative;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.io.File;
 import java.util.List;
 

@@ -37,8 +37,6 @@
  */
 package org.dspace.content.authority;
 
-import java.util.List;
-
 /**
  * This is a *very* stupid test fixture for authority control, and also
  * serves as a trivial example of an authority plugin implementation.

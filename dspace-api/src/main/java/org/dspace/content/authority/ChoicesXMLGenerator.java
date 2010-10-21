@@ -37,12 +37,8 @@
  */
 package org.dspace.content.authority;
 
-import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.Choice;
-
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 

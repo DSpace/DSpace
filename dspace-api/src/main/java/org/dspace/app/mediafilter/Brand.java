@@ -37,17 +37,12 @@
  */
 package org.dspace.app.mediafilter;
 
-import java.io.File;
-import java.io.IOException;
 import java.awt.image.BufferedImage;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import javax.imageio.ImageIO;
-import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
 
 /**
  * Class to attach a footer to an image using ImageMagick.

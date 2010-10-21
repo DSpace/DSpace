@@ -47,10 +47,7 @@ import java.util.Enumeration;
 import org.apache.log4j.Logger;
 
 import org.dspace.content.MetadataField;
-import org.dspace.content.Collection;
-import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.PluginManager;
 
 /**
  * Broker for metadata authority settings configured for each metadata field.

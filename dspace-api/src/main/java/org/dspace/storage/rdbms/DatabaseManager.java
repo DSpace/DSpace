@@ -68,7 +68,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.naming.InitialContext;
-import javax.naming.NoInitialContextException;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;

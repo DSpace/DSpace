@@ -41,7 +41,6 @@ package org.dspace.app.xmlui.aspect.administrative.community;
 
 import java.sql.SQLException;
 
-import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.app.xmlui.aspect.administrative.FlowContainerUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;

@@ -57,7 +57,6 @@ import org.dspace.browse.*;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.LogManager;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 import org.xml.sax.SAXException;

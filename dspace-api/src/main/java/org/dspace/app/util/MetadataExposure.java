@@ -46,7 +46,6 @@ import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.core.Constants;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 

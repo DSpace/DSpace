@@ -42,8 +42,6 @@ package org.dspace.app.xmlui.utils;
 import java.util.Map;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
-
 import org.dspace.app.util.SyndicationFeed;
 
 import org.w3c.dom.Document;

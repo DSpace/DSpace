@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.license.FormattableArgument;
-import org.dspace.content.license.LicenseArgumentFormatter;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 

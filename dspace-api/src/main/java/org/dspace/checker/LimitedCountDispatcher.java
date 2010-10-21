@@ -31,8 +31,6 @@
  */
 package org.dspace.checker;
 
-import java.sql.SQLException;
-
 import org.dspace.core.PluginManager;
 
 /**
