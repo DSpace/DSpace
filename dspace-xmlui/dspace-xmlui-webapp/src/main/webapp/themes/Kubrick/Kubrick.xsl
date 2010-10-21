@@ -239,7 +239,15 @@
                                 <xsl:attribute name="style">left: 218px;</xsl:attribute>
                             </xsl:if>
                             <i18n:translate>
-                                <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
+                                <!--Filter out our total if we have no results-->
+                                <xsl:choose>
+                                    <xsl:when test="parent::node()/@itemsTotal = -1">
+                                        <i18n:text>xmlui.dri2xhtml.structural.pagination-info.nototal</i18n:text>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                                 <i18n:param><xsl:value-of select="parent::node()/@firstItemIndex"/></i18n:param>
                                 <i18n:param><xsl:value-of select="parent::node()/@lastItemIndex"/></i18n:param>
                                 <i18n:param><xsl:value-of select="parent::node()/@itemsTotal"/></i18n:param>
@@ -277,7 +285,14 @@
                         </xsl:if>
                         <p class="pagination-info">
                             <i18n:translate>
-                                <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
+                                <xsl:choose>
+                                    <xsl:when test="parent::node()/@itemsTotal = -1">
+                                        <i18n:text>xmlui.dri2xhtml.structural.pagination-info.nototal</i18n:text>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                                 <i18n:param><xsl:value-of select="parent::node()/@firstItemIndex"/></i18n:param>
                                 <i18n:param><xsl:value-of select="parent::node()/@lastItemIndex"/></i18n:param>
                                 <i18n:param><xsl:value-of select="parent::node()/@itemsTotal"/></i18n:param>

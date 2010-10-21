@@ -112,6 +112,21 @@
         </profile>
 
         <!--
+            Builds DSpace discovery for DSpace
+        -->
+        <profile>
+            <id>dspace-discovery</id>
+            <activation>
+                <file>
+                    <exists>../dspace-discovery/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>../dspace-discovery</module>
+            </modules>
+        </profile>
+
+        <!--
            Builds OAI Gateway WAR for DSpace
         -->
         <profile>
@@ -563,6 +578,10 @@
         <dependency>
              <groupId>org.dspace</groupId>
              <artifactId>dspace-stats</artifactId>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-discovery-provider</artifactId>
          </dependency>
          <dependency>
             <groupId>javax.servlet</groupId>

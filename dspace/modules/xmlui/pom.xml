@@ -156,6 +156,20 @@
          <type>war</type>
       </dependency>
 
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-discovery-xmlui-api</artifactId>
+         <version>1.7.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-discovery-xmlui-webapp</artifactId>
+         <version>1.7.0-SNAPSHOT</version>
+         <type>war</type>
+      </dependency>
+
+
       <!-- DSpace XMLUI API -->
       <dependency>
          <groupId>org.dspace</groupId>

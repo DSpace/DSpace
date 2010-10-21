@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  sitemap.xmap
+
+  Version: $Revision: 4417 $
+
+  Date: $Date: 2009-10-08 01:09:53 +0200 (do, 08 okt 2009) $
+
+  Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
+  Institute of Technology.  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+
+  - Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+
+  - Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+
+  - Neither the name of the Hewlett-Packard Company nor the name of the
+  Massachusetts Institute of Technology nor the names of their
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+  DAMAGE.
+-->
+
+<!--
+
+The BrowseArtifacts Aspect is responsible for browsing communities /
+collections / items / and bitstreams.
+
+-->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+    <map:components>
+
+        <map:transformers>
+            <map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.browseArtifacts.Navigation"/>
+            <map:transformer name="CommunityBrowser" src="org.dspace.app.xmlui.aspect.artifactbrowser.CommunityBrowser"/>
+            <map:transformer name="CommunityRecentSubmissions" src="org.dspace.app.xmlui.aspect.artifactbrowser.CommunityRecentSubmissions"/>
+            <map:transformer name="CollectionRecentSubmissions" src="org.dspace.app.xmlui.aspect.artifactbrowser.CollectionRecentSubmissions"/>
+            <map:transformer name="ConfigurableBrowse" src="org.dspace.app.xmlui.aspect.artifactbrowser.ConfigurableBrowse"/>
+        </map:transformers>
+
+        <map:matchers default="wildcard">
+                <map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
+                <map:matcher name="HandleAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.general.HandleAuthorizedMatcher"/>
+        </map:matchers>
+    </map:components>
+
+    <map:pipelines>
+        <map:pipeline>
+            <map:generate/>
+
+            <!--
+                    Navigation links to browse the repository.
+                    - This includes links that are relative to the currently
+            -->
+            <map:transform type="Navigation"/>
+
+            <map:match pattern="">
+                <map:transform type="CommunityBrowser">
+                        <map:parameter name="depth" value="1"/>
+                </map:transform>
+                <map:serialize type="xml"/>
+            </map:match>
+
+            <!-- List all communities & collections in DSpace -->
+            <map:match pattern="community-list">
+                    <map:transform type="CommunityBrowser">
+                            <map:parameter name="depth" value="999"/>
+                    </map:transform>
+                    <map:serialize type="xml"/>
+            </map:match>
+
+            <!-- Browse (by anything) -->
+            <map:match pattern="browse">
+                    <map:transform type="ConfigurableBrowse"/>
+                    <map:serialize type="xml"/>
+            </map:match>
+
+            <!-- Handle specific features -->
+            <map:match pattern="handle/*/**">
+                <map:match type="HandleAuthorizedMatcher" pattern="READ">
+                    <map:match type="HandleTypeMatcher" pattern="community,collection">
+                        <!-- Browse (by anything) -->
+                        <map:match pattern="handle/*/*/browse">
+                            <map:transform type="ConfigurableBrowse"/>
+                            <map:serialize type="xml"/>
+                        </map:match>
+
+                        <map:match type="HandleTypeMatcher" pattern="community">
+                            <map:match pattern="handle/*/*">
+                                <map:transform type="CommunityRecentSubmissions"/>
+                            </map:match>
+                        </map:match>
+
+                        <map:match type="HandleTypeMatcher" pattern="collection">
+                            <map:match pattern="handle/*/*">
+                                <map:transform type="CollectionRecentSubmissions"/>
+                            </map:match>
+                        </map:match>
+
+                    </map:match>
+
+                </map:match>
+
+            </map:match>
+
+
+            <!-- Not a URL we care about, so just pass it on. -->
+            <map:serialize type="xml"/>
+
+        </map:pipeline>
+    </map:pipelines>
+</map:sitemap>

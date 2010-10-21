@@ -105,6 +105,7 @@
          <modules>
             <module>dspace-api</module>
             <module>dspace-stats</module>
+            <module>dspace-discovery</module>
             <module>dspace-ui-shared</module>
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
@@ -128,6 +129,7 @@
          <modules>
             <module>dspace-api</module>
             <module>dspace-stats</module>
+            <module>dspace-discovery</module>
             <module>dspace-ui-shared</module>
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
@@ -344,6 +346,11 @@
             <version>[1.6.0.0,1.7.0.0)</version>
             <type>war</type>
          </dependency>
+          <dependency>
+              <groupId>org.dspace</groupId>
+              <artifactId>dspace-discovery-provider</artifactId>
+              <version>1.7.0-SNAPSHOT</version>
+          </dependency>
          <!-- DSpace third Party Dependencies -->
          <dependency>
             <groupId>org.apache.ant</groupId>

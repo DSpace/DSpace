@@ -217,6 +217,7 @@
                     <map:reader name="OpenURLReader" src="org.dspace.app.xmlui.cocoon.OpenURLReader"/>
                     <map:reader name="SitemapReader" src="org.dspace.app.xmlui.cocoon.SitemapReader"/>
                     <map:reader name="ConcatenationReader" src="org.dspace.app.xmlui.cocoon.ConcatenationReader"/>
+                    <map:reader name="JQueryLoaderReader" src="org.dspace.app.xmlui.utils.JQueryLoaderReader"/>
                 </map:readers>
                 <map:actions>
                         <map:action name="locale" src="org.dspace.app.xmlui.cocoon.DSpaceLocaleAction"/>
@@ -350,7 +351,7 @@
 
                         <!--
                                 Bitstreams not attached to to items (community / collection logos)
-
+                                
                                 /bitstream/id/[bitstreamID]/[ignored]
                         -->
                         <map:match pattern="bitstream/id/*/**">
@@ -399,6 +400,10 @@
                                 <map:read type="MetadataExportReader">
                                     <map:parameter name="handle" value="{1}/{2}" />
                                 </map:read>
+                        </map:match>
+
+                        <map:match pattern="JSON/discovery/**">
+                            <map:mount check-reload="no" src="aspects/json-solr.xmap" uri-prefix="JSON/discovery/"/>
                         </map:match>
 
                 </map:pipeline>
@@ -536,6 +541,10 @@
                                         <map:parameter name="type" value="sitemaps.org"/>
                                 </map:read>
       </map:match>
+
+                    <map:match pattern="loadJQuery.js">
+                        <map:read type="JQueryLoaderReader"/>
+                    </map:match>
 
                     <!-- handle static js and css -->
                     <map:match pattern="themes/*.js">

@@ -82,21 +82,17 @@ import org.xml.sax.SAXException;
  *     private static final Logger log = Logger.getLogger(DSpaceFeedGenerator.class);
 
  * @author Scott Phillips
+ * @author Kevin Van de Velde (kevin at atmire dot com)
+ * @author Mark Diggory (markd at atmire dot com)
+ * @author Ben Bosman (ben at atmire dot com)
  */
 public class CommunityViewer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
-    private static final Logger log = Logger.getLogger(CommunityViewer.class);
-	
     /** Language Strings */
     private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
     
-    private static final Message T_full_text_search =
-        message("xmlui.ArtifactBrowser.CommunityViewer.full_text_search");
-    
-    private static final Message T_go =
-        message("xmlui.general.go");
-    
+
     public static final Message T_untitled = 
     	message("xmlui.general.untitled");
 
@@ -112,27 +108,17 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
     private static final Message T_browse_dates =
         message("xmlui.ArtifactBrowser.CommunityViewer.browse_dates");
     
-    private static final Message T_advanced_search_link=
-    	message("xmlui.ArtifactBrowser.CommunityViewer.advanced_search_link");
-    
+
     private static final Message T_head_sub_communities = 
         message("xmlui.ArtifactBrowser.CommunityViewer.head_sub_communities");
     
     private static final Message T_head_sub_collections =
         message("xmlui.ArtifactBrowser.CommunityViewer.head_sub_collections");
     
-    private static final Message T_head_recent_submissions =
-        message("xmlui.ArtifactBrowser.CommunityViewer.head_recent_submissions");
-    
-    /** How many recent submissions to list */
-    private static final int RECENT_SUBMISSIONS = 5;
 
-    /** The cache of recently submitted items */
-    private java.util.List<BrowseItem> recentSubmittedItems;
-    
     /** Cached validity object */
     private SourceValidity validity;
-    
+
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
@@ -191,13 +177,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	            {
 	                validity.add(collection);
 	            }
-	
-	            // Recently submitted items
-	            for (BrowseItem item : getRecentlySubmittedIems(community))
-	            {
-	                validity.add(item);
-	            }
-	            
+
 	            this.validity = validity.complete();
 	        } 
 	        catch (Exception e)
@@ -283,19 +263,8 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             Division search = home.addDivision("community-search-browse",
                     "secondary search-browse");
 
-            // Search query
-            Division query = search.addInteractiveDivision("community-search",
-                    contextPath + "/handle/" + community.getHandle() + "/search", 
-                    Division.METHOD_POST, "secondary search");
-            
-            Para para = query.addPara("search-query", null);
-            para.addContent(T_full_text_search);
-            para.addContent(" ");
-            para.addText("query");
-            para.addContent(" ");
-            para.addButton("submit").setValue(T_go);
-            query.addPara().addXref(contextPath + "/handle/" + community.getHandle() + "/advanced-search", T_advanced_search_link);
 
+//            TODO: move browse stuff out of here
             // Browse by list
             Division browseDiv = search.addDivision("community-browse","secondary browse");
             List browse = browseDiv.addList("community-browse", List.TYPE_SIMPLE,
@@ -365,70 +334,9 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 
             }
         }// main refrence
-
-        // Recently submitted items
-        {
-            java.util.List<BrowseItem> items = getRecentlySubmittedIems(community);
-
-            Division lastSubmittedDiv = home
-                    .addDivision("community-recent-submission","secondary recent-submission");
-            lastSubmittedDiv.setHead(T_head_recent_submissions);
-            ReferenceSet lastSubmitted = lastSubmittedDiv.addReferenceSet(
-                    "collection-last-submitted", ReferenceSet.TYPE_SUMMARY_LIST,
-                    null, "recent-submissions");
-            for (BrowseItem item : items)
-            {
-                lastSubmitted.addReference(item);
-            }
-        }
     }
     
-    /**
-     * Get the recently submitted items for the given community.
-     * 
-     * @param community The community.
-     * @return List of recently submitted items
-     */
-    @SuppressWarnings("unchecked") 
-    private java.util.List<BrowseItem> getRecentlySubmittedIems(Community community)
-            throws SQLException
-    {
-        if (recentSubmittedItems != null)
-            return recentSubmittedItems;
 
-        String source = ConfigurationManager.getProperty("recent.submissions.sort-option");
-        int numRecentSubmissions = ConfigurationManager.getIntProperty("recent.submissions.count", RECENT_SUBMISSIONS);
-        BrowserScope scope = new BrowserScope(context);
-        scope.setCommunity(community);
-        scope.setResultsPerPage(numRecentSubmissions);
-        
-        // FIXME Exception Handling
-        try
-        {
-        	scope.setBrowseIndex(BrowseIndex.getItemBrowseIndex());
-            for (SortOption so : SortOption.getSortOptions())
-            {
-                if (so.getName().equals(source))
-                {
-                    scope.setSortBy(so.getNumber());
-                	scope.setOrder(SortOption.DESCENDING);
-                }
-            }
-
-        	BrowseEngine be = new BrowseEngine(context);
-        	this.recentSubmittedItems = be.browse(scope).getResults();
-        }
-        catch (SortException se)
-        {
-            log.error("Caught SortException", se);
-        }
-        catch (BrowseException bex)
-        {
-        	log.error("Caught BrowseException", bex);
-        }
-        
-        return this.recentSubmittedItems;
-    }
 
     /**
      * Recycle
@@ -436,7 +344,6 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
     public void recycle()
     {
         // Clear out our item's cache.
-        this.recentSubmittedItems = null;
         this.validity = null;
         super.recycle();
     }

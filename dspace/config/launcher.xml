@@ -325,4 +325,13 @@
         </step>
     </command>
 
+    <command>
+		<name>update-discovery-index</name>
+		<description>Update Discovery Solr Search Index</description>
+		<step>
+			<class>org.dspace.discovery.IndexClient</class>
+		</step>
+	</command>
+
+
 </commands>

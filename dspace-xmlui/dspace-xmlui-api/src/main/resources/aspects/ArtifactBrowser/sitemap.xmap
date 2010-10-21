@@ -40,6 +40,8 @@
 -->
 
 <!--
+@deprecated: the Artifact Browser has been devided into ViewArtifacts,
+            BrowseArtifacts, SearchArtifacts
 
 The ArtifactBrowser Aspect is responsible for browsing communities /
 collections / items / and bitstreams, viewing an individual item,

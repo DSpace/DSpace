@@ -519,9 +519,7 @@
         
         <xsl:variable name="localJQuerySrc">
                 <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                <xsl:text>/themes/</xsl:text>
-                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-                <xsl:text>/lib/js/jquery-1.4.2.min.js</xsl:text>
+                <xsl:text>/static/js/jquery-1.4.2.min.js</xsl:text>
         </xsl:variable>
 
         <script type="text/javascript">

@@ -71,6 +71,7 @@
 - [DS-615] Optimize solr performance with solr.optimize and autocommit
 - [DS-706] Alternative to dri2xhtml, with the goal to be more developer-friendly
 - [DS-710] New Base Theme For DSpace 1.7.0
+- [DS-711] Discovery release for XMLUI
 
 1.6.2
 =====

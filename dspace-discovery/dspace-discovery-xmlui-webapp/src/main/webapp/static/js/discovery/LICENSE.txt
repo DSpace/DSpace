@@ -1,0 +1,1 @@
+Portions of this AJAX Solr is licensed under the Apache License (ASL) v2.0.

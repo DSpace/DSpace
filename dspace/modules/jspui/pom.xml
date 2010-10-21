@@ -123,15 +123,23 @@
 	</build>
 
 	<dependencies>
+
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-jspui-webapp</artifactId>
 			<type>war</type>
 		</dependency>
+
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-jspui-api</artifactId>
 		</dependency>
+
+		<dependency>
+           <groupId>org.dspace</groupId>
+           <artifactId>dspace-discovery-provider</artifactId>
+        </dependency>
+
 		<dependency>
 		   <groupId>javax.servlet</groupId>
 		   <artifactId>servlet-api</artifactId>

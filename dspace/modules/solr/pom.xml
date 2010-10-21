@@ -23,6 +23,19 @@
             <checksumPolicy>fail</checksumPolicy>
          </snapshots>
       </repository>
+      <repository>
+         <id>maven.dspace.org/release</id>
+         <name>DSpace Maven Release Repository</name>
+         <url>http://maven.dspace.org/release</url>
+         <releases>
+            <enabled>true</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <enabled>false</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </repository>
    </repositories>
 
    <!--
@@ -50,19 +63,34 @@
       </plugins>
    </build>
    <dependencies>
-   	<dependency>
-   		<groupId>org.dspace</groupId>
-   		<artifactId>dspace-solr</artifactId>
-   		<version>1.3.0.2</version>
-   		<classifier>classes</classifier>
-   	</dependency>
-   	<dependency>
-   		<groupId>org.dspace</groupId>
-   		<artifactId>dspace-solr</artifactId>
-   		<version>1.3.0.2</version>
-   		<classifier>skinny</classifier>
-   		<type>war</type>
-   	</dependency>
+       <dependency>
+           <groupId>org.dspace</groupId>
+           <artifactId>dspace-solr</artifactId>
+           <version>1.4.1.0</version>
+           <classifier>skinny</classifier>
+           <type>war</type>
+       </dependency>
+
+       <dependency>
+           <groupId>org.dspace</groupId>
+           <artifactId>dspace-solr</artifactId>
+           <version>1.4.1.0</version>
+           <classifier>classes</classifier>
+           <type>jar</type>
+       </dependency>
+
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-api</artifactId>
+         <version>1.5.6</version>
+      </dependency>
+       
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-jdk14</artifactId>
+         <version>1.5.6</version>
+      </dependency>
+
 
     <!-- support odd cases where JAXP cannot be found in JVM -->
     <dependency>
