@@ -270,13 +270,13 @@ public class UIUtil extends Util
      */
     public static String getRequestLogInfo(HttpServletRequest request)
     {
-        String report;
+        StringBuilder report = new StringBuilder();
 
-        report = "-- URL Was: " + getOriginalURL(request) + "\n";
-        report = report + "-- Method: " + request.getMethod() + "\n";
+        report.append("-- URL Was: ").append(getOriginalURL(request)).append("\n").toString();
+        report.append("-- Method: ").append(request.getMethod()).append("\n").toString();
 
         // First write the parameters we had
-        report = report + "-- Parameters were:\n";
+        report.append("-- Parameters were:\n");
 
         Enumeration e = request.getParameterNames();
 
@@ -288,16 +288,16 @@ public class UIUtil extends Util
             {
                 // We don't want to write a clear text password
                 // to the log, even if it's wrong!
-                report = report + "-- " + name + ": *not logged*\n";
+                report.append("-- ").append(name).append(": *not logged*\n").toString();
             }
             else
             {
-                report = report + "-- " + name + ": \""
-                        + request.getParameter(name) + "\"\n";
+                report.append("-- ").append(name).append(": \"")
+                        .append(request.getParameter(name)).append("\"\n");
             }
         }
 
-        return report;
+        return report.toString();
     }
     
     
@@ -440,7 +440,7 @@ public class UIUtil extends Util
     /**
 	 * Evaluate filename and client and encode appropriate disposition
 	 * 
-	 * @param uri
+	 * @param filename
 	 * @param request
 	 * @param response
 	 * @throws UnsupportedEncodingException

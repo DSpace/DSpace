@@ -42,7 +42,6 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -387,7 +386,8 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
     {
     	Perl5Util util = new Perl5Util();
     	
-    	String query = "";
+    	StringBuilder query = new StringBuilder();
+        query.append("(");
     	
     	// Loop through the fields building the search query as we go.
     	for (SearchField field : fields)
@@ -398,38 +398,41 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
     		
     		// Add the conjunction for everything but the first field.
     		if (fields.indexOf(field) > 0)
-    			query += " " + field.getConjunction() + " ";
+    			query.append(" ").append(field.getConjunction()).append(" ").toString();
             
     		// Two cases, one if a specific search field is specified or if 
     		// ANY is given then just a general search is performed.
             if ("ANY".equals(field.getField()))
             {
             	// No field specified, 
-            	query += "(" + field.getQuery() + ")";
+            	query.append("(").append(field.getQuery()).append(")").toString();
             }
             else
             {   
             	// Specific search field specified, add the field specific field.
             	
             	// Replace singe quote's with double quotes (only if they match)
-            	String subquery = util.substitute("s/\'(.*)\'/\"$1\"/g", field.getQuery());
+            	String subQuery = util.substitute("s/\'(.*)\'/\"$1\"/g", field.getQuery());
             	
             	// If the field is not quoted ...
-            	if (!util.match("/\".*\"/", subquery))
+            	if (!util.match("/\".*\"/", subQuery))
                 {
             		// ... then seperate each word and re-specify the search field.
-                    subquery = util.substitute("s/[ ]+/ " + field.getField() + ":/g", subquery);
+                    subQuery = util.substitute("s/[ ]+/ " + field.getField() + ":/g", subQuery);
                 }
             	
-            	// Put the subquery into the general query
-            	query += "("+field.getField()+":"+subquery+")";
+            	// Put the subQuery into the general query
+            	query.append("(").append(field.getField()).append(":").append(subQuery).append(")").toString();
             }
     	}
-    	
-    	if (query.length() == 0)
+
+
+    	if (query.length() == 1)
+        {
     		return "";
-    	else
-    		return "("+query+")";
+        }
+
+    	return query.append(")").toString();
     }
 
    

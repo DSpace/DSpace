@@ -590,19 +590,19 @@ implements TreeSelectionListener
          addTableRow(buffer, "Nested Service Document", collection.getService());
 
          String[] accepts = collection.getAccepts();
-         String acceptList = "";
+         StringBuilder acceptList = new StringBuilder();
          if( accepts != null && accepts.length == 0 )
          {
-            acceptList = "None specified";
+            acceptList.append("None specified");
          }
          else
          {
             for (String s : accepts)
             {
-               acceptList +=  s + "<br>";
+               acceptList.append(s).append("<br>");
             }
          }
-         addTableRow(buffer, "Accepts", acceptList);
+         addTableRow(buffer, "Accepts", acceptList.toString());
 
          List<SwordAcceptPackaging> acceptsPackaging = collection.getAcceptPackaging();
 

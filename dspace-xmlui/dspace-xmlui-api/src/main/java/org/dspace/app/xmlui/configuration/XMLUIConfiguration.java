@@ -108,16 +108,17 @@ public class XMLUIConfiguration
         
         if (configFile == null)
         {
-        	String allPaths = "";
-        	boolean first = true;
+        	StringBuilder allPaths = new StringBuilder();
         	for (String configPath : configPaths)
         	{
-        		if (first)
-        			first = false;
-        		else
-        			allPaths += ", ";
-        		allPaths += configPath;
+        		if (allPaths.length() > 0)
+                {
+        			allPaths.append(", ");
+                }
+                
+        		allPaths.append(configPath);
         	}
+            
         	throw new IllegalStateException("None of the xmlui configuration paths were valid: "+ allPaths);
         }
         

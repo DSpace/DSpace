@@ -71,15 +71,15 @@ public class StatisticsBSAdapter {
     }
 
     private String resolveFilterQueries(){
-        String out = "";
+        StringBuilder out = new StringBuilder();
         for (int i = 0; i < filters.size(); i++) {
             StatisticsFilter statisticsFilter = filters.get(i);
-            out += statisticsFilter.toQuery();
+            out.append(statisticsFilter.toQuery());
 
             if(i != 0 && (i != filters.size() -1))
-                out += " AND ";
+                out.append(" AND ");
         }
-        return out;
+        return out.toString();
     }
 
     ///////////////////////

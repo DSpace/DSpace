@@ -323,11 +323,11 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         	row.addCell().addXref(url,name);
         	
         	// Iterate other other polices of our parent resource to see if any match the currently selected group
-        	String otherAuthorizations = "";
+        	StringBuilder otherAuthorizations = new StringBuilder();
         	int groupsMatched = 0;
         	for (ResourcePolicy otherPolicy : otherPolicies) {
         		if (otherPolicy.getGroup() == group) {
-        			otherAuthorizations += otherPolicy.getActionText() + ", ";
+        			otherAuthorizations.append(otherPolicy.getActionText()).append(", ");
         			groupsMatched++;
         		}
         	}

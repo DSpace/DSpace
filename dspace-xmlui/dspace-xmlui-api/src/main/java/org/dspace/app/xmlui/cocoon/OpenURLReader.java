@@ -289,7 +289,7 @@ public class OpenURLReader extends AbstractReader implements Recyclable {
 		/**
 		 * Otherwise, attempt to full text search for the item
 		 */
-		String query = "";
+		StringBuilder queryBuilder = new StringBuilder();
 
 		Enumeration<String> e = request.getParameterNames();
 
@@ -299,13 +299,14 @@ public class OpenURLReader extends AbstractReader implements Recyclable {
 			String name = e.nextElement();
 			if (name.startsWith("rft.")) {
 				for (String value : request.getParameterValues(name)) {
-					query += value + " ";
+					queryBuilder.append(value).append(" ");
 					error = false;
 				}
 			}
 		}
-		
-		if(query.trim().length() == 0)
+
+        String query = queryBuilder.toString().trim();
+		if(query.length() == 0)
 		{
 			httpResponse.sendError(httpResponse.SC_BAD_REQUEST, "OpenURL Request requires a valid rtf_id, rtf.identifier or other rtf.<dublincore> search fields" );
 		}

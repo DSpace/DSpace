@@ -220,22 +220,22 @@ public class ItemExport extends AbstractDSpaceTransformer implements
 			return "0";
 		}
 
-		String key;
+		StringBuilder key = new StringBuilder();
 		if (context.getCurrentUser() != null) {
-			key = context.getCurrentUser().getEmail();
+			key.append(context.getCurrentUser().getEmail());
 			if (availableExports != null && availableExports.size() > 0) {
 				for (String fileName : availableExports) {
-					key += ":" + fileName;
+					key.append(":").append(fileName);
 				}
 			}
 
 			if (request.getQueryString() != null) {
-				key += request.getQueryString();
+				key.append(request.getQueryString());
 			}
 		} else
-			key = "anonymous";
+			key.append("anonymous");
 
-		return HashUtil.hash(key);
+		return HashUtil.hash(key.toString());
 	}
 
 	/**

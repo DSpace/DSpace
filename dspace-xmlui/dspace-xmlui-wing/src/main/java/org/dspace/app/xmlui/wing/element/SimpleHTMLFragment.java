@@ -195,20 +195,19 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 			if (element.getContent().size() == 0) {
 				// The element contains nothing, we can use shorthand notation
 				// for it.
-				String replacement = "<" + element.getName();
+				StringBuilder replacement = new StringBuilder().append("<").append(element.getName());
 
 				@SuppressWarnings("unchecked")
 				// This cast is correct
 				List<Attribute> attributes = element.getAttributes();
 				for (Attribute attribute : attributes) {
-					replacement += " " + attribute.getName() + "=\""
-							+ attribute.getValue() + "\"";
+					replacement .append(" ").append(attribute.getName()).append("=\"").append(attribute.getValue()).append("\"").toString();
 				}
-				replacement += "/>";
+				replacement.append("/>");
 
 				Element parent = element.getParentElement();
 				int index = parent.indexOf(element);
-				parent.setContent(index, new Text(replacement));
+				parent.setContent(index, new Text(replacement.toString()));
 			} else {
 				// The element contains data
 				String prepend = "<" + element.getName();

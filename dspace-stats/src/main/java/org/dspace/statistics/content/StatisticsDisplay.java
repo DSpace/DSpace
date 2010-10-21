@@ -101,16 +101,18 @@ public abstract class StatisticsDisplay {
 
     public String getCss() {
         if (css != null) {
-            String result = "";
+            StringBuilder result = new StringBuilder();
             for (String s : css) {
+                result.append(s);
                 if (!s.endsWith(";"))
-                    s += ";";
-                result += s;
+                {
+                    result.append(";");
+                }
             }
-            return result;
+            return result.toString();
         }
-        else
-            return "";
+
+        return "";
     }
 }
 

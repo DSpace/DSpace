@@ -174,15 +174,15 @@ public class ControlledVocabularyTag extends TagSupport
     private String renderVocabulariesAsHTML(Hashtable vocabularies,
             String xslt, boolean allowMultipleSelection, String contextPath)
     {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         Iterator iter = vocabularies.values().iterator();
         while (iter.hasNext())
         {
             Document controlledVocabularyXML = (Document) iter.next();
-            result += renderVocabularyAsHTML(controlledVocabularyXML, xslt,
-                    allowMultipleSelection, contextPath);
+            result.append(renderVocabularyAsHTML(controlledVocabularyXML, xslt,
+                    allowMultipleSelection, contextPath));
         }
-        return result;
+        return result.toString();
     }
 
     /**

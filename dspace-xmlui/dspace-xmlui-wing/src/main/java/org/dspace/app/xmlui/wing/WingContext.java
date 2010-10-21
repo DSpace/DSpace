@@ -185,7 +185,7 @@ public class WingContext
     private String combine(String... parts)
     {
 
-        String combine = "";
+        StringBuilder combine = new StringBuilder();
         boolean skipDivider = true;
         for (String part : parts)
         {
@@ -196,15 +196,19 @@ public class WingContext
             }
 
             if (skipDivider)
+            {
                 skipDivider = false;
+            }
             else
-                combine += DIVIDER;
+            {
+                combine.append(DIVIDER);
+            }
 
-            combine += part;
+            combine.append(part);
 
         }
 
-        return combine;
+        return combine.toString();
     }
 
     /**

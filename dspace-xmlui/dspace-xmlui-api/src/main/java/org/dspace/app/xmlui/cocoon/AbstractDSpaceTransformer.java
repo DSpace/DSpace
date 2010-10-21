@@ -262,23 +262,22 @@ public abstract class AbstractDSpaceTransformer extends AbstractWingTransformer
     public static String generateURL(String baseURL,
             Map<String, String> parameters)
     {
-        boolean first = true;
+        StringBuilder urlBuffer = new StringBuilder();
         for (Map.Entry<String, String> param : parameters.entrySet())
         {
-            if (first)
+            if (urlBuffer.length() == 0)
             {
-                baseURL += "?";
-                first = false;
+                urlBuffer.append(baseURL).append('?');
             }
             else
             {
-                baseURL += "&";
+                urlBuffer.append( '&');
             }
 
-            baseURL += param.getKey() + "=" + param.getValue();
+            urlBuffer.append(param.getKey()).append("=").append(param.getValue());
         }
 
-        return baseURL;
+        return urlBuffer.length() > 0 ? urlBuffer.toString() : baseURL;
     }
     
     

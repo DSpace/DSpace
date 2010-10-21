@@ -173,11 +173,14 @@ public class StatisticsDataGenerator {
 			String city;
 
 			// 1. Generate an ip for our user
+            StringBuilder ipBuilder = new StringBuilder();
 			for (int j = 0; j < 4; j++) {
-				ip += getRandomNumberInRange(0, 254);
+				ipBuilder.append(getRandomNumberInRange(0, 254));
 				if (j != 3)
-					ip += ".";
+					ipBuilder.append(".");
 			}
+            ip = ipBuilder.toString();
+            
 			// 2 Depending on our ip get all the location info
 			Location location;
 			try {

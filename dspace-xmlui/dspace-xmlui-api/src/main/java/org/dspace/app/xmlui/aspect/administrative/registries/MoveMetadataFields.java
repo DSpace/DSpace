@@ -135,15 +135,21 @@ public class MoveMetadataFields extends AbstractDSpaceTransformer
 			MetadataSchema schema = MetadataSchema.find(context, field.getSchemaID());
 			String schemaName = schema.getName();
 			
-			String fieldName = schemaName +"."+ fieldEelement;
+			StringBuilder fieldName = new StringBuilder()
+                                            .append(schemaName)
+                                            .append(".")
+                                            .append(fieldEelement);
+
 			if (fieldQualifier != null && fieldQualifier.length() > 0)
-				fieldName += "."+fieldQualifier;
+            {
+				fieldName.append(".").append(fieldQualifier);
+            }
 				
 			String fieldScopeNote = field.getScopeNote();
     		
     		Row row = table.addRow();
     		row.addCell().addContent(fieldID);
-        	row.addCell().addContent(fieldName);
+        	row.addCell().addContent(fieldName.toString());
         	row.addCell().addContent(fieldScopeNote);
 	    }
 
