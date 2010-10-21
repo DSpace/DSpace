@@ -39,6 +39,10 @@
 - [DS-596] Cannot Delete Community which has two or more levels of SubCommunities
 - [DS-628] Make the timeout for the extended resolver dnslookup configurable
 
+(Claudia Juergen, Andreas Schwander)
+- [DS-709] ArrayIndexOutOfBoundsException when editing group roles
+
+
 (Erick Rocha Fonseca, Claudia Juergen)
 - [DS-563] Brazilian Portuguese (pt_BR) translation for XML-UI 1.6.2
 

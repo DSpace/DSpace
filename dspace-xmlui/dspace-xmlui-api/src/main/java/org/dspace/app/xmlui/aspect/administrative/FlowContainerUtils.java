@@ -545,7 +545,7 @@ public class FlowContainerUtils
 	 * 
 	 * @param context The current DSpace context.
 	 * @param collectionID The collection id.
-	 * @return The id of the group associated with that particular role.
+	 * @return The id of the group associated with that particular role or -1
 	 */
 	public static int getCollectionDefaultRead(Context context, int collectionID) throws SQLException, AuthorizeException
 	{
@@ -554,22 +554,32 @@ public class FlowContainerUtils
 		Group[] itemGroups = AuthorizeManager.getAuthorizedGroups(context, collection, Constants.DEFAULT_ITEM_READ);
 		Group[] bitstreamGroups = AuthorizeManager.getAuthorizedGroups(context, collection, Constants.DEFAULT_BITSTREAM_READ);
 		
-		if (itemGroups.length != 1 && bitstreamGroups.length != 1)
-			// If there are more than one groups assigned either of these privileges then this role based method will not work.
-			// The user will need to go to the authorization section to manually straighten this out.
-			return -1;
-		
-		Group itemGroup = itemGroups[0];
-		Group bitstreamGroup = bitstreamGroups[0];
-		
-		if (itemGroup.getID() != bitstreamGroup.getID())
-			// If the same group is not assigned both of these privileges then this role based method will not work. The user 
-			// will need to go to the authorization section to manually straighten this out.
-			return -1;
-		
-		
-		
-		return itemGroup.getID();
+       int itemGroupID = -1;
+        
+		// If there are more than one groups assigned either of these privileges then this role based method will not work.
+        // The user will need to go to the authorization section to manually straighten this out.		
+		if (itemGroups.length != 1 || bitstreamGroups.length != 1)
+		{
+		    // do nothing the itemGroupID is already set to -1
+		}
+		else
+		{
+	        Group itemGroup = itemGroups[0];
+	        Group bitstreamGroup = bitstreamGroups[0];
+	        
+            // If the same group is not assigned both of these privileges then this role based method will not work. The user 
+            // will need to go to the authorization section to manually straighten this out.
+	        if (itemGroup.getID() != bitstreamGroup.getID())
+	        {
+	            // do nothing the itemGroupID is already set to -1
+	        }
+	        else
+	        {
+	            itemGroupID = itemGroup.getID();
+	        }
+		}
+
+		return itemGroupID;
 	}
 	
 	/**
