@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.dspace.dependencies.solr</groupId>
+    <artifactId>dspace-solr-parent</artifactId>
+    <version>1.4.0.1</version>
+  </parent>
+
+  <groupId>org.dspace.dependencies.solr</groupId>
+  <artifactId>dspace-solr-contrib</artifactId>
+  <name>Apache Solr Contributions</name>
+  <version>1.4.0.1</version>
+  <description>Apache Solr Contributions</description>
+  <url>http://lucene.apache.org/solr</url>
+  <packaging>pom</packaging>
+
+  <scm>
+      <connection>
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-parent-1.4.0.1/contrib
+    </connection>
+      <developerConnection>
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-parent-1.4.0.1/contrib
+    </developerConnection>
+     <url>http://svn.apache.org/viewvc/maven/pom/tags/dspace-solr-parent-1.4.0.1/dspace-solr-contrib</url>
+  </scm>
+   
+  <modules>
+  	<module>clustering</module>
+  	<module>dataimporthandler</module>
+  	<module>extraction</module>
+  	<module>velocity</module>
+  </modules>
+
+</project>

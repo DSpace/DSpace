@@ -1,0 +1,99 @@
+Index: org/apache/solr/common/params/CollapseParams.java
+===================================================================
+--- org/apache/solr/common/params/CollapseParams.java	(revision 0)
++++ org/apache/solr/common/params/CollapseParams.java	(revision 0)
+@@ -0,0 +1,94 @@
++package org.apache.solr.common.params;
++
++import org.apache.solr.common.SolrException;
++
++public interface CollapseParams {
++  
++  /**
++   * The field to collapse results on.
++   */
++  public static final String COLLAPSE_FIELD = "collapse.field";
++  
++  /**
++   * Type of collapsing to perform: "normal" or "adjacent".
++   */
++  public static final String COLLAPSE_TYPE = "collapse.type";
++
++  public enum CollapseType {
++    NORMAL, ADJACENT;
++    
++    public String toString() {
++      return super.toString().toLowerCase();
++    }
++    
++    public static CollapseType get(String label) {
++      try {
++        return valueOf(label.toUpperCase());
++      } catch (IllegalArgumentException e) {
++        throw new SolrException(SolrException.ErrorCode.BAD_REQUEST, label
++            + " is not a valid type of field collapsing", e);
++      }
++    }
++  }
++  
++  /**
++   * Apply faceting before or after collapsing.
++   */
++  public static final String COLLAPSE_FACET = "collapse.facet";
++  
++  public enum CollapseFacet {
++    BEFORE, AFTER;
++    
++    public String toString() {
++      return super.toString().toLowerCase();
++    }
++    
++    public static CollapseFacet get(String label) {
++      try {
++        return valueOf(label.toUpperCase());
++      } catch (IllegalArgumentException e) {
++        throw new SolrException(SolrException.ErrorCode.BAD_REQUEST, label
++            + " is not a valid faceting mode for field collapsing", e);
++      }
++    }
++  }
++  
++  /**
++   * The number of documents with the same value for collapse.field after which
++   * collapsing kicks in.
++   */
++  public static final String COLLAPSE_THRESHOLD = "collapse.threshold";
++  
++  /**
++   * @deprecated Deprecated in favour of collapse.threshold.
++   */
++  public static final String COLLAPSE_MAX = "collapse.max";
++  
++  /**
++   * Maximum number of documents to process during field collapsing.
++   */
++  public static final String COLLAPSE_MAXDOCS = "collapse.maxdocs";
++  
++  /**
++   * Return collapse count for each document? Defaults to true.
++   */
++  public static final String COLLAPSE_INFO_DOC = "collapse.info.doc";
++  
++  /**
++   * Return collapse count for each field value? Defaults to true.
++   */
++  public static final String COLLAPSE_INFO_COUNT = "collapse.info.count";
++
++  /**
++   * Parameter indicating to return the collapsed documents in the response and what fields to return in comma separated manner.
++   * A value * indicates that all fields will be returned.
++   */
++  public static final String COLLAPSE_INCLUDE_COLLAPSED_DOCS_FIELDS = "collapse.includeCollapsedDocs.fl";
++
++  /**
++   * Parameter indicating wheter to include collapse debug information
++   */
++  public static final String COLLAPSE_DEBUG = "collapse.debug";
++
++  public static final String COLLAPSE_AGGREGATE = "collapse.aggregate";
++}
