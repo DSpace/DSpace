@@ -1036,7 +1036,7 @@ public class MetadataImport
             return;
         }
 
-        // Perform the first import - just higlight differences
+        // Perform the first import - just highlight differences
         MetadataImport importer = new MetadataImport(c, csv.getCSVLines());
         List<BulkEditChange> changes;
 

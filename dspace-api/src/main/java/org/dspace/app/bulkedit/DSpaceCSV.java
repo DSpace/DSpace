@@ -194,7 +194,7 @@ public class DSpaceCSV
     {
         // Set the value separator
         setValueSeparator();
-        
+
         // Set the field separator
         setFieldSeparator();
 
@@ -320,7 +320,7 @@ public class DSpaceCSV
             // Only add if it is not the owning collection
             if (!c.getHandle().equals(owningCollectionHandle))
             {
-                line.add("collection", c.getHandle());   
+                line.add("collection", c.getHandle());
             }
         }
 
@@ -374,7 +374,7 @@ public class DSpaceCSV
             last = true;
             line += " ";
         }
-        
+
         // Split up on field separator
         String[] parts = line.split(escapedFieldSeparator);
         ArrayList<String> bits = new ArrayList<String>();
@@ -430,7 +430,7 @@ public class DSpaceCSV
         // Add elements to a DSpaceCSVLine
         String id = parts[0].replaceAll("\"", "");
         DSpaceCSVLine csvLine;
-                
+
         // Is this an existing item, or a new item (where id = '+')
         if ("+".equals(id))
         {
@@ -583,77 +583,5 @@ public class DSpaceCSV
             csvLines.append(line).append("\n");
         }
         return csvLines.toString();
-    }
-
-    /**
-     * Test main method to check the marshalling and unmarshalling of strings in and out of CSV format
-     *
-     * @param args Not used
-     * @throws Exception Thrown if something goes wrong
-     */
-    public static void main(String[] args) throws Exception
-    {
-        // Test the CSV parsing
-        String[] csv = {"id,collection,\"dc.title[en]\",dc.contributor.author,dc.description.abstract",
-                        "1,2,Easy line,\"Lewis, Stuart\",A nice short abstract",
-                        "2,2,Two authors,\"Lewis, Stuart||Bloggs, Joe\",Two people wrote this item",
-                        "3,2,Three authors,\"Lewis, Stuart||Bloggs, Joe||Loaf, Meat\",Three people wrote this item",
-                        "4,2,\"Two line\ntitle\",\"Lewis, Stuart\",abstract",
-                        "5,2,\"\"\"Embedded quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\"",
-                        "6,2,\"\"\"Unbalanced embedded\"\" quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\"",};
-
-        // Write the string to a file
-        String filename = "test.csv";
-        BufferedWriter out = new BufferedWriter(
-                             new OutputStreamWriter(
-                             new FileOutputStream(filename), "UTF-8"));
-        for (String csvLine : csv) {
-            out.write(csvLine + "\n");
-        }
-        out.flush();
-        out.close();
-        System.gc();
-
-        // Test the CSV parsing
-        Context c = new Context();
-        DSpaceCSV dcsv = new DSpaceCSV(new File(filename), c);
-        String[] lines = dcsv.getCSVLinesAsStringArray();
-        for (String line : lines)
-        {
-            System.out.println(line);          
-        }
-
-        // Test the CSV parsing with a bad heading value
-        String[] csv2 = {"id,collection,\"dc.title[en]\",dc.contributor.foobar[en-US],dc.description.abstract",
-                         "1,2,Easy line,\"Lewis, Stuart\",A nice short abstract",
-                         "2,2,Two authors,\"Lewis, Stuart||Bloggs, Joe\",Two people wrote this item",
-                         "3,2,Three authors,\"Lewis, Stuart||Bloggs, Joe||Loaf, Meat\",Three people wrote this item",
-                         "4,2,\"Two line\ntitle\",\"Lewis, Stuart\",abstract",
-                         "5,2,\"\"\"Embedded quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\"",
-                         "6,2,\"\"\"Unbalanced embedded\"\" quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\"",};
-
-        // Write the string to a file
-        filename = "test.csv";
-        out = new BufferedWriter(
-                 new OutputStreamWriter(
-                 new FileOutputStream(filename), "UTF-8"));
-        for (String csvLine : csv2) {
-            out.write(csvLine + "\n");
-        }
-        out.flush();
-        out.close();
-        System.gc();
-
-        // Test the CSV parsing
-        dcsv = new DSpaceCSV(new File(filename), c);
-        lines = dcsv.getCSVLinesAsStringArray();
-        for (String line : lines)
-        {
-            System.out.println(line);
-        }
-
-        // Delete the test file
-        File toDelete = new File(filename);
-        toDelete.delete();
     }
 }
