@@ -111,9 +111,6 @@ public class DSpaceOREGenerator extends AbstractGenerator
 	
 	private Item getItem(Context context) throws SQLException, CrosswalkException 
 	{			
-		Request request = ObjectModelHelper.getRequest(objectModel);
-        String contextPath = request.getContextPath();
-
         // Determine the correct adatper to use for this item
         String handle = parameters.getParameter("handle",null);
         String internal = parameters.getParameter("internal",null);

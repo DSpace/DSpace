@@ -470,7 +470,7 @@ public class WorkflowManager
                 + e.getID()));
 
         // convert into personal workspace
-        WorkspaceItem wsi = returnToWorkspace(c, wi);
+        returnToWorkspace(c, wi);
     }
 
     // returns true if archived

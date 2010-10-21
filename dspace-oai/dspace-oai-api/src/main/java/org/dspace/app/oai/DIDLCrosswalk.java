@@ -192,7 +192,7 @@ public class DIDLCrosswalk extends Crosswalk
                                     BufferedInputStream bis = new BufferedInputStream(is);
                                     try
                                     {
-                                        int size=bis.read(buffer);
+                                        bis.read(buffer);
                                     }
                                     finally
                                     {

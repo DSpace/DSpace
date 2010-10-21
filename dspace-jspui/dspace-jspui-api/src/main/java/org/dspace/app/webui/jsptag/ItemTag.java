@@ -258,11 +258,9 @@ public class ItemTag extends TagSupport
 
         String urn;
         for (int i = 1; null != (urn = ConfigurationManager.getProperty("webui.resolver."+i+".urn")); i++){
-            String baseurl = ConfigurationManager.getProperty("webui.resolver."+i+".baseurl"); 
+            String baseurl = ConfigurationManager.getProperty("webui.resolver."+i+".baseurl");
             if (baseurl != null){
-            urn2baseurl.put(ConfigurationManager
-                    .getProperty("webui.resolver."+i+".urn"),
-                    baseurl);
+                urn2baseurl.put(urn, baseurl);
             } else {
                 log.warn("Wrong webui.resolver configuration, you need to specify both webui.resolver.<n>.urn and webui.resolver.<n>.baseurl: missing baseurl for n = "+i);
             }

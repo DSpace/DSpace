@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -151,9 +150,6 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         // String query = request.getParameter("query");
         int start = UIUtil.getIntParameter(request, "start");
         String advanced = request.getParameter("advanced");
-        String fromAdvanced = request.getParameter("from_advanced");
-        String advancedQuery = "";
-        HashMap queryHash = new HashMap();
 
         // can't start earlier than 0 in the results!
         if (start < 0)
@@ -177,7 +173,6 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         if (advanced != null)
         {
             query = qArgs.buildQuery(request);
-            advancedQuery = qArgs.buildHTTPQuery(request);
         }
 
         // Ensure the query is non-null
@@ -185,10 +180,6 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             query = "";
         }
-
-        // Get the location parameter, if any
-        String location = request.getParameter("location");
-        String newURL;
 
         // Build log information
         String logInfo = "";

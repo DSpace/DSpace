@@ -519,8 +519,10 @@ public class PluginManager
     {
         try
         {
-            Class intf = Class.forName(iname);
-            return true;
+            if (Class.forName(iname) != null)
+            {
+                return true;
+            }
         }
         catch (ClassNotFoundException ce)
         {

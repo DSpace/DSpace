@@ -208,7 +208,7 @@ public class ScriptLauncher
                         System.out.println("");**/
 
                         Method main = target.getMethod("main", argTypes);
-                        Object output = main.invoke(null, arguments);
+                        main.invoke(null, arguments);
 
                         // ensure we close out the request (happy request)
                         requestService.endRequest(null);

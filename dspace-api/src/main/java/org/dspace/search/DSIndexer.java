@@ -944,8 +944,6 @@ public class DSIndexer
         log.debug("Building Item: " + handle);
 
         int j;
-        int k = 0;
-
         if (indexConfigArr.length > 0)
         {
             DCValue[] mydc;

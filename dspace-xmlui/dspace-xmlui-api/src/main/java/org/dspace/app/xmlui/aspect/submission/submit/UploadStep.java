@@ -391,7 +391,6 @@ public class UploadStep extends AbstractSubmissionStep
         {
             BitstreamFormat bitstreamFormat = bitstream.getFormat();
             
-            int id = item.getID();
             String name = bitstream.getName();
             String url = makeBitstreamLink(item, bitstream);
             String format = bitstreamFormat.getShortDescription();

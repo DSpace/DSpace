@@ -49,7 +49,6 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
@@ -99,7 +98,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         /* Create skeleton menu structure to ensure consistent order between aspects,
          * even if they are never used
          */
-        List browse = options.addList("browse");
+        options.addList("browse");
         options.addList("account");
         options.addList("context");
         options.addList("administrative");

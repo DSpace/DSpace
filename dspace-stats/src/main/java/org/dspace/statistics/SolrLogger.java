@@ -531,7 +531,6 @@ public class SolrLogger
             List<String> fieldNames, List<List<Object>> fieldValuesList)
             throws SolrServerException, IOException
     {
-        long start = new Date().getTime();
         // Since there is NO update
         // We need to get our documents
         // QueryResponse queryResponse = solr.query()//query(query, null, -1,

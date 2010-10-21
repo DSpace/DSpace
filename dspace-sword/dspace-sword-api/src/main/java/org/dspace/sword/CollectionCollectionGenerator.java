@@ -106,10 +106,6 @@ public class CollectionCollectionGenerator extends ATOMCollectionGenerator
 		// we just do support mediation
 		boolean mediation = swordConfig.isMediated();
 
-		// the list of mime types that we accept
-		// for the time being, we just take a zip, and we have to trust what's in it
-		String zip = "application/zip";
-
 		// load up the sword collection
 		scol.setLocation(location);
 

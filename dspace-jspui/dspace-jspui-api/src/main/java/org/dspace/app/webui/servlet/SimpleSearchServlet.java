@@ -177,7 +177,6 @@ public class SimpleSearchServlet extends DSpaceServlet
 
         // Get the location parameter, if any
         String location = request.getParameter("location");
-        String newURL;
 
         // If there is a location parameter, we should redirect to
         // do the search with the correct location.

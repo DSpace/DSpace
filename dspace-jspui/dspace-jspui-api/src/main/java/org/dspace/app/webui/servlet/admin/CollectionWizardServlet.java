@@ -289,8 +289,6 @@ public class CollectionWizardServlet extends DSpaceServlet
             Collection collection) throws SQLException, ServletException,
             IOException, AuthorizeException
     {
-        Group anonymousGroup = Group.find(context, 0);
-
         // "Public read" checkbox. Only need to do anything
         // if it's not checked (only system admin can uncheck this!).
         if (!UIUtil.getBoolParameter(request, "public_read")
@@ -307,7 +305,7 @@ public class CollectionWizardServlet extends DSpaceServlet
         if (UIUtil.getBoolParameter(request, "submitters"))
         {
             // Create submitters group
-            Group g = collection.createSubmitters();
+            collection.createSubmitters();
         }
 
         // Check for the workflow steps
@@ -316,7 +314,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             if (UIUtil.getBoolParameter(request, "workflow" + i))
             {
                 // should have workflow step i
-                Group g = collection.createWorkflowGroup(i);
+                collection.createWorkflowGroup(i);
             }
         }
 
@@ -324,7 +322,7 @@ public class CollectionWizardServlet extends DSpaceServlet
         if (UIUtil.getBoolParameter(request, "admins"))
         {
             // Create administrators group
-            Group g = collection.createAdministrators();
+            collection.createAdministrators();
         }
 
         // Default item stuff?
@@ -367,7 +365,6 @@ public class CollectionWizardServlet extends DSpaceServlet
         if (UIUtil.getBoolParameter(request, "mitgroup"))
         {
             Group mitGroup = Group.findByName(context, "MIT Users");
-            int action;
 
             if (permission == PERM_READ)
             {

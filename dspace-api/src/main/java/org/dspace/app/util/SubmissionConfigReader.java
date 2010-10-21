@@ -372,7 +372,6 @@ public class SubmissionConfigReader
     private void processStepDefinition(Node e) throws SAXException,
             ServletException
     {
-        int numStepDefns = 0;
         stepDefns = new HashMap<String, Map>();
 
         NodeList nl = e.getChildNodes();
@@ -383,7 +382,6 @@ public class SubmissionConfigReader
             // process each step definition
             if (nd.getNodeName().equals("step"))
             {
-                numStepDefns++;
                 String stepID = getAttribute(nd, "id");
                 if (stepID == null)
                 {
@@ -475,13 +473,11 @@ public class SubmissionConfigReader
                 submitDefns.put(submitName, steps);
 
                 // loop through all the 'step' nodes of the 'submission-process'
-                int stepNum = 0;
                 NodeList pl = nd.getChildNodes();
                 int lenStep = pl.getLength();
                 for (int j = 0; j < lenStep; j++)
                 {
                     Node nStep = pl.item(j);
-                    stepNum++;
 
                     // process each 'step' definition
                     if (nStep.getNodeName().equals("step"))

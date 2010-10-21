@@ -116,7 +116,6 @@ public class RegisterServlet extends DSpaceServlet
          * will go to the "enter personal info" or "enter new password" page as
          * appropriate.
          */
-        boolean updated = false;
 
         // Get the token
         String token = request.getParameter("token");

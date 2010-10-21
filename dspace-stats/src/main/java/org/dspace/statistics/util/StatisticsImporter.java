@@ -183,7 +183,7 @@ public class StatisticsImporter
             BufferedReader input =  new BufferedReader(new FileReader(new File(filename)));
 
             String line;
-            String uuid;
+//            String uuid;
             String action;
             String id;
             Date date;
@@ -210,7 +210,7 @@ public class StatisticsImporter
                 errors++;
                 if (verbose) System.out.println("Line:" + line);
                 String[] parts = line.split(",");
-                uuid = parts[0];
+//                uuid = parts[0];
                 action = parts[1];
                 id = parts[2];
                 date = dateFormat.parse(parts[3]);

@@ -667,7 +667,6 @@ public class Item extends DSpaceObject
     {
         List<DCValue> dublinCore = getMetadata();
         MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();        
-        ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
         boolean authorityControlled = mam.isAuthorityControlled(schema, element, qualifier);
         boolean authorityRequired = mam.isAuthorityRequired(schema, element, qualifier);
         String fieldName = schema+"."+element+((qualifier==null)? "": "."+qualifier);
@@ -2135,8 +2134,6 @@ public class Item extends DSpaceObject
 
             for (int j = 0; j < bs.length; j++)
             {
-                Bitstream mybitstream = bs[j];
-
                 // remove bitstream policies
                 AuthorizeManager.removeGroupPolicies(ourContext, bs[j], g);
             }

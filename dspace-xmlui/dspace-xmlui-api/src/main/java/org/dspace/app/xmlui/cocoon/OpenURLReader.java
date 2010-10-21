@@ -290,14 +290,11 @@ public class OpenURLReader extends AbstractReader implements Recyclable {
 
 		Enumeration<String> e = request.getParameterNames();
 
-		boolean error = true;
-		
 		while (e.hasMoreElements()) {
 			String name = e.nextElement();
 			if (name.startsWith("rft.")) {
 				for (String value : request.getParameterValues(name)) {
 					queryBuilder.append(value).append(" ");
-					error = false;
 				}
 			}
 		}

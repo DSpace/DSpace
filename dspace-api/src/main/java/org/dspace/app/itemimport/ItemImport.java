@@ -638,7 +638,6 @@ public class ItemImport
             String oldHandle = mapEntry.getValue();
 
             Item oldItem = null;
-            Item newItem = null;
 
             if (oldHandle.indexOf('/') != -1)
             {
@@ -674,9 +673,7 @@ public class ItemImport
             handleOut.close();
 
             deleteItem(c, oldItem);
-
-            newItem = addItem(c, mycollections, sourceDir, newItemName, null, template);
-
+            addItem(c, mycollections, sourceDir, newItemName, null, template);
         }
     }
 
@@ -1020,7 +1017,6 @@ public class ItemImport
             String filename)
     {
         String filePath = path + File.separatorChar + filename;
-        String line = "";
         String result = null;
 
         System.out.println("Processing handle file: " + filename);

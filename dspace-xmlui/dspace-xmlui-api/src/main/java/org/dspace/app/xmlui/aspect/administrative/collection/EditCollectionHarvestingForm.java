@@ -40,8 +40,6 @@
 package org.dspace.app.xmlui.aspect.administrative.collection;
 
 import java.sql.SQLException;
-import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -124,7 +122,6 @@ public class EditCollectionHarvestingForm extends AbstractDSpaceTransformer
 		int collectionID = parameters.getParameterAsInteger("collectionID", -1);
 		Collection thisCollection = Collection.find(context, collectionID);
 		HarvestedCollection hc = HarvestedCollection.find(context, collectionID);
-		Request request = ObjectModelHelper.getRequest(objectModel);
 				
 		String baseURL = contextPath + "/admin/collection?administrative-continue=" + knot.getId();
 		

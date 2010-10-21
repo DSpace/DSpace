@@ -345,7 +345,6 @@ public class PDFPackager
                log.debug("PDF Info dict title=\""+title+"\"");
             item.addDC("title", null, "en", title);
             String value;
-            Calendar date;
             if ((value = docinfo.getAuthor()) != null)
             {
                 item.addDC("contributor", "author", null, value);

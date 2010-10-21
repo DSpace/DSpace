@@ -153,7 +153,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             String key = "";
             
             // Page Parameter
-            Request request = ObjectModelHelper.getRequest(objectModel);
             key += "-" + getParameterPage();
             key += "-" + getParameterRpp();
             key += "-" + getParameterSortBy();

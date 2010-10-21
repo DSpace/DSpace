@@ -137,7 +137,6 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         search.addHidden("solr-search-url").setValue(searchUrl);
         search.addHidden("contextpath").setValue(contextPath);
 
-        Request request = ObjectModelHelper.getRequest(objectModel);
         String[] fqs = getParameterFilterQueries();
 
         Division query = search.addInteractiveDivision("general-query",

@@ -222,8 +222,6 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 				return;
 			}
 
-			String base = ConfigurationManager.getProperty("dspace.url");
-
 			// link to all the files in the item
 			Bundle[] bundles = item.getBundles("ORIGINAL");
 			for (int i = 0; i < bundles.length ; i++)

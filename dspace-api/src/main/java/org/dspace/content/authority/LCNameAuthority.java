@@ -122,10 +122,12 @@ public class LCNameAuthority implements ChoiceAuthority
      */
     public Choices getMatches(String text, int collection, int start, int limit, String locale)
     {
-        boolean error = false;
         Choices result = queryPerson(text, start, limit);
         if (result == null)
+        {
             result = new Choices(true);
+        }
+        
         return result;
     }
 
@@ -144,7 +146,9 @@ public class LCNameAuthority implements ChoiceAuthority
     {
         // punt if there is no query text
         if (text == null || text.trim().length() == 0)
+        {
             return new Choices(true);
+        }
 
         // 1. build CQL query
         DCPersonName pn = new DCPersonName(text);

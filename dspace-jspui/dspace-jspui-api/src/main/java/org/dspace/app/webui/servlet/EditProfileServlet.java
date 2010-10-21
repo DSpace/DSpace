@@ -102,8 +102,6 @@ public class EditProfileServlet extends DSpaceServlet
             request.setAttribute("missing.fields", Boolean.TRUE);
         }
 
-        String passwordProblem = null;
-
         if (ok && settingPassword)
         {
             // They want to set a new password.

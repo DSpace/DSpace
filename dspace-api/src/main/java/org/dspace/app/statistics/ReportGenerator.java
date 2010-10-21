@@ -283,10 +283,6 @@ public class ReportGenerator
         // set the parameters for this analysis
         setParameters(myInput);
         
-        // pre prepare our standard file readers and buffered readers
-        FileReader fr = null;
-        BufferedReader br = null;
-        
         // read the input file
         readInput(input);
         

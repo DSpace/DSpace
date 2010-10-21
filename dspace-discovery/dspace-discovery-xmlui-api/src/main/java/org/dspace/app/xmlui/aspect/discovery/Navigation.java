@@ -115,7 +115,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     public void addOptions(Options options) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+//        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
 //        List test = options.addList("browse");
 

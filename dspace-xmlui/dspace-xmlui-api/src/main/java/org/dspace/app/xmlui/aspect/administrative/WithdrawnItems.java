@@ -234,9 +234,6 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
     {
         BrowseInfo info = getBrowseInfo();
 
-        // Get the name of the index
-        String type = info.getBrowseIndex().getName();
-
         pageMeta.addMetadata("title").addContent(getTitleMessage(info));
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
@@ -356,9 +353,6 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
     private void addBrowseJumpNavigation(Division div, BrowseInfo info, BrowseParams params)
             throws WingException
     {
-        // Get the name of the index
-        String type = info.getBrowseIndex().getName();
-
         // Prepare a Map of query parameters required for all links
         Map<String, String> queryParams = new HashMap<String, String>();
         queryParams.putAll(params.getCommonParameters());

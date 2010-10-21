@@ -137,8 +137,6 @@ public class RelatedItems extends AbstractFiltersTransformer
                 List<DSpaceObject> dsos = new ArrayList<DSpaceObject>();
                 for(Map.Entry<String,SolrDocumentList> entry : mlt)
                 {
-                    String key = entry.getKey();
-
                     //org.dspace.app.xmlui.wing.element.List mltList = mltDiv.addList(key);
 
                     //mltList.setHead(key);
@@ -175,7 +173,7 @@ public class RelatedItems extends AbstractFiltersTransformer
                             null, "related-items");
 
                     for (DSpaceObject dso : dsos) {
-                        Reference ref = set.addReference(dso);
+                        set.addReference(dso);
                     }
                 }
             }

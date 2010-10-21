@@ -129,7 +129,6 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
             Table mdchanges = div.addTable("metadata-changes", num_changes, 2);
 
             // Display the changes
-            int changeCounter = 0;
             for (BulkEditChange change : changes)
             {
                 // Get the changes
@@ -157,7 +156,6 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
                       headerrow.addCellContent(T_new_item);
                     }
                     headerrow.addCell();
-                    changeCounter++;
                 }
 
                 // Show new owning collection

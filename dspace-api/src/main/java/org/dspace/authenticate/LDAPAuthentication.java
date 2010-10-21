@@ -181,7 +181,6 @@ public class LDAPAuthentication
         catch (SQLException e)
         {
         }
-        boolean loggedIn = false;
         SpeakerToLDAP ldap = new SpeakerToLDAP(log);
 
         // if they entered a netid that matches an eperson

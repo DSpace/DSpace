@@ -148,7 +148,6 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
             String key = "";
 
             // Page Parameter
-            Request request = ObjectModelHelper.getRequest(objectModel);
             key += "-" + getParameterPage();
             key += "-" + getParameterRpp();
             key += "-" + getParameterSortBy();
@@ -291,9 +290,6 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
             // Look for any communities or collections in the mix
             ReferenceSet referenceSet = null;
 
-
-            boolean resultsContainsBothContainersAndItems = false;
-
             for (SolrDocument doc : solrResults) {
 
                 DSpaceObject resultDSO =
@@ -306,8 +302,6 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
                                 ReferenceSet.TYPE_SUMMARY_LIST, null, "repository-search-results");
                         // Set a heading showing that we will be listing containers that matched:
                         referenceSet.setHead(T_head2);
-                        resultsContainsBothContainersAndItems = true;
-
                     }
                     referenceSet.addReference(resultDSO);
                 }

@@ -128,7 +128,6 @@ public class MetadataImportConfirm extends AbstractDSpaceTransformer {
 
 
                     // Display the changes
-                    int changeCounter = 0;
                     for (BulkEditChange change : changes)
                     {
                         // Get the changes
@@ -155,7 +154,6 @@ public class MetadataImportConfirm extends AbstractDSpaceTransformer {
                               headerrow.addCellContent(T_new_item);
                             }
                             headerrow.addCell();
-                            changeCounter++;
                         }
 
                         // Show new owning collection

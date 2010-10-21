@@ -377,15 +377,14 @@ public class ClassicDSpaceLogConverter {
                 String out = line.getOptionValue('o') +
                              (dir.getAbsolutePath() +
                               System.getProperty("file.separator") + in).substring(line.getOptionValue('i').length());
-                int count = converter.convert(dir.getAbsolutePath() + System.getProperty("file.separator") + in,
-                                              out);
+
+                converter.convert(dir.getAbsolutePath() + System.getProperty("file.separator") + in, out);
             }
         }
         else
         {
             // Just convert the one file
-            int count = converter.convert(line.getOptionValue('i'),
-                                          line.getOptionValue('o'));
+            converter.convert(line.getOptionValue('i'), line.getOptionValue('o'));
         }
 
         // Clean everything up

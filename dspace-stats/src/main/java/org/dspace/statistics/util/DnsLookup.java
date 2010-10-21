@@ -24,7 +24,6 @@ import java.io.IOException;
 public class DnsLookup {
 
     public static String reverseDns(String hostIp) throws IOException {
-         Record opt = null;
          Resolver res = new ExtendedResolver();
          
          // set the timeout, defaults to 200 milliseconds

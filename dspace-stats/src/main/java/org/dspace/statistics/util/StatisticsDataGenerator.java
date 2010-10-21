@@ -164,7 +164,6 @@ public class StatisticsDataGenerator {
 			String ip = "";
 			Date time;
 			String continent;
-			String country = "";
 			String countryCode;
 			float longitude;
 			float latitude;
@@ -196,7 +195,6 @@ public class StatisticsDataGenerator {
 			}
 
 			city = location.city;
-			country = location.countryName;
 			countryCode = location.countryCode;
 			longitude = location.longitude;
 			latitude = location.latitude;

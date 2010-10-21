@@ -583,7 +583,6 @@ public class MediaFilterManager
                 {
                 	String handle = myItem.getHandle();
                 	Bundle[] bundles = myBitstream.getBundles();
-                	String name = myBitstream.getName();
                 	long size = myBitstream.getSize();
                 	String checksum = myBitstream.getChecksum() + " ("+myBitstream.getChecksumAlgorithm()+")";
                 	int assetstore = myBitstream.getStoreNumber();

@@ -482,7 +482,6 @@ class DAVItem extends DAVDSpaceObject
 
         String packageType = this.request.getParameter("package");
         Bundle[] original = this.item.getBundles("ORIGINAL");
-        int bsid;
 
         if (packageType == null)
         {

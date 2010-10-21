@@ -88,12 +88,8 @@ public class CommunityRecentSubmissions extends AbstractFiltersTransformer
         if (!(dso instanceof Community))
             return;
 
-        // Set up the major variables
-        Community community = (Community) dso;
-
         // Build the community viewer division.
         Division home = body.addDivision("community-home", "primary repository community");
-
 
         performSearch(dso);
 

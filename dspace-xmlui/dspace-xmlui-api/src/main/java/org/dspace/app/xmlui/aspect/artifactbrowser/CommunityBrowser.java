@@ -162,10 +162,8 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 	            Stack<TreeNode> stack = new Stack<TreeNode>();
 	            stack.push(root);
 	            
-	            int objectCount = 0;
 	            while (!stack.empty())
 	            {
-	            	objectCount++;
 	                TreeNode node = stack.pop();
 	                
 	                validity.add(node.getDSO());

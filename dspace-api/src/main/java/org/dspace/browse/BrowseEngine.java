@@ -316,13 +316,6 @@ public class BrowseEngine
 
                 log.debug("browsing using focus: " + focusValue);
 
-                // Now we have a value to focus on, we need to find out where it is
-                String focusField = browseIndex.getSortField(scope.isSecondLevel());
-                if (scope.getSortBy() > 0)
-                {
-                    focusField = "sort_" + Integer.toString(scope.getSortBy());
-                }
-
                 // Convert the focus value into an offset
                 offset = getOffsetForValue(focusValue);
             }
@@ -656,11 +649,6 @@ public class BrowseEngine
     private int getOffsetForValue(String value)
         throws BrowseException
     {
-        // get the table name.  We don't really need to care about whether we are in a
-        // community or collection at this point.  This is only for full or second
-        // level browse, so there is no need to worry about distinct value browsing
-        String tableName = browseIndex.getTableName();
-
         // we need to make sure that we select from the correct column.  If the sort option
         // is the 0th option then we use sort_value, but if it is one of the others we have
         // to select from that column instead.  Otherwise, we end up missing the focus value
@@ -696,11 +684,6 @@ public class BrowseEngine
     {
         if (!browseIndex.isMetadataIndex())
             throw new IllegalArgumentException("getOffsetForDistinctValue called when not a metadata index");
-
-        // get the table name.  We don't really need to care about whether we are in a
-        // community or collection at this point.  This is only for full or second
-        // level browse, so there is no need to worry about distinct value browsing
-        String tableName = browseIndex.getTableName();
 
         // now get the DAO to do the query for us, returning the highest
         // string value in the given column in the given table for the
@@ -825,9 +808,6 @@ public class BrowseEngine
             log.debug(LogManager.getHeader(context, "get_position_return", "return=0"));
             return 0;
         }
-
-        // get the table name that we are going to be getting our data from
-        String tableName = browseIndex.getTableName(distinct, scope.inCommunity(), scope.inCollection());
 
         // ensure that the select is set to "*"
         String[] select = { "*" };

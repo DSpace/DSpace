@@ -155,13 +155,9 @@ public class OREIngestionCrosswalk
 		nf.setGroupingUsed(false);
 		nf.setMinimumIntegerDigits(4);  
 		
-    	int countInt=0;
-    	String count;
         for (Element resource : aggregatedResources) 
         {
-        	countInt++;
-        	count = nf.format((long)countInt);
-        	String href = resource.getAttributeValue("href"); 
+        	String href = resource.getAttributeValue("href");
         	log.debug("ORE processing: " + href);
         	
         	String bundleName;

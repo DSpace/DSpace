@@ -373,8 +373,6 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
-        java.util.List fqs = Arrays.asList(getParameterFacetQueries());
-
         // Set up the major variables
         //Collection collection = (Collection) dso;
 

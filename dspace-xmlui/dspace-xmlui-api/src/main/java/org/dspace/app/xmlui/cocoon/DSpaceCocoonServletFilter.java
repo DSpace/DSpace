@@ -120,7 +120,6 @@ public class DSpaceCocoonServletFilter implements Filter
          * Previous stages moved to shared ServletListener available in dspace-api
          */
         String dspaceConfig = null;
-        String log4jConfig  = null;
         
         /**
          * Stage 1

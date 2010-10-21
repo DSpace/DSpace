@@ -1083,7 +1083,7 @@ public class DatabaseManager
                 {
                     // Use execute, not executeQuery (which expects results) or
                     // executeUpdate
-                    boolean succeeded = statement.execute(SQL);
+                    statement.execute(SQL);
                 }
                 catch (SQLWarning sqlw)
                 {
@@ -1776,6 +1776,7 @@ public class DatabaseManager
         try
         {
             Connection connection = DatabaseManager.getConnection();
+            connection.close();
         }
         catch (SQLException sqle)
         {

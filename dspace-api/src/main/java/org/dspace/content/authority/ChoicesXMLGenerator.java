@@ -39,7 +39,6 @@ package org.dspace.content.authority;
 
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
 
@@ -59,7 +58,6 @@ public class ChoicesXMLGenerator
     public static void generate(Choices result, String format, ContentHandler contentHandler)
         throws SAXException
     {
-        Attributes noAtts = new AttributesImpl();
         AttributesImpl resultAtts = new AttributesImpl();
         if (result.more)
             resultAtts.addAttribute("", "more", "more", "boolean", "true");

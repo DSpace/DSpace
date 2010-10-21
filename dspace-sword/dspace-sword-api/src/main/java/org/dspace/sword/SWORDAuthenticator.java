@@ -496,7 +496,6 @@ public class SWORDAuthenticator
 	{
 		try
 		{
-			Context context = swordContext.getContext();
 			EPerson authenticated = swordContext.getAuthenticated();
 			if (authenticated != null)
 			{
@@ -523,7 +522,6 @@ public class SWORDAuthenticator
 	public boolean isOnBehalfOfAdmin(SWORDContext swordContext)
 		throws DSpaceSWORDException
 	{
-		Context context = swordContext.getContext();
 		EPerson onBehalfOf = swordContext.getOnBehalfOf();
 		try
 		{
@@ -733,7 +731,6 @@ public class SWORDAuthenticator
 		try
 		{
 			Community[] comms = community.getSubcommunities();
-			Context context = swordContext.getContext();
 			List<Community> allowed = new ArrayList<Community>();
 
 			for (int i = 0; i < comms.length; i++)

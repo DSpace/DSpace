@@ -252,14 +252,14 @@ public class JSPSampleStep extends JSPStep
 
         // This function retrieves the path of the JSP which just submitted its
         // form to this class (e.g. "/submit/sample-step.jsp", in this case)
-        String lastJSPDisplayed = JSPStepManager.getLastJSPDisplayed(request);
+        // String lastJSPDisplayed = JSPStepManager.getLastJSPDisplayed(request);
 
         // This function retrieves the number of the current "page"
         // within this Step. This is useful if your step actually
         // has more than one "page" within the Progress Bar. It can
         // help you determine which Page the user just came from,
         // as well as determine which JSP to load in doPreProcessing()
-        int currentPageNum = SampleStep.getCurrentPage(request);
+        // int currentPageNum = SampleStep.getCurrentPage(request);
 
         // This function returns the NAME of the button the user
         // just pressed in order to submit the form.

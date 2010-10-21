@@ -586,11 +586,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         Community[] communities = target.getCommunities();
 
         // now put those into strings
-        String location = "";
         int i = 0;
 
         for (i = 0; i < communities.length; i++)
-            locations.add(new String("m" + communities[i].getID()));
+        {
+            locations.add("m" + communities[i].getID());
+        }
 
         return locations;
     }
@@ -1016,8 +1017,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             List<DSpaceObject> result = new ArrayList<DSpaceObject>();
             while (iter.hasNext()) {
                 SolrDocument doc = (SolrDocument) iter.next();
-
-                String handle = (String) doc.getFieldValue("handle");
 
                 DSpaceObject o = DSpaceObject.find(context, (Integer) doc.getFirstValue("search.resourcetype"), (Integer) doc.getFirstValue("search.resourceid"));
 
