@@ -23,7 +23,7 @@
       <version>4</version>
    </parent>
 
-   <groupId>org.dspace.dependencies.solr</groupId>
+   <groupId>org.dspace</groupId>
    <artifactId>dspace-solr-parent</artifactId>
    <name>Apache Solr Parent POM</name>
    <version>1.4.1.0</version>
