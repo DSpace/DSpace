@@ -379,7 +379,7 @@ public class ContainerAdapter extends AbstractAdapter
     		
         	String dmdID = getGenericID("dmd_");
 	   		// Add our id to the list.
-	   		dmdSecIDS.append(" " + dmdID);
+            dmdSecIDS.append(" ").append(dmdID);
 
             // ////////////////////////////////
             // Start a new dmdSec for each crosswalk.
@@ -445,7 +445,7 @@ public class ContainerAdapter extends AbstractAdapter
             }
             else
             {
-                dmdSecIDS.append(" " + dmdID);
+                dmdSecIDS.append(" ").append(dmdID);
 
             }
         }

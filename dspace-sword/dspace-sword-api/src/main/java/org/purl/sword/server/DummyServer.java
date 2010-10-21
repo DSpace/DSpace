@@ -258,7 +258,7 @@ public class DummyServer implements SWORDServer {
 			ZipInputStream zip = new ZipInputStream(fileStream);
 			ZipEntry ze;
 			while ((ze = zip.getNextEntry()) != null) {
-				filenames.append(" " + ze.toString());
+                filenames.append(" ").append(ze.toString());
 			}
 		} catch (IOException ioe) {
 			throw new SWORDException("Failed to open deposited zip file", null, ErrorCodes.ERROR_CONTENT);

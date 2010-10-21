@@ -117,9 +117,8 @@ public class DIDLCrosswalk extends Crosswalk
             .append("<didl:Item id=\"")
             .append("uuid-" + UUIDFactory.generateUUID().toString()+"\">");
         metadata.append("<didl:Descriptor>")
-            .append("<didl:Statement mimeType=\"application/xml; charset=utf-8\">")
-            .append("<dii:Identifier xmlns:dii=\"urn:mpeg:mpeg21:2002:01-DII-NS\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:mpeg:mpeg21:2002:01-DII-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/dii/dii.xsd\">")
-            .append("urn:hdl:" + itemhandle)
+                .append("<didl:Statement mimeType=\"application/xml; charset=utf-8\">")
+                .append("<dii:Identifier xmlns:dii=\"urn:mpeg:mpeg21:2002:01-DII-NS\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:mpeg:mpeg21:2002:01-DII-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/dii/dii.xsd\">").append("urn:hdl:").append(itemhandle)
             .append("</dii:Identifier>")
             .append("</didl:Statement>")
             .append("</didl:Descriptor>");

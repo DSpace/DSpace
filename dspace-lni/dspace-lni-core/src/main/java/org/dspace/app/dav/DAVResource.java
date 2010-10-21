@@ -457,7 +457,7 @@ abstract class DAVResource
         {
             if (i + 1 < this.pathElt.length)
             {
-                result.append(this.pathElt[i] + "/");
+                result.append(this.pathElt[i]).append("/");
             }
             else
             {

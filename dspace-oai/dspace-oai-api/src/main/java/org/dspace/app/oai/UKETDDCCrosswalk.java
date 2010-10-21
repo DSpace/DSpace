@@ -272,14 +272,14 @@ public class UKETDDCCrosswalk extends Crosswalk
     public String writeMetadataWithSchema (Item item)
     {
         StringBuffer metadata = new StringBuffer ();
-        metadata.append (uketdIn + " ");
+        metadata.append(uketdIn).append(" ");
         metadata.append ("xmlns:" + uketdNs + "=\"" + uketdUri + "\" ");
         metadata.append ("xmlns:" + dcNs + "=\"" + dcUri + "\" ");
         metadata.append ("xmlns:" + dcTermsNs + "=\"" + dcTermsUri + "\" ");
         metadata.append ("xmlns:" + uketdTermsNs + "=\"" + uketdTermsUri + "\" ");
-        metadata.append (xsi + " ");
+        metadata.append(xsi).append(" ");
         metadata.append (schemaLoc + "=\"" + uketdSchemaLocNs + " ");
-        metadata.append (uketdSchemaLocUri + "\">\n");
+        metadata.append(uketdSchemaLocUri).append("\">\n");
         metadata.append (writeMetadata (item));
         metadata.append ("</uketd_dc:uketddc>\n");
         return metadata.toString ( );

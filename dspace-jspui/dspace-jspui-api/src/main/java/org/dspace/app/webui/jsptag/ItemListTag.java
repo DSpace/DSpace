@@ -551,7 +551,7 @@ public class ItemListTag extends TagSupport
                             if (truncated)
                             {
                                 String etal = LocaleSupport.getLocalizedMessage(pageContext, "itemlist.et-al");
-                                sb.append(", " + etal);
+                                sb.append(", ").append(etal);
                             }
                             metadata = "<em>" + sb.toString() + "</em>";
                         }
@@ -864,9 +864,8 @@ public class ItemListTag extends TagSupport
             String alt = thumb.getName();
             String scAttr = getScalingAttr(hrq, thumb);
             thumbFrag.append("<img src=\"")
-                     .append(img)
-                     .append("\" alt=\"")
-                     .append(alt + "\" ")
+                    .append(img)
+                    .append("\" alt=\"").append(alt).append("\" ")
                      .append(scAttr)
                      .append("/ border=\"0\"></a>");
 

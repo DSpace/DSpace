@@ -246,7 +246,7 @@ public class ItemAdapter extends AbstractAdapter
                 // Metadata element's ID
                 String dmdID = getGenericID("dmd_");
                 // Keep track of all descriptive sections
-            dmdSecIDS.append("" + dmdID);
+            dmdSecIDS.append(dmdID);
                 
                         ////////////////////////////////
                         // Start a metadata wrapper
@@ -328,7 +328,7 @@ public class ItemAdapter extends AbstractAdapter
                 
                 String dmdID = getGenericID("dmd_");
                  // Add our id to the list.
-                dmdSecIDS.append(" " + dmdID);
+                dmdSecIDS.append(" ").append(dmdID);
                 
                 ////////////////////////////////
                 // Start a metadata wrapper

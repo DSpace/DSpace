@@ -304,10 +304,10 @@ public class DSpaceValidity implements SourceValidity
             DCValue[] dcvs = item.getDC(Item.ANY,Item.ANY,Item.ANY);
             for (DCValue dcv : dcvs)
             {
-                validityKey.append(dcv.schema + ".");
-                validityKey.append(dcv.element + ".");
-                validityKey.append(dcv.qualifier + ".");
-                validityKey.append(dcv.language + "=");
+                validityKey.append(dcv.schema).append(".");
+                validityKey.append(dcv.element).append(".");
+                validityKey.append(dcv.qualifier).append(".");
+                validityKey.append(dcv.language).append("=");
                 validityKey.append(dcv.value);
             }
             
@@ -326,10 +326,10 @@ public class DSpaceValidity implements SourceValidity
         	DCValue[] dcvs = browseItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             for (DCValue dcv : dcvs)
             {
-                validityKey.append(dcv.schema + ".");
-                validityKey.append(dcv.element + ".");
-                validityKey.append(dcv.qualifier + ".");
-                validityKey.append(dcv.language + "=");
+                validityKey.append(dcv.schema).append(".");
+                validityKey.append(dcv.element).append(".");
+                validityKey.append(dcv.qualifier).append(".");
+                validityKey.append(dcv.language).append("=");
                 validityKey.append(dcv.value);
             }
         }
