@@ -99,23 +99,12 @@ public final class UUID implements Serializable
         if(this == obj) // comparing to myself
             return true;
         if(obj instanceof UUID)
-            return equals((UUID)obj);
+        {
+            UUID uuid = (UUID)obj;
+            return (hi == uuid.hi && lo == uuid.lo);
+        }
         return false;
     }
-
-    /**
-     * Compare UUIDs 
-     * 
-     * @param uuid
-     *      the UUID to compare this UUID against
-     * 
-     * @return true or false
-     **/
-    public boolean equals(UUID uuid)
-    {
-        return (hi == uuid.hi && lo == uuid.lo);
-    }
-
     
     /**
      * Generate a hash for the UUID 

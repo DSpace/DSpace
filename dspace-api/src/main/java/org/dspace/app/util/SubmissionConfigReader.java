@@ -40,7 +40,6 @@ package org.dspace.app.util;
 
 import java.io.File;
 import java.util.*;
-import java.lang.Exception;
 import javax.servlet.ServletException;
 import org.xml.sax.SAXException;
 import org.w3c.dom.*;

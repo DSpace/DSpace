@@ -430,8 +430,8 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                                 if(facetQuery != null && facetQuery.startsWith(field.getFacetField())){
                                     //We have a facet query, the values looks something like: dateissued.year:[1990 TO 2000] AND -2000
                                     //Prepare the string from {facet.field.name}:[startyear TO endyear] to startyear - endyear
-                                    String name = facetQuery.substring(facetQuery.indexOf("[") + 1);
-                                    name = name.substring(0, name.lastIndexOf("]")).replaceAll("TO", "-");
+                                    String name = facetQuery.substring(facetQuery.indexOf('[') + 1);
+                                    name = name.substring(0, name.lastIndexOf(']')).replaceAll("TO", "-");
                                     Integer count = sortedFacetQueries.get(facetQuery);
 
                                     //No need to show empty years

@@ -572,12 +572,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         for (i = 0; i < communities.length; i++)
         {
-            locations.add(new String("m" + communities[i].getID()));
+            locations.add("m" + communities[i].getID());
         }
 
         for (i = 0; i < collections.length; i++)
         {
-            locations.add(new String("l" + collections[i].getID()));
+            locations.add("l" + collections[i].getID());
         }
 
         return locations;

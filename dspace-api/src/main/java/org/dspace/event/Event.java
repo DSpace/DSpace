@@ -268,15 +268,21 @@ public class Event implements Serializable
      *            the event to compare this one to
      * @return true if events are "equal", false otherwise.
      */
-    public boolean equals(Event other)
+    public boolean equals(Object other)
     {
-        return (this.detail == null ? other.detail == null : this.detail
-                .equals(other.detail))
-                && this.eventType == other.eventType
-                && this.subjectType == other.subjectType
-                && this.subjectID == other.subjectID
-                && this.objectType == other.objectType
-                && this.objectID == other.objectID;
+        if (other instanceof Event)
+        {
+            Event otherEvent = (Event)other;
+            return (this.detail == null ? otherEvent.detail == null : this.detail
+                    .equals(otherEvent.detail))
+                    && this.eventType == otherEvent.eventType
+                    && this.subjectType == otherEvent.subjectType
+                    && this.subjectID == otherEvent.subjectID
+                    && this.objectType == otherEvent.objectType
+                    && this.objectID == otherEvent.objectID;
+        }
+
+        return false;
     }
 
     public int hashCode()

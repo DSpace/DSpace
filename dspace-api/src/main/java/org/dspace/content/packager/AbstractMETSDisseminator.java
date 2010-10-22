@@ -1452,19 +1452,19 @@ public abstract class AbstractMETSDisseminator
      * be deterministic, since this gets called twice for each bitstream
      * when building archive.
      */
-    abstract public String makeBitstreamURL(Bitstream bitstream, PackageParameters params);
+    public abstract String makeBitstreamURL(Bitstream bitstream, PackageParameters params);
 
     /**
      * Create metsHdr element - separate so subclasses can override.
      */
-    abstract public MetsHdr makeMetsHdr(Context context, DSpaceObject dso,
+    public abstract MetsHdr makeMetsHdr(Context context, DSpaceObject dso,
                                PackageParameters params);
     /**
      * Returns name of METS profile to which this package conforms, e.g.
      *  "DSpace METS DIP Profile 1.0"
      * @return string name of profile.
      */
-    abstract public String getProfile();
+    public abstract String getProfile();
 
     /**
      * Returns fileGrp's USE attribute value corresponding to a DSpace bundle name.
@@ -1472,7 +1472,7 @@ public abstract class AbstractMETSDisseminator
      * @param bname name of DSpace bundle.
      * @return string name of fileGrp
      */
-    abstract public String bundleToFileGrp(String bname);
+    public abstract String bundleToFileGrp(String bname);
 
     /**
      * Get the types of Item-wide DMD to include in package.
@@ -1486,7 +1486,7 @@ public abstract class AbstractMETSDisseminator
      * @param params the PackageParameters passed to the disseminator.
      * @return array of metadata type strings, never null.
      */
-    abstract public String [] getDmdTypes(Context context, DSpaceObject dso, PackageParameters params)
+    public abstract String [] getDmdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException;
 
     /**
@@ -1497,7 +1497,7 @@ public abstract class AbstractMETSDisseminator
      * @param params the PackageParameters passed to the disseminator.
      * @return array of metadata type strings, never null.
      */
-    abstract public String[] getTechMdTypes(Context context, DSpaceObject dso, PackageParameters params)
+    public abstract String[] getTechMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException;
 
     /**
@@ -1508,7 +1508,7 @@ public abstract class AbstractMETSDisseminator
      * @param params the PackageParameters passed to the disseminator.
      * @return array of metadata type strings, never null.
      */
-    abstract public String[] getSourceMdTypes(Context context, DSpaceObject dso, PackageParameters params)
+    public abstract String[] getSourceMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException;
 
     /**
@@ -1520,7 +1520,7 @@ public abstract class AbstractMETSDisseminator
      * @param params the PackageParameters passed to the disseminator.
      * @return array of metadata type strings, never null.
      */
-    abstract public String[] getDigiprovMdTypes(Context context, DSpaceObject dso, PackageParameters params)
+    public abstract String[] getDigiprovMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException;
 
     /**
@@ -1532,7 +1532,7 @@ public abstract class AbstractMETSDisseminator
      * @param params the PackageParameters passed to the disseminator.
      * @return array of metadata type strings, never null.
      */
-    abstract public String[] getRightsMdTypes(Context context, DSpaceObject dso, PackageParameters params)
+    public abstract String[] getRightsMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException;
 
     /**
@@ -1542,7 +1542,7 @@ public abstract class AbstractMETSDisseminator
      * requirements is already present, so this does not need to do anything.
      * @param mets the METS document to which to add structMaps
      */
-    abstract public void addStructMap(Context context, DSpaceObject dso,
+    public abstract void addStructMap(Context context, DSpaceObject dso,
                                PackageParameters params, Mets mets)
         throws SQLException, IOException, AuthorizeException, MetsException;
 
@@ -1550,5 +1550,5 @@ public abstract class AbstractMETSDisseminator
      * @return true when this bundle should be included as "content"
      *  in the package.. e.g. DSpace SIP does not include metadata bundles.
      */
-    abstract public boolean includeBundle(Bundle bundle);
+    public abstract boolean includeBundle(Bundle bundle);
 }

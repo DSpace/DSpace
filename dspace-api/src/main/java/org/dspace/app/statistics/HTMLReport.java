@@ -82,7 +82,7 @@ public class HTMLReport implements Report
     /**
      * constructor for HTML reporting
      */
-    public void HTMLReport()
+    public HTMLReport()
     {
         // empty constructor
     }

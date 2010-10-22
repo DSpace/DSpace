@@ -92,9 +92,15 @@ public class StepAndPage implements Comparable<StepAndPage>
      * @param other
      * @return true if both objects have same step value and same page value.
      */
-    public boolean equals(StepAndPage other)
+    public boolean equals(Object other)
     {
-        return (this.step == other.step) && (this.page == other.page);
+        if (other instanceof StepAndPage)
+        {
+            StepAndPage sapOther = (StepAndPage)other;
+            return (this.step == sapOther.step) && (this.page == sapOther.page);
+        }
+
+        return false;
     }
 
     @Override

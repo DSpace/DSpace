@@ -606,7 +606,7 @@ public class ItemAdapter extends AbstractAdapter
            }
            else
            {
-               amdSecIDS.append(" " + amdSecID);
+               amdSecIDS.append(" ").append(amdSecID);
            }
         }
 
