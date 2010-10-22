@@ -142,7 +142,7 @@ public abstract class AbstractAdapter
      * 
      * @param sections Comma separated list of METS sections.
      */
-    public void setSections(String sections)
+    public final void setSections(String sections)
     {
     	if (sections == null)
     		return;
@@ -159,7 +159,7 @@ public abstract class AbstractAdapter
      * 
      * @param dmdTypes Comma separated list of METS metadata types.
      */
-    public void setDmdTypes(String dmdTypes)
+    public final void setDmdTypes(String dmdTypes)
     {
     	if (dmdTypes == null)
     		return;
@@ -178,7 +178,7 @@ public abstract class AbstractAdapter
      *                will be rendered
      * @param mdTypes Comma separated list of METS metadata types.
      */
-    public void setAmdTypes(String amdSec, String mdTypes)
+    public final void setAmdTypes(String amdSec, String mdTypes)
     {
     	if (mdTypes == null)
     		return;
@@ -198,7 +198,7 @@ public abstract class AbstractAdapter
      *
      * @param techMDTypes Comma separated list of METS metadata types.
      */
-    public void setTechMDTypes(String techMDTypes)
+    public final void setTechMDTypes(String techMDTypes)
     {
     	setAmdTypes("techMD", techMDTypes);
     }
@@ -209,7 +209,7 @@ public abstract class AbstractAdapter
      *
      * @param rightsMDTypes Comma separated list of METS metadata types.
      */
-    public void setRightsMDTypes(String rightsMDTypes)
+    public final void setRightsMDTypes(String rightsMDTypes)
     {
     	setAmdTypes("rightsMD", rightsMDTypes);
     }
@@ -220,7 +220,7 @@ public abstract class AbstractAdapter
      *
      * @param sourceMDTypes Comma separated list of METS metadata types.
      */
-    public void setSourceMDTypes(String sourceMDTypes)
+    public final void setSourceMDTypes(String sourceMDTypes)
     {
     	setAmdTypes("sourceMD", sourceMDTypes);
     }
@@ -231,7 +231,7 @@ public abstract class AbstractAdapter
      *
      * @param digiprovMDTypes Comma separated list of METS metadata types.
      */
-    public void setDigiProvMDTypes(String digiprovMDTypes)
+    public final void setDigiProvMDTypes(String digiprovMDTypes)
     {
     	setAmdTypes("digiprovMD", digiprovMDTypes);
     }
@@ -242,7 +242,7 @@ public abstract class AbstractAdapter
      * 
      * @param fileGrpTypes Comma separated list of METS file groups.
      */
-    public void setFileGrpTypes(String fileGrpTypes)
+    public final void setFileGrpTypes(String fileGrpTypes)
     {
     	if (fileGrpTypes == null)
     		return;
@@ -259,7 +259,7 @@ public abstract class AbstractAdapter
      * 
      * @param structTypes Comma separated list of METS structure types.
      */
-    public void setStructTypes(String structTypes)
+    public final void setStructTypes(String structTypes)
     {
     	if (structTypes == null)
     		return;
@@ -316,7 +316,7 @@ public abstract class AbstractAdapter
 	/**
 	 * Render the complete METS document.
 	 */
-    public void renderMETS(ContentHandler contentHandler, LexicalHandler lexicalHandler) throws WingException, SAXException, CrosswalkException, IOException, SQLException 
+    public final void renderMETS(ContentHandler contentHandler, LexicalHandler lexicalHandler) throws WingException, SAXException, CrosswalkException, IOException, SQLException 
     {
     		this.contentHandler = contentHandler;
     		this.lexicalHandler = lexicalHandler;
@@ -408,7 +408,7 @@ public abstract class AbstractAdapter
      *            The group id for this file, if it is derived from another file
      *            then they should share the same groupID.
      */
-	protected void renderFile(Item item, Bitstream bitstream, String fileID, String groupID) throws SAXException
+	protected final void renderFile(Item item, Bitstream bitstream, String fileID, String groupID) throws SAXException
 	{
        renderFile(item, bitstream, fileID, groupID, null);
     }
@@ -430,7 +430,7 @@ public abstract class AbstractAdapter
      *            The IDs of the administrative metadata sections which pertain
      *            to this file
      */
-	protected void renderFile(Item item, Bitstream bitstream, String fileID, String groupID, String admID) throws SAXException
+	protected final void renderFile(Item item, Bitstream bitstream, String fileID, String groupID, String admID) throws SAXException
 	{
 		AttributeMap attributes;
 		
@@ -540,7 +540,7 @@ public abstract class AbstractAdapter
      * 
      * @return A unique METS id.
      */
-    protected String getGenericID(String prefix)
+    protected final String getGenericID(String prefix)
     {
         return prefix + (idSequence++);
     }
@@ -551,7 +551,7 @@ public abstract class AbstractAdapter
      * @param crosswalkName
      * @return The crosswalk or throw an exception if not found.
      */
-    public DisseminationCrosswalk getDisseminationCrosswalk(String crosswalkName) throws WingException 
+    public final DisseminationCrosswalk getDisseminationCrosswalk(String crosswalkName) throws WingException 
     {
     	// FIXME add some caching here
     	DisseminationCrosswalk crosswalk = (DisseminationCrosswalk) PluginManager.getNamedPlugin(DisseminationCrosswalk.class, crosswalkName);
@@ -577,7 +577,7 @@ public abstract class AbstractAdapter
      * @param metadataType type name
      * @return True if METS defined
      */
-    public boolean isDefinedMETStype(String metadataType)
+    public final boolean isDefinedMETStype(String metadataType)
     {
        for (String definedType : METS_DEFINED_TYPES)
        {
@@ -610,7 +610,7 @@ public abstract class AbstractAdapter
      * @param attributes
      *            (May be null) Attributes for this element
      */
-    protected void startElement(Namespace namespace, String name,
+    protected final void startElement(Namespace namespace, String name,
             AttributeMap... attributes) throws SAXException
     {
         contentHandler.startElement(namespace.URI, name, qName(namespace, name),
@@ -624,7 +624,7 @@ public abstract class AbstractAdapter
      * @param characters
      *            (May be null) Characters to send.
      */
-    protected void sendCharacters(String characters) throws SAXException
+    protected final void sendCharacters(String characters) throws SAXException
     {
         if (characters != null)
         {
@@ -641,7 +641,7 @@ public abstract class AbstractAdapter
      * @param name
      *            (Required) The local name of this element.
      */
-    protected void endElement(Namespace namespace, String name)
+    protected final void endElement(Namespace namespace, String name)
             throws SAXException
     {
         contentHandler.endElement(namespace.URI, name, qName(namespace, name));
